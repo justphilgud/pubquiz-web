@@ -1,28 +1,32 @@
-import { mkdir, readdir, writeFile } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 
-async function getErlaubteZielordner() {
-  const gruppen = ["bilder", "audio", "video"];
-  const erlaubteOrdner: string[] = [];
+const erlaubteZielordner = [
+  "bilder/unsortiert",
+  "bilder/uploads",
+  "bilder/facemorph",
+  "bilder/flaggen",
+  "bilder/kunst",
+  "bilder/logo",
+  "bilder/quiz_logo",
+  "bilder/qr_codes",
+  "bilder/wahrzeichen",
+  "audio/unsortiert",
+  "audio/uploads",
+  "audio/8bit",
+  "audio/intro",
+  "audio/reverse",
+  "video/unsortiert",
+  "video/uploads",
+  "video/intro",
+  "video/preis",
+];
 
-  for (const gruppe of gruppen) {
-    const basisPfad = path.join(process.cwd(), "public", "medien", gruppe);
-
-    try {
-      const eintraege = await readdir(basisPfad, { withFileTypes: true });
-
-      for (const eintrag of eintraege) {
-        if (eintrag.isDirectory()) {
-          erlaubteOrdner.push(`${gruppe}/${eintrag.name}`);
-        }
-      }
-    } catch {
-      // Ordner existiert noch nicht
-    }
-  }
-
-  return erlaubteOrdner;
+function bereinigeDateiname(dateiname: string) {
+  return dateiname
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9._-]/g, "");
 }
 
 export async function POST(request: Request) {
@@ -38,8 +42,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const erlaubteZielordner = await getErlaubteZielordner();
-
     const zielordner =
       typeof zielordnerRaw === "string" &&
       erlaubteZielordner.includes(zielordnerRaw)
@@ -53,29 +55,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    const originalName = file.name
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9._-]/g, "");
-
+    const originalName = bereinigeDateiname(file.name);
     const fileName = `${Date.now()}-${originalName}`;
+    const blobPfad = `medien/${zielordner}/${fileName}`;
 
-    const uploadDir = path.join(
-      process.cwd(),
-      "public",
-      "medien",
-      zielordner
-    );
-
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, fileName), buffer);
+    const blob = await put(blobPfad, file, {
+      access: "public",
+      addRandomSuffix: false,
+    });
 
     return NextResponse.json({
       success: true,
-      datei: `${zielordner}/${fileName}`,
+      datei: blob.url,
       message: "Datei wurde hochgeladen.",
     });
   } catch (error) {
