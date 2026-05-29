@@ -83,6 +83,10 @@ export default function FrageSuche({
   onEditFrage,
 }: {
   kategorien: Kategorie[];
+  quizze: {
+    quiz_id: number;
+    titel: string | null;
+  }[];
   onEditFrage: (frage: FrageForEdit) => void;
 }) {
   const [suchtext, setSuchtext] = useState("");
