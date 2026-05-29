@@ -228,6 +228,12 @@ export default function FrageSuche({
   }
 
   return (
+    <div className="bg-red-500 p-4 text-white">
+      TEST FRAGESUCHE
+    </div>
+  );
+   /*
+   return () 
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
       <div className="mb-5">
         <h2 className="text-xl font-semibold text-slate-900">Fragen suchen</h2>
