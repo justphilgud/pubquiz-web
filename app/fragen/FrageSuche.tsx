@@ -87,6 +87,8 @@ export default function FrageSuche({
   quizze: QuizOption[];
   onEditFrage: (frage: FrageForEdit) => void;
 }) {
+  console.log("Quizze in FrageSuche", quizze);
+
   const [suchtext, setSuchtext] = useState("");
   const [quelle, setQuelle] = useState("");
   const [kategorieId, setKategorieId] = useState<number | null>(null);
@@ -227,7 +229,7 @@ export default function FrageSuche({
     setNextOffset(0);
   }
 
-   return ( 
+  return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
       <div className="mb-5">
         <h2 className="text-xl font-semibold text-slate-900">Fragen suchen</h2>
