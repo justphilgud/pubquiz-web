@@ -1,0 +1,6 @@
+frage;antwort_1;antwort_2;antwort_3;antwort_4;richtige_antworten;kategorie;quelle;frage_medien_1;antwort_1_medien_1;antwort_2_medien_1
+Welches Tier ist auf dem Bild zu sehen?;Fuchs;Wolf;Hund;Katze;1;Tiere;Testimport;tiere/fuchs.jpg;;
+Welche dieser Länder liegen in Europa?;Deutschland;Brasilien;Frankreich;Japan;1|3;Geografie;Testimport;;;
+Wie heißt der Interpret dieses Songs?;Ed Sheeran;Lewis Capaldi;Coldplay;Adele;2;Musik;Testimport;musik/song1.mp3;;
+Schätzfrage: Wie viele Tischtennisbälle passen in einen Smart?;;;;;;Schätzfrage;Testimport;;;
+Welcher Film ist auf dem Bild zu sehen?;Titanic;Inception;Avatar;Matrix;3;Filme;Testimport;filme/avatar.webp;;

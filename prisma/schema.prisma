@@ -1,0 +1,311 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../app/generated/prisma"
+  previewFeatures = ["multiSchema", "partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["pubquiz"]
+}
+
+model antworten {
+  antwort_id     Int              @id @default(autoincrement())
+  fragen_id      Int
+  antwort        String
+  ist_richtig    Boolean          @default(false)
+  antworttyp_id  Int
+  antworttyp     antworttyp       @relation(fields: [antworttyp_id], references: [antworttyp_id], onUpdate: NoAction, map: "fk_antworten_antworttyp")
+  fragen         fragen           @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_antworten_fragen")
+  medien         medien[]
+  team_antworten team_antworten[]
+
+  @@index([fragen_id], map: "idx_antworten_fragen_id")
+  @@schema("pubquiz")
+}
+
+model antworttyp {
+  antworttyp_id Int         @id @default(autoincrement())
+  antworttyp    String      @unique
+  antworten     antworten[]
+
+  @@schema("pubquiz")
+}
+
+model fragen {
+  fragen_id           Int                   @id @default(autoincrement())
+  frage               String
+  quelle              String?
+  fragentyp           String?
+  schwierigkeitslevel Decimal?              @db.Decimal(5, 2)
+  erstellungsdatum    DateTime              @default(dbgenerated("CURRENT_DATE")) @db.Date
+  ist_archiviert      Boolean               @default(false)
+  archivierungsgrund  String?
+  vorlage_id          Int?
+  antworten           antworten[]
+  antwortfelder       frage_antwortfelder[]
+  vorlage             frage_vorlagen?       @relation(fields: [vorlage_id], references: [vorlage_id])
+  fragen_kategorien   fragen_kategorien[]
+  medien              medien[]
+  quiz_fragen         quiz_fragen[]
+
+  @@schema("pubquiz")
+}
+
+model fragen_kategorien {
+  fragen_kategorie_zuordnung_id Int             @id @default(autoincrement())
+  fragen_id                     Int
+  fragenkategorie_id            Int
+  fragen                        fragen          @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_fragen_kategorien_fragen")
+  fragenkategorie               fragenkategorie @relation(fields: [fragenkategorie_id], references: [fragenkategorie_id], onUpdate: NoAction, map: "fk_fragen_kategorien_kategorie")
+
+  @@unique([fragen_id, fragenkategorie_id], map: "uq_fragen_kategorien")
+  @@index([fragen_id], map: "idx_fragen_kategorien_fragen_id")
+  @@index([fragenkategorie_id], map: "idx_fragen_kategorien_kategorie_id")
+  @@schema("pubquiz")
+}
+
+model fragenkategorie {
+  fragenkategorie_id Int                 @id @default(autoincrement())
+  kategorie          String              @unique
+  fragen_kategorien  fragen_kategorien[]
+
+  @@schema("pubquiz")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model medien {
+  medien_id    Int        @id @default(autoincrement())
+  fragen_id    Int?
+  antwort_id   Int?
+  medientyp_id Int
+  datei        String
+  sortierung   Int        @default(1)
+  bemerkung    String?
+  antworten    antworten? @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
+  fragen       fragen?    @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
+  medientyp    medientyp  @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
+
+  @@index([antwort_id], map: "idx_medien_antwort_id")
+  @@index([fragen_id], map: "idx_medien_fragen_id")
+  @@index([antwort_id, sortierung], map: "idx_medien_sortierung_antwort", where: raw("(antwort_id IS NOT NULL)"))
+  @@index([fragen_id, sortierung], map: "idx_medien_sortierung_frage", where: raw("(fragen_id IS NOT NULL)"))
+  @@schema("pubquiz")
+}
+
+model medientyp {
+  medientyp_id Int      @id @default(autoincrement())
+  medientyp    String   @unique
+  medien       medien[]
+
+  @@schema("pubquiz")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model quiz {
+  quiz_id                 Int                    @id @default(autoincrement())
+  quiz_datum              DateTime?              @db.Date
+  titel                   String?
+  team_anzahl             Int?
+  teilnehmer_anzahl       Int?
+  bemerkung               String?
+  ist_archiviert          Boolean                @default(false)
+  archivierungsgrund      String?
+  intro_begruessungstext  String?
+  intro_begruessungstitel String?
+  intro_logo_url          String?
+  intro_musik_url         String?
+  intro_preise            String?
+  intro_regeln            String?
+  intro_wartetext         String?
+  intro_startsequenz_text String?
+  intro_startzeit         String?
+  intro_video_url         String?
+  outro_bekanntmachungen  String?
+  quiz_abschnitte         quiz_abschnitte[]
+  quiz_block_freigaben    quiz_block_freigaben[]
+  quiz_fragen             quiz_fragen[]
+  quiz_team_sessions      quiz_team_sessions[]
+  quiz_teams              quiz_teams[]
+  team_antworten          team_antworten[]
+
+  @@schema("pubquiz")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model quiz_fragen {
+  quiz_fragen_id       Int              @id @default(autoincrement())
+  quiz_id              Int
+  fragen_id            Int
+  sortierung           Int?
+  richtigeantworten    Int?             @default(0)
+  falscheantworten     Int?             @default(0)
+  antwort_reihenfolge  Int[]            @default([])
+  praesentationslayout String?          @default("standard")
+  quiz_abschnitt_id    Int?
+  punkte_basis         Decimal          @default(1)
+  punkte_modus         String           @default("standard")
+  fragen               fragen           @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
+  quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
+  quiz_abschnitte      quiz_abschnitte? @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
+  team_antworten       team_antworten[]
+
+  @@unique([quiz_id, fragen_id], map: "uq_quiz_fragen")
+  @@unique([quiz_id, sortierung], map: "uq_quiz_fragen_sortierung")
+  @@index([quiz_id], map: "idx_quiz_fragen_quiz_id")
+  @@schema("pubquiz")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model quiz_teams {
+  quiz_team_id Int      @id @default(autoincrement())
+  quiz_id      Int
+  team_id      Int
+  punkte       Decimal? @db.Decimal(6, 2)
+  platzierung  Int?
+  quiz         quiz     @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_teams_quiz")
+  teams        teams    @relation(fields: [team_id], references: [team_id], onUpdate: NoAction, map: "fk_quiz_teams_teams")
+
+  @@unique([quiz_id, team_id], map: "uq_quiz_teams")
+  @@index([quiz_id], map: "idx_quiz_teams_quiz_id")
+  @@schema("pubquiz")
+}
+
+model teams {
+  team_id       Int          @id @default(autoincrement())
+  teamname      String       @unique
+  team_passwort String?
+  quiz_teams    quiz_teams[]
+
+  @@schema("pubquiz")
+}
+
+model quiz_abschnitte {
+  quiz_abschnitt_id    Int                    @id @default(autoincrement())
+  quiz_id              Int
+  titel                String
+  abschnitt_typ        String
+  sortierung           Int
+  dauer_sekunden       Int?
+  qr_code_url          String?
+  medien_datei         String?
+  bemerkung            String?
+  quiz                 quiz                   @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  quiz_block_freigaben quiz_block_freigaben[]
+  quiz_fragen          quiz_fragen[]
+  team_antworten       team_antworten[]
+
+  @@schema("pubquiz")
+}
+
+model quiz_team_sessions {
+  quiz_team_session_id Int              @id @default(autoincrement())
+  quiz_id              Int
+  teamname             String
+  erstellt_am          DateTime         @default(now())
+  quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  team_antworten       team_antworten[]
+
+  @@unique([quiz_id, teamname], map: "uq_quiz_team_session_teamname")
+  @@schema("pubquiz")
+}
+
+model quiz_block_freigaben {
+  quiz_block_freigabe_id  Int             @id @default(autoincrement())
+  quiz_id                 Int
+  quiz_abschnitt_id       Int
+  ist_freigegeben         Boolean         @default(false)
+  ist_geschlossen         Boolean         @default(false)
+  freigegeben_ab          DateTime?
+  geschlossen_ab          DateTime?
+  aktuelle_quiz_fragen_id Int?
+  quiz_abschnitte         quiz_abschnitte @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id], onDelete: Cascade)
+  quiz                    quiz            @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+
+  @@unique([quiz_id, quiz_abschnitt_id], map: "uq_quiz_block_freigabe")
+  @@schema("pubquiz")
+}
+
+model team_antworten {
+  team_antwort_id      Int                  @id @default(autoincrement())
+  quiz_id              Int
+  quiz_abschnitt_id    Int
+  quiz_fragen_id       Int
+  quiz_team_session_id Int
+  antwort_text         String?
+  antwort_id           Int?
+  aktualisiert_am      DateTime             @default(now())
+  bewertete_antwort    String?
+  bewertung_final      Boolean              @default(false)
+  ist_manuell_falsch   Boolean              @default(false)
+  ist_manuell_richtig  Boolean              @default(false)
+  ist_skurril          Boolean              @default(false)
+  antworten            antworten?           @relation(fields: [antwort_id], references: [antwort_id])
+  quiz_abschnitte      quiz_abschnitte      @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id], onDelete: Cascade)
+  quiz_fragen          quiz_fragen          @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
+  quiz                 quiz                 @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  quiz_team_sessions   quiz_team_sessions   @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
+  antwortfelder        team_antwortfelder[]
+
+  @@unique([quiz_fragen_id, quiz_team_session_id], map: "uq_team_antwort_pro_frage")
+  @@schema("pubquiz")
+}
+
+model frage_antwortfelder {
+  antwortfeld_id Int                           @id @default(autoincrement())
+  fragen_id      Int
+  label          String
+  sortierung     Int
+  ist_pflicht    Boolean                       @default(true)
+  loesungen      frage_antwortfeld_loesungen[]
+  frage          fragen                        @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  team_antworten team_antwortfelder[]
+
+  @@schema("pubquiz")
+}
+
+model team_antwortfelder {
+  team_antwortfeld_id Int                 @id @default(autoincrement())
+  team_antwort_id     Int
+  antwortfeld_id      Int
+  antwort_text        String?
+  antwortfeld         frage_antwortfelder @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+  team_antwort        team_antworten      @relation(fields: [team_antwort_id], references: [team_antwort_id], onDelete: Cascade)
+
+  @@unique([team_antwort_id, antwortfeld_id], map: "uq_team_antwortfeld")
+  @@schema("pubquiz")
+}
+
+model frage_antwortfeld_loesungen {
+  loesung_id     Int                 @id @default(autoincrement())
+  antwortfeld_id Int
+  loesung_text   String
+  sortierung     Int
+  ist_akzeptiert Boolean             @default(true)
+  antwortfeld    frage_antwortfelder @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+
+  @@schema("pubquiz")
+}
+
+model frage_vorlagen {
+  vorlage_id    Int                           @id @default(autoincrement())
+  code          String                        @unique
+  name          String
+  slide_typ     String
+  ist_aktiv     Boolean                       @default(true)
+  antwortfelder frage_vorlage_antwortfelder[]
+  fragen        fragen[]
+
+  @@schema("pubquiz")
+}
+
+model frage_vorlage_antwortfelder {
+  vorlage_antwortfeld_id Int            @id @default(autoincrement())
+  vorlage_id             Int
+  label                  String
+  sortierung             Int
+  ist_pflicht            Boolean        @default(true)
+  vorlage                frage_vorlagen @relation(fields: [vorlage_id], references: [vorlage_id], onDelete: Cascade)
+
+  @@schema("pubquiz")
+}
