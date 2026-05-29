@@ -108,18 +108,18 @@ export default function FragenWorkspace({
             editFrage={editFrage}
             onCancelEdit={handleCancelEdit}
           />
-
-          <div className={activeTab === "suche" ? "block" : "hidden"}>
-            <FrageSuche
-              kategorien={kategorien}
-              quizze={quizze}
-              onEditFrage={(frage) => {
-                setEditFrage(frage);
-                setActiveTab("neu");
-              }}
-            />
-          </div>
         </div>
+        <div className={activeTab === "suche" ? "block" : "hidden"}>
+          <FrageSuche
+            kategorien={kategorien}
+            quizze={quizze}
+            onEditFrage={(frage) => {
+              setEditFrage(frage);
+              setActiveTab("neu");
+            }}
+          />
+        </div>
+
       </div>
     </main>
   );
