@@ -278,6 +278,7 @@ export async function getQuizDetails(
     bemerkung: quiz.bemerkung,
     ist_archiviert: quiz.ist_archiviert,
     archivierungsgrund: quiz.archivierungsgrund,
+    fragen_anzahl: quiz.quiz_fragen.length,
 
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,
@@ -1040,21 +1041,21 @@ export async function getQuizAntwortStatus(
   }));
 
   const aktuellerBlock =
-  abschnitte.find(
-    (abschnitt) =>
-      ["fragenrunde", "fragenblock"].includes(
-        abschnitt.abschnitt_typ
-      ) &&
-      abschnitt.ist_freigegeben &&
-      !abschnitt.ist_geschlossen
-  ) ??
-  abschnitte.find(
-    (abschnitt) =>
-      ["fragenrunde", "fragenblock"].includes(
-        abschnitt.abschnitt_typ
-      ) &&
-      abschnitt.ist_geschlossen
-  );
+    abschnitte.find(
+      (abschnitt) =>
+        ["fragenrunde", "fragenblock"].includes(
+          abschnitt.abschnitt_typ
+        ) &&
+        abschnitt.ist_freigegeben &&
+        !abschnitt.ist_geschlossen
+    ) ??
+    abschnitte.find(
+      (abschnitt) =>
+        ["fragenrunde", "fragenblock"].includes(
+          abschnitt.abschnitt_typ
+        ) &&
+        abschnitt.ist_geschlossen
+    );
 
   const blockIstGesperrt = aktuellerBlock?.ist_geschlossen ?? false;
 
@@ -2021,10 +2022,19 @@ export async function createQuizAbschnitt(data: {
   quizId: number;
   titel: string;
   abschnittTyp: string;
-  bemerkung: string;
-  qrCodeUrl: string;
-  medienDatei: string;
-}) {
+  bemerkung?: string;
+  qrCodeUrl?: string;
+  medienDatei?: string;
+}): Promise<
+  | {
+    success: true;
+    abschnitt: Awaited<ReturnType<typeof prisma.quiz_abschnitte.create>>;
+  }
+  | {
+    success: false;
+    message: string;
+  }
+> {
   const letzteSortierung = await prisma.quiz_abschnitte.findFirst({
     where: { quiz_id: data.quizId },
     orderBy: { sortierung: "desc" },
@@ -2036,9 +2046,9 @@ export async function createQuizAbschnitt(data: {
       titel: data.titel.trim(),
       abschnitt_typ: data.abschnittTyp,
       sortierung: (letzteSortierung?.sortierung ?? 0) + 1,
-      bemerkung: data.bemerkung.trim() || null,
-      qr_code_url: data.qrCodeUrl.trim() || null,
-      medien_datei: data.medienDatei.trim() || null,
+      bemerkung: data.bemerkung?.trim() || null,
+      qr_code_url: data.qrCodeUrl?.trim() || null,
+      medien_datei: data.medienDatei?.trim() || null,
     },
   });
 

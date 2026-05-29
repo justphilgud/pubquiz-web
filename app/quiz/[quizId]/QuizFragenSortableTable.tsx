@@ -807,7 +807,7 @@ export default function QuizFragenSortableTable({
 
     setIsCreatingBlock(false);
 
-    if (!result.success || !result.abschnitt) {
+    if (!result.success) {
       setMeldung(result.message ?? "Block konnte nicht angelegt werden.");
       return;
     }

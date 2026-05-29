@@ -120,6 +120,9 @@ export default function QuizAbschnitteForm({
       quizId,
       titel: titel.trim(),
       abschnittTyp,
+      bemerkung: "",
+      qrCodeUrl: "",
+      medienDatei: "",
     });
 
     if (!result.success) {

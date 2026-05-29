@@ -14,6 +14,7 @@ import { addFrageToQuiz } from "../quiz/actions";
 import ZuQuizHinzufuegenButton from "./ZuQuizHinzufuegenButton";
 import type { QuizResult } from "@/app/quiz/actions";
 import QuizVerwendungPopover from "./QuizVerwendungPopover";
+import type { QuizOption } from "./FragenWorkspace";
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -61,7 +62,7 @@ function StatBox({
   warning,
 }: {
   label: string;
-  value: string | number;
+  value: React.ReactNode;
   warning?: boolean;
 }) {
   return (
@@ -83,10 +84,7 @@ export default function FrageSuche({
   onEditFrage,
 }: {
   kategorien: Kategorie[];
-  quizze: {
-    quiz_id: number;
-    titel: string | null;
-  }[];
+  quizze: QuizOption[];
   onEditFrage: (frage: FrageForEdit) => void;
 }) {
   const [suchtext, setSuchtext] = useState("");

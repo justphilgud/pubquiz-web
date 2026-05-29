@@ -5,11 +5,11 @@ import {
   addFrageToQuiz,
   removeFrageFromQuizByFrageId,
 } from "@/app/quiz/actions";
-import type { QuizResult } from "@/app/quiz/actions";
+import type { QuizOption } from "./FragenWorkspace";
 
 type Props = {
   fragenId: number;
-  quizze: QuizResult[];
+  quizze: QuizOption[];
   disabled?: boolean;
   verwendeteQuizIds?: number[];
 };
@@ -81,11 +81,15 @@ export default function ZuQuizHinzufuegenButton({
 
         {quizze.map((quiz) => {
           const bereitsVerwendet = verwendeteQuizIds.includes(quiz.quiz_id);
+          const quizDatum =
+            quiz.quiz_datum instanceof Date
+              ? quiz.quiz_datum.toISOString().split("T")[0]
+              : quiz.quiz_datum ?? "-";
 
           return (
             <option key={quiz.quiz_id} value={quiz.quiz_id}>
               {bereitsVerwendet ? "✓ " : ""}
-              {quiz.quiz_datum ?? "-"} · {quiz.titel ?? `Quiz ${quiz.quiz_id}`}
+              {quizDatum} · {quiz.titel ?? `Quiz ${quiz.quiz_id}`}
             </option>
           );
         })}

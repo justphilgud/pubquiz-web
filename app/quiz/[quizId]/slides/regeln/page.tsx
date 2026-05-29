@@ -31,17 +31,18 @@ export default async function RegelnPage({ params, searchParams }: Props) {
   if (!quiz) {
     notFound();
   }
+  const quizIdValue = quiz.quiz_id;
 
   async function save(formData: FormData) {
     "use server";
 
     await updateIntroRegeln({
-      quizId: quiz.quiz_id,
+      quizId: quizIdValue,
       regeln: String(formData.get("regeln") ?? ""),
     });
 
     redirect(
-      `/quiz/${quiz.quiz_id}/slides/regeln?passwort=${encodeURIComponent(
+      `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(
         passwort
       )}`
     );
@@ -59,10 +60,10 @@ export default async function RegelnPage({ params, searchParams }: Props) {
 
   const regeln = regelnText
     .split("\n")
-    .map((regel) => regel.trim())
+    .map((regel: string) => regel.trim())
     .filter(Boolean);
 
-  const naechsteSlideUrl = `/quiz/${quiz.quiz_id
+  const naechsteSlideUrl = `/quiz/${quizIdValue
     }/slides/preise?passwort=${encodeURIComponent(passwort)}`;
 
   return (
@@ -107,7 +108,7 @@ export default async function RegelnPage({ params, searchParams }: Props) {
               </button>
 
               <a
-                href={`/quiz/${quiz.quiz_id}?passwort=${encodeURIComponent(
+                href={`/quiz/${quizIdValue}?passwort=${encodeURIComponent(
                   passwort
                 )}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
@@ -116,11 +117,11 @@ export default async function RegelnPage({ params, searchParams }: Props) {
               </a>
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quiz.quiz_id}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
                   label: "Begrüßung",
                 }}
                 next={{
-                  href: `/quiz/${quiz.quiz_id}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
                   label: "Preise",
                 }}
               />
@@ -143,7 +144,7 @@ export default async function RegelnPage({ params, searchParams }: Props) {
               </h2>
 
               <div className="mt-10 grid gap-5">
-                {regeln.map((regel, index) => (
+                {regeln.map((regel: string, index: number) => (
                   <div
                     key={`${regel}-${index}`}
                     className="flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 px-6 py-4"

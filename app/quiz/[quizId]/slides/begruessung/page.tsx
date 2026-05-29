@@ -29,22 +29,24 @@ export default async function BegruessungPage({
   }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
-
+  
   if (!quiz) {
     notFound();
   }
+  const quizIdValue = quiz.quiz_id;
 
   async function save(formData: FormData) {
     "use server";
 
+
     await updateIntroBegruessung({
-      quizId: quiz.quiz_id,
+      quizId: quizIdValue,
       titel: String(formData.get("titel") ?? ""),
       text: String(formData.get("text") ?? ""),
     });
 
     redirect(
-      `/quiz/${quiz.quiz_id}/slides/begruessung?passwort=${encodeURIComponent(
+      `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(
         passwort
       )}`
     );
@@ -57,7 +59,7 @@ export default async function BegruessungPage({
     (quiz as any).intro_begruessungstext ??
     "Willkommen zum heutigen Quizabend!";
 
-  const naechsteSlideUrl = `/quiz/${quiz.quiz_id
+  const naechsteSlideUrl = `/quiz/${quizIdValue
     }/slides/regeln?passwort=${encodeURIComponent(passwort)}`;
 
   return (
@@ -114,7 +116,7 @@ export default async function BegruessungPage({
               </button>
 
               <a
-                href={`/quiz/${quiz.quiz_id}?passwort=${encodeURIComponent(
+                href={`/quiz/${quizIdValue}?passwort=${encodeURIComponent(
                   passwort
                 )}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
@@ -124,11 +126,11 @@ export default async function BegruessungPage({
 
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quiz.quiz_id}/slides/startsequenz?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/startsequenz?passwort=${encodeURIComponent(passwort)}`,
                   label: "Countdown",
                 }}
                 next={{
-                  href: `/quiz/${quiz.quiz_id}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
                   label: "Regeln",
                 }}
               />

@@ -22,7 +22,8 @@ type Medientyp = {
   medientyp: string;
 };
 
-type QuizOption = {
+
+export type QuizOption = {
   quiz_id: number;
   titel: string | null;
   quiz_datum: string | Date | null;
@@ -47,6 +48,9 @@ export default function FragenWorkspace({
 
   const [activeTab, setActiveTab] = useState<"neu" | "suche">(initialTab);
   const [editFrage, setEditFrage] = useState<EditFrage>(null);
+  const handleCancelEdit = () => {
+    setEditFrage(null);
+  };
 
   return (
     <main className="min-h-screen p-4 md:p-8">
@@ -66,11 +70,10 @@ export default function FragenWorkspace({
                 setEditFrage(null);
                 setActiveTab("neu");
               }}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                activeTab === "neu"
-                  ? "bg-slate-900 text-white shadow-sm"
-                  : "text-slate-700 hover:bg-slate-50"
-              }`}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === "neu"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "text-slate-700 hover:bg-slate-50"
+                }`}
             >
               Neue Frage
             </button>
@@ -78,11 +81,10 @@ export default function FragenWorkspace({
             <button
               type="button"
               onClick={() => setActiveTab("suche")}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                activeTab === "suche"
-                  ? "bg-slate-900 text-white shadow-sm"
-                  : "text-slate-700 hover:bg-slate-50"
-              }`}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === "suche"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "text-slate-700 hover:bg-slate-50"
+                }`}
             >
               Suche
             </button>
@@ -101,20 +103,22 @@ export default function FragenWorkspace({
             kategorien={kategorien}
             antworttypen={antworttypen}
             medientypen={medientypen}
+            frageVorlagen={[]}
+            offeneQuizzes={[]}
             editFrage={editFrage}
-            onCancelEdit={() => setEditFrage(null)}
+            onCancelEdit={handleCancelEdit}
           />
-        </div>
 
-        <div className={activeTab === "suche" ? "block" : "hidden"}>
-          <FrageSuche
-            kategorien={kategorien}
-            quizze={quizze}
-            onEditFrage={(frage) => {
-              setEditFrage(frage);
-              setActiveTab("neu");
-            }}
-          />
+          <div className={activeTab === "suche" ? "block" : "hidden"}>
+            <FrageSuche
+              kategorien={kategorien}
+              quizze={quizze}
+              onEditFrage={(frage) => {
+                setEditFrage(frage);
+                setActiveTab("neu");
+              }}
+            />
+          </div>
         </div>
       </div>
     </main>

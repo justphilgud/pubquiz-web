@@ -45,6 +45,7 @@ export async function saveVorDemStart(formData: FormData) {
     logoUrl: String(formData.get("logoUrl") ?? ""),
     musikUrl: currentMusikUrl,
     wartetext: String(formData.get("wartetext") ?? ""),
+    startzeit: String(formData.get("startzeit") ?? ""),
   });
 
   if (submitAction === "stay") {

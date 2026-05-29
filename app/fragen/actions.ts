@@ -361,6 +361,7 @@ export async function updateFrage(data: {
   fragenId: number;
   frage: string;
   quelle: string | null;
+  schwierigkeitslevel: number | null;
   kategorieIds: number[];
   neueKategorien: string[];
   medienZurFrage: {

@@ -24,6 +24,7 @@ export default async function PreisePage({ params, searchParams }: Props) {
   if (!quiz) {
     notFound();
   }
+  const quizIdValue = quiz.quiz_id;
 
   async function save(formData: FormData) {
     "use server";
@@ -35,12 +36,12 @@ export default async function PreisePage({ params, searchParams }: Props) {
     ].join("\n");
 
     await updateIntroPreise({
-      quizId: quiz.quiz_id,
+      quizId: quizIdValue,
       preise,
     });
 
     redirect(
-      `/quiz/${quiz.quiz_id}/slides/preise?passwort=${encodeURIComponent(
+      `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(
         passwort
       )}`
     );
@@ -60,9 +61,8 @@ export default async function PreisePage({ params, searchParams }: Props) {
     { platz: "3", titel: "Platz 3", preis: platz3 || "Ruhm und Ehre" },
   ];
 
-  const naechsteSlideUrl = `/quiz/${
-    quiz.quiz_id
-  }/slides/fragerunde-1?passwort=${encodeURIComponent(passwort)}`;
+  const naechsteSlideUrl = `/quiz/${quizIdValue
+    }/slides/fragerunde-1?passwort=${encodeURIComponent(passwort)}`;
 
   return (
     <main className="min-h-screen bg-slate-100 p-8">
@@ -125,7 +125,7 @@ export default async function PreisePage({ params, searchParams }: Props) {
               </button>
 
               <a
-                href={`/quiz/${quiz.quiz_id}?passwort=${encodeURIComponent(
+                href={`/quiz/${quizIdValue}?passwort=${encodeURIComponent(
                   passwort
                 )}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
@@ -134,15 +134,15 @@ export default async function PreisePage({ params, searchParams }: Props) {
               </a>
 
               <ConfigSlideNavigation
-                              previous={{
-                                href: `/quiz/${quiz.quiz_id}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
-                                label: "Regeln",
-                              }}
-                              next={{
-                                href: `/quiz/${quiz.quiz_id}/slides/vor-dem-start?passwort=${encodeURIComponent(passwort)}`,
-                                label: "Warteslide",
-                              }}
-                            />
+                previous={{
+                  href: `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Regeln",
+                }}
+                next={{
+                  href: `/quiz/${quizIdValue}/slides/vor-dem-start?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Warteslide",
+                }}
+              />
             </div>
           </form>
         </section>
