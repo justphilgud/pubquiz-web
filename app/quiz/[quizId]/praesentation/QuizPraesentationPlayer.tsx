@@ -1339,27 +1339,16 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
             playsInline
             className="absolute inset-0 h-full w-full object-cover"
           >
-            <source src={praesentationQuiz.intro_video_url} type="video/mp4" />
+            <source
+              src={praesentationQuiz.intro_video_url}
+              type="video/mp4"
+            />
           </video>
         )}
 
-        <div className="relative z-10 h-full w-full">
-          console.log("Intro Video URL im Player:", praesentationQuiz.intro_video_url);
-
-          <IntroSlideAnkommen
-            quizId={quiz.quiz_id}
-            startzeit={praesentationQuiz.intro_startzeit ?? "19:30"}
-            videoUrl={praesentationQuiz.intro_video_url ?? null}
-          />
+        <div className="absolute bottom-8 right-8 z-20 rounded-2xl border-4 border-yellow-300 bg-black/70 px-7 py-4 text-3xl font-black text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
+          Beginn: {praesentationQuiz.intro_startzeit ?? "19:30"} Uhr
         </div>
-
-        <style jsx global>{`
-          .vor-dem-start-player > div > section {
-            height: 100% !important;
-            width: 100% !important;
-            background: transparent !important;
-          }
-        `}</style>
       </div>
     );
   }
@@ -1566,7 +1555,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
 
     return (
       <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-        
+
         <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
           {abschnitt.titel}
         </h2>
