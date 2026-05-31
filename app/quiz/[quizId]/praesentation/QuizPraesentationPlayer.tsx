@@ -11,6 +11,7 @@ import {
 
 import type { QuizPraesentationResult } from "../../actions";
 import { IntroSlideAnkommen } from "../slides/vor-dem-start/IntroSlideAnkommen";
+import QRCode from "react-qr-code";
 
 
 type Props = {
@@ -33,8 +34,9 @@ type FixerSlideTyp =
   | "vor-dem-start"
   | "startsequenz"
   | "begruessung"
-  | "regeln"
   | "preise"
+  | "regeln"
+  | "qrcode"
   | "bekanntmachungen";
 
 type Medium = {
@@ -267,8 +269,9 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
         result.push({ typ: "fixer-slide", slideTyp: "vor-dem-start" });
         result.push({ typ: "fixer-slide", slideTyp: "startsequenz" });
         result.push({ typ: "fixer-slide", slideTyp: "begruessung" });
-        result.push({ typ: "fixer-slide", slideTyp: "regeln" });
         result.push({ typ: "fixer-slide", slideTyp: "preise" });
+        result.push({ typ: "fixer-slide", slideTyp: "regeln" });
+        result.push({ typ: "fixer-slide", slideTyp: "qrcode" });
         continue;
       }
 
@@ -413,14 +416,16 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
+      const activeElement = document.activeElement as HTMLElement | null;
+      const element = target ?? activeElement;
 
-      const tagName = target?.tagName?.toLowerCase();
+      const tagName = element?.tagName?.toLowerCase();
 
       const isInput =
         tagName === "input" ||
         tagName === "textarea" ||
         tagName === "select" ||
-        target?.isContentEditable;
+        element?.isContentEditable;
 
       if (isInput) {
         return;
@@ -1337,7 +1342,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
             muted
             loop
             playsInline
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain"
           >
             <source
               src={praesentationQuiz.intro_video_url}
@@ -1386,6 +1391,13 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       });
     }
 
+    if (slide.slideTyp === "preise") {
+      return renderBlockSlide({
+        typ: "block",
+        abschnitt: createVirtuellenAbschnitt("Preise", "intro_preise"),
+      });
+    }
+
     if (slide.slideTyp === "regeln") {
       return renderBlockSlide({
         typ: "block",
@@ -1393,10 +1405,14 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       });
     }
 
-    return renderBlockSlide({
-      typ: "block",
-      abschnitt: createVirtuellenAbschnitt("Preise", "intro_preise"),
-    });
+    if (slide.slideTyp === "qrcode") {
+      return renderBlockSlide({
+        typ: "block",
+        abschnitt: createVirtuellenAbschnitt("QR-Code", "intro_qrcode"),
+      });
+    }
+
+    return null;
   }
 
   function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
@@ -1430,7 +1446,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       return (
         <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
           <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
-            Willkommen
+            Willkommen zum
           </div>
 
           <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
@@ -1482,6 +1498,10 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
           </div>
         </div>
       );
+    }
+
+    if (abschnitt.abschnitt_typ === "intro_qrcode") {
+      return renderQrCodeSlide();
     }
 
     if (abschnitt.abschnitt_typ === "intro_preise") {
@@ -1576,6 +1596,32 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     );
   }
 
+  function renderQrCodeSlide() {
+    const antwortUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten?passwort=${encodeURIComponent(
+          new URLSearchParams(window.location.search).get("passwort") ?? ""
+        )}`
+        : "";
+
+    return (
+      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        <div className="mb-10 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-8 py-4 text-2xl font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[5px_5px_0_#00e5ff]">
+          Jetzt scannen
+        </div>
+
+        <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
+          <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
+            <QRCode
+              value={antwortUrl}
+              size={500}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
     const aktuelleSekunden = timerSekunden ?? slide.dauerSekunden;
     const minuten = Math.floor(aktuelleSekunden / 60);
@@ -1657,6 +1703,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       </div>
     );
   }
+
   function renderAktuellenSlide() {
     if (!slide) {
       return (
@@ -1729,7 +1776,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   return (
 
     <main className="h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#ff00aa_0,#ff00aa22_24%,transparent_42%),radial-gradient(circle_at_80%_10%,#00e5ff66_0,#00e5ff22_22%,transparent_38%),linear-gradient(135deg,#1a0033,#080014_45%,#001a3a)] text-white">
-      
+
       <style jsx global>{`
   @keyframes pferdGalopp {
   0% {

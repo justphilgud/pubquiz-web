@@ -53,7 +53,7 @@ export default async function BegruessungPage({
   }
 
   const titel =
-    (quiz as any).intro_begruessungstitel ?? quiz.titel ?? "Willkommen";
+    (quiz as any).intro_begruessungstitel ?? quiz.titel ?? "Willkommen im";
 
   const text =
     (quiz as any).intro_begruessungstext ??

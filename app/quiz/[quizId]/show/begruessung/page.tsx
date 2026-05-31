@@ -26,7 +26,7 @@ export default async function ShowBegruessungPage({
     notFound();
   }
 
-  const titel = quiz.intro_begruessungstitel ?? quiz.titel ?? "Willkommen";
+  const titel = quiz.intro_begruessungstitel ?? quiz.titel ?? "Willkommen im";
   const text =
     quiz.intro_begruessungstext ?? "Willkommen zum heutigen Quizabend!";
 
