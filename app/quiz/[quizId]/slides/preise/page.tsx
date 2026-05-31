@@ -135,12 +135,12 @@ export default async function PreisePage({ params, searchParams }: Props) {
 
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
-                  label: "Regeln",
+                  href: `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Begrüßung",
                 }}
                 next={{
-                  href: `/quiz/${quizIdValue}/slides/vor-dem-start?passwort=${encodeURIComponent(passwort)}`,
-                  label: "Warteslide",
+                  href: `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Regeln",
                 }}
               />
             </div>

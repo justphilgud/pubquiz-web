@@ -130,8 +130,8 @@ export default async function BegruessungPage({
                   label: "Countdown",
                 }}
                 next={{
-                  href: `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
-                  label: "Regeln",
+                  href: `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Preise",
                 }}
               />
             </div>

@@ -1446,7 +1446,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       return (
         <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
           <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
-            Willkommen zum
+            Willkommen im
           </div>
 
           <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">

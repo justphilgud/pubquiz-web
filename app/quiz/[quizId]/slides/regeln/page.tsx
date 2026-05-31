@@ -95,6 +95,9 @@ export default async function RegelnPage({ params, searchParams }: Props) {
                 name="regeln"
                 rows={12}
                 defaultValue={regelnText}
+                onKeyDown={(event) => {
+                  event.stopPropagation();
+                }}
                 className="rounded-2xl border border-slate-300 px-5 py-4 font-medium"
               />
             </div>
@@ -117,12 +120,12 @@ export default async function RegelnPage({ params, searchParams }: Props) {
               </a>
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
-                  label: "Begrüßung",
-                }}
-                next={{
                   href: `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
                   label: "Preise",
+                }}
+                next={{
+                  href: `/quiz/${quizIdValue}/slides/vor-dem-start?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Warteslide",
                 }}
               />
 
