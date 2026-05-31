@@ -26,7 +26,7 @@ export default function BlobUploadField({
 
     try {
       const blob = await upload(
-        `${zielordner}/${Date.now()}-${file.name}`,
+        `medien/${zielordner}/${Date.now()}-${file.name}`,
         file,
         {
           access: "public",
