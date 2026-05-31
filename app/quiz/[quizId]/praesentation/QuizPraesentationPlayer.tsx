@@ -581,9 +581,13 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     setIsSchaetzfrageLoading(false);
   }
 
-  function getMediumUrl(datei: string) {
-    return `/medien/${datei}`;
+ function getMediumUrl(datei: string) {
+  if (datei.startsWith("http://") || datei.startsWith("https://")) {
+    return datei;
   }
+
+  return `/medien/${datei}`;
+}
 
   function isBild(datei: string) {
     return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(datei);
