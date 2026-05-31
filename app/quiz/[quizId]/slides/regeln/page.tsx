@@ -95,9 +95,6 @@ export default async function RegelnPage({ params, searchParams }: Props) {
                 name="regeln"
                 rows={12}
                 defaultValue={regelnText}
-                onKeyDown={(event) => {
-                  event.stopPropagation();
-                }}
                 className="rounded-2xl border border-slate-300 px-5 py-4 font-medium"
               />
             </div>
@@ -120,12 +117,12 @@ export default async function RegelnPage({ params, searchParams }: Props) {
               </a>
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
-                  label: "Preise",
+                  href: `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Begrüßung",
                 }}
                 next={{
-                  href: `/quiz/${quizIdValue}/slides/vor-dem-start?passwort=${encodeURIComponent(passwort)}`,
-                  label: "Warteslide",
+                  href: `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
+                  label: "Preise",
                 }}
               />
 
@@ -134,99 +131,43 @@ export default async function RegelnPage({ params, searchParams }: Props) {
         </section>
 
         <section className="relative overflow-hidden rounded-3xl bg-black shadow-sm">
-  <div className="relative h-[680px] overflow-hidden bg-[#050510] text-white">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,245,255,0.16),transparent_38%),radial-gradient(circle_at_8%_100%,rgba(255,0,170,0.20),transparent_42%)]" />
+          <div className="relative h-[680px] overflow-hidden bg-[#050510] text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,245,255,0.16),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(255,0,140,0.22),transparent_40%)]" />
 
-    <div className="absolute inset-4 rounded-[2rem] border-2 border-yellow-300/90 shadow-[0_0_24px_rgba(250,204,21,0.35)]" />
-
-    <div className="relative z-10 flex h-full flex-col px-10 py-8">
-      <div className="mb-6 flex items-center justify-between rounded-2xl border-2 border-yellow-300/80 bg-black/40 px-5 py-3">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 rotate-[-5deg] items-center justify-center rounded-xl bg-pink-500 text-xs font-black uppercase text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
-            Logo
-          </div>
-
-          <div>
-            <div className="text-xs font-black uppercase tracking-[0.35em] text-cyan-300">
-              Regeln
-            </div>
-            <div className="text-2xl font-black uppercase text-yellow-200 drop-shadow-[3px_3px_0_#ff00aa]">
-              {quiz.titel ?? "PubQuiz"}
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border-4 border-pink-500 bg-yellow-300 px-5 py-2 text-2xl font-black text-black shadow-[4px_4px_0_#ff00aa]">
-          5 / 12
-        </div>
-      </div>
-
-      <div className="mb-5 text-center">
-        <div className="mx-auto mb-3 flex max-w-2xl items-center justify-center gap-4">
-          <div className="h-1 flex-1 rounded-full bg-cyan-300 shadow-[0_0_12px_#00e5ff]" />
-          <div className="rounded-xl border-2 border-cyan-300 bg-pink-500 px-6 py-2 text-sm font-black uppercase tracking-[0.35em] text-white shadow-[4px_4px_0_#00e5ff]">
-            Rules are good!
-          </div>
-          <div className="h-1 flex-1 rounded-full bg-cyan-300 shadow-[0_0_12px_#00e5ff]" />
-        </div>
-
-        <h2 className="text-5xl font-black italic uppercase leading-none text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
-          Rules help control the fun!*
-        </h2>
-
-        <div className="mt-2 text-right text-sm font-black text-cyan-300">
-          * Monica Geller (Schlechte Verliererin)
-        </div>
-      </div>
-
-      <div className="grid min-h-0 flex-1 content-start gap-4">
-        {regeln.map((regel: string, index: number) => {
-          const regelTextClass =
-            regeln.length <= 4
-              ? "text-3xl"
-              : regeln.length <= 6
-                ? "text-2xl"
-                : "text-xl";
-
-          return (
-            <div
-              key={`${regel}-${index}`}
-              className="flex items-center gap-6 rounded-2xl border-4 border-cyan-300 bg-slate-950/80 px-6 py-4 shadow-[4px_4px_0_#ff00aa]"
-            >
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-pink-500 text-3xl font-black text-yellow-200 shadow-[3px_3px_0_#ff00aa]">
-                {index + 1}
+            <div className="absolute inset-8 flex flex-col justify-center rounded-[2rem] border-4 border-cyan-400/80 bg-black/45 p-12 shadow-[0_0_35px_rgba(0,240,255,0.85)]">
+              <div className="mb-6 text-sm font-black uppercase tracking-[0.35em] text-pink-300 drop-shadow-[0_0_12px_rgba(255,0,150,1)]">
+                Kurz und schmerzlos
               </div>
 
-              <div
-                className={`${regelTextClass} font-black leading-tight text-white drop-shadow-[3px_3px_0_#000]`}
-              >
-                {regel}
+              <h2 className="text-7xl font-black leading-tight text-cyan-300 drop-shadow-[0_0_18px_rgba(0,240,255,1)]">
+                Regeln
+              </h2>
+
+              <div className="mt-10 grid gap-5">
+                {regeln.map((regel: string, index: number) => (
+                  <div
+                    key={`${regel}-${index}`}
+                    className="flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 px-6 py-4"
+                  >
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-pink-400 text-2xl font-black text-pink-300 shadow-[0_0_18px_rgba(255,0,150,0.75)]">
+                      {index + 1}
+                    </div>
+
+                    <div className="pt-1 text-3xl font-extrabold leading-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.55)]">
+                      {regel}
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              <div className="mt-10 w-fit rounded-2xl border border-pink-400/70 px-6 py-3 text-xl font-bold text-pink-200 shadow-[0_0_22px_rgba(255,0,150,0.45)]">
+                Spaß zählt. Google nicht.
+              </div>
+
+              <SlideNavigation href={naechsteSlideUrl} />
             </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-6 flex items-center gap-4 rounded-2xl border-2 border-pink-500/80 bg-black/45 px-5 py-4">
-        <a
-          href={`/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(
-            passwort
-          )}`}
-          className="rounded-xl border-4 border-cyan-300 bg-slate-950 px-6 py-3 font-black uppercase text-cyan-300 shadow-[4px_4px_0_#ff00aa]"
-        >
-          ← Zurück
-        </a>
-
-        <a
-          href={naechsteSlideUrl}
-          className="rounded-xl border-4 border-cyan-300 bg-slate-950 px-6 py-3 font-black uppercase text-cyan-300 shadow-[4px_4px_0_#ff00aa]"
-        >
-          Weiter →
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+          </div>
+        </section>
       </div>
     </main>
   );
