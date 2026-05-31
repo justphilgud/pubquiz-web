@@ -3,6 +3,7 @@ import { getQuizDetails } from "@/app/quiz/actions";
 import { saveStartsequenz } from "./actions";
 import { IntroSlideStartsequenz } from "./IntroSlideStartsequenz";
 import { ConfigSlideNavigation } from "../ConfigSlideNavigation";
+import BlobUploadField from "../BlobUploadField";
 
 type Props = {
   params: Promise<{
@@ -74,37 +75,13 @@ export default async function StartsequenzPage({
             />
 
             <div className="grid gap-6">
-              <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
-                <div className="text-sm font-bold text-slate-700">
-                  Intro-Musik
-                </div>
-
-                <p>
-                  Lade hier eine MP3-Datei hoch. Sie wird im Cloud-Speicher
-                  abgelegt und für dieses Quiz verwendet.
-                </p>
-
-                <div className="mt-3 rounded-xl bg-white px-4 py-3 font-mono text-sm text-slate-800">
-                  Aktuelle Datei: {audioUrl}
-                </div>
-
-                <input
-                  type="file"
-                  name="audioFile"
-                  accept=".mp3,audio/mpeg"
-                  className="mt-4 block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
-                />
-
-                <div className="mt-3 space-y-1 text-xs text-slate-500">
-                  <div>• Erlaubt sind nur MP3-Dateien</div>
-                  <div>• Maximale Dateigröße: 10 MB</div>
-                  <div>• Die Datei wird automatisch umbenannt</div>
-                </div>
-
-                <p className="mt-3 text-xs text-slate-500">
-                  Aktueller Webpfad: {audioUrl}
-                </p>
-              </div>
+              <BlobUploadField
+                label="Intro-Musik"
+                hiddenFieldName="currentIntroMusikUrl"
+                currentUrl={quiz.intro_musik_url}
+                zielordner="audio/intro"
+                accept=".mp3,audio/mpeg"
+              />
 
               <label className="grid gap-2">
                 <div className="text-sm font-bold text-slate-700">

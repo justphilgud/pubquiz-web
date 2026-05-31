@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getQuizDetails } from "@/app/quiz/actions";
 import { saveVorDemStart } from "./actions";
 import { ConfigSlideNavigation } from "../ConfigSlideNavigation";
+import BlobUploadField from "../BlobUploadField";
 
 export const runtime = "nodejs";
 
@@ -55,34 +56,13 @@ export default async function VorDemStartPage({ params, searchParams }: Props) {
             <input type="hidden" name="passwort" value={passwort} />
 
             <div className="grid gap-6">
-              <label className="grid gap-2">
-                <span className="text-sm font-bold text-slate-700">
-                  Intro-Video
-                </span>
-
-                <input
-                  type="hidden"
-                  name="currentIntroVideoUrl"
-                  value={quiz.intro_video_url ?? ""}
-                />
-
-                <input
-                  type="file"
-                  name="introVideoFile"
-                  accept="video/*"
-                  className="rounded-2xl border border-slate-300 px-5 py-4 text-lg"
-                />
-
-                <span className="text-sm text-slate-500">
-                  Das Video wird im Cloud-Speicher abgelegt und später im Vollbild angezeigt.
-                </span>
-
-                {quiz.intro_video_url && (
-                  <span className="break-all text-xs text-slate-400">
-                    Aktuelles Video: {quiz.intro_video_url}
-                  </span>
-                )}
-              </label>
+              <BlobUploadField
+                label="Intro-Video"
+                hiddenFieldName="currentIntroVideoUrl"
+                currentUrl={quiz.intro_video_url}
+                zielordner="video/intro"
+                accept="video/*"
+              />
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
