@@ -51,12 +51,7 @@ export default async function ShowVorDemStartPage({
         <IntroSlideAnkommen
           quizId={quiz.quiz_id}
           startzeit={quiz.intro_startzeit ?? "19:30"}
-          logoUrl={quiz.intro_logo_url ?? undefined}
-          qrCodeUrl={qrCodePfad}
-          wartetext={
-            quiz.intro_wartetext ??
-            "Wir warten noch auf die Les Humphries Singers.\nDann geht’s los!"
-          }
+          videoUrl={quiz.intro_video_url ?? null}
         />
 
         <ShowNavigation

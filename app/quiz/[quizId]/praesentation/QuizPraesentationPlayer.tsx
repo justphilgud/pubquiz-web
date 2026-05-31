@@ -363,7 +363,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     return result;
   }, [quiz.abschnitte, quiz.fragen]);
   const slide = slides[slideIndex];
-  
+
   const hatGleichstandAufPlatz1 =
     punktestand.length > 1 &&
     punktestand[0].punkte === punktestand[1].punkte;
@@ -498,7 +498,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   }, [slideIndex, quiz.quiz_id, slide?.typ]);
 
   function nextSlide() {
-    
+
     if (slide?.typ === "endstand" && endstandRevealCount < 5) {
       setEndstandRevealCount((current) => Math.min(5, current + 1));
       return;
@@ -581,13 +581,13 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     setIsSchaetzfrageLoading(false);
   }
 
- function getMediumUrl(datei: string) {
-  if (datei.startsWith("http://") || datei.startsWith("https://")) {
-    return datei;
-  }
+  function getMediumUrl(datei: string) {
+    if (datei.startsWith("http://") || datei.startsWith("https://")) {
+      return datei;
+    }
 
-  return `/medien/${datei}`;
-}
+    return `/medien/${datei}`;
+  }
 
   function isBild(datei: string) {
     return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(datei);
@@ -998,7 +998,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
                         animation: `pferdEinreiten 1.4s ease-out ${index * 0.12}s both`,
                       }}
                     >
-                    
+
                       {renderRennPferd({
                         farbe: pferdeFarben[index % pferdeFarben.length],
                         nummer: index + 1,
@@ -1156,7 +1156,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
                           animationDelay: `${index * 0.12}s`,
                         }}
                       >
-                        
+
                         {renderRennPferd({
                           farbe: pferdeFarben[index % pferdeFarben.length],
                           nummer: index + 1,
@@ -1347,12 +1347,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
           <IntroSlideAnkommen
             quizId={quiz.quiz_id}
             startzeit={praesentationQuiz.intro_startzeit ?? "19:30"}
-            logoUrl={praesentationQuiz.intro_logo_url ?? undefined}
-            qrCodeUrl={qrCodePfad}
-            wartetext={
-              praesentationQuiz.intro_wartetext ??
-              "Wir warten noch auf die Les Humphries Singers.\nDann geht’s los!"
-            }
+            videoUrl={praesentationQuiz.intro_video_url ?? null}
           />
         </div>
 

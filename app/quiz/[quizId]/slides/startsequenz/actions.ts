@@ -50,5 +50,14 @@ export async function saveStartsequenz(formData: FormData) {
       );
     }
 
-    redirect(`/quiz/${quizId}?passwort=${encodeURIComponent(passwort)}`);
+    if (submitAction === "close") {
+      redirect(`/quiz/${quizId}?passwort=${encodeURIComponent(passwort)}`);
+    }
+
+    redirect(
+      `/quiz/${quizId}/slides/startsequenz?passwort=${encodeURIComponent(
+        passwort
+      )}`
+    );
   }
+}
