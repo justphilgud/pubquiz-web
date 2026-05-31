@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { upload } from "@vercel/blob/client";
 
 type BlobUploadFieldProps = {
   label: string;
@@ -24,25 +25,18 @@ export default function BlobUploadField({
     setUploading(true);
 
     try {
-      const formData = new FormData();
+      const blob = await upload(
+        `${zielordner}/${Date.now()}-${file.name}`,
+        file,
+        {
+          access: "public",
+          handleUploadUrl: "/api/blob-upload-token",
+        }
+      );
 
-      formData.append("file", file);
-      formData.append("zielordner", zielordner);
-
-      const response = await fetch("/api/upload-medium", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!result.success || !result.datei) {
-        alert(result.message ?? "Upload fehlgeschlagen.");
-        return;
-      }
-
-      setUrl(result.datei);
-    } catch {
+      setUrl(blob.url);
+    } catch (error) {
+      console.error(error);
       alert("Upload fehlgeschlagen.");
     } finally {
       setUploading(false);
