@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 
 export async function saveVorDemStart(formData: FormData) {
@@ -8,8 +9,30 @@ export async function saveVorDemStart(formData: FormData) {
   const passwort = formData.get("passwort")?.toString() ?? "";
   const submitAction = formData.get("submitAction")?.toString() ?? "stay";
 
-  const introVideoUrl = formData.get("introVideoUrl")?.toString() ?? "";
   const startzeit = formData.get("startzeit")?.toString() ?? "19:30";
+
+  const videoFile = formData.get("introVideoFile");
+
+  let introVideoUrl =
+    formData.get("currentIntroVideoUrl")?.toString() ?? "";
+
+  if (videoFile instanceof File && videoFile.size > 0) {
+    const originalName = videoFile.name
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9._-]/g, "");
+
+    const blob = await put(
+      `medien/video/intro/${quizId}-${Date.now()}-${originalName}`,
+      videoFile,
+      {
+        access: "public",
+        addRandomSuffix: false,
+      }
+    );
+
+    introVideoUrl = blob.url;
+  }
 
   await prisma.quiz.update({
     where: {

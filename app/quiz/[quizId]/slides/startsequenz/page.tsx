@@ -34,7 +34,7 @@ export default async function StartsequenzPage({
 
   const audioUrl =
     (quiz as any).intro_startsequenz_audio_url ??
-    `/medien/audio/intro/${quiz.quiz_id}.mp3`;
+    "/medien/audio/intro/mexico.mp3";
 
   const text =
     (quiz as any).intro_startsequenz_text ??
@@ -79,13 +79,13 @@ export default async function StartsequenzPage({
                   Intro-Musik
                 </div>
 
-                <p className="mt-2 text-sm text-slate-600">
-                  Lade hier eine MP3-Datei hoch. Sie wird automatisch
-                  passend zur Quiz-ID gespeichert.
+                <p>
+                  Lade hier eine MP3-Datei hoch. Sie wird im Cloud-Speicher
+                  abgelegt und für dieses Quiz verwendet.
                 </p>
 
                 <div className="mt-3 rounded-xl bg-white px-4 py-3 font-mono text-sm text-slate-800">
-                  public/medien/audio/intro/{quiz.quiz_id}.mp3
+                  Aktuelle Datei: {audioUrl}
                 </div>
 
                 <input

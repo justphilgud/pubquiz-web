@@ -4,6 +4,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { redirect } from "next/navigation";
 import { updateIntroStartsequenz } from "@/app/quiz/actions";
+import { put } from "@vercel/blob";
 
 const STANDARD_AUDIO_URL = "/medien/audio/intro/mexico.mp3";
 
@@ -26,40 +27,28 @@ export async function saveStartsequenz(formData: FormData) {
       throw new Error("Es sind nur MP3-Dateien erlaubt.");
     }
 
-    const bytes = await audioFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const fileName = `intro/custom-${quizId}.mp3`;
 
-    const uploadDir = path.join(
-      process.cwd(),
-      "public",
-      "medien",
-      "audio",
-      "intro"
-    );
+    const blob = await put(fileName, audioFile, {
+      access: "public",
+      addRandomSuffix: false,
+    });
 
-    await mkdir(uploadDir, { recursive: true });
+    audioUrl = blob.url;
 
-    const fileName = `custom-${quizId}.mp3`;
-    const filePath = path.join(uploadDir, fileName);
+    await updateIntroStartsequenz({
+      quizId,
+      audioUrl,
+      text: String(formData.get("text") ?? ""),
+    });
 
-    await writeFile(filePath, buffer);
+    if (submitAction === "stay") {
+      redirect(
+        `/quiz/${quizId}/slides/startsequenz?passwort=${encodeURIComponent(
+          passwort
+        )}`
+      );
+    }
 
-    audioUrl = `/medien/audio/intro/${fileName}`;
+    redirect(`/quiz/${quizId}?passwort=${encodeURIComponent(passwort)}`);
   }
-
-  await updateIntroStartsequenz({
-    quizId,
-    audioUrl,
-    text: String(formData.get("text") ?? ""),
-  });
-
-  if (submitAction === "stay") {
-    redirect(
-      `/quiz/${quizId}/slides/startsequenz?passwort=${encodeURIComponent(
-        passwort
-      )}`
-    );
-  }
-
-  redirect(`/quiz/${quizId}?passwort=${encodeURIComponent(passwort)}`);
-}

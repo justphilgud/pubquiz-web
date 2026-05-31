@@ -48,46 +48,40 @@ export default async function VorDemStartPage({ params, searchParams }: Props) {
             </p>
           </div>
 
-          <form action={saveVorDemStart}>
+          <form
+            action={saveVorDemStart}
+            encType="multipart/form-data">
             <input type="hidden" name="quizId" value={quiz.quiz_id} />
             <input type="hidden" name="passwort" value={passwort} />
 
             <div className="grid gap-6">
               <label className="grid gap-2">
                 <span className="text-sm font-bold text-slate-700">
-                  Intro-Video URL
+                  Intro-Video
                 </span>
 
                 <input
-                  type="text"
-                  name="introVideoUrl"
-                  defaultValue={quiz.intro_video_url ?? ""}
-                  placeholder="/medien/video/intro/intro.mp4"
+                  type="hidden"
+                  name="currentIntroVideoUrl"
+                  value={quiz.intro_video_url ?? ""}
+                />
+
+                <input
+                  type="file"
+                  name="introVideoFile"
+                  accept="video/*"
                   className="rounded-2xl border border-slate-300 px-5 py-4 text-lg"
                 />
 
                 <span className="text-sm text-slate-500">
-                  Lege das Video z. B. unter public/videos/intro.mp4 ab und
-                  trage hier /videos/intro.mp4 ein.
-                </span>
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-sm font-bold text-slate-700">
-                  Beginn-Uhrzeit
+                  Das Video wird im Cloud-Speicher abgelegt und später im Vollbild angezeigt.
                 </span>
 
-                <input
-                  type="time"
-                  name="startzeit"
-                  defaultValue={quiz.intro_startzeit ?? "19:30"}
-                  className="rounded-2xl border border-slate-300 px-5 py-4 text-lg"
-                />
-
-                <span className="text-sm text-slate-500">
-                  Diese Uhrzeit wird unten rechts als „Beginn: 19:30 Uhr“
-                  angezeigt.
-                </span>
+                {quiz.intro_video_url && (
+                  <span className="break-all text-xs text-slate-400">
+                    Aktuelles Video: {quiz.intro_video_url}
+                  </span>
+                )}
               </label>
             </div>
 
