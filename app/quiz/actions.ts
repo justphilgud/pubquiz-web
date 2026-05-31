@@ -671,6 +671,8 @@ export type QuizPraesentationResult = {
   intro_logo_url: string | null;
   intro_musik_url: string | null;
   intro_wartetext: string | null;
+  intro_video_url: string | null;
+  intro_startzeit: string | null;
   titel: string | null;
   quiz_datum: string | null;
   fragen: {
@@ -796,6 +798,8 @@ export async function getQuizPraesentation(
     intro_logo_url: quiz.intro_logo_url,
     intro_musik_url: quiz.intro_musik_url,
     intro_wartetext: quiz.intro_wartetext,
+    intro_video_url: quiz.intro_video_url,
+    intro_startzeit: quiz.intro_startzeit,
     titel: quiz.titel,
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]

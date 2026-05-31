@@ -1729,10 +1729,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   return (
 
     <main className="h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#ff00aa_0,#ff00aa22_24%,transparent_42%),radial-gradient(circle_at_80%_10%,#00e5ff66_0,#00e5ff22_22%,transparent_38%),linear-gradient(135deg,#1a0033,#080014_45%,#001a3a)] text-white">
-      <div className="fixed left-4 top-4 z-[9999] rounded bg-red-600 px-4 py-2 text-white">
-        Slide {slideIndex + 1} / {slides.length}:{" "}
-        {slide?.typ === "fixer-slide" ? slide.slideTyp : slide?.typ}
-      </div>
+      
       <style jsx global>{`
   @keyframes pferdGalopp {
   0% {
