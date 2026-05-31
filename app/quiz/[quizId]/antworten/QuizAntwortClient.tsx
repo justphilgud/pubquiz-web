@@ -111,7 +111,14 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
   );
 
   function getBildUrl(datei: string) {
-    if (datei.startsWith("/")) return datei;
+    if (/^https?:\/\//.test(datei)) {
+      return datei;
+    }
+
+    if (datei.startsWith("/")) {
+      return datei;
+    }
+
     return `/medien/${datei}`;
   }
 
@@ -275,6 +282,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
     setTeamVorschlaege([]);
     setMeldung("");
   }
+
 
   function updateAntwortfeld(
     quizFragenId: number,
