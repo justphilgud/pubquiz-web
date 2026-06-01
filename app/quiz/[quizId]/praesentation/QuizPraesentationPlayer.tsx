@@ -230,6 +230,9 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   const [timerSekunden, setTimerSekunden] = useState<number | null>(null);
   const [timerLaeuft, setTimerLaeuft] = useState(false);
   const [showSchaetzfrage, setShowSchaetzfrage] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioPlayCount, setAudioPlayCount] = useState(0);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [timerInputMinuten, setTimerInputMinuten] = useState("5");
   const [freigabeMeldung, setFreigabeMeldung] = useState("");
   const [isFreigabeLoading, setIsFreigabeLoading] = useState(false);
@@ -502,6 +505,25 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
 
     ladePunktestand();
   }, [slideIndex, quiz.quiz_id, slide?.typ]);
+
+  function handleAudioPlayPause() {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isAudioPlaying) {
+      audio.pause();
+      setIsAudioPlaying(false);
+      return;
+    }
+
+    if (audioPlayCount >= 2) {
+      audio.currentTime = 0;
+      setAudioPlayCount(0);
+    }
+
+    audio.play();
+    setIsAudioPlaying(true);
+  }
 
   function nextSlide() {
     if (overlayMedien) {
@@ -794,28 +816,58 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     }
 
     if (effektivesLayout === "audio_fokus") {
+      const audioMedium = frage.medien[0];
+
       return (
-        <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-7 shadow-[7px_7px_0_#00e5ff]">
-            <h2 className="text-4xl font-black leading-tight text-white drop-shadow-[4px_4px_0_#ff00aa] xl:text-5xl">
+        <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
+          <div className="mb-10 text-center">
+            <div className="mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
+              Audiofrage
+            </div>
+
+            <h2 className="mx-auto max-w-6xl text-6xl font-black leading-tight text-white drop-shadow-[0_0_10px_#FF3BD4]">
               {frage.frage}
             </h2>
           </div>
 
-          <div className="flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/55 p-8 text-center shadow-[8px_8px_0_#ff00aa]">
-            <div className="mb-5 text-sm font-black uppercase tracking-[0.3em] text-cyan-300">
-              Audio
-            </div>
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <div className="flex h-full max-h-[520px] w-full max-w-5xl flex-col items-center justify-center rounded-[2rem] border-4 border-[#FF3BD4] bg-[radial-gradient(circle_at_center,rgba(255,59,212,0.18),transparent_55%),linear-gradient(135deg,rgba(59,130,255,0.16),rgba(0,0,0,0.95))] p-10 text-center shadow-[0_0_20px_#FF3BD4,0_0_40px_rgba(255,59,212,0.35)]">
+              {!audioMedium ? (
+                <div className="text-4xl font-black uppercase text-white/40">
+                  Keine Audiodatei
+                </div>
+              ) : (
+                <>
+                  <audio
+                    ref={audioRef}
+                    src={getMediumUrl(audioMedium.datei)}
+                    onEnded={() => {
+                      setIsAudioPlaying(false);
+                      setAudioPlayCount((current) => Math.min(2, current + 1));
+                    }}
+                  />
 
-            {frage.medien.length === 0 ? (
-              <div className="text-3xl font-black uppercase text-white/40">
-                Keine Audiodatei
-              </div>
-            ) : (
-              frage.medien.slice(0, 1).map((medium) =>
-                renderMedienKarte(medium, "large")
-              )
-            )}
+                  <div className="mb-10 text-sm font-black uppercase tracking-[0.45em] text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                    Durchlauf {Math.min(audioPlayCount + 1, 2)} / 2
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAudioPlayPause}
+                    className="flex h-40 w-40 items-center justify-center rounded-full border-4 border-[#FFD83B] bg-black text-7xl font-black text-[#FFD83B] shadow-[0_0_18px_#FFD83B,0_0_42px_rgba(255,216,59,0.55)] transition hover:scale-105"
+                  >
+                    {isAudioPlaying ? "Ⅱ" : "▶"}
+                  </button>
+
+                  <div className="mt-10 text-2xl font-black text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
+                    {audioPlayCount === 0 && !isAudioPlaying && "Erster Durchlauf"}
+                    {audioPlayCount === 1 && !isAudioPlaying && "Nochmal abspielen"}
+                    {audioPlayCount >= 2 && !isAudioPlaying && "Zweimal abgespielt"}
+                    {isAudioPlaying && "Läuft ..."}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       );
