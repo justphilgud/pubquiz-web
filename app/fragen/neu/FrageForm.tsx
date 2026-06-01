@@ -718,7 +718,7 @@ export default function FrageForm({
         frage,
         quelle,
         kategorien: selectedKategorien,
-        neueKategorie: neueKategorien.join(","),
+        neueKategorien,
         medienZurFrage: medienZurFrageOhneUploadMeta,
         antworten: antwortenOhneUploadMeta,
         vorlageId: selectedVorlageId,

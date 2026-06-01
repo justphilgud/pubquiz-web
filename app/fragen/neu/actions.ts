@@ -70,7 +70,7 @@ export async function saveFrage(data: {
   frage: string;
   quelle: string;
   kategorien: number[];
-  neueKategorie: string;
+  neueKategorien: string[];
   medienZurFrage: MediumInput[];
   antworten: AntwortInput[];
 
@@ -137,20 +137,29 @@ export async function saveFrage(data: {
     (m) => m.datei.trim() !== ""
   );
 
-  const neueKategorieText = data.neueKategorie.trim();
+  const kategorieIds = [...data.kategorien];
 
-  const neueKategorie = neueKategorieText
-    ? await prisma.fragenkategorie.upsert({
-        where: { kategorie: neueKategorieText },
-        update: {},
-        create: { kategorie: neueKategorieText },
-      })
-    : null;
+  for (const neueKategorieName of data.neueKategorien) {
+    const name = neueKategorieName.trim();
 
-  const kategorieIds = [
-    ...data.kategorien,
-    ...(neueKategorie ? [neueKategorie.fragenkategorie_id] : []),
-  ];
+    if (!name) {
+      continue;
+    }
+
+    const neueKategorie = await prisma.fragenkategorie.upsert({
+      where: {
+        kategorie: name,
+      },
+      update: {},
+      create: {
+        kategorie: name,
+      },
+    });
+
+    if (!kategorieIds.includes(neueKategorie.fragenkategorie_id)) {
+      kategorieIds.push(neueKategorie.fragenkategorie_id);
+    }
+  }
 
   const neueFrage = await prisma.$transaction(async (tx) => {
     const createdFrage = await tx.fragen.create({
@@ -251,6 +260,7 @@ export async function saveFrage(data: {
   });
 
   revalidatePath("/");
+  revalidatePath("/fragen");
   revalidatePath("/fragen/neu");
 
   for (const quizId of data.quizIds ?? []) {
