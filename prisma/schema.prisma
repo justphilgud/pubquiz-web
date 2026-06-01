@@ -202,6 +202,7 @@ model quiz_team_sessions {
   quiz_team_session_id Int              @id @default(autoincrement())
   quiz_id              Int
   teamname             String
+  spieler_anzahl       Int @default(1)
   erstellt_am          DateTime         @default(now())
   quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
   team_antworten       team_antworten[]

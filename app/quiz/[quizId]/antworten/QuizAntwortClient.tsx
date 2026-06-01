@@ -83,6 +83,7 @@ type TeamSession = {
 
 export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
   const [teamname, setTeamname] = useState("");
+  const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
   const [teamVorschlaege, setTeamVorschlaege] = useState<
     { team_id: number; teamname: string }[]
@@ -244,8 +245,9 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
 
     const result = await startQuizTeamSession({
       quizId: liveDaten.quiz_id,
-      teamname: name,
+      teamname: teamname.trim(),
       passwort: teamPasswort.trim() || undefined,
+      spielerAnzahl: Math.max(1, Number(spielerAnzahl) || 1),
     });
 
     setIsStartingSession(false);
@@ -313,118 +315,66 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
           <p className="mt-2 text-slate-600">Antwortformular für Teams</p>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="space-y-4">
           <label className="block">
             <span className="mb-2 block text-sm font-semibold text-slate-700">
               Teamname
             </span>
 
             <input
+              type="text"
               value={teamname}
               disabled={!!session}
               onChange={(e) => setTeamname(e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
-              placeholder="z. B. Die Ratlosen"
+              placeholder="z. B. Quiztopher Columbus"
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">
+              Anzahl Spieler
+            </span>
+
+            <input
+              type="number"
+              min={1}
+              value={spielerAnzahl}
+              disabled={!!session}
+              onChange={(e) => setSpielerAnzahl(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
+              placeholder="z. B. 4"
             />
           </label>
 
           {teamExistiert && (
-            <label className="mt-4 block">
+            <label className="block">
               <span className="mb-2 block text-sm font-semibold text-slate-700">
                 Team-Passwort
               </span>
 
               <input
+                type="password"
                 value={teamPasswort}
                 disabled={!!session}
                 onChange={(e) => setTeamPasswort(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
-                placeholder="Nur nötig, wenn das Team schon existiert"
+                placeholder="Passwort eingeben"
               />
             </label>
           )}
 
-          {isLoadingTeams && (
-            <div className="mt-2 text-sm text-slate-500">
-              Teams werden gesucht...
-            </div>
+          {!session && (
+            <button
+              type="button"
+              onClick={handleStartSession}
+              disabled={isStartingSession || !teamname.trim()}
+              className="w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              {isStartingSession ? "Verbinde..." : "Team starten"}
+            </button>
           )}
-
-          {teamVorschlaege.length > 0 && (
-            <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white">
-              {teamVorschlaege.map((team) => (
-                <button
-                  key={team.team_id}
-                  type="button"
-                  onClick={() => {
-                    setTeamname(team.teamname);
-                    setTeamVorschlaege([]);
-                  }}
-                  className="block w-full border-b border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50"
-                >
-                  {team.teamname}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {meldung && (
-            <div className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-              {meldung}
-            </div>
-          )}
-
-          <div className="mt-4">
-            {session ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-3 rounded-2xl bg-green-50 p-4">
-                  <div>
-                    <div className="text-sm font-semibold text-green-700">
-                      Team angemeldet
-                    </div>
-                    <div className="text-lg font-bold text-green-900">
-                      {session.teamname}
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleTeamWechseln}
-                    className="rounded-xl border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700"
-                  >
-                    Team wechseln
-                  </button>
-                </div>
-
-                {generiertesPasswort && (
-                  <div className="rounded-2xl border border-yellow-300 bg-yellow-50 p-4 text-yellow-900">
-                    <div className="text-sm font-semibold uppercase tracking-wide">
-                      Euer Team-Passwort:
-                    </div>
-
-                    <div className="mt-2 text-3xl font-black">
-                      {generiertesPasswort}
-                    </div>
-
-                    <p className="mt-2 text-sm">
-                      Merkt euch dieses Passwort. Damit könnt ihr euch später
-                      mit demselben Teamnamen wieder anmelden.
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleStartSession}
-                disabled={!teamname.trim() || isStartingSession}
-                className="w-full rounded-2xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-              >
-                {isStartingSession ? "Wird gestartet..." : "Quiz beitreten"}
-              </button>
-            )}
-          </div>
-        </section>
+        </div>
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           {aktuellerBlock ? (

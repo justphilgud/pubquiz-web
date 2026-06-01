@@ -29,8 +29,6 @@ export default function QuizForm({
   const [editingQuizId, setEditingQuizId] = useState<number | null>(null);
   const [titel, setTitel] = useState("");
   const [quizDatum, setQuizDatum] = useState("");
-  const [teamAnzahl, setTeamAnzahl] = useState("");
-  const [teilnehmerAnzahl, setTeilnehmerAnzahl] = useState("");
   const [bemerkung, setBemerkung] = useState("");
   const [meldung, setMeldung] = useState("");
 
@@ -38,8 +36,6 @@ export default function QuizForm({
     setEditingQuizId(null);
     setTitel("");
     setQuizDatum("");
-    setTeamAnzahl("");
-    setTeilnehmerAnzahl("");
     setBemerkung("");
   }
 
@@ -47,10 +43,6 @@ export default function QuizForm({
     setEditingQuizId(quiz.quiz_id);
     setTitel(quiz.titel ?? "");
     setQuizDatum(quiz.quiz_datum ?? "");
-    setTeamAnzahl(quiz.team_anzahl !== null ? String(quiz.team_anzahl) : "");
-    setTeilnehmerAnzahl(
-      quiz.teilnehmer_anzahl !== null ? String(quiz.teilnehmer_anzahl) : ""
-    );
     setBemerkung(quiz.bemerkung ?? "");
     setMeldung(`Quiz ${quiz.quiz_id} wird bearbeitet.`);
   }
@@ -61,8 +53,6 @@ export default function QuizForm({
     const data = {
       titel,
       quizDatum,
-      teamAnzahl: teamAnzahl ? Number(teamAnzahl) : null,
-      teilnehmerAnzahl: teilnehmerAnzahl ? Number(teilnehmerAnzahl) : null,
       bemerkung,
     };
 
@@ -80,6 +70,7 @@ export default function QuizForm({
         quizId: editingQuizId,
         ...data,
       });
+
       setMeldung("Quiz wurde aktualisiert.");
     }
 
@@ -132,7 +123,7 @@ export default function QuizForm({
             />
           </label>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-1">
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700">
                 Quiz-Datum:
@@ -141,32 +132,6 @@ export default function QuizForm({
                 type="date"
                 value={quizDatum}
                 onChange={(e) => setQuizDatum(e.target.value)}
-                className={inputClass}
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">
-                Teamanzahl:
-              </span>
-              <input
-                type="number"
-                min={0}
-                value={teamAnzahl}
-                onChange={(e) => setTeamAnzahl(e.target.value)}
-                className={inputClass}
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">
-                Teilnehmeranzahl:
-              </span>
-              <input
-                type="number"
-                min={0}
-                value={teilnehmerAnzahl}
-                onChange={(e) => setTeilnehmerAnzahl(e.target.value)}
                 className={inputClass}
               />
             </label>

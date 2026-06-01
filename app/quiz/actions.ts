@@ -117,8 +117,6 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 export async function createQuiz(data: {
   titel: string;
   quizDatum: string;
-  teamAnzahl: number | null;
-  teilnehmerAnzahl: number | null;
   bemerkung: string;
 }) {
   if (!data.titel.trim()) {
@@ -132,8 +130,8 @@ export async function createQuiz(data: {
     data: {
       titel: data.titel.trim(),
       quiz_datum: data.quizDatum ? new Date(data.quizDatum) : null,
-      team_anzahl: data.teamAnzahl,
-      teilnehmer_anzahl: data.teilnehmerAnzahl,
+      team_anzahl: 0,
+      teilnehmer_anzahl: 0,
       bemerkung: data.bemerkung.trim() || null,
     },
   });
@@ -152,8 +150,6 @@ export async function updateQuiz(data: {
   quizId: number;
   titel: string;
   quizDatum: string;
-  teamAnzahl: number | null;
-  teilnehmerAnzahl: number | null;
   bemerkung: string;
 }) {
   await prisma.quiz.update({
@@ -163,8 +159,6 @@ export async function updateQuiz(data: {
     data: {
       titel: data.titel.trim() || null,
       quiz_datum: data.quizDatum ? new Date(data.quizDatum) : null,
-      team_anzahl: data.teamAnzahl,
-      teilnehmer_anzahl: data.teilnehmerAnzahl,
       bemerkung: data.bemerkung.trim() || null,
     },
   });
@@ -1214,6 +1208,7 @@ export async function searchTeamsForAntworten(query: string) {
 export async function startQuizTeamSession(data: {
   quizId: number;
   teamname: string;
+  spielerAnzahl?: number | null;
   passwort?: string;
 }) {
   const teamname = data.teamname.trim();
@@ -1224,6 +1219,11 @@ export async function startQuizTeamSession(data: {
       message: "Bitte einen Teamnamen eingeben.",
     };
   }
+
+  const spielerAnzahl =
+    typeof data.spielerAnzahl === "number" && data.spielerAnzahl > 0
+      ? data.spielerAnzahl
+      : 1;
 
   let team = await prisma.teams.findUnique({
     where: {
@@ -1264,12 +1264,40 @@ export async function startQuizTeamSession(data: {
         teamname,
       },
     },
-    update: {},
+    update: {
+      spieler_anzahl: spielerAnzahl,
+    },
     create: {
       quiz_id: data.quizId,
       teamname,
+      spieler_anzahl: spielerAnzahl,
     },
   });
+
+  const statistik = await prisma.quiz_team_sessions.aggregate({
+    where: {
+      quiz_id: data.quizId,
+    },
+    _count: {
+      quiz_team_session_id: true,
+    },
+    _sum: {
+      spieler_anzahl: true,
+    },
+  });
+
+  await prisma.quiz.update({
+    where: {
+      quiz_id: data.quizId,
+    },
+    data: {
+      team_anzahl: statistik._count.quiz_team_session_id,
+      teilnehmer_anzahl: statistik._sum.spieler_anzahl ?? 0,
+    },
+  });
+
+  revalidatePath(`/quiz/${data.quizId}`);
+  revalidatePath("/quiz");
 
   return {
     success: true,

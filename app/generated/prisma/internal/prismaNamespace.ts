@@ -2095,6 +2095,7 @@ export const Quiz_team_sessionsScalarFieldEnum = {
   quiz_team_session_id: 'quiz_team_session_id',
   quiz_id: 'quiz_id',
   teamname: 'teamname',
+  spieler_anzahl: 'spieler_anzahl',
   erstellt_am: 'erstellt_am'
 } as const
 
