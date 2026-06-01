@@ -1897,30 +1897,48 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
 }
 `}</style>
       <div className="flex h-screen flex-col p-4">
-        <header className="mb-3 flex h-20 shrink-0 items-center justify-between rounded-3xl border-4 border-yellow-300 bg-black/60 px-5 shadow-[0_0_30px_rgba(255,0,170,0.55)]">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 rotate-[-6deg] items-center justify-center rounded-2xl border-4 border-cyan-300 bg-pink-500 shadow-[6px_6px_0_#00e5ff] overflow-hidden">
-              <img
-                src={praesentationQuiz.intro_logo_url ?? "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780326275893-logo.png"}
-                alt="Quiz Logo"
-                className="h-full w-full object-cover"
-              />
-            </div>
+        <header className="mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
+
+          {/* LINKER BEREICH */}
+          <div className="flex items-center gap-6">
+
+            <img
+              src="https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780332661261-logo_schriftzug.png"
+              alt="ungegoogelt"
+              className="h-16 w-auto object-contain"
+            />
+
+            <div className="h-14 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
 
             <div>
-              <div className="text-xs font-black uppercase tracking-[0.35em] text-cyan-300">
+              <div className="text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
                 {slideLabel}
               </div>
 
-              <h1 className="text-2xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[3px_3px_0_#ff00aa]">
-                {quiz.titel ?? `Quiz ${quiz.quiz_id}`}
-              </h1>
+              <div className="text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                {quiz.titel}
+              </div>
             </div>
+
           </div>
 
-          <div className="rounded-2xl border-4 border-pink-400 bg-yellow-300 px-5 py-2 text-xl font-black text-slate-950 shadow-[5px_5px_0_#ff00aa]">
-            {slideIndex + 1} / {slides.length}
+          {/* RECHTS */}
+          <div className="flex items-center gap-4">
+
+            <div className="rounded-2xl border-2 border-[#FF3BD4] px-6 py-3 text-2xl font-black text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4]">
+              {slideIndex + 1}
+            </div>
+
+            <div className="text-3xl font-black text-[#38E8FF]">
+              /
+            </div>
+
+            <div className="rounded-2xl border-2 border-[#FFD83B] px-6 py-3 text-2xl font-black text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
+              {slides.length}
+            </div>
+
           </div>
+
         </header>
 
         <section className="min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
