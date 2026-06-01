@@ -503,9 +503,24 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   }, [slideIndex, quiz.quiz_id, slide?.typ]);
 
   function nextSlide() {
+    if (overlayMedien) {
+      setOverlayMedien(null);
+
+      if (slideIndex >= slides.length - 1) return;
+      setSlideIndex((current) => current + 1);
+      return;
+    }
 
     if (slide?.typ === "endstand" && endstandRevealCount < 5) {
       setEndstandRevealCount((current) => Math.min(5, current + 1));
+      return;
+    }
+
+    if (
+      slide?.typ === "frage" &&
+      slide.frage.medien.length > 0
+    ) {
+      setOverlayMedien(slide.frage.medien);
       return;
     }
 
@@ -1918,72 +1933,18 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
           {renderAktuellenSlide()}
         </section>
 
-        <footer className="mt-3 flex h-20 shrink-0 items-center justify-between gap-4">
-          <div className="flex gap-3">
+
+        {hatGleichstandAufPlatz1 && slide?.typ === "endstand" && (
+          <footer className="mt-3 flex h-20 shrink-0 items-center justify-start gap-4">
             <button
               type="button"
-              onClick={previousSlide}
-              disabled={slideIndex === 0}
-              className="rounded-2xl border-4 border-cyan-300 bg-black px-5 py-3 font-black uppercase text-cyan-200 shadow-[5px_5px_0_#ff00aa] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              onClick={handleSchaetzfrageStarten}
+              className="rounded-2xl border-4 border-pink-400 bg-pink-500 px-6 py-4 text-xl font-black uppercase tracking-[0.2em] text-yellow-200 shadow-[4px_4px_0_#00e5ff] transition hover:scale-105"
             >
-              ← Zurück
+              Schätzfrage
             </button>
-            {hatGleichstandAufPlatz1 && (
-              <button
-                type="button"
-                onClick={handleSchaetzfrageStarten}
-                className="rounded-2xl border-4 border-pink-400 bg-pink-500 px-6 py-4 text-xl font-black uppercase tracking-[0.2em] text-yellow-200 shadow-[4px_4px_0_#00e5ff] transition hover:scale-105"
-              >
-                Schätzfrage
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={nextSlide}
-              disabled={slideIndex >= slides.length - 1}
-              className="rounded-2xl border-4 border-cyan-300 bg-black px-5 py-3 font-black uppercase text-cyan-200 shadow-[5px_5px_0_#ff00aa] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              Weiter →
-            </button>
-
-            {slide &&
-              (
-                (slide.typ === "block" &&
-                  istFragenblock(slide.abschnitt.abschnitt_typ)) ||
-                slide.typ === "pause"
-              ) && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleBlockFreigeben}
-                    disabled={isFreigabeLoading}
-                    className="rounded-2xl border-4 border-emerald-300 bg-black px-5 py-3 font-black uppercase text-emerald-200 shadow-[5px_5px_0_#ff00aa] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
-                  >
-                    Freigeben
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleBlockSchliessen}
-                    disabled={isFreigabeLoading}
-                    className="rounded-2xl border-4 border-red-300 bg-black px-5 py-3 font-black uppercase text-red-200 shadow-[5px_5px_0_#ff00aa] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
-                  >
-                    Schließen
-                  </button>
-                </>
-              )}
-          </div>
-
-          <div className="rounded-3xl border-4 border-yellow-300 bg-black/60 px-6 py-3 text-sm font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
-            {modusLabel}
-            {freigabeMeldung && (
-              <div className="mt-2 text-center text-xs font-black uppercase tracking-wide text-cyan-300">
-                {freigabeMeldung}
-              </div>
-            )}
-          </div>
-        </footer>
+          </footer>
+        )}
 
         {overlayMedien && (
           <div
