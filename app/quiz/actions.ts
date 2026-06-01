@@ -225,6 +225,119 @@ export async function deleteQuiz(quizId: number) {
   };
 }
 
+export async function copyQuiz(data: {
+  quizId: number;
+  neuerTitel: string;
+}) {
+  const neuerTitel = data.neuerTitel.trim();
+
+  if (!neuerTitel) {
+    return {
+      success: false,
+      message: "Bitte einen Namen für die Kopie eingeben.",
+    };
+  }
+
+  const original = await prisma.quiz.findUnique({
+    where: {
+      quiz_id: data.quizId,
+    },
+    include: {
+      quiz_abschnitte: {
+        orderBy: {
+          sortierung: "asc",
+        },
+      },
+      quiz_fragen: {
+        orderBy: {
+          sortierung: "asc",
+        },
+      },
+    },
+  });
+
+  if (!original) {
+    return {
+      success: false,
+      message: "Original-Quiz wurde nicht gefunden.",
+    };
+  }
+
+  const kopie = await prisma.$transaction(async (tx) => {
+    const neuesQuiz = await tx.quiz.create({
+      data: {
+        titel: neuerTitel,
+        quiz_datum: null,
+        team_anzahl: 0,
+        teilnehmer_anzahl: 0,
+        bemerkung: original.bemerkung,
+
+        intro_logo_url: original.intro_logo_url,
+        intro_musik_url: original.intro_musik_url,
+        intro_video_url: original.intro_video_url,
+        intro_startzeit: original.intro_startzeit,
+        intro_wartetext: original.intro_wartetext,
+        intro_begruessungstitel: original.intro_begruessungstitel,
+        intro_begruessungstext: original.intro_begruessungstext,
+        intro_regeln: original.intro_regeln,
+        intro_preise: original.intro_preise,
+        intro_startsequenz_text: original.intro_startsequenz_text,
+        outro_bekanntmachungen: original.outro_bekanntmachungen,
+        ist_archiviert: false,
+        archivierungsgrund: null,
+      },
+    });
+
+    const abschnittIdMap = new Map<number, number>();
+
+    for (const abschnitt of original.quiz_abschnitte) {
+      const neuerAbschnitt = await tx.quiz_abschnitte.create({
+        data: {
+          quiz_id: neuesQuiz.quiz_id,
+          titel: abschnitt.titel,
+          abschnitt_typ: abschnitt.abschnitt_typ,
+          sortierung: abschnitt.sortierung,
+          dauer_sekunden: abschnitt.dauer_sekunden,
+          qr_code_url: abschnitt.qr_code_url,
+          medien_datei: abschnitt.medien_datei,
+          bemerkung: abschnitt.bemerkung,
+        },
+      });
+
+      abschnittIdMap.set(
+        abschnitt.quiz_abschnitt_id,
+        neuerAbschnitt.quiz_abschnitt_id
+      );
+    }
+
+    for (const quizFrage of original.quiz_fragen) {
+      await tx.quiz_fragen.create({
+        data: {
+          quiz_id: neuesQuiz.quiz_id,
+          fragen_id: quizFrage.fragen_id,
+          quiz_abschnitt_id: quizFrage.quiz_abschnitt_id
+            ? abschnittIdMap.get(quizFrage.quiz_abschnitt_id) ?? null
+            : null,
+          sortierung: quizFrage.sortierung,
+          punkte_modus: quizFrage.punkte_modus,
+          praesentationslayout: quizFrage.praesentationslayout,
+          antwort_reihenfolge: quizFrage.antwort_reihenfolge,
+        },
+      });
+    }
+
+    return neuesQuiz;
+  });
+
+  revalidatePath("/quiz");
+
+  return {
+    success: true,
+    message: "Quiz wurde kopiert.",
+    quizId: kopie.quiz_id,
+  };
+}
+
 export async function getQuizDetails(
   quizId: number
 ): Promise<QuizDetailsResult | null> {

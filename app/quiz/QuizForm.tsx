@@ -7,9 +7,17 @@ import {
   createQuiz,
   restoreQuiz,
   updateQuiz,
-  deleteQuiz
+  deleteQuiz,
+  copyQuiz,
 } from "./actions";
 import type { QuizResult } from "./actions";
+import {
+  ArchiveBoxIcon,
+  TrashIcon,
+  PlayIcon,
+  DocumentDuplicateIcon,
+  LockOpenIcon,
+} from "@heroicons/react/24/outline";
 
 type Props = {
   quizze: QuizResult[];
@@ -239,60 +247,83 @@ export default function QuizForm({
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-2">
 
+                        <button
+                          type="button"
+                          title="Quiz kopieren"
+                          onClick={async () => {
+                            const neuerTitel = window.prompt(
+                              "Name der Quiz-Kopie",
+                              `${quiz.titel} (Kopie)`
+                            );
+
+                            if (!neuerTitel?.trim()) {
+                              return;
+                            }
+
+                            const result = await copyQuiz({
+                              quizId: quiz.quiz_id,
+                              neuerTitel,
+                            });
+
+                            setMeldung(result.message);
+                          }}
+                          className="rounded-xl border border-slate-300 bg-slate-50 p-2 text-slate-700 shadow-sm transition hover:bg-slate-100"
+                        >
+                          <DocumentDuplicateIcon className="h-5 w-5" />
+                        </button>
+
                         {quiz.ist_archiviert ? (
                           <button
                             type="button"
+                            title="Archivierung aufheben"
                             onClick={() => handleRestore(quiz.quiz_id)}
-                            className="rounded-xl border border-green-300 bg-green-50 px-4 py-2 font-medium text-green-700 shadow-sm transition hover:bg-green-100 active:scale-[0.99]"
+                            className="rounded-xl border border-green-300 bg-green-50 p-2 text-green-700 shadow-sm transition hover:bg-green-100"
                           >
-                            Entsperren
+                            <LockOpenIcon className="h-5 w-5" />
+                          </button>
+                        ) : quiz.fragen_anzahl === 0 ? (
+                          <button
+                            type="button"
+                            title="Quiz löschen"
+                            onClick={async () => {
+                              const ok = window.confirm(
+                                "Dieses Quiz wirklich löschen?"
+                              );
+
+                              if (!ok) return;
+
+                              const result = await deleteQuiz(quiz.quiz_id);
+
+                              if (!result.success) {
+                                setMeldung(result.message);
+                                return;
+                              }
+
+                              setMeldung(result.message);
+                            }}
+                            className="rounded-xl border border-red-300 bg-red-50 p-2 text-red-700 shadow-sm transition hover:bg-red-100"
+                          >
+                            <TrashIcon className="h-5 w-5" />
                           </button>
                         ) : (
-                          quiz.fragen_anzahl === 0 ? (
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                const ok = window.confirm("Dieses Quiz wirklich löschen?");
-                                if (!ok) return;
-
-                                const result = await deleteQuiz(quiz.quiz_id);
-
-                                if (!result.success) {
-                                  setMeldung(result.message);
-                                  return;
-                                }
-
-                                setMeldung(result.message);
-                              }}
-                              className="rounded-xl border border-red-300 bg-red-50 px-4 py-2 font-medium text-red-700 shadow-sm transition hover:bg-red-100 active:scale-[0.99]"
-                            >
-                              Löschen
-                            </button>
-                          ) : quiz.ist_archiviert ? (
-                            <button
-                              type="button"
-                              onClick={() => handleRestore(quiz.quiz_id)}
-                              className="rounded-xl border border-green-300 bg-green-50 px-4 py-2 font-medium text-green-700 shadow-sm transition hover:bg-green-100 active:scale-[0.99]"
-                            >
-                              Entsperren
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => handleArchive(quiz.quiz_id)}
-                              className="rounded-xl border border-orange-300 bg-orange-50 px-4 py-2 font-medium text-orange-700 shadow-sm transition hover:bg-orange-100 active:scale-[0.99]"
-                            >
-                              Archivieren
-                            </button>
-
-                          )
+                          <button
+                            type="button"
+                            title="Archivieren"
+                            onClick={() => handleArchive(quiz.quiz_id)}
+                            className="rounded-xl border border-orange-300 bg-orange-50 p-2 text-orange-700 shadow-sm transition hover:bg-orange-100"
+                          >
+                            <ArchiveBoxIcon className="h-5 w-5" />
+                          </button>
                         )}
+
                         <Link
                           href={`/quiz/${quiz.quiz_id}/praesentation`}
-                          className="rounded-xl border border-cyan-300 bg-cyan-50 px-4 py-2 font-medium text-cyan-700 shadow-sm transition hover:bg-cyan-100 active:scale-[0.99]"
+                          title="Präsentieren"
+                          className="rounded-xl border border-cyan-300 bg-cyan-50 p-2 text-cyan-700 shadow-sm transition hover:bg-cyan-100"
                         >
-                          Präsentieren
+                          <PlayIcon className="h-5 w-5" />
                         </Link>
+
                       </div>
                     </td>
                   </tr>

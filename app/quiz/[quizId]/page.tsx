@@ -2,7 +2,16 @@ import {
   archiveQuiz,
   getQuizDetails,
   restoreQuiz,
+  copyQuiz
 } from "../actions";
+
+import {
+  ArchiveBoxIcon,
+  DocumentDuplicateIcon,
+  LockOpenIcon,
+  PlayIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
 
@@ -63,6 +72,7 @@ export default async function QuizDetailPage({
   }
 
   const quizIdValue = quiz.quiz_id;
+  const quizTitelValue = quiz.titel;
 
   async function archiveAction() {
     "use server";
@@ -77,6 +87,15 @@ export default async function QuizDetailPage({
     "use server";
 
     await restoreQuiz(quizIdValue);
+  }
+
+  async function copyAction() {
+    "use server";
+
+    await copyQuiz({
+      quizId: quizIdValue,
+      neuerTitel: `${quizTitelValue} (Kopie)`,
+    });
   }
 
   return (
@@ -101,36 +120,50 @@ export default async function QuizDetailPage({
           <div className="flex flex-wrap gap-3">
             <a
               href={`/quiz?passwort=${passwort}`}
-              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
+              title="Zur Übersicht"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white p-3 text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
-              Zur Übersicht
+              <ArrowLeftIcon className="h-5 w-5" />
             </a>
+
+            <form action={copyAction}>
+              <button
+                type="submit"
+                title="Quiz kopieren"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white p-3 text-slate-700 shadow-sm transition hover:bg-slate-50"
+              >
+                <DocumentDuplicateIcon className="h-5 w-5" />
+              </button>
+            </form>
 
             {quiz.ist_archiviert ? (
               <form action={restoreAction}>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+                  title="Archivierung aufheben"
+                  className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white p-3 text-emerald-700 shadow-sm transition hover:bg-emerald-50"
                 >
-                  Archivierung aufheben
+                  <LockOpenIcon className="h-5 w-5" />
                 </button>
               </form>
             ) : (
               <form action={archiveAction}>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-semibold text-orange-600 shadow-sm transition hover:bg-orange-50"
+                  title="Archivieren"
+                  className="inline-flex items-center justify-center rounded-xl border border-orange-300 bg-white p-3 text-orange-600 shadow-sm transition hover:bg-orange-50"
                 >
-                  Archivieren
+                  <ArchiveBoxIcon className="h-5 w-5" />
                 </button>
               </form>
             )}
 
             <a
               href={`/quiz/${quiz.quiz_id}/praesentation?passwort=${passwort}`}
-              className="inline-flex items-center justify-center rounded-xl border border-cyan-300 bg-white px-5 py-3 text-sm font-semibold text-cyan-700 shadow-sm transition hover:bg-cyan-50"
+              title="Präsentieren"
+              className="inline-flex items-center justify-center rounded-xl border border-cyan-300 bg-white p-3 text-cyan-700 shadow-sm transition hover:bg-cyan-50"
             >
-              Präsentieren
+              <PlayIcon className="h-5 w-5" />
             </a>
           </div>
         </div>
