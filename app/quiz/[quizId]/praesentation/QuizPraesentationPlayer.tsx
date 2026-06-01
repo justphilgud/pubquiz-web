@@ -1899,8 +1899,12 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       <div className="flex h-screen flex-col p-4">
         <header className="mb-3 flex h-20 shrink-0 items-center justify-between rounded-3xl border-4 border-yellow-300 bg-black/60 px-5 shadow-[0_0_30px_rgba(255,0,170,0.55)]">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 rotate-[-6deg] items-center justify-center rounded-2xl border-4 border-cyan-300 bg-pink-500 text-xs font-black uppercase tracking-wide text-yellow-200 shadow-[6px_6px_0_#00e5ff]">
-              Logo
+            <div className="flex h-14 w-14 rotate-[-6deg] items-center justify-center rounded-2xl border-4 border-cyan-300 bg-pink-500 shadow-[6px_6px_0_#00e5ff] overflow-hidden">
+              <img
+                src={praesentationQuiz.intro_logo_url ?? "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780326275893-logo.png"}
+                alt="Quiz Logo"
+                className="h-full w-full object-cover"
+              />
             </div>
 
             <div>
