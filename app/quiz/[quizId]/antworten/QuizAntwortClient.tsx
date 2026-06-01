@@ -316,67 +316,102 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
           <p className="mt-2 text-slate-600">Antwortformular für Teams</p>
         </section>
 
-        <div className="space-y-4">
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-slate-700">
-              Teamname
-            </span>
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          {!session ? (
+            <div className="space-y-4">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-slate-700">
+                  Teamname
+                </span>
 
-            <input
-              type="text"
-              value={teamname}
-              disabled={!!session}
-              onChange={(e) => setTeamname(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
-              placeholder="z. B. Quiztopher Columbus"
-            />
-          </label>
+                <input
+                  type="text"
+                  value={teamname}
+                  onChange={(e) => setTeamname(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+                  placeholder="z. B. Quiztopher Columbus"
+                />
+              </label>
 
-          {!session && (
-            <label className="mt-4 block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">
-                Anzahl Spieler
-              </span>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-slate-700">
+                  Anzahl Spieler
+                </span>
 
-              <input
-                type="number"
-                min={1}
-                value={spielerAnzahl}
-                onChange={(e) => setSpielerAnzahl(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-                placeholder="z. B. 4"
-              />
-            </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={spielerAnzahl}
+                  onChange={(e) => setSpielerAnzahl(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+                  placeholder="z. B. 4"
+                />
+              </label>
+
+              {teamExistiert && (
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">
+                    Team-Passwort
+                  </span>
+
+                  <input
+                    type="password"
+                    value={teamPasswort}
+                    onChange={(e) => setTeamPasswort(e.target.value)}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+                    placeholder="Passwort eingeben"
+                  />
+                </label>
+              )}
+
+              <button
+                type="button"
+                onClick={handleStartSession}
+                disabled={isStartingSession || !teamname.trim()}
+                className="w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+              >
+                {isStartingSession ? "Verbinde..." : "Team starten"}
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <div>
+                <div className="text-sm font-bold text-emerald-700">
+                  Team angemeldet
+                </div>
+
+                <div className="mt-1 text-xl font-black text-slate-900">
+                  {session.teamname}
+                </div>
+
+                {generiertesPasswort && (
+                  <div className="mt-2 text-sm text-slate-700">
+                    Team-Passwort:{" "}
+                    <span className="font-black text-slate-900">
+                      {generiertesPasswort}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
+                  setSession(null);
+                  setTeamname("");
+                  setTeamPasswort("");
+                  setGeneriertesPasswort(null);
+                  setSpielerAnzahl("1");
+                  setMeldung("");
+                }}
+                className="shrink-0 rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-800"
+              >
+                Team wechseln
+              </button>
+            </div>
           )}
-
-          {teamExistiert && (
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">
-                Team-Passwort
-              </span>
-
-              <input
-                type="password"
-                value={teamPasswort}
-                disabled={!!session}
-                onChange={(e) => setTeamPasswort(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
-                placeholder="Passwort eingeben"
-              />
-            </label>
-          )}
-
-          {!session && (
-            <button
-              type="button"
-              onClick={handleStartSession}
-              disabled={isStartingSession || !teamname.trim()}
-              className="w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              {isStartingSession ? "Verbinde..." : "Team starten"}
-            </button>
-          )}
-        </div>
+        </section>
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           {aktuellerBlock ? (
