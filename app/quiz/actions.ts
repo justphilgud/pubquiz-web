@@ -1305,6 +1305,7 @@ export async function startQuizTeamSession(data: {
     session: {
       quiz_team_session_id: session.quiz_team_session_id,
       teamname: session.teamname,
+      teamPasswort: team.team_passwort,
     },
   };
 }

@@ -79,6 +79,7 @@ type AntwortStatus = {
 type TeamSession = {
   quiz_team_session_id: number;
   teamname: string;
+  teamPasswort: string | null;
 };
 
 export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
@@ -384,14 +385,12 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
                   {session.teamname}
                 </div>
 
-                {generiertesPasswort && (
-                  <div className="mt-2 text-sm text-slate-700">
-                    Team-Passwort:{" "}
-                    <span className="font-black text-slate-900">
-                      {generiertesPasswort}
-                    </span>
-                  </div>
-                )}
+                <div className="mt-2 text-sm text-slate-700">
+                  Team-Passwort:{" "}
+                  <span className="font-black text-slate-900">
+                    {session.teamPasswort}
+                  </span>
+                </div>
               </div>
 
               <button
