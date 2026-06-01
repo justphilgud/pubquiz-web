@@ -281,6 +281,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
     localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
     setSession(null);
     setTeamname("");
+    setSpielerAnzahl("1");
     setTeamVorschlaege([]);
     setMeldung("");
   }
@@ -331,36 +332,22 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
             />
           </label>
 
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-slate-700">
-              Anzahl Spieler
-            </span>
+          {!session && (
+            <label className="mt-4 block">
+              <span className="mb-2 block text-sm font-semibold text-slate-700">
+                Anzahl Spieler
+              </span>
 
-            <input
-              type="number"
-              min={1}
-              value={spielerAnzahl}
-              disabled={!!session}
-              onChange={(e) => setSpielerAnzahl(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
-              placeholder="z. B. 4"
-            />
-          </label>
-          <label className="mt-4 block">
-            <span className="mb-2 block text-sm font-semibold text-slate-700">
-              Anzahl Spieler
-            </span>
-
-            <input
-              type="number"
-              min={1}
-              value={spielerAnzahl}
-              disabled={!!session}
-              onChange={(e) => setSpielerAnzahl(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
-              placeholder="z. B. 4"
-            />
-          </label>
+              <input
+                type="number"
+                min={1}
+                value={spielerAnzahl}
+                onChange={(e) => setSpielerAnzahl(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+                placeholder="z. B. 4"
+              />
+            </label>
+          )}
 
           {teamExistiert && (
             <label className="block">
