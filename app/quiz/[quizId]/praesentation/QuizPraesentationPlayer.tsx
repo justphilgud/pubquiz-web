@@ -514,21 +514,6 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       return;
     }
 
-    if (slide?.typ === "frage" && slide.frage.medien.length > 0) {
-      const wurdeSchonGezeigt = autoGezeigteMedienFrageIds.includes(
-        slide.frage.fragen_id
-      );
-
-      if (!wurdeSchonGezeigt) {
-        setAutoGezeigteMedienFrageIds((current) => [
-          ...current,
-          slide.frage.fragen_id,
-        ]);
-        setOverlayMedien(slide.frage.medien);
-        return;
-      }
-    }
-
     if (slideIndex >= slides.length - 1) return;
 
     setSlideIndex((current) => current + 1);
