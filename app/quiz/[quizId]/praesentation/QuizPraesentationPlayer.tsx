@@ -234,6 +234,9 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   const [freigabeMeldung, setFreigabeMeldung] = useState("");
   const [isFreigabeLoading, setIsFreigabeLoading] = useState(false);
   const [endstandRevealCount, setEndstandRevealCount] = useState(2);
+  const [autoGezeigteMedienSlideIds, setAutoGezeigteMedienSlideIds] = useState<
+    number[]
+  >([]);
   const [schaetzfrage, setSchaetzfrage] = useState<{
     fragen_id: number;
     frage: string;
@@ -513,12 +516,14 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       return;
     }
 
-    if (
-      slide?.typ === "frage" &&
-      slide.frage.medien.length > 0
-    ) {
-      setOverlayMedien(slide.frage.medien);
-      return;
+    if (slide?.typ === "frage" && slide.frage.medien.length > 0) {
+      const wurdeSchonGezeigt = autoGezeigteMedienSlideIds.includes(slideIndex);
+
+      if (!wurdeSchonGezeigt) {
+        setAutoGezeigteMedienSlideIds((current) => [...current, slideIndex]);
+        setOverlayMedien(slide.frage.medien);
+        return;
+      }
     }
 
     if (slideIndex >= slides.length - 1) return;
