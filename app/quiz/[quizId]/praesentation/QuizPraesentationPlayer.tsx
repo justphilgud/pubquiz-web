@@ -1897,49 +1897,44 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
 }
 `}</style>
       <div className="flex h-screen flex-col p-4">
-        <header className="mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
+        {slideLabel !== "VOR DEM START" && (
+          <header className="mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
+            <div className="flex items-center gap-6">
+              <img
+                src={
+                  praesentationQuiz.intro_logo_url ??
+                  "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780326275893-logo.png"
+                }
+                alt="ungegoogelt"
+                className="h-20 w-20 object-contain"
+              />
 
-          {/* LINKER BEREICH */}
-          <div className="flex items-center gap-6">
+              <div className="h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
 
-            <img
-              src="https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780332661261-logo_schriftzug.png"
-              alt="ungegoogelt"
-              className="h-16 w-auto object-contain"
-            />
+              <div>
+                <div className="text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
+                  {slideLabel}
+                </div>
 
-            <div className="h-14 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
+                <div className="text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                  {quiz.titel}
+                </div>
+              </div>
+            </div>
 
-            <div>
-              <div className="text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
-                {slideLabel}
+            <div className="flex items-center gap-4">
+              <div className="rounded-2xl border-2 border-[#FF3BD4] px-6 py-3 text-2xl font-black text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4]">
+                {slideIndex + 1}
               </div>
 
-              <div className="text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
-                {quiz.titel}
+              <div className="text-3xl font-black text-[#38E8FF]">/</div>
+
+              <div className="rounded-2xl border-2 border-[#FFD83B] px-6 py-3 text-2xl font-black text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
+                {slides.length}
               </div>
             </div>
-
-          </div>
-
-          {/* RECHTS */}
-          <div className="flex items-center gap-4">
-
-            <div className="rounded-2xl border-2 border-[#FF3BD4] px-6 py-3 text-2xl font-black text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4]">
-              {slideIndex + 1}
-            </div>
-
-            <div className="text-3xl font-black text-[#38E8FF]">
-              /
-            </div>
-
-            <div className="rounded-2xl border-2 border-[#FFD83B] px-6 py-3 text-2xl font-black text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
-              {slides.length}
-            </div>
-
-          </div>
-
-        </header>
+          </header>
+        )}
 
         <section className="min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
           {renderAktuellenSlide()}
