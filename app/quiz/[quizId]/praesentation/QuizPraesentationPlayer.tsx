@@ -1906,7 +1906,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
                   "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780326275893-logo.png"
                 }
                 alt="ungegoogelt"
-                className="h-20 w-20 object-contain"
+                className="h-28 w-28 object-contain"
               />
 
               <div className="h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
