@@ -346,6 +346,21 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
               placeholder="z. B. 4"
             />
           </label>
+          <label className="mt-4 block">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">
+              Anzahl Spieler
+            </span>
+
+            <input
+              type="number"
+              min={1}
+              value={spielerAnzahl}
+              disabled={!!session}
+              onChange={(e) => setSpielerAnzahl(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
+              placeholder="z. B. 4"
+            />
+          </label>
 
           {teamExistiert && (
             <label className="block">
