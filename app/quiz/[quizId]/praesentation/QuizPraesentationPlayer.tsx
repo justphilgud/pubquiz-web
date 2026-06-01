@@ -1543,11 +1543,11 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     if (abschnitt.abschnitt_typ === "intro_vor_dem_start") {
       return (
         <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-          {quiz.intro_logo_url ? (
+          {praesentationQuiz.intro_logo_url ? (
             <img
-              src={quiz.intro_logo_url}
+              src={praesentationQuiz.intro_logo_url}
               alt="Quiz Logo"
-              className="mb-10 max-h-52 max-w-xl object-contain"
+              className="mb-10 max-h-72 max-w-3xl object-contain"
             />
           ) : (
             <div className="mb-10 rounded-3xl border-4 border-cyan-300 bg-slate-950/70 px-12 py-8 text-5xl font-black uppercase text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
