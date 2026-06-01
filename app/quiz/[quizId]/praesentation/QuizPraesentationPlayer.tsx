@@ -505,9 +505,6 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   function nextSlide() {
     if (overlayMedien) {
       setOverlayMedien(null);
-
-      if (slideIndex >= slides.length - 1) return;
-      setSlideIndex((current) => current + 1);
       return;
     }
 
