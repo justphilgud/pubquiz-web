@@ -256,11 +256,15 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   const slides = useMemo<Slide[]>(() => {
     const result: Slide[] = [];
 
-    const fragenrunden = quiz.abschnitte.filter(
+    const sortierteAbschnitte = [...quiz.abschnitte].sort(
+      (a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)
+    );
+
+    const fragenrunden = sortierteAbschnitte.filter(
       (abschnitt) => abschnitt.abschnitt_typ === "fragenblock"
     );
 
-    for (const abschnitt of quiz.abschnitte) {
+    for (const abschnitt of sortierteAbschnitte) {
       const fragenImBlock = quiz.fragen
         .filter(
           (frage) =>
