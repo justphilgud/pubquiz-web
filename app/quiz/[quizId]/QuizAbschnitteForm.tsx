@@ -93,7 +93,7 @@ export default function QuizAbschnitteForm({
   abschnitte: Abschnitt[];
 }) {
   const [titel, setTitel] = useState("");
-  const [abschnittTyp, setAbschnittTyp] = useState("fragenrunde");
+  const [abschnittTyp, setAbschnittTyp] = useState("fragenblock");
   const [meldung, setMeldung] = useState("");
   const [mounted, setMounted] = useState(false);
 
@@ -180,7 +180,7 @@ export default function QuizAbschnitteForm({
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           className="rounded-xl border border-slate-300 bg-white px-4 py-3"
-          placeholder="z. B. Fragenrunde 1"
+          placeholder="z. B. Block 1"
         />
 
         <select
@@ -191,7 +191,7 @@ export default function QuizAbschnitteForm({
           <option value="intro">Intro</option>
           <option value="regeln">Regeln</option>
           <option value="qr_code">QR-Code</option>
-          <option value="fragenblock">Fragenblock</option>
+          <option value="fragenblock">Block</option>
           <option value="pause">Pause</option>
           <option value="aufloesung">Auflösung</option>
           <option value="siegerehrung">Siegerehrung</option>
