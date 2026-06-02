@@ -191,7 +191,7 @@ export default function QuizAbschnitteForm({
           <option value="intro">Intro</option>
           <option value="regeln">Regeln</option>
           <option value="qr_code">QR-Code</option>
-          <option value="fragenrunde">Fragenrunde</option>
+          <option value="fragenblock">Fragenblock</option>
           <option value="pause">Pause</option>
           <option value="aufloesung">Auflösung</option>
           <option value="siegerehrung">Siegerehrung</option>
