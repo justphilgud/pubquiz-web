@@ -1813,6 +1813,11 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
           ? slide.abschnitt.titel
           : slide.abschnitt?.titel ?? "Kein Block";
 
+  const zeigtFreigabeButtons =
+    slide?.typ === "pause" ||
+    (slide?.typ === "block" &&
+      istFragenblock(slide.abschnitt.abschnitt_typ));
+
   const modusLabel =
     !slide
       ? "-"
@@ -1994,14 +1999,67 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
 
 
         {hatGleichstandAufPlatz1 && slide?.typ === "endstand" && (
-          <footer className="mt-3 flex h-20 shrink-0 items-center justify-start gap-4">
-            <button
-              type="button"
-              onClick={handleSchaetzfrageStarten}
-              className="rounded-2xl border-4 border-pink-400 bg-pink-500 px-6 py-4 text-xl font-black uppercase tracking-[0.2em] text-yellow-200 shadow-[4px_4px_0_#00e5ff] transition hover:scale-105"
-            >
-              Schätzfrage
-            </button>
+          <footer className="mt-3 flex h-20 shrink-0 items-center justify-between gap-4">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={previousSlide}
+                disabled={slideIndex === 0}
+                className="rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                ← Zurück
+              </button>
+
+              <button
+                type="button"
+                onClick={nextSlide}
+                disabled={slideIndex >= slides.length - 1}
+                className="rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                Weiter →
+              </button>
+
+              {zeigtFreigabeButtons && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleBlockFreigeben}
+                    disabled={isFreigabeLoading}
+                    className="rounded-2xl border-4 border-[#42FF5E] bg-black px-5 py-3 font-black uppercase text-[#42FF5E] shadow-[0_0_12px_#42FF5E] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Freigeben
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleBlockSchliessen}
+                    disabled={isFreigabeLoading}
+                    className="rounded-2xl border-4 border-[#FF4A4A] bg-black px-5 py-3 font-black uppercase text-[#FF4A4A] shadow-[0_0_12px_#FF4A4A] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Schließen
+                  </button>
+                </>
+              )}
+
+              {hatGleichstandAufPlatz1 && slide?.typ === "endstand" && (
+                <button
+                  type="button"
+                  onClick={handleSchaetzfrageStarten}
+                  className="rounded-2xl border-4 border-[#FF3BD4] bg-black px-6 py-4 text-xl font-black uppercase tracking-[0.2em] text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4] transition hover:scale-105"
+                >
+                  Schätzfrage
+                </button>
+              )}
+            </div>
+
+            <div className="rounded-3xl border-4 border-[#FFD83B] bg-black/70 px-6 py-3 text-sm font-black uppercase tracking-[0.25em] text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
+              {modusLabel}
+              {freigabeMeldung && (
+                <div className="mt-2 text-center text-xs font-black uppercase tracking-wide text-[#38E8FF]">
+                  {freigabeMeldung}
+                </div>
+              )}
+            </div>
           </footer>
         )}
 
