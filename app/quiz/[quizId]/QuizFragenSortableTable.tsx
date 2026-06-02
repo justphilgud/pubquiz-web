@@ -52,7 +52,7 @@ type Gruppe = {
   containerId: string;
   quizAbschnittId: number | null;
   fragen: QuizFrage[];
-  blockTyp: "intro" | "outro" | "fragenrunde" | "kein-block";
+  blockTyp: "intro" | "outro" | "fragenblock" | "kein-block";
 };
 
 type Props = {
@@ -82,7 +82,7 @@ function getBlockTyp(titel: string): Gruppe["blockTyp"] {
   if (normalisiert === "intro") return "intro";
   if (normalisiert === "outro") return "outro";
 
-  return "fragenrunde";
+  return "fragenblock";
 }
 
 function DragHandle({
@@ -223,7 +223,7 @@ function SortableBlockHeader({
   onDeleteBlock: (quizAbschnittId: number) => void | Promise<void>;
   fragenrundenAnzahl: number;
 }) {
-  const istFragenrunde = gruppe.blockTyp === "fragenrunde";
+  const istFragenrunde = gruppe.blockTyp === "fragenblock";
 
   return (
     <tr className="bg-slate-100">
@@ -411,13 +411,13 @@ function DroppableBlock({
               ))}
             </>
           ) : gruppe.fragen.length === 0 ? (
-            gruppe.blockTyp === "fragenrunde" ? (
+            gruppe.blockTyp === "fragenblock" ? (
               <tr ref={setNodeRef}>
                 <td
                   colSpan={8}
                   className={`px-4 py-6 text-sm font-medium transition ${isOver
-                      ? "bg-cyan-50 text-cyan-700"
-                      : "bg-white text-slate-400"
+                    ? "bg-cyan-50 text-cyan-700"
+                    : "bg-white text-slate-400"
                     }`}
                 >
                   Frage hier ablegen
@@ -486,7 +486,7 @@ export default function QuizFragenSortableTable({
     blockItems.find((block) => getBlockTyp(block.titel) === "outro") ?? null;
 
   const fragenrundeBlocks = blockItems.filter(
-    (block) => getBlockTyp(block.titel) === "fragenrunde"
+    (block) => getBlockTyp(block.titel) === "fragenblock"
   );
 
   const gruppen: Gruppe[] = [
@@ -514,7 +514,7 @@ export default function QuizFragenSortableTable({
       titel: `Block ${index + 1}`,
       containerId: getContainerId(abschnitt.quiz_abschnitt_id),
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
-      blockTyp: "fragenrunde" as const,
+      blockTyp: "fragenblock" as const,
       fragen: items
         .filter(
           (frage) =>
@@ -802,7 +802,7 @@ export default function QuizFragenSortableTable({
     const result = await createQuizAbschnitt({
       quizId,
       titel,
-      abschnittTyp: "fragenrunde",
+      abschnittTyp: "fragenblock",
     });
 
     setIsCreatingBlock(false);
