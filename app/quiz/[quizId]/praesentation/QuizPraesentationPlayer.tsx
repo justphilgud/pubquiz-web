@@ -1259,6 +1259,22 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     const antwortMedien = richtigeAntworten.flatMap((antwort) => antwort.medien);
     const alleLoesungsMedien = [...frage.medien, ...antwortMedien];
     const hatAntwortmoeglichkeiten = antworten.length > 1;
+    const richtigeAntwortfeldLoesungen = (frage.antwortfelder ?? []).map((feld) => ({
+      label: feld.label,
+      loesungen: (feld.loesungen ?? []).filter((loesung) => loesung.ist_akzeptiert),
+    }));
+
+
+
+    console.log(
+      "AUFLOESUNG",
+      frage.fragen_id,
+      frage.antwortfelder
+    );
+
+    const hatAntwortfelderLoesungen = richtigeAntwortfeldLoesungen.some(
+      (feld) => feld.loesungen.length > 0
+    );
 
     return (
       <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
@@ -1324,7 +1340,23 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
                 </div>
               ))}
 
-            {richtigeAntworten.length === 0 && (
+            {hatAntwortfelderLoesungen &&
+              richtigeAntwortfeldLoesungen.map((feld) => (
+                <div
+                  key={feld.label}
+                  className="rounded-3xl border-4 border-emerald-300 bg-black/45 p-6 shadow-[6px_6px_0_#00e5ff]"
+                >
+                  <div className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-emerald-300">
+                    {feld.label}
+                  </div>
+
+                  <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
+                    {feld.loesungen.map((loesung) => loesung.loesung_text).join(" / ")}
+                  </div>
+                </div>
+              ))}
+
+            {richtigeAntworten.length === 0 && !hatAntwortfelderLoesungen && (
               <div className="flex flex-1 items-center justify-center text-2xl font-black text-white/50">
                 Keine richtige Antwort markiert
               </div>
