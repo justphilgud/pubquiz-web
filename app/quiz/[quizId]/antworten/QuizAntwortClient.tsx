@@ -108,6 +108,10 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
   const aktuellerBlock = liveDaten.aktuellerBlock;
   const blockIstGesperrt = liveDaten.blockIstGesperrt;
 
+  const speicherBlockId =
+    liveDaten.offenerBlock?.quiz_abschnitt_id ??
+    liveDaten.aktuellerBlock?.quiz_abschnitt_id ??
+    null;
   const teamExistiert = teamVorschlaege.some(
     (team) => team.teamname.toLowerCase() === teamname.trim().toLowerCase()
   );
@@ -174,16 +178,15 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
   }, [liveDaten.quiz_id, session?.quiz_team_session_id]);
 
   useEffect(() => {
-    if (!session || !liveDaten.offenerBlock || blockIstGesperrt) {
+    if (!session || !speicherBlockId || blockIstGesperrt) {
       return;
     }
-
     const timeout = window.setTimeout(async () => {
       await Promise.all(
         Object.entries(antworten).map(([quizFragenId, antwort]) =>
           saveTeamAntwort({
             quizId: liveDaten.quiz_id,
-            quizAbschnittId: liveDaten.offenerBlock!.quiz_abschnitt_id,
+            quizAbschnittId: speicherBlockId,
             quizFragenId: Number(quizFragenId),
             quizTeamSessionId: session.quiz_team_session_id,
             antwortText: antwort.antwortText,
