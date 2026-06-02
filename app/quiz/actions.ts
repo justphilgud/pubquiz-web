@@ -1567,6 +1567,13 @@ export async function saveTeamAntwort(data: {
     antwortText: string | null;
   }[];
 }) {
+
+  console.log("saveTeamAntwort", {
+    quizFragenId: data.quizFragenId,
+    antwortText: data.antwortText,
+    antwortId: data.antwortId,
+    antwortfelder: data.antwortfelder,
+  });
   const teamAntwort = await prisma.team_antworten.upsert({
     where: {
       quiz_fragen_id_quiz_team_session_id: {
