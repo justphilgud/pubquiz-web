@@ -2181,24 +2181,72 @@ export async function createQuizAbschnitt(data: {
     message: string;
   }
 > {
-  const letzteSortierung = await prisma.quiz_abschnitte.findFirst({
-    where: { quiz_id: data.quizId },
-    orderBy: { sortierung: "desc" },
-  });
+  const titel = data.titel.trim();
 
-  const abschnitt = await prisma.quiz_abschnitte.create({
-    data: {
+  if (!titel) {
+    return {
+      success: false,
+      message: "Bitte einen Titel für den Abschnitt eingeben.",
+    };
+  }
+
+  const ersterOutroAbschnitt = await prisma.quiz_abschnitte.findFirst({
+    where: {
       quiz_id: data.quizId,
-      titel: data.titel.trim(),
-      abschnitt_typ: data.abschnittTyp,
-      sortierung: (letzteSortierung?.sortierung ?? 0) + 1,
-      bemerkung: data.bemerkung?.trim() || null,
-      qr_code_url: data.qrCodeUrl?.trim() || null,
-      medien_datei: data.medienDatei?.trim() || null,
+      abschnitt_typ: {
+        startsWith: "outro",
+      },
+    },
+    orderBy: {
+      sortierung: "asc",
     },
   });
 
+  const letzteSortierung = await prisma.quiz_abschnitte.findFirst({
+    where: {
+      quiz_id: data.quizId,
+    },
+    orderBy: {
+      sortierung: "desc",
+    },
+  });
+
+  const neueSortierung =
+    ersterOutroAbschnitt?.sortierung ??
+    (letzteSortierung?.sortierung ?? 0) + 1;
+
+  const abschnitt = await prisma.$transaction(async (tx) => {
+    if (ersterOutroAbschnitt) {
+      await tx.quiz_abschnitte.updateMany({
+        where: {
+          quiz_id: data.quizId,
+          sortierung: {
+            gte: neueSortierung,
+          },
+        },
+        data: {
+          sortierung: {
+            increment: 1,
+          },
+        },
+      });
+    }
+
+    return tx.quiz_abschnitte.create({
+      data: {
+        quiz_id: data.quizId,
+        titel,
+        abschnitt_typ: data.abschnittTyp,
+        sortierung: neueSortierung,
+        bemerkung: data.bemerkung?.trim() || null,
+        qr_code_url: data.qrCodeUrl?.trim() || null,
+        medien_datei: data.medienDatei?.trim() || null,
+      },
+    });
+  });
+
   revalidatePath(`/quiz/${data.quizId}`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
 
   return {
     success: true,
