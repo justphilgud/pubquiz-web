@@ -1855,6 +1855,43 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
     },
   });
 
+  const teamAntwortIds = quizFragen.flatMap((quizFrage) =>
+    quizFrage.team_antworten.map((antwort) => antwort.team_antwort_id)
+  );
+
+  const offeneAntworten =
+    teamAntwortIds.length > 0
+      ? await prisma.team_antwortfelder.findMany({
+        where: {
+          team_antwort_id: {
+            in: teamAntwortIds,
+          },
+        },
+        orderBy: {
+          antwortfeld_id: "asc",
+        },
+      })
+      : [];
+
+  const antwortfeldIds = Array.from(
+    new Set(offeneAntworten.map((feld) => feld.antwortfeld_id))
+  );
+
+  const antwortfelder =
+    antwortfeldIds.length > 0
+      ? await prisma.frage_antwortfelder.findMany({
+        where: {
+          antwortfeld_id: {
+            in: antwortfeldIds,
+          },
+        },
+      })
+      : [];
+
+  const antwortfeldLabelMap = new Map(
+    antwortfelder.map((feld) => [feld.antwortfeld_id, feld.label])
+  );
+
   return quizFragen.flatMap((quizFrage, frageIndex) => {
     const richtigeAntwortIds = quizFrage.fragen.antworten
       .filter((antwort) => antwort.ist_richtig)
@@ -1877,7 +1914,27 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
           eintrag.quiz_team_session_id === session.quiz_team_session_id
       );
 
-      const istUnbeantwortet = !antwort;
+      const offeneAntwortfelderText = antwort
+        ? offeneAntworten
+          .filter((feld) => feld.team_antwort_id === antwort.team_antwort_id)
+          .map((feld) => {
+            const label =
+              antwortfeldLabelMap.get(feld.antwortfeld_id) ?? "Antwort";
+            const text = feld.antwort_text?.trim();
+
+            if (!text) {
+              return null;
+            }
+
+            return `${label}: ${text}`;
+          })
+          .filter(Boolean)
+          .join(" | ")
+        : null;
+
+      const istUnbeantwortet =
+        !antwort &&
+        !offeneAntwortfelderText;
 
       const istAutomatischRichtig =
         !!antwort &&
@@ -1896,7 +1953,7 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         teamname: session.teamname,
-        antwortText: antwort?.antwort_text ?? null,
+        antwortText: offeneAntwortfelderText || antwort?.antwort_text || null,
         antwortId: antwort?.antwort_id ?? null,
         ausgewaehlteAntwort: antwort?.antworten?.antwort ?? null,
         punkte_modus: quizFrage.punkte_modus ?? "standard",
