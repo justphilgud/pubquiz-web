@@ -782,6 +782,7 @@ export type QuizPraesentationResult = {
   intro_startzeit: string | null;
   titel: string | null;
   quiz_datum: string | null;
+
   fragen: {
     quiz_fragen_id: number;
     quiz_abschnitt_id: number | null;
@@ -795,6 +796,7 @@ export type QuizPraesentationResult = {
     quelle: string | null;
     kategorien: string[];
     praesentationslayout: string | null;
+    antwort_reihenfolge: number[];
 
     medien: {
       medien_id: number;
@@ -803,7 +805,19 @@ export type QuizPraesentationResult = {
       sortierung: number;
       bemerkung: string | null;
     }[];
-    antwort_reihenfolge: number[];
+
+    antwortfelder: {
+      antwortfeld_id: number;
+      label: string;
+      sortierung: number;
+      ist_pflicht: boolean;
+      loesungen: {
+        loesung_text: string;
+        sortierung: number;
+        ist_akzeptiert: boolean;
+      }[];
+    }[];
+
     antworten: {
       antwort_id: number;
       antwort: string;
@@ -817,7 +831,14 @@ export type QuizPraesentationResult = {
         bemerkung: string | null;
       }[];
     }[];
+
+    bildMedien: {
+      medien_id: number;
+      datei: string;
+      medientyp: string;
+    }[];
   }[];
+
   abschnitte: {
     quiz_abschnitt_id: number;
     titel: string;
@@ -829,7 +850,6 @@ export type QuizPraesentationResult = {
     bemerkung: string | null;
   }[];
 };
-
 export async function getQuizPraesentation(
   quizId: number
 ): Promise<QuizPraesentationResult | null> {
@@ -867,6 +887,13 @@ export async function getQuizPraesentation(
               antwortfelder: {
                 orderBy: {
                   sortierung: "asc",
+                },
+                include: {
+                  loesungen: {
+                    orderBy: {
+                      sortierung: "asc",
+                    },
+                  },
                 },
               },
               antworten: {
@@ -972,6 +999,11 @@ export async function getQuizPraesentation(
         label: feld.label,
         sortierung: feld.sortierung,
         ist_pflicht: feld.ist_pflicht,
+        loesungen: feld.loesungen.map((loesung) => ({
+          loesung_text: loesung.loesung_text,
+          sortierung: loesung.sortierung,
+          ist_akzeptiert: loesung.ist_akzeptiert,
+        })),
       })),
     })),
   };
