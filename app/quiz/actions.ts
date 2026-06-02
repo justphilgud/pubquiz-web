@@ -850,6 +850,7 @@ export type QuizPraesentationResult = {
     bemerkung: string | null;
   }[];
 };
+
 export async function getQuizPraesentation(
   quizId: number
 ): Promise<QuizPraesentationResult | null> {
@@ -1827,6 +1828,18 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
     include: {
       fragen: {
         include: {
+          antwortfelder: {
+            orderBy: {
+              sortierung: "asc",
+            },
+            include: {
+              loesungen: {
+                orderBy: {
+                  sortierung: "asc",
+                },
+              },
+            },
+          },
           antworten: {
             include: {
               antworttyp: true,
@@ -1902,11 +1915,29 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
       .map((antwort) => antwort.antwort)
       .join(", ");
 
+    const offeneMusterloesung = quizFrage.fragen.antwortfelder
+      .map((feld) => {
+        const loesungen = feld.loesungen
+          .filter((loesung) => loesung.ist_akzeptiert)
+          .map((loesung) => loesung.loesung_text)
+          .join(" / ");
+
+        if (!loesungen) {
+          return null;
+        }
+
+        return `${feld.label}: ${loesungen}`;
+      })
+      .filter(Boolean)
+      .join(" | ");
+
     const auswertbareAntwortoptionen = quizFrage.fragen.antworten.filter(
       (antwort) => antwort.antworttyp?.antworttyp !== "Freitext"
     );
 
-    const istOffeneFrage = auswertbareAntwortoptionen.length === 0;
+    const istOffeneFrage =
+      auswertbareAntwortoptionen.length === 0 ||
+      quizFrage.fragen.antwortfelder.length > 0;
 
     return sessions.map((session) => {
       const antwort = quizFrage.team_antworten.find(
@@ -1932,9 +1963,7 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
           .join(" | ")
         : null;
 
-      const istUnbeantwortet =
-        !antwort &&
-        !offeneAntwortfelderText;
+      const istUnbeantwortet = !antwort && !offeneAntwortfelderText;
 
       const istAutomatischRichtig =
         !!antwort &&
@@ -1949,7 +1978,7 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
         fragen_id: quizFrage.fragen.fragen_id,
         frageIndex: frageIndex + 1,
         frage: quizFrage.fragen.frage,
-        richtigeAntwort: richtigeAntworten || "-",
+        richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         teamname: session.teamname,
