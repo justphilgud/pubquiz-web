@@ -1721,6 +1721,8 @@ export async function updateTeamAntwortBewertung(data: {
       data: {
         ist_manuell_richtig: true,
         ist_manuell_falsch: false,
+        bewertung_final: true,
+
       },
     });
   }
@@ -1731,6 +1733,8 @@ export async function updateTeamAntwortBewertung(data: {
       data: {
         ist_manuell_richtig: false,
         ist_manuell_falsch: true,
+        bewertung_final: true,
+
       },
     });
   }
@@ -1762,6 +1766,89 @@ export async function updateTeamAntwortBewertung(data: {
   }
 
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
+}
+
+export async function updateQuizFragenStatistiken() {
+  const quizFragen = await prisma.quiz_fragen.findMany({
+    include: {
+      fragen: {
+        include: {
+          antworten: true,
+        },
+      },
+      team_antworten: {
+        include: {
+          antworten: true,
+        },
+      },
+    },
+  });
+
+  for (const quizFrage of quizFragen) {
+    const richtigeAntwortIds = quizFrage.fragen.antworten
+      .filter((antwort) => antwort.ist_richtig)
+      .map((antwort) => antwort.antwort_id);
+
+    const beantworteteAntworten = quizFrage.team_antworten.filter(
+      (antwort) => antwort.antwort_id !== null || antwort.antwort_text !== null
+    );
+
+    const richtigeantworten = beantworteteAntworten.filter((antwort) => {
+      if (antwort.ist_manuell_falsch) return false;
+      if (antwort.ist_manuell_richtig) return true;
+
+      return (
+        antwort.antwort_id !== null &&
+        richtigeAntwortIds.includes(antwort.antwort_id)
+      );
+    }).length;
+
+    const falscheantworten = beantworteteAntworten.length - richtigeantworten;
+
+    await prisma.quiz_fragen.update({
+      where: {
+        quiz_fragen_id: quizFrage.quiz_fragen_id,
+      },
+      data: {
+        richtigeantworten,
+        falscheantworten,
+      },
+    });
+  }
+
+  const fragen = await prisma.fragen.findMany({
+    include: {
+      quiz_fragen: true,
+    },
+  });
+
+  for (const frage of fragen) {
+    const richtigGesamt = frage.quiz_fragen.reduce(
+      (summe, quizFrage) => summe + (quizFrage.richtigeantworten ?? 0),
+      0
+    );
+
+    const falschGesamt = frage.quiz_fragen.reduce(
+      (summe, quizFrage) => summe + (quizFrage.falscheantworten ?? 0),
+      0
+    );
+
+    const gesamt = richtigGesamt + falschGesamt;
+
+    const schwierigkeitslevel =
+      gesamt > 0 ? Math.round((falschGesamt / gesamt) * 100) : null;
+
+    await prisma.fragen.update({
+      where: {
+        fragen_id: frage.fragen_id,
+      },
+      data: {
+        schwierigkeitslevel,
+      },
+    });
+  }
+
+  revalidatePath("/fragen");
 }
 export async function getQuizAuswertungUebersicht(quizId: number) {
   const quizFragen = await prisma.quiz_fragen.findMany({
@@ -2570,4 +2657,58 @@ export async function updateIntroStartsequenz(data: {
   });
 
   revalidatePath(`/quiz/${data.quizId}`);
+}
+
+export async function updateAlleSchwierigkeitslevel() {
+  const fragen = await prisma.fragen.findMany({
+    where: {
+      ist_archiviert: false,
+    },
+    include: {
+      quiz_fragen: {
+        include: {
+          team_antworten: {
+            include: {
+              antworten: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  for (const frage of fragen) {
+    const alleFinalenAntworten = frage.quiz_fragen.flatMap((quizFrage) =>
+      quizFrage.team_antworten.filter((antwort) => antwort.bewertung_final)
+    );
+
+    const teamsGesamt = alleFinalenAntworten.length;
+
+    if (teamsGesamt === 0) {
+      continue;
+    }
+
+    const teamsRichtig = alleFinalenAntworten.filter((antwort) => {
+      if (antwort.ist_manuell_falsch) return false;
+      if (antwort.ist_manuell_richtig) return true;
+      if (antwort.antworten?.ist_richtig) return true;
+
+      return false;
+    }).length;
+
+    const schwierigkeitslevel = Math.round(
+      100 - (teamsRichtig / teamsGesamt) * 100
+    );
+
+    await prisma.fragen.update({
+      where: {
+        fragen_id: frage.fragen_id,
+      },
+      data: {
+        schwierigkeitslevel,
+      },
+    });
+  }
+
+  revalidatePath("/fragen");
 }

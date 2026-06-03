@@ -206,6 +206,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
   }, [
     antworten,
     session,
+    speicherBlockId,
     liveDaten.offenerBlock,
     liveDaten.quiz_id,
     blockIstGesperrt,
