@@ -1764,7 +1764,7 @@ export async function updateTeamAntwortBewertung(data: {
       },
     });
   }
-
+  await updateQuizFragenStatistiken();
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
 }
 
@@ -1789,9 +1789,7 @@ export async function updateQuizFragenStatistiken() {
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => antwort.antwort_id);
 
-    const beantworteteAntworten = quizFrage.team_antworten.filter(
-      (antwort) => antwort.antwort_id !== null || antwort.antwort_text !== null
-    );
+    const beantworteteAntworten = quizFrage.team_antworten;
 
     const richtigeantworten = beantworteteAntworten.filter((antwort) => {
       if (antwort.ist_manuell_falsch) return false;
