@@ -30,12 +30,14 @@ export type QuizAvgAggregateOutputType = {
   quiz_id: number | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
+  manuelle_bewertungen: number | null
 }
 
 export type QuizSumAggregateOutputType = {
   quiz_id: number | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
+  manuelle_bewertungen: number | null
 }
 
 export type QuizMinAggregateOutputType = {
@@ -44,6 +46,7 @@ export type QuizMinAggregateOutputType = {
   titel: string | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
+  manuelle_bewertungen: number | null
   bemerkung: string | null
   ist_archiviert: boolean | null
   archivierungsgrund: string | null
@@ -66,6 +69,7 @@ export type QuizMaxAggregateOutputType = {
   titel: string | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
+  manuelle_bewertungen: number | null
   bemerkung: string | null
   ist_archiviert: boolean | null
   archivierungsgrund: string | null
@@ -88,6 +92,7 @@ export type QuizCountAggregateOutputType = {
   titel: number
   team_anzahl: number
   teilnehmer_anzahl: number
+  manuelle_bewertungen: number
   bemerkung: number
   ist_archiviert: number
   archivierungsgrund: number
@@ -110,12 +115,14 @@ export type QuizAvgAggregateInputType = {
   quiz_id?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
+  manuelle_bewertungen?: true
 }
 
 export type QuizSumAggregateInputType = {
   quiz_id?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
+  manuelle_bewertungen?: true
 }
 
 export type QuizMinAggregateInputType = {
@@ -124,6 +131,7 @@ export type QuizMinAggregateInputType = {
   titel?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
+  manuelle_bewertungen?: true
   bemerkung?: true
   ist_archiviert?: true
   archivierungsgrund?: true
@@ -146,6 +154,7 @@ export type QuizMaxAggregateInputType = {
   titel?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
+  manuelle_bewertungen?: true
   bemerkung?: true
   ist_archiviert?: true
   archivierungsgrund?: true
@@ -168,6 +177,7 @@ export type QuizCountAggregateInputType = {
   titel?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
+  manuelle_bewertungen?: true
   bemerkung?: true
   ist_archiviert?: true
   archivierungsgrund?: true
@@ -277,6 +287,7 @@ export type QuizGroupByOutputType = {
   titel: string | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
+  manuelle_bewertungen: number | null
   bemerkung: string | null
   ist_archiviert: boolean
   archivierungsgrund: string | null
@@ -322,6 +333,7 @@ export type quizWhereInput = {
   titel?: Prisma.StringNullableFilter<"quiz"> | string | null
   team_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
   teilnehmer_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
+  manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
   bemerkung?: Prisma.StringNullableFilter<"quiz"> | string | null
   ist_archiviert?: Prisma.BoolFilter<"quiz"> | boolean
   archivierungsgrund?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -350,6 +362,7 @@ export type quizOrderByWithRelationInput = {
   titel?: Prisma.SortOrderInput | Prisma.SortOrder
   team_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrderInput | Prisma.SortOrder
   bemerkung?: Prisma.SortOrderInput | Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -381,6 +394,7 @@ export type quizWhereUniqueInput = Prisma.AtLeast<{
   titel?: Prisma.StringNullableFilter<"quiz"> | string | null
   team_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
   teilnehmer_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
+  manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
   bemerkung?: Prisma.StringNullableFilter<"quiz"> | string | null
   ist_archiviert?: Prisma.BoolFilter<"quiz"> | boolean
   archivierungsgrund?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -409,6 +423,7 @@ export type quizOrderByWithAggregationInput = {
   titel?: Prisma.SortOrderInput | Prisma.SortOrder
   team_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrderInput | Prisma.SortOrder
   bemerkung?: Prisma.SortOrderInput | Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -439,6 +454,7 @@ export type quizScalarWhereWithAggregatesInput = {
   titel?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   team_anzahl?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
   teilnehmer_anzahl?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
+  manuelle_bewertungen?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
   bemerkung?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   ist_archiviert?: Prisma.BoolWithAggregatesFilter<"quiz"> | boolean
   archivierungsgrund?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
@@ -460,6 +476,7 @@ export type quizCreateInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -488,6 +505,7 @@ export type quizUncheckedCreateInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -515,6 +533,7 @@ export type quizUpdateInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -543,6 +562,7 @@ export type quizUncheckedUpdateInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -571,6 +591,7 @@ export type quizCreateManyInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -592,6 +613,7 @@ export type quizUpdateManyMutationInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -614,6 +636,7 @@ export type quizUncheckedUpdateManyInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -636,6 +659,7 @@ export type quizCountOrderByAggregateInput = {
   titel?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrder
@@ -656,6 +680,7 @@ export type quizAvgOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrder
 }
 
 export type quizMaxOrderByAggregateInput = {
@@ -664,6 +689,7 @@ export type quizMaxOrderByAggregateInput = {
   titel?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrder
@@ -686,6 +712,7 @@ export type quizMinOrderByAggregateInput = {
   titel?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrder
@@ -706,6 +733,7 @@ export type quizSumOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
+  manuelle_bewertungen?: Prisma.SortOrder
 }
 
 export type QuizScalarRelationFilter = {
@@ -806,6 +834,7 @@ export type quizCreateWithoutQuiz_fragenInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -833,6 +862,7 @@ export type quizUncheckedCreateWithoutQuiz_fragenInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -875,6 +905,7 @@ export type quizUpdateWithoutQuiz_fragenInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -902,6 +933,7 @@ export type quizUncheckedUpdateWithoutQuiz_fragenInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -928,6 +960,7 @@ export type quizCreateWithoutQuiz_teamsInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -955,6 +988,7 @@ export type quizUncheckedCreateWithoutQuiz_teamsInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -997,6 +1031,7 @@ export type quizUpdateWithoutQuiz_teamsInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1024,6 +1059,7 @@ export type quizUncheckedUpdateWithoutQuiz_teamsInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1050,6 +1086,7 @@ export type quizCreateWithoutQuiz_abschnitteInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1077,6 +1114,7 @@ export type quizUncheckedCreateWithoutQuiz_abschnitteInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1119,6 +1157,7 @@ export type quizUpdateWithoutQuiz_abschnitteInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1146,6 +1185,7 @@ export type quizUncheckedUpdateWithoutQuiz_abschnitteInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1172,6 +1212,7 @@ export type quizCreateWithoutQuiz_team_sessionsInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1199,6 +1240,7 @@ export type quizUncheckedCreateWithoutQuiz_team_sessionsInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1241,6 +1283,7 @@ export type quizUpdateWithoutQuiz_team_sessionsInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1268,6 +1311,7 @@ export type quizUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1294,6 +1338,7 @@ export type quizCreateWithoutQuiz_block_freigabenInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1321,6 +1366,7 @@ export type quizUncheckedCreateWithoutQuiz_block_freigabenInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1363,6 +1409,7 @@ export type quizUpdateWithoutQuiz_block_freigabenInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1390,6 +1437,7 @@ export type quizUncheckedUpdateWithoutQuiz_block_freigabenInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1416,6 +1464,7 @@ export type quizCreateWithoutTeam_antwortenInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1443,6 +1492,7 @@ export type quizUncheckedCreateWithoutTeam_antwortenInput = {
   titel?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
+  manuelle_bewertungen?: number | null
   bemerkung?: string | null
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1485,6 +1535,7 @@ export type quizUpdateWithoutTeam_antwortenInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1512,6 +1563,7 @@ export type quizUncheckedUpdateWithoutTeam_antwortenInput = {
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1615,6 +1667,7 @@ export type quizSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   titel?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
+  manuelle_bewertungen?: boolean
   bemerkung?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -1644,6 +1697,7 @@ export type quizSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   titel?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
+  manuelle_bewertungen?: boolean
   bemerkung?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -1666,6 +1720,7 @@ export type quizSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   titel?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
+  manuelle_bewertungen?: boolean
   bemerkung?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -1688,6 +1743,7 @@ export type quizSelectScalar = {
   titel?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
+  manuelle_bewertungen?: boolean
   bemerkung?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -1704,7 +1760,7 @@ export type quizSelectScalar = {
   outro_bekanntmachungen?: boolean
 }
 
-export type quizOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "quiz_datum" | "titel" | "team_anzahl" | "teilnehmer_anzahl" | "bemerkung" | "ist_archiviert" | "archivierungsgrund" | "intro_begruessungstext" | "intro_begruessungstitel" | "intro_logo_url" | "intro_musik_url" | "intro_preise" | "intro_regeln" | "intro_wartetext" | "intro_startsequenz_text" | "intro_startzeit" | "intro_video_url" | "outro_bekanntmachungen", ExtArgs["result"]["quiz"]>
+export type quizOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "quiz_datum" | "titel" | "team_anzahl" | "teilnehmer_anzahl" | "manuelle_bewertungen" | "bemerkung" | "ist_archiviert" | "archivierungsgrund" | "intro_begruessungstext" | "intro_begruessungstitel" | "intro_logo_url" | "intro_musik_url" | "intro_preise" | "intro_regeln" | "intro_wartetext" | "intro_startsequenz_text" | "intro_startzeit" | "intro_video_url" | "outro_bekanntmachungen", ExtArgs["result"]["quiz"]>
 export type quizInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz_abschnitte?: boolean | Prisma.quiz$quiz_abschnitteArgs<ExtArgs>
   quiz_block_freigaben?: boolean | Prisma.quiz$quiz_block_freigabenArgs<ExtArgs>
@@ -1733,6 +1789,7 @@ export type $quizPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     titel: string | null
     team_anzahl: number | null
     teilnehmer_anzahl: number | null
+    manuelle_bewertungen: number | null
     bemerkung: string | null
     ist_archiviert: boolean
     archivierungsgrund: string | null
@@ -2181,6 +2238,7 @@ export interface quizFieldRefs {
   readonly titel: Prisma.FieldRef<"quiz", 'String'>
   readonly team_anzahl: Prisma.FieldRef<"quiz", 'Int'>
   readonly teilnehmer_anzahl: Prisma.FieldRef<"quiz", 'Int'>
+  readonly manuelle_bewertungen: Prisma.FieldRef<"quiz", 'Int'>
   readonly bemerkung: Prisma.FieldRef<"quiz", 'String'>
   readonly ist_archiviert: Prisma.FieldRef<"quiz", 'Boolean'>
   readonly archivierungsgrund: Prisma.FieldRef<"quiz", 'String'>

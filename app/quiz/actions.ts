@@ -1845,6 +1845,33 @@ export async function updateQuizFragenStatistiken() {
       },
     });
   }
+  const quizIds = await prisma.quiz.findMany({
+    select: {
+      quiz_id: true,
+    },
+  });
+
+  for (const quiz of quizIds) {
+    const manuelleBewertungen = await prisma.team_antworten.count({
+      where: {
+        quiz_id: quiz.quiz_id,
+        OR: [
+          { ist_manuell_richtig: true },
+          { ist_manuell_falsch: true },
+        ],
+      },
+    });
+
+    await prisma.quiz.update({
+      where: {
+        quiz_id: quiz.quiz_id,
+      },
+      data: {
+        manuelle_bewertungen: manuelleBewertungen,
+      },
+    });
+  }
+
 
   revalidatePath("/fragen");
 }

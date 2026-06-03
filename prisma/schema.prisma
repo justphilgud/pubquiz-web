@@ -108,6 +108,7 @@ model quiz {
   titel                   String?
   team_anzahl             Int?
   teilnehmer_anzahl       Int?
+  manuelle_bewertungen Int? @default(0)
   bemerkung               String?
   ist_archiviert          Boolean                @default(false)
   archivierungsgrund      String?
@@ -128,6 +129,7 @@ model quiz {
   quiz_team_sessions      quiz_team_sessions[]
   quiz_teams              quiz_teams[]
   team_antworten          team_antworten[]
+  
 
   @@schema("pubquiz")
 }

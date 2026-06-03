@@ -2020,6 +2020,7 @@ export const QuizScalarFieldEnum = {
   titel: 'titel',
   team_anzahl: 'team_anzahl',
   teilnehmer_anzahl: 'teilnehmer_anzahl',
+  manuelle_bewertungen: 'manuelle_bewertungen',
   bemerkung: 'bemerkung',
   ist_archiviert: 'ist_archiviert',
   archivierungsgrund: 'archivierungsgrund',
