@@ -70,7 +70,8 @@ export const ModelName = {
   team_antwortfelder: 'team_antwortfelder',
   frage_antwortfeld_loesungen: 'frage_antwortfeld_loesungen',
   frage_vorlagen: 'frage_vorlagen',
-  frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder'
+  frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
+  quiz_praesentation_status: 'quiz_praesentation_status'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -144,6 +145,7 @@ export const MedienScalarFieldEnum = {
   medien_id: 'medien_id',
   fragen_id: 'fragen_id',
   antwort_id: 'antwort_id',
+  antwortfeld_id: 'antwortfeld_id',
   medientyp_id: 'medientyp_id',
   datei: 'datei',
   sortierung: 'sortierung',
@@ -197,6 +199,8 @@ export const Quiz_fragenScalarFieldEnum = {
   antwort_reihenfolge: 'antwort_reihenfolge',
   praesentationslayout: 'praesentationslayout',
   quiz_abschnitt_id: 'quiz_abschnitt_id',
+  praesentationsdauer_sekunden: 'praesentationsdauer_sekunden',
+  praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   punkte_basis: 'punkte_basis',
   punkte_modus: 'punkte_modus'
 } as const
@@ -335,6 +339,24 @@ export const Frage_vorlage_antwortfelderScalarFieldEnum = {
 } as const
 
 export type Frage_vorlage_antwortfelderScalarFieldEnum = (typeof Frage_vorlage_antwortfelderScalarFieldEnum)[keyof typeof Frage_vorlage_antwortfelderScalarFieldEnum]
+
+
+export const Quiz_praesentation_statusScalarFieldEnum = {
+  quiz_id: 'quiz_id',
+  slide_index: 'slide_index',
+  slide_started_at: 'slide_started_at',
+  quiz_started_at: 'quiz_started_at',
+  updated_at: 'updated_at',
+  medium_overlay_aktiv: 'medium_overlay_aktiv',
+  audio_aktion: 'audio_aktion',
+  audio_aktion_id: 'audio_aktion_id',
+  countdown_dauer_sekunden: 'countdown_dauer_sekunden',
+  countdown_started_at: 'countdown_started_at',
+  countdown_ended_at: 'countdown_ended_at',
+  countdown_status: 'countdown_status'
+} as const
+
+export type Quiz_praesentation_statusScalarFieldEnum = (typeof Quiz_praesentation_statusScalarFieldEnum)[keyof typeof Quiz_praesentation_statusScalarFieldEnum]
 
 
 export const SortOrder = {

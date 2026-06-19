@@ -890,6 +890,14 @@ export async function getQuizPraesentation(
                   sortierung: "asc",
                 },
                 include: {
+                  medien: {
+                    include: {
+                      medientyp: true,
+                    },
+                    orderBy: {
+                      sortierung: "asc",
+                    },
+                  },
                   loesungen: {
                     orderBy: {
                       sortierung: "asc",
@@ -1000,6 +1008,13 @@ export async function getQuizPraesentation(
         label: feld.label,
         sortierung: feld.sortierung,
         ist_pflicht: feld.ist_pflicht,
+        medien: feld.medien.map((medium) => ({
+          medien_id: medium.medien_id,
+          datei: medium.datei,
+          medientyp: medium.medientyp.medientyp,
+          sortierung: medium.sortierung,
+          bemerkung: medium.bemerkung,
+        })),
         loesungen: feld.loesungen.map((loesung) => ({
           loesung_text: loesung.loesung_text,
           sortierung: loesung.sortierung,
@@ -1087,10 +1102,30 @@ export async function updateQuizFragenBlockSortierung(data: {
     sortierung: number;
   }[];
 }) {
+  const vorhandeneEintraege = await prisma.quiz_fragen.findMany({
+    where: {
+      quiz_id: data.quizId,
+      quiz_fragen_id: {
+        in: data.items.map((item) => item.quizFragenId),
+      },
+    },
+    select: {
+      quiz_fragen_id: true,
+    },
+  });
+
+  const vorhandeneIds = new Set(
+    vorhandeneEintraege.map((eintrag) => eintrag.quiz_fragen_id)
+  );
+
+  const gueltigeItems = data.items.filter((item) =>
+    vorhandeneIds.has(item.quizFragenId)
+  );
+
   const temporaereBasis = -1000000;
 
   await prisma.$transaction(
-    data.items.map((item, index) =>
+    gueltigeItems.map((item, index) =>
       prisma.quiz_fragen.update({
         where: {
           quiz_fragen_id: item.quizFragenId,
@@ -1103,7 +1138,7 @@ export async function updateQuizFragenBlockSortierung(data: {
   );
 
   await prisma.$transaction(
-    data.items.map((item) =>
+    gueltigeItems.map((item) =>
       prisma.quiz_fragen.update({
         where: {
           quiz_fragen_id: item.quizFragenId,
@@ -1569,12 +1604,6 @@ export async function saveTeamAntwort(data: {
   }[];
 }) {
 
-  console.log("saveTeamAntwort", {
-    quizFragenId: data.quizFragenId,
-    antwortText: data.antwortText,
-    antwortId: data.antwortId,
-    antwortfelder: data.antwortfelder,
-  });
   const teamAntwort = await prisma.team_antworten.upsert({
     where: {
       quiz_fragen_id_quiz_team_session_id: {

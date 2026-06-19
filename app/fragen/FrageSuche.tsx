@@ -87,8 +87,6 @@ export default function FrageSuche({
   quizze: QuizOption[];
   onEditFrage: (frage: FrageForEdit) => void;
 }) {
-  console.log("Quizze in FrageSuche", quizze);
-
   const [suchtext, setSuchtext] = useState("");
   const [quelle, setQuelle] = useState("");
   const [kategorieId, setKategorieId] = useState<number | null>(null);

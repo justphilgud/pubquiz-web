@@ -110,12 +110,14 @@ function SortableRow({
   frage,
   index,
   quizId,
+  onRemove,
   onLayoutChange,
   onPunkteModusChange,
 }: {
   frage: QuizFrage;
   index: number;
   quizId: number;
+  onRemove: (quizFragenId: number) => void;
   onLayoutChange: (
     quizFragenId: number,
     praesentationslayout: string
@@ -203,6 +205,7 @@ function SortableRow({
           <QuizFrageEntfernenButton
             quizId={quizId}
             quizFragenId={frage.quiz_fragen_id}
+            onRemoved={onRemove}
           />
         </div>
       </td>
@@ -280,6 +283,7 @@ function DroppableBlock({
   onToggleGruppe,
   onLayoutChange,
   onPunkteModusChange,
+  onRemove,
   onDeleteBlock,
   fragenrundenAnzahl,
 }: {
@@ -296,6 +300,7 @@ function DroppableBlock({
     quizFragenId: number,
     punkteModus: string
   ) => void | Promise<void>;
+  onRemove: (quizFragenId: number) => void;
   onDeleteBlock: (quizAbschnittId: number) => void | Promise<void>;
   fragenrundenAnzahl: number;
 }) {
@@ -341,22 +346,15 @@ function DroppableBlock({
                   <td className="px-4 py-5 text-slate-300">—</td>
 
                   <td className="px-4 py-5">
-                    <div className="font-semibold text-slate-900">
-                      {titel}
-                    </div>
+                    <div className="font-semibold text-slate-900">{titel}</div>
                     <div className="mt-1 text-sm text-slate-500">
                       {beschreibung}
                     </div>
                   </td>
 
-                  <td className="px-4 py-5 text-sm text-slate-400">
-                    Intro
-                  </td>
-
+                  <td className="px-4 py-5 text-sm text-slate-400">Intro</td>
                   <td className="px-4 py-5 text-slate-300">—</td>
-
                   <td className="px-4 py-5 text-slate-300">Fixiert</td>
-
                   <td className="px-4 py-5 text-slate-300">—</td>
 
                   <td className="px-4 py-5">
@@ -381,22 +379,15 @@ function DroppableBlock({
                   <td className="px-4 py-5 text-slate-300">—</td>
 
                   <td className="px-4 py-5">
-                    <div className="font-semibold text-slate-900">
-                      {titel}
-                    </div>
+                    <div className="font-semibold text-slate-900">{titel}</div>
                     <div className="mt-1 text-sm text-slate-500">
                       {beschreibung}
                     </div>
                   </td>
 
-                  <td className="px-4 py-5 text-sm text-slate-400">
-                    Outro
-                  </td>
-
+                  <td className="px-4 py-5 text-sm text-slate-400">Outro</td>
                   <td className="px-4 py-5 text-slate-300">—</td>
-
                   <td className="px-4 py-5 text-slate-300">Fixiert</td>
-
                   <td className="px-4 py-5 text-slate-300">—</td>
 
                   <td className="px-4 py-5">
@@ -415,9 +406,7 @@ function DroppableBlock({
               <tr ref={setNodeRef}>
                 <td
                   colSpan={8}
-                  className={`px-4 py-6 text-sm font-medium transition ${isOver
-                    ? "bg-cyan-50 text-cyan-700"
-                    : "bg-white text-slate-400"
+                  className={`px-4 py-6 text-sm font-medium transition ${isOver ? "bg-cyan-50 text-cyan-700" : "bg-white text-slate-400"
                     }`}
                 >
                   Frage hier ablegen
@@ -433,6 +422,7 @@ function DroppableBlock({
                 quizId={quizId}
                 onLayoutChange={onLayoutChange}
                 onPunkteModusChange={onPunkteModusChange}
+                onRemove={onRemove}
               />
             ))
           )}
@@ -449,11 +439,18 @@ export default function QuizFragenSortableTable({
   passwort,
 }: Props) {
   const [items, setItems] = useState<QuizFrage[]>(fragen);
+
   const [blockItems, setBlockItems] = useState(abschnitte);
   const [isCreatingBlock, setIsCreatingBlock] = useState(false);
   const [meldung, setMeldung] = useState("");
   const [mounted, setMounted] = useState(false);
   const [eingeklappteGruppen, setEingeklappteGruppen] = useState<string[]>([]);
+
+  function handleRemoveFrage(quizFragenId: number) {
+    setItems((current) =>
+      current.filter((item) => item.quiz_fragen_id !== quizFragenId)
+    );
+  }
 
   function toggleGruppe(containerId: string) {
     setEingeklappteGruppen((current) =>
@@ -879,6 +876,7 @@ export default function QuizFragenSortableTable({
                     onToggleGruppe={toggleGruppe}
                     onLayoutChange={handleLayoutChange}
                     onPunkteModusChange={handlePunkteModusChange}
+                    onRemove={handleRemoveFrage}
                     onDeleteBlock={handleDeleteBlock}
                     fragenrundenAnzahl={fragenrundeBlocks.length}
                   />

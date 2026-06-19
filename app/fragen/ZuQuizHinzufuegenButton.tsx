@@ -20,7 +20,6 @@ export default function ZuQuizHinzufuegenButton({
   disabled = false,
   verwendeteQuizIds = [],
 }: Props) {
-  console.log("Quizze im Button", quizze);
 
   const [meldung, setMeldung] = useState("");
   const [isSaving, setIsSaving] = useState(false);

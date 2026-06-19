@@ -35,6 +35,8 @@ export type Quiz_fragenAvgAggregateOutputType = {
   falscheantworten: number | null
   antwort_reihenfolge: number | null
   quiz_abschnitt_id: number | null
+  praesentationsdauer_sekunden: number | null
+  praesentationsdauer_messungen: number | null
   punkte_basis: runtime.Decimal | null
 }
 
@@ -47,6 +49,8 @@ export type Quiz_fragenSumAggregateOutputType = {
   falscheantworten: number | null
   antwort_reihenfolge: number[]
   quiz_abschnitt_id: number | null
+  praesentationsdauer_sekunden: number | null
+  praesentationsdauer_messungen: number | null
   punkte_basis: runtime.Decimal | null
 }
 
@@ -59,6 +63,8 @@ export type Quiz_fragenMinAggregateOutputType = {
   falscheantworten: number | null
   praesentationslayout: string | null
   quiz_abschnitt_id: number | null
+  praesentationsdauer_sekunden: number | null
+  praesentationsdauer_messungen: number | null
   punkte_basis: runtime.Decimal | null
   punkte_modus: string | null
 }
@@ -72,6 +78,8 @@ export type Quiz_fragenMaxAggregateOutputType = {
   falscheantworten: number | null
   praesentationslayout: string | null
   quiz_abschnitt_id: number | null
+  praesentationsdauer_sekunden: number | null
+  praesentationsdauer_messungen: number | null
   punkte_basis: runtime.Decimal | null
   punkte_modus: string | null
 }
@@ -86,6 +94,8 @@ export type Quiz_fragenCountAggregateOutputType = {
   antwort_reihenfolge: number
   praesentationslayout: number
   quiz_abschnitt_id: number
+  praesentationsdauer_sekunden: number
+  praesentationsdauer_messungen: number
   punkte_basis: number
   punkte_modus: number
   _all: number
@@ -101,6 +111,8 @@ export type Quiz_fragenAvgAggregateInputType = {
   falscheantworten?: true
   antwort_reihenfolge?: true
   quiz_abschnitt_id?: true
+  praesentationsdauer_sekunden?: true
+  praesentationsdauer_messungen?: true
   punkte_basis?: true
 }
 
@@ -113,6 +125,8 @@ export type Quiz_fragenSumAggregateInputType = {
   falscheantworten?: true
   antwort_reihenfolge?: true
   quiz_abschnitt_id?: true
+  praesentationsdauer_sekunden?: true
+  praesentationsdauer_messungen?: true
   punkte_basis?: true
 }
 
@@ -125,6 +139,8 @@ export type Quiz_fragenMinAggregateInputType = {
   falscheantworten?: true
   praesentationslayout?: true
   quiz_abschnitt_id?: true
+  praesentationsdauer_sekunden?: true
+  praesentationsdauer_messungen?: true
   punkte_basis?: true
   punkte_modus?: true
 }
@@ -138,6 +154,8 @@ export type Quiz_fragenMaxAggregateInputType = {
   falscheantworten?: true
   praesentationslayout?: true
   quiz_abschnitt_id?: true
+  praesentationsdauer_sekunden?: true
+  praesentationsdauer_messungen?: true
   punkte_basis?: true
   punkte_modus?: true
 }
@@ -152,6 +170,8 @@ export type Quiz_fragenCountAggregateInputType = {
   antwort_reihenfolge?: true
   praesentationslayout?: true
   quiz_abschnitt_id?: true
+  praesentationsdauer_sekunden?: true
+  praesentationsdauer_messungen?: true
   punkte_basis?: true
   punkte_modus?: true
   _all?: true
@@ -253,6 +273,8 @@ export type Quiz_fragenGroupByOutputType = {
   antwort_reihenfolge: number[]
   praesentationslayout: string | null
   quiz_abschnitt_id: number | null
+  praesentationsdauer_sekunden: number | null
+  praesentationsdauer_messungen: number | null
   punkte_basis: runtime.Decimal
   punkte_modus: string
   _count: Quiz_fragenCountAggregateOutputType | null
@@ -290,6 +312,8 @@ export type quiz_fragenWhereInput = {
   antwort_reihenfolge?: Prisma.IntNullableListFilter<"quiz_fragen">
   praesentationslayout?: Prisma.StringNullableFilter<"quiz_fragen"> | string | null
   quiz_abschnitt_id?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_sekunden?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_messungen?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
   punkte_basis?: Prisma.DecimalFilter<"quiz_fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFilter<"quiz_fragen"> | string
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
@@ -308,6 +332,8 @@ export type quiz_fragenOrderByWithRelationInput = {
   antwort_reihenfolge?: Prisma.SortOrder
   praesentationslayout?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrderInput | Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrderInput | Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
   punkte_modus?: Prisma.SortOrder
   fragen?: Prisma.fragenOrderByWithRelationInput
@@ -331,6 +357,8 @@ export type quiz_fragenWhereUniqueInput = Prisma.AtLeast<{
   antwort_reihenfolge?: Prisma.IntNullableListFilter<"quiz_fragen">
   praesentationslayout?: Prisma.StringNullableFilter<"quiz_fragen"> | string | null
   quiz_abschnitt_id?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_sekunden?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_messungen?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
   punkte_basis?: Prisma.DecimalFilter<"quiz_fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFilter<"quiz_fragen"> | string
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
@@ -349,6 +377,8 @@ export type quiz_fragenOrderByWithAggregationInput = {
   antwort_reihenfolge?: Prisma.SortOrder
   praesentationslayout?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrderInput | Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrderInput | Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
   punkte_modus?: Prisma.SortOrder
   _count?: Prisma.quiz_fragenCountOrderByAggregateInput
@@ -371,6 +401,8 @@ export type quiz_fragenScalarWhereWithAggregatesInput = {
   antwort_reihenfolge?: Prisma.IntNullableListFilter<"quiz_fragen">
   praesentationslayout?: Prisma.StringNullableWithAggregatesFilter<"quiz_fragen"> | string | null
   quiz_abschnitt_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_sekunden?: Prisma.IntNullableWithAggregatesFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_messungen?: Prisma.IntNullableWithAggregatesFilter<"quiz_fragen"> | number | null
   punkte_basis?: Prisma.DecimalWithAggregatesFilter<"quiz_fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringWithAggregatesFilter<"quiz_fragen"> | string
 }
@@ -381,6 +413,8 @@ export type quiz_fragenCreateInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
@@ -399,6 +433,8 @@ export type quiz_fragenUncheckedCreateInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -410,6 +446,8 @@ export type quiz_fragenUpdateInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
@@ -428,6 +466,8 @@ export type quiz_fragenUncheckedUpdateInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -443,6 +483,8 @@ export type quiz_fragenCreateManyInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
 }
@@ -453,6 +495,8 @@ export type quiz_fragenUpdateManyMutationInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -467,6 +511,8 @@ export type quiz_fragenUncheckedUpdateManyInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -509,6 +555,8 @@ export type quiz_fragenCountOrderByAggregateInput = {
   antwort_reihenfolge?: Prisma.SortOrder
   praesentationslayout?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
   punkte_modus?: Prisma.SortOrder
 }
@@ -522,6 +570,8 @@ export type quiz_fragenAvgOrderByAggregateInput = {
   falscheantworten?: Prisma.SortOrder
   antwort_reihenfolge?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
 }
 
@@ -534,6 +584,8 @@ export type quiz_fragenMaxOrderByAggregateInput = {
   falscheantworten?: Prisma.SortOrder
   praesentationslayout?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
   punkte_modus?: Prisma.SortOrder
 }
@@ -547,6 +599,8 @@ export type quiz_fragenMinOrderByAggregateInput = {
   falscheantworten?: Prisma.SortOrder
   praesentationslayout?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
   punkte_modus?: Prisma.SortOrder
 }
@@ -560,6 +614,8 @@ export type quiz_fragenSumOrderByAggregateInput = {
   falscheantworten?: Prisma.SortOrder
   antwort_reihenfolge?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
+  praesentationsdauer_sekunden?: Prisma.SortOrder
+  praesentationsdauer_messungen?: Prisma.SortOrder
   punkte_basis?: Prisma.SortOrder
 }
 
@@ -731,6 +787,8 @@ export type quiz_fragenCreateWithoutFragenInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
@@ -747,6 +805,8 @@ export type quiz_fragenUncheckedCreateWithoutFragenInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -791,6 +851,8 @@ export type quiz_fragenScalarWhereInput = {
   antwort_reihenfolge?: Prisma.IntNullableListFilter<"quiz_fragen">
   praesentationslayout?: Prisma.StringNullableFilter<"quiz_fragen"> | string | null
   quiz_abschnitt_id?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_sekunden?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  praesentationsdauer_messungen?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
   punkte_basis?: Prisma.DecimalFilter<"quiz_fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFilter<"quiz_fragen"> | string
 }
@@ -801,6 +863,8 @@ export type quiz_fragenCreateWithoutQuizInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
@@ -817,6 +881,8 @@ export type quiz_fragenUncheckedCreateWithoutQuizInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -854,6 +920,8 @@ export type quiz_fragenCreateWithoutQuiz_abschnitteInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
@@ -870,6 +938,8 @@ export type quiz_fragenUncheckedCreateWithoutQuiz_abschnitteInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -907,6 +977,8 @@ export type quiz_fragenCreateWithoutTeam_antwortenInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
@@ -924,6 +996,8 @@ export type quiz_fragenUncheckedCreateWithoutTeam_antwortenInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
 }
@@ -950,6 +1024,8 @@ export type quiz_fragenUpdateWithoutTeam_antwortenInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
@@ -967,6 +1043,8 @@ export type quiz_fragenUncheckedUpdateWithoutTeam_antwortenInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -980,6 +1058,8 @@ export type quiz_fragenCreateManyFragenInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
 }
@@ -990,6 +1070,8 @@ export type quiz_fragenUpdateWithoutFragenInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
@@ -1006,6 +1088,8 @@ export type quiz_fragenUncheckedUpdateWithoutFragenInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -1020,6 +1104,8 @@ export type quiz_fragenUncheckedUpdateManyWithoutFragenInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -1033,6 +1119,8 @@ export type quiz_fragenCreateManyQuizInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
   quiz_abschnitt_id?: number | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
 }
@@ -1043,6 +1131,8 @@ export type quiz_fragenUpdateWithoutQuizInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
@@ -1059,6 +1149,8 @@ export type quiz_fragenUncheckedUpdateWithoutQuizInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -1073,6 +1165,8 @@ export type quiz_fragenUncheckedUpdateManyWithoutQuizInput = {
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -1086,6 +1180,8 @@ export type quiz_fragenCreateManyQuiz_abschnitteInput = {
   falscheantworten?: number | null
   antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
   praesentationslayout?: string | null
+  praesentationsdauer_sekunden?: number | null
+  praesentationsdauer_messungen?: number | null
   punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: string
 }
@@ -1096,6 +1192,8 @@ export type quiz_fragenUpdateWithoutQuiz_abschnitteInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
@@ -1112,6 +1210,8 @@ export type quiz_fragenUncheckedUpdateWithoutQuiz_abschnitteInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -1126,6 +1226,8 @@ export type quiz_fragenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
   falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
   praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -1171,6 +1273,8 @@ export type quiz_fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   antwort_reihenfolge?: boolean
   praesentationslayout?: boolean
   quiz_abschnitt_id?: boolean
+  praesentationsdauer_sekunden?: boolean
+  praesentationsdauer_messungen?: boolean
   punkte_basis?: boolean
   punkte_modus?: boolean
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
@@ -1190,6 +1294,8 @@ export type quiz_fragenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   antwort_reihenfolge?: boolean
   praesentationslayout?: boolean
   quiz_abschnitt_id?: boolean
+  praesentationsdauer_sekunden?: boolean
+  praesentationsdauer_messungen?: boolean
   punkte_basis?: boolean
   punkte_modus?: boolean
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
@@ -1207,6 +1313,8 @@ export type quiz_fragenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   antwort_reihenfolge?: boolean
   praesentationslayout?: boolean
   quiz_abschnitt_id?: boolean
+  praesentationsdauer_sekunden?: boolean
+  praesentationsdauer_messungen?: boolean
   punkte_basis?: boolean
   punkte_modus?: boolean
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
@@ -1224,11 +1332,13 @@ export type quiz_fragenSelectScalar = {
   antwort_reihenfolge?: boolean
   praesentationslayout?: boolean
   quiz_abschnitt_id?: boolean
+  praesentationsdauer_sekunden?: boolean
+  praesentationsdauer_messungen?: boolean
   punkte_basis?: boolean
   punkte_modus?: boolean
 }
 
-export type quiz_fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_fragen_id" | "quiz_id" | "fragen_id" | "sortierung" | "richtigeantworten" | "falscheantworten" | "antwort_reihenfolge" | "praesentationslayout" | "quiz_abschnitt_id" | "punkte_basis" | "punkte_modus", ExtArgs["result"]["quiz_fragen"]>
+export type quiz_fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_fragen_id" | "quiz_id" | "fragen_id" | "sortierung" | "richtigeantworten" | "falscheantworten" | "antwort_reihenfolge" | "praesentationslayout" | "quiz_abschnitt_id" | "praesentationsdauer_sekunden" | "praesentationsdauer_messungen" | "punkte_basis" | "punkte_modus", ExtArgs["result"]["quiz_fragen"]>
 export type quiz_fragenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
@@ -1265,6 +1375,8 @@ export type $quiz_fragenPayload<ExtArgs extends runtime.Types.Extensions.Interna
     antwort_reihenfolge: number[]
     praesentationslayout: string | null
     quiz_abschnitt_id: number | null
+    praesentationsdauer_sekunden: number | null
+    praesentationsdauer_messungen: number | null
     punkte_basis: runtime.Decimal
     punkte_modus: string
   }, ExtArgs["result"]["quiz_fragen"]>
@@ -1703,6 +1815,8 @@ export interface quiz_fragenFieldRefs {
   readonly antwort_reihenfolge: Prisma.FieldRef<"quiz_fragen", 'Int[]'>
   readonly praesentationslayout: Prisma.FieldRef<"quiz_fragen", 'String'>
   readonly quiz_abschnitt_id: Prisma.FieldRef<"quiz_fragen", 'Int'>
+  readonly praesentationsdauer_sekunden: Prisma.FieldRef<"quiz_fragen", 'Int'>
+  readonly praesentationsdauer_messungen: Prisma.FieldRef<"quiz_fragen", 'Int'>
   readonly punkte_basis: Prisma.FieldRef<"quiz_fragen", 'Decimal'>
   readonly punkte_modus: Prisma.FieldRef<"quiz_fragen", 'String'>
 }

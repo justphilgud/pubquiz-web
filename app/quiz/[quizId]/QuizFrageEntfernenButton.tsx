@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { removeFrageFromQuiz } from "../actions";
 
 type Props = {
   quizId: number;
   quizFragenId: number;
+  onRemoved?: (quizFragenId: number) => void;
 };
 
 const trashButtonClass =
@@ -13,7 +15,10 @@ const trashButtonClass =
 export default function QuizFrageEntfernenButton({
   quizId,
   quizFragenId,
+  onRemoved,
 }: Props) {
+  const router = useRouter();
+
   async function handleRemove() {
     const confirmed = window.confirm(
       "Möchtest du diese Frage wirklich aus dem Quiz entfernen?"
@@ -25,6 +30,10 @@ export default function QuizFrageEntfernenButton({
       quizId,
       quizFragenId,
     });
+
+    onRemoved?.(quizFragenId);
+
+    router.refresh();
   }
 
   return (

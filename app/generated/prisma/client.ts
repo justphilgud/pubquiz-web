@@ -141,3 +141,8 @@ export type frage_vorlagen = Prisma.frage_vorlagenModel
  * 
  */
 export type frage_vorlage_antwortfelder = Prisma.frage_vorlage_antwortfelderModel
+/**
+ * Model quiz_praesentation_status
+ * 
+ */
+export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getQuizPraesentation } from "../../actions";
+import { getOrCreatePraesentationStatus } from "./statusActions";
 import QuizPraesentationPlayer from "./QuizPraesentationPlayer";
 
 
@@ -18,11 +19,19 @@ export default async function QuizPraesentationPage({ params }: Props) {
   }
 
   const quiz = await getQuizPraesentation(quizId);
-  
+  console.log("Praesentation quizId", quizId, "quiz gefunden", Boolean(quiz));
+
 
   if (!quiz) {
     notFound();
   }
+  const status = await getOrCreatePraesentationStatus(quizId);
 
-  return <QuizPraesentationPlayer quiz={quiz} />;
+  return (
+    <QuizPraesentationPlayer
+      quiz={quiz}
+      quizId={quizId}
+      initialSlideIndex={status.slide_index}
+    />
+  );
 }

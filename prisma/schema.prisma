@@ -75,19 +75,24 @@ model fragenkategorie {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model medien {
-  medien_id    Int        @id @default(autoincrement())
-  fragen_id    Int?
-  antwort_id   Int?
-  medientyp_id Int
-  datei        String
-  sortierung   Int        @default(1)
-  bemerkung    String?
-  antworten    antworten? @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
-  fragen       fragen?    @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
-  medientyp    medientyp  @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
+  medien_id      Int     @id @default(autoincrement())
+  fragen_id      Int?
+  antwort_id     Int?
+  antwortfeld_id Int?
+  medientyp_id   Int
+  datei          String
+  sortierung     Int     @default(1)
+  bemerkung      String?
+
+  antworten   antworten?           @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
+  fragen      fragen?              @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
+  antwortfeld frage_antwortfelder? @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+  medientyp   medientyp            @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
 
   @@index([antwort_id], map: "idx_medien_antwort_id")
   @@index([fragen_id], map: "idx_medien_fragen_id")
+  @@index([antwortfeld_id], map: "idx_medien_antwortfeld_id")
+  @@index([antwortfeld_id, sortierung], map: "idx_medien_sortierung_antwortfeld", where: raw("(antwortfeld_id IS NOT NULL)"))
   @@index([antwort_id, sortierung], map: "idx_medien_sortierung_antwort", where: raw("(antwort_id IS NOT NULL)"))
   @@index([fragen_id, sortierung], map: "idx_medien_sortierung_frage", where: raw("(fragen_id IS NOT NULL)"))
   @@schema("pubquiz")
@@ -103,14 +108,14 @@ model medientyp {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz {
-  quiz_id                 Int                    @id @default(autoincrement())
-  quiz_datum              DateTime?              @db.Date
+  quiz_id                 Int                        @id @default(autoincrement())
+  quiz_datum              DateTime?                  @db.Date
   titel                   String?
   team_anzahl             Int?
   teilnehmer_anzahl       Int?
-  manuelle_bewertungen Int? @default(0)
+  manuelle_bewertungen    Int?                       @default(0)
   bemerkung               String?
-  ist_archiviert          Boolean                @default(false)
+  ist_archiviert          Boolean                    @default(false)
   archivierungsgrund      String?
   intro_begruessungstext  String?
   intro_begruessungstitel String?
@@ -123,13 +128,13 @@ model quiz {
   intro_startzeit         String?
   intro_video_url         String?
   outro_bekanntmachungen  String?
+  praesentation_status    quiz_praesentation_status?
   quiz_abschnitte         quiz_abschnitte[]
   quiz_block_freigaben    quiz_block_freigaben[]
   quiz_fragen             quiz_fragen[]
   quiz_team_sessions      quiz_team_sessions[]
   quiz_teams              quiz_teams[]
   team_antworten          team_antworten[]
-  
 
   @@schema("pubquiz")
 }
@@ -145,6 +150,8 @@ model quiz_fragen {
   antwort_reihenfolge  Int[]            @default([])
   praesentationslayout String?          @default("standard")
   quiz_abschnitt_id    Int?
+  praesentationsdauer_sekunden Int?
+  praesentationsdauer_messungen Int?    @default(0)
   punkte_basis         Decimal          @default(1)
   punkte_modus         String           @default("standard")
   fragen               fragen           @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
@@ -204,7 +211,7 @@ model quiz_team_sessions {
   quiz_team_session_id Int              @id @default(autoincrement())
   quiz_id              Int
   teamname             String
-  spieler_anzahl       Int @default(1)
+  spieler_anzahl       Int              @default(1)
   erstellt_am          DateTime         @default(now())
   quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
   team_antworten       team_antworten[]
@@ -255,12 +262,14 @@ model team_antworten {
 }
 
 model frage_antwortfelder {
-  antwortfeld_id Int                           @id @default(autoincrement())
+  antwortfeld_id Int     @id @default(autoincrement())
   fragen_id      Int
   label          String
   sortierung     Int
-  ist_pflicht    Boolean                       @default(true)
+  ist_pflicht    Boolean @default(true)
+
   loesungen      frage_antwortfeld_loesungen[]
+  medien         medien[]
   frage          fragen                        @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
   team_antworten team_antwortfelder[]
 
@@ -309,6 +318,26 @@ model frage_vorlage_antwortfelder {
   sortierung             Int
   ist_pflicht            Boolean        @default(true)
   vorlage                frage_vorlagen @relation(fields: [vorlage_id], references: [vorlage_id], onDelete: Cascade)
+
+  @@schema("pubquiz")
+}
+
+model quiz_praesentation_status {
+  quiz_id          Int       @id
+  slide_index      Int       @default(0)
+  slide_started_at DateTime  @default(now())
+  quiz_started_at  DateTime?
+  updated_at       DateTime  @updatedAt
+
+  medium_overlay_aktiv Boolean @default(false)
+  audio_aktion         String?
+  audio_aktion_id      Int     @default(0)
+  countdown_dauer_sekunden Int?
+  countdown_started_at     DateTime?
+  countdown_ended_at       DateTime?
+  countdown_status         String?   // "idle" | "running" | "finished"
+
+  quiz quiz @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
 
   @@schema("pubquiz")
 }

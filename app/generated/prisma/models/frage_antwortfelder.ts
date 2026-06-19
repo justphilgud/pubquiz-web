@@ -225,6 +225,7 @@ export type frage_antwortfelderWhereInput = {
   sortierung?: Prisma.IntFilter<"frage_antwortfelder"> | number
   ist_pflicht?: Prisma.BoolFilter<"frage_antwortfelder"> | boolean
   loesungen?: Prisma.Frage_antwortfeld_loesungenListRelationFilter
+  medien?: Prisma.MedienListRelationFilter
   frage?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   team_antworten?: Prisma.Team_antwortfelderListRelationFilter
 }
@@ -236,6 +237,7 @@ export type frage_antwortfelderOrderByWithRelationInput = {
   sortierung?: Prisma.SortOrder
   ist_pflicht?: Prisma.SortOrder
   loesungen?: Prisma.frage_antwortfeld_loesungenOrderByRelationAggregateInput
+  medien?: Prisma.medienOrderByRelationAggregateInput
   frage?: Prisma.fragenOrderByWithRelationInput
   team_antworten?: Prisma.team_antwortfelderOrderByRelationAggregateInput
 }
@@ -250,6 +252,7 @@ export type frage_antwortfelderWhereUniqueInput = Prisma.AtLeast<{
   sortierung?: Prisma.IntFilter<"frage_antwortfelder"> | number
   ist_pflicht?: Prisma.BoolFilter<"frage_antwortfelder"> | boolean
   loesungen?: Prisma.Frage_antwortfeld_loesungenListRelationFilter
+  medien?: Prisma.MedienListRelationFilter
   frage?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   team_antworten?: Prisma.Team_antwortfelderListRelationFilter
 }, "antwortfeld_id">
@@ -283,6 +286,7 @@ export type frage_antwortfelderCreateInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenCreateNestedManyWithoutAntwortfeldInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
   team_antworten?: Prisma.team_antwortfelderCreateNestedManyWithoutAntwortfeldInput
 }
@@ -294,6 +298,7 @@ export type frage_antwortfelderUncheckedCreateInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedCreateNestedManyWithoutAntwortfeldInput
+  medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortfeldInput
   team_antworten?: Prisma.team_antwortfelderUncheckedCreateNestedManyWithoutAntwortfeldInput
 }
 
@@ -302,6 +307,7 @@ export type frage_antwortfelderUpdateInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUpdateManyWithoutAntwortfeldNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
   team_antworten?: Prisma.team_antwortfelderUpdateManyWithoutAntwortfeldNestedInput
 }
@@ -313,6 +319,7 @@ export type frage_antwortfelderUncheckedUpdateInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedUpdateManyWithoutAntwortfeldNestedInput
+  medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortfeldNestedInput
   team_antworten?: Prisma.team_antwortfelderUncheckedUpdateManyWithoutAntwortfeldNestedInput
 }
 
@@ -346,6 +353,11 @@ export type Frage_antwortfelderListRelationFilter = {
 
 export type frage_antwortfelderOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type Frage_antwortfelderNullableScalarRelationFilter = {
+  is?: Prisma.frage_antwortfelderWhereInput | null
+  isNot?: Prisma.frage_antwortfelderWhereInput | null
 }
 
 export type frage_antwortfelderCountOrderByAggregateInput = {
@@ -431,6 +443,22 @@ export type frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput = {
   deleteMany?: Prisma.frage_antwortfelderScalarWhereInput | Prisma.frage_antwortfelderScalarWhereInput[]
 }
 
+export type frage_antwortfelderCreateNestedOneWithoutMedienInput = {
+  create?: Prisma.XOR<Prisma.frage_antwortfelderCreateWithoutMedienInput, Prisma.frage_antwortfelderUncheckedCreateWithoutMedienInput>
+  connectOrCreate?: Prisma.frage_antwortfelderCreateOrConnectWithoutMedienInput
+  connect?: Prisma.frage_antwortfelderWhereUniqueInput
+}
+
+export type frage_antwortfelderUpdateOneWithoutMedienNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_antwortfelderCreateWithoutMedienInput, Prisma.frage_antwortfelderUncheckedCreateWithoutMedienInput>
+  connectOrCreate?: Prisma.frage_antwortfelderCreateOrConnectWithoutMedienInput
+  upsert?: Prisma.frage_antwortfelderUpsertWithoutMedienInput
+  disconnect?: Prisma.frage_antwortfelderWhereInput | boolean
+  delete?: Prisma.frage_antwortfelderWhereInput | boolean
+  connect?: Prisma.frage_antwortfelderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.frage_antwortfelderUpdateToOneWithWhereWithoutMedienInput, Prisma.frage_antwortfelderUpdateWithoutMedienInput>, Prisma.frage_antwortfelderUncheckedUpdateWithoutMedienInput>
+}
+
 export type frage_antwortfelderCreateNestedOneWithoutTeam_antwortenInput = {
   create?: Prisma.XOR<Prisma.frage_antwortfelderCreateWithoutTeam_antwortenInput, Prisma.frage_antwortfelderUncheckedCreateWithoutTeam_antwortenInput>
   connectOrCreate?: Prisma.frage_antwortfelderCreateOrConnectWithoutTeam_antwortenInput
@@ -464,6 +492,7 @@ export type frage_antwortfelderCreateWithoutFrageInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenCreateNestedManyWithoutAntwortfeldInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   team_antworten?: Prisma.team_antwortfelderCreateNestedManyWithoutAntwortfeldInput
 }
 
@@ -473,6 +502,7 @@ export type frage_antwortfelderUncheckedCreateWithoutFrageInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedCreateNestedManyWithoutAntwortfeldInput
+  medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortfeldInput
   team_antworten?: Prisma.team_antwortfelderUncheckedCreateNestedManyWithoutAntwortfeldInput
 }
 
@@ -513,11 +543,66 @@ export type frage_antwortfelderScalarWhereInput = {
   ist_pflicht?: Prisma.BoolFilter<"frage_antwortfelder"> | boolean
 }
 
+export type frage_antwortfelderCreateWithoutMedienInput = {
+  label: string
+  sortierung: number
+  ist_pflicht?: boolean
+  loesungen?: Prisma.frage_antwortfeld_loesungenCreateNestedManyWithoutAntwortfeldInput
+  frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
+  team_antworten?: Prisma.team_antwortfelderCreateNestedManyWithoutAntwortfeldInput
+}
+
+export type frage_antwortfelderUncheckedCreateWithoutMedienInput = {
+  antwortfeld_id?: number
+  fragen_id: number
+  label: string
+  sortierung: number
+  ist_pflicht?: boolean
+  loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedCreateNestedManyWithoutAntwortfeldInput
+  team_antworten?: Prisma.team_antwortfelderUncheckedCreateNestedManyWithoutAntwortfeldInput
+}
+
+export type frage_antwortfelderCreateOrConnectWithoutMedienInput = {
+  where: Prisma.frage_antwortfelderWhereUniqueInput
+  create: Prisma.XOR<Prisma.frage_antwortfelderCreateWithoutMedienInput, Prisma.frage_antwortfelderUncheckedCreateWithoutMedienInput>
+}
+
+export type frage_antwortfelderUpsertWithoutMedienInput = {
+  update: Prisma.XOR<Prisma.frage_antwortfelderUpdateWithoutMedienInput, Prisma.frage_antwortfelderUncheckedUpdateWithoutMedienInput>
+  create: Prisma.XOR<Prisma.frage_antwortfelderCreateWithoutMedienInput, Prisma.frage_antwortfelderUncheckedCreateWithoutMedienInput>
+  where?: Prisma.frage_antwortfelderWhereInput
+}
+
+export type frage_antwortfelderUpdateToOneWithWhereWithoutMedienInput = {
+  where?: Prisma.frage_antwortfelderWhereInput
+  data: Prisma.XOR<Prisma.frage_antwortfelderUpdateWithoutMedienInput, Prisma.frage_antwortfelderUncheckedUpdateWithoutMedienInput>
+}
+
+export type frage_antwortfelderUpdateWithoutMedienInput = {
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  loesungen?: Prisma.frage_antwortfeld_loesungenUpdateManyWithoutAntwortfeldNestedInput
+  frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
+  team_antworten?: Prisma.team_antwortfelderUpdateManyWithoutAntwortfeldNestedInput
+}
+
+export type frage_antwortfelderUncheckedUpdateWithoutMedienInput = {
+  antwortfeld_id?: Prisma.IntFieldUpdateOperationsInput | number
+  fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedUpdateManyWithoutAntwortfeldNestedInput
+  team_antworten?: Prisma.team_antwortfelderUncheckedUpdateManyWithoutAntwortfeldNestedInput
+}
+
 export type frage_antwortfelderCreateWithoutTeam_antwortenInput = {
   label: string
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenCreateNestedManyWithoutAntwortfeldInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
 }
 
@@ -528,6 +613,7 @@ export type frage_antwortfelderUncheckedCreateWithoutTeam_antwortenInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedCreateNestedManyWithoutAntwortfeldInput
+  medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortfeldInput
 }
 
 export type frage_antwortfelderCreateOrConnectWithoutTeam_antwortenInput = {
@@ -551,6 +637,7 @@ export type frage_antwortfelderUpdateWithoutTeam_antwortenInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUpdateManyWithoutAntwortfeldNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
 }
 
@@ -561,12 +648,14 @@ export type frage_antwortfelderUncheckedUpdateWithoutTeam_antwortenInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedUpdateManyWithoutAntwortfeldNestedInput
+  medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortfeldNestedInput
 }
 
 export type frage_antwortfelderCreateWithoutLoesungenInput = {
   label: string
   sortierung: number
   ist_pflicht?: boolean
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
   team_antworten?: Prisma.team_antwortfelderCreateNestedManyWithoutAntwortfeldInput
 }
@@ -577,6 +666,7 @@ export type frage_antwortfelderUncheckedCreateWithoutLoesungenInput = {
   label: string
   sortierung: number
   ist_pflicht?: boolean
+  medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortfeldInput
   team_antworten?: Prisma.team_antwortfelderUncheckedCreateNestedManyWithoutAntwortfeldInput
 }
 
@@ -600,6 +690,7 @@ export type frage_antwortfelderUpdateWithoutLoesungenInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
   team_antworten?: Prisma.team_antwortfelderUpdateManyWithoutAntwortfeldNestedInput
 }
@@ -610,6 +701,7 @@ export type frage_antwortfelderUncheckedUpdateWithoutLoesungenInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortfeldNestedInput
   team_antworten?: Prisma.team_antwortfelderUncheckedUpdateManyWithoutAntwortfeldNestedInput
 }
 
@@ -625,6 +717,7 @@ export type frage_antwortfelderUpdateWithoutFrageInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUpdateManyWithoutAntwortfeldNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   team_antworten?: Prisma.team_antwortfelderUpdateManyWithoutAntwortfeldNestedInput
 }
 
@@ -634,6 +727,7 @@ export type frage_antwortfelderUncheckedUpdateWithoutFrageInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUncheckedUpdateManyWithoutAntwortfeldNestedInput
+  medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortfeldNestedInput
   team_antworten?: Prisma.team_antwortfelderUncheckedUpdateManyWithoutAntwortfeldNestedInput
 }
 
@@ -651,11 +745,13 @@ export type frage_antwortfelderUncheckedUpdateManyWithoutFrageInput = {
 
 export type Frage_antwortfelderCountOutputType = {
   loesungen: number
+  medien: number
   team_antworten: number
 }
 
 export type Frage_antwortfelderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   loesungen?: boolean | Frage_antwortfelderCountOutputTypeCountLoesungenArgs
+  medien?: boolean | Frage_antwortfelderCountOutputTypeCountMedienArgs
   team_antworten?: boolean | Frage_antwortfelderCountOutputTypeCountTeam_antwortenArgs
 }
 
@@ -679,6 +775,13 @@ export type Frage_antwortfelderCountOutputTypeCountLoesungenArgs<ExtArgs extends
 /**
  * Frage_antwortfelderCountOutputType without action
  */
+export type Frage_antwortfelderCountOutputTypeCountMedienArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.medienWhereInput
+}
+
+/**
+ * Frage_antwortfelderCountOutputType without action
+ */
 export type Frage_antwortfelderCountOutputTypeCountTeam_antwortenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.team_antwortfelderWhereInput
 }
@@ -691,6 +794,7 @@ export type frage_antwortfelderSelect<ExtArgs extends runtime.Types.Extensions.I
   sortierung?: boolean
   ist_pflicht?: boolean
   loesungen?: boolean | Prisma.frage_antwortfelder$loesungenArgs<ExtArgs>
+  medien?: boolean | Prisma.frage_antwortfelder$medienArgs<ExtArgs>
   frage?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   team_antworten?: boolean | Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs>
   _count?: boolean | Prisma.Frage_antwortfelderCountOutputTypeDefaultArgs<ExtArgs>
@@ -725,6 +829,7 @@ export type frage_antwortfelderSelectScalar = {
 export type frage_antwortfelderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"antwortfeld_id" | "fragen_id" | "label" | "sortierung" | "ist_pflicht", ExtArgs["result"]["frage_antwortfelder"]>
 export type frage_antwortfelderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   loesungen?: boolean | Prisma.frage_antwortfelder$loesungenArgs<ExtArgs>
+  medien?: boolean | Prisma.frage_antwortfelder$medienArgs<ExtArgs>
   frage?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   team_antworten?: boolean | Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs>
   _count?: boolean | Prisma.Frage_antwortfelderCountOutputTypeDefaultArgs<ExtArgs>
@@ -740,6 +845,7 @@ export type $frage_antwortfelderPayload<ExtArgs extends runtime.Types.Extensions
   name: "frage_antwortfelder"
   objects: {
     loesungen: Prisma.$frage_antwortfeld_loesungenPayload<ExtArgs>[]
+    medien: Prisma.$medienPayload<ExtArgs>[]
     frage: Prisma.$fragenPayload<ExtArgs>
     team_antworten: Prisma.$team_antwortfelderPayload<ExtArgs>[]
   }
@@ -1144,6 +1250,7 @@ readonly fields: frage_antwortfelderFieldRefs;
 export interface Prisma__frage_antwortfelderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   loesungen<T extends Prisma.frage_antwortfelder$loesungenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$loesungenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_antwortfeld_loesungenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  medien<T extends Prisma.frage_antwortfelder$medienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$medienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$medienPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   frage<T extends Prisma.fragenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragenDefaultArgs<ExtArgs>>): Prisma.Prisma__fragenClient<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   team_antworten<T extends Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortfelderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1602,6 +1709,30 @@ export type frage_antwortfelder$loesungenArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.Frage_antwortfeld_loesungenScalarFieldEnum | Prisma.Frage_antwortfeld_loesungenScalarFieldEnum[]
+}
+
+/**
+ * frage_antwortfelder.medien
+ */
+export type frage_antwortfelder$medienArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the medien
+   */
+  select?: Prisma.medienSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the medien
+   */
+  omit?: Prisma.medienOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.medienInclude<ExtArgs> | null
+  where?: Prisma.medienWhereInput
+  orderBy?: Prisma.medienOrderByWithRelationInput | Prisma.medienOrderByWithRelationInput[]
+  cursor?: Prisma.medienWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MedienScalarFieldEnum | Prisma.MedienScalarFieldEnum[]
 }
 
 /**

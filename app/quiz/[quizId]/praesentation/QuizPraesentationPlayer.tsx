@@ -9,91 +9,56 @@ import {
   getZufaelligeSchaetzfrage,
 } from "../../actions";
 
+import {
+  getPraesentationStatus,
+  setPraesentationSlideIndex,
+  starteQuiz,
+} from "./statusActions";
+
 import type { QuizPraesentationResult } from "../../actions";
 import { IntroSlideAnkommen } from "../slides/vor-dem-start/IntroSlideAnkommen";
 import QRCode from "react-qr-code";
 
+import {
+  buildPraesentationSlides,
+  type Medium,
+  type PraesentationQuiz,
+  type Slide,
+} from "./buildPraesentationSlides";
+
+
+
 
 type Props = {
   quiz: QuizPraesentationResult;
-};
-
-type PraesentationQuiz = QuizPraesentationResult & {
-  intro_startzeit?: string | null;
-  intro_video_url?: string | null;
-  intro_logo_url?: string | null;
-  intro_wartetext?: string | null;
-  intro_musik_url?: string | null;
-  intro_startsequenz_text?: string | null;
-  outro_bekanntmachungen?: string | null;
+  quizId: number;
+  initialSlideIndex?: number;
 };
 
 type Abschnitt = QuizPraesentationResult["abschnitte"][number];
 
-type FixerSlideTyp =
-  | "vor-dem-start"
-  | "startsequenz"
-  | "begruessung"
-  | "preise"
-  | "regeln"
-  | "qrcode"
-  | "bekanntmachungen";
-
-type Medium = {
-  medien_id: number;
-  datei: string;
-  medientyp: string;
-  sortierung: number;
-  bemerkung: string | null;
-};
-
-type Slide =
-  | {
-    typ: "fixer-slide";
-    slideTyp: FixerSlideTyp;
-  }
-  | {
-    typ: "block";
-    abschnitt: Abschnitt;
-  }
-  | {
-    typ: "frage";
-    abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
-    frageIndexImBlock: number;
-    fragenAnzahlImBlock: number;
-  }
-  | {
-    typ: "aufloesung";
-    abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
-    frageIndexImBlock: number;
-    fragenAnzahlImBlock: number;
-  }
-  | {
-    typ: "pause";
-    abschnitt: Abschnitt;
-    dauerSekunden: number;
-  }
-  | {
-    typ: "zwischenstand";
-    abschnitt: Abschnitt;
-  }
-  | {
-    typ: "endstand";
-    abschnitt: Abschnitt;
-  };
 
 function StartsequenzSlideInPlayer({
-  audioUrl = "/medien/audio/intro/mexico.mp3",
+  audioUrl,
   text = "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen.",
   onFinished,
+  onStarted,
+  audioAktion,
+  audioAktionId,
 }: {
-  audioUrl?: string;
+  audioUrl?: string | null;
   text?: string;
   onFinished: () => void;
+  onStarted?: () => void;
+  audioAktion?: "play" | "pause" | "stop" | null;
+  audioAktionId?: number | null;
 }) {
+  const fallbackAudioUrl = "/medien/audio/intro/mexico.mp3";
+  const effectiveAudioUrl = audioUrl?.trim() || fallbackAudioUrl;
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastHandledAudioAktionIdRef = useRef<number | null>(null);
+
   const [started, setStarted] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [audioFehlt, setAudioFehlt] = useState(false);
@@ -103,18 +68,67 @@ function StartsequenzSlideInPlayer({
 
     if (!audio) return;
 
-    setAudioFehlt(false);
-    audio.currentTime = 0;
+    try {
+      setAudioFehlt(false);
 
-    await audio.play();
+      if (!started) {
+        audio.currentTime = 0;
+        audio.load();
+      }
 
-    const duration = Number.isFinite(audio.duration)
-      ? Math.ceil(audio.duration)
-      : 0;
+      await audio.play();
 
-    setStarted(true);
-    setRemainingSeconds(duration);
+      if (!started) {
+        onStarted?.();
+      }
+
+      const duration = Number.isFinite(audio.duration)
+        ? Math.ceil(audio.duration)
+        : 0;
+
+      setStarted(true);
+      setRemainingSeconds(duration);
+    } catch (error) {
+      console.error("Intro-Audio konnte nicht gestartet werden:", error);
+      setAudioFehlt(true);
+    }
   }
+
+  function pauseIntro() {
+    audioRef.current?.pause();
+  }
+
+  function stopIntro() {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    audio.pause();
+    audio.currentTime = 0;
+    setStarted(false);
+    setRemainingSeconds(null);
+  }
+
+  useEffect(() => {
+    if (!audioAktionId) return;
+    if (lastHandledAudioAktionIdRef.current === audioAktionId) return;
+
+    lastHandledAudioAktionIdRef.current = audioAktionId;
+
+    if (audioAktion === "play") {
+      void startIntro();
+      return;
+    }
+
+    if (audioAktion === "pause") {
+      pauseIntro();
+      return;
+    }
+
+    if (audioAktion === "stop") {
+      stopIntro();
+    }
+  }, [audioAktion, audioAktionId]);
 
   function updateCountdown() {
     const audio = audioRef.current;
@@ -142,8 +156,9 @@ function StartsequenzSlideInPlayer({
     <section className="relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[#050510] text-white">
       <audio
         ref={audioRef}
-        src={audioUrl}
+        src={effectiveAudioUrl}
         preload="metadata"
+        onLoadedMetadata={updateCountdown}
         onTimeUpdate={updateCountdown}
         onEnded={() => {
           setRemainingSeconds(0);
@@ -177,7 +192,7 @@ function StartsequenzSlideInPlayer({
             <>
               <button
                 type="button"
-                onClick={() => audioRef.current?.pause()}
+                onClick={pauseIntro}
                 className="h-10 w-10 rounded-full border border-white/20 bg-white/5 text-white/30 transition hover:border-white/60 hover:bg-white/10 hover:text-white/80"
                 title="Pausieren"
               >
@@ -186,7 +201,7 @@ function StartsequenzSlideInPlayer({
 
               <button
                 type="button"
-                onClick={() => audioRef.current?.play()}
+                onClick={startIntro}
                 className="h-10 w-10 rounded-full border border-white/20 bg-white/5 text-white/30 transition hover:border-white/60 hover:bg-white/10 hover:text-white/80"
                 title="Fortsetzen"
               >
@@ -207,7 +222,8 @@ function StartsequenzSlideInPlayer({
 
         {audioFehlt && (
           <div className="absolute bottom-8 left-10 rounded-xl border border-red-400/60 bg-red-950/70 px-5 py-3 text-sm font-bold text-red-100">
-            Audiodatei konnte nicht geladen werden: {audioUrl}
+            Audiodatei konnte nicht geladen oder gestartet werden:{" "}
+            {effectiveAudioUrl}
           </div>
         )}
       </div>
@@ -223,20 +239,39 @@ function istFragenblock(abschnittTyp: string) {
 }
 
 
-export default function QuizPraesentationPlayer({ quiz }: Props) {
+export default function QuizPraesentationPlayer({
+  quiz,
+  quizId,
+  initialSlideIndex = 0,
+}: Props) {
   const praesentationQuiz = quiz as PraesentationQuiz;
-  const [slideIndex, setSlideIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(initialSlideIndex);
   const [overlayMedien, setOverlayMedien] = useState<Medium[] | null>(null);
-  const [timerSekunden, setTimerSekunden] = useState<number | null>(null);
-  const [timerLaeuft, setTimerLaeuft] = useState(false);
+  const [remoteAudioAktion, setRemoteAudioAktion] = useState<
+    "play" | "pause" | "stop" | null
+  >(null);
+
+  const [remoteAudioAktionId, setRemoteAudioAktionId] =
+    useState<number | null>(null);
+  const [remoteMediumOverlayAktiv, setRemoteMediumOverlayAktiv] =
+    useState(false);
+  const [lastAudioAktionId, setLastAudioAktionId] = useState<number | null>(null);
   const [showSchaetzfrage, setShowSchaetzfrage] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioPlayCount, setAudioPlayCount] = useState(0);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [timerInputMinuten, setTimerInputMinuten] = useState("5");
   const [freigabeMeldung, setFreigabeMeldung] = useState("");
   const [isFreigabeLoading, setIsFreigabeLoading] = useState(false);
   const [endstandRevealCount, setEndstandRevealCount] = useState(2);
+  const [remoteCountdownDauerSekunden, setRemoteCountdownDauerSekunden] =
+    useState<number | null>(null);
+
+  const [remoteCountdownStartedAt, setRemoteCountdownStartedAt] =
+    useState<string | null>(null);
+
+  const [remoteCountdownStatus, setRemoteCountdownStatus] =
+    useState<string | null>("idle");
+
   const [autoGezeigteMedienFrageIds, setAutoGezeigteMedienFrageIds] = useState<number[]>([]);
   const [schaetzfrage, setSchaetzfrage] = useState<{
     fragen_id: number;
@@ -252,168 +287,125 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       punkte: number;
     }[]
   >([]);
+  const [now, setNow] = useState(() => Date.now());
 
-  const slides = useMemo<Slide[]>(() => {
-    const result: Slide[] = [];
+  const slides = useMemo(
+    () => buildPraesentationSlides(quiz),
+    [quiz]
+  );
 
-    const sortierteAbschnitte = [...quiz.abschnitte].sort(
-      (a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)
-    );
 
-    const fragenrunden = sortierteAbschnitte.filter(
-      (abschnitt) => abschnitt.abschnitt_typ === "fragenblock"
-    );
-
-    for (const abschnitt of sortierteAbschnitte) {
-      const fragenImBlock = quiz.fragen
-        .filter(
-          (frage) =>
-            Number(frage.quiz_abschnitt_id) ===
-            Number(abschnitt.quiz_abschnitt_id)
-        )
-        .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0));
-
-      if (abschnitt.abschnitt_typ === "intro") {
-        result.push({ typ: "fixer-slide", slideTyp: "vor-dem-start" });
-        result.push({ typ: "fixer-slide", slideTyp: "startsequenz" });
-        result.push({ typ: "fixer-slide", slideTyp: "begruessung" });
-        result.push({ typ: "fixer-slide", slideTyp: "preise" });
-        result.push({ typ: "fixer-slide", slideTyp: "regeln" });
-        result.push({ typ: "fixer-slide", slideTyp: "qrcode" });
-        continue;
-      }
-
-      if (abschnitt.abschnitt_typ === "outro") {
-        result.push({ typ: "fixer-slide", slideTyp: "bekanntmachungen" });
-        continue;
-      }
-
-      result.push({
-        typ: "block",
-        abschnitt,
-      });
-
-      if (abschnitt.abschnitt_typ === "fragenblock") {
-        fragenImBlock.forEach((frage, index) => {
-          result.push({
-            typ: "frage",
-            abschnitt,
-            frage,
-            frageIndexImBlock: index + 1,
-            fragenAnzahlImBlock: fragenImBlock.length,
-          });
-        });
-
-        if (fragenImBlock.length > 0) {
-          result.push({
-            typ: "pause",
-            abschnitt,
-            dauerSekunden: abschnitt.dauer_sekunden ?? 300,
-          });
-        }
-
-        fragenImBlock.forEach((frage, index) => {
-          result.push({
-            typ: "aufloesung",
-            abschnitt,
-            frage,
-            frageIndexImBlock: index + 1,
-            fragenAnzahlImBlock: fragenImBlock.length,
-          });
-        });
-
-        if (fragenImBlock.length > 0) {
-          const istLetzteFragenrunde =
-            fragenrunden[fragenrunden.length - 1]?.quiz_abschnitt_id ===
-            abschnitt.quiz_abschnitt_id;
-
-          result.push({
-            typ: istLetzteFragenrunde ? "endstand" : "zwischenstand",
-            abschnitt,
-          });
-        }
-
-        continue;
-      }
-
-      fragenImBlock.forEach((frage, index) => {
-        result.push({
-          typ: "frage",
-          abschnitt,
-          frage,
-          frageIndexImBlock: index + 1,
-          fragenAnzahlImBlock: fragenImBlock.length,
-        });
-      });
-    }
-
-    const fragenOhneBlock = quiz.fragen
-      .filter((frage) => frage.quiz_abschnitt_id == null)
-      .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0));
-
-    if (fragenOhneBlock.length > 0) {
-      fragenOhneBlock.forEach((frage, index) => {
-        result.push({
-          typ: "frage",
-          abschnitt: null,
-          frage,
-          frageIndexImBlock: index + 1,
-          fragenAnzahlImBlock: fragenOhneBlock.length,
-        });
-
-        result.push({
-          typ: "aufloesung",
-          abschnitt: null,
-          frage,
-          frageIndexImBlock: index + 1,
-          fragenAnzahlImBlock: fragenOhneBlock.length,
-        });
-      });
-    }
-
-    return result;
-  }, [quiz.abschnitte, quiz.fragen]);
   const slide = slides[slideIndex];
+
+  function getMedienFuerAktuellenSlide() {
+    if (!slide) return [];
+
+    if (slide.typ === "frage") {
+      return slide.frage.medien ?? [];
+    }
+
+    if (slide.typ === "aufloesung") {
+      const antwortMedien = slide.frage.antworten.flatMap(
+        (antwort) => antwort.medien ?? []
+      );
+
+      return [...(slide.frage.medien ?? []), ...antwortMedien];
+    }
+
+    return [];
+  }
+
+
+  useEffect(() => {
+    const interval = window.setInterval(async () => {
+      console.log("Praesentation polling läuft", quizId);
+      const status = await getPraesentationStatus(quizId);
+
+      if (!status) return;
+
+      console.log("Countdown Status in Präsentation", {
+        dauer: status.countdown_dauer_sekunden,
+        startedAt: status.countdown_started_at,
+        status: status.countdown_status,
+      });
+
+      setRemoteCountdownDauerSekunden(status.countdown_dauer_sekunden ?? null);
+
+      setRemoteCountdownStartedAt(
+        status.countdown_started_at
+          ? new Date(status.countdown_started_at).toISOString()
+          : null
+      );
+
+      setRemoteCountdownStatus(status.countdown_status ?? "idle");
+
+      setSlideIndex((current) => {
+        const nextIndex = Math.min(
+          Math.max(status.slide_index, 0),
+          Math.max(slides.length - 1, 0)
+        );
+
+        if (current === nextIndex) {
+          setRemoteMediumOverlayAktiv(status.medium_overlay_aktiv);
+          return current;
+        }
+
+        setOverlayMedien(null);
+        setRemoteMediumOverlayAktiv(false);
+        setEndstandRevealCount(2);
+
+        return nextIndex;
+      });
+      setRemoteAudioAktion(
+        (status.audio_aktion as "play" | "pause" | "stop" | null) ?? null
+      );
+
+      setRemoteAudioAktionId(status.audio_aktion_id ?? null);
+
+      if (status.audio_aktion_id !== lastAudioAktionId) {
+        setLastAudioAktionId(status.audio_aktion_id);
+
+        const audio = audioRef.current;
+
+        if (audio) {
+          if (status.audio_aktion === "play") {
+            void audio.play();
+            setIsAudioPlaying(true);
+          }
+
+          if (status.audio_aktion === "pause") {
+            audio.pause();
+            setIsAudioPlaying(false);
+          }
+
+          if (status.audio_aktion === "stop") {
+            audio.pause();
+            audio.currentTime = 0;
+            setIsAudioPlaying(false);
+          }
+        }
+      }
+    }, 1000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [quizId, slides.length, lastAudioAktionId]);
+
+  useEffect(() => {
+    if (!remoteMediumOverlayAktiv) {
+      setOverlayMedien(null);
+      return;
+    }
+
+    const medien = getMedienFuerAktuellenSlide();
+
+    setOverlayMedien(medien.length > 0 ? medien : null);
+  }, [remoteMediumOverlayAktiv, slideIndex]);
 
   const hatGleichstandAufPlatz1 =
     punktestand.length > 1 &&
     punktestand[0].punkte === punktestand[1].punkte;
-  useEffect(() => {
-    if (slide?.typ === "pause") {
-      setTimerSekunden(slide.dauerSekunden);
-      setTimerInputMinuten(String(slide.dauerSekunden / 60));
-      setTimerLaeuft(false);
-    } else {
-      setTimerSekunden(null);
-      setTimerLaeuft(false);
-    }
-  }, [slideIndex, slide]);
-
-  useEffect(() => {
-    if (!timerLaeuft || timerSekunden === null || timerSekunden <= 0) {
-      return;
-    }
-
-
-    const interval = window.setInterval(() => {
-      setTimerSekunden((current) => {
-        if (current === null || current <= 1) {
-          window.clearInterval(interval);
-          setTimerLaeuft(false);
-
-          setTimeout(() => {
-            handleBlockSchliessen();
-          }, 0);
-
-          return 0;
-        }
-
-        return current - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(interval);
-  }, [timerLaeuft, timerSekunden]);
 
   useEffect(() => {
     if (slide?.typ === "endstand") {
@@ -479,7 +471,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [slideIndex, slides.length]);
+  }, [slideIndex, slides.length, overlayMedien, endstandRevealCount, slide?.typ]);
 
   useEffect(() => {
     if (
@@ -510,6 +502,14 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     ladePunktestand();
   }, [slideIndex, quiz.quiz_id, slide?.typ]);
 
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
   function handleAudioPlayPause() {
     const audio = audioRef.current;
     if (!audio) return;
@@ -529,7 +529,7 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     setIsAudioPlaying(true);
   }
 
-  function nextSlide() {
+  async function nextSlide() {
     if (overlayMedien) {
       setOverlayMedien(null);
       return;
@@ -542,14 +542,23 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
 
     if (slideIndex >= slides.length - 1) return;
 
-    setSlideIndex((current) => current + 1);
+    const neuerIndex = slideIndex + 1;
+
+    setSlideIndex(neuerIndex);
     setOverlayMedien(null);
+
+    await setPraesentationSlideIndex(quizId, neuerIndex);
   }
 
-  function previousSlide() {
+  async function previousSlide() {
     if (slideIndex <= 0) return;
-    setSlideIndex((current) => current - 1);
+
+    const neuerIndex = slideIndex - 1;
+
+    setSlideIndex(neuerIndex);
     setOverlayMedien(null);
+
+    await setPraesentationSlideIndex(quizId, neuerIndex);
   }
   function getAktuellerFragenrundenAbschnitt() {
     if (!slide) return null;
@@ -1264,14 +1273,6 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       loesungen: (feld.loesungen ?? []).filter((loesung) => loesung.ist_akzeptiert),
     }));
 
-
-
-    console.log(
-      "AUFLOESUNG",
-      frage.fragen_id,
-      frage.antwortfelder
-    );
-
     const hatAntwortfelderLoesungen = richtigeAntwortfeldLoesungen.some(
       (feld) => feld.loesungen.length > 0
     );
@@ -1454,12 +1455,20 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   function renderStartsequenzSlide() {
     return (
       <StartsequenzSlideInPlayer
-        audioUrl={praesentationQuiz.intro_musik_url ?? "/medien/audio/intro/mexico.mp3"}
+        audioUrl={
+          praesentationQuiz.intro_musik_url?.trim() ||
+          "/medien/audio/intro/mexico.mp3"
+        }
         text={
-          praesentationQuiz.intro_startsequenz_text ??
+          praesentationQuiz.intro_startsequenz_text?.trim() ||
           "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen."
         }
+        onStarted={() => {
+          starteQuiz(quizId);
+        }}
         onFinished={nextSlide}
+        audioAktion={remoteAudioAktion}
+        audioAktionId={remoteAudioAktionId}
       />
     );
   }
@@ -1512,10 +1521,13 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     const abschnitt = slide.abschnitt;
 
     const zeilen =
-      abschnitt.bemerkung
-        ?.split("\n")
-        .map((zeile) => zeile.trim())
-        .filter(Boolean) ?? [];
+      abschnitt.abschnitt_typ === "fragenrunde" ||
+        abschnitt.abschnitt_typ === "fragenblock"
+        ? []
+        : abschnitt.bemerkung
+          ?.split("\n")
+          .map((zeile) => zeile.trim())
+          .filter(Boolean) ?? [];
 
     const regeln =
       quiz.intro_regeln
@@ -1666,11 +1678,28 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
       );
     }
 
+    const blockTitel =
+      abschnitt.abschnitt_typ === "fragenrunde" ||
+        abschnitt.abschnitt_typ === "fragenblock"
+        ? `Block ${slides
+          .filter(
+            (item) =>
+              item.typ === "block" &&
+              (item.abschnitt.abschnitt_typ === "fragenrunde" ||
+                item.abschnitt.abschnitt_typ === "fragenblock")
+          )
+          .findIndex(
+            (item) =>
+              item.typ === "block" &&
+              item.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id
+          ) + 1}`
+        : abschnitt.titel;
+
     return (
       <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
 
         <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
-          {abschnitt.titel}
+          {blockTitel}
         </h2>
 
         {zeilen.length > 0 && (
@@ -1716,15 +1745,28 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
   }
 
   function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
-    const aktuelleSekunden = timerSekunden ?? slide.dauerSekunden;
+
+    const dauerSekunden =
+      remoteCountdownDauerSekunden ?? slide.dauerSekunden;
+
+    const verstrichen =
+      remoteCountdownStartedAt && remoteCountdownStatus === "running"
+        ? Math.max(
+          0,
+          Math.floor(
+            (now - new Date(remoteCountdownStartedAt).getTime()) / 1000
+          )
+        )
+        : 0;
+
+    const aktuelleSekunden =
+      remoteCountdownStatus === "running"
+        ? Math.max(0, dauerSekunden - verstrichen)
+        : dauerSekunden;
+
     const minuten = Math.floor(aktuelleSekunden / 60);
     const sekunden = aktuelleSekunden % 60;
 
-    function setTimerMinuten(minutenWert: number) {
-      const sichereMinuten = Math.max(0, minutenWert);
-      setTimerSekunden(Math.round(sichereMinuten * 60));
-      setTimerLaeuft(false);
-    }
 
     return (
       <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
@@ -1743,55 +1785,8 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <button
-            type="button"
-            onClick={() => setTimerLaeuft((current) => !current)}
-            className="rounded-2xl border-4 border-emerald-300 bg-black px-6 py-3 font-black uppercase text-emerald-200 shadow-[5px_5px_0_#ff00aa]"
-          >
-            {timerLaeuft ? "Pause" : "Start"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setTimerSekunden(slide.dauerSekunden);
-              setTimerLaeuft(false);
-              setTimerInputMinuten(String(slide.dauerSekunden / 60));
-            }}
-            className="rounded-2xl border-4 border-cyan-300 bg-black px-6 py-3 font-black uppercase text-cyan-200 shadow-[5px_5px_0_#ff00aa]"
-          >
-            Reset
-          </button>
-
-          <div className="flex items-center gap-2 rounded-2xl border-4 border-yellow-300 bg-black px-4 py-2 shadow-[5px_5px_0_#ff00aa]">
-            <span className="text-sm font-black uppercase text-yellow-200">
-              Minuten
-            </span>
-
-            <input
-              type="number"
-              min={0}
-              step={0.5}
-              value={timerInputMinuten}
-              onChange={(e) => {
-                const value = e.target.value;
-
-                setTimerInputMinuten(value);
-
-                const minuten = Number(value);
-
-                if (!Number.isNaN(minuten)) {
-                  setTimerMinuten(minuten);
-                }
-              }}
-              className="w-28 rounded-xl border-2 border-white/20 bg-slate-950 px-3 py-2 text-center text-xl font-black text-white outline-none"
-            />
-          </div>
-        </div>
-
         <div className="mt-8 text-2xl font-black uppercase tracking-wide text-white/70">
-          Bitte schickt das Formular ab, bevor der Timer abgelaufen ist.
+          Am Ende des Countdowns wird das Formular automatisch gesperrt und abgeschickt.
         </div>
       </div>
     );
@@ -1832,6 +1827,32 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
     return renderAufloesungSlide(slide);
   }
 
+  function getAbschnittAnzeigeTitel(abschnitt: Abschnitt | null | undefined) {
+    if (!abschnitt) return "Kein Block";
+
+    if (
+      abschnitt.abschnitt_typ === "fragenrunde" ||
+      abschnitt.abschnitt_typ === "fragenblock"
+    ) {
+      const blockIndex = slides
+        .filter(
+          (item) =>
+            item.typ === "block" &&
+            (item.abschnitt.abschnitt_typ === "fragenrunde" ||
+              item.abschnitt.abschnitt_typ === "fragenblock")
+        )
+        .findIndex(
+          (item) =>
+            item.typ === "block" &&
+            item.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id
+        );
+
+      return `Block ${blockIndex + 1}`;
+    }
+
+    return abschnitt.titel;
+  }
+
   const slideLabel =
     !slide
       ? "-"
@@ -1846,9 +1867,8 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
                 ? "Preise"
                 : "Bekanntmachungen"
         : slide.typ === "block"
-          ? slide.abschnitt.titel
-          : slide.abschnitt?.titel ?? "Kein Block";
-
+          ? getAbschnittAnzeigeTitel(slide.abschnitt)
+          : getAbschnittAnzeigeTitel(slide.abschnitt);
   const zeigtFreigabeButtons =
     slide?.typ === "pause" ||
     (slide?.typ === "block" &&
@@ -2045,7 +2065,6 @@ export default function QuizPraesentationPlayer({ quiz }: Props) {
             >
               ← Zurück
             </button>
-
             <button
               type="button"
               onClick={nextSlide}

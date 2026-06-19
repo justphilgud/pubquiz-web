@@ -30,6 +30,7 @@ export type MedienAvgAggregateOutputType = {
   medien_id: number | null
   fragen_id: number | null
   antwort_id: number | null
+  antwortfeld_id: number | null
   medientyp_id: number | null
   sortierung: number | null
 }
@@ -38,6 +39,7 @@ export type MedienSumAggregateOutputType = {
   medien_id: number | null
   fragen_id: number | null
   antwort_id: number | null
+  antwortfeld_id: number | null
   medientyp_id: number | null
   sortierung: number | null
 }
@@ -46,6 +48,7 @@ export type MedienMinAggregateOutputType = {
   medien_id: number | null
   fragen_id: number | null
   antwort_id: number | null
+  antwortfeld_id: number | null
   medientyp_id: number | null
   datei: string | null
   sortierung: number | null
@@ -56,6 +59,7 @@ export type MedienMaxAggregateOutputType = {
   medien_id: number | null
   fragen_id: number | null
   antwort_id: number | null
+  antwortfeld_id: number | null
   medientyp_id: number | null
   datei: string | null
   sortierung: number | null
@@ -66,6 +70,7 @@ export type MedienCountAggregateOutputType = {
   medien_id: number
   fragen_id: number
   antwort_id: number
+  antwortfeld_id: number
   medientyp_id: number
   datei: number
   sortierung: number
@@ -78,6 +83,7 @@ export type MedienAvgAggregateInputType = {
   medien_id?: true
   fragen_id?: true
   antwort_id?: true
+  antwortfeld_id?: true
   medientyp_id?: true
   sortierung?: true
 }
@@ -86,6 +92,7 @@ export type MedienSumAggregateInputType = {
   medien_id?: true
   fragen_id?: true
   antwort_id?: true
+  antwortfeld_id?: true
   medientyp_id?: true
   sortierung?: true
 }
@@ -94,6 +101,7 @@ export type MedienMinAggregateInputType = {
   medien_id?: true
   fragen_id?: true
   antwort_id?: true
+  antwortfeld_id?: true
   medientyp_id?: true
   datei?: true
   sortierung?: true
@@ -104,6 +112,7 @@ export type MedienMaxAggregateInputType = {
   medien_id?: true
   fragen_id?: true
   antwort_id?: true
+  antwortfeld_id?: true
   medientyp_id?: true
   datei?: true
   sortierung?: true
@@ -114,6 +123,7 @@ export type MedienCountAggregateInputType = {
   medien_id?: true
   fragen_id?: true
   antwort_id?: true
+  antwortfeld_id?: true
   medientyp_id?: true
   datei?: true
   sortierung?: true
@@ -211,6 +221,7 @@ export type MedienGroupByOutputType = {
   medien_id: number
   fragen_id: number | null
   antwort_id: number | null
+  antwortfeld_id: number | null
   medientyp_id: number
   datei: string
   sortierung: number
@@ -244,12 +255,14 @@ export type medienWhereInput = {
   medien_id?: Prisma.IntFilter<"medien"> | number
   fragen_id?: Prisma.IntNullableFilter<"medien"> | number | null
   antwort_id?: Prisma.IntNullableFilter<"medien"> | number | null
+  antwortfeld_id?: Prisma.IntNullableFilter<"medien"> | number | null
   medientyp_id?: Prisma.IntFilter<"medien"> | number
   datei?: Prisma.StringFilter<"medien"> | string
   sortierung?: Prisma.IntFilter<"medien"> | number
   bemerkung?: Prisma.StringNullableFilter<"medien"> | string | null
   antworten?: Prisma.XOR<Prisma.AntwortenNullableScalarRelationFilter, Prisma.antwortenWhereInput> | null
   fragen?: Prisma.XOR<Prisma.FragenNullableScalarRelationFilter, Prisma.fragenWhereInput> | null
+  antwortfeld?: Prisma.XOR<Prisma.Frage_antwortfelderNullableScalarRelationFilter, Prisma.frage_antwortfelderWhereInput> | null
   medientyp?: Prisma.XOR<Prisma.MedientypScalarRelationFilter, Prisma.medientypWhereInput>
 }
 
@@ -257,12 +270,14 @@ export type medienOrderByWithRelationInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
   antwort_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrderInput | Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   datei?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrderInput | Prisma.SortOrder
   antworten?: Prisma.antwortenOrderByWithRelationInput
   fragen?: Prisma.fragenOrderByWithRelationInput
+  antwortfeld?: Prisma.frage_antwortfelderOrderByWithRelationInput
   medientyp?: Prisma.medientypOrderByWithRelationInput
 }
 
@@ -273,12 +288,14 @@ export type medienWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.medienWhereInput | Prisma.medienWhereInput[]
   fragen_id?: Prisma.IntNullableFilter<"medien"> | number | null
   antwort_id?: Prisma.IntNullableFilter<"medien"> | number | null
+  antwortfeld_id?: Prisma.IntNullableFilter<"medien"> | number | null
   medientyp_id?: Prisma.IntFilter<"medien"> | number
   datei?: Prisma.StringFilter<"medien"> | string
   sortierung?: Prisma.IntFilter<"medien"> | number
   bemerkung?: Prisma.StringNullableFilter<"medien"> | string | null
   antworten?: Prisma.XOR<Prisma.AntwortenNullableScalarRelationFilter, Prisma.antwortenWhereInput> | null
   fragen?: Prisma.XOR<Prisma.FragenNullableScalarRelationFilter, Prisma.fragenWhereInput> | null
+  antwortfeld?: Prisma.XOR<Prisma.Frage_antwortfelderNullableScalarRelationFilter, Prisma.frage_antwortfelderWhereInput> | null
   medientyp?: Prisma.XOR<Prisma.MedientypScalarRelationFilter, Prisma.medientypWhereInput>
 }, "medien_id">
 
@@ -286,6 +303,7 @@ export type medienOrderByWithAggregationInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
   antwort_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrderInput | Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   datei?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
@@ -304,6 +322,7 @@ export type medienScalarWhereWithAggregatesInput = {
   medien_id?: Prisma.IntWithAggregatesFilter<"medien"> | number
   fragen_id?: Prisma.IntNullableWithAggregatesFilter<"medien"> | number | null
   antwort_id?: Prisma.IntNullableWithAggregatesFilter<"medien"> | number | null
+  antwortfeld_id?: Prisma.IntNullableWithAggregatesFilter<"medien"> | number | null
   medientyp_id?: Prisma.IntWithAggregatesFilter<"medien"> | number
   datei?: Prisma.StringWithAggregatesFilter<"medien"> | string
   sortierung?: Prisma.IntWithAggregatesFilter<"medien"> | number
@@ -316,6 +335,7 @@ export type medienCreateInput = {
   bemerkung?: string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutMedienInput
   fragen?: Prisma.fragenCreateNestedOneWithoutMedienInput
+  antwortfeld?: Prisma.frage_antwortfelderCreateNestedOneWithoutMedienInput
   medientyp: Prisma.medientypCreateNestedOneWithoutMedienInput
 }
 
@@ -323,6 +343,7 @@ export type medienUncheckedCreateInput = {
   medien_id?: number
   fragen_id?: number | null
   antwort_id?: number | null
+  antwortfeld_id?: number | null
   medientyp_id: number
   datei: string
   sortierung?: number
@@ -335,6 +356,7 @@ export type medienUpdateInput = {
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutMedienNestedInput
   fragen?: Prisma.fragenUpdateOneWithoutMedienNestedInput
+  antwortfeld?: Prisma.frage_antwortfelderUpdateOneWithoutMedienNestedInput
   medientyp?: Prisma.medientypUpdateOneRequiredWithoutMedienNestedInput
 }
 
@@ -342,6 +364,7 @@ export type medienUncheckedUpdateInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
@@ -352,6 +375,7 @@ export type medienCreateManyInput = {
   medien_id?: number
   fragen_id?: number | null
   antwort_id?: number | null
+  antwortfeld_id?: number | null
   medientyp_id: number
   datei: string
   sortierung?: number
@@ -368,6 +392,7 @@ export type medienUncheckedUpdateManyInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
@@ -388,6 +413,7 @@ export type medienCountOrderByAggregateInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrder
   antwort_id?: Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   datei?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
@@ -398,6 +424,7 @@ export type medienAvgOrderByAggregateInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrder
   antwort_id?: Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
 }
@@ -406,6 +433,7 @@ export type medienMaxOrderByAggregateInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrder
   antwort_id?: Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   datei?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
@@ -416,6 +444,7 @@ export type medienMinOrderByAggregateInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrder
   antwort_id?: Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   datei?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
@@ -426,6 +455,7 @@ export type medienSumOrderByAggregateInput = {
   medien_id?: Prisma.SortOrder
   fragen_id?: Prisma.SortOrder
   antwort_id?: Prisma.SortOrder
+  antwortfeld_id?: Prisma.SortOrder
   medientyp_id?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
 }
@@ -556,17 +586,61 @@ export type medienUncheckedUpdateManyWithoutMedientypNestedInput = {
   deleteMany?: Prisma.medienScalarWhereInput | Prisma.medienScalarWhereInput[]
 }
 
+export type medienCreateNestedManyWithoutAntwortfeldInput = {
+  create?: Prisma.XOR<Prisma.medienCreateWithoutAntwortfeldInput, Prisma.medienUncheckedCreateWithoutAntwortfeldInput> | Prisma.medienCreateWithoutAntwortfeldInput[] | Prisma.medienUncheckedCreateWithoutAntwortfeldInput[]
+  connectOrCreate?: Prisma.medienCreateOrConnectWithoutAntwortfeldInput | Prisma.medienCreateOrConnectWithoutAntwortfeldInput[]
+  createMany?: Prisma.medienCreateManyAntwortfeldInputEnvelope
+  connect?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+}
+
+export type medienUncheckedCreateNestedManyWithoutAntwortfeldInput = {
+  create?: Prisma.XOR<Prisma.medienCreateWithoutAntwortfeldInput, Prisma.medienUncheckedCreateWithoutAntwortfeldInput> | Prisma.medienCreateWithoutAntwortfeldInput[] | Prisma.medienUncheckedCreateWithoutAntwortfeldInput[]
+  connectOrCreate?: Prisma.medienCreateOrConnectWithoutAntwortfeldInput | Prisma.medienCreateOrConnectWithoutAntwortfeldInput[]
+  createMany?: Prisma.medienCreateManyAntwortfeldInputEnvelope
+  connect?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+}
+
+export type medienUpdateManyWithoutAntwortfeldNestedInput = {
+  create?: Prisma.XOR<Prisma.medienCreateWithoutAntwortfeldInput, Prisma.medienUncheckedCreateWithoutAntwortfeldInput> | Prisma.medienCreateWithoutAntwortfeldInput[] | Prisma.medienUncheckedCreateWithoutAntwortfeldInput[]
+  connectOrCreate?: Prisma.medienCreateOrConnectWithoutAntwortfeldInput | Prisma.medienCreateOrConnectWithoutAntwortfeldInput[]
+  upsert?: Prisma.medienUpsertWithWhereUniqueWithoutAntwortfeldInput | Prisma.medienUpsertWithWhereUniqueWithoutAntwortfeldInput[]
+  createMany?: Prisma.medienCreateManyAntwortfeldInputEnvelope
+  set?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  disconnect?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  delete?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  connect?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  update?: Prisma.medienUpdateWithWhereUniqueWithoutAntwortfeldInput | Prisma.medienUpdateWithWhereUniqueWithoutAntwortfeldInput[]
+  updateMany?: Prisma.medienUpdateManyWithWhereWithoutAntwortfeldInput | Prisma.medienUpdateManyWithWhereWithoutAntwortfeldInput[]
+  deleteMany?: Prisma.medienScalarWhereInput | Prisma.medienScalarWhereInput[]
+}
+
+export type medienUncheckedUpdateManyWithoutAntwortfeldNestedInput = {
+  create?: Prisma.XOR<Prisma.medienCreateWithoutAntwortfeldInput, Prisma.medienUncheckedCreateWithoutAntwortfeldInput> | Prisma.medienCreateWithoutAntwortfeldInput[] | Prisma.medienUncheckedCreateWithoutAntwortfeldInput[]
+  connectOrCreate?: Prisma.medienCreateOrConnectWithoutAntwortfeldInput | Prisma.medienCreateOrConnectWithoutAntwortfeldInput[]
+  upsert?: Prisma.medienUpsertWithWhereUniqueWithoutAntwortfeldInput | Prisma.medienUpsertWithWhereUniqueWithoutAntwortfeldInput[]
+  createMany?: Prisma.medienCreateManyAntwortfeldInputEnvelope
+  set?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  disconnect?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  delete?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  connect?: Prisma.medienWhereUniqueInput | Prisma.medienWhereUniqueInput[]
+  update?: Prisma.medienUpdateWithWhereUniqueWithoutAntwortfeldInput | Prisma.medienUpdateWithWhereUniqueWithoutAntwortfeldInput[]
+  updateMany?: Prisma.medienUpdateManyWithWhereWithoutAntwortfeldInput | Prisma.medienUpdateManyWithWhereWithoutAntwortfeldInput[]
+  deleteMany?: Prisma.medienScalarWhereInput | Prisma.medienScalarWhereInput[]
+}
+
 export type medienCreateWithoutAntwortenInput = {
   datei: string
   sortierung?: number
   bemerkung?: string | null
   fragen?: Prisma.fragenCreateNestedOneWithoutMedienInput
+  antwortfeld?: Prisma.frage_antwortfelderCreateNestedOneWithoutMedienInput
   medientyp: Prisma.medientypCreateNestedOneWithoutMedienInput
 }
 
 export type medienUncheckedCreateWithoutAntwortenInput = {
   medien_id?: number
   fragen_id?: number | null
+  antwortfeld_id?: number | null
   medientyp_id: number
   datei: string
   sortierung?: number
@@ -606,6 +680,7 @@ export type medienScalarWhereInput = {
   medien_id?: Prisma.IntFilter<"medien"> | number
   fragen_id?: Prisma.IntNullableFilter<"medien"> | number | null
   antwort_id?: Prisma.IntNullableFilter<"medien"> | number | null
+  antwortfeld_id?: Prisma.IntNullableFilter<"medien"> | number | null
   medientyp_id?: Prisma.IntFilter<"medien"> | number
   datei?: Prisma.StringFilter<"medien"> | string
   sortierung?: Prisma.IntFilter<"medien"> | number
@@ -617,12 +692,14 @@ export type medienCreateWithoutFragenInput = {
   sortierung?: number
   bemerkung?: string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutMedienInput
+  antwortfeld?: Prisma.frage_antwortfelderCreateNestedOneWithoutMedienInput
   medientyp: Prisma.medientypCreateNestedOneWithoutMedienInput
 }
 
 export type medienUncheckedCreateWithoutFragenInput = {
   medien_id?: number
   antwort_id?: number | null
+  antwortfeld_id?: number | null
   medientyp_id: number
   datei: string
   sortierung?: number
@@ -661,12 +738,14 @@ export type medienCreateWithoutMedientypInput = {
   bemerkung?: string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutMedienInput
   fragen?: Prisma.fragenCreateNestedOneWithoutMedienInput
+  antwortfeld?: Prisma.frage_antwortfelderCreateNestedOneWithoutMedienInput
 }
 
 export type medienUncheckedCreateWithoutMedientypInput = {
   medien_id?: number
   fragen_id?: number | null
   antwort_id?: number | null
+  antwortfeld_id?: number | null
   datei: string
   sortierung?: number
   bemerkung?: string | null
@@ -698,9 +777,55 @@ export type medienUpdateManyWithWhereWithoutMedientypInput = {
   data: Prisma.XOR<Prisma.medienUpdateManyMutationInput, Prisma.medienUncheckedUpdateManyWithoutMedientypInput>
 }
 
+export type medienCreateWithoutAntwortfeldInput = {
+  datei: string
+  sortierung?: number
+  bemerkung?: string | null
+  antworten?: Prisma.antwortenCreateNestedOneWithoutMedienInput
+  fragen?: Prisma.fragenCreateNestedOneWithoutMedienInput
+  medientyp: Prisma.medientypCreateNestedOneWithoutMedienInput
+}
+
+export type medienUncheckedCreateWithoutAntwortfeldInput = {
+  medien_id?: number
+  fragen_id?: number | null
+  antwort_id?: number | null
+  medientyp_id: number
+  datei: string
+  sortierung?: number
+  bemerkung?: string | null
+}
+
+export type medienCreateOrConnectWithoutAntwortfeldInput = {
+  where: Prisma.medienWhereUniqueInput
+  create: Prisma.XOR<Prisma.medienCreateWithoutAntwortfeldInput, Prisma.medienUncheckedCreateWithoutAntwortfeldInput>
+}
+
+export type medienCreateManyAntwortfeldInputEnvelope = {
+  data: Prisma.medienCreateManyAntwortfeldInput | Prisma.medienCreateManyAntwortfeldInput[]
+  skipDuplicates?: boolean
+}
+
+export type medienUpsertWithWhereUniqueWithoutAntwortfeldInput = {
+  where: Prisma.medienWhereUniqueInput
+  update: Prisma.XOR<Prisma.medienUpdateWithoutAntwortfeldInput, Prisma.medienUncheckedUpdateWithoutAntwortfeldInput>
+  create: Prisma.XOR<Prisma.medienCreateWithoutAntwortfeldInput, Prisma.medienUncheckedCreateWithoutAntwortfeldInput>
+}
+
+export type medienUpdateWithWhereUniqueWithoutAntwortfeldInput = {
+  where: Prisma.medienWhereUniqueInput
+  data: Prisma.XOR<Prisma.medienUpdateWithoutAntwortfeldInput, Prisma.medienUncheckedUpdateWithoutAntwortfeldInput>
+}
+
+export type medienUpdateManyWithWhereWithoutAntwortfeldInput = {
+  where: Prisma.medienScalarWhereInput
+  data: Prisma.XOR<Prisma.medienUpdateManyMutationInput, Prisma.medienUncheckedUpdateManyWithoutAntwortfeldInput>
+}
+
 export type medienCreateManyAntwortenInput = {
   medien_id?: number
   fragen_id?: number | null
+  antwortfeld_id?: number | null
   medientyp_id: number
   datei: string
   sortierung?: number
@@ -712,12 +837,14 @@ export type medienUpdateWithoutAntwortenInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragen?: Prisma.fragenUpdateOneWithoutMedienNestedInput
+  antwortfeld?: Prisma.frage_antwortfelderUpdateOneWithoutMedienNestedInput
   medientyp?: Prisma.medientypUpdateOneRequiredWithoutMedienNestedInput
 }
 
 export type medienUncheckedUpdateWithoutAntwortenInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
@@ -727,6 +854,7 @@ export type medienUncheckedUpdateWithoutAntwortenInput = {
 export type medienUncheckedUpdateManyWithoutAntwortenInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
@@ -736,6 +864,7 @@ export type medienUncheckedUpdateManyWithoutAntwortenInput = {
 export type medienCreateManyFragenInput = {
   medien_id?: number
   antwort_id?: number | null
+  antwortfeld_id?: number | null
   medientyp_id: number
   datei: string
   sortierung?: number
@@ -747,12 +876,14 @@ export type medienUpdateWithoutFragenInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutMedienNestedInput
+  antwortfeld?: Prisma.frage_antwortfelderUpdateOneWithoutMedienNestedInput
   medientyp?: Prisma.medientypUpdateOneRequiredWithoutMedienNestedInput
 }
 
 export type medienUncheckedUpdateWithoutFragenInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
@@ -762,6 +893,7 @@ export type medienUncheckedUpdateWithoutFragenInput = {
 export type medienUncheckedUpdateManyWithoutFragenInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
@@ -772,6 +904,7 @@ export type medienCreateManyMedientypInput = {
   medien_id?: number
   fragen_id?: number | null
   antwort_id?: number | null
+  antwortfeld_id?: number | null
   datei: string
   sortierung?: number
   bemerkung?: string | null
@@ -783,12 +916,14 @@ export type medienUpdateWithoutMedientypInput = {
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutMedienNestedInput
   fragen?: Prisma.fragenUpdateOneWithoutMedienNestedInput
+  antwortfeld?: Prisma.frage_antwortfelderUpdateOneWithoutMedienNestedInput
 }
 
 export type medienUncheckedUpdateWithoutMedientypInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -798,6 +933,46 @@ export type medienUncheckedUpdateManyWithoutMedientypInput = {
   medien_id?: Prisma.IntFieldUpdateOperationsInput | number
   fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwortfeld_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datei?: Prisma.StringFieldUpdateOperationsInput | string
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type medienCreateManyAntwortfeldInput = {
+  medien_id?: number
+  fragen_id?: number | null
+  antwort_id?: number | null
+  medientyp_id: number
+  datei: string
+  sortierung?: number
+  bemerkung?: string | null
+}
+
+export type medienUpdateWithoutAntwortfeldInput = {
+  datei?: Prisma.StringFieldUpdateOperationsInput | string
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  antworten?: Prisma.antwortenUpdateOneWithoutMedienNestedInput
+  fragen?: Prisma.fragenUpdateOneWithoutMedienNestedInput
+  medientyp?: Prisma.medientypUpdateOneRequiredWithoutMedienNestedInput
+}
+
+export type medienUncheckedUpdateWithoutAntwortfeldInput = {
+  medien_id?: Prisma.IntFieldUpdateOperationsInput | number
+  fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  datei?: Prisma.StringFieldUpdateOperationsInput | string
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type medienUncheckedUpdateManyWithoutAntwortfeldInput = {
+  medien_id?: Prisma.IntFieldUpdateOperationsInput | number
+  fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwort_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  medientyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   datei?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -809,12 +984,14 @@ export type medienSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   medien_id?: boolean
   fragen_id?: boolean
   antwort_id?: boolean
+  antwortfeld_id?: boolean
   medientyp_id?: boolean
   datei?: boolean
   sortierung?: boolean
   bemerkung?: boolean
   antworten?: boolean | Prisma.medien$antwortenArgs<ExtArgs>
   fragen?: boolean | Prisma.medien$fragenArgs<ExtArgs>
+  antwortfeld?: boolean | Prisma.medien$antwortfeldArgs<ExtArgs>
   medientyp?: boolean | Prisma.medientypDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["medien"]>
 
@@ -822,12 +999,14 @@ export type medienSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   medien_id?: boolean
   fragen_id?: boolean
   antwort_id?: boolean
+  antwortfeld_id?: boolean
   medientyp_id?: boolean
   datei?: boolean
   sortierung?: boolean
   bemerkung?: boolean
   antworten?: boolean | Prisma.medien$antwortenArgs<ExtArgs>
   fragen?: boolean | Prisma.medien$fragenArgs<ExtArgs>
+  antwortfeld?: boolean | Prisma.medien$antwortfeldArgs<ExtArgs>
   medientyp?: boolean | Prisma.medientypDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["medien"]>
 
@@ -835,12 +1014,14 @@ export type medienSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   medien_id?: boolean
   fragen_id?: boolean
   antwort_id?: boolean
+  antwortfeld_id?: boolean
   medientyp_id?: boolean
   datei?: boolean
   sortierung?: boolean
   bemerkung?: boolean
   antworten?: boolean | Prisma.medien$antwortenArgs<ExtArgs>
   fragen?: boolean | Prisma.medien$fragenArgs<ExtArgs>
+  antwortfeld?: boolean | Prisma.medien$antwortfeldArgs<ExtArgs>
   medientyp?: boolean | Prisma.medientypDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["medien"]>
 
@@ -848,26 +1029,30 @@ export type medienSelectScalar = {
   medien_id?: boolean
   fragen_id?: boolean
   antwort_id?: boolean
+  antwortfeld_id?: boolean
   medientyp_id?: boolean
   datei?: boolean
   sortierung?: boolean
   bemerkung?: boolean
 }
 
-export type medienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"medien_id" | "fragen_id" | "antwort_id" | "medientyp_id" | "datei" | "sortierung" | "bemerkung", ExtArgs["result"]["medien"]>
+export type medienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"medien_id" | "fragen_id" | "antwort_id" | "antwortfeld_id" | "medientyp_id" | "datei" | "sortierung" | "bemerkung", ExtArgs["result"]["medien"]>
 export type medienInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.medien$antwortenArgs<ExtArgs>
   fragen?: boolean | Prisma.medien$fragenArgs<ExtArgs>
+  antwortfeld?: boolean | Prisma.medien$antwortfeldArgs<ExtArgs>
   medientyp?: boolean | Prisma.medientypDefaultArgs<ExtArgs>
 }
 export type medienIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.medien$antwortenArgs<ExtArgs>
   fragen?: boolean | Prisma.medien$fragenArgs<ExtArgs>
+  antwortfeld?: boolean | Prisma.medien$antwortfeldArgs<ExtArgs>
   medientyp?: boolean | Prisma.medientypDefaultArgs<ExtArgs>
 }
 export type medienIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.medien$antwortenArgs<ExtArgs>
   fragen?: boolean | Prisma.medien$fragenArgs<ExtArgs>
+  antwortfeld?: boolean | Prisma.medien$antwortfeldArgs<ExtArgs>
   medientyp?: boolean | Prisma.medientypDefaultArgs<ExtArgs>
 }
 
@@ -876,12 +1061,14 @@ export type $medienPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     antworten: Prisma.$antwortenPayload<ExtArgs> | null
     fragen: Prisma.$fragenPayload<ExtArgs> | null
+    antwortfeld: Prisma.$frage_antwortfelderPayload<ExtArgs> | null
     medientyp: Prisma.$medientypPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     medien_id: number
     fragen_id: number | null
     antwort_id: number | null
+    antwortfeld_id: number | null
     medientyp_id: number
     datei: string
     sortierung: number
@@ -1282,6 +1469,7 @@ export interface Prisma__medienClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   antworten<T extends Prisma.medien$antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.medien$antwortenArgs<ExtArgs>>): Prisma.Prisma__antwortenClient<runtime.Types.Result.GetResult<Prisma.$antwortenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   fragen<T extends Prisma.medien$fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.medien$fragenArgs<ExtArgs>>): Prisma.Prisma__fragenClient<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  antwortfeld<T extends Prisma.medien$antwortfeldArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.medien$antwortfeldArgs<ExtArgs>>): Prisma.Prisma__frage_antwortfelderClient<runtime.Types.Result.GetResult<Prisma.$frage_antwortfelderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   medientyp<T extends Prisma.medientypDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.medientypDefaultArgs<ExtArgs>>): Prisma.Prisma__medientypClient<runtime.Types.Result.GetResult<Prisma.$medientypPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1315,6 +1503,7 @@ export interface medienFieldRefs {
   readonly medien_id: Prisma.FieldRef<"medien", 'Int'>
   readonly fragen_id: Prisma.FieldRef<"medien", 'Int'>
   readonly antwort_id: Prisma.FieldRef<"medien", 'Int'>
+  readonly antwortfeld_id: Prisma.FieldRef<"medien", 'Int'>
   readonly medientyp_id: Prisma.FieldRef<"medien", 'Int'>
   readonly datei: Prisma.FieldRef<"medien", 'String'>
   readonly sortierung: Prisma.FieldRef<"medien", 'Int'>
@@ -1755,6 +1944,25 @@ export type medien$fragenArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   include?: Prisma.fragenInclude<ExtArgs> | null
   where?: Prisma.fragenWhereInput
+}
+
+/**
+ * medien.antwortfeld
+ */
+export type medien$antwortfeldArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the frage_antwortfelder
+   */
+  select?: Prisma.frage_antwortfelderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the frage_antwortfelder
+   */
+  omit?: Prisma.frage_antwortfelderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.frage_antwortfelderInclude<ExtArgs> | null
+  where?: Prisma.frage_antwortfelderWhereInput
 }
 
 /**

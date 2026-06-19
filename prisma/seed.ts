@@ -48,7 +48,7 @@ async function createVorlage(data: {
     });
   }
 
-  console.log(`Vorlage erstellt: ${data.name}`);
+
 }
 
 async function main() {
@@ -136,7 +136,6 @@ async function main() {
     ],
   });
 
-  console.log("Seed erfolgreich abgeschlossen.");
 }
 
 main()
