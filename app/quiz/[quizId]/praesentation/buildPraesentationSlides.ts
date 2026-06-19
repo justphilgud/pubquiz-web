@@ -67,6 +67,10 @@ export type Slide =
     abschnitt: Abschnitt;
   };
 
+function istFragenblock(abschnittTyp: string) {
+  return abschnittTyp === "fragenrunde" || abschnittTyp === "fragenblock";
+}
+
 export function buildPraesentationSlides(
   quiz: QuizPraesentationResult
 ): Slide[] {
@@ -76,8 +80,8 @@ export function buildPraesentationSlides(
     (a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)
   );
 
-  const fragenrunden = sortierteAbschnitte.filter(
-    (abschnitt) => abschnitt.abschnitt_typ === "fragenrunde"
+  const fragenrunden = sortierteAbschnitte.filter((abschnitt) =>
+    istFragenblock(abschnitt.abschnitt_typ)
   );
 
   for (const abschnitt of sortierteAbschnitte) {
@@ -109,7 +113,7 @@ export function buildPraesentationSlides(
       abschnitt,
     });
 
-    if (abschnitt.abschnitt_typ === "fragenrunde") {
+    if (istFragenblock(abschnitt.abschnitt_typ)) {
       fragenImBlock.forEach((frage, index) => {
         result.push({
           typ: "frage",
