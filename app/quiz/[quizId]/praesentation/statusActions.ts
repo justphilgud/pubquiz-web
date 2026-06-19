@@ -30,11 +30,13 @@ export async function setPraesentationSlideIndex(
     update: {
       slide_index: slideIndex,
       slide_started_at: new Date(),
+      endstand_reveal_count: 0,
     },
     create: {
       quiz_id: quizId,
       slide_index: slideIndex,
       slide_started_at: new Date(),
+      endstand_reveal_count: 0,
     },
   });
 
@@ -230,6 +232,21 @@ export async function beendeCountdown(data: {
     data: {
       countdown_ended_at: new Date(),
       countdown_status: "finished",
+    },
+  });
+
+  return { success: true };
+}
+export async function setEndstandRevealCount(data: {
+  quizId: number;
+  revealCount: number;
+}) {
+  await prisma.quiz_praesentation_status.update({
+    where: {
+      quiz_id: data.quizId,
+    },
+    data: {
+      endstand_reveal_count: data.revealCount,
     },
   });
 

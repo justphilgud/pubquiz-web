@@ -325,6 +325,7 @@ model frage_vorlage_antwortfelder {
 model quiz_praesentation_status {
   quiz_id          Int       @id
   slide_index      Int       @default(0)
+  endstand_reveal_count Int @default(0)
   slide_started_at DateTime  @default(now())
   quiz_started_at  DateTime?
   updated_at       DateTime  @updatedAt
@@ -336,6 +337,7 @@ model quiz_praesentation_status {
   countdown_started_at     DateTime?
   countdown_ended_at       DateTime?
   countdown_status         String?   // "idle" | "running" | "finished"
+
 
   quiz quiz @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
 

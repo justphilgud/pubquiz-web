@@ -5,6 +5,7 @@ import {
   freigabeQuizBlock,
   schliesseQuizBlock,
   QuizPraesentationResult,
+  getQuizPunktestand,
 } from "../../actions";
 import {
   buildPraesentationSlides,
@@ -18,6 +19,7 @@ import {
   starteCountdown,
   resetCountdown,
   beendeCountdown,
+  setEndstandRevealCount,
 } from "../praesentation/statusActions";
 
 import {
@@ -482,16 +484,10 @@ export default function ModerationClient({
       countdownDauerMinuten * 60 - countdownVerstrichen
     );
 
-  console.log("Moderation Countdown", {
-    countdownStartedAt,
-    countdownStatus,
-    countdownDauerMinuten,
-    countdownVerstrichen,
-    countdownRestSekunden,
-  });
-
   const [auswertungDialogBereitsGezeigt,
     setAuswertungDialogBereitsGezeigt] = useState(false);
+
+  const [endstandRevealCount, setEndstandRevealCountLokal] = useState(1);
 
   useEffect(() => {
     if (!istPauseAbgelaufen) return;
@@ -550,6 +546,7 @@ export default function ModerationClient({
     setSlideStartedAt(newStartedAt);
     setShowAuswertungDialog(false);
     setAuswertungDialogBereitsGezeigt(false);
+    setEndstandRevealCountLokal(1);
 
     await setPraesentationSlideIndex(quizId, safeIndex);
   }
@@ -597,7 +594,38 @@ export default function ModerationClient({
     void goToSlide(slideIndex - 1);
   }
 
-  function naechsterSlideAction() {
+  async function naechsterSlideAction() {
+    if (aktuellerSlide?.typ === "endstand") {
+      const punktestand = await getQuizPunktestand(quizId);
+      const topTeams = punktestand.slice(0, 5);
+
+      const platzGruppen = Array.from(
+        new Set(
+          topTeams.map((team) =>
+            topTeams.findIndex(
+              (vergleichsTeam) => vergleichsTeam.punkte === team.punkte
+            ) + 1
+          )
+        )
+      ).sort((a, b) => b - a);
+
+      if (endstandRevealCount < platzGruppen.length) {
+        const neuerRevealCount = Math.min(
+          platzGruppen.length,
+          endstandRevealCount + 1
+        );
+
+        setEndstandRevealCountLokal(neuerRevealCount);
+
+        await setEndstandRevealCount({
+          quizId,
+          revealCount: neuerRevealCount,
+        });
+
+        return;
+      }
+    }
+
     void goToSlide(slideIndex + 1);
   }
   async function handleMediumToggle() {

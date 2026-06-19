@@ -344,6 +344,7 @@ export type Frage_vorlage_antwortfelderScalarFieldEnum = (typeof Frage_vorlage_a
 export const Quiz_praesentation_statusScalarFieldEnum = {
   quiz_id: 'quiz_id',
   slide_index: 'slide_index',
+  endstand_reveal_count: 'endstand_reveal_count',
   slide_started_at: 'slide_started_at',
   quiz_started_at: 'quiz_started_at',
   updated_at: 'updated_at',
