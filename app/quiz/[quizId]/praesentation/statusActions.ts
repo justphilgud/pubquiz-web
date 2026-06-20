@@ -30,13 +30,13 @@ export async function setPraesentationSlideIndex(
     update: {
       slide_index: slideIndex,
       slide_started_at: new Date(),
-      endstand_reveal_count: 0,
+      endstand_reveal_count: 1,
     },
     create: {
       quiz_id: quizId,
       slide_index: slideIndex,
       slide_started_at: new Date(),
-      endstand_reveal_count: 0,
+      endstand_reveal_count: 1,
     },
   });
 

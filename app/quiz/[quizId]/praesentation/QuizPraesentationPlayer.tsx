@@ -262,7 +262,7 @@ export default function QuizPraesentationPlayer({
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [freigabeMeldung, setFreigabeMeldung] = useState("");
   const [isFreigabeLoading, setIsFreigabeLoading] = useState(false);
-  const [endstandRevealCount, setEndstandRevealCount] = useState(2);
+  const [endstandRevealCount, setEndstandRevealCount] = useState(1);
   const [remoteCountdownDauerSekunden, setRemoteCountdownDauerSekunden] =
     useState<number | null>(null);
 
@@ -1114,6 +1114,26 @@ export default function QuizPraesentationPlayer({
     const maxPunkte = Math.max(...topTeams.map((team) => team.punkte), 1);
     const pferdeFarben = ["#22d3ee", "#fb7185", "#84cc16", "#60a5fa", "#f59e0b"];
 
+    const teamsMitPlatz = topTeams.map((team) => {
+      const ersterIndexMitDiesenPunkten = topTeams.findIndex(
+        (vergleichsTeam) => vergleichsTeam.punkte === team.punkte
+      );
+
+      return {
+        ...team,
+        platz: ersterIndexMitDiesenPunkten + 1,
+      };
+    });
+
+    const platzGruppen = Array.from(
+      new Set(teamsMitPlatz.map((team) => team.platz))
+    ).sort((a, b) => b - a);
+
+    const sichtbarePlaetze = platzGruppen.slice(
+      0,
+      Math.min(endstandRevealCount, platzGruppen.length)
+    );
+
     if (showSchaetzfrage) {
       return (
         <div className="flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
@@ -1170,16 +1190,11 @@ export default function QuizPraesentationPlayer({
 
         <div className="min-h-0 flex-1 rounded-[1.5rem] border-4 border-cyan-300 bg-black/45 p-4 shadow-[6px_6px_0_#ff00aa]">
           <div className="grid h-full gap-3">
-            {topTeams.map((team, index) => {
+            {teamsMitPlatz.map((team, index) => {
               const prozent = Math.max(8, (team.punkte / maxPunkte) * 100);
               const pferdLinks = `calc(${prozent}% - 5rem)`;
-              const istSichtbar = index >= 3 || index >= 5 - endstandRevealCount;
-              const vorherigesTeam = topTeams[index - 1];
-
-              const platz =
-                vorherigesTeam && vorherigesTeam.punkte === team.punkte
-                  ? topTeams.findIndex((t) => t.punkte === team.punkte) + 1
-                  : index + 1;
+              const istSichtbar = sichtbarePlaetze.includes(team.platz);
+              const platz = team.platz;
 
               const istGewinner =
                 team.punkte === topTeams[0].punkte;
