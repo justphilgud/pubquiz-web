@@ -13,6 +13,7 @@ import {
   getPraesentationStatus,
   setPraesentationSlideIndex,
   starteQuiz,
+  setEndstandRevealCount as setRemoteEndstandRevealCount,
 } from "./statusActions";
 
 import type { QuizPraesentationResult } from "../../actions";
@@ -352,7 +353,7 @@ export default function QuizPraesentationPlayer({
 
         setOverlayMedien(null);
         setRemoteMediumOverlayAktiv(false);
-        setEndstandRevealCount(2);
+        setEndstandRevealCount(1);
 
         return nextIndex;
       });
@@ -409,7 +410,7 @@ export default function QuizPraesentationPlayer({
 
   useEffect(() => {
     if (slide?.typ === "endstand") {
-      setEndstandRevealCount(2);
+      setEndstandRevealCount(1);
     }
   }, [slideIndex, slide?.typ]);
 
@@ -527,6 +528,23 @@ export default function QuizPraesentationPlayer({
 
     audio.play();
     setIsAudioPlaying(true);
+
+  }
+
+  function getEndstandRevealGruppenAnzahl() {
+    const topTeamsFuerReveal = punktestand.slice(0, 5);
+
+    const platzGruppenFuerReveal = Array.from(
+      new Set(
+        topTeamsFuerReveal.map((team) =>
+          topTeamsFuerReveal.findIndex(
+            (vergleichsTeam) => vergleichsTeam.punkte === team.punkte
+          ) + 1
+        )
+      )
+    );
+
+    return platzGruppenFuerReveal.length;
   }
 
   async function nextSlide() {
@@ -535,8 +553,18 @@ export default function QuizPraesentationPlayer({
       return;
     }
 
-    if (slide?.typ === "endstand" && endstandRevealCount < 5) {
-      setEndstandRevealCount((current) => Math.min(5, current + 1));
+    const revealGruppen = getEndstandRevealGruppenAnzahl();
+
+    if (slide?.typ === "endstand" && endstandRevealCount < revealGruppen) {
+      const neuerRevealCount = Math.min(revealGruppen, endstandRevealCount + 1);
+
+      setEndstandRevealCount(neuerRevealCount);
+
+      await setRemoteEndstandRevealCount({
+        quizId,
+        revealCount: neuerRevealCount,
+      });
+
       return;
     }
 
