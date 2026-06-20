@@ -324,6 +324,9 @@ export default function QuizPraesentationPlayer({
 
       if (!status) return;
 
+      const [lastStatusUpdatedAt, setLastStatusUpdatedAt] =
+        useState<string | null>(null);
+
       console.log("Countdown Status in Präsentation", {
         dauer: status.countdown_dauer_sekunden,
         startedAt: status.countdown_started_at,
