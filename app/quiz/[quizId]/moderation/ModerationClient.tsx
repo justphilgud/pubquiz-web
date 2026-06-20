@@ -39,6 +39,7 @@ type ModerationStatus = {
   slide_index: number;
   slide_started_at: string | null;
   quiz_started_at: string | null;
+  endstand_reveal_count: number;
 };
 
 type AntwortStatus = {
@@ -487,7 +488,9 @@ export default function ModerationClient({
   const [auswertungDialogBereitsGezeigt,
     setAuswertungDialogBereitsGezeigt] = useState(false);
 
-  const [endstandRevealCount, setEndstandRevealCountLokal] = useState(1);
+  const [endstandRevealCount, setEndstandRevealCountLokal] = useState(
+    initialStatus.endstand_reveal_count ?? 1
+  );
 
   useEffect(() => {
     if (!istPauseAbgelaufen) return;

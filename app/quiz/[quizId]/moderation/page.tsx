@@ -41,6 +41,7 @@ export default async function ModerationPage({ params }: Props) {
         quiz_started_at: status.quiz_started_at
           ? status.quiz_started_at.toISOString()
           : null,
+        endstand_reveal_count: status.endstand_reveal_count ?? 1,
       }}
       initialAntwortStatus={{
         teamsAngemeldet: antwortStatus.teamsAngemeldet,
