@@ -39,10 +39,6 @@ export async function setPraesentationSlideIndex(
       endstand_reveal_count: 1,
     },
   });
-
-  revalidatePath(`/quiz/${quizId}/praesentation`);
-  revalidatePath(`/quiz/${quizId}/moderation`);
-
   return status;
 }
 export async function getAntwortStatus(
