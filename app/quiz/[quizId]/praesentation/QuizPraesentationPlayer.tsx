@@ -252,6 +252,8 @@ export default function QuizPraesentationPlayer({
     "play" | "pause" | "stop" | null
   >(null);
 
+  const endstandRevealCountRef = useRef(1);
+
   const [remoteAudioAktionId, setRemoteAudioAktionId] =
     useState<number | null>(null);
   const [remoteMediumOverlayAktiv, setRemoteMediumOverlayAktiv] =
@@ -358,7 +360,9 @@ export default function QuizPraesentationPlayer({
 
       setRemoteCountdownStatus(status.countdown_status ?? "idle");
 
-      setEndstandRevealCount(status.endstand_reveal_count ?? 1);
+      const remoteRevealCount = status.endstand_reveal_count ?? 1;
+      endstandRevealCountRef.current = remoteRevealCount;
+      setEndstandRevealCount(remoteRevealCount);
 
       setSlideIndex((current) => {
         const nextIndex = Math.min(
@@ -423,6 +427,10 @@ export default function QuizPraesentationPlayer({
 
     setOverlayMedien(medien.length > 0 ? medien : null);
   }, [remoteMediumOverlayAktiv, slideIndex]);
+
+  useEffect(() => {
+    endstandRevealCountRef.current = endstandRevealCount;
+  }, [endstandRevealCount]);
 
   const hatGleichstandAufPlatz1 =
     punktestand.length > 1 &&
@@ -582,9 +590,12 @@ export default function QuizPraesentationPlayer({
 
     const revealGruppen = getEndstandRevealGruppenAnzahl();
 
-    if (slide?.typ === "endstand" && endstandRevealCount < revealGruppen) {
-      const neuerRevealCount = Math.min(revealGruppen, endstandRevealCount + 1);
+    const aktuellerRevealCount = endstandRevealCountRef.current;
 
+    if (slide?.typ === "endstand" && aktuellerRevealCount < revealGruppen) {
+      const neuerRevealCount = Math.min(revealGruppen, aktuellerRevealCount + 1);
+
+      endstandRevealCountRef.current = neuerRevealCount;
       setEndstandRevealCount(neuerRevealCount);
 
       await setRemoteEndstandRevealCount({
