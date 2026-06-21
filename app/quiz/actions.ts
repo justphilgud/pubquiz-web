@@ -2283,6 +2283,36 @@ export async function getZufaelligeSchaetzfrage() {
       frage.antworten.map((antwort) => antwort.antwort).join(", ") || null,
   };
 }
+
+export async function getSchaetzfrageById(fragenId: number) {
+  const frage = await prisma.fragen.findUnique({
+    where: {
+      fragen_id: fragenId,
+    },
+    include: {
+      antworten: {
+        where: {
+          ist_richtig: true,
+        },
+        orderBy: {
+          antwort_id: "asc",
+        },
+      },
+    },
+  });
+
+  if (!frage) {
+    return null;
+  }
+
+  return {
+    fragen_id: frage.fragen_id,
+    frage: frage.frage,
+    richtigeAntwort:
+      frage.antworten.map((antwort) => antwort.antwort).join(", ") || null,
+  };
+}
+
 export async function getSchnellQuizKategorien() {
   return prisma.fragenkategorie.findMany({
     orderBy: {

@@ -329,6 +329,9 @@ model quiz_praesentation_status {
   slide_started_at DateTime  @default(now())
   quiz_started_at  DateTime?
   updated_at       DateTime  @updatedAt
+  show_schaetzfrage Boolean @default(false)
+  zeige_schaetzantwort Boolean @default(false)
+  schaetzfrage_id Int?
 
   medium_overlay_aktiv Boolean @default(false)
   audio_aktion         String?

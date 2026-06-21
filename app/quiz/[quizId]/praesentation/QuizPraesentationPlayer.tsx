@@ -7,6 +7,7 @@ import {
   setAktuelleQuizFrage,
   getQuizPunktestand,
   getZufaelligeSchaetzfrage,
+  getSchaetzfrageById,
 } from "../../actions";
 
 import {
@@ -14,6 +15,7 @@ import {
   setPraesentationSlideIndex,
   starteQuiz,
   setEndstandRevealCount as setRemoteEndstandRevealCount,
+  setSchaetzfrageStatus,
 } from "./statusActions";
 
 import type { QuizPraesentationResult } from "../../actions";
@@ -288,6 +290,7 @@ export default function QuizPraesentationPlayer({
     richtigeAntwort: string | null;
   } | null>(null);
 
+
   const [isSchaetzfrageLoading, setIsSchaetzfrageLoading] = useState(false);
   const [zeigeSchaetzAntwort, setZeigeSchaetzAntwort] = useState(false);
   const [punktestand, setPunktestand] = useState<
@@ -297,6 +300,8 @@ export default function QuizPraesentationPlayer({
     }[]
   >([]);
   const [now, setNow] = useState(() => Date.now());
+  const [remoteSchaetzfrageId, setRemoteSchaetzfrageId] =
+    useState<number | null>(null);
 
 
 
@@ -376,8 +381,7 @@ export default function QuizPraesentationPlayer({
         }
 
         setOverlayMedien(null);
-        setRemoteMediumOverlayAktiv(false);
-
+        setRemoteMediumOverlayAktiv(false)
         return nextIndex;
       });
 
@@ -385,6 +389,10 @@ export default function QuizPraesentationPlayer({
         (status.audio_aktion as "play" | "pause" | "stop" | null) ?? null
       );
 
+
+      setShowSchaetzfrage(status.show_schaetzfrage ?? false);
+      setZeigeSchaetzAntwort(status.zeige_schaetzantwort ?? false);
+      setRemoteSchaetzfrageId(status.schaetzfrage_id ?? null);
       setRemoteAudioAktionId(status.audio_aktion_id ?? null);
 
       if (status.audio_aktion_id !== lastAudioAktionId) {
@@ -545,6 +553,23 @@ export default function QuizPraesentationPlayer({
 
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (remoteSchaetzfrageId == null) {
+      setSchaetzfrage(null);
+      return;
+    }
+
+    const schaetzfrageId = remoteSchaetzfrageId;
+
+    async function ladeSchaetzfrage() {
+      const frage = await getSchaetzfrageById(schaetzfrageId);
+      setSchaetzfrage(frage);
+    }
+
+    void ladeSchaetzfrage();
+  }, [remoteSchaetzfrageId]);
+
 
   function handleAudioPlayPause() {
     const audio = audioRef.current;
@@ -709,6 +734,36 @@ export default function QuizPraesentationPlayer({
     setSchaetzfrage(frage);
     setShowSchaetzfrage(true);
     setIsSchaetzfrageLoading(false);
+
+    await setSchaetzfrageStatus({
+      quizId,
+      showSchaetzfrage: true,
+      zeigeSchaetzantwort: false,
+      schaetzfrageId: frage?.fragen_id ?? null,
+    });
+  }
+
+  async function handleSchaetzfrageLoesungZeigen() {
+    setZeigeSchaetzAntwort(true);
+
+    await setSchaetzfrageStatus({
+      quizId,
+      showSchaetzfrage: true,
+      zeigeSchaetzantwort: true,
+      schaetzfrageId: schaetzfrage?.fragen_id ?? null,
+    });
+  }
+
+  async function handleSchaetzfrageZurueck() {
+    setShowSchaetzfrage(false);
+    setZeigeSchaetzAntwort(false);
+
+    await setSchaetzfrageStatus({
+      quizId,
+      showSchaetzfrage: false,
+      zeigeSchaetzantwort: false,
+      schaetzfrageId: null,
+    });
   }
 
   function getMediumUrl(datei: string) {
@@ -1996,11 +2051,6 @@ export default function QuizPraesentationPlayer({
 
 
     <main className="h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#ff00aa_0,#ff00aa22_24%,transparent_42%),radial-gradient(circle_at_80%_10%,#00e5ff66_0,#00e5ff22_22%,transparent_38%),linear-gradient(135deg,#1a0033,#080014_45%,#001a3a)] text-white">
-      <div className="fixed left-4 top-4 z-[9999] rounded bg-red-600 px-4 py-2 text-white">
-        slide: {slide?.typ} | reveal: {endstandRevealCount} | gruppen:{" "}
-        {getEndstandRevealGruppenAnzahl()}
-      </div>
-
       <style jsx global>{`
   @keyframes pferdGalopp {
   0% {

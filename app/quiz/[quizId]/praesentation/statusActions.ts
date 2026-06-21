@@ -248,3 +248,20 @@ export async function setEndstandRevealCount(data: {
 
   return { success: true };
 }
+export async function setSchaetzfrageStatus(data: {
+  quizId: number;
+  showSchaetzfrage: boolean;
+  zeigeSchaetzantwort?: boolean;
+  schaetzfrageId?: number | null;
+}) {
+  await prisma.quiz_praesentation_status.update({
+    where: { quiz_id: data.quizId },
+    data: {
+      show_schaetzfrage: data.showSchaetzfrage,
+      zeige_schaetzantwort: data.zeigeSchaetzantwort ?? false,
+      schaetzfrage_id: data.schaetzfrageId ?? null,
+    },
+  });
+
+  return { success: true };
+}
