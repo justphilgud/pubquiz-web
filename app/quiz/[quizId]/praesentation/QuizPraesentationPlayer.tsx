@@ -273,6 +273,9 @@ export default function QuizPraesentationPlayer({
   const [remoteCountdownStatus, setRemoteCountdownStatus] =
     useState<string | null>("idle");
 
+  const [lastStatusUpdatedAt, setLastStatusUpdatedAt] =
+    useState<string | null>(null);
+
   const [autoGezeigteMedienFrageIds, setAutoGezeigteMedienFrageIds] = useState<number[]>([]);
   const [schaetzfrage, setSchaetzfrage] = useState<{
     fragen_id: number;
@@ -319,19 +322,26 @@ export default function QuizPraesentationPlayer({
 
   useEffect(() => {
     const interval = window.setInterval(async () => {
-      console.log("Praesentation polling läuft", quizId);
       const status = await getPraesentationStatus(quizId);
 
       if (!status) return;
 
-      const [lastStatusUpdatedAt, setLastStatusUpdatedAt] =
-        useState<string | null>(null);
+      const statusUpdatedAt = status.updated_at
+        ? new Date(status.updated_at).toISOString()
+        : null;
 
-      console.log("Countdown Status in Präsentation", {
-        dauer: status.countdown_dauer_sekunden,
-        startedAt: status.countdown_started_at,
-        status: status.countdown_status,
-      });
+      if (
+        lastStatusUpdatedAt &&
+        statusUpdatedAt &&
+        new Date(statusUpdatedAt).getTime() <
+        new Date(lastStatusUpdatedAt).getTime()
+      ) {
+        return;
+      }
+
+      if (statusUpdatedAt) {
+        setLastStatusUpdatedAt(statusUpdatedAt);
+      }
 
       setRemoteCountdownDauerSekunden(status.countdown_dauer_sekunden ?? null);
 
@@ -342,6 +352,8 @@ export default function QuizPraesentationPlayer({
       );
 
       setRemoteCountdownStatus(status.countdown_status ?? "idle");
+
+      setEndstandRevealCount(status.endstand_reveal_count ?? 1);
 
       setSlideIndex((current) => {
         const nextIndex = Math.min(
@@ -356,10 +368,10 @@ export default function QuizPraesentationPlayer({
 
         setOverlayMedien(null);
         setRemoteMediumOverlayAktiv(false);
-        setEndstandRevealCount(1);
 
         return nextIndex;
       });
+
       setRemoteAudioAktion(
         (status.audio_aktion as "play" | "pause" | "stop" | null) ?? null
       );
@@ -394,7 +406,7 @@ export default function QuizPraesentationPlayer({
     return () => {
       window.clearInterval(interval);
     };
-  }, [quizId, slides.length, lastAudioAktionId]);
+  }, [quizId, slides.length, lastAudioAktionId, lastStatusUpdatedAt]);
 
   useEffect(() => {
     if (!remoteMediumOverlayAktiv) {
@@ -441,7 +453,7 @@ export default function QuizPraesentationPlayer({
         event.key === "PageDown"
       ) {
         event.preventDefault();
-        nextSlide();
+        void nextSlide();
         return;
       }
 
@@ -475,8 +487,15 @@ export default function QuizPraesentationPlayer({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [slideIndex, slides.length, overlayMedien, endstandRevealCount, slide?.typ]);
-
+  }, [
+    slideIndex,
+    slides.length,
+    overlayMedien,
+    endstandRevealCount,
+    slide?.typ,
+    nextSlide,
+    previousSlide,
+  ]);
   useEffect(() => {
     if (
       slide?.typ !== "frage" ||
