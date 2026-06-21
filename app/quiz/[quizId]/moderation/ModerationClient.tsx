@@ -934,10 +934,12 @@ export default function ModerationClient({
     hatAudio,
     mediumOverlayAktiv,
     audioLaeuft,
+    endstandRevealCount,
   ]);
 
   return (
     <>
+
       {showAuswertungDialog && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 p-6">
           <div className="w-full max-w-xl rounded-3xl border border-zinc-700 bg-zinc-900 p-8 text-white shadow-2xl">
