@@ -1274,50 +1274,6 @@ export default function QuizPraesentationPlayer({
       Math.min(endstandRevealCount, platzGruppen.length)
     );
 
-    if (showSchaetzfrage) {
-      return (
-        <div className="flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-          <div className="mx-auto mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
-            Tie-Breaker
-          </div>
-
-          <h2 className="text-6xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
-            Schätzfrage
-          </h2>
-
-          <div className="mx-auto mt-10 max-w-5xl rounded-3xl border-4 border-cyan-300 bg-slate-950/80 px-8 py-8 text-4xl font-black leading-tight text-white shadow-[6px_6px_0_#ff00aa]">
-            {isSchaetzfrageLoading
-              ? "Schätzfrage wird geladen..."
-              : schaetzfrage?.frage ?? "Keine Schätzfrage gefunden."}
-          </div>
-
-          {zeigeSchaetzAntwort && (
-            <div className="mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
-              {schaetzfrage?.richtigeAntwort ?? "Keine Lösung hinterlegt."}
-            </div>
-          )}
-
-          <div className="mt-10 flex justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => setZeigeSchaetzAntwort(true)}
-              className="rounded-xl border-4 border-yellow-300 bg-yellow-300 px-6 py-4 text-xl font-black uppercase text-slate-950 shadow-[4px_4px_0_#ff00aa]"
-            >
-              Lösung zeigen
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowSchaetzfrage(false)}
-              className="rounded-xl border-4 border-cyan-300 bg-cyan-300 px-6 py-4 text-xl font-black uppercase text-slate-950 shadow-[4px_4px_0_#ff00aa]"
-            >
-              Zurück zum Endstand
-            </button>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
         <div className="mb-4 inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
@@ -1519,6 +1475,32 @@ export default function QuizPraesentationPlayer({
             )}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  function renderSchaetzfrageOverlay() {
+    return (
+      <div className="flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        <div className="mx-auto mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+          Tie-Breaker
+        </div>
+
+        <h2 className="text-6xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+          Schätzfrage
+        </h2>
+
+        <div className="mx-auto mt-10 max-w-5xl rounded-3xl border-4 border-cyan-300 bg-slate-950/80 px-8 py-8 text-4xl font-black leading-tight text-white shadow-[6px_6px_0_#ff00aa]">
+          {isSchaetzfrageLoading
+            ? "Schätzfrage wird geladen..."
+            : schaetzfrage?.frage ?? "Keine Schätzfrage gefunden."}
+        </div>
+
+        {zeigeSchaetzAntwort && (
+          <div className="mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
+            {schaetzfrage?.richtigeAntwort ?? "Keine Lösung hinterlegt."}
+          </div>
+        )}
       </div>
     );
   }
@@ -2206,6 +2188,7 @@ export default function QuizPraesentationPlayer({
         )}
 
         <section className="min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
+          {showSchaetzfrage ? renderSchaetzfrageOverlay() : renderAktuellenSlide()}
           {renderAktuellenSlide()}
         </section>
 
