@@ -583,6 +583,14 @@ export default function QuizPraesentationPlayer({
   }
 
   async function nextSlide() {
+
+    console.log("NEXT SLIDE START", {
+      slideIndex,
+      slideTyp: slide?.typ,
+      endstandRevealCount,
+      endstandRevealCountRef: endstandRevealCountRef.current,
+      revealGruppen: getEndstandRevealGruppenAnzahl(),
+    });
     if (overlayMedien) {
       setOverlayMedien(null);
       return;
@@ -596,6 +604,11 @@ export default function QuizPraesentationPlayer({
       const neuerRevealCount = Math.min(revealGruppen, aktuellerRevealCount + 1);
 
       endstandRevealCountRef.current = neuerRevealCount;
+      console.log("ENDSTAND REVEAL", {
+        alterRevealCount: endstandRevealCount,
+        neuerRevealCount,
+        revealGruppen,
+      });
       setEndstandRevealCount(neuerRevealCount);
 
       await setRemoteEndstandRevealCount({
@@ -609,6 +622,12 @@ export default function QuizPraesentationPlayer({
     if (slideIndex >= slides.length - 1) return;
 
     const neuerIndex = slideIndex + 1;
+
+    console.log("ECHTER SLIDEWECHSEL", {
+      von: slideIndex,
+      nach: neuerIndex,
+      slideTyp: slide?.typ,
+    });
 
     setSlideIndex(neuerIndex);
     setOverlayMedien(null);
