@@ -175,13 +175,135 @@ function SlidePreview({
   slide,
   slides,
   countdownRestSekunden,
+  punktestand,
+  endstandRevealCount,
+  preiseText,
 }: {
   slide: Slide | undefined;
   slides: Slide[];
   countdownRestSekunden: number;
+  punktestand: { teamname: string; punkte: number }[];
+  endstandRevealCount: number;
+  preiseText?: string | null;
 }) {
   if (!slide) {
     return <div className="text-zinc-500">Kein Slide vorhanden</div>;
+  }
+
+  function renderPunktestandPreview({
+    anonym,
+    titel,
+    istEndstand,
+  }: {
+    anonym: boolean;
+    titel: string;
+    istEndstand: boolean;
+  }) {
+    const topTeams = [...punktestand]
+      .sort((a, b) => b.punkte - a.punkte)
+      .slice(0, 5);
+
+    const teamsMitPlatz = topTeams.map((team) => {
+      const ersterIndex = topTeams.findIndex(
+        (vergleich) => vergleich.punkte === team.punkte
+      );
+
+      return {
+        ...team,
+        platz: ersterIndex + 1,
+      };
+    });
+
+    const platzGruppen = Array.from(
+      new Set(teamsMitPlatz.map((team) => team.platz))
+    ).sort((a, b) => b - a);
+
+    const sichtbarePlaetze =
+      istEndstand
+        ? platzGruppen.slice(
+          0,
+          Math.min(endstandRevealCount, platzGruppen.length)
+        )
+        : platzGruppen;
+
+    const naechsterPlatz =
+      istEndstand
+        ? platzGruppen[endstandRevealCount] ?? null
+        : null;
+
+    return (
+      <div className="grid h-full min-h-[360px] grid-cols-[minmax(0,1.55fr)_minmax(280px,0.75fr)] gap-5">
+        <div className="rounded-2xl border border-zinc-700 bg-zinc-950 p-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm uppercase tracking-[0.25em] text-yellow-300">
+                {titel}
+              </div>
+              {istEndstand && (
+                <div className="mt-1 text-xs text-zinc-400">
+                  Sichtbar:{" "}
+                  <span className="font-bold text-yellow-300">
+                    {sichtbarePlaetze
+                      .map((platz) => `Platz ${platz}`)
+                      .join(", ")}
+                  </span>
+                  {naechsterPlatz && (
+                    <>
+                      {" "}
+                      · Nächster Klick:{" "}
+                      <span className="font-bold text-cyan-300">
+                        Platz {naechsterPlatz}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-zinc-800">
+            {teamsMitPlatz.map((team, index) => {
+              const istSichtbar = sichtbarePlaetze.includes(team.platz);
+              const name = anonym ? `Team ${index + 1}` : team.teamname;
+
+              return (
+                <div
+                  key={`${team.teamname}-${index}`}
+                  className={`grid grid-cols-[80px_1fr_110px] items-center gap-3 border-b border-zinc-800 px-4 py-3 last:border-b-0 ${istSichtbar
+                    ? "bg-yellow-400/10 text-white"
+                    : "bg-black/30 text-zinc-600"
+                    }`}
+                >
+                  <div className="text-xl font-black">#{team.platz}</div>
+
+                  <div className="truncate text-lg font-bold">
+                    {istSichtbar ? name : "???"}
+                  </div>
+
+                  <div className="text-right text-xl font-black">
+                    {istSichtbar ? team.punkte.toFixed(1) : "?"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-700 bg-zinc-950 p-5">
+          <h3 className="mb-4 text-xl font-black">Preise</h3>
+
+          {preiseText ? (
+            <div className="whitespace-pre-line text-sm leading-relaxed text-zinc-300">
+              {preiseText}
+            </div>
+          ) : (
+            <div className="text-sm text-zinc-500">
+              Keine Preise hinterlegt.
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   if (slide.typ === "fixer-slide") {
@@ -191,7 +313,9 @@ function SlidePreview({
           <div className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-300">
             Fixer Slide
           </div>
-          <div className="text-5xl font-black">{getSlideTitel(slide, slides)}</div>
+          <div className="text-5xl font-black">
+            {getSlideTitel(slide, slides)}
+          </div>
         </div>
       </div>
     );
@@ -280,19 +404,19 @@ function SlidePreview({
   }
 
   if (slide.typ === "zwischenstand") {
-    return (
-      <div className="flex h-full min-h-[300px] items-center justify-center text-center">
-        <div className="text-5xl font-black">Zwischenstand</div>
-      </div>
-    );
+    return renderPunktestandPreview({
+      anonym: true,
+      titel: "Anonymer Zwischenstand",
+      istEndstand: false,
+    });
   }
 
   if (slide.typ === "endstand") {
-    return (
-      <div className="flex h-full min-h-[300px] items-center justify-center text-center">
-        <div className="text-5xl font-black">Endstand</div>
-      </div>
-    );
+    return renderPunktestandPreview({
+      anonym: false,
+      titel: "Finale Tabelle",
+      istEndstand: true,
+    });
   }
 
   return <div className="text-zinc-500">Unbekannter Slide</div>;
@@ -444,6 +568,10 @@ export default function ModerationClient({
           ...aktuellerSlide.frage.antworten.flatMap((antwort) => antwort.medien),
         ]
         : [];
+
+  const [punktestand, setPunktestand] = useState<
+    { teamname: string; punkte: number }[]
+  >([]);
 
   const hatMedien = aktuelleMedien.length > 0;
 
@@ -700,6 +828,19 @@ export default function ModerationClient({
   ]);
 
   useEffect(() => {
+    if (aktuellerSlide?.typ !== "zwischenstand" && aktuellerSlide?.typ !== "endstand") {
+      return;
+    }
+
+    async function ladePunktestand() {
+      const daten = await getQuizPunktestand(quizId);
+      setPunktestand(daten);
+    }
+
+    void ladePunktestand();
+  }, [aktuellerSlide?.typ, quizId]);
+
+  useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
       const tagName = target?.tagName?.toLowerCase();
@@ -886,6 +1027,9 @@ export default function ModerationClient({
                   slide={aktuellerSlide}
                   slides={slides}
                   countdownRestSekunden={countdownRestSekunden}
+                  punktestand={punktestand}
+                  endstandRevealCount={endstandRevealCount}
+                  preiseText={quiz.intro_preise}
                 />
               </div>
             </div>
