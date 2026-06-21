@@ -11,9 +11,9 @@ import {
   LockOpenIcon,
   PlayIcon,
   ArrowLeftIcon,
-  AdjustmentsHorizontalIcon,
+  MegaphoneIcon,
   UsersIcon,
-  TrophyIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
@@ -163,6 +163,8 @@ export default async function QuizDetailPage({
 
             <a
               href={`/quiz/${quiz.quiz_id}/praesentation?passwort=${passwort}`}
+              target="_blank"
+              rel="noopener noreferrer"
               title="Präsentieren"
               className="inline-flex items-center justify-center rounded-xl border border-cyan-300 bg-white p-3 text-cyan-700 shadow-sm transition hover:bg-cyan-50"
             >
@@ -170,14 +172,18 @@ export default async function QuizDetailPage({
             </a>
             <a
               href={`/quiz/${quiz.quiz_id}/moderation?passwort=${passwort}`}
+              target="_blank"
+              rel="noopener noreferrer"
               title="Moderation"
               className="inline-flex items-center justify-center rounded-xl border border-violet-300 bg-white p-3 text-violet-700 shadow-sm transition hover:bg-violet-50"
             >
-              <AdjustmentsHorizontalIcon className="h-5 w-5" />
+              <MegaphoneIcon className="h-5 w-5" />
             </a>
 
             <a
               href={`/quiz/${quiz.quiz_id}/antworten?passwort=${passwort}`}
+              target="_blank"
+              rel="noopener noreferrer"
               title="Antwortformular"
               className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white p-3 text-emerald-700 shadow-sm transition hover:bg-emerald-50"
             >
@@ -186,10 +192,12 @@ export default async function QuizDetailPage({
 
             <a
               href={`/quiz/${quiz.quiz_id}/auswertung?passwort=${passwort}`}
+              target="_blank"
+              rel="noopener noreferrer"
               title="Auswertung"
               className="inline-flex items-center justify-center rounded-xl border border-yellow-300 bg-white p-3 text-yellow-700 shadow-sm transition hover:bg-yellow-50"
             >
-              <TrophyIcon className="h-5 w-5" />
+              <ChartBarIcon className="h-5 w-5" />
             </a>
           </div>
         </div>

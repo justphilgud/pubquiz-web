@@ -17,9 +17,9 @@ import {
   PlayIcon,
   DocumentDuplicateIcon,
   LockOpenIcon,
-  AdjustmentsHorizontalIcon,
+  MegaphoneIcon,
   UsersIcon,
-  TrophyIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
 type Props = {
@@ -321,6 +321,8 @@ export default function QuizForm({
 
                         <Link
                           href={`/quiz/${quiz.quiz_id}/praesentation`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           title="Präsentieren"
                           className="rounded-xl border border-cyan-300 bg-cyan-50 p-2 text-cyan-700 shadow-sm transition hover:bg-cyan-100"
                         >
@@ -328,14 +330,18 @@ export default function QuizForm({
                         </Link>
                         <Link
                           href={`/quiz/${quiz.quiz_id}/moderation`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           title="Moderation"
                           className="rounded-xl border border-violet-300 bg-violet-50 p-2 text-violet-700 shadow-sm transition hover:bg-violet-100"
                         >
-                          <AdjustmentsHorizontalIcon className="h-5 w-5" />
+                          <MegaphoneIcon className="h-5 w-5" />
                         </Link>
 
                         <Link
                           href={`/quiz/${quiz.quiz_id}/antworten`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           title="Antwortformular"
                           className="rounded-xl border border-emerald-300 bg-emerald-50 p-2 text-emerald-700 shadow-sm transition hover:bg-emerald-100"
                         >
@@ -344,10 +350,12 @@ export default function QuizForm({
 
                         <Link
                           href={`/quiz/${quiz.quiz_id}/auswertung`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           title="Auswertung"
                           className="rounded-xl border border-yellow-300 bg-yellow-50 p-2 text-yellow-700 shadow-sm transition hover:bg-yellow-100"
                         >
-                          <TrophyIcon className="h-5 w-5" />
+                          <ChartBarIcon className="h-5 w-5" />
                         </Link>
 
                       </div>
