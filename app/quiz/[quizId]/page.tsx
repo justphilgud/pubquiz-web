@@ -11,6 +11,9 @@ import {
   LockOpenIcon,
   PlayIcon,
   ArrowLeftIcon,
+  AdjustmentsHorizontalIcon,
+  UsersIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
 
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
@@ -164,6 +167,29 @@ export default async function QuizDetailPage({
               className="inline-flex items-center justify-center rounded-xl border border-cyan-300 bg-white p-3 text-cyan-700 shadow-sm transition hover:bg-cyan-50"
             >
               <PlayIcon className="h-5 w-5" />
+            </a>
+            <a
+              href={`/quiz/${quiz.quiz_id}/moderation?passwort=${passwort}`}
+              title="Moderation"
+              className="inline-flex items-center justify-center rounded-xl border border-violet-300 bg-white p-3 text-violet-700 shadow-sm transition hover:bg-violet-50"
+            >
+              <AdjustmentsHorizontalIcon className="h-5 w-5" />
+            </a>
+
+            <a
+              href={`/quiz/${quiz.quiz_id}/antworten?passwort=${passwort}`}
+              title="Antwortformular"
+              className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white p-3 text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+            >
+              <UsersIcon className="h-5 w-5" />
+            </a>
+
+            <a
+              href={`/quiz/${quiz.quiz_id}/auswertung?passwort=${passwort}`}
+              title="Auswertung"
+              className="inline-flex items-center justify-center rounded-xl border border-yellow-300 bg-white p-3 text-yellow-700 shadow-sm transition hover:bg-yellow-50"
+            >
+              <TrophyIcon className="h-5 w-5" />
             </a>
           </div>
         </div>

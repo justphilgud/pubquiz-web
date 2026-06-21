@@ -36,6 +36,8 @@ import {
   ArrowPathIcon,
   ClockIcon,
   ScaleIcon,
+  EyeIcon,
+  ArrowUturnLeftIcon,
 } from "@heroicons/react/24/outline";
 
 type ModerationStatus = {
@@ -1153,7 +1155,7 @@ export default function ModerationClient({
                   <button
                     type="button"
                     onClick={handleSchaetzfrageStarten}
-                    title="Schätzfrage"
+                    title="Schätzfrage starten"
                     className="rounded-xl bg-fuchsia-600 p-3 hover:bg-fuchsia-500"
                   >
                     <ScaleIcon className="h-6 w-6" />
@@ -1162,17 +1164,19 @@ export default function ModerationClient({
                   <button
                     type="button"
                     onClick={handleSchaetzfrageLoesungZeigen}
-                    className="rounded-xl bg-yellow-500 px-4 py-3 font-bold text-black hover:bg-yellow-400"
+                    title="Lösung zeigen"
+                    className="rounded-xl bg-yellow-500 p-3 text-black hover:bg-yellow-400"
                   >
-                    Lösung
+                    <EyeIcon className="h-6 w-6" />
                   </button>
 
                   <button
                     type="button"
                     onClick={handleSchaetzfrageZurueck}
-                    className="rounded-xl bg-zinc-700 px-4 py-3 font-bold hover:bg-zinc-600"
+                    title="Zurück zum Endstand"
+                    className="rounded-xl bg-zinc-700 p-3 hover:bg-zinc-600"
                   >
-                    Zurück
+                    <ArrowUturnLeftIcon className="h-6 w-6" />
                   </button>
                 </>
               )}

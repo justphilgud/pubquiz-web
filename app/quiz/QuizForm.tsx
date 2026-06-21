@@ -17,6 +17,9 @@ import {
   PlayIcon,
   DocumentDuplicateIcon,
   LockOpenIcon,
+  AdjustmentsHorizontalIcon,
+  UsersIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
 
 type Props = {
@@ -322,6 +325,29 @@ export default function QuizForm({
                           className="rounded-xl border border-cyan-300 bg-cyan-50 p-2 text-cyan-700 shadow-sm transition hover:bg-cyan-100"
                         >
                           <PlayIcon className="h-5 w-5" />
+                        </Link>
+                        <Link
+                          href={`/quiz/${quiz.quiz_id}/moderation`}
+                          title="Moderation"
+                          className="rounded-xl border border-violet-300 bg-violet-50 p-2 text-violet-700 shadow-sm transition hover:bg-violet-100"
+                        >
+                          <AdjustmentsHorizontalIcon className="h-5 w-5" />
+                        </Link>
+
+                        <Link
+                          href={`/quiz/${quiz.quiz_id}/antworten`}
+                          title="Antwortformular"
+                          className="rounded-xl border border-emerald-300 bg-emerald-50 p-2 text-emerald-700 shadow-sm transition hover:bg-emerald-100"
+                        >
+                          <UsersIcon className="h-5 w-5" />
+                        </Link>
+
+                        <Link
+                          href={`/quiz/${quiz.quiz_id}/auswertung`}
+                          title="Auswertung"
+                          className="rounded-xl border border-yellow-300 bg-yellow-50 p-2 text-yellow-700 shadow-sm transition hover:bg-yellow-100"
+                        >
+                          <TrophyIcon className="h-5 w-5" />
                         </Link>
 
                       </div>
