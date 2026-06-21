@@ -6,6 +6,7 @@ import {
   schliesseQuizBlock,
   QuizPraesentationResult,
   getQuizPunktestand,
+  getZufaelligeSchaetzfrage
 } from "../../actions";
 import {
   buildPraesentationSlides,
@@ -20,6 +21,7 @@ import {
   resetCountdown,
   beendeCountdown,
   setEndstandRevealCount,
+  setSchaetzfrageStatus
 } from "../praesentation/statusActions";
 
 import {
@@ -33,6 +35,7 @@ import {
   PlayIcon,
   ArrowPathIcon,
   ClockIcon,
+  ScaleIcon,
 } from "@heroicons/react/24/outline";
 
 type ModerationStatus = {
@@ -785,6 +788,33 @@ export default function ModerationClient({
     setShowAuswertungIframe(true);
     setShowAuswertungDialog(false);
   }
+  async function handleSchaetzfrageStarten() {
+    const frage = await getZufaelligeSchaetzfrage();
+
+    await setSchaetzfrageStatus({
+      quizId,
+      showSchaetzfrage: true,
+      zeigeSchaetzantwort: false,
+      schaetzfrageId: frage?.fragen_id ?? null,
+    });
+  }
+
+  async function handleSchaetzfrageLoesungZeigen() {
+    await setSchaetzfrageStatus({
+      quizId,
+      showSchaetzfrage: true,
+      zeigeSchaetzantwort: true,
+    });
+  }
+
+  async function handleSchaetzfrageZurueck() {
+    await setSchaetzfrageStatus({
+      quizId,
+      showSchaetzfrage: false,
+      zeigeSchaetzantwort: false,
+      schaetzfrageId: null,
+    });
+  }
 
   async function handleCountdownStart() {
     await starteCountdown({
@@ -1118,6 +1148,34 @@ export default function ModerationClient({
               >
                 <ChartBarIcon className="h-6 w-6" />
               </button>
+              {aktuellerSlide?.typ === "endstand" && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleSchaetzfrageStarten}
+                    title="Schätzfrage"
+                    className="rounded-xl bg-fuchsia-600 p-3 hover:bg-fuchsia-500"
+                  >
+                    <ScaleIcon className="h-6 w-6" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSchaetzfrageLoesungZeigen}
+                    className="rounded-xl bg-yellow-500 px-4 py-3 font-bold text-black hover:bg-yellow-400"
+                  >
+                    Lösung
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSchaetzfrageZurueck}
+                    className="rounded-xl bg-zinc-700 px-4 py-3 font-bold hover:bg-zinc-600"
+                  >
+                    Zurück
+                  </button>
+                </>
+              )} F
 
               <div
                 className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${istCountdownSlide
