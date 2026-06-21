@@ -263,6 +263,9 @@ export default function QuizPraesentationPlayer({
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [freigabeMeldung, setFreigabeMeldung] = useState("");
   const [isFreigabeLoading, setIsFreigabeLoading] = useState(false);
+  const nextButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousButtonRef = useRef<HTMLButtonElement | null>(null);
+
   const [endstandRevealCount, setEndstandRevealCount] = useState(1);
   const [remoteCountdownDauerSekunden, setRemoteCountdownDauerSekunden] =
     useState<number | null>(null);
@@ -292,6 +295,8 @@ export default function QuizPraesentationPlayer({
     }[]
   >([]);
   const [now, setNow] = useState(() => Date.now());
+
+
 
   const slides = useMemo(
     () => buildPraesentationSlides(quiz),
@@ -453,7 +458,7 @@ export default function QuizPraesentationPlayer({
         event.key === "PageDown"
       ) {
         event.preventDefault();
-        void nextSlide();
+        nextButtonRef.current?.click();
         return;
       }
 
@@ -463,7 +468,7 @@ export default function QuizPraesentationPlayer({
         event.key === "PageUp"
       ) {
         event.preventDefault();
-        previousSlide();
+        previousButtonRef.current?.click();
         return;
       }
 
@@ -2123,6 +2128,7 @@ export default function QuizPraesentationPlayer({
         <footer className="mt-3 flex h-20 shrink-0 items-center justify-between gap-4">
           <div className="flex gap-3">
             <button
+              ref={previousButtonRef}
               type="button"
               onClick={previousSlide}
               disabled={slideIndex === 0}
@@ -2132,13 +2138,13 @@ export default function QuizPraesentationPlayer({
             </button>
             <button
               type="button"
+              ref={nextButtonRef}
               onClick={nextSlide}
               disabled={slideIndex >= slides.length - 1}
               className="rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
             >
               Weiter →
             </button>
-
             {zeigtFreigabeButtons && (
               <>
                 <button
