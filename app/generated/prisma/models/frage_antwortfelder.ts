@@ -225,8 +225,8 @@ export type frage_antwortfelderWhereInput = {
   sortierung?: Prisma.IntFilter<"frage_antwortfelder"> | number
   ist_pflicht?: Prisma.BoolFilter<"frage_antwortfelder"> | boolean
   loesungen?: Prisma.Frage_antwortfeld_loesungenListRelationFilter
-  medien?: Prisma.MedienListRelationFilter
   frage?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
+  medien?: Prisma.MedienListRelationFilter
   team_antworten?: Prisma.Team_antwortfelderListRelationFilter
 }
 
@@ -237,8 +237,8 @@ export type frage_antwortfelderOrderByWithRelationInput = {
   sortierung?: Prisma.SortOrder
   ist_pflicht?: Prisma.SortOrder
   loesungen?: Prisma.frage_antwortfeld_loesungenOrderByRelationAggregateInput
-  medien?: Prisma.medienOrderByRelationAggregateInput
   frage?: Prisma.fragenOrderByWithRelationInput
+  medien?: Prisma.medienOrderByRelationAggregateInput
   team_antworten?: Prisma.team_antwortfelderOrderByRelationAggregateInput
 }
 
@@ -252,8 +252,8 @@ export type frage_antwortfelderWhereUniqueInput = Prisma.AtLeast<{
   sortierung?: Prisma.IntFilter<"frage_antwortfelder"> | number
   ist_pflicht?: Prisma.BoolFilter<"frage_antwortfelder"> | boolean
   loesungen?: Prisma.Frage_antwortfeld_loesungenListRelationFilter
-  medien?: Prisma.MedienListRelationFilter
   frage?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
+  medien?: Prisma.MedienListRelationFilter
   team_antworten?: Prisma.Team_antwortfelderListRelationFilter
 }, "antwortfeld_id">
 
@@ -286,8 +286,8 @@ export type frage_antwortfelderCreateInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenCreateNestedManyWithoutAntwortfeldInput
-  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   team_antworten?: Prisma.team_antwortfelderCreateNestedManyWithoutAntwortfeldInput
 }
 
@@ -307,8 +307,8 @@ export type frage_antwortfelderUpdateInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUpdateManyWithoutAntwortfeldNestedInput
-  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   team_antworten?: Prisma.team_antwortfelderUpdateManyWithoutAntwortfeldNestedInput
 }
 
@@ -602,8 +602,8 @@ export type frage_antwortfelderCreateWithoutTeam_antwortenInput = {
   sortierung: number
   ist_pflicht?: boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenCreateNestedManyWithoutAntwortfeldInput
-  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
 }
 
 export type frage_antwortfelderUncheckedCreateWithoutTeam_antwortenInput = {
@@ -637,8 +637,8 @@ export type frage_antwortfelderUpdateWithoutTeam_antwortenInput = {
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
   loesungen?: Prisma.frage_antwortfeld_loesungenUpdateManyWithoutAntwortfeldNestedInput
-  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
 }
 
 export type frage_antwortfelderUncheckedUpdateWithoutTeam_antwortenInput = {
@@ -655,8 +655,8 @@ export type frage_antwortfelderCreateWithoutLoesungenInput = {
   label: string
   sortierung: number
   ist_pflicht?: boolean
-  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   frage: Prisma.fragenCreateNestedOneWithoutAntwortfelderInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortfeldInput
   team_antworten?: Prisma.team_antwortfelderCreateNestedManyWithoutAntwortfeldInput
 }
 
@@ -690,8 +690,8 @@ export type frage_antwortfelderUpdateWithoutLoesungenInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_pflicht?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   frage?: Prisma.fragenUpdateOneRequiredWithoutAntwortfelderNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortfeldNestedInput
   team_antworten?: Prisma.team_antwortfelderUpdateManyWithoutAntwortfeldNestedInput
 }
 
@@ -794,8 +794,8 @@ export type frage_antwortfelderSelect<ExtArgs extends runtime.Types.Extensions.I
   sortierung?: boolean
   ist_pflicht?: boolean
   loesungen?: boolean | Prisma.frage_antwortfelder$loesungenArgs<ExtArgs>
-  medien?: boolean | Prisma.frage_antwortfelder$medienArgs<ExtArgs>
   frage?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
+  medien?: boolean | Prisma.frage_antwortfelder$medienArgs<ExtArgs>
   team_antworten?: boolean | Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs>
   _count?: boolean | Prisma.Frage_antwortfelderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["frage_antwortfelder"]>
@@ -829,8 +829,8 @@ export type frage_antwortfelderSelectScalar = {
 export type frage_antwortfelderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"antwortfeld_id" | "fragen_id" | "label" | "sortierung" | "ist_pflicht", ExtArgs["result"]["frage_antwortfelder"]>
 export type frage_antwortfelderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   loesungen?: boolean | Prisma.frage_antwortfelder$loesungenArgs<ExtArgs>
-  medien?: boolean | Prisma.frage_antwortfelder$medienArgs<ExtArgs>
   frage?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
+  medien?: boolean | Prisma.frage_antwortfelder$medienArgs<ExtArgs>
   team_antworten?: boolean | Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs>
   _count?: boolean | Prisma.Frage_antwortfelderCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -845,8 +845,8 @@ export type $frage_antwortfelderPayload<ExtArgs extends runtime.Types.Extensions
   name: "frage_antwortfelder"
   objects: {
     loesungen: Prisma.$frage_antwortfeld_loesungenPayload<ExtArgs>[]
-    medien: Prisma.$medienPayload<ExtArgs>[]
     frage: Prisma.$fragenPayload<ExtArgs>
+    medien: Prisma.$medienPayload<ExtArgs>[]
     team_antworten: Prisma.$team_antwortfelderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1250,8 +1250,8 @@ readonly fields: frage_antwortfelderFieldRefs;
 export interface Prisma__frage_antwortfelderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   loesungen<T extends Prisma.frage_antwortfelder$loesungenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$loesungenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_antwortfeld_loesungenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  medien<T extends Prisma.frage_antwortfelder$medienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$medienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$medienPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   frage<T extends Prisma.fragenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragenDefaultArgs<ExtArgs>>): Prisma.Prisma__fragenClient<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  medien<T extends Prisma.frage_antwortfelder$medienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$medienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$medienPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   team_antworten<T extends Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_antwortfelder$team_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortfelderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.

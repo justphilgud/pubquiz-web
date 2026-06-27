@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getQuizPraesentation } from "../../actions";
 import { getOrCreatePraesentationStatus } from "./statusActions";
 import QuizPraesentationPlayer from "./QuizPraesentationPlayer";
-
+import { requireAdmin } from "@/app/lib/permissions";
 
 type Props = {
   params: Promise<{
@@ -11,6 +11,7 @@ type Props = {
 };
 
 export default async function QuizPraesentationPage({ params }: Props) {
+  await requireAdmin();
   const resolvedParams = await params;
   const quizId = Number(resolvedParams.quizId);
 
@@ -20,7 +21,6 @@ export default async function QuizPraesentationPage({ params }: Props) {
 
   const quiz = await getQuizPraesentation(quizId);
   console.log("Praesentation quizId", quizId, "quiz gefunden", Boolean(quiz));
-
 
   if (!quiz) {
     notFound();

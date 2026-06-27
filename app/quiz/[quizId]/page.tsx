@@ -16,6 +16,7 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
+import { requireAdmin } from "@/app/lib/permissions";
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
 
 type Props = {
@@ -32,6 +33,7 @@ export default async function QuizDetailPage({
   params,
   searchParams,
 }: Props) {
+  await requireAdmin();
   const { quizId } = await params;
   const resolvedSearchParams = await searchParams;
   const passwort = resolvedSearchParams.passwort ?? "";

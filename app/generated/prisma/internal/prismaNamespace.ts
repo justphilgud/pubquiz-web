@@ -404,7 +404,8 @@ export const ModelName = {
   frage_antwortfeld_loesungen: 'frage_antwortfeld_loesungen',
   frage_vorlagen: 'frage_vorlagen',
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
-  quiz_praesentation_status: 'quiz_praesentation_status'
+  quiz_praesentation_status: 'quiz_praesentation_status',
+  users: 'users'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medientyp" | "quiz" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medientyp" | "quiz" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1978,6 +1979,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    users: {
+      payload: Prisma.$usersPayload<ExtArgs>
+      fields: Prisma.usersFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.usersFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.usersFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>
+        }
+        findFirst: {
+          args: Prisma.usersFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.usersFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>
+        }
+        findMany: {
+          args: Prisma.usersFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>[]
+        }
+        create: {
+          args: Prisma.usersCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>
+        }
+        createMany: {
+          args: Prisma.usersCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.usersCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>[]
+        }
+        delete: {
+          args: Prisma.usersDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>
+        }
+        update: {
+          args: Prisma.usersUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>
+        }
+        deleteMany: {
+          args: Prisma.usersDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.usersUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.usersUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>[]
+        }
+        upsert: {
+          args: Prisma.usersUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$usersPayload>
+        }
+        aggregate: {
+          args: Prisma.UsersAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUsers>
+        }
+        groupBy: {
+          args: Prisma.usersGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UsersGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.usersCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UsersCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2045,7 +2120,14 @@ export const FragenScalarFieldEnum = {
   erstellungsdatum: 'erstellungsdatum',
   ist_archiviert: 'ist_archiviert',
   archivierungsgrund: 'archivierungsgrund',
-  vorlage_id: 'vorlage_id'
+  vorlage_id: 'vorlage_id',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at',
+  last_modified_by_user_id: 'last_modified_by_user_id',
+  updated_at: 'updated_at',
+  approved_by_user_id: 'approved_by_user_id',
+  approved_at: 'approved_at',
+  freigegeben: 'freigegeben'
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
@@ -2072,11 +2154,11 @@ export const MedienScalarFieldEnum = {
   medien_id: 'medien_id',
   fragen_id: 'fragen_id',
   antwort_id: 'antwort_id',
-  antwortfeld_id: 'antwortfeld_id',
   medientyp_id: 'medientyp_id',
   datei: 'datei',
   sortierung: 'sortierung',
-  bemerkung: 'bemerkung'
+  bemerkung: 'bemerkung',
+  antwortfeld_id: 'antwortfeld_id'
 } as const
 
 export type MedienScalarFieldEnum = (typeof MedienScalarFieldEnum)[keyof typeof MedienScalarFieldEnum]
@@ -2096,7 +2178,6 @@ export const QuizScalarFieldEnum = {
   titel: 'titel',
   team_anzahl: 'team_anzahl',
   teilnehmer_anzahl: 'teilnehmer_anzahl',
-  manuelle_bewertungen: 'manuelle_bewertungen',
   bemerkung: 'bemerkung',
   ist_archiviert: 'ist_archiviert',
   archivierungsgrund: 'archivierungsgrund',
@@ -2110,7 +2191,8 @@ export const QuizScalarFieldEnum = {
   intro_startsequenz_text: 'intro_startsequenz_text',
   intro_startzeit: 'intro_startzeit',
   intro_video_url: 'intro_video_url',
-  outro_bekanntmachungen: 'outro_bekanntmachungen'
+  outro_bekanntmachungen: 'outro_bekanntmachungen',
+  manuelle_bewertungen: 'manuelle_bewertungen'
 } as const
 
 export type QuizScalarFieldEnum = (typeof QuizScalarFieldEnum)[keyof typeof QuizScalarFieldEnum]
@@ -2126,10 +2208,10 @@ export const Quiz_fragenScalarFieldEnum = {
   antwort_reihenfolge: 'antwort_reihenfolge',
   praesentationslayout: 'praesentationslayout',
   quiz_abschnitt_id: 'quiz_abschnitt_id',
-  praesentationsdauer_sekunden: 'praesentationsdauer_sekunden',
-  praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   punkte_basis: 'punkte_basis',
-  punkte_modus: 'punkte_modus'
+  punkte_modus: 'punkte_modus',
+  praesentationsdauer_messungen: 'praesentationsdauer_messungen',
+  praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
 } as const
 
 export type Quiz_fragenScalarFieldEnum = (typeof Quiz_fragenScalarFieldEnum)[keyof typeof Quiz_fragenScalarFieldEnum]
@@ -2174,8 +2256,8 @@ export const Quiz_team_sessionsScalarFieldEnum = {
   quiz_team_session_id: 'quiz_team_session_id',
   quiz_id: 'quiz_id',
   teamname: 'teamname',
-  spieler_anzahl: 'spieler_anzahl',
-  erstellt_am: 'erstellt_am'
+  erstellt_am: 'erstellt_am',
+  spieler_anzahl: 'spieler_anzahl'
 } as const
 
 export type Quiz_team_sessionsScalarFieldEnum = (typeof Quiz_team_sessionsScalarFieldEnum)[keyof typeof Quiz_team_sessionsScalarFieldEnum]
@@ -2271,23 +2353,35 @@ export type Frage_vorlage_antwortfelderScalarFieldEnum = (typeof Frage_vorlage_a
 export const Quiz_praesentation_statusScalarFieldEnum = {
   quiz_id: 'quiz_id',
   slide_index: 'slide_index',
-  endstand_reveal_count: 'endstand_reveal_count',
   slide_started_at: 'slide_started_at',
   quiz_started_at: 'quiz_started_at',
   updated_at: 'updated_at',
-  show_schaetzfrage: 'show_schaetzfrage',
-  zeige_schaetzantwort: 'zeige_schaetzantwort',
-  schaetzfrage_id: 'schaetzfrage_id',
-  medium_overlay_aktiv: 'medium_overlay_aktiv',
   audio_aktion: 'audio_aktion',
   audio_aktion_id: 'audio_aktion_id',
   countdown_dauer_sekunden: 'countdown_dauer_sekunden',
-  countdown_started_at: 'countdown_started_at',
   countdown_ended_at: 'countdown_ended_at',
-  countdown_status: 'countdown_status'
+  countdown_started_at: 'countdown_started_at',
+  countdown_status: 'countdown_status',
+  medium_overlay_aktiv: 'medium_overlay_aktiv',
+  endstand_reveal_count: 'endstand_reveal_count',
+  show_schaetzfrage: 'show_schaetzfrage',
+  zeige_schaetzantwort: 'zeige_schaetzantwort',
+  schaetzfrage_id: 'schaetzfrage_id'
 } as const
 
 export type Quiz_praesentation_statusScalarFieldEnum = (typeof Quiz_praesentation_statusScalarFieldEnum)[keyof typeof Quiz_praesentation_statusScalarFieldEnum]
+
+
+export const UsersScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  password_hash: 'password_hash',
+  role: 'role',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2380,6 +2474,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole'
+ */
+export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole[]'
+ */
+export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
     
 
 
@@ -2527,6 +2635,7 @@ export type GlobalOmitConfig = {
   frage_vorlagen?: Prisma.frage_vorlagenOmit
   frage_vorlage_antwortfelder?: Prisma.frage_vorlage_antwortfelderOmit
   quiz_praesentation_status?: Prisma.quiz_praesentation_statusOmit
+  users?: Prisma.usersOmit
 }
 
 /* Types for Logging */

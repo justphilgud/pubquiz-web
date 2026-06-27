@@ -33,21 +33,28 @@ model antworttyp {
 }
 
 model fragen {
-  fragen_id           Int                   @id @default(autoincrement())
-  frage               String
-  quelle              String?
-  fragentyp           String?
-  schwierigkeitslevel Decimal?              @db.Decimal(5, 2)
-  erstellungsdatum    DateTime              @default(dbgenerated("CURRENT_DATE")) @db.Date
-  ist_archiviert      Boolean               @default(false)
-  archivierungsgrund  String?
-  vorlage_id          Int?
-  antworten           antworten[]
-  antwortfelder       frage_antwortfelder[]
-  vorlage             frage_vorlagen?       @relation(fields: [vorlage_id], references: [vorlage_id])
-  fragen_kategorien   fragen_kategorien[]
-  medien              medien[]
-  quiz_fragen         quiz_fragen[]
+  fragen_id                Int                   @id @default(autoincrement())
+  frage                    String
+  quelle                   String?
+  fragentyp                String?
+  schwierigkeitslevel      Decimal?              @db.Decimal(5, 2)
+  erstellungsdatum         DateTime              @default(dbgenerated("CURRENT_DATE")) @db.Date
+  ist_archiviert           Boolean               @default(false)
+  archivierungsgrund       String?
+  vorlage_id               Int?
+  antworten                antworten[]
+  antwortfelder            frage_antwortfelder[]
+  vorlage                  frage_vorlagen?       @relation(fields: [vorlage_id], references: [vorlage_id])
+  fragen_kategorien        fragen_kategorien[]
+  medien                   medien[]
+  quiz_fragen              quiz_fragen[]
+  created_by_user_id       Int?
+  created_at               DateTime              @default(now())
+  last_modified_by_user_id Int?
+  updated_at               DateTime              @default(now()) @updatedAt
+  approved_by_user_id      Int?
+  approved_at              DateTime?
+  freigegeben              Boolean               @default(false)
 
   @@schema("pubquiz")
 }
@@ -75,19 +82,18 @@ model fragenkategorie {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model medien {
-  medien_id      Int     @id @default(autoincrement())
+  medien_id      Int                  @id @default(autoincrement())
   fragen_id      Int?
   antwort_id     Int?
-  antwortfeld_id Int?
   medientyp_id   Int
   datei          String
-  sortierung     Int     @default(1)
+  sortierung     Int                  @default(1)
   bemerkung      String?
-
-  antworten   antworten?           @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
-  fragen      fragen?              @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
-  antwortfeld frage_antwortfelder? @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
-  medientyp   medientyp            @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
+  antwortfeld_id Int?
+  antworten      antworten?           @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
+  fragen         fragen?              @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
+  medientyp      medientyp            @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
+  antwortfeld    frage_antwortfelder? @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
 
   @@index([antwort_id], map: "idx_medien_antwort_id")
   @@index([fragen_id], map: "idx_medien_fragen_id")
@@ -113,7 +119,6 @@ model quiz {
   titel                   String?
   team_anzahl             Int?
   teilnehmer_anzahl       Int?
-  manuelle_bewertungen    Int?                       @default(0)
   bemerkung               String?
   ist_archiviert          Boolean                    @default(false)
   archivierungsgrund      String?
@@ -128,10 +133,11 @@ model quiz {
   intro_startzeit         String?
   intro_video_url         String?
   outro_bekanntmachungen  String?
-  praesentation_status    quiz_praesentation_status?
+  manuelle_bewertungen    Int?                       @default(0)
   quiz_abschnitte         quiz_abschnitte[]
   quiz_block_freigaben    quiz_block_freigaben[]
   quiz_fragen             quiz_fragen[]
+  praesentation_status    quiz_praesentation_status?
   quiz_team_sessions      quiz_team_sessions[]
   quiz_teams              quiz_teams[]
   team_antworten          team_antworten[]
@@ -141,23 +147,23 @@ model quiz {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz_fragen {
-  quiz_fragen_id       Int              @id @default(autoincrement())
-  quiz_id              Int
-  fragen_id            Int
-  sortierung           Int?
-  richtigeantworten    Int?             @default(0)
-  falscheantworten     Int?             @default(0)
-  antwort_reihenfolge  Int[]            @default([])
-  praesentationslayout String?          @default("standard")
-  quiz_abschnitt_id    Int?
-  praesentationsdauer_sekunden Int?
-  praesentationsdauer_messungen Int?    @default(0)
-  punkte_basis         Decimal          @default(1)
-  punkte_modus         String           @default("standard")
-  fragen               fragen           @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
-  quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
-  quiz_abschnitte      quiz_abschnitte? @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
-  team_antworten       team_antworten[]
+  quiz_fragen_id                Int              @id @default(autoincrement())
+  quiz_id                       Int
+  fragen_id                     Int
+  sortierung                    Int?
+  richtigeantworten             Int?             @default(0)
+  falscheantworten              Int?             @default(0)
+  antwort_reihenfolge           Int[]            @default([])
+  praesentationslayout          String?          @default("standard")
+  quiz_abschnitt_id             Int?
+  punkte_basis                  Decimal          @default(1)
+  punkte_modus                  String           @default("standard")
+  praesentationsdauer_messungen Int?             @default(0)
+  praesentationsdauer_sekunden  Int?
+  fragen                        fragen           @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
+  quiz                          quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
+  quiz_abschnitte               quiz_abschnitte? @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
+  team_antworten                team_antworten[]
 
   @@unique([quiz_id, fragen_id], map: "uq_quiz_fragen")
   @@unique([quiz_id, sortierung], map: "uq_quiz_fragen_sortierung")
@@ -211,8 +217,8 @@ model quiz_team_sessions {
   quiz_team_session_id Int              @id @default(autoincrement())
   quiz_id              Int
   teamname             String
-  spieler_anzahl       Int              @default(1)
   erstellt_am          DateTime         @default(now())
+  spieler_anzahl       Int              @default(1)
   quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
   team_antworten       team_antworten[]
 
@@ -262,15 +268,14 @@ model team_antworten {
 }
 
 model frage_antwortfelder {
-  antwortfeld_id Int     @id @default(autoincrement())
+  antwortfeld_id Int                           @id @default(autoincrement())
   fragen_id      Int
   label          String
   sortierung     Int
-  ist_pflicht    Boolean @default(true)
-
+  ist_pflicht    Boolean                       @default(true)
   loesungen      frage_antwortfeld_loesungen[]
-  medien         medien[]
   frage          fragen                        @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  medien         medien[]
   team_antworten team_antwortfelder[]
 
   @@schema("pubquiz")
@@ -323,26 +328,41 @@ model frage_vorlage_antwortfelder {
 }
 
 model quiz_praesentation_status {
-  quiz_id          Int       @id
-  slide_index      Int       @default(0)
-  endstand_reveal_count Int @default(0)
-  slide_started_at DateTime  @default(now())
-  quiz_started_at  DateTime?
-  updated_at       DateTime  @updatedAt
-  show_schaetzfrage Boolean @default(false)
-  zeige_schaetzantwort Boolean @default(false)
-  schaetzfrage_id Int?
-
-  medium_overlay_aktiv Boolean @default(false)
-  audio_aktion         String?
-  audio_aktion_id      Int     @default(0)
+  quiz_id                  Int       @id
+  slide_index              Int       @default(0)
+  slide_started_at         DateTime  @default(now())
+  quiz_started_at          DateTime?
+  updated_at               DateTime  @updatedAt
+  audio_aktion             String?
+  audio_aktion_id          Int       @default(0)
   countdown_dauer_sekunden Int?
-  countdown_started_at     DateTime?
   countdown_ended_at       DateTime?
-  countdown_status         String?   // "idle" | "running" | "finished"
+  countdown_started_at     DateTime?
+  countdown_status         String?
+  medium_overlay_aktiv     Boolean   @default(false)
+  endstand_reveal_count    Int       @default(0)
+  show_schaetzfrage        Boolean   @default(false)
+  zeige_schaetzantwort     Boolean   @default(false)
+  schaetzfrage_id          Int?
+  quiz                     quiz      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
 
+  @@schema("pubquiz")
+}
 
-  quiz quiz @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+enum UserRole {
+  ADMIN
+  EDITOR
+
+  @@schema("pubquiz")
+}
+
+model users {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password_hash String
+  role          UserRole @default(EDITOR)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   @@schema("pubquiz")
 }

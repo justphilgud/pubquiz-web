@@ -29,76 +29,76 @@ export type AggregateQuiz_praesentation_status = {
 export type Quiz_praesentation_statusAvgAggregateOutputType = {
   quiz_id: number | null
   slide_index: number | null
-  endstand_reveal_count: number | null
-  schaetzfrage_id: number | null
   audio_aktion_id: number | null
   countdown_dauer_sekunden: number | null
+  endstand_reveal_count: number | null
+  schaetzfrage_id: number | null
 }
 
 export type Quiz_praesentation_statusSumAggregateOutputType = {
   quiz_id: number | null
   slide_index: number | null
-  endstand_reveal_count: number | null
-  schaetzfrage_id: number | null
   audio_aktion_id: number | null
   countdown_dauer_sekunden: number | null
+  endstand_reveal_count: number | null
+  schaetzfrage_id: number | null
 }
 
 export type Quiz_praesentation_statusMinAggregateOutputType = {
   quiz_id: number | null
   slide_index: number | null
-  endstand_reveal_count: number | null
   slide_started_at: Date | null
   quiz_started_at: Date | null
   updated_at: Date | null
-  show_schaetzfrage: boolean | null
-  zeige_schaetzantwort: boolean | null
-  schaetzfrage_id: number | null
-  medium_overlay_aktiv: boolean | null
   audio_aktion: string | null
   audio_aktion_id: number | null
   countdown_dauer_sekunden: number | null
-  countdown_started_at: Date | null
   countdown_ended_at: Date | null
+  countdown_started_at: Date | null
   countdown_status: string | null
+  medium_overlay_aktiv: boolean | null
+  endstand_reveal_count: number | null
+  show_schaetzfrage: boolean | null
+  zeige_schaetzantwort: boolean | null
+  schaetzfrage_id: number | null
 }
 
 export type Quiz_praesentation_statusMaxAggregateOutputType = {
   quiz_id: number | null
   slide_index: number | null
-  endstand_reveal_count: number | null
   slide_started_at: Date | null
   quiz_started_at: Date | null
   updated_at: Date | null
-  show_schaetzfrage: boolean | null
-  zeige_schaetzantwort: boolean | null
-  schaetzfrage_id: number | null
-  medium_overlay_aktiv: boolean | null
   audio_aktion: string | null
   audio_aktion_id: number | null
   countdown_dauer_sekunden: number | null
-  countdown_started_at: Date | null
   countdown_ended_at: Date | null
+  countdown_started_at: Date | null
   countdown_status: string | null
+  medium_overlay_aktiv: boolean | null
+  endstand_reveal_count: number | null
+  show_schaetzfrage: boolean | null
+  zeige_schaetzantwort: boolean | null
+  schaetzfrage_id: number | null
 }
 
 export type Quiz_praesentation_statusCountAggregateOutputType = {
   quiz_id: number
   slide_index: number
-  endstand_reveal_count: number
   slide_started_at: number
   quiz_started_at: number
   updated_at: number
-  show_schaetzfrage: number
-  zeige_schaetzantwort: number
-  schaetzfrage_id: number
-  medium_overlay_aktiv: number
   audio_aktion: number
   audio_aktion_id: number
   countdown_dauer_sekunden: number
-  countdown_started_at: number
   countdown_ended_at: number
+  countdown_started_at: number
   countdown_status: number
+  medium_overlay_aktiv: number
+  endstand_reveal_count: number
+  show_schaetzfrage: number
+  zeige_schaetzantwort: number
+  schaetzfrage_id: number
   _all: number
 }
 
@@ -106,76 +106,76 @@ export type Quiz_praesentation_statusCountAggregateOutputType = {
 export type Quiz_praesentation_statusAvgAggregateInputType = {
   quiz_id?: true
   slide_index?: true
-  endstand_reveal_count?: true
-  schaetzfrage_id?: true
   audio_aktion_id?: true
   countdown_dauer_sekunden?: true
+  endstand_reveal_count?: true
+  schaetzfrage_id?: true
 }
 
 export type Quiz_praesentation_statusSumAggregateInputType = {
   quiz_id?: true
   slide_index?: true
-  endstand_reveal_count?: true
-  schaetzfrage_id?: true
   audio_aktion_id?: true
   countdown_dauer_sekunden?: true
+  endstand_reveal_count?: true
+  schaetzfrage_id?: true
 }
 
 export type Quiz_praesentation_statusMinAggregateInputType = {
   quiz_id?: true
   slide_index?: true
-  endstand_reveal_count?: true
   slide_started_at?: true
   quiz_started_at?: true
   updated_at?: true
-  show_schaetzfrage?: true
-  zeige_schaetzantwort?: true
-  schaetzfrage_id?: true
-  medium_overlay_aktiv?: true
   audio_aktion?: true
   audio_aktion_id?: true
   countdown_dauer_sekunden?: true
-  countdown_started_at?: true
   countdown_ended_at?: true
+  countdown_started_at?: true
   countdown_status?: true
+  medium_overlay_aktiv?: true
+  endstand_reveal_count?: true
+  show_schaetzfrage?: true
+  zeige_schaetzantwort?: true
+  schaetzfrage_id?: true
 }
 
 export type Quiz_praesentation_statusMaxAggregateInputType = {
   quiz_id?: true
   slide_index?: true
-  endstand_reveal_count?: true
   slide_started_at?: true
   quiz_started_at?: true
   updated_at?: true
-  show_schaetzfrage?: true
-  zeige_schaetzantwort?: true
-  schaetzfrage_id?: true
-  medium_overlay_aktiv?: true
   audio_aktion?: true
   audio_aktion_id?: true
   countdown_dauer_sekunden?: true
-  countdown_started_at?: true
   countdown_ended_at?: true
+  countdown_started_at?: true
   countdown_status?: true
+  medium_overlay_aktiv?: true
+  endstand_reveal_count?: true
+  show_schaetzfrage?: true
+  zeige_schaetzantwort?: true
+  schaetzfrage_id?: true
 }
 
 export type Quiz_praesentation_statusCountAggregateInputType = {
   quiz_id?: true
   slide_index?: true
-  endstand_reveal_count?: true
   slide_started_at?: true
   quiz_started_at?: true
   updated_at?: true
-  show_schaetzfrage?: true
-  zeige_schaetzantwort?: true
-  schaetzfrage_id?: true
-  medium_overlay_aktiv?: true
   audio_aktion?: true
   audio_aktion_id?: true
   countdown_dauer_sekunden?: true
-  countdown_started_at?: true
   countdown_ended_at?: true
+  countdown_started_at?: true
   countdown_status?: true
+  medium_overlay_aktiv?: true
+  endstand_reveal_count?: true
+  show_schaetzfrage?: true
+  zeige_schaetzantwort?: true
+  schaetzfrage_id?: true
   _all?: true
 }
 
@@ -268,20 +268,20 @@ export type quiz_praesentation_statusGroupByArgs<ExtArgs extends runtime.Types.E
 export type Quiz_praesentation_statusGroupByOutputType = {
   quiz_id: number
   slide_index: number
-  endstand_reveal_count: number
   slide_started_at: Date
   quiz_started_at: Date | null
   updated_at: Date
-  show_schaetzfrage: boolean
-  zeige_schaetzantwort: boolean
-  schaetzfrage_id: number | null
-  medium_overlay_aktiv: boolean
   audio_aktion: string | null
   audio_aktion_id: number
   countdown_dauer_sekunden: number | null
-  countdown_started_at: Date | null
   countdown_ended_at: Date | null
+  countdown_started_at: Date | null
   countdown_status: string | null
+  medium_overlay_aktiv: boolean
+  endstand_reveal_count: number
+  show_schaetzfrage: boolean
+  zeige_schaetzantwort: boolean
+  schaetzfrage_id: number | null
   _count: Quiz_praesentation_statusCountAggregateOutputType | null
   _avg: Quiz_praesentation_statusAvgAggregateOutputType | null
   _sum: Quiz_praesentation_statusSumAggregateOutputType | null
@@ -310,40 +310,40 @@ export type quiz_praesentation_statusWhereInput = {
   NOT?: Prisma.quiz_praesentation_statusWhereInput | Prisma.quiz_praesentation_statusWhereInput[]
   quiz_id?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_index?: Prisma.IntFilter<"quiz_praesentation_status"> | number
-  endstand_reveal_count?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_started_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
   quiz_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   updated_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
-  show_schaetzfrage?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
-  zeige_schaetzantwort?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
-  schaetzfrage_id?: Prisma.IntNullableFilter<"quiz_praesentation_status"> | number | null
-  medium_overlay_aktiv?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
   audio_aktion?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
   audio_aktion_id?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   countdown_dauer_sekunden?: Prisma.IntNullableFilter<"quiz_praesentation_status"> | number | null
-  countdown_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   countdown_ended_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
+  countdown_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   countdown_status?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
+  medium_overlay_aktiv?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
+  endstand_reveal_count?: Prisma.IntFilter<"quiz_praesentation_status"> | number
+  show_schaetzfrage?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
+  zeige_schaetzantwort?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
+  schaetzfrage_id?: Prisma.IntNullableFilter<"quiz_praesentation_status"> | number | null
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.quizWhereInput>
 }
 
 export type quiz_praesentation_statusOrderByWithRelationInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrder
-  show_schaetzfrage?: Prisma.SortOrder
-  zeige_schaetzantwort?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrderInput | Prisma.SortOrder
-  medium_overlay_aktiv?: Prisma.SortOrder
   audio_aktion?: Prisma.SortOrderInput | Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrderInput | Prisma.SortOrder
-  countdown_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   countdown_ended_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  countdown_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   countdown_status?: Prisma.SortOrderInput | Prisma.SortOrder
+  medium_overlay_aktiv?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  show_schaetzfrage?: Prisma.SortOrder
+  zeige_schaetzantwort?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz?: Prisma.quizOrderByWithRelationInput
 }
 
@@ -353,40 +353,40 @@ export type quiz_praesentation_statusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.quiz_praesentation_statusWhereInput[]
   NOT?: Prisma.quiz_praesentation_statusWhereInput | Prisma.quiz_praesentation_statusWhereInput[]
   slide_index?: Prisma.IntFilter<"quiz_praesentation_status"> | number
-  endstand_reveal_count?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_started_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
   quiz_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   updated_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
-  show_schaetzfrage?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
-  zeige_schaetzantwort?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
-  schaetzfrage_id?: Prisma.IntNullableFilter<"quiz_praesentation_status"> | number | null
-  medium_overlay_aktiv?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
   audio_aktion?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
   audio_aktion_id?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   countdown_dauer_sekunden?: Prisma.IntNullableFilter<"quiz_praesentation_status"> | number | null
-  countdown_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   countdown_ended_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
+  countdown_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   countdown_status?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
+  medium_overlay_aktiv?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
+  endstand_reveal_count?: Prisma.IntFilter<"quiz_praesentation_status"> | number
+  show_schaetzfrage?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
+  zeige_schaetzantwort?: Prisma.BoolFilter<"quiz_praesentation_status"> | boolean
+  schaetzfrage_id?: Prisma.IntNullableFilter<"quiz_praesentation_status"> | number | null
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.quizWhereInput>
 }, "quiz_id">
 
 export type quiz_praesentation_statusOrderByWithAggregationInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrder
-  show_schaetzfrage?: Prisma.SortOrder
-  zeige_schaetzantwort?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrderInput | Prisma.SortOrder
-  medium_overlay_aktiv?: Prisma.SortOrder
   audio_aktion?: Prisma.SortOrderInput | Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrderInput | Prisma.SortOrder
-  countdown_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   countdown_ended_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  countdown_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   countdown_status?: Prisma.SortOrderInput | Prisma.SortOrder
+  medium_overlay_aktiv?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  show_schaetzfrage?: Prisma.SortOrder
+  zeige_schaetzantwort?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.quiz_praesentation_statusCountOrderByAggregateInput
   _avg?: Prisma.quiz_praesentation_statusAvgOrderByAggregateInput
   _max?: Prisma.quiz_praesentation_statusMaxOrderByAggregateInput
@@ -400,152 +400,152 @@ export type quiz_praesentation_statusScalarWhereWithAggregatesInput = {
   NOT?: Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput | Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput[]
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
   slide_index?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
-  endstand_reveal_count?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
   slide_started_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_praesentation_status"> | Date | string
   quiz_started_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_praesentation_status"> | Date | string | null
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_praesentation_status"> | Date | string
-  show_schaetzfrage?: Prisma.BoolWithAggregatesFilter<"quiz_praesentation_status"> | boolean
-  zeige_schaetzantwort?: Prisma.BoolWithAggregatesFilter<"quiz_praesentation_status"> | boolean
-  schaetzfrage_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_praesentation_status"> | number | null
-  medium_overlay_aktiv?: Prisma.BoolWithAggregatesFilter<"quiz_praesentation_status"> | boolean
   audio_aktion?: Prisma.StringNullableWithAggregatesFilter<"quiz_praesentation_status"> | string | null
   audio_aktion_id?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
   countdown_dauer_sekunden?: Prisma.IntNullableWithAggregatesFilter<"quiz_praesentation_status"> | number | null
-  countdown_started_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_praesentation_status"> | Date | string | null
   countdown_ended_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_praesentation_status"> | Date | string | null
+  countdown_started_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_praesentation_status"> | Date | string | null
   countdown_status?: Prisma.StringNullableWithAggregatesFilter<"quiz_praesentation_status"> | string | null
+  medium_overlay_aktiv?: Prisma.BoolWithAggregatesFilter<"quiz_praesentation_status"> | boolean
+  endstand_reveal_count?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
+  show_schaetzfrage?: Prisma.BoolWithAggregatesFilter<"quiz_praesentation_status"> | boolean
+  zeige_schaetzantwort?: Prisma.BoolWithAggregatesFilter<"quiz_praesentation_status"> | boolean
+  schaetzfrage_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_praesentation_status"> | number | null
 }
 
 export type quiz_praesentation_statusCreateInput = {
   slide_index?: number
-  endstand_reveal_count?: number
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: number | null
-  medium_overlay_aktiv?: boolean
   audio_aktion?: string | null
   audio_aktion_id?: number
   countdown_dauer_sekunden?: number | null
-  countdown_started_at?: Date | string | null
   countdown_ended_at?: Date | string | null
+  countdown_started_at?: Date | string | null
   countdown_status?: string | null
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: number
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: number | null
   quiz: Prisma.quizCreateNestedOneWithoutPraesentation_statusInput
 }
 
 export type quiz_praesentation_statusUncheckedCreateInput = {
   quiz_id: number
   slide_index?: number
-  endstand_reveal_count?: number
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: number | null
-  medium_overlay_aktiv?: boolean
   audio_aktion?: string | null
   audio_aktion_id?: number
   countdown_dauer_sekunden?: number | null
-  countdown_started_at?: Date | string | null
   countdown_ended_at?: Date | string | null
+  countdown_started_at?: Date | string | null
   countdown_status?: string | null
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: number
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: number | null
 }
 
 export type quiz_praesentation_statusUpdateInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
-  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
   audio_aktion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audio_aktion_id?: Prisma.IntFieldUpdateOperationsInput | number
   countdown_dauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_ended_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
+  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quiz?: Prisma.quizUpdateOneRequiredWithoutPraesentation_statusNestedInput
 }
 
 export type quiz_praesentation_statusUncheckedUpdateInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
-  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
   audio_aktion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audio_aktion_id?: Prisma.IntFieldUpdateOperationsInput | number
   countdown_dauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_ended_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
+  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type quiz_praesentation_statusCreateManyInput = {
   quiz_id: number
   slide_index?: number
-  endstand_reveal_count?: number
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: number | null
-  medium_overlay_aktiv?: boolean
   audio_aktion?: string | null
   audio_aktion_id?: number
   countdown_dauer_sekunden?: number | null
-  countdown_started_at?: Date | string | null
   countdown_ended_at?: Date | string | null
+  countdown_started_at?: Date | string | null
   countdown_status?: string | null
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: number
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: number | null
 }
 
 export type quiz_praesentation_statusUpdateManyMutationInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
-  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
   audio_aktion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audio_aktion_id?: Prisma.IntFieldUpdateOperationsInput | number
   countdown_dauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_ended_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
+  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type quiz_praesentation_statusUncheckedUpdateManyInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
-  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
   audio_aktion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audio_aktion_id?: Prisma.IntFieldUpdateOperationsInput | number
   countdown_dauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_ended_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
+  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type Quiz_praesentation_statusNullableScalarRelationFilter = {
@@ -556,76 +556,76 @@ export type Quiz_praesentation_statusNullableScalarRelationFilter = {
 export type quiz_praesentation_statusCountOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
-  show_schaetzfrage?: Prisma.SortOrder
-  zeige_schaetzantwort?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrder
-  medium_overlay_aktiv?: Prisma.SortOrder
   audio_aktion?: Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrder
-  countdown_started_at?: Prisma.SortOrder
   countdown_ended_at?: Prisma.SortOrder
+  countdown_started_at?: Prisma.SortOrder
   countdown_status?: Prisma.SortOrder
+  medium_overlay_aktiv?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  show_schaetzfrage?: Prisma.SortOrder
+  zeige_schaetzantwort?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrder
 }
 
 export type quiz_praesentation_statusAvgOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrder
 }
 
 export type quiz_praesentation_statusMaxOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
-  show_schaetzfrage?: Prisma.SortOrder
-  zeige_schaetzantwort?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrder
-  medium_overlay_aktiv?: Prisma.SortOrder
   audio_aktion?: Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrder
-  countdown_started_at?: Prisma.SortOrder
   countdown_ended_at?: Prisma.SortOrder
+  countdown_started_at?: Prisma.SortOrder
   countdown_status?: Prisma.SortOrder
+  medium_overlay_aktiv?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  show_schaetzfrage?: Prisma.SortOrder
+  zeige_schaetzantwort?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrder
 }
 
 export type quiz_praesentation_statusMinOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
-  show_schaetzfrage?: Prisma.SortOrder
-  zeige_schaetzantwort?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrder
-  medium_overlay_aktiv?: Prisma.SortOrder
   audio_aktion?: Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrder
-  countdown_started_at?: Prisma.SortOrder
   countdown_ended_at?: Prisma.SortOrder
+  countdown_started_at?: Prisma.SortOrder
   countdown_status?: Prisma.SortOrder
+  medium_overlay_aktiv?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  show_schaetzfrage?: Prisma.SortOrder
+  zeige_schaetzantwort?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrder
 }
 
 export type quiz_praesentation_statusSumOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
-  endstand_reveal_count?: Prisma.SortOrder
-  schaetzfrage_id?: Prisma.SortOrder
   audio_aktion_id?: Prisma.SortOrder
   countdown_dauer_sekunden?: Prisma.SortOrder
+  endstand_reveal_count?: Prisma.SortOrder
+  schaetzfrage_id?: Prisma.SortOrder
 }
 
 export type quiz_praesentation_statusCreateNestedOneWithoutQuizInput = {
@@ -662,38 +662,38 @@ export type quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput = 
 
 export type quiz_praesentation_statusCreateWithoutQuizInput = {
   slide_index?: number
-  endstand_reveal_count?: number
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: number | null
-  medium_overlay_aktiv?: boolean
   audio_aktion?: string | null
   audio_aktion_id?: number
   countdown_dauer_sekunden?: number | null
-  countdown_started_at?: Date | string | null
   countdown_ended_at?: Date | string | null
+  countdown_started_at?: Date | string | null
   countdown_status?: string | null
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: number
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: number | null
 }
 
 export type quiz_praesentation_statusUncheckedCreateWithoutQuizInput = {
   slide_index?: number
-  endstand_reveal_count?: number
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: number | null
-  medium_overlay_aktiv?: boolean
   audio_aktion?: string | null
   audio_aktion_id?: number
   countdown_dauer_sekunden?: number | null
-  countdown_started_at?: Date | string | null
   countdown_ended_at?: Date | string | null
+  countdown_started_at?: Date | string | null
   countdown_status?: string | null
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: number
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: number | null
 }
 
 export type quiz_praesentation_statusCreateOrConnectWithoutQuizInput = {
@@ -714,38 +714,38 @@ export type quiz_praesentation_statusUpdateToOneWithWhereWithoutQuizInput = {
 
 export type quiz_praesentation_statusUpdateWithoutQuizInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
-  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
   audio_aktion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audio_aktion_id?: Prisma.IntFieldUpdateOperationsInput | number
   countdown_dauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_ended_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
+  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type quiz_praesentation_statusUncheckedUpdateWithoutQuizInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
-  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
   audio_aktion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audio_aktion_id?: Prisma.IntFieldUpdateOperationsInput | number
   countdown_dauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_ended_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  countdown_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   countdown_status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medium_overlay_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  endstand_reveal_count?: Prisma.IntFieldUpdateOperationsInput | number
+  show_schaetzfrage?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zeige_schaetzantwort?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  schaetzfrage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -753,83 +753,83 @@ export type quiz_praesentation_statusUncheckedUpdateWithoutQuizInput = {
 export type quiz_praesentation_statusSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
   slide_index?: boolean
-  endstand_reveal_count?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: boolean
-  medium_overlay_aktiv?: boolean
   audio_aktion?: boolean
   audio_aktion_id?: boolean
   countdown_dauer_sekunden?: boolean
-  countdown_started_at?: boolean
   countdown_ended_at?: boolean
+  countdown_started_at?: boolean
   countdown_status?: boolean
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: boolean
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: boolean
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_praesentation_status"]>
 
 export type quiz_praesentation_statusSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
   slide_index?: boolean
-  endstand_reveal_count?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: boolean
-  medium_overlay_aktiv?: boolean
   audio_aktion?: boolean
   audio_aktion_id?: boolean
   countdown_dauer_sekunden?: boolean
-  countdown_started_at?: boolean
   countdown_ended_at?: boolean
+  countdown_started_at?: boolean
   countdown_status?: boolean
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: boolean
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: boolean
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_praesentation_status"]>
 
 export type quiz_praesentation_statusSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
   slide_index?: boolean
-  endstand_reveal_count?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: boolean
-  medium_overlay_aktiv?: boolean
   audio_aktion?: boolean
   audio_aktion_id?: boolean
   countdown_dauer_sekunden?: boolean
-  countdown_started_at?: boolean
   countdown_ended_at?: boolean
+  countdown_started_at?: boolean
   countdown_status?: boolean
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: boolean
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: boolean
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_praesentation_status"]>
 
 export type quiz_praesentation_statusSelectScalar = {
   quiz_id?: boolean
   slide_index?: boolean
-  endstand_reveal_count?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
-  show_schaetzfrage?: boolean
-  zeige_schaetzantwort?: boolean
-  schaetzfrage_id?: boolean
-  medium_overlay_aktiv?: boolean
   audio_aktion?: boolean
   audio_aktion_id?: boolean
   countdown_dauer_sekunden?: boolean
-  countdown_started_at?: boolean
   countdown_ended_at?: boolean
+  countdown_started_at?: boolean
   countdown_status?: boolean
+  medium_overlay_aktiv?: boolean
+  endstand_reveal_count?: boolean
+  show_schaetzfrage?: boolean
+  zeige_schaetzantwort?: boolean
+  schaetzfrage_id?: boolean
 }
 
-export type quiz_praesentation_statusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "slide_index" | "endstand_reveal_count" | "slide_started_at" | "quiz_started_at" | "updated_at" | "show_schaetzfrage" | "zeige_schaetzantwort" | "schaetzfrage_id" | "medium_overlay_aktiv" | "audio_aktion" | "audio_aktion_id" | "countdown_dauer_sekunden" | "countdown_started_at" | "countdown_ended_at" | "countdown_status", ExtArgs["result"]["quiz_praesentation_status"]>
+export type quiz_praesentation_statusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "slide_index" | "slide_started_at" | "quiz_started_at" | "updated_at" | "audio_aktion" | "audio_aktion_id" | "countdown_dauer_sekunden" | "countdown_ended_at" | "countdown_started_at" | "countdown_status" | "medium_overlay_aktiv" | "endstand_reveal_count" | "show_schaetzfrage" | "zeige_schaetzantwort" | "schaetzfrage_id", ExtArgs["result"]["quiz_praesentation_status"]>
 export type quiz_praesentation_statusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
 }
@@ -848,20 +848,20 @@ export type $quiz_praesentation_statusPayload<ExtArgs extends runtime.Types.Exte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     quiz_id: number
     slide_index: number
-    endstand_reveal_count: number
     slide_started_at: Date
     quiz_started_at: Date | null
     updated_at: Date
-    show_schaetzfrage: boolean
-    zeige_schaetzantwort: boolean
-    schaetzfrage_id: number | null
-    medium_overlay_aktiv: boolean
     audio_aktion: string | null
     audio_aktion_id: number
     countdown_dauer_sekunden: number | null
-    countdown_started_at: Date | null
     countdown_ended_at: Date | null
+    countdown_started_at: Date | null
     countdown_status: string | null
+    medium_overlay_aktiv: boolean
+    endstand_reveal_count: number
+    show_schaetzfrage: boolean
+    zeige_schaetzantwort: boolean
+    schaetzfrage_id: number | null
   }, ExtArgs["result"]["quiz_praesentation_status"]>
   composites: {}
 }
@@ -1288,20 +1288,20 @@ export interface Prisma__quiz_praesentation_statusClient<T, Null = never, ExtArg
 export interface quiz_praesentation_statusFieldRefs {
   readonly quiz_id: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
   readonly slide_index: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
-  readonly endstand_reveal_count: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
   readonly slide_started_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
   readonly quiz_started_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
-  readonly show_schaetzfrage: Prisma.FieldRef<"quiz_praesentation_status", 'Boolean'>
-  readonly zeige_schaetzantwort: Prisma.FieldRef<"quiz_praesentation_status", 'Boolean'>
-  readonly schaetzfrage_id: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
-  readonly medium_overlay_aktiv: Prisma.FieldRef<"quiz_praesentation_status", 'Boolean'>
   readonly audio_aktion: Prisma.FieldRef<"quiz_praesentation_status", 'String'>
   readonly audio_aktion_id: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
   readonly countdown_dauer_sekunden: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
-  readonly countdown_started_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
   readonly countdown_ended_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
+  readonly countdown_started_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
   readonly countdown_status: Prisma.FieldRef<"quiz_praesentation_status", 'String'>
+  readonly medium_overlay_aktiv: Prisma.FieldRef<"quiz_praesentation_status", 'Boolean'>
+  readonly endstand_reveal_count: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
+  readonly show_schaetzfrage: Prisma.FieldRef<"quiz_praesentation_status", 'Boolean'>
+  readonly zeige_schaetzantwort: Prisma.FieldRef<"quiz_praesentation_status", 'Boolean'>
+  readonly schaetzfrage_id: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
 }
     
 

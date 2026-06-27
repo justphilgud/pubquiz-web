@@ -1,9 +1,12 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/app/lib/prisma";
 import FragenWorkspace from "./FragenWorkspace";
 import { getAktiveQuizListe } from "@/app/quiz/actions";
 import { Suspense } from "react";
+import { requireQuestionEditor } from "@/app/lib/permissions";
 
 export default async function FragenPage() {
+  await requireQuestionEditor();
+
   const kategorien = await prisma.fragenkategorie.findMany({
     orderBy: { kategorie: "asc" },
   });
@@ -15,6 +18,7 @@ export default async function FragenPage() {
   const medientypen = await prisma.medientyp.findMany({
     orderBy: { medientyp: "asc" },
   });
+
   const quizze = await getAktiveQuizListe();
 
   return (
@@ -25,6 +29,6 @@ export default async function FragenPage() {
         medientypen={medientypen}
         quizze={quizze}
       />
-    </Suspense >
+    </Suspense>
   );
 }

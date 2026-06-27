@@ -122,3 +122,8 @@ export type frage_vorlage_antwortfelder = Prisma.frage_vorlage_antwortfelderMode
  * 
  */
 export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel
+/**
+ * Model users
+ * 
+ */
+export type users = Prisma.usersModel

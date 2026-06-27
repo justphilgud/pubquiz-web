@@ -4,6 +4,7 @@ import {
   getQuizPraesentation,
 } from "../../actions";
 
+import { requireAdmin } from "@/app/lib/permissions";
 import QuizAuswertungClient from "./QuizAuswertungClient";
 
 type Props = {
@@ -20,6 +21,7 @@ export default async function QuizAuswertungPage({
   params,
   searchParams,
 }: Props) {
+  await requireAdmin();
   const { quizId } = await params;
   const resolvedSearchParams = await searchParams;
   const passwort = resolvedSearchParams.passwort;

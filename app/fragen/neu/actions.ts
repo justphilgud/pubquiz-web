@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/app/lib/permissions";
+import { addQuestionToQuiz } from "@/app/services/quizService";
 
 type MediumInput = {
   datei: string;
@@ -88,7 +90,7 @@ export async function saveFrage(data: {
   }
 
   const gefuellteAntworten = data.antworten.filter(
-    (a) => a.antwort.trim() !== ""
+    (a) => a.antwort.trim() !== "",
   );
 
   const gefuellteAntwortfelder = (data.antwortfelder ?? [])
@@ -134,7 +136,7 @@ export async function saveFrage(data: {
   }
 
   const gefuellteMedienZurFrage = data.medienZurFrage.filter(
-    (m) => m.datei.trim() !== ""
+    (m) => m.datei.trim() !== "",
   );
 
   const kategorieIds = [...data.kategorien];
@@ -246,14 +248,17 @@ export async function saveFrage(data: {
           sortierung: true,
         },
       });
+      const session = await requireAdmin();
 
-      await tx.quiz_fragen.create({
-        data: {
+      await addQuestionToQuiz(
+        {
           quiz_id: quizId,
           fragen_id: createdFrage.fragen_id,
           sortierung: (letzterEintrag?.sortierung ?? 0) + 1,
         },
-      });
+        session,
+        tx,
+      );
     }
 
     return createdFrage;

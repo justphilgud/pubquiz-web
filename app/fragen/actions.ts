@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { Buffer } from "buffer";
+import { auth } from "@/auth";
+import { createQuestion } from "@/app/services/questionService";
 
 function getMedientypIdAusDatei(datei: string) {
   const lower = datei.toLowerCase();
@@ -124,16 +126,16 @@ export async function searchFragen(data: {
   const where = {
     frage: data.suchtext.trim()
       ? {
-        contains: data.suchtext.trim(),
-        mode: "insensitive" as const,
-      }
+          contains: data.suchtext.trim(),
+          mode: "insensitive" as const,
+        }
       : undefined,
 
     quelle: data.quelle.trim()
       ? {
-        contains: data.quelle.trim(),
-        mode: "insensitive" as const,
-      }
+          contains: data.quelle.trim(),
+          mode: "insensitive" as const,
+        }
       : undefined,
 
     ist_archiviert:
@@ -145,22 +147,22 @@ export async function searchFragen(data: {
 
     fragen_kategorien: data.kategorieId
       ? {
-        some: {
-          fragenkategorie_id: data.kategorieId,
-        },
-      }
+          some: {
+            fragenkategorie_id: data.kategorieId,
+          },
+        }
       : undefined,
 
     medien: data.nurOhneMedien
       ? {
-        none: {},
-      }
+          none: {},
+        }
       : undefined,
 
     antworten: data.nurOhneAntworten
       ? {
-        none: {},
-      }
+          none: {},
+        }
       : undefined,
   };
 
@@ -197,7 +199,7 @@ export async function searchFragen(data: {
   const results = sichtbareFragen.map((frage) => {
     const medienAntwortenAnzahl = frage.antworten.reduce(
       (summe, antwort) => summe + antwort.medien.length,
-      0
+      0,
     );
 
     return {
@@ -208,7 +210,7 @@ export async function searchFragen(data: {
       ist_archiviert: frage.ist_archiviert,
       archivierungsgrund: frage.archivierungsgrund,
       kategorien: frage.fragen_kategorien.map(
-        (k) => k.fragenkategorie.kategorie
+        (k) => k.fragenkategorie.kategorie,
       ),
       antworten_anzahl: frage.antworten.length,
       medien_frage_anzahl: frage.medien.length,
@@ -234,7 +236,7 @@ export async function searchFragen(data: {
 }
 
 export async function getFrageDetails(
-  fragenId: number
+  fragenId: number,
 ): Promise<FrageDetailsResult | null> {
   const frage = await prisma.fragen.findUnique({
     where: {
@@ -291,9 +293,7 @@ export async function getFrageDetails(
     quelle: frage.quelle,
     schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
     erstellungsdatum: frage.erstellungsdatum.toISOString().slice(0, 10),
-    kategorien: frage.fragen_kategorien.map(
-      (k) => k.fragenkategorie.kategorie
-    ),
+    kategorien: frage.fragen_kategorien.map((k) => k.fragenkategorie.kategorie),
     medien: frage.medien.map((medium) => ({
       medien_id: medium.medien_id,
       datei: medium.datei,
@@ -434,7 +434,7 @@ export async function updateFrage(data: {
   });
 
   const medienZurFrage = data.medienZurFrage.filter((medium) =>
-    medium.datei.trim()
+    medium.datei.trim(),
   );
 
   if (medienZurFrage.length > 0) {
@@ -455,7 +455,7 @@ export async function updateFrage(data: {
   });
 
   const gueltigeAntworten = data.antworten.filter((antwort) =>
-    antwort.antwort.trim()
+    antwort.antwort.trim(),
   );
 
   for (const antwort of gueltigeAntworten) {
@@ -469,7 +469,7 @@ export async function updateFrage(data: {
     });
 
     const medienZurAntwort = antwort.medien.filter((medium) =>
-      medium.datei.trim()
+      medium.datei.trim(),
     );
 
     if (medienZurAntwort.length > 0) {
@@ -639,6 +639,12 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
     grund: string;
   }[] = [];
 
+  const session = await auth();
+
+  if (!session?.user) {
+    throw new Error("Nicht eingeloggt.");
+  }
+
   for (const [index, zeile] of zeilen.entries()) {
     const frageText = zeile.frage.trim();
 
@@ -670,13 +676,15 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
       continue;
     }
 
-    const frage = await prisma.fragen.create({
-      data: {
+    const frage = await createQuestion(
+      {
         frage: frageText,
         quelle: zeile.quelle.trim() || null,
         ist_archiviert: false,
       },
-    });
+      session,
+      false,
+    );
 
     if (zeile.kategorie.trim()) {
       const kategorie = await prisma.fragenkategorie.upsert({

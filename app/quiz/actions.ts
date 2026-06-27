@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/app/lib/permissions";
+import { addQuestionToQuiz } from "@/app/services/quizService";
 
 import { TEAM_PASSWORT_WOERTER } from "@/app/lib/teamPasswortWoerter";
 
@@ -119,6 +121,8 @@ export async function createQuiz(data: {
   quizDatum: string;
   bemerkung: string;
 }) {
+  await requireAdmin();
+
   if (!data.titel.trim()) {
     return {
       success: false,
@@ -152,6 +156,8 @@ export async function updateQuiz(data: {
   quizDatum: string;
   bemerkung: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -170,6 +176,8 @@ export async function archiveQuiz(data: {
   quizId: number;
   archivierungsgrund: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -184,6 +192,8 @@ export async function archiveQuiz(data: {
 }
 
 export async function restoreQuiz(quizId: number) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: quizId,
@@ -198,6 +208,8 @@ export async function restoreQuiz(quizId: number) {
 }
 
 export async function deleteQuiz(quizId: number) {
+  await requireAdmin();
+
   const fragenAnzahl = await prisma.quiz_fragen.count({
     where: {
       quiz_id: quizId,
@@ -207,7 +219,8 @@ export async function deleteQuiz(quizId: number) {
   if (fragenAnzahl > 0) {
     return {
       success: false,
-      message: "Quiz kann nicht gelöscht werden, weil bereits Fragen zugeordnet sind.",
+      message:
+        "Quiz kann nicht gelöscht werden, weil bereits Fragen zugeordnet sind.",
     };
   }
 
@@ -225,10 +238,9 @@ export async function deleteQuiz(quizId: number) {
   };
 }
 
-export async function copyQuiz(data: {
-  quizId: number;
-  neuerTitel: string;
-}) {
+export async function copyQuiz(data: { quizId: number; neuerTitel: string }) {
+  const session = await requireAdmin();
+
   const neuerTitel = data.neuerTitel.trim();
 
   if (!neuerTitel) {
@@ -306,24 +318,26 @@ export async function copyQuiz(data: {
 
       abschnittIdMap.set(
         abschnitt.quiz_abschnitt_id,
-        neuerAbschnitt.quiz_abschnitt_id
+        neuerAbschnitt.quiz_abschnitt_id,
       );
     }
 
     for (const quizFrage of original.quiz_fragen) {
-      await tx.quiz_fragen.create({
-        data: {
+      await addQuestionToQuiz(
+        {
           quiz_id: neuesQuiz.quiz_id,
           fragen_id: quizFrage.fragen_id,
           quiz_abschnitt_id: quizFrage.quiz_abschnitt_id
-            ? abschnittIdMap.get(quizFrage.quiz_abschnitt_id) ?? null
+            ? (abschnittIdMap.get(quizFrage.quiz_abschnitt_id) ?? null)
             : null,
           sortierung: quizFrage.sortierung,
           punkte_modus: quizFrage.punkte_modus,
           praesentationslayout: quizFrage.praesentationslayout,
           antwort_reihenfolge: quizFrage.antwort_reihenfolge,
         },
-      });
+        session,
+        tx,
+      );
     }
 
     return neuesQuiz;
@@ -339,7 +353,7 @@ export async function copyQuiz(data: {
 }
 
 export async function getQuizDetails(
-  quizId: number
+  quizId: number,
 ): Promise<QuizDetailsResult | null> {
   const quiz = await prisma.quiz.findUnique({
     where: {
@@ -423,7 +437,7 @@ export async function getQuizDetails(
         eintrag.fragen.schwierigkeitslevel?.toString() ?? null,
       praesentationslayout: eintrag.praesentationslayout ?? "standard",
       kategorien: eintrag.fragen.fragen_kategorien.map(
-        (k) => k.fragenkategorie.kategorie
+        (k) => k.fragenkategorie.kategorie,
       ),
     })),
   };
@@ -447,9 +461,9 @@ export async function searchFragenForQuiz(data: {
       ist_archiviert: false,
       frage: data.suchtext.trim()
         ? {
-          contains: data.suchtext.trim(),
-          mode: "insensitive",
-        }
+            contains: data.suchtext.trim(),
+            mode: "insensitive",
+          }
         : undefined,
     },
     orderBy: {
@@ -475,9 +489,7 @@ export async function searchFragenForQuiz(data: {
     frage: frage.frage,
     quelle: frage.quelle,
     schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
-    kategorien: frage.fragen_kategorien.map(
-      (k) => k.fragenkategorie.kategorie
-    ),
+    kategorien: frage.fragen_kategorien.map((k) => k.fragenkategorie.kategorie),
     ist_bereits_im_quiz: frage.quiz_fragen.length > 0,
   }));
 }
@@ -486,6 +498,8 @@ export async function addFrageToQuiz(data: {
   quizId: number;
   fragenId: number;
 }) {
+  const session = await requireAdmin();
+
   const letzterEintrag = await prisma.quiz_fragen.findFirst({
     where: {
       quiz_id: data.quizId,
@@ -512,24 +526,21 @@ export async function addFrageToQuiz(data: {
     throw new Error("Frage nicht gefunden.");
   }
 
-  const antwortIds = frage.antworten.map(
-    (antwort) => antwort.antwort_id
-  );
+  const antwortIds = frage.antworten.map((antwort) => antwort.antwort_id);
 
-  const gemischteAntwortIds = [...antwortIds].sort(
-    () => Math.random() - 0.5
-  );
+  const gemischteAntwortIds = [...antwortIds].sort(() => Math.random() - 0.5);
 
   const naechsteSortierung = (letzterEintrag?.sortierung ?? 0) + 1;
 
-  await prisma.quiz_fragen.create({
-    data: {
+  await addQuestionToQuiz(
+    {
       quiz_id: data.quizId,
       fragen_id: data.fragenId,
       sortierung: naechsteSortierung,
       antwort_reihenfolge: gemischteAntwortIds,
     },
-  });
+    session,
+  );
 
   revalidatePath(`/quiz/${data.quizId}`);
   revalidatePath("/fragen");
@@ -539,6 +550,8 @@ export async function removeFrageFromQuiz(data: {
   quizId: number;
   quizFragenId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_fragen.delete({
     where: {
       quiz_fragen_id: data.quizFragenId,
@@ -553,6 +566,8 @@ export async function moveQuizFrage(data: {
   quizFragenId: number;
   direction: "up" | "down";
 }) {
+  await requireAdmin();
+
   const aktuelleFrage = await prisma.quiz_fragen.findUnique({
     where: {
       quiz_fragen_id: data.quizFragenId,
@@ -622,6 +637,8 @@ export async function updateQuizFragenSortierung(data: {
     sortierung: number;
   }[];
 }) {
+  await requireAdmin();
+
   const temporaereBasis = -1000000;
 
   await prisma.$transaction(
@@ -633,8 +650,8 @@ export async function updateQuizFragenSortierung(data: {
         data: {
           sortierung: temporaereBasis - index,
         },
-      })
-    )
+      }),
+    ),
   );
 
   await prisma.$transaction(
@@ -646,8 +663,8 @@ export async function updateQuizFragenSortierung(data: {
         data: {
           sortierung: item.sortierung,
         },
-      })
-    )
+      }),
+    ),
   );
 
   revalidatePath(`/quiz/${data.quizId}`);
@@ -682,7 +699,7 @@ export type FrageVorschauResult = {
 };
 
 export async function getFrageVorschau(
-  fragenId: number
+  fragenId: number,
 ): Promise<FrageVorschauResult | null> {
   const frage = await prisma.fragen.findUnique({
     where: {
@@ -730,9 +747,7 @@ export async function getFrageVorschau(
     frage: frage.frage,
     quelle: frage.quelle,
     schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
-    kategorien: frage.fragen_kategorien.map(
-      (k) => k.fragenkategorie.kategorie
-    ),
+    kategorien: frage.fragen_kategorien.map((k) => k.fragenkategorie.kategorie),
     medien: frage.medien.map((medium) => ({
       medien_id: medium.medien_id,
       datei: medium.datei,
@@ -759,6 +774,8 @@ export async function removeFrageFromQuizByFrageId(data: {
   quizId: number;
   fragenId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_fragen.deleteMany({
     where: {
       quiz_id: data.quizId,
@@ -852,7 +869,7 @@ export type QuizPraesentationResult = {
 };
 
 export async function getQuizPraesentation(
-  quizId: number
+  quizId: number,
 ): Promise<QuizPraesentationResult | null> {
   const quiz = await prisma.quiz.findUnique({
     where: {
@@ -971,7 +988,7 @@ export async function getQuizPraesentation(
       antwort_reihenfolge: eintrag.antwort_reihenfolge,
       quelle: eintrag.fragen.quelle,
       kategorien: eintrag.fragen.fragen_kategorien.map(
-        (k) => k.fragenkategorie.kategorie
+        (k) => k.fragenkategorie.kategorie,
       ),
       medien: eintrag.fragen.medien.map((medium) => ({
         medien_id: medium.medien_id,
@@ -995,7 +1012,7 @@ export async function getQuizPraesentation(
       })),
       bildMedien: eintrag.fragen.medien
         .filter((medium) =>
-          medium.medientyp.medientyp.toLowerCase().includes("bild")
+          medium.medientyp.medientyp.toLowerCase().includes("bild"),
         )
         .map((medium) => ({
           medien_id: medium.medien_id,
@@ -1029,6 +1046,8 @@ export async function updatePraesentationslayout(data: {
   praesentationslayout: string;
   quizId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_fragen.update({
     where: {
       quiz_fragen_id: data.quizFragenId,
@@ -1048,6 +1067,8 @@ export async function updateQuizAbschnitteSortierung(data: {
     sortierung: number;
   }[];
 }) {
+  await requireAdmin();
+
   const temporaereBasis = -1000000;
 
   await prisma.$transaction(
@@ -1059,8 +1080,8 @@ export async function updateQuizAbschnitteSortierung(data: {
         data: {
           sortierung: temporaereBasis - index,
         },
-      })
-    )
+      }),
+    ),
   );
 
   await prisma.$transaction(
@@ -1072,8 +1093,8 @@ export async function updateQuizAbschnitteSortierung(data: {
         data: {
           sortierung: item.sortierung,
         },
-      })
-    )
+      }),
+    ),
   );
 
   revalidatePath(`/quiz/${data.quizId}`);
@@ -1083,6 +1104,8 @@ export async function updateQuizFrageAbschnitt(data: {
   quizFragenId: number;
   quizAbschnittId: number | null;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_fragen.update({
     where: {
       quiz_fragen_id: data.quizFragenId,
@@ -1102,6 +1125,8 @@ export async function updateQuizFragenBlockSortierung(data: {
     sortierung: number;
   }[];
 }) {
+  await requireAdmin();
+
   const vorhandeneEintraege = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: data.quizId,
@@ -1115,11 +1140,11 @@ export async function updateQuizFragenBlockSortierung(data: {
   });
 
   const vorhandeneIds = new Set(
-    vorhandeneEintraege.map((eintrag) => eintrag.quiz_fragen_id)
+    vorhandeneEintraege.map((eintrag) => eintrag.quiz_fragen_id),
   );
 
   const gueltigeItems = data.items.filter((item) =>
-    vorhandeneIds.has(item.quizFragenId)
+    vorhandeneIds.has(item.quizFragenId),
   );
 
   const temporaereBasis = -1000000;
@@ -1133,8 +1158,8 @@ export async function updateQuizFragenBlockSortierung(data: {
         data: {
           sortierung: temporaereBasis - index,
         },
-      })
-    )
+      }),
+    ),
   );
 
   await prisma.$transaction(
@@ -1147,15 +1172,15 @@ export async function updateQuizFragenBlockSortierung(data: {
           quiz_abschnitt_id: item.quizAbschnittId,
           sortierung: item.sortierung,
         },
-      })
-    )
+      }),
+    ),
   );
 
   revalidatePath(`/quiz/${data.quizId}`);
 }
 export async function getQuizAntwortStatus(
   quizId: number,
-  quizTeamSessionId?: number
+  quizTeamSessionId?: number,
 ) {
   const quiz = await prisma.quiz.findUnique({
     where: {
@@ -1222,132 +1247,123 @@ export async function getQuizAntwortStatus(
   const aktuellerBlock =
     abschnitte.find(
       (abschnitt) =>
-        ["fragenrunde", "fragenblock"].includes(
-          abschnitt.abschnitt_typ
-        ) &&
+        ["fragenrunde", "fragenblock"].includes(abschnitt.abschnitt_typ) &&
         abschnitt.ist_freigegeben &&
-        !abschnitt.ist_geschlossen
+        !abschnitt.ist_geschlossen,
     ) ??
     abschnitte.find(
       (abschnitt) =>
-        ["fragenrunde", "fragenblock"].includes(
-          abschnitt.abschnitt_typ
-        ) &&
-        abschnitt.ist_geschlossen
+        ["fragenrunde", "fragenblock"].includes(abschnitt.abschnitt_typ) &&
+        abschnitt.ist_geschlossen,
     );
 
   const blockIstGesperrt = aktuellerBlock?.ist_geschlossen ?? false;
 
   const blockFreigabe = quiz.quiz_abschnitte.find(
     (abschnitt) =>
-      abschnitt.quiz_abschnitt_id === aktuellerBlock?.quiz_abschnitt_id
+      abschnitt.quiz_abschnitt_id === aktuellerBlock?.quiz_abschnitt_id,
   )?.quiz_block_freigaben[0];
 
-  const aktuelleQuizFragenId =
-    blockFreigabe?.aktuelle_quiz_fragen_id ?? null;
+  const aktuelleQuizFragenId = blockFreigabe?.aktuelle_quiz_fragen_id ?? null;
 
   const gespeicherteAntworten = quizTeamSessionId
     ? await prisma.team_antworten.findMany({
-      where: {
-        quiz_team_session_id: quizTeamSessionId,
-      },
-      include: {
-        antwortfelder: {
-          include: {
-            antwortfeld: true,
+        where: {
+          quiz_team_session_id: quizTeamSessionId,
+        },
+        include: {
+          antwortfelder: {
+            include: {
+              antwortfeld: true,
+            },
           },
         },
-      },
-    })
+      })
     : [];
 
   const fragenImAktuellenBlock = aktuellerBlock
     ? quiz.quiz_fragen
-      .filter(
-        (eintrag) =>
-          Number(eintrag.quiz_abschnitt_id) ===
-          Number(aktuellerBlock.quiz_abschnitt_id)
-      )
-      .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0))
+        .filter(
+          (eintrag) =>
+            Number(eintrag.quiz_abschnitt_id) ===
+            Number(aktuellerBlock.quiz_abschnitt_id),
+        )
+        .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0))
     : [];
 
   const aktuelleFrageIndex = fragenImAktuellenBlock.findIndex(
-    (eintrag) => eintrag.quiz_fragen_id === aktuelleQuizFragenId
+    (eintrag) => eintrag.quiz_fragen_id === aktuelleQuizFragenId,
   );
 
   const fragen =
     aktuellerBlock && !blockIstGesperrt
       ? fragenImAktuellenBlock.map((eintrag, index) => {
-        const antworten = [...eintrag.fragen.antworten].sort((a, b) => {
-          const indexA = eintrag.antwort_reihenfolge.indexOf(a.antwort_id);
-          const indexB = eintrag.antwort_reihenfolge.indexOf(b.antwort_id);
+          const antworten = [...eintrag.fragen.antworten].sort((a, b) => {
+            const indexA = eintrag.antwort_reihenfolge.indexOf(a.antwort_id);
+            const indexB = eintrag.antwort_reihenfolge.indexOf(b.antwort_id);
 
-          if (indexA === -1 && indexB === -1) {
-            return a.antwort_id - b.antwort_id;
-          }
+            if (indexA === -1 && indexB === -1) {
+              return a.antwort_id - b.antwort_id;
+            }
 
-          if (indexA === -1) return 1;
-          if (indexB === -1) return -1;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
 
-          return indexA - indexB;
-        });
+            return indexA - indexB;
+          });
 
-        const istFreigegeben =
-          aktuelleFrageIndex >= 0 && index <= aktuelleFrageIndex;
+          const istFreigegeben =
+            aktuelleFrageIndex >= 0 && index <= aktuelleFrageIndex;
 
-        const gespeicherteAntwort = gespeicherteAntworten.find(
-          (antwort) => antwort.quiz_fragen_id === eintrag.quiz_fragen_id
-        );
+          const gespeicherteAntwort = gespeicherteAntworten.find(
+            (antwort) => antwort.quiz_fragen_id === eintrag.quiz_fragen_id,
+          );
 
-        return {
-          quiz_fragen_id: eintrag.quiz_fragen_id,
-          fragen_id: eintrag.fragen.fragen_id,
-          frage: eintrag.fragen.frage,
-          istFreigegeben,
-          punkte_modus: eintrag.punkte_modus ?? "standard",
+          return {
+            quiz_fragen_id: eintrag.quiz_fragen_id,
+            fragen_id: eintrag.fragen.fragen_id,
+            frage: eintrag.fragen.frage,
+            istFreigegeben,
+            punkte_modus: eintrag.punkte_modus ?? "standard",
 
-          bildMedien: (eintrag.fragen.medien ?? [])
-            .filter((medium) =>
-              medium.medientyp.medientyp.toLowerCase().includes("bild")
-            )
-            .map((medium) => ({
-              medien_id: medium.medien_id,
-              datei: medium.datei,
-              medientyp: medium.medientyp.medientyp,
-            })),
+            bildMedien: (eintrag.fragen.medien ?? [])
+              .filter((medium) =>
+                medium.medientyp.medientyp.toLowerCase().includes("bild"),
+              )
+              .map((medium) => ({
+                medien_id: medium.medien_id,
+                datei: medium.datei,
+                medientyp: medium.medientyp.medientyp,
+              })),
 
-          antwortfelder: (eintrag.fragen.antwortfelder ?? []).map(
-            (feld) => ({
+            antwortfelder: (eintrag.fragen.antwortfelder ?? []).map((feld) => ({
               antwortfeld_id: feld.antwortfeld_id,
               label: feld.label,
               sortierung: feld.sortierung,
               ist_pflicht: feld.ist_pflicht,
-            })
-          ),
-
-          gespeicherteAntwort: gespeicherteAntwort
-            ? {
-              antwortId: gespeicherteAntwort.antwort_id,
-              antwortText: gespeicherteAntwort.antwort_text,
-              antwortfelder: (
-                gespeicherteAntwort.antwortfelder ?? []
-              ).map((feld) => ({
-                antwortfeldId: feld.antwortfeld_id,
-                antwortText: feld.antwort_text,
-              })),
-            }
-            : null,
-
-          antworten: antworten
-            .filter(
-              (antwort) => antwort.antworttyp.antworttyp !== "Freitext"
-            )
-            .map((antwort) => ({
-              antwort_id: antwort.antwort_id,
-              antwort: antwort.antwort,
             })),
-        };
-      })
+
+            gespeicherteAntwort: gespeicherteAntwort
+              ? {
+                  antwortId: gespeicherteAntwort.antwort_id,
+                  antwortText: gespeicherteAntwort.antwort_text,
+                  antwortfelder: (gespeicherteAntwort.antwortfelder ?? []).map(
+                    (feld) => ({
+                      antwortfeldId: feld.antwortfeld_id,
+                      antwortText: feld.antwort_text,
+                    }),
+                  ),
+                }
+              : null,
+
+            antworten: antworten
+              .filter((antwort) => antwort.antworttyp.antworttyp !== "Freitext")
+              .map((antwort) => ({
+                antwort_id: antwort.antwort_id,
+                antwort: antwort.antwort,
+              })),
+          };
+        })
       : [];
 
   return {
@@ -1417,7 +1433,7 @@ export async function startQuizTeamSession(data: {
   if (!team) {
     generiertesPasswort =
       TEAM_PASSWORT_WOERTER[
-      Math.floor(Math.random() * TEAM_PASSWORT_WOERTER.length)
+        Math.floor(Math.random() * TEAM_PASSWORT_WOERTER.length)
       ];
 
     team = await prisma.teams.create({
@@ -1427,10 +1443,7 @@ export async function startQuizTeamSession(data: {
       },
     });
   } else {
-    if (
-      team.team_passwort &&
-      team.team_passwort !== data.passwort
-    ) {
+    if (team.team_passwort && team.team_passwort !== data.passwort) {
       return {
         success: false,
         message: "Falsches Team-Passwort.",
@@ -1494,6 +1507,8 @@ export async function freigabeQuizBlock(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_block_freigaben.updateMany({
     where: {
       quiz_id: data.quizId,
@@ -1535,6 +1550,8 @@ export async function schliesseQuizBlock(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_block_freigaben.upsert({
     where: {
       quiz_id_quiz_abschnitt_id: {
@@ -1566,6 +1583,8 @@ export async function setAktuelleQuizFrage(data: {
   quizAbschnittId: number;
   quizFragenId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_block_freigaben.upsert({
     where: {
       quiz_id_quiz_abschnitt_id: {
@@ -1587,7 +1606,7 @@ export async function setAktuelleQuizFrage(data: {
 }
 export async function getQuizAntwortStatusLive(
   quizId: number,
-  quizTeamSessionId?: number
+  quizTeamSessionId?: number,
 ) {
   return getQuizAntwortStatus(quizId, quizTeamSessionId);
 }
@@ -1603,7 +1622,6 @@ export async function saveTeamAntwort(data: {
     antwortText: string | null;
   }[];
 }) {
-
   const teamAntwort = await prisma.team_antworten.upsert({
     where: {
       quiz_fragen_id_quiz_team_session_id: {
@@ -1636,8 +1654,8 @@ export async function saveTeamAntwort(data: {
       },
     });
 
-    const gefuellteFelder = data.antwortfelder.filter(
-      (feld) => feld.antwortText?.trim()
+    const gefuellteFelder = data.antwortfelder.filter((feld) =>
+      feld.antwortText?.trim(),
     );
 
     if (gefuellteFelder.length > 0) {
@@ -1692,7 +1710,7 @@ export async function getQuizFrageAuswertung(quizFragenId: number) {
   }
 
   const auswertbareAntwortoptionen = quizFrage.fragen.antworten.filter(
-    (antwort) => antwort.antworttyp?.antworttyp !== "Freitext"
+    (antwort) => antwort.antworttyp?.antworttyp !== "Freitext",
   );
 
   const istOffeneFrage = auswertbareAntwortoptionen.length === 0;
@@ -1719,8 +1737,7 @@ export async function getQuizFrageAuswertung(quizFragenId: number) {
         antwort.antwort_id !== null &&
         richtigeAntwortIds.includes(antwort.antwort_id);
 
-      const istPruefpflichtig =
-        istOffeneFrage || !istAutomatischRichtig;
+      const istPruefpflichtig = istOffeneFrage || !istAutomatischRichtig;
 
       return {
         team_antwort_id: antwort.team_antwort_id,
@@ -1744,6 +1761,8 @@ export async function updateTeamAntwortBewertung(data: {
   teamAntwortId: number;
   aktion: "richtig" | "falsch" | "skurril" | "zuruecksetzen";
 }) {
+  await requireAdmin();
+
   if (data.aktion === "richtig") {
     await prisma.team_antworten.update({
       where: { team_antwort_id: data.teamAntwortId },
@@ -1751,7 +1770,6 @@ export async function updateTeamAntwortBewertung(data: {
         ist_manuell_richtig: true,
         ist_manuell_falsch: false,
         bewertung_final: true,
-
       },
     });
   }
@@ -1763,7 +1781,6 @@ export async function updateTeamAntwortBewertung(data: {
         ist_manuell_richtig: false,
         ist_manuell_falsch: true,
         bewertung_final: true,
-
       },
     });
   }
@@ -1798,6 +1815,8 @@ export async function updateTeamAntwortBewertung(data: {
 }
 
 export async function updateQuizFragenStatistiken() {
+  await requireAdmin();
+
   const quizFragen = await prisma.quiz_fragen.findMany({
     include: {
       fragen: {
@@ -1852,12 +1871,12 @@ export async function updateQuizFragenStatistiken() {
   for (const frage of fragen) {
     const richtigGesamt = frage.quiz_fragen.reduce(
       (summe, quizFrage) => summe + (quizFrage.richtigeantworten ?? 0),
-      0
+      0,
     );
 
     const falschGesamt = frage.quiz_fragen.reduce(
       (summe, quizFrage) => summe + (quizFrage.falscheantworten ?? 0),
-      0
+      0,
     );
 
     const gesamt = richtigGesamt + falschGesamt;
@@ -1884,10 +1903,7 @@ export async function updateQuizFragenStatistiken() {
     const manuelleBewertungen = await prisma.team_antworten.count({
       where: {
         quiz_id: quiz.quiz_id,
-        OR: [
-          { ist_manuell_richtig: true },
-          { ist_manuell_falsch: true },
-        ],
+        OR: [{ ist_manuell_richtig: true }, { ist_manuell_falsch: true }],
       },
     });
 
@@ -1900,7 +1916,6 @@ export async function updateQuizFragenStatistiken() {
       },
     });
   }
-
 
   revalidatePath("/fragen");
 }
@@ -1936,18 +1951,18 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
           richtigeAntwortIds.includes(antwort.antwort_id);
 
         return istOffeneFrage || !istAutomatischRichtig;
-      }
+      },
     );
 
     const offenePruefungen = pruefpflichtigeAntworten.filter(
       (antwort) =>
         !antwort.ist_manuell_richtig &&
         !antwort.ist_manuell_falsch &&
-        !antwort.bewertung_final
+        !antwort.bewertung_final,
     ).length;
 
     const skurrileAntworten = quizFrage.team_antworten.filter(
-      (antwort) => antwort.ist_skurril
+      (antwort) => antwort.ist_skurril,
     ).length;
 
     return {
@@ -2010,40 +2025,40 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
   });
 
   const teamAntwortIds = quizFragen.flatMap((quizFrage) =>
-    quizFrage.team_antworten.map((antwort) => antwort.team_antwort_id)
+    quizFrage.team_antworten.map((antwort) => antwort.team_antwort_id),
   );
 
   const offeneAntworten =
     teamAntwortIds.length > 0
       ? await prisma.team_antwortfelder.findMany({
-        where: {
-          team_antwort_id: {
-            in: teamAntwortIds,
+          where: {
+            team_antwort_id: {
+              in: teamAntwortIds,
+            },
           },
-        },
-        orderBy: {
-          antwortfeld_id: "asc",
-        },
-      })
+          orderBy: {
+            antwortfeld_id: "asc",
+          },
+        })
       : [];
 
   const antwortfeldIds = Array.from(
-    new Set(offeneAntworten.map((feld) => feld.antwortfeld_id))
+    new Set(offeneAntworten.map((feld) => feld.antwortfeld_id)),
   );
 
   const antwortfelder =
     antwortfeldIds.length > 0
       ? await prisma.frage_antwortfelder.findMany({
-        where: {
-          antwortfeld_id: {
-            in: antwortfeldIds,
+          where: {
+            antwortfeld_id: {
+              in: antwortfeldIds,
+            },
           },
-        },
-      })
+        })
       : [];
 
   const antwortfeldLabelMap = new Map(
-    antwortfelder.map((feld) => [feld.antwortfeld_id, feld.label])
+    antwortfelder.map((feld) => [feld.antwortfeld_id, feld.label]),
   );
 
   return quizFragen.flatMap((quizFrage, frageIndex) => {
@@ -2073,7 +2088,7 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
       .join(" | ");
 
     const auswertbareAntwortoptionen = quizFrage.fragen.antworten.filter(
-      (antwort) => antwort.antworttyp?.antworttyp !== "Freitext"
+      (antwort) => antwort.antworttyp?.antworttyp !== "Freitext",
     );
 
     const istOffeneFrage =
@@ -2083,25 +2098,25 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
     return sessions.map((session) => {
       const antwort = quizFrage.team_antworten.find(
         (eintrag) =>
-          eintrag.quiz_team_session_id === session.quiz_team_session_id
+          eintrag.quiz_team_session_id === session.quiz_team_session_id,
       );
 
       const offeneAntwortfelderText = antwort
         ? offeneAntworten
-          .filter((feld) => feld.team_antwort_id === antwort.team_antwort_id)
-          .map((feld) => {
-            const label =
-              antwortfeldLabelMap.get(feld.antwortfeld_id) ?? "Antwort";
-            const text = feld.antwort_text?.trim();
+            .filter((feld) => feld.team_antwort_id === antwort.team_antwort_id)
+            .map((feld) => {
+              const label =
+                antwortfeldLabelMap.get(feld.antwortfeld_id) ?? "Antwort";
+              const text = feld.antwort_text?.trim();
 
-            if (!text) {
-              return null;
-            }
+              if (!text) {
+                return null;
+              }
 
-            return `${label}: ${text}`;
-          })
-          .filter(Boolean)
-          .join(" | ")
+              return `${label}: ${text}`;
+            })
+            .filter(Boolean)
+            .join(" | ")
         : null;
 
       const istUnbeantwortet = !antwort && !offeneAntwortfelderText;
@@ -2146,6 +2161,8 @@ export async function updateQuizFragePunkteModus(data: {
   quizFragenId: number;
   punkteModus: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_fragen.update({
     where: {
       quiz_fragen_id: data.quizFragenId,
@@ -2165,7 +2182,9 @@ export async function updateQuizFragePunkteModus(data: {
 export async function getQuizPunktestand(quizId: number) {
   const antworten = await getQuizAuswertungAlleAntworten(quizId);
 
-  const teams = Array.from(new Set(antworten.map((antwort) => antwort.teamname)));
+  const teams = Array.from(
+    new Set(antworten.map((antwort) => antwort.teamname)),
+  );
 
   const fragen = Array.from(
     new Map(
@@ -2176,8 +2195,8 @@ export async function getQuizPunktestand(quizId: number) {
           frageIndex: antwort.frageIndex,
           punkteModus: antwort.punkte_modus ?? "standard",
         },
-      ])
-    ).values()
+      ]),
+    ).values(),
   );
 
   const punkteJeTeam = teams.map((teamname) => ({
@@ -2193,7 +2212,7 @@ export async function getQuizPunktestand(quizId: number) {
 
   for (const frage of fragen) {
     const antwortenZurFrage = antworten.filter(
-      (antwort) => antwort.quiz_fragen_id === frage.quiz_fragen_id
+      (antwort) => antwort.quiz_fragen_id === frage.quiz_fragen_id,
     );
 
     const richtigeAntworten = antwortenZurFrage.filter((antwort) => {
@@ -2210,7 +2229,7 @@ export async function getQuizPunktestand(quizId: number) {
       const istRichtig = richtigeAntworten.some(
         (richtigeAntwort) =>
           richtigeAntwort.teamname === antwort.teamname &&
-          richtigeAntwort.quiz_fragen_id === antwort.quiz_fragen_id
+          richtigeAntwort.quiz_fragen_id === antwort.quiz_fragen_id,
       );
 
       if (!istRichtig) continue;
@@ -2223,13 +2242,11 @@ export async function getQuizPunktestand(quizId: number) {
 
       if (frage.punkteModus === "risikofrage") {
         punkte =
-          anzahlRichtig > 0
-            ? Math.max(1, anzahlTeams / anzahlRichtig)
-            : 0;
+          anzahlRichtig > 0 ? Math.max(1, anzahlTeams / anzahlRichtig) : 0;
       }
 
       const team = punkteJeTeam.find(
-        (eintrag) => eintrag.teamname === antwort.teamname
+        (eintrag) => eintrag.teamname === antwort.teamname,
       );
 
       if (team) {
@@ -2333,6 +2350,8 @@ export async function createSchnellQuiz(data: {
   preisPlatz2: string;
   preisPlatz3: string;
 }) {
+  const session = await requireAdmin();
+
   if (!data.titel.trim()) {
     return {
       success: false,
@@ -2358,29 +2377,29 @@ export async function createSchnellQuiz(data: {
       fragen_kategorien:
         data.kategorieIds.length > 0
           ? {
-            some: {
-              fragenkategorie_id: {
-                in: data.kategorieIds,
+              some: {
+                fragenkategorie_id: {
+                  in: data.kategorieIds,
+                },
               },
-            },
-          }
+            }
           : undefined,
 
       medien:
         data.medienFilter === "nurMitMedien"
           ? {
-            some: {},
-          }
+              some: {},
+            }
           : data.medienFilter === "nurOhneMedien"
             ? {
-              none: {},
-            }
+                none: {},
+              }
             : undefined,
 
       quiz_fragen: data.nurBereitsVerwendete
         ? {
-          some: {},
-        }
+            some: {},
+          }
         : undefined,
     },
 
@@ -2431,7 +2450,7 @@ export async function createSchnellQuiz(data: {
 
     const blockFragen = ausgewaehlteFragen.slice(
       blockIndex * data.fragenProBlock,
-      (blockIndex + 1) * data.fragenProBlock
+      (blockIndex + 1) * data.fragenProBlock,
     );
 
     for (const [frageIndex, frage] of blockFragen.entries()) {
@@ -2439,15 +2458,16 @@ export async function createSchnellQuiz(data: {
         .map((antwort) => antwort.antwort_id)
         .sort(() => Math.random() - 0.5);
 
-      await prisma.quiz_fragen.create({
-        data: {
+      await addQuestionToQuiz(
+        {
           quiz_id: quiz.quiz_id,
           fragen_id: frage.fragen_id,
           quiz_abschnitt_id: fragenrunde.quiz_abschnitt_id,
           sortierung: blockIndex * data.fragenProBlock + frageIndex + 1,
           antwort_reihenfolge: antwortReihenfolge,
         },
-      });
+        session,
+      );
     }
   }
 
@@ -2469,14 +2489,16 @@ export async function createQuizAbschnitt(data: {
   medienDatei?: string;
 }): Promise<
   | {
-    success: true;
-    abschnitt: Awaited<ReturnType<typeof prisma.quiz_abschnitte.create>>;
-  }
+      success: true;
+      abschnitt: Awaited<ReturnType<typeof prisma.quiz_abschnitte.create>>;
+    }
   | {
-    success: false;
-    message: string;
-  }
+      success: false;
+      message: string;
+    }
 > {
+  await requireAdmin();
+
   const titel = data.titel.trim();
 
   if (!titel) {
@@ -2508,8 +2530,7 @@ export async function createQuizAbschnitt(data: {
   });
 
   const neueSortierung =
-    ersterOutroAbschnitt?.sortierung ??
-    (letzteSortierung?.sortierung ?? 0) + 1;
+    ersterOutroAbschnitt?.sortierung ?? (letzteSortierung?.sortierung ?? 0) + 1;
 
   const abschnitt = await prisma.$transaction(async (tx) => {
     if (ersterOutroAbschnitt) {
@@ -2559,6 +2580,8 @@ export async function updateQuizAbschnitt(data: {
   qrCodeUrl: string;
   medienDatei: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_abschnitte.update({
     where: {
       quiz_abschnitt_id: data.quizAbschnittId,
@@ -2583,6 +2606,8 @@ export async function deleteQuizAbschnitt(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
+  await requireAdmin();
+
   await prisma.quiz_abschnitte.delete({
     where: {
       quiz_abschnitt_id: data.quizAbschnittId,
@@ -2600,6 +2625,8 @@ export async function updateIntroBegruessung(data: {
   titel: string;
   text: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -2621,6 +2648,8 @@ export async function updateIntroRegeln(data: {
   quizId: number;
   regeln: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -2640,6 +2669,8 @@ export async function updateIntroPreise(data: {
   quizId: number;
   preise: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -2662,6 +2693,8 @@ export async function updateIntroVorDemStart(data: {
   wartetext: string;
   startzeit: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -2700,7 +2733,7 @@ async function createDefaultQuizAbschnitte(quizId: number) {
 }
 async function createSchnellquizAbschnitte(
   quizId: number,
-  anzahlBloecke: number
+  anzahlBloecke: number,
 ) {
   await prisma.quiz_abschnitte.createMany({
     data: [
@@ -2730,6 +2763,8 @@ export async function updateIntroStartsequenz(data: {
   audioUrl: string;
   text: string;
 }) {
+  await requireAdmin();
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
@@ -2744,6 +2779,8 @@ export async function updateIntroStartsequenz(data: {
 }
 
 export async function updateAlleSchwierigkeitslevel() {
+  await requireAdmin();
+
   const fragen = await prisma.fragen.findMany({
     where: {
       ist_archiviert: false,
@@ -2763,7 +2800,7 @@ export async function updateAlleSchwierigkeitslevel() {
 
   for (const frage of fragen) {
     const alleFinalenAntworten = frage.quiz_fragen.flatMap((quizFrage) =>
-      quizFrage.team_antworten.filter((antwort) => antwort.bewertung_final)
+      quizFrage.team_antworten.filter((antwort) => antwort.bewertung_final),
     );
 
     const teamsGesamt = alleFinalenAntworten.length;
@@ -2781,7 +2818,7 @@ export async function updateAlleSchwierigkeitslevel() {
     }).length;
 
     const schwierigkeitslevel = Math.round(
-      100 - (teamsRichtig / teamsGesamt) * 100
+      100 - (teamsRichtig / teamsGesamt) * 100,
     );
 
     await prisma.fragen.update({

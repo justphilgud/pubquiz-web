@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { prisma } from "@/app/lib/prisma";
+import { requireAdmin } from "@/app/lib/permissions";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   return prisma.quiz_praesentation_status.upsert({
@@ -23,8 +23,9 @@ export async function getPraesentationStatus(quizId: number) {
 
 export async function setPraesentationSlideIndex(
   quizId: number,
-  slideIndex: number
+  slideIndex: number,
 ) {
+  await requireAdmin();
   const status = await prisma.quiz_praesentation_status.upsert({
     where: { quiz_id: quizId },
     update: {
@@ -43,7 +44,7 @@ export async function setPraesentationSlideIndex(
 }
 export async function getAntwortStatus(
   quizId: number,
-  quizFragenId: number | null
+  quizFragenId: number | null,
 ) {
   const teamsAngemeldet = await prisma.quiz_team_sessions.count({
     where: {
@@ -91,6 +92,7 @@ export async function getAntwortStatus(
   };
 }
 export async function starteQuiz(quizId: number) {
+  await requireAdmin();
   return prisma.quiz_praesentation_status.upsert({
     where: { quiz_id: quizId },
     update: {
@@ -108,6 +110,7 @@ export async function speicherePraesentationsdauer(data: {
   quizFragenId: number;
   dauerSekunden: number;
 }) {
+  await requireAdmin();
   if (!Number.isFinite(data.dauerSekunden) || data.dauerSekunden <= 0) {
     return { success: false };
   }
@@ -122,18 +125,13 @@ export async function speicherePraesentationsdauer(data: {
     },
   });
 
-  const bisherigerDurchschnitt =
-    frage?.praesentationsdauer_sekunden ?? 0;
+  const bisherigerDurchschnitt = frage?.praesentationsdauer_sekunden ?? 0;
 
-  const bisherigeMessungen =
-    frage?.praesentationsdauer_messungen ?? 0;
+  const bisherigeMessungen = frage?.praesentationsdauer_messungen ?? 0;
 
   const neuerDurchschnitt = Math.round(
-    (
-      bisherigerDurchschnitt * bisherigeMessungen +
-      data.dauerSekunden
-    ) /
-    (bisherigeMessungen + 1)
+    (bisherigerDurchschnitt * bisherigeMessungen + data.dauerSekunden) /
+      (bisherigeMessungen + 1),
   );
 
   await prisma.quiz_fragen.update({
@@ -152,6 +150,7 @@ export async function setMediumOverlayAktiv(data: {
   quizId: number;
   aktiv: boolean;
 }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -168,6 +167,7 @@ export async function setAudioAktion(data: {
   quizId: number;
   aktion: "play" | "pause" | "stop";
 }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -186,6 +186,7 @@ export async function starteCountdown(data: {
   quizId: number;
   dauerSekunden: number;
 }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -201,9 +202,8 @@ export async function starteCountdown(data: {
   return { success: true };
 }
 
-export async function resetCountdown(data: {
-  quizId: number;
-}) {
+export async function resetCountdown(data: { quizId: number }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -218,9 +218,8 @@ export async function resetCountdown(data: {
   return { success: true };
 }
 
-export async function beendeCountdown(data: {
-  quizId: number;
-}) {
+export async function beendeCountdown(data: { quizId: number }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -237,6 +236,7 @@ export async function setEndstandRevealCount(data: {
   quizId: number;
   revealCount: number;
 }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -254,6 +254,7 @@ export async function setSchaetzfrageStatus(data: {
   zeigeSchaetzantwort?: boolean;
   schaetzfrageId?: number | null;
 }) {
+  await requireAdmin();
   await prisma.quiz_praesentation_status.update({
     where: { quiz_id: data.quizId },
     data: {

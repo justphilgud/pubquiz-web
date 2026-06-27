@@ -5,6 +5,7 @@ import {
   getAntwortStatus,
 } from "../praesentation/statusActions";
 import ModerationClient from "./ModerationClient";
+import { requireAdmin } from "@/app/lib/permissions";
 
 type Props = {
   params: Promise<{
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export default async function ModerationPage({ params }: Props) {
+  await requireAdmin();
   const resolvedParams = await params;
   const quizId = Number(resolvedParams.quizId);
 
