@@ -1,12 +1,16 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { Buffer } from "buffer";
 import { auth } from "@/auth";
 import { createQuestion } from "@/app/services/questionService";
+import {
+  requireAdmin,
+  requireQuestionEditor,
+} from "@/app/lib/permissions";
 
 function getMedientypIdAusDatei(datei: string) {
   const lower = datei.toLowerCase();
@@ -120,6 +124,7 @@ export async function searchFragen(data: {
   limit?: number;
   offset?: number;
 }) {
+  await requireQuestionEditor();
   const limit = data.limit ?? 50;
   const offset = data.offset ?? 0;
 
@@ -238,6 +243,7 @@ export async function searchFragen(data: {
 export async function getFrageDetails(
   fragenId: number,
 ): Promise<FrageDetailsResult | null> {
+  await requireQuestionEditor();
   const frage = await prisma.fragen.findUnique({
     where: {
       fragen_id: fragenId,
@@ -328,6 +334,7 @@ export async function getFrageDetails(
 }
 
 export async function getFrageForEdit(fragenId: number) {
+  await requireQuestionEditor();
   const frage = await prisma.fragen.findUnique({
     where: {
       fragen_id: fragenId,
@@ -380,6 +387,7 @@ export async function updateFrage(data: {
     }[];
   }[];
 }) {
+  await requireQuestionEditor();
   await prisma.fragen.update({
     where: {
       fragen_id: data.fragenId,
@@ -496,6 +504,7 @@ export async function archiveFrage(data: {
   fragenId: number;
   archivierungsgrund: string;
 }) {
+  await requireAdmin();
   await prisma.fragen.update({
     where: {
       fragen_id: data.fragenId,
@@ -512,6 +521,7 @@ export async function archiveFrage(data: {
 }
 
 export async function restoreFrage(fragenId: number) {
+  await requireAdmin();
   await prisma.fragen.update({
     where: {
       fragen_id: fragenId,
@@ -532,6 +542,7 @@ export async function uploadMediumDatei(formData: FormData): Promise<{
   datei?: string;
   message: string;
 }> {
+  await requireQuestionEditor();
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
@@ -579,6 +590,7 @@ export async function uploadMediumDatei(formData: FormData): Promise<{
 }
 
 export async function pruefeFragenImport(zeilen: FragenImportZeile[]) {
+  await requireAdmin();
   let importiert = 0;
   let uebersprungen = 0;
 
@@ -630,6 +642,7 @@ export async function pruefeFragenImport(zeilen: FragenImportZeile[]) {
 }
 
 export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
+  await requireAdmin();
   let importiert = 0;
   let uebersprungen = 0;
 

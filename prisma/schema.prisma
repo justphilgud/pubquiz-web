@@ -357,12 +357,23 @@ enum UserRole {
 }
 
 model users {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
+  id Int @id @default(autoincrement())
+
+  // Persönliche Daten
+  name       String?
+  email      String  @unique
+  avatar_url String?
+
+  // Authentifizierung
   password_hash String
   role          UserRole @default(EDITOR)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  is_active     Boolean  @default(true)
+
+  must_change_password Boolean @default(false)
+
+  // Audit
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@schema("pubquiz")
 }

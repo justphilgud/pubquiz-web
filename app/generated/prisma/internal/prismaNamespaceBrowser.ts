@@ -373,9 +373,13 @@ export type Quiz_praesentation_statusScalarFieldEnum = (typeof Quiz_praesentatio
 
 export const UsersScalarFieldEnum = {
   id: 'id',
+  name: 'name',
   email: 'email',
+  avatar_url: 'avatar_url',
   password_hash: 'password_hash',
   role: 'role',
+  is_active: 'is_active',
+  must_change_password: 'must_change_password',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const

@@ -14,15 +14,16 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const email = process.argv[2]?.toLowerCase().trim();
-  const password = process.argv[3];
-  const roleInput = process.argv[4] as UserRole | undefined;
+  const name = process.argv[2]?.trim();
+  const email = process.argv[3]?.toLowerCase().trim();
+  const password = process.argv[4];
+  const roleInput = process.argv[5] as UserRole | undefined;
 
   const validRoles = Object.values(UserRole);
 
-  if (!email || !password || !roleInput) {
+  if (!name || !email || !password || !roleInput) {
     throw new Error(
-      `Aufruf: npx tsx scripts/create-user.ts <email> <passwort> <rolle>\nGültige Rollen: ${validRoles.join(", ")}`,
+      `Aufruf: npx tsx scripts/create-user.ts <name> <email> <passwort> <rolle>\nGültige Rollen: ${validRoles.join(", ")}`,
     );
   }
 
@@ -41,19 +42,24 @@ async function main() {
   await prisma.users.upsert({
     where: { email },
     update: {
+      name,
       password_hash,
       role: roleInput,
+      is_active: true,
     },
     create: {
+      name,
       email,
       password_hash,
       role: roleInput,
+      is_active: true,
     },
   });
 
   console.log("──────────────────────────────");
   console.log("✓ Benutzer gespeichert");
   console.log("");
+  console.log(`Name   : ${name}`);
   console.log(`E-Mail : ${email}`);
   console.log(`Rolle  : ${roleInput}`);
   console.log("──────────────────────────────");
