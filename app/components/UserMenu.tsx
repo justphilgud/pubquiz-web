@@ -9,6 +9,7 @@ import {
   KeyIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
 
 type Props = {
   email: string;
@@ -18,31 +19,6 @@ type Props = {
   logoutAction: () => Promise<void>;
 };
 
-function getInitials(name?: string | null, email?: string) {
-  const source = name?.trim() || email?.trim() || "?";
-
-  const parts = source
-    .replace(/@.*/, "")
-    .split(/[\s._-]+/)
-    .filter(Boolean);
-
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-
-  return source[0]?.toUpperCase() ?? "?";
-}
-
-function getRoleLabel(role: string) {
-  switch (role) {
-    case "ADMIN":
-      return "Administrator";
-    case "EDITOR":
-      return "Editor";
-    default:
-      return role;
-  }
-}
 
 function InitialsAvatar({
   name,
@@ -64,7 +40,7 @@ function InitialsAvatar({
     <div
       className={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-slate-200 font-semibold text-slate-700 transition`}
     >
-      {getInitials(name, email)}
+      {getUserInitials(name, email)}
     </div>
   );
 }
@@ -78,7 +54,7 @@ export default function UserMenu({
 }: Props) {
   const [open, setOpen] = useState(false);
   const displayName = name?.trim() || email;
-  const roleLabel = getRoleLabel(role);
+  const roleLabel = getUserRoleLabel(role);
   const iconClass = "h-5 w-5 shrink-0 text-slate-600";
 
   return (
