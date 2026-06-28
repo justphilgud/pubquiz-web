@@ -1,8 +1,8 @@
 import { requireAdmin } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
-import { createUserAction } from "./actions";
 import CreateUserDialog from "./CreateUserDialog";
 import EditUserDialog from "./EditUserDialog";
+import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
 
 export default async function UsersPage() {
   await requireAdmin();
@@ -33,7 +33,7 @@ export default async function UsersPage() {
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-700">
-                  {(user.name ?? user.email).slice(0, 2).toUpperCase()}
+                  {getUserInitials(user.name, user.email)}
                 </div>
 
                 <div>
@@ -44,7 +44,7 @@ export default async function UsersPage() {
 
               <div className="flex items-center gap-4">
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                  {user.role === "ADMIN" ? "Administrator" : "Editor"}
+                  {getUserRoleLabel(user.role)}
                 </span>
 
                 <span

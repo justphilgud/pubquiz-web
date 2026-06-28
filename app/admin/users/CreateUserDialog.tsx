@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { createUserAction } from "./actions";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { useState, useTransition } from "react";
 
 export default function CreateUserDialog() {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState(generateMemorablePassword);
+  const [isPending, startTransition] = useTransition();
 
   return (
     <>
@@ -35,7 +36,15 @@ export default function CreateUserDialog() {
               </p>
             </div>
 
-            <form action={createUserAction} className="space-y-4">
+            <form
+              action={(formData) => {
+                startTransition(async () => {
+                  await createUserAction(formData);
+                  setOpen(false);
+                });
+              }}
+              className="space-y-4"
+            >
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">
                   Name <span className="text-red-500">*</span>
@@ -116,9 +125,10 @@ export default function CreateUserDialog() {
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                  disabled={isPending}
+                  className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                 >
-                  Speichern
+                  {isPending ? "Speichert..." : "Speichern"}
                 </button>
               </div>
             </form>
