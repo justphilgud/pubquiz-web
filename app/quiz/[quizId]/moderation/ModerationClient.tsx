@@ -22,9 +22,15 @@ import {
   beendeCountdown,
   setEndstandRevealCount,
   setSchaetzfrageStatus,
+  getAntwortStatus,
 } from "../praesentation/statusActions";
 
 import ModerationToolbar from "./ModerationToolbar";
+import TeamStatusPanel from "./TeamStatusPanel";
+import ProgressPanel from "./ProgressPanel";
+import TimePanel from "./TimePanel";
+import SlideNotes from "./SlideNotes";
+import PresentationPreview from "./PresentationPreview";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 type ModerationStatus = {
@@ -132,35 +138,6 @@ function secondsSince(startAt: string | null, now: number) {
   if (!startAt) return null;
 
   return Math.max(0, Math.floor((now - new Date(startAt).getTime()) / 1000));
-}
-
-function LiveTimer({
-  label,
-  startAt,
-  now,
-  emptyText = "Noch nicht gestartet",
-  stopped = false,
-}: {
-  label: string;
-  startAt: string | null;
-  now: number;
-  emptyText?: string;
-  stopped?: boolean;
-}) {
-  const seconds = stopped ? null : secondsSince(startAt, now);
-
-  return (
-    <div className="rounded-xl bg-zinc-950 p-4">
-      <div className="text-sm text-zinc-400">{label}</div>
-      <div className="mt-1 text-2xl font-black" suppressHydrationWarning>
-        {stopped
-          ? "Beendet"
-          : seconds === null
-            ? emptyText
-            : formatSeconds(seconds)}
-      </div>
-    </div>
-  );
 }
 
 function SlidePreview({
@@ -412,106 +389,6 @@ function SlidePreview({
 
   return <div className="text-zinc-500">Unbekannter Slide</div>;
 }
-
-function ProgressBlock({
-  slideIndex,
-  slidesLength,
-  quizStartedAt,
-  now,
-}: {
-  slideIndex: number;
-  slidesLength: number;
-  quizStartedAt: string | null;
-  now: number;
-}) {
-  const currentSlideNumber = slidesLength === 0 ? 0 : slideIndex + 1;
-  const completedSlides = Math.max(0, slideIndex);
-  const remainingSlides = Math.max(0, slidesLength - currentSlideNumber);
-  const progressPercent =
-    slidesLength > 0
-      ? Math.round((currentSlideNumber / slidesLength) * 100)
-      : 0;
-
-  const elapsedSeconds = secondsSince(quizStartedAt, now);
-  const averageSecondsPerCompletedSlide =
-    elapsedSeconds !== null && completedSlides > 0
-      ? elapsedSeconds / completedSlides
-      : null;
-
-  const estimatedRemainingSeconds =
-    averageSecondsPerCompletedSlide !== null
-      ? Math.round(averageSecondsPerCompletedSlide * remainingSlides)
-      : null;
-
-  const estimatedEndAt =
-    estimatedRemainingSeconds !== null
-      ? new Date(now + estimatedRemainingSeconds * 1000)
-      : null;
-
-  return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Fortschritt</h2>
-        <div className="text-xl font-black text-cyan-300">
-          {progressPercent}%
-        </div>
-      </div>
-
-      <div className="mb-3 h-3 overflow-hidden rounded-full bg-zinc-800">
-        <div
-          className="h-full rounded-full bg-cyan-400 transition-all"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 text-center">
-        <div className="rounded-xl bg-zinc-950 p-2">
-          <div className="text-xl font-black">
-            {currentSlideNumber} / {slidesLength}
-          </div>
-          <div className="mt-1 text-xs text-zinc-400">Slides</div>
-        </div>
-
-        <div className="rounded-xl bg-zinc-950 p-2">
-          <div className="text-xl font-black">{remainingSlides}</div>
-          <div className="mt-1 text-xs text-zinc-400">verbleibend</div>
-        </div>
-      </div>
-
-      <div className="mt-2 grid grid-cols-2 gap-2 text-center">
-        <div className="rounded-xl bg-zinc-950 p-2">
-          <div className="text-xl font-black">
-            <span suppressHydrationWarning>
-              {formatSeconds(estimatedRemainingSeconds)}
-            </span>{" "}
-          </div>
-          <div className="mt-1 text-xs text-zinc-400">Prognose Rest</div>
-        </div>
-
-        <div className="rounded-xl bg-zinc-950 p-2">
-          <div className="text-xl font-black">
-            <span suppressHydrationWarning>
-              {estimatedEndAt
-                ? estimatedEndAt.toLocaleTimeString("de-DE", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "--:--"}
-            </span>
-          </div>
-          <div className="mt-1 text-xs text-zinc-400">Prognose Ende</div>
-        </div>
-      </div>
-
-      {!quizStartedAt && (
-        <div className="mt-4 text-sm text-zinc-500">
-          Prognose startet, sobald das Quiz gestartet wurde.
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function ModerationClient({
   quizId,
   quiz,
@@ -532,7 +409,7 @@ export default function ModerationClient({
     initialStatus.slide_started_at,
   );
   const [quizStartedAt] = useState(initialStatus.quiz_started_at);
-  const [antwortStatus] = useState(initialAntwortStatus);
+  const [antwortStatus, setAntwortStatus] = useState(initialAntwortStatus);
   const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(false);
 
   const [confirmEndOpen, setConfirmEndOpen] = useState(false);
@@ -657,12 +534,14 @@ export default function ModerationClient({
 
     const newStartedAt = new Date().toISOString();
 
-    setMediumOverlayAktivLokal(false);
+    if (mediumOverlayAktiv) {
+      setMediumOverlayAktivLokal(false);
 
-    await setMediumOverlayAktiv({
-      quizId,
-      aktiv: false,
-    });
+      await setMediumOverlayAktiv({
+        quizId,
+        aktiv: false,
+      });
+    }
 
     setSlideIndex(safeIndex);
     setSlideStartedAt(newStartedAt);
@@ -671,6 +550,7 @@ export default function ModerationClient({
     setEndstandRevealCountLokal(1);
 
     await setPraesentationSlideIndex(quizId, safeIndex);
+    await aktualisiereAntwortStatus();
   }
 
   async function handleBlockFreigeben() {
@@ -684,6 +564,24 @@ export default function ModerationClient({
     await freigabeQuizBlock({
       quizId,
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
+    });
+  }
+
+  async function aktualisiereAntwortStatus() {
+    const aktuelleQuizFragenId =
+      aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
+        ? aktuellerSlide.frage.quiz_fragen_id
+        : null;
+
+    const neuerStatus = await getAntwortStatus(quizId, aktuelleQuizFragenId);
+
+    setAntwortStatus({
+      teamsAngemeldet: neuerStatus.teamsAngemeldet,
+      antwortenEingegangen: neuerStatus.antwortenEingegangen,
+      prozent: neuerStatus.prozent,
+      letzteAntwortAt: neuerStatus.letzteAntwortAt
+        ? neuerStatus.letzteAntwortAt.toISOString()
+        : null,
     });
   }
 
@@ -1078,10 +976,7 @@ export default function ModerationClient({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-              <h2 className="mb-3 text-xl font-semibold">Moderationsnotizen</h2>
-              <p className="text-zinc-400">Noch keine Notizen angebunden.</p>
-            </div>
+            <SlideNotes />
 
             <ModerationToolbar
               blockFreigegeben={blockFreigegeben}
@@ -1111,82 +1006,15 @@ export default function ModerationClient({
           </section>
 
           <aside className="flex min-h-0 flex-col gap-3 overflow-hidden">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-              <h2 className="mb-2 text-lg font-semibold">Nächster Slide</h2>
-              <div className="line-clamp-3 rounded-xl border border-zinc-800 bg-black p-3 text-sm font-semibold text-zinc-300">
-                {getSlideTitel(naechsterSlide, slides)}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-              <h2 className="mb-3 text-lg font-semibold">Antworten</h2>
-
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-xl bg-zinc-950 p-2">
-                  <div className="text-xl font-black">
-                    {antwortStatus.teamsAngemeldet}
-                  </div>
-                  <div className="mt-1 text-[11px] text-zinc-400">Teams</div>
-                </div>
-
-                <div className="rounded-xl bg-zinc-950 p-2">
-                  <div className="text-xl font-black">
-                    {antwortStatus.antwortenEingegangen}
-                  </div>
-                  <div className="mt-1 text-[11px] text-zinc-400">
-                    Antworten
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-zinc-950 p-2">
-                  <div className="text-xl font-black">
-                    {antwortStatus.prozent}%
-                  </div>
-                  <div className="mt-1 text-[11px] text-zinc-400">Quote</div>
-                </div>
-              </div>
-
-              <div className="mt-3 h-3 overflow-hidden rounded-full bg-zinc-800">
-                <div
-                  className="h-full rounded-full bg-cyan-400"
-                  style={{ width: `${antwortStatus.prozent}%` }}
-                />
-              </div>
-
-              <div className="mt-2 text-xs text-zinc-400">
-                {antwortStatus.letzteAntwortAt
-                  ? `Letzte Antwort: ${new Date(
-                      antwortStatus.letzteAntwortAt,
-                    ).toLocaleTimeString("de-DE", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}`
-                  : "Noch keine Antwort eingegangen"}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-              <h2 className="mb-3 text-lg font-semibold">Zeit</h2>
-
-              <div className="grid grid-cols-2 gap-2">
-                <LiveTimer
-                  label="Aktuelle Folie"
-                  startAt={slideStartedAt}
-                  now={now}
-                />
-
-                <LiveTimer
-                  label="Quiz gesamt"
-                  startAt={quizStartedAt}
-                  now={now}
-                  emptyText="Nicht gestartet"
-                  stopped={quizBeendet}
-                />
-              </div>
-            </div>
-
-            <ProgressBlock
+            <PresentationPreview slide={naechsterSlide} />
+            <TeamStatusPanel antwortStatus={antwortStatus} />
+            <TimePanel
+              slideStartedAt={slideStartedAt}
+              quizStartedAt={quizStartedAt}
+              now={now}
+              quizBeendet={quizBeendet}
+            />
+            <ProgressPanel
               slideIndex={slideIndex}
               slidesLength={slides.length}
               quizStartedAt={quizStartedAt}

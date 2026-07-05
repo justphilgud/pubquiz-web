@@ -27,13 +27,20 @@ const tones: Record<IconButtonTone, string> = {
 };
 
 const activeTones: Record<IconButtonTone, string> = {
-  default: "bg-zinc-600 text-white",
-  primary: "bg-cyan-300 text-black",
-  success: "bg-emerald-400 text-black",
-  warning: "bg-amber-400 text-black",
-  danger: "bg-red-400 text-black",
-  violet: "bg-violet-400 text-black",
-  pink: "bg-pink-400 text-black",
+  default: "bg-zinc-600 text-white ring-2 ring-white/30 shadow-md",
+
+  primary: "bg-cyan-300 text-black ring-2 ring-cyan-100 shadow-md",
+
+  success: "bg-emerald-400 text-black ring-2 ring-emerald-200 shadow-md",
+
+  warning: "bg-amber-400 text-black ring-2 ring-amber-200 shadow-md",
+
+  danger: "bg-red-400 text-black ring-2 ring-red-200 shadow-md",
+
+  violet:
+    "bg-violet-400 text-black ring-2 ring-violet-200 shadow-lg shadow-violet-500/30",
+
+  pink: "bg-pink-400 text-black ring-2 ring-pink-200 shadow-lg shadow-pink-500/30",
 };
 
 export function IconButton({
@@ -52,7 +59,8 @@ export function IconButton({
         aria-label={label}
         disabled={disabled}
         className={[
-          "inline-flex items-center justify-center rounded-xl p-3 transition",
+          "inline-flex items-center justify-center rounded-xl p-3 transition-all duration-150",
+          active ? "scale-95" : "hover:scale-105",
           "disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600 disabled:hover:bg-zinc-800",
           active ? activeTones[tone] : tones[tone],
           className,
