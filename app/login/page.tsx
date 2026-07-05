@@ -1,4 +1,4 @@
-import { auth, signIn } from "@/auth";
+import { signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
@@ -35,14 +35,16 @@ export default async function LoginPage({
         },
       });
 
+      const callbackUrl = params?.callbackUrl ?? "/fragen";
+
       if (user?.must_change_password) {
         redirect("/profil/passwort");
       }
 
-      redirect("/fragen");
+      redirect(callbackUrl);
     } catch (error) {
       if (error instanceof AuthError && error.type === "CredentialsSignin") {
-        return;
+        redirect("/login?error=CredentialsSignin");
       }
 
       throw error;
