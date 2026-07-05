@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { updateUserAction } from "./actions";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
 import { BeakerIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useState, useTransition } from "react";
 
 type User = {
   id: number;
@@ -17,6 +17,7 @@ export default function EditUserDialog({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [changePassword, setChangePassword] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   function generateNewPassword() {
     setNewPassword(generateMemorablePassword());
@@ -50,7 +51,15 @@ export default function EditUserDialog({ user }: { user: User }) {
               </p>
             </div>
 
-            <form action={updateUserAction} className="space-y-5">
+            <form
+              action={(formData) => {
+                startTransition(async () => {
+                  await updateUserAction(formData);
+                  setOpen(false);
+                });
+              }}
+              className="space-y-5"
+            >
               <input type="hidden" name="id" value={user.id} />
 
               <div>
@@ -186,9 +195,10 @@ export default function EditUserDialog({ user }: { user: User }) {
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                  disabled={isPending}
+                  className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                 >
-                  Speichern
+                  {isPending ? "Speichert..." : "Speichern"}
                 </button>
               </div>
             </form>

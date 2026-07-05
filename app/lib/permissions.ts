@@ -1,6 +1,7 @@
 import type { Session } from "next-auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { requireUser } from "./auth-guard";
 
 export function isAdmin(session: Session | null) {
   return session?.user?.role === "ADMIN";
@@ -55,7 +56,7 @@ export function canCreateApprovedQuestion(session: Session | null) {
 }
 
 export async function requireSession() {
-  const session = await auth();
+  const session = await requireUser();
 
   if (!session?.user) {
     redirect("/login");

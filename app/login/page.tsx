@@ -1,4 +1,7 @@
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
+import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
+import { prisma } from "@/app/lib/prisma";
 
 export default async function LoginPage({
   searchParams,
@@ -16,11 +19,34 @@ export default async function LoginPage({
     const email = String(formData.get("email") ?? "");
     const password = String(formData.get("password") ?? "");
 
-    await signIn("credentials", {
-      email,
-      password,
-      redirectTo: "/fragen",
-    });
+    try {
+      await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      const user = await prisma.users.findUnique({
+        where: {
+          email: email.toLowerCase().trim(),
+        },
+        select: {
+          must_change_password: true,
+        },
+      });
+
+      if (user?.must_change_password) {
+        redirect("/profil/passwort");
+      }
+
+      redirect("/fragen");
+    } catch (error) {
+      if (error instanceof AuthError && error.type === "CredentialsSignin") {
+        return;
+      }
+
+      throw error;
+    }
   }
 
   return (
@@ -54,6 +80,7 @@ export default async function LoginPage({
             />
           </label>
         </div>
+
         <div style={{ marginBottom: 16 }}>
           <label>
             Passwort
@@ -74,6 +101,7 @@ export default async function LoginPage({
             />
           </label>
         </div>
+
         <button
           type="submit"
           style={{
@@ -87,7 +115,6 @@ export default async function LoginPage({
         >
           Einloggen
         </button>
-        s
       </form>
     </main>
   );

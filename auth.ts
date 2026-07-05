@@ -27,6 +27,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!user) return null;
 
+        if (!user.is_active) return null;
+
         const validPassword = await bcrypt.compare(
           password,
           user.password_hash,
@@ -39,11 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
-        } as {
-          id: string;
-          email: string;
-          name: string | null;
-          role: string;
+          mustChangePassword: user.must_change_password,
         };
       },
     }),
@@ -54,6 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.userId = user.id;
         token.role = user.role;
         token.name = user.name;
+        token.mustChangePassword = user.mustChangePassword;
       }
 
       return token;
@@ -63,6 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = String(token.userId);
         session.user.role = String(token.role);
         session.user.name = String(token.name ?? "");
+        session.user.mustChangePassword = Boolean(token.mustChangePassword);
       }
 
       return session;

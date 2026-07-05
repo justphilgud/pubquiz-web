@@ -3,12 +3,20 @@ import { prisma } from "@/app/lib/prisma";
 import CreateUserDialog from "./CreateUserDialog";
 import EditUserDialog from "./EditUserDialog";
 import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
+import { ArchiveUser } from "./ArchiveUser";
+import { ReactivateUser } from "./ReactivateUser";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 export default async function UsersPage() {
   await requireAdmin();
 
   const users = await prisma.users.findMany({
-    orderBy: [{ role: "asc" }, { name: "asc" }, { email: "asc" }],
+    orderBy: [
+      { is_active: "desc" },
+      { role: "asc" },
+      { name: "asc" },
+      { email: "asc" },
+    ],
   });
 
   return (
@@ -50,14 +58,28 @@ export default async function UsersPage() {
                 <span
                   className={
                     user.is_active
-                      ? "rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
-                      : "rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500"
+                      ? "inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700"
+                      : "inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
                   }
                 >
-                  {user.is_active ? "Aktiv" : "Inaktiv"}
+                  {user.is_active ? (
+                    <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <XCircleIcon className="h-4 w-4 text-red-600" />
+                  )}
+
+                  {user.is_active ? "Aktiv" : "Archiviert"}
                 </span>
 
-                <EditUserDialog user={user} />
+                <div className="flex items-center gap-2">
+                  <EditUserDialog user={user} />
+
+                  {user.is_active ? (
+                    <ArchiveUser userId={user.id} />
+                  ) : (
+                    <ReactivateUser userId={user.id} />
+                  )}
+                </div>
               </div>
             </div>
           ))}

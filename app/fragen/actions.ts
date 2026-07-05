@@ -7,10 +7,8 @@ import path from "path";
 import { Buffer } from "buffer";
 import { auth } from "@/auth";
 import { createQuestion } from "@/app/services/questionService";
-import {
-  requireAdmin,
-  requireQuestionEditor,
-} from "@/app/lib/permissions";
+import { requireAdmin, requireQuestionEditor } from "@/app/lib/permissions";
+import { requireUser } from "../lib/auth-guard";
 
 function getMedientypIdAusDatei(datei: string) {
   const lower = datei.toLowerCase();
@@ -652,7 +650,7 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
     grund: string;
   }[] = [];
 
-  const session = await auth();
+  const session = await requireUser();
 
   if (!session?.user) {
     throw new Error("Nicht eingeloggt.");

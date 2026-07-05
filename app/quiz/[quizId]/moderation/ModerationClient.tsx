@@ -6,7 +6,7 @@ import {
   schliesseQuizBlock,
   QuizPraesentationResult,
   getQuizPunktestand,
-  getZufaelligeSchaetzfrage
+  getZufaelligeSchaetzfrage,
 } from "../../actions";
 import {
   buildPraesentationSlides,
@@ -21,24 +21,11 @@ import {
   resetCountdown,
   beendeCountdown,
   setEndstandRevealCount,
-  setSchaetzfrageStatus
+  setSchaetzfrageStatus,
 } from "../praesentation/statusActions";
 
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  LockOpenIcon,
-  LockClosedIcon,
-  PhotoIcon,
-  SpeakerWaveIcon,
-  ChartBarIcon,
-  PlayIcon,
-  ArrowPathIcon,
-  ClockIcon,
-  ScaleIcon,
-  EyeIcon,
-  ArrowUturnLeftIcon,
-} from "@heroicons/react/24/outline";
+import ModerationToolbar from "./ModerationToolbar";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 type ModerationStatus = {
   slide_index: number;
@@ -78,7 +65,7 @@ function formatSeconds(seconds: number | null | undefined) {
   if (hours > 0) {
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
       2,
-      "0"
+      "0",
     )}:${String(rest).padStart(2, "0")}`;
   }
 
@@ -87,7 +74,7 @@ function formatSeconds(seconds: number | null | undefined) {
 
 function getAbschnittAnzeigeTitel(
   abschnitt: QuizPraesentationResult["abschnitte"][number] | null | undefined,
-  slides?: Slide[]
+  slides?: Slide[],
 ) {
   if (!abschnitt) return "Kein Block";
 
@@ -100,12 +87,13 @@ function getAbschnittAnzeigeTitel(
   const blockIndex = slides
     .filter(
       (slide) =>
-        slide.typ === "block" && istFragenblockTyp(slide.abschnitt.abschnitt_typ)
+        slide.typ === "block" &&
+        istFragenblockTyp(slide.abschnitt.abschnitt_typ),
     )
     .findIndex(
       (slide) =>
         slide.typ === "block" &&
-        slide.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id
+        slide.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id,
     );
 
   return blockIndex >= 0 ? `Block ${blockIndex + 1}` : abschnitt.titel;
@@ -130,8 +118,10 @@ function getSlideTitel(slide: Slide | undefined, slides?: Slide[]) {
   }
 
   if (slide.typ === "frage") return slide.frage.frage ?? "Frage";
-  if (slide.typ === "aufloesung") return `Auflösung: ${slide.frage.frage ?? "Frage"}`;
-  if (slide.typ === "pause") return `Countdown: ${getAbschnittAnzeigeTitel(slide.abschnitt, slides)}`;
+  if (slide.typ === "aufloesung")
+    return `Auflösung: ${slide.frage.frage ?? "Frage"}`;
+  if (slide.typ === "pause")
+    return `Countdown: ${getAbschnittAnzeigeTitel(slide.abschnitt, slides)}`;
   if (slide.typ === "zwischenstand") return "Zwischenstand";
   if (slide.typ === "endstand") return "Endstand";
 
@@ -141,10 +131,7 @@ function getSlideTitel(slide: Slide | undefined, slides?: Slide[]) {
 function secondsSince(startAt: string | null, now: number) {
   if (!startAt) return null;
 
-  return Math.max(
-    0,
-    Math.floor((now - new Date(startAt).getTime()) / 1000)
-  );
+  return Math.max(0, Math.floor((now - new Date(startAt).getTime()) / 1000));
 }
 
 function LiveTimer({
@@ -152,25 +139,25 @@ function LiveTimer({
   startAt,
   now,
   emptyText = "Noch nicht gestartet",
+  stopped = false,
 }: {
   label: string;
   startAt: string | null;
   now: number;
   emptyText?: string;
+  stopped?: boolean;
 }) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const seconds = isMounted ? secondsSince(startAt, now) : null;
+  const seconds = stopped ? null : secondsSince(startAt, now);
 
   return (
     <div className="rounded-xl bg-zinc-950 p-4">
       <div className="text-sm text-zinc-400">{label}</div>
-      <div className="mt-1 text-2xl font-black">
-        {!isMounted ? "--:--" : seconds === null ? emptyText : formatSeconds(seconds)}
+      <div className="mt-1 text-2xl font-black" suppressHydrationWarning>
+        {stopped
+          ? "Beendet"
+          : seconds === null
+            ? emptyText
+            : formatSeconds(seconds)}
       </div>
     </div>
   );
@@ -210,7 +197,7 @@ function SlidePreview({
 
     const teamsMitPlatz = topTeams.map((team) => {
       const ersterIndex = topTeams.findIndex(
-        (vergleich) => vergleich.punkte === team.punkte
+        (vergleich) => vergleich.punkte === team.punkte,
       );
 
       return {
@@ -220,24 +207,22 @@ function SlidePreview({
     });
 
     const platzGruppen = Array.from(
-      new Set(teamsMitPlatz.map((team) => team.platz))
+      new Set(teamsMitPlatz.map((team) => team.platz)),
     ).sort((a, b) => b - a);
 
-    const sichtbarePlaetze =
-      istEndstand
-        ? platzGruppen.slice(
+    const sichtbarePlaetze = istEndstand
+      ? platzGruppen.slice(
           0,
-          Math.min(endstandRevealCount, platzGruppen.length)
+          Math.min(endstandRevealCount, platzGruppen.length),
         )
-        : platzGruppen;
+      : platzGruppen;
 
-    const naechsterPlatz =
-      istEndstand
-        ? platzGruppen[endstandRevealCount] ?? null
-        : null;
+    const naechsterPlatz = istEndstand
+      ? (platzGruppen[endstandRevealCount] ?? null)
+      : null;
 
     return (
-      <div className="grid h-full min-h-[360px] grid-cols-[minmax(0,1.55fr)_minmax(280px,0.75fr)] gap-5">
+      <div className="grid h-full min-h-360px grid-cols-[minmax(0,1.55fr)_minmax(280px,0.75fr)] gap-5">
         <div className="rounded-2xl border border-zinc-700 bg-zinc-950 p-5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
@@ -274,10 +259,11 @@ function SlidePreview({
               return (
                 <div
                   key={`${team.teamname}-${index}`}
-                  className={`grid grid-cols-[80px_1fr_110px] items-center gap-3 border-b border-zinc-800 px-4 py-3 last:border-b-0 ${istSichtbar
-                    ? "bg-yellow-400/10 text-white"
-                    : "bg-black/30 text-zinc-600"
-                    }`}
+                  className={`grid grid-cols-[80px_1fr_110px] items-center gap-3 border-b border-zinc-800 px-4 py-3 last:border-b-0 ${
+                    istSichtbar
+                      ? "bg-yellow-400/10 text-white"
+                      : "bg-black/30 text-zinc-600"
+                  }`}
                 >
                   <div className="text-xl font-black">#{team.platz}</div>
 
@@ -313,7 +299,7 @@ function SlidePreview({
 
   if (slide.typ === "fixer-slide") {
     return (
-      <div className="flex h-full min-h-[300px] items-center justify-center text-center">
+      <div className="flex h-full min-h-300px items-center justify-center text-center">
         <div>
           <div className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-300">
             Fixer Slide
@@ -328,7 +314,7 @@ function SlidePreview({
 
   if (slide.typ === "block") {
     return (
-      <div className="flex h-full min-h-[300px] items-center justify-center text-center">
+      <div className="flex h-full min-h-300px items-center justify-center text-center">
         <div>
           <div className="mb-4 text-sm uppercase tracking-[0.3em] text-pink-300">
             Block
@@ -343,11 +329,11 @@ function SlidePreview({
 
   if (slide.typ === "frage") {
     const bildMedien = slide.frage.medien.filter((medium) =>
-      medium.medientyp.toLowerCase().includes("bild")
+      medium.medientyp.toLowerCase().includes("bild"),
     );
 
     return (
-      <div className="flex h-full min-h-[360px] flex-col justify-center">
+      <div className="flex h-full min-h-360px flex-col justify-center">
         <div className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-300">
           Frage {slide.frageIndexImBlock} / {slide.fragenAnzahlImBlock}
         </div>
@@ -362,7 +348,7 @@ function SlidePreview({
               <img
                 src={bildMedien[0].datei}
                 alt=""
-                className="max-h-[320px] w-full object-contain"
+                className="max-h-320px w-full object-contain"
               />
             </div>
           )}
@@ -395,7 +381,7 @@ function SlidePreview({
 
   if (slide.typ === "pause") {
     return (
-      <div className="flex h-full min-h-[300px] items-center justify-center text-center">
+      <div className="flex h-full min-h-300px items-center justify-center text-center">
         <div>
           <div className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-300">
             Antwortzeit
@@ -438,16 +424,13 @@ function ProgressBlock({
   quizStartedAt: string | null;
   now: number;
 }) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const currentSlideNumber = slidesLength === 0 ? 0 : slideIndex + 1; const completedSlides = Math.max(0, slideIndex);
+  const currentSlideNumber = slidesLength === 0 ? 0 : slideIndex + 1;
+  const completedSlides = Math.max(0, slideIndex);
   const remainingSlides = Math.max(0, slidesLength - currentSlideNumber);
   const progressPercent =
-    slidesLength > 0 ? Math.round((currentSlideNumber / slidesLength) * 100) : 0;
+    slidesLength > 0
+      ? Math.round((currentSlideNumber / slidesLength) * 100)
+      : 0;
 
   const elapsedSeconds = secondsSince(quizStartedAt, now);
   const averageSecondsPerCompletedSlide =
@@ -498,19 +481,23 @@ function ProgressBlock({
       <div className="mt-2 grid grid-cols-2 gap-2 text-center">
         <div className="rounded-xl bg-zinc-950 p-2">
           <div className="text-xl font-black">
-            {isMounted ? formatSeconds(estimatedRemainingSeconds) : "--:--"}
+            <span suppressHydrationWarning>
+              {formatSeconds(estimatedRemainingSeconds)}
+            </span>{" "}
           </div>
           <div className="mt-1 text-xs text-zinc-400">Prognose Rest</div>
         </div>
 
         <div className="rounded-xl bg-zinc-950 p-2">
           <div className="text-xl font-black">
-            {isMounted && estimatedEndAt
-              ? estimatedEndAt.toLocaleTimeString("de-DE", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-              : "--:--"}
+            <span suppressHydrationWarning>
+              {estimatedEndAt
+                ? estimatedEndAt.toLocaleTimeString("de-DE", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "--:--"}
+            </span>
           </div>
           <div className="mt-1 text-xs text-zinc-400">Prognose Ende</div>
         </div>
@@ -537,41 +524,43 @@ export default function ModerationClient({
   const [slideIndex, setSlideIndex] = useState(() =>
     Math.min(
       Math.max(initialStatus.slide_index, 0),
-      Math.max(slides.length - 1, 0)
-    )
+      Math.max(slides.length - 1, 0),
+    ),
   );
 
   const [slideStartedAt, setSlideStartedAt] = useState(
-    initialStatus.slide_started_at
+    initialStatus.slide_started_at,
   );
   const [quizStartedAt] = useState(initialStatus.quiz_started_at);
   const [antwortStatus] = useState(initialAntwortStatus);
-  const [mediumOverlayAktiv, setMediumOverlayAktivLokal] =
-    useState(false);
+  const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(false);
+
+  const [confirmEndOpen, setConfirmEndOpen] = useState(false);
+  const [quizBeendet, setQuizBeendet] = useState(false);
 
   const aktuellerSlide = slides[slideIndex];
   const pauseVerstrichen =
     aktuellerSlide?.typ === "pause"
-      ? secondsSince(slideStartedAt, now) ?? 0
+      ? (secondsSince(slideStartedAt, now) ?? 0)
       : 0;
 
   const istPauseAbgelaufen =
     aktuellerSlide?.typ === "pause" &&
     pauseVerstrichen >= aktuellerSlide.dauerSekunden;
 
-
   const naechsterSlide = slides[slideIndex + 1];
-  const istCountdownSlide =
-    aktuellerSlide?.typ === "pause";
+  const istCountdownSlide = aktuellerSlide?.typ === "pause";
 
   const aktuelleMedien =
     aktuellerSlide?.typ === "frage"
       ? aktuellerSlide.frage.medien
       : aktuellerSlide?.typ === "aufloesung"
         ? [
-          ...aktuellerSlide.frage.medien,
-          ...aktuellerSlide.frage.antworten.flatMap((antwort) => antwort.medien),
-        ]
+            ...aktuellerSlide.frage.medien,
+            ...aktuellerSlide.frage.antworten.flatMap(
+              (antwort) => antwort.medien,
+            ),
+          ]
         : [];
 
   const [punktestand, setPunktestand] = useState<
@@ -582,55 +571,54 @@ export default function ModerationClient({
 
   const hatAudio =
     aktuellerSlide?.typ === "fixer-slide" &&
-      aktuellerSlide.slideTyp === "startsequenz"
+    aktuellerSlide.slideTyp === "startsequenz"
       ? true
       : aktuelleMedien.some((medium) =>
-        medium.medientyp.toLowerCase().includes("audio")
-      );
+          medium.medientyp.toLowerCase().includes("audio"),
+        );
 
   const [audioLaeuft, setAudioLaeuft] = useState(false);
 
-  const [showAuswertungDialog, setShowAuswertungDialog] =
-    useState(false);
+  const [showAuswertungDialog, setShowAuswertungDialog] = useState(false);
 
   const [blockFreigegeben, setBlockFreigegeben] = useState(false);
 
-  const [countdownDauerMinuten, setCountdownDauerMinuten] =
-    useState(5);
+  const [countdownDauerMinuten, setCountdownDauerMinuten] = useState(5);
 
-  const [countdownStartedAt, setCountdownStartedAt] =
-    useState<string | null>(null);
+  const [countdownStartedAt, setCountdownStartedAt] = useState<string | null>(
+    null,
+  );
 
-  const [countdownStatus, setCountdownStatus] =
-    useState<string | null>("idle");
+  const [countdownStatus, setCountdownStatus] = useState<string | null>("idle");
 
-  const [showAuswertungIframe, setShowAuswertungIframe] =
+  const [showAuswertungIframe, setShowAuswertungIframe] = useState(false);
+
+  const countdownVerstrichen = countdownStartedAt
+    ? (secondsSince(countdownStartedAt, now) ?? 0)
+    : 0;
+
+  const countdownRestSekunden = Math.max(
+    0,
+    countdownDauerMinuten * 60 - countdownVerstrichen,
+  );
+
+  const [auswertungDialogBereitsGezeigt, setAuswertungDialogBereitsGezeigt] =
     useState(false);
 
-  const countdownVerstrichen =
-    countdownStartedAt
-      ? secondsSince(countdownStartedAt, now) ?? 0
-      : 0;
-
-  const countdownRestSekunden =
-    Math.max(
-      0,
-      countdownDauerMinuten * 60 - countdownVerstrichen
-    );
-
-  const [auswertungDialogBereitsGezeigt,
-    setAuswertungDialogBereitsGezeigt] = useState(false);
-
   const [endstandRevealCount, setEndstandRevealCountLokal] = useState(
-    initialStatus.endstand_reveal_count ?? 1
+    initialStatus.endstand_reveal_count ?? 1,
   );
 
   useEffect(() => {
     if (!istPauseAbgelaufen) return;
     if (auswertungDialogBereitsGezeigt) return;
 
-    setShowAuswertungDialog(true);
-    setAuswertungDialogBereitsGezeigt(true);
+    const timeoutId = window.setTimeout(() => {
+      setShowAuswertungDialog(true);
+      setAuswertungDialogBereitsGezeigt(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [istPauseAbgelaufen, auswertungDialogBereitsGezeigt]);
 
   useEffect(() => {
@@ -641,8 +629,6 @@ export default function ModerationClient({
     return () => window.clearInterval(interval);
   }, []);
 
-
-
   async function speichereDauerVomAktuellenSlide() {
     if (aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
       return;
@@ -650,7 +636,7 @@ export default function ModerationClient({
 
     const dauerSekunden = Math.max(
       0,
-      Math.round((Date.now() - new Date(slideStartedAt).getTime()) / 1000)
+      Math.round((Date.now() - new Date(slideStartedAt).getTime()) / 1000),
     );
 
     await speicherePraesentationsdauer({
@@ -662,7 +648,7 @@ export default function ModerationClient({
   async function goToSlide(nextIndex: number) {
     const safeIndex = Math.min(
       Math.max(nextIndex, 0),
-      Math.max(slides.length - 1, 0)
+      Math.max(slides.length - 1, 0),
     );
 
     if (safeIndex === slideIndex) return;
@@ -730,6 +716,17 @@ export default function ModerationClient({
     void goToSlide(slideIndex - 1);
   }
 
+  function zurErstenSlide() {
+    void goToSlide(0);
+  }
+
+  async function handleQuizBeenden() {
+    setQuizBeendet(true);
+    setConfirmEndOpen(false);
+
+    await beendeCountdown({ quizId });
+  }
+
   async function naechsterSlideAction() {
     if (aktuellerSlide?.typ === "endstand") {
       const punktestand = await getQuizPunktestand(quizId);
@@ -737,18 +734,19 @@ export default function ModerationClient({
 
       const platzGruppen = Array.from(
         new Set(
-          topTeams.map((team) =>
-            topTeams.findIndex(
-              (vergleichsTeam) => vergleichsTeam.punkte === team.punkte
-            ) + 1
-          )
-        )
+          topTeams.map(
+            (team) =>
+              topTeams.findIndex(
+                (vergleichsTeam) => vergleichsTeam.punkte === team.punkte,
+              ) + 1,
+          ),
+        ),
       ).sort((a, b) => b - a);
 
       if (endstandRevealCount < platzGruppen.length) {
         const neuerRevealCount = Math.min(
           platzGruppen.length,
-          endstandRevealCount + 1
+          endstandRevealCount + 1,
         );
 
         setEndstandRevealCountLokal(neuerRevealCount);
@@ -837,30 +835,31 @@ export default function ModerationClient({
     setCountdownStatus("idle");
   }
 
-  useEffect(() => {
-    if (countdownStatus !== "running") return;
-    if (countdownRestSekunden > 0) return;
-    if (auswertungDialogBereitsGezeigt) return;
-
-    setCountdownStatus("finished");
-    setAuswertungDialogBereitsGezeigt(true);
-
-    void handleBlockSchliessen();
-
-    setShowAuswertungDialog(true);
-
-    void beendeCountdown({
-      quizId,
-    });
-  }, [
-    countdownStatus,
-    countdownRestSekunden,
-    auswertungDialogBereitsGezeigt,
-    quizId,
-  ]);
+  const countdownIstAbgelaufen =
+    countdownStatus === "running" &&
+    countdownRestSekunden <= 0 &&
+    !auswertungDialogBereitsGezeigt;
 
   useEffect(() => {
-    if (aktuellerSlide?.typ !== "zwischenstand" && aktuellerSlide?.typ !== "endstand") {
+    if (!countdownIstAbgelaufen) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setCountdownStatus("finished");
+      setAuswertungDialogBereitsGezeigt(true);
+      setShowAuswertungDialog(true);
+
+      void handleBlockSchliessen();
+      void beendeCountdown({ quizId });
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [countdownIstAbgelaufen, quizId, handleBlockSchliessen]);
+
+  useEffect(() => {
+    if (
+      aktuellerSlide?.typ !== "zwischenstand" &&
+      aktuellerSlide?.typ !== "endstand"
+    ) {
       return;
     }
 
@@ -971,9 +970,22 @@ export default function ModerationClient({
 
   return (
     <>
+      <ConfirmDialog
+        open={confirmEndOpen}
+        title="Quiz wirklich beenden?"
+        danger
+        confirmLabel="Quiz beenden"
+        onClose={() => setConfirmEndOpen(false)}
+        onConfirm={handleQuizBeenden}
+      >
+        <p className="text-sm text-gray-600">
+          Der Timer wird gestoppt. Bereits abgegebene Antworten bleiben
+          erhalten.
+        </p>
+      </ConfirmDialog>
 
       {showAuswertungDialog && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 p-6">
+        <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/75 p-6">
           <div className="w-full max-w-xl rounded-3xl border border-zinc-700 bg-zinc-900 p-8 text-white shadow-2xl">
             <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-cyan-300">
               Antwortzeit beendet
@@ -984,8 +996,8 @@ export default function ModerationClient({
             </h2>
 
             <p className="mb-8 text-lg text-zinc-300">
-              Der zuletzt automatisch gespeicherte Stand zählt. Änderungen sind ab
-              jetzt nicht mehr möglich.
+              Der zuletzt automatisch gespeicherte Stand zählt. Änderungen sind
+              ab jetzt nicht mehr möglich.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -1013,15 +1025,13 @@ export default function ModerationClient({
       )}
 
       {showAuswertungIframe && (
-        <div className="fixed inset-0 z-[10000] flex flex-col bg-zinc-950 p-4 text-white">
+        <div className="fixed inset-0 z-10000 flex flex-col bg-zinc-950 p-4 text-white">
           <div className="mb-3 flex items-center justify-between">
             <div>
               <div className="text-sm font-black uppercase tracking-[0.3em] text-cyan-300">
                 Auswertung
               </div>
-              <div className="text-xl font-black">
-                Quiz {quizId}
-              </div>
+              <div className="text-xl font-black">Quiz {quizId}</div>
             </div>
 
             <button
@@ -1073,180 +1083,31 @@ export default function ModerationClient({
               <p className="text-zinc-400">Noch keine Notizen angebunden.</p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={vorherigerSlide}
-                className="rounded-xl bg-zinc-800 p-3 hover:bg-zinc-700"
-                title="Zurück (←)"
-              >
-                <ChevronLeftIcon className="h-6 w-6" />
-              </button>
-
-              <button
-                type="button"
-                onClick={naechsterSlideAction}
-                className="rounded-xl bg-cyan-500 p-3 text-black hover:bg-cyan-400"
-                title="Weiter (→)"
-              >
-                <ChevronRightIcon className="h-6 w-6" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleBlockToggle}
-                className={`rounded-xl p-3 ${blockFreigegeben
-                  ? "bg-amber-600 hover:bg-amber-500"
-                  : "bg-emerald-600 hover:bg-emerald-500"
-                  }`}
-                title={blockFreigegeben ? "Block schließen (S)" : "Block freigeben (B)"}
-              >
-                {blockFreigegeben ? (
-                  <LockClosedIcon className="h-6 w-6" />
-                ) : (
-                  <LockOpenIcon className="h-6 w-6" />
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleMediumToggle}
-                disabled={!hatMedien}
-                className={`rounded-xl p-3 ${!hatMedien
-                  ? "cursor-not-allowed bg-zinc-800 text-zinc-600"
-                  : mediumOverlayAktiv
-                    ? "bg-violet-400 text-black"
-                    : "bg-violet-600 hover:bg-violet-500"
-                  }`}
-                title={
-                  hatMedien
-                    ? "Bild anzeigen / schließen (I)"
-                    : "Kein Medium auf diesem Slide"
-                }
-              >
-                <PhotoIcon className="h-6 w-6" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleAudioPlay}
-                disabled={!hatAudio}
-                className={`rounded-xl p-3 ${!hatAudio
-                  ? "cursor-not-allowed bg-zinc-800 text-zinc-600"
-                  : audioLaeuft
-                    ? "bg-pink-400 text-black"
-                    : "bg-pink-600 hover:bg-pink-500"
-                  }`}
-                title={hatAudio ? "Audio abspielen (M)" : "Kein Audio auf diesem Slide"}
-              >
-                <SpeakerWaveIcon className="h-6 w-6" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleAuswertungOeffnen}
-                className="rounded-xl bg-zinc-700 p-3 hover:bg-zinc-600"
-                title="Auswertung (A)"
-              >
-                <ChartBarIcon className="h-6 w-6" />
-              </button>
-              {aktuellerSlide?.typ === "endstand" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleSchaetzfrageStarten}
-                    title="Schätzfrage starten"
-                    className="rounded-xl bg-fuchsia-600 p-3 hover:bg-fuchsia-500"
-                  >
-                    <ScaleIcon className="h-6 w-6" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleSchaetzfrageLoesungZeigen}
-                    title="Lösung zeigen"
-                    className="rounded-xl bg-yellow-500 p-3 text-black hover:bg-yellow-400"
-                  >
-                    <EyeIcon className="h-6 w-6" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleSchaetzfrageZurueck}
-                    title="Zurück zum Endstand"
-                    className="rounded-xl bg-zinc-700 p-3 hover:bg-zinc-600"
-                  >
-                    <ArrowUturnLeftIcon className="h-6 w-6" />
-                  </button>
-                </>
-              )}
-
-              <div
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${istCountdownSlide
-                  ? "border-zinc-700 bg-zinc-900"
-                  : "border-zinc-800 bg-zinc-900/50"
-                  }`}
-              >
-                <ClockIcon
-                  className={`h-5 w-5 ${istCountdownSlide ? "text-cyan-300" : "text-zinc-600"
-                    }`}
-                />
-
-                <input
-                  type="number"
-                  min={1}
-                  value={countdownDauerMinuten}
-                  disabled={!istCountdownSlide}
-                  onChange={(event) =>
-                    setCountdownDauerMinuten(Number(event.target.value))
-                  }
-                  className={`w-20 rounded-lg border px-2 py-1 text-right pr-2 text-sm font-bold [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${istCountdownSlide
-                    ? "border-zinc-700 bg-zinc-950 text-white"
-                    : "cursor-not-allowed border-zinc-800 bg-zinc-950 text-zinc-600"
-                    }`}
-                />
-
-                <span
-                  className={`text-xs ${istCountdownSlide ? "text-zinc-400" : "text-zinc-600"
-                    }`}
-                >
-                  min
-                </span>
-
-                <div
-                  className={`w-16 text-center text-sm font-black ${istCountdownSlide ? "text-cyan-300" : "text-zinc-600"
-                    }`}
-                >
-                  {formatSeconds(countdownRestSekunden)}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleCountdownStart}
-                  disabled={!istCountdownSlide}
-                  className={`rounded-lg p-2 ${istCountdownSlide
-                    ? "bg-emerald-600 hover:bg-emerald-500"
-                    : "cursor-not-allowed bg-zinc-800 text-zinc-600"
-                    }`}
-                  title="Countdown starten"
-                >
-                  <PlayIcon className="h-4 w-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCountdownReset}
-                  disabled={!istCountdownSlide}
-                  className={`rounded-lg p-2 ${istCountdownSlide
-                    ? "bg-zinc-700 hover:bg-zinc-600"
-                    : "cursor-not-allowed bg-zinc-800 text-zinc-600"
-                    }`}
-                  title="Countdown zurücksetzen"
-                >
-                  <ArrowPathIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <ModerationToolbar
+              blockFreigegeben={blockFreigegeben}
+              mediumOverlayAktiv={mediumOverlayAktiv}
+              audioLaeuft={audioLaeuft}
+              hatMedien={hatMedien}
+              hatAudio={hatAudio}
+              istCountdownSlide={istCountdownSlide}
+              countdownDauerMinuten={countdownDauerMinuten}
+              countdownRestSekunden={countdownRestSekunden}
+              showSchaetzfrageControls={aktuellerSlide?.typ === "endstand"}
+              onZurErstenSlide={zurErstenSlide}
+              onZurueck={vorherigerSlide}
+              onWeiter={naechsterSlideAction}
+              onBlockToggle={handleBlockToggle}
+              onMediumToggle={handleMediumToggle}
+              onAudioToggle={handleAudioPlay}
+              onAuswertungOeffnen={handleAuswertungOeffnen}
+              onSchaetzfrageStarten={handleSchaetzfrageStarten}
+              onSchaetzfrageLoesungZeigen={handleSchaetzfrageLoesungZeigen}
+              onSchaetzfrageZurueck={handleSchaetzfrageZurueck}
+              onCountdownDauerChange={setCountdownDauerMinuten}
+              onCountdownStart={handleCountdownStart}
+              onCountdownReset={handleCountdownReset}
+              onQuizBeenden={() => setConfirmEndOpen(true)}
+            />
           </section>
 
           <aside className="flex min-h-0 flex-col gap-3 overflow-hidden">
@@ -1272,7 +1133,9 @@ export default function ModerationClient({
                   <div className="text-xl font-black">
                     {antwortStatus.antwortenEingegangen}
                   </div>
-                  <div className="mt-1 text-[11px] text-zinc-400">Antworten</div>
+                  <div className="mt-1 text-[11px] text-zinc-400">
+                    Antworten
+                  </div>
                 </div>
 
                 <div className="rounded-xl bg-zinc-950 p-2">
@@ -1293,12 +1156,12 @@ export default function ModerationClient({
               <div className="mt-2 text-xs text-zinc-400">
                 {antwortStatus.letzteAntwortAt
                   ? `Letzte Antwort: ${new Date(
-                    antwortStatus.letzteAntwortAt
-                  ).toLocaleTimeString("de-DE", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                  })}`
+                      antwortStatus.letzteAntwortAt,
+                    ).toLocaleTimeString("de-DE", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}`
                   : "Noch keine Antwort eingegangen"}
               </div>
             </div>
@@ -1318,10 +1181,9 @@ export default function ModerationClient({
                   startAt={quizStartedAt}
                   now={now}
                   emptyText="Nicht gestartet"
+                  stopped={quizBeendet}
                 />
               </div>
-
-
             </div>
 
             <ProgressBlock
