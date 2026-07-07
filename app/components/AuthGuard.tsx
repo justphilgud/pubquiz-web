@@ -5,9 +5,13 @@ import { ReactNode } from "react";
 
 type AuthGuardProps = {
   children: ReactNode;
+  allowPasswordChange?: boolean;
 };
 
-export async function AuthGuard({ children }: AuthGuardProps) {
+export async function AuthGuard({
+  children,
+  allowPasswordChange = false,
+}: AuthGuardProps) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -28,7 +32,7 @@ export async function AuthGuard({ children }: AuthGuardProps) {
     redirect("/login");
   }
 
-  if (user.must_change_password) {
+  if (user.must_change_password && !allowPasswordChange) {
     redirect("/profil/passwort");
   }
 

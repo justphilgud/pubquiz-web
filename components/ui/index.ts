@@ -20,6 +20,7 @@ export { Modal } from "./Modal";
 export { MediaPreview } from "./MediaPreview";
 export { QuestionCard } from "./QuestionCard";
 export { AnswerCard } from "./AnswerCard";
+export { AuthCard } from "./AuthCard";
 
 export { Label } from "./Label";
 export { FormField } from "./FormField";

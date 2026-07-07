@@ -2,6 +2,7 @@ import { signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
+import { Alert, AuthCard, Button, FormField, Input } from "@/components/ui";
 
 export default async function LoginPage({
   searchParams,
@@ -52,72 +53,33 @@ export default async function LoginPage({
   }
 
   return (
-    <main style={{ maxWidth: 420, margin: "80px auto", padding: 24 }}>
-      <h1>Login</h1>
-
+    <AuthCard title="Quizverwaltung">
       {params?.error && (
-        <p style={{ color: "red" }}>
-          Login fehlgeschlagen. Bitte Zugangsdaten prüfen.
-        </p>
+        <div className="mb-4">
+          <Alert variant="danger" title="Login fehlgeschlagen">
+            Bitte prüfe deine Zugangsdaten.
+          </Alert>
+        </div>
       )}
 
-      <form action={loginAction}>
-        <div style={{ marginBottom: 16 }}>
-          <label>
-            E-Mail
-            <input
-              name="email"
-              type="email"
-              required
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                marginTop: "6px",
-                border: "1px solid #999",
-                borderRadius: "6px",
-                background: "white",
-                color: "black",
-              }}
-            />
-          </label>
-        </div>
+      <form action={loginAction} className="space-y-5">
+        <FormField label="E-Mail">
+          <Input name="email" type="email" required autoComplete="email" />
+        </FormField>
 
-        <div style={{ marginBottom: 16 }}>
-          <label>
-            Passwort
-            <input
-              name="password"
-              type="password"
-              required
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                marginTop: "6px",
-                border: "1px solid #999",
-                borderRadius: "6px",
-                background: "white",
-                color: "black",
-              }}
-            />
-          </label>
-        </div>
+        <FormField label="Passwort">
+          <Input
+            name="password"
+            type="password"
+            required
+            autoComplete="current-password"
+          />
+        </FormField>
 
-        <button
-          type="submit"
-          style={{
-            padding: "10px 16px",
-            border: "1px solid #333",
-            borderRadius: "6px",
-            background: "white",
-            color: "black",
-            cursor: "pointer",
-          }}
-        >
-          Einloggen
-        </button>
+        <div className="flex justify-center pt-2">
+          <Button type="submit">Einloggen</Button>
+        </div>
       </form>
-    </main>
+    </AuthCard>
   );
 }

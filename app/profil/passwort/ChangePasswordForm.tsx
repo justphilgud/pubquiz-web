@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { changePassword } from "./actions";
-import { PasswordInput } from "@/app/components/PasswordInput";
+import { Alert, AuthCard, Button, FormField, Input } from "@/components/ui";
 
 const initialState = {
   success: false,
@@ -16,68 +16,47 @@ export function ChangePasswordForm() {
   );
 
   return (
-    <main className="mx-auto max-w-xl p-6">
-      <h1 className="mb-6 text-2xl font-semibold">Passwort ändern</h1>
-
+    <AuthCard title="Passwort ändern">
       {state?.error && (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {state.error}
+        <div className="mb-4">
+          <Alert variant="danger" title="Fehler">
+            {state.error}
+          </Alert>
         </div>
       )}
 
       {state?.success && (
-        <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-          Passwort wurde erfolgreich geändert.
+        <div className="mb-4">
+          <Alert variant="success" title="Erfolgreich">
+            Passwort wurde erfolgreich geändert.
+          </Alert>
         </div>
       )}
 
-      <form action={formAction} className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium">
-            Aktuelles Passwort
-          </label>
-          <input
-            name="currentPassword"
-            type="password"
-            required
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
-          />
-        </div>
+      <form action={formAction} className="space-y-5">
+        <FormField label="Aktuelles Passwort">
+          <Input name="currentPassword" type="password" required />
+        </FormField>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">
-            Neues Passwort
-          </label>
-          <input
-            name="newPassword"
-            type="password"
-            required
-            minLength={8}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
-          />
-        </div>
+        <FormField label="Neues Passwort">
+          <Input name="newPassword" type="password" required minLength={8} />
+        </FormField>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">
-            Neues Passwort wiederholen
-          </label>
-          <input
+        <FormField label="Neues Passwort wiederholen">
+          <Input
             name="confirmPassword"
             type="password"
             required
             minLength={8}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
           />
-        </div>
+        </FormField>
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-        >
-          {pending ? "Speichern..." : "Passwort speichern"}
-        </button>
+        <div className="flex justify-center pt-2">
+          <Button type="submit" disabled={pending}>
+            {pending ? "Speichern..." : "Passwort speichern"}
+          </Button>
+        </div>
       </form>
-    </main>
+    </AuthCard>
   );
 }

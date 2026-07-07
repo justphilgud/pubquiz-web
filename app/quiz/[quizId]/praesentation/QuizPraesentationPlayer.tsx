@@ -2189,7 +2189,6 @@ export default function QuizPraesentationPlayer({
 
         <section className="min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
           {showSchaetzfrage ? renderSchaetzfrageOverlay() : renderAktuellenSlide()}
-          {renderAktuellenSlide()}
         </section>
 
 
