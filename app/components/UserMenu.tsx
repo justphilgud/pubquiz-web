@@ -9,6 +9,7 @@ import {
   KeyIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { AppVersion } from "@/app/components/AppVersion";
 import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
 
 type Props = {
@@ -151,6 +152,10 @@ export default function UserMenu({
                 Abmelden
               </button>
             </form>
+          </div>
+
+          <div className="border-t border-slate-100 bg-slate-50 px-4 py-3">
+            <AppVersion />
           </div>
         </div>
       )}
