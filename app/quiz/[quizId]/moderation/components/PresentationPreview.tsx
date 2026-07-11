@@ -1,4 +1,4 @@
-import type { Slide } from "../praesentation/buildPraesentationSlides";
+import type { Slide } from "../../praesentation/buildPraesentationSlides";
 
 function getSlideTitel(slide: Slide | undefined) {
   if (!slide) return "Kein Slide";

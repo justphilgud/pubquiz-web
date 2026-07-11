@@ -1,9 +1,7 @@
 # Architektur
 
-- Systemübersicht
-- Next.js-Anwendung
-- Authentifizierung und Berechtigungen
-- Prisma-Datenmodell
-- PostgreSQL / Neon
-- Medienablage
-- Präsentations- und Moderationslogik
+```text
+Browser -> Next.js/TypeScript -> Serverlogik -> Prisma -> PostgreSQL/Neon
+```
+
+Zentrale Module: Authentifizierung, Fragen, Quiz, Teams, Moderation, Präsentation, Auswertung und Medien.

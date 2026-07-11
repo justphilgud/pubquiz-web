@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useModerationHotkeys } from "./hooks/useModerationHotkeys";
+
 import {
   freigabeQuizBlock,
   schliesseQuizBlock,
@@ -25,13 +27,16 @@ import {
   getAntwortStatus,
 } from "../praesentation/statusActions";
 
-import ModerationToolbar from "./ModerationToolbar";
-import TeamStatusPanel from "./TeamStatusPanel";
-import ProgressPanel from "./ProgressPanel";
-import TimePanel from "./TimePanel";
-import SlideNotes from "./SlideNotes";
-import PresentationPreview from "./PresentationPreview";
+import ModerationToolbar from "./components/ModerationToolbar";
+import TeamStatusPanel from "./components/TeamStatusPanel";
+import ProgressPanel from "./components/ProgressPanel";
+import TimePanel from "./components/TimePanel";
+import SlideNotes from "./components/SlideNotes";
+import PresentationPreview from "./components/PresentationPreview";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import SlidePreview, { getSlideTitel } from "./components/SlidePreview";
+
+import AuswertungOverlay from "./components/AuswertungOverlay";
 
 type ModerationStatus = {
   slide_index: number;
@@ -54,341 +59,12 @@ type Props = {
   initialAntwortStatus: AntwortStatus;
 };
 
-function istFragenblockTyp(abschnittTyp: string | null | undefined) {
-  return abschnittTyp === "fragenrunde" || abschnittTyp === "fragenblock";
-}
-
-function formatSeconds(seconds: number | null | undefined) {
-  if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
-    return "--:--";
-  }
-
-  const safeSeconds = Math.max(0, Math.floor(seconds));
-  const hours = Math.floor(safeSeconds / 3600);
-  const minutes = Math.floor((safeSeconds % 3600) / 60);
-  const rest = safeSeconds % 60;
-
-  if (hours > 0) {
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-      2,
-      "0",
-    )}:${String(rest).padStart(2, "0")}`;
-  }
-
-  return `${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
-}
-
-function getAbschnittAnzeigeTitel(
-  abschnitt: QuizPraesentationResult["abschnitte"][number] | null | undefined,
-  slides?: Slide[],
-) {
-  if (!abschnitt) return "Kein Block";
-
-  if (!istFragenblockTyp(abschnitt.abschnitt_typ)) {
-    return abschnitt.titel;
-  }
-
-  if (!slides) return abschnitt.titel;
-
-  const blockIndex = slides
-    .filter(
-      (slide) =>
-        slide.typ === "block" &&
-        istFragenblockTyp(slide.abschnitt.abschnitt_typ),
-    )
-    .findIndex(
-      (slide) =>
-        slide.typ === "block" &&
-        slide.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id,
-    );
-
-  return blockIndex >= 0 ? `Block ${blockIndex + 1}` : abschnitt.titel;
-}
-
-function getSlideTitel(slide: Slide | undefined, slides?: Slide[]) {
-  if (!slide) return "Kein Slide";
-
-  if (slide.typ === "fixer-slide") {
-    if (slide.slideTyp === "vor-dem-start") return "Vor dem Start";
-    if (slide.slideTyp === "startsequenz") return "Startsequenz";
-    if (slide.slideTyp === "begruessung") return "Begrüßung";
-    if (slide.slideTyp === "preise") return "Preise";
-    if (slide.slideTyp === "regeln") return "Regeln";
-    if (slide.slideTyp === "qrcode") return "QR-Code";
-    if (slide.slideTyp === "bekanntmachungen") return "Bekanntmachungen";
-    return slide.slideTyp;
-  }
-
-  if (slide.typ === "block") {
-    return getAbschnittAnzeigeTitel(slide.abschnitt, slides);
-  }
-
-  if (slide.typ === "frage") return slide.frage.frage ?? "Frage";
-  if (slide.typ === "aufloesung")
-    return `Auflösung: ${slide.frage.frage ?? "Frage"}`;
-  if (slide.typ === "pause")
-    return `Countdown: ${getAbschnittAnzeigeTitel(slide.abschnitt, slides)}`;
-  if (slide.typ === "zwischenstand") return "Zwischenstand";
-  if (slide.typ === "endstand") return "Endstand";
-
-  return "Slide";
-}
-
 function secondsSince(startAt: string | null, now: number) {
   if (!startAt) return null;
 
   return Math.max(0, Math.floor((now - new Date(startAt).getTime()) / 1000));
 }
 
-function SlidePreview({
-  slide,
-  slides,
-  countdownRestSekunden,
-  punktestand,
-  endstandRevealCount,
-  preiseText,
-}: {
-  slide: Slide | undefined;
-  slides: Slide[];
-  countdownRestSekunden: number;
-  punktestand: { teamname: string; punkte: number }[];
-  endstandRevealCount: number;
-  preiseText?: string | null;
-}) {
-  if (!slide) {
-    return <div className="text-zinc-500">Kein Slide vorhanden</div>;
-  }
-
-  function renderPunktestandPreview({
-    anonym,
-    titel,
-    istEndstand,
-  }: {
-    anonym: boolean;
-    titel: string;
-    istEndstand: boolean;
-  }) {
-    const topTeams = [...punktestand]
-      .sort((a, b) => b.punkte - a.punkte)
-      .slice(0, 5);
-
-    const teamsMitPlatz = topTeams.map((team) => {
-      const ersterIndex = topTeams.findIndex(
-        (vergleich) => vergleich.punkte === team.punkte,
-      );
-
-      return {
-        ...team,
-        platz: ersterIndex + 1,
-      };
-    });
-
-    const platzGruppen = Array.from(
-      new Set(teamsMitPlatz.map((team) => team.platz)),
-    ).sort((a, b) => b - a);
-
-    const sichtbarePlaetze = istEndstand
-      ? platzGruppen.slice(
-          0,
-          Math.min(endstandRevealCount, platzGruppen.length),
-        )
-      : platzGruppen;
-
-    const naechsterPlatz = istEndstand
-      ? (platzGruppen[endstandRevealCount] ?? null)
-      : null;
-
-    return (
-      <div className="grid h-full min-h-360px grid-cols-[minmax(0,1.55fr)_minmax(280px,0.75fr)] gap-5">
-        <div className="rounded-2xl border border-zinc-700 bg-zinc-950 p-5">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <div className="text-sm uppercase tracking-[0.25em] text-yellow-300">
-                {titel}
-              </div>
-              {istEndstand && (
-                <div className="mt-1 text-xs text-zinc-400">
-                  Sichtbar:{" "}
-                  <span className="font-bold text-yellow-300">
-                    {sichtbarePlaetze
-                      .map((platz) => `Platz ${platz}`)
-                      .join(", ")}
-                  </span>
-                  {naechsterPlatz && (
-                    <>
-                      {" "}
-                      · Nächster Klick:{" "}
-                      <span className="font-bold text-cyan-300">
-                        Platz {naechsterPlatz}
-                      </span>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-xl border border-zinc-800">
-            {teamsMitPlatz.map((team, index) => {
-              const istSichtbar = sichtbarePlaetze.includes(team.platz);
-              const name = anonym ? `Team ${index + 1}` : team.teamname;
-
-              return (
-                <div
-                  key={`${team.teamname}-${index}`}
-                  className={`grid grid-cols-[80px_1fr_110px] items-center gap-3 border-b border-zinc-800 px-4 py-3 last:border-b-0 ${
-                    istSichtbar
-                      ? "bg-yellow-400/10 text-white"
-                      : "bg-black/30 text-zinc-600"
-                  }`}
-                >
-                  <div className="text-xl font-black">#{team.platz}</div>
-
-                  <div className="truncate text-lg font-bold">
-                    {istSichtbar ? name : "???"}
-                  </div>
-
-                  <div className="text-right text-xl font-black">
-                    {istSichtbar ? team.punkte.toFixed(1) : "?"}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-700 bg-zinc-950 p-5">
-          <h3 className="mb-4 text-xl font-black">Preise</h3>
-
-          {preiseText ? (
-            <div className="whitespace-pre-line text-sm leading-relaxed text-zinc-300">
-              {preiseText}
-            </div>
-          ) : (
-            <div className="text-sm text-zinc-500">
-              Keine Preise hinterlegt.
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (slide.typ === "fixer-slide") {
-    return (
-      <div className="flex h-full min-h-300px items-center justify-center text-center">
-        <div>
-          <div className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-300">
-            Fixer Slide
-          </div>
-          <div className="text-5xl font-black">
-            {getSlideTitel(slide, slides)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (slide.typ === "block") {
-    return (
-      <div className="flex h-full min-h-300px items-center justify-center text-center">
-        <div>
-          <div className="mb-4 text-sm uppercase tracking-[0.3em] text-pink-300">
-            Block
-          </div>
-          <div className="text-5xl font-black">
-            {getAbschnittAnzeigeTitel(slide.abschnitt, slides)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (slide.typ === "frage") {
-    const bildMedien = slide.frage.medien.filter((medium) =>
-      medium.medientyp.toLowerCase().includes("bild"),
-    );
-
-    return (
-      <div className="flex h-full min-h-360px flex-col justify-center">
-        <div className="mb-4 text-sm uppercase tracking-[0.3em] text-cyan-300">
-          Frage {slide.frageIndexImBlock} / {slide.fragenAnzahlImBlock}
-        </div>
-
-        <div className="grid items-center gap-8 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="text-4xl font-black leading-tight">
-            {slide.frage.frage}
-          </div>
-
-          {bildMedien.length > 0 && (
-            <div className="overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
-              <img
-                src={bildMedien[0].datei}
-                alt=""
-                className="max-h-320px w-full object-contain"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (slide.typ === "aufloesung") {
-    const richtigeAntworten = slide.frage.antworten
-      .filter((antwort) => antwort.ist_richtig)
-      .map((antwort) => antwort.antwort);
-
-    return (
-      <div>
-        <div className="mb-4 text-sm uppercase tracking-[0.3em] text-emerald-300">
-          Auflösung
-        </div>
-        <div className="mb-8 text-3xl font-black leading-tight">
-          {slide.frage.frage}
-        </div>
-        <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/40 p-5 text-2xl font-bold text-emerald-100">
-          {richtigeAntworten.length > 0
-            ? richtigeAntworten.join(" / ")
-            : "Keine Antwort hinterlegt"}
-        </div>
-      </div>
-    );
-  }
-
-  if (slide.typ === "pause") {
-    return (
-      <div className="flex h-full min-h-300px items-center justify-center text-center">
-        <div>
-          <div className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-300">
-            Antwortzeit
-          </div>
-          <div className="text-6xl font-black">
-            {formatSeconds(countdownRestSekunden)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (slide.typ === "zwischenstand") {
-    return renderPunktestandPreview({
-      anonym: true,
-      titel: "Anonymer Zwischenstand",
-      istEndstand: false,
-    });
-  }
-
-  if (slide.typ === "endstand") {
-    return renderPunktestandPreview({
-      anonym: false,
-      titel: "Finale Tabelle",
-      istEndstand: true,
-    });
-  }
-
-  return <div className="text-zinc-500">Unbekannter Slide</div>;
-}
 export default function ModerationClient({
   quizId,
   quiz,
@@ -522,38 +198,8 @@ export default function ModerationClient({
     });
   }
 
-  async function goToSlide(nextIndex: number) {
-    const safeIndex = Math.min(
-      Math.max(nextIndex, 0),
-      Math.max(slides.length - 1, 0),
-    );
 
-    if (safeIndex === slideIndex) return;
-
-    await speichereDauerVomAktuellenSlide();
-
-    const newStartedAt = new Date().toISOString();
-
-    if (mediumOverlayAktiv) {
-      setMediumOverlayAktivLokal(false);
-
-      await setMediumOverlayAktiv({
-        quizId,
-        aktiv: false,
-      });
-    }
-
-    setSlideIndex(safeIndex);
-    setSlideStartedAt(newStartedAt);
-    setShowAuswertungDialog(false);
-    setAuswertungDialogBereitsGezeigt(false);
-    setEndstandRevealCountLokal(1);
-
-    await setPraesentationSlideIndex(quizId, safeIndex);
-    await aktualisiereAntwortStatus();
-  }
-
-  async function handleBlockFreigeben() {
+  const handleBlockFreigeben = useCallback(async () => {
     const abschnitt =
       aktuellerSlide && "abschnitt" in aktuellerSlide
         ? aktuellerSlide.abschnitt
@@ -565,27 +211,9 @@ export default function ModerationClient({
       quizId,
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
     });
-  }
+  }, [aktuellerSlide, quizId]);
 
-  async function aktualisiereAntwortStatus() {
-    const aktuelleQuizFragenId =
-      aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
-        ? aktuellerSlide.frage.quiz_fragen_id
-        : null;
-
-    const neuerStatus = await getAntwortStatus(quizId, aktuelleQuizFragenId);
-
-    setAntwortStatus({
-      teamsAngemeldet: neuerStatus.teamsAngemeldet,
-      antwortenEingegangen: neuerStatus.antwortenEingegangen,
-      prozent: neuerStatus.prozent,
-      letzteAntwortAt: neuerStatus.letzteAntwortAt
-        ? neuerStatus.letzteAntwortAt.toISOString()
-        : null,
-    });
-  }
-
-  async function handleBlockSchliessen() {
+  const handleBlockSchliessen = useCallback(async () => {
     const abschnitt =
       aktuellerSlide && "abschnitt" in aktuellerSlide
         ? aktuellerSlide.abschnitt
@@ -597,35 +225,13 @@ export default function ModerationClient({
       quizId,
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
     });
-  }
+  }, [aktuellerSlide, quizId]);
 
-  async function handleBlockToggle() {
-    if (blockFreigegeben) {
-      await handleBlockSchliessen();
-      setBlockFreigegeben(false);
-      return;
-    }
-
-    await handleBlockFreigeben();
-    setBlockFreigegeben(true);
-  }
-
-  function vorherigerSlide() {
+  const vorherigerSlide = useCallback(() => {
     void goToSlide(slideIndex - 1);
-  }
+  }, [slideIndex]);
 
-  function zurErstenSlide() {
-    void goToSlide(0);
-  }
-
-  async function handleQuizBeenden() {
-    setQuizBeendet(true);
-    setConfirmEndOpen(false);
-
-    await beendeCountdown({ quizId });
-  }
-
-  async function naechsterSlideAction() {
+  const naechsterSlideAction = useCallback(async () => {
     if (aktuellerSlide?.typ === "endstand") {
       const punktestand = await getQuizPunktestand(quizId);
       const topTeams = punktestand.slice(0, 5);
@@ -659,8 +265,9 @@ export default function ModerationClient({
     }
 
     void goToSlide(slideIndex + 1);
-  }
-  async function handleMediumToggle() {
+  }, [aktuellerSlide, quizId, endstandRevealCount, slideIndex]);
+
+  const handleMediumToggle = useCallback(async () => {
     const neuerWert = !mediumOverlayAktiv;
 
     setMediumOverlayAktivLokal(neuerWert);
@@ -669,9 +276,9 @@ export default function ModerationClient({
       quizId,
       aktiv: neuerWert,
     });
-  }
+  }, [mediumOverlayAktiv, quizId]);
 
-  async function handleAudioPlay() {
+  const handleAudioPlay = useCallback(async () => {
     const naechsteAktion = audioLaeuft ? "pause" : "play";
 
     setAudioLaeuft(!audioLaeuft);
@@ -680,12 +287,88 @@ export default function ModerationClient({
       quizId,
       aktion: naechsteAktion,
     });
-  }
+  }, [audioLaeuft, quizId]);
 
-  function handleAuswertungOeffnen() {
+  const handleAuswertungOeffnen = useCallback(() => {
     setShowAuswertungIframe(true);
     setShowAuswertungDialog(false);
+  }, []);
+  const aktualisiereAntwortStatus = useCallback(async () => {
+  const aktuelleQuizFragenId =
+    aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
+      ? aktuellerSlide.frage.quiz_fragen_id
+      : null;
+
+  const neuerStatus = await getAntwortStatus(
+    quizId,
+    aktuelleQuizFragenId,
+  );
+
+  setAntwortStatus({
+    teamsAngemeldet: neuerStatus.teamsAngemeldet,
+    antwortenEingegangen: neuerStatus.antwortenEingegangen,
+    prozent: neuerStatus.prozent,
+    letzteAntwortAt: neuerStatus.letzteAntwortAt
+      ? neuerStatus.letzteAntwortAt.toISOString()
+      : null,
+  });
+}, [aktuellerSlide, quizId]);
+
+
+
+  async function goToSlide(nextIndex: number) {
+    const safeIndex = Math.min(
+      Math.max(nextIndex, 0),
+      Math.max(slides.length - 1, 0),
+    );
+
+    if (safeIndex === slideIndex) return;
+
+    await speichereDauerVomAktuellenSlide();
+
+    const newStartedAt = new Date().toISOString();
+
+    if (mediumOverlayAktiv) {
+      setMediumOverlayAktivLokal(false);
+
+      await setMediumOverlayAktiv({
+        quizId,
+        aktiv: false,
+      });
+    }
+
+    setSlideIndex(safeIndex);
+    setSlideStartedAt(newStartedAt);
+    setShowAuswertungDialog(false);
+    setAuswertungDialogBereitsGezeigt(false);
+    setEndstandRevealCountLokal(1);
+
+    await setPraesentationSlideIndex(quizId, safeIndex);
+    await aktualisiereAntwortStatus();
   }
+
+  async function handleBlockToggle() {
+    if (blockFreigegeben) {
+      await handleBlockSchliessen();
+      setBlockFreigegeben(false);
+      return;
+    }
+
+    await handleBlockFreigeben();
+    setBlockFreigegeben(true);
+  }
+
+  function zurErstenSlide() {
+    void goToSlide(0);
+  }
+
+  async function handleQuizBeenden() {
+    setQuizBeendet(true);
+    setConfirmEndOpen(false);
+
+    await beendeCountdown({ quizId });
+  }
+
   async function handleSchaetzfrageStarten() {
     const frage = await getZufaelligeSchaetzfrage();
 
@@ -769,102 +452,27 @@ export default function ModerationClient({
     void ladePunktestand();
   }, [aktuellerSlide?.typ, quizId]);
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      const tagName = target?.tagName?.toLowerCase();
-
-      if (
-        tagName === "input" ||
-        tagName === "textarea" ||
-        tagName === "select" ||
-        target?.isContentEditable
-      ) {
-        return;
-      }
-
-      if (
-        event.key === "ArrowRight" ||
-        event.key === "PageDown" ||
-        event.key === " "
-      ) {
-        event.preventDefault();
-        naechsterSlideAction();
-        return;
-      }
-
-      if (
-        event.key === "ArrowLeft" ||
-        event.key === "PageUp" ||
-        event.key === "Backspace"
-      ) {
-        event.preventDefault();
-        vorherigerSlide();
-        return;
-      }
-
-      if (event.key.toLowerCase() === "f") {
-        event.preventDefault();
-
-        if (!document.fullscreenElement) {
-          void document.documentElement.requestFullscreen();
-        } else {
-          void document.exitFullscreen();
-        }
-      }
-      if (event.key.toLowerCase() === "b") {
-        event.preventDefault();
-        void handleBlockFreigeben();
-        return;
-      }
-
-      if (event.key.toLowerCase() === "s") {
-        event.preventDefault();
-        void handleBlockSchliessen();
-        return;
-      }
-
-      if (event.key.toLowerCase() === "a") {
-        event.preventDefault();
-        handleAuswertungOeffnen();
-        return;
-      }
-
-      if (event.key.toLowerCase() === "i") {
-        event.preventDefault();
-
-        if (hatMedien) {
-          void handleMediumToggle();
-        }
-
-        return;
-      }
-
-      if (event.key.toLowerCase() === "m") {
-        event.preventDefault();
-
-        if (hatAudio) {
-          void handleAudioPlay();
-        }
-
-        return;
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    slideIndex,
-    slides.length,
-    aktuellerSlide,
-    slideStartedAt,
+  useModerationHotkeys({
     hatMedien,
     hatAudio,
-    mediumOverlayAktiv,
-    audioLaeuft,
-    endstandRevealCount,
-  ]);
+    onWeiter: () => {
+      void naechsterSlideAction();
+    },
+    onZurueck: vorherigerSlide,
+    onBlockFreigeben: () => {
+      void handleBlockFreigeben();
+    },
+    onBlockSchliessen: () => {
+      void handleBlockSchliessen();
+    },
+    onAuswertungOeffnen: handleAuswertungOeffnen,
+    onMediumToggle: () => {
+      void handleMediumToggle();
+    },
+    onAudioToggle: () => {
+      void handleAudioPlay();
+    },
+  });
 
   return (
     <>
@@ -882,71 +490,14 @@ export default function ModerationClient({
         </p>
       </ConfirmDialog>
 
-      {showAuswertungDialog && (
-        <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/75 p-6">
-          <div className="w-full max-w-xl rounded-3xl border border-zinc-700 bg-zinc-900 p-8 text-white shadow-2xl">
-            <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-cyan-300">
-              Antwortzeit beendet
-            </div>
-
-            <h2 className="mb-4 text-3xl font-black">
-              Die Antworten sind eingefroren.
-            </h2>
-
-            <p className="mb-8 text-lg text-zinc-300">
-              Der zuletzt automatisch gespeicherte Stand zählt. Änderungen sind
-              ab jetzt nicht mehr möglich.
-            </p>
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  handleAuswertungOeffnen();
-                  setShowAuswertungDialog(false);
-                }}
-                className="rounded-xl bg-cyan-500 px-5 py-3 font-bold text-black hover:bg-cyan-400"
-              >
-                Auswertung öffnen
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowAuswertungDialog(false)}
-                className="rounded-xl bg-zinc-700 px-5 py-3 font-bold hover:bg-zinc-600"
-              >
-                Später
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAuswertungIframe && (
-        <div className="fixed inset-0 z-10000 flex flex-col bg-zinc-950 p-4 text-white">
-          <div className="mb-3 flex items-center justify-between">
-            <div>
-              <div className="text-sm font-black uppercase tracking-[0.3em] text-cyan-300">
-                Auswertung
-              </div>
-              <div className="text-xl font-black">Quiz {quizId}</div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowAuswertungIframe(false)}
-              className="rounded-xl bg-zinc-800 px-4 py-2 font-bold hover:bg-zinc-700"
-            >
-              Schließen
-            </button>
-          </div>
-
-          <iframe
-            src={`/quiz/${quizId}/auswertung`}
-            className="min-h-0 flex-1 rounded-2xl border border-zinc-700 bg-white"
-          />
-        </div>
-      )}
+      <AuswertungOverlay
+        quizId={quizId}
+        dialogOpen={showAuswertungDialog}
+        iframeOpen={showAuswertungIframe}
+        onAuswertungOeffnen={handleAuswertungOeffnen}
+        onDialogSchliessen={() => setShowAuswertungDialog(false)}
+        onIframeSchliessen={() => setShowAuswertungIframe(false)}
+      />
 
       <main className="h-screen overflow-hidden bg-zinc-950 p-4 text-zinc-100">
         <div className="grid h-[calc(100vh-2rem)] grid-cols-[minmax(0,2.4fr)_360px] gap-4">

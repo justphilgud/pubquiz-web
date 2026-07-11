@@ -1,9 +1,7 @@
 ---
 name: Feature
 about: Neue oder geänderte Produktfunktion
-title: ""
 labels: feature
-assignees: ""
 ---
 
 ## Ziel
@@ -11,32 +9,26 @@ assignees: ""
 ## Beschreibung
 
 ## Akzeptanzkriterien
-
 1.
 2.
 3.
 
 ## Betroffene Rollen
-
 - [ ] Administrator
 - [ ] Editor
 - [ ] Moderator
 - [ ] Quizteam
-- [ ] Öffentlich
 
 ## Dokumentationsauswirkung
-
 - [ ] Benutzerhandbuch
 - [ ] Administratorhandbuch
 - [ ] Produktkatalog
 - [ ] Roadmap
-- [ ] Architektur
-- [ ] Betrieb
-- [ ] Changelog / Release Notes
-- [ ] keine Dokumentationsänderung erforderlich
+- [ ] Architektur/Betrieb
+- [ ] Changelog/Release Notes
+- [ ] keine Änderung erforderlich
 
 ## Testauswirkung
-
 - [ ] neuer Testfall
 - [ ] bestehenden Testfall anpassen
 - [ ] kleine Regression

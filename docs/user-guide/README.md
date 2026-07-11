@@ -1,10 +1,7 @@
 # Benutzerhandbuch
 
-Geplante Kapitel:
-
-- Anmeldung und Passwort
-- Fragen erstellen und bearbeiten
-- Kategorien verwenden
-- Quiz erstellen, kopieren und archivieren
-- Quiz moderieren
-- Ergebnisse auswerten
+## Rollen
+- Administrator: Benutzer, Kategorien und Freigaben
+- Editor: Fragen erstellen und bearbeiten
+- Moderator: Quiz durchführen
+- Quizteam: teilnehmen und Antworten abgeben

@@ -7,7 +7,7 @@ function formatDuration(startAt: string | Date | null | undefined) {
 
   const diffSeconds = Math.max(
     0,
-    Math.floor((Date.now() - new Date(startAt).getTime()) / 1000)
+    Math.floor((Date.now() - new Date(startAt).getTime()) / 1000),
   );
 
   const hours = Math.floor(diffSeconds / 3600);
@@ -17,13 +17,13 @@ function formatDuration(startAt: string | Date | null | undefined) {
   if (hours > 0) {
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
       2,
-      "0"
+      "0",
     )}:${String(seconds).padStart(2, "0")}`;
   }
 
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
     2,
-    "0"
+    "0",
   )}`;
 }
 
@@ -36,17 +36,17 @@ export function LiveTimer({
   startAt: string | Date | null | undefined;
   emptyText?: string;
 }) {
-  const [value, setValue] = useState<string | null>(null);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    setValue(formatDuration(startAt));
-
     const interval = window.setInterval(() => {
-      setValue(formatDuration(startAt));
+      setTick((tick) => tick + 1);
     }, 1000);
 
     return () => window.clearInterval(interval);
-  }, [startAt]);
+  }, []);
+
+  const value = formatDuration(startAt);
 
   return (
     <div className="rounded-xl bg-zinc-950 p-4">
