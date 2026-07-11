@@ -28,15 +28,11 @@ import {
 } from "../praesentation/statusActions";
 
 import ModerationToolbar from "./components/ModerationToolbar";
-import TeamStatusPanel from "./components/TeamStatusPanel";
-import ProgressPanel from "./components/ProgressPanel";
-import TimePanel from "./components/TimePanel";
+import ModerationSidebar from "./components/ModerationSidebar";
 import SlideNotes from "./components/SlideNotes";
-import PresentationPreview from "./components/PresentationPreview";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import SlidePreview, { getSlideTitel } from "./components/SlidePreview";
-
 import AuswertungOverlay from "./components/AuswertungOverlay";
+import CurrentSlidePanel from "./components/CurrentSlidePanel";
 
 type ModerationStatus = {
   slide_index: number;
@@ -198,7 +194,6 @@ export default function ModerationClient({
     });
   }
 
-
   const handleBlockFreigeben = useCallback(async () => {
     const abschnitt =
       aktuellerSlide && "abschnitt" in aktuellerSlide
@@ -294,27 +289,22 @@ export default function ModerationClient({
     setShowAuswertungDialog(false);
   }, []);
   const aktualisiereAntwortStatus = useCallback(async () => {
-  const aktuelleQuizFragenId =
-    aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
-      ? aktuellerSlide.frage.quiz_fragen_id
-      : null;
+    const aktuelleQuizFragenId =
+      aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
+        ? aktuellerSlide.frage.quiz_fragen_id
+        : null;
 
-  const neuerStatus = await getAntwortStatus(
-    quizId,
-    aktuelleQuizFragenId,
-  );
+    const neuerStatus = await getAntwortStatus(quizId, aktuelleQuizFragenId);
 
-  setAntwortStatus({
-    teamsAngemeldet: neuerStatus.teamsAngemeldet,
-    antwortenEingegangen: neuerStatus.antwortenEingegangen,
-    prozent: neuerStatus.prozent,
-    letzteAntwortAt: neuerStatus.letzteAntwortAt
-      ? neuerStatus.letzteAntwortAt.toISOString()
-      : null,
-  });
-}, [aktuellerSlide, quizId]);
-
-
+    setAntwortStatus({
+      teamsAngemeldet: neuerStatus.teamsAngemeldet,
+      antwortenEingegangen: neuerStatus.antwortenEingegangen,
+      prozent: neuerStatus.prozent,
+      letzteAntwortAt: neuerStatus.letzteAntwortAt
+        ? neuerStatus.letzteAntwortAt.toISOString()
+        : null,
+    });
+  }, [aktuellerSlide, quizId]);
 
   async function goToSlide(nextIndex: number) {
     const safeIndex = Math.min(
@@ -502,30 +492,15 @@ export default function ModerationClient({
       <main className="h-screen overflow-hidden bg-zinc-950 p-4 text-zinc-100">
         <div className="grid h-[calc(100vh-2rem)] grid-cols-[minmax(0,2.4fr)_360px] gap-4">
           <section className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-              <div className="mb-3 text-sm text-zinc-400">
-                Aktueller Slide {slideIndex + 1} / {slides.length}
-              </div>
-
-              <h1 className="text-3xl font-bold">
-                {aktuellerSlide?.typ === "frage"
-                  ? "Frage"
-                  : aktuellerSlide?.typ === "aufloesung"
-                    ? "Auflösung"
-                    : getSlideTitel(aktuellerSlide, slides)}
-              </h1>
-
-              <div className="mt-6 min-h-[420px] rounded-xl border border-zinc-800 bg-black p-8 text-zinc-100">
-                <SlidePreview
-                  slide={aktuellerSlide}
-                  slides={slides}
-                  countdownRestSekunden={countdownRestSekunden}
-                  punktestand={punktestand}
-                  endstandRevealCount={endstandRevealCount}
-                  preiseText={quiz.intro_preise}
-                />
-              </div>
-            </div>
+            <CurrentSlidePanel
+              slideIndex={slideIndex}
+              slides={slides}
+              aktuellerSlide={aktuellerSlide}
+              countdownRestSekunden={countdownRestSekunden}
+              punktestand={punktestand}
+              endstandRevealCount={endstandRevealCount}
+              preiseText={quiz.intro_preise}
+            />
 
             <SlideNotes />
 
@@ -556,29 +531,16 @@ export default function ModerationClient({
             />
           </section>
 
-          <aside className="flex min-h-0 flex-col gap-3 overflow-hidden">
-            <PresentationPreview slide={naechsterSlide} />
-            <TeamStatusPanel antwortStatus={antwortStatus} />
-            <TimePanel
-              slideStartedAt={slideStartedAt}
-              quizStartedAt={quizStartedAt}
-              now={now}
-              quizBeendet={quizBeendet}
-            />
-            <ProgressPanel
-              slideIndex={slideIndex}
-              slidesLength={slides.length}
-              quizStartedAt={quizStartedAt}
-              now={now}
-            />
-
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 text-xs leading-relaxed text-zinc-400">
-              <div className="mb-1 text-sm font-semibold text-zinc-200">
-                Hotkeys
-              </div>
-              ←/→ Slide · Leertaste weiter · PageUp/PageDown · F Vollbild
-            </div>
-          </aside>
+          <ModerationSidebar
+            naechsterSlide={naechsterSlide}
+            antwortStatus={antwortStatus}
+            slideStartedAt={slideStartedAt}
+            quizStartedAt={quizStartedAt}
+            now={now}
+            quizBeendet={quizBeendet}
+            slideIndex={slideIndex}
+            slidesLength={slides.length}
+          />
         </div>
       </main>
     </>
