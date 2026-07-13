@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 export function Modal({
   open,
@@ -15,10 +15,33 @@ export function Modal({
   footer?: ReactNode;
   onClose: () => void;
 }) {
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, open]);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="w-full max-w-lg rounded-xl bg-white shadow-xl">
         <div className="flex items-center justify-between border-b p-4">
           <h2 className="text-lg font-semibold">{title}</h2>

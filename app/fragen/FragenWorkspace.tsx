@@ -37,14 +37,22 @@ export default function FragenWorkspace({
   antworttypen,
   medientypen,
   quizze,
+  embedded = false,
+  defaultTab = "neu",
 }: {
   kategorien: Kategorie[];
   antworttypen: Antworttyp[];
   medientypen: Medientyp[];
   quizze: QuizOption[];
+  embedded?: boolean;
+  defaultTab?: "neu" | "suche";
 }) {
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab") === "suche" ? "suche" : "neu";
+  const requestedTab = searchParams.get("tab");
+  const initialTab =
+    requestedTab === "neu" || requestedTab === "suche"
+      ? requestedTab
+      : defaultTab;
 
   const [activeTab, setActiveTab] = useState<"neu" | "suche">(initialTab);
   const [editFrage, setEditFrage] = useState<EditFrage>(null);
@@ -52,16 +60,20 @@ export default function FragenWorkspace({
     setEditFrage(null);
   };
 
+  const Wrapper = embedded ? "div" : "main";
+
   return (
-    <main className="min-h-screen p-4 md:p-8">
-      <div className="mx-auto max-w-5xl">
+    <Wrapper className={embedded ? "" : "min-h-screen p-4 md:p-8"}>
+      <div className={embedded ? "" : "mx-auto max-w-5xl"}>
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Fragen</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Fragen anlegen, suchen und bearbeiten.
-            </p>
-          </div>
+          {!embedded && (
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">Fragen</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Fragen anlegen, suchen und bearbeiten.
+              </p>
+            </div>
+          )}
 
           <div className="flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
             <button
@@ -121,6 +133,6 @@ export default function FragenWorkspace({
         </div>
 
       </div>
-    </main>
+    </Wrapper>
   );
 }

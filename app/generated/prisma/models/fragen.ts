@@ -33,6 +33,8 @@ export type FragenAvgAggregateOutputType = {
   created_by_user_id: number | null
   last_modified_by_user_id: number | null
   approved_by_user_id: number | null
+  submitted_by_user_id: number | null
+  reviewed_by_user_id: number | null
 }
 
 export type FragenSumAggregateOutputType = {
@@ -42,6 +44,8 @@ export type FragenSumAggregateOutputType = {
   created_by_user_id: number | null
   last_modified_by_user_id: number | null
   approved_by_user_id: number | null
+  submitted_by_user_id: number | null
+  reviewed_by_user_id: number | null
 }
 
 export type FragenMinAggregateOutputType = {
@@ -61,6 +65,15 @@ export type FragenMinAggregateOutputType = {
   approved_by_user_id: number | null
   approved_at: Date | null
   freigegeben: boolean | null
+  ist_unfertig: boolean | null
+  moderationsnotizen: string | null
+  gueltig_bis: Date | null
+  review_status: $Enums.QuestionReviewStatus | null
+  submitted_at: Date | null
+  submitted_by_user_id: number | null
+  review_feedback: string | null
+  reviewed_at: Date | null
+  reviewed_by_user_id: number | null
 }
 
 export type FragenMaxAggregateOutputType = {
@@ -80,6 +93,15 @@ export type FragenMaxAggregateOutputType = {
   approved_by_user_id: number | null
   approved_at: Date | null
   freigegeben: boolean | null
+  ist_unfertig: boolean | null
+  moderationsnotizen: string | null
+  gueltig_bis: Date | null
+  review_status: $Enums.QuestionReviewStatus | null
+  submitted_at: Date | null
+  submitted_by_user_id: number | null
+  review_feedback: string | null
+  reviewed_at: Date | null
+  reviewed_by_user_id: number | null
 }
 
 export type FragenCountAggregateOutputType = {
@@ -99,6 +121,15 @@ export type FragenCountAggregateOutputType = {
   approved_by_user_id: number
   approved_at: number
   freigegeben: number
+  ist_unfertig: number
+  moderationsnotizen: number
+  gueltig_bis: number
+  review_status: number
+  submitted_at: number
+  submitted_by_user_id: number
+  review_feedback: number
+  reviewed_at: number
+  reviewed_by_user_id: number
   _all: number
 }
 
@@ -110,6 +141,8 @@ export type FragenAvgAggregateInputType = {
   created_by_user_id?: true
   last_modified_by_user_id?: true
   approved_by_user_id?: true
+  submitted_by_user_id?: true
+  reviewed_by_user_id?: true
 }
 
 export type FragenSumAggregateInputType = {
@@ -119,6 +152,8 @@ export type FragenSumAggregateInputType = {
   created_by_user_id?: true
   last_modified_by_user_id?: true
   approved_by_user_id?: true
+  submitted_by_user_id?: true
+  reviewed_by_user_id?: true
 }
 
 export type FragenMinAggregateInputType = {
@@ -138,6 +173,15 @@ export type FragenMinAggregateInputType = {
   approved_by_user_id?: true
   approved_at?: true
   freigegeben?: true
+  ist_unfertig?: true
+  moderationsnotizen?: true
+  gueltig_bis?: true
+  review_status?: true
+  submitted_at?: true
+  submitted_by_user_id?: true
+  review_feedback?: true
+  reviewed_at?: true
+  reviewed_by_user_id?: true
 }
 
 export type FragenMaxAggregateInputType = {
@@ -157,6 +201,15 @@ export type FragenMaxAggregateInputType = {
   approved_by_user_id?: true
   approved_at?: true
   freigegeben?: true
+  ist_unfertig?: true
+  moderationsnotizen?: true
+  gueltig_bis?: true
+  review_status?: true
+  submitted_at?: true
+  submitted_by_user_id?: true
+  review_feedback?: true
+  reviewed_at?: true
+  reviewed_by_user_id?: true
 }
 
 export type FragenCountAggregateInputType = {
@@ -176,6 +229,15 @@ export type FragenCountAggregateInputType = {
   approved_by_user_id?: true
   approved_at?: true
   freigegeben?: true
+  ist_unfertig?: true
+  moderationsnotizen?: true
+  gueltig_bis?: true
+  review_status?: true
+  submitted_at?: true
+  submitted_by_user_id?: true
+  review_feedback?: true
+  reviewed_at?: true
+  reviewed_by_user_id?: true
   _all?: true
 }
 
@@ -282,6 +344,15 @@ export type FragenGroupByOutputType = {
   approved_by_user_id: number | null
   approved_at: Date | null
   freigegeben: boolean
+  ist_unfertig: boolean
+  moderationsnotizen: string | null
+  gueltig_bis: Date | null
+  review_status: $Enums.QuestionReviewStatus
+  submitted_at: Date | null
+  submitted_by_user_id: number | null
+  review_feedback: string | null
+  reviewed_at: Date | null
+  reviewed_by_user_id: number | null
   _count: FragenCountAggregateOutputType | null
   _avg: FragenAvgAggregateOutputType | null
   _sum: FragenSumAggregateOutputType | null
@@ -324,6 +395,15 @@ export type fragenWhereInput = {
   approved_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
   approved_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
   freigegeben?: Prisma.BoolFilter<"fragen"> | boolean
+  ist_unfertig?: Prisma.BoolFilter<"fragen"> | boolean
+  moderationsnotizen?: Prisma.StringNullableFilter<"fragen"> | string | null
+  gueltig_bis?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFilter<"fragen"> | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  submitted_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
+  review_feedback?: Prisma.StringNullableFilter<"fragen"> | string | null
+  reviewed_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  reviewed_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
   antworten?: Prisma.AntwortenListRelationFilter
   antwortfelder?: Prisma.Frage_antwortfelderListRelationFilter
   vorlage?: Prisma.XOR<Prisma.Frage_vorlagenNullableScalarRelationFilter, Prisma.frage_vorlagenWhereInput> | null
@@ -349,6 +429,15 @@ export type fragenOrderByWithRelationInput = {
   approved_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
   approved_at?: Prisma.SortOrderInput | Prisma.SortOrder
   freigegeben?: Prisma.SortOrder
+  ist_unfertig?: Prisma.SortOrder
+  moderationsnotizen?: Prisma.SortOrderInput | Prisma.SortOrder
+  gueltig_bis?: Prisma.SortOrderInput | Prisma.SortOrder
+  review_status?: Prisma.SortOrder
+  submitted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  review_feedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
   antworten?: Prisma.antwortenOrderByRelationAggregateInput
   antwortfelder?: Prisma.frage_antwortfelderOrderByRelationAggregateInput
   vorlage?: Prisma.frage_vorlagenOrderByWithRelationInput
@@ -377,6 +466,15 @@ export type fragenWhereUniqueInput = Prisma.AtLeast<{
   approved_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
   approved_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
   freigegeben?: Prisma.BoolFilter<"fragen"> | boolean
+  ist_unfertig?: Prisma.BoolFilter<"fragen"> | boolean
+  moderationsnotizen?: Prisma.StringNullableFilter<"fragen"> | string | null
+  gueltig_bis?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFilter<"fragen"> | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  submitted_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
+  review_feedback?: Prisma.StringNullableFilter<"fragen"> | string | null
+  reviewed_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  reviewed_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
   antworten?: Prisma.AntwortenListRelationFilter
   antwortfelder?: Prisma.Frage_antwortfelderListRelationFilter
   vorlage?: Prisma.XOR<Prisma.Frage_vorlagenNullableScalarRelationFilter, Prisma.frage_vorlagenWhereInput> | null
@@ -402,6 +500,15 @@ export type fragenOrderByWithAggregationInput = {
   approved_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
   approved_at?: Prisma.SortOrderInput | Prisma.SortOrder
   freigegeben?: Prisma.SortOrder
+  ist_unfertig?: Prisma.SortOrder
+  moderationsnotizen?: Prisma.SortOrderInput | Prisma.SortOrder
+  gueltig_bis?: Prisma.SortOrderInput | Prisma.SortOrder
+  review_status?: Prisma.SortOrder
+  submitted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  review_feedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.fragenCountOrderByAggregateInput
   _avg?: Prisma.fragenAvgOrderByAggregateInput
   _max?: Prisma.fragenMaxOrderByAggregateInput
@@ -429,6 +536,15 @@ export type fragenScalarWhereWithAggregatesInput = {
   approved_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"fragen"> | number | null
   approved_at?: Prisma.DateTimeNullableWithAggregatesFilter<"fragen"> | Date | string | null
   freigegeben?: Prisma.BoolWithAggregatesFilter<"fragen"> | boolean
+  ist_unfertig?: Prisma.BoolWithAggregatesFilter<"fragen"> | boolean
+  moderationsnotizen?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
+  gueltig_bis?: Prisma.DateTimeNullableWithAggregatesFilter<"fragen"> | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusWithAggregatesFilter<"fragen"> | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"fragen"> | Date | string | null
+  submitted_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"fragen"> | number | null
+  review_feedback?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
+  reviewed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"fragen"> | Date | string | null
+  reviewed_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"fragen"> | number | null
 }
 
 export type fragenCreateInput = {
@@ -446,6 +562,15 @@ export type fragenCreateInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
   vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
@@ -471,6 +596,15 @@ export type fragenUncheckedCreateInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
@@ -493,6 +627,15 @@ export type fragenUpdateInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
   vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
@@ -518,6 +661,15 @@ export type fragenUncheckedUpdateInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
@@ -542,6 +694,15 @@ export type fragenCreateManyInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
 }
 
 export type fragenUpdateManyMutationInput = {
@@ -559,6 +720,15 @@ export type fragenUpdateManyMutationInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type fragenUncheckedUpdateManyInput = {
@@ -578,6 +748,15 @@ export type fragenUncheckedUpdateManyInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type FragenScalarRelationFilter = {
@@ -602,6 +781,15 @@ export type fragenCountOrderByAggregateInput = {
   approved_by_user_id?: Prisma.SortOrder
   approved_at?: Prisma.SortOrder
   freigegeben?: Prisma.SortOrder
+  ist_unfertig?: Prisma.SortOrder
+  moderationsnotizen?: Prisma.SortOrder
+  gueltig_bis?: Prisma.SortOrder
+  review_status?: Prisma.SortOrder
+  submitted_at?: Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrder
+  review_feedback?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type fragenAvgOrderByAggregateInput = {
@@ -611,6 +799,8 @@ export type fragenAvgOrderByAggregateInput = {
   created_by_user_id?: Prisma.SortOrder
   last_modified_by_user_id?: Prisma.SortOrder
   approved_by_user_id?: Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type fragenMaxOrderByAggregateInput = {
@@ -630,6 +820,15 @@ export type fragenMaxOrderByAggregateInput = {
   approved_by_user_id?: Prisma.SortOrder
   approved_at?: Prisma.SortOrder
   freigegeben?: Prisma.SortOrder
+  ist_unfertig?: Prisma.SortOrder
+  moderationsnotizen?: Prisma.SortOrder
+  gueltig_bis?: Prisma.SortOrder
+  review_status?: Prisma.SortOrder
+  submitted_at?: Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrder
+  review_feedback?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type fragenMinOrderByAggregateInput = {
@@ -649,6 +848,15 @@ export type fragenMinOrderByAggregateInput = {
   approved_by_user_id?: Prisma.SortOrder
   approved_at?: Prisma.SortOrder
   freigegeben?: Prisma.SortOrder
+  ist_unfertig?: Prisma.SortOrder
+  moderationsnotizen?: Prisma.SortOrder
+  gueltig_bis?: Prisma.SortOrder
+  review_status?: Prisma.SortOrder
+  submitted_at?: Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrder
+  review_feedback?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type fragenSumOrderByAggregateInput = {
@@ -658,6 +866,8 @@ export type fragenSumOrderByAggregateInput = {
   created_by_user_id?: Prisma.SortOrder
   last_modified_by_user_id?: Prisma.SortOrder
   approved_by_user_id?: Prisma.SortOrder
+  submitted_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type FragenNullableScalarRelationFilter = {
@@ -689,10 +899,6 @@ export type fragenUpdateOneRequiredWithoutAntwortenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.fragenUpdateToOneWithWhereWithoutAntwortenInput, Prisma.fragenUpdateWithoutAntwortenInput>, Prisma.fragenUncheckedUpdateWithoutAntwortenInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableDecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -715,6 +921,10 @@ export type NullableIntFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type EnumQuestionReviewStatusFieldUpdateOperationsInput = {
+  set?: $Enums.QuestionReviewStatus
 }
 
 export type fragenCreateNestedOneWithoutFragen_kategorienInput = {
@@ -832,6 +1042,15 @@ export type fragenCreateWithoutAntwortenInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
   vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
   fragen_kategorien?: Prisma.fragen_kategorienCreateNestedManyWithoutFragenInput
@@ -856,6 +1075,15 @@ export type fragenUncheckedCreateWithoutAntwortenInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutFragenInput
@@ -893,6 +1121,15 @@ export type fragenUpdateWithoutAntwortenInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
   vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUpdateManyWithoutFragenNestedInput
@@ -917,6 +1154,15 @@ export type fragenUncheckedUpdateWithoutAntwortenInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
   medien?: Prisma.medienUncheckedUpdateManyWithoutFragenNestedInput
@@ -938,6 +1184,15 @@ export type fragenCreateWithoutFragen_kategorienInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
   vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
@@ -962,6 +1217,15 @@ export type fragenUncheckedCreateWithoutFragen_kategorienInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutFragenInput
@@ -999,6 +1263,15 @@ export type fragenUpdateWithoutFragen_kategorienInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
   vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
@@ -1023,6 +1296,15 @@ export type fragenUncheckedUpdateWithoutFragen_kategorienInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   medien?: Prisma.medienUncheckedUpdateManyWithoutFragenNestedInput
@@ -1044,6 +1326,15 @@ export type fragenCreateWithoutMedienInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
   vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
@@ -1068,6 +1359,15 @@ export type fragenUncheckedCreateWithoutMedienInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
@@ -1105,6 +1405,15 @@ export type fragenUpdateWithoutMedienInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
   vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
@@ -1129,6 +1438,15 @@ export type fragenUncheckedUpdateWithoutMedienInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
@@ -1150,6 +1468,15 @@ export type fragenCreateWithoutQuiz_fragenInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
   vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
@@ -1174,6 +1501,15 @@ export type fragenUncheckedCreateWithoutQuiz_fragenInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
@@ -1211,6 +1547,15 @@ export type fragenUpdateWithoutQuiz_fragenInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
   vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
@@ -1235,6 +1580,15 @@ export type fragenUncheckedUpdateWithoutQuiz_fragenInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
@@ -1256,6 +1610,15 @@ export type fragenCreateWithoutAntwortfelderInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
   vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
   fragen_kategorien?: Prisma.fragen_kategorienCreateNestedManyWithoutFragenInput
@@ -1280,6 +1643,15 @@ export type fragenUncheckedCreateWithoutAntwortfelderInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutFragenInput
@@ -1317,6 +1689,15 @@ export type fragenUpdateWithoutAntwortfelderInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
   vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUpdateManyWithoutFragenNestedInput
@@ -1341,6 +1722,15 @@ export type fragenUncheckedUpdateWithoutAntwortfelderInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
   medien?: Prisma.medienUncheckedUpdateManyWithoutFragenNestedInput
@@ -1362,6 +1752,15 @@ export type fragenCreateWithoutVorlageInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
   fragen_kategorien?: Prisma.fragen_kategorienCreateNestedManyWithoutFragenInput
@@ -1385,6 +1784,15 @@ export type fragenUncheckedCreateWithoutVorlageInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
   antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
@@ -1438,6 +1846,15 @@ export type fragenScalarWhereInput = {
   approved_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
   approved_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
   freigegeben?: Prisma.BoolFilter<"fragen"> | boolean
+  ist_unfertig?: Prisma.BoolFilter<"fragen"> | boolean
+  moderationsnotizen?: Prisma.StringNullableFilter<"fragen"> | string | null
+  gueltig_bis?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFilter<"fragen"> | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  submitted_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
+  review_feedback?: Prisma.StringNullableFilter<"fragen"> | string | null
+  reviewed_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
+  reviewed_by_user_id?: Prisma.IntNullableFilter<"fragen"> | number | null
 }
 
 export type fragenCreateManyVorlageInput = {
@@ -1456,6 +1873,15 @@ export type fragenCreateManyVorlageInput = {
   approved_by_user_id?: number | null
   approved_at?: Date | string | null
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
 }
 
 export type fragenUpdateWithoutVorlageInput = {
@@ -1473,6 +1899,15 @@ export type fragenUpdateWithoutVorlageInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUpdateManyWithoutFragenNestedInput
@@ -1496,6 +1931,15 @@ export type fragenUncheckedUpdateWithoutVorlageInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
@@ -1519,6 +1963,15 @@ export type fragenUncheckedUpdateManyWithoutVorlageInput = {
   approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -1605,6 +2058,15 @@ export type fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   approved_by_user_id?: boolean
   approved_at?: boolean
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: boolean
+  gueltig_bis?: boolean
+  review_status?: boolean
+  submitted_at?: boolean
+  submitted_by_user_id?: boolean
+  review_feedback?: boolean
+  reviewed_at?: boolean
+  reviewed_by_user_id?: boolean
   antworten?: boolean | Prisma.fragen$antwortenArgs<ExtArgs>
   antwortfelder?: boolean | Prisma.fragen$antwortfelderArgs<ExtArgs>
   vorlage?: boolean | Prisma.fragen$vorlageArgs<ExtArgs>
@@ -1631,6 +2093,15 @@ export type fragenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   approved_by_user_id?: boolean
   approved_at?: boolean
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: boolean
+  gueltig_bis?: boolean
+  review_status?: boolean
+  submitted_at?: boolean
+  submitted_by_user_id?: boolean
+  review_feedback?: boolean
+  reviewed_at?: boolean
+  reviewed_by_user_id?: boolean
   vorlage?: boolean | Prisma.fragen$vorlageArgs<ExtArgs>
 }, ExtArgs["result"]["fragen"]>
 
@@ -1651,6 +2122,15 @@ export type fragenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   approved_by_user_id?: boolean
   approved_at?: boolean
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: boolean
+  gueltig_bis?: boolean
+  review_status?: boolean
+  submitted_at?: boolean
+  submitted_by_user_id?: boolean
+  review_feedback?: boolean
+  reviewed_at?: boolean
+  reviewed_by_user_id?: boolean
   vorlage?: boolean | Prisma.fragen$vorlageArgs<ExtArgs>
 }, ExtArgs["result"]["fragen"]>
 
@@ -1671,9 +2151,18 @@ export type fragenSelectScalar = {
   approved_by_user_id?: boolean
   approved_at?: boolean
   freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: boolean
+  gueltig_bis?: boolean
+  review_status?: boolean
+  submitted_at?: boolean
+  submitted_by_user_id?: boolean
+  review_feedback?: boolean
+  reviewed_at?: boolean
+  reviewed_by_user_id?: boolean
 }
 
-export type fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragen_id" | "frage" | "quelle" | "fragentyp" | "schwierigkeitslevel" | "erstellungsdatum" | "ist_archiviert" | "archivierungsgrund" | "vorlage_id" | "created_by_user_id" | "created_at" | "last_modified_by_user_id" | "updated_at" | "approved_by_user_id" | "approved_at" | "freigegeben", ExtArgs["result"]["fragen"]>
+export type fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragen_id" | "frage" | "quelle" | "fragentyp" | "schwierigkeitslevel" | "erstellungsdatum" | "ist_archiviert" | "archivierungsgrund" | "vorlage_id" | "created_by_user_id" | "created_at" | "last_modified_by_user_id" | "updated_at" | "approved_by_user_id" | "approved_at" | "freigegeben" | "ist_unfertig" | "moderationsnotizen" | "gueltig_bis" | "review_status" | "submitted_at" | "submitted_by_user_id" | "review_feedback" | "reviewed_at" | "reviewed_by_user_id", ExtArgs["result"]["fragen"]>
 export type fragenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.fragen$antwortenArgs<ExtArgs>
   antwortfelder?: boolean | Prisma.fragen$antwortfelderArgs<ExtArgs>
@@ -1717,6 +2206,15 @@ export type $fragenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     approved_by_user_id: number | null
     approved_at: Date | null
     freigegeben: boolean
+    ist_unfertig: boolean
+    moderationsnotizen: string | null
+    gueltig_bis: Date | null
+    review_status: $Enums.QuestionReviewStatus
+    submitted_at: Date | null
+    submitted_by_user_id: number | null
+    review_feedback: string | null
+    reviewed_at: Date | null
+    reviewed_by_user_id: number | null
   }, ExtArgs["result"]["fragen"]>
   composites: {}
 }
@@ -2162,6 +2660,15 @@ export interface fragenFieldRefs {
   readonly approved_by_user_id: Prisma.FieldRef<"fragen", 'Int'>
   readonly approved_at: Prisma.FieldRef<"fragen", 'DateTime'>
   readonly freigegeben: Prisma.FieldRef<"fragen", 'Boolean'>
+  readonly ist_unfertig: Prisma.FieldRef<"fragen", 'Boolean'>
+  readonly moderationsnotizen: Prisma.FieldRef<"fragen", 'String'>
+  readonly gueltig_bis: Prisma.FieldRef<"fragen", 'DateTime'>
+  readonly review_status: Prisma.FieldRef<"fragen", 'QuestionReviewStatus'>
+  readonly submitted_at: Prisma.FieldRef<"fragen", 'DateTime'>
+  readonly submitted_by_user_id: Prisma.FieldRef<"fragen", 'Int'>
+  readonly review_feedback: Prisma.FieldRef<"fragen", 'String'>
+  readonly reviewed_at: Prisma.FieldRef<"fragen", 'DateTime'>
+  readonly reviewed_by_user_id: Prisma.FieldRef<"fragen", 'Int'>
 }
     
 

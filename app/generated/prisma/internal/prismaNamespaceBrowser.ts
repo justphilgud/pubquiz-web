@@ -96,7 +96,8 @@ export const AntwortenScalarFieldEnum = {
   fragen_id: 'fragen_id',
   antwort: 'antwort',
   ist_richtig: 'ist_richtig',
-  antworttyp_id: 'antworttyp_id'
+  antworttyp_id: 'antworttyp_id',
+  zusatzinformation: 'zusatzinformation'
 } as const
 
 export type AntwortenScalarFieldEnum = (typeof AntwortenScalarFieldEnum)[keyof typeof AntwortenScalarFieldEnum]
@@ -126,7 +127,16 @@ export const FragenScalarFieldEnum = {
   updated_at: 'updated_at',
   approved_by_user_id: 'approved_by_user_id',
   approved_at: 'approved_at',
-  freigegeben: 'freigegeben'
+  freigegeben: 'freigegeben',
+  ist_unfertig: 'ist_unfertig',
+  moderationsnotizen: 'moderationsnotizen',
+  gueltig_bis: 'gueltig_bis',
+  review_status: 'review_status',
+  submitted_at: 'submitted_at',
+  submitted_by_user_id: 'submitted_by_user_id',
+  review_feedback: 'review_feedback',
+  reviewed_at: 'reviewed_at',
+  reviewed_by_user_id: 'reviewed_by_user_id'
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
@@ -321,7 +331,8 @@ export const Frage_antwortfeld_loesungenScalarFieldEnum = {
   antwortfeld_id: 'antwortfeld_id',
   loesung_text: 'loesung_text',
   sortierung: 'sortierung',
-  ist_akzeptiert: 'ist_akzeptiert'
+  ist_akzeptiert: 'ist_akzeptiert',
+  zusatzinformation: 'zusatzinformation'
 } as const
 
 export type Frage_antwortfeld_loesungenScalarFieldEnum = (typeof Frage_antwortfeld_loesungenScalarFieldEnum)[keyof typeof Frage_antwortfeld_loesungenScalarFieldEnum]

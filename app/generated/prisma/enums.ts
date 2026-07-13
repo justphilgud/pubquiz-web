@@ -15,3 +15,13 @@ export const UserRole = {
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const QuestionReviewStatus = {
+  DRAFT: 'DRAFT',
+  IN_REVIEW: 'IN_REVIEW',
+  CHANGES_REQUESTED: 'CHANGES_REQUESTED',
+  APPROVED: 'APPROVED'
+} as const
+
+export type QuestionReviewStatus = (typeof QuestionReviewStatus)[keyof typeof QuestionReviewStatus]

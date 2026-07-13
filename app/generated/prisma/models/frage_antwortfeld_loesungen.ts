@@ -44,6 +44,7 @@ export type Frage_antwortfeld_loesungenMinAggregateOutputType = {
   loesung_text: string | null
   sortierung: number | null
   ist_akzeptiert: boolean | null
+  zusatzinformation: string | null
 }
 
 export type Frage_antwortfeld_loesungenMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type Frage_antwortfeld_loesungenMaxAggregateOutputType = {
   loesung_text: string | null
   sortierung: number | null
   ist_akzeptiert: boolean | null
+  zusatzinformation: string | null
 }
 
 export type Frage_antwortfeld_loesungenCountAggregateOutputType = {
@@ -60,6 +62,7 @@ export type Frage_antwortfeld_loesungenCountAggregateOutputType = {
   loesung_text: number
   sortierung: number
   ist_akzeptiert: number
+  zusatzinformation: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type Frage_antwortfeld_loesungenMinAggregateInputType = {
   loesung_text?: true
   sortierung?: true
   ist_akzeptiert?: true
+  zusatzinformation?: true
 }
 
 export type Frage_antwortfeld_loesungenMaxAggregateInputType = {
@@ -90,6 +94,7 @@ export type Frage_antwortfeld_loesungenMaxAggregateInputType = {
   loesung_text?: true
   sortierung?: true
   ist_akzeptiert?: true
+  zusatzinformation?: true
 }
 
 export type Frage_antwortfeld_loesungenCountAggregateInputType = {
@@ -98,6 +103,7 @@ export type Frage_antwortfeld_loesungenCountAggregateInputType = {
   loesung_text?: true
   sortierung?: true
   ist_akzeptiert?: true
+  zusatzinformation?: true
   _all?: true
 }
 
@@ -193,6 +199,7 @@ export type Frage_antwortfeld_loesungenGroupByOutputType = {
   loesung_text: string
   sortierung: number
   ist_akzeptiert: boolean
+  zusatzinformation: string | null
   _count: Frage_antwortfeld_loesungenCountAggregateOutputType | null
   _avg: Frage_antwortfeld_loesungenAvgAggregateOutputType | null
   _sum: Frage_antwortfeld_loesungenSumAggregateOutputType | null
@@ -224,6 +231,7 @@ export type frage_antwortfeld_loesungenWhereInput = {
   loesung_text?: Prisma.StringFilter<"frage_antwortfeld_loesungen"> | string
   sortierung?: Prisma.IntFilter<"frage_antwortfeld_loesungen"> | number
   ist_akzeptiert?: Prisma.BoolFilter<"frage_antwortfeld_loesungen"> | boolean
+  zusatzinformation?: Prisma.StringNullableFilter<"frage_antwortfeld_loesungen"> | string | null
   antwortfeld?: Prisma.XOR<Prisma.Frage_antwortfelderScalarRelationFilter, Prisma.frage_antwortfelderWhereInput>
 }
 
@@ -233,6 +241,7 @@ export type frage_antwortfeld_loesungenOrderByWithRelationInput = {
   loesung_text?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
   ist_akzeptiert?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrderInput | Prisma.SortOrder
   antwortfeld?: Prisma.frage_antwortfelderOrderByWithRelationInput
 }
 
@@ -245,6 +254,7 @@ export type frage_antwortfeld_loesungenWhereUniqueInput = Prisma.AtLeast<{
   loesung_text?: Prisma.StringFilter<"frage_antwortfeld_loesungen"> | string
   sortierung?: Prisma.IntFilter<"frage_antwortfeld_loesungen"> | number
   ist_akzeptiert?: Prisma.BoolFilter<"frage_antwortfeld_loesungen"> | boolean
+  zusatzinformation?: Prisma.StringNullableFilter<"frage_antwortfeld_loesungen"> | string | null
   antwortfeld?: Prisma.XOR<Prisma.Frage_antwortfelderScalarRelationFilter, Prisma.frage_antwortfelderWhereInput>
 }, "loesung_id">
 
@@ -254,6 +264,7 @@ export type frage_antwortfeld_loesungenOrderByWithAggregationInput = {
   loesung_text?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
   ist_akzeptiert?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.frage_antwortfeld_loesungenCountOrderByAggregateInput
   _avg?: Prisma.frage_antwortfeld_loesungenAvgOrderByAggregateInput
   _max?: Prisma.frage_antwortfeld_loesungenMaxOrderByAggregateInput
@@ -270,12 +281,14 @@ export type frage_antwortfeld_loesungenScalarWhereWithAggregatesInput = {
   loesung_text?: Prisma.StringWithAggregatesFilter<"frage_antwortfeld_loesungen"> | string
   sortierung?: Prisma.IntWithAggregatesFilter<"frage_antwortfeld_loesungen"> | number
   ist_akzeptiert?: Prisma.BoolWithAggregatesFilter<"frage_antwortfeld_loesungen"> | boolean
+  zusatzinformation?: Prisma.StringNullableWithAggregatesFilter<"frage_antwortfeld_loesungen"> | string | null
 }
 
 export type frage_antwortfeld_loesungenCreateInput = {
   loesung_text: string
   sortierung: number
   ist_akzeptiert?: boolean
+  zusatzinformation?: string | null
   antwortfeld: Prisma.frage_antwortfelderCreateNestedOneWithoutLoesungenInput
 }
 
@@ -285,12 +298,14 @@ export type frage_antwortfeld_loesungenUncheckedCreateInput = {
   loesung_text: string
   sortierung: number
   ist_akzeptiert?: boolean
+  zusatzinformation?: string | null
 }
 
 export type frage_antwortfeld_loesungenUpdateInput = {
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antwortfeld?: Prisma.frage_antwortfelderUpdateOneRequiredWithoutLoesungenNestedInput
 }
 
@@ -300,6 +315,7 @@ export type frage_antwortfeld_loesungenUncheckedUpdateInput = {
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type frage_antwortfeld_loesungenCreateManyInput = {
@@ -308,12 +324,14 @@ export type frage_antwortfeld_loesungenCreateManyInput = {
   loesung_text: string
   sortierung: number
   ist_akzeptiert?: boolean
+  zusatzinformation?: string | null
 }
 
 export type frage_antwortfeld_loesungenUpdateManyMutationInput = {
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type frage_antwortfeld_loesungenUncheckedUpdateManyInput = {
@@ -322,6 +340,7 @@ export type frage_antwortfeld_loesungenUncheckedUpdateManyInput = {
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type Frage_antwortfeld_loesungenListRelationFilter = {
@@ -340,6 +359,7 @@ export type frage_antwortfeld_loesungenCountOrderByAggregateInput = {
   loesung_text?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
   ist_akzeptiert?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrder
 }
 
 export type frage_antwortfeld_loesungenAvgOrderByAggregateInput = {
@@ -354,6 +374,7 @@ export type frage_antwortfeld_loesungenMaxOrderByAggregateInput = {
   loesung_text?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
   ist_akzeptiert?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrder
 }
 
 export type frage_antwortfeld_loesungenMinOrderByAggregateInput = {
@@ -362,6 +383,7 @@ export type frage_antwortfeld_loesungenMinOrderByAggregateInput = {
   loesung_text?: Prisma.SortOrder
   sortierung?: Prisma.SortOrder
   ist_akzeptiert?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrder
 }
 
 export type frage_antwortfeld_loesungenSumOrderByAggregateInput = {
@@ -416,6 +438,7 @@ export type frage_antwortfeld_loesungenCreateWithoutAntwortfeldInput = {
   loesung_text: string
   sortierung: number
   ist_akzeptiert?: boolean
+  zusatzinformation?: string | null
 }
 
 export type frage_antwortfeld_loesungenUncheckedCreateWithoutAntwortfeldInput = {
@@ -423,6 +446,7 @@ export type frage_antwortfeld_loesungenUncheckedCreateWithoutAntwortfeldInput = 
   loesung_text: string
   sortierung: number
   ist_akzeptiert?: boolean
+  zusatzinformation?: string | null
 }
 
 export type frage_antwortfeld_loesungenCreateOrConnectWithoutAntwortfeldInput = {
@@ -460,6 +484,7 @@ export type frage_antwortfeld_loesungenScalarWhereInput = {
   loesung_text?: Prisma.StringFilter<"frage_antwortfeld_loesungen"> | string
   sortierung?: Prisma.IntFilter<"frage_antwortfeld_loesungen"> | number
   ist_akzeptiert?: Prisma.BoolFilter<"frage_antwortfeld_loesungen"> | boolean
+  zusatzinformation?: Prisma.StringNullableFilter<"frage_antwortfeld_loesungen"> | string | null
 }
 
 export type frage_antwortfeld_loesungenCreateManyAntwortfeldInput = {
@@ -467,12 +492,14 @@ export type frage_antwortfeld_loesungenCreateManyAntwortfeldInput = {
   loesung_text: string
   sortierung: number
   ist_akzeptiert?: boolean
+  zusatzinformation?: string | null
 }
 
 export type frage_antwortfeld_loesungenUpdateWithoutAntwortfeldInput = {
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type frage_antwortfeld_loesungenUncheckedUpdateWithoutAntwortfeldInput = {
@@ -480,6 +507,7 @@ export type frage_antwortfeld_loesungenUncheckedUpdateWithoutAntwortfeldInput = 
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type frage_antwortfeld_loesungenUncheckedUpdateManyWithoutAntwortfeldInput = {
@@ -487,6 +515,7 @@ export type frage_antwortfeld_loesungenUncheckedUpdateManyWithoutAntwortfeldInpu
   loesung_text?: Prisma.StringFieldUpdateOperationsInput | string
   sortierung?: Prisma.IntFieldUpdateOperationsInput | number
   ist_akzeptiert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -497,6 +526,7 @@ export type frage_antwortfeld_loesungenSelect<ExtArgs extends runtime.Types.Exte
   loesung_text?: boolean
   sortierung?: boolean
   ist_akzeptiert?: boolean
+  zusatzinformation?: boolean
   antwortfeld?: boolean | Prisma.frage_antwortfelderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["frage_antwortfeld_loesungen"]>
 
@@ -506,6 +536,7 @@ export type frage_antwortfeld_loesungenSelectCreateManyAndReturn<ExtArgs extends
   loesung_text?: boolean
   sortierung?: boolean
   ist_akzeptiert?: boolean
+  zusatzinformation?: boolean
   antwortfeld?: boolean | Prisma.frage_antwortfelderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["frage_antwortfeld_loesungen"]>
 
@@ -515,6 +546,7 @@ export type frage_antwortfeld_loesungenSelectUpdateManyAndReturn<ExtArgs extends
   loesung_text?: boolean
   sortierung?: boolean
   ist_akzeptiert?: boolean
+  zusatzinformation?: boolean
   antwortfeld?: boolean | Prisma.frage_antwortfelderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["frage_antwortfeld_loesungen"]>
 
@@ -524,9 +556,10 @@ export type frage_antwortfeld_loesungenSelectScalar = {
   loesung_text?: boolean
   sortierung?: boolean
   ist_akzeptiert?: boolean
+  zusatzinformation?: boolean
 }
 
-export type frage_antwortfeld_loesungenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"loesung_id" | "antwortfeld_id" | "loesung_text" | "sortierung" | "ist_akzeptiert", ExtArgs["result"]["frage_antwortfeld_loesungen"]>
+export type frage_antwortfeld_loesungenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"loesung_id" | "antwortfeld_id" | "loesung_text" | "sortierung" | "ist_akzeptiert" | "zusatzinformation", ExtArgs["result"]["frage_antwortfeld_loesungen"]>
 export type frage_antwortfeld_loesungenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antwortfeld?: boolean | Prisma.frage_antwortfelderDefaultArgs<ExtArgs>
 }
@@ -548,6 +581,7 @@ export type $frage_antwortfeld_loesungenPayload<ExtArgs extends runtime.Types.Ex
     loesung_text: string
     sortierung: number
     ist_akzeptiert: boolean
+    zusatzinformation: string | null
   }, ExtArgs["result"]["frage_antwortfeld_loesungen"]>
   composites: {}
 }
@@ -977,6 +1011,7 @@ export interface frage_antwortfeld_loesungenFieldRefs {
   readonly loesung_text: Prisma.FieldRef<"frage_antwortfeld_loesungen", 'String'>
   readonly sortierung: Prisma.FieldRef<"frage_antwortfeld_loesungen", 'Int'>
   readonly ist_akzeptiert: Prisma.FieldRef<"frage_antwortfeld_loesungen", 'Boolean'>
+  readonly zusatzinformation: Prisma.FieldRef<"frage_antwortfeld_loesungen", 'String'>
 }
     
 

@@ -44,6 +44,7 @@ export type AntwortenMinAggregateOutputType = {
   antwort: string | null
   ist_richtig: boolean | null
   antworttyp_id: number | null
+  zusatzinformation: string | null
 }
 
 export type AntwortenMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type AntwortenMaxAggregateOutputType = {
   antwort: string | null
   ist_richtig: boolean | null
   antworttyp_id: number | null
+  zusatzinformation: string | null
 }
 
 export type AntwortenCountAggregateOutputType = {
@@ -60,6 +62,7 @@ export type AntwortenCountAggregateOutputType = {
   antwort: number
   ist_richtig: number
   antworttyp_id: number
+  zusatzinformation: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type AntwortenMinAggregateInputType = {
   antwort?: true
   ist_richtig?: true
   antworttyp_id?: true
+  zusatzinformation?: true
 }
 
 export type AntwortenMaxAggregateInputType = {
@@ -90,6 +94,7 @@ export type AntwortenMaxAggregateInputType = {
   antwort?: true
   ist_richtig?: true
   antworttyp_id?: true
+  zusatzinformation?: true
 }
 
 export type AntwortenCountAggregateInputType = {
@@ -98,6 +103,7 @@ export type AntwortenCountAggregateInputType = {
   antwort?: true
   ist_richtig?: true
   antworttyp_id?: true
+  zusatzinformation?: true
   _all?: true
 }
 
@@ -193,6 +199,7 @@ export type AntwortenGroupByOutputType = {
   antwort: string
   ist_richtig: boolean
   antworttyp_id: number
+  zusatzinformation: string | null
   _count: AntwortenCountAggregateOutputType | null
   _avg: AntwortenAvgAggregateOutputType | null
   _sum: AntwortenSumAggregateOutputType | null
@@ -224,6 +231,7 @@ export type antwortenWhereInput = {
   antwort?: Prisma.StringFilter<"antworten"> | string
   ist_richtig?: Prisma.BoolFilter<"antworten"> | boolean
   antworttyp_id?: Prisma.IntFilter<"antworten"> | number
+  zusatzinformation?: Prisma.StringNullableFilter<"antworten"> | string | null
   antworttyp?: Prisma.XOR<Prisma.AntworttypScalarRelationFilter, Prisma.antworttypWhereInput>
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   medien?: Prisma.MedienListRelationFilter
@@ -236,6 +244,7 @@ export type antwortenOrderByWithRelationInput = {
   antwort?: Prisma.SortOrder
   ist_richtig?: Prisma.SortOrder
   antworttyp_id?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrderInput | Prisma.SortOrder
   antworttyp?: Prisma.antworttypOrderByWithRelationInput
   fragen?: Prisma.fragenOrderByWithRelationInput
   medien?: Prisma.medienOrderByRelationAggregateInput
@@ -251,6 +260,7 @@ export type antwortenWhereUniqueInput = Prisma.AtLeast<{
   antwort?: Prisma.StringFilter<"antworten"> | string
   ist_richtig?: Prisma.BoolFilter<"antworten"> | boolean
   antworttyp_id?: Prisma.IntFilter<"antworten"> | number
+  zusatzinformation?: Prisma.StringNullableFilter<"antworten"> | string | null
   antworttyp?: Prisma.XOR<Prisma.AntworttypScalarRelationFilter, Prisma.antworttypWhereInput>
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   medien?: Prisma.MedienListRelationFilter
@@ -263,6 +273,7 @@ export type antwortenOrderByWithAggregationInput = {
   antwort?: Prisma.SortOrder
   ist_richtig?: Prisma.SortOrder
   antworttyp_id?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.antwortenCountOrderByAggregateInput
   _avg?: Prisma.antwortenAvgOrderByAggregateInput
   _max?: Prisma.antwortenMaxOrderByAggregateInput
@@ -279,11 +290,13 @@ export type antwortenScalarWhereWithAggregatesInput = {
   antwort?: Prisma.StringWithAggregatesFilter<"antworten"> | string
   ist_richtig?: Prisma.BoolWithAggregatesFilter<"antworten"> | boolean
   antworttyp_id?: Prisma.IntWithAggregatesFilter<"antworten"> | number
+  zusatzinformation?: Prisma.StringNullableWithAggregatesFilter<"antworten"> | string | null
 }
 
 export type antwortenCreateInput = {
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
@@ -296,6 +309,7 @@ export type antwortenUncheckedCreateInput = {
   antwort: string
   ist_richtig?: boolean
   antworttyp_id: number
+  zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
 }
@@ -303,6 +317,7 @@ export type antwortenUncheckedCreateInput = {
 export type antwortenUpdateInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
@@ -315,6 +330,7 @@ export type antwortenUncheckedUpdateInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
 }
@@ -325,11 +341,13 @@ export type antwortenCreateManyInput = {
   antwort: string
   ist_richtig?: boolean
   antworttyp_id: number
+  zusatzinformation?: string | null
 }
 
 export type antwortenUpdateManyMutationInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type antwortenUncheckedUpdateManyInput = {
@@ -338,6 +356,7 @@ export type antwortenUncheckedUpdateManyInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type antwortenCountOrderByAggregateInput = {
@@ -346,6 +365,7 @@ export type antwortenCountOrderByAggregateInput = {
   antwort?: Prisma.SortOrder
   ist_richtig?: Prisma.SortOrder
   antworttyp_id?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrder
 }
 
 export type antwortenAvgOrderByAggregateInput = {
@@ -360,6 +380,7 @@ export type antwortenMaxOrderByAggregateInput = {
   antwort?: Prisma.SortOrder
   ist_richtig?: Prisma.SortOrder
   antworttyp_id?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrder
 }
 
 export type antwortenMinOrderByAggregateInput = {
@@ -368,6 +389,7 @@ export type antwortenMinOrderByAggregateInput = {
   antwort?: Prisma.SortOrder
   ist_richtig?: Prisma.SortOrder
   antworttyp_id?: Prisma.SortOrder
+  zusatzinformation?: Prisma.SortOrder
 }
 
 export type antwortenSumOrderByAggregateInput = {
@@ -397,6 +419,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -526,6 +552,7 @@ export type antwortenUpdateOneWithoutTeam_antwortenNestedInput = {
 export type antwortenCreateWithoutAntworttypInput = {
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
@@ -536,6 +563,7 @@ export type antwortenUncheckedCreateWithoutAntworttypInput = {
   fragen_id: number
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
 }
@@ -575,11 +603,13 @@ export type antwortenScalarWhereInput = {
   antwort?: Prisma.StringFilter<"antworten"> | string
   ist_richtig?: Prisma.BoolFilter<"antworten"> | boolean
   antworttyp_id?: Prisma.IntFilter<"antworten"> | number
+  zusatzinformation?: Prisma.StringNullableFilter<"antworten"> | string | null
 }
 
 export type antwortenCreateWithoutFragenInput = {
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
@@ -590,6 +620,7 @@ export type antwortenUncheckedCreateWithoutFragenInput = {
   antwort: string
   ist_richtig?: boolean
   antworttyp_id: number
+  zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
 }
@@ -623,6 +654,7 @@ export type antwortenUpdateManyWithWhereWithoutFragenInput = {
 export type antwortenCreateWithoutMedienInput = {
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
@@ -634,6 +666,7 @@ export type antwortenUncheckedCreateWithoutMedienInput = {
   antwort: string
   ist_richtig?: boolean
   antworttyp_id: number
+  zusatzinformation?: string | null
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
 }
 
@@ -656,6 +689,7 @@ export type antwortenUpdateToOneWithWhereWithoutMedienInput = {
 export type antwortenUpdateWithoutMedienInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
@@ -667,12 +701,14 @@ export type antwortenUncheckedUpdateWithoutMedienInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
 }
 
 export type antwortenCreateWithoutTeam_antwortenInput = {
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
@@ -684,6 +720,7 @@ export type antwortenUncheckedCreateWithoutTeam_antwortenInput = {
   antwort: string
   ist_richtig?: boolean
   antworttyp_id: number
+  zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
 }
 
@@ -706,6 +743,7 @@ export type antwortenUpdateToOneWithWhereWithoutTeam_antwortenInput = {
 export type antwortenUpdateWithoutTeam_antwortenInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
@@ -717,6 +755,7 @@ export type antwortenUncheckedUpdateWithoutTeam_antwortenInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
 }
 
@@ -725,11 +764,13 @@ export type antwortenCreateManyAntworttypInput = {
   fragen_id: number
   antwort: string
   ist_richtig?: boolean
+  zusatzinformation?: string | null
 }
 
 export type antwortenUpdateWithoutAntworttypInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
@@ -740,6 +781,7 @@ export type antwortenUncheckedUpdateWithoutAntworttypInput = {
   fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
 }
@@ -749,6 +791,7 @@ export type antwortenUncheckedUpdateManyWithoutAntworttypInput = {
   fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type antwortenCreateManyFragenInput = {
@@ -756,11 +799,13 @@ export type antwortenCreateManyFragenInput = {
   antwort: string
   ist_richtig?: boolean
   antworttyp_id: number
+  zusatzinformation?: string | null
 }
 
 export type antwortenUpdateWithoutFragenInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
@@ -771,6 +816,7 @@ export type antwortenUncheckedUpdateWithoutFragenInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
 }
@@ -780,6 +826,7 @@ export type antwortenUncheckedUpdateManyWithoutFragenInput = {
   antwort?: Prisma.StringFieldUpdateOperationsInput | string
   ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -828,6 +875,7 @@ export type antwortenSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   antwort?: boolean
   ist_richtig?: boolean
   antworttyp_id?: boolean
+  zusatzinformation?: boolean
   antworttyp?: boolean | Prisma.antworttypDefaultArgs<ExtArgs>
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   medien?: boolean | Prisma.antworten$medienArgs<ExtArgs>
@@ -841,6 +889,7 @@ export type antwortenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   antwort?: boolean
   ist_richtig?: boolean
   antworttyp_id?: boolean
+  zusatzinformation?: boolean
   antworttyp?: boolean | Prisma.antworttypDefaultArgs<ExtArgs>
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["antworten"]>
@@ -851,6 +900,7 @@ export type antwortenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   antwort?: boolean
   ist_richtig?: boolean
   antworttyp_id?: boolean
+  zusatzinformation?: boolean
   antworttyp?: boolean | Prisma.antworttypDefaultArgs<ExtArgs>
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["antworten"]>
@@ -861,9 +911,10 @@ export type antwortenSelectScalar = {
   antwort?: boolean
   ist_richtig?: boolean
   antworttyp_id?: boolean
+  zusatzinformation?: boolean
 }
 
-export type antwortenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"antwort_id" | "fragen_id" | "antwort" | "ist_richtig" | "antworttyp_id", ExtArgs["result"]["antworten"]>
+export type antwortenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"antwort_id" | "fragen_id" | "antwort" | "ist_richtig" | "antworttyp_id" | "zusatzinformation", ExtArgs["result"]["antworten"]>
 export type antwortenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworttyp?: boolean | Prisma.antworttypDefaultArgs<ExtArgs>
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
@@ -894,6 +945,7 @@ export type $antwortenPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     antwort: string
     ist_richtig: boolean
     antworttyp_id: number
+    zusatzinformation: string | null
   }, ExtArgs["result"]["antworten"]>
   composites: {}
 }
@@ -1326,6 +1378,7 @@ export interface antwortenFieldRefs {
   readonly antwort: Prisma.FieldRef<"antworten", 'String'>
   readonly ist_richtig: Prisma.FieldRef<"antworten", 'Boolean'>
   readonly antworttyp_id: Prisma.FieldRef<"antworten", 'Int'>
+  readonly zusatzinformation: Prisma.FieldRef<"antworten", 'String'>
 }
     
 

@@ -10,15 +10,16 @@ datasource db {
 }
 
 model antworten {
-  antwort_id     Int              @id @default(autoincrement())
-  fragen_id      Int
-  antwort        String
-  ist_richtig    Boolean          @default(false)
-  antworttyp_id  Int
-  antworttyp     antworttyp       @relation(fields: [antworttyp_id], references: [antworttyp_id], onUpdate: NoAction, map: "fk_antworten_antworttyp")
-  fragen         fragen           @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_antworten_fragen")
-  medien         medien[]
-  team_antworten team_antworten[]
+  antwort_id        Int              @id @default(autoincrement())
+  fragen_id         Int
+  antwort           String
+  ist_richtig       Boolean          @default(false)
+  antworttyp_id     Int
+  zusatzinformation String?
+  antworttyp        antworttyp       @relation(fields: [antworttyp_id], references: [antworttyp_id], onUpdate: NoAction, map: "fk_antworten_antworttyp")
+  fragen            fragen           @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_antworten_fragen")
+  medien            medien[]
+  team_antworten    team_antworten[]
 
   @@index([fragen_id], map: "idx_antworten_fragen_id")
   @@schema("pubquiz")
@@ -55,7 +56,18 @@ model fragen {
   approved_by_user_id      Int?
   approved_at              DateTime?
   freigegeben              Boolean               @default(false)
+  ist_unfertig             Boolean               @default(false)
+  moderationsnotizen       String?
+  gueltig_bis              DateTime?              @db.Date
+  review_status            QuestionReviewStatus   @default(DRAFT)
+  submitted_at             DateTime?
+  submitted_by_user_id     Int?
+  review_feedback          String?
+  reviewed_at              DateTime?
+  reviewed_by_user_id      Int?
 
+  @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
+  @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
   @@schema("pubquiz")
 }
 
@@ -294,12 +306,13 @@ model team_antwortfelder {
 }
 
 model frage_antwortfeld_loesungen {
-  loesung_id     Int                 @id @default(autoincrement())
-  antwortfeld_id Int
-  loesung_text   String
-  sortierung     Int
-  ist_akzeptiert Boolean             @default(true)
-  antwortfeld    frage_antwortfelder @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+  loesung_id         Int                 @id @default(autoincrement())
+  antwortfeld_id     Int
+  loesung_text       String
+  sortierung         Int
+  ist_akzeptiert     Boolean             @default(true)
+  zusatzinformation String?
+  antwortfeld        frage_antwortfelder @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
 
   @@schema("pubquiz")
 }
@@ -352,6 +365,15 @@ model quiz_praesentation_status {
 enum UserRole {
   ADMIN
   EDITOR
+
+  @@schema("pubquiz")
+}
+
+enum QuestionReviewStatus {
+  DRAFT
+  IN_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
 
   @@schema("pubquiz")
 }
