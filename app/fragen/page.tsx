@@ -11,7 +11,23 @@ import { loadOwnQuestionWorklists, loadReviewQueue } from "./questionWorklists";
 import { QuestionWorklist } from "./components/QuestionWorklist";
 import { ReviewQueue } from "./components/ReviewQueue";
 
-export default async function FragenPage() {
+type QuestionView = "drafts" | "review" | "changes-requested";
+
+function getQuestionView(view: string | undefined): QuestionView | null {
+  if (view === "drafts" || view === "review" || view === "changes-requested") {
+    return view;
+  }
+
+  return null;
+}
+
+export default async function FragenPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ view?: string }>;
+}) {
+  const params = await searchParams;
+  const view = getQuestionView(params?.view);
   const session = await requireQuestionEditor();
   const capabilities = getQuestionOverviewCapabilities(session);
   const userId = Number(session.user.id);
@@ -50,33 +66,52 @@ export default async function FragenPage() {
           </Link>
         </header>
 
-        {ownWorklists && (
-          <div className="space-y-8">
-            <QuestionWorklist
-              title="Meine Entwürfe"
-              description="Noch nicht zur Prüfung eingereichte Fragen."
-              emptyTitle="Du hast aktuell keine Entwürfe."
-              entries={ownWorklists.drafts}
-              timestampLabel="Zuletzt geändert"
-            />
-            <QuestionWorklist
-              title="Zur Prüfung eingereicht"
-              description="Fertige Fragen, die auf eine Prüfung warten."
-              emptyTitle="Du hast aktuell keine eingereichten Fragen."
-              entries={ownWorklists.submitted}
-              timestampLabel="Eingereicht"
-            />
-            <QuestionWorklist
-              title="Zur Überarbeitung zurückgegeben"
-              description="Fragen mit einem Rückgabehinweis aus der Prüfung."
-              emptyTitle="Aktuell ist keine Überarbeitung erforderlich."
-              entries={ownWorklists.changesRequested}
-              timestampLabel="Zurückgegeben"
-            />
+        {view && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <span className="font-medium text-slate-700">
+              Gefilterte Ansicht: {view === "drafts" ? "Entwürfe" : view === "review" ? "Prüfung" : "Überarbeitung"}
+            </span>
+            <Link href="/fragen" className="font-semibold text-slate-700 hover:text-slate-950">
+              Alle Bereiche anzeigen
+            </Link>
           </div>
         )}
 
-        {reviewQueue && <ReviewQueue entries={reviewQueue} />}
+        {ownWorklists && (
+          <div className="space-y-8">
+            {(!view || view === "changes-requested") && (
+              <QuestionWorklist
+                title="Zur Überarbeitung zurückgegeben"
+                description="Fragen mit einem Rückgabehinweis aus der Prüfung."
+                emptyTitle="Aktuell ist keine Überarbeitung erforderlich."
+                entries={ownWorklists.changesRequested}
+                timestampLabel="Zurückgegeben"
+              />
+            )}
+            {(!view || view === "drafts") && (
+              <QuestionWorklist
+                title="Meine Entwürfe"
+                description="Noch nicht zur Prüfung eingereichte Fragen."
+                emptyTitle="Du hast aktuell keine Entwürfe."
+                entries={ownWorklists.drafts}
+                timestampLabel="Zuletzt geändert"
+              />
+            )}
+            {(!view || view === "review") && (
+              <QuestionWorklist
+                title="Zur Prüfung eingereicht"
+                description="Fertige Fragen, die auf eine Prüfung warten."
+                emptyTitle="Du hast aktuell keine eingereichten Fragen."
+                entries={ownWorklists.submitted}
+                timestampLabel="Eingereicht"
+              />
+            )}
+          </div>
+        )}
+
+        {reviewQueue && (!view || view === "review") && (
+          <ReviewQueue entries={reviewQueue} />
+        )}
 
         {searchData && (
           <Suspense fallback={<div className="p-8">Lade Fragensuche...</div>}>

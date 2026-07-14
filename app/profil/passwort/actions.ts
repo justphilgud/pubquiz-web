@@ -65,5 +65,5 @@ export async function changePassword(
     },
   });
 
-  redirect("/fragen");
+  redirect("/");
 }

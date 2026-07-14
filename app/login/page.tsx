@@ -1,8 +1,9 @@
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
 import { Alert, AuthCard, Button, FormField, Input } from "@/components/ui";
+import { getSafeLoginRedirect } from "./redirectTarget";
 
 export default async function LoginPage({
   searchParams,
@@ -13,6 +14,21 @@ export default async function LoginPage({
   }>;
 }) {
   const params = await searchParams;
+  const callbackUrl = getSafeLoginRedirect(params?.callbackUrl);
+  const session = await auth();
+
+  if (session?.user?.id) {
+    const currentUser = await prisma.users.findUnique({
+      where: { id: Number(session.user.id) },
+      select: { is_active: true, must_change_password: true },
+    });
+
+    if (currentUser?.is_active) {
+      redirect(
+        currentUser.must_change_password ? "/profil/passwort" : callbackUrl,
+      );
+    }
+  }
 
   async function loginAction(formData: FormData) {
     "use server";
@@ -35,8 +51,6 @@ export default async function LoginPage({
           must_change_password: true,
         },
       });
-
-      const callbackUrl = params?.callbackUrl ?? "/fragen";
 
       if (user?.must_change_password) {
         redirect("/profil/passwort");

@@ -176,6 +176,38 @@ export function canManageQuizzes(session: Session | null) {
   return isAdmin(session);
 }
 
+export function canManageUsers(session: Session | null) {
+  return isAdmin(session);
+}
+
+export function canViewAdminTools(session: Session | null) {
+  return isAdmin(session);
+}
+
+export type DashboardCapabilities = {
+  canCreateQuestion: boolean;
+  canViewQuestionEditorial: boolean;
+  canViewOwnQuestionWorklist: boolean;
+  canViewReviewQueue: boolean;
+  canManageQuizzes: boolean;
+  canManageUsers: boolean;
+  canViewAdminTools: boolean;
+};
+
+export function getDashboardCapabilities(
+  session: Session | null,
+): DashboardCapabilities {
+  return {
+    canCreateQuestion: canCreateQuestions(session),
+    canViewQuestionEditorial: canSearchQuestions(session),
+    canViewOwnQuestionWorklist: canViewOwnQuestionWorklist(session),
+    canViewReviewQueue: canViewReviewQueue(session),
+    canManageQuizzes: canManageQuizzes(session),
+    canManageUsers: canManageUsers(session),
+    canViewAdminTools: canViewAdminTools(session),
+  };
+}
+
 export function canModerateQuiz(session: Session | null) {
   return isAdmin(session);
 }

@@ -10,6 +10,7 @@ import { AdditionalDetailsSection } from "./AdditionalDetailsSection";
 import { AnswersSection } from "./AnswersSection";
 import { EditorSaveActions } from "./EditorSaveActions";
 import { QuestionReviewPanel } from "./QuestionReviewPanel";
+import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { QuestionSection } from "./QuestionSection";
 import { TemplateSelector } from "./TemplateSelector";
@@ -50,6 +51,7 @@ function createInitialDraft(): QuestionEditorDraft {
   return {
     templateId: null,
     questionText: "",
+    questionMedia: null,
     answers: [createAnswer({ isCorrect: true }, "initial-answer")],
 
     categoryIds: [],
@@ -101,6 +103,9 @@ export function QuestionEditor({
   );
   const [pendingAction, setPendingAction] =
     useState<PendingQuestionSaveAction | null>(null);
+  const [questionMediaUploadStatus, setQuestionMediaUploadStatus] = useState<
+    "IDLE" | "UPLOADING" | "ERROR"
+  >("IDLE");
   const [saveMessage, setSaveMessage] = useState<{
     tone: "success" | "error";
     text: string;
@@ -116,6 +121,23 @@ export function QuestionEditor({
   );
   const quality = useMemo(() => evaluateQuestionQuality(draft), [draft]);
   const isReadOnly = editorContext === "readOnly";
+  const activeMediaSlot = useMemo(() => {
+    if (selectedTemplate?.questionMediaSlot) {
+      return selectedTemplate.questionMediaSlot;
+    }
+
+    if (draft.questionMedia) {
+      return {
+        allowedMediaType: draft.questionMedia.mediaType ?? ("IMAGE" as const),
+        required: false,
+        label: "Medium zur Frage",
+        helpText:
+          "Vorhandenes Fragenmedium. Beim Speichern bleibt es unverändert, solange du es nicht ersetzt oder entfernst.",
+      };
+    }
+
+    return null;
+  }, [draft.questionMedia, selectedTemplate]);
 
   function applyTemplate(template: QuestionTemplate): boolean {
     if (template.id === draft.templateId) {
@@ -203,6 +225,15 @@ export function QuestionEditor({
       return;
     }
 
+    if (target === "questionMedia") {
+      const mediaSection = document.querySelector<HTMLElement>(
+        "[data-editor-question-media]",
+      );
+      mediaSection?.scrollIntoView({ behavior: "smooth", block: "center" });
+      mediaSection?.querySelector<HTMLInputElement>('input[type="file"]')?.focus();
+      return;
+    }
+
     if (target === "validUntil") {
       document
         .querySelector<HTMLInputElement>("[data-editor-valid-until]")
@@ -219,6 +250,15 @@ export function QuestionEditor({
       reviewComment?: string;
     },
   ) {
+    if (questionMediaUploadStatus === "UPLOADING") {
+      setSaveMessage({
+        tone: "error",
+        text: "Warte, bis der Medien-Upload abgeschlossen ist.",
+      });
+      focusValidationTarget("questionMedia");
+      return;
+    }
+
     if (saveInProgressRef.current) {
       return;
     }
@@ -235,6 +275,7 @@ export function QuestionEditor({
         questionId: savedQuestionId ?? undefined,
         intent,
         questionText: draft.questionText,
+        questionMedia: draft.questionMedia,
         answers: draft.answers.map((answer) => ({
           fieldGroupId: answer.fieldGroupId,
           fieldLabel: answer.fieldLabel,
@@ -268,6 +309,10 @@ export function QuestionEditor({
           requestAnimationFrame(() => questionTextRef.current?.focus());
         } else {
           setSavedQuestionId(result.questionId);
+          setDraft((current) => ({
+            ...current,
+            questionMedia: result.questionMedia,
+          }));
         }
       } else {
         if (intent === "REQUEST_CHANGES") {
@@ -293,6 +338,24 @@ export function QuestionEditor({
   }
 
   function handleWorkflowSave() {
+    const requiredMediaSlot = selectedTemplate?.questionMediaSlot;
+
+    if (
+      requiredMediaSlot?.required &&
+      (!draft.questionMedia ||
+        draft.questionMedia.operation === "REMOVE" ||
+        !draft.questionMedia.url ||
+        draft.questionMedia.mediaType !== requiredMediaSlot.allowedMediaType ||
+        draft.questionMedia.blockedReason)
+    ) {
+      setSaveMessage({
+        tone: "error",
+        text: `Für diese Spezialfrage ist ${requiredMediaSlot.label} erforderlich.`,
+      });
+      focusValidationTarget("questionMedia");
+      return;
+    }
+
     if (capabilities.canApproveQuestion) {
       if (editorContext === "review" && quality.blockers.length > 0) {
         setSaveMessage({
@@ -395,6 +458,19 @@ export function QuestionEditor({
             }))
           }
         />
+
+        {activeMediaSlot && (
+          <QuestionMediaSlot
+            slot={activeMediaSlot}
+            media={draft.questionMedia}
+            questionId={savedQuestionId}
+            disabled={isReadOnly}
+            onUploadStatusChange={setQuestionMediaUploadStatus}
+            onChange={(questionMedia) =>
+              setDraft((current) => ({ ...current, questionMedia }))
+            }
+          />
+        )}
 
         <AnswersSection
           answers={draft.answers}

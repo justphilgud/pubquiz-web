@@ -17,9 +17,32 @@ export type QuestionCategory = {
   name: string;
 };
 
+export type QuestionMediaType = "IMAGE" | "AUDIO";
+
+export type QuestionMediaOperation = "UNCHANGED" | "NEW" | "REMOVE";
+
+export type QuestionMediaDraft = {
+  existingMediaId: number | null;
+  url: string | null;
+  mediaType: QuestionMediaType | null;
+  fileName?: string;
+  mimeType?: string;
+  operation: QuestionMediaOperation;
+  existingMediaCount: number;
+  blockedReason?: string;
+};
+
+export type QuestionMediaSlotConfig = {
+  allowedMediaType: QuestionMediaType;
+  required: boolean;
+  label: string;
+  helpText?: string;
+};
+
 export type QuestionEditorDraft = {
   templateId: string | null;
   questionText: string;
+  questionMedia: QuestionMediaDraft | null;
   answers: QuestionAnswerDraft[];
 
   categoryIds: number[];
@@ -45,7 +68,7 @@ export type QuestionTemplate = {
     isCorrect?: boolean;
   }>;
 
-  requiresQuestionMedia?: boolean;
+  questionMediaSlot?: QuestionMediaSlotConfig;
 };
 
 export type QuestionSaveIntent =
@@ -91,6 +114,7 @@ export type QuestionEditorRecord = {
 
 export type QuestionValidationTarget =
   | "questionText"
+  | "questionMedia"
   | "answers"
   | "categories"
   | "validUntil";
@@ -99,6 +123,7 @@ export type SaveQuestionPayload = {
   questionId?: number;
   intent: QuestionSaveIntent;
   questionText: string;
+  questionMedia: QuestionMediaDraft | null;
   answers: Array<Omit<QuestionAnswerDraft, "id">>;
   categoryIds: number[];
   sourceOrRemark: string;
@@ -114,6 +139,7 @@ export type SaveQuestionResult =
       success: true;
       questionId: number;
       message: string;
+      questionMedia: QuestionMediaDraft | null;
     }
   | {
       success: false;

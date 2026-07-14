@@ -1,4 +1,5 @@
 import type { QuestionEditorDraft } from "./types";
+import { questionTemplates } from "./templates/questionTemplates";
 
 export type QuestionQualityResult = {
   blockers: string[];
@@ -24,9 +25,23 @@ export function evaluateQuestionQuality(
   const blockers: string[] = [];
   const warnings: string[] = [];
   const filledAnswers = draft.answers.filter((answer) => answer.text.trim());
+  const mediaSlot = questionTemplates.find(
+    (template) => template.id === draft.templateId,
+  )?.questionMediaSlot;
 
   if (!draft.questionText.trim()) {
     blockers.push("Fragetext fehlt");
+  }
+
+  if (
+    mediaSlot?.required &&
+    (!draft.questionMedia ||
+      draft.questionMedia.operation === "REMOVE" ||
+      !draft.questionMedia.url ||
+      draft.questionMedia.mediaType !== mediaSlot.allowedMediaType ||
+      draft.questionMedia.blockedReason)
+  ) {
+    blockers.push(`${mediaSlot.label} fehlt oder ist nicht verwendbar`);
   }
 
   if (!filledAnswers.some((answer) => answer.isCorrect)) {

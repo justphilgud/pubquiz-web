@@ -4,6 +4,7 @@ import type {
   QuestionEditorDraft,
   QuestionEditorRecord,
 } from "./types";
+import { createQuestionMediaDraftFromStoredMedia } from "./questionMedia";
 
 export async function loadQuestionForEditor(questionId: number) {
   const question = await prisma.fragen.findUnique({
@@ -35,6 +36,14 @@ export async function loadQuestionForEditor(questionId: number) {
       fragen_kategorien: {
         orderBy: { fragenkategorie_id: "asc" },
         select: { fragenkategorie_id: true },
+      },
+      medien: {
+        orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+        select: {
+          medien_id: true,
+          datei: true,
+          medientyp: { select: { medientyp: true } },
+        },
       },
       antworten: {
         orderBy: { antwort_id: "asc" },
@@ -126,9 +135,14 @@ export async function loadQuestionForEditor(questionId: number) {
     },
   );
   const answers = [...classicAnswers, ...labeledAnswers];
+  const questionMedia = createQuestionMediaDraftFromStoredMedia(
+    question.medien,
+  );
+
   const draft: QuestionEditorDraft = {
     templateId: question.vorlage?.code ?? null,
     questionText: question.frage,
+    questionMedia,
     answers:
       answers.length > 0
         ? answers

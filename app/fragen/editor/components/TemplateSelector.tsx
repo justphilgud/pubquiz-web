@@ -54,9 +54,9 @@ export function TemplateSelector({
               <p className="mt-1 text-sm text-slate-600">
                 {selectedTemplate.description}
               </p>
-              {selectedTemplate.requiresQuestionMedia && (
+              {selectedTemplate.questionMediaSlot?.required && (
                 <p className="mt-1 text-sm font-medium text-amber-700">
-                  Für diese Spezialfrage wird ein Bild benötigt.
+                  {selectedTemplate.questionMediaSlot.label} ist erforderlich.
                 </p>
               )}
             </div>

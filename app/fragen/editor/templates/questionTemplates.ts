@@ -40,7 +40,12 @@ export const questionTemplates: QuestionTemplate[] = [
         isCorrect: true,
       },
     ],
-    requiresQuestionMedia: true,
+    questionMediaSlot: {
+      allowedMediaType: "IMAGE",
+      required: true,
+      label: "FaceMorph-Bild",
+      helpText: "Lade das fertig erstellte FaceMorph als JPEG, PNG oder WebP hoch.",
+    },
   },
   {
     id: "music-reverse",
@@ -58,5 +63,11 @@ export const questionTemplates: QuestionTemplate[] = [
         isCorrect: true,
       },
     ],
+    questionMediaSlot: {
+      allowedMediaType: "AUDIO",
+      required: true,
+      label: "Rückwärts abgespielte Audiodatei",
+      helpText: "Lade die bereits rückwärts vorbereitete MP3-, WAV- oder OGG-Datei hoch.",
+    },
   },
 ];
