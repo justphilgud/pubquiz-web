@@ -21,6 +21,7 @@ import type {
   QuestionEditorContext,
   QuestionEditorDraft,
   QuestionEditorRecord,
+  QuestionMediaDraft,
   QuestionSaveIntent,
   QuestionTemplate,
   QuestionValidationTarget,
@@ -44,6 +45,7 @@ function createAnswer(
     text: answer?.text ?? "",
     isCorrect: answer?.isCorrect ?? false,
     additionalInfo: "",
+    media: null,
   };
 }
 
@@ -72,6 +74,7 @@ type QuestionEditorProps = {
   editorContext: QuestionEditorContext;
   initialDraft?: QuestionEditorDraft;
   questionRecord?: QuestionEditorRecord;
+  mediaUploadPathnamePrefix: string;
 };
 
 const visibleSpecialQuestionTemplateIds = new Set([
@@ -89,6 +92,7 @@ export function QuestionEditor({
   editorContext,
   initialDraft,
   questionRecord,
+  mediaUploadPathnamePrefix,
 }: QuestionEditorProps) {
   const router = useRouter();
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
@@ -106,6 +110,9 @@ export function QuestionEditor({
   const [questionMediaUploadStatus, setQuestionMediaUploadStatus] = useState<
     "IDLE" | "UPLOADING" | "ERROR"
   >("IDLE");
+  const [answerMediaUploadStatuses, setAnswerMediaUploadStatuses] = useState<
+    Record<string, "IDLE" | "UPLOADING" | "ERROR">
+  >({});
   const [saveMessage, setSaveMessage] = useState<{
     tone: "success" | "error";
     text: string;
@@ -151,7 +158,8 @@ export function QuestionEditor({
       draft.answers.some(
         (answer) =>
           answer.text.trim().length > 0 ||
-          answer.additionalInfo.trim().length > 0,
+          answer.additionalInfo.trim().length > 0 ||
+          answer.media !== null,
       );
 
     if (
@@ -205,6 +213,29 @@ export function QuestionEditor({
     });
   }
 
+  function updateAnswerMedia(
+    answerId: string,
+    media: QuestionMediaDraft | null,
+  ) {
+    setDraft((current) => {
+      const source = current.answers.find((answer) => answer.id === answerId);
+
+      if (!source) {
+        return current;
+      }
+
+      return {
+        ...current,
+        answers: current.answers.map((answer) =>
+          answer.id === answerId ||
+          (source.fieldGroupId && answer.fieldGroupId === source.fieldGroupId)
+            ? { ...answer, media }
+            : answer,
+        ),
+      };
+    });
+  }
+
   function changeCategories(categoryIds: number[]) {
     setDraft((current) => ({
       ...current,
@@ -250,12 +281,21 @@ export function QuestionEditor({
       reviewComment?: string;
     },
   ) {
-    if (questionMediaUploadStatus === "UPLOADING") {
+    const isAnswerMediaUploading = Object.values(
+      answerMediaUploadStatuses,
+    ).includes("UPLOADING");
+
+    if (
+      questionMediaUploadStatus === "UPLOADING" ||
+      isAnswerMediaUploading
+    ) {
       setSaveMessage({
         tone: "error",
         text: "Warte, bis der Medien-Upload abgeschlossen ist.",
       });
-      focusValidationTarget("questionMedia");
+      focusValidationTarget(
+        isAnswerMediaUploading ? "answers" : "questionMedia",
+      );
       return;
     }
 
@@ -277,12 +317,17 @@ export function QuestionEditor({
         questionText: draft.questionText,
         questionMedia: draft.questionMedia,
         answers: draft.answers.map((answer) => ({
+          clientId: answer.id,
+          answerId: answer.answerId,
+          answerFieldId: answer.answerFieldId,
+          solutionId: answer.solutionId,
           fieldGroupId: answer.fieldGroupId,
           fieldLabel: answer.fieldLabel,
           isRequired: answer.isRequired,
           text: answer.text,
           isCorrect: answer.isCorrect,
           additionalInfo: answer.additionalInfo,
+          media: answer.media,
         })),
         categoryIds: draft.categoryIds,
         sourceOrRemark: draft.sourceOrRemark,
@@ -312,7 +357,23 @@ export function QuestionEditor({
           setDraft((current) => ({
             ...current,
             questionMedia: result.questionMedia,
+            answers: current.answers.map((answer) => {
+              const savedAnswer = result.answers.find(
+                (candidate) => candidate.clientId === answer.id,
+              );
+
+              return savedAnswer
+                ? {
+                    ...answer,
+                    answerId: savedAnswer.answerId,
+                    answerFieldId: savedAnswer.answerFieldId,
+                    solutionId: savedAnswer.solutionId,
+                    media: savedAnswer.media,
+                  }
+                : answer;
+            }),
           }));
+          setAnswerMediaUploadStatuses({});
         }
       } else {
         if (intent === "REQUEST_CHANGES") {
@@ -464,6 +525,7 @@ export function QuestionEditor({
             slot={activeMediaSlot}
             media={draft.questionMedia}
             questionId={savedQuestionId}
+            pathnamePrefix={mediaUploadPathnamePrefix}
             disabled={isReadOnly}
             onUploadStatusChange={setQuestionMediaUploadStatus}
             onChange={(questionMedia) =>
@@ -474,9 +536,19 @@ export function QuestionEditor({
 
         <AnswersSection
           answers={draft.answers}
+          questionId={savedQuestionId}
+          pathnamePrefix={mediaUploadPathnamePrefix}
+          disabled={isReadOnly}
           onAnswerChange={updateAnswer}
           onAddAnswer={addAnswer}
           onRemoveAnswer={removeAnswer}
+          onAnswerMediaChange={updateAnswerMedia}
+          onAnswerMediaUploadStatusChange={(answerId, status) =>
+            setAnswerMediaUploadStatuses((current) => ({
+              ...current,
+              [answerId]: status,
+            }))
+          }
         />
 
         <AdditionalDetailsSection

@@ -13,11 +13,16 @@ import {
 } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import {
+  getMediaUploadServerConfig,
+  logMediaUploadFailure,
+} from "./mediaUploadEnvironment";
+import {
   getCurrentUserId,
   resolveQuestionApprovalOnCreate,
   resolveQuestionApprovalOnUpdate,
 } from "@/app/services/questionService";
 import {
+  createAnswerMediaDraftFromStoredMedia,
   createQuestionMediaDraftFromStoredMedia,
   getQuestionMediaFileName,
   getQuestionMediaTypeFromName,
@@ -45,17 +50,22 @@ class DraftValidationError extends Error {
 }
 
 type NormalizedAnswer = {
+  clientId: string;
+  answerId?: number;
+  answerFieldId?: number;
+  solutionId?: number;
   fieldGroupId?: string;
   fieldLabel?: string;
   isRequired?: boolean;
   text: string;
   isCorrect: boolean;
   additionalInfo: string;
+  media: NormalizedMediaDraft;
 };
 
 type NormalizedDraft = {
   questionText: string;
-  questionMedia: NormalizedQuestionMedia;
+  questionMedia: NormalizedMediaDraft;
   answers: NormalizedAnswer[];
   categoryIds: number[];
   sourceOrRemark: string;
@@ -64,7 +74,7 @@ type NormalizedDraft = {
   reviewFeedback: string | null;
 };
 
-type NormalizedQuestionMedia = {
+type NormalizedMediaDraft = {
   existingMediaId: number | null;
   url: string | null;
   mediaType: QuestionMediaType | null;
@@ -72,6 +82,14 @@ type NormalizedQuestionMedia = {
   mimeType?: string;
   operation: QuestionMediaOperation;
 } | null;
+
+type SavedAnswerState = {
+  clientId: string;
+  answerId?: number;
+  answerFieldId?: number;
+  solutionId?: number;
+  media: ReturnType<typeof createAnswerMediaDraftFromStoredMedia>;
+};
 
 const reviewReasonLabels: Record<ReviewReasonCode, string> = {
   SOURCE: "Quelle ergänzen",
@@ -172,7 +190,8 @@ function parseValidUntil(
 
 function normalizeQuestionMedia(
   value: SaveQuestionPayload["questionMedia"],
-): NormalizedQuestionMedia {
+  validationTarget: QuestionValidationTarget = "questionMedia",
+): NormalizedMediaDraft {
   if (value === null) {
     return null;
   }
@@ -195,7 +214,7 @@ function normalizeQuestionMedia(
   ) {
     throw new DraftValidationError(
       "Die Mediendaten sind ungültig.",
-      "questionMedia",
+      validationTarget,
     );
   }
 
@@ -206,21 +225,21 @@ function normalizeQuestionMedia(
   if (url && url.length > 2048) {
     throw new DraftValidationError(
       "Die Medien-URL ist zu lang.",
-      "questionMedia",
+      validationTarget,
     );
   }
 
   if ((fileName?.length ?? 0) > 255 || (mimeType?.length ?? 0) > 100) {
     throw new DraftValidationError(
       "Die Metadaten des Mediums sind ungültig.",
-      "questionMedia",
+      validationTarget,
     );
   }
 
   if (value.operation === "NEW" && (!url || !value.mediaType)) {
     throw new DraftValidationError(
       "Das neue Medium wurde nicht vollständig hochgeladen.",
-      "questionMedia",
+      validationTarget,
     );
   }
 
@@ -235,7 +254,9 @@ function normalizeQuestionMedia(
 }
 
 async function verifyUploadedQuestionMedia(
-  media: Exclude<NormalizedQuestionMedia, null>,
+  media: Exclude<NormalizedMediaDraft, null>,
+  target: "QUESTION" | "ANSWER" = "QUESTION",
+  validationTarget: QuestionValidationTarget = "questionMedia",
 ) {
   if (media.operation !== "NEW" || !media.url || !media.mediaType) {
     return media;
@@ -248,7 +269,7 @@ async function verifyUploadedQuestionMedia(
   } catch {
     throw new DraftValidationError(
       "Die hochgeladene Datei besitzt keine gültige URL.",
-      "questionMedia",
+      validationTarget,
     );
   }
 
@@ -258,32 +279,40 @@ async function verifyUploadedQuestionMedia(
   ) {
     throw new DraftValidationError(
       "Die Datei stammt nicht aus dem vorgesehenen Medienspeicher.",
-      "questionMedia",
+      validationTarget,
     );
   }
 
   try {
-    const metadata = await head(media.url);
+    const uploadConfig = getMediaUploadServerConfig();
+    const metadata = await head(media.url, uploadConfig.blobAuthentication);
     const rule = questionMediaRules[media.mediaType];
 
-    if (!isAllowedQuestionMediaPathname(metadata.pathname, media.mediaType)) {
+    if (
+      !isAllowedQuestionMediaPathname(
+        metadata.pathname,
+        media.mediaType,
+        target,
+        uploadConfig.pathnamePrefix,
+      )
+    ) {
       throw new DraftValidationError(
         "Dateipfad oder Dateiendung des Mediums ist ungültig.",
-        "questionMedia",
+        validationTarget,
       );
     }
 
     if (!rule.mimeTypes.includes(metadata.contentType.toLowerCase())) {
       throw new DraftValidationError(
         "Der tatsächliche Dateityp des Mediums wird nicht unterstützt.",
-        "questionMedia",
+        validationTarget,
       );
     }
 
     if (metadata.size > rule.maximumSizeInBytes) {
       throw new DraftValidationError(
         `Das Medium darf höchstens ${rule.sizeLabel} groß sein.`,
-        "questionMedia",
+        validationTarget,
       );
     }
 
@@ -298,9 +327,10 @@ async function verifyUploadedQuestionMedia(
       throw error;
     }
 
+    logMediaUploadFailure("blob-verification", error, { target });
     throw new DraftValidationError(
       "Die hochgeladene Datei konnte nicht verifiziert werden.",
-      "questionMedia",
+      validationTarget,
     );
   }
 }
@@ -359,6 +389,9 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     if (
       !answer ||
       typeof answer !== "object" ||
+      typeof answer.clientId !== "string" ||
+      !answer.clientId.trim() ||
+      answer.clientId.length > 100 ||
       typeof answer.text !== "string" ||
       typeof answer.isCorrect !== "boolean" ||
       typeof answer.additionalInfo !== "string" ||
@@ -367,7 +400,13 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
       (answer.fieldGroupId !== undefined &&
         typeof answer.fieldGroupId !== "string") ||
       (answer.isRequired !== undefined &&
-        typeof answer.isRequired !== "boolean")
+        typeof answer.isRequired !== "boolean") ||
+      (answer.answerId !== undefined &&
+        (!Number.isInteger(answer.answerId) || answer.answerId <= 0)) ||
+      (answer.answerFieldId !== undefined &&
+        (!Number.isInteger(answer.answerFieldId) || answer.answerFieldId <= 0)) ||
+      (answer.solutionId !== undefined &&
+        (!Number.isInteger(answer.solutionId) || answer.solutionId <= 0))
     ) {
       throw new DraftValidationError("Mindestens eine Antwort ist ungültig.");
     }
@@ -386,18 +425,57 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
       );
     }
 
+    const media = normalizeQuestionMedia(answer.media, "answers");
+
+    if (media?.operation === "NEW" && media.mediaType !== "IMAGE") {
+      throw new DraftValidationError(
+        "Für Antworten sind nur Bilder erlaubt.",
+        "answers",
+      );
+    }
+
+    const fieldLabel = answer.fieldLabel?.trim() || undefined;
+
+    if (
+      (fieldLabel && answer.answerId !== undefined) ||
+      (!fieldLabel &&
+        (answer.answerFieldId !== undefined || answer.solutionId !== undefined))
+    ) {
+      throw new DraftValidationError(
+        "Die Antwortzuordnung ist technisch inkonsistent.",
+        "answers",
+      );
+    }
+
     return {
+      clientId: answer.clientId.trim(),
+      answerId: answer.answerId,
+      answerFieldId: answer.answerFieldId,
+      solutionId: answer.solutionId,
       fieldGroupId: answer.fieldGroupId?.trim() || undefined,
-      fieldLabel: answer.fieldLabel?.trim() || undefined,
+      fieldLabel,
       isRequired: answer.isRequired,
       text: answer.text.trim(),
       isCorrect: answer.isCorrect,
       additionalInfo: answer.additionalInfo.trim(),
+      media,
     };
   });
+
+  if (new Set(answers.map((answer) => answer.clientId)).size !== answers.length) {
+    throw new DraftValidationError(
+      "Die Antwort-IDs sind technisch inkonsistent.",
+      "answers",
+    );
+  }
   const fieldsByGroup = new Map<
     string,
-    { label: string; isRequired: boolean }
+    {
+      label: string;
+      isRequired: boolean;
+      answerFieldId?: number;
+      mediaSignature: string;
+    }
   >();
 
   for (const answer of answers) {
@@ -407,11 +485,14 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
 
     const existingField = fieldsByGroup.get(answer.fieldGroupId);
     const isRequired = answer.isRequired !== false;
+    const mediaSignature = JSON.stringify(answer.media);
 
     if (
       existingField &&
       (existingField.label !== answer.fieldLabel ||
-        existingField.isRequired !== isRequired)
+        existingField.isRequired !== isRequired ||
+        existingField.answerFieldId !== answer.answerFieldId ||
+        existingField.mediaSignature !== mediaSignature)
     ) {
       throw new DraftValidationError(
         "Beschriftete Antwortdaten sind technisch inkonsistent.",
@@ -422,6 +503,8 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     fieldsByGroup.set(answer.fieldGroupId, {
       label: answer.fieldLabel,
       isRequired,
+      answerFieldId: answer.answerFieldId,
+      mediaSignature,
     });
   }
 
@@ -563,6 +646,15 @@ export async function saveQuestion(
         draft.questionMedia,
       );
     }
+    for (const answer of draft.answers) {
+      if (answer.media) {
+        answer.media = await verifyUploadedQuestionMedia(
+          answer.media,
+          "ANSWER",
+          "answers",
+        );
+      }
+    }
   } catch (error) {
     if (error instanceof DraftValidationError) {
       return {
@@ -607,9 +699,11 @@ export async function saveQuestion(
           existingGroup.solutions.push(answer);
         } else {
           groups.set(groupId, {
+            answerFieldId: answer.answerFieldId,
             label: answer.fieldLabel,
             isRequired: answer.isRequired !== false,
             sortOrder: index + 1,
+            media: answer.media,
             solutions: [answer],
           });
         }
@@ -619,9 +713,11 @@ export async function saveQuestion(
       new Map<
         string,
         {
+          answerFieldId?: number;
           label: string;
           isRequired: boolean;
           sortOrder: number;
+          media: NormalizedMediaDraft;
           solutions: NormalizedAnswer[];
         }
       >(),
@@ -694,6 +790,30 @@ export async function saveQuestion(
 
       const requestedMediaTypeId =
         matchingMediaTypes[0]?.medientyp_id ?? null;
+      const hasNewAnswerImage = draft.answers.some(
+        (answer) => answer.media?.operation === "NEW",
+      );
+      const matchingAnswerImageTypes = hasNewAnswerImage
+        ? await tx.medientyp.findMany({
+            where: {
+              medientyp: {
+                equals: "Bild",
+                mode: "insensitive",
+              },
+            },
+            select: { medientyp_id: true },
+          })
+        : [];
+
+      if (hasNewAnswerImage && matchingAnswerImageTypes.length !== 1) {
+        throw new DraftValidationError(
+          "Der Medientyp Bild ist nicht eindeutig konfiguriert.",
+          "answers",
+        );
+      }
+
+      const answerImageTypeId =
+        matchingAnswerImageTypes[0]?.medientyp_id ?? null;
 
       const categoryCreates = draft.categoryIds.map((categoryId) => ({
         fragenkategorie: {
@@ -702,31 +822,154 @@ export async function saveQuestion(
           },
         },
       }));
-      const classicAnswerCreates = classicAnswers.map((answer) => ({
-        antwort: answer.text,
-        ist_richtig: answer.isCorrect,
-        zusatzinformation: answer.additionalInfo || null,
-        antworttyp_id: standardAnswerType!.antworttyp_id,
-      }));
-      const labeledAnswerCreates = labeledAnswerGroups.map((group) => ({
-        label: group.label,
-        sortierung: group.sortOrder,
-        ist_pflicht: group.isRequired,
-        loesungen: group.solutions.some(
-          (answer) => answer.text || answer.additionalInfo,
-        )
-          ? {
-              create: group.solutions
-                .filter((answer) => answer.text || answer.additionalInfo)
-                .map((answer, solutionIndex) => ({
-                  loesung_text: answer.text,
-                  sortierung: solutionIndex + 1,
-                  ist_akzeptiert: answer.isCorrect,
-                  zusatzinformation: answer.additionalInfo || null,
-                })),
-            }
-          : undefined,
-      }));
+      const storedMediaSelect = {
+        medien_id: true,
+        datei: true,
+        medientyp: { select: { medientyp: true } },
+      } as const;
+
+      async function createClassicAnswer(
+        questionId: number,
+        answer: NormalizedAnswer,
+      ) {
+        if (
+          answer.answerId !== undefined ||
+          answer.media?.operation === "UNCHANGED" ||
+          answer.media?.existingMediaId
+        ) {
+          throw new DraftValidationError(
+            "Eine neue Antwort verweist auf nicht zugehörige gespeicherte Daten.",
+            "answers",
+          );
+        }
+
+        const created = await tx.antworten.create({
+          data: {
+            fragen_id: questionId,
+            antwort: answer.text,
+            ist_richtig: answer.isCorrect,
+            zusatzinformation: answer.additionalInfo || null,
+            antworttyp_id: standardAnswerType!.antworttyp_id,
+          },
+          select: { antwort_id: true },
+        });
+
+        if (
+          answer.media?.operation === "NEW" &&
+          answer.media.url &&
+          answerImageTypeId
+        ) {
+          await tx.medien.create({
+            data: {
+              fragen_id: null,
+              antwort_id: created.antwort_id,
+              medientyp_id: answerImageTypeId,
+              datei: answer.media.url,
+              sortierung: 1,
+            },
+          });
+        }
+
+        const storedMedia = await tx.medien.findMany({
+          where: { antwort_id: created.antwort_id },
+          orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+          select: storedMediaSelect,
+        });
+
+        return {
+          clientId: answer.clientId,
+          answerId: created.antwort_id,
+          media: createAnswerMediaDraftFromStoredMedia(storedMedia),
+        };
+      }
+
+      async function createLabeledAnswerGroup(
+        questionId: number,
+        group: (typeof labeledAnswerGroups)[number],
+      ) {
+        if (
+          group.answerFieldId !== undefined ||
+          group.solutions.some((solution) => solution.solutionId !== undefined) ||
+          group.media?.operation === "UNCHANGED" ||
+          group.media?.existingMediaId
+        ) {
+          throw new DraftValidationError(
+            "Ein neues Antwortfeld verweist auf nicht zugehörige gespeicherte Daten.",
+            "answers",
+          );
+        }
+
+        const createdField = await tx.frage_antwortfelder.create({
+          data: {
+            fragen_id: questionId,
+            label: group.label,
+            sortierung: group.sortOrder,
+            ist_pflicht: group.isRequired,
+          },
+          select: { antwortfeld_id: true },
+        });
+
+        if (
+          group.media?.operation === "NEW" &&
+          group.media.url &&
+          answerImageTypeId
+        ) {
+          await tx.medien.create({
+            data: {
+              fragen_id: null,
+              antwortfeld_id: createdField.antwortfeld_id,
+              medientyp_id: answerImageTypeId,
+              datei: group.media.url,
+              sortierung: 1,
+            },
+          });
+        }
+
+        const storedMedia = await tx.medien.findMany({
+          where: { antwortfeld_id: createdField.antwortfeld_id },
+          orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+          select: storedMediaSelect,
+        });
+        const savedMedia = createAnswerMediaDraftFromStoredMedia(storedMedia);
+        const answerStates: Array<{
+          clientId: string;
+          answerFieldId: number;
+          solutionId?: number;
+          media: ReturnType<typeof createAnswerMediaDraftFromStoredMedia>;
+        }> = [];
+        let solutionSortOrder = 0;
+
+        for (const solution of group.solutions) {
+          if (!solution.text && !solution.additionalInfo) {
+            answerStates.push({
+              clientId: solution.clientId,
+              answerFieldId: createdField.antwortfeld_id,
+              media: savedMedia,
+            });
+            continue;
+          }
+
+          solutionSortOrder += 1;
+          const createdSolution = await tx.frage_antwortfeld_loesungen.create({
+            data: {
+              antwortfeld_id: createdField.antwortfeld_id,
+              loesung_text: solution.text,
+              sortierung: solutionSortOrder,
+              ist_akzeptiert: solution.isCorrect,
+              zusatzinformation: solution.additionalInfo || null,
+            },
+            select: { loesung_id: true },
+          });
+          answerStates.push({
+            clientId: solution.clientId,
+            answerFieldId: createdField.antwortfeld_id,
+            solutionId: createdSolution.loesung_id,
+            media: savedMedia,
+          });
+        }
+
+        return answerStates;
+      }
 
       if (payload.questionId === undefined) {
         if (draft.questionMedia?.operation === "UNCHANGED") {
@@ -783,8 +1026,6 @@ export async function saveQuestion(
             created_by_user_id: userId,
             last_modified_by_user_id: userId,
             fragen_kategorien: { create: categoryCreates },
-            antworten: { create: classicAnswerCreates },
-            antwortfelder: { create: labeledAnswerCreates },
           },
           select: {
             fragen_id: true,
@@ -806,6 +1047,27 @@ export async function saveQuestion(
           });
         }
 
+        const answerStates: SavedAnswerState[] = [];
+
+        for (const answer of classicAnswers) {
+          answerStates.push(
+            await createClassicAnswer(createdQuestion.fragen_id, answer),
+          );
+        }
+        for (const group of labeledAnswerGroups) {
+          answerStates.push(
+            ...(await createLabeledAnswerGroup(
+              createdQuestion.fragen_id,
+              group,
+            )),
+          );
+        }
+        for (const answer of draft.answers) {
+          if (!answerStates.some((state) => state.clientId === answer.clientId)) {
+            answerStates.push({ clientId: answer.clientId, media: null });
+          }
+        }
+
         const storedMedia = await tx.medien.findMany({
           where: { fragen_id: createdQuestion.fragen_id },
           orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
@@ -820,6 +1082,7 @@ export async function saveQuestion(
           fragen_id: createdQuestion.fragen_id,
           questionMedia:
             createQuestionMediaDraftFromStoredMedia(storedMedia),
+          answers: answerStates,
         };
       }
 
@@ -841,10 +1104,14 @@ export async function saveQuestion(
           antworten: {
             orderBy: { antwort_id: "asc" },
             select: {
+              antwort_id: true,
               antwort: true,
               ist_richtig: true,
               zusatzinformation: true,
-              medien: { select: { medien_id: true }, take: 1 },
+              medien: {
+                orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+                select: storedMediaSelect,
+              },
               team_antworten: {
                 select: { team_antwort_id: true },
                 take: 1,
@@ -854,9 +1121,13 @@ export async function saveQuestion(
           antwortfelder: {
             orderBy: [{ sortierung: "asc" }, { antwortfeld_id: "asc" }],
             select: {
+              antwortfeld_id: true,
               label: true,
               ist_pflicht: true,
-              medien: { select: { medien_id: true }, take: 1 },
+              medien: {
+                orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+                select: storedMediaSelect,
+              },
               team_antworten: {
                 select: { team_antwortfeld_id: true },
                 take: 1,
@@ -864,6 +1135,7 @@ export async function saveQuestion(
               loesungen: {
                 orderBy: [{ sortierung: "asc" }, { loesung_id: "asc" }],
                 select: {
+                  loesung_id: true,
                   loesung_text: true,
                   ist_akzeptiert: true,
                   zusatzinformation: true,
@@ -949,57 +1221,237 @@ export async function saveQuestion(
         );
       }
 
-      const existingAnswerStructure = {
-        classic: existingQuestion.antworten.map((answer) => ({
-          text: answer.antwort,
-          isCorrect: answer.ist_richtig,
-          additionalInfo: answer.zusatzinformation ?? "",
-        })),
-        labeled: existingQuestion.antwortfelder.map((field) => ({
-          label: field.label,
-          isRequired: field.ist_pflicht,
-          solutions: field.loesungen.map((solution) => ({
-            text: solution.loesung_text,
-            isCorrect: solution.ist_akzeptiert,
-            additionalInfo: solution.zusatzinformation ?? "",
-          })),
-        })),
-      };
-      const requestedAnswerStructure = {
-        classic: classicAnswers.map((answer) => ({
-          text: answer.text,
-          isCorrect: answer.isCorrect,
-          additionalInfo: answer.additionalInfo,
-        })),
-        labeled: labeledAnswerGroups.map((group) => ({
-          label: group.label,
-          isRequired: group.isRequired,
-          solutions: group.solutions
-            .filter((answer) => answer.text || answer.additionalInfo)
-            .map((answer) => ({
-              text: answer.text,
-              isCorrect: answer.isCorrect,
-              additionalInfo: answer.additionalInfo,
-            })),
-        })),
-      };
-      const answersChanged =
-        JSON.stringify(existingAnswerStructure) !==
-        JSON.stringify(requestedAnswerStructure);
-      const hasAnswerDependencies =
-        existingQuestion.antworten.some(
-          (answer) =>
-            answer.medien.length > 0 || answer.team_antworten.length > 0,
-        ) ||
-        existingQuestion.antwortfelder.some(
-          (field) =>
-            field.medien.length > 0 || field.team_antworten.length > 0,
-        );
+      const existingClassicAnswersById = new Map(
+        existingQuestion.antworten.map((answer) => [answer.antwort_id, answer]),
+      );
+      const requestedClassicAnswerIds = new Set<number>();
 
-      if (answersChanged && hasAnswerDependencies) {
-        throw new DraftValidationError(
-          "Antworten mit Medien oder bereits abgegebenen Quizantworten können in diesem Editor noch nicht ersetzt werden.",
+      for (const answer of classicAnswers) {
+        if (answer.answerId === undefined) {
+          continue;
+        }
+
+        if (
+          requestedClassicAnswerIds.has(answer.answerId) ||
+          !existingClassicAnswersById.has(answer.answerId)
+        ) {
+          throw new DraftValidationError(
+            "Eine klassische Antwort gehört nicht zu dieser Frage.",
+            "answers",
+          );
+        }
+        const existingAnswer = existingClassicAnswersById.get(answer.answerId)!;
+        if (
+          existingAnswer.team_antworten.length > 0 &&
+          (existingAnswer.antwort !== answer.text ||
+            existingAnswer.ist_richtig !== answer.isCorrect ||
+            (existingAnswer.zusatzinformation ?? "") !== answer.additionalInfo)
+        ) {
+          throw new DraftValidationError(
+            "Eine bereits im Quiz beantwortete Antwort kann inhaltlich nicht verändert werden.",
+            "answers",
+          );
+        }
+        requestedClassicAnswerIds.add(answer.answerId);
+      }
+
+      for (const existingAnswer of existingQuestion.antworten) {
+        if (requestedClassicAnswerIds.has(existingAnswer.antwort_id)) {
+          continue;
+        }
+
+        if (existingAnswer.team_antworten.length > 0) {
+          throw new DraftValidationError(
+            "Eine bereits im Quiz beantwortete Antwort kann nicht entfernt werden.",
+            "answers",
+          );
+        }
+        if (existingAnswer.medien.length > 1) {
+          throw new DraftValidationError(
+            "Eine Antwort mit mehreren Medien kann im MVP nicht entfernt werden.",
+            "answers",
+          );
+        }
+      }
+
+      const existingFieldsById = new Map(
+        existingQuestion.antwortfelder.map((field) => [
+          field.antwortfeld_id,
+          field,
+        ]),
+      );
+      const requestedFieldIds = new Set<number>();
+
+      for (const group of labeledAnswerGroups) {
+        if (group.answerFieldId === undefined) {
+          if (group.solutions.some((solution) => solution.solutionId !== undefined)) {
+            throw new DraftValidationError(
+              "Eine neue Lösung verweist auf ein nicht gespeichertes Antwortfeld.",
+              "answers",
+            );
+          }
+          continue;
+        }
+
+        const existingField = existingFieldsById.get(group.answerFieldId);
+
+        if (requestedFieldIds.has(group.answerFieldId) || !existingField) {
+          throw new DraftValidationError(
+            "Ein beschriftetes Antwortfeld gehört nicht zu dieser Frage.",
+            "answers",
+          );
+        }
+        requestedFieldIds.add(group.answerFieldId);
+
+        const requestedSolutions = group.solutions
+          .filter((solution) => solution.text || solution.additionalInfo)
+          .map((solution) => ({
+            text: solution.text,
+            isCorrect: solution.isCorrect,
+            additionalInfo: solution.additionalInfo,
+          }));
+        const storedSolutions = existingField.loesungen.map((solution) => ({
+          text: solution.loesung_text,
+          isCorrect: solution.ist_akzeptiert,
+          additionalInfo: solution.zusatzinformation ?? "",
+        }));
+
+        if (
+          existingField.team_antworten.length > 0 &&
+          (existingField.label !== group.label ||
+            existingField.ist_pflicht !== group.isRequired ||
+            JSON.stringify(storedSolutions) !==
+              JSON.stringify(requestedSolutions))
+        ) {
+          throw new DraftValidationError(
+            "Ein bereits im Quiz beantwortetes Antwortfeld kann inhaltlich nicht verändert werden.",
+            "answers",
+          );
+        }
+
+        const existingSolutionIds = new Set(
+          existingField.loesungen.map((solution) => solution.loesung_id),
         );
+        const requestedSolutionIds = new Set<number>();
+
+        for (const solution of group.solutions) {
+          if (solution.solutionId === undefined) {
+            continue;
+          }
+          if (
+            requestedSolutionIds.has(solution.solutionId) ||
+            !existingSolutionIds.has(solution.solutionId)
+          ) {
+            throw new DraftValidationError(
+              "Eine Lösung gehört nicht zu diesem Antwortfeld.",
+              "answers",
+            );
+          }
+          requestedSolutionIds.add(solution.solutionId);
+        }
+      }
+
+      for (const existingField of existingQuestion.antwortfelder) {
+        if (requestedFieldIds.has(existingField.antwortfeld_id)) {
+          continue;
+        }
+
+        if (existingField.team_antworten.length > 0) {
+          throw new DraftValidationError(
+            "Ein bereits im Quiz beantwortetes Antwortfeld kann nicht entfernt werden.",
+            "answers",
+          );
+        }
+        if (existingField.medien.length > 1) {
+          throw new DraftValidationError(
+            "Ein Antwortfeld mit mehreren Medien kann im MVP nicht entfernt werden.",
+            "answers",
+          );
+        }
+      }
+
+      async function applyAnswerMediaChange(
+        media: NormalizedMediaDraft,
+        existingMedia: Array<{
+          medien_id: number;
+          datei: string;
+          medientyp: { medientyp: string };
+        }>,
+        target:
+          | { type: "CLASSIC"; answerId: number }
+          | { type: "LABELED_FIELD"; answerFieldId: number },
+      ) {
+        const operation = media?.operation ?? "UNCHANGED";
+
+        if (existingMedia.length > 1 && operation !== "UNCHANGED") {
+          throw new DraftValidationError(
+            "Mehrere vorhandene Antwortmedien können im MVP nicht ersetzt oder entfernt werden.",
+            "answers",
+          );
+        }
+
+        if (
+          media?.existingMediaId &&
+          !existingMedia.some(
+            (medium) => medium.medien_id === media.existingMediaId,
+          )
+        ) {
+          throw new DraftValidationError(
+            "Das vorhandene Bild gehört nicht mehr zu dieser Antwort.",
+            "answers",
+          );
+        }
+
+        const relationData =
+          target.type === "CLASSIC"
+            ? {
+                fragen_id: null,
+                antwort_id: target.answerId,
+                antwortfeld_id: null,
+              }
+            : {
+                fragen_id: null,
+                antwort_id: null,
+                antwortfeld_id: target.answerFieldId,
+              };
+
+        if (operation === "NEW" && media?.url && answerImageTypeId) {
+          if (existingMedia.length === 1) {
+            await tx.medien.update({
+              where: { medien_id: existingMedia[0].medien_id },
+              data: {
+                ...relationData,
+                datei: media.url,
+                medientyp_id: answerImageTypeId,
+                sortierung: 1,
+              },
+            });
+          } else {
+            await tx.medien.create({
+              data: {
+                ...relationData,
+                datei: media.url,
+                medientyp_id: answerImageTypeId,
+                sortierung: 1,
+              },
+            });
+          }
+        } else if (operation === "REMOVE" && existingMedia.length === 1) {
+          await tx.medien.delete({
+            where: { medien_id: existingMedia[0].medien_id },
+          });
+        }
+
+        const storedMedia = await tx.medien.findMany({
+          where:
+            target.type === "CLASSIC"
+              ? { antwort_id: target.answerId }
+              : { antwortfeld_id: target.answerFieldId },
+          orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+          select: storedMediaSelect,
+        });
+
+        return createAnswerMediaDraftFromStoredMedia(storedMedia);
       }
 
       const approval =
@@ -1042,14 +1494,6 @@ export async function saveQuestion(
       await tx.fragen_kategorien.deleteMany({
         where: { fragen_id: payload.questionId },
       });
-      if (answersChanged) {
-        await tx.antworten.deleteMany({
-          where: { fragen_id: payload.questionId },
-        });
-        await tx.frage_antwortfelder.deleteMany({
-          where: { fragen_id: payload.questionId },
-        });
-      }
 
       if (
         mediaOperation === "NEW" &&
@@ -1098,17 +1542,148 @@ export async function saveQuestion(
           ...reviewUpdate,
           last_modified_by_user_id: userId,
           fragen_kategorien: { create: categoryCreates },
-          antworten: answersChanged
-            ? { create: classicAnswerCreates }
-            : undefined,
-          antwortfelder: answersChanged
-            ? { create: labeledAnswerCreates }
-            : undefined,
         },
         select: {
           fragen_id: true,
         },
       });
+
+      const answerStates: SavedAnswerState[] = [];
+
+      for (const answer of classicAnswers) {
+        if (answer.answerId === undefined) {
+          answerStates.push(
+            await createClassicAnswer(payload.questionId, answer),
+          );
+          continue;
+        }
+
+        const existingAnswer = existingClassicAnswersById.get(answer.answerId)!;
+        await tx.antworten.update({
+          where: { antwort_id: answer.answerId },
+          data: {
+            antwort: answer.text,
+            ist_richtig: answer.isCorrect,
+            zusatzinformation: answer.additionalInfo || null,
+            antworttyp_id: standardAnswerType!.antworttyp_id,
+          },
+        });
+        const savedMedia = await applyAnswerMediaChange(
+          answer.media,
+          existingAnswer.medien,
+          { type: "CLASSIC", answerId: answer.answerId },
+        );
+        answerStates.push({
+          clientId: answer.clientId,
+          answerId: answer.answerId,
+          media: savedMedia,
+        });
+      }
+
+      const classicIdsToDelete = existingQuestion.antworten
+        .map((answer) => answer.antwort_id)
+        .filter((answerId) => !requestedClassicAnswerIds.has(answerId));
+      if (classicIdsToDelete.length > 0) {
+        await tx.antworten.deleteMany({
+          where: { antwort_id: { in: classicIdsToDelete } },
+        });
+      }
+
+      for (const group of labeledAnswerGroups) {
+        if (group.answerFieldId === undefined) {
+          answerStates.push(
+            ...(await createLabeledAnswerGroup(payload.questionId, group)),
+          );
+          continue;
+        }
+
+        const existingField = existingFieldsById.get(group.answerFieldId)!;
+        await tx.frage_antwortfelder.update({
+          where: { antwortfeld_id: group.answerFieldId },
+          data: {
+            label: group.label,
+            sortierung: group.sortOrder,
+            ist_pflicht: group.isRequired,
+          },
+        });
+        const savedMedia = await applyAnswerMediaChange(
+          group.media,
+          existingField.medien,
+          { type: "LABELED_FIELD", answerFieldId: group.answerFieldId },
+        );
+        const solutionIdsToKeep = new Set<number>();
+        let solutionSortOrder = 0;
+
+        for (const solution of group.solutions) {
+          if (!solution.text && !solution.additionalInfo) {
+            answerStates.push({
+              clientId: solution.clientId,
+              answerFieldId: group.answerFieldId,
+              media: savedMedia,
+            });
+            continue;
+          }
+
+          solutionSortOrder += 1;
+          let solutionId = solution.solutionId;
+
+          if (solutionId === undefined) {
+            const createdSolution =
+              await tx.frage_antwortfeld_loesungen.create({
+                data: {
+                  antwortfeld_id: group.answerFieldId,
+                  loesung_text: solution.text,
+                  sortierung: solutionSortOrder,
+                  ist_akzeptiert: solution.isCorrect,
+                  zusatzinformation: solution.additionalInfo || null,
+                },
+                select: { loesung_id: true },
+              });
+            solutionId = createdSolution.loesung_id;
+          } else {
+            await tx.frage_antwortfeld_loesungen.update({
+              where: { loesung_id: solutionId },
+              data: {
+                loesung_text: solution.text,
+                sortierung: solutionSortOrder,
+                ist_akzeptiert: solution.isCorrect,
+                zusatzinformation: solution.additionalInfo || null,
+              },
+            });
+          }
+
+          solutionIdsToKeep.add(solutionId);
+          answerStates.push({
+            clientId: solution.clientId,
+            answerFieldId: group.answerFieldId,
+            solutionId,
+            media: savedMedia,
+          });
+        }
+
+        const solutionIdsToDelete = existingField.loesungen
+          .map((solution) => solution.loesung_id)
+          .filter((solutionId) => !solutionIdsToKeep.has(solutionId));
+        if (solutionIdsToDelete.length > 0) {
+          await tx.frage_antwortfeld_loesungen.deleteMany({
+            where: { loesung_id: { in: solutionIdsToDelete } },
+          });
+        }
+      }
+
+      const fieldIdsToDelete = existingQuestion.antwortfelder
+        .map((field) => field.antwortfeld_id)
+        .filter((fieldId) => !requestedFieldIds.has(fieldId));
+      if (fieldIdsToDelete.length > 0) {
+        await tx.frage_antwortfelder.deleteMany({
+          where: { antwortfeld_id: { in: fieldIdsToDelete } },
+        });
+      }
+      for (const answer of draft.answers) {
+        if (!answerStates.some((state) => state.clientId === answer.clientId)) {
+          answerStates.push({ clientId: answer.clientId, media: null });
+        }
+      }
 
       const storedMedia = await tx.medien.findMany({
         where: { fragen_id: payload.questionId },
@@ -1123,6 +1698,7 @@ export async function saveQuestion(
       return {
         fragen_id: updatedQuestion.fragen_id,
         questionMedia: createQuestionMediaDraftFromStoredMedia(storedMedia),
+        answers: answerStates,
       };
     });
 
@@ -1132,6 +1708,7 @@ export async function saveQuestion(
       success: true,
       questionId: question.fragen_id,
       questionMedia: question.questionMedia,
+      answers: question.answers,
       message: createSuccessMessage(
         payload.intent,
         question.fragen_id,

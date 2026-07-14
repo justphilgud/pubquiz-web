@@ -1,18 +1,34 @@
 import { useId, useState } from "react";
-import type { QuestionAnswerDraft } from "../types";
+import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
+import {
+  AnswerMediaSlot,
+  type AnswerMediaUploadStatus,
+} from "./AnswerMediaSlot";
 import { CharacterCount } from "./CharacterCount";
 
 type AnswerCardProps = {
   answer: QuestionAnswerDraft;
   canRemove: boolean;
+  questionId: number | null;
+  pathnamePrefix: string;
+  disabled: boolean;
+  showMedia: boolean;
   onChange: (changes: Partial<QuestionAnswerDraft>) => void;
+  onMediaChange: (media: QuestionMediaDraft | null) => void;
+  onMediaUploadStatusChange: (status: AnswerMediaUploadStatus) => void;
   onRemove: () => void;
 };
 
 export function AnswerCard({
   answer,
   canRemove,
+  questionId,
+  pathnamePrefix,
+  disabled,
+  showMedia,
   onChange,
+  onMediaChange,
+  onMediaUploadStatusChange,
   onRemove,
 }: AnswerCardProps) {
   const fieldId = useId();
@@ -70,6 +86,17 @@ export function AnswerCard({
           </button>
         )}
       </div>
+
+      {showMedia && (
+        <AnswerMediaSlot
+          answer={answer}
+          questionId={questionId}
+          pathnamePrefix={pathnamePrefix}
+          disabled={disabled}
+          onChange={onMediaChange}
+          onUploadStatusChange={onMediaUploadStatusChange}
+        />
+      )}
 
       {isAdditionalInfoOpen ? (
         <div className="mt-2 border-t border-slate-100 pt-3">

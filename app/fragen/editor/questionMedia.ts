@@ -67,16 +67,25 @@ export function validateQuestionMediaFile(
 export function isAllowedQuestionMediaPathname(
   pathname: string,
   mediaType: QuestionMediaType,
+  target: "QUESTION" | "ANSWER",
+  pathnamePrefix: string,
 ) {
   const directory = mediaType === "IMAGE" ? "image" : "audio";
+  const baseDirectory = `${pathnamePrefix}${target.toLowerCase()}/${directory}/`;
 
   return (
-    pathname.startsWith(`medien/fragen/editor/${directory}/`) &&
+    pathname.startsWith(baseDirectory) &&
     questionMediaRules[mediaType].extensions.includes(
       getFileExtension(pathname),
     )
   );
 }
+
+type StoredMedia = {
+  medien_id: number;
+  datei: string;
+  medientyp: { medientyp: string };
+};
 
 export function resolveQuestionMediaUrl(url: string) {
   return url.startsWith("http://") || url.startsWith("https://")
@@ -114,11 +123,7 @@ export function getQuestionMediaTypeFromName(typeName: string) {
 }
 
 export function createQuestionMediaDraftFromStoredMedia(
-  media: Array<{
-    medien_id: number;
-    datei: string;
-    medientyp: { medientyp: string };
-  }>,
+  media: StoredMedia[],
 ): QuestionMediaDraft | null {
   if (media.length === 0) {
     return null;
@@ -148,5 +153,41 @@ export function createQuestionMediaDraftFromStoredMedia(
     blockedReason: mediaType
       ? undefined
       : `Der vorhandene Medientyp „${medium.medientyp.medientyp}“ wird im MVP nicht unterstützt.`,
+  };
+}
+
+export function createAnswerMediaDraftFromStoredMedia(
+  media: StoredMedia[],
+): QuestionMediaDraft | null {
+  if (media.length === 0) {
+    return null;
+  }
+
+  const supportedImage = media.find(
+    (medium) =>
+      getQuestionMediaTypeFromName(medium.medientyp.medientyp) === "IMAGE",
+  );
+  const selectedMedia = supportedImage ?? media[0];
+  const mediaType = getQuestionMediaTypeFromName(
+    selectedMedia.medientyp.medientyp,
+  );
+  const blockedReason =
+    media.length > 1
+      ? `Diese Antwort besitzt ${media.length} Medien. Der MVP unterstützt genau ein Bild.`
+      : mediaType !== "IMAGE"
+        ? `Der vorhandene Medientyp „${selectedMedia.medientyp.medientyp}“ wird für Antworten nicht unterstützt.`
+        : undefined;
+
+  return {
+    existingMediaId: selectedMedia.medien_id,
+    url: mediaType === "IMAGE" ? selectedMedia.datei : null,
+    mediaType: mediaType === "IMAGE" ? "IMAGE" : null,
+    fileName:
+      mediaType === "IMAGE"
+        ? getQuestionMediaFileName(selectedMedia.datei)
+        : undefined,
+    operation: "UNCHANGED",
+    existingMediaCount: media.length,
+    blockedReason,
   };
 }

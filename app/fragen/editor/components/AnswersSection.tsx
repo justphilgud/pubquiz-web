@@ -1,21 +1,38 @@
-import type { QuestionAnswerDraft } from "../types";
+import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
+import type { AnswerMediaUploadStatus } from "./AnswerMediaSlot";
 import { AnswerCard } from "./AnswerCard";
 
 type AnswersSectionProps = {
   answers: QuestionAnswerDraft[];
+  questionId: number | null;
+  pathnamePrefix: string;
+  disabled: boolean;
   onAnswerChange: (
     answerId: string,
     changes: Partial<QuestionAnswerDraft>,
   ) => void;
   onAddAnswer: () => void;
   onRemoveAnswer: (answerId: string) => void;
+  onAnswerMediaChange: (
+    answerId: string,
+    media: QuestionMediaDraft | null,
+  ) => void;
+  onAnswerMediaUploadStatusChange: (
+    answerId: string,
+    status: AnswerMediaUploadStatus,
+  ) => void;
 };
 
 export function AnswersSection({
   answers,
+  questionId,
+  pathnamePrefix,
+  disabled,
   onAnswerChange,
   onAddAnswer,
   onRemoveAnswer,
+  onAnswerMediaChange,
+  onAnswerMediaUploadStatusChange,
 }: AnswersSectionProps) {
   const canRemoveAnswer = answers.length > 1;
   const correctAnswerCount = answers.filter((answer) => answer.isCorrect).length;
@@ -37,15 +54,33 @@ export function AnswersSection({
       </div>
 
       <div className="mt-4 space-y-4">
-        {answers.map((answer) => (
-          <AnswerCard
-            key={answer.id}
-            answer={answer}
-            canRemove={canRemoveAnswer}
-            onChange={(changes) => onAnswerChange(answer.id, changes)}
-            onRemove={() => onRemoveAnswer(answer.id)}
-          />
-        ))}
+        {answers.map((answer, index) => {
+          const showMedia =
+            !answer.fieldGroupId ||
+            answers.findIndex(
+              (candidate) => candidate.fieldGroupId === answer.fieldGroupId,
+            ) === index;
+
+          return (
+            <AnswerCard
+              key={answer.id}
+              answer={answer}
+              canRemove={canRemoveAnswer}
+              questionId={questionId}
+              pathnamePrefix={pathnamePrefix}
+              disabled={disabled}
+              showMedia={showMedia}
+              onChange={(changes) => onAnswerChange(answer.id, changes)}
+              onMediaChange={(media) =>
+                onAnswerMediaChange(answer.id, media)
+              }
+              onMediaUploadStatusChange={(status) =>
+                onAnswerMediaUploadStatusChange(answer.id, status)
+              }
+              onRemove={() => onRemoveAnswer(answer.id)}
+            />
+          );
+        })}
       </div>
 
       <button

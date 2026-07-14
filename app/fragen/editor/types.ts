@@ -4,12 +4,16 @@ export type QuestionStatus = "DRAFT" | "READY" | "NOT_APPROVED" | "APPROVED";
 
 export type QuestionAnswerDraft = {
   id: string;
+  answerId?: number;
+  answerFieldId?: number;
+  solutionId?: number;
   fieldGroupId?: string;
   fieldLabel?: string;
   isRequired?: boolean;
   text: string;
   isCorrect: boolean;
   additionalInfo: string;
+  media: QuestionMediaDraft | null;
 };
 
 export type QuestionCategory = {
@@ -124,7 +128,11 @@ export type SaveQuestionPayload = {
   intent: QuestionSaveIntent;
   questionText: string;
   questionMedia: QuestionMediaDraft | null;
-  answers: Array<Omit<QuestionAnswerDraft, "id">>;
+  answers: Array<
+    Omit<QuestionAnswerDraft, "id"> & {
+      clientId: string;
+    }
+  >;
   categoryIds: number[];
   sourceOrRemark: string;
   moderationNotes: string;
@@ -140,6 +148,13 @@ export type SaveQuestionResult =
       questionId: number;
       message: string;
       questionMedia: QuestionMediaDraft | null;
+      answers: Array<{
+        clientId: string;
+        answerId?: number;
+        answerFieldId?: number;
+        solutionId?: number;
+        media: QuestionMediaDraft | null;
+      }>;
     }
   | {
       success: false;

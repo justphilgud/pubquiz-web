@@ -4,7 +4,10 @@ import type {
   QuestionEditorDraft,
   QuestionEditorRecord,
 } from "./types";
-import { createQuestionMediaDraftFromStoredMedia } from "./questionMedia";
+import {
+  createAnswerMediaDraftFromStoredMedia,
+  createQuestionMediaDraftFromStoredMedia,
+} from "./questionMedia";
 
 export async function loadQuestionForEditor(questionId: number) {
   const question = await prisma.fragen.findUnique({
@@ -52,6 +55,14 @@ export async function loadQuestionForEditor(questionId: number) {
           antwort: true,
           ist_richtig: true,
           zusatzinformation: true,
+          medien: {
+            orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+            select: {
+              medien_id: true,
+              datei: true,
+              medientyp: { select: { medientyp: true } },
+            },
+          },
         },
       },
       antwortfelder: {
@@ -60,6 +71,14 @@ export async function loadQuestionForEditor(questionId: number) {
           antwortfeld_id: true,
           label: true,
           ist_pflicht: true,
+          medien: {
+            orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
+            select: {
+              medien_id: true,
+              datei: true,
+              medientyp: { select: { medientyp: true } },
+            },
+          },
           loesungen: {
             orderBy: [{ sortierung: "asc" }, { loesung_id: "asc" }],
             select: {
@@ -100,37 +119,45 @@ export async function loadQuestionForEditor(questionId: number) {
   const classicAnswers: QuestionAnswerDraft[] = question.antworten.map(
     (answer) => ({
       id: `answer-${answer.antwort_id}`,
+      answerId: answer.antwort_id,
       text: answer.antwort,
       isCorrect: answer.ist_richtig,
       additionalInfo: answer.zusatzinformation ?? "",
+      media: createAnswerMediaDraftFromStoredMedia(answer.medien),
     }),
   );
-  const labeledAnswers: QuestionAnswerDraft[] = question.antwortfelder.flatMap(
+  const labeledAnswers: QuestionAnswerDraft[] = question.antwortfelder.flatMap<QuestionAnswerDraft>(
     (field) => {
       const fieldGroupId = `field-${field.antwortfeld_id}`;
+      const media = createAnswerMediaDraftFromStoredMedia(field.medien);
 
       if (field.loesungen.length === 0) {
         return [
           {
             id: `${fieldGroupId}-empty`,
+            answerFieldId: field.antwortfeld_id,
             fieldGroupId,
             fieldLabel: field.label,
             isRequired: field.ist_pflicht,
             text: "",
             isCorrect: false,
             additionalInfo: "",
+            media,
           },
         ];
       }
 
       return field.loesungen.map((solution) => ({
         id: `solution-${solution.loesung_id}`,
+        answerFieldId: field.antwortfeld_id,
+        solutionId: solution.loesung_id,
         fieldGroupId,
         fieldLabel: field.label,
         isRequired: field.ist_pflicht,
         text: solution.loesung_text,
         isCorrect: solution.ist_akzeptiert,
         additionalInfo: solution.zusatzinformation ?? "",
+        media,
       }));
     },
   );
@@ -152,6 +179,7 @@ export async function loadQuestionForEditor(questionId: number) {
               text: "",
               isCorrect: true,
               additionalInfo: "",
+              media: null,
             },
           ],
     categoryIds: question.fragen_kategorien.map(
