@@ -9,23 +9,12 @@ type Props = {
   params: Promise<{
     quizId: string;
   }>;
-  searchParams: Promise<{
-    passwort?: string;
-  }>;
 };
 
 export default async function StartsequenzPage({
   params,
-  searchParams,
 }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -61,12 +50,6 @@ export default async function StartsequenzPage({
 
           <form action={saveStartsequenz}>
             <input type="hidden" name="quizId" value={quiz.quiz_id} />
-
-            <input
-              type="hidden"
-              name="passwort"
-              value={passwort}
-            />
 
             <input
               type="hidden"
@@ -117,9 +100,7 @@ export default async function StartsequenzPage({
               </button>
 
               <a
-                href={`/quiz/${quiz.quiz_id}?passwort=${encodeURIComponent(
-                  passwort
-                )}`}
+                href={`/quiz/${quiz.quiz_id}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
               >
                 Abbrechen und zurück
@@ -127,11 +108,11 @@ export default async function StartsequenzPage({
 
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quiz.quiz_id}/slides/vor-dem-start?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quiz.quiz_id}/slides/vor-dem-start`,
                   label: "Warteslide",
                 }}
                 next={{
-                  href: `/quiz/${quiz.quiz_id}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quiz.quiz_id}/slides/begruessung`,
                   label: "Begrüßung",
                 }}
               />
@@ -143,7 +124,6 @@ export default async function StartsequenzPage({
           <div className="origin-top-left scale-[0.38]">
             <IntroSlideStartsequenz
               quizId={quiz.quiz_id}
-              passwort={passwort}
               audioUrl={`${audioUrl}?v=${Date.now()}`}
             />
           </div>

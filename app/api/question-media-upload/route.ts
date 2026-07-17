@@ -236,7 +236,7 @@ export async function POST(request: Request) {
             pathname,
             context.mediaType,
             context.target,
-            uploadConfig.pathnamePrefix,
+            uploadConfig.environmentPrefix,
           )
         ) {
           throw new Error("Dateipfad oder Dateiendung ist ungültig.");

@@ -13,7 +13,7 @@ import {
 } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import {
-  getMediaUploadServerConfig,
+  getMediaVerificationServerConfig,
   logMediaUploadFailure,
 } from "./mediaUploadEnvironment";
 import {
@@ -284,7 +284,7 @@ async function verifyUploadedQuestionMedia(
   }
 
   try {
-    const uploadConfig = getMediaUploadServerConfig();
+    const uploadConfig = getMediaVerificationServerConfig();
     const metadata = await head(media.url, uploadConfig.blobAuthentication);
     const rule = questionMediaRules[media.mediaType];
 
@@ -293,7 +293,7 @@ async function verifyUploadedQuestionMedia(
         metadata.pathname,
         media.mediaType,
         target,
-        uploadConfig.pathnamePrefix,
+        uploadConfig.environmentPrefix,
       )
     ) {
       throw new DraftValidationError(

@@ -1,17 +1,24 @@
 import { handleUpload } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
+import {
+  getBlobUploadAuthentication,
+  getMediaUploadPathnamePrefix,
+  logMediaUploadFailure,
+} from "@/app/fragen/editor/mediaUploadEnvironment";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-
   try {
+    const body = await request.json();
+    const blobAuthentication = getBlobUploadAuthentication();
+    const mediaPrefix = getMediaUploadPathnamePrefix("media");
     const jsonResponse = await handleUpload({
       body,
       request,
+      ...blobAuthentication,
       onBeforeGenerateToken: async (pathname) => {
         const erlaubtePraefixe = [
-          "medien/audio/intro/",
-          "medien/video/intro/",
+          `${mediaPrefix}audio/intro/`,
+          `${mediaPrefix}video/intro/`,
         ];
 
         const istErlaubt = erlaubtePraefixe.some((prefix) =>
@@ -40,7 +47,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
-    console.error("Blob Upload Token Fehler:", error);
+    logMediaUploadFailure("legacy-client-token", error);
 
     return NextResponse.json(
       { error: "Upload konnte nicht vorbereitet werden." },

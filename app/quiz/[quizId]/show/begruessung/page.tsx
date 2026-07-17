@@ -4,21 +4,12 @@ import { ShowNavigation } from "../ShowNavigation";
 
 type Props = {
   params: Promise<{ quizId: string }>;
-  searchParams: Promise<{ passwort?: string }>;
 };
 
 export default async function ShowBegruessungPage({
   params,
-  searchParams,
 }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -30,9 +21,7 @@ export default async function ShowBegruessungPage({
   const text =
     quiz.intro_begruessungstext ?? "Willkommen zum heutigen Quizabend!";
 
-  const nextUrl = `/quiz/${quiz.quiz_id}/show/regeln?passwort=${encodeURIComponent(
-    passwort
-  )}`;
+  const nextUrl = `/quiz/${quiz.quiz_id}/show/regeln`;
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-[#050510] text-white">

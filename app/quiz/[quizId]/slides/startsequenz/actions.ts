@@ -7,7 +7,6 @@ const STANDARD_AUDIO_URL = "/medien/audio/intro/mexico.mp3";
 
 export async function saveStartsequenz(formData: FormData) {
   const quizId = Number(formData.get("quizId"));
-  const passwort = String(formData.get("passwort") ?? "");
   const submitAction = String(formData.get("submitAction") ?? "close");
 
   const introMusikUrl =
@@ -22,12 +21,8 @@ export async function saveStartsequenz(formData: FormData) {
   });
 
   if (submitAction === "close") {
-    redirect(`/quiz/${quizId}?passwort=${encodeURIComponent(passwort)}`);
+    redirect(`/quiz/${quizId}`);
   }
 
-  redirect(
-    `/quiz/${quizId}/slides/startsequenz?passwort=${encodeURIComponent(
-      passwort
-    )}`
-  );
+  redirect(`/quiz/${quizId}/slides/startsequenz`);
 }

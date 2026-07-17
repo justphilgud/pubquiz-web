@@ -59,7 +59,6 @@ type Props = {
   quizId: number;
   fragen: QuizFrage[];
   abschnitte: Abschnitt[];
-  passwort: string;
 };
 
 function getContainerId(quizAbschnittId: number | null) {
@@ -278,7 +277,6 @@ function SortableBlockHeader({
 function DroppableBlock({
   gruppe,
   quizId,
-  passwort,
   istEingeklappt,
   onToggleGruppe,
   onLayoutChange,
@@ -289,7 +287,6 @@ function DroppableBlock({
 }: {
   gruppe: Gruppe;
   quizId: number;
-  passwort: string;
   istEingeklappt: boolean;
   onToggleGruppe: (containerId: string) => void;
   onLayoutChange: (
@@ -359,7 +356,7 @@ function DroppableBlock({
 
                   <td className="px-4 py-5">
                     <a
-                      href={`/quiz/${quizId}/slides/${key}?passwort=${passwort}`}
+                      href={`/quiz/${quizId}/slides/${key}`}
                       className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
                     >
                       Konfigurieren
@@ -392,7 +389,7 @@ function DroppableBlock({
 
                   <td className="px-4 py-5">
                     <a
-                      href={`/quiz/${quizId}/slides/${key}?passwort=${passwort}`}
+                      href={`/quiz/${quizId}/slides/${key}`}
                       className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
                     >
                       Konfigurieren
@@ -436,7 +433,6 @@ export default function QuizFragenSortableTable({
   quizId,
   fragen,
   abschnitte,
-  passwort,
 }: Props) {
   const [items, setItems] = useState<QuizFrage[]>(fragen);
 
@@ -871,7 +867,6 @@ export default function QuizFragenSortableTable({
                     key={gruppe.key}
                     gruppe={gruppe}
                     quizId={quizId}
-                    passwort={passwort}
                     istEingeklappt={eingeklappteGruppen.includes(gruppe.containerId)}
                     onToggleGruppe={toggleGruppe}
                     onLayoutChange={handleLayoutChange}

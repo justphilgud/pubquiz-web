@@ -1,8 +1,10 @@
-import "dotenv/config";
 import bcrypt from "bcryptjs";
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, UserRole } from "../app/generated/prisma/client";
+import { loadLocalEnvironment } from "./load-local-environment";
+
+loadLocalEnvironment({ required: true });
 
 const { Pool } = pg;
 

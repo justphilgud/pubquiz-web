@@ -1,11 +1,12 @@
 import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import type { AnswerMediaUploadStatus } from "./AnswerMediaSlot";
 import { AnswerCard } from "./AnswerCard";
 
 type AnswersSectionProps = {
   answers: QuestionAnswerDraft[];
   questionId: number | null;
-  pathnamePrefix: string;
+  pathnamePrefix: BlobEnvironmentPrefix;
   disabled: boolean;
   onAnswerChange: (
     answerId: string,

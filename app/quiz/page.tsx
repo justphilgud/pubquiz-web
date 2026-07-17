@@ -17,5 +17,5 @@ export default async function QuizPage({ searchParams }: Props) {
   const quizze = await getQuizListe();
   const kategorien = await getSchnellQuizKategorien();
 
-  return <QuizWorkspace quizze={quizze} kategorien={kategorien} passwort="" />;
+  return <QuizWorkspace quizze={quizze} kategorien={kategorien} />;
 }

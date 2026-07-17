@@ -4,18 +4,10 @@ import { ShowNavigation } from "../ShowNavigation";
 
 type Props = {
   params: Promise<{ quizId: string }>;
-  searchParams: Promise<{ passwort?: string }>;
 };
 
-export default async function ShowRegelnPage({ params, searchParams }: Props) {
+export default async function ShowRegelnPage({ params }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -36,9 +28,7 @@ export default async function ShowRegelnPage({ params, searchParams }: Props) {
     .map((regel) => regel.trim())
     .filter(Boolean);
 
-  const nextUrl = `/quiz/${quiz.quiz_id}/show/preise?passwort=${encodeURIComponent(
-    passwort
-  )}`;
+  const nextUrl = `/quiz/${quiz.quiz_id}/show/preise`;
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-[#050510] text-white">

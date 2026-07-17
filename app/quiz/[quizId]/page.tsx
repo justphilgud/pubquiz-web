@@ -17,54 +17,20 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { requireAdmin } from "@/app/lib/permissions";
+import Link from "next/link";
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
 
 type Props = {
   params: Promise<{
     quizId: string;
   }>;
-
-  searchParams: Promise<{
-    passwort?: string;
-  }>;
 };
 
 export default async function QuizDetailPage({
   params,
-  searchParams,
 }: Props) {
   await requireAdmin();
   const { quizId } = await params;
-  const resolvedSearchParams = await searchParams;
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    return (
-      <main className="min-h-screen bg-slate-100 p-8">
-        <div className="mx-auto max-w-md rounded-3xl bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-black text-slate-900">
-            Quiz geschützt
-          </h1>
-
-          <form className="mt-5 space-y-4">
-            <input
-              name="passwort"
-              type="password"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3"
-              placeholder="Passwort"
-            />
-
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white"
-            >
-              Öffnen
-            </button>
-          </form>
-        </div>
-      </main>
-    );
-  }
 
   const quiz = await getQuizDetails(Number(quizId));
 
@@ -123,13 +89,13 @@ export default async function QuizDetailPage({
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <a
-              href={`/quiz?passwort=${passwort}`}
+            <Link
+              href="/quiz"
               title="Zur Übersicht"
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white p-3 text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
               <ArrowLeftIcon className="h-5 w-5" />
-            </a>
+            </Link>
 
             <form action={copyAction}>
               <button
@@ -164,7 +130,7 @@ export default async function QuizDetailPage({
             )}
 
             <a
-              href={`/quiz/${quiz.quiz_id}/praesentation?passwort=${passwort}`}
+              href={`/quiz/${quiz.quiz_id}/praesentation`}
               target="_blank"
               rel="noopener noreferrer"
               title="Präsentieren"
@@ -173,7 +139,7 @@ export default async function QuizDetailPage({
               <PlayIcon className="h-5 w-5" />
             </a>
             <a
-              href={`/quiz/${quiz.quiz_id}/moderation?passwort=${passwort}`}
+              href={`/quiz/${quiz.quiz_id}/moderation`}
               target="_blank"
               rel="noopener noreferrer"
               title="Moderation"
@@ -183,7 +149,7 @@ export default async function QuizDetailPage({
             </a>
 
             <a
-              href={`/quiz/${quiz.quiz_id}/antworten?passwort=${passwort}`}
+              href={`/quiz/${quiz.quiz_id}/antworten`}
               target="_blank"
               rel="noopener noreferrer"
               title="Antwortformular"
@@ -193,7 +159,7 @@ export default async function QuizDetailPage({
             </a>
 
             <a
-              href={`/quiz/${quiz.quiz_id}/auswertung?passwort=${passwort}`}
+              href={`/quiz/${quiz.quiz_id}/auswertung`}
               target="_blank"
               rel="noopener noreferrer"
               title="Auswertung"
@@ -208,7 +174,6 @@ export default async function QuizDetailPage({
           quizId={quiz.quiz_id}
           fragen={quiz.fragen}
           abschnitte={quiz.abschnitte}
-          passwort={passwort}
         />
       </div>
     </main>

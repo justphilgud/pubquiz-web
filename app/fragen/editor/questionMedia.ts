@@ -1,4 +1,8 @@
 import type { QuestionMediaDraft, QuestionMediaType } from "./types";
+import {
+  buildBlobPath,
+  type BlobEnvironmentPrefix,
+} from "@/app/lib/blobPath";
 
 type QuestionMediaRule = {
   accept: string;
@@ -68,16 +72,30 @@ export function isAllowedQuestionMediaPathname(
   pathname: string,
   mediaType: QuestionMediaType,
   target: "QUESTION" | "ANSWER",
-  pathnamePrefix: string,
+  environmentPrefix: BlobEnvironmentPrefix,
 ) {
   const directory = mediaType === "IMAGE" ? "image" : "audio";
-  const baseDirectory = `${pathnamePrefix}${target.toLowerCase()}/${directory}/`;
+  const area = target === "QUESTION" ? "question-media" : "answer-media";
+  const baseDirectory = `${buildBlobPath(environmentPrefix, area, [directory])}/`;
 
   return (
     pathname.startsWith(baseDirectory) &&
     questionMediaRules[mediaType].extensions.includes(
       getFileExtension(pathname),
     )
+  );
+}
+
+export function buildQuestionMediaPathname(
+  environmentPrefix: BlobEnvironmentPrefix,
+  target: "QUESTION" | "ANSWER",
+  mediaType: QuestionMediaType,
+  fileName: string,
+) {
+  return buildBlobPath(
+    environmentPrefix,
+    target === "QUESTION" ? "question-media" : "answer-media",
+    [mediaType === "IMAGE" ? "image" : "audio", fileName],
   );
 }
 

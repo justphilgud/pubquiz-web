@@ -16,11 +16,9 @@ type Tab = "verwaltung" | "schnellquiz";
 export default function QuizWorkspace({
   quizze,
   kategorien,
-  passwort,
 }: {
   quizze: QuizResult[];
   kategorien: Kategorie[];
-  passwort: string;
 }) {
   const searchParams = useSearchParams();
 
@@ -69,10 +67,7 @@ export default function QuizWorkspace({
         </div>
 
         <div className={activeTab === "verwaltung" ? "block" : "hidden"}>
-          <QuizForm
-            quizze={quizze}
-            passwort={passwort}
-          />
+          <QuizForm quizze={quizze} />
         </div>
 
         <div className={activeTab === "schnellquiz" ? "block" : "hidden"}>

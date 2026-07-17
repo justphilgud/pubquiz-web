@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 
 export async function saveBekanntmachungen(formData: FormData) {
   const quizId = Number(formData.get("quizId"));
-  const passwort = formData.get("passwort")?.toString() ?? "";
 
   const bekanntmachungen =
     formData.get("bekanntmachungen")?.toString() ?? "";
@@ -22,9 +21,5 @@ export async function saveBekanntmachungen(formData: FormData) {
     },
   });
 
-  redirect(
-    `/quiz/${quizId}/slides/bekanntmachungen?passwort=${encodeURIComponent(
-      passwort
-    )}`
-  );
+  redirect(`/quiz/${quizId}/slides/bekanntmachungen`);
 }

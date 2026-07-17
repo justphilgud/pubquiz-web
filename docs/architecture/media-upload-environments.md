@@ -1,105 +1,78 @@
-# Medien-Uploads in Entwicklungs-, Preview- und Produktionsumgebungen
+# Medien-Uploads nach Umgebung
 
-## Zielbild
+Stand: 17. Juli 2026
 
-Der Question Editor verwendet für Fragenmedien und Antwortbilder denselben
-Browser-zu-Blob-Ablauf:
+## Verbindliches Modell
 
-1. Der Browser validiert Dateiendung, MIME-Typ und Größe.
-2. Der Browser fordert relativ über `/api/question-media-upload` eine
-   Upload-Autorisierung an. Dadurch gelten dieselbe Origin und die bestehende
-   Auth.js-Sitzung.
-3. Die Route prüft Benutzer, Frage- beziehungsweise Antwortzuordnung und den
-   serverseitig bestimmten Dateipfad.
-4. Die Route stellt mit explizit aufgelösten Blob-Zugangsdaten einen kurzlebigen
-   signierten Token aus.
-5. Der Browser überträgt die Datei direkt zu Vercel Blob und übernimmt die URL
-   in den Entwurf.
-6. Beim Speichern verifiziert der Server URL, Pfad, MIME-Typ und Größe mit
-   denselben Blob-Zugangsdaten, bevor er die Zuordnung in der Datenbank speichert.
+Alle drei Upload-Routen verwenden dieselbe serverseitige Auflösung für
+Umgebung, Blob-Credential und Pfade. Das Credential ist in jeder Umgebung ein
+explizit gesetzter `BLOB_READ_WRITE_TOKEN` des jeweils zugeordneten Stores.
+`VERCEL_OIDC_TOKEN` und `BLOB_STORE_ID` werden von der Anwendung nicht als
+Blob-Credentials verwendet; insbesondere gibt es lokal keinen OIDC-Fallback.
 
-Die Umgebung kommt nie aus `clientPayload`. Der Server leitet sie auf Vercel
-aus `VERCEL_ENV` und außerhalb Vercels optional aus `MEDIA_UPLOAD_ENV` ab.
-
-## Umgebungen und Pfade
-
-| Laufzeit | Auflösung | Präfix für neue Dateien |
+| Umgebung | Blob-Store | Präfix für neue Dateien |
 | --- | --- | --- |
-| lokales `next dev` | Standard `dev` | `question-media/dev/` |
-| Vercel Development | `VERCEL_ENV=development` | `question-media/dev/` |
-| Vercel Preview | `VERCEL_ENV=preview` | `question-media/preview/` |
-| Vercel Production | `VERCEL_ENV=production` | `question-media/prod/` |
-| andere Serverlaufzeit | `MEDIA_UPLOAD_ENV=dev\|preview\|prod`, sonst anhand `NODE_ENV` | entsprechendes Präfix |
+| Development | `pubquiz-media-nonprod` | `dev/` |
+| Preview | `pubquiz-media-nonprod` | `preview/` |
+| Production | `pubquiz-media-public` | `prod/` |
 
-Darunter folgen Ziel und Typ, zum Beispiel
-`question-media/preview/question/image/...` oder
-`question-media/prod/answer/image/...`.
+Die fachliche Kategorie folgt direkt auf das Environment-Präfix:
 
-Bereits gespeicherte URLs und alte Präfixe bleiben lesbar. Die strengere
-Pfadprüfung gilt nur für neu hochgeladene Dateien.
+- Fragenmedium: `dev/question-media/image/...`
+- Antwortbild: `preview/answer-media/image/...`
+- ältere, weiterhin aktive Uploadoberflächen: `prod/media/audio/intro/...`
 
-## Benötigte Server-Konfiguration
+Bereits vorhandene Blobs und gespeicherte URLs werden weder verschoben noch
+umbenannt. Die neue Regel gilt ausschließlich für neu erzeugte Pfade.
 
-Die zentrale Prüfung in `mediaUploadEnvironment.ts` erwartet:
+## Serverseitige Auflösung
 
-- `AUTH_SECRET`
-- eine gültige PostgreSQL-`DATABASE_URL`
-- optional eine gültige `AUTH_URL` oder `NEXTAUTH_URL`, falls gesetzt
-- `BLOB_WEBHOOK_PUBLIC_KEY`
-- entweder `BLOB_READ_WRITE_TOKEN`
-- oder ein noch gültiges Paar aus `VERCEL_OIDC_TOKEN` und `BLOB_STORE_ID`
+Die logische Umgebung ist genau `development`, `preview` oder `production`.
+Die Priorität lautet:
 
-Lokal wird ein vorhandener `BLOB_READ_WRITE_TOKEN` bevorzugt. Auf Vercel wird
-ein gültiger OIDC-Token mit passender Store-ID bevorzugt; das Read/Write-Token
-bleibt dort der Fallback. Damit kann ein abgelaufener lokaler OIDC-Token die
-lokale Entwicklung nicht überschreiben. Zugangsdaten dürfen weder mit
-`NEXT_PUBLIC_` beginnen noch geloggt oder an den Browser übergeben werden.
+1. `MEDIA_UPLOAD_ENV` als expliziter serverseitiger Override für kontrollierte
+   lokale Tests,
+2. `VERCEL_ENV` auf Vercel,
+3. `NODE_ENV` als Fallback (`production` → Production, sonst Development).
 
-### Lokale Entwicklung
+`NEXT_PUBLIC_APP_ENV` ist nur ein sichtbares Label und niemals Eingabe für
+Credential-, Datenbank- oder Pfadentscheidungen.
 
-Für einen stabilen lokalen Betrieb wird `BLOB_READ_WRITE_TOKEN` in der nicht
-eingecheckten `.env.local` empfohlen. Alternativ kann eine aktuelle, vom
-Vercel-CLI bezogene OIDC-Konfiguration verwendet werden; ein lokal kopierter
-OIDC-Token ist kurzlebig und muss nach Ablauf erneuert werden.
+Der Browser erhält nur das nicht geheime Präfix `dev`, `preview` oder `prod`.
+Die gemeinsame `MediaUploadSlot`-Komponente baut daraus einen Pfad; die Route
+berechnet die erlaubte Umgebung unabhängig erneut und prüft den vollständigen
+Pfad. Tokens, Cookies, signierte URLs und andere Secrets werden weder als Props
+übergeben noch in Diagnose-Logs ausgegeben.
 
-Die vorhandene lokale Fehlersituation entstand vor der Dateiübertragung: Es
-gab keinen Read/Write-Token, während `VERCEL_OIDC_TOKEN` bereits abgelaufen war.
-Die Blob-API verweigerte deshalb die Ausstellung des signierten Tokens mit
-`Access denied`.
+## Aktive Upload-Routen
 
-### Vercel Preview und Production
+| Route | Verwendung | Status |
+| --- | --- | --- |
+| `/api/question-media-upload` | gemeinsamer Upload für `QuestionMediaSlot` und `AnswerMediaSlot` | aktiv |
+| `/api/blob-upload-token` | Intro-Audio und Intro-Video in den Slide-Einstellungen | aktiv, Legacy-API |
+| `/api/upload-medium` | altes Fragenformular | aktiv, Legacy-API |
 
-Auf Vercel ist OIDC die bevorzugte Konfiguration, weil Vercel den kurzlebigen
-Token für Functions automatisch bereitstellt und rotiert. Blob-Store und
-Projekt müssen korrekt verbunden sein; `BLOB_STORE_ID` und der Webhook Public
-Key müssen in Preview beziehungsweise Production verfügbar sein. Ein
-Read/Write-Token bleibt als explizite kompatible Alternative unterstützt.
+`/api/blob-upload-token` darf daher noch nicht entfernt werden. Alle Routen
+beziehen ihren `BLOB_READ_WRITE_TOKEN` ausdrücklich aus derselben zentralen
+Serverfunktion; das Blob-SDK darf kein Credential implizit auswählen.
 
-Referenzen:
+## Optionale Validierung
 
-- [Vercel Blob SDK](https://vercel.com/docs/vercel-blob/using-blob-sdk)
-- [OIDC-Unterstützung für Vercel Blob](https://vercel.com/changelog/vercel-blob-now-supports-oidc-authentication)
-- [Blob-Speicher verwalten](https://vercel.com/docs/vercel-blob/manage-blob-storage)
+Die Basisvalidierung prüft `DATABASE_URL`, `AUTH_SECRET` (oder den erlaubten
+Alias `NEXTAUTH_SECRET`), die logische Umgebung und das daraus folgende Präfix.
+Uploadfunktionen prüfen bei ihrem Aufruf zusätzlich `BLOB_READ_WRITE_TOKEN`.
+Der Presigned-Upload prüft außerdem `BLOB_WEBHOOK_PUBLIC_KEY`.
 
-## Diagnose
+Diagnosen melden ausschließlich Status, Phase, Fehlerklasse, bereinigte
+Fehlermeldung, internen Code, erwartete Authentifizierungsart und das
+Vorhandensein der Variablen. Werte, Hosts und Secrets bleiben verborgen.
 
-Serverlogs nennen eine sichere Phase, aber keine Tokens:
+## Smoke-Test je Umgebung
 
-- `authentication`: Auth.js-Sitzung konnte nicht gelesen werden
-- `user-authorization`: Benutzerstatus oder Datenbankzugriff
-- `configuration`: fehlende oder abgelaufene Server-Konfiguration
-- `request-processing`: ungültige Anfrage oder Webhook-Verarbeitung
-- `context-authorization`: Frage, Antwortzuordnung oder Pfad nicht erlaubt
-- `signed-token`: Blob verweigert die Token-Ausstellung
-- `blob-verification`: Blob-Metadaten konnten beim Speichern nicht geprüft werden
-
-Die Browseroberfläche unterscheidet mindestens Autorisierung von der
-eigentlichen Dateiübertragung. Die genaue Serverphase steht im Function-Log.
-
-## Deployment-Checkliste
-
-1. Blob-Store mit dem richtigen Vercel-Projekt und allen benötigten Targets verbinden.
-2. Servervariablen pro Preview und Production prüfen; keine Blob-Geheimnisse als `NEXT_PUBLIC_*` setzen.
-3. Sicherstellen, dass `VERCEL_ENV` nicht manuell aus dem Browser überschrieben wird.
-4. Je Umgebung ein kleines Bild hochladen, speichern, neu laden, ersetzen und entfernen.
-5. Function-Logs auf die Phasen `signed-token` und `blob-verification` prüfen.
+1. `npm run env:check` beziehungsweise die gleichwertige Vercel-Prüfung ohne
+   Ausgabe von Werten durchführen.
+2. Je ein kleines Fragenbild und Antwortbild hochladen, speichern und neu laden.
+3. Intro-Audio oder Intro-Video über die Legacy-Oberfläche hochladen.
+4. Prüfen, dass der neue Blobpfad mit `dev/`, `preview/` beziehungsweise
+   `prod/` beginnt.
+5. Function-Logs auf Fehlerphasen prüfen; keine Secretwerte kopieren.

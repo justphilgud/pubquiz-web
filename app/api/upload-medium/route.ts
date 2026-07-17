@@ -1,5 +1,10 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import {
+  buildMediaUploadPathname,
+  getBlobUploadAuthentication,
+  logMediaUploadFailure,
+} from "@/app/fragen/editor/mediaUploadEnvironment";
 
 const erlaubteZielordner = [
   "bilder/unsortiert",
@@ -57,9 +62,14 @@ export async function POST(request: Request) {
 
     const originalName = bereinigeDateiname(file.name);
     const fileName = `${Date.now()}-${originalName}`;
-    const blobPfad = `medien/${zielordner}/${fileName}`;
+    const blobPfad = buildMediaUploadPathname("media", [
+      ...zielordner.split("/"),
+      fileName,
+    ]);
+    const blobAuthentication = getBlobUploadAuthentication();
 
     const blob = await put(blobPfad, file, {
+      ...blobAuthentication,
       access: "public",
       addRandomSuffix: false,
     });
@@ -70,7 +80,7 @@ export async function POST(request: Request) {
       message: "Datei wurde hochgeladen.",
     });
   } catch (error) {
-    console.error("Upload fehlgeschlagen:", error);
+    logMediaUploadFailure("legacy-server-upload", error);
 
     return NextResponse.json(
       { success: false, message: "Upload fehlgeschlagen." },

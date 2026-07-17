@@ -11,20 +11,10 @@ type Props = {
   params: Promise<{
     quizId: string;
   }>;
-  searchParams: Promise<{
-    passwort?: string;
-  }>;
 };
 
-export default async function RegelnPage({ params, searchParams }: Props) {
+export default async function RegelnPage({ params }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -41,11 +31,7 @@ export default async function RegelnPage({ params, searchParams }: Props) {
       regeln: String(formData.get("regeln") ?? ""),
     });
 
-    redirect(
-      `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(
-        passwort
-      )}`
-    );
+    redirect(`/quiz/${quizIdValue}/slides/regeln`);
   }
 
   const defaultRegeln = [
@@ -63,8 +49,7 @@ export default async function RegelnPage({ params, searchParams }: Props) {
     .map((regel: string) => regel.trim())
     .filter(Boolean);
 
-  const naechsteSlideUrl = `/quiz/${quizIdValue
-    }/slides/preise?passwort=${encodeURIComponent(passwort)}`;
+  const naechsteSlideUrl = `/quiz/${quizIdValue}/slides/preise`;
 
   return (
     <main className="min-h-screen bg-slate-100 p-8">
@@ -108,20 +93,18 @@ export default async function RegelnPage({ params, searchParams }: Props) {
               </button>
 
               <a
-                href={`/quiz/${quizIdValue}?passwort=${encodeURIComponent(
-                  passwort
-                )}`}
+                href={`/quiz/${quizIdValue}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
               >
                 Abbrechen und zurück
               </a>
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/begruessung`,
                   label: "Begrüßung",
                 }}
                 next={{
-                  href: `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/preise`,
                   label: "Preise",
                 }}
               />

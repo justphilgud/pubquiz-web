@@ -1,6 +1,5 @@
 type Props = {
   quizId: number;
-  passwort: string;
 };
 
 const introSlides = [
@@ -28,7 +27,6 @@ const introSlides = [
 
 export default function IntroSlidesOverview({
   quizId,
-  passwort,
 }: Props) {
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -62,7 +60,7 @@ export default function IntroSlidesOverview({
             </div>
 
             <a
-              href={`/quiz/${quizId}/slides/${slide.key}?passwort=${passwort}`}
+              href={`/quiz/${quizId}/slides/${slide.key}`}
               className="inline-flex justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-50"
             >
               Konfigurieren

@@ -10,7 +10,7 @@ import {
 import { QuestionEditor } from "../components/QuestionEditor";
 import { loadQuestionForEditor } from "../questionEditorData";
 import type { QuestionEditorContext } from "../types";
-import { getMediaUploadPathnamePrefix } from "../mediaUploadEnvironment";
+import { getMediaUploadEnvironmentPrefix } from "../mediaUploadEnvironment";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -60,7 +60,7 @@ export default async function ExistingQuestionEditorPage({
         loadedQuestion.access,
       )}
       editorContext={editorContext}
-      mediaUploadPathnamePrefix={getMediaUploadPathnamePrefix()}
+      mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
       initialDraft={loadedQuestion.draft}
       questionRecord={loadedQuestion.record}
       categories={categories.map((category) => ({

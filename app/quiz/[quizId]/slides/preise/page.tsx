@@ -6,18 +6,10 @@ import { ConfigSlideNavigation } from "../ConfigSlideNavigation";
 
 type Props = {
   params: Promise<{ quizId: string }>;
-  searchParams: Promise<{ passwort?: string }>;
 };
 
-export default async function PreisePage({ params, searchParams }: Props) {
+export default async function PreisePage({ params }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -40,11 +32,7 @@ export default async function PreisePage({ params, searchParams }: Props) {
       preise,
     });
 
-    redirect(
-      `/quiz/${quizIdValue}/slides/preise?passwort=${encodeURIComponent(
-        passwort
-      )}`
-    );
+    redirect(`/quiz/${quizIdValue}/slides/preise`);
   }
 
   const gespeichertePreise = ((quiz as any).intro_preise ?? "")
@@ -61,8 +49,7 @@ export default async function PreisePage({ params, searchParams }: Props) {
     { platz: "3", titel: "Platz 3", preis: platz3 || "Ruhm und Ehre" },
   ];
 
-  const naechsteSlideUrl = `/quiz/${quizIdValue
-    }/slides/fragerunde-1?passwort=${encodeURIComponent(passwort)}`;
+  const naechsteSlideUrl = `/quiz/${quizIdValue}/slides/fragerunde-1`;
 
   return (
     <main className="min-h-screen bg-slate-100 p-8">
@@ -125,9 +112,7 @@ export default async function PreisePage({ params, searchParams }: Props) {
               </button>
 
               <a
-                href={`/quiz/${quizIdValue}?passwort=${encodeURIComponent(
-                  passwort
-                )}`}
+                href={`/quiz/${quizIdValue}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
               >
                 Abbrechen und zurück
@@ -135,11 +120,11 @@ export default async function PreisePage({ params, searchParams }: Props) {
 
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quizIdValue}/slides/begruessung?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/begruessung`,
                   label: "Begrüßung",
                 }}
                 next={{
-                  href: `/quiz/${quizIdValue}/slides/regeln?passwort=${encodeURIComponent(passwort)}`,
+                  href: `/quiz/${quizIdValue}/slides/regeln`,
                   label: "Regeln",
                 }}
               />

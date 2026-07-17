@@ -1858,9 +1858,7 @@ export default function QuizPraesentationPlayer({
   function renderQrCodeSlide() {
     const antwortUrl =
       typeof window !== "undefined"
-        ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten?passwort=${encodeURIComponent(
-          new URLSearchParams(window.location.search).get("passwort") ?? ""
-        )}`
+        ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten`
         : "";
 
     return (

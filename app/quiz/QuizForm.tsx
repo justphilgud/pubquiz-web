@@ -24,7 +24,6 @@ import {
 
 type Props = {
   quizze: QuizResult[];
-  passwort: string;
 };
 
 const inputClass =
@@ -35,7 +34,6 @@ const buttonSecondaryClass =
 
 export default function QuizForm({
   quizze,
-  passwort,
 }: Props) {
   const [editingQuizId, setEditingQuizId] = useState<number | null>(null);
   const [titel, setTitel] = useState("");
@@ -222,7 +220,7 @@ export default function QuizForm({
                     <td className="px-4 py-3 font-medium">
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
-                          href={`/quiz/${quiz.quiz_id}?passwort=${passwort}`}
+                          href={`/quiz/${quiz.quiz_id}`}
                           className="text-slate-900 underline decoration-slate-300 underline-offset-4 hover:decoration-slate-900"
                         >
                           {quiz.titel ?? `Quiz ${quiz.quiz_id}`}

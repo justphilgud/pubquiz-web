@@ -4,7 +4,7 @@ import {
   requireQuestionEditor,
 } from "@/app/lib/permissions";
 import { QuestionEditor } from "./components/QuestionEditor";
-import { getMediaUploadPathnamePrefix } from "./mediaUploadEnvironment";
+import { getMediaUploadEnvironmentPrefix } from "./mediaUploadEnvironment";
 
 export default async function QuestionEditorPage() {
   const session = await requireQuestionEditor();
@@ -20,7 +20,7 @@ export default async function QuestionEditorPage() {
     <QuestionEditor
       capabilities={getQuestionEditorCapabilities(session)}
       editorContext="create"
-      mediaUploadPathnamePrefix={getMediaUploadPathnamePrefix()}
+      mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
       categories={categories.map((category) => ({
         id: category.fragenkategorie_id,
         name: category.kategorie,

@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   quizId: number;
-  passwort: string;
   audioUrl?: string;
   text?: string;
 };
 
 export function IntroSlideStartsequenz({
   quizId,
-  passwort,
   audioUrl = "/medien/audio/intro/mexico.mp3",
   text = "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen.",
 }: Props) {
@@ -27,11 +25,7 @@ export function IntroSlideStartsequenz({
   function goToNextSlide() {
     audioRef.current?.pause();
 
-    router.push(
-      `/quiz/${quizId}/show/begruessung?passwort=${encodeURIComponent(
-        passwort
-      )}`
-    );
+    router.push(`/quiz/${quizId}/show/begruessung`);
   }
 
   async function startIntro() {

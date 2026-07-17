@@ -4,17 +4,12 @@ import { saveBekanntmachungen } from "./actions";
 
 type Props = {
   params: Promise<{ quizId: string }>;
-  searchParams: Promise<{ passwort?: string }>;
 };
 
 export default async function BekanntmachungenPage({
   params,
-  searchParams,
 }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -37,8 +32,6 @@ export default async function BekanntmachungenPage({
 
         <form action={saveBekanntmachungen} className="space-y-6">
           <input type="hidden" name="quizId" value={quiz.quiz_id} />
-          <input type="hidden" name="passwort" value={passwort} />
-
           <textarea
             name="bekanntmachungen"
             defaultValue={

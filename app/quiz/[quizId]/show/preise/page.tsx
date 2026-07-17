@@ -3,21 +3,12 @@ import { getQuizDetails } from "@/app/quiz/actions";
 
 type Props = {
   params: Promise<{ quizId: string }>;
-  searchParams: Promise<{ passwort?: string }>;
 };
 
 export default async function ShowPreisePage({
   params,
-  searchParams,
 }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 

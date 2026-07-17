@@ -1,14 +1,20 @@
 import "server-only";
 
-export type MediaUploadEnvironment = "dev" | "preview" | "prod";
+import {
+  assertBaseEnvironment,
+  EnvironmentConfigurationError,
+  getBlobEnvironmentPrefix,
+  getBlobReadWriteToken,
+  getLogicalEnvironment,
+  type LogicalEnvironment,
+} from "@/config/environment";
+import {
+  buildBlobPath,
+  getBlobAreaPrefix,
+  type BlobPathArea,
+} from "@/app/lib/blobPath";
 
-type BlobAuthentication =
-  | { token: string }
-  | { oidcToken: string; storeId: string };
-
-export type MediaUploadAuthenticationKind =
-  | "BLOB_READ_WRITE_TOKEN"
-  | "VERCEL_OIDC_TOKEN";
+export type MediaUploadAuthenticationKind = "BLOB_READ_WRITE_TOKEN";
 
 export type MediaUploadFailureDetails = {
   code: string;
@@ -18,11 +24,16 @@ export type MediaUploadFailureDetails = {
 };
 
 export type MediaUploadServerConfig = {
-  environment: MediaUploadEnvironment;
-  pathnamePrefix: string;
-  blobAuthentication: BlobAuthentication;
+  environment: LogicalEnvironment;
+  environmentPrefix: "dev" | "preview" | "prod";
+  blobAuthentication: { token: string };
   webhookPublicKey: string;
 };
+
+export type MediaVerificationServerConfig = Omit<
+  MediaUploadServerConfig,
+  "webhookPublicKey"
+>;
 
 export class MediaUploadConfigurationError extends Error {
   constructor(
@@ -34,215 +45,79 @@ export class MediaUploadConfigurationError extends Error {
   }
 }
 
-function parseEnvironment(value: string): MediaUploadEnvironment | null {
-  if (value === "production" || value === "prod") {
-    return "prod";
-  }
-
-  if (value === "preview") {
-    return "preview";
-  }
-
-  if (value === "development" || value === "dev") {
-    return "dev";
-  }
-
-  return null;
-}
-
 export function getMediaUploadAuthenticationDiagnostics() {
-  const blobReadWriteTokenPresent = Boolean(
-    process.env.BLOB_READ_WRITE_TOKEN,
-  );
-  const vercelOidcTokenPresent = Boolean(process.env.VERCEL_OIDC_TOKEN);
-  const blobStoreIdPresent = Boolean(process.env.BLOB_STORE_ID);
-  const oidcExpiry = process.env.VERCEL_OIDC_TOKEN
-    ? getOidcExpiry(process.env.VERCEL_OIDC_TOKEN)
-    : null;
-  const vercelOidcTokenUsable = Boolean(
-    oidcExpiry && oidcExpiry > Date.now() + 60_000 && blobStoreIdPresent,
-  );
-  const isVercelRuntime = Boolean(
-    process.env.VERCEL_ENV || process.env.VERCEL === "1",
-  );
-  const preferredAuthenticationKind: MediaUploadAuthenticationKind =
-    isVercelRuntime ? "VERCEL_OIDC_TOKEN" : "BLOB_READ_WRITE_TOKEN";
-  const authenticationKind: MediaUploadAuthenticationKind =
-    isVercelRuntime && vercelOidcTokenUsable
-      ? "VERCEL_OIDC_TOKEN"
-      : blobReadWriteTokenPresent
-      ? "BLOB_READ_WRITE_TOKEN"
-      : vercelOidcTokenPresent
-        ? "VERCEL_OIDC_TOKEN"
-        : preferredAuthenticationKind;
-
   return {
-    authenticationKind,
-    authenticationVariablePresent:
-      authenticationKind === "BLOB_READ_WRITE_TOKEN"
-        ? blobReadWriteTokenPresent
-        : vercelOidcTokenPresent,
-    preferredAuthenticationKind,
-    blobReadWriteTokenPresent,
-    vercelOidcTokenPresent,
-    vercelOidcTokenUsable,
-    blobStoreIdPresent,
-    isVercelRuntime,
+    authenticationKind: "BLOB_READ_WRITE_TOKEN" as const,
+    authenticationVariablePresent: Boolean(
+      process.env.BLOB_READ_WRITE_TOKEN,
+    ),
+    preferredAuthenticationKind: "BLOB_READ_WRITE_TOKEN" as const,
+    blobReadWriteTokenPresent: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+    vercelOidcTokenPresent: Boolean(process.env.VERCEL_OIDC_TOKEN),
+    vercelOidcTokenUsed: false,
+    isVercelRuntime: Boolean(
+      process.env.VERCEL_ENV || process.env.VERCEL === "1",
+    ),
     vercelEnvironmentPresent: Boolean(process.env.VERCEL_ENV),
-    vercelEnvironmentRecognized: process.env.VERCEL_ENV
-      ? parseEnvironment(process.env.VERCEL_ENV) !== null
-      : null,
     mediaUploadEnvironmentPresent: Boolean(process.env.MEDIA_UPLOAD_ENV),
-    mediaUploadEnvironmentRecognized: process.env.MEDIA_UPLOAD_ENV
-      ? parseEnvironment(process.env.MEDIA_UPLOAD_ENV) !== null
-      : null,
   };
 }
 
-export function getMediaUploadEnvironment(): MediaUploadEnvironment {
-  const vercelEnvironment = process.env.VERCEL_ENV;
-
-  if (vercelEnvironment) {
-    const parsed = parseEnvironment(vercelEnvironment);
-
-    if (!parsed) {
-      throw new MediaUploadConfigurationError(
-        "UNSUPPORTED_VERCEL_ENV",
-        "Die Vercel-Umgebung für Medien-Uploads ist ungültig.",
-      );
-    }
-
-    return parsed;
-  }
-
-  const configuredEnvironment = process.env.MEDIA_UPLOAD_ENV;
-
-  if (configuredEnvironment) {
-    const parsed = parseEnvironment(configuredEnvironment);
-
-    if (!parsed) {
-      throw new MediaUploadConfigurationError(
-        "UNSUPPORTED_MEDIA_UPLOAD_ENV",
-        "MEDIA_UPLOAD_ENV muss dev, preview oder prod sein.",
-      );
-    }
-
-    return parsed;
-  }
-
-  return process.env.NODE_ENV === "production" ? "prod" : "dev";
+export function getMediaUploadEnvironment() {
+  return getLogicalEnvironment();
 }
 
-export function getMediaUploadPathnamePrefix() {
-  return `question-media/${getMediaUploadEnvironment()}/`;
+export function getMediaUploadEnvironmentPrefix() {
+  return getBlobEnvironmentPrefix();
 }
 
-function validateApplicationConfiguration() {
-  if (!process.env.AUTH_SECRET) {
-    throw new MediaUploadConfigurationError(
-      "AUTH_SECRET_MISSING",
-      "AUTH_SECRET fehlt in der Server-Umgebung.",
-    );
+export function getMediaUploadPathnamePrefix(area: BlobPathArea) {
+  return getBlobAreaPrefix(getMediaUploadEnvironmentPrefix(), area);
+}
+
+export function buildMediaUploadPathname(
+  area: BlobPathArea,
+  segments: readonly string[],
+) {
+  return buildBlobPath(getMediaUploadEnvironmentPrefix(), area, segments);
+}
+
+export function getBlobUploadAuthentication() {
+  return { token: getBlobReadWriteToken() };
+}
+
+export function getMediaVerificationServerConfig(): MediaVerificationServerConfig {
+  try {
+    assertBaseEnvironment();
+  } catch (error) {
+    if (error instanceof EnvironmentConfigurationError) {
+      throw new MediaUploadConfigurationError(error.code, error.message);
+    }
+
+    throw error;
   }
 
-  const databaseUrl = process.env.DATABASE_URL;
+  let token: string;
 
   try {
-    const url = new URL(databaseUrl ?? "");
-
-    if (url.protocol !== "postgres:" && url.protocol !== "postgresql:") {
-      throw new Error("Unsupported database protocol");
+    token = getBlobReadWriteToken();
+  } catch (error) {
+    if (error instanceof EnvironmentConfigurationError) {
+      throw new MediaUploadConfigurationError(error.code, error.message);
     }
-  } catch {
-    throw new MediaUploadConfigurationError(
-      "DATABASE_URL_INVALID",
-      "DATABASE_URL fehlt oder ist ungültig.",
-    );
+
+    throw error;
   }
 
-  const authUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL;
-
-  if (authUrl) {
-    try {
-      const url = new URL(authUrl);
-
-      if (url.protocol !== "http:" && url.protocol !== "https:") {
-        throw new Error("Unsupported application URL protocol");
-      }
-    } catch {
-      throw new MediaUploadConfigurationError(
-        "AUTH_URL_INVALID",
-        "AUTH_URL beziehungsweise NEXTAUTH_URL ist ungültig.",
-      );
-    }
-  }
-}
-
-function getOidcExpiry(token: string) {
-  try {
-    const payload = token.split(".")[1];
-    const decoded: unknown = JSON.parse(
-      Buffer.from(payload, "base64url").toString("utf8"),
-    );
-    const expiry =
-      decoded && typeof decoded === "object" ? Reflect.get(decoded, "exp") : null;
-
-    return typeof expiry === "number" ? expiry * 1000 : null;
-  } catch {
-    return null;
-  }
-}
-
-function getBlobAuthentication(): BlobAuthentication {
-  const readWriteToken = process.env.BLOB_READ_WRITE_TOKEN;
-  const oidcToken = process.env.VERCEL_OIDC_TOKEN;
-  const storeId = process.env.BLOB_STORE_ID;
-  const diagnostics = getMediaUploadAuthenticationDiagnostics();
-  const oidcExpiry = oidcToken ? getOidcExpiry(oidcToken) : null;
-  const validOidc = Boolean(
-    oidcToken && storeId && oidcExpiry && oidcExpiry > Date.now() + 60_000,
-  );
-
-  if (
-    diagnostics.preferredAuthenticationKind === "VERCEL_OIDC_TOKEN" &&
-    validOidc &&
-    oidcToken &&
-    storeId
-  ) {
-    return { oidcToken, storeId };
-  }
-
-  if (readWriteToken) {
-    return { token: readWriteToken };
-  }
-
-  if (!oidcToken) {
-    throw new MediaUploadConfigurationError(
-      "BLOB_CREDENTIALS_MISSING",
-      "Blob-Zugangsdaten fehlen. Lokal wird BLOB_READ_WRITE_TOKEN empfohlen; auf Vercel werden OIDC und BLOB_STORE_ID verwendet.",
-    );
-  }
-
-  if (!storeId) {
-    throw new MediaUploadConfigurationError(
-      "BLOB_STORE_ID_MISSING",
-      "BLOB_STORE_ID fehlt für die Vercel-OIDC-Authentifizierung.",
-    );
-  }
-
-  if (!validOidc) {
-    throw new MediaUploadConfigurationError(
-      "BLOB_OIDC_EXPIRED",
-      "Der lokale Vercel-OIDC-Token ist ungültig oder abgelaufen. Bitte die lokale Vercel-Umgebung aktualisieren oder BLOB_READ_WRITE_TOKEN setzen.",
-    );
-  }
-
-  return { oidcToken, storeId };
+  return {
+    environment: getMediaUploadEnvironment(),
+    environmentPrefix: getMediaUploadEnvironmentPrefix(),
+    blobAuthentication: { token },
+  };
 }
 
 export function getMediaUploadServerConfig(): MediaUploadServerConfig {
-  validateApplicationConfiguration();
-
+  const verificationConfig = getMediaVerificationServerConfig();
   const webhookPublicKey = process.env.BLOB_WEBHOOK_PUBLIC_KEY;
 
   if (!webhookPublicKey) {
@@ -252,14 +127,7 @@ export function getMediaUploadServerConfig(): MediaUploadServerConfig {
     );
   }
 
-  const environment = getMediaUploadEnvironment();
-
-  return {
-    environment,
-    pathnamePrefix: `question-media/${environment}/`,
-    blobAuthentication: getBlobAuthentication(),
-    webhookPublicKey,
-  };
+  return { ...verificationConfig, webhookPublicKey };
 }
 
 export function logMediaUploadFailure(
@@ -293,8 +161,14 @@ export function logMediaUploadFailure(
 function sanitizeDiagnosticText(value: string) {
   return value
     .replace(/https?:\/\/\S+/gi, "[REDACTED_URL]")
-    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g, "[REDACTED_TOKEN]")
-    .replace(/\b(?:Bearer|token|secret|cookie|authorization)\s*[=:]\s*\S+/gi, "[REDACTED_SECRET]")
+    .replace(
+      /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g,
+      "[REDACTED_TOKEN]",
+    )
+    .replace(
+      /\b(?:Bearer|token|secret|cookie|authorization)\s*[=:]\s*\S+/gi,
+      "[REDACTED_SECRET]",
+    )
     .replace(/\b[A-Za-z0-9_-]{40,}\b/g, "[REDACTED_VALUE]")
     .slice(0, 300);
 }
@@ -307,6 +181,7 @@ function getFailureCode(phase: string) {
     "request-processing": "UPLOAD_REQUEST_INVALID",
     "context-authorization": "UPLOAD_CONTEXT_NOT_AUTHORIZED",
     "signed-token": "BLOB_SIGNED_TOKEN_FAILED",
+    "blob-verification": "BLOB_VERIFICATION_FAILED",
   };
 
   return phaseCodes[phase] ?? "MEDIA_UPLOAD_FAILED";

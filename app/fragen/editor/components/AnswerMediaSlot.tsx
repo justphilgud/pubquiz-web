@@ -2,13 +2,14 @@
 
 import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
 import { MediaUploadSlot, type MediaUploadStatus } from "./MediaUploadSlot";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 
 export type AnswerMediaUploadStatus = MediaUploadStatus;
 
 type AnswerMediaSlotProps = {
   answer: QuestionAnswerDraft;
   questionId: number | null;
-  pathnamePrefix: string;
+  pathnamePrefix: BlobEnvironmentPrefix;
   disabled: boolean;
   onChange: (media: QuestionMediaDraft | null) => void;
   onUploadStatusChange: (status: AnswerMediaUploadStatus) => void;
@@ -36,7 +37,7 @@ export function AnswerMediaSlot({
             }
           : { type: "CLASSIC", answerId: answer.answerId ?? null },
       }}
-      pathnamePrefix={pathnamePrefix}
+      environmentPrefix={pathnamePrefix}
       label="Antwortbild"
       helpText="Optional · JPEG, PNG oder WebP · maximal 10 MB"
       compact

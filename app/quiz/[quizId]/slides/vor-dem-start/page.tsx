@@ -8,21 +8,10 @@ export const runtime = "nodejs";
 
 type Props = {
   params: Promise<{ quizId: string }>;
-  searchParams: Promise<{ passwort?: string }>;
 };
 
-export default async function VorDemStartPage({ params, searchParams }: Props) {
+export default async function VorDemStartPage({ params }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (
-    process.env.NODE_ENV === "production" &&
-    passwort !== process.env.AUSWERTUNG_PASSWORT
-  ) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -53,8 +42,6 @@ export default async function VorDemStartPage({ params, searchParams }: Props) {
             action={saveVorDemStart}
             encType="multipart/form-data">
             <input type="hidden" name="quizId" value={quiz.quiz_id} />
-            <input type="hidden" name="passwort" value={passwort} />
-
             <div className="grid gap-6">
               <BlobUploadField
                 label="Intro-Video"
@@ -85,9 +72,7 @@ export default async function VorDemStartPage({ params, searchParams }: Props) {
               </button>
 
               <a
-                href={`/quiz/${quiz.quiz_id}?passwort=${encodeURIComponent(
-                  passwort
-                )}`}
+                href={`/quiz/${quiz.quiz_id}`}
                 className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-900"
               >
                 Abbrechen und zurück
@@ -95,15 +80,11 @@ export default async function VorDemStartPage({ params, searchParams }: Props) {
 
               <ConfigSlideNavigation
                 previous={{
-                  href: `/quiz/${quiz.quiz_id}/slides/preise?passwort=${encodeURIComponent(
-                    passwort
-                  )}`,
+                  href: `/quiz/${quiz.quiz_id}/slides/preise`,
                   label: "Preise",
                 }}
                 next={{
-                  href: `/quiz/${quiz.quiz_id}/slides/startsequenz?passwort=${encodeURIComponent(
-                    passwort
-                  )}`,
+                  href: `/quiz/${quiz.quiz_id}/slides/startsequenz`,
                   label: "Startsequenz",
                 }}
               />

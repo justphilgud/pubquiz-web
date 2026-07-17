@@ -7,23 +7,12 @@ type Props = {
   params: Promise<{
     quizId: string;
   }>;
-  searchParams: Promise<{
-    passwort?: string;
-  }>;
 };
 
 export default async function ShowVorDemStartPage({
   params,
-  searchParams,
 }: Props) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const passwort = resolvedSearchParams.passwort ?? "";
-
-  if (passwort !== process.env.AUSWERTUNG_PASSWORT) {
-    notFound();
-  }
 
   const quiz = await getQuizDetails(Number(resolvedParams.quizId));
 
@@ -55,9 +44,7 @@ export default async function ShowVorDemStartPage({
         />
 
         <ShowNavigation
-          href={`/quiz/${quiz.quiz_id}/show/startsequenz?passwort=${encodeURIComponent(
-            passwort
-          )}`}
+          href={`/quiz/${quiz.quiz_id}/show/startsequenz`}
         />
       </div>
     </div>

@@ -7,7 +7,6 @@ import { updateIntroVorDemStart } from "@/app/quiz/actions";
 
 export async function saveVorDemStart(formData: FormData) {
   const quizId = Number(formData.get("quizId"));
-  const passwort = String(formData.get("passwort") ?? "");
   const currentMusikUrl = String(formData.get("currentMusikUrl") ?? "");
   const submitAction = String(formData.get("submitAction") ?? "close");
 
@@ -49,8 +48,8 @@ export async function saveVorDemStart(formData: FormData) {
   });
 
   if (submitAction === "stay") {
-    redirect(`/quiz/${quizId}/slides/vor-dem-start?passwort=${passwort}`);
+    redirect(`/quiz/${quizId}/slides/vor-dem-start`);
   }
 
-  redirect(`/quiz/${quizId}?passwort=${passwort}`);
+  redirect(`/quiz/${quizId}`);
 }

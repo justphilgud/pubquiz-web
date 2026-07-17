@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { saveQuestion } from "../actions";
 import { questionTemplates } from "../templates/questionTemplates";
 import { AdditionalDetailsSection } from "./AdditionalDetailsSection";
@@ -74,7 +75,7 @@ type QuestionEditorProps = {
   editorContext: QuestionEditorContext;
   initialDraft?: QuestionEditorDraft;
   questionRecord?: QuestionEditorRecord;
-  mediaUploadPathnamePrefix: string;
+  mediaUploadPathnamePrefix: BlobEnvironmentPrefix;
 };
 
 const visibleSpecialQuestionTemplateIds = new Set([

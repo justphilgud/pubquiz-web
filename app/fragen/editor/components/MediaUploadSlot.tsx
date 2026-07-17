@@ -10,11 +10,13 @@ import {
 } from "@/components/ui";
 import {
   getQuestionMediaFileName,
+  buildQuestionMediaPathname,
   questionMediaRules,
   resolveQuestionMediaUrl,
   validateQuestionMediaFile,
 } from "../questionMedia";
 import type { QuestionMediaDraft, QuestionMediaType } from "../types";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 
 export type MediaUploadStatus = "IDLE" | "UPLOADING" | "ERROR";
 
@@ -32,7 +34,7 @@ type MediaUploadSlotProps = {
   media: QuestionMediaDraft | null;
   mediaType: QuestionMediaType;
   uploadTarget: UploadTarget;
-  pathnamePrefix: string;
+  environmentPrefix: BlobEnvironmentPrefix;
   label: string;
   helpText?: string;
   required?: boolean;
@@ -80,7 +82,7 @@ export function MediaUploadSlot({
   media,
   mediaType,
   uploadTarget,
-  pathnamePrefix,
+  environmentPrefix,
   label,
   helpText,
   required = false,
@@ -117,8 +119,12 @@ export function MediaUploadSlot({
     changeUploadState({ status: "UPLOADING" });
 
     try {
-      const directory = mediaType === "IMAGE" ? "image" : "audio";
-      const pathname = `${pathnamePrefix}${uploadTarget.target.toLowerCase()}/${directory}/${crypto.randomUUID()}-${sanitizeFileName(file.name)}`;
+      const pathname = buildQuestionMediaPathname(
+        environmentPrefix,
+        uploadTarget.target,
+        mediaType,
+        `${crypto.randomUUID()}-${sanitizeFileName(file.name)}`,
+      );
       const blob = await uploadPresigned(pathname, file, {
         access: "public",
         handleUploadUrl: "/api/question-media-upload",

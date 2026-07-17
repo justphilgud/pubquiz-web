@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import {
   AnswerMediaSlot,
   type AnswerMediaUploadStatus,
@@ -10,7 +11,7 @@ type AnswerCardProps = {
   answer: QuestionAnswerDraft;
   canRemove: boolean;
   questionId: number | null;
-  pathnamePrefix: string;
+  pathnamePrefix: BlobEnvironmentPrefix;
   disabled: boolean;
   showMedia: boolean;
   onChange: (changes: Partial<QuestionAnswerDraft>) => void;
