@@ -49,9 +49,10 @@ Die zentrale Prüfung in `mediaUploadEnvironment.ts` erwartet:
 - entweder `BLOB_READ_WRITE_TOKEN`
 - oder ein noch gültiges Paar aus `VERCEL_OIDC_TOKEN` und `BLOB_STORE_ID`
 
-`BLOB_READ_WRITE_TOKEN` wird, wenn vorhanden, explizit bevorzugt. Damit kann ein
-zusätzlich vorhandener, aber abgelaufener lokaler OIDC-Token die lokale
-Entwicklung nicht überschreiben. Zugangsdaten dürfen weder mit
+Lokal wird ein vorhandener `BLOB_READ_WRITE_TOKEN` bevorzugt. Auf Vercel wird
+ein gültiger OIDC-Token mit passender Store-ID bevorzugt; das Read/Write-Token
+bleibt dort der Fallback. Damit kann ein abgelaufener lokaler OIDC-Token die
+lokale Entwicklung nicht überschreiben. Zugangsdaten dürfen weder mit
 `NEXT_PUBLIC_` beginnen noch geloggt oder an den Browser übergeben werden.
 
 ### Lokale Entwicklung
