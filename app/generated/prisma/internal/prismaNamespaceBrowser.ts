@@ -133,6 +133,7 @@ export const FragenScalarFieldEnum = {
   freigegeben: 'freigegeben',
   ist_unfertig: 'ist_unfertig',
   moderationsnotizen: 'moderationsnotizen',
+  kategorienwunsch: 'kategorienwunsch',
   gueltig_bis: 'gueltig_bis',
   review_status: 'review_status',
   submitted_at: 'submitted_at',

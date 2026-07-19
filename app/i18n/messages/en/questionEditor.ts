@@ -10,6 +10,11 @@ export const enQuestionEditorMessages = {
     pixelQuestionSyncFailed: "The question was saved, but at least one linked pixel question could not be generated completely. Open the child question and run the pixel stages again.",
     openPixelQuestion: "Open pixel question for answer {position} (ID {id})",
     unsavedChanges: "There are unsaved changes. Do you really want to leave this page?",
+    duplicateTitle: "Possible duplicate",
+    duplicateHelp: "Before saving, check whether one of these similar questions already covers the topic.",
+    expiredTitle: "This question has expired",
+    expiredHelp: "It remains searchable and editable but is no longer offered for new quiz assignments.",
+    archivedTitle: "This question is archived",
   },
   templates: {
     standard: { name: "Standard question", description: "Free-form question with any number of answers." },
@@ -18,6 +23,13 @@ export const enQuestionEditorMessages = {
     musicReverse: { name: "Music reversed", description: "Identify the artist and title of a song played backwards.", defaultQuestion: "Which song is being played backwards? Name the artist and title.", artist: "Artist", title: "Title" },
     musicEightBit: { name: "Bitcrush music", description: "Identify a song from a digitally reduced retro lo-fi version.", defaultQuestion: "Which song can you hear in this bitcrushed version?" },
     pixelImage: { name: "Pixel image", description: "Identify a subject from a generated pixel graphic.", defaultQuestion: "What can you see in this pixel image?" },
+  },
+  management: {
+    title: "Manage question", clone: "Clone question", cloning: "Cloning …", archive: "Archive", restore: "Restore", delete: "Delete permanently", deleting: "Deleting …",
+    archiveConfirm: "Archive this question? It remains stored and searchable.", restoreConfirm: "Restore this question?", deleteConfirm: "Delete this archived question permanently? This cannot be undone.",
+    errors: {
+      QUESTION_NOT_FOUND: "The question was not found.", PERMISSION_DENIED: "You are not allowed to perform this action.", QUESTION_IN_USE: "The question is used in a quiz or has team answers.", QUESTION_HAS_RELATIONS: "The question is linked to a FaceMorph/pixel question and cannot be deleted.", QUESTION_HAS_MEDIA: "The question contains media or generator runs. Archive it instead of deleting it.", UNEXPECTED_ERROR: "The action could not be completed.",
+    },
   },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", title: "Title", solution: "Solution" },
   templateSelector: { selected: "Special question: {name}", change: "Change", clear: "Clear selection", select: "Select special question", searchLabel: "Search special questions", searchPlaceholder: "Search special question", empty: "No special question found." },

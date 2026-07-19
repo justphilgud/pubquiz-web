@@ -76,6 +76,7 @@ test("quality evaluation returns structured codes instead of display text", () =
     categoryIds: [],
     sourceOrRemark: "",
     moderationNotes: "",
+    categoryRequest: "",
     approvalRemark: "",
     isIncomplete: true,
     validUntil: null,

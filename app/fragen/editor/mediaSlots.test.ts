@@ -74,7 +74,7 @@ test("optional standard media does not block while required template media does"
     questionText: "Frage",
     questionMedia: [],
     answers: [{ id: "a", text: "Antwort", isCorrect: true, additionalInfo: "", media: null }],
-    categoryIds: [1], sourceOrRemark: "Quelle", moderationNotes: "", approvalRemark: "",
+    categoryIds: [1], sourceOrRemark: "Quelle", moderationNotes: "", categoryRequest: "", approvalRemark: "",
     isIncomplete: false, validUntil: null, status: "READY",
   };
   assert.equal(evaluateQuestionQuality(base).blockers.some((issue) => issue.field === "questionMedia"), false);
@@ -92,6 +92,7 @@ test("whitespace-only question text is rejected by the central quality check", (
     categoryIds: [],
     sourceOrRemark: "",
     moderationNotes: "",
+    categoryRequest: "",
     approvalRemark: "",
     isIncomplete: false,
     validUntil: null,
@@ -113,6 +114,7 @@ test("an empty correct-answer card is not accepted as a correct solution", () =>
     categoryIds: [],
     sourceOrRemark: "",
     moderationNotes: "",
+    categoryRequest: "",
     approvalRemark: "",
     isIncomplete: false,
     validUntil: null,
@@ -149,7 +151,7 @@ test("FaceMorph requires its result and both answer images", () => {
       { id: "a", fieldGroupId: "a", fieldLabel: "Person A", text: "A", isCorrect: true, additionalInfo: "", media: image(1) },
       { id: "b", fieldGroupId: "b", fieldLabel: "Person B", text: "B", isCorrect: true, additionalInfo: "", media: null },
     ],
-    categoryIds: [], sourceOrRemark: "", moderationNotes: "", approvalRemark: "",
+    categoryIds: [], sourceOrRemark: "", moderationNotes: "", categoryRequest: "", approvalRemark: "",
     isIncomplete: false, validUntil: null, status: "READY",
   };
 

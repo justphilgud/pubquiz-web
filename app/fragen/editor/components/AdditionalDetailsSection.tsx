@@ -11,11 +11,13 @@ type AdditionalDetailsSectionProps = {
   selectedCategoryIds: number[];
   sourceOrRemark: string;
   moderationNotes: string;
+  categoryRequest: string;
   validUntil: string | null;
   initiallyOpen?: boolean;
   onChangeCategories: (categoryIds: number[]) => void;
   onSourceOrRemarkChange: (sourceOrRemark: string) => void;
   onModerationNotesChange: (moderationNotes: string) => void;
+  onCategoryRequestChange: (categoryRequest: string) => void;
   onValidUntilChange: (validUntil: string | null) => void;
 };
 
@@ -24,11 +26,13 @@ export function AdditionalDetailsSection({
   selectedCategoryIds,
   sourceOrRemark,
   moderationNotes,
+  categoryRequest,
   validUntil,
   initiallyOpen = false,
   onChangeCategories,
   onSourceOrRemarkChange,
   onModerationNotesChange,
+  onCategoryRequestChange,
   onValidUntilChange,
 }: AdditionalDetailsSectionProps) {
   const { locale, messages } = useQuestionEditorMessages();
@@ -46,6 +50,7 @@ export function AdditionalDetailsSection({
       : null,
     sourceOrRemark.trim() ? messages.details.sourcePresent : null,
     moderationNotes.trim() ? messages.details.moderationPresent : null,
+    categoryRequest.trim() ? messages.details.categoryRequestPresent : null,
     validUntil === ""
       ? messages.details.expiryEnabled
       : validUntil
@@ -86,6 +91,24 @@ export function AdditionalDetailsSection({
             selectedCategoryIds={selectedCategoryIds}
             onChangeCategories={onChangeCategories}
           />
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <label className="block">
+              <span className="font-medium text-slate-950">
+                {messages.details.categoryRequest}
+              </span>
+              <span className="mt-1 block text-sm text-slate-600">
+                {messages.details.categoryRequestHelp}
+              </span>
+              <textarea
+                value={categoryRequest}
+                maxLength={500}
+                onChange={(event) => onCategoryRequestChange(event.target.value)}
+                placeholder={messages.details.categoryRequestPlaceholder}
+                className="mt-3 min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3"
+              />
+            </label>
+          </section>
 
           <section className="rounded-2xl border border-slate-200 p-4">
             <NotesSection

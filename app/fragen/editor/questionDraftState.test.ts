@@ -13,6 +13,7 @@ function draft(): QuestionEditorDraft {
     categoryIds: [],
     sourceOrRemark: "",
     moderationNotes: "",
+    categoryRequest: "",
     approvalRemark: "",
     isIncomplete: true,
     validUntil: null,

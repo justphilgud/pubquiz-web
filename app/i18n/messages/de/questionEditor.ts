@@ -26,6 +26,11 @@ export const deQuestionEditorMessages = {
     requiredTemplateMedia: "Für diese Spezialfrage ist {label} erforderlich.",
     approvalBlocked: "Die Frage kann noch nicht freigegeben werden: {issues}.",
     resubmit: "Erneut zur Prüfung einreichen",
+    duplicateTitle: "Mögliche Dublette",
+    duplicateHelp: "Prüfe vor dem Speichern, ob eine dieser ähnlichen Fragen bereits ausreicht.",
+    expiredTitle: "Diese Frage ist abgelaufen",
+    expiredHelp: "Sie bleibt bearbeitbar und auffindbar, wird aber nicht mehr für neue Quizzuordnungen angeboten.",
+    archivedTitle: "Diese Frage ist archiviert",
     unsavedChanges: "Es gibt ungespeicherte Änderungen. Möchtest du die Seite wirklich verlassen?",
   },
   templates: {
@@ -167,6 +172,7 @@ export const deQuestionEditorMessages = {
   details: {
     title: "Weitere Angaben", emptySummary: "Kategorien, interne Angaben und Ablaufdatum", category: "{count} Kategorie", categories: "{count} Kategorien",
     sourcePresent: "Quelle vorhanden", moderationPresent: "Moderationsnotiz vorhanden", expiryEnabled: "Ablaufdatum aktiviert", validUntil: "Gültig bis {date}",
+    categoryRequestPresent: "Kategorienwunsch vorhanden", categoryRequest: "Kategorienwunsch", categoryRequestHelp: "Falls keine passende Kategorie existiert, kannst du hier einen Vorschlag für die Prüfung hinterlegen.", categoryRequestPlaceholder: "Zum Beispiel: Wissenschaft · Raumfahrt",
     expiryTitle: "Zeitlich begrenzte Frage", expiryDescription: "Nutze diese Einstellung für Fragen, deren Antwort nur bis zu einem bestimmten Zeitpunkt aktuell ist, zum Beispiel „Vogel des Jahres 2026“.",
     hasExpiry: "Frage hat ein Ablaufdatum", hasExpiryHelp: "Nach dem Ablauf bleibt die Frage erhalten, wird aber nicht mehr automatisch für neue Quizze vorgeschlagen.",
     usableUntil: "Aktuell nutzbar bis einschließlich", expiryAfterHelp: "Ab dem folgenden Tag gilt die Frage als veraltet. Sie wird nicht gelöscht und kann weiterhin gefunden, bearbeitet oder bewusst verwendet werden.",
@@ -175,6 +181,13 @@ export const deQuestionEditorMessages = {
     title: "Kategorien", remove: "{name} entfernen", select: "Kategorien auswählen", done: "Fertig ({count})", searchLabel: "Kategorien durchsuchen",
     searchPlaceholder: "Kategorie suchen", none: "Keine Kategorien vorhanden.", notFound: "Keine Kategorien gefunden.", discardTitle: "Änderungen verwerfen?",
     continue: "Weiter auswählen", discard: "Änderungen verwerfen", discardDescription: "Deine Änderungen an der Kategorieauswahl wurden noch nicht übernommen.",
+  },
+  management: {
+    title: "Frage verwalten", clone: "Frage klonen", cloning: "Wird geklont …", archive: "Archivieren", restore: "Wiederherstellen", delete: "Endgültig löschen", deleting: "Wird gelöscht …",
+    archiveConfirm: "Diese Frage archivieren? Sie bleibt erhalten und auffindbar.", restoreConfirm: "Diese Frage wiederherstellen?", deleteConfirm: "Diese archivierte Frage endgültig löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+    errors: {
+      QUESTION_NOT_FOUND: "Die Frage wurde nicht gefunden.", PERMISSION_DENIED: "Für diese Aktion fehlt die Berechtigung.", QUESTION_IN_USE: "Die Frage wird in mindestens einem Quiz verwendet oder besitzt Antworten von Teams.", QUESTION_HAS_RELATIONS: "Die Frage ist mit einer FaceMorph-/Pixelfrage gekoppelt und kann nicht gelöscht werden.", QUESTION_HAS_MEDIA: "Die Frage besitzt Medien oder Generatorläufe. Archiviere sie, statt sie zu löschen.", UNEXPECTED_ERROR: "Die Aktion konnte nicht abgeschlossen werden.",
+    },
   },
   notes: { title: "Interne Angaben", source: "Quelle oder Bemerkung", moderation: "Moderationsnotizen" },
   review: {

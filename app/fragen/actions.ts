@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { Buffer } from "buffer";
-import { auth } from "@/auth";
 import { createQuestion } from "@/app/services/questionService";
 import { requireAdmin, requireQuestionEditor } from "@/app/lib/permissions";
 import { requireUser } from "../lib/auth-guard";
@@ -67,6 +66,8 @@ export type FrageSuchResult = {
   quiz_anzahl: number;
   ist_archiviert: boolean;
   archivierungsgrund: string | null;
+  review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
+  gueltig_bis: string | null;
   quizze: {
     quiz_id: number;
     titel: string | null;
@@ -212,6 +213,8 @@ export async function searchFragen(data: {
       schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
       ist_archiviert: frage.ist_archiviert,
       archivierungsgrund: frage.archivierungsgrund,
+      review_status: frage.review_status,
+      gueltig_bis: frage.gueltig_bis?.toISOString().slice(0, 10) ?? null,
       kategorien: frage.fragen_kategorien.map(
         (k) => k.fragenkategorie.kategorie,
       ),

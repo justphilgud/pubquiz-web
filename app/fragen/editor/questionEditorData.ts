@@ -20,6 +20,7 @@ export async function loadQuestionForEditor(questionId: number) {
       frage: true,
       quelle: true,
       moderationsnotizen: true,
+      kategorienwunsch: true,
       gueltig_bis: true,
       ist_unfertig: true,
       ist_archiviert: true,
@@ -219,6 +220,7 @@ export async function loadQuestionForEditor(questionId: number) {
     ),
     sourceOrRemark: question.quelle ?? "",
     moderationNotes: question.moderationsnotizen ?? "",
+    categoryRequest: question.kategorienwunsch ?? "",
     approvalRemark: "",
     isIncomplete: question.ist_unfertig,
     validUntil: question.gueltig_bis?.toISOString().slice(0, 10) ?? null,
@@ -243,6 +245,7 @@ export async function loadQuestionForEditor(questionId: number) {
     updatedAt: question.updated_at.toISOString(),
     approvedAt: question.approved_at?.toISOString() ?? null,
     templateName: question.vorlage?.name ?? null,
+    isArchived: question.ist_archiviert,
   };
 
   return {

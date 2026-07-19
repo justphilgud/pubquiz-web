@@ -142,6 +142,7 @@ export type QuestionEditorDraft = {
 
   sourceOrRemark: string;
   moderationNotes: string;
+  categoryRequest: string;
   approvalRemark: string;
 
   isIncomplete: boolean;
@@ -246,6 +247,7 @@ export type QuestionEditorRecord = {
   updatedAt: string;
   approvedAt: string | null;
   templateName: string | null;
+  isArchived: boolean;
 };
 
 export type QuestionValidationTarget =
@@ -268,6 +270,7 @@ export type SaveQuestionPayload = {
   categoryIds: number[];
   sourceOrRemark: string;
   moderationNotes: string;
+  categoryRequest: string;
   validUntil: string | null;
   templateId: string | null;
   generatorParameters?: GeneratorParametersDraft;

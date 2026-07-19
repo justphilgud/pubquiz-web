@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/app/lib/permissions";
 import { addQuestionToQuiz } from "@/app/services/quizService";
+import { getBerlinDate } from "@/app/lib/berlinDate";
 
 import { TEAM_PASSWORT_WOERTER } from "@/app/lib/teamPasswortWoerter";
 
@@ -459,6 +460,7 @@ export async function searchFragenForQuiz(data: {
   const fragen = await prisma.fragen.findMany({
     where: {
       ist_archiviert: false,
+      OR: [{ gueltig_bis: null }, { gueltig_bis: { gte: getBerlinDate() } }],
       frage: data.suchtext.trim()
         ? {
             contains: data.suchtext.trim(),

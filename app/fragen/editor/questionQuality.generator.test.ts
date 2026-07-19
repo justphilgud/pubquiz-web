@@ -11,7 +11,7 @@ function draft(questionMedia: QuestionMediaDraft[]): QuestionEditorDraft {
   return {
     templateId: "musik_rueckwaerts", questionText: "Song?", questionMedia,
     generatorRuns: [], templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } }, answers: [{ id: "a", text: "Titel", isCorrect: true, additionalInfo: "", media: null }],
-    categoryIds: [1], sourceOrRemark: "Quelle", moderationNotes: "", approvalRemark: "", isIncomplete: false, validUntil: null, status: "READY",
+    categoryIds: [1], sourceOrRemark: "Quelle", moderationNotes: "", categoryRequest: "", approvalRemark: "", isIncomplete: false, validUntil: null, status: "READY",
   };
 }
 

@@ -67,6 +67,7 @@ export type FragenMinAggregateOutputType = {
   freigegeben: boolean | null
   ist_unfertig: boolean | null
   moderationsnotizen: string | null
+  kategorienwunsch: string | null
   gueltig_bis: Date | null
   review_status: $Enums.QuestionReviewStatus | null
   submitted_at: Date | null
@@ -95,6 +96,7 @@ export type FragenMaxAggregateOutputType = {
   freigegeben: boolean | null
   ist_unfertig: boolean | null
   moderationsnotizen: string | null
+  kategorienwunsch: string | null
   gueltig_bis: Date | null
   review_status: $Enums.QuestionReviewStatus | null
   submitted_at: Date | null
@@ -123,6 +125,7 @@ export type FragenCountAggregateOutputType = {
   freigegeben: number
   ist_unfertig: number
   moderationsnotizen: number
+  kategorienwunsch: number
   gueltig_bis: number
   review_status: number
   submitted_at: number
@@ -176,6 +179,7 @@ export type FragenMinAggregateInputType = {
   freigegeben?: true
   ist_unfertig?: true
   moderationsnotizen?: true
+  kategorienwunsch?: true
   gueltig_bis?: true
   review_status?: true
   submitted_at?: true
@@ -204,6 +208,7 @@ export type FragenMaxAggregateInputType = {
   freigegeben?: true
   ist_unfertig?: true
   moderationsnotizen?: true
+  kategorienwunsch?: true
   gueltig_bis?: true
   review_status?: true
   submitted_at?: true
@@ -232,6 +237,7 @@ export type FragenCountAggregateInputType = {
   freigegeben?: true
   ist_unfertig?: true
   moderationsnotizen?: true
+  kategorienwunsch?: true
   gueltig_bis?: true
   review_status?: true
   submitted_at?: true
@@ -348,6 +354,7 @@ export type FragenGroupByOutputType = {
   freigegeben: boolean
   ist_unfertig: boolean
   moderationsnotizen: string | null
+  kategorienwunsch: string | null
   gueltig_bis: Date | null
   review_status: $Enums.QuestionReviewStatus
   submitted_at: Date | null
@@ -400,6 +407,7 @@ export type fragenWhereInput = {
   freigegeben?: Prisma.BoolFilter<"fragen"> | boolean
   ist_unfertig?: Prisma.BoolFilter<"fragen"> | boolean
   moderationsnotizen?: Prisma.StringNullableFilter<"fragen"> | string | null
+  kategorienwunsch?: Prisma.StringNullableFilter<"fragen"> | string | null
   gueltig_bis?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFilter<"fragen"> | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
@@ -438,6 +446,7 @@ export type fragenOrderByWithRelationInput = {
   freigegeben?: Prisma.SortOrder
   ist_unfertig?: Prisma.SortOrder
   moderationsnotizen?: Prisma.SortOrderInput | Prisma.SortOrder
+  kategorienwunsch?: Prisma.SortOrderInput | Prisma.SortOrder
   gueltig_bis?: Prisma.SortOrderInput | Prisma.SortOrder
   review_status?: Prisma.SortOrder
   submitted_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -479,6 +488,7 @@ export type fragenWhereUniqueInput = Prisma.AtLeast<{
   freigegeben?: Prisma.BoolFilter<"fragen"> | boolean
   ist_unfertig?: Prisma.BoolFilter<"fragen"> | boolean
   moderationsnotizen?: Prisma.StringNullableFilter<"fragen"> | string | null
+  kategorienwunsch?: Prisma.StringNullableFilter<"fragen"> | string | null
   gueltig_bis?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFilter<"fragen"> | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
@@ -517,6 +527,7 @@ export type fragenOrderByWithAggregationInput = {
   freigegeben?: Prisma.SortOrder
   ist_unfertig?: Prisma.SortOrder
   moderationsnotizen?: Prisma.SortOrderInput | Prisma.SortOrder
+  kategorienwunsch?: Prisma.SortOrderInput | Prisma.SortOrder
   gueltig_bis?: Prisma.SortOrderInput | Prisma.SortOrder
   review_status?: Prisma.SortOrder
   submitted_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -554,6 +565,7 @@ export type fragenScalarWhereWithAggregatesInput = {
   freigegeben?: Prisma.BoolWithAggregatesFilter<"fragen"> | boolean
   ist_unfertig?: Prisma.BoolWithAggregatesFilter<"fragen"> | boolean
   moderationsnotizen?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
+  kategorienwunsch?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
   gueltig_bis?: Prisma.DateTimeNullableWithAggregatesFilter<"fragen"> | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusWithAggregatesFilter<"fragen"> | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"fragen"> | Date | string | null
@@ -581,6 +593,7 @@ export type fragenCreateInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -619,6 +632,7 @@ export type fragenUncheckedCreateInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -654,6 +668,7 @@ export type fragenUpdateInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -692,6 +707,7 @@ export type fragenUncheckedUpdateInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -729,6 +745,7 @@ export type fragenCreateManyInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -756,6 +773,7 @@ export type fragenUpdateManyMutationInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -785,6 +803,7 @@ export type fragenUncheckedUpdateManyInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -819,6 +838,7 @@ export type fragenCountOrderByAggregateInput = {
   freigegeben?: Prisma.SortOrder
   ist_unfertig?: Prisma.SortOrder
   moderationsnotizen?: Prisma.SortOrder
+  kategorienwunsch?: Prisma.SortOrder
   gueltig_bis?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
   submitted_at?: Prisma.SortOrder
@@ -859,6 +879,7 @@ export type fragenMaxOrderByAggregateInput = {
   freigegeben?: Prisma.SortOrder
   ist_unfertig?: Prisma.SortOrder
   moderationsnotizen?: Prisma.SortOrder
+  kategorienwunsch?: Prisma.SortOrder
   gueltig_bis?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
   submitted_at?: Prisma.SortOrder
@@ -887,6 +908,7 @@ export type fragenMinOrderByAggregateInput = {
   freigegeben?: Prisma.SortOrder
   ist_unfertig?: Prisma.SortOrder
   moderationsnotizen?: Prisma.SortOrder
+  kategorienwunsch?: Prisma.SortOrder
   gueltig_bis?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
   submitted_at?: Prisma.SortOrder
@@ -1123,6 +1145,7 @@ export type fragenCreateWithoutAntwortenInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1160,6 +1183,7 @@ export type fragenUncheckedCreateWithoutAntwortenInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1210,6 +1234,7 @@ export type fragenUpdateWithoutAntwortenInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1247,6 +1272,7 @@ export type fragenUncheckedUpdateWithoutAntwortenInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1281,6 +1307,7 @@ export type fragenCreateWithoutRelationen_als_quelleInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1318,6 +1345,7 @@ export type fragenUncheckedCreateWithoutRelationen_als_quelleInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1357,6 +1385,7 @@ export type fragenCreateWithoutRelationen_als_zielInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1394,6 +1423,7 @@ export type fragenUncheckedCreateWithoutRelationen_als_zielInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1444,6 +1474,7 @@ export type fragenUpdateWithoutRelationen_als_quelleInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1481,6 +1512,7 @@ export type fragenUncheckedUpdateWithoutRelationen_als_quelleInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1526,6 +1558,7 @@ export type fragenUpdateWithoutRelationen_als_zielInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1563,6 +1596,7 @@ export type fragenUncheckedUpdateWithoutRelationen_als_zielInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1597,6 +1631,7 @@ export type fragenCreateWithoutFragen_kategorienInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1634,6 +1669,7 @@ export type fragenUncheckedCreateWithoutFragen_kategorienInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1684,6 +1720,7 @@ export type fragenUpdateWithoutFragen_kategorienInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1721,6 +1758,7 @@ export type fragenUncheckedUpdateWithoutFragen_kategorienInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1755,6 +1793,7 @@ export type fragenCreateWithoutMedienInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1792,6 +1831,7 @@ export type fragenUncheckedCreateWithoutMedienInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1842,6 +1882,7 @@ export type fragenUpdateWithoutMedienInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1879,6 +1920,7 @@ export type fragenUncheckedUpdateWithoutMedienInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1913,6 +1955,7 @@ export type fragenCreateWithoutGenerator_laefeInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -1950,6 +1993,7 @@ export type fragenUncheckedCreateWithoutGenerator_laefeInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2000,6 +2044,7 @@ export type fragenUpdateWithoutGenerator_laefeInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2037,6 +2082,7 @@ export type fragenUncheckedUpdateWithoutGenerator_laefeInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2071,6 +2117,7 @@ export type fragenCreateWithoutQuiz_fragenInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2108,6 +2155,7 @@ export type fragenUncheckedCreateWithoutQuiz_fragenInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2158,6 +2206,7 @@ export type fragenUpdateWithoutQuiz_fragenInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2195,6 +2244,7 @@ export type fragenUncheckedUpdateWithoutQuiz_fragenInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2229,6 +2279,7 @@ export type fragenCreateWithoutAntwortfelderInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2266,6 +2317,7 @@ export type fragenUncheckedCreateWithoutAntwortfelderInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2316,6 +2368,7 @@ export type fragenUpdateWithoutAntwortfelderInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2353,6 +2406,7 @@ export type fragenUncheckedUpdateWithoutAntwortfelderInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2387,6 +2441,7 @@ export type fragenCreateWithoutVorlageInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2423,6 +2478,7 @@ export type fragenUncheckedCreateWithoutVorlageInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2489,6 +2545,7 @@ export type fragenScalarWhereInput = {
   freigegeben?: Prisma.BoolFilter<"fragen"> | boolean
   ist_unfertig?: Prisma.BoolFilter<"fragen"> | boolean
   moderationsnotizen?: Prisma.StringNullableFilter<"fragen"> | string | null
+  kategorienwunsch?: Prisma.StringNullableFilter<"fragen"> | string | null
   gueltig_bis?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFilter<"fragen"> | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.DateTimeNullableFilter<"fragen"> | Date | string | null
@@ -2517,6 +2574,7 @@ export type fragenCreateManyVorlageInput = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
   gueltig_bis?: Date | string | null
   review_status?: $Enums.QuestionReviewStatus
   submitted_at?: Date | string | null
@@ -2544,6 +2602,7 @@ export type fragenUpdateWithoutVorlageInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2580,6 +2639,7 @@ export type fragenUncheckedUpdateWithoutVorlageInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2616,6 +2676,7 @@ export type fragenUncheckedUpdateManyWithoutVorlageInput = {
   freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
   moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
   submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2739,6 +2800,7 @@ export type fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: boolean
+  kategorienwunsch?: boolean
   gueltig_bis?: boolean
   review_status?: boolean
   submitted_at?: boolean
@@ -2778,6 +2840,7 @@ export type fragenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: boolean
+  kategorienwunsch?: boolean
   gueltig_bis?: boolean
   review_status?: boolean
   submitted_at?: boolean
@@ -2808,6 +2871,7 @@ export type fragenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: boolean
+  kategorienwunsch?: boolean
   gueltig_bis?: boolean
   review_status?: boolean
   submitted_at?: boolean
@@ -2838,6 +2902,7 @@ export type fragenSelectScalar = {
   freigegeben?: boolean
   ist_unfertig?: boolean
   moderationsnotizen?: boolean
+  kategorienwunsch?: boolean
   gueltig_bis?: boolean
   review_status?: boolean
   submitted_at?: boolean
@@ -2848,7 +2913,7 @@ export type fragenSelectScalar = {
   template_config_json?: boolean
 }
 
-export type fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragen_id" | "frage" | "quelle" | "fragentyp" | "schwierigkeitslevel" | "erstellungsdatum" | "ist_archiviert" | "archivierungsgrund" | "vorlage_id" | "created_by_user_id" | "created_at" | "last_modified_by_user_id" | "updated_at" | "approved_by_user_id" | "approved_at" | "freigegeben" | "ist_unfertig" | "moderationsnotizen" | "gueltig_bis" | "review_status" | "submitted_at" | "submitted_by_user_id" | "review_feedback" | "reviewed_at" | "reviewed_by_user_id" | "template_config_json", ExtArgs["result"]["fragen"]>
+export type fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragen_id" | "frage" | "quelle" | "fragentyp" | "schwierigkeitslevel" | "erstellungsdatum" | "ist_archiviert" | "archivierungsgrund" | "vorlage_id" | "created_by_user_id" | "created_at" | "last_modified_by_user_id" | "updated_at" | "approved_by_user_id" | "approved_at" | "freigegeben" | "ist_unfertig" | "moderationsnotizen" | "kategorienwunsch" | "gueltig_bis" | "review_status" | "submitted_at" | "submitted_by_user_id" | "review_feedback" | "reviewed_at" | "reviewed_by_user_id" | "template_config_json", ExtArgs["result"]["fragen"]>
 export type fragenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.fragen$antwortenArgs<ExtArgs>
   antwortfelder?: boolean | Prisma.fragen$antwortfelderArgs<ExtArgs>
@@ -2900,6 +2965,7 @@ export type $fragenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     freigegeben: boolean
     ist_unfertig: boolean
     moderationsnotizen: string | null
+    kategorienwunsch: string | null
     gueltig_bis: Date | null
     review_status: $Enums.QuestionReviewStatus
     submitted_at: Date | null
@@ -3358,6 +3424,7 @@ export interface fragenFieldRefs {
   readonly freigegeben: Prisma.FieldRef<"fragen", 'Boolean'>
   readonly ist_unfertig: Prisma.FieldRef<"fragen", 'Boolean'>
   readonly moderationsnotizen: Prisma.FieldRef<"fragen", 'String'>
+  readonly kategorienwunsch: Prisma.FieldRef<"fragen", 'String'>
   readonly gueltig_bis: Prisma.FieldRef<"fragen", 'DateTime'>
   readonly review_status: Prisma.FieldRef<"fragen", 'QuestionReviewStatus'>
   readonly submitted_at: Prisma.FieldRef<"fragen", 'DateTime'>

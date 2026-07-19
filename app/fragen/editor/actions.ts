@@ -117,6 +117,7 @@ type NormalizedDraft = {
   categoryIds: number[];
   sourceOrRemark: string;
   moderationNotes: string;
+  categoryRequest: string;
   validUntil: Date | null;
   reviewFeedback: string | null;
   generatorParameters: GeneratorParametersDraft;
@@ -406,6 +407,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     typeof payload.questionText !== "string" ||
     typeof payload.sourceOrRemark !== "string" ||
     typeof payload.moderationNotes !== "string" ||
+    typeof payload.categoryRequest !== "string" ||
     !Array.isArray(payload.answers) ||
     !Array.isArray(payload.categoryIds) ||
     (payload.validUntil !== null && typeof payload.validUntil !== "string") ||
@@ -430,6 +432,13 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
   if (payload.moderationNotes.length > 1000) {
     throw new DraftValidationError(
       "Moderationsnotizen dürfen höchstens 1.000 Zeichen lang sein.",
+    );
+  }
+
+  if (payload.categoryRequest.length > 500) {
+    throw new DraftValidationError(
+      "Der Kategorienwunsch darf höchstens 500 Zeichen lang sein.",
+      "categories",
     );
   }
 
@@ -657,6 +666,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     categoryIds: [...new Set(payload.categoryIds)],
     sourceOrRemark: payload.sourceOrRemark.trim(),
     moderationNotes: payload.moderationNotes.trim(),
+    categoryRequest: payload.categoryRequest.trim(),
     validUntil: parseValidUntil(
       payload.validUntil,
       requiresCompleteQuestion,
@@ -1168,6 +1178,7 @@ export async function saveQuestion(
             ist_archiviert: false,
             ist_unfertig: payload.intent === "DRAFT",
             moderationsnotizen: draft.moderationNotes || null,
+            kategorienwunsch: draft.categoryRequest || null,
             gueltig_bis: draft.validUntil,
             freigegeben: approval.freigegeben,
             approved_by_user_id: approval.approved_by_user_id,
@@ -1799,6 +1810,7 @@ export async function saveQuestion(
           template_config_json: draft.templateConfig,
           ist_unfertig: payload.intent === "DRAFT",
           moderationsnotizen: draft.moderationNotes || null,
+          kategorienwunsch: draft.categoryRequest || null,
           gueltig_bis: draft.validUntil,
           freigegeben: approval.freigegeben,
           approved_by_user_id: approval.approved_by_user_id,

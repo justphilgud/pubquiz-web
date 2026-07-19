@@ -61,6 +61,7 @@ model fragen {
   freigegeben              Boolean               @default(false)
   ist_unfertig             Boolean               @default(false)
   moderationsnotizen       String?
+  kategorienwunsch         String?
   gueltig_bis              DateTime?              @db.Date
   review_status            QuestionReviewStatus   @default(DRAFT)
   submitted_at             DateTime?

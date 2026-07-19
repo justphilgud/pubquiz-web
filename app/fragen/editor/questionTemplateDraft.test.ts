@@ -36,6 +36,7 @@ function createDraft(questionMedia: QuestionMediaDraft[] = []): QuestionEditorDr
     categoryIds: [],
     sourceOrRemark: "",
     moderationNotes: "",
+    categoryRequest: "",
     approvalRemark: "",
     isIncomplete: true,
     validUntil: null,

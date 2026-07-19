@@ -69,11 +69,31 @@ export function canViewQuestion(
     isEditor(session) &&
     Number.isInteger(currentUserId) &&
     question.createdByUserId === currentUserId &&
-    !question.isArchived &&
     (question.reviewStatus === "DRAFT" ||
       question.reviewStatus === "CHANGES_REQUESTED" ||
       question.reviewStatus === "IN_REVIEW")
   );
+}
+
+export function canCloneQuestion(
+  session: Session | null,
+  question: Parameters<typeof canViewQuestion>[1],
+) {
+  return canCreateQuestions(session) && canViewQuestion(session, question);
+}
+
+export function canArchiveQuestion(
+  session: Session | null,
+  question: { createdByUserId: number | null },
+) {
+  if (canManageEverything(session)) return true;
+  const currentUserId = Number(session?.user?.id);
+  return isEditor(session) && Number.isInteger(currentUserId) &&
+    question.createdByUserId === currentUserId;
+}
+
+export function canDeleteQuestion(session: Session | null) {
+  return canManageEverything(session);
 }
 
 export function canSearchQuestions(session: Session | null) {
@@ -133,6 +153,9 @@ export type QuestionEditorCapabilities = {
   canSubmitForReview: boolean;
   canApproveQuestion: boolean;
   canRequestQuestionChanges: boolean;
+  canCloneQuestion: boolean;
+  canArchiveQuestion: boolean;
+  canDeleteQuestion: boolean;
 };
 
 export function getQuestionEditorCapabilities(
@@ -157,6 +180,9 @@ export function getQuestionEditorCapabilities(
         session,
         question.reviewStatus,
       ),
+      canCloneQuestion: canCloneQuestion(session, question),
+      canArchiveQuestion: canArchiveQuestion(session, question),
+      canDeleteQuestion: canDeleteQuestion(session),
     };
   }
 
@@ -165,6 +191,9 @@ export function getQuestionEditorCapabilities(
     canSubmitForReview: canSubmitForReview(session),
     canApproveQuestion: canReviewQuestions(session),
     canRequestQuestionChanges: false,
+    canCloneQuestion: false,
+    canArchiveQuestion: false,
+    canDeleteQuestion: false,
   };
 }
 

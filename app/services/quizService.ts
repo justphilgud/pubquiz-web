@@ -2,6 +2,7 @@ import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
 import { canAssignQuestionsToQuiz } from "@/app/lib/permissions";
 import { FACE_MORPH_PIXEL_RELATION_TYPE } from "@/app/fragen/editor/faceMorphPixelQuestionPlan";
+import { getBerlinDate } from "@/app/lib/berlinDate";
 
 type QuizQuestionCreateData = Parameters<
   typeof prisma.quiz_fragen.create
@@ -20,13 +21,16 @@ export async function addQuestionToQuiz(
 
   const frage = await db.fragen.findUnique({
     where: { fragen_id: data.fragen_id },
-    select: { freigegeben: true },
+    select: { freigegeben: true, gueltig_bis: true },
   });
 
   if (!frage?.freigegeben) {
     throw new Error(
       "Diese Frage ist noch nicht freigegeben und kann keinem Quiz hinzugefügt werden.",
     );
+  }
+  if (frage.gueltig_bis && frage.gueltig_bis < getBerlinDate()) {
+    throw new Error("Diese Frage ist abgelaufen und kann keinem neuen Quiz hinzugefügt werden.");
   }
 
   const relations = await db.fragen_relationen.findMany({

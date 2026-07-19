@@ -13,6 +13,7 @@ import {
 import ZuQuizHinzufuegenButton from "./ZuQuizHinzufuegenButton";
 import QuizVerwendungPopover from "./QuizVerwendungPopover";
 import type { QuizOption } from "./FragenWorkspace";
+import { getBerlinDate } from "@/app/lib/berlinDate";
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -348,6 +349,16 @@ export default function FrageSuche({
             const hatKeineMedien = frage.medien_anzahl === 0;
             const hatKeineAntworten = frage.antworten_anzahl === 0;
             const wurdeNochNieVerwendet = frage.quiz_anzahl === 0;
+            const istAbgelaufen = Boolean(
+              frage.gueltig_bis &&
+                frage.gueltig_bis < getBerlinDate().toISOString().slice(0, 10),
+            );
+            const workflowStatus = {
+              DRAFT: "Entwurf",
+              IN_REVIEW: "Eingereicht",
+              CHANGES_REQUESTED: "Feedback",
+              APPROVED: "Freigegeben",
+            }[frage.review_status];
             return (
               <article
                 key={frage.fragen_id}
@@ -362,6 +373,15 @@ export default function FrageSuche({
 
                       {frage.ist_archiviert && (
                         <StatusPill label="archiviert" tone="slate" />
+                      )}
+
+                      <StatusPill
+                        label={workflowStatus}
+                        tone={frage.review_status === "APPROVED" ? "green" : "blue"}
+                      />
+
+                      {istAbgelaufen && (
+                        <StatusPill label="abgelaufen" tone="orange" />
                       )}
 
                       {hatKeineAntworten && (

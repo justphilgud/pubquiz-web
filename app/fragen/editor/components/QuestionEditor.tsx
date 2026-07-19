@@ -26,6 +26,7 @@ import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { QuestionSection } from "./QuestionSection";
 import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
+import { QuestionManagementActions } from "./QuestionManagementActions";
 import { TemplateSelector } from "./TemplateSelector";
 import { evaluateQuestionQuality } from "../questionQuality";
 import type {
@@ -65,9 +66,17 @@ import {
   getQuestionDraftFingerprint,
   removeAnswerById,
 } from "../questionDraftState";
+import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
 
 function createId(): string {
   return crypto.randomUUID();
+}
+
+function getLocalDateInputValue(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function createAnswer(
@@ -100,6 +109,7 @@ function createInitialDraft(): QuestionEditorDraft {
 
     sourceOrRemark: "",
     moderationNotes: "",
+    categoryRequest: "",
     approvalRemark: "",
 
     isIncomplete: true,
@@ -167,6 +177,7 @@ export function QuestionEditor({
   const [pixelQuestionSync, setPixelQuestionSync] = useState<
     import("../types").FaceMorphPixelQuestionSyncResult | null
   >(null);
+  const [similarQuestions, setSimilarQuestions] = useState<SimilarQuestion[]>([]);
   const [fieldError, setFieldError] = useState<{
     target: QuestionValidationTarget;
     text: string;
@@ -194,6 +205,28 @@ export function QuestionEditor({
     () => getActiveQuestionMediaSlots(mediaTemplate, draft.questionMedia, messages),
     [draft.questionMedia, mediaTemplate, messages],
   );
+
+  useEffect(() => {
+    let active = true;
+    const questionText = draft.questionText.trim();
+    const timer = window.setTimeout(() => {
+      if (questionText.length < 12) {
+        setSimilarQuestions([]);
+        return;
+      }
+      void findSimilarQuestions(questionText, savedQuestionId ?? undefined)
+        .then((result) => {
+          if (active) setSimilarQuestions(result);
+        })
+        .catch(() => {
+          if (active) setSimilarQuestions([]);
+        });
+    }, 500);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [draft.questionText, savedQuestionId]);
 
   useEffect(() => {
     if (!hasUnsavedChanges || isReadOnly) return;
@@ -504,6 +537,7 @@ export function QuestionEditor({
         categoryIds: draft.categoryIds,
         sourceOrRemark: draft.sourceOrRemark,
         moderationNotes: draft.moderationNotes,
+        categoryRequest: draft.categoryRequest,
         validUntil: draft.validUntil,
         templateId: draft.templateId,
         generatorParameters: draft.generatorParameters,
@@ -730,6 +764,26 @@ export function QuestionEditor({
         />
       )}
 
+      {questionRecord && (
+        <QuestionManagementActions
+          capabilities={capabilities}
+          record={questionRecord}
+        />
+      )}
+
+      {questionRecord?.isArchived && (
+        <div role="status" className="rounded-2xl border border-slate-300 bg-slate-100 p-4 text-sm text-slate-800">
+          <p className="font-semibold">{messages.editor.archivedTitle}</p>
+        </div>
+      )}
+
+      {draft.validUntil && draft.validUntil < getLocalDateInputValue() && (
+        <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          <p className="font-semibold">{messages.editor.expiredTitle}</p>
+          <p className="mt-1">{messages.editor.expiredHelp}</p>
+        </div>
+      )}
+
       <fieldset
         disabled={isEditorDisabled}
         aria-busy={pendingAction !== null}
@@ -820,6 +874,26 @@ export function QuestionEditor({
           }
         />
 
+        {similarQuestions.length > 0 && (
+          <aside className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+            <h2 className="font-semibold">{messages.editor.duplicateTitle}</h2>
+            <p className="mt-1">{messages.editor.duplicateHelp}</p>
+            <ul className="mt-3 space-y-2">
+              {similarQuestions.map((question) => (
+                <li key={question.questionId}>
+                  <Link
+                    href={`/fragen/editor/${question.questionId}`}
+                    target="_blank"
+                    className="font-medium underline"
+                  >
+                    #{question.questionId}: {question.questionText}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+
         <AnswersSection
           answers={draft.answers}
           questionId={savedQuestionId}
@@ -864,6 +938,7 @@ export function QuestionEditor({
           selectedCategoryIds={draft.categoryIds}
           sourceOrRemark={draft.sourceOrRemark}
           moderationNotes={draft.moderationNotes}
+          categoryRequest={draft.categoryRequest}
           validUntil={draft.validUntil}
           initiallyOpen={editorContext === "review" || isReadOnly}
           onChangeCategories={changeCategories}
@@ -877,6 +952,12 @@ export function QuestionEditor({
             setDraft((current) => ({
               ...current,
               moderationNotes,
+            }))
+          }
+          onCategoryRequestChange={(categoryRequest) =>
+            setDraft((current) => ({
+              ...current,
+              categoryRequest,
             }))
           }
           onValidUntilChange={(validUntil) =>
