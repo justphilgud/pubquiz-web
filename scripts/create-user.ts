@@ -4,7 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, UserRole } from "../app/generated/prisma/client";
 import { loadLocalEnvironment } from "./load-local-environment";
 
-loadLocalEnvironment({ required: true });
+loadLocalEnvironment({ required: !process.env.DATABASE_URL });
 
 const { Pool } = pg;
 

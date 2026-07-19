@@ -16,11 +16,27 @@ deaktiviert keine Infrastruktur.
 
 ## Lokale Konfiguration
 
-`.env.development.local` ist die einzige verbindliche lokale Quelle. Next.js,
-Prisma CLI, Seed, `scripts/create-user.ts` und `npm run env:check` verwenden
-denselben Loader. Relevante Werte werden nicht still aus `.env` oder
-`.env.local` ergänzt. `.env.example` enthält die benötigten Namen und
-wertfreie Platzhalter; alle echten `.env*`-Dateien bleiben ignoriert.
+`.env.development.local` ist die verbindliche lokale Standardquelle. Bereits
+explizit gesetzte Prozessvariablen besitzen entsprechend der Next.js-Laderegel
+immer Vorrang. Prisma CLI, Seed, `scripts/create-user.ts` und
+`npm run env:check` verwenden denselben Loader. Relevante Werte werden nicht
+still aus `.env` oder `.env.local` ergänzt. `.env.example` enthält die
+benötigten Namen und wertfreie Platzhalter; alle echten `.env*`-Dateien bleiben
+ignoriert.
+
+Ein kontrollierter einmaliger Prisma-Aufruf kann deshalb ein explizites Ziel
+verwenden, ohne die lokale Datei umzuschreiben:
+
+```powershell
+$env:DATABASE_URL='<explizite-url>'
+npx prisma migrate status
+Remove-Item Env:DATABASE_URL
+```
+
+`prisma.config.ts` meldet dabei ausschließlich, ob die URL aus der
+Prozessumgebung, der lokalen Datei oder der Plattform stammt. Prisma zeigt bei
+Migrationsbefehlen Host, Datenbank und Schema des Ziels. Die URL und
+Zugangsdaten werden nicht durch eigene Diagnoseausgaben protokolliert.
 
 Einrichtung:
 
@@ -64,6 +80,13 @@ Vor jedem lokalen Prisma-Befehl muss `npm run env:check` erfolgreich sein.
 - `prisma db push`, `prisma migrate reset` und vergleichbare Reset-/Push-Wege
   sind für Preview und Production verboten.
 - `npm run dev` führt keine Migration automatisch aus.
+- `npm run build` und Vercel-Builds führen ebenfalls keine Migration aus.
+- Vor `migrate dev` oder `migrate deploy` immer zuerst `migrate status` mit
+  exakt derselben `DATABASE_URL` ausführen und das angezeigte Ziel prüfen.
+- `20260718170000_add_question_template_config` enthält die Spalte
+  `pubquiz.fragen.template_config_json`. Ein P2022 in einer Zielumgebung zeigt,
+  dass diese vorhandene Migration dort noch nicht ausgerollt wurde; die
+  Anwendung ersetzt keinen kontrollierten `migrate deploy`-Schritt.
 
 Der gemeinsame Loader stellt sicher, dass Prisma-Konfiguration, Seed und
 Benutzeranlage lokal dieselbe `DATABASE_URL` wie Next.js sehen. Er prüft keine

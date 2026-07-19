@@ -43,23 +43,34 @@ export function loadLocalEnvironment(options?: { required?: boolean }) {
     env: {} as Record<string, string | undefined>,
   };
 
-  for (const name of LOCAL_MANAGED_VARIABLES) {
-    delete process.env[name];
-  }
+  const inheritedValues = new Map(
+    LOCAL_MANAGED_VARIABLES.flatMap((name) => {
+      const value = process.env[name];
+      return value === undefined ? [] : [[name, value] as const];
+    }),
+  );
 
   processEnv([loadedFile], process.cwd(), console, true);
 
   for (const name of LOCAL_MANAGED_VARIABLES) {
-    if (!(name in loadedFile.env)) {
+    const inheritedValue = inheritedValues.get(name);
+
+    if (inheritedValue !== undefined) {
+      process.env[name] = inheritedValue;
+    } else if (!(name in loadedFile.env)) {
       delete process.env[name];
     }
   }
 
   for (const [name, value] of Object.entries(loadedFile.env)) {
-    if (value !== undefined) {
+    if (value !== undefined && !inheritedValues.has(name as typeof LOCAL_MANAGED_VARIABLES[number])) {
       process.env[name] = value;
     }
   }
 
-  return { loaded: true, path } as const;
+  return {
+    loaded: true,
+    path,
+    preservedVariables: [...inheritedValues.keys()],
+  } as const;
 }

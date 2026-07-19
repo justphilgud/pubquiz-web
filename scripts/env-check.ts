@@ -2,11 +2,17 @@ import { getSafeEnvironmentSummary, validateUploadEnvironment } from "../config/
 import { LOCAL_ENV_FILE, loadLocalEnvironment } from "./load-local-environment";
 
 function main() {
-  const inheritedDatabaseUrl = process.env.DATABASE_URL;
+  const inheritedDatabaseUrlPresent = Boolean(process.env.DATABASE_URL);
   const source = loadLocalEnvironment({ required: true });
   const results = validateUploadEnvironment();
 
-  console.log(source.loaded ? `Environment-Quelle: ${LOCAL_ENV_FILE} (geladen)` : "Environment-Quelle: Plattformvariablen");
+  console.log(
+    inheritedDatabaseUrlPresent
+      ? `Environment-Quelle: explizite Prozessvariablen vor ${LOCAL_ENV_FILE}`
+      : source.loaded
+        ? `Environment-Quelle: ${LOCAL_ENV_FILE} (geladen)`
+        : "Environment-Quelle: Plattformvariablen",
+  );
   try {
     const summary = getSafeEnvironmentSummary();
     console.log(`Logische Umgebung: ${summary.environment}`);
@@ -25,10 +31,6 @@ function main() {
     process.exitCode = 1;
   }
 
-  if (inheritedDatabaseUrl && inheritedDatabaseUrl !== process.env.DATABASE_URL) {
-    console.error("FEHLER DATABASE_URL: Die geerbte Shell-Variable widerspricht .env.development.local. Next.js und Prisma verwenden die lokale Datei; entferne die Shell-Variable.");
-    process.exitCode = 1;
-  }
   for (const result of results) {
     console.log(`${result.ok ? "OK" : "FEHLER"} ${result.name}: ${result.message}`);
   }
