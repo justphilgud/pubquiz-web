@@ -395,6 +395,7 @@ export const ModelName = {
   medien_generator_lauf_medien: 'medien_generator_lauf_medien',
   medientyp: 'medientyp',
   quiz: 'quiz',
+  eventreihen: 'eventreihen',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
   teams: 'teams',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1239,6 +1240,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.quizCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.QuizCountAggregateOutputType> | number
+        }
+      }
+    }
+    eventreihen: {
+      payload: Prisma.$eventreihenPayload<ExtArgs>
+      fields: Prisma.eventreihenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.eventreihenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.eventreihenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>
+        }
+        findFirst: {
+          args: Prisma.eventreihenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.eventreihenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>
+        }
+        findMany: {
+          args: Prisma.eventreihenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>[]
+        }
+        create: {
+          args: Prisma.eventreihenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>
+        }
+        createMany: {
+          args: Prisma.eventreihenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.eventreihenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>[]
+        }
+        delete: {
+          args: Prisma.eventreihenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>
+        }
+        update: {
+          args: Prisma.eventreihenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>
+        }
+        deleteMany: {
+          args: Prisma.eventreihenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.eventreihenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.eventreihenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>[]
+        }
+        upsert: {
+          args: Prisma.eventreihenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihenPayload>
+        }
+        aggregate: {
+          args: Prisma.EventreihenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEventreihen>
+        }
+        groupBy: {
+          args: Prisma.eventreihenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EventreihenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.eventreihenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EventreihenCountAggregateOutputType> | number
         }
       }
     }
@@ -2457,8 +2532,13 @@ export type MedientypScalarFieldEnum = (typeof MedientypScalarFieldEnum)[keyof t
 
 export const QuizScalarFieldEnum = {
   quiz_id: 'quiz_id',
+  eventreihe_id: 'eventreihe_id',
   quiz_datum: 'quiz_datum',
   titel: 'titel',
+  veranstaltungszeit: 'veranstaltungszeit',
+  veranstaltungsname: 'veranstaltungsname',
+  karten_url: 'karten_url',
+  oeffentliche_url: 'oeffentliche_url',
   team_anzahl: 'team_anzahl',
   teilnehmer_anzahl: 'teilnehmer_anzahl',
   bemerkung: 'bemerkung',
@@ -2479,6 +2559,23 @@ export const QuizScalarFieldEnum = {
 } as const
 
 export type QuizScalarFieldEnum = (typeof QuizScalarFieldEnum)[keyof typeof QuizScalarFieldEnum]
+
+
+export const EventreihenScalarFieldEnum = {
+  eventreihe_id: 'eventreihe_id',
+  name: 'name',
+  slug: 'slug',
+  oeffentlicher_name: 'oeffentlicher_name',
+  beschreibung: 'beschreibung',
+  interne_bemerkung: 'interne_bemerkung',
+  ist_oeffentlich: 'ist_oeffentlich',
+  ist_archiviert: 'ist_archiviert',
+  archiviert_am: 'archiviert_am',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type EventreihenScalarFieldEnum = (typeof EventreihenScalarFieldEnum)[keyof typeof EventreihenScalarFieldEnum]
 
 
 export const Quiz_fragenScalarFieldEnum = {
@@ -2958,6 +3055,7 @@ export type GlobalOmitConfig = {
   medien_generator_lauf_medien?: Prisma.medien_generator_lauf_medienOmit
   medientyp?: Prisma.medientypOmit
   quiz?: Prisma.quizOmit
+  eventreihen?: Prisma.eventreihenOmit
   quiz_fragen?: Prisma.quiz_fragenOmit
   quiz_teams?: Prisma.quiz_teamsOmit
   teams?: Prisma.teamsOmit

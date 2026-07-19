@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { Session } from "next-auth";
-import { getQuestionEditorCapabilities } from "./permissions";
+import {
+  canManageEventSeries,
+  getQuestionEditorCapabilities,
+} from "./permissions";
 
 const adminSession = {
   user: { id: "1", role: "ADMIN" },
@@ -33,4 +36,10 @@ test("editors cannot manage categories or clone another editor's question", () =
   });
   assert.equal(capabilities.canManageCategories, false);
   assert.equal(capabilities.canCloneQuestion, false);
+});
+
+test("only admins can manage event series", () => {
+  assert.equal(canManageEventSeries(adminSession), true);
+  assert.equal(canManageEventSeries(editorSession), false);
+  assert.equal(canManageEventSeries(null), false);
 });

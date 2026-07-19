@@ -1,10 +1,12 @@
 import QuizWorkspace from "./QuizWorkspace";
 import { getQuizListe, getSchnellQuizKategorien } from "./actions";
 import { requireAdmin } from "@/app/lib/permissions";
+import { getEventSeriesOptions } from "@/app/eventreihen/actions";
 
 type Props = {
   searchParams: Promise<{
     tab?: string;
+    eventreiheId?: string;
   }>;
 };
 
@@ -12,10 +14,24 @@ export default async function QuizPage({ searchParams }: Props) {
   await requireAdmin();
 
   const resolvedSearchParams = await searchParams;
-  const _tab = resolvedSearchParams.tab;
+  const [quizze, kategorien, eventSeries] = await Promise.all([
+    getQuizListe(),
+    getSchnellQuizKategorien(),
+    getEventSeriesOptions(true),
+  ]);
+  const requestedEventSeriesId = Number(resolvedSearchParams.eventreiheId);
+  const initialEventSeriesId = eventSeries.some(
+    (entry) => entry.id === requestedEventSeriesId && !entry.isArchived,
+  )
+    ? requestedEventSeriesId
+    : undefined;
 
-  const quizze = await getQuizListe();
-  const kategorien = await getSchnellQuizKategorien();
-
-  return <QuizWorkspace quizze={quizze} kategorien={kategorien} />;
+  return (
+    <QuizWorkspace
+      quizze={quizze}
+      kategorien={kategorien}
+      eventSeries={eventSeries}
+      initialEventSeriesId={initialEventSeriesId}
+    />
+  );
 }

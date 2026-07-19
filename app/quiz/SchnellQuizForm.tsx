@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createSchnellQuiz } from "./actions";
+import type { EventSeriesOption } from "@/app/eventreihen/actions";
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -12,11 +13,23 @@ type MedienFilter = "alle" | "nurMitMedien" | "nurOhneMedien";
 
 export default function SchnellQuizForm({
   kategorien,
+  eventSeries,
+  initialEventSeriesId,
 }: {
   kategorien: Kategorie[];
+  eventSeries: EventSeriesOption[];
+  initialEventSeriesId?: number;
 }) {
+  const [eventSeriesId, setEventSeriesId] = useState(
+    initialEventSeriesId ? String(initialEventSeriesId) : "",
+  );
   const [titel, setTitel] = useState("Schnellquiz");
   const [quizDatum, setQuizDatum] = useState("");
+  const [veranstaltungszeit, setVeranstaltungszeit] = useState("");
+  const [veranstaltungsname, setVeranstaltungsname] = useState("");
+  const [kartenUrl, setKartenUrl] = useState("");
+  const [oeffentlicheUrl, setOeffentlicheUrl] = useState("");
+  const [bemerkung, setBemerkung] = useState("");
   const [anzahlBloecke, setAnzahlBloecke] = useState(2);
   const [fragenProBlock, setFragenProBlock] = useState(5);
   const [kategorieIds, setKategorieIds] = useState<number[]>([]);
@@ -41,8 +54,14 @@ export default function SchnellQuizForm({
     setMeldung("");
 
     const result = await createSchnellQuiz({
+      eventSeriesId: Number(eventSeriesId),
       titel,
       quizDatum,
+      veranstaltungszeit,
+      veranstaltungsname,
+      kartenUrl,
+      oeffentlicheUrl,
+      bemerkung,
       anzahlBloecke,
       fragenProBlock,
       kategorieIds,
@@ -72,8 +91,22 @@ export default function SchnellQuizForm({
 
       <div className="grid gap-5">
         <label className="block">
-          <div className="mb-1 text-sm font-semibold text-slate-700">Titel</div>
+          <div className="mb-1 text-sm font-semibold text-slate-700">Eventreihe *</div>
+          <select
+            required
+            value={eventSeriesId}
+            onChange={(event) => setEventSeriesId(event.target.value)}
+            className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3"
+          >
+            <option value="">Bitte auswählen</option>
+            {eventSeries.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+          </select>
+        </label>
+        <label className="block">
+          <div className="mb-1 text-sm font-semibold text-slate-700">Titel *</div>
           <input
+            required
+            maxLength={200}
             value={titel}
             onChange={(event) => setTitel(event.target.value)}
             className="w-full rounded-xl border border-slate-300 px-4 py-3"
@@ -83,10 +116,11 @@ export default function SchnellQuizForm({
         <div className="grid gap-4 md:grid-cols-[220px_150px_170px]">
           <label className="block">
             <div className="mb-1 text-sm font-semibold text-slate-700">
-              Quizdatum
+              Quizdatum *
             </div>
             <input
               type="date"
+              required
               value={quizDatum}
               onChange={(event) => setQuizDatum(event.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3"
@@ -121,6 +155,17 @@ export default function SchnellQuizForm({
             />
           </label>
         </div>
+
+        <details className="rounded-2xl border border-slate-200 p-4">
+          <summary className="cursor-pointer font-semibold">Optionale Veranstaltungsdaten</summary>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <label className="block"><div className="mb-1 text-sm font-semibold">Uhrzeit</div><input type="time" value={veranstaltungszeit} onChange={(event) => setVeranstaltungszeit(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
+            <label className="block"><div className="mb-1 text-sm font-semibold">Veranstaltungsname</div><input maxLength={200} value={veranstaltungsname} onChange={(event) => setVeranstaltungsname(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
+            <label className="block"><div className="mb-1 text-sm font-semibold">Kartenlink</div><input type="url" maxLength={2048} value={kartenUrl} onChange={(event) => setKartenUrl(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
+            <label className="block"><div className="mb-1 text-sm font-semibold">Veranstaltungs-URL</div><input type="url" maxLength={2048} value={oeffentlicheUrl} onChange={(event) => setOeffentlicheUrl(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
+            <label className="block md:col-span-2"><div className="mb-1 text-sm font-semibold">Interne Bemerkung</div><textarea maxLength={2000} value={bemerkung} onChange={(event) => setBemerkung(event.target.value)} className="min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
+          </div>
+        </details>
 
         <div>
           <div className="mb-2 text-sm font-semibold text-slate-700">

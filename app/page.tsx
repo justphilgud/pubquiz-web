@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   CalendarDaysIcon,
+  BuildingOffice2Icon,
   CheckBadgeIcon,
   ClipboardDocumentCheckIcon,
   ClockIcon,
@@ -255,12 +256,20 @@ export default async function HomePage() {
               />
             )}
             {capabilities.canManageQuizzes && (
-              <QuickActionCard
-                href="/quiz"
-                title="Quizverwaltung"
-                description="Quiz-Abende und Fragenzuordnung verwalten."
-                icon={CalendarDaysIcon}
-              />
+              <>
+                <QuickActionCard
+                  href="/quiz"
+                  title="Quizverwaltung"
+                  description="Quiz-Abende und Fragenzuordnung verwalten."
+                  icon={CalendarDaysIcon}
+                />
+                <QuickActionCard
+                  href="/admin/eventreihen"
+                  title="Eventreihen"
+                  description="Veranstaltungsreihen und ihre Termine verwalten."
+                  icon={BuildingOffice2Icon}
+                />
+              </>
             )}
           </div>
         </section>

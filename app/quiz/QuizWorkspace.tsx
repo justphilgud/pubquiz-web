@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import QuizForm from "./QuizForm";
 import SchnellQuizForm from "./SchnellQuizForm";
 import type { QuizResult } from "./actions";
+import type { EventSeriesOption } from "@/app/eventreihen/actions";
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -16,9 +17,13 @@ type Tab = "verwaltung" | "schnellquiz";
 export default function QuizWorkspace({
   quizze,
   kategorien,
+  eventSeries,
+  initialEventSeriesId,
 }: {
   quizze: QuizResult[];
   kategorien: Kategorie[];
+  eventSeries: EventSeriesOption[];
+  initialEventSeriesId?: number;
 }) {
   const searchParams = useSearchParams();
 
@@ -67,11 +72,19 @@ export default function QuizWorkspace({
         </div>
 
         <div className={activeTab === "verwaltung" ? "block" : "hidden"}>
-          <QuizForm quizze={quizze} />
+          <QuizForm
+            quizze={quizze}
+            eventSeries={eventSeries}
+            initialEventSeriesId={initialEventSeriesId}
+          />
         </div>
 
         <div className={activeTab === "schnellquiz" ? "block" : "hidden"}>
-          <SchnellQuizForm kategorien={kategorien} />
+          <SchnellQuizForm
+            kategorien={kategorien}
+            eventSeries={eventSeries.filter((entry) => !entry.isArchived)}
+            initialEventSeriesId={initialEventSeriesId}
+          />
         </div>
       </div>
     </main>

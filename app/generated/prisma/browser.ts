@@ -73,6 +73,11 @@ export type medientyp = Prisma.medientypModel
  */
 export type quiz = Prisma.quizModel
 /**
+ * Model eventreihen
+ *
+ */
+export type eventreihen = Prisma.eventreihenModel
+/**
  * Model quiz_fragen
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */

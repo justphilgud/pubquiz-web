@@ -62,6 +62,7 @@ export const ModelName = {
   medien_generator_lauf_medien: 'medien_generator_lauf_medien',
   medientyp: 'medientyp',
   quiz: 'quiz',
+  eventreihen: 'eventreihen',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
   teams: 'teams',
@@ -234,8 +235,13 @@ export type MedientypScalarFieldEnum = (typeof MedientypScalarFieldEnum)[keyof t
 
 export const QuizScalarFieldEnum = {
   quiz_id: 'quiz_id',
+  eventreihe_id: 'eventreihe_id',
   quiz_datum: 'quiz_datum',
   titel: 'titel',
+  veranstaltungszeit: 'veranstaltungszeit',
+  veranstaltungsname: 'veranstaltungsname',
+  karten_url: 'karten_url',
+  oeffentliche_url: 'oeffentliche_url',
   team_anzahl: 'team_anzahl',
   teilnehmer_anzahl: 'teilnehmer_anzahl',
   bemerkung: 'bemerkung',
@@ -256,6 +262,23 @@ export const QuizScalarFieldEnum = {
 } as const
 
 export type QuizScalarFieldEnum = (typeof QuizScalarFieldEnum)[keyof typeof QuizScalarFieldEnum]
+
+
+export const EventreihenScalarFieldEnum = {
+  eventreihe_id: 'eventreihe_id',
+  name: 'name',
+  slug: 'slug',
+  oeffentlicher_name: 'oeffentlicher_name',
+  beschreibung: 'beschreibung',
+  interne_bemerkung: 'interne_bemerkung',
+  ist_oeffentlich: 'ist_oeffentlich',
+  ist_archiviert: 'ist_archiviert',
+  archiviert_am: 'archiviert_am',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type EventreihenScalarFieldEnum = (typeof EventreihenScalarFieldEnum)[keyof typeof EventreihenScalarFieldEnum]
 
 
 export const Quiz_fragenScalarFieldEnum = {
