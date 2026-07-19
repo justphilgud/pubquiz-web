@@ -43,12 +43,16 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
   async function handleAdd(fragenId: number) {
     setMeldung("");
 
-    await addFrageToQuiz({
+    const assignment = await addFrageToQuiz({
       quizId,
       fragenId,
     });
 
-    setMeldung("Frage wurde zum Quiz hinzugefügt.");
+    setMeldung(
+      assignment.coupledQuestionAlreadyInQuiz
+        ? "Frage wurde hinzugefügt. Hinweis: Die gekoppelte FaceMorph-/Pixelfrage ist ebenfalls in diesem Quiz."
+        : "Frage wurde zum Quiz hinzugefügt.",
+    );
 
     const result = await searchFragenForQuiz({
       quizId,

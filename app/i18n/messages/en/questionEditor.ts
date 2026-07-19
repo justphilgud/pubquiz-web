@@ -7,6 +7,8 @@ export const enQuestionEditorMessages = {
     titles: { create: "New question", edit: "Edit question", review: "Review question", readOnly: "Submitted question" },
     back: "Back to questions",
     uploadPending: "Wait until the media upload has finished.",
+    pixelQuestionSyncFailed: "The question was saved, but at least one linked pixel question could not be generated completely. Open the child question and run the pixel stages again.",
+    openPixelQuestion: "Open pixel question for answer {position} (ID {id})",
     unsavedChanges: "There are unsaved changes. Do you really want to leave this page?",
   },
   templates: {
@@ -20,7 +22,7 @@ export const enQuestionEditorMessages = {
   templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", title: "Title", solution: "Solution" },
   templateSelector: { selected: "Special question: {name}", change: "Change", clear: "Clear selection", select: "Select special question", searchLabel: "Search special questions", searchPlaceholder: "Search special question", empty: "No special question found." },
   question: { label: "Question", placeholder: "Write your question..." },
-  answers: { title: "Answers", answer: "Answer", answers: "Answers", correctShort: "correct", inputPlaceholder: "Enter answer", correct: "This answer is correct", add: "+ Add answer", removeConfirm: "This answer already contains data. Do you really want to remove it?", imageRequired: "An image is required for this FaceMorph answer." },
+  answers: { title: "Answers", answer: "Answer", answers: "Answers", correctShort: "correct", inputPlaceholder: "Enter answer", correct: "This answer is correct", add: "+ Add answer", removeConfirm: "This answer already contains data. Do you really want to remove it?", imageRequired: "An image is required for this FaceMorph answer.", createPixelQuestionLater: "Also create a pixel question from this image later" },
   media: { existingLabel: "Question media", replace: "Replace media", choose: "Choose file", uploading: "Uploading …" },
   mediaSlots: {
     musicOriginalAudio: { label: "Original audio", help: "A reversed version is generated from this audio." },

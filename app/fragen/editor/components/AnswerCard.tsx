@@ -1,5 +1,9 @@
 import { useId, useState } from "react";
-import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
+import type {
+  FaceMorphPixelQuestionOptionKey,
+  QuestionAnswerDraft,
+  QuestionMediaDraft,
+} from "../types";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import {
   AnswerMediaSlot,
@@ -7,6 +11,7 @@ import {
 } from "./AnswerMediaSlot";
 import { CharacterCount } from "./CharacterCount";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { FaceMorphPixelQuestionOption } from "./FaceMorphPixelQuestionOption";
 
 type AnswerCardProps = {
   answer: QuestionAnswerDraft;
@@ -16,6 +21,11 @@ type AnswerCardProps = {
   disabled: boolean;
   showMedia: boolean;
   requireImage: boolean;
+  pixelQuestionOption?: {
+    key: FaceMorphPixelQuestionOptionKey;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+  };
   onChange: (changes: Partial<QuestionAnswerDraft>) => void;
   onMediaChange: (media: QuestionMediaDraft | null) => void;
   onMediaUploadStatusChange: (status: AnswerMediaUploadStatus) => void;
@@ -30,6 +40,7 @@ export function AnswerCard({
   disabled,
   showMedia,
   requireImage,
+  pixelQuestionOption,
   onChange,
   onMediaChange,
   onMediaUploadStatusChange,
@@ -94,15 +105,25 @@ export function AnswerCard({
       </div>
 
       {showMedia && (
-        <AnswerMediaSlot
-          answer={answer}
-          questionId={questionId}
-          pathnamePrefix={pathnamePrefix}
-          disabled={disabled}
-          required={requireImage}
-          onChange={onMediaChange}
-          onUploadStatusChange={onMediaUploadStatusChange}
-        />
+        <>
+          <AnswerMediaSlot
+            answer={answer}
+            questionId={questionId}
+            pathnamePrefix={pathnamePrefix}
+            disabled={disabled}
+            required={requireImage}
+            onChange={onMediaChange}
+            onUploadStatusChange={onMediaUploadStatusChange}
+          />
+          {pixelQuestionOption && (
+            <FaceMorphPixelQuestionOption
+              checked={pixelQuestionOption.checked}
+              disabled={disabled}
+              label={messages.answers.createPixelQuestionLater}
+              onChange={pixelQuestionOption.onChange}
+            />
+          )}
+        </>
       )}
 
       {showMedia && requireImage &&

@@ -4,6 +4,7 @@ import { localizeQuestionTemplates } from "./questionTemplates";
 import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
 import {
   findQuestionTemplate,
+  getQuestionTemplatePersistenceIds,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "./questionTemplateRegistry";
@@ -36,6 +37,34 @@ test("bitcrush and pixel templates expose separate generator input and output sl
   assert.deepEqual(pixel?.mediaSlots.map((slot) => slot.key), [
     "pixel_original_image", "pixel_stage_3_image", "pixel_stage_2_image", "pixel_stage_1_image",
   ]);
+});
+
+test("a new pixel question uses the selectable canonical registry entry", () => {
+  const pixel = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.pixelImage,
+  );
+
+  assert.ok(pixel);
+  assert.equal(pixel.id, "pixelbild");
+  assert.equal(pixel.selectable, true);
+  assert.deepEqual(pixel.generators, ["image_pixelate"]);
+});
+
+test("stored pixel aliases resolve to the canonical readable template", () => {
+  const storedTemplateId = resolveCanonicalQuestionTemplateId("image_pixel");
+  const pixel = findQuestionTemplate(questionTemplates, storedTemplateId);
+
+  assert.equal(storedTemplateId, questionTemplateIds.pixelImage);
+  assert.equal(pixel?.id, questionTemplateIds.pixelImage);
+  assert.deepEqual(
+    getQuestionTemplatePersistenceIds(questionTemplateIds.pixelImage),
+    [questionTemplateIds.pixelImage, "image_pixel"],
+  );
+});
+
+test("an unknown template id is handled as missing configuration", () => {
+  assert.equal(findQuestionTemplate(questionTemplates, "unknown_template"), null);
 });
 
 test("bitcrush remains readable but is not productively selectable", () => {

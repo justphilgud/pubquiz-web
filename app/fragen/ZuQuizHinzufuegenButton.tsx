@@ -53,12 +53,16 @@ export default function ZuQuizHinzufuegenButton({
           [selectedQuizId]: false,
         }));
       } else {
-        await addFrageToQuiz({
+        const result = await addFrageToQuiz({
           quizId: selectedQuizId,
           fragenId,
         });
 
-        setMeldung("Zu Quiz hinzugefügt.");
+        setMeldung(
+          result.coupledQuestionAlreadyInQuiz
+            ? "Zu Quiz hinzugefügt. Hinweis: Die gekoppelte FaceMorph-/Pixelfrage ist ebenfalls in diesem Quiz."
+            : "Zu Quiz hinzugefügt.",
+        );
         setAssignmentOverrides((current) => ({
           ...current,
           [selectedQuizId]: true,

@@ -1,0 +1,11 @@
+# Basic Pitch itself is installed with --no-deps by setup.ps1 so that Windows
+# uses the ONNX runtime instead of the Python-3.11 TensorFlow dependency branch.
+onnxruntime==1.19.2
+numpy==1.26.4
+librosa==0.10.2.post1
+mir_eval==0.7
+pretty_midi==0.2.10
+resampy==0.4.2
+scikit-learn==1.5.2
+scipy==1.13.1
+typing_extensions==4.12.2

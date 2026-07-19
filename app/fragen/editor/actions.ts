@@ -32,6 +32,7 @@ import {
 import { questionTemplateDefinitions } from "./templates/questionTemplates";
 import {
   findQuestionTemplate,
+  getQuestionTemplatePersistenceIds,
   resolveCanonicalQuestionTemplateId,
 } from "./templates/questionTemplateRegistry";
 import type {
@@ -67,6 +68,7 @@ import {
   parseQuestionTemplateConfigDraft,
 } from "./pixelTemplateConfig";
 import { hasRequiredTemplateAnswerImages } from "./questionQuality";
+import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -628,8 +630,8 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     generatorParameters[generatorId] = parameters;
   }
   const templateConfig = requiresCompleteQuestion
-    ? normalizeQuestionTemplateConfig(payload.templateConfig)
-    : parseQuestionTemplateConfigDraft(payload.templateConfig);
+    ? normalizeQuestionTemplateConfig(payload.templateConfig, templateId)
+    : parseQuestionTemplateConfigDraft(payload.templateConfig, templateId);
   if (!templateConfig) {
     throw new DraftValidationError("Die Anzeigedauern der Pixelstufen sind ungültig.", "questionMedia");
   }
@@ -877,11 +879,20 @@ export async function saveQuestion(
         );
       }
 
-      const persistedTemplate = draft.templateId
-        ? await tx.frage_vorlagen.findUnique({
-            where: { code: draft.templateId },
-            select: { vorlage_id: true },
+      const persistedTemplates = draft.templateId
+        ? await tx.frage_vorlagen.findMany({
+            where: {
+              code: {
+                in: [...getQuestionTemplatePersistenceIds(draft.templateId)],
+              },
+            },
+            select: { vorlage_id: true, code: true },
           })
+        : [];
+      const persistedTemplate = draft.templateId
+        ? persistedTemplates.find(({ code }) => code === draft.templateId) ??
+          persistedTemplates[0] ??
+          null
         : null;
 
       if (draft.templateId && !persistedTemplate) {
@@ -1956,6 +1967,11 @@ export async function saveQuestion(
       };
     });
 
+    const pixelQuestionSync = await synchronizeFaceMorphPixelQuestions(
+      question.fragen_id,
+      userId,
+    );
+
     revalidatePath("/fragen");
 
     return {
@@ -1963,6 +1979,7 @@ export async function saveQuestion(
       questionId: question.fragen_id,
       questionMedia: question.questionMedia,
       answers: question.answers,
+      pixelQuestionSync,
       messageCode: createSuccessCode(
         payload.intent,
         payload.questionId !== undefined,

@@ -21,7 +21,7 @@ const questionTemplates = localizeQuestionTemplates(
 
 function createDraft(questionMedia: QuestionMediaDraft[] = []): QuestionEditorDraft {
   return {
-    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 } },
+    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "Bestehende Frage",
     questionMedia,
     answers: [
@@ -121,10 +121,31 @@ test("clearing a template preserves existing question media unchanged", () => {
 
 test("template switches preserve pixel stage durations", () => {
   const original = createDraft([]);
-  original.templateConfig = { stageDurationsSeconds: { stage3: 25, stage2: 15, stage1: 10 } };
+  original.templateConfig = { stageDurationsSeconds: { stage3: 25, stage2: 15, stage1: 10 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } };
   const changed = applyQuestionTemplateToDraft(original, questionTemplates[0], () => "new-answer");
   assert.deepEqual(changed.templateConfig, original.templateConfig);
   assert.deepEqual(clearQuestionTemplateFromDraft(changed).templateConfig, original.templateConfig);
+});
+
+test("applying the pixel template creates a canonical editable draft", () => {
+  const pixel = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.pixelImage,
+  );
+
+  assert.ok(pixel);
+  const changed = applyQuestionTemplateToDraft(
+    createDraft(),
+    pixel,
+    () => "pixel-answer",
+  );
+
+  assert.equal(changed.templateId, questionTemplateIds.pixelImage);
+  assert.equal(changed.answers[0]?.fieldLabel, "Lösung");
+  assert.deepEqual(changed.templateConfig, {
+    stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 },
+    createPixelQuestionByAnswer: { answer1: false, answer2: false },
+  });
 });
 
 test("a template switch reports an incompatible retained required medium", () => {

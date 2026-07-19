@@ -49,6 +49,8 @@ model fragen {
   fragen_kategorien        fragen_kategorien[]
   medien                   medien[]
   generator_laefe          medien_generator_laefe[]
+  relationen_als_quelle    fragen_relationen[]      @relation("fragen_relation_quelle")
+  relationen_als_ziel      fragen_relationen[]      @relation("fragen_relation_ziel")
   quiz_fragen              quiz_fragen[]
   created_by_user_id       Int?
   created_at               DateTime              @default(now())
@@ -70,6 +72,25 @@ model fragen {
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
+  @@schema("pubquiz")
+}
+
+model fragen_relationen {
+  fragen_relation_id Int      @id @default(autoincrement())
+  quell_fragen_id    Int
+  ziel_fragen_id     Int
+  antwort_position  Int
+  typ                String   @db.VarChar(80)
+  ist_aktiv          Boolean  @default(true)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now()) @updatedAt
+  quell_frage        fragen   @relation("fragen_relation_quelle", fields: [quell_fragen_id], references: [fragen_id], onDelete: Cascade)
+  ziel_frage         fragen   @relation("fragen_relation_ziel", fields: [ziel_fragen_id], references: [fragen_id], onDelete: Cascade)
+
+  @@unique([quell_fragen_id, typ, antwort_position], map: "uq_fragen_relation_quelle_typ_position")
+  @@unique([ziel_fragen_id, typ], map: "uq_fragen_relation_ziel_typ")
+  @@index([quell_fragen_id, ist_aktiv], map: "idx_fragen_relation_quelle_aktiv")
+  @@index([ziel_fragen_id, ist_aktiv], map: "idx_fragen_relation_ziel_aktiv")
   @@schema("pubquiz")
 }
 

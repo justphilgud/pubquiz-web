@@ -10,7 +10,7 @@ function media(slotKey: QuestionMediaDraft["slotKey"], id: number): QuestionMedi
 function draft(questionMedia: QuestionMediaDraft[]): QuestionEditorDraft {
   return {
     templateId: "musik_rueckwaerts", questionText: "Song?", questionMedia,
-    generatorRuns: [], templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 } }, answers: [{ id: "a", text: "Titel", isCorrect: true, additionalInfo: "", media: null }],
+    generatorRuns: [], templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } }, answers: [{ id: "a", text: "Titel", isCorrect: true, additionalInfo: "", media: null }],
     categoryIds: [1], sourceOrRemark: "Quelle", moderationNotes: "", approvalRemark: "", isIncomplete: false, validUntil: null, status: "READY",
   };
 }
@@ -71,7 +71,7 @@ test("a complete three-stage pixel run is current while a version-one result sta
 test("pixel stage durations block completion outside the allowed integer range", () => {
   const current = draft([]);
   current.templateId = "pixelbild";
-  current.templateConfig = { stageDurationsSeconds: { stage3: 0, stage2: 20, stage1: 20 } };
+  current.templateConfig = { stageDurationsSeconds: { stage3: 0, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } };
   assert.equal(evaluateQuestionQuality(current).blockers.some((issue) => issue.code === "PIXEL_STAGE_DURATIONS_INVALID"), true);
 });
 

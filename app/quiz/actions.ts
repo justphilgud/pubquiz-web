@@ -532,7 +532,7 @@ export async function addFrageToQuiz(data: {
 
   const naechsteSortierung = (letzterEintrag?.sortierung ?? 0) + 1;
 
-  await addQuestionToQuiz(
+  const assignment = await addQuestionToQuiz(
     {
       quiz_id: data.quizId,
       fragen_id: data.fragenId,
@@ -544,6 +544,7 @@ export async function addFrageToQuiz(data: {
 
   revalidatePath(`/quiz/${data.quizId}`);
   revalidatePath("/fragen");
+  return { coupledQuestionAlreadyInQuiz: assignment.coupledQuestionAlreadyInQuiz };
 }
 
 export async function removeFrageFromQuiz(data: {

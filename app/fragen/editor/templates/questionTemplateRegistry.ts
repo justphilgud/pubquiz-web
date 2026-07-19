@@ -16,6 +16,23 @@ const questionTemplateAliases: Readonly<Record<string, string>> = {
   image_pixel: questionTemplateIds.pixelImage,
 };
 
+export function getQuestionTemplatePersistenceIds(
+  templateId: string | null,
+): readonly string[] {
+  const canonicalId = resolveCanonicalQuestionTemplateId(templateId);
+
+  if (canonicalId === null) {
+    return [];
+  }
+
+  return [
+    canonicalId,
+    ...Object.entries(questionTemplateAliases)
+      .filter(([, resolvedId]) => resolvedId === canonicalId)
+      .map(([alias]) => alias),
+  ];
+}
+
 export function resolveCanonicalQuestionTemplateId(
   templateId: string | null,
 ): string | null {

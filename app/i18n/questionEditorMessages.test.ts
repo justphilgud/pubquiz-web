@@ -31,6 +31,17 @@ test("the question placeholder uses the deployment copy", () => {
   assert.equal(loadQuestionEditorMessages("en").question.placeholder, "Write your question...");
 });
 
+test("the FaceMorph pixel option is translated", () => {
+  assert.equal(
+    loadQuestionEditorMessages("de").answers.createPixelQuestionLater,
+    "Zusätzlich später eine Pixelfrage aus diesem Bild erzeugen",
+  );
+  assert.equal(
+    loadQuestionEditorMessages("en").answers.createPixelQuestionLater,
+    "Also create a pixel question from this image later",
+  );
+});
+
 test("the English catalog loads and falls back to German for missing details", () => {
   const messages = loadQuestionEditorMessages("en");
   assertCoreStructure(messages);
@@ -58,7 +69,7 @@ test("central quality codes resolve in German and English", () => {
 
 test("quality evaluation returns structured codes instead of display text", () => {
   const result = evaluateQuestionQuality({
-    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 } },
+    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "",
     questionMedia: [],
     answers: [{ id: "answer-1", text: "", isCorrect: true, additionalInfo: "", media: null }],

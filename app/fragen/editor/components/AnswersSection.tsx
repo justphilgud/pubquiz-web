@@ -1,4 +1,9 @@
-import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
+import type {
+  FaceMorphPixelQuestionOptionKey,
+  FaceMorphPixelQuestionOptions,
+  QuestionAnswerDraft,
+  QuestionMediaDraft,
+} from "../types";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import type { AnswerMediaUploadStatus } from "./AnswerMediaSlot";
 import { AnswerCard } from "./AnswerCard";
@@ -12,6 +17,11 @@ type AnswersSectionProps = {
   disabled: boolean;
   validationError?: string | null;
   requireAnswerImages?: boolean;
+  faceMorphPixelQuestionOptions?: FaceMorphPixelQuestionOptions;
+  onFaceMorphPixelQuestionOptionChange?: (
+    option: FaceMorphPixelQuestionOptionKey,
+    checked: boolean,
+  ) => void;
   onAnswerChange: (
     answerId: string,
     changes: Partial<QuestionAnswerDraft>,
@@ -35,6 +45,8 @@ export function AnswersSection({
   disabled,
   validationError = null,
   requireAnswerImages = false,
+  faceMorphPixelQuestionOptions,
+  onFaceMorphPixelQuestionOptionChange,
   onAnswerChange,
   onAddAnswer,
   onRemoveAnswer,
@@ -44,6 +56,15 @@ export function AnswersSection({
   const { locale, messages } = useQuestionEditorMessages();
   const canRemoveAnswer = answers.length > 1;
   const correctAnswerCount = answers.filter((answer) => answer.isCorrect).length;
+  const visibleMediaAnswerIds = answers
+    .filter(
+      (answer, index) =>
+        !answer.fieldGroupId ||
+        answers.findIndex(
+          (candidate) => candidate.fieldGroupId === answer.fieldGroupId,
+        ) === index,
+    )
+    .map((answer) => answer.id);
 
   return (
     <section
@@ -76,6 +97,15 @@ export function AnswersSection({
             answers.findIndex(
               (candidate) => candidate.fieldGroupId === answer.fieldGroupId,
             ) === index;
+          const pixelOptionKey =
+            showMedia && faceMorphPixelQuestionOptions
+              ? (["answer1", "answer2"] as const)[
+                  visibleMediaAnswerIds.indexOf(answer.id)
+                ]
+              : undefined;
+          const pixelOptionChecked = pixelOptionKey
+            ? faceMorphPixelQuestionOptions?.[pixelOptionKey]
+            : undefined;
 
           return (
             <AnswerCard
@@ -87,6 +117,19 @@ export function AnswersSection({
               disabled={disabled}
               showMedia={showMedia}
               requireImage={requireAnswerImages}
+              pixelQuestionOption={
+                pixelOptionKey && onFaceMorphPixelQuestionOptionChange
+                  ? {
+                      key: pixelOptionKey,
+                      checked: pixelOptionChecked ?? false,
+                      onChange: (checked) =>
+                        onFaceMorphPixelQuestionOptionChange(
+                          pixelOptionKey,
+                          checked,
+                        ),
+                    }
+                  : undefined
+              }
               onChange={(changes) => onAnswerChange(answer.id, changes)}
               onMediaChange={(media) =>
                 onAnswerMediaChange(answer.id, media)

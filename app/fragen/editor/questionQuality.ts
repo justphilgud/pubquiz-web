@@ -1,6 +1,9 @@
 import type { QuestionEditorDraft } from "./types";
 import { questionTemplateDefinitions } from "./templates/questionTemplates";
-import { findQuestionTemplate } from "./templates/questionTemplateRegistry";
+import {
+  findQuestionTemplate,
+  questionTemplateIds,
+} from "./templates/questionTemplateRegistry";
 import { getMediaSlotDefinition } from "./mediaSlots";
 import { getGeneratorDefinition } from "./generators/registry";
 import {
@@ -120,7 +123,10 @@ export function evaluateQuestionQuality(
     blockers.push({ code: "QUESTION_TEXT_REQUIRED", field: "questionText" });
   }
 
-  if (draft.templateId === "pixelbild" && !normalizeQuestionTemplateConfig(draft.templateConfig)) {
+  if (
+    template?.id === questionTemplateIds.pixelImage &&
+    !normalizeQuestionTemplateConfig(draft.templateConfig)
+  ) {
     blockers.push({ code: "PIXEL_STAGE_DURATIONS_INVALID", field: "questionMedia" });
   }
 

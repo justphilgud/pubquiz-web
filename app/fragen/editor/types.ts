@@ -70,8 +70,16 @@ export type PixelStageDurationsSeconds = {
   stage1: number;
 };
 
+export type FaceMorphPixelQuestionOptionKey = "answer1" | "answer2";
+
+export type FaceMorphPixelQuestionOptions = Record<
+  FaceMorphPixelQuestionOptionKey,
+  boolean
+>;
+
 export type QuestionTemplateConfig = {
   stageDurationsSeconds: PixelStageDurationsSeconds;
+  createPixelQuestionByAnswer: FaceMorphPixelQuestionOptions;
 };
 
 export type GeneratorParametersDraft = Partial<
@@ -268,6 +276,17 @@ export type SaveQuestionPayload = {
   reviewComment?: string;
 };
 
+export type FaceMorphPixelQuestionSyncResult = {
+  children: Array<{
+    answerPosition: 1 | 2;
+    questionId: number;
+    status: "SUCCEEDED" | "FAILED";
+    errorCode?: string;
+  }>;
+  detachedQuestionIds: number[];
+  errorCode?: "FACE_MORPH_PIXEL_SYNC_FAILED";
+};
+
 export type SaveQuestionResult =
   | {
       success: true;
@@ -283,6 +302,7 @@ export type SaveQuestionResult =
         solutionId?: number;
         media: QuestionMediaDraft | null;
       }>;
+      pixelQuestionSync?: FaceMorphPixelQuestionSyncResult;
     }
   | {
       success: false;

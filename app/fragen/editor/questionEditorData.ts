@@ -197,7 +197,11 @@ export async function loadQuestionForEditor(questionId: number) {
     questionMedia,
     generatorRuns,
     generatorParameters,
-    templateConfig: normalizeQuestionTemplateConfig(question.template_config_json) ?? DEFAULT_PIXEL_TEMPLATE_CONFIG,
+    templateConfig:
+      normalizeQuestionTemplateConfig(
+        question.template_config_json,
+        templateId,
+      ) ?? DEFAULT_PIXEL_TEMPLATE_CONFIG,
     answers:
       answers.length > 0
         ? answers

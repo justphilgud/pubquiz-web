@@ -15,6 +15,8 @@ export const deQuestionEditorMessages = {
     titles: { create: "Neue Frage", edit: "Frage bearbeiten", review: "Frage prüfen", readOnly: "Eingereichte Frage" },
     back: "Zurück zu Fragen",
     uploadPending: "Warte, bis der Medien-Upload abgeschlossen ist.",
+    pixelQuestionSyncFailed: "Die Frage wurde gespeichert, aber mindestens eine gekoppelte Pixelfrage konnte nicht vollständig erzeugt werden. Öffne die Kindfrage und starte die Pixelstufen dort erneut.",
+    openPixelQuestion: "Pixelfrage für Antwort {position} öffnen (ID {id})",
     saveUnexpected: "Die Frage konnte nicht gespeichert werden. Bitte versuche es erneut.",
     requestChangesUnexpected: "Die Frage konnte nicht zurückgegeben werden. Bitte versuche es erneut.",
     templateChangeContent: "Fragetext und Antworten werden ersetzt.",
@@ -143,6 +145,7 @@ export const deQuestionEditorMessages = {
     imageLabel: "Antwortbild", imageHelp: "Optional · JPEG, PNG oder WebP · maximal 10 MB", addImage: "Bild hinzufügen", imageAlt: "Bild zu {answer}",
     removeConfirm: "Diese Antwort enthält bereits Daten. Möchtest du sie wirklich entfernen?",
     imageRequired: "Für diese FaceMorph-Antwort ist ein Bild erforderlich.",
+    createPixelQuestionLater: "Zusätzlich später eine Pixelfrage aus diesem Bild erzeugen",
   },
   media: {
     existingLabel: "Medium zur Frage", existingHelp: "Vorhandenes Fragenmedium. Beim Speichern bleibt es unverändert, solange du es nicht ersetzt oder entfernst.",

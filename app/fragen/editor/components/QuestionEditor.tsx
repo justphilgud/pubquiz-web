@@ -50,7 +50,14 @@ import {
   formatQuestionQualityIssue,
 } from "../questionEditorLocalization";
 import { QuestionEditorMessagesProvider } from "./QuestionEditorMessagesProvider";
-import { DEFAULT_PIXEL_TEMPLATE_CONFIG } from "../pixelTemplateConfig";
+import {
+  DEFAULT_PIXEL_TEMPLATE_CONFIG,
+  NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
+  getFaceMorphPixelQuestionOptionsForTemplate,
+  updateFaceMorphPixelQuestionOption,
+  withFaceMorphPixelQuestionOptions,
+  withoutFaceMorphPixelQuestionOptions,
+} from "../pixelTemplateConfig";
 import { PixelStageTimingFields } from "./PixelStageTimingFields";
 import { getGeneratorDefinition } from "../generators/registry";
 import {
@@ -131,6 +138,10 @@ export function QuestionEditor({
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
     initialDraft ?? createInitialDraft(),
   );
+  const retainedFaceMorphPixelOptionsRef = useRef(
+    initialDraft?.templateConfig.createPixelQuestionByAnswer ??
+      NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
+  );
   const [savedDraftFingerprint, setSavedDraftFingerprint] = useState(() =>
     getQuestionDraftFingerprint(initialDraft ?? createInitialDraft()),
   );
@@ -153,6 +164,9 @@ export function QuestionEditor({
     tone: "success" | "error";
     text: string;
   } | null>(null);
+  const [pixelQuestionSync, setPixelQuestionSync] = useState<
+    import("../types").FaceMorphPixelQuestionSyncResult | null
+  >(null);
   const [fieldError, setFieldError] = useState<{
     target: QuestionValidationTarget;
     text: string;
@@ -252,11 +266,56 @@ export function QuestionEditor({
       return false;
     }
 
-    setDraft((current) =>
-      applyQuestionTemplateToDraft(current, template, createId),
-    );
+    setDraft((current) => {
+      if (
+        resolveCanonicalQuestionTemplateId(current.templateId) ===
+        questionTemplateIds.faceMorph
+      ) {
+        retainedFaceMorphPixelOptionsRef.current =
+          current.templateConfig.createPixelQuestionByAnswer;
+      }
+
+      const changedDraft = applyQuestionTemplateToDraft(
+        current,
+        template,
+        createId,
+      );
+
+      return {
+        ...changedDraft,
+        templateConfig:
+          template.id === questionTemplateIds.faceMorph
+            ? withFaceMorphPixelQuestionOptions(
+                changedDraft.templateConfig,
+                retainedFaceMorphPixelOptionsRef.current,
+              )
+            : withoutFaceMorphPixelQuestionOptions(
+                changedDraft.templateConfig,
+              ),
+      };
+    });
 
     return true;
+  }
+
+  function clearTemplateSelection() {
+    setDraft((current) => {
+      if (
+        resolveCanonicalQuestionTemplateId(current.templateId) ===
+        questionTemplateIds.faceMorph
+      ) {
+        retainedFaceMorphPixelOptionsRef.current =
+          current.templateConfig.createPixelQuestionByAnswer;
+      }
+
+      const changedDraft = clearQuestionTemplateFromDraft(current);
+      return {
+        ...changedDraft,
+        templateConfig: withoutFaceMorphPixelQuestionOptions(
+          changedDraft.templateConfig,
+        ),
+      };
+    });
   }
 
   function updateAnswer(
@@ -416,6 +475,7 @@ export function QuestionEditor({
     saveInProgressRef.current = true;
     setPendingAction(action);
     setSaveMessage(null);
+    setPixelQuestionSync(null);
     setFieldError(null);
     if (intent === "REQUEST_CHANGES") {
       setReviewFeedbackError(null);
@@ -469,13 +529,23 @@ export function QuestionEditor({
       });
 
       if (result.success) {
-        if (intent !== "DRAFT") {
+        setPixelQuestionSync(result.pixelQuestionSync ?? null);
+        const pixelSyncFailed = Boolean(
+          result.pixelQuestionSync?.errorCode ||
+            result.pixelQuestionSync?.children.some(
+              (child) => child.status === "FAILED",
+            ),
+        );
+        if (intent !== "DRAFT" && !pixelSyncFailed) {
           allowNavigationRef.current = true;
           setIsReviewFeedbackOpen(false);
           router.push("/fragen");
           router.refresh();
         } else if (options?.resetAfterSuccess) {
           const resetDraft = createInitialDraft();
+          retainedFaceMorphPixelOptionsRef.current = {
+            ...NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
+          };
           setDraft(resetDraft);
           setSavedDraftFingerprint(getQuestionDraftFingerprint(resetDraft));
           setSavedQuestionId(null);
@@ -670,9 +740,7 @@ export function QuestionEditor({
           selectedTemplateId={draft.templateId}
           selectedTemplate={selectedTemplate}
           onSelectTemplate={applyTemplate}
-          onClearSelection={() =>
-            setDraft(clearQuestionTemplateFromDraft)
-          }
+          onClearSelection={clearTemplateSelection}
         />
 
         <QuestionSection
@@ -741,7 +809,10 @@ export function QuestionEditor({
                   disabled={isEditorDisabled}
                   onChange={(stageDurationsSeconds) => setDraft((current) => ({
                     ...current,
-                    templateConfig: { stageDurationsSeconds },
+                    templateConfig: {
+                      ...current.templateConfig,
+                      stageDurationsSeconds,
+                    },
                   }))}
                 />
               )}
@@ -756,6 +827,26 @@ export function QuestionEditor({
           disabled={isEditorDisabled}
           validationError={fieldError?.target === "answers" ? fieldError.text : null}
           requireAnswerImages={selectedTemplate?.requiresAnswerImages ?? false}
+          faceMorphPixelQuestionOptions={
+            getFaceMorphPixelQuestionOptionsForTemplate(
+              draft.templateConfig,
+              selectedTemplate?.id ?? null,
+            )
+          }
+          onFaceMorphPixelQuestionOptionChange={(option, checked) => {
+            retainedFaceMorphPixelOptionsRef.current = {
+              ...retainedFaceMorphPixelOptionsRef.current,
+              [option]: checked,
+            };
+            setDraft((current) => ({
+              ...current,
+              templateConfig: updateFaceMorphPixelQuestionOption(
+                current.templateConfig,
+                option,
+                checked,
+              ),
+            }));
+          }}
           onAnswerChange={updateAnswer}
           onAddAnswer={addAnswer}
           onRemoveAnswer={removeAnswer}
@@ -796,6 +887,31 @@ export function QuestionEditor({
           }
         />
       </fieldset>
+
+      {pixelQuestionSync &&
+        (pixelQuestionSync.errorCode ||
+          pixelQuestionSync.children.some((child) => child.status === "FAILED")) && (
+          <div
+            role="alert"
+            className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"
+          >
+            <p className="font-semibold">{messages.editor.pixelQuestionSyncFailed}</p>
+            {pixelQuestionSync.children
+              .filter((child) => child.status === "FAILED")
+              .map((child) => (
+                <Link
+                  key={child.questionId}
+                  href={`/fragen/editor/${child.questionId}`}
+                  className="mt-2 block font-semibold underline"
+                >
+                  {formatMessage(messages.editor.openPixelQuestion, {
+                    position: child.answerPosition,
+                    id: child.questionId,
+                  })}
+                </Link>
+              ))}
+          </div>
+        )}
 
       {showSaveActions && (
         <EditorSaveActions

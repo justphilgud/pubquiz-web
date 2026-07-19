@@ -1,0 +1,17 @@
+samples/*
+!samples/.gitkeep
+output/*
+!output/.gitkeep
+*.debug/
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+python/.runtime/
+python/.downloads/
+python/demucs/.runtime/
+python/demucs/.downloads/
+python/demucs/.models/
+.cache/
+__pycache__/

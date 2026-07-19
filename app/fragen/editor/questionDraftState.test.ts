@@ -8,7 +8,7 @@ function draft(): QuestionEditorDraft {
     templateId: null,
     questionText: "Frage",
     questionMedia: [],
-    templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 } },
+    templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     answers: [{ id: "temporary-1", text: "Antwort", isCorrect: true, additionalInfo: "", media: null }],
     categoryIds: [],
     sourceOrRemark: "",
@@ -30,6 +30,23 @@ test("the draft fingerprint detects answer changes", () => {
   const changed = structuredClone(current);
   changed.answers[0].text = "Geändert";
   assert.notEqual(getQuestionDraftFingerprint(current), getQuestionDraftFingerprint(changed));
+});
+
+test("the draft fingerprint detects a FaceMorph pixel option change", () => {
+  const current = draft();
+  const changed = {
+    ...current,
+    templateId: "face_morph",
+    templateConfig: {
+      ...current.templateConfig,
+      createPixelQuestionByAnswer: { answer1: true, answer2: false },
+    },
+  };
+
+  assert.notEqual(
+    getQuestionDraftFingerprint(current),
+    getQuestionDraftFingerprint(changed),
+  );
 });
 
 test("saved answer IDs are assigned by stable client identity", () => {
