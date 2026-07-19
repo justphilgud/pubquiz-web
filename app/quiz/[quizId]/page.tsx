@@ -14,7 +14,7 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireQuizViewer } from "../quizAccess.server";
 import Link from "next/link";
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
 import { QuizCopyDialog } from "../QuizCopyDialog";
@@ -28,8 +28,8 @@ type Props = {
 export default async function QuizDetailPage({
   params,
 }: Props) {
-  await requireAdmin();
   const { quizId } = await params;
+  await requireQuizViewer(Number(quizId));
 
   const quiz = await getQuizDetails(Number(quizId));
 

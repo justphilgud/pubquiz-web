@@ -1,12 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
-import {
-  canEditQuestion,
-  canReviewQuestions,
-  canViewQuestion,
-  getQuestionEditorCapabilities,
-  requireQuestionEditor,
-} from "@/app/lib/permissions";
+import { getQuestionEditorCapabilities, requireQuestionEditor } from "@/app/lib/permissions";
 import { QuestionEditor } from "../components/QuestionEditor";
 import { loadQuestionForEditor } from "../questionEditorData";
 import type { QuestionEditorContext } from "../types";
@@ -14,6 +8,14 @@ import { getMediaUploadEnvironmentPrefix } from "../mediaUploadEnvironment";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { getQuestionEditorMessages } from "@/app/i18n/getMessages";
 import { localizeQuestionTemplates } from "../templates/questionTemplates";
+import { getAssignableQuestionEventSeries, getQuestionActor } from "../questionAccess.server";
+import {
+  canApproveScopedQuestion,
+  canCloneScopedQuestion,
+  canEditScopedQuestion,
+  canRequestChangesForScopedQuestion,
+  canViewScopedQuestion,
+} from "../questionScopePolicy";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -29,17 +31,19 @@ export default async function ExistingQuestionEditorPage({
 
   const session = await requireQuestionEditor();
   const { locale, messages } = getQuestionEditorMessages(getDefaultLocale());
-  const [loadedQuestion, categories] = await Promise.all([
+  const [loadedQuestion, categories, actor, eventSeries] = await Promise.all([
     loadQuestionForEditor(questionId),
     prisma.fragenkategorie.findMany({
       orderBy: { kategorie: "asc" },
       select: { fragenkategorie_id: true, kategorie: true },
     }),
+    getQuestionActor(session),
+    getAssignableQuestionEventSeries(session),
   ]);
 
   if (
     !loadedQuestion ||
-    !canViewQuestion(session, loadedQuestion.access)
+    !canViewScopedQuestion(actor, loadedQuestion.access)
   ) {
     notFound();
   }
@@ -47,11 +51,11 @@ export default async function ExistingQuestionEditorPage({
   let editorContext: QuestionEditorContext;
 
   if (
-    canReviewQuestions(session) &&
+    canApproveScopedQuestion(actor, loadedQuestion.access) &&
     loadedQuestion.access.reviewStatus === "IN_REVIEW"
   ) {
     editorContext = "review";
-  } else if (canEditQuestion(session, loadedQuestion.access)) {
+  } else if (canEditScopedQuestion(actor, loadedQuestion.access)) {
     editorContext = "edit";
   } else {
     editorContext = "readOnly";
@@ -59,10 +63,16 @@ export default async function ExistingQuestionEditorPage({
 
   return (
     <QuestionEditor
-      capabilities={getQuestionEditorCapabilities(
-        session,
-        loadedQuestion.access,
-      )}
+      capabilities={{
+        ...getQuestionEditorCapabilities(session, loadedQuestion.access),
+        canSaveDraft: canEditScopedQuestion(actor, loadedQuestion.access),
+        canSubmitForReview: canEditScopedQuestion(actor, loadedQuestion.access) && actor.globalRole !== "ADMIN",
+        canApproveQuestion: canApproveScopedQuestion(actor, loadedQuestion.access),
+        canRequestQuestionChanges: canRequestChangesForScopedQuestion(actor, loadedQuestion.access),
+        canCloneQuestion: canCloneScopedQuestion(actor, loadedQuestion.access),
+        canArchiveQuestion: canEditScopedQuestion(actor, loadedQuestion.access),
+        canDeleteQuestion: canApproveScopedQuestion(actor, loadedQuestion.access),
+      }}
       editorContext={editorContext}
       mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
       locale={locale}
@@ -74,6 +84,10 @@ export default async function ExistingQuestionEditorPage({
         id: category.fragenkategorie_id,
         name: category.kategorie,
       }))}
+      scopeOptions={{
+        canSelectGlobal: actor.globalRole === "ADMIN",
+        eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
+      }}
     />
   );
 }

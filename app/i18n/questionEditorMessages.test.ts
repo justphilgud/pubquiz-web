@@ -69,7 +69,7 @@ test("central quality codes resolve in German and English", () => {
 
 test("quality evaluation returns structured codes instead of display text", () => {
   const result = evaluateQuestionQuality({
-    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
+    scope: "GLOBAL", eventSeriesIds: [], templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "",
     questionMedia: [],
     answers: [{ id: "answer-1", text: "", isCorrect: true, additionalInfo: "", media: null }],

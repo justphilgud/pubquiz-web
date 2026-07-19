@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import QuizWorkspace from "./QuizWorkspace";
 import { getQuizListe, getSchnellQuizKategorien } from "./actions";
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireSession } from "@/app/lib/permissions";
 import { getEventSeriesOptions } from "@/app/eventreihen/actions";
 import { resolveInitialEventSeriesId } from "./quizMasterData";
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function QuizPage({ searchParams }: Props) {
-  await requireAdmin();
+  await requireSession();
 
   const resolvedSearchParams = await searchParams;
   const [quizze, kategorien, eventSeries] = await Promise.all([

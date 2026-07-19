@@ -10,6 +10,7 @@ import {
 import UserMenu from "@/app/components/UserMenu";
 import AppNav from "@/app/components/AppNav";
 import { getAppNavigationItems } from "@/app/components/appNavigation";
+import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 
 export default async function AppHeader() {
   const session = await auth();
@@ -17,6 +18,10 @@ export default async function AppHeader() {
   if (!session?.user) return null;
 
   const admin = isAdmin(session);
+  const [quizSeriesIds, editableSeriesIds] = await Promise.all([
+    getEventSeriesIdsForCapability("MANAGE_QUIZZES", session),
+    getEventSeriesIdsForCapability("EDIT", session),
+  ]);
 
   async function logoutAction() {
     "use server";
@@ -27,8 +32,8 @@ export default async function AppHeader() {
   }
 
   const navItems = getAppNavigationItems({
-    canManageQuizzes: canManageQuizzes(session),
-    canManageEventSeries: canManageEventSeries(session),
+    canManageQuizzes: canManageQuizzes(session) || (quizSeriesIds?.length ?? 0) > 0,
+    canManageEventSeries: canManageEventSeries(session) || (editableSeriesIds?.length ?? 0) > 0,
     canManageUsers: canManageUsers(session),
   });
 

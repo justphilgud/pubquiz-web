@@ -130,6 +130,8 @@ export type QuestionMediaSlotConfig = {
 };
 
 export type QuestionEditorDraft = {
+  scope: "GLOBAL" | "EVENT_SERIES";
+  eventSeriesIds: number[];
   templateId: string | null;
   questionText: string;
   questionMedia: QuestionMediaDraft[];
@@ -248,6 +250,8 @@ export type QuestionEditorRecord = {
   approvedAt: string | null;
   templateName: string | null;
   isArchived: boolean;
+  scope: "GLOBAL" | "EVENT_SERIES";
+  eventSeriesNames: string[];
 };
 
 export type QuestionValidationTarget =
@@ -260,6 +264,8 @@ export type QuestionValidationTarget =
 export type SaveQuestionPayload = {
   questionId?: number;
   intent: QuestionSaveIntent;
+  scope: "GLOBAL" | "EVENT_SERIES";
+  eventSeriesIds: number[];
   questionText: string;
   questionMedia: QuestionMediaDraft[];
   answers: Array<

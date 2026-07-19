@@ -437,6 +437,9 @@ export default function FrageSuche({
                     <p className="mt-3 text-sm text-slate-500">
                       Quelle: {frage.quelle || "—"}
                     </p>
+                    <p className="mt-1 break-words text-sm text-slate-500">
+                      Geltungsbereich: {frage.geltungsbereich === "GLOBAL" ? "Global" : frage.eventreihen.join(", ") || "Keine Eventreihe"}
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-5 lg:w-[620px]">

@@ -5,7 +5,7 @@ import {
   getAntwortStatus,
 } from "../praesentation/statusActions";
 import ModerationClient from "./ModerationClient";
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireQuizLiveController } from "../../quizAccess.server";
 
 type Props = {
   params: Promise<{
@@ -14,13 +14,13 @@ type Props = {
 };
 
 export default async function ModerationPage({ params }: Props) {
-  await requireAdmin();
   const resolvedParams = await params;
   const quizId = Number(resolvedParams.quizId);
 
   if (Number.isNaN(quizId)) {
     notFound();
   }
+  await requireQuizLiveController(quizId);
 
   const quiz = await getQuizPraesentation(quizId);
 

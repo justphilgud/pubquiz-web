@@ -28,7 +28,7 @@ const emptyForm: FormState = {
   isPublic: false,
 };
 
-export function EventSeriesManager({ series }: { series: EventSeriesListItem[] }) {
+export function EventSeriesManager({ series, canCreate }: { series: EventSeriesListItem[]; canCreate: boolean }) {
   const [filter, setFilter] = useState<"active" | "archived" | "all">("active");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -77,7 +77,7 @@ export function EventSeriesManager({ series }: { series: EventSeriesListItem[] }
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+      {(canCreate || editingId !== null) && <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
         <h2 className="text-xl font-bold">{editingId === null ? "Eventreihe anlegen" : "Eventreihe bearbeiten"}</h2>
         <p className="mt-1 text-sm text-slate-600">Der Slug wird bei der Anlage automatisch erzeugt und bleibt danach stabil.</p>
         <form action={submit} className="mt-5 grid gap-4">
@@ -92,7 +92,7 @@ export function EventSeriesManager({ series }: { series: EventSeriesListItem[] }
             {editingId !== null && <button type="button" onClick={() => { setEditingId(null); setForm(emptyForm); setErrors({}); }} className="min-h-11 rounded-xl border border-slate-300 px-5 py-2 font-semibold">Abbrechen</button>}
           </div>
         </form>
-      </section>
+      </section>}
 
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -107,8 +107,8 @@ export function EventSeriesManager({ series }: { series: EventSeriesListItem[] }
               <p className="mt-2 text-sm text-slate-600">{entry.quizCount} {entry.quizCount === 1 ? "Quiz" : "Quizze"} · {entry.isPublic ? "öffentlich vorbereitet" : "nicht öffentlich"}</p>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Link href={`/admin/eventreihen/${entry.id}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 font-semibold">Öffnen</Link>
-                <button type="button" onClick={() => edit(entry)} className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-semibold">Bearbeiten</button>
-                {entry.isArchived ? <button type="button" onClick={async () => { const result = await restoreEventSeries(entry.id); setMessage(result.message); if (result.success) window.location.reload(); }} className="min-h-11 rounded-xl border border-emerald-300 px-4 py-2 font-semibold text-emerald-800">Wiederherstellen</button> : <button type="button" onClick={() => setArchiveTarget(entry)} className="min-h-11 rounded-xl border border-orange-300 px-4 py-2 font-semibold text-orange-800">Archivieren</button>}
+                {entry.canEdit && !entry.isArchived && <button type="button" onClick={() => edit(entry)} className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-semibold">Bearbeiten</button>}
+                {entry.canChangeArchiveState && (entry.isArchived ? <button type="button" onClick={async () => { const result = await restoreEventSeries(entry.id); setMessage(result.message); if (result.success) window.location.reload(); }} className="min-h-11 rounded-xl border border-emerald-300 px-4 py-2 font-semibold text-emerald-800">Wiederherstellen</button> : <button type="button" onClick={() => setArchiveTarget(entry)} className="min-h-11 rounded-xl border border-orange-300 px-4 py-2 font-semibold text-orange-800">Archivieren</button>)}
               </div>
             </article>
           ))}
