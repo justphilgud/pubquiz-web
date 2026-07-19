@@ -80,6 +80,7 @@ type TeamSession = {
   quiz_team_session_id: number;
   teamname: string;
   teamPasswort: string | null;
+  sessionToken: string;
 };
 
 export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
@@ -137,6 +138,10 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
 
     try {
       const parsedSession = JSON.parse(gespeicherteSession) as TeamSession;
+      if (!parsedSession.sessionToken) {
+        localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
+        return;
+      }
       setSession(parsedSession);
       setTeamname(parsedSession.teamname);
     } catch {
@@ -166,7 +171,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
     const interval = window.setInterval(async () => {
       const aktuelleDaten = await getQuizAntwortStatusLive(
         liveDaten.quiz_id,
-        session?.quiz_team_session_id
+        session?.sessionToken
       );
 
       if (aktuelleDaten) {
@@ -175,7 +180,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
     }, 2000);
 
     return () => window.clearInterval(interval);
-  }, [liveDaten.quiz_id, session?.quiz_team_session_id]);
+  }, [liveDaten.quiz_id, session?.sessionToken]);
 
   useEffect(() => {
     if (!session || !speicherBlockId || blockIstGesperrt) {
@@ -188,7 +193,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
             quizId: liveDaten.quiz_id,
             quizAbschnittId: speicherBlockId,
             quizFragenId: Number(quizFragenId),
-            quizTeamSessionId: session.quiz_team_session_id,
+            quizTeamSessionToken: session.sessionToken,
             antwortText: antwort.antwortText,
             antwortId: antwort.antwortId,
             antwortfelder: Object.entries(antwort.antwortfelder).map(
@@ -274,7 +279,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
 
     const aktuelleDaten = await getQuizAntwortStatusLive(
       liveDaten.quiz_id,
-      result.session.quiz_team_session_id
+      result.session.sessionToken
     );
 
     if (aktuelleDaten) {
@@ -389,12 +394,14 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
                   {session.teamname}
                 </div>
 
-                <div className="mt-2 text-sm text-slate-700">
-                  Team-Passwort:{" "}
-                  <span className="font-black text-slate-900">
-                    {session.teamPasswort}
-                  </span>
-                </div>
+                {session.teamPasswort && (
+                  <div className="mt-2 text-sm text-slate-700">
+                    Team-Passwort:{" "}
+                    <span className="font-black text-slate-900">
+                      {session.teamPasswort}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <button

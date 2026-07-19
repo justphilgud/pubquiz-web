@@ -7,9 +7,11 @@ import {
   buildMediaUploadPathname,
   getBlobUploadAuthentication,
 } from "@/app/fragen/editor/mediaUploadEnvironment";
+import { requireQuizEditor } from "@/app/quiz/quizAccess.server";
 
 export async function saveVorDemStart(formData: FormData) {
   const quizId = Number(formData.get("quizId"));
+  await requireQuizEditor(quizId);
   const submitAction = formData.get("submitAction")?.toString() ?? "stay";
 
   const startzeit = formData.get("startzeit")?.toString() ?? "19:30";

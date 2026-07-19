@@ -563,7 +563,7 @@ export default function QuizPraesentationPlayer({
     const schaetzfrageId = remoteSchaetzfrageId;
 
     async function ladeSchaetzfrage() {
-      const frage = await getSchaetzfrageById(schaetzfrageId);
+      const frage = await getSchaetzfrageById(quizId, schaetzfrageId);
       setSchaetzfrage(frage);
     }
 
@@ -729,7 +729,7 @@ export default function QuizPraesentationPlayer({
     setIsSchaetzfrageLoading(true);
     setZeigeSchaetzAntwort(false);
 
-    const frage = await getZufaelligeSchaetzfrage();
+    const frage = await getZufaelligeSchaetzfrage(quizId);
 
     setSchaetzfrage(frage);
     setShowSchaetzfrage(true);

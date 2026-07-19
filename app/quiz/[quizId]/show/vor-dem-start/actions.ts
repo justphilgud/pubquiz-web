@@ -4,9 +4,11 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { redirect } from "next/navigation";
 import { updateIntroVorDemStart } from "@/app/quiz/actions";
+import { requireQuizEditor } from "@/app/quiz/quizAccess.server";
 
 export async function saveVorDemStart(formData: FormData) {
   const quizId = Number(formData.get("quizId"));
+  await requireQuizEditor(quizId);
   const currentMusikUrl = String(formData.get("currentMusikUrl") ?? "");
   const submitAction = String(formData.get("submitAction") ?? "close");
 

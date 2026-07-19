@@ -1,9 +1,14 @@
 "use server";
 
 import { prisma } from "@/app/lib/prisma";
-import { requireAdmin } from "@/app/lib/permissions";
+import {
+  requireQuizLiveController,
+  requireQuizQuestion,
+  requireQuizViewer,
+} from "../../quizAccess.server";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
+  await requireQuizLiveController(quizId);
   return prisma.quiz_praesentation_status.upsert({
     where: { quiz_id: quizId },
     update: {},
@@ -16,6 +21,7 @@ export async function getOrCreatePraesentationStatus(quizId: number) {
 }
 
 export async function getPraesentationStatus(quizId: number) {
+  await requireQuizViewer(quizId);
   return prisma.quiz_praesentation_status.findUnique({
     where: { quiz_id: quizId },
   });
@@ -25,7 +31,7 @@ export async function setPraesentationSlideIndex(
   quizId: number,
   slideIndex: number,
 ) {
-  await requireAdmin();
+  await requireQuizLiveController(quizId);
   const status = await prisma.quiz_praesentation_status.upsert({
     where: { quiz_id: quizId },
     update: {
@@ -46,6 +52,10 @@ export async function getAntwortStatus(
   quizId: number,
   quizFragenId: number | null,
 ) {
+  await requireQuizLiveController(quizId);
+  if (quizFragenId !== null) {
+    await requireQuizQuestion(quizId, quizFragenId);
+  }
   const teamsAngemeldet = await prisma.quiz_team_sessions.count({
     where: {
       quiz_id: quizId,
@@ -92,7 +102,7 @@ export async function getAntwortStatus(
   };
 }
 export async function starteQuiz(quizId: number) {
-  await requireAdmin();
+  await requireQuizLiveController(quizId);
   return prisma.quiz_praesentation_status.upsert({
     where: { quiz_id: quizId },
     update: {
@@ -107,10 +117,12 @@ export async function starteQuiz(quizId: number) {
   });
 }
 export async function speicherePraesentationsdauer(data: {
+  quizId: number;
   quizFragenId: number;
   dauerSekunden: number;
 }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
+  await requireQuizQuestion(data.quizId, data.quizFragenId);
   if (!Number.isFinite(data.dauerSekunden) || data.dauerSekunden <= 0) {
     return { success: false };
   }
@@ -150,7 +162,7 @@ export async function setMediumOverlayAktiv(data: {
   quizId: number;
   aktiv: boolean;
 }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -167,7 +179,7 @@ export async function setAudioAktion(data: {
   quizId: number;
   aktion: "play" | "pause" | "stop";
 }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -186,7 +198,7 @@ export async function starteCountdown(data: {
   quizId: number;
   dauerSekunden: number;
 }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -203,7 +215,7 @@ export async function starteCountdown(data: {
 }
 
 export async function resetCountdown(data: { quizId: number }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -219,7 +231,7 @@ export async function resetCountdown(data: { quizId: number }) {
 }
 
 export async function beendeCountdown(data: { quizId: number }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -236,7 +248,7 @@ export async function setEndstandRevealCount(data: {
   quizId: number;
   revealCount: number;
 }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: {
       quiz_id: data.quizId,
@@ -254,7 +266,7 @@ export async function setSchaetzfrageStatus(data: {
   zeigeSchaetzantwort?: boolean;
   schaetzfrageId?: number | null;
 }) {
-  await requireAdmin();
+  await requireQuizLiveController(data.quizId);
   await prisma.quiz_praesentation_status.update({
     where: { quiz_id: data.quizId },
     data: {

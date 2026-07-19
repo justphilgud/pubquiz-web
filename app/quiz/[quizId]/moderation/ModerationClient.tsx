@@ -189,6 +189,7 @@ export default function ModerationClient({
     );
 
     await speicherePraesentationsdauer({
+      quizId,
       quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
       dauerSekunden,
     });
@@ -360,7 +361,7 @@ export default function ModerationClient({
   }
 
   async function handleSchaetzfrageStarten() {
-    const frage = await getZufaelligeSchaetzfrage();
+    const frage = await getZufaelligeSchaetzfrage(quizId);
 
     await setSchaetzfrageStatus({
       quizId,
