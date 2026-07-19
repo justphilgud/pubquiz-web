@@ -171,3 +171,13 @@ export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel
  *
  */
 export type users = Prisma.usersModel
+/**
+ * Model eventreihe_benutzerrollen
+ *
+ */
+export type eventreihe_benutzerrollen = Prisma.eventreihe_benutzerrollenModel
+/**
+ * Model fragen_eventreihen
+ *
+ */
+export type fragen_eventreihen = Prisma.fragen_eventreihenModel

@@ -6,11 +6,9 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { Buffer } from "buffer";
 import { createQuestion } from "@/app/services/questionService";
-import {
-  canCloneQuestion,
-  requireAdmin,
-  requireQuestionEditor,
-} from "@/app/lib/permissions";
+import { requireAdmin, requireQuestionEditor } from "@/app/lib/permissions";
+import { getQuestionActor, mapQuestionAccessContext } from "./editor/questionAccess.server";
+import { canCloneScopedQuestion } from "./editor/questionScopePolicy";
 import { requireUser } from "../lib/auth-guard";
 
 function getMedientypIdAusDatei(datei: string) {
@@ -73,6 +71,8 @@ export type FrageSuchResult = {
   review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
   gueltig_bis: string | null;
   can_clone: boolean;
+  geltungsbereich: "GLOBAL" | "EVENT_SERIES";
+  eventreihen: string[];
   quizze: {
     quiz_id: number;
     titel: string | null;
@@ -129,10 +129,11 @@ export async function searchFragen(data: {
   offset?: number;
 }) {
   const session = await requireQuestionEditor();
+  const actor = await getQuestionActor(session);
   const limit = data.limit ?? 50;
   const offset = data.offset ?? 0;
 
-  const where = {
+  const baseWhere = {
     frage: data.suchtext.trim()
       ? {
           contains: data.suchtext.trim(),
@@ -175,6 +176,24 @@ export async function searchFragen(data: {
       : undefined,
   };
 
+  const where = actor.globalRole === "ADMIN"
+    ? baseWhere
+    : {
+        AND: [
+          baseWhere,
+          {
+            OR: [
+              { geltungsbereich: "GLOBAL" as const, freigegeben: true },
+              { geltungsbereich: "GLOBAL" as const, created_by_user_id: actor.userId ?? -1 },
+              {
+                geltungsbereich: "EVENT_SERIES" as const,
+                eventreihen: { some: { eventreihe_id: { in: [...actor.assignments.keys()] } } },
+              },
+            ],
+          },
+        ],
+      };
+
   const fragen = await prisma.fragen.findMany({
     where,
     include: {
@@ -194,6 +213,7 @@ export async function searchFragen(data: {
           quiz: true,
         },
       },
+      eventreihen: { include: { eventreihe: true } },
     },
     orderBy: {
       fragen_id: "desc",
@@ -220,11 +240,9 @@ export async function searchFragen(data: {
       archivierungsgrund: frage.archivierungsgrund,
       review_status: frage.review_status,
       gueltig_bis: frage.gueltig_bis?.toISOString().slice(0, 10) ?? null,
-      can_clone: canCloneQuestion(session, {
-        createdByUserId: frage.created_by_user_id,
-        reviewStatus: frage.review_status,
-        isArchived: frage.ist_archiviert,
-      }),
+      can_clone: canCloneScopedQuestion(actor, mapQuestionAccessContext(frage)),
+      geltungsbereich: frage.geltungsbereich,
+      eventreihen: frage.eventreihen.map((entry) => entry.eventreihe.name),
       kategorien: frage.fragen_kategorien.map(
         (k) => k.fragenkategorie.kategorie,
       ),

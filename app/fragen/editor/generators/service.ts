@@ -3,7 +3,8 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { head, put } from "@vercel/blob";
 import { prisma } from "@/app/lib/prisma";
-import { canEditQuestion, requireQuestionEditor } from "@/app/lib/permissions";
+import { requireQuestionEditor } from "@/app/lib/permissions";
+import { requireQuestionAccess } from "../questionAccess.server";
 import { buildMediaUploadPathname, getBlobUploadAuthentication } from "../mediaUploadEnvironment";
 import { createQuestionMediaDraftFromStoredMedia } from "../questionMedia";
 import { resolveCanonicalQuestionTemplateId } from "../templates/questionTemplateRegistry";
@@ -68,7 +69,12 @@ export async function runQuestionGenerator(
   generatorId: GeneratorId,
   rawParameters?: unknown,
 ): Promise<RunGeneratorResult> {
-  const session = await requireQuestionEditor();
+  await requireQuestionEditor();
+  try {
+    await requireQuestionAccess(questionId, "EDIT");
+  } catch {
+    return failure("GENERATOR_NOT_AUTHORIZED");
+  }
   const question = await prisma.fragen.findUnique({
     where: { fragen_id: questionId },
     select: {
@@ -82,11 +88,7 @@ export async function runQuestionGenerator(
       },
     },
   });
-  if (!question || !canEditQuestion(session, {
-    createdByUserId: question.created_by_user_id,
-    reviewStatus: question.review_status,
-    isArchived: question.ist_archiviert,
-  })) return failure("GENERATOR_NOT_AUTHORIZED");
+  if (!question) return failure("GENERATOR_NOT_AUTHORIZED");
 
   const templateId = resolveCanonicalQuestionTemplateId(question.vorlage?.code ?? null) ?? "standard";
   const definition = getGeneratorDefinition(generatorId);

@@ -70,6 +70,8 @@ model fragen {
   reviewed_at              DateTime?
   reviewed_by_user_id      Int?
   template_config_json     Json?
+  geltungsbereich          QuestionScope            @default(GLOBAL)
+  eventreihen              fragen_eventreihen[]
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
@@ -234,18 +236,20 @@ model quiz {
 }
 
 model eventreihen {
-  eventreihe_id      Int       @id @default(autoincrement())
-  name               String    @db.VarChar(150)
-  slug               String    @unique @db.VarChar(180)
-  oeffentlicher_name String?   @db.VarChar(150)
-  beschreibung       String?   @db.VarChar(2000)
-  interne_bemerkung  String?   @db.VarChar(2000)
-  ist_oeffentlich    Boolean   @default(false)
-  ist_archiviert     Boolean   @default(false)
+  eventreihe_id      Int                         @id @default(autoincrement())
+  name               String                      @db.VarChar(150)
+  slug               String                      @unique @db.VarChar(180)
+  oeffentlicher_name String?                     @db.VarChar(150)
+  beschreibung       String?                     @db.VarChar(2000)
+  interne_bemerkung  String?                     @db.VarChar(2000)
+  ist_oeffentlich    Boolean                     @default(false)
+  ist_archiviert     Boolean                     @default(false)
   archiviert_am      DateTime?
-  created_at         DateTime  @default(now())
-  updated_at         DateTime  @default(now()) @updatedAt
+  created_at         DateTime                    @default(now())
+  updated_at         DateTime                    @default(now()) @updatedAt
   quiz               quiz[]
+  benutzerrollen     eventreihe_benutzerrollen[]
+  fragen             fragen_eventreihen[]
 
   @@index([ist_archiviert, name], map: "idx_eventreihen_status_name")
   @@schema("pubquiz")
@@ -463,6 +467,20 @@ enum UserRole {
   @@schema("pubquiz")
 }
 
+enum EventSeriesRole {
+  EVENT_MANAGER
+  EDITOR
+
+  @@schema("pubquiz")
+}
+
+enum QuestionScope {
+  GLOBAL
+  EVENT_SERIES
+
+  @@schema("pubquiz")
+}
+
 enum QuestionReviewStatus {
   DRAFT
   IN_REVIEW
@@ -491,5 +509,40 @@ model users {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  eventreihenrollen             eventreihe_benutzerrollen[] @relation("EventSeriesMembershipUser")
+  zugewiesene_eventreihenrollen eventreihe_benutzerrollen[] @relation("EventSeriesMembershipAssigner")
+
+  @@schema("pubquiz")
+}
+
+model eventreihe_benutzerrollen {
+  eventreihe_benutzerrolle_id Int             @id @default(autoincrement())
+  eventreihe_id               Int
+  benutzer_id                 Int
+  rolle                       EventSeriesRole
+  zugewiesen_von_user_id      Int?
+  created_at                  DateTime        @default(now())
+  updated_at                  DateTime        @default(now()) @updatedAt
+  eventreihe                  eventreihen     @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  benutzer                    users           @relation("EventSeriesMembershipUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
+  zugewiesen_von              users?          @relation("EventSeriesMembershipAssigner", fields: [zugewiesen_von_user_id], references: [id], onDelete: SetNull)
+
+  @@unique([benutzer_id, eventreihe_id], map: "uq_eventreihe_benutzerrolle_benutzer_eventreihe")
+  @@index([benutzer_id], map: "idx_eventreihe_benutzerrollen_benutzer")
+  @@index([eventreihe_id], map: "idx_eventreihe_benutzerrollen_eventreihe")
+  @@schema("pubquiz")
+}
+
+model fragen_eventreihen {
+  fragen_eventreihe_id Int         @id @default(autoincrement())
+  fragen_id            Int
+  eventreihe_id        Int
+  created_at           DateTime    @default(now())
+  frage                fragen      @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  eventreihe           eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
+
+  @@unique([fragen_id, eventreihe_id], map: "uq_fragen_eventreihen_frage_eventreihe")
+  @@index([fragen_id], map: "idx_fragen_eventreihen_frage")
+  @@index([eventreihe_id], map: "idx_fragen_eventreihen_eventreihe")
   @@schema("pubquiz")
 }

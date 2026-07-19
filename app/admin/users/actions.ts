@@ -6,8 +6,6 @@ import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
 import { UserRole } from "@/app/generated/prisma/client";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
-import { auth } from "@/auth";
-import { requireUser } from "@/app/lib/auth-guard";
 
 export async function createUserAction(formData: FormData) {
   await requireAdmin();
@@ -108,7 +106,7 @@ export async function resetUserPasswordAction(formData: FormData) {
 }
 
 export async function archiveUser(formData: FormData) {
-  const session = await requireUser();
+  const session = await requireAdmin();
 
   if (!session?.user?.id) {
     throw new Error("Nicht angemeldet.");
@@ -163,6 +161,7 @@ export async function archiveUser(formData: FormData) {
 }
 
 export async function reactivateUser(formData: FormData) {
+  await requireAdmin();
   const userId = Number(formData.get("userId"));
 
   if (!Number.isInteger(userId)) {

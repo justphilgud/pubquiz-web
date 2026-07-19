@@ -38,6 +38,11 @@ export async function loadQuestionForEditor(questionId: number) {
       updated_at: true,
       last_modified_by_user_id: true,
       template_config_json: true,
+      geltungsbereich: true,
+      eventreihen: {
+        orderBy: { eventreihe: { name: "asc" } },
+        select: { eventreihe_id: true, eventreihe: { select: { name: true } } },
+      },
       vorlage: {
         select: { code: true, name: true },
       },
@@ -193,6 +198,8 @@ export async function loadQuestionForEditor(questionId: number) {
   }
 
   const draft: QuestionEditorDraft = {
+    scope: question.geltungsbereich,
+    eventSeriesIds: question.eventreihen.map((entry) => entry.eventreihe_id),
     templateId,
     questionText: question.frage,
     questionMedia,
@@ -246,6 +253,8 @@ export async function loadQuestionForEditor(questionId: number) {
     approvedAt: question.approved_at?.toISOString() ?? null,
     templateName: question.vorlage?.name ?? null,
     isArchived: question.ist_archiviert,
+    scope: question.geltungsbereich,
+    eventSeriesNames: question.eventreihen.map((entry) => entry.eventreihe.name),
   };
 
   return {
@@ -255,6 +264,9 @@ export async function loadQuestionForEditor(questionId: number) {
       createdByUserId: question.created_by_user_id,
       reviewStatus: question.review_status,
       isArchived: question.ist_archiviert,
+      scope: question.geltungsbereich,
+      eventSeriesIds: question.eventreihen.map((entry) => entry.eventreihe_id),
+      isApproved: question.freigegeben,
     },
   };
 }

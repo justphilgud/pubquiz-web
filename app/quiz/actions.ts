@@ -2,7 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireAdmin, requireSession } from "@/app/lib/permissions";
+import {
+  getEventSeriesIdsForCapability,
+  requireEventSeriesAccess,
+} from "@/app/eventreihen/eventSeriesAccess.server";
 import { addQuestionToQuiz } from "@/app/services/quizService";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 
@@ -24,6 +28,8 @@ import {
 import { getTeamSessionSigningSecret } from "./teamSessionSecret.server";
 import { assertTeamAnswerAuthorized } from "./teamAnswerPolicy";
 import { buildDefaultQuizSections, buildQuickQuizSections } from "./quizStructure";
+import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
+import { requireQuestionAccess } from "@/app/fragen/editor/questionAccess.server";
 import {
   buildQuizCopyMasterData,
   getQuizTemporalStatus,
@@ -127,8 +133,9 @@ export type QuizDetailsResult = QuizResult & {
 };
 
 export async function getQuizListe(): Promise<QuizResult[]> {
-  await requireAdmin();
+  const manageableIds = await getEventSeriesIdsForCapability("MANAGE_QUIZZES");
   const quizze = await prisma.quiz.findMany({
+    where: manageableIds === null ? undefined : { eventreihe_id: { in: manageableIds } },
     orderBy: {
       quiz_datum: "desc",
     },
@@ -166,10 +173,11 @@ export async function getQuizListe(): Promise<QuizResult[]> {
 }
 
 export async function getAktiveQuizListe(): Promise<QuizResult[]> {
-  await requireAdmin();
+  const manageableIds = await getEventSeriesIdsForCapability("MANAGE_QUIZZES");
   const quizze = await prisma.quiz.findMany({
     where: {
       ist_archiviert: false,
+      ...(manageableIds === null ? {} : { eventreihe_id: { in: manageableIds } }),
     },
     orderBy: {
       quiz_datum: "desc",
@@ -217,7 +225,6 @@ export async function createQuiz(data: {
   oeffentlicheUrl?: string;
   bemerkung: string;
 }) {
-  await requireAdmin();
   const validated = validateQuizMasterData({
     eventSeriesId: data.eventSeriesId,
     title: data.titel,
@@ -229,6 +236,7 @@ export async function createQuiz(data: {
     internalNote: data.bemerkung,
   });
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
+  await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
   const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId);
   if (!eventSeries.ok) return { success: false, message: eventSeries.message };
 
@@ -286,6 +294,7 @@ export async function updateQuiz(data: {
     internalNote: data.bemerkung,
   });
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
+  await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
   const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId, {
     allowArchivedId: existing.eventreihe_id,
   });
@@ -623,11 +632,11 @@ export async function searchFragenForQuiz(data: {
   quizId: number;
   suchtext: string;
 }): Promise<QuizFrageSuchResult[]> {
-  await requireQuizEditor(data.quizId);
+  const quizAccess = await requireQuizEditor(data.quizId);
+  const eventSeriesId = quizAccess.ownership.eventSeriesId!;
   const fragen = await prisma.fragen.findMany({
     where: {
-      ist_archiviert: false,
-      OR: [{ gueltig_bis: null }, { gueltig_bis: { gte: getBerlinDate() } }],
+      ...buildQuestionEligibilityWhere(eventSeriesId, getBerlinDate()),
       frage: data.suchtext.trim()
         ? {
             contains: data.suchtext.trim(),
@@ -877,7 +886,7 @@ export type FrageVorschauResult = {
 export async function getFrageVorschau(
   fragenId: number,
 ): Promise<FrageVorschauResult | null> {
-  await requireAdmin();
+  await requireQuestionAccess(fragenId, "VIEW");
   const frage = await prisma.fragen.findUnique({
     where: {
       fragen_id: fragenId,
@@ -2580,9 +2589,10 @@ export async function getQuizPunktestand(quizId: number) {
 }
 
 export async function getZufaelligeSchaetzfrage(quizId: number) {
-  await requireQuizLiveController(quizId);
+  const access = await requireQuizLiveController(quizId);
   const fragen = await prisma.fragen.findMany({
     where: {
+      ...buildQuestionEligibilityWhere(access.ownership.eventSeriesId!, getBerlinDate()),
       fragen_kategorien: {
         some: {
           fragenkategorie: {
@@ -2618,10 +2628,11 @@ export async function getZufaelligeSchaetzfrage(quizId: number) {
 }
 
 export async function getSchaetzfrageById(quizId: number, fragenId: number) {
-  await requireQuizLiveController(quizId);
-  const frage = await prisma.fragen.findUnique({
+  const access = await requireQuizLiveController(quizId);
+  const frage = await prisma.fragen.findFirst({
     where: {
       fragen_id: fragenId,
+      ...buildQuestionEligibilityWhere(access.ownership.eventSeriesId!, getBerlinDate()),
     },
     include: {
       antworten: {
@@ -2648,7 +2659,7 @@ export async function getSchaetzfrageById(quizId: number, fragenId: number) {
 }
 
 export async function getSchnellQuizKategorien() {
-  await requireAdmin();
+  await requireSession();
   return prisma.fragenkategorie.findMany({
     orderBy: {
       kategorie: "asc",
@@ -2674,7 +2685,6 @@ export async function createSchnellQuiz(data: {
   preisPlatz2: string;
   preisPlatz3: string;
 }) {
-  const session = await requireAdmin();
   const validated = validateQuizMasterData({
     eventSeriesId: data.eventSeriesId,
     title: data.titel,
@@ -2688,6 +2698,7 @@ export async function createSchnellQuiz(data: {
   if (!validated.ok) {
     return { success: false, message: validated.message, errors: validated.errors, quizId: null };
   }
+  const { session } = await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
   const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId);
   if (!eventSeries.ok) {
     return { success: false, message: eventSeries.message, quizId: null };
@@ -2705,7 +2716,7 @@ export async function createSchnellQuiz(data: {
 
   const fragenPool = await prisma.fragen.findMany({
     where: {
-      ist_archiviert: false,
+      ...buildQuestionEligibilityWhere(validated.value.eventSeriesId, getBerlinDate()),
 
       fragen_kategorien:
         data.kategorieIds.length > 0

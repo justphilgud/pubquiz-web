@@ -2,25 +2,13 @@
 
 import { head } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
-import {
-  canApproveQuestion,
-  canCreateQuestions,
-  canEditQuestion,
-  canRequestQuestionChanges,
-  canReviewQuestions,
-  canSubmitForReview,
-  requireQuestionEditor,
-} from "@/app/lib/permissions";
+import { requireQuestionEditor } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import {
   getMediaVerificationServerConfig,
   logMediaUploadFailure,
 } from "./mediaUploadEnvironment";
-import {
-  getCurrentUserId,
-  resolveQuestionApprovalOnCreate,
-  resolveQuestionApprovalOnUpdate,
-} from "@/app/services/questionService";
+import { getCurrentUserId } from "@/app/services/questionService";
 import {
   createAnswerMediaDraftFromStoredMedia,
   createQuestionMediaDraftFromStoredMedia,
@@ -70,6 +58,17 @@ import {
 import { hasRequiredTemplateAnswerImages } from "./questionQuality";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
 import { getAffectedQuestionIds } from "./questionSaveResult";
+import {
+  getQuestionActor,
+  mapQuestionAccessContext,
+  requireQuestionScopeSelection,
+} from "./questionAccess.server";
+import {
+  canApproveScopedQuestion,
+  canEditScopedQuestion,
+  canRequestChangesForScopedQuestion,
+  canUseQuestionScope,
+} from "./questionScopePolicy";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -678,25 +677,6 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
   };
 }
 
-function canPerformSaveIntent(
-  intent: QuestionSaveIntent,
-  session: Awaited<ReturnType<typeof requireQuestionEditor>>,
-): boolean {
-  if (intent === "DRAFT") {
-    return canCreateQuestions(session);
-  }
-
-  if (intent === "SUBMIT_FOR_REVIEW") {
-    return canSubmitForReview(session);
-  }
-
-  if (intent === "REQUEST_CHANGES") {
-    return canReviewQuestions(session);
-  }
-
-  return canReviewQuestions(session);
-}
-
 export async function saveQuestion(
   payload: SaveQuestionPayload,
 ): Promise<SaveQuestionResult> {
@@ -716,11 +696,14 @@ export async function saveQuestion(
     };
   }
 
-  if (!canPerformSaveIntent(payload.intent, session)) {
+  if (
+    (payload.scope !== "GLOBAL" && payload.scope !== "EVENT_SERIES") ||
+    !Array.isArray(payload.eventSeriesIds)
+  ) {
     return {
       success: false,
-      errorCode: "PERMISSION_DENIED",
-      fallbackMessage: serverMessages.errors.PERMISSION_DENIED,
+      errorCode: "VALIDATION_ERROR",
+      fallbackMessage: "Der Geltungsbereich ist ungültig.",
     };
   }
 
@@ -732,6 +715,74 @@ export async function saveQuestion(
       success: false,
       errorCode: "VALIDATION_ERROR",
       fallbackMessage: "Nur eine bestehende Frage kann zurückgegeben werden.",
+    };
+  }
+
+  const actor = await getQuestionActor(session);
+  const preflightQuestion = payload.questionId === undefined
+    ? null
+    : await prisma.fragen.findUnique({
+        where: { fragen_id: payload.questionId },
+        select: {
+          geltungsbereich: true,
+          created_by_user_id: true,
+          review_status: true,
+          ist_archiviert: true,
+          freigegeben: true,
+          eventreihen: { select: { eventreihe_id: true } },
+        },
+      });
+  if (payload.questionId !== undefined && !preflightQuestion) {
+    return {
+      success: false,
+      errorCode: "QUESTION_NOT_FOUND",
+      fallbackMessage: serverMessages.errors.QUESTION_NOT_FOUND,
+    };
+  }
+
+  const currentContext = preflightQuestion
+    ? mapQuestionAccessContext(preflightQuestion)
+    : null;
+  const targetContext = {
+    scope: payload.scope,
+    eventSeriesIds: payload.scope === "GLOBAL" ? [] : payload.eventSeriesIds,
+    createdByUserId: currentContext?.createdByUserId ?? actor.userId,
+    reviewStatus: currentContext?.reviewStatus ?? "DRAFT" as const,
+    isArchived: currentContext?.isArchived ?? false,
+    isApproved: currentContext?.isApproved ?? false,
+  };
+  const keepsLegacyGlobalScope = currentContext?.scope === "GLOBAL" && payload.scope === "GLOBAL";
+
+  try {
+    if (!keepsLegacyGlobalScope || actor.globalRole === "ADMIN" || payload.questionId === undefined) {
+      await requireQuestionScopeSelection(payload.scope, payload.eventSeriesIds, session);
+    }
+  } catch {
+    return {
+      success: false,
+      errorCode: "PERMISSION_DENIED",
+      fallbackMessage: "Der gewählte Geltungsbereich ist nicht erlaubt.",
+    };
+  }
+
+  const mayPerformIntent = payload.questionId === undefined
+    ? payload.intent === "DRAFT" ||
+      (payload.intent === "SUBMIT_FOR_REVIEW" && actor.globalRole !== "ADMIN") ||
+      (payload.intent === "APPROVE" && canApproveScopedQuestion(actor, targetContext))
+    : payload.intent === "APPROVE"
+      ? canApproveScopedQuestion(actor, targetContext)
+      : payload.intent === "REQUEST_CHANGES"
+        ? canRequestChangesForScopedQuestion(actor, targetContext)
+        : (
+            canEditScopedQuestion(actor, currentContext!) &&
+            (canUseQuestionScope(actor, payload.scope, targetContext.eventSeriesIds) || keepsLegacyGlobalScope) &&
+            (payload.intent !== "SUBMIT_FOR_REVIEW" || actor.globalRole !== "ADMIN")
+          );
+  if (!mayPerformIntent) {
+    return {
+      success: false,
+      errorCode: "PERMISSION_DENIED",
+      fallbackMessage: serverMessages.errors.PERMISSION_DENIED,
     };
   }
 
@@ -1165,14 +1216,17 @@ export async function saveQuestion(
           );
         }
 
-        const approval = resolveQuestionApprovalOnCreate(
-          session,
-          payload.intent === "APPROVE",
-        );
+        const approvalDate = payload.intent === "APPROVE" ? new Date() : null;
+        const approval = {
+          freigegeben: payload.intent === "APPROVE",
+          approved_by_user_id: payload.intent === "APPROVE" ? userId : null,
+          approved_at: approvalDate,
+        };
 
         const createdQuestion = await tx.fragen.create({
           data: {
             frage: draft.questionText,
+            geltungsbereich: payload.scope,
             quelle: draft.sourceOrRemark || null,
             vorlage_id: persistedTemplate?.vorlage_id ?? null,
             template_config_json: draft.templateConfig,
@@ -1202,6 +1256,9 @@ export async function saveQuestion(
             created_by_user_id: userId,
             last_modified_by_user_id: userId,
             fragen_kategorien: { create: categoryCreates },
+            eventreihen: payload.scope === "EVENT_SERIES"
+              ? { create: payload.eventSeriesIds.map((eventSeriesId) => ({ eventreihe_id: eventSeriesId })) }
+              : undefined,
           },
           select: {
             fragen_id: true,
@@ -1272,6 +1329,8 @@ export async function saveQuestion(
           freigegeben: true,
           review_status: true,
           ist_archiviert: true,
+          geltungsbereich: true,
+          eventreihen: { select: { eventreihe_id: true } },
           medien: {
             orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
             select: {
@@ -1343,24 +1402,7 @@ export async function saveQuestion(
         );
       }
 
-      const questionAccess = {
-        createdByUserId: existingQuestion.created_by_user_id,
-        reviewStatus: existingQuestion.review_status,
-        isArchived: existingQuestion.ist_archiviert,
-      };
-      const mayPerformUpdate =
-        payload.intent === "APPROVE"
-          ? canApproveQuestion(session)
-          : payload.intent === "REQUEST_CHANGES"
-            ? canRequestQuestionChanges(
-                session,
-                existingQuestion.review_status,
-              )
-            : canEditQuestion(session, questionAccess) &&
-              (payload.intent !== "SUBMIT_FOR_REVIEW" ||
-                canSubmitForReview(session));
-
-      if (!mayPerformUpdate) {
+      if (!mayPerformIntent) {
         throw new DraftValidationError(
           "Du darfst diese Aktion für diese Frage nicht ausführen.",
           undefined,
@@ -1712,18 +1754,10 @@ export async function saveQuestion(
         return createAnswerMediaDraftFromStoredMedia(storedMedia);
       }
 
-      const approval =
-        payload.intent === "APPROVE"
-          ? resolveQuestionApprovalOnUpdate(
-              session,
-              existingQuestion.freigegeben,
-              true,
-            )
-          : {
-              freigegeben: false,
-              approved_by_user_id: null,
-              approved_at: null,
-            };
+      const approvalDate = payload.intent === "APPROVE" ? new Date() : null;
+      const approval = payload.intent === "APPROVE"
+        ? { freigegeben: true, approved_by_user_id: userId, approved_at: approvalDate }
+        : { freigegeben: false, approved_by_user_id: null, approved_at: null };
 
       const reviewUpdate =
         payload.intent === "DRAFT"
@@ -1802,10 +1836,29 @@ export async function saveQuestion(
         });
       }
 
+      if (existingQuestion.geltungsbereich === "GLOBAL" && payload.scope === "EVENT_SERIES") {
+        const conflictingQuizzes = await tx.quiz_fragen.findMany({
+          where: {
+            fragen_id: payload.questionId,
+            quiz: { eventreihe_id: { notIn: payload.eventSeriesIds } },
+          },
+          select: { quiz_id: true },
+          distinct: ["quiz_id"],
+        });
+        if (conflictingQuizzes.length > 0) {
+          throw new DraftValidationError(
+            `Der Geltungsbereich kann nicht eingeschränkt werden. Die Frage wird in Quiz ${conflictingQuizzes.map((entry) => entry.quiz_id).join(", ")} anderer Eventreihen verwendet.`,
+            undefined,
+            "CONFLICT",
+          );
+        }
+      }
+
       const updatedQuestion = await tx.fragen.update({
         where: { fragen_id: payload.questionId },
         data: {
           frage: draft.questionText,
+          geltungsbereich: payload.scope,
           quelle: draft.sourceOrRemark || null,
           vorlage_id: persistedTemplate?.vorlage_id ?? null,
           template_config_json: draft.templateConfig,
@@ -1819,6 +1872,12 @@ export async function saveQuestion(
           ...reviewUpdate,
           last_modified_by_user_id: userId,
           fragen_kategorien: { create: categoryCreates },
+          eventreihen: {
+            deleteMany: {},
+            ...(payload.scope === "EVENT_SERIES"
+              ? { create: payload.eventSeriesIds.map((eventSeriesId) => ({ eventreihe_id: eventSeriesId })) }
+              : {}),
+          },
         },
         select: {
           fragen_id: true,

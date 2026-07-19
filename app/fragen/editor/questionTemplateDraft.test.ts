@@ -21,7 +21,7 @@ const questionTemplates = localizeQuestionTemplates(
 
 function createDraft(questionMedia: QuestionMediaDraft[] = []): QuestionEditorDraft {
   return {
-    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
+    scope: "GLOBAL", eventSeriesIds: [], templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "Bestehende Frage",
     questionMedia,
     answers: [

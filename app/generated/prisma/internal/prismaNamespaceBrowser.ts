@@ -76,7 +76,9 @@ export const ModelName = {
   frage_vorlagen: 'frage_vorlagen',
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
-  users: 'users'
+  users: 'users',
+  eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
+  fragen_eventreihen: 'fragen_eventreihen'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -142,7 +144,8 @@ export const FragenScalarFieldEnum = {
   review_feedback: 'review_feedback',
   reviewed_at: 'reviewed_at',
   reviewed_by_user_id: 'reviewed_by_user_id',
-  template_config_json: 'template_config_json'
+  template_config_json: 'template_config_json',
+  geltungsbereich: 'geltungsbereich'
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
@@ -470,6 +473,29 @@ export const UsersScalarFieldEnum = {
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const Eventreihe_benutzerrollenScalarFieldEnum = {
+  eventreihe_benutzerrolle_id: 'eventreihe_benutzerrolle_id',
+  eventreihe_id: 'eventreihe_id',
+  benutzer_id: 'benutzer_id',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Eventreihe_benutzerrollenScalarFieldEnum = (typeof Eventreihe_benutzerrollenScalarFieldEnum)[keyof typeof Eventreihe_benutzerrollenScalarFieldEnum]
+
+
+export const Fragen_eventreihenScalarFieldEnum = {
+  fragen_eventreihe_id: 'fragen_eventreihe_id',
+  fragen_id: 'fragen_id',
+  eventreihe_id: 'eventreihe_id',
+  created_at: 'created_at'
+} as const
+
+export type Fragen_eventreihenScalarFieldEnum = (typeof Fragen_eventreihenScalarFieldEnum)[keyof typeof Fragen_eventreihenScalarFieldEnum]
 
 
 export const SortOrder = {

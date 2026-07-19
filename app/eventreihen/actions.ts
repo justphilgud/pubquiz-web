@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireAdmin, requireSession } from "@/app/lib/permissions";
+import {
+  getEventSeriesIdsForCapability,
+  requireEventSeriesEditor,
+  requireEventSeriesViewer,
+} from "./eventSeriesAccess.server";
 import {
   generateUniqueEventSeriesSlug,
   eventSeriesArchiveState,
@@ -27,6 +32,8 @@ export type EventSeriesListItem = EventSeriesOption & {
   createdAt: string;
   updatedAt: string;
   quizCount: number;
+  canEdit: boolean;
+  canChangeArchiveState: boolean;
 };
 
 export type EventSeriesActionResult = {
@@ -49,7 +56,7 @@ function toListItem(series: {
   created_at: Date;
   updated_at: Date;
   _count: { quiz: number };
-}): EventSeriesListItem {
+}, capabilities: { canEdit: boolean; canChangeArchiveState: boolean }): EventSeriesListItem {
   return {
     id: series.eventreihe_id,
     name: series.name,
@@ -63,24 +70,35 @@ function toListItem(series: {
     createdAt: series.created_at.toISOString(),
     updatedAt: series.updated_at.toISOString(),
     quizCount: series._count.quiz,
+    ...capabilities,
   };
 }
 
 export async function getEventSeriesList(): Promise<EventSeriesListItem[]> {
-  await requireAdmin();
+  const session = await requireSession();
+  const visibleIds = await getEventSeriesIdsForCapability("VIEW", session);
+  const editableIds = await getEventSeriesIdsForCapability("EDIT", session);
   const series = await prisma.eventreihen.findMany({
+    where: visibleIds === null ? undefined : { eventreihe_id: { in: visibleIds } },
     include: { _count: { select: { quiz: true } } },
     orderBy: [{ ist_archiviert: "asc" }, { name: "asc" }],
   });
-  return series.map(toListItem);
+  return series.map((entry) => toListItem(entry, {
+    canEdit: editableIds === null || editableIds.includes(entry.eventreihe_id),
+    canChangeArchiveState: session.user?.role === "ADMIN",
+  }));
 }
 
 export async function getEventSeriesOptions(
   includeArchived = false,
 ): Promise<EventSeriesOption[]> {
-  await requireAdmin();
+  const session = await requireSession();
+  const manageableIds = await getEventSeriesIdsForCapability("MANAGE_QUIZZES", session);
   const series = await prisma.eventreihen.findMany({
-    where: includeArchived ? undefined : { ist_archiviert: false },
+    where: {
+      ...(includeArchived ? {} : { ist_archiviert: false }),
+      ...(manageableIds === null ? {} : { eventreihe_id: { in: manageableIds } }),
+    },
     orderBy: [{ ist_archiviert: "asc" }, { name: "asc" }],
     select: { eventreihe_id: true, name: true, ist_archiviert: true },
   });
@@ -152,10 +170,10 @@ export async function updateEventSeries(
   eventSeriesId: number,
   input: EventSeriesInput,
 ): Promise<EventSeriesActionResult> {
-  await requireAdmin();
   if (!Number.isInteger(eventSeriesId) || eventSeriesId <= 0) {
     return { success: false, message: "Ungültige Eventreihe." };
   }
+  await requireEventSeriesEditor(eventSeriesId);
   const validated = validateEventSeriesInput(input);
   if (!validated.ok) {
     return { success: false, message: "Bitte Eingaben prüfen.", errors: validated.errors };
@@ -220,8 +238,8 @@ export async function restoreEventSeries(
 }
 
 export async function getEventSeriesDetails(eventSeriesId: number) {
-  await requireAdmin();
   if (!Number.isInteger(eventSeriesId) || eventSeriesId <= 0) return null;
+  const access = await requireEventSeriesViewer(eventSeriesId);
   const series = await prisma.eventreihen.findUnique({
     where: { eventreihe_id: eventSeriesId },
     include: {
@@ -231,7 +249,11 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
   });
   if (!series) return null;
   return {
-    ...toListItem(series),
+    ...toListItem(series, {
+      canEdit: access.session.user?.role === "ADMIN" || access.assignmentRole === "EVENT_MANAGER",
+      canChangeArchiveState: access.session.user?.role === "ADMIN",
+    }),
+    canManageQuizzes: access.session.user?.role === "ADMIN" || access.assignmentRole === "EVENT_MANAGER",
     quizzes: series.quiz.map((quiz) => ({
       id: quiz.quiz_id,
       title: quiz.titel?.trim() || `Quiz ${quiz.quiz_id}`,

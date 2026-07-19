@@ -409,7 +409,9 @@ export const ModelName = {
   frage_vorlagen: 'frage_vorlagen',
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
-  users: 'users'
+  users: 'users',
+  eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
+  fragen_eventreihen: 'fragen_eventreihen'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2353,6 +2355,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    eventreihe_benutzerrollen: {
+      payload: Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>
+      fields: Prisma.eventreihe_benutzerrollenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.eventreihe_benutzerrollenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.eventreihe_benutzerrollenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>
+        }
+        findFirst: {
+          args: Prisma.eventreihe_benutzerrollenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.eventreihe_benutzerrollenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>
+        }
+        findMany: {
+          args: Prisma.eventreihe_benutzerrollenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>[]
+        }
+        create: {
+          args: Prisma.eventreihe_benutzerrollenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>
+        }
+        createMany: {
+          args: Prisma.eventreihe_benutzerrollenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.eventreihe_benutzerrollenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>[]
+        }
+        delete: {
+          args: Prisma.eventreihe_benutzerrollenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>
+        }
+        update: {
+          args: Prisma.eventreihe_benutzerrollenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>
+        }
+        deleteMany: {
+          args: Prisma.eventreihe_benutzerrollenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.eventreihe_benutzerrollenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.eventreihe_benutzerrollenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>[]
+        }
+        upsert: {
+          args: Prisma.eventreihe_benutzerrollenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_benutzerrollenPayload>
+        }
+        aggregate: {
+          args: Prisma.Eventreihe_benutzerrollenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEventreihe_benutzerrollen>
+        }
+        groupBy: {
+          args: Prisma.eventreihe_benutzerrollenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Eventreihe_benutzerrollenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.eventreihe_benutzerrollenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Eventreihe_benutzerrollenCountAggregateOutputType> | number
+        }
+      }
+    }
+    fragen_eventreihen: {
+      payload: Prisma.$fragen_eventreihenPayload<ExtArgs>
+      fields: Prisma.fragen_eventreihenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.fragen_eventreihenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.fragen_eventreihenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>
+        }
+        findFirst: {
+          args: Prisma.fragen_eventreihenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.fragen_eventreihenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>
+        }
+        findMany: {
+          args: Prisma.fragen_eventreihenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>[]
+        }
+        create: {
+          args: Prisma.fragen_eventreihenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>
+        }
+        createMany: {
+          args: Prisma.fragen_eventreihenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.fragen_eventreihenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>[]
+        }
+        delete: {
+          args: Prisma.fragen_eventreihenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>
+        }
+        update: {
+          args: Prisma.fragen_eventreihenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>
+        }
+        deleteMany: {
+          args: Prisma.fragen_eventreihenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.fragen_eventreihenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.fragen_eventreihenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>[]
+        }
+        upsert: {
+          args: Prisma.fragen_eventreihenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$fragen_eventreihenPayload>
+        }
+        aggregate: {
+          args: Prisma.Fragen_eventreihenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFragen_eventreihen>
+        }
+        groupBy: {
+          args: Prisma.fragen_eventreihenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Fragen_eventreihenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.fragen_eventreihenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Fragen_eventreihenCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2439,7 +2589,8 @@ export const FragenScalarFieldEnum = {
   review_feedback: 'review_feedback',
   reviewed_at: 'reviewed_at',
   reviewed_by_user_id: 'reviewed_by_user_id',
-  template_config_json: 'template_config_json'
+  template_config_json: 'template_config_json',
+  geltungsbereich: 'geltungsbereich'
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
@@ -2769,6 +2920,29 @@ export const UsersScalarFieldEnum = {
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
 
 
+export const Eventreihe_benutzerrollenScalarFieldEnum = {
+  eventreihe_benutzerrolle_id: 'eventreihe_benutzerrolle_id',
+  eventreihe_id: 'eventreihe_id',
+  benutzer_id: 'benutzer_id',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Eventreihe_benutzerrollenScalarFieldEnum = (typeof Eventreihe_benutzerrollenScalarFieldEnum)[keyof typeof Eventreihe_benutzerrollenScalarFieldEnum]
+
+
+export const Fragen_eventreihenScalarFieldEnum = {
+  fragen_eventreihe_id: 'fragen_eventreihe_id',
+  fragen_id: 'fragen_id',
+  eventreihe_id: 'eventreihe_id',
+  created_at: 'created_at'
+} as const
+
+export type Fragen_eventreihenScalarFieldEnum = (typeof Fragen_eventreihenScalarFieldEnum)[keyof typeof Fragen_eventreihenScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2908,6 +3082,20 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
+ * Reference to a field of type 'QuestionScope'
+ */
+export type EnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionScope'>
+
+
+
+/**
+ * Reference to a field of type 'QuestionScope[]'
+ */
+export type ListEnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionScope[]'>
+
+
+
+/**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -2918,6 +3106,20 @@ export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'UserRole[]'
  */
 export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+
+
+
+/**
+ * Reference to a field of type 'EventSeriesRole'
+ */
+export type EnumEventSeriesRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventSeriesRole'>
+
+
+
+/**
+ * Reference to a field of type 'EventSeriesRole[]'
+ */
+export type ListEnumEventSeriesRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventSeriesRole[]'>
 
 
 
@@ -3070,6 +3272,8 @@ export type GlobalOmitConfig = {
   frage_vorlage_antwortfelder?: Prisma.frage_vorlage_antwortfelderOmit
   quiz_praesentation_status?: Prisma.quiz_praesentation_statusOmit
   users?: Prisma.usersOmit
+  eventreihe_benutzerrollen?: Prisma.eventreihe_benutzerrollenOmit
+  fragen_eventreihen?: Prisma.fragen_eventreihenOmit
 }
 
 /* Types for Logging */

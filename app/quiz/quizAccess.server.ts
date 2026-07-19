@@ -2,7 +2,8 @@ import "server-only";
 
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireSession } from "@/app/lib/permissions";
+import { requireEventSeriesAccess } from "@/app/eventreihen/eventSeriesAccess.server";
 import { buildQuizOwnershipContext } from "./quizOwnershipPolicy";
 
 export type QuizCapability = "VIEW" | "EDIT" | "ADMIN" | "CONTROL_LIVE";
@@ -28,7 +29,7 @@ export async function requireQuizAccess(
   quizId: number,
   capability: QuizCapability,
 ): Promise<QuizAuthorizationContext> {
-  const session = await requireAdmin();
+  await requireSession();
   const quiz = await prisma.quiz.findUnique({
     where: { quiz_id: quizId },
     select: { quiz_id: true, ist_archiviert: true, eventreihe_id: true },
@@ -38,12 +39,17 @@ export async function requireQuizAccess(
     throw new Error("Quiz nicht gefunden.");
   }
 
+  const eventSeriesAccess = await requireEventSeriesAccess(
+    quiz.eventreihe_id,
+    capability === "CONTROL_LIVE" ? "CONTROL_LIVE" : "MANAGE_QUIZZES",
+  );
+
   if (quiz.ist_archiviert && !capabilityAllowsArchivedQuiz(capability)) {
     throw new Error("Archivierte Quizze können nicht verändert oder gesteuert werden.");
   }
 
   return {
-    session,
+    session: eventSeriesAccess.session,
     capability,
     quiz,
     ownership: buildQuizOwnershipContext(quiz.eventreihe_id),
