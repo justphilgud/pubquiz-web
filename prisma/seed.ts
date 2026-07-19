@@ -105,7 +105,7 @@ async function main() {
 
   await createVorlage({
     code: "eight_bit",
-    name: "8 Bit Song",
+    name: "Bitcrush-Musik",
     slide_typ: "audio_guess",
     antwortfelder: [
       {
@@ -148,4 +148,16 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+  });
+
+  await createVorlage({
+    code: "pixelbild",
+    name: "Pixelbild",
+    slide_typ: "image_guess",
+    antwortfelder: [
+      {
+        label: "Lösung",
+        sortierung: 1,
+      },
+    ],
   });

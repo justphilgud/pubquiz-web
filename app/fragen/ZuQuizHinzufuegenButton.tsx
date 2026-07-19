@@ -23,12 +23,19 @@ export default function ZuQuizHinzufuegenButton({
 
   const [meldung, setMeldung] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedQuizId, setSelectedQuizId] = useState("");
+  const [assignmentOverrides, setAssignmentOverrides] = useState<
+    Record<number, boolean>
+  >({});
+
+  const isAssigned = (quizId: number) =>
+    assignmentOverrides[quizId] ?? verwendeteQuizIds.includes(quizId);
 
   async function handleQuizChange(value: string) {
     if (!value) return;
 
     const selectedQuizId = Number(value);
-    const bereitsVerwendet = verwendeteQuizIds.includes(selectedQuizId);
+    const bereitsVerwendet = isAssigned(selectedQuizId);
 
     setIsSaving(true);
     setMeldung("");
@@ -41,6 +48,10 @@ export default function ZuQuizHinzufuegenButton({
         });
 
         setMeldung("Aus Quiz entfernt.");
+        setAssignmentOverrides((current) => ({
+          ...current,
+          [selectedQuizId]: false,
+        }));
       } else {
         await addFrageToQuiz({
           quizId: selectedQuizId,
@@ -48,11 +59,16 @@ export default function ZuQuizHinzufuegenButton({
         });
 
         setMeldung("Zu Quiz hinzugefügt.");
+        setAssignmentOverrides((current) => ({
+          ...current,
+          [selectedQuizId]: true,
+        }));
       }
     } catch {
       setMeldung("Aktion fehlgeschlagen.");
     }
 
+    setSelectedQuizId("");
     setIsSaving(false);
   }
 
@@ -71,8 +87,12 @@ export default function ZuQuizHinzufuegenButton({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <select
-        value=""
-        onChange={(e) => handleQuizChange(e.target.value)}
+        aria-label="Quiz auswählen"
+        value={selectedQuizId}
+        onChange={(event) => {
+          setSelectedQuizId(event.target.value);
+          void handleQuizChange(event.target.value);
+        }}
         disabled={isSaving}
         className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
       >
@@ -81,7 +101,7 @@ export default function ZuQuizHinzufuegenButton({
         </option>
 
         {quizze.map((quiz) => {
-          const bereitsVerwendet = verwendeteQuizIds.includes(quiz.quiz_id);
+          const bereitsVerwendet = isAssigned(quiz.quiz_id);
           const quizDatum =
             quiz.quiz_datum instanceof Date
               ? quiz.quiz_datum.toISOString().split("T")[0]

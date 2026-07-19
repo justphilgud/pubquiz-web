@@ -16,12 +16,16 @@ const statusPresentation = {
 
 export function QuestionStatusBadge({
   status,
+  labels,
 }: {
   status: QuestionReviewStatus;
+  labels?: Record<QuestionReviewStatus, string>;
 }) {
   const presentation = statusPresentation[status];
 
   return (
-    <Badge variant={presentation.variant}>{presentation.label}</Badge>
+    <Badge variant={presentation.variant}>
+      {labels?.[status] ?? presentation.label}
+    </Badge>
   );
 }

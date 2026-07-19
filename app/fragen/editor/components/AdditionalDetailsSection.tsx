@@ -2,6 +2,9 @@ import { useId, useState } from "react";
 import type { QuestionCategory } from "../types";
 import { CategorySection } from "./CategorySection";
 import { NotesSection } from "./NotesSection";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { formatEditorDate, formatEditorNumber } from "@/app/i18n/formatting";
+import { formatMessage } from "@/app/i18n/formatMessage";
 
 type AdditionalDetailsSectionProps = {
   categories: QuestionCategory[];
@@ -16,12 +19,6 @@ type AdditionalDetailsSectionProps = {
   onValidUntilChange: (validUntil: string | null) => void;
 };
 
-function formatValidUntil(validUntil: string): string {
-  const [year, month, day] = validUntil.split("-");
-
-  return day && month && year ? `${day}.${month}.${year}` : validUntil;
-}
-
 export function AdditionalDetailsSection({
   categories,
   selectedCategoryIds,
@@ -34,21 +31,27 @@ export function AdditionalDetailsSection({
   onModerationNotesChange,
   onValidUntilChange,
 }: AdditionalDetailsSectionProps) {
+  const { locale, messages } = useQuestionEditorMessages();
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const contentId = useId();
   const validUntilId = useId();
   const summaries = [
     selectedCategoryIds.length > 0
-      ? `${selectedCategoryIds.length} ${
-          selectedCategoryIds.length === 1 ? "Kategorie" : "Kategorien"
-        }`
+      ? formatMessage(
+          selectedCategoryIds.length === 1
+            ? messages.details.category
+            : messages.details.categories,
+          { count: formatEditorNumber(locale, selectedCategoryIds.length) },
+        )
       : null,
-    sourceOrRemark.trim() ? "Quelle vorhanden" : null,
-    moderationNotes.trim() ? "Moderationsnotiz vorhanden" : null,
+    sourceOrRemark.trim() ? messages.details.sourcePresent : null,
+    moderationNotes.trim() ? messages.details.moderationPresent : null,
     validUntil === ""
-      ? "Ablaufdatum aktiviert"
+      ? messages.details.expiryEnabled
       : validUntil
-        ? `Gültig bis ${formatValidUntil(validUntil)}`
+        ? formatMessage(messages.details.validUntil, {
+            date: formatEditorDate(locale, validUntil),
+          })
         : null,
   ].filter((summary): summary is string => summary !== null);
 
@@ -63,12 +66,12 @@ export function AdditionalDetailsSection({
       >
         <span className="min-w-0">
           <span className="block font-semibold text-slate-950">
-            Weitere Angaben
+            {messages.details.title}
           </span>
           <span className="mt-1 block truncate text-sm text-slate-600">
             {summaries.length > 0
               ? summaries.join(" · ")
-              : "Kategorien, interne Angaben und Ablaufdatum"}
+              : messages.details.emptySummary}
           </span>
         </span>
         <span className="shrink-0 text-xl text-slate-500" aria-hidden="true">
@@ -96,12 +99,10 @@ export function AdditionalDetailsSection({
           <section className="rounded-2xl border border-slate-200 p-4">
             <div>
               <h3 className="font-medium text-slate-950">
-                Zeitlich begrenzte Frage
+                {messages.details.expiryTitle}
               </h3>
               <p className="mt-1 text-sm text-slate-600">
-                Nutze diese Einstellung für Fragen, deren Antwort nur bis zu
-                einem bestimmten Zeitpunkt aktuell ist, zum Beispiel „Vogel des
-                Jahres 2026“.
+                {messages.details.expiryDescription}
               </p>
             </div>
 
@@ -116,11 +117,10 @@ export function AdditionalDetailsSection({
               />
               <span>
                 <span className="block font-medium text-slate-900">
-                  Frage hat ein Ablaufdatum
+                  {messages.details.hasExpiry}
                 </span>
                 <span className="mt-1 block text-sm text-slate-600">
-                  Nach dem Ablauf bleibt die Frage erhalten, wird aber nicht mehr
-                  automatisch für neue Quizze vorgeschlagen.
+                  {messages.details.hasExpiryHelp}
                 </span>
               </span>
             </label>
@@ -131,7 +131,7 @@ export function AdditionalDetailsSection({
                   htmlFor={validUntilId}
                   className="text-sm font-medium text-slate-900"
                 >
-                  Aktuell nutzbar bis einschließlich
+                  {messages.details.usableUntil}
                 </label>
                 <input
                   id={validUntilId}
@@ -142,9 +142,7 @@ export function AdditionalDetailsSection({
                   className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3"
                 />
                 <p className="mt-2 text-sm text-slate-600">
-                  Ab dem folgenden Tag gilt die Frage als veraltet. Sie wird nicht
-                  gelöscht und kann weiterhin gefunden, bearbeitet oder bewusst
-                  verwendet werden.
+                  {messages.details.expiryAfterHelp}
                 </p>
               </div>
             )}

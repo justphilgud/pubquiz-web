@@ -390,6 +390,8 @@ export const ModelName = {
   fragen_kategorien: 'fragen_kategorien',
   fragenkategorie: 'fragenkategorie',
   medien: 'medien',
+  medien_generator_laefe: 'medien_generator_laefe',
+  medien_generator_lauf_medien: 'medien_generator_lauf_medien',
   medientyp: 'medientyp',
   quiz: 'quiz',
   quiz_fragen: 'quiz_fragen',
@@ -421,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medientyp" | "quiz" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +868,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.medienCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MedienCountAggregateOutputType> | number
+        }
+      }
+    }
+    medien_generator_laefe: {
+      payload: Prisma.$medien_generator_laefePayload<ExtArgs>
+      fields: Prisma.medien_generator_laefeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.medien_generator_laefeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.medien_generator_laefeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>
+        }
+        findFirst: {
+          args: Prisma.medien_generator_laefeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.medien_generator_laefeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>
+        }
+        findMany: {
+          args: Prisma.medien_generator_laefeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>[]
+        }
+        create: {
+          args: Prisma.medien_generator_laefeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>
+        }
+        createMany: {
+          args: Prisma.medien_generator_laefeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.medien_generator_laefeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>[]
+        }
+        delete: {
+          args: Prisma.medien_generator_laefeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>
+        }
+        update: {
+          args: Prisma.medien_generator_laefeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>
+        }
+        deleteMany: {
+          args: Prisma.medien_generator_laefeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.medien_generator_laefeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.medien_generator_laefeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>[]
+        }
+        upsert: {
+          args: Prisma.medien_generator_laefeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_laefePayload>
+        }
+        aggregate: {
+          args: Prisma.Medien_generator_laefeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMedien_generator_laefe>
+        }
+        groupBy: {
+          args: Prisma.medien_generator_laefeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Medien_generator_laefeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.medien_generator_laefeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Medien_generator_laefeCountAggregateOutputType> | number
+        }
+      }
+    }
+    medien_generator_lauf_medien: {
+      payload: Prisma.$medien_generator_lauf_medienPayload<ExtArgs>
+      fields: Prisma.medien_generator_lauf_medienFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.medien_generator_lauf_medienFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.medien_generator_lauf_medienFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>
+        }
+        findFirst: {
+          args: Prisma.medien_generator_lauf_medienFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.medien_generator_lauf_medienFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>
+        }
+        findMany: {
+          args: Prisma.medien_generator_lauf_medienFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>[]
+        }
+        create: {
+          args: Prisma.medien_generator_lauf_medienCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>
+        }
+        createMany: {
+          args: Prisma.medien_generator_lauf_medienCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.medien_generator_lauf_medienCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>[]
+        }
+        delete: {
+          args: Prisma.medien_generator_lauf_medienDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>
+        }
+        update: {
+          args: Prisma.medien_generator_lauf_medienUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>
+        }
+        deleteMany: {
+          args: Prisma.medien_generator_lauf_medienDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.medien_generator_lauf_medienUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.medien_generator_lauf_medienUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>[]
+        }
+        upsert: {
+          args: Prisma.medien_generator_lauf_medienUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$medien_generator_lauf_medienPayload>
+        }
+        aggregate: {
+          args: Prisma.Medien_generator_lauf_medienAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMedien_generator_lauf_medien>
+        }
+        groupBy: {
+          args: Prisma.medien_generator_lauf_medienGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Medien_generator_lauf_medienGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.medien_generator_lauf_medienCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Medien_generator_lauf_medienCountAggregateOutputType> | number
         }
       }
     }
@@ -2137,7 +2287,8 @@ export const FragenScalarFieldEnum = {
   submitted_by_user_id: 'submitted_by_user_id',
   review_feedback: 'review_feedback',
   reviewed_at: 'reviewed_at',
-  reviewed_by_user_id: 'reviewed_by_user_id'
+  reviewed_by_user_id: 'reviewed_by_user_id',
+  template_config_json: 'template_config_json'
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
@@ -2168,10 +2319,42 @@ export const MedienScalarFieldEnum = {
   datei: 'datei',
   sortierung: 'sortierung',
   bemerkung: 'bemerkung',
-  antwortfeld_id: 'antwortfeld_id'
+  antwortfeld_id: 'antwortfeld_id',
+  slot_key: 'slot_key'
 } as const
 
 export type MedienScalarFieldEnum = (typeof MedienScalarFieldEnum)[keyof typeof MedienScalarFieldEnum]
+
+
+export const Medien_generator_laefeScalarFieldEnum = {
+  generator_lauf_id: 'generator_lauf_id',
+  fragen_id: 'fragen_id',
+  generator_id: 'generator_id',
+  generator_version: 'generator_version',
+  status: 'status',
+  input_fingerprint: 'input_fingerprint',
+  error_code: 'error_code',
+  error_message: 'error_message',
+  parameters_json: 'parameters_json',
+  started_at: 'started_at',
+  finished_at: 'finished_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Medien_generator_laefeScalarFieldEnum = (typeof Medien_generator_laefeScalarFieldEnum)[keyof typeof Medien_generator_laefeScalarFieldEnum]
+
+
+export const Medien_generator_lauf_medienScalarFieldEnum = {
+  generator_lauf_medium_id: 'generator_lauf_medium_id',
+  generator_lauf_id: 'generator_lauf_id',
+  medien_id: 'medien_id',
+  rolle: 'rolle',
+  slot_key: 'slot_key',
+  created_at: 'created_at'
+} as const
+
+export type Medien_generator_lauf_medienScalarFieldEnum = (typeof Medien_generator_lauf_medienScalarFieldEnum)[keyof typeof Medien_generator_lauf_medienScalarFieldEnum]
 
 
 export const MedientypScalarFieldEnum = {
@@ -2407,6 +2590,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -2421,6 +2612,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -2503,6 +2703,20 @@ export type EnumQuestionReviewStatusFieldRefInput<$PrismaModel> = FieldRefInputT
  * Reference to a field of type 'QuestionReviewStatus[]'
  */
 export type ListEnumQuestionReviewStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionReviewStatus[]'>
+
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
 
 
 
@@ -2649,6 +2863,8 @@ export type GlobalOmitConfig = {
   fragen_kategorien?: Prisma.fragen_kategorienOmit
   fragenkategorie?: Prisma.fragenkategorieOmit
   medien?: Prisma.medienOmit
+  medien_generator_laefe?: Prisma.medien_generator_laefeOmit
+  medien_generator_lauf_medien?: Prisma.medien_generator_lauf_medienOmit
   medientyp?: Prisma.medientypOmit
   quiz?: Prisma.quizOmit
   quiz_fragen?: Prisma.quiz_fragenOmit

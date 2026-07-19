@@ -48,6 +48,7 @@ model fragen {
   vorlage                  frage_vorlagen?       @relation(fields: [vorlage_id], references: [vorlage_id])
   fragen_kategorien        fragen_kategorien[]
   medien                   medien[]
+  generator_laefe          medien_generator_laefe[]
   quiz_fragen              quiz_fragen[]
   created_by_user_id       Int?
   created_at               DateTime              @default(now())
@@ -65,6 +66,7 @@ model fragen {
   review_feedback          String?
   reviewed_at              DateTime?
   reviewed_by_user_id      Int?
+  template_config_json     Json?
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
@@ -102,17 +104,62 @@ model medien {
   sortierung     Int                  @default(1)
   bemerkung      String?
   antwortfeld_id Int?
+  slot_key       String?              @db.VarChar(80)
   antworten      antworten?           @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
   fragen         fragen?              @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
   medientyp      medientyp            @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
   antwortfeld    frage_antwortfelder? @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+  generator_lauf_medien medien_generator_lauf_medien[]
 
   @@index([antwort_id], map: "idx_medien_antwort_id")
   @@index([fragen_id], map: "idx_medien_fragen_id")
+  @@index([fragen_id, slot_key], map: "idx_medien_fragen_slot")
+  @@index([antwort_id, slot_key], map: "idx_medien_antwort_slot")
+  @@index([antwortfeld_id, slot_key], map: "idx_medien_antwortfeld_slot")
   @@index([antwortfeld_id], map: "idx_medien_antwortfeld_id")
   @@index([antwortfeld_id, sortierung], map: "idx_medien_sortierung_antwortfeld", where: raw("(antwortfeld_id IS NOT NULL)"))
   @@index([antwort_id, sortierung], map: "idx_medien_sortierung_antwort", where: raw("(antwort_id IS NOT NULL)"))
   @@index([fragen_id, sortierung], map: "idx_medien_sortierung_frage", where: raw("(fragen_id IS NOT NULL)"))
+  @@schema("pubquiz")
+}
+
+model medien_generator_laefe {
+  generator_lauf_id Int       @id @default(autoincrement())
+  fragen_id          Int
+  generator_id       String    @db.VarChar(80)
+  generator_version  Int
+  status             String    @db.VarChar(20)
+  input_fingerprint  String?   @db.VarChar(64)
+  error_code         String?   @db.VarChar(80)
+  error_message      String?
+  parameters_json    Json?
+  started_at         DateTime?
+  finished_at        DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @default(now()) @updatedAt
+  fragen             fragen    @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  medien             medien_generator_lauf_medien[]
+
+  @@index([fragen_id, generator_id, created_at], map: "idx_generator_laefe_frage_generator")
+  @@index([fragen_id, generator_id, input_fingerprint], map: "idx_generator_laefe_fingerprint")
+  @@index([status, updated_at], map: "idx_generator_laefe_status")
+  @@unique([fragen_id, generator_id], map: "uq_generator_lauf_active", where: raw("(status IN ('PENDING', 'PROCESSING'))"))
+  @@schema("pubquiz")
+}
+
+model medien_generator_lauf_medien {
+  generator_lauf_medium_id Int       @id @default(autoincrement())
+  generator_lauf_id        Int
+  medien_id                 Int
+  rolle                     String    @db.VarChar(10)
+  slot_key                  String    @db.VarChar(80)
+  created_at                DateTime  @default(now())
+  generator_lauf            medien_generator_laefe @relation(fields: [generator_lauf_id], references: [generator_lauf_id], onDelete: Cascade)
+  medium                    medien    @relation(fields: [medien_id], references: [medien_id], onDelete: Cascade)
+
+  @@unique([generator_lauf_id, medien_id, rolle], map: "uq_generator_lauf_medium_rolle")
+  @@index([medien_id, rolle], map: "idx_generator_lauf_medien_medium")
+  @@index([generator_lauf_id, rolle], map: "idx_generator_lauf_medien_lauf")
   @@schema("pubquiz")
 }
 

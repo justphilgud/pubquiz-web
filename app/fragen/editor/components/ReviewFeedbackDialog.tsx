@@ -4,16 +4,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import type { ReviewReasonCode } from "../types";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
-const reasons: Array<{ code: ReviewReasonCode; label: string }> = [
-  { code: "SOURCE", label: "Quelle ergänzen" },
-  { code: "QUESTION_TEXT", label: "Fragetext überarbeiten" },
-  { code: "ANSWER", label: "Antwort oder Lösung prüfen" },
-  { code: "CATEGORIES", label: "Kategorien korrigieren" },
-  { code: "MEDIA", label: "Medien ergänzen oder ersetzen" },
-  { code: "ADDITIONAL_INFO", label: "Zusatzinformationen ergänzen" },
-  { code: "OTHER", label: "Sonstiges" },
-];
+const reasons: ReviewReasonCode[] = ["SOURCE", "QUESTION_TEXT", "ANSWER", "CATEGORIES", "MEDIA", "ADDITIONAL_INFO", "OTHER"];
 
 export function ReviewFeedbackDialog({
   open,
@@ -28,6 +21,7 @@ export function ReviewFeedbackDialog({
   onClose: () => void;
   onConfirm: (reasonCodes: ReviewReasonCode[], comment: string) => void;
 }) {
+  const { messages } = useQuestionEditorMessages();
   const [selectedReasons, setSelectedReasons] = useState<ReviewReasonCode[]>([]);
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -54,12 +48,12 @@ export function ReviewFeedbackDialog({
     const normalizedComment = comment.trim();
 
     if (selectedReasons.length === 0 && !normalizedComment) {
-      setError("Wähle mindestens einen Grund oder ergänze einen Freitext.");
+      setError(messages.review.reasonRequired);
       return;
     }
 
     if (selectedReasons.includes("OTHER") && !normalizedComment) {
-      setError("Bei „Sonstiges“ ist ein Freitext erforderlich.");
+      setError(messages.review.otherRequired);
       return;
     }
 
@@ -69,43 +63,43 @@ export function ReviewFeedbackDialog({
   return (
     <Modal
       open={open}
-      title="Zur Überarbeitung zurückgeben"
+      title={messages.review.returnTitle}
       onClose={close}
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button variant="secondary" onClick={close} disabled={isPending}>
-            Abbrechen
+            {messages.common.cancel}
           </Button>
           <Button variant="danger" onClick={confirm} disabled={isPending}>
-            {isPending ? "Wird zurückgegeben …" : "Zurückgeben"}
+            {isPending ? messages.review.returning : messages.review.returnAction}
           </Button>
         </div>
       }
     >
       <p className="text-sm text-slate-600">
-        Mindestens ein Rückgabegrund oder ein Freitext ist erforderlich.
+        {messages.review.returnDescription}
       </p>
       <div className="mt-4 space-y-2">
         {reasons.map((reason) => (
           <label
-            key={reason.code}
+            key={reason}
             className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2"
           >
             <input
               type="checkbox"
-              checked={selectedReasons.includes(reason.code)}
-              onChange={() => toggleReason(reason.code)}
+              checked={selectedReasons.includes(reason)}
+              onChange={() => toggleReason(reason)}
               className="h-5 w-5"
             />
             <span className="text-sm font-medium text-slate-800">
-              {reason.label}
+              {messages.review.reasons[reason]}
             </span>
           </label>
         ))}
       </div>
       <label className="mt-4 block">
         <span className="text-sm font-medium text-slate-900">
-          Zusätzlicher Hinweis
+          {messages.review.additionalHint}
         </span>
         <textarea
           value={comment}
@@ -116,7 +110,7 @@ export function ReviewFeedbackDialog({
           }}
           rows={4}
           className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3"
-          placeholder="Optional, außer bei „Sonstiges“"
+          placeholder={messages.review.hintPlaceholder}
         />
         <span className="mt-1 block text-right text-xs text-slate-500">
           {comment.length}/1000

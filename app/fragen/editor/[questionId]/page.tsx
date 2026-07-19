@@ -11,6 +11,9 @@ import { QuestionEditor } from "../components/QuestionEditor";
 import { loadQuestionForEditor } from "../questionEditorData";
 import type { QuestionEditorContext } from "../types";
 import { getMediaUploadEnvironmentPrefix } from "../mediaUploadEnvironment";
+import { getDefaultLocale } from "@/app/i18n/locale";
+import { getQuestionEditorMessages } from "@/app/i18n/getMessages";
+import { localizeQuestionTemplates } from "../templates/questionTemplates";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -25,6 +28,7 @@ export default async function ExistingQuestionEditorPage({
   }
 
   const session = await requireQuestionEditor();
+  const { locale, messages } = getQuestionEditorMessages(getDefaultLocale());
   const [loadedQuestion, categories] = await Promise.all([
     loadQuestionForEditor(questionId),
     prisma.fragenkategorie.findMany({
@@ -61,6 +65,9 @@ export default async function ExistingQuestionEditorPage({
       )}
       editorContext={editorContext}
       mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
+      locale={locale}
+      messages={messages}
+      templates={localizeQuestionTemplates(messages)}
       initialDraft={loadedQuestion.draft}
       questionRecord={loadedQuestion.record}
       categories={categories.map((category) => ({

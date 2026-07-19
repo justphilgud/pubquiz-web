@@ -29,24 +29,68 @@ import {
   isAllowedQuestionMediaPathname,
   questionMediaRules,
 } from "./questionMedia";
-import { questionTemplates } from "./templates/questionTemplates";
+import { questionTemplateDefinitions } from "./templates/questionTemplates";
+import {
+  findQuestionTemplate,
+  resolveCanonicalQuestionTemplateId,
+} from "./templates/questionTemplateRegistry";
 import type {
   QuestionMediaOperation,
+  QuestionMediaDraft,
   QuestionMediaType,
   QuestionSaveIntent,
   QuestionValidationTarget,
   ReviewReasonCode,
   SaveQuestionPayload,
   SaveQuestionResult,
+  QuestionEditorErrorCode,
+  QuestionEditorSuccessCode,
+  GeneratorParametersDraft,
+  QuestionTemplateConfig,
 } from "./types";
+import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
+import { formatMessage } from "@/app/i18n/formatMessage";
+import {
+  getMediaSlotDefinition,
+  hasExactlyOneMediaOwner,
+  isMediaSlotAllowedForTemplate,
+  isMediaSlotKey,
+} from "./mediaSlots";
+import type { MediaSlotKey } from "./types";
+import { getGeneratorDefinition } from "./generators/registry";
+import {
+  generatorParametersEqual,
+  normalizeGeneratorParameters,
+} from "./generators/parameters";
+import {
+  normalizeQuestionTemplateConfig,
+  parseQuestionTemplateConfigDraft,
+} from "./pixelTemplateConfig";
+import { hasRequiredTemplateAnswerImages } from "./questionQuality";
+
+const serverMessages = loadQuestionEditorMessages("de");
 
 class DraftValidationError extends Error {
   constructor(
     message: string,
     readonly validationTarget?: QuestionValidationTarget,
+    readonly errorCode: QuestionEditorErrorCode = "VALIDATION_ERROR",
   ) {
     super(message);
   }
+}
+
+function createValidationFailure(error: DraftValidationError): SaveQuestionResult {
+  return {
+    success: false,
+    errorCode: error.errorCode,
+    errorParams:
+      error.errorCode === "VALIDATION_ERROR"
+        ? { detail: error.message }
+        : undefined,
+    fallbackMessage: error.message,
+    validationTarget: error.validationTarget,
+  };
 }
 
 type NormalizedAnswer = {
@@ -64,17 +108,21 @@ type NormalizedAnswer = {
 };
 
 type NormalizedDraft = {
+  templateId: string | null;
   questionText: string;
-  questionMedia: NormalizedMediaDraft;
+  questionMedia: Exclude<NormalizedMediaDraft, null>[];
   answers: NormalizedAnswer[];
   categoryIds: number[];
   sourceOrRemark: string;
   moderationNotes: string;
   validUntil: Date | null;
   reviewFeedback: string | null;
+  generatorParameters: GeneratorParametersDraft;
+  templateConfig: QuestionTemplateConfig;
 };
 
 type NormalizedMediaDraft = {
+  slotKey: MediaSlotKey;
   existingMediaId: number | null;
   url: string | null;
   mediaType: QuestionMediaType | null;
@@ -91,15 +139,8 @@ type SavedAnswerState = {
   media: ReturnType<typeof createAnswerMediaDraftFromStoredMedia>;
 };
 
-const reviewReasonLabels: Record<ReviewReasonCode, string> = {
-  SOURCE: "Quelle ergänzen",
-  QUESTION_TEXT: "Fragetext überarbeiten",
-  ANSWER: "Antwort oder Lösung prüfen",
-  CATEGORIES: "Kategorien korrigieren",
-  MEDIA: "Medien ergänzen oder ersetzen",
-  ADDITIONAL_INFO: "Zusatzinformationen ergänzen",
-  OTHER: "Sonstiges",
-};
+const reviewReasonLabels: Record<ReviewReasonCode, string> =
+  serverMessages.review.reasons;
 
 function normalizeReviewFeedback(payload: SaveQuestionPayload): string | null {
   if (payload.intent !== "REQUEST_CHANGES") {
@@ -189,7 +230,7 @@ function parseValidUntil(
 }
 
 function normalizeQuestionMedia(
-  value: SaveQuestionPayload["questionMedia"],
+  value: QuestionMediaDraft | null,
   validationTarget: QuestionValidationTarget = "questionMedia",
 ): NormalizedMediaDraft {
   if (value === null) {
@@ -205,7 +246,9 @@ function normalizeQuestionMedia(
     (value.url !== null && typeof value.url !== "string") ||
     (value.mediaType !== null &&
       value.mediaType !== "IMAGE" &&
-      value.mediaType !== "AUDIO") ||
+      value.mediaType !== "AUDIO" &&
+      value.mediaType !== "VIDEO") ||
+    !isMediaSlotKey(value.slotKey) ||
     (value.fileName !== undefined && typeof value.fileName !== "string") ||
     (value.mimeType !== undefined && typeof value.mimeType !== "string") ||
     (value.operation !== "UNCHANGED" &&
@@ -244,6 +287,7 @@ function normalizeQuestionMedia(
   }
 
   return {
+    slotKey: value.slotKey,
     existingMediaId: value.existingMediaId,
     url,
     mediaType: value.mediaType,
@@ -287,6 +331,7 @@ async function verifyUploadedQuestionMedia(
     const uploadConfig = getMediaVerificationServerConfig();
     const metadata = await head(media.url, uploadConfig.blobAuthentication);
     const rule = questionMediaRules[media.mediaType];
+    const slotDefinition = getMediaSlotDefinition(media.slotKey);
 
     if (
       !isAllowedQuestionMediaPathname(
@@ -294,6 +339,7 @@ async function verifyUploadedQuestionMedia(
         media.mediaType,
         target,
         uploadConfig.environmentPrefix,
+        media.slotKey,
       )
     ) {
       throw new DraftValidationError(
@@ -302,14 +348,14 @@ async function verifyUploadedQuestionMedia(
       );
     }
 
-    if (!rule.mimeTypes.includes(metadata.contentType.toLowerCase())) {
+    if (!slotDefinition.allowedMimeTypes.includes(metadata.contentType.toLowerCase())) {
       throw new DraftValidationError(
         "Der tatsächliche Dateityp des Mediums wird nicht unterstützt.",
         validationTarget,
       );
     }
 
-    if (metadata.size > rule.maximumSizeInBytes) {
+    if (metadata.size > slotDefinition.maxFileSizeBytes) {
       throw new DraftValidationError(
         `Das Medium darf höchstens ${rule.sizeLabel} groß sein.`,
         validationTarget,
@@ -427,7 +473,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
 
     const media = normalizeQuestionMedia(answer.media, "answers");
 
-    if (media?.operation === "NEW" && media.mediaType !== "IMAGE") {
+    if (media && (media.slotKey !== "answer_image" || (media.operation === "NEW" && media.mediaType !== "IMAGE"))) {
       throw new DraftValidationError(
         "Für Antworten sind nur Bilder erlaubt.",
         "answers",
@@ -571,9 +617,40 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     );
   }
 
+  const templateId = resolveCanonicalQuestionTemplateId(payload.templateId);
+  const template = findQuestionTemplate(questionTemplateDefinitions, templateId ?? "standard");
+  const generatorParameters: GeneratorParametersDraft = {};
+  for (const generatorId of template?.generators ?? []) {
+    const parameters = normalizeGeneratorParameters(generatorId, payload.generatorParameters?.[generatorId]);
+    if (!parameters) {
+      throw new DraftValidationError("Die Generatorparameter sind ungültig.", "questionMedia");
+    }
+    generatorParameters[generatorId] = parameters;
+  }
+  const templateConfig = requiresCompleteQuestion
+    ? normalizeQuestionTemplateConfig(payload.templateConfig)
+    : parseQuestionTemplateConfigDraft(payload.templateConfig);
+  if (!templateConfig) {
+    throw new DraftValidationError("Die Anzeigedauern der Pixelstufen sind ungültig.", "questionMedia");
+  }
+
   return {
+    templateId,
     questionText,
-    questionMedia: normalizeQuestionMedia(payload.questionMedia),
+    questionMedia: (() => {
+      if (!Array.isArray(payload.questionMedia)) {
+        throw new DraftValidationError("Die Fragenmedien sind ungültig.", "questionMedia");
+      }
+      const normalized = payload.questionMedia.map((media) => normalizeQuestionMedia(media));
+      if (normalized.some((media) => media === null)) {
+        throw new DraftValidationError("Die Fragenmedien sind ungültig.", "questionMedia");
+      }
+      const slots = normalized.map((media) => media!.slotKey);
+      if (new Set(slots).size !== slots.length) {
+        throw new DraftValidationError("Ein Medienslot darf nur einmal vorkommen.", "questionMedia", "CONFLICT");
+      }
+      return normalized as Exclude<NormalizedMediaDraft, null>[];
+    })(),
     answers,
     categoryIds: [...new Set(payload.categoryIds)],
     sourceOrRemark: payload.sourceOrRemark.trim(),
@@ -583,6 +660,8 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
       requiresCompleteQuestion,
     ),
     reviewFeedback: normalizeReviewFeedback(payload),
+    generatorParameters,
+    templateConfig,
   };
 }
 
@@ -617,13 +696,18 @@ export async function saveQuestion(
       payload.intent !== "APPROVE" &&
       payload.intent !== "REQUEST_CHANGES")
   ) {
-    return { success: false, message: "Die Speicheraktion ist ungültig." };
+    return {
+      success: false,
+      errorCode: "INVALID_SAVE_ACTION",
+      fallbackMessage: serverMessages.errors.INVALID_SAVE_ACTION,
+    };
   }
 
   if (!canPerformSaveIntent(payload.intent, session)) {
     return {
       success: false,
-      message: "Du bist für diese Speicheraktion nicht berechtigt.",
+      errorCode: "PERMISSION_DENIED",
+      fallbackMessage: serverMessages.errors.PERMISSION_DENIED,
     };
   }
 
@@ -633,7 +717,8 @@ export async function saveQuestion(
   ) {
     return {
       success: false,
-      message: "Nur eine bestehende Frage kann zurückgegeben werden.",
+      errorCode: "VALIDATION_ERROR",
+      fallbackMessage: "Nur eine bestehende Frage kann zurückgegeben werden.",
     };
   }
 
@@ -641,11 +726,9 @@ export async function saveQuestion(
 
   try {
     draft = validateQuestion(payload);
-    if (draft.questionMedia) {
-      draft.questionMedia = await verifyUploadedQuestionMedia(
-        draft.questionMedia,
-      );
-    }
+    draft.questionMedia = await Promise.all(
+      draft.questionMedia.map((media) => verifyUploadedQuestionMedia(media)),
+    );
     for (const answer of draft.answers) {
       if (answer.media) {
         answer.media = await verifyUploadedQuestionMedia(
@@ -657,29 +740,81 @@ export async function saveQuestion(
     }
   } catch (error) {
     if (error instanceof DraftValidationError) {
-      return {
-        success: false,
-        message: error.message,
-        validationTarget: error.validationTarget,
-      };
+      return createValidationFailure(error);
     }
 
     console.error("Entwurfsdaten konnten nicht validiert werden", error);
 
     return {
       success: false,
-      message: "Der Entwurf konnte nicht geprüft werden.",
+      errorCode: "UNEXPECTED_ERROR",
+      fallbackMessage: serverMessages.errors.UNEXPECTED_ERROR,
     };
   }
 
   const requiresCompleteQuestion =
     payload.intent === "SUBMIT_FOR_REVIEW" || payload.intent === "APPROVE";
-  const selectedTemplate = questionTemplates.find(
-    (template) => template.id === payload.templateId,
+  const selectedTemplate = findQuestionTemplate(
+    questionTemplateDefinitions,
+    draft.templateId ?? "standard",
   );
-  const requiredMediaSlot = selectedTemplate?.questionMediaSlot?.required
-    ? selectedTemplate.questionMediaSlot
-    : null;
+  const templateMediaSlots = selectedTemplate?.mediaSlots ?? [];
+  const requiredMediaSlots = templateMediaSlots.filter((slot) => slot.required);
+  const requiredMediaSlot = requiredMediaSlots[0] ?? null;
+  const requiredMediaLabel = requiredMediaSlot ? serverMessages.media.existingLabel : null;
+
+  if (selectedTemplate?.requiresAnswerImages) {
+    const requiredQuestionMediaMissing = requiredMediaSlots.some((slot) => {
+      const media = draft.questionMedia.find(
+        (candidate) => candidate.slotKey === slot.slotKey,
+      );
+      return !media || media.operation === "REMOVE" || !media.url;
+    });
+    if (requiredQuestionMediaMissing) {
+      return createValidationFailure(
+        new DraftValidationError(
+          "Das FaceMorph-Ergebnisbild ist erforderlich.",
+          "questionMedia",
+        ),
+      );
+    }
+    if (
+      !hasRequiredTemplateAnswerImages(
+        draft.answers,
+        selectedTemplate.initialAnswers.length,
+      )
+    ) {
+      return createValidationFailure(
+        new DraftValidationError(
+          "Für FaceMorph sind beide Antwortbilder erforderlich.",
+          "answers",
+        ),
+      );
+    }
+  }
+
+  try {
+    for (const media of draft.questionMedia) {
+      const definition = getMediaSlotDefinition(media.slotKey);
+      if (
+        definition.scope !== "QUESTION" ||
+        definition.mediaType !== media.mediaType ||
+        (media.operation === "NEW" && !definition.manualUploadAllowed) ||
+        (media.operation === "NEW" && !isMediaSlotAllowedForTemplate(templateMediaSlots, media.slotKey))
+      ) {
+        throw new DraftValidationError(
+          "Ein Fragenmedium gehört nicht zu einem zulässigen Slot der Vorlage.",
+          "questionMedia",
+          "CONFLICT",
+        );
+      }
+    }
+  } catch (error) {
+    if (error instanceof DraftValidationError) {
+      return createValidationFailure(error);
+    }
+    throw error;
+  }
   const classicAnswers = draft.answers.filter(
     (answer) =>
       !answer.fieldLabel &&
@@ -742,6 +877,21 @@ export async function saveQuestion(
         );
       }
 
+      const persistedTemplate = draft.templateId
+        ? await tx.frage_vorlagen.findUnique({
+            where: { code: draft.templateId },
+            select: { vorlage_id: true },
+          })
+        : null;
+
+      if (draft.templateId && !persistedTemplate) {
+        throw new DraftValidationError(
+          serverMessages.errors.UNKNOWN_TEMPLATE,
+          undefined,
+          "UNKNOWN_TEMPLATE",
+        );
+      }
+
       const standardAnswerType = classicAnswers.length
         ? await tx.antworttyp.findFirst({
             where: {
@@ -762,34 +912,29 @@ export async function saveQuestion(
         );
       }
 
-      const requestedMediaTypeName =
-        draft.questionMedia?.mediaType === "IMAGE" ? "Bild" : "Audio";
-      const matchingMediaTypes =
-        draft.questionMedia?.operation === "NEW" &&
-        draft.questionMedia.mediaType
-          ? await tx.medientyp.findMany({
-              where: {
-                medientyp: {
-                  equals: requestedMediaTypeName,
-                  mode: "insensitive",
-                },
-              },
-              select: { medientyp_id: true, medientyp: true },
-            })
-          : [];
-
-      if (
-        draft.questionMedia?.operation === "NEW" &&
-        matchingMediaTypes.length !== 1
-      ) {
-        throw new DraftValidationError(
-          "Der Medientyp ist nicht eindeutig konfiguriert.",
-          "questionMedia",
+      const newQuestionMediaTypes = new Set(
+        draft.questionMedia
+          .filter((media) => media.operation === "NEW" && media.mediaType)
+          .map((media) => media.mediaType!),
+      );
+      const mediaTypeName = (type: QuestionMediaType) =>
+        type === "IMAGE" ? "Bild" : type === "AUDIO" ? "Audio" : "Video";
+      const matchingMediaTypes = newQuestionMediaTypes.size
+        ? await tx.medientyp.findMany({
+            where: { medientyp: { in: [...newQuestionMediaTypes].map(mediaTypeName), mode: "insensitive" } },
+            select: { medientyp_id: true, medientyp: true },
+          })
+        : [];
+      const requestedMediaTypeIds = new Map<QuestionMediaType, number>();
+      for (const mediaType of newQuestionMediaTypes) {
+        const matches = matchingMediaTypes.filter(
+          (candidate) => candidate.medientyp.toLowerCase() === mediaTypeName(mediaType).toLowerCase(),
         );
+        if (matches.length !== 1) {
+          throw new DraftValidationError("Der Medientyp ist nicht eindeutig konfiguriert.", "questionMedia");
+        }
+        requestedMediaTypeIds.set(mediaType, matches[0].medientyp_id);
       }
-
-      const requestedMediaTypeId =
-        matchingMediaTypes[0]?.medientyp_id ?? null;
       const hasNewAnswerImage = draft.answers.some(
         (answer) => answer.media?.operation === "NEW",
       );
@@ -825,6 +970,7 @@ export async function saveQuestion(
       const storedMediaSelect = {
         medien_id: true,
         datei: true,
+        slot_key: true,
         medientyp: { select: { medientyp: true } },
       } as const;
 
@@ -865,6 +1011,7 @@ export async function saveQuestion(
               antwort_id: created.antwort_id,
               medientyp_id: answerImageTypeId,
               datei: answer.media.url,
+              slot_key: "answer_image",
               sortierung: 1,
             },
           });
@@ -920,6 +1067,7 @@ export async function saveQuestion(
               antwortfeld_id: createdField.antwortfeld_id,
               medientyp_id: answerImageTypeId,
               datei: group.media.url,
+              slot_key: "answer_image",
               sortierung: 1,
             },
           });
@@ -972,7 +1120,7 @@ export async function saveQuestion(
       }
 
       if (payload.questionId === undefined) {
-        if (draft.questionMedia?.operation === "UNCHANGED") {
+        if (draft.questionMedia.some((media) => media.operation === "UNCHANGED" || media.existingMediaId !== null)) {
           throw new DraftValidationError(
             "Ein vorhandenes Medium kann keiner neuen Frage zugeordnet werden.",
             "questionMedia",
@@ -981,13 +1129,16 @@ export async function saveQuestion(
 
         if (
           requiresCompleteQuestion &&
-          requiredMediaSlot &&
-          (draft.questionMedia?.operation !== "NEW" ||
-            draft.questionMedia.mediaType !==
-              requiredMediaSlot.allowedMediaType)
+          requiredMediaSlots.some((slot) =>
+            !draft.questionMedia.some(
+              (media) => media.slotKey === slot.slotKey && media.operation === "NEW",
+            ),
+          )
         ) {
           throw new DraftValidationError(
-            `Für diese Spezialfrage ist ${requiredMediaSlot.label} erforderlich.`,
+            formatMessage(serverMessages.editor.requiredTemplateMedia, {
+              label: serverMessages.media.existingLabel,
+            }),
             "questionMedia",
           );
         }
@@ -1001,6 +1152,8 @@ export async function saveQuestion(
           data: {
             frage: draft.questionText,
             quelle: draft.sourceOrRemark || null,
+            vorlage_id: persistedTemplate?.vorlage_id ?? null,
+            template_config_json: draft.templateConfig,
             ist_archiviert: false,
             ist_unfertig: payload.intent === "DRAFT",
             moderationsnotizen: draft.moderationNotes || null,
@@ -1032,19 +1185,21 @@ export async function saveQuestion(
           },
         });
 
-        if (
-          draft.questionMedia?.operation === "NEW" &&
-          draft.questionMedia.url &&
-          requestedMediaTypeId
-        ) {
-          await tx.medien.create({
-            data: {
-              fragen_id: createdQuestion.fragen_id,
-              medientyp_id: requestedMediaTypeId,
-              datei: draft.questionMedia.url,
-              sortierung: 1,
-            },
-          });
+        for (const media of draft.questionMedia) {
+          if (media.operation !== "NEW" || !media.url || !media.mediaType) continue;
+          const medientypId = requestedMediaTypeIds.get(media.mediaType);
+          if (!medientypId || !hasExactlyOneMediaOwner({ questionId: createdQuestion.fragen_id })) {
+            throw new DraftValidationError("Die Medienzuordnung ist ungültig.", "questionMedia");
+          }
+          await tx.medien.create({ data: {
+            fragen_id: createdQuestion.fragen_id,
+            antwort_id: null,
+            antwortfeld_id: null,
+            slot_key: media.slotKey,
+            medientyp_id: medientypId,
+            datei: media.url,
+            sortierung: 1,
+          } });
         }
 
         const answerStates: SavedAnswerState[] = [];
@@ -1074,6 +1229,7 @@ export async function saveQuestion(
           select: {
             medien_id: true,
             datei: true,
+            slot_key: true,
             medientyp: { select: { medientyp: true } },
           },
         });
@@ -1081,7 +1237,7 @@ export async function saveQuestion(
         return {
           fragen_id: createdQuestion.fragen_id,
           questionMedia:
-            createQuestionMediaDraftFromStoredMedia(storedMedia),
+            createQuestionMediaDraftFromStoredMedia(storedMedia, draft.templateId),
           answers: answerStates,
         };
       }
@@ -1098,7 +1254,17 @@ export async function saveQuestion(
             select: {
               medien_id: true,
               datei: true,
+              slot_key: true,
               medientyp: { select: { medientyp: true } },
+            },
+          },
+          generator_laefe: {
+            select: {
+              generator_id: true,
+              generator_version: true,
+              status: true,
+              parameters_json: true,
+              medien: { select: { medien_id: true, rolle: true, slot_key: true } },
             },
           },
           antworten: {
@@ -1148,7 +1314,9 @@ export async function saveQuestion(
 
       if (!existingQuestion) {
         throw new DraftValidationError(
-          "Die gespeicherte Frage existiert nicht mehr.",
+          serverMessages.errors.QUESTION_NOT_FOUND,
+          undefined,
+          "QUESTION_NOT_FOUND",
         );
       }
 
@@ -1172,27 +1340,31 @@ export async function saveQuestion(
       if (!mayPerformUpdate) {
         throw new DraftValidationError(
           "Du darfst diese Aktion für diese Frage nicht ausführen.",
+          undefined,
+          "PERMISSION_DENIED",
         );
       }
 
-      const mediaOperation = draft.questionMedia?.operation ?? "UNCHANGED";
+      const primaryQuestionMedia = draft.questionMedia[0] ?? null;
+      const mediaOperation = primaryQuestionMedia?.operation ?? "UNCHANGED";
       const existingQuestionMedia = existingQuestion.medien;
 
       if (
-        existingQuestionMedia.length > 1 &&
+        false && existingQuestionMedia.length > 1 &&
         mediaOperation !== "UNCHANGED"
       ) {
         throw new DraftValidationError(
           "Diese Frage besitzt mehrere Fragenmedien. Sie können im MVP nicht ersetzt oder entfernt werden.",
           "questionMedia",
+          "CONFLICT",
         );
       }
 
       if (
-        draft.questionMedia?.existingMediaId &&
+        primaryQuestionMedia?.existingMediaId &&
         !existingQuestionMedia.some(
           (medium) =>
-            medium.medien_id === draft.questionMedia?.existingMediaId,
+            medium.medien_id === primaryQuestionMedia?.existingMediaId,
         )
       ) {
         throw new DraftValidationError(
@@ -1203,7 +1375,7 @@ export async function saveQuestion(
 
       const effectiveMediaType =
         mediaOperation === "NEW"
-          ? draft.questionMedia?.mediaType ?? null
+          ? primaryQuestionMedia?.mediaType ?? null
           : mediaOperation === "REMOVE" || existingQuestionMedia.length !== 1
             ? null
             : getQuestionMediaTypeFromName(
@@ -1211,12 +1383,67 @@ export async function saveQuestion(
               );
 
       if (
-        requiresCompleteQuestion &&
+        false && requiresCompleteQuestion &&
         requiredMediaSlot &&
-        effectiveMediaType !== requiredMediaSlot.allowedMediaType
+        effectiveMediaType !== getMediaSlotDefinition(requiredMediaSlot.slotKey).mediaType
       ) {
         throw new DraftValidationError(
-          `Für diese Spezialfrage ist ${requiredMediaSlot.label} erforderlich.`,
+          formatMessage(serverMessages.editor.requiredTemplateMedia, {
+            label: requiredMediaLabel ?? serverMessages.media.existingLabel,
+          }),
+          "questionMedia",
+        );
+      }
+
+      const existingIds = new Set(existingQuestionMedia.map((medium) => medium.medien_id));
+      const requestedExistingIds = new Set<number>();
+      for (const media of draft.questionMedia) {
+        if (media.existingMediaId === null) continue;
+        if (requestedExistingIds.has(media.existingMediaId) || !existingIds.has(media.existingMediaId)) {
+          throw new DraftValidationError("Das vorhandene Medium gehört nicht mehr zu dieser Frage.", "questionMedia");
+        }
+        requestedExistingIds.add(media.existingMediaId);
+      }
+      const visibleQuestionMedia = draft.questionMedia.filter(
+        (media) => media.operation !== "REMOVE" && Boolean(media.url),
+      );
+      const hasLegacyGeneratorOutput = (selectedTemplate?.generators ?? []).some((generatorId) => {
+        const definition = getGeneratorDefinition(generatorId);
+        const runs = existingQuestion.generator_laefe.filter((run) => run.generator_id === generatorId);
+        const legacyPixelRun = generatorId === "image_pixelate" &&
+          visibleQuestionMedia.some((media) => media.slotKey === "pixel_result_image") &&
+          !runs.some((run) => run.generator_version >= 2);
+        return legacyPixelRun || Boolean(definition && runs.length === 0 &&
+          definition.inputSlots.every((slotKey) => !visibleQuestionMedia.some((media) => media.slotKey === slotKey)) &&
+          definition.outputSlots.every((slotKey) => visibleQuestionMedia.some((media) => media.slotKey === slotKey)));
+      });
+      const generatorMediaMissing = (selectedTemplate?.generators ?? []).some((generatorId) => {
+        const definition = getGeneratorDefinition(generatorId);
+        if (!definition) return true;
+        const inputMedia = definition.inputSlots.map((slotKey) =>
+          visibleQuestionMedia.find((media) => media.slotKey === slotKey),
+        );
+        const outputMedia = definition.outputSlots.map((slotKey) =>
+          visibleQuestionMedia.find((media) => media.slotKey === slotKey),
+        );
+        const desiredParameters = draft.generatorParameters[generatorId];
+        return inputMedia.some((media) => !media || media.operation !== "UNCHANGED") || outputMedia.some((media) => !media) ||
+          !existingQuestion.generator_laefe.some((run) => {
+            const runParameters = normalizeGeneratorParameters(generatorId, run.parameters_json);
+            return run.generator_id === generatorId && run.generator_version === definition.version &&
+              run.status === "SUCCEEDED" && Boolean(desiredParameters && runParameters && generatorParametersEqual(desiredParameters, runParameters)) &&
+              inputMedia.every((media) => media?.existingMediaId !== null && run.medien.some((item) => item.rolle === "INPUT" && item.medien_id === media?.existingMediaId)) &&
+              outputMedia.every((media) => media?.existingMediaId !== null && run.medien.some((item) => item.rolle === "OUTPUT" && item.medien_id === media?.existingMediaId));
+          });
+      });
+      const requiredMediaMissing = hasLegacyGeneratorOutput
+        ? false
+        : generatorMediaMissing || requiredMediaSlots.some(
+            (slot) => !visibleQuestionMedia.some((media) => media.slotKey === slot.slotKey),
+          );
+      if (requiresCompleteQuestion && requiredMediaMissing) {
+        throw new DraftValidationError(
+          formatMessage(serverMessages.editor.requiredTemplateMedia, { label: serverMessages.media.existingLabel }),
           "questionMedia",
         );
       }
@@ -1375,6 +1602,7 @@ export async function saveQuestion(
         existingMedia: Array<{
           medien_id: number;
           datei: string;
+          slot_key: string | null;
           medientyp: { medientyp: string };
         }>,
         target:
@@ -1422,6 +1650,7 @@ export async function saveQuestion(
               data: {
                 ...relationData,
                 datei: media.url,
+                slot_key: "answer_image",
                 medientyp_id: answerImageTypeId,
                 sortierung: 1,
               },
@@ -1431,6 +1660,7 @@ export async function saveQuestion(
               data: {
                 ...relationData,
                 datei: media.url,
+                slot_key: "answer_image",
                 medientyp_id: answerImageTypeId,
                 sortierung: 1,
               },
@@ -1439,6 +1669,11 @@ export async function saveQuestion(
         } else if (operation === "REMOVE" && existingMedia.length === 1) {
           await tx.medien.delete({
             where: { medien_id: existingMedia[0].medien_id },
+          });
+        } else if (operation === "UNCHANGED" && existingMedia.length === 1 && existingMedia[0].slot_key === null) {
+          await tx.medien.update({
+            where: { medien_id: existingMedia[0].medien_id },
+            data: { slot_key: "answer_image" },
           });
         }
 
@@ -1495,36 +1730,52 @@ export async function saveQuestion(
         where: { fragen_id: payload.questionId },
       });
 
-      if (
-        mediaOperation === "NEW" &&
-        draft.questionMedia?.url &&
-        requestedMediaTypeId
-      ) {
-        if (existingQuestionMedia.length === 1) {
-          await tx.medien.update({
-            where: { medien_id: existingQuestionMedia[0].medien_id },
-            data: {
-              datei: draft.questionMedia.url,
-              medientyp_id: requestedMediaTypeId,
-              sortierung: 1,
-            },
-          });
-        } else {
-          await tx.medien.create({
-            data: {
+      for (const media of draft.questionMedia) {
+        const existing = media.existingMediaId === null
+          ? null
+          : existingQuestionMedia.find((candidate) => candidate.medien_id === media.existingMediaId) ?? null;
+        if (media.operation === "NEW" && media.url && media.mediaType) {
+          const medientypId = requestedMediaTypeIds.get(media.mediaType);
+          if (!medientypId) throw new DraftValidationError("Der Medientyp ist nicht konfiguriert.", "questionMedia");
+          if (existing) {
+            await tx.medien.update({
+              where: { medien_id: existing.medien_id },
+              data: { datei: media.url, medientyp_id: medientypId, slot_key: media.slotKey, sortierung: 1 },
+            });
+          } else {
+            await tx.medien.create({ data: {
               fragen_id: payload.questionId,
-              datei: draft.questionMedia.url,
-              medientyp_id: requestedMediaTypeId,
+              antwort_id: null,
+              antwortfeld_id: null,
+              slot_key: media.slotKey,
+              datei: media.url,
+              medientyp_id: medientypId,
               sortierung: 1,
-            },
-          });
+            } });
+          }
+        } else if (media.operation === "REMOVE" && existing) {
+          await tx.medien.delete({ where: { medien_id: existing.medien_id } });
+        } else if (media.operation === "UNCHANGED" && existing && existing.slot_key === null) {
+          await tx.medien.update({ where: { medien_id: existing.medien_id }, data: { slot_key: media.slotKey } });
         }
-      } else if (
-        mediaOperation === "REMOVE" &&
-        existingQuestionMedia.length === 1
-      ) {
-        await tx.medien.delete({
-          where: { medien_id: existingQuestionMedia[0].medien_id },
+      }
+
+      const changedGeneratorSlots = draft.questionMedia
+        .filter((media) => media.operation === "NEW" || media.operation === "REMOVE")
+        .map((media) => media.slotKey);
+      const staleGeneratorIds = (selectedTemplate?.generators ?? []).filter((generatorId) => {
+        const definition = getGeneratorDefinition(generatorId);
+        return definition && [...definition.inputSlots, ...definition.outputSlots]
+          .some((slotKey) => changedGeneratorSlots.includes(slotKey));
+      });
+      if (staleGeneratorIds.length > 0) {
+        await tx.medien_generator_laefe.updateMany({
+          where: {
+            fragen_id: payload.questionId,
+            generator_id: { in: staleGeneratorIds },
+            status: "SUCCEEDED",
+          },
+          data: { status: "STALE", finished_at: new Date() },
         });
       }
 
@@ -1533,6 +1784,8 @@ export async function saveQuestion(
         data: {
           frage: draft.questionText,
           quelle: draft.sourceOrRemark || null,
+          vorlage_id: persistedTemplate?.vorlage_id ?? null,
+          template_config_json: draft.templateConfig,
           ist_unfertig: payload.intent === "DRAFT",
           moderationsnotizen: draft.moderationNotes || null,
           gueltig_bis: draft.validUntil,
@@ -1691,13 +1944,14 @@ export async function saveQuestion(
         select: {
           medien_id: true,
           datei: true,
+          slot_key: true,
           medientyp: { select: { medientyp: true } },
         },
       });
 
       return {
         fragen_id: updatedQuestion.fragen_id,
-        questionMedia: createQuestionMediaDraftFromStoredMedia(storedMedia),
+        questionMedia: createQuestionMediaDraftFromStoredMedia(storedMedia, draft.templateId),
         answers: answerStates,
       };
     });
@@ -1709,54 +1963,50 @@ export async function saveQuestion(
       questionId: question.fragen_id,
       questionMedia: question.questionMedia,
       answers: question.answers,
-      message: createSuccessMessage(
+      messageCode: createSuccessCode(
         payload.intent,
-        question.fragen_id,
-        payload.templateId !== null,
         payload.questionId !== undefined,
+      ),
+      messageParams: { id: question.fragen_id },
+      fallbackMessage: formatMessage(
+        serverMessages.success[
+          createSuccessCode(payload.intent, payload.questionId !== undefined)
+        ],
+        { id: question.fragen_id },
       ),
     };
   } catch (error) {
     if (error instanceof DraftValidationError) {
-      return {
-        success: false,
-        message: error.message,
-        validationTarget: error.validationTarget,
-      };
+      return createValidationFailure(error);
     }
 
     console.error("Frage konnte nicht gespeichert werden", error);
 
     return {
       success: false,
-      message:
-        "Die Frage konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      errorCode: "UNEXPECTED_ERROR",
+      fallbackMessage: serverMessages.errors.UNEXPECTED_ERROR,
     };
   }
 }
 
-function createSuccessMessage(
+function createSuccessCode(
   intent: QuestionSaveIntent,
-  questionId: number,
-  hasTemplate: boolean,
   wasUpdated: boolean,
-): string {
-  const message =
+): QuestionEditorSuccessCode {
+  return (
     intent === "DRAFT"
       ? wasUpdated
-        ? `Entwurf aktualisiert. Fragen-ID: ${questionId}`
-        : `Entwurf gespeichert. Fragen-ID: ${questionId}`
+        ? "draftUpdated"
+        : "draftCreated"
       : intent === "SUBMIT_FOR_REVIEW"
         ? wasUpdated
-          ? `Frage aktualisiert und zur Prüfung eingereicht. Fragen-ID: ${questionId}`
-          : `Frage zur Prüfung eingereicht. Fragen-ID: ${questionId}`
+          ? "submittedUpdated"
+          : "submittedCreated"
         : intent === "REQUEST_CHANGES"
-          ? `Frage zur Überarbeitung zurückgegeben. Fragen-ID: ${questionId}`
+          ? "changesRequested"
           : wasUpdated
-            ? `Frage aktualisiert und freigegeben. Fragen-ID: ${questionId}`
-            : `Frage gespeichert und freigegeben. Fragen-ID: ${questionId}`;
-
-  return hasTemplate
-    ? `${message}. Die Spezialfrage-Herkunft wird noch nicht gespeichert.`
-    : message;
+            ? "approvedUpdated"
+            : "approvedCreated"
+  );
 }

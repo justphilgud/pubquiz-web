@@ -8,6 +8,9 @@ import {
   createAnswerMediaDraftFromStoredMedia,
   createQuestionMediaDraftFromStoredMedia,
 } from "./questionMedia";
+import { resolveCanonicalQuestionTemplateId } from "./templates/questionTemplateRegistry";
+import { mapGeneratorRun } from "./generators/runState";
+import { normalizeQuestionTemplateConfig, DEFAULT_PIXEL_TEMPLATE_CONFIG } from "./pixelTemplateConfig";
 
 export async function loadQuestionForEditor(questionId: number) {
   const question = await prisma.fragen.findUnique({
@@ -33,6 +36,7 @@ export async function loadQuestionForEditor(questionId: number) {
       created_by_user_id: true,
       updated_at: true,
       last_modified_by_user_id: true,
+      template_config_json: true,
       vorlage: {
         select: { code: true, name: true },
       },
@@ -45,7 +49,21 @@ export async function loadQuestionForEditor(questionId: number) {
         select: {
           medien_id: true,
           datei: true,
+          slot_key: true,
           medientyp: { select: { medientyp: true } },
+        },
+      },
+      generator_laefe: {
+        orderBy: { created_at: "desc" },
+        select: {
+          generator_lauf_id: true,
+          generator_id: true,
+          generator_version: true,
+          status: true,
+          input_fingerprint: true,
+          error_code: true,
+          parameters_json: true,
+          medien: { select: { medien_id: true, rolle: true } },
         },
       },
       antworten: {
@@ -114,7 +132,7 @@ export async function loadQuestionForEditor(questionId: number) {
     users.map((user) => [user.id, user.name?.trim() || user.email]),
   );
   const getUserName = (userId: number | null) =>
-    userId === null ? null : (userNames.get(userId) ?? "Unbekannt");
+    userId === null ? null : (userNames.get(userId) ?? null);
 
   const classicAnswers: QuestionAnswerDraft[] = question.antworten.map(
     (answer) => ({
@@ -162,14 +180,24 @@ export async function loadQuestionForEditor(questionId: number) {
     },
   );
   const answers = [...classicAnswers, ...labeledAnswers];
-  const questionMedia = createQuestionMediaDraftFromStoredMedia(
-    question.medien,
+  const templateId = resolveCanonicalQuestionTemplateId(
+    question.vorlage?.code ?? null,
   );
+  const questionMedia = createQuestionMediaDraftFromStoredMedia(question.medien, templateId);
+
+  const generatorRuns = question.generator_laefe.map(mapGeneratorRun).filter((run) => run !== null);
+  const generatorParameters = {} as NonNullable<QuestionEditorDraft["generatorParameters"]>;
+  for (const run of generatorRuns) {
+    generatorParameters[run.generatorId] ??= run.parameters;
+  }
 
   const draft: QuestionEditorDraft = {
-    templateId: question.vorlage?.code ?? null,
+    templateId,
     questionText: question.frage,
     questionMedia,
+    generatorRuns,
+    generatorParameters,
+    templateConfig: normalizeQuestionTemplateConfig(question.template_config_json) ?? DEFAULT_PIXEL_TEMPLATE_CONFIG,
     answers:
       answers.length > 0
         ? answers
@@ -202,7 +230,7 @@ export async function loadQuestionForEditor(questionId: number) {
     reviewFeedback: question.review_feedback,
     submittedAt: question.submitted_at?.toISOString() ?? null,
     reviewedAt: question.reviewed_at?.toISOString() ?? null,
-    creatorName: getUserName(question.created_by_user_id) ?? "Unbekannt",
+    creatorName: getUserName(question.created_by_user_id) ?? "",
     submittedByName: getUserName(question.submitted_by_user_id),
     reviewedByName: getUserName(question.reviewed_by_user_id),
     approvedByName: getUserName(question.approved_by_user_id),

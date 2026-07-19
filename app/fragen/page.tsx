@@ -40,10 +40,8 @@ export default async function FragenPage({
     : null;
 
   const searchData = capabilities.canViewReviewQueue
-    ? await Promise.all([
+      ? await Promise.all([
         prisma.fragenkategorie.findMany({ orderBy: { kategorie: "asc" } }),
-        prisma.antworttyp.findMany({ orderBy: { antworttyp: "asc" } }),
-        prisma.medientyp.findMany({ orderBy: { medientyp: "asc" } }),
         getAktiveQuizListe(),
       ])
     : null;
@@ -117,11 +115,8 @@ export default async function FragenPage({
           <Suspense fallback={<div className="p-8">Lade Fragensuche...</div>}>
             <FragenWorkspace
               embedded
-              defaultTab="suche"
               kategorien={searchData[0]}
-              antworttypen={searchData[1]}
-              medientypen={searchData[2]}
-              quizze={searchData[3]}
+              quizze={searchData[1]}
             />
           </Suspense>
         )}

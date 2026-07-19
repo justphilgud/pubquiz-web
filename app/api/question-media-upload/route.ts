@@ -14,20 +14,26 @@ import {
 } from "@/app/fragen/editor/mediaUploadEnvironment";
 import {
   isAllowedQuestionMediaPathname,
-  questionMediaRules,
 } from "@/app/fragen/editor/questionMedia";
 import type { QuestionMediaType } from "@/app/fragen/editor/types";
+import type { MediaSlotKey } from "@/app/fragen/editor/types";
+import { getMediaSlotDefinition, isMediaSlotKey } from "@/app/fragen/editor/mediaSlots";
+import { questionTemplateDefinitions } from "@/app/fragen/editor/templates/questionTemplates";
+import { findQuestionTemplate, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
 type UploadContext =
   | {
       target: "QUESTION";
       questionId: number | null;
       mediaType: QuestionMediaType;
+      slotKey: MediaSlotKey;
+      templateId: string | null;
     }
   | {
       target: "ANSWER";
       questionId: number | null;
       mediaType: "IMAGE";
+      slotKey: "answer_image";
       answerTarget:
         | { type: "CLASSIC"; answerId: number | null }
         | { type: "LABELED_FIELD"; answerFieldId: number | null };
@@ -78,10 +84,13 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
   const questionId = Reflect.get(value, "questionId");
   const mediaType = Reflect.get(value, "mediaType");
   const target = Reflect.get(value, "target");
+  const slotKey = Reflect.get(value, "slotKey");
+  const rawTemplateId = Reflect.get(value, "templateId");
 
   if (
     (target !== "QUESTION" && target !== "ANSWER") ||
-    (mediaType !== "IMAGE" && mediaType !== "AUDIO")
+    (mediaType !== "IMAGE" && mediaType !== "AUDIO" && mediaType !== "VIDEO") ||
+    !isMediaSlotKey(slotKey)
   ) {
     throw new Error("Uploadkontext ist ungültig.");
   }
@@ -89,10 +98,14 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
   const parsedQuestionId = parseOptionalId(questionId);
 
   if (target === "QUESTION") {
-    return { target, questionId: parsedQuestionId, mediaType };
+    if (rawTemplateId !== null && typeof rawTemplateId !== "string") throw new Error("Vorlagenkontext ist ungültig.");
+    const definition = getMediaSlotDefinition(slotKey);
+    if (definition.scope !== "QUESTION" || definition.mediaType !== mediaType) throw new Error("Medienslot ist ungültig.");
+    if (!definition.manualUploadAllowed) throw new Error("Dieser Medienslot darf nicht manuell hochgeladen werden.");
+    return { target, questionId: parsedQuestionId, mediaType, slotKey, templateId: resolveCanonicalQuestionTemplateId(rawTemplateId) };
   }
 
-  if (mediaType !== "IMAGE") {
+  if (mediaType !== "IMAGE" || slotKey !== "answer_image") {
     throw new Error("Für Antworten sind nur Bilder erlaubt.");
   }
 
@@ -109,6 +122,7 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
       target,
       questionId: parsedQuestionId,
       mediaType,
+      slotKey,
       answerTarget: {
         type: answerTargetType,
         answerId: parseOptionalId(Reflect.get(answerTarget, "answerId")),
@@ -121,6 +135,7 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
       target,
       questionId: parsedQuestionId,
       mediaType,
+      slotKey,
       answerTarget: {
         type: answerTargetType,
         answerFieldId: parseOptionalId(
@@ -170,6 +185,7 @@ export async function POST(request: Request) {
       getSignedToken: async (pathname, clientPayload) => {
         phase = "context-authorization";
         const context = parseUploadContext(clientPayload);
+        let effectiveTemplateId = context.target === "QUESTION" ? context.templateId : null;
 
         if (context.questionId === null) {
           if (!canCreateQuestions(session)) {
@@ -182,6 +198,7 @@ export async function POST(request: Request) {
               created_by_user_id: true,
               review_status: true,
               ist_archiviert: true,
+              vorlage: { select: { code: true } },
             },
           });
 
@@ -195,6 +212,8 @@ export async function POST(request: Request) {
           ) {
             throw new Error("Frage darf nicht bearbeitet werden.");
           }
+
+          effectiveTemplateId = resolveCanonicalQuestionTemplateId(question.vorlage?.code ?? null);
 
           if (context.target === "ANSWER") {
             const belongsToQuestion =
@@ -231,34 +250,42 @@ export async function POST(request: Request) {
           throw new Error("Antwortzuordnung ist ungültig.");
         }
 
+        if (context.target === "QUESTION") {
+          const template = findQuestionTemplate(questionTemplateDefinitions, effectiveTemplateId ?? "standard");
+          if (!template?.mediaSlots.some((slot) => slot.slotKey === context.slotKey)) {
+            throw new Error("Medienslot ist für diese Vorlage nicht erlaubt.");
+          }
+        }
+
         if (
           !isAllowedQuestionMediaPathname(
             pathname,
             context.mediaType,
             context.target,
             uploadConfig.environmentPrefix,
+            context.slotKey,
           )
         ) {
           throw new Error("Dateipfad oder Dateiendung ist ungültig.");
         }
 
-        const rule = questionMediaRules[context.mediaType];
+        const slotDefinition = getMediaSlotDefinition(context.slotKey);
         const validUntil = Date.now() + 10 * 60 * 1000;
         phase = "signed-token";
         const token = await issueSignedToken({
           ...uploadConfig.blobAuthentication,
           pathname,
           operations: ["put"],
-          allowedContentTypes: [...rule.mimeTypes],
-          maximumSizeInBytes: rule.maximumSizeInBytes,
+          allowedContentTypes: [...slotDefinition.allowedMimeTypes],
+          maximumSizeInBytes: slotDefinition.maxFileSizeBytes,
           validUntil,
         });
 
         return {
           token,
           urlOptions: {
-            allowedContentTypes: [...rule.mimeTypes],
-            maximumSizeInBytes: rule.maximumSizeInBytes,
+            allowedContentTypes: [...slotDefinition.allowedMimeTypes],
+            maximumSizeInBytes: slotDefinition.maxFileSizeBytes,
             addRandomSuffix: true,
             validUntil,
           },

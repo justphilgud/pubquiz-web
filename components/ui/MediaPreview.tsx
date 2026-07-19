@@ -7,7 +7,7 @@ export function MediaPreview({
   compact = false,
 }: {
   title: string;
-  type?: "Bild" | "Audio" | "Video" | "Datei";
+  type?: string;
   children?: ReactNode;
   compact?: boolean;
 }) {

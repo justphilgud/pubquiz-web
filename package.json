@@ -3,10 +3,12 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run dev:check && next dev",
+    "dev:check": "tsx scripts/env-check.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --import tsx --test app/i18n/questionEditorMessages.test.ts app/fragen/editor/mediaSlots.test.ts app/fragen/editor/questionDraftState.test.ts app/fragen/editor/questionTemplateDraft.test.ts app/fragen/editor/questionQuality.generator.test.ts app/fragen/editor/templates/questionTemplateRegistry.test.ts app/fragen/editor/components/QuestionMediaSection.test.ts app/fragen/editor/generators/fingerprints.test.ts app/fragen/editor/generators/parameters.test.ts app/fragen/editor/generators/outputValidation.test.ts app/fragen/editor/generators/registry.test.ts app/fragen/editor/generators/status.test.ts app/fragen/editor/generators/processors/audioReverse.test.ts app/fragen/editor/generators/processors/audioBitcrush.test.ts app/fragen/editor/generators/processors/imagePixelate.test.ts app/fragen/editor/pixelTemplateConfig.test.ts config/environment.test.ts",
     "env:check": "tsx scripts/env-check.ts"
   },
   "dependencies": {
@@ -19,6 +21,7 @@
     "@vercel/blob": "^2.4.0",
     "bcryptjs": "^3.0.3",
     "fast-xml-parser": "^5.8.0",
+    "ffmpeg-static": "5.3.0",
     "jose": "^6.2.3",
     "next": "16.2.5",
     "next-auth": "^5.0.0-beta.31",
@@ -27,6 +30,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-qr-code": "^2.0.21",
+    "sharp": "0.34.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

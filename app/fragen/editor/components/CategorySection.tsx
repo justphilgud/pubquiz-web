@@ -3,6 +3,9 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Modal } from "@/components/ui/Modal";
 import { SearchInput } from "@/components/ui/SearchInput";
 import type { QuestionCategory } from "../types";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { normalizeEditorSearch } from "@/app/i18n/formatting";
+import { formatMessage } from "@/app/i18n/formatMessage";
 
 type CategorySectionProps = {
   categories: QuestionCategory[];
@@ -22,6 +25,7 @@ export function CategorySection({
   selectedCategoryIds,
   onChangeCategories,
 }: CategorySectionProps) {
+  const { locale, messages } = useQuestionEditorMessages();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isDiscardConfirmationOpen, setIsDiscardConfirmationOpen] =
     useState(false);
@@ -38,12 +42,12 @@ export function CategorySection({
   );
 
   const filteredCategories = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLocaleLowerCase("de-DE");
+    const normalizedQuery = normalizeEditorSearch(locale, searchQuery);
 
     return categories.filter((category) =>
-      category.name.toLocaleLowerCase("de-DE").includes(normalizedQuery),
+      normalizeEditorSearch(locale, category.name).includes(normalizedQuery),
     );
-  }, [categories, searchQuery]);
+  }, [categories, locale, searchQuery]);
 
   const hasPendingChanges = !haveSameCategoryIds(
     initialCategoryIds,
@@ -98,7 +102,7 @@ export function CategorySection({
   return (
     <>
       <section className="rounded-2xl border border-slate-200 bg-white p-4">
-        <h2 className="font-semibold text-slate-950">Kategorien</h2>
+        <h2 className="font-semibold text-slate-950">{messages.categories.title}</h2>
 
         {selectedCategories.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2">
@@ -111,7 +115,7 @@ export function CategorySection({
                     selectedCategoryIds.filter((id) => id !== category.id),
                   )
                 }
-                aria-label={`${category.name} entfernen`}
+                aria-label={formatMessage(messages.categories.remove, { name: category.name })}
                 className="min-h-10 rounded-full border border-slate-300 bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-200"
               >
                 {category.name} <span aria-hidden="true">×</span>
@@ -125,13 +129,13 @@ export function CategorySection({
           onClick={openPicker}
           className="mt-3 min-h-11 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-500"
         >
-          Kategorien auswählen
+          {messages.categories.select}
         </button>
       </section>
 
       <Modal
         open={isPickerOpen}
-        title="Kategorien auswählen"
+        title={messages.categories.select}
         onClose={requestCancelPicker}
         footer={
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -140,14 +144,14 @@ export function CategorySection({
               onClick={requestCancelPicker}
               className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-medium text-slate-800"
             >
-              Abbrechen
+              {messages.common.cancel}
             </button>
             <button
               type="button"
               onClick={applyCategories}
               className="min-h-11 rounded-xl bg-slate-950 px-4 py-2 font-medium text-white"
             >
-              Fertig ({pendingCategoryIds.length})
+              {formatMessage(messages.categories.done, { count: pendingCategoryIds.length })}
             </button>
           </div>
         }
@@ -155,12 +159,12 @@ export function CategorySection({
         <div className="flex max-h-[calc(100dvh-12rem)] min-h-0 flex-col">
           <label className="block shrink-0">
             <span className="text-sm font-medium text-slate-900">
-              Kategorien durchsuchen
+              {messages.categories.searchLabel}
             </span>
             <SearchInput
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Kategorie suchen"
+              placeholder={messages.categories.searchPlaceholder}
               className="mt-2 min-h-11 rounded-xl border-slate-300 px-4 py-3 focus:border-slate-950 focus:ring-slate-200"
             />
           </label>
@@ -191,8 +195,8 @@ export function CategorySection({
             {filteredCategories.length === 0 && (
               <p className="py-3 text-sm text-slate-500">
                 {categories.length === 0
-                  ? "Keine Kategorien vorhanden."
-                  : "Keine Kategorien gefunden."}
+                  ? messages.categories.none
+                  : messages.categories.notFound}
               </p>
             )}
           </div>
@@ -201,16 +205,15 @@ export function CategorySection({
 
       <ConfirmDialog
         open={isDiscardConfirmationOpen}
-        title="Änderungen verwerfen?"
-        cancelLabel="Weiter auswählen"
-        confirmLabel="Änderungen verwerfen"
+        title={messages.categories.discardTitle}
+        cancelLabel={messages.categories.continue}
+        confirmLabel={messages.categories.discard}
         danger
         onClose={continueSelecting}
         onConfirm={resetPickerState}
       >
         <p>
-          Deine Änderungen an der Kategorieauswahl wurden noch nicht
-          übernommen.
+          {messages.categories.discardDescription}
         </p>
       </ConfirmDialog>
     </>

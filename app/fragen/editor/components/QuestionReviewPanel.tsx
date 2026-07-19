@@ -5,16 +5,10 @@ import type {
   QuestionEditorContext,
   QuestionEditorRecord,
 } from "../types";
-
-const dateFormatter = new Intl.DateTimeFormat("de-DE", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "Europe/Berlin",
-});
-
-function formatDate(value: string | null) {
-  return value ? dateFormatter.format(new Date(value)) : "–";
-}
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { formatEditorDateTime } from "@/app/i18n/formatting";
+import { formatMessage } from "@/app/i18n/formatMessage";
+import { formatQuestionQualityIssue } from "../questionEditorLocalization";
 
 export function QuestionReviewPanel({
   record,
@@ -25,55 +19,61 @@ export function QuestionReviewPanel({
   editorContext: QuestionEditorContext;
   quality: QuestionQualityResult;
 }) {
+  const { locale, messages } = useQuestionEditorMessages();
+  const formatDate = (value: string | null) =>
+    value ? formatEditorDateTime(locale, value) : messages.common.unknownDate;
   return (
     <div className="space-y-4">
       <section className="rounded-2xl border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-slate-500">Frage #{record.questionId}</p>
+            <p className="text-sm text-slate-500">{formatMessage(messages.review.questionNumber, { id: record.questionId })}</p>
             <p className="mt-1 text-sm text-slate-700">
-              Erstellt von {record.creatorName} am {formatDate(record.createdAt)}
-              {` · zuletzt geändert ${formatDate(record.updatedAt)}`}
+              {formatMessage(messages.review.created, { name: record.creatorName || messages.common.unknownUser, date: formatDate(record.createdAt) })}
+              {` · ${formatMessage(messages.review.modified, { date: formatDate(record.updatedAt) })}`}
               {record.lastModifiedByName
-                ? ` von ${record.lastModifiedByName}`
+                ? ` ${formatMessage(messages.review.by, { name: record.lastModifiedByName })}`
                 : ""}
             </p>
           </div>
-          <QuestionStatusBadge status={record.reviewStatus} />
+          <QuestionStatusBadge
+            status={record.reviewStatus}
+            labels={messages.review.statuses}
+          />
         </div>
 
         {(record.submittedAt || record.reviewedAt || record.templateName) && (
           <dl className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
             {record.submittedAt && (
               <div>
-                <dt className="font-medium text-slate-800">Eingereicht</dt>
+                <dt className="font-medium text-slate-800">{messages.review.submitted}</dt>
                 <dd>
                   {formatDate(record.submittedAt)}
-                  {record.submittedByName ? ` von ${record.submittedByName}` : ""}
+                  {record.submittedByName ? ` ${formatMessage(messages.review.by, { name: record.submittedByName })}` : ""}
                 </dd>
               </div>
             )}
             {record.reviewedAt && (
               <div>
-                <dt className="font-medium text-slate-800">Zuletzt geprüft</dt>
+                <dt className="font-medium text-slate-800">{messages.review.reviewed}</dt>
                 <dd>
                   {formatDate(record.reviewedAt)}
-                  {record.reviewedByName ? ` von ${record.reviewedByName}` : ""}
+                  {record.reviewedByName ? ` ${formatMessage(messages.review.by, { name: record.reviewedByName })}` : ""}
                 </dd>
               </div>
             )}
             {record.approvedAt && (
               <div>
-                <dt className="font-medium text-slate-800">Freigegeben</dt>
+                <dt className="font-medium text-slate-800">{messages.review.approved}</dt>
                 <dd>
                   {formatDate(record.approvedAt)}
-                  {record.approvedByName ? ` von ${record.approvedByName}` : ""}
+                  {record.approvedByName ? ` ${formatMessage(messages.review.by, { name: record.approvedByName })}` : ""}
                 </dd>
               </div>
             )}
             {record.templateName && (
               <div>
-                <dt className="font-medium text-slate-800">Vorlage</dt>
+                <dt className="font-medium text-slate-800">{messages.review.template}</dt>
                 <dd>{record.templateName}</dd>
               </div>
             )}
@@ -82,48 +82,48 @@ export function QuestionReviewPanel({
       </section>
 
       {record.reviewFeedback && (
-        <Alert variant="warning" title="Rückgabehinweis">
+        <Alert variant="warning" title={messages.review.feedback}>
           {record.reviewFeedback}
         </Alert>
       )}
 
       {editorContext === "readOnly" && (
-        <Alert variant="info" title="Frage ist in Prüfung">
-          Die Inhalte können während der Prüfung nur angesehen werden.
+        <Alert variant="info" title={messages.review.inReview}>
+          {messages.review.inReviewHelp}
         </Alert>
       )}
 
       {editorContext === "review" && (
         <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <h2 className="font-semibold text-slate-950">Qualitätsprüfung</h2>
+          <h2 className="font-semibold text-slate-950">{messages.review.quality}</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
               <h3 className="text-sm font-semibold text-red-800">
-                Blockierende Kriterien
+                {messages.review.blockers}
               </h3>
               {quality.blockers.length > 0 ? (
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-red-800">
                   {quality.blockers.map((blocker) => (
-                    <li key={blocker}>{blocker}</li>
+                    <li key={`${blocker.code}-${JSON.stringify(blocker.params)}`}>{formatQuestionQualityIssue(blocker, messages)}</li>
                   ))}
                 </ul>
               ) : (
                 <p className="mt-2 text-sm text-emerald-700">
-                  Keine Blocker erkannt.
+                  {messages.review.noBlockers}
                 </p>
               )}
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-amber-800">Warnungen</h3>
+              <h3 className="text-sm font-semibold text-amber-800">{messages.review.warnings}</h3>
               {quality.warnings.length > 0 ? (
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-800">
                   {quality.warnings.map((warning) => (
-                    <li key={warning}>{warning}</li>
+                    <li key={`${warning.code}-${JSON.stringify(warning.params)}`}>{formatQuestionQualityIssue(warning, messages)}</li>
                   ))}
                 </ul>
               ) : (
                 <p className="mt-2 text-sm text-emerald-700">
-                  Keine Qualitätswarnungen.
+                  {messages.review.noWarnings}
                 </p>
               )}
             </div>

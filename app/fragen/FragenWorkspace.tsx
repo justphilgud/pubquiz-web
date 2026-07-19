@@ -1,27 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import FrageSuche from "./FrageSuche";
-import FrageForm from "./neu/FrageForm";
-import { getFrageForEdit } from "./actions";
 
 type Kategorie = {
   fragenkategorie_id: number;
   kategorie: string;
 };
-
-type Antworttyp = {
-  antworttyp_id: number;
-  antworttyp: string;
-};
-
-type Medientyp = {
-  medientyp_id: number;
-  medientyp: string;
-};
-
 
 export type QuizOption = {
   quiz_id: number;
@@ -30,36 +15,15 @@ export type QuizOption = {
   ist_archiviert: boolean;
 };
 
-type EditFrage = Awaited<ReturnType<typeof getFrageForEdit>>;
-
 export default function FragenWorkspace({
   kategorien,
-  antworttypen,
-  medientypen,
   quizze,
   embedded = false,
-  defaultTab = "neu",
 }: {
   kategorien: Kategorie[];
-  antworttypen: Antworttyp[];
-  medientypen: Medientyp[];
   quizze: QuizOption[];
   embedded?: boolean;
-  defaultTab?: "neu" | "suche";
 }) {
-  const searchParams = useSearchParams();
-  const requestedTab = searchParams.get("tab");
-  const initialTab =
-    requestedTab === "neu" || requestedTab === "suche"
-      ? requestedTab
-      : defaultTab;
-
-  const [activeTab, setActiveTab] = useState<"neu" | "suche">(initialTab);
-  const [editFrage, setEditFrage] = useState<EditFrage>(null);
-  const handleCancelEdit = () => {
-    setEditFrage(null);
-  };
-
   const Wrapper = embedded ? "div" : "main";
 
   return (
@@ -76,30 +40,16 @@ export default function FragenWorkspace({
           )}
 
           <div className="flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
-            <button
-              type="button"
-              onClick={() => {
-                setEditFrage(null);
-                setActiveTab("neu");
-              }}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === "neu"
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-700 hover:bg-slate-50"
-                }`}
+            <Link
+              href="/fragen/editor"
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
               Neue Frage
-            </button>
+            </Link>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab("suche")}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === "suche"
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-700 hover:bg-slate-50"
-                }`}
-            >
+            <span className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm">
               Suche
-            </button>
+            </span>
 
             <Link
               href="/fragen/import"
@@ -110,25 +60,10 @@ export default function FragenWorkspace({
           </div>
         </div>
 
-        <div className={activeTab === "neu" ? "block" : "hidden"}>
-          <FrageForm
-            kategorien={kategorien}
-            antworttypen={antworttypen}
-            medientypen={medientypen}
-            frageVorlagen={[]}
-            offeneQuizzes={[]}
-            editFrage={editFrage}
-            onCancelEdit={handleCancelEdit}
-          />
-        </div>
-        <div className={activeTab === "suche" ? "block" : "hidden"}>
+        <div>
           <FrageSuche
             kategorien={kategorien}
             quizze={quizze}
-            onEditFrage={(frage) => {
-              setEditFrage(frage);
-              setActiveTab("neu");
-            }}
           />
         </div>
 

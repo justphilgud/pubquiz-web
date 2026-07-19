@@ -1,4 +1,5 @@
 import { CharacterCount } from "./CharacterCount";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
 type NotesSectionProps = {
   sourceOrRemark: string;
@@ -13,13 +14,14 @@ export function NotesSection({
   onSourceOrRemarkChange,
   onModerationNotesChange,
 }: NotesSectionProps) {
+  const { messages } = useQuestionEditorMessages();
   return (
     <>
-      <h2 className="font-semibold text-slate-950">Interne Angaben</h2>
+      <h2 className="font-semibold text-slate-950">{messages.notes.title}</h2>
 
       <div className="mt-4 space-y-4">
         <label className="block">
-          <span className="text-sm font-medium">Quelle oder Bemerkung</span>
+          <span className="text-sm font-medium">{messages.notes.source}</span>
           <textarea
             value={sourceOrRemark}
             maxLength={1000}
@@ -32,7 +34,7 @@ export function NotesSection({
         </label>
 
         <label className="block">
-          <span className="text-sm font-medium">Moderationsnotizen</span>
+          <span className="text-sm font-medium">{messages.notes.moderation}</span>
           <textarea
             value={moderationNotes}
             maxLength={1000}

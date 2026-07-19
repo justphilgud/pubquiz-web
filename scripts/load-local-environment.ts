@@ -16,6 +16,7 @@ const LOCAL_MANAGED_VARIABLES = [
   "BLOB_READ_WRITE_TOKEN",
   "BLOB_WEBHOOK_PUBLIC_KEY",
   "VERCEL_BLOB_CALLBACK_URL",
+  "PRODUCTION_DATABASE_HOST",
 ] as const;
 
 export function loadLocalEnvironment(options?: { required?: boolean }) {

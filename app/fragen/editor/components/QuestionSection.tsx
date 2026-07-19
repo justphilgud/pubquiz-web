@@ -1,21 +1,27 @@
-import type { Ref } from "react";
+import type { ReactNode, Ref } from "react";
 import { CharacterCount } from "./CharacterCount";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
 type QuestionSectionProps = {
   questionText: string;
   questionTextRef?: Ref<HTMLTextAreaElement>;
   onQuestionTextChange: (questionText: string) => void;
+  mediaContent?: ReactNode;
+  validationError?: string | null;
 };
 
 export function QuestionSection({
   questionText,
   questionTextRef,
   onQuestionTextChange,
+  mediaContent,
+  validationError = null,
 }: QuestionSectionProps) {
+  const { messages } = useQuestionEditorMessages();
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4">
       <label htmlFor="questionText" className="font-semibold text-slate-950">
-        Frage
+        {messages.question.label}
       </label>
 
       <textarea
@@ -26,15 +32,24 @@ export function QuestionSection({
         onChange={(event) => onQuestionTextChange(event.target.value)}
         rows={4}
         autoFocus
-        placeholder="Was möchtest du wissen?"
+        placeholder={messages.question.placeholder}
+        aria-invalid={validationError ? true : undefined}
+        aria-describedby={validationError ? "questionText-error" : undefined}
         className="mt-3 w-full resize-y rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-slate-950"
       />
+
+      {validationError && (
+        <p id="questionText-error" role="alert" className="mt-2 text-sm font-medium text-red-700">
+          {validationError}
+        </p>
+      )}
 
       <CharacterCount
         current={questionText.length}
         maximum={300}
         warningAt={220}
       />
+      {mediaContent}
     </section>
   );
 }

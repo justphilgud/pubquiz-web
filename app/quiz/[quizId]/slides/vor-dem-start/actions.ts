@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
+import {
+  buildMediaUploadPathname,
+  getBlobUploadAuthentication,
+} from "@/app/fragen/editor/mediaUploadEnvironment";
 
 export async function saveVorDemStart(formData: FormData) {
   const quizId = Number(formData.get("quizId"));
@@ -21,14 +25,18 @@ export async function saveVorDemStart(formData: FormData) {
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9._-]/g, "");
 
-    const blob = await put(
-      `medien/video/intro/${quizId}-${Date.now()}-${originalName}`,
-      videoFile,
-      {
-        access: "public",
-        addRandomSuffix: false,
-      }
-    );
+    const blobPath = buildMediaUploadPathname("media", [
+      "video",
+      "intro",
+      `${quizId}-${Date.now()}-${originalName}`,
+    ]);
+    const blobAuthentication = getBlobUploadAuthentication();
+
+    const blob = await put(blobPath, videoFile, {
+      ...blobAuthentication,
+      access: "public",
+      addRandomSuffix: false,
+    });
 
     introVideoUrl = blob.url;
   }

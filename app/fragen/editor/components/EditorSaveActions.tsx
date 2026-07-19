@@ -6,6 +6,7 @@ import type {
   PendingQuestionSaveAction,
   QuestionEditorContext,
 } from "../types";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
 type SaveMessage = {
   tone: "success" | "error";
@@ -37,6 +38,7 @@ export function EditorSaveActions({
   onRunWorkflow,
   onRequestChanges,
 }: EditorSaveActionsProps) {
+  const { messages } = useQuestionEditorMessages();
   const [isDraftMenuOpen, setIsDraftMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isPending = pendingAction !== null;
@@ -73,20 +75,20 @@ export function EditorSaveActions({
   const workflowLabel = capabilities.canApproveQuestion
     ? pendingAction === "APPROVE"
       ? editorContext === "create"
-        ? "Wird gespeichert …"
-        : "Wird freigegeben …"
+        ? messages.save.saving
+        : messages.save.approving
       : workflowIdleLabel ??
-        (editorContext === "create" ? "Frage speichern" : "Frage freigeben")
+        (editorContext === "create" ? messages.save.saveQuestion : messages.save.approve)
     : pendingAction === "SUBMIT_FOR_REVIEW"
-      ? "Wird eingereicht …"
-      : workflowIdleLabel ?? "Zur Prüfung einreichen";
+      ? messages.save.submitting
+      : workflowIdleLabel ?? messages.save.submit;
 
   const draftLabel =
     pendingAction === "SAVE_DRAFT_AND_NEW"
-      ? "Speichern & neu …"
+      ? messages.save.saveAndNewPending
       : pendingAction === "SAVE_DRAFT"
-        ? "Wird gespeichert …"
-        : "Entwurf speichern";
+        ? messages.save.saving
+        : messages.save.saveDraft;
 
   function saveDraft(startNewQuestion: boolean) {
     setIsDraftMenuOpen(false);
@@ -110,7 +112,7 @@ export function EditorSaveActions({
           </p>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
           {showDraftActions && capabilities.canSaveDraft && (
             <div ref={menuRef} className="relative flex min-w-0 flex-1">
               {allowStartNewQuestion && isDraftMenuOpen && (
@@ -125,7 +127,7 @@ export function EditorSaveActions({
                     disabled={isPending}
                     className="min-h-11 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-900 hover:bg-slate-100"
                   >
-                    Entwurf speichern
+                    {messages.save.saveDraft}
                   </button>
                   <button
                     type="button"
@@ -134,7 +136,7 @@ export function EditorSaveActions({
                     disabled={isPending}
                     className="min-h-11 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-900 hover:bg-slate-100"
                   >
-                    Entwurf speichern &amp; neue Frage
+                    {messages.save.saveDraftAndNew}
                   </button>
                 </div>
               )}
@@ -154,7 +156,7 @@ export function EditorSaveActions({
               {allowStartNewQuestion && (
                 <button
                   type="button"
-                  aria-label="Entwurf-Aktionen öffnen"
+                  aria-label={messages.save.openDraftActions}
                   aria-haspopup="menu"
                   aria-expanded={isDraftMenuOpen}
                   onClick={() => setIsDraftMenuOpen((current) => !current)}
@@ -187,8 +189,8 @@ export function EditorSaveActions({
               className="flex-1 rounded-xl border border-red-300 bg-white px-4 py-3 font-medium text-red-800 disabled:cursor-wait disabled:opacity-60"
             >
               {pendingAction === "REQUEST_CHANGES"
-                ? "Wird zurückgegeben …"
-                : "Zur Überarbeitung zurückgeben"}
+                ? messages.review.returning
+                : messages.save.requestChanges}
             </button>
           )}
         </div>

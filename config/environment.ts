@@ -19,6 +19,40 @@ export class EnvironmentConfigurationError extends Error {
   }
 }
 
+export type DatabaseConnectionInfo = {
+  host: string;
+  database: string;
+  schema: string;
+};
+
+export function getDatabaseConnectionInfo(value = process.env.DATABASE_URL): DatabaseConnectionInfo {
+  let url: URL;
+  try {
+    url = new URL(value ?? "");
+  } catch {
+    throw new EnvironmentConfigurationError("DATABASE_URL_INVALID", "DATABASE_URL ist keine gültige URL.");
+  }
+  if (url.protocol !== "postgres:" && url.protocol !== "postgresql:") {
+    throw new EnvironmentConfigurationError("DATABASE_URL_INVALID", "DATABASE_URL muss PostgreSQL verwenden.");
+  }
+  return {
+    host: url.hostname,
+    database: decodeURIComponent(url.pathname.replace(/^\//, "")) || "(default)",
+    schema: url.searchParams.get("schema") || "pubquiz",
+  };
+}
+
+export function getSafeEnvironmentSummary() {
+  const database = getDatabaseConnectionInfo();
+  return {
+    environment: getLogicalEnvironment(),
+    databaseHost: database.host,
+    databaseName: database.database,
+    databaseSchema: database.schema,
+    blobPrefix: getBlobEnvironmentPrefix(),
+  };
+}
+
 function parseLogicalEnvironment(value: string): LogicalEnvironment | null {
   return value === "development" ||
     value === "preview" ||

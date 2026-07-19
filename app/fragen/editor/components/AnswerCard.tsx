@@ -6,6 +6,7 @@ import {
   type AnswerMediaUploadStatus,
 } from "./AnswerMediaSlot";
 import { CharacterCount } from "./CharacterCount";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
 type AnswerCardProps = {
   answer: QuestionAnswerDraft;
@@ -14,6 +15,7 @@ type AnswerCardProps = {
   pathnamePrefix: BlobEnvironmentPrefix;
   disabled: boolean;
   showMedia: boolean;
+  requireImage: boolean;
   onChange: (changes: Partial<QuestionAnswerDraft>) => void;
   onMediaChange: (media: QuestionMediaDraft | null) => void;
   onMediaUploadStatusChange: (status: AnswerMediaUploadStatus) => void;
@@ -27,11 +29,13 @@ export function AnswerCard({
   pathnamePrefix,
   disabled,
   showMedia,
+  requireImage,
   onChange,
   onMediaChange,
   onMediaUploadStatusChange,
   onRemove,
 }: AnswerCardProps) {
+  const { messages } = useQuestionEditorMessages();
   const fieldId = useId();
   const answerInputId = `${fieldId}-answer`;
   const additionalInfoInputId = `${fieldId}-additional-info`;
@@ -46,8 +50,8 @@ export function AnswerCard({
           htmlFor={answerInputId}
           className="text-sm font-medium text-slate-900"
         >
-          {answer.fieldLabel ?? "Antwort"}
-          {answer.fieldLabel && answer.isRequired === false ? " (optional)" : ""}
+          {answer.fieldLabel ?? messages.answers.answer}
+          {answer.fieldLabel && answer.isRequired === false ? ` (${messages.common.optional})` : ""}
         </label>
 
         <input
@@ -56,7 +60,7 @@ export function AnswerCard({
           value={answer.text}
           maxLength={200}
           onChange={(event) => onChange({ text: event.target.value })}
-          placeholder="Antwort eingeben"
+          placeholder={messages.answers.inputPlaceholder}
           className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3"
         />
 
@@ -73,7 +77,7 @@ export function AnswerCard({
           />
 
           <span className="text-sm font-medium text-slate-800">
-            Diese Antwort ist richtig
+            {messages.answers.correct}
           </span>
         </label>
 
@@ -81,9 +85,10 @@ export function AnswerCard({
           <button
             type="button"
             onClick={onRemove}
+            aria-label={`${messages.common.remove}: ${answer.fieldLabel ?? (answer.text.trim() || messages.answers.answer)}`}
             className="ml-auto min-h-11 rounded-lg px-3 py-2 text-sm text-red-700 hover:bg-red-50"
           >
-            Entfernen
+            {messages.common.remove}
           </button>
         )}
       </div>
@@ -94,10 +99,18 @@ export function AnswerCard({
           questionId={questionId}
           pathnamePrefix={pathnamePrefix}
           disabled={disabled}
+          required={requireImage}
           onChange={onMediaChange}
           onUploadStatusChange={onMediaUploadStatusChange}
         />
       )}
+
+      {showMedia && requireImage &&
+        (!answer.media || answer.media.operation === "REMOVE" || !answer.media.url) && (
+          <p role="alert" className="mt-2 text-sm font-medium text-red-700">
+            {messages.answers.imageRequired}
+          </p>
+        )}
 
       {isAdditionalInfoOpen ? (
         <div className="mt-2 border-t border-slate-100 pt-3">
@@ -106,14 +119,14 @@ export function AnswerCard({
               htmlFor={additionalInfoInputId}
               className="text-sm font-medium text-slate-900"
             >
-              Zusatzinformation für die Auflösung
+              {messages.answers.additionalInfo}
             </label>
             <button
               type="button"
               onClick={() => setIsAdditionalInfoOpen(false)}
               className="shrink-0 rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-slate-100"
             >
-              Einklappen
+              {messages.answers.collapse}
             </button>
           </div>
 
@@ -125,7 +138,7 @@ export function AnswerCard({
               onChange({ additionalInfo: event.target.value })
             }
             rows={2}
-            placeholder="Optionale Zusatzinformation für die Auflösung"
+            placeholder={messages.answers.additionalInfoPlaceholder}
             className="mt-2 w-full resize-y rounded-xl border border-slate-300 px-4 py-3 text-sm"
           />
 
@@ -142,7 +155,7 @@ export function AnswerCard({
               }}
               className="mt-1 min-h-11 rounded-lg px-3 py-2 text-sm text-red-700 hover:bg-red-50"
             >
-              Zusatzinformation entfernen
+              {messages.answers.removeAdditionalInfo}
             </button>
           )}
         </div>
@@ -153,8 +166,8 @@ export function AnswerCard({
           className="mt-2 min-h-11 rounded-lg px-2 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100"
         >
           {answer.additionalInfo.length > 0
-            ? "Zusatzinformation anzeigen"
-            : "Zusatzinformation hinzufügen"}
+            ? messages.answers.showAdditionalInfo
+            : messages.answers.addAdditionalInfo}
         </button>
       )}
     </article>

@@ -1,18 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   searchFragen,
   getFrageDetails,
-  getFrageForEdit,
   archiveFrage,
   restoreFrage,
   type FrageSuchResult,
   type FrageDetailsResult,
 } from "./actions";
-import { addFrageToQuiz } from "../quiz/actions";
 import ZuQuizHinzufuegenButton from "./ZuQuizHinzufuegenButton";
-import type { QuizResult } from "@/app/quiz/actions";
 import QuizVerwendungPopover from "./QuizVerwendungPopover";
 import type { QuizOption } from "./FragenWorkspace";
 
@@ -20,8 +18,6 @@ type Kategorie = {
   fragenkategorie_id: number;
   kategorie: string;
 };
-
-type FrageForEdit = Awaited<ReturnType<typeof getFrageForEdit>>;
 
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-200";
@@ -81,11 +77,9 @@ function StatBox({
 export default function FrageSuche({
   kategorien,
   quizze,
-  onEditFrage,
 }: {
   kategorien: Kategorie[];
   quizze: QuizOption[];
-  onEditFrage: (frage: FrageForEdit) => void;
 }) {
   const [suchtext, setSuchtext] = useState("");
   const [quelle, setQuelle] = useState("");
@@ -104,7 +98,6 @@ export default function FrageSuche({
     {}
   );
   const [detailsLoadingId, setDetailsLoadingId] = useState<number | null>(null);
-  const [editingFragenId, setEditingFragenId] = useState<number | null>(null);
   const [archivStatus, setArchivStatus] = useState<"alle" | "aktiv" | "archiviert">("alle");
 
   async function handleSearch() {
@@ -178,18 +171,6 @@ export default function FrageSuche({
     }));
 
     setDetailsLoadingId(null);
-  }
-
-  async function handleEdit(fragenId: number) {
-    const frage = await getFrageForEdit(fragenId);
-
-    if (!frage) {
-      alert("Frage konnte nicht geladen werden.");
-      return;
-    }
-
-    setEditingFragenId(frage.fragen_id);
-    onEditFrage(frage);
   }
 
   async function handleArchive(fragenId: number) {
@@ -367,8 +348,6 @@ export default function FrageSuche({
             const hatKeineMedien = frage.medien_anzahl === 0;
             const hatKeineAntworten = frage.antworten_anzahl === 0;
             const wurdeNochNieVerwendet = frage.quiz_anzahl === 0;
-            const isEditing = editingFragenId === frage.fragen_id;
-
             return (
               <article
                 key={frage.fragen_id}
@@ -380,10 +359,6 @@ export default function FrageSuche({
                       <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
                         ID {frage.fragen_id}
                       </span>
-
-                      {isEditing && (
-                        <StatusPill label="wird bearbeitet" tone="slate" />
-                      )}
 
                       {frage.ist_archiviert && (
                         <StatusPill label="archiviert" tone="slate" />
@@ -464,13 +439,12 @@ export default function FrageSuche({
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleEdit(frage.fragen_id)}
+                  <Link
+                    href={`/fragen/editor/${frage.fragen_id}`}
                     className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-700"
                   >
                     Bearbeiten
-                  </button>
+                  </Link>
 
                   {frage.ist_archiviert ? (
                     <button

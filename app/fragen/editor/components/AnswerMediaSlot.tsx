@@ -3,6 +3,8 @@
 import type { QuestionAnswerDraft, QuestionMediaDraft } from "../types";
 import { MediaUploadSlot, type MediaUploadStatus } from "./MediaUploadSlot";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { formatMessage } from "@/app/i18n/formatMessage";
 
 export type AnswerMediaUploadStatus = MediaUploadStatus;
 
@@ -11,6 +13,7 @@ type AnswerMediaSlotProps = {
   questionId: number | null;
   pathnamePrefix: BlobEnvironmentPrefix;
   disabled: boolean;
+  required?: boolean;
   onChange: (media: QuestionMediaDraft | null) => void;
   onUploadStatusChange: (status: AnswerMediaUploadStatus) => void;
 };
@@ -20,13 +23,16 @@ export function AnswerMediaSlot({
   questionId,
   pathnamePrefix,
   disabled,
+  required = false,
   onChange,
   onUploadStatusChange,
 }: AnswerMediaSlotProps) {
+  const { messages } = useQuestionEditorMessages();
   return (
     <MediaUploadSlot
       media={answer.media}
       mediaType="IMAGE"
+      slotKey="answer_image"
       uploadTarget={{
         target: "ANSWER",
         questionId,
@@ -38,12 +44,15 @@ export function AnswerMediaSlot({
           : { type: "CLASSIC", answerId: answer.answerId ?? null },
       }}
       environmentPrefix={pathnamePrefix}
-      label="Antwortbild"
-      helpText="Optional · JPEG, PNG oder WebP · maximal 10 MB"
+      label={messages.answers.imageLabel}
+      helpText={messages.answers.imageHelp}
       compact
-      collapsedLabel="Bild hinzufügen"
+      required={required}
+      collapsedLabel={messages.answers.addImage}
       disabled={disabled}
-      previewAlt={`Bild zu ${answer.fieldLabel ?? "Antwort"}`}
+      previewAlt={formatMessage(messages.answers.imageAlt, {
+        answer: answer.fieldLabel ?? messages.answers.answer,
+      })}
       onChange={onChange}
       onUploadStatusChange={onUploadStatusChange}
     />

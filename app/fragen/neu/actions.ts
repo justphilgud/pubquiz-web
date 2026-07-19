@@ -80,6 +80,7 @@ export async function saveFrage(data: {
   antwortfelder?: AntwortfeldInput[];
   quizIds?: number[];
 }) {
+  const session = await requireAdmin();
   const frageText = data.frage.trim();
 
   if (!frageText) {
@@ -248,8 +249,6 @@ export async function saveFrage(data: {
           sortierung: true,
         },
       });
-      const session = await requireAdmin();
-
       await addQuestionToQuiz(
         {
           quiz_id: quizId,

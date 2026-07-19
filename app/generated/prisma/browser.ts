@@ -48,6 +48,16 @@ export type fragenkategorie = Prisma.fragenkategorieModel
  */
 export type medien = Prisma.medienModel
 /**
+ * Model medien_generator_laefe
+ *
+ */
+export type medien_generator_laefe = Prisma.medien_generator_laefeModel
+/**
+ * Model medien_generator_lauf_medien
+ *
+ */
+export type medien_generator_lauf_medien = Prisma.medien_generator_lauf_medienModel
+/**
  * Model medientyp
  * 
  */

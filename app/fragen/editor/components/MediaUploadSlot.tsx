@@ -15,13 +15,15 @@ import {
   resolveQuestionMediaUrl,
   validateQuestionMediaFile,
 } from "../questionMedia";
-import type { QuestionMediaDraft, QuestionMediaType } from "../types";
+import type { MediaSlotKey, QuestionMediaDraft, QuestionMediaType } from "../types";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
+import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { formatMessage } from "@/app/i18n/formatMessage";
 
 export type MediaUploadStatus = "IDLE" | "UPLOADING" | "ERROR";
 
 type UploadTarget =
-  | { target: "QUESTION"; questionId: number | null }
+  | { target: "QUESTION"; questionId: number | null; templateId: string | null }
   | {
       target: "ANSWER";
       questionId: number | null;
@@ -33,6 +35,7 @@ type UploadTarget =
 type MediaUploadSlotProps = {
   media: QuestionMediaDraft | null;
   mediaType: QuestionMediaType;
+  slotKey: MediaSlotKey;
   uploadTarget: UploadTarget;
   environmentPrefix: BlobEnvironmentPrefix;
   label: string;
@@ -40,6 +43,7 @@ type MediaUploadSlotProps = {
   required?: boolean;
   compact?: boolean;
   disabled?: boolean;
+  manualUploadAllowed?: boolean;
   collapsedLabel?: string;
   previewAlt: string;
   onChange: (media: QuestionMediaDraft | null) => void;
@@ -60,27 +64,15 @@ function sanitizeFileName(fileName: string) {
   return sanitized || "medium";
 }
 
-function describeUploadFailure(error: unknown) {
+function isAuthorizationUploadFailure(error: unknown) {
   const message = error instanceof Error ? error.message : "";
-  const authorizationFailure =
-    /presigned url|authoriz|401|403|access denied/i.test(message);
-
-  return authorizationFailure
-    ? {
-        phase: "authorization",
-        message:
-          "Der Upload konnte nicht autorisiert werden. Bitte prüfe die Server-Konfiguration oder versuche es später erneut.",
-      }
-    : {
-        phase: "transfer",
-        message:
-          "Die Datei konnte nicht übertragen werden. Das bisherige Medium und deine Eingaben bleiben erhalten.",
-      };
+  return /presigned url|authoriz|401|403|access denied/i.test(message);
 }
 
 export function MediaUploadSlot({
   media,
   mediaType,
+  slotKey,
   uploadTarget,
   environmentPrefix,
   label,
@@ -88,11 +80,13 @@ export function MediaUploadSlot({
   required = false,
   compact = false,
   disabled = false,
+  manualUploadAllowed = true,
   collapsedLabel,
   previewAlt,
   onChange,
   onUploadStatusChange,
 }: MediaUploadSlotProps) {
+  const { messages } = useQuestionEditorMessages();
   const [isOpen, setIsOpen] = useState(Boolean(media) || !collapsedLabel);
   const [uploadState, setUploadState] = useState<UploadState>({ status: "IDLE" });
   const rule = questionMediaRules[mediaType];
@@ -112,7 +106,15 @@ export function MediaUploadSlot({
     const validationError = validateQuestionMediaFile(file, mediaType);
 
     if (validationError) {
-      changeUploadState({ status: "ERROR", message: validationError });
+      const template = validationError.code === "INVALID_EXTENSION"
+        ? messages.media.invalidExtension
+        : validationError.code === "INVALID_MIME"
+          ? messages.media.invalidMime
+          : messages.media.tooLarge;
+      changeUploadState({
+        status: "ERROR",
+        message: formatMessage(template, validationError.params),
+      });
       return;
     }
 
@@ -123,15 +125,17 @@ export function MediaUploadSlot({
         environmentPrefix,
         uploadTarget.target,
         mediaType,
+        slotKey,
         `${crypto.randomUUID()}-${sanitizeFileName(file.name)}`,
       );
       const blob = await uploadPresigned(pathname, file, {
         access: "public",
         handleUploadUrl: "/api/question-media-upload",
-        clientPayload: JSON.stringify({ ...uploadTarget, mediaType }),
+        clientPayload: JSON.stringify({ ...uploadTarget, mediaType, slotKey }),
       });
 
       onChange({
+        slotKey,
         existingMediaId: media?.existingMediaId ?? null,
         url: blob.url,
         mediaType,
@@ -142,13 +146,18 @@ export function MediaUploadSlot({
       });
       changeUploadState({ status: "IDLE" });
     } catch (error) {
-      const failure = describeUploadFailure(error);
+      const authorizationFailure = isAuthorizationUploadFailure(error);
 
       console.error("Medien-Upload im Browser fehlgeschlagen", {
-        phase: failure.phase,
+        phase: authorizationFailure ? "authorization" : "transfer",
         errorName: error instanceof Error ? error.name : "UnknownError",
       });
-      changeUploadState({ status: "ERROR", message: failure.message });
+      changeUploadState({
+        status: "ERROR",
+        message: authorizationFailure
+          ? messages.media.authorizationError
+          : messages.media.transferError,
+      });
     }
   }
 
@@ -165,7 +174,7 @@ export function MediaUploadSlot({
     changeUploadState({ status: "IDLE" });
   }
 
-  if (!isOpen && !media) {
+  if (!isOpen && !media && !required) {
     if (disabled) {
       return null;
     }
@@ -190,18 +199,25 @@ export function MediaUploadSlot({
           </h2>
           {required && (
             <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900">
-              Erforderlich
+              {messages.common.required}
             </span>
           )}
         </div>
         {helpText && <p className="mt-1 text-sm text-slate-600">{helpText}</p>}
       </div>
 
-      {media?.blockedReason ? (
+      {media?.blockedReason || media?.blockedReasonCode ? (
         <div role="alert" className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-          <p className="font-medium">Medium kann hier nicht bearbeitet werden.</p>
-          <p className="mt-1">{media.blockedReason}</p>
-          <p className="mt-1">Beim Speichern bleiben vorhandene Medien unverändert.</p>
+          <p className="font-medium">{messages.media.blockedTitle}</p>
+          <p className="mt-1">
+            {media.blockedReasonCode
+              ? formatMessage(
+                  messages.media.blockedReasons[media.blockedReasonCode],
+                  media.blockedReasonParams,
+                )
+              : media.blockedReason}
+          </p>
+          <p className="mt-1">{messages.media.blockedRetained}</p>
         </div>
       ) : (
         <div className={compact ? "mt-3 space-y-3" : "space-y-4"}>
@@ -209,7 +225,7 @@ export function MediaUploadSlot({
             <MediaPreview
               compact={compact}
               title={visibleMedia.fileName ?? getQuestionMediaFileName(visibleMedia.url!)}
-              type={visibleMedia.mediaType === "IMAGE" ? "Bild" : "Audio"}
+              type={visibleMedia.mediaType === "IMAGE" ? messages.common.image : messages.common.audio}
             >
               {visibleMedia.mediaType === "IMAGE" ? (
                 <ImageViewer
@@ -224,29 +240,41 @@ export function MediaUploadSlot({
 
           {isIncompatible && (
             <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
-              Das vorhandene Medium hat nicht den erforderlichen Typ.
+              {messages.media.incompatible}
             </p>
           )}
 
-          {!disabled &&
+          {!disabled && manualUploadAllowed &&
             (media?.operation === "REMOVE" ? (
               <div className="rounded-xl border border-dashed border-slate-300 p-3">
-                <p className="text-sm text-slate-700">Wird beim Speichern entfernt.</p>
+                <p className="text-sm text-slate-700">{messages.media.removalPending}</p>
                 <button
                   type="button"
                   onClick={restoreRemovedMedia}
                   className="mt-2 min-h-11 rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium"
                 >
-                  Entfernen rückgängig machen
+                  {messages.media.undoRemove}
                 </button>
               </div>
             ) : (
-              <div className="flex flex-wrap items-stretch gap-2">
+              <div
+                className="flex flex-wrap items-stretch gap-2"
+                onDragOver={(event) => {
+                  if (!disabled) event.preventDefault();
+                }}
+                onDrop={(event) => {
+                  if (disabled || uploadState.status === "UPLOADING") return;
+                  event.preventDefault();
+                  const file = event.dataTransfer.files[0];
+                  if (file) void uploadFile(file);
+                }}
+              >
                 <FileUpload
                   compact={compact}
-                  label={visibleMedia ? "Medium ersetzen" : "Datei auswählen"}
-                  description={`${mediaType === "IMAGE" ? "JPEG, PNG oder WebP" : "MP3, WAV oder OGG"} · maximal ${rule.sizeLabel}`}
+                  label={visibleMedia ? messages.media.replace : messages.media.choose}
+                  description={`${mediaType === "IMAGE" ? messages.media.imageFormats : messages.media.audioFormats} · ${formatMessage(messages.media.maximum, { size: rule.sizeLabel })}`}
                   accept={rule.accept}
+                  capture={mediaType === "IMAGE" ? "environment" : undefined}
                   disabled={uploadState.status === "UPLOADING"}
                   className={compact ? "min-w-40 flex-1" : "w-full"}
                   onChange={(event) => {
@@ -267,7 +295,7 @@ export function MediaUploadSlot({
                     disabled={uploadState.status === "UPLOADING"}
                     className="min-h-11 rounded-xl px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
                   >
-                    Entfernen
+                    {messages.common.remove}
                   </button>
                 )}
               </div>
@@ -278,7 +306,7 @@ export function MediaUploadSlot({
       <div aria-live="polite" aria-atomic="true">
         {uploadState.status === "UPLOADING" && (
           <p role="status" className="mt-2 text-sm font-medium text-slate-700">
-            Upload läuft …
+            {messages.media.uploading}
           </p>
         )}
         {uploadState.status === "ERROR" && (

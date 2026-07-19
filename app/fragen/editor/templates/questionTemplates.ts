@@ -1,73 +1,136 @@
-import type { QuestionTemplate } from "../types";
+import type { QuestionEditorMessages } from "@/app/i18n/messageTypes";
+import type {
+  QuestionTemplate,
+  QuestionTemplateDefinition,
+} from "../types";
+import { questionTemplateIds } from "./questionTemplateRegistry";
+import { getMediaSlotDefinition } from "../mediaSlots";
 
-export const questionTemplates: QuestionTemplate[] = [
+export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
-    id: "standard",
-    name: "Standardfrage",
-    description: "Freie Frage mit beliebig vielen Antworten.",
-    defaultQuestionText: "",
-    initialAnswers: [
-      {
-        isCorrect: true,
-      },
+    id: questionTemplateIds.standard,
+    selectable: false,
+    requiresAnswerImages: false,
+    translationKey: "standard",
+    allowsOptionalQuestionImage: true,
+    initialAnswers: [{ isCorrect: true }],
+    mediaSlots: [
+      { slotKey: "question_image", required: false },
+      { slotKey: "question_audio", required: false },
     ],
+    generators: [],
   },
   {
-    id: "multiple-choice",
-    name: "Multiple Choice",
-    description: "Geschlossene Frage mit vier Antwortmöglichkeiten.",
-    defaultQuestionText: "",
+    id: questionTemplateIds.multipleChoice,
+    selectable: false,
+    requiresAnswerImages: false,
+    translationKey: "multipleChoice",
+    allowsOptionalQuestionImage: true,
     initialAnswers: [
       { isCorrect: false },
       { isCorrect: false },
       { isCorrect: false },
       { isCorrect: false },
     ],
+    mediaSlots: [
+      { slotKey: "question_image", required: false },
+      { slotKey: "question_audio", required: false },
+    ],
+    generators: [],
   },
   {
-    id: "facemorph",
-    name: "FaceMorph",
-    description: "Zwei Personen in einem kombinierten Bild erkennen.",
-    defaultQuestionText:
-      "Welche beiden Personen sind auf diesem Bild zu sehen?",
+    id: questionTemplateIds.faceMorph,
+    selectable: true,
+    requiresAnswerImages: true,
+    translationKey: "faceMorph",
+    allowsOptionalQuestionImage: false,
     initialAnswers: [
-      {
-        fieldLabel: "Person A",
-        isCorrect: true,
-      },
-      {
-        fieldLabel: "Person B",
-        isCorrect: true,
-      },
+      { fieldLabelKey: "personA", isCorrect: true },
+      { fieldLabelKey: "personB", isCorrect: true },
     ],
-    questionMediaSlot: {
-      allowedMediaType: "IMAGE",
-      required: true,
-      label: "FaceMorph-Bild",
-      helpText: "Lade das fertig erstellte FaceMorph als JPEG, PNG oder WebP hoch.",
-    },
+    mediaSlots: [{ slotKey: "face_morph_result", required: true }],
+    generators: [],
   },
   {
-    id: "music-reverse",
-    name: "Musik rückwärts",
-    description: "Interpret und Titel eines rückwärts abgespielten Songs.",
-    defaultQuestionText:
-      "Welcher Song wurde hier rückwärts abgespielt? Nennt Interpret und Titel.",
+    id: questionTemplateIds.musicReverse,
+    selectable: true,
+    requiresAnswerImages: false,
+    translationKey: "musicReverse",
+    allowsOptionalQuestionImage: false,
     initialAnswers: [
-      {
-        fieldLabel: "Interpret",
-        isCorrect: true,
-      },
-      {
-        fieldLabel: "Titel",
-        isCorrect: true,
-      },
+      { fieldLabelKey: "artist", isCorrect: true },
+      { fieldLabelKey: "title", isCorrect: true },
     ],
-    questionMediaSlot: {
-      allowedMediaType: "AUDIO",
-      required: true,
-      label: "Rückwärts abgespielte Audiodatei",
-      helpText: "Lade die bereits rückwärts vorbereitete MP3-, WAV- oder OGG-Datei hoch.",
-    },
+    mediaSlots: [
+      { slotKey: "music_original_audio", required: true },
+      { slotKey: "music_reverse_audio", required: true },
+    ],
+    generators: ["audio_reverse"],
+  },
+  {
+    id: questionTemplateIds.musicEightBit,
+    selectable: false,
+    requiresAnswerImages: false,
+    translationKey: "musicEightBit",
+    allowsOptionalQuestionImage: false,
+    initialAnswers: [{ fieldLabelKey: "title", isCorrect: true }],
+    mediaSlots: [
+      { slotKey: "music_original_audio", required: true },
+      { slotKey: "music_bitcrush_audio", required: true },
+    ],
+    generators: ["audio_bitcrush"],
+  },
+  {
+    id: questionTemplateIds.pixelImage,
+    selectable: true,
+    requiresAnswerImages: false,
+    translationKey: "pixelImage",
+    allowsOptionalQuestionImage: false,
+    initialAnswers: [{ fieldLabelKey: "solution", isCorrect: true }],
+    mediaSlots: [
+      { slotKey: "pixel_original_image", required: true },
+      { slotKey: "pixel_stage_3_image", required: true },
+      { slotKey: "pixel_stage_2_image", required: true },
+      { slotKey: "pixel_stage_1_image", required: true },
+    ],
+    generators: ["image_pixelate"],
   },
 ];
+
+export function localizeQuestionTemplates(
+  messages: QuestionEditorMessages,
+): QuestionTemplate[] {
+  return questionTemplateDefinitions.map((definition) => {
+    const translation = messages.templates[definition.translationKey];
+
+    return {
+      id: definition.id,
+      selectable: definition.selectable,
+      requiresAnswerImages: definition.requiresAnswerImages,
+      name: translation.name,
+      description: translation.description,
+      defaultQuestionText: translation.defaultQuestion,
+      allowsOptionalQuestionImage: definition.allowsOptionalQuestionImage,
+      generators: definition.generators,
+      initialAnswers: definition.initialAnswers.map((answer) => ({
+        fieldLabel: answer.fieldLabelKey
+          ? messages.templateFields[answer.fieldLabelKey]
+          : undefined,
+        isCorrect: answer.isCorrect,
+      })),
+      mediaSlots: definition.mediaSlots.map((templateSlot) => {
+        const slotDefinition = getMediaSlotDefinition(templateSlot.slotKey);
+        return {
+          key: slotDefinition.key,
+          allowedMediaType: slotDefinition.mediaType,
+          required: templateSlot.required,
+          label: messages.mediaSlots[slotDefinition.labelKey].label,
+          helpText: messages.mediaSlots[slotDefinition.helpKey].help,
+          manualUploadAllowed: slotDefinition.manualUploadAllowed,
+          generatorInput: slotDefinition.generatorInput,
+          generatorOutput: slotDefinition.generatorOutput,
+        };
+      }),
+    };
+  });
+}

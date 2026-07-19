@@ -57,6 +57,8 @@ export const ModelName = {
   fragen_kategorien: 'fragen_kategorien',
   fragenkategorie: 'fragenkategorie',
   medien: 'medien',
+  medien_generator_laefe: 'medien_generator_laefe',
+  medien_generator_lauf_medien: 'medien_generator_lauf_medien',
   medientyp: 'medientyp',
   quiz: 'quiz',
   quiz_fragen: 'quiz_fragen',
@@ -136,7 +138,8 @@ export const FragenScalarFieldEnum = {
   submitted_by_user_id: 'submitted_by_user_id',
   review_feedback: 'review_feedback',
   reviewed_at: 'reviewed_at',
-  reviewed_by_user_id: 'reviewed_by_user_id'
+  reviewed_by_user_id: 'reviewed_by_user_id',
+  template_config_json: 'template_config_json'
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
@@ -167,10 +170,42 @@ export const MedienScalarFieldEnum = {
   datei: 'datei',
   sortierung: 'sortierung',
   bemerkung: 'bemerkung',
-  antwortfeld_id: 'antwortfeld_id'
+  antwortfeld_id: 'antwortfeld_id',
+  slot_key: 'slot_key'
 } as const
 
 export type MedienScalarFieldEnum = (typeof MedienScalarFieldEnum)[keyof typeof MedienScalarFieldEnum]
+
+
+export const Medien_generator_laefeScalarFieldEnum = {
+  generator_lauf_id: 'generator_lauf_id',
+  fragen_id: 'fragen_id',
+  generator_id: 'generator_id',
+  generator_version: 'generator_version',
+  status: 'status',
+  input_fingerprint: 'input_fingerprint',
+  error_code: 'error_code',
+  error_message: 'error_message',
+  parameters_json: 'parameters_json',
+  started_at: 'started_at',
+  finished_at: 'finished_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Medien_generator_laefeScalarFieldEnum = (typeof Medien_generator_laefeScalarFieldEnum)[keyof typeof Medien_generator_laefeScalarFieldEnum]
+
+
+export const Medien_generator_lauf_medienScalarFieldEnum = {
+  generator_lauf_medium_id: 'generator_lauf_medium_id',
+  generator_lauf_id: 'generator_lauf_id',
+  medien_id: 'medien_id',
+  rolle: 'rolle',
+  slot_key: 'slot_key',
+  created_at: 'created_at'
+} as const
+
+export type Medien_generator_lauf_medienScalarFieldEnum = (typeof Medien_generator_lauf_medienScalarFieldEnum)[keyof typeof Medien_generator_lauf_medienScalarFieldEnum]
 
 
 export const MedientypScalarFieldEnum = {
@@ -406,6 +441,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -420,4 +463,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

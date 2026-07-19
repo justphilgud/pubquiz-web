@@ -1,12 +1,22 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { saveQuestion } from "../actions";
-import { questionTemplates } from "../templates/questionTemplates";
+import {
+  findQuestionTemplate,
+  questionTemplateIds,
+  resolveCanonicalQuestionTemplateId,
+} from "../templates/questionTemplateRegistry";
+import {
+  analyzeQuestionTemplateChange,
+  applyQuestionTemplateToDraft,
+  clearQuestionTemplateFromDraft,
+  getActiveQuestionMediaSlots,
+} from "../questionTemplateDraft";
 import { AdditionalDetailsSection } from "./AdditionalDetailsSection";
 import { AnswersSection } from "./AnswersSection";
 import { EditorSaveActions } from "./EditorSaveActions";
@@ -14,6 +24,8 @@ import { QuestionReviewPanel } from "./QuestionReviewPanel";
 import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { QuestionSection } from "./QuestionSection";
+import { QuestionMediaSection } from "./QuestionMediaSection";
+import { QuestionGenerators } from "./QuestionGenerators";
 import { TemplateSelector } from "./TemplateSelector";
 import { evaluateQuestionQuality } from "../questionQuality";
 import type {
@@ -29,6 +41,23 @@ import type {
   PendingQuestionSaveAction,
   ReviewReasonCode,
 } from "../types";
+import type { AppLocale } from "@/app/i18n/locale";
+import type { QuestionEditorMessages } from "@/app/i18n/messageTypes";
+import { formatMessage } from "@/app/i18n/formatMessage";
+import {
+  formatQuestionEditorError,
+  formatQuestionEditorSuccess,
+  formatQuestionQualityIssue,
+} from "../questionEditorLocalization";
+import { QuestionEditorMessagesProvider } from "./QuestionEditorMessagesProvider";
+import { DEFAULT_PIXEL_TEMPLATE_CONFIG } from "../pixelTemplateConfig";
+import { PixelStageTimingFields } from "./PixelStageTimingFields";
+import { getGeneratorDefinition } from "../generators/registry";
+import {
+  applySavedAnswerState,
+  getQuestionDraftFingerprint,
+  removeAnswerById,
+} from "../questionDraftState";
 
 function createId(): string {
   return crypto.randomUUID();
@@ -54,7 +83,10 @@ function createInitialDraft(): QuestionEditorDraft {
   return {
     templateId: null,
     questionText: "",
-    questionMedia: null,
+    questionMedia: [],
+    generatorRuns: [],
+    generatorParameters: {},
+    templateConfig: DEFAULT_PIXEL_TEMPLATE_CONFIG,
     answers: [createAnswer({ isCorrect: true }, "initial-answer")],
 
     categoryIds: [],
@@ -76,16 +108,10 @@ type QuestionEditorProps = {
   initialDraft?: QuestionEditorDraft;
   questionRecord?: QuestionEditorRecord;
   mediaUploadPathnamePrefix: BlobEnvironmentPrefix;
+  locale: AppLocale;
+  messages: QuestionEditorMessages;
+  templates: QuestionTemplate[];
 };
-
-const visibleSpecialQuestionTemplateIds = new Set([
-  "facemorph",
-  "music-reverse",
-]);
-
-const specialQuestionTemplates = questionTemplates.filter((template) =>
-  visibleSpecialQuestionTemplateIds.has(template.id),
-);
 
 export function QuestionEditor({
   capabilities,
@@ -94,10 +120,19 @@ export function QuestionEditor({
   initialDraft,
   questionRecord,
   mediaUploadPathnamePrefix,
+  locale,
+  messages,
+  templates,
 }: QuestionEditorProps) {
+  const specialQuestionTemplates = templates.filter(
+    (template) => template.selectable,
+  );
   const router = useRouter();
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
     initialDraft ?? createInitialDraft(),
+  );
+  const [savedDraftFingerprint, setSavedDraftFingerprint] = useState(() =>
+    getQuestionDraftFingerprint(initialDraft ?? createInitialDraft()),
   );
   const [savedQuestionId, setSavedQuestionId] = useState<number | null>(
     questionRecord?.questionId ?? null,
@@ -108,9 +143,9 @@ export function QuestionEditor({
   );
   const [pendingAction, setPendingAction] =
     useState<PendingQuestionSaveAction | null>(null);
-  const [questionMediaUploadStatus, setQuestionMediaUploadStatus] = useState<
-    "IDLE" | "UPLOADING" | "ERROR"
-  >("IDLE");
+  const [questionMediaUploadStatuses, setQuestionMediaUploadStatuses] = useState<
+    Record<string, "IDLE" | "UPLOADING" | "ERROR">
+  >({});
   const [answerMediaUploadStatuses, setAnswerMediaUploadStatuses] = useState<
     Record<string, "IDLE" | "UPLOADING" | "ERROR">
   >({});
@@ -118,66 +153,108 @@ export function QuestionEditor({
     tone: "success" | "error";
     text: string;
   } | null>(null);
+  const [fieldError, setFieldError] = useState<{
+    target: QuestionValidationTarget;
+    text: string;
+  } | null>(null);
   const saveInProgressRef = useRef(false);
+  const allowNavigationRef = useRef(false);
   const questionTextRef = useRef<HTMLTextAreaElement>(null);
 
   const selectedTemplate = useMemo(
-    () =>
-      questionTemplates.find((template) => template.id === draft.templateId) ??
-      null,
-    [draft.templateId],
+    () => draft.templateId === null
+      ? null
+      : findQuestionTemplate(templates, draft.templateId),
+    [draft.templateId, templates],
   );
   const quality = useMemo(() => evaluateQuestionQuality(draft), [draft]);
+  const currentDraftFingerprint = useMemo(
+    () => getQuestionDraftFingerprint(draft),
+    [draft],
+  );
+  const hasUnsavedChanges = currentDraftFingerprint !== savedDraftFingerprint;
   const isReadOnly = editorContext === "readOnly";
-  const activeMediaSlot = useMemo(() => {
-    if (selectedTemplate?.questionMediaSlot) {
-      return selectedTemplate.questionMediaSlot;
-    }
+  const isEditorDisabled = isReadOnly || pendingAction !== null;
+  const mediaTemplate = selectedTemplate ?? findQuestionTemplate(templates, questionTemplateIds.standard);
+  const activeMediaSlots = useMemo(
+    () => getActiveQuestionMediaSlots(mediaTemplate, draft.questionMedia, messages),
+    [draft.questionMedia, mediaTemplate, messages],
+  );
 
-    if (draft.questionMedia) {
-      return {
-        allowedMediaType: draft.questionMedia.mediaType ?? ("IMAGE" as const),
-        required: false,
-        label: "Medium zur Frage",
-        helpText:
-          "Vorhandenes Fragenmedium. Beim Speichern bleibt es unverändert, solange du es nicht ersetzt oder entfernst.",
-      };
-    }
+  useEffect(() => {
+    if (!hasUnsavedChanges || isReadOnly) return;
 
-    return null;
-  }, [draft.questionMedia, selectedTemplate]);
+    const confirmNavigation = () => {
+      if (allowNavigationRef.current) return true;
+      const confirmed = window.confirm(messages.editor.unsavedChanges);
+      if (confirmed) allowNavigationRef.current = true;
+      return confirmed;
+    };
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (allowNavigationRef.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest("a[href]") as HTMLAnchorElement | null;
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+      const target = new URL(anchor.href, window.location.href);
+      if (target.origin !== window.location.origin || target.href === window.location.href) return;
+      if (!confirmNavigation()) event.preventDefault();
+    };
+    const handlePopState = () => {
+      if (!confirmNavigation()) window.history.forward();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+    document.addEventListener("click", handleDocumentClick, true);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+      document.removeEventListener("click", handleDocumentClick, true);
+    };
+  }, [hasUnsavedChanges, isReadOnly, messages.editor.unsavedChanges]);
 
   function applyTemplate(template: QuestionTemplate): boolean {
-    if (template.id === draft.templateId) {
+    if (
+      template.id === resolveCanonicalQuestionTemplateId(draft.templateId)
+    ) {
       return true;
     }
 
-    const wouldOverwriteContent =
-      draft.templateId !== null ||
-      draft.questionText.trim().length > 0 ||
-      draft.answers.length !== 1 ||
-      draft.answers.some(
-        (answer) =>
-          answer.text.trim().length > 0 ||
-          answer.additionalInfo.trim().length > 0 ||
-          answer.media !== null,
+    const impact = analyzeQuestionTemplateChange(draft, template);
+    const warningParts = [];
+
+    if (impact.overwritesContent) {
+      warningParts.push(messages.editor.templateChangeContent);
+    }
+
+    if (impact.retainsQuestionMedia) {
+      warningParts.push(messages.editor.templateChangeMediaRetained);
+    }
+
+    if (impact.hasRequiredMediaTypeConflict) {
+      warningParts.push(
+        messages.editor.templateChangeMediaConflict,
       );
+    }
 
     if (
-      wouldOverwriteContent &&
+      warningParts.length > 0 &&
       !window.confirm(
-        "Beim Wechsel der Spezialfrage werden Fragetext und Antworten ersetzt. Möchtest du fortfahren?",
+        formatMessage(messages.editor.templateChangeConfirm, {
+          details: warningParts.join(" "),
+        }),
       )
     ) {
       return false;
     }
 
-    setDraft((current) => ({
-      ...current,
-      templateId: template.id,
-      questionText: template.defaultQuestionText,
-      answers: template.initialAnswers.map((answer) => createAnswer(answer)),
-    }));
+    setDraft((current) =>
+      applyQuestionTemplateToDraft(current, template, createId),
+    );
 
     return true;
   }
@@ -186,6 +263,7 @@ export function QuestionEditor({
     answerId: string,
     changes: Partial<QuestionAnswerDraft>,
   ) {
+    if (fieldError?.target === "answers") setFieldError(null);
     setDraft((current) => ({
       ...current,
       answers: current.answers.map((answer) =>
@@ -195,6 +273,7 @@ export function QuestionEditor({
   }
 
   function addAnswer() {
+    if (fieldError?.target === "answers") setFieldError(null);
     setDraft((current) => ({
       ...current,
       answers: [...current.answers, createAnswer()],
@@ -202,6 +281,20 @@ export function QuestionEditor({
   }
 
   function removeAnswer(answerId: string) {
+    const answer = draft.answers.find((candidate) => candidate.id === answerId);
+    const containsRelevantData = Boolean(
+      answer &&
+        (answer.answerId ||
+          answer.answerFieldId ||
+          answer.solutionId ||
+          answer.text.trim() ||
+          answer.additionalInfo.trim() ||
+          answer.media),
+    );
+    if (containsRelevantData && !window.confirm(messages.answers.removeConfirm)) {
+      return;
+    }
+    if (fieldError?.target === "answers") setFieldError(null);
     setDraft((current) => {
       if (current.answers.length <= 1) {
         return current;
@@ -209,7 +302,7 @@ export function QuestionEditor({
 
       return {
         ...current,
-        answers: current.answers.filter((answer) => answer.id !== answerId),
+        answers: removeAnswerById(current.answers, answerId),
       };
     });
   }
@@ -218,6 +311,7 @@ export function QuestionEditor({
     answerId: string,
     media: QuestionMediaDraft | null,
   ) {
+    if (fieldError?.target === "answers") setFieldError(null);
     setDraft((current) => {
       const source = current.answers.find((answer) => answer.id === answerId);
 
@@ -282,17 +376,32 @@ export function QuestionEditor({
       reviewComment?: string;
     },
   ) {
+    if (selectedTemplate?.requiresAnswerImages) {
+      const faceMorphBlocker = quality.blockers.find(
+        (issue) =>
+          issue.code === "ANSWER_MEDIA_REQUIRED" ||
+          issue.code === "MEDIA_SLOT_REQUIRED",
+      );
+      if (faceMorphBlocker) {
+        const text = formatQuestionQualityIssue(faceMorphBlocker, messages);
+        const target = faceMorphBlocker.field ?? "answers";
+        setSaveMessage({ tone: "error", text });
+        setFieldError({ target, text });
+        focusValidationTarget(target);
+        return;
+      }
+    }
     const isAnswerMediaUploading = Object.values(
       answerMediaUploadStatuses,
     ).includes("UPLOADING");
 
     if (
-      questionMediaUploadStatus === "UPLOADING" ||
+      Object.values(questionMediaUploadStatuses).includes("UPLOADING") ||
       isAnswerMediaUploading
     ) {
       setSaveMessage({
         tone: "error",
-        text: "Warte, bis der Medien-Upload abgeschlossen ist.",
+        text: messages.editor.uploadPending,
       });
       focusValidationTarget(
         isAnswerMediaUploading ? "answers" : "questionMedia",
@@ -307,11 +416,13 @@ export function QuestionEditor({
     saveInProgressRef.current = true;
     setPendingAction(action);
     setSaveMessage(null);
+    setFieldError(null);
     if (intent === "REQUEST_CHANGES") {
       setReviewFeedbackError(null);
     }
 
     try {
+      const submittedDraft = draft;
       const result = await saveQuestion({
         questionId: savedQuestionId ?? undefined,
         intent,
@@ -335,50 +446,77 @@ export function QuestionEditor({
         moderationNotes: draft.moderationNotes,
         validUntil: draft.validUntil,
         templateId: draft.templateId,
+        generatorParameters: draft.generatorParameters,
+        templateConfig: draft.templateConfig,
         reviewReasonCodes: options?.reviewReasonCodes,
         reviewComment: options?.reviewComment,
       });
 
       setSaveMessage({
         tone: result.success ? "success" : "error",
-        text: result.message,
+        text: result.success
+          ? formatQuestionEditorSuccess(
+              result.messageCode,
+              messages,
+              result.messageParams,
+            )
+          : formatQuestionEditorError(
+              result.errorCode,
+              messages,
+              result.fallbackMessage,
+              result.errorParams,
+            ),
       });
 
       if (result.success) {
         if (intent !== "DRAFT") {
+          allowNavigationRef.current = true;
           setIsReviewFeedbackOpen(false);
           router.push("/fragen");
           router.refresh();
         } else if (options?.resetAfterSuccess) {
-          setDraft(createInitialDraft());
+          const resetDraft = createInitialDraft();
+          setDraft(resetDraft);
+          setSavedDraftFingerprint(getQuestionDraftFingerprint(resetDraft));
           setSavedQuestionId(null);
           requestAnimationFrame(() => questionTextRef.current?.focus());
         } else {
           setSavedQuestionId(result.questionId);
+          const savedDraft = {
+            ...submittedDraft,
+            questionMedia: result.questionMedia,
+            answers: applySavedAnswerState(submittedDraft.answers, result),
+          };
+          setSavedDraftFingerprint(getQuestionDraftFingerprint(savedDraft));
           setDraft((current) => ({
             ...current,
             questionMedia: result.questionMedia,
-            answers: current.answers.map((answer) => {
-              const savedAnswer = result.answers.find(
-                (candidate) => candidate.clientId === answer.id,
-              );
-
-              return savedAnswer
-                ? {
-                    ...answer,
-                    answerId: savedAnswer.answerId,
-                    answerFieldId: savedAnswer.answerFieldId,
-                    solutionId: savedAnswer.solutionId,
-                    media: savedAnswer.media,
-                  }
-                : answer;
-            }),
+            answers: applySavedAnswerState(current.answers, result),
           }));
+          setQuestionMediaUploadStatuses({});
           setAnswerMediaUploadStatuses({});
         }
       } else {
+        if (result.validationTarget) {
+          setFieldError({
+            target: result.validationTarget,
+            text: formatQuestionEditorError(
+              result.errorCode,
+              messages,
+              result.fallbackMessage,
+              result.errorParams,
+            ),
+          });
+        }
         if (intent === "REQUEST_CHANGES") {
-          setReviewFeedbackError(result.message);
+          setReviewFeedbackError(
+            formatQuestionEditorError(
+              result.errorCode,
+              messages,
+              result.fallbackMessage,
+              result.errorParams,
+            ),
+          );
         }
         focusValidationTarget(result.validationTarget);
       }
@@ -386,11 +524,11 @@ export function QuestionEditor({
       console.error("Frage speichern fehlgeschlagen", error);
       setSaveMessage({
         tone: "error",
-        text: "Die Frage konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        text: messages.editor.saveUnexpected,
       });
       if (intent === "REQUEST_CHANGES") {
         setReviewFeedbackError(
-          "Die Frage konnte nicht zurückgegeben werden. Bitte versuche es erneut.",
+          messages.editor.requestChangesUnexpected,
         );
       }
     } finally {
@@ -400,20 +538,49 @@ export function QuestionEditor({
   }
 
   function handleWorkflowSave() {
-    const requiredMediaSlot = selectedTemplate?.questionMediaSlot;
+    const firstBlocker = quality.blockers[0];
+    if (firstBlocker) {
+      const text = formatQuestionQualityIssue(firstBlocker, messages);
+      setSaveMessage({ tone: "error", text });
+      if (firstBlocker.field) {
+        setFieldError({ target: firstBlocker.field, text });
+        focusValidationTarget(firstBlocker.field);
+      }
+      return;
+    }
+    const requiredMediaSlot = selectedTemplate?.mediaSlots.find((slot) => slot.required);
+    const requiredMedia = requiredMediaSlot
+      ? draft.questionMedia.find((media) => media.slotKey === requiredMediaSlot.key)
+      : null;
+
+    const isLegacyReverseOutput =
+      selectedTemplate?.id === questionTemplateIds.musicReverse &&
+      (draft.generatorRuns ?? []).length === 0 &&
+      !draft.questionMedia.some((media) => media.slotKey === "music_original_audio" && media.operation !== "REMOVE" && media.url) &&
+      draft.questionMedia.some((media) => media.slotKey === "music_reverse_audio" && media.operation !== "REMOVE" && media.url);
 
     if (
+      !isLegacyReverseOutput &&
       requiredMediaSlot?.required &&
-      (!draft.questionMedia ||
-        draft.questionMedia.operation === "REMOVE" ||
-        !draft.questionMedia.url ||
-        draft.questionMedia.mediaType !== requiredMediaSlot.allowedMediaType ||
-        draft.questionMedia.blockedReason)
+      (!requiredMedia ||
+        requiredMedia.operation === "REMOVE" ||
+        !requiredMedia.url ||
+        requiredMedia.mediaType !== requiredMediaSlot.allowedMediaType ||
+        (requiredMedia.blockedReason || requiredMedia.blockedReasonCode))
     ) {
       setSaveMessage({
         tone: "error",
-        text: `Für diese Spezialfrage ist ${requiredMediaSlot.label} erforderlich.`,
+        text: formatMessage(messages.editor.requiredTemplateMedia, {
+          label: requiredMediaSlot.label,
+        }),
       });
+      focusValidationTarget("questionMedia");
+      return;
+    }
+
+    const generatorBlocker = quality.blockers.find((issue) => issue.code.startsWith("GENERATOR_"));
+    if (generatorBlocker) {
+      setSaveMessage({ tone: "error", text: formatQuestionQualityIssue(generatorBlocker, messages) });
       focusValidationTarget("questionMedia");
       return;
     }
@@ -422,7 +589,11 @@ export function QuestionEditor({
       if (editorContext === "review" && quality.blockers.length > 0) {
         setSaveMessage({
           tone: "error",
-          text: `Die Frage kann noch nicht freigegeben werden: ${quality.blockers.join("; ")}.`,
+          text: formatMessage(messages.editor.approvalBlocked, {
+            issues: quality.blockers
+              .map((issue) => formatQuestionQualityIssue(issue, messages))
+              .join("; "),
+          }),
         });
         return;
       }
@@ -446,16 +617,11 @@ export function QuestionEditor({
     });
   }
 
-  const pageTitle = {
-    create: "Neue Frage",
-    edit: "Frage bearbeiten",
-    review: "Frage prüfen",
-    readOnly: "Eingereichte Frage",
-  }[editorContext];
+  const pageTitle = messages.editor.titles[editorContext];
   const workflowIdleLabel =
     questionRecord?.reviewStatus === "CHANGES_REQUESTED" &&
     capabilities.canSubmitForReview
-      ? "Erneut zur Prüfung einreichen"
+      ? messages.editor.resubmit
       : undefined;
   const showSaveActions =
     !isReadOnly &&
@@ -465,13 +631,14 @@ export function QuestionEditor({
       capabilities.canRequestQuestionChanges);
 
   return (
+    <QuestionEditorMessagesProvider locale={locale} messages={messages}>
     <main
-      className={`mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6 ${
-        showSaveActions ? "pb-28" : "pb-8"
+      className={`mx-auto flex w-full max-w-4xl flex-col gap-6 overflow-x-clip px-3 py-4 sm:px-4 sm:py-6 ${
+        showSaveActions ? "pb-64 sm:pb-28" : "pb-8"
       }`}
     >
       <header>
-        <p className="text-sm text-slate-500">Fragenverwaltung</p>
+        <p className="text-sm text-slate-500">{messages.editor.eyebrow}</p>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold text-slate-950">{pageTitle}</h1>
           {editorContext !== "create" && (
@@ -479,7 +646,7 @@ export function QuestionEditor({
               href="/fragen"
               className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
             >
-              Zurück zu Fragen
+              {messages.editor.back}
             </Link>
           )}
         </div>
@@ -494,7 +661,8 @@ export function QuestionEditor({
       )}
 
       <fieldset
-        disabled={isReadOnly}
+        disabled={isEditorDisabled}
+        aria-busy={pendingAction !== null}
         className="min-w-0 space-y-6 border-0 p-0 disabled:opacity-90"
       >
         <TemplateSelector
@@ -503,43 +671,91 @@ export function QuestionEditor({
           selectedTemplate={selectedTemplate}
           onSelectTemplate={applyTemplate}
           onClearSelection={() =>
-            setDraft((current) => ({
-              ...current,
-              templateId: null,
-            }))
+            setDraft(clearQuestionTemplateFromDraft)
           }
         />
 
         <QuestionSection
           questionText={draft.questionText}
           questionTextRef={questionTextRef}
-          onQuestionTextChange={(questionText) =>
+          onQuestionTextChange={(questionText) => {
+            if (fieldError?.target === "questionText") setFieldError(null);
             setDraft((current) => ({
               ...current,
               questionText,
-            }))
+            }));
+          }}
+          validationError={fieldError?.target === "questionText" ? fieldError.text : null}
+          mediaContent={
+            <QuestionMediaSection
+              slots={activeMediaSlots}
+              media={draft.questionMedia}
+              uploadStatuses={questionMediaUploadStatuses}
+              generatorRuns={draft.generatorRuns ?? []}
+              validationError={fieldError?.target === "questionMedia" ? fieldError.text : null}
+            >
+              {activeMediaSlots.map((slot) => {
+                const media = draft.questionMedia.find((candidate) => candidate.slotKey === slot.key) ?? null;
+                return <QuestionMediaSlot
+                  key={slot.key}
+                  slot={slot}
+                  media={media}
+                  questionId={savedQuestionId}
+                  templateId={draft.templateId}
+                  pathnamePrefix={mediaUploadPathnamePrefix}
+                  disabled={isEditorDisabled}
+                  onUploadStatusChange={(status) => setQuestionMediaUploadStatuses((current) => ({ ...current, [slot.key]: status }))}
+                  onChange={(changedMedia) => setDraft((current) => ({
+                    ...current,
+                    questionMedia: changedMedia
+                      ? [...current.questionMedia.filter((candidate) => candidate.slotKey !== slot.key), changedMedia]
+                      : current.questionMedia.filter((candidate) => candidate.slotKey !== slot.key),
+                    generatorRuns: (current.generatorRuns ?? []).map((run) => {
+                      const definition = getGeneratorDefinition(run.generatorId);
+                      return run.status === "SUCCEEDED" && definition &&
+                        [...definition.inputSlots, ...definition.outputSlots].includes(slot.key as never)
+                        ? { ...run, status: "STALE" }
+                        : run;
+                    }),
+                  }))}
+                />;
+              })}
+              {mediaTemplate && (
+                <QuestionGenerators
+                  generatorIds={mediaTemplate.generators}
+                  questionId={savedQuestionId}
+                  media={draft.questionMedia}
+                  runs={draft.generatorRuns ?? []}
+                  parameters={draft.generatorParameters ?? {}}
+                  disabled={isEditorDisabled}
+                  onStateChange={(state) => setDraft((current) => ({
+                    ...current,
+                    questionMedia: state.questionMedia,
+                    generatorRuns: state.generatorRuns,
+                  }))}
+                />
+              )}
+              {mediaTemplate?.id === questionTemplateIds.pixelImage && (
+                <PixelStageTimingFields
+                  value={draft.templateConfig.stageDurationsSeconds}
+                  disabled={isEditorDisabled}
+                  onChange={(stageDurationsSeconds) => setDraft((current) => ({
+                    ...current,
+                    templateConfig: { stageDurationsSeconds },
+                  }))}
+                />
+              )}
+            </QuestionMediaSection>
           }
         />
-
-        {activeMediaSlot && (
-          <QuestionMediaSlot
-            slot={activeMediaSlot}
-            media={draft.questionMedia}
-            questionId={savedQuestionId}
-            pathnamePrefix={mediaUploadPathnamePrefix}
-            disabled={isReadOnly}
-            onUploadStatusChange={setQuestionMediaUploadStatus}
-            onChange={(questionMedia) =>
-              setDraft((current) => ({ ...current, questionMedia }))
-            }
-          />
-        )}
 
         <AnswersSection
           answers={draft.answers}
           questionId={savedQuestionId}
           pathnamePrefix={mediaUploadPathnamePrefix}
-          disabled={isReadOnly}
+          disabled={isEditorDisabled}
+          validationError={fieldError?.target === "answers" ? fieldError.text : null}
+          requireAnswerImages={selectedTemplate?.requiresAnswerImages ?? false}
           onAnswerChange={updateAnswer}
           onAddAnswer={addAnswer}
           onRemoveAnswer={removeAnswer}
@@ -613,5 +829,6 @@ export function QuestionEditor({
         onConfirm={requestChanges}
       />
     </main>
+    </QuestionEditorMessagesProvider>
   );
 }
