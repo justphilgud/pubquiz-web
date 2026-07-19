@@ -1,9 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
-import { isAdmin } from "@/app/lib/permissions";
+import {
+  canManageEventSeries,
+  canManageQuizzes,
+  canManageUsers,
+  isAdmin,
+} from "@/app/lib/permissions";
 import UserMenu from "@/app/components/UserMenu";
 import AppNav from "@/app/components/AppNav";
+import { getAppNavigationItems } from "@/app/components/appNavigation";
 
 export default async function AppHeader() {
   const session = await auth();
@@ -20,41 +26,42 @@ export default async function AppHeader() {
     });
   }
 
-  const navItems = [
-    { href: "/fragen", label: "Fragen" },
-    ...(admin
-      ? [
-          { href: "/quiz", label: "Quiz" },
-          { href: "/admin/users", label: "Benutzer" },
-        ]
-      : []),
-  ];
+  const navItems = getAppNavigationItems({
+    canManageQuizzes: canManageQuizzes(session),
+    canManageEventSeries: canManageEventSeries(session),
+    canManageUsers: canManageUsers(session),
+  });
 
   return (
-    <header className="border-b border-slate-200 bg-white px-6 py-3 text-slate-900 shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
-        <nav className="flex items-center gap-12">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/logo.png"
-              alt="ungegoogelt"
-              width={180}
-              height={48}
-              priority
-              className="h-10 w-auto"
-            />
-          </Link>
+    <header className="border-b border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm md:px-6">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-12">
+        <Link
+          href="/"
+          className="flex min-h-11 min-w-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+        >
+          <Image
+            src="/logo.png"
+            alt="ungegoogelt"
+            width={180}
+            height={48}
+            priority
+            className="h-8 w-auto max-w-full sm:h-10"
+          />
+        </Link>
 
+        <div className="col-span-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1">
           <AppNav items={navItems} />
-        </nav>
+        </div>
 
-        <UserMenu
-          email={session.user.email ?? ""}
-          name={session.user.name}
-          role={session.user.role}
-          isAdmin={admin}
-          logoutAction={logoutAction}
-        />
+        <div className="col-start-2 row-start-1 shrink-0 md:col-start-3">
+          <UserMenu
+            email={session.user.email ?? ""}
+            name={session.user.name}
+            role={session.user.role}
+            isAdmin={admin}
+            logoutAction={logoutAction}
+          />
+        </div>
       </div>
     </header>
   );

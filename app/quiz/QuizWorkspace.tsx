@@ -38,11 +38,11 @@ export default function QuizWorkspace({
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Quiz-Verwaltung
+              Alle Quizze
             </h1>
 
             <p className="mt-2 text-slate-600">
-              Lege Quiz-Abende an, verwalte bestehende Quizze oder erstelle ein Schnellquiz.
+              Verwalte alle Quizze über sämtliche Eventreihen hinweg oder erstelle ein Schnellquiz.
             </p>
           </div>
 

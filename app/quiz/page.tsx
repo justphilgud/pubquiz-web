@@ -1,13 +1,19 @@
+import type { Metadata } from "next";
 import QuizWorkspace from "./QuizWorkspace";
 import { getQuizListe, getSchnellQuizKategorien } from "./actions";
 import { requireAdmin } from "@/app/lib/permissions";
 import { getEventSeriesOptions } from "@/app/eventreihen/actions";
+import { resolveInitialEventSeriesId } from "./quizMasterData";
 
 type Props = {
   searchParams: Promise<{
     tab?: string;
     eventreiheId?: string;
   }>;
+};
+
+export const metadata: Metadata = {
+  title: "Alle Quizze | ungegoogelt",
 };
 
 export default async function QuizPage({ searchParams }: Props) {
@@ -19,12 +25,10 @@ export default async function QuizPage({ searchParams }: Props) {
     getSchnellQuizKategorien(),
     getEventSeriesOptions(true),
   ]);
-  const requestedEventSeriesId = Number(resolvedSearchParams.eventreiheId);
-  const initialEventSeriesId = eventSeries.some(
-    (entry) => entry.id === requestedEventSeriesId && !entry.isArchived,
-  )
-    ? requestedEventSeriesId
-    : undefined;
+  const initialEventSeriesId = resolveInitialEventSeriesId(
+    resolvedSearchParams.eventreiheId,
+    eventSeries,
+  );
 
   return (
     <QuizWorkspace

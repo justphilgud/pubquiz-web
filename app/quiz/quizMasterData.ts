@@ -34,6 +34,18 @@ export type QuizMasterDataValidationResult =
   | { ok: true; value: NormalizedQuizMasterData }
   | { ok: false; errors: Record<string, string>; message: string };
 
+export function resolveInitialEventSeriesId(
+  requestedId: string | undefined,
+  eventSeries: ReadonlyArray<{ id: number; isArchived: boolean }>,
+) {
+  const parsedId = Number(requestedId);
+  return eventSeries.some(
+    (entry) => entry.id === parsedId && !entry.isArchived,
+  )
+    ? parsedId
+    : undefined;
+}
+
 function optional(value: string | undefined) {
   const normalized = value?.trim() ?? "";
   return normalized || null;

@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   buildQuizCopyMasterData,
   getQuizTemporalStatus,
+  resolveInitialEventSeriesId,
   validateQuizMasterData,
 } from "./quizMasterData";
 
@@ -23,6 +24,16 @@ test("quiz master data requires event series, title and a real calendar date", (
   assert.equal(validateQuizMasterData({ ...validInput, title: " " }).ok, false);
   assert.equal(validateQuizMasterData({ ...validInput, date: "" }).ok, false);
   assert.equal(validateQuizMasterData({ ...validInput, date: "2026-02-30" }).ok, false);
+});
+
+test("quiz creation preselects only the requested active event series", () => {
+  const eventSeries = [
+    { id: 7, isArchived: false },
+    { id: 8, isArchived: true },
+  ];
+  assert.equal(resolveInitialEventSeriesId("7", eventSeries), 7);
+  assert.equal(resolveInitialEventSeriesId("8", eventSeries), undefined);
+  assert.equal(resolveInitialEventSeriesId("not-a-number", eventSeries), undefined);
 });
 
 test("quiz URLs allow only HTTP and HTTPS", () => {
