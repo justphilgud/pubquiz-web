@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { QuestionEditorRecord } from "../types";
 import {
-  cloneQuestion,
   deleteQuestionPermanently,
   setQuestionArchived,
 } from "../managementActions";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { CloneQuestionButton } from "./CloneQuestionButton";
 
 export function QuestionManagementActions({
   capabilities,
@@ -22,19 +22,6 @@ export function QuestionManagementActions({
   const { messages } = useQuestionEditorMessages();
   const [pending, setPending] = useState<"clone" | "archive" | "delete" | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  async function handleClone() {
-    setPending("clone");
-    setError(null);
-    const result = await cloneQuestion(record.questionId);
-    setPending(null);
-    if (result.ok) {
-      router.push(`/fragen/editor/${result.questionId}`);
-      router.refresh();
-    } else {
-      setError(messages.management.errors[result.code]);
-    }
-  }
 
   async function handleArchive() {
     const nextArchived = !record.isArchived;
@@ -76,14 +63,15 @@ export function QuestionManagementActions({
       <h2 className="font-semibold text-slate-950">{messages.management.title}</h2>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         {capabilities.canCloneQuestion && (
-          <button
-            type="button"
-            onClick={() => void handleClone()}
+          <CloneQuestionButton
+            questionId={record.questionId}
+            label={messages.management.clone}
+            pendingLabel={messages.management.cloning}
+            errorMessages={messages.management.errors}
             disabled={pending !== null}
-            className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-medium disabled:opacity-60"
-          >
-            {pending === "clone" ? messages.management.cloning : messages.management.clone}
-          </button>
+            onPendingChange={(isPending) => setPending(isPending ? "clone" : null)}
+            className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-2 font-medium disabled:opacity-60 sm:w-auto"
+          />
         )}
         {capabilities.canArchiveQuestion && (
           <button

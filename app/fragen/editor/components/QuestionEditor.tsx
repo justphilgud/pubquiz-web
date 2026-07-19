@@ -966,6 +966,7 @@ export function QuestionEditor({
               validUntil,
             }))
           }
+          canManageCategories={capabilities.canManageCategories}
         />
       </fieldset>
 
@@ -997,7 +998,6 @@ export function QuestionEditor({
       {showSaveActions && (
         <EditorSaveActions
           capabilities={capabilities}
-          editorContext={editorContext}
           pendingAction={pendingAction}
           message={saveMessage}
           showDraftActions={editorContext !== "review"}

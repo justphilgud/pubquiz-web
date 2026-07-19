@@ -11,17 +11,19 @@ import {
 import { getCurrentUserId } from "@/app/services/questionService";
 import { getQuestionDeletionBlocker } from "./questionDeletionPolicy";
 
+export type QuestionManagementErrorCode =
+  | "QUESTION_NOT_FOUND"
+  | "PERMISSION_DENIED"
+  | "QUESTION_IN_USE"
+  | "QUESTION_HAS_RELATIONS"
+  | "QUESTION_HAS_MEDIA"
+  | "UNEXPECTED_ERROR";
+
 type ManagementResult =
   | { ok: true; questionId: number }
   | {
       ok: false;
-      code:
-        | "QUESTION_NOT_FOUND"
-        | "PERMISSION_DENIED"
-        | "QUESTION_IN_USE"
-        | "QUESTION_HAS_RELATIONS"
-        | "QUESTION_HAS_MEDIA"
-        | "UNEXPECTED_ERROR";
+      code: QuestionManagementErrorCode;
     };
 
 const accessSelect = {

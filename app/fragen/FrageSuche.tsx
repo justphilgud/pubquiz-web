@@ -14,6 +14,16 @@ import ZuQuizHinzufuegenButton from "./ZuQuizHinzufuegenButton";
 import QuizVerwendungPopover from "./QuizVerwendungPopover";
 import type { QuizOption } from "./FragenWorkspace";
 import { getBerlinDate } from "@/app/lib/berlinDate";
+import { CloneQuestionButton } from "./editor/components/CloneQuestionButton";
+
+const cloneErrorMessages = {
+  QUESTION_NOT_FOUND: "Die Frage wurde nicht gefunden.",
+  PERMISSION_DENIED: "Du darfst diese Frage nicht klonen.",
+  QUESTION_IN_USE: "Die Frage konnte nicht geklont werden.",
+  QUESTION_HAS_RELATIONS: "Die Frage konnte nicht geklont werden.",
+  QUESTION_HAS_MEDIA: "Die Frage konnte nicht geklont werden.",
+  UNEXPECTED_ERROR: "Die Frage konnte nicht geklont werden.",
+};
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -465,6 +475,16 @@ export default function FrageSuche({
                   >
                     Bearbeiten
                   </Link>
+
+                  {frage.can_clone && (
+                    <CloneQuestionButton
+                      questionId={frage.fragen_id}
+                      label="Klonen"
+                      pendingLabel="Wird geklont …"
+                      errorMessages={cloneErrorMessages}
+                      className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-50 disabled:opacity-60 sm:w-auto"
+                    />
+                  )}
 
                   {frage.ist_archiviert ? (
                     <button

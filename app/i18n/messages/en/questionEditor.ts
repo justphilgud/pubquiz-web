@@ -31,6 +31,10 @@ export const enQuestionEditorMessages = {
       QUESTION_NOT_FOUND: "The question was not found.", PERMISSION_DENIED: "You are not allowed to perform this action.", QUESTION_IN_USE: "The question is used in a quiz or has team answers.", QUESTION_HAS_RELATIONS: "The question is linked to a FaceMorph/pixel question and cannot be deleted.", QUESTION_HAS_MEDIA: "The question contains media or generator runs. Archive it instead of deleting it.", UNEXPECTED_ERROR: "The action could not be completed.",
     },
   },
+  categories: {
+    createLabel: "New category", createPlaceholder: "Category name", create: "Create category", creating: "Creating …", rename: "Rename", renamePrompt: "New category name", delete: "Delete", deleteConfirm: "Permanently delete this unused category?",
+    errors: { INVALID_NAME: "The category name must contain 1 to 100 characters.", CATEGORY_EXISTS: "A category with this name already exists.", CATEGORY_NOT_FOUND: "The category was not found.", CATEGORY_IN_USE: "The category is assigned to at least one question and cannot be deleted.", PERMISSION_DENIED: "Only admins can manage categories.", UNEXPECTED_ERROR: "The category action could not be completed." },
+  },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", title: "Title", solution: "Solution" },
   templateSelector: { selected: "Special question: {name}", change: "Change", clear: "Clear selection", select: "Select special question", searchLabel: "Search special questions", searchPlaceholder: "Search special question", empty: "No special question found." },
   question: { label: "Question", placeholder: "Write your question..." },
@@ -76,7 +80,7 @@ export const enQuestionEditorMessages = {
     seconds: "seconds",
     invalidDurations: "Each pixel stage duration must be a whole number between 1 and 120 seconds.",
   },
-  save: { saving: "Saving …", saveQuestion: "Save question", saveDraft: "Save draft", saveDraftAndNew: "Save draft & new question", submit: "Submit for review", approve: "Approve question" },
+  save: { saving: "Saving …", saveQuestion: "Save question", saveDraft: "Save draft", saveDraftAndNew: "Save draft & new question", submit: "Submit for review", approve: "Approve question", saveAndApprove: "Save and approve" },
   review: { statuses: { DRAFT: "Draft", IN_REVIEW: "In review", CHANGES_REQUESTED: "Changes requested", APPROVED: "Approved" }, quality: "Quality review", blockers: "Blocking criteria", warnings: "Warnings" },
   quality: {
     QUESTION_TEXT_REQUIRED: "Question text is missing", TEMPLATE_MEDIA_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_TYPE_MISMATCH: "{label} has the wrong media type", MEDIA_SLOT_CONFLICT: "{label} has a conflicting assignment", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} contains too many media items", MEDIA_UPLOAD_IN_PROGRESS: "The upload for {label} is still running", MEDIA_UPLOAD_FAILED: "The upload for {label} failed", MEDIA_OWNER_INVALID: "{label} has no unique owner", CORRECT_ANSWER_REQUIRED: "No completed correct answer is available", ANSWER_MEDIA_REQUIRED: "Both FaceMorph answer images are required",

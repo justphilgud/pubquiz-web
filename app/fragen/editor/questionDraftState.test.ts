@@ -54,8 +54,9 @@ test("saved answer IDs are assigned by stable client identity", () => {
   const result = {
     success: true,
     questionId: 12,
+    affectedQuestionIds: [12],
     messageCode: "draftCreated",
-    messageParams: { id: 12 },
+    messageParams: { id: 12, ids: "12" },
     fallbackMessage: "gespeichert",
     questionMedia: [],
     answers: [{ clientId: "temporary-1", answerId: 44, media: null }],

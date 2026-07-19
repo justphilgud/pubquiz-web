@@ -181,6 +181,11 @@ export const deQuestionEditorMessages = {
     title: "Kategorien", remove: "{name} entfernen", select: "Kategorien auswählen", done: "Fertig ({count})", searchLabel: "Kategorien durchsuchen",
     searchPlaceholder: "Kategorie suchen", none: "Keine Kategorien vorhanden.", notFound: "Keine Kategorien gefunden.", discardTitle: "Änderungen verwerfen?",
     continue: "Weiter auswählen", discard: "Änderungen verwerfen", discardDescription: "Deine Änderungen an der Kategorieauswahl wurden noch nicht übernommen.",
+    createLabel: "Neue Kategorie", createPlaceholder: "Kategoriename", create: "Kategorie anlegen", creating: "Wird angelegt …",
+    rename: "Umbenennen", renamePrompt: "Neuer Kategoriename", delete: "Löschen", deleteConfirm: "Diese ungenutzte Kategorie endgültig löschen?",
+    errors: {
+      INVALID_NAME: "Der Kategoriename muss zwischen 1 und 100 Zeichen lang sein.", CATEGORY_EXISTS: "Eine Kategorie mit diesem Namen existiert bereits.", CATEGORY_NOT_FOUND: "Die Kategorie wurde nicht gefunden.", CATEGORY_IN_USE: "Die Kategorie ist mindestens einer Frage zugeordnet und kann nicht gelöscht werden.", PERMISSION_DENIED: "Nur Admins dürfen Kategorien verwalten.", UNEXPECTED_ERROR: "Die Kategorieaktion konnte nicht abgeschlossen werden.",
+    },
   },
   management: {
     title: "Frage verwalten", clone: "Frage klonen", cloning: "Wird geklont …", archive: "Archivieren", restore: "Wiederherstellen", delete: "Endgültig löschen", deleting: "Wird gelöscht …",
@@ -201,7 +206,7 @@ export const deQuestionEditorMessages = {
     reasons: { SOURCE: "Quelle ergänzen", QUESTION_TEXT: "Fragetext überarbeiten", ANSWER: "Antwort oder Lösung prüfen", CATEGORIES: "Kategorien korrigieren", MEDIA: "Medien ergänzen oder ersetzen", ADDITIONAL_INFO: "Zusatzinformationen ergänzen", OTHER: "Sonstiges" },
   },
   save: {
-    saving: "Wird gespeichert …", approving: "Wird freigegeben …", saveQuestion: "Frage speichern", approve: "Frage freigeben", submitting: "Wird eingereicht …",
+    saving: "Wird gespeichert …", approving: "Wird gespeichert und freigegeben …", saveQuestion: "Frage speichern", approve: "Frage freigeben", saveAndApprove: "Speichern und freigeben", submitting: "Wird eingereicht …",
     submit: "Zur Prüfung einreichen", saveAndNewPending: "Speichern & neu …", saveDraft: "Entwurf speichern", saveDraftAndNew: "Entwurf speichern & neue Frage",
     openDraftActions: "Entwurf-Aktionen öffnen", requestChanges: "Zur Überarbeitung zurückgeben",
   },
@@ -220,8 +225,8 @@ export const deQuestionEditorMessages = {
     UNEXPECTED_ERROR: "Die Frage konnte nicht gespeichert werden. Bitte versuche es erneut.", UNKNOWN_ERROR: "Ein unbekannter Fehler ist aufgetreten.",
   },
   success: {
-    draftCreated: "Entwurf gespeichert. Fragen-ID: {id}", draftUpdated: "Entwurf aktualisiert. Fragen-ID: {id}", submittedCreated: "Frage zur Prüfung eingereicht. Fragen-ID: {id}",
-    submittedUpdated: "Frage aktualisiert und zur Prüfung eingereicht. Fragen-ID: {id}", changesRequested: "Frage zur Überarbeitung zurückgegeben. Fragen-ID: {id}",
-    approvedCreated: "Frage gespeichert und freigegeben. Fragen-ID: {id}", approvedUpdated: "Frage aktualisiert und freigegeben. Fragen-ID: {id}",
+    draftCreated: "Entwurf gespeichert. Betroffene Fragen-IDs: {ids}", draftUpdated: "Entwurf aktualisiert. Betroffene Fragen-IDs: {ids}", submittedCreated: "Frage zur Prüfung eingereicht. Betroffene Fragen-IDs: {ids}",
+    submittedUpdated: "Frage aktualisiert und zur Prüfung eingereicht. Betroffene Fragen-IDs: {ids}", changesRequested: "Frage zur Überarbeitung zurückgegeben. Betroffene Fragen-IDs: {ids}",
+    approvedCreated: "Frage gespeichert und freigegeben. Betroffene Fragen-IDs: {ids}", approvedUpdated: "Frage aktualisiert und freigegeben. Betroffene Fragen-IDs: {ids}",
   },
 } as const;

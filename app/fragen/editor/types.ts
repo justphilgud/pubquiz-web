@@ -294,6 +294,7 @@ export type SaveQuestionResult =
   | {
       success: true;
       questionId: number;
+      affectedQuestionIds: number[];
       messageCode: QuestionEditorSuccessCode;
       messageParams: Record<string, string | number>;
       fallbackMessage: string;

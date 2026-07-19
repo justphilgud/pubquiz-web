@@ -6,11 +6,16 @@ import type { QuestionCategory } from "../types";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 import { normalizeEditorSearch } from "@/app/i18n/formatting";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import {
+  CategoryCreateControl,
+  CategoryRowActions,
+} from "./CategoryAdminControls";
 
 type CategorySectionProps = {
   categories: QuestionCategory[];
   selectedCategoryIds: number[];
   onChangeCategories: (categoryIds: number[]) => void;
+  canManageCategories: boolean;
 };
 
 function haveSameCategoryIds(left: number[], right: number[]): boolean {
@@ -24,6 +29,7 @@ export function CategorySection({
   categories,
   selectedCategoryIds,
   onChangeCategories,
+  canManageCategories,
 }: CategorySectionProps) {
   const { locale, messages } = useQuestionEditorMessages();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -32,22 +38,53 @@ export function CategorySection({
   const [searchQuery, setSearchQuery] = useState("");
   const [initialCategoryIds, setInitialCategoryIds] = useState<number[]>([]);
   const [pendingCategoryIds, setPendingCategoryIds] = useState<number[]>([]);
+  const [availableCategories, setAvailableCategories] = useState(categories);
 
   const selectedCategories = useMemo(
     () =>
-      categories.filter((category) =>
+      availableCategories.filter((category) =>
         selectedCategoryIds.includes(category.id),
       ),
-    [categories, selectedCategoryIds],
+    [availableCategories, selectedCategoryIds],
   );
 
   const filteredCategories = useMemo(() => {
     const normalizedQuery = normalizeEditorSearch(locale, searchQuery);
 
-    return categories.filter((category) =>
+    return availableCategories.filter((category) =>
       normalizeEditorSearch(locale, category.name).includes(normalizedQuery),
     );
-  }, [categories, locale, searchQuery]);
+  }, [availableCategories, locale, searchQuery]);
+
+  function sortCategories(nextCategories: QuestionCategory[]) {
+    return [...nextCategories].sort((left, right) =>
+      left.name.localeCompare(right.name, locale),
+    );
+  }
+
+  function addAvailableCategory(category: QuestionCategory) {
+    setAvailableCategories((current) => sortCategories([...current, category]));
+    setPendingCategoryIds((current) => [...new Set([...current, category.id])]);
+  }
+
+  function renameAvailableCategory(category: QuestionCategory) {
+    setAvailableCategories((current) =>
+      sortCategories(
+        current.map((candidate) =>
+          candidate.id === category.id ? category : candidate,
+        ),
+      ),
+    );
+  }
+
+  function removeAvailableCategory(categoryId: number) {
+    setAvailableCategories((current) =>
+      current.filter((category) => category.id !== categoryId),
+    );
+    setPendingCategoryIds((current) => current.filter((id) => id !== categoryId));
+    setInitialCategoryIds((current) => current.filter((id) => id !== categoryId));
+    onChangeCategories(selectedCategoryIds.filter((id) => id !== categoryId));
+  }
 
   const hasPendingChanges = !haveSameCategoryIds(
     initialCategoryIds,
@@ -169,32 +206,47 @@ export function CategorySection({
             />
           </label>
 
+          {canManageCategories && (
+            <CategoryCreateControl onCreated={addAvailableCategory} />
+          )}
+
           <div className="mt-4 min-h-0 space-y-2 overflow-y-auto pr-1">
             {filteredCategories.map((category) => {
               const isSelected = pendingCategoryIds.includes(category.id);
 
               return (
-                <button
+                <div
                   key={category.id}
-                  type="button"
-                  onClick={() => togglePendingCategory(category.id)}
-                  aria-pressed={isSelected}
-                  className={[
-                    "flex min-h-12 w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
-                    isSelected
-                      ? "border-slate-950 bg-slate-950 text-white"
-                      : "border-slate-300 bg-white text-slate-800 hover:border-slate-500",
-                  ].join(" ")}
+                  className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-start"
                 >
-                  <span>{category.name}</span>
-                  <span aria-hidden="true">{isSelected ? "✓" : "+"}</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => togglePendingCategory(category.id)}
+                    aria-pressed={isSelected}
+                    className={[
+                      "flex min-h-12 min-w-0 flex-1 items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
+                      isSelected
+                        ? "border-slate-950 bg-slate-950 text-white"
+                        : "border-slate-300 bg-white text-slate-800 hover:border-slate-500",
+                    ].join(" ")}
+                  >
+                    <span>{category.name}</span>
+                    <span aria-hidden="true">{isSelected ? "✓" : "+"}</span>
+                  </button>
+                  {canManageCategories && (
+                    <CategoryRowActions
+                      category={category}
+                      onRenamed={renameAvailableCategory}
+                      onDeleted={removeAvailableCategory}
+                    />
+                  )}
+                </div>
               );
             })}
 
             {filteredCategories.length === 0 && (
               <p className="py-3 text-sm text-slate-500">
-                {categories.length === 0
+                {availableCategories.length === 0
                   ? messages.categories.none
                   : messages.categories.notFound}
               </p>

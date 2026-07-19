@@ -96,6 +96,10 @@ export function canDeleteQuestion(session: Session | null) {
   return canManageEverything(session);
 }
 
+export function canManageCategories(session: Session | null) {
+  return canManageEverything(session);
+}
+
 export function canSearchQuestions(session: Session | null) {
   return isAdmin(session) || isEditor(session);
 }
@@ -120,11 +124,8 @@ export function canReviewQuestions(session: Session | null) {
   return isAdmin(session);
 }
 
-export function canApproveQuestion(
-  session: Session | null,
-  reviewStatus: QuestionReviewStatus,
-) {
-  return canReviewQuestions(session) && reviewStatus !== "APPROVED";
+export function canApproveQuestion(session: Session | null) {
+  return canReviewQuestions(session);
 }
 
 export function canRequestQuestionChanges(
@@ -156,6 +157,7 @@ export type QuestionEditorCapabilities = {
   canCloneQuestion: boolean;
   canArchiveQuestion: boolean;
   canDeleteQuestion: boolean;
+  canManageCategories: boolean;
 };
 
 export function getQuestionEditorCapabilities(
@@ -172,10 +174,7 @@ export function getQuestionEditorCapabilities(
     return {
       canSaveDraft: canEdit,
       canSubmitForReview: canEdit && canSubmitForReview(session),
-      canApproveQuestion: canApproveQuestion(
-        session,
-        question.reviewStatus,
-      ),
+      canApproveQuestion: canApproveQuestion(session),
       canRequestQuestionChanges: canRequestQuestionChanges(
         session,
         question.reviewStatus,
@@ -183,6 +182,7 @@ export function getQuestionEditorCapabilities(
       canCloneQuestion: canCloneQuestion(session, question),
       canArchiveQuestion: canArchiveQuestion(session, question),
       canDeleteQuestion: canDeleteQuestion(session),
+      canManageCategories: canManageCategories(session),
     };
   }
 
@@ -194,6 +194,7 @@ export function getQuestionEditorCapabilities(
     canCloneQuestion: false,
     canArchiveQuestion: false,
     canDeleteQuestion: false,
+    canManageCategories: canManageCategories(session),
   };
 }
 

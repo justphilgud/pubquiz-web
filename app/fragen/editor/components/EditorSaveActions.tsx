@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type {
   PendingQuestionSaveAction,
-  QuestionEditorContext,
 } from "../types";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
@@ -15,7 +14,6 @@ type SaveMessage = {
 
 type EditorSaveActionsProps = {
   capabilities: QuestionEditorCapabilities;
-  editorContext: QuestionEditorContext;
   pendingAction: PendingQuestionSaveAction | null;
   message: SaveMessage | null;
   showDraftActions?: boolean;
@@ -28,7 +26,6 @@ type EditorSaveActionsProps = {
 
 export function EditorSaveActions({
   capabilities,
-  editorContext,
   pendingAction,
   message,
   showDraftActions = true,
@@ -74,11 +71,9 @@ export function EditorSaveActions({
 
   const workflowLabel = capabilities.canApproveQuestion
     ? pendingAction === "APPROVE"
-      ? editorContext === "create"
-        ? messages.save.saving
-        : messages.save.approving
+      ? messages.save.approving
       : workflowIdleLabel ??
-        (editorContext === "create" ? messages.save.saveQuestion : messages.save.approve)
+        messages.save.saveAndApprove
     : pendingAction === "SUBMIT_FOR_REVIEW"
       ? messages.save.submitting
       : workflowIdleLabel ?? messages.save.submit;

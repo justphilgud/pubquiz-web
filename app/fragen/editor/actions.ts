@@ -69,6 +69,7 @@ import {
 } from "./pixelTemplateConfig";
 import { hasRequiredTemplateAnswerImages } from "./questionQuality";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
+import { getAffectedQuestionIds } from "./questionSaveResult";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -1349,7 +1350,7 @@ export async function saveQuestion(
       };
       const mayPerformUpdate =
         payload.intent === "APPROVE"
-          ? canApproveQuestion(session, existingQuestion.review_status)
+          ? canApproveQuestion(session)
           : payload.intent === "REQUEST_CHANGES"
             ? canRequestQuestionChanges(
                 session,
@@ -1983,12 +1984,17 @@ export async function saveQuestion(
       question.fragen_id,
       userId,
     );
+    const affectedQuestionIds = getAffectedQuestionIds(
+      question.fragen_id,
+      pixelQuestionSync,
+    );
 
     revalidatePath("/fragen");
 
     return {
       success: true,
       questionId: question.fragen_id,
+      affectedQuestionIds,
       questionMedia: question.questionMedia,
       answers: question.answers,
       pixelQuestionSync,
@@ -1996,12 +2002,15 @@ export async function saveQuestion(
         payload.intent,
         payload.questionId !== undefined,
       ),
-      messageParams: { id: question.fragen_id },
+      messageParams: {
+        id: question.fragen_id,
+        ids: affectedQuestionIds.join(", "),
+      },
       fallbackMessage: formatMessage(
         serverMessages.success[
           createSuccessCode(payload.intent, payload.questionId !== undefined)
         ],
-        { id: question.fragen_id },
+        { id: question.fragen_id, ids: affectedQuestionIds.join(", ") },
       ),
     };
   } catch (error) {

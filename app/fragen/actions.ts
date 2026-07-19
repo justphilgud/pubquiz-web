@@ -6,7 +6,11 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { Buffer } from "buffer";
 import { createQuestion } from "@/app/services/questionService";
-import { requireAdmin, requireQuestionEditor } from "@/app/lib/permissions";
+import {
+  canCloneQuestion,
+  requireAdmin,
+  requireQuestionEditor,
+} from "@/app/lib/permissions";
 import { requireUser } from "../lib/auth-guard";
 
 function getMedientypIdAusDatei(datei: string) {
@@ -68,6 +72,7 @@ export type FrageSuchResult = {
   archivierungsgrund: string | null;
   review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
   gueltig_bis: string | null;
+  can_clone: boolean;
   quizze: {
     quiz_id: number;
     titel: string | null;
@@ -123,7 +128,7 @@ export async function searchFragen(data: {
   limit?: number;
   offset?: number;
 }) {
-  await requireQuestionEditor();
+  const session = await requireQuestionEditor();
   const limit = data.limit ?? 50;
   const offset = data.offset ?? 0;
 
@@ -215,6 +220,11 @@ export async function searchFragen(data: {
       archivierungsgrund: frage.archivierungsgrund,
       review_status: frage.review_status,
       gueltig_bis: frage.gueltig_bis?.toISOString().slice(0, 10) ?? null,
+      can_clone: canCloneQuestion(session, {
+        createdByUserId: frage.created_by_user_id,
+        reviewStatus: frage.review_status,
+        isArchived: frage.ist_archiviert,
+      }),
       kategorien: frage.fragen_kategorien.map(
         (k) => k.fragenkategorie.kategorie,
       ),

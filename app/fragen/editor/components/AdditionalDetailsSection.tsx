@@ -19,6 +19,7 @@ type AdditionalDetailsSectionProps = {
   onModerationNotesChange: (moderationNotes: string) => void;
   onCategoryRequestChange: (categoryRequest: string) => void;
   onValidUntilChange: (validUntil: string | null) => void;
+  canManageCategories: boolean;
 };
 
 export function AdditionalDetailsSection({
@@ -34,6 +35,7 @@ export function AdditionalDetailsSection({
   onModerationNotesChange,
   onCategoryRequestChange,
   onValidUntilChange,
+  canManageCategories,
 }: AdditionalDetailsSectionProps) {
   const { locale, messages } = useQuestionEditorMessages();
   const [isOpen, setIsOpen] = useState(initiallyOpen);
@@ -90,6 +92,7 @@ export function AdditionalDetailsSection({
             categories={categories}
             selectedCategoryIds={selectedCategoryIds}
             onChangeCategories={onChangeCategories}
+            canManageCategories={canManageCategories}
           />
 
           <section className="rounded-2xl border border-slate-200 bg-white p-4">
