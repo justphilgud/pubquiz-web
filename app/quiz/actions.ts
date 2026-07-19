@@ -23,11 +23,26 @@ import {
 } from "./teamSessionToken";
 import { getTeamSessionSigningSecret } from "./teamSessionSecret.server";
 import { assertTeamAnswerAuthorized } from "./teamAnswerPolicy";
+import { buildDefaultQuizSections, buildQuickQuizSections } from "./quizStructure";
+import {
+  buildQuizCopyMasterData,
+  getQuizTemporalStatus,
+  validateQuizMasterData,
+  type QuizTemporalStatus,
+} from "./quizMasterData";
 
 export type QuizResult = {
   quiz_id: number;
+  eventreihe_id: number;
+  eventreihe_name: string;
+  eventreihe_archiviert: boolean;
   titel: string | null;
   quiz_datum: string | null;
+  veranstaltungszeit: string | null;
+  veranstaltungsname: string | null;
+  karten_url: string | null;
+  oeffentliche_url: string | null;
+  temporal_status: QuizTemporalStatus;
   team_anzahl: number | null;
   teilnehmer_anzahl: number | null;
   bemerkung: string | null;
@@ -35,6 +50,45 @@ export type QuizResult = {
   archivierungsgrund: string | null;
   fragen_anzahl: number;
 };
+
+async function getEventSeriesForQuizSave(
+  eventSeriesId: number,
+  options?: { allowArchivedId?: number },
+) {
+  const eventSeries = await prisma.eventreihen.findUnique({
+    where: { eventreihe_id: eventSeriesId },
+    select: { eventreihe_id: true, ist_archiviert: true },
+  });
+  if (!eventSeries) return { ok: false as const, message: "Eventreihe wurde nicht gefunden." };
+  if (
+    eventSeries.ist_archiviert &&
+    eventSeries.eventreihe_id !== options?.allowArchivedId
+  ) {
+    return { ok: false as const, message: "Archivierte Eventreihen können nicht ausgewählt werden." };
+  }
+  return { ok: true as const, eventSeries };
+}
+
+function sortQuizResults(quizze: QuizResult[]) {
+  const rank: Record<QuizTemporalStatus, number> = {
+    TODAY: 0,
+    UPCOMING: 1,
+    PAST: 2,
+    MISSING_DATE: 3,
+    ARCHIVED: 4,
+  };
+  return quizze.sort((a, b) => {
+    const statusDifference = rank[a.temporal_status] - rank[b.temporal_status];
+    if (statusDifference !== 0) return statusDifference;
+    if (a.temporal_status === "UPCOMING" || a.temporal_status === "TODAY") {
+      return (a.quiz_datum ?? "").localeCompare(b.quiz_datum ?? "");
+    }
+    if (a.temporal_status === "PAST") {
+      return (b.quiz_datum ?? "").localeCompare(a.quiz_datum ?? "");
+    }
+    return b.quiz_id - a.quiz_id;
+  });
+}
 
 export type QuizDetailsResult = QuizResult & {
   intro_begruessungstitel: string | null;
@@ -79,6 +133,7 @@ export async function getQuizListe(): Promise<QuizResult[]> {
       quiz_datum: "desc",
     },
     include: {
+      eventreihe: true,
       _count: {
         select: {
           quiz_fragen: true,
@@ -87,19 +142,27 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     },
   });
 
-  return quizze.map((quiz) => ({
+  return sortQuizResults(quizze.map((quiz) => ({
     quiz_id: quiz.quiz_id,
+    eventreihe_id: quiz.eventreihe_id,
+    eventreihe_name: quiz.eventreihe.name,
+    eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
+    veranstaltungszeit: quiz.veranstaltungszeit,
+    veranstaltungsname: quiz.veranstaltungsname,
+    karten_url: quiz.karten_url,
+    oeffentliche_url: quiz.oeffentliche_url,
+    temporal_status: getQuizTemporalStatus(quiz.quiz_datum, quiz.ist_archiviert),
     team_anzahl: quiz.team_anzahl,
     teilnehmer_anzahl: quiz.teilnehmer_anzahl,
     bemerkung: quiz.bemerkung,
     ist_archiviert: quiz.ist_archiviert,
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: quiz._count.quiz_fragen,
-  }));
+  })));
 }
 
 export async function getAktiveQuizListe(): Promise<QuizResult[]> {
@@ -112,6 +175,7 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
       quiz_datum: "desc",
     },
     include: {
+      eventreihe: true,
       _count: {
         select: {
           quiz_fragen: true,
@@ -122,10 +186,18 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 
   return quizze.map((quiz) => ({
     quiz_id: quiz.quiz_id,
+    eventreihe_id: quiz.eventreihe_id,
+    eventreihe_name: quiz.eventreihe.name,
+    eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
+    veranstaltungszeit: quiz.veranstaltungszeit,
+    veranstaltungsname: quiz.veranstaltungsname,
+    karten_url: quiz.karten_url,
+    oeffentliche_url: quiz.oeffentliche_url,
+    temporal_status: getQuizTemporalStatus(quiz.quiz_datum, quiz.ist_archiviert),
     team_anzahl: quiz.team_anzahl,
     teilnehmer_anzahl: quiz.teilnehmer_anzahl,
     bemerkung: quiz.bemerkung,
@@ -136,26 +208,42 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 }
 
 export async function createQuiz(data: {
+  eventSeriesId: number;
   titel: string;
   quizDatum: string;
+  veranstaltungszeit?: string;
+  veranstaltungsname?: string;
+  kartenUrl?: string;
+  oeffentlicheUrl?: string;
   bemerkung: string;
 }) {
   await requireAdmin();
-
-  if (!data.titel.trim()) {
-    return {
-      success: false,
-      message: "Bitte einen Quiznamen eingeben.",
-    };
-  }
+  const validated = validateQuizMasterData({
+    eventSeriesId: data.eventSeriesId,
+    title: data.titel,
+    date: data.quizDatum,
+    time: data.veranstaltungszeit,
+    venueName: data.veranstaltungsname,
+    mapUrl: data.kartenUrl,
+    publicUrl: data.oeffentlicheUrl,
+    internalNote: data.bemerkung,
+  });
+  if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
+  const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId);
+  if (!eventSeries.ok) return { success: false, message: eventSeries.message };
 
   const quiz = await prisma.quiz.create({
     data: {
-      titel: data.titel.trim(),
-      quiz_datum: data.quizDatum ? new Date(data.quizDatum) : null,
+      eventreihe_id: validated.value.eventSeriesId,
+      titel: validated.value.title,
+      quiz_datum: validated.value.dateValue,
+      veranstaltungszeit: validated.value.time,
+      veranstaltungsname: validated.value.venueName,
+      karten_url: validated.value.mapUrl,
+      oeffentliche_url: validated.value.publicUrl,
       team_anzahl: 0,
       teilnehmer_anzahl: 0,
-      bemerkung: data.bemerkung.trim() || null,
+      bemerkung: validated.value.internalNote,
     },
   });
 
@@ -166,29 +254,62 @@ export async function createQuiz(data: {
   return {
     success: true,
     message: "Quiz wurde angelegt.",
+    quizId: quiz.quiz_id,
   };
 }
 
 export async function updateQuiz(data: {
   quizId: number;
+  eventSeriesId: number;
   titel: string;
   quizDatum: string;
+  veranstaltungszeit?: string;
+  veranstaltungsname?: string;
+  kartenUrl?: string;
+  oeffentlicheUrl?: string;
   bemerkung: string;
 }) {
   await requireQuizEditor(data.quizId);
+  const existing = await prisma.quiz.findUnique({
+    where: { quiz_id: data.quizId },
+    select: { eventreihe_id: true },
+  });
+  if (!existing) return { success: false, message: "Quiz nicht gefunden." };
+  const validated = validateQuizMasterData({
+    eventSeriesId: data.eventSeriesId,
+    title: data.titel,
+    date: data.quizDatum,
+    time: data.veranstaltungszeit,
+    venueName: data.veranstaltungsname,
+    mapUrl: data.kartenUrl,
+    publicUrl: data.oeffentlicheUrl,
+    internalNote: data.bemerkung,
+  });
+  if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
+  const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId, {
+    allowArchivedId: existing.eventreihe_id,
+  });
+  if (!eventSeries.ok) return { success: false, message: eventSeries.message };
 
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
     },
     data: {
-      titel: data.titel.trim() || null,
-      quiz_datum: data.quizDatum ? new Date(data.quizDatum) : null,
-      bemerkung: data.bemerkung.trim() || null,
+      eventreihe_id: validated.value.eventSeriesId,
+      titel: validated.value.title,
+      quiz_datum: validated.value.dateValue,
+      veranstaltungszeit: validated.value.time,
+      veranstaltungsname: validated.value.venueName,
+      karten_url: validated.value.mapUrl,
+      oeffentliche_url: validated.value.publicUrl,
+      bemerkung: validated.value.internalNote,
     },
   });
 
   revalidatePath("/quiz");
+  revalidatePath(`/quiz/${data.quizId}`);
+  return { success: true, message: "Quiz wurde aktualisiert." };
 }
 
 export async function archiveQuiz(data: {
@@ -257,23 +378,19 @@ export async function deleteQuiz(quizId: number) {
   };
 }
 
-export async function copyQuiz(data: { quizId: number; neuerTitel: string }) {
+export async function copyQuiz(data: {
+  quizId: number;
+  neuerTitel: string;
+  quizDatum: string;
+}) {
   const { session } = await requireQuizAdmin(data.quizId);
-
-  const neuerTitel = data.neuerTitel.trim();
-
-  if (!neuerTitel) {
-    return {
-      success: false,
-      message: "Bitte einen Namen für die Kopie eingeben.",
-    };
-  }
 
   const original = await prisma.quiz.findUnique({
     where: {
       quiz_id: data.quizId,
     },
     include: {
+      eventreihe: true,
       quiz_abschnitte: {
         orderBy: {
           sortierung: "asc",
@@ -293,15 +410,36 @@ export async function copyQuiz(data: { quizId: number; neuerTitel: string }) {
       message: "Original-Quiz wurde nicht gefunden.",
     };
   }
+  const validated = validateQuizMasterData(
+    buildQuizCopyMasterData(
+      {
+        eventSeriesId: original.eventreihe_id,
+        time: original.veranstaltungszeit,
+        venueName: original.veranstaltungsname,
+        mapUrl: original.karten_url,
+        internalNote: original.bemerkung,
+      },
+      { title: data.neuerTitel, date: data.quizDatum },
+    ),
+  );
+  if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
+  if (original.eventreihe.ist_archiviert) {
+    return { success: false, message: "Quizze in archivierten Eventreihen können nicht kopiert werden." };
+  }
 
   const kopie = await prisma.$transaction(async (tx) => {
     const neuesQuiz = await tx.quiz.create({
       data: {
-        titel: neuerTitel,
-        quiz_datum: null,
+        eventreihe_id: original.eventreihe_id,
+        titel: validated.value.title,
+        quiz_datum: validated.value.dateValue,
+        veranstaltungszeit: validated.value.time,
+        veranstaltungsname: validated.value.venueName,
+        karten_url: validated.value.mapUrl,
+        oeffentliche_url: null,
         team_anzahl: 0,
         teilnehmer_anzahl: 0,
-        bemerkung: original.bemerkung,
+        bemerkung: validated.value.internalNote,
 
         intro_logo_url: original.intro_logo_url,
         intro_musik_url: original.intro_musik_url,
@@ -380,6 +518,7 @@ export async function getQuizDetails(
       quiz_id: quizId,
     },
     include: {
+      eventreihe: true,
       quiz_abschnitte: {
         orderBy: {
           sortierung: "asc",
@@ -410,10 +549,18 @@ export async function getQuizDetails(
 
   return {
     quiz_id: quiz.quiz_id,
+    eventreihe_id: quiz.eventreihe_id,
+    eventreihe_name: quiz.eventreihe.name,
+    eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
+    veranstaltungszeit: quiz.veranstaltungszeit,
+    veranstaltungsname: quiz.veranstaltungsname,
+    karten_url: quiz.karten_url,
+    oeffentliche_url: quiz.oeffentliche_url,
+    temporal_status: getQuizTemporalStatus(quiz.quiz_datum, quiz.ist_archiviert),
     team_anzahl: quiz.team_anzahl,
     teilnehmer_anzahl: quiz.teilnehmer_anzahl,
     bemerkung: quiz.bemerkung,
@@ -2510,8 +2657,14 @@ export async function getSchnellQuizKategorien() {
 }
 
 export async function createSchnellQuiz(data: {
+  eventSeriesId: number;
   titel: string;
   quizDatum: string;
+  veranstaltungszeit?: string;
+  veranstaltungsname?: string;
+  kartenUrl?: string;
+  oeffentlicheUrl?: string;
+  bemerkung?: string;
   anzahlBloecke: number;
   fragenProBlock: number;
   kategorieIds: number[];
@@ -2522,13 +2675,22 @@ export async function createSchnellQuiz(data: {
   preisPlatz3: string;
 }) {
   const session = await requireAdmin();
-
-  if (!data.titel.trim()) {
-    return {
-      success: false,
-      message: "Bitte einen Titel eingeben.",
-      quizId: null,
-    };
+  const validated = validateQuizMasterData({
+    eventSeriesId: data.eventSeriesId,
+    title: data.titel,
+    date: data.quizDatum,
+    time: data.veranstaltungszeit,
+    venueName: data.veranstaltungsname,
+    mapUrl: data.kartenUrl,
+    publicUrl: data.oeffentlicheUrl,
+    internalNote: data.bemerkung,
+  });
+  if (!validated.ok) {
+    return { success: false, message: validated.message, errors: validated.errors, quizId: null };
+  }
+  const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId);
+  if (!eventSeries.ok) {
+    return { success: false, message: eventSeries.message, quizId: null };
   }
 
   const gesamtAnzahlFragen = data.anzahlBloecke * data.fragenProBlock;
@@ -2592,9 +2754,14 @@ export async function createSchnellQuiz(data: {
 
   const quiz = await prisma.quiz.create({
     data: {
-      titel: data.titel.trim(),
-      quiz_datum: data.quizDatum ? new Date(data.quizDatum) : null,
-      bemerkung: "Automatisch erstelltes Schnellquiz",
+      eventreihe_id: validated.value.eventSeriesId,
+      titel: validated.value.title,
+      quiz_datum: validated.value.dateValue,
+      veranstaltungszeit: validated.value.time,
+      veranstaltungsname: validated.value.venueName,
+      karten_url: validated.value.mapUrl,
+      oeffentliche_url: validated.value.publicUrl,
+      bemerkung: validated.value.internalNote ?? "Automatisch erstelltes Schnellquiz",
       intro_startzeit: "19:30",
       intro_video_url: "/medien/video/intro/intro.mp4",
     },
@@ -2882,26 +3049,7 @@ export async function updateIntroVorDemStart(data: {
 }
 async function createDefaultQuizAbschnitte(quizId: number) {
   await prisma.quiz_abschnitte.createMany({
-    data: [
-      {
-        quiz_id: quizId,
-        titel: "Intro",
-        abschnitt_typ: "intro",
-        sortierung: 1,
-      },
-      {
-        quiz_id: quizId,
-        titel: "Fragenblock 1",
-        abschnitt_typ: "fragenblock",
-        sortierung: 2,
-      },
-      {
-        quiz_id: quizId,
-        titel: "Outro",
-        abschnitt_typ: "outro",
-        sortierung: 3,
-      },
-    ],
+    data: buildDefaultQuizSections(quizId),
   });
 }
 async function createSchnellquizAbschnitte(
@@ -2909,26 +3057,7 @@ async function createSchnellquizAbschnitte(
   anzahlBloecke: number,
 ) {
   await prisma.quiz_abschnitte.createMany({
-    data: [
-      {
-        quiz_id: quizId,
-        titel: "Intro",
-        abschnitt_typ: "intro",
-        sortierung: 1,
-      },
-      ...Array.from({ length: anzahlBloecke }, (_, index) => ({
-        quiz_id: quizId,
-        titel: `Fragenblock ${index + 1}`,
-        abschnitt_typ: "fragenblock",
-        sortierung: index + 2,
-      })),
-      {
-        quiz_id: quizId,
-        titel: "Outro",
-        abschnitt_typ: "outro",
-        sortierung: anzahlBloecke + 2,
-      },
-    ],
+    data: buildQuickQuizSections(quizId, anzahlBloecke),
   });
 }
 export async function updateIntroStartsequenz(data: {
