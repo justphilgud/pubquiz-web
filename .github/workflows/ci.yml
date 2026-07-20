@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push: {}
+  pull_request: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Prisma, TypeScript, Tests, Changed-file ESLint and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "true"
+      DATABASE_URL: postgresql://ci_validation:ci_validation@127.0.0.1:5432/ci_validation?schema=pubquiz
+      AUTH_SECRET: ci-validation-only-not-a-secret
+      BLOB_READ_WRITE_TOKEN: ci-validation-only-not-a-secret
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+
+      - name: Validate Prisma schema
+        run: npm run db:validate
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      - name: Strict ESLint for CI/CD package TypeScript
+        run: >-
+          npx eslint --max-warnings=0 --
+          scripts/ci-workflows.test.ts
+          scripts/lint-changed-files.ts
+          scripts/lint-changed-files.test.ts
+          scripts/validate-deployment-environment.ts
+          scripts/validate-deployment-environment.test.ts
+
+      - name: ESLint changed JavaScript and TypeScript files
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CI_BEFORE_SHA: ${{ github.event.before }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: npm run lint:changed
+
+      - name: Production build
+        run: npm run build
+
+  repository-lint-information:
+    name: Informational only — full repository ESLint debt
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full repository ESLint for information
+        id: repository_lint
+        continue-on-error: true
+        run: npm run lint -- --max-warnings=0
+
+      - name: Publish repository lint status
+        if: always()
+        shell: bash
+        env:
+          LINT_OUTCOME: ${{ steps.repository_lint.outcome }}
+        run: |
+          if [[ "$LINT_OUTCOME" == "success" ]]; then
+            echo "## Full repository ESLint: successful" >> "$GITHUB_STEP_SUMMARY"
+            echo "The repository-wide lint backlog is currently empty." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Full repository ESLint still reports pre-existing debt. This informational job does not gate deployments during the transition."
+            {
+              echo "## Full repository ESLint: debt remains"
+              echo "This is an explicitly non-blocking transition job."
+              echo "The repository is **not** fully lint-clean; see the ESLint step above for the current findings."
+              echo "Changed JavaScript/TypeScript files are enforced separately in the blocking quality job."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
