@@ -5,6 +5,7 @@ import {
   canManageEventSeries,
   canManageQuizzes,
   canManageUsers,
+  canCreateQuestions,
   isAdmin,
 } from "@/app/lib/permissions";
 import UserMenu from "@/app/components/UserMenu";
@@ -18,7 +19,8 @@ export default async function AppHeader() {
   if (!session?.user) return null;
 
   const admin = isAdmin(session);
-  const [quizSeriesIds, editableSeriesIds] = await Promise.all([
+  const [questionSeriesIds, quizSeriesIds, editableSeriesIds] = await Promise.all([
+    getEventSeriesIdsForCapability("CREATE_QUESTION", session),
     getEventSeriesIdsForCapability("MANAGE_QUIZZES", session),
     getEventSeriesIdsForCapability("EDIT", session),
   ]);
@@ -32,6 +34,8 @@ export default async function AppHeader() {
   }
 
   const navItems = getAppNavigationItems({
+    canAccessQuestions:
+      canCreateQuestions(session) || (questionSeriesIds?.length ?? 0) > 0,
     canManageQuizzes: canManageQuizzes(session) || (quizSeriesIds?.length ?? 0) > 0,
     canManageEventSeries: canManageEventSeries(session) || (editableSeriesIds?.length ?? 0) > 0,
     canManageUsers: canManageUsers(session),

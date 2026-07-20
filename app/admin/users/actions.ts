@@ -59,6 +59,31 @@ export async function updateUserAction(formData: FormData) {
   if (!id || !name || !email) {
     throw new Error("Ungültige Benutzerdaten.");
   }
+  if (!Object.values(UserRole).includes(role)) {
+    throw new Error("Ungültige Rolle.");
+  }
+
+  const existingUser = await prisma.users.findUnique({
+    where: { id },
+    select: { role: true, is_active: true },
+  });
+  if (!existingUser) {
+    throw new Error("Benutzer nicht gefunden.");
+  }
+  if (
+    existingUser.role === "ADMIN" &&
+    existingUser.is_active &&
+    (role !== "ADMIN" || !is_active)
+  ) {
+    const activeAdminCount = await prisma.users.count({
+      where: { role: "ADMIN", is_active: true },
+    });
+    if (activeAdminCount <= 1) {
+      throw new Error(
+        "Der letzte aktive Administrator kann nicht herabgestuft oder deaktiviert werden.",
+      );
+    }
+  }
 
   const data = {
     name,

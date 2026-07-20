@@ -25,7 +25,9 @@ function hasEverySeries(
 ) {
   return eventSeriesIds.length > 0 && eventSeriesIds.every((id) => {
     const role = actor.assignments.get(id);
-    return requiredRole ? role === requiredRole : role === "EVENT_MANAGER" || role === "EDITOR";
+    return requiredRole
+      ? role === requiredRole
+      : role === "EVENT_MANAGER" || role === "EVENT_EDITOR";
   });
 }
 
@@ -37,6 +39,9 @@ export function canUseQuestionScope(
   if (actor.globalRole === "ADMIN") {
     return scope === "GLOBAL" || eventSeriesIds.length > 0;
   }
+  if (scope === "GLOBAL") {
+    return actor.globalRole === "EDITOR" && eventSeriesIds.length === 0;
+  }
   return scope === "EVENT_SERIES" && hasEverySeries(actor, eventSeriesIds);
 }
 
@@ -44,7 +49,9 @@ export function canViewScopedQuestion(actor: QuestionActorContext, question: Que
   if (actor.globalRole === "ADMIN") return true;
   if (question.scope === "GLOBAL") {
     if (question.isApproved) return true;
-    return actor.userId !== null && actor.userId === question.createdByUserId;
+    return actor.globalRole === "EDITOR" &&
+      actor.userId !== null &&
+      actor.userId === question.createdByUserId;
   }
   return question.eventSeriesIds.some((id) => actor.assignments.has(id));
 }
@@ -53,7 +60,9 @@ export function canEditScopedQuestion(actor: QuestionActorContext, question: Que
   if (actor.globalRole === "ADMIN") return true;
   if (question.isArchived) return false;
   if (question.scope === "GLOBAL") {
-    return actor.userId !== null && actor.userId === question.createdByUserId &&
+    return actor.globalRole === "EDITOR" &&
+      actor.userId !== null &&
+      actor.userId === question.createdByUserId &&
       (question.reviewStatus === "DRAFT" || question.reviewStatus === "CHANGES_REQUESTED");
   }
   if (hasEverySeries(actor, question.eventSeriesIds, "EVENT_MANAGER")) return true;

@@ -465,15 +465,16 @@ model quiz_praesentation_status {
 }
 
 enum UserRole {
-  ADMIN
+  USER
   EDITOR
+  ADMIN
 
   @@schema("pubquiz")
 }
 
 enum EventSeriesRole {
   EVENT_MANAGER
-  EDITOR
+  EVENT_EDITOR
 
   @@schema("pubquiz")
 }

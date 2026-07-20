@@ -2,15 +2,19 @@ import { requireAdmin } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import CreateUserDialog from "./CreateUserDialog";
 import EditUserDialog from "./EditUserDialog";
-import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
+import { getUserInitials } from "@/app/lib/userDisplay";
 import { ArchiveUser } from "./ArchiveUser";
 import { ReactivateUser } from "./ReactivateUser";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { getEventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
-import { EventSeriesMembershipManager } from "@/app/eventreihen/EventSeriesMembershipManager";
+import { countMembershipRoles } from "@/app/eventreihen/membershipPolicy";
+import { loadRoleMessages } from "@/app/i18n/roleMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
+import { formatMessage } from "@/app/i18n/formatMessage";
 
 export default async function UsersPage() {
   await requireAdmin();
+  const messages = loadRoleMessages(getDefaultLocale());
 
   const [users, membershipData] = await Promise.all([
     prisma.users.findMany({
@@ -35,11 +39,16 @@ export default async function UsersPage() {
             </p>
           </div>
 
-          <CreateUserDialog />
+          <CreateUserDialog messages={messages} />
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          {users.map((user) => (
+          {users.map((user) => {
+            const memberships = membershipData.memberships.filter(
+              (membership) => membership.userId === user.id,
+            );
+            const counts = countMembershipRoles(memberships);
+            return (
             <article
               key={user.id}
               className="border-b border-slate-100 px-4 py-4 last:border-b-0 sm:px-5"
@@ -58,7 +67,7 @@ export default async function UsersPage() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                  {getUserRoleLabel(user.role)}
+                  {messages.fields.globalRole}: {messages.globalRoles[user.role]}
                 </span>
 
                 <span
@@ -74,11 +83,17 @@ export default async function UsersPage() {
                     <XCircleIcon className="h-4 w-4 text-red-600" />
                   )}
 
-                  {user.is_active ? "Aktiv" : "Archiviert"}
+                  {user.is_active
+                    ? messages.status.active
+                    : messages.status.archived}
                 </span>
 
                 <div className="flex items-center gap-2">
-                  <EditUserDialog user={user} />
+                  <EditUserDialog
+                    user={user}
+                    membershipData={membershipData}
+                    messages={messages}
+                  />
 
                   {user.is_active ? (
                     <ArchiveUser userId={user.id} />
@@ -86,18 +101,35 @@ export default async function UsersPage() {
                     <ReactivateUser userId={user.id} />
                   )}
                 </div>
+                </div>
               </div>
+              <div className="mt-3 text-sm text-slate-600">
+                {memberships.length === 0 ? (
+                  messages.summaries.noAssignment
+                ) : (
+                  <>
+                    <p className="font-medium">
+                      {memberships.length === 1
+                        ? messages.summaries.oneAssignment
+                        : formatMessage(messages.summaries.multipleAssignments, {
+                            count: memberships.length,
+                          })}
+                    </p>
+                    <p className="mt-1 break-words text-xs text-slate-500">
+                      {formatMessage(messages.summaries.managers, {
+                        count: counts.EVENT_MANAGER,
+                      })}
+                      {" · "}
+                      {formatMessage(messages.summaries.editors, {
+                        count: counts.EVENT_EDITOR,
+                      })}
+                    </p>
+                  </>
+                )}
               </div>
-              {user.is_active && (
-                <details className="mt-4 rounded-xl border border-slate-200 p-3">
-                  <summary className="min-h-11 cursor-pointer py-2 font-semibold">Eventreihenzuordnungen</summary>
-                  <div className="mt-3">
-                    <EventSeriesMembershipManager data={membershipData} fixedUserId={user.id} compact />
-                  </div>
-                </details>
-              )}
             </article>
-          ))}
+            );
+          })}
         </div>
       </div>
     </main>

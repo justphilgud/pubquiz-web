@@ -8,11 +8,13 @@ import {
   removingAssignmentLeavesNoEventManager,
   type EventSeriesAssignmentRole,
 } from "./eventSeriesAccessPolicy";
+import { deRoleMessages } from "@/app/i18n/messages/de/roles";
 
 export type EventSeriesMembership = {
   id: number;
   eventSeriesId: number;
   eventSeriesName: string;
+  eventSeriesArchived: boolean;
   userId: number;
   userName: string | null;
   userEmail: string;
@@ -57,7 +59,7 @@ export async function getEventSeriesMembershipOptions(): Promise<EventSeriesMemb
         eventreihe_id: true,
         benutzer_id: true,
         rolle: true,
-        eventreihe: { select: { name: true } },
+        eventreihe: { select: { name: true, ist_archiviert: true } },
         benutzer: { select: { name: true, email: true } },
       },
     }),
@@ -70,6 +72,7 @@ export async function getEventSeriesMembershipOptions(): Promise<EventSeriesMemb
       id: membership.eventreihe_benutzerrolle_id,
       eventSeriesId: membership.eventreihe_id,
       eventSeriesName: membership.eventreihe.name,
+      eventSeriesArchived: membership.eventreihe.ist_archiviert,
       userId: membership.benutzer_id,
       userName: membership.benutzer.name,
       userEmail: membership.benutzer.email,
@@ -78,11 +81,10 @@ export async function getEventSeriesMembershipOptions(): Promise<EventSeriesMemb
   };
 }
 
-export async function saveEventSeriesMembership(input: {
+export async function addEventSeriesMembership(input: {
   userId: number;
   eventSeriesId: number;
   role: string;
-  confirmedWithoutManager?: boolean;
 }): Promise<MembershipActionResult> {
   const session = await requireAdmin();
   if (!Number.isInteger(input.userId) || !Number.isInteger(input.eventSeriesId) || !isEventSeriesAssignmentRole(input.role)) {
@@ -104,40 +106,88 @@ export async function saveEventSeriesMembership(input: {
     where: { benutzer_id_eventreihe_id: { benutzer_id: input.userId, eventreihe_id: input.eventSeriesId } },
     select: { rolle: true },
   });
-  if (existing?.rolle === "EVENT_MANAGER" && input.role === "EDITOR") {
+  if (existing) {
+    return {
+      success: false,
+      message: deRoleMessages.messages.duplicateAssignment,
+    };
+  }
+
+  const assignedBy = Number(session.user?.id);
+  try {
+    await prisma.eventreihe_benutzerrollen.create({
+      data: {
+        benutzer_id: input.userId,
+        eventreihe_id: input.eventSeriesId,
+        rolle: input.role,
+        zugewiesen_von_user_id: Number.isInteger(assignedBy) ? assignedBy : null,
+      },
+    });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return {
+        success: false,
+        message: deRoleMessages.messages.duplicateAssignment,
+      };
+    }
+    throw error;
+  }
+  revalidateMembershipPages(input.eventSeriesId);
+  return { success: true, message: deRoleMessages.messages.addSuccess };
+}
+
+export async function changeEventSeriesMembershipRole(input: {
+  membershipId: number;
+  role: string;
+  confirmedWithoutManager?: boolean;
+}): Promise<MembershipActionResult> {
+  const session = await requireAdmin();
+  if (
+    !Number.isInteger(input.membershipId) ||
+    input.membershipId <= 0 ||
+    !isEventSeriesAssignmentRole(input.role)
+  ) {
+    return { success: false, message: "Ungültige Zuordnung." };
+  }
+
+  const existing = await prisma.eventreihe_benutzerrollen.findUnique({
+    where: { eventreihe_benutzerrolle_id: input.membershipId },
+    select: { eventreihe_id: true, rolle: true },
+  });
+  if (!existing) {
+    return { success: false, message: "Zuordnung nicht gefunden." };
+  }
+  if (
+    existing.rolle === "EVENT_MANAGER" &&
+    input.role === "EVENT_EDITOR"
+  ) {
     const managerCount = await prisma.eventreihe_benutzerrollen.count({
-      where: { eventreihe_id: input.eventSeriesId, rolle: "EVENT_MANAGER" },
+      where: { eventreihe_id: existing.eventreihe_id, rolle: "EVENT_MANAGER" },
     });
     if (managerCount <= 1 && !input.confirmedWithoutManager) {
       return {
         success: false,
         requiresConfirmation: true,
-        message: "Diese Eventreihe besitzt danach keinen Eventmanager mehr.",
+        message: deRoleMessages.messages.noManagerWarning,
       };
     }
   }
 
   const assignedBy = Number(session.user?.id);
-  await prisma.eventreihe_benutzerrollen.upsert({
-    where: {
-      benutzer_id_eventreihe_id: {
-        benutzer_id: input.userId,
-        eventreihe_id: input.eventSeriesId,
-      },
-    },
-    create: {
-      benutzer_id: input.userId,
-      eventreihe_id: input.eventSeriesId,
-      rolle: input.role,
-      zugewiesen_von_user_id: Number.isInteger(assignedBy) ? assignedBy : null,
-    },
-    update: {
+  await prisma.eventreihe_benutzerrollen.update({
+    where: { eventreihe_benutzerrolle_id: input.membershipId },
+    data: {
       rolle: input.role,
       zugewiesen_von_user_id: Number.isInteger(assignedBy) ? assignedBy : null,
     },
   });
-  revalidateMembershipPages(input.eventSeriesId);
-  return { success: true, message: "Eventreihenzuordnung wurde gespeichert." };
+  revalidateMembershipPages(existing.eventreihe_id);
+  return { success: true, message: deRoleMessages.messages.changeSuccess };
 }
 
 export async function removeEventSeriesMembership(
@@ -167,7 +217,7 @@ export async function removeEventSeriesMembership(
     return {
       success: false,
       requiresConfirmation: true,
-      message: "Diese Eventreihe besitzt danach keinen Eventmanager mehr.",
+      message: deRoleMessages.messages.noManagerWarning,
     };
   }
 
@@ -175,5 +225,5 @@ export async function removeEventSeriesMembership(
     where: { eventreihe_benutzerrolle_id: membershipId },
   });
   revalidateMembershipPages(membership.eventreihe_id);
-  return { success: true, message: "Eventreihenzuordnung wurde entfernt." };
+  return { success: true, message: deRoleMessages.messages.removeSuccess };
 }

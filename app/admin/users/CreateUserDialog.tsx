@@ -4,8 +4,9 @@ import { createUserAction } from "./actions";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useState, useTransition } from "react";
+import type { RoleMessages } from "@/app/i18n/roleMessages";
 
-export default function CreateUserDialog() {
+export default function CreateUserDialog({ messages }: { messages: RoleMessages }) {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState(generateMemorablePassword);
   const [isPending, startTransition] = useTransition();
@@ -102,15 +103,16 @@ export default function CreateUserDialog() {
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Rolle <span className="text-red-500">*</span>
+                  {messages.fields.globalRole} <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="role"
                   defaultValue="EDITOR"
                   className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
                 >
-                  <option value="EDITOR">Editor</option>
-                  <option value="ADMIN">Administrator</option>
+                  <option value="USER">{messages.globalRoles.USER}</option>
+                  <option value="EDITOR">{messages.globalRoles.EDITOR}</option>
+                  <option value="ADMIN">{messages.globalRoles.ADMIN}</option>
                 </select>
               </div>
 

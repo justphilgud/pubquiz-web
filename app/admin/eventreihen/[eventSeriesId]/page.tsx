@@ -2,11 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/app/lib/permissions";
 import { getEventSeriesDetails } from "@/app/eventreihen/actions";
-import { getEventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
-import { EventSeriesMembershipManager } from "@/app/eventreihen/EventSeriesMembershipManager";
 import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { getAnswerFormTemplate, getPresentationTemplate } from "@/app/rendering/templateRegistry";
+import { loadRoleMessages } from "@/app/i18n/roleMessages";
+import { formatMessage } from "@/app/i18n/formatMessage";
 
 const statusLabels = {
   UPCOMING: "Bevorstehend",
@@ -21,14 +21,12 @@ export default async function EventSeriesDetailPage({
 }: {
   params: Promise<{ eventSeriesId: string }>;
 }) {
-  const session = await requireSession();
+  await requireSession();
   const { eventSeriesId } = await params;
   const series = await getEventSeriesDetails(Number(eventSeriesId));
   if (!series) notFound();
-  const membershipData = session.user?.role === "ADMIN"
-    ? await getEventSeriesMembershipOptions()
-    : null;
   const messages = loadRenderingMessages(getDefaultLocale());
+  const roleMessages = loadRoleMessages(getDefaultLocale());
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8">
@@ -48,13 +46,30 @@ export default async function EventSeriesDetailPage({
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>
-        {membershipData && (
-          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-            <h2 className="text-xl font-bold">Berechtigte Benutzer</h2>
-            <p className="mt-1 text-sm text-slate-600">Eventmanager und Editoren dieser Eventreihe verwalten.</p>
-            <div className="mt-5"><EventSeriesMembershipManager data={membershipData} fixedEventSeriesId={series.id} /></div>
-          </section>
-        )}
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-bold">{roleMessages.fields.access}</h2>
+              <p className="mt-1 break-words text-sm text-slate-600">
+                {formatMessage(roleMessages.summaries.accessManagers, {
+                  count: series.accessSummary.managerCount,
+                })}
+                {" · "}
+                {formatMessage(roleMessages.summaries.accessEditors, {
+                  count: series.accessSummary.editorCount,
+                })}
+              </p>
+            </div>
+            {series.canManageMemberships && (
+              <Link
+                href="/admin/users"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-center font-semibold"
+              >
+                {roleMessages.actions.editInUserManagement}
+              </Link>
+            )}
+          </div>
+        </section>
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div><h2 className="text-xl font-bold">Quizze</h2><p className="mt-1 text-sm text-slate-500">{series.quizCount} Termine in dieser Eventreihe.</p></div>

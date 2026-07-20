@@ -27,6 +27,7 @@ export default async function QuestionEditorPage() {
     <QuestionEditor
       capabilities={{
         ...baseCapabilities,
+        canSaveDraft: true,
         canApproveQuestion: canApproveInAnySeries,
         canSubmitForReview: actor.globalRole !== "ADMIN",
       }}
@@ -40,7 +41,8 @@ export default async function QuestionEditorPage() {
         name: category.kategorie,
       }))}
       scopeOptions={{
-        canSelectGlobal: actor.globalRole === "ADMIN",
+        canSelectGlobal:
+          actor.globalRole === "ADMIN" || actor.globalRole === "EDITOR",
         eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
       }}
     />

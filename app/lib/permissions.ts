@@ -2,6 +2,7 @@ import type { Session } from "next-auth";
 import type { QuestionReviewStatus } from "@/app/generated/prisma/enums";
 import { redirect } from "next/navigation";
 import { requireUser } from "./auth-guard";
+import { prisma } from "./prisma";
 
 export function isAdmin(session: Session | null) {
   return session?.user?.role === "ADMIN";
@@ -281,7 +282,22 @@ export async function requireAdmin() {
 export async function requireQuestionEditor() {
   const session = await requireSession();
 
-  if (!canCreateQuestions(session)) {
+  if (canCreateQuestions(session)) {
+    return session;
+  }
+
+  const userId = Number(session.user?.id);
+  const membershipCount = Number.isInteger(userId)
+    ? await prisma.eventreihe_benutzerrollen.count({
+        where: {
+          benutzer_id: userId,
+          benutzer: { is_active: true },
+          rolle: { in: ["EVENT_MANAGER", "EVENT_EDITOR"] },
+        },
+      })
+    : 0;
+
+  if (membershipCount === 0) {
     redirect("/login");
   }
 

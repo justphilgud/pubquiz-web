@@ -265,6 +265,14 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
     include: {
       _count: { select: { quiz: true } },
       quiz: { orderBy: [{ quiz_datum: "desc" }, { quiz_id: "desc" }] },
+      benutzerrollen: {
+        where: { benutzer: { is_active: true } },
+        orderBy: [{ rolle: "asc" }, { benutzer: { name: "asc" } }],
+        select: {
+          rolle: true,
+          benutzer: { select: { name: true, email: true } },
+        },
+      },
     },
   });
   if (!series) return null;
@@ -274,6 +282,15 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
       canChangeArchiveState: access.session.user?.role === "ADMIN",
     }),
     canManageQuizzes: access.session.user?.role === "ADMIN" || access.assignmentRole === "EVENT_MANAGER",
+    canManageMemberships: access.session.user?.role === "ADMIN",
+    accessSummary: {
+      managerCount: series.benutzerrollen.filter(
+        ({ rolle }) => rolle === "EVENT_MANAGER",
+      ).length,
+      editorCount: series.benutzerrollen.filter(
+        ({ rolle }) => rolle === "EVENT_EDITOR",
+      ).length,
+    },
     quizzes: series.quiz.map((quiz) => ({
       id: quiz.quiz_id,
       title: quiz.titel?.trim() || `Quiz ${quiz.quiz_id}`,

@@ -10,8 +10,9 @@
 */
 
 export const UserRole = {
-  ADMIN: 'ADMIN',
-  EDITOR: 'EDITOR'
+  USER: 'USER',
+  EDITOR: 'EDITOR',
+  ADMIN: 'ADMIN'
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
@@ -19,7 +20,7 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 export const EventSeriesRole = {
   EVENT_MANAGER: 'EVENT_MANAGER',
-  EDITOR: 'EDITOR'
+  EVENT_EDITOR: 'EVENT_EDITOR'
 } as const
 
 export type EventSeriesRole = (typeof EventSeriesRole)[keyof typeof EventSeriesRole]

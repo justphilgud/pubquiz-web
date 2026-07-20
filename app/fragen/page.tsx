@@ -33,11 +33,13 @@ export default async function FragenPage({
   const session = await requireQuestionEditor();
   const capabilities = getQuestionOverviewCapabilities(session);
   const actor = await getQuestionActor(session);
+  const canViewOwnWorklists =
+    capabilities.canViewOwnQuestionWorklist || actor.assignments.size > 0;
   const managedEventSeriesIds = await getEventSeriesIdsForCapability("REVIEW_QUESTION", session);
   const canReview = actor.globalRole === "ADMIN" || (managedEventSeriesIds?.length ?? 0) > 0;
   const userId = Number(session.user.id);
 
-  const ownWorklists = capabilities.canViewOwnQuestionWorklist
+  const ownWorklists = canViewOwnWorklists
     ? await loadOwnQuestionWorklists(userId, [...actor.assignments.keys()])
     : null;
   const reviewQueue = canReview

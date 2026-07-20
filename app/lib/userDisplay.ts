@@ -23,6 +23,8 @@ export function getUserRoleLabel(role: string) {
       return "Administrator";
     case "EDITOR":
       return "Editor";
+    case "USER":
+      return "Benutzer";
     default:
       return role;
   }

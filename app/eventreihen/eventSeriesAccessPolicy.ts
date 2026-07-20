@@ -1,4 +1,4 @@
-export type EventSeriesAssignmentRole = "EVENT_MANAGER" | "EDITOR";
+export type EventSeriesAssignmentRole = "EVENT_MANAGER" | "EVENT_EDITOR";
 
 export type EventSeriesCapability =
   | "VIEW"
@@ -19,7 +19,7 @@ const EVENT_MANAGER_CAPABILITIES = new Set<EventSeriesCapability>([
   "REVIEW_QUESTION",
 ]);
 
-const EDITOR_CAPABILITIES = new Set<EventSeriesCapability>([
+const EVENT_EDITOR_CAPABILITIES = new Set<EventSeriesCapability>([
   "VIEW",
   "CREATE_QUESTION",
 ]);
@@ -27,7 +27,7 @@ const EDITOR_CAPABILITIES = new Set<EventSeriesCapability>([
 export function isEventSeriesAssignmentRole(
   value: unknown,
 ): value is EventSeriesAssignmentRole {
-  return value === "EVENT_MANAGER" || value === "EDITOR";
+  return value === "EVENT_MANAGER" || value === "EVENT_EDITOR";
 }
 
 export function hasEventSeriesCapability(input: {
@@ -39,8 +39,8 @@ export function hasEventSeriesCapability(input: {
   if (input.assignmentRole === "EVENT_MANAGER") {
     return EVENT_MANAGER_CAPABILITIES.has(input.capability);
   }
-  if (input.assignmentRole === "EDITOR") {
-    return EDITOR_CAPABILITIES.has(input.capability);
+  if (input.assignmentRole === "EVENT_EDITOR") {
+    return EVENT_EDITOR_CAPABILITIES.has(input.capability);
   }
   return false;
 }

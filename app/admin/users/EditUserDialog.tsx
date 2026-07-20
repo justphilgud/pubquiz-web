@@ -4,16 +4,27 @@ import { updateUserAction } from "./actions";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
 import { BeakerIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useTransition } from "react";
+import type { EventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
+import { EventSeriesMembershipManager } from "@/app/eventreihen/EventSeriesMembershipManager";
+import type { RoleMessages } from "@/app/i18n/roleMessages";
 
 type User = {
   id: number;
   name: string | null;
   email: string;
-  role: "ADMIN" | "EDITOR";
+  role: "ADMIN" | "EDITOR" | "USER";
   is_active: boolean;
 };
 
-export default function EditUserDialog({ user }: { user: User }) {
+export default function EditUserDialog({
+  user,
+  membershipData,
+  messages,
+}: {
+  user: User;
+  membershipData: EventSeriesMembershipOptions;
+  messages: RoleMessages;
+}) {
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [changePassword, setChangePassword] = useState(false);
@@ -32,14 +43,16 @@ export default function EditUserDialog({ user }: { user: User }) {
           setChangePassword(false);
           setOpen(true);
         }}
-        className="rounded-lg px-3 py-1 text-sm text-slate-600 hover:bg-slate-100"
+        aria-label={messages.actions.edit}
+        title={messages.actions.edit}
+        className="min-h-11 min-w-11 rounded-lg px-3 py-1 text-sm text-slate-600 hover:bg-slate-100"
       >
         <PencilSquareIcon className="h-5 w-5" />
       </button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="max-h-[calc(100vh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
             <div className="mb-5">
               <h2 className="text-xl font-bold">Benutzer bearbeiten</h2>
               <p className="mt-1 text-sm text-slate-600">
@@ -95,19 +108,27 @@ export default function EditUserDialog({ user }: { user: User }) {
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-slate-700">
-                      Rolle
+                      {messages.fields.globalRole}
                     </label>
-                    <div className="rounded-xl bg-slate-100 px-3 py-2 text-sm text-slate-700">
-                      {user.role === "ADMIN" ? "Administrator" : "Editor"}
-                    </div>
-                    <input type="hidden" name="role" value={user.role} />
+                    <select
+                      name="role"
+                      defaultValue={user.role}
+                      className="min-h-11 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                    >
+                      <option value="USER">{messages.globalRoles.USER}</option>
+                      <option value="EDITOR">{messages.globalRoles.EDITOR}</option>
+                      <option value="ADMIN">{messages.globalRoles.ADMIN}</option>
+                    </select>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {messages.globalRoleDescriptions[user.role]}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="border-t border-slate-100 pt-4">
                 <h3 className="mb-3 text-sm font-semibold text-slate-900">
-                  Status
+                  {messages.fields.accountStatus}
                 </h3>
 
                 <div className="flex gap-6">
@@ -202,6 +223,19 @@ export default function EditUserDialog({ user }: { user: User }) {
                 </button>
               </div>
             </form>
+
+            <section className="mt-6 border-t border-slate-200 pt-5">
+              <h3 className="text-sm font-semibold text-slate-900">
+                {messages.fields.eventSeriesAccess}
+              </h3>
+              <div className="mt-3">
+                <EventSeriesMembershipManager
+                  data={membershipData}
+                  userId={user.id}
+                  messages={messages}
+                />
+              </div>
+            </section>
           </div>
         </div>
       )}

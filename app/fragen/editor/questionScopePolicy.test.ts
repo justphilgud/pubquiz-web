@@ -11,9 +11,9 @@ import {
 } from "./questionScopePolicy";
 
 const manager: QuestionActorContext = {
-  globalRole: "EDITOR",
+  globalRole: "USER",
   userId: 5,
-  assignments: new Map([[10, "EVENT_MANAGER"], [20, "EDITOR"]]),
+  assignments: new Map([[10, "EVENT_MANAGER"], [20, "EVENT_EDITOR"]]),
 };
 const question = (overrides: Partial<QuestionScopeAccessContext> = {}): QuestionScopeAccessContext => ({
   scope: "EVENT_SERIES",
@@ -44,10 +44,18 @@ test("editor can edit own drafts but cannot approve", () => {
   assert.equal(canApproveScopedQuestion(manager, ownDraft), false);
 });
 
-test("global approved questions are visible but global drafts remain compatible for their creator", () => {
+test("global EDITOR can keep own drafts while USER cannot edit global drafts", () => {
+  const globalEditor = { ...manager, globalRole: "EDITOR" };
   assert.equal(canViewScopedQuestion(manager, question({ scope: "GLOBAL", eventSeriesIds: [], isApproved: true })), true);
-  assert.equal(canViewScopedQuestion(manager, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5 })), true);
-  assert.equal(canEditScopedQuestion(manager, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5, reviewStatus: "DRAFT" })), true);
+  assert.equal(canViewScopedQuestion(globalEditor, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5 })), true);
+  assert.equal(canEditScopedQuestion(globalEditor, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5, reviewStatus: "DRAFT" })), true);
+  assert.equal(canEditScopedQuestion(manager, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5, reviewStatus: "DRAFT" })), false);
+});
+
+test("global EDITOR can use global scope without receiving event-series rights", () => {
+  const editor = { globalRole: "EDITOR", userId: 6, assignments: new Map() };
+  assert.equal(canUseQuestionScope(editor, "GLOBAL", []), true);
+  assert.equal(canUseQuestionScope(editor, "EVENT_SERIES", [10]), false);
 });
 
 test("quiz eligibility accepts global or matching approved questions only", () => {

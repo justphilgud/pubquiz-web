@@ -23,6 +23,7 @@ const editorSession = {
 
 function navigationItemsFor(session: Session) {
   return getAppNavigationItems({
+    canAccessQuestions: true,
     canManageQuizzes: canManageQuizzes(session),
     canManageEventSeries: canManageEventSeries(session),
     canManageUsers: canManageUsers(session),
@@ -34,7 +35,7 @@ test("admin navigation contains event series between quiz and user management", 
     { href: "/fragen", label: "Fragen" },
     { href: "/quiz", label: "Quiz" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
-    { href: "/admin/users", label: "Benutzerverwaltung" },
+    { href: "/admin/users", label: "Benutzer" },
   ]);
 });
 
@@ -42,6 +43,34 @@ test("editor navigation does not expose admin destinations", () => {
   assert.deepEqual(navigationItemsFor(editorSession), [
     { href: "/fragen", label: "Fragen" },
   ]);
+});
+
+test("USER without global or event-series rights has no functional navigation", () => {
+  assert.deepEqual(
+    getAppNavigationItems({
+      canAccessQuestions: false,
+      canManageQuizzes: false,
+      canManageEventSeries: false,
+      canManageUsers: false,
+    }),
+    [],
+  );
+});
+
+test("membership capabilities expose operational navigation without users", () => {
+  assert.deepEqual(
+    getAppNavigationItems({
+      canAccessQuestions: true,
+      canManageQuizzes: true,
+      canManageEventSeries: true,
+      canManageUsers: false,
+    }),
+    [
+      { href: "/fragen", label: "Fragen" },
+      { href: "/quiz", label: "Quiz" },
+      { href: "/admin/eventreihen", label: "Eventreihen" },
+    ],
+  );
 });
 
 test("event series navigation stays active on detail pages", () => {
