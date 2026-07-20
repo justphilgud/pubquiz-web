@@ -20,6 +20,8 @@ export type EventSeriesOption = {
   id: number;
   name: string;
   isArchived: boolean;
+  defaultPresentationTemplateId: string;
+  defaultAnswerFormTemplateId: string;
 };
 
 export type EventSeriesListItem = EventSeriesOption & {
@@ -28,6 +30,8 @@ export type EventSeriesListItem = EventSeriesOption & {
   description: string | null;
   internalNote: string | null;
   isPublic: boolean;
+  defaultPresentationTemplateId: string;
+  defaultAnswerFormTemplateId: string;
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -51,6 +55,8 @@ function toListItem(series: {
   beschreibung: string | null;
   interne_bemerkung: string | null;
   ist_oeffentlich: boolean;
+  default_presentation_template_id: string;
+  default_answer_form_template_id: string;
   ist_archiviert: boolean;
   archiviert_am: Date | null;
   created_at: Date;
@@ -65,6 +71,8 @@ function toListItem(series: {
     description: series.beschreibung,
     internalNote: series.interne_bemerkung,
     isPublic: series.ist_oeffentlich,
+    defaultPresentationTemplateId: series.default_presentation_template_id,
+    defaultAnswerFormTemplateId: series.default_answer_form_template_id,
     isArchived: series.ist_archiviert,
     archivedAt: series.archiviert_am?.toISOString() ?? null,
     createdAt: series.created_at.toISOString(),
@@ -100,12 +108,20 @@ export async function getEventSeriesOptions(
       ...(manageableIds === null ? {} : { eventreihe_id: { in: manageableIds } }),
     },
     orderBy: [{ ist_archiviert: "asc" }, { name: "asc" }],
-    select: { eventreihe_id: true, name: true, ist_archiviert: true },
+    select: {
+      eventreihe_id: true,
+      name: true,
+      ist_archiviert: true,
+      default_presentation_template_id: true,
+      default_answer_form_template_id: true,
+    },
   });
   return series.map((entry) => ({
     id: entry.eventreihe_id,
     name: entry.name,
     isArchived: entry.ist_archiviert,
+    defaultPresentationTemplateId: entry.default_presentation_template_id,
+    defaultAnswerFormTemplateId: entry.default_answer_form_template_id,
   }));
 }
 
@@ -154,6 +170,8 @@ export async function createEventSeries(
       beschreibung: validated.value.description,
       interne_bemerkung: validated.value.internalNote,
       ist_oeffentlich: validated.value.isPublic,
+      default_presentation_template_id: validated.value.defaultPresentationTemplateId,
+      default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
     },
     select: { eventreihe_id: true },
   });
@@ -199,6 +217,8 @@ export async function updateEventSeries(
       beschreibung: validated.value.description,
       interne_bemerkung: validated.value.internalNote,
       ist_oeffentlich: validated.value.isPublic,
+      default_presentation_template_id: validated.value.defaultPresentationTemplateId,
+      default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
     },
   });
   revalidatePath("/admin/eventreihen");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useModerationHotkeys } from "./hooks/useModerationHotkeys";
 
 import {
@@ -53,6 +54,7 @@ type Props = {
   quiz: QuizPraesentationResult;
   initialStatus: ModerationStatus;
   initialAntwortStatus: AntwortStatus;
+  backToQuizLabel: string;
 };
 
 function secondsSince(startAt: string | null, now: number) {
@@ -66,6 +68,7 @@ export default function ModerationClient({
   quiz,
   initialStatus,
   initialAntwortStatus,
+  backToQuizLabel,
 }: Props) {
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
@@ -490,8 +493,16 @@ export default function ModerationClient({
         onIframeSchliessen={() => setShowAuswertungIframe(false)}
       />
 
-      <main className="h-screen overflow-hidden bg-zinc-950 p-4 text-zinc-100">
-        <div className="grid h-[calc(100vh-2rem)] grid-cols-[minmax(0,2.4fr)_360px] gap-4">
+      <main className="flex min-h-dvh flex-col bg-zinc-950 p-3 text-zinc-100 lg:h-dvh lg:overflow-hidden lg:p-4">
+        <header className="mb-3 flex min-h-11 flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2">
+          <div className="min-w-0">
+            <div className="truncate font-bold">{quiz.titel ?? `Quiz ${quizId}`}</div>
+          </div>
+          <Link href={`/quiz/${quizId}`} className="inline-flex min-h-11 items-center rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
+            {backToQuizLabel}
+          </Link>
+        </header>
+        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,2.4fr)_360px] lg:overflow-hidden">
           <section className="flex flex-col gap-4">
             <CurrentSlidePanel
               slideIndex={slideIndex}

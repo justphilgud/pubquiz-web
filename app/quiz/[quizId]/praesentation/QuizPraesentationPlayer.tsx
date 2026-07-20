@@ -21,6 +21,9 @@ import {
 import type { QuizPraesentationResult } from "../../actions";
 import { IntroSlideAnkommen } from "../slides/vor-dem-start/IntroSlideAnkommen";
 import QRCode from "react-qr-code";
+import type { ResolvedTemplate } from "@/app/rendering/templateResolver";
+import type { PresentationTemplate } from "@/app/rendering/templateRegistry";
+import { presentationTemplateStyle } from "@/app/rendering/templateStyles";
 
 import {
   buildPraesentationSlides,
@@ -36,6 +39,7 @@ type Props = {
   quiz: QuizPraesentationResult;
   quizId: number;
   initialSlideIndex?: number;
+  templateContext: ResolvedTemplate<PresentationTemplate>;
 };
 
 type Abschnitt = QuizPraesentationResult["abschnitte"][number];
@@ -246,6 +250,7 @@ export default function QuizPraesentationPlayer({
   quiz,
   quizId,
   initialSlideIndex = 0,
+  templateContext,
 }: Props) {
   const praesentationQuiz = quiz as PraesentationQuiz;
   const [slideIndex, setSlideIndex] = useState(initialSlideIndex);
@@ -862,7 +867,7 @@ export default function QuizPraesentationPlayer({
         {antworten.map((antwort, index) => (
           <div
             key={antwort.antwort_id}
-            className="rounded-3xl border-4 border-yellow-300 bg-black/45 px-6 py-4 text-2xl font-black text-white shadow-[6px_6px_0_#ff00aa] xl:text-3xl"
+            className="presentation-answer-option rounded-3xl border-4 border-yellow-300 bg-black/45 px-6 py-4 text-2xl font-black text-white shadow-[6px_6px_0_#ff00aa] xl:text-3xl"
           >
             <span className="mr-4 text-cyan-300">
               {String.fromCharCode(65 + index)}.
@@ -885,7 +890,7 @@ export default function QuizPraesentationPlayer({
           : punkteModus;
 
     return (
-      <span className="rounded-xl border-4 border-yellow-300 bg-yellow-300 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
+      <span className="presentation-badge rounded-xl border-4 border-yellow-300 bg-yellow-300 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
         {label}
       </span>
     );
@@ -909,7 +914,7 @@ export default function QuizPraesentationPlayer({
     if (effektivesLayout === "bild_fokus") {
       return (
         <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]">
-          <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
+          <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
                 Frage {slide.frageIndexImBlock}
@@ -952,7 +957,7 @@ export default function QuizPraesentationPlayer({
 
     if (effektivesLayout === "text_fokus") {
       return (
-        <div className="flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
+        <div className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
               Frage {slide.frageIndexImBlock}
@@ -1028,7 +1033,7 @@ export default function QuizPraesentationPlayer({
 
     return (
       <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
+        <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
               Frage {slide.frageIndexImBlock}
@@ -2030,7 +2035,11 @@ export default function QuizPraesentationPlayer({
 
 
 
-    <main className="h-screen overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#ff00aa_0,#ff00aa22_24%,transparent_42%),radial-gradient(circle_at_80%_10%,#00e5ff66_0,#00e5ff22_22%,transparent_38%),linear-gradient(135deg,#1a0033,#080014_45%,#001a3a)] text-white">
+    <main
+      className="presentation-template h-dvh overflow-hidden text-white"
+      data-template-variant={templateContext.template.variant}
+      style={presentationTemplateStyle(templateContext.template)}
+    >
       <style jsx global>{`
   @keyframes pferdGalopp {
   0% {
@@ -2147,25 +2156,25 @@ export default function QuizPraesentationPlayer({
 `}</style>
       <div className="flex h-screen flex-col p-4">
         {slideLabel !== "VOR DEM START" && (
-          <header className="mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
+          <header className="presentation-chrome mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
             <div className="flex items-center gap-6">
               <img
                 src={
                   praesentationQuiz.intro_logo_url ??
-                  "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/medien/bilder/unsortiert/1780326275893-logo.png"
+                  templateContext.template.tokens.assets.logo
                 }
                 alt="ungegoogelt"
                 className="h-24 w-24 object-contain"
               />
 
-              <div className="h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
+              <div className="presentation-divider h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
 
               <div>
-                <div className="text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
+                <div className="presentation-primary-text text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
                   {slideLabel}
                 </div>
 
-                <div className="text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                <div className="presentation-accent-text text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
                   {quiz.titel}
                 </div>
               </div>
@@ -2185,7 +2194,7 @@ export default function QuizPraesentationPlayer({
           </header>
         )}
 
-        <section className="min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
+        <section className="presentation-stage min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
           {showSchaetzfrage ? renderSchaetzfrageOverlay() : renderAktuellenSlide()}
         </section>
 
@@ -2198,7 +2207,7 @@ export default function QuizPraesentationPlayer({
               type="button"
               onClick={previousSlide}
               disabled={slideIndex === 0}
-              className="rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              className="presentation-control rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
             >
               ← Zurück
             </button>
@@ -2207,7 +2216,7 @@ export default function QuizPraesentationPlayer({
               ref={nextButtonRef}
               onClick={nextSlide}
               disabled={slideIndex >= slides.length - 1}
-              className="rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              className="presentation-control rounded-2xl border-4 border-[#38E8FF] bg-black px-5 py-3 font-black uppercase text-[#38E8FF] shadow-[0_0_12px_#38E8FF] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-30"
             >
               Weiter →
             </button>
@@ -2244,7 +2253,7 @@ export default function QuizPraesentationPlayer({
             )}
           </div>
 
-          <div className="rounded-3xl border-4 border-[#FFD83B] bg-black/70 px-6 py-3 text-sm font-black uppercase tracking-[0.25em] text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
+          <div className="presentation-status rounded-3xl border-4 border-[#FFD83B] bg-black/70 px-6 py-3 text-sm font-black uppercase tracking-[0.25em] text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
             {modusLabel}
             {freigabeMeldung && (
               <div className="mt-2 text-center text-xs font-black uppercase tracking-wide text-[#38E8FF]">

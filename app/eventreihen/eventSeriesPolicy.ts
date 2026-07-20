@@ -1,8 +1,19 @@
+import { deRenderingMessages } from "@/app/i18n/messages/de/rendering";
+import {
+  SYSTEM_ANSWER_FORM_TEMPLATE_ID,
+  SYSTEM_PRESENTATION_TEMPLATE_ID,
+  isSelectableAnswerFormTemplateId,
+  isSelectablePresentationTemplateId,
+  type AnswerFormTemplate,
+  type PresentationTemplate,
+} from "@/app/rendering/templateRegistry";
+
 export const EVENT_SERIES_LIMITS = {
   name: 150,
   publicName: 150,
   description: 2000,
   internalNote: 2000,
+  templateId: 64,
 } as const;
 
 export type EventSeriesInput = {
@@ -11,6 +22,8 @@ export type EventSeriesInput = {
   description?: string;
   internalNote?: string;
   isPublic: boolean;
+  defaultPresentationTemplateId?: string;
+  defaultAnswerFormTemplateId?: string;
 };
 
 export type NormalizedEventSeriesInput = {
@@ -19,6 +32,8 @@ export type NormalizedEventSeriesInput = {
   description: string | null;
   internalNote: string | null;
   isPublic: boolean;
+  defaultPresentationTemplateId: PresentationTemplate["id"];
+  defaultAnswerFormTemplateId: AnswerFormTemplate["id"];
 };
 
 export type EventSeriesValidationResult =
@@ -39,6 +54,8 @@ export function validateEventSeriesInput(
     description: optional(input.description),
     internalNote: optional(input.internalNote),
     isPublic: input.isPublic,
+    defaultPresentationTemplateId: (input.defaultPresentationTemplateId?.trim() || SYSTEM_PRESENTATION_TEMPLATE_ID) as PresentationTemplate["id"],
+    defaultAnswerFormTemplateId: (input.defaultAnswerFormTemplateId?.trim() || SYSTEM_ANSWER_FORM_TEMPLATE_ID) as AnswerFormTemplate["id"],
   };
   const errors: Record<string, string> = {};
 
@@ -54,6 +71,12 @@ export function validateEventSeriesInput(
   }
   if ((value.internalNote?.length ?? 0) > EVENT_SERIES_LIMITS.internalNote) {
     errors.internalNote = `Interne Bemerkung darf maximal ${EVENT_SERIES_LIMITS.internalNote} Zeichen enthalten.`;
+  }
+  if (!isSelectablePresentationTemplateId(value.defaultPresentationTemplateId)) {
+    errors.defaultPresentationTemplateId = deRenderingMessages.validation.unknownPresentation;
+  }
+  if (!isSelectableAnswerFormTemplateId(value.defaultAnswerFormTemplateId)) {
+    errors.defaultAnswerFormTemplateId = deRenderingMessages.validation.unknownAnswerForm;
   }
 
   return Object.keys(errors).length > 0

@@ -222,6 +222,8 @@ model quiz {
   intro_video_url         String?
   outro_bekanntmachungen  String?
   manuelle_bewertungen    Int?                       @default(0)
+  presentation_template_id String?                   @db.VarChar(64)
+  answer_form_template_id  String?                   @db.VarChar(64)
   quiz_abschnitte         quiz_abschnitte[]
   quiz_block_freigaben    quiz_block_freigaben[]
   quiz_fragen             quiz_fragen[]
@@ -247,6 +249,8 @@ model eventreihen {
   archiviert_am      DateTime?
   created_at         DateTime                    @default(now())
   updated_at         DateTime                    @default(now()) @updatedAt
+  default_presentation_template_id String        @default("ungegoogelt-default") @db.VarChar(64)
+  default_answer_form_template_id  String        @default("ungegoogelt-default") @db.VarChar(64)
   quiz               quiz[]
   benutzerrollen     eventreihe_benutzerrollen[]
   fragen             fragen_eventreihen[]

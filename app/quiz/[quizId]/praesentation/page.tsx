@@ -3,6 +3,7 @@ import { getQuizPraesentation } from "../../actions";
 import { getOrCreatePraesentationStatus } from "./statusActions";
 import QuizPraesentationPlayer from "./QuizPraesentationPlayer";
 import { requireQuizLiveController } from "../../quizAccess.server";
+import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
 
 type Props = {
   params: Promise<{
@@ -25,13 +26,18 @@ export default async function QuizPraesentationPage({ params }: Props) {
   if (!quiz) {
     notFound();
   }
-  const status = await getOrCreatePraesentationStatus(quizId);
+  const [status, templates] = await Promise.all([
+    getOrCreatePraesentationStatus(quizId),
+    resolveQuizTemplates(quizId),
+  ]);
+  if (!templates) notFound();
 
   return (
     <QuizPraesentationPlayer
       quiz={quiz}
       quizId={quizId}
       initialSlideIndex={status.slide_index}
+      templateContext={templates.presentation}
     />
   );
 }

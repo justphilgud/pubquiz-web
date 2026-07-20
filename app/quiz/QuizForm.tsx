@@ -22,6 +22,13 @@ import {
   TrashIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import type { RenderingMessages } from "@/app/i18n/renderingMessages";
+import { TemplatePreview } from "@/app/rendering/TemplatePreview";
+import { templateRegistry } from "@/app/rendering/templateRegistry";
+import {
+  resolveAnswerFormTemplate,
+  resolvePresentationTemplate,
+} from "@/app/rendering/templateResolver";
 
 const inputClass =
   "min-h-11 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200";
@@ -43,6 +50,8 @@ type FormState = {
   mapUrl: string;
   publicUrl: string;
   internalNote: string;
+  presentationTemplateId: string;
+  answerFormTemplateId: string;
 };
 
 function emptyForm(initialEventSeriesId?: number): FormState {
@@ -55,6 +64,8 @@ function emptyForm(initialEventSeriesId?: number): FormState {
     mapUrl: "",
     publicUrl: "",
     internalNote: "",
+    presentationTemplateId: "",
+    answerFormTemplateId: "",
   };
 }
 
@@ -62,10 +73,12 @@ export default function QuizForm({
   quizze,
   eventSeries,
   initialEventSeriesId,
+  messages,
 }: {
   quizze: QuizResult[];
   eventSeries: EventSeriesOption[];
   initialEventSeriesId?: number;
+  messages: RenderingMessages;
 }) {
   const [editingQuizId, setEditingQuizId] = useState<number | null>(null);
   const [form, setForm] = useState(() => emptyForm(initialEventSeriesId));
@@ -104,6 +117,8 @@ export default function QuizForm({
       mapUrl: quiz.karten_url ?? "",
       publicUrl: quiz.oeffentliche_url ?? "",
       internalNote: quiz.bemerkung ?? "",
+      presentationTemplateId: quiz.presentation_template_id ?? "",
+      answerFormTemplateId: quiz.answer_form_template_id ?? "",
     });
     setMessage(
       quiz.quiz_datum
@@ -124,6 +139,8 @@ export default function QuizForm({
       kartenUrl: form.mapUrl,
       oeffentlicheUrl: form.publicUrl,
       bemerkung: form.internalNote,
+      presentationTemplateId: form.presentationTemplateId || null,
+      answerFormTemplateId: form.answerFormTemplateId || null,
     };
     const result = editingQuizId === null
       ? await createQuiz(data)
@@ -143,6 +160,18 @@ export default function QuizForm({
     await archiveQuiz({ quizId, archivierungsgrund: reason });
     window.location.reload();
   }
+
+  const selectedEventSeries = eventSeries.find(
+    (entry) => entry.id === Number(form.eventSeriesId),
+  );
+  const effectivePresentation = resolvePresentationTemplate({
+    quizTemplateId: form.presentationTemplateId || null,
+    eventSeriesTemplateId: selectedEventSeries?.defaultPresentationTemplateId,
+  });
+  const effectiveAnswerForm = resolveAnswerFormTemplate({
+    quizTemplateId: form.answerFormTemplateId || null,
+    eventSeriesTemplateId: selectedEventSeries?.defaultAnswerFormTemplateId,
+  });
 
   return (
     <div className="space-y-6 text-slate-900">
@@ -199,6 +228,28 @@ export default function QuizForm({
             <label className="block">
               <span className="mb-1 block text-sm font-semibold">Öffentliche Veranstaltungs-URL</span>
               <input type="url" maxLength={2048} value={form.publicUrl} onChange={(event) => updateField("publicUrl", event.target.value)} className={inputClass} placeholder="https://…" />
+            </label>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="min-w-0">
+              <span className="mb-1 block text-sm font-semibold">{messages.fields.presentationTemplate}</span>
+              <select value={form.presentationTemplateId} onChange={(event) => updateField("presentationTemplateId", event.target.value)} className={inputClass}>
+                <option value="">{messages.fields.eventSeriesDefault}</option>
+                {templateRegistry.presentation.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
+              </select>
+              <p className="mt-2 break-words text-sm text-slate-600">{messages.fields.effectiveTemplate}: <strong>{messages.templates[effectivePresentation.template.labelKey].label}</strong> · {messages.fields.templateSource}: {messages.sources[effectivePresentation.source]}</p>
+              {effectivePresentation.usedFallback && <p role="status" className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</p>}
+              <div className="mt-3"><TemplatePreview template={effectivePresentation.template} messages={messages} /></div>
+            </label>
+            <label className="min-w-0">
+              <span className="mb-1 block text-sm font-semibold">{messages.fields.answerFormTemplate}</span>
+              <select value={form.answerFormTemplateId} onChange={(event) => updateField("answerFormTemplateId", event.target.value)} className={inputClass}>
+                <option value="">{messages.fields.eventSeriesDefault}</option>
+                {templateRegistry.answerForm.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
+              </select>
+              <p className="mt-2 break-words text-sm text-slate-600">{messages.fields.effectiveTemplate}: <strong>{messages.templates[effectiveAnswerForm.template.labelKey].label}</strong> · {messages.fields.templateSource}: {messages.sources[effectiveAnswerForm.source]}</p>
+              {effectiveAnswerForm.usedFallback && <p role="status" className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</p>}
+              <div className="mt-3"><TemplatePreview template={effectiveAnswerForm.template} messages={messages} /></div>
             </label>
           </div>
           <label className="block">

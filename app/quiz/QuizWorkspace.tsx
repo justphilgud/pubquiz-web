@@ -6,6 +6,7 @@ import QuizForm from "./QuizForm";
 import SchnellQuizForm from "./SchnellQuizForm";
 import type { QuizResult } from "./actions";
 import type { EventSeriesOption } from "@/app/eventreihen/actions";
+import type { RenderingMessages } from "@/app/i18n/renderingMessages";
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -19,11 +20,13 @@ export default function QuizWorkspace({
   kategorien,
   eventSeries,
   initialEventSeriesId,
+  renderingMessages,
 }: {
   quizze: QuizResult[];
   kategorien: Kategorie[];
   eventSeries: EventSeriesOption[];
   initialEventSeriesId?: number;
+  renderingMessages: RenderingMessages;
 }) {
   const searchParams = useSearchParams();
 
@@ -76,6 +79,7 @@ export default function QuizWorkspace({
             quizze={quizze}
             eventSeries={eventSeries}
             initialEventSeriesId={initialEventSeriesId}
+            messages={renderingMessages}
           />
         </div>
 

@@ -4,6 +4,9 @@ import { getQuizListe, getSchnellQuizKategorien } from "./actions";
 import { requireSession } from "@/app/lib/permissions";
 import { getEventSeriesOptions } from "@/app/eventreihen/actions";
 import { resolveInitialEventSeriesId } from "./quizMasterData";
+import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
+import AppHeader from "@/app/components/AppHeader";
 
 type Props = {
   searchParams: Promise<{
@@ -29,13 +32,15 @@ export default async function QuizPage({ searchParams }: Props) {
     resolvedSearchParams.eventreiheId,
     eventSeries,
   );
+  const renderingMessages = loadRenderingMessages(getDefaultLocale());
 
   return (
-    <QuizWorkspace
+    <><AppHeader /><QuizWorkspace
       quizze={quizze}
       kategorien={kategorien}
       eventSeries={eventSeries}
       initialEventSeriesId={initialEventSeriesId}
-    />
+      renderingMessages={renderingMessages}
+    /></>
   );
 }

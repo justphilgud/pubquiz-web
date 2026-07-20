@@ -6,6 +6,8 @@ import {
 } from "../praesentation/statusActions";
 import ModerationClient from "./ModerationClient";
 import { requireQuizLiveController } from "../../quizAccess.server";
+import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
 
 type Props = {
   params: Promise<{
@@ -53,6 +55,7 @@ export default async function ModerationPage({ params }: Props) {
           ? antwortStatus.letzteAntwortAt.toISOString()
           : null,
       }}
+      backToQuizLabel={loadRenderingMessages(getDefaultLocale()).fields.backToQuiz}
     />
   );
 }

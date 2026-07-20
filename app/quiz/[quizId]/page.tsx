@@ -18,6 +18,7 @@ import { requireQuizViewer } from "../quizAccess.server";
 import Link from "next/link";
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
 import { QuizCopyDialog } from "../QuizCopyDialog";
+import AppHeader from "@/app/components/AppHeader";
 
 type Props = {
   params: Promise<{
@@ -60,7 +61,7 @@ export default async function QuizDetailPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 md:px-8">
+    <><AppHeader /><main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 md:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
@@ -182,6 +183,6 @@ export default async function QuizDetailPage({
           abschnitte={quiz.abschnitte}
         />
       </div>
-    </main>
+    </main></>
   );
 }

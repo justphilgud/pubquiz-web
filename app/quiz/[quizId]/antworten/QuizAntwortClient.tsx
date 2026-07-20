@@ -7,6 +7,9 @@ import {
   startQuizTeamSession,
   getQuizAntwortStatusLive,
 } from "../../actions";
+import type { ResolvedTemplate } from "@/app/rendering/templateResolver";
+import type { AnswerFormTemplate } from "@/app/rendering/templateRegistry";
+import { answerFormTemplateStyle } from "@/app/rendering/templateStyles";
 
 type TeamAntwortState = {
   antwortText: string | null;
@@ -83,7 +86,7 @@ type TeamSession = {
   sessionToken: string;
 };
 
-export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
+export default function QuizAntwortClient({ daten, templateContext }: { daten: AntwortStatus; templateContext: ResolvedTemplate<AnswerFormTemplate> }) {
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
@@ -316,9 +319,13 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
+    <main
+      className="answer-template min-h-dvh px-4 py-6 text-slate-900 sm:py-8"
+      data-template-variant={templateContext.template.variant}
+      style={answerFormTemplateStyle(templateContext.template)}
+    >
       <div className="mx-auto max-w-2xl space-y-6">
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h1 className="text-3xl font-bold">
             {liveDaten.titel ?? `Quiz ${liveDaten.quiz_id}`}
           </h1>
@@ -326,7 +333,13 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
           <p className="mt-2 text-slate-600">Antwortformular für Teams</p>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        {meldung && (
+          <p role="alert" aria-live="assertive" className="answer-message rounded-xl border border-current bg-white p-4 font-semibold">
+            {meldung}
+          </p>
+        )}
+
+        <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           {!session ? (
             <div className="space-y-4">
               <label className="block">
@@ -378,13 +391,13 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
                 type="button"
                 onClick={handleStartSession}
                 disabled={isStartingSession || !teamname.trim()}
-                className="w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
                 {isStartingSession ? "Verbinde..." : "Team starten"}
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <div className="answer-success flex flex-col items-start justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center">
               <div>
                 <div className="text-sm font-bold text-emerald-700">
                   Team angemeldet
@@ -423,7 +436,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
           )}
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           {aktuellerBlock ? (
             <>
               <div className="text-sm font-semibold uppercase tracking-wide text-green-600">
@@ -448,7 +461,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
                   return (
                     <div
                       key={frage.quiz_fragen_id}
-                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                      className="answer-question rounded-2xl border border-slate-200 bg-slate-50 p-4"
                     >
                       <div className="mb-3 text-sm font-semibold text-slate-500">
                         Frage {frageIndex + 1}
@@ -459,7 +472,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
                       </h3>
 
                       {frage.punkte_modus !== "standard" && (
-                        <div className="mt-3 rounded-xl bg-yellow-50 px-4 py-3 text-sm font-semibold text-yellow-900">
+                        <div className="answer-warning mt-3 rounded-xl bg-yellow-50 px-4 py-3 text-sm font-semibold text-yellow-900">
                           {frage.punkte_modus === "expertenbonus"
                             ? "Expertenbonus: Wenn nur ein Team diese Frage richtig beantwortet, gibt es doppelte Punkte."
                             : "Risikofrage: Je weniger Teams richtig liegen, desto mehr Punkte gibt es für eine richtige Antwort."}
@@ -518,7 +531,7 @@ export default function QuizAntwortClient({ daten }: { daten: AntwortStatus }) {
                           {frage.antworten.map((antwort, antwortIndex) => (
                             <label
                               key={antwort.antwort_id}
-                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3"
+                              className="answer-option flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3"
                             >
                               <input
                                 type="radio"

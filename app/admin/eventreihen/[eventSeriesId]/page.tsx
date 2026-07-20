@@ -4,6 +4,9 @@ import { requireSession } from "@/app/lib/permissions";
 import { getEventSeriesDetails } from "@/app/eventreihen/actions";
 import { getEventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
 import { EventSeriesMembershipManager } from "@/app/eventreihen/EventSeriesMembershipManager";
+import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
+import { getAnswerFormTemplate, getPresentationTemplate } from "@/app/rendering/templateRegistry";
 
 const statusLabels = {
   UPCOMING: "Bevorstehend",
@@ -25,6 +28,7 @@ export default async function EventSeriesDetailPage({
   const membershipData = session.user?.role === "ADMIN"
     ? await getEventSeriesMembershipOptions()
     : null;
+  const messages = loadRenderingMessages(getDefaultLocale());
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8">
@@ -38,7 +42,9 @@ export default async function EventSeriesDetailPage({
         </header>
         <section className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 md:p-6">
           <div><h2 className="font-semibold">Öffentlicher Name</h2><p className="mt-1 break-words text-slate-600">{series.publicName ?? "–"}</p></div>
-          <div><h2 className="font-semibold">Sichtbarkeit</h2><p className="mt-1 text-slate-600">{series.isPublic ? "Öffentlich vorbereitet" : "Nicht öffentlich"}</p></div>
+          <div><h2 className="font-semibold">Sichtbarkeit</h2><p className="mt-1 text-slate-600">{series.isPublic ? "Öffentlich vorbereitet" : messages.fields.internalOnly}</p></div>
+          <div><h2 className="font-semibold">{messages.fields.defaultPresentation}</h2><p className="mt-1 text-slate-600">{messages.templates[getPresentationTemplate(series.defaultPresentationTemplateId)?.labelKey ?? "presentationDefault"].label}</p></div>
+          <div><h2 className="font-semibold">{messages.fields.defaultAnswerForm}</h2><p className="mt-1 text-slate-600">{messages.templates[getAnswerFormTemplate(series.defaultAnswerFormTemplateId)?.labelKey ?? "answerDefault"].label}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>

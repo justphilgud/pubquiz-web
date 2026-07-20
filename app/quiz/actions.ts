@@ -55,6 +55,8 @@ export type QuizResult = {
   ist_archiviert: boolean;
   archivierungsgrund: string | null;
   fragen_anzahl: number;
+  presentation_template_id: string | null;
+  answer_form_template_id: string | null;
 };
 
 async function getEventSeriesForQuizSave(
@@ -169,6 +171,8 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     ist_archiviert: quiz.ist_archiviert,
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: quiz._count.quiz_fragen,
+    presentation_template_id: quiz.presentation_template_id,
+    answer_form_template_id: quiz.answer_form_template_id,
   })));
 }
 
@@ -212,6 +216,8 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
     ist_archiviert: quiz.ist_archiviert,
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: 0,
+    presentation_template_id: quiz.presentation_template_id,
+    answer_form_template_id: quiz.answer_form_template_id,
   }));
 }
 
@@ -224,6 +230,8 @@ export async function createQuiz(data: {
   kartenUrl?: string;
   oeffentlicheUrl?: string;
   bemerkung: string;
+  presentationTemplateId?: string | null;
+  answerFormTemplateId?: string | null;
 }) {
   const validated = validateQuizMasterData({
     eventSeriesId: data.eventSeriesId,
@@ -234,6 +242,8 @@ export async function createQuiz(data: {
     mapUrl: data.kartenUrl,
     publicUrl: data.oeffentlicheUrl,
     internalNote: data.bemerkung,
+    presentationTemplateId: data.presentationTemplateId,
+    answerFormTemplateId: data.answerFormTemplateId,
   });
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
@@ -252,6 +262,8 @@ export async function createQuiz(data: {
       team_anzahl: 0,
       teilnehmer_anzahl: 0,
       bemerkung: validated.value.internalNote,
+      presentation_template_id: validated.value.presentationTemplateId,
+      answer_form_template_id: validated.value.answerFormTemplateId,
     },
   });
 
@@ -276,6 +288,8 @@ export async function updateQuiz(data: {
   kartenUrl?: string;
   oeffentlicheUrl?: string;
   bemerkung: string;
+  presentationTemplateId?: string | null;
+  answerFormTemplateId?: string | null;
 }) {
   await requireQuizEditor(data.quizId);
   const existing = await prisma.quiz.findUnique({
@@ -292,6 +306,8 @@ export async function updateQuiz(data: {
     mapUrl: data.kartenUrl,
     publicUrl: data.oeffentlicheUrl,
     internalNote: data.bemerkung,
+    presentationTemplateId: data.presentationTemplateId,
+    answerFormTemplateId: data.answerFormTemplateId,
   });
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
@@ -313,6 +329,8 @@ export async function updateQuiz(data: {
       karten_url: validated.value.mapUrl,
       oeffentliche_url: validated.value.publicUrl,
       bemerkung: validated.value.internalNote,
+      presentation_template_id: validated.value.presentationTemplateId,
+      answer_form_template_id: validated.value.answerFormTemplateId,
     },
   });
 
@@ -427,6 +445,8 @@ export async function copyQuiz(data: {
         venueName: original.veranstaltungsname,
         mapUrl: original.karten_url,
         internalNote: original.bemerkung,
+        presentationTemplateId: original.presentation_template_id,
+        answerFormTemplateId: original.answer_form_template_id,
       },
       { title: data.neuerTitel, date: data.quizDatum },
     ),
@@ -449,6 +469,8 @@ export async function copyQuiz(data: {
         team_anzahl: 0,
         teilnehmer_anzahl: 0,
         bemerkung: validated.value.internalNote,
+        presentation_template_id: validated.value.presentationTemplateId,
+        answer_form_template_id: validated.value.answerFormTemplateId,
 
         intro_logo_url: original.intro_logo_url,
         intro_musik_url: original.intro_musik_url,
@@ -576,6 +598,8 @@ export async function getQuizDetails(
     ist_archiviert: quiz.ist_archiviert,
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: quiz.quiz_fragen.length,
+    presentation_template_id: quiz.presentation_template_id,
+    answer_form_template_id: quiz.answer_form_template_id,
 
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,
