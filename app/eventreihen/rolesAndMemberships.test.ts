@@ -9,6 +9,7 @@ import {
   countEventSeriesRoleAssignments,
   getAvailableEventSeries,
 } from "./membershipPolicy";
+import { getGlobalAssignmentRoles } from "@/app/admin/users/userOverviewPolicy";
 
 const migration = readFileSync(
   "prisma/migrations/20260723120000_cleanup_event_series_roles/migration.sql",
@@ -25,8 +26,64 @@ const eventSeriesPage = readFileSync(
   "app/admin/eventreihen/[eventSeriesId]/page.tsx",
   "utf8",
 );
+const appHeader = readFileSync("app/components/AppHeader.tsx", "utf8");
+const userMenu = readFileSync("app/components/UserMenu.tsx", "utf8");
 
 const userActor: AuthorizationActor = { userId: 3, assignments: [] };
+
+test("user overview reads assignments without deserializing legacy EVENT_EDITOR rows", () => {
+  const legacyEventEditorRow = { rolle: "EVENT_EDITOR" };
+
+  assert.equal(legacyEventEditorRow.rolle, "EVENT_EDITOR");
+  assert.match(userOverview, /getRoleAssignmentOptions/);
+  assert.match(membershipActions, /benutzer_rollenzuweisungen\.findMany/);
+  assert.doesNotMatch(
+    membershipActions,
+    /eventreihe_benutzerrollen\.(findMany|findFirst)/,
+  );
+  assert.doesNotMatch(userOverview, /eventreihe_benutzerrollen|user\.role/);
+});
+
+test("navigation displays global roles from assignments instead of users.role", () => {
+  assert.match(appHeader, /hasGlobalRole\(actor, "EDITOR"\)/);
+  assert.match(appHeader, /roleLabel=\{globalRoleLabel\}/);
+  assert.doesNotMatch(appHeader, /session\.user\.role/);
+  assert.doesNotMatch(userMenu, /getUserRoleLabel|\brole:\s*string/);
+});
+
+test("global overview roles come only from valid GLOBAL assignments", () => {
+  assert.deepEqual(
+    getGlobalAssignmentRoles([
+      { rolle: "ADMIN", scope_typ: "GLOBAL", eventreihe_id: null },
+      { rolle: "EDITOR", scope_typ: "GLOBAL", eventreihe_id: null },
+      { rolle: "EDITOR", scope_typ: "EVENT_SERIES", eventreihe_id: 10 },
+      { rolle: "USER", scope_typ: "GLOBAL", eventreihe_id: null },
+    ]),
+    ["ADMIN", "EDITOR"],
+  );
+});
+
+test("USER without a global assignment is represented without a global role", () => {
+  assert.deepEqual(
+    getGlobalAssignmentRoles([
+      { rolle: "EVENT_MANAGER", scope_typ: "EVENT_SERIES", eventreihe_id: 10 },
+      { rolle: "EDITOR", scope_typ: "EVENT_SERIES", eventreihe_id: 20 },
+    ]),
+    [],
+  );
+});
+
+test("unknown overview assignment values fail closed", () => {
+  assert.deepEqual(
+    getGlobalAssignmentRoles([
+      { rolle: "OWNER", scope_typ: "GLOBAL", eventreihe_id: null },
+      { rolle: "ADMIN", scope_typ: "UNKNOWN", eventreihe_id: null },
+      { rolle: "EDITOR", scope_typ: "GLOBAL", eventreihe_id: 10 },
+      { rolle: "EVENT_MANAGER", scope_typ: "GLOBAL", eventreihe_id: null },
+    ]),
+    [],
+  );
+});
 
 test("role migration is additive and preserves existing users and memberships", () => {
   assert.match(migration, /UserRole" ADD VALUE 'USER'/);

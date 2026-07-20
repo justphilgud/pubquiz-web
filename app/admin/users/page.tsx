@@ -11,6 +11,7 @@ import { countEventSeriesRoleAssignments } from "@/app/eventreihen/membershipPol
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import { getGlobalAssignmentRoles } from "./userOverviewPolicy";
 
 export default async function UsersPage() {
   await requireAdmin();
@@ -20,14 +21,21 @@ export default async function UsersPage() {
     prisma.users.findMany({
       orderBy: [
         { is_active: "desc" },
-        { role: "asc" },
         { name: "asc" },
         { email: "asc" },
       ],
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        is_active: true,
         rollenzuweisungen: {
           where: { scope_typ: "GLOBAL" },
-          select: { rolle: true },
+          select: {
+            rolle: true,
+            scope_typ: true,
+            eventreihe_id: true,
+          },
         },
       },
     }),
@@ -54,9 +62,7 @@ export default async function UsersPage() {
               (assignment) => assignment.userId === user.id,
             );
             const counts = countEventSeriesRoleAssignments(assignments);
-            const globalRoles = user.rollenzuweisungen.flatMap(({ rolle }) =>
-              rolle === "ADMIN" || rolle === "EDITOR" ? [rolle] : [],
-            );
+            const globalRoles = getGlobalAssignmentRoles(user.rollenzuweisungen);
             return (
             <article
               key={user.id}

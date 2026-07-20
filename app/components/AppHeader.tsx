@@ -13,6 +13,7 @@ import AppNav from "@/app/components/AppNav";
 import { getAppNavigationItems } from "@/app/components/appNavigation";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
+import { hasGlobalRole } from "@/app/roles/roleAssignmentPolicy";
 
 export default async function AppHeader() {
   const session = await auth();
@@ -21,6 +22,11 @@ export default async function AppHeader() {
 
   const actor = await getActorForSession(session);
   const admin = isAdmin(actor);
+  const globalRoleLabel = [
+    ...(admin ? ["Administrator"] : []),
+    ...(hasGlobalRole(actor, "EDITOR") ? ["Globaler Editor"] : []),
+  ].join(", ") || "Keine globale Rolle";
+
   const [questionSeriesIds, quizSeriesIds, editableSeriesIds] = await Promise.all([
     getEventSeriesIdsForCapability("CREATE_QUESTION", session),
     getEventSeriesIdsForCapability("MANAGE_QUIZZES", session),
@@ -68,7 +74,7 @@ export default async function AppHeader() {
           <UserMenu
             email={session.user.email ?? ""}
             name={session.user.name}
-            role={session.user.role}
+            roleLabel={globalRoleLabel}
             isAdmin={admin}
             logoutAction={logoutAction}
           />

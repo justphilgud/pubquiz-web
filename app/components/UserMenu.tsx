@@ -10,11 +10,11 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { AppVersion } from "@/app/components/AppVersion";
-import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
+import { getUserInitials } from "@/app/lib/userDisplay";
 
 type Props = {
   email: string;
-  role: string;
+  roleLabel: string;
   name?: string | null;
   isAdmin: boolean;
   logoutAction: () => Promise<void>;
@@ -47,7 +47,7 @@ function InitialsAvatar({
 
 export default function UserMenu({
   email,
-  role,
+  roleLabel,
   name,
   isAdmin,
   logoutAction,
@@ -79,7 +79,6 @@ export default function UserMenu({
   }, []);
 
   const displayName = name?.trim() || email;
-  const roleLabel = getUserRoleLabel(role);
   const iconClass = "h-5 w-5 shrink-0 text-slate-600";
 
   return (
