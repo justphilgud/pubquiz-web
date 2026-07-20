@@ -13,16 +13,57 @@ import {
   isGlobalRole,
   replaceGlobalRoleAssignments,
   replaceEventSeriesRoleAssignments,
+  RoleAssignmentValidationError,
   type GlobalRole,
 } from "@/app/roles/roleAssignmentWrites.server";
 import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
 
 import { resolveUserRoleSelection } from "./userRoleFormPolicy";
+
+export type UserFormActionResult = {
+  success: boolean;
+  message: string;
+};
+
+class UserFormValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "UserFormValidationError";
+  }
+}
+
+type UserActionOperation = "create" | "update" | "archive";
+
+function userActionFailure(
+  operation: UserActionOperation,
+  error: unknown,
+): UserFormActionResult {
+  if (
+    error instanceof UserFormValidationError ||
+    error instanceof RoleAssignmentValidationError
+  ) {
+    return { success: false, message: error.message };
+  }
+  const errorCode =
+    typeof error === "object" && error !== null && "code" in error &&
+    typeof error.code === "string"
+      ? error.code
+      : undefined;
+  console.error("Benutzeraktion fehlgeschlagen", {
+    operation,
+    errorName: error instanceof Error ? error.name : typeof error,
+    errorCode,
+  });
+  return {
+    success: false,
+    message: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+  };
+}
 function globalRolesFromForm(formData: FormData): GlobalRole[] {
   const values = formData.getAll("globalRoles");
   if (!values.every(isGlobalRole)) {
     logRoleAudit("invalid_role_assignment_rejected", { scope: "GLOBAL" });
-    throw new Error("Ungültige Rollenzuweisung.");
+    throw new UserFormValidationError("Ungültige Rollenzuweisung.");
   }
   return [...new Set(values)];
 }
@@ -48,7 +89,9 @@ function roleSelectionFromForm(formData: FormData) {
     });
   } catch (error) {
     logRoleAudit("invalid_role_assignment_rejected", { scope: "USER_FORM" });
-    throw error;
+    throw new UserFormValidationError(
+      error instanceof Error ? error.message : "Ungültige Rollenzuweisung.",
+    );
   }
 }
 
@@ -68,20 +111,24 @@ async function assertEventSeriesExist(
     where: { eventreihe_id: { in: uniqueIds } },
   });
   if (count !== uniqueIds.length) {
-    throw new Error(
+    throw new UserFormValidationError(
       "Mindestens eine angegebene Eventreihe wurde nicht gefunden.",
     );
   }
 }
 
-export async function createUserAction(formData: FormData) {
+async function createUser(formData: FormData) {
   const session = await requireAdmin();
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").toLowerCase().trim();
   const password = String(formData.get("password") ?? "");
   const roleSelection = roleSelectionFromForm(formData);
-  if (!name || !email || !password) throw new Error("Name, E-Mail und Passwort sind Pflichtfelder.");
-  if (password.length < 8) throw new Error("Das Passwort muss mindestens 8 Zeichen lang sein.");
+  if (!name || !email || !password) {
+    throw new UserFormValidationError("Name, E-Mail und Passwort sind Pflichtfelder.");
+  }
+  if (password.length < 8) {
+    throw new UserFormValidationError("Das Passwort muss mindestens 8 Zeichen lang sein.");
+  }
   const passwordHash = await bcrypt.hash(password, 12);
   const assignedById = actorId(session);
   const user = await withSerializableTransaction(async (transaction) => {
@@ -116,7 +163,18 @@ export async function createUserAction(formData: FormData) {
   revalidatePath("/admin/users");
 }
 
-export async function updateUserAction(formData: FormData) {
+export async function createUserAction(
+  formData: FormData,
+): Promise<UserFormActionResult> {
+  try {
+    await createUser(formData);
+    return { success: true, message: "Benutzer wurde angelegt." };
+  } catch (error) {
+    return userActionFailure("create", error);
+  }
+}
+
+async function updateUser(formData: FormData) {
   const session = await requireAdmin();
   const id = Number(formData.get("id"));
   const name = String(formData.get("name") ?? "").trim();
@@ -125,7 +183,7 @@ export async function updateUserAction(formData: FormData) {
   const isActive = formData.get("is_active") === "true";
   const newPassword = String(formData.get("newPassword") ?? "");
   if (!Number.isInteger(id) || id <= 0 || !name || !email) {
-    throw new Error("Ungültige Benutzerdaten.");
+    throw new UserFormValidationError("Ungültige Benutzerdaten.");
   }
   const passwordData = newPassword
     ? { password_hash: await bcrypt.hash(newPassword, 12), must_change_password: true }
@@ -142,7 +200,7 @@ export async function updateUserAction(formData: FormData) {
         },
       },
     });
-    if (!existing) throw new Error("Benutzer nicht gefunden.");
+    if (!existing) throw new UserFormValidationError("Benutzer nicht gefunden.");
     if (existing.is_active && existing.rollenzuweisungen.length > 0 &&
       (!isActive || !roleSelection.globalRoles.includes("ADMIN"))) {
       await assertCanRemoveGlobalAdmin(transaction, id);
@@ -173,6 +231,17 @@ export async function updateUserAction(formData: FormData) {
   revalidatePath("/admin/users");
 }
 
+export async function updateUserAction(
+  formData: FormData,
+): Promise<UserFormActionResult> {
+  try {
+    await updateUser(formData);
+    return { success: true, message: "Benutzer wurde gespeichert." };
+  } catch (error) {
+    return userActionFailure("update", error);
+  }
+}
+
 export async function resetUserPasswordAction(formData: FormData) {
   await requireAdmin();
   const id = Number(formData.get("id"));
@@ -189,20 +258,35 @@ export async function resetUserPasswordAction(formData: FormData) {
   return newPassword;
 }
 
-export async function archiveUser(formData: FormData) {
+async function archiveUserAccount(formData: FormData) {
   const session = await requireAdmin();
   const currentUserId = actorId(session);
   const userId = Number(formData.get("userId"));
-  if (!Number.isInteger(userId) || userId <= 0) throw new Error("Ungültige Benutzer-ID.");
-  if (userId === currentUserId) throw new Error("Du kannst dich nicht selbst archivieren.");
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new UserFormValidationError("Ungültige Benutzer-ID.");
+  }
+  if (userId === currentUserId) {
+    throw new UserFormValidationError("Du kannst dich nicht selbst archivieren.");
+  }
   await withSerializableTransaction(async (transaction) => {
     const user = await transaction.users.findUnique({ where: { id: userId }, select: { is_active: true } });
-    if (!user) throw new Error("Benutzer nicht gefunden.");
+    if (!user) throw new UserFormValidationError("Benutzer nicht gefunden.");
     if (!user.is_active) return;
     await assertCanDeactivateUser(transaction, userId);
     await transaction.users.update({ where: { id: userId }, data: { is_active: false } });
   });
   revalidatePath("/admin/users");
+}
+
+export async function archiveUser(
+  formData: FormData,
+): Promise<UserFormActionResult> {
+  try {
+    await archiveUserAccount(formData);
+    return { success: true, message: "Benutzer wurde archiviert." };
+  } catch (error) {
+    return userActionFailure("archive", error);
+  }
 }
 
 export async function reactivateUser(formData: FormData) {

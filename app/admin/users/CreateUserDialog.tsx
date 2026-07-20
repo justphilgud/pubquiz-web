@@ -21,6 +21,7 @@ export default function CreateUserDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState(generateMemorablePassword);
+  const [formMessage, setFormMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -30,6 +31,7 @@ export default function CreateUserDialog({
         onClick={() => {
           setPassword(generateMemorablePassword());
           setOpen(true);
+          setFormMessage("");
         }}
         className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
       >
@@ -51,9 +53,14 @@ export default function CreateUserDialog({
 
             <form
               action={(formData) => {
+                setFormMessage("");
                 startTransition(async () => {
-                  await createUserAction(formData);
-                  setOpen(false);
+                  const result = await createUserAction(formData);
+                  if (result.success) {
+                    setOpen(false);
+                  } else {
+                    setFormMessage(result.message);
+                  }
                 });
               }}
               className="space-y-4"
@@ -120,6 +127,15 @@ export default function CreateUserDialog({
               />
 
               <div className="flex justify-end gap-3 pt-4">
+              {formMessage && (
+                <p
+                  role="alert"
+                  aria-live="polite"
+                  className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"
+                >
+                  {formMessage}
+                </p>
+              )}
                 <button
                   type="button"
                   onClick={() => setOpen(false)}

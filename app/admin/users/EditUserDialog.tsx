@@ -32,6 +32,7 @@ export default function EditUserDialog({
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [changePassword, setChangePassword] = useState(false);
+  const [formMessage, setFormMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const initialEventSeriesAssignments = assignmentData.assignments
     .filter((assignment) => assignment.userId === user.id)
@@ -51,6 +52,7 @@ export default function EditUserDialog({
         onClick={() => {
           setNewPassword("");
           setChangePassword(false);
+          setFormMessage("");
           setOpen(true);
         }}
         aria-label={messages.actions.edit}
@@ -76,9 +78,14 @@ export default function EditUserDialog({
 
             <form
               action={(formData) => {
+                setFormMessage("");
                 startTransition(async () => {
-                  await updateUserAction(formData);
-                  setOpen(false);
+                  const result = await updateUserAction(formData);
+                  if (result.success) {
+                    setOpen(false);
+                  } else {
+                    setFormMessage(result.message);
+                  }
                 });
               }}
               className="space-y-5"
@@ -207,6 +214,15 @@ export default function EditUserDialog({
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
+              {formMessage && (
+                <p
+                  role="alert"
+                  aria-live="polite"
+                  className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"
+                >
+                  {formMessage}
+                </p>
+              )}
                 <button
                   type="button"
                   onClick={() => setOpen(false)}

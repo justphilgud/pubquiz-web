@@ -5,7 +5,6 @@ type RoleAuditEvent =
   | "role_assignment_changed"
   | "role_assignment_removed"
   | "last_admin_protected"
-  | "last_event_manager_protected"
   | "invalid_role_assignment_rejected"
   | "legacy_assignment_inconsistency";
 

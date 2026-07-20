@@ -66,7 +66,7 @@ test("invalid and unknown assignments fail closed", () => {
   assert.equal(canManageEventSeries(actor, 10), false);
 });
 
-test("last active role holder protection distinguishes one from multiple holders", () => {
+test("last active global administrator protection distinguishes one from multiple holders", () => {
   assert.equal(isLastActiveRoleHolder(1), true);
   assert.equal(isLastActiveRoleHolder(2), false);
 });

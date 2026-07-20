@@ -4,7 +4,6 @@ import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import {
   hasEventSeriesCapability,
   isEventSeriesAssignmentRole,
-  removingAssignmentLeavesNoEventManager,
 } from "./eventSeriesAccessPolicy";
 
 const actor = (
@@ -42,11 +41,9 @@ test("global EDITOR receives no event-series rights without a scoped assignment"
   assert.equal(hasEventSeriesCapability({ actor: editor, eventSeriesId: 10, capability: "VIEW" }), false);
 });
 
-test("event roles are closed and last-manager detection is deterministic", () => {
+test("event-series roles are closed", () => {
   assert.equal(isEventSeriesAssignmentRole("EVENT_MANAGER"), true);
   assert.equal(isEventSeriesAssignmentRole("EDITOR"), true);
   assert.equal(isEventSeriesAssignmentRole("EVENT_EDITOR"), false);
   assert.equal(isEventSeriesAssignmentRole("ADMIN"), false);
-  assert.equal(removingAssignmentLeavesNoEventManager([{ role: "EVENT_MANAGER" }], "EVENT_MANAGER"), true);
-  assert.equal(removingAssignmentLeavesNoEventManager([{ role: "EVENT_MANAGER" }, { role: "EVENT_MANAGER" }], "EVENT_MANAGER"), false);
 });

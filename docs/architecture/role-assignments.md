@@ -47,7 +47,7 @@ Unbekannte Rollen, unbekannte Scopes, eine fehlende Eventreihen-ID oder eine Eve
 
 Globale Assignments werden auf die Legacy-Rolle mit der Priorität `ADMIN > EDITOR > USER` abgebildet. Eventreihenrollen werden als `EDITOR -> EVENT_EDITOR` und `EVENT_MANAGER -> EVENT_MANAGER` gespiegelt. Teilupdates sind durch serialisierbare Transaktionen ausgeschlossen; Serialisierungskonflikte werden begrenzt wiederholt.
 
-Der letzte aktive globale Administrator kann weder seine Adminrolle verlieren noch deaktiviert oder archiviert werden. Der letzte aktive Eventmanager einer aktiven Eventreihe kann weder entfernt, zum Editor geändert noch deaktiviert werden. Für archivierte Eventreihen greift diese Manager-Mindestbesetzung bewusst nicht, bestehende Zuweisungen bleiben aber sichtbar und entfernbar.
+Der letzte aktive globale Administrator kann weder seine Adminrolle verlieren noch deaktiviert oder archiviert werden. Für Eventmanager gibt es dagegen keine Mindestbesetzung: Eine Eventreihe darf ohne Eventmanager bestehen, und die letzte Eventmanager-Zuweisung darf entfernt, zum Editor geändert oder durch Deaktivierung beziehungsweise Archivierung des Benutzers inaktiv werden.
 
 Sicherheitsrelevante Änderungen, Schutzfälle, ungültige Kombinationen und erkannte Legacy-/Assignment-Inkonsistenzen werden mit technischen IDs, jedoch ohne vertrauliche Benutzerdaten, über das bestehende Console-Logging protokolliert.
 

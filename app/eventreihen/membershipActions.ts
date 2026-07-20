@@ -1,13 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
 import { deRoleMessages } from "@/app/i18n/messages/de/roles";
 import { logRoleAudit } from "@/app/roles/roleAudit.server";
 import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
-import { isLastActiveRoleHolder } from "@/app/roles/roleAssignmentPolicy";
 import {
   isEventSeriesAssignmentRole,
   type EventSeriesAssignmentRole,
@@ -185,19 +183,6 @@ export async function addEventSeriesRoleAssignment(input: {
   return { success: true, message: deRoleMessages.messages.assignmentSaved };
 }
 
-async function activeManagerCount(
-  transaction: Prisma.TransactionClient,
-  eventSeriesId: number,
-) {
-  return transaction.benutzer_rollenzuweisungen.count({
-    where: {
-      eventreihe_id: eventSeriesId,
-      scope_typ: "EVENT_SERIES",
-      rolle: "EVENT_MANAGER",
-      benutzer: { is_active: true },
-    },
-  });
-}
 
 export async function changeEventSeriesRoleAssignment(input: {
   assignmentId: number;
@@ -217,20 +202,12 @@ export async function changeEventSeriesRoleAssignment(input: {
         benutzer_id: true,
         eventreihe_id: true,
         rolle: true,
-        benutzer: { select: { is_active: true } },
-        eventreihe: { select: { ist_archiviert: true } },
       },
     });
     if (!existing || existing.eventreihe_id === null ||
       !isEventSeriesAssignmentRole(existing.rolle)) return { kind: "missing" as const };
     if (existing.rolle === role) {
       return { kind: "unchanged" as const, eventSeriesId: existing.eventreihe_id };
-    }
-    if (existing.rolle === "EVENT_MANAGER" && role === "EDITOR" &&
-      existing.benutzer.is_active &&
-      !existing.eventreihe?.ist_archiviert &&
-      isLastActiveRoleHolder(await activeManagerCount(transaction, existing.eventreihe_id))) {
-      return { kind: "lastManager" as const, eventSeriesId: existing.eventreihe_id };
     }
     const legacy = await transaction.eventreihe_benutzerrollen.updateMany({
       where: { benutzer_id: existing.benutzer_id, eventreihe_id: existing.eventreihe_id },
@@ -244,10 +221,6 @@ export async function changeEventSeriesRoleAssignment(input: {
     return { kind: "changed" as const, eventSeriesId: existing.eventreihe_id };
   });
   if (result.kind === "missing") return { success: false, message: deRoleMessages.messages.assignmentNotFound };
-  if (result.kind === "lastManager") {
-    logRoleAudit("last_event_manager_protected", { eventSeriesId: result.eventSeriesId });
-    return { success: false, message: deRoleMessages.messages.lastManagerProtected };
-  }
   if (result.kind === "inconsistent") {
     logRoleAudit("legacy_assignment_inconsistency", { eventSeriesId: result.eventSeriesId });
     return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
@@ -273,17 +246,10 @@ export async function removeEventSeriesRoleAssignment(
         benutzer_id: true,
         eventreihe_id: true,
         rolle: true,
-        benutzer: { select: { is_active: true } },
-        eventreihe: { select: { ist_archiviert: true } },
       },
     });
     if (!assignment || assignment.eventreihe_id === null ||
       !isEventSeriesAssignmentRole(assignment.rolle)) return { kind: "missing" as const };
-    if (assignment.rolle === "EVENT_MANAGER" && assignment.benutzer.is_active &&
-      !assignment.eventreihe?.ist_archiviert &&
-      isLastActiveRoleHolder(await activeManagerCount(transaction, assignment.eventreihe_id))) {
-      return { kind: "lastManager" as const, eventSeriesId: assignment.eventreihe_id };
-    }
     const legacy = await transaction.eventreihe_benutzerrollen.deleteMany({
       where: { benutzer_id: assignment.benutzer_id, eventreihe_id: assignment.eventreihe_id },
     });
@@ -292,10 +258,6 @@ export async function removeEventSeriesRoleAssignment(
     return { kind: "removed" as const, eventSeriesId: assignment.eventreihe_id };
   });
   if (result.kind === "missing") return { success: false, message: deRoleMessages.messages.assignmentNotFound };
-  if (result.kind === "lastManager") {
-    logRoleAudit("last_event_manager_protected", { eventSeriesId: result.eventSeriesId });
-    return { success: false, message: deRoleMessages.messages.lastManagerProtected };
-  }
   if (result.kind === "inconsistent") {
     logRoleAudit("legacy_assignment_inconsistency", { eventSeriesId: result.eventSeriesId });
     return { success: false, message: deRoleMessages.messages.inconsistentAssignment };

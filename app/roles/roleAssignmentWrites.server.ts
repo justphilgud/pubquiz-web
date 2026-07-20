@@ -10,6 +10,13 @@ export type EventSeriesRoleAssignmentInput = {
   role: "EDITOR" | "EVENT_MANAGER";
 };
 
+export class RoleAssignmentValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "RoleAssignmentValidationError";
+  }
+}
+
 export function isGlobalRole(value: unknown): value is GlobalRole {
   return value === "ADMIN" || value === "EDITOR";
 }
@@ -43,7 +50,9 @@ export async function replaceGlobalRoleAssignments(
     );
     if (user && user.role !== legacyRoleForGlobalRoles(existingRoles)) {
       logRoleAudit("legacy_assignment_inconsistency", { userId: input.userId, scope: "GLOBAL" });
-      throw new Error("Legacy- und Rollenzuweisung sind inkonsistent. Es wurde nichts geändert.");
+      throw new RoleAssignmentValidationError(
+        "Legacy- und Rollenzuweisung sind inkonsistent. Es wurde nichts geändert.",
+      );
     }
   }
   await transaction.benutzer_rollenzuweisungen.deleteMany({
@@ -93,7 +102,9 @@ export async function replaceEventSeriesRoleAssignments(
     input.assignments.map((assignment) => [assignment.eventSeriesId, assignment.role]),
   );
   if (requestedBySeries.size !== input.assignments.length) {
-    throw new Error("Eine Eventreihe kann pro Benutzer nur einer Rolle zugeordnet werden.");
+    throw new RoleAssignmentValidationError(
+      "Eine Eventreihe kann pro Benutzer nur einer Rolle zugeordnet werden.",
+    );
   }
 
   const [existingAssignments, legacyAssignments] = await Promise.all([
@@ -102,8 +113,6 @@ export async function replaceEventSeriesRoleAssignments(
       select: {
         eventreihe_id: true,
         rolle: true,
-        benutzer: { select: { is_active: true } },
-        eventreihe: { select: { ist_archiviert: true } },
       },
     }),
     input.verifyLegacy
@@ -129,49 +138,86 @@ export async function replaceEventSeriesRoleAssignments(
         userId: input.userId,
         scope: "EVENT_SERIES",
       });
-      throw new Error("Legacy- und Rollenzuweisung sind inkonsistent. Es wurde nichts ge\u00e4ndert.");
+      throw new RoleAssignmentValidationError(
+        "Legacy- und Rollenzuweisung sind inkonsistent. Es wurde nichts ge\u00e4ndert.",
+      );
     }
   }
 
   for (const existing of existingAssignments) {
-    if (
-      existing.eventreihe_id !== null &&
-      existing.rolle === "EVENT_MANAGER" &&
-      requestedBySeries.get(existing.eventreihe_id) !== "EVENT_MANAGER" &&
-      existing.benutzer.is_active &&
-      !existing.eventreihe?.ist_archiviert
-    ) {
-      const activeManagers = await transaction.benutzer_rollenzuweisungen.count({
+    if (existing.eventreihe_id === null) continue;
+    const eventSeriesId = existing.eventreihe_id;
+    const requestedRole = requestedBySeries.get(eventSeriesId);
+
+    if (requestedRole === undefined) {
+      const legacyDelete = await transaction.eventreihe_benutzerrollen.deleteMany({
         where: {
-          scope_typ: "EVENT_SERIES",
-          rolle: "EVENT_MANAGER",
-          eventreihe_id: existing.eventreihe_id,
-          benutzer: { is_active: true },
+          benutzer_id: input.userId,
+          eventreihe_id: eventSeriesId,
         },
       });
-      if (isLastActiveRoleHolder(activeManagers)) {
-        logRoleAudit("last_event_manager_protected", {
-          userId: input.userId,
-          eventSeriesId: existing.eventreihe_id,
-        });
-        throw new Error("Der letzte Eventmanager dieser Eventreihe kann nicht entfernt werden.");
+      if (legacyDelete.count !== 1) {
+        throw new RoleAssignmentValidationError(
+          "Legacy- und Rollenzuweisung sind inkonsistent. Es wurde nichts geändert.",
+        );
       }
+      const assignmentDelete = await transaction.benutzer_rollenzuweisungen.deleteMany({
+        where: {
+          benutzer_id: input.userId,
+          eventreihe_id: eventSeriesId,
+          scope_typ: "EVENT_SERIES",
+        },
+      });
+      if (assignmentDelete.count !== 1) {
+        throw new RoleAssignmentValidationError(
+          "Die Rollenzuweisung konnte nicht eindeutig entfernt werden.",
+        );
+      }
+      continue;
+    }
+
+    requestedBySeries.delete(eventSeriesId);
+    if (existing.rolle === requestedRole) continue;
+
+    const legacyUpdate = await transaction.eventreihe_benutzerrollen.updateMany({
+      where: {
+        benutzer_id: input.userId,
+        eventreihe_id: eventSeriesId,
+      },
+      data: {
+        rolle: legacyEventSeriesRole(requestedRole),
+        zugewiesen_von_user_id: input.assignedById,
+      },
+    });
+    if (legacyUpdate.count !== 1) {
+      throw new RoleAssignmentValidationError(
+        "Legacy- und Rollenzuweisung sind inkonsistent. Es wurde nichts geändert.",
+      );
+    }
+    const assignmentUpdate = await transaction.benutzer_rollenzuweisungen.updateMany({
+      where: {
+        benutzer_id: input.userId,
+        eventreihe_id: eventSeriesId,
+        scope_typ: "EVENT_SERIES",
+      },
+      data: {
+        rolle: requestedRole,
+        zugewiesen_von_user_id: input.assignedById,
+      },
+    });
+    if (assignmentUpdate.count !== 1) {
+      throw new RoleAssignmentValidationError(
+        "Die Rollenzuweisung konnte nicht eindeutig geändert werden.",
+      );
     }
   }
 
-  await transaction.eventreihe_benutzerrollen.deleteMany({
-    where: { benutzer_id: input.userId },
-  });
-  await transaction.benutzer_rollenzuweisungen.deleteMany({
-    where: { benutzer_id: input.userId, scope_typ: "EVENT_SERIES" },
-  });
-
-  for (const assignment of input.assignments) {
+  for (const [eventSeriesId, role] of requestedBySeries) {
     await transaction.benutzer_rollenzuweisungen.create({
       data: {
         benutzer_id: input.userId,
-        eventreihe_id: assignment.eventSeriesId,
-        rolle: assignment.role,
+        eventreihe_id: eventSeriesId,
+        rolle: role,
         scope_typ: "EVENT_SERIES",
         zugewiesen_von_user_id: input.assignedById,
       },
@@ -179,8 +225,8 @@ export async function replaceEventSeriesRoleAssignments(
     await transaction.eventreihe_benutzerrollen.create({
       data: {
         benutzer_id: input.userId,
-        eventreihe_id: assignment.eventSeriesId,
-        rolle: legacyEventSeriesRole(assignment.role),
+        eventreihe_id: eventSeriesId,
+        rolle: legacyEventSeriesRole(role),
         zugewiesen_von_user_id: input.assignedById,
       },
     });
@@ -205,7 +251,9 @@ export async function assertCanRemoveGlobalAdmin(
     });
     if (isLastActiveRoleHolder(activeAdmins)) {
       logRoleAudit("last_admin_protected", { userId });
-      throw new Error("Der letzte Administrator kann nicht entfernt werden.");
+      throw new RoleAssignmentValidationError(
+        "Der letzte Administrator kann nicht entfernt werden.",
+      );
     }
   }
 }
@@ -215,30 +263,4 @@ export async function assertCanDeactivateUser(
   userId: number,
 ) {
   await assertCanRemoveGlobalAdmin(transaction, userId);
-  const managedActiveSeries = await transaction.benutzer_rollenzuweisungen.findMany({
-    where: {
-      benutzer_id: userId,
-      scope_typ: "EVENT_SERIES",
-      rolle: "EVENT_MANAGER",
-      eventreihe: { ist_archiviert: false },
-    },
-    select: { eventreihe_id: true },
-  });
-  for (const assignment of managedActiveSeries) {
-    const activeManagers = await transaction.benutzer_rollenzuweisungen.count({
-      where: {
-        scope_typ: "EVENT_SERIES",
-        rolle: "EVENT_MANAGER",
-        eventreihe_id: assignment.eventreihe_id,
-        benutzer: { is_active: true },
-      },
-    });
-    if (isLastActiveRoleHolder(activeManagers)) {
-      logRoleAudit("last_event_manager_protected", {
-        userId,
-        eventSeriesId: assignment.eventreihe_id,
-      });
-      throw new Error("Der letzte Eventmanager dieser Eventreihe kann nicht entfernt werden.");
-    }
-  }
 }

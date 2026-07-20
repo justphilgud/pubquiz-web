@@ -77,7 +77,6 @@ export const deRoleMessages = {
   messages: {
     invalidCombination: "Diese Rolle ist in diesem Bereich nicht zulässig.",
     lastAdminProtected: "Der letzte Administrator kann nicht entfernt werden.",
-    lastManagerProtected: "Der letzte Eventmanager dieser Eventreihe kann nicht entfernt werden.",
     duplicateAssignment: "Rolle bereits zugewiesen.",
     invalidAssignment: "Ungültige Rollenzuweisung.",
     assignmentSaved: "Rollenzuweisung gespeichert.",
@@ -90,6 +89,5 @@ export const deRoleMessages = {
     removeSuccess: "Rollenzuweisung entfernt.",
     removeQuestion: "Soll diese Rolle wirklich entfernt werden?",
     noAvailableSeries: "Alle aktiven Eventreihen sind bereits zugeordnet.",
-    noManagerWarning: "Der letzte Eventmanager dieser Eventreihe kann nicht entfernt werden.",
   },
 } as const;

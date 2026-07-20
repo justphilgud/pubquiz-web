@@ -39,11 +39,3 @@ export function hasEventSeriesCapability(input: {
   if (capability === "REVIEW_QUESTION") return canReviewEventSeriesQuestions(actor, eventSeriesId);
   return isAdministrator(actor);
 }
-
-export function removingAssignmentLeavesNoEventManager(
-  assignments: readonly { role: EventSeriesAssignmentRole }[],
-  removedRole: EventSeriesAssignmentRole,
-) {
-  return removedRole === "EVENT_MANAGER" &&
-    assignments.filter((assignment) => assignment.role === "EVENT_MANAGER").length <= 1;
-}

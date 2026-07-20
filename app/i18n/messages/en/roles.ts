@@ -80,7 +80,6 @@ export const enRoleMessages: WidenMessageCatalog<typeof deRoleMessages> = {
   messages: {
     invalidCombination: "This role is not allowed in this scope.",
     lastAdminProtected: "The last administrator cannot be removed.",
-    lastManagerProtected: "The last event manager for this event series cannot be removed.",
     duplicateAssignment: "Role already assigned.",
     invalidAssignment: "Invalid role assignment.",
     assignmentSaved: "Role assignment saved.",
@@ -93,6 +92,5 @@ export const enRoleMessages: WidenMessageCatalog<typeof deRoleMessages> = {
     removeSuccess: "Role assignment removed.",
     removeQuestion: "Do you really want to remove this role?",
     noAvailableSeries: "All active event series are already assigned.",
-    noManagerWarning: "The last event manager for this event series cannot be removed.",
   },
 };

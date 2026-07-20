@@ -35,6 +35,7 @@ const appHeader = readFileSync("app/components/AppHeader.tsx", "utf8");
 const userMenu = readFileSync("app/components/UserMenu.tsx", "utf8");
 const userCreator = readFileSync("app/admin/users/CreateUserDialog.tsx", "utf8");
 const userActions = readFileSync("app/admin/users/actions.ts", "utf8");
+const archiveUser = readFileSync("app/admin/users/ArchiveUser.tsx", "utf8");
 const roleFields = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const seriesPicker = readFileSync("app/admin/users/EventSeriesPicker.tsx", "utf8");
 const assignmentWrites = readFileSync("app/roles/roleAssignmentWrites.server.ts", "utf8");
@@ -348,4 +349,87 @@ test("German and English role and membership messages are complete", () => {
       assert.ok(messages.eventSeriesPicker[key]);
     }
   }
+});
+
+test("only the last active global administrator remains protected", () => {
+  assert.match(
+    assignmentWrites,
+    /assertCanRemoveGlobalAdmin[\s\S]+scope_typ: "GLOBAL"[\s\S]+rolle: "ADMIN"[\s\S]+isLastActiveRoleHolder/,
+  );
+  assert.match(
+    assignmentWrites,
+    /assertCanDeactivateUser[\s\S]+assertCanRemoveGlobalAdmin/,
+  );
+  assert.match(assignmentWrites, /last_admin_protected/);
+});
+
+test("the final event manager can be changed to editor or removed", () => {
+  const roleWriteSources = assignmentWrites + membershipActions;
+  assert.doesNotMatch(
+    roleWriteSources,
+    /last_event_manager|lastManager|activeManagerCount|managedActiveSeries/,
+  );
+  assert.match(
+    membershipActions,
+    /eventreihe_benutzerrollen\.updateMany[\s\S]+benutzer_rollenzuweisungen\.update/,
+  );
+  assert.match(
+    membershipActions,
+    /eventreihe_benutzerrollen\.deleteMany[\s\S]+benutzer_rollenzuweisungen\.delete/,
+  );
+});
+
+test("deactivation and archiving do not require an event manager successor", () => {
+  const deactivatePolicy = assignmentWrites.slice(
+    assignmentWrites.indexOf("export async function assertCanDeactivateUser"),
+  );
+  assert.match(deactivatePolicy, /assertCanRemoveGlobalAdmin/);
+  assert.doesNotMatch(deactivatePolicy, /EVENT_MANAGER|eventreihe/);
+  assert.match(
+    userActions,
+    /assertCanDeactivateUser[\s\S]+is_active: false/,
+  );
+});
+
+test("event series stay loadable without an event manager assignment", () => {
+  const optionsLoader = membershipActions.slice(
+    membershipActions.indexOf("export async function getRoleAssignmentOptions"),
+    membershipActions.indexOf("export async function addEventSeriesRoleAssignment"),
+  );
+  assert.match(optionsLoader, /eventreihen\.findMany/);
+  assert.doesNotMatch(optionsLoader, /rolle: "EVENT_MANAGER"|activeManagerCount/);
+  assert.match(eventSeriesPage, /getEventSeriesDetails/);
+});
+
+test("user forms return controlled errors instead of unhandled action failures", () => {
+  assert.match(userActions, /UserFormActionResult/);
+  assert.match(userActions, /userActionFailure\("update", error\)/);
+  assert.match(userActions, /userActionFailure\("archive", error\)/);
+  assert.match(userEditor, /result\.success[\s\S]+setFormMessage\(result\.message\)/);
+  assert.match(userCreator, /result\.success[\s\S]+setFormMessage\(result\.message\)/);
+  assert.match(archiveUser, /result\.success[\s\S]+setMessage\(result\.message\)/);
+  assert.match(userEditor, /role="alert"/);
+});
+
+test("event-series dual writes remain atomic and rollback together", () => {
+  assert.match(
+    userActions,
+    /withSerializableTransaction[\s\S]+replaceEventSeriesRoleAssignments/,
+  );
+  assert.match(
+    assignmentWrites,
+    /eventreihe_benutzerrollen\.deleteMany[\s\S]+benutzer_rollenzuweisungen\.deleteMany/,
+  );
+  assert.match(
+    assignmentWrites,
+    /benutzer_rollenzuweisungen\.create[\s\S]+eventreihe_benutzerrollen\.create/,
+  );
+  assert.match(
+    assignmentWrites,
+    /requestedBySeries\.delete[\s\S]+existing\.rolle === requestedRole/,
+  );
+  assert.doesNotMatch(
+    assignmentWrites,
+    /eventreihe_benutzerrollen\.deleteMany\(\{\s*where: \{ benutzer_id: input\.userId \}/,
+  );
 });
