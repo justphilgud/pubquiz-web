@@ -104,9 +104,25 @@ test("Preview is gated, serialized and deploys only after migrate deploy", () =>
   assert.match(preview, /cancel-in-progress: false/);
   assert.match(preview, /ACTIONS_DEPLOYMENTS_ENABLED/);
   assert.match(preview, /head_repository\.full_name == github\.repository/);
-  assert.ok(preview.indexOf("npm run db:deploy") < preview.indexOf("vercel@56.3.2 build"));
-  assert.match(preview, /deploy --prebuilt --token/);
-  assert.doesNotMatch(preview, /deploy --prebuilt --prod/);
+  assert.ok(
+    preview.indexOf("Validate GitHub Preview database identity") <
+      preview.indexOf("npm run db:deploy"),
+  );
+  assert.ok(
+    preview.indexOf("npm run db:deploy") <
+      preview.indexOf("vercel@56.3.2 deploy"),
+  );
+  assert.ok(
+    preview.indexOf("vercel@56.3.2 deploy") <
+      preview.indexOf("Smoke-test Preview"),
+  );
+  assert.match(preview, /deploy --yes --token/);
+  assert.doesNotMatch(
+    preview,
+    /--prod|--prebuilt|vercel@56\.3\.2 (?:pull|build)/,
+  );
+  assert.doesNotMatch(preview, /--env-file=\.vercel\/\.env\.preview\.local/);
+  assert.doesNotMatch(preview, /Validate Vercel Preview database identity/);
 });
 
 test("Production is gated, serialized, main-only and explicitly uses --prod", () => {
@@ -116,8 +132,31 @@ test("Production is gated, serialized, main-only and explicitly uses --prod", ()
   assert.match(production, /ACTIONS_DEPLOYMENTS_ENABLED/);
   assert.match(production, /head_branch == 'main'/);
   assert.match(production, /github\.ref == 'refs\/heads\/main'/);
-  assert.ok(production.indexOf("npm run db:deploy") < production.indexOf("vercel@56.3.2 build --prod"));
-  assert.match(production, /deploy --prebuilt --prod --token/);
+  assert.ok(
+    production.indexOf("Validate GitHub Production database identity") <
+      production.indexOf("npm run db:deploy"),
+  );
+  assert.ok(
+    production.indexOf("npm run db:deploy") <
+      production.indexOf("vercel@56.3.2 deploy"),
+  );
+  assert.ok(
+    production.indexOf("vercel@56.3.2 deploy") <
+      production.indexOf("Smoke-test Production"),
+  );
+  assert.match(production, /deploy --yes --prod --token/);
+  assert.doesNotMatch(
+    production,
+    /--prebuilt|vercel@56\.3\.2 (?:pull|build)/,
+  );
+  assert.doesNotMatch(production, /--env-file=\.vercel\/\.env\.production\.local/);
+  assert.doesNotMatch(production, /Validate Vercel Production database identity/);
+});
+
+test("Deployment workflows never manage Vercel environment variables", () => {
+  for (const workflow of [preview, production]) {
+    assert.doesNotMatch(workflow, /vercel@56\.3\.2 env (?:add|update|rm)/);
+  }
 });
 
 test("Deployment workflows contain no destructive Prisma commands", () => {

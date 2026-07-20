@@ -77,24 +77,11 @@ jobs:
       - name: Verify migration status after deploy
         run: npm run db:status
 
-      - name: Pull Vercel Preview configuration
-        run: >-
-          npx --yes vercel@56.3.2 pull --yes --environment=preview
-          --git-branch="${DEPLOYMENT_REF#refs/heads/}" --token="$VERCEL_TOKEN"
-
-      - name: Validate Vercel Preview database identity
-        run: >-
-          npm run deployment:validate --
-          --env-file=.vercel/.env.preview.local
-
-      - name: Build Vercel Preview
-        run: npx --yes vercel@56.3.2 build --token="$VERCEL_TOKEN"
-
-      - name: Deploy Vercel Preview
+      - name: Build and deploy Vercel Preview
         id: deploy
         shell: bash
         run: |
-          deployment_url="$(npx --yes vercel@56.3.2 deploy --prebuilt --token="$VERCEL_TOKEN")"
+          deployment_url="$(npx --yes vercel@56.3.2 deploy --yes --token="$VERCEL_TOKEN")"
           if [[ ! "$deployment_url" =~ ^https://[A-Za-z0-9.-]+$ ]]; then
             echo "Vercel hat keine plausible HTTPS-Deployment-URL geliefert." >&2
             exit 1

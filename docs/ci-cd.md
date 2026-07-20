@@ -15,11 +15,11 @@ Push / Pull Request
 └── Information: vollständiger Repository-ESLint (vorübergehend nicht blockierend)
 
 erfolgreicher Push auf Feature-Branch
-└── Preview-Freigabeschalter → DB-Prüfung → Migration → Vercel Build/Deploy → Smoke-Test
+└── Preview-Freigabeschalter → DB-Prüfung → Migration → Vercel Remote-Build/Deploy → Smoke-Test
 
 erfolgreicher Push auf main
 └── Production-Environment → Required Reviewer → DB-Prüfung → Migration
-    → Vercel Production Build/Deploy → Smoke-Test
+    → Vercel Production Remote-Build/Deploy → Smoke-Test
 ```
 
 Die beiden Deployment-Workflows starten nur, wenn die Repository-Variable
@@ -103,18 +103,18 @@ Push-CI-Lauf im Hauptrepository oder auf einen manuellen Start außerhalb von
 `main`. Pull-Request-Ereignisse und Fork-Repositories werden abgewiesen.
 
 Der Job verwendet das GitHub Environment `preview`, validiert zuerst dessen
-`DATABASE_URL`, führt ausschließlich committed Migrationen aus und prüft danach
-die von `vercel pull --environment=preview` geladene Vercel-Datenbankvariable
-gegen dieselbe Whitelist. Erst anschließend erfolgen Build und Deployment ohne
-`--prod`.
+`DATABASE_URL` und führt ausschließlich committed Migrationen aus. Erst danach
+stößt `vercel deploy` den Remote-Build und das Preview-Deployment an. Der Aufruf
+enthält weder `--prod` noch `--prebuilt`.
 
 ### Production
 
 `.github/workflows/deploy-production.yml` akzeptiert ausschließlich einen
 erfolgreichen Push-CI-Lauf auf `main` oder einen manuellen Start auf `main`. Der
 Job verweist auf das Environment `production`; dessen Required Reviewer muss
-Migration und Secrets vor Jobstart freigeben. Build und Deployment verwenden
-`--prod` ausdrücklich.
+Migration und Secrets vor Jobstart freigeben. Erst nach Datenbankvalidierung und
+Migration stößt `vercel deploy --prod` den Production-Remote-Build und das
+Deployment an.
 
 ## Datenbankvalidierung
 
@@ -129,9 +129,15 @@ Migration und Secrets vor Jobstart freigeben. Build und Deployment verwenden
 
 Die Ausgabe enthält nur Umgebung, Repository, Branch, freigegebenen Host und
 Datenbanknamen. Benutzername, Passwort, vollständige URL und Query-Parameter
-werden nie ausgegeben. Dieselbe Prüfung läuft ein zweites Mal gegen die durch
-Vercel gepullte Environment-Datei. Damit müssen GitHub Migration und Vercel
-Runtime auf dieselbe freigegebene Datenbankidentität zeigen.
+werden nie ausgegeben. Diese verbindliche Prüfung gilt für die GitHub-
+`DATABASE_URL`, mit der unmittelbar danach die Migration ausgeführt wird.
+
+Eine als Sensitive gespeicherte Vercel-Variable ist nach dem Anlegen nicht mehr
+im Klartext lesbar und fehlt deshalb insbesondere in einer durch `vercel pull`
+erzeugten lokalen Environment-Datei. Ihre Identität kann dort nicht erneut
+validiert werden. Die Vercel-Zuordnung wird daher als separat manuell gepflegte
+Projektkonfiguration behandelt; die Pipeline liest, überschreibt oder erzeugt
+keine Vercel-Variable.
 
 ## Prisma-Ablauf
 
@@ -140,7 +146,7 @@ Jedes Deployment führt in dieser Reihenfolge aus:
 1. `prisma migrate status` als informative Vorprüfung;
 2. `prisma migrate deploy`;
 3. `prisma migrate status` als verbindliche Nachprüfung;
-4. erst danach Vercel Build und Deployment.
+4. erst danach Vercel Remote-Build und Deployment.
 
 Die Vorprüfung darf einen Fehlerstatus liefern, weil ausstehende committed
 Migrationen genau der erwartete Deploymentfall sind. `migrate deploy` und die
@@ -235,6 +241,16 @@ ignoriert; Org- und Project-ID werden als GitHub-Environment-Variablen gesetzt.
 
 Der Vercel Token soll minimalen Zugriff auf Team und Projekt besitzen. Werte
 werden weder in Befehlsausgaben noch in Job Summaries geschrieben.
+
+Die Workflows verwenden bewusst keinen lokalen Prebuilt-Ablauf. `vercel build`
+benötigt die von `vercel pull` lokal zwischengespeicherten Buildvariablen; bei
+Sensitive-Variablen ist dieser Cache unvollständig. Stattdessen lädt
+`vercel deploy` den ausgecheckten Quellstand in das ausschließlich über
+`VERCEL_ORG_ID` und `VERCEL_PROJECT_ID` ausgewählte Projekt. Vercel baut remote
+mit den dort für Preview beziehungsweise Production hinterlegten Variablen.
+Preview wird ohne `--prod`, Production ausschließlich mit `--prod` gestartet.
+Ein fehlgeschlagener Remote-Build liefert keine erfolgreiche Deployment-URL und
+verhindert damit den Smoke-Test sowie ein vermeintlich erfolgreiches Deployment.
 
 ## Neon-Prüfung
 
@@ -355,6 +371,7 @@ Feature entwickeln
 
 - [Vercel: automatische Git-Deployments deaktivieren](https://vercel.com/docs/project-configuration/git-configuration#turning-off-all-automatic-deployments)
 - [Vercel CLI: pull](https://vercel.com/docs/cli/pull)
-- [Vercel CLI: deploy und --prebuilt](https://vercel.com/docs/cli/deploy)
+- [Vercel CLI: deploy](https://vercel.com/docs/cli/deploy)
+- [Vercel CLI: Projektbindung in CI](https://vercel.com/docs/cli/global-options)
 - [GitHub: Deployments und Environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)
 - [GitHub: Concurrency](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency)
