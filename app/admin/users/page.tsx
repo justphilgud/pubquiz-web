@@ -15,7 +15,8 @@ import { getGlobalAssignmentRoles } from "./userOverviewPolicy";
 
 export default async function UsersPage() {
   await requireAdmin();
-  const messages = loadRoleMessages(getDefaultLocale());
+  const locale = getDefaultLocale();
+  const messages = loadRoleMessages(locale);
 
   const [users, assignmentData] = await Promise.all([
     prisma.users.findMany({
@@ -53,7 +54,11 @@ export default async function UsersPage() {
             </p>
           </div>
 
-          <CreateUserDialog messages={messages} />
+          <CreateUserDialog
+            eventSeries={assignmentData.eventSeries}
+            locale={locale}
+            messages={messages}
+          />
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -110,6 +115,7 @@ export default async function UsersPage() {
                     user={{ ...user, globalRoles }}
                     assignmentData={assignmentData}
                     messages={messages}
+                    locale={locale}
                   />
 
                   {user.is_active ? (

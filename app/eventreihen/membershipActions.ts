@@ -26,7 +26,7 @@ export type EventSeriesRoleAssignment = {
 
 export type RoleAssignmentOptions = {
   users: { id: number; name: string | null; email: string }[];
-  eventSeries: { id: number; name: string }[];
+  eventSeries: { id: number; name: string; archived: boolean }[];
   assignments: EventSeriesRoleAssignment[];
 };
 
@@ -60,9 +60,8 @@ export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions>
       select: { id: true, name: true, email: true },
     }),
     prisma.eventreihen.findMany({
-      where: { ist_archiviert: false },
       orderBy: { name: "asc" },
-      select: { eventreihe_id: true, name: true },
+      select: { eventreihe_id: true, name: true, ist_archiviert: true },
     }),
     prisma.benutzer_rollenzuweisungen.findMany({
       where: { scope_typ: "EVENT_SERIES" },
@@ -79,7 +78,11 @@ export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions>
   ]);
   return {
     users,
-    eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
+    eventSeries: eventSeries.map((series) => ({
+      id: series.eventreihe_id,
+      name: series.name,
+      archived: series.ist_archiviert,
+    })),
     assignments: assignments.flatMap((assignment) =>
       assignment.eventreihe_id !== null && isEventSeriesAssignmentRole(assignment.rolle)
         ? [{

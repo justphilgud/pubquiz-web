@@ -9,6 +9,7 @@ const userActions = readFileSync("app/admin/users/actions.ts", "utf8");
 const transaction = readFileSync("app/roles/serializableTransaction.server.ts", "utf8");
 const assignmentManager = readFileSync("app/eventreihen/EventSeriesMembershipManager.tsx", "utf8");
 const userEditor = readFileSync("app/admin/users/EditUserDialog.tsx", "utf8");
+const roleFields = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const documentation = readFileSync("docs/architecture/role-assignments.md", "utf8");
 
 test("assignment migration is additive and keeps every legacy structure", () => {
@@ -60,8 +61,10 @@ test("dual writes use serializable transactions and touch both representations",
 
 test("role UI separates global and event-series roles and remains mobile safe", () => {
   assert.match(userEditor, /globalRoles/);
-  assert.match(userEditor, /EventSeriesRoleAssignmentManager/);
+  assert.match(userEditor, /UserRoleFields/);
   assert.match(assignmentManager, /eventSeriesArchived/);
+  assert.match(roleFields, /EventSeriesPicker/);
+  assert.match(roleFields, /sm:grid-cols-2/);
   assert.match(assignmentManager, /\[overflow-wrap:anywhere\]/);
   assert.match(assignmentManager, /min-h-11/);
   assert.match(assignmentManager, /aria-live="polite"/);

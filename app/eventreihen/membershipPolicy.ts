@@ -23,12 +23,14 @@ export function canAddEventSeriesRole(
   );
 }
 
-export function getAvailableEventSeries<T extends { id: number }>(
+export function getAvailableEventSeries<T extends { id: number; archived?: boolean }>(
   eventSeries: readonly T[],
   assignments: readonly { eventSeriesId: number }[],
 ) {
   const assignedIds = new Set(
     assignments.map((assignment) => assignment.eventSeriesId),
   );
-  return eventSeries.filter((series) => !assignedIds.has(series.id));
+  return eventSeries.filter(
+    (series) => !series.archived && !assignedIds.has(series.id),
+  );
 }

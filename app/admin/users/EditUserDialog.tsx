@@ -5,8 +5,10 @@ import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
 import { BeakerIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useTransition } from "react";
 import type { RoleAssignmentOptions } from "@/app/eventreihen/membershipActions";
-import { EventSeriesRoleAssignmentManager } from "@/app/eventreihen/EventSeriesMembershipManager";
 import type { RoleMessages } from "@/app/i18n/roleMessages";
+import type { AppLocale } from "@/app/i18n/locale";
+import { UserRoleFields } from "./UserRoleFields";
+
 
 type User = {
   id: number;
@@ -20,15 +22,23 @@ export default function EditUserDialog({
   user,
   assignmentData,
   messages,
+  locale,
 }: {
   user: User;
   assignmentData: RoleAssignmentOptions;
   messages: RoleMessages;
+  locale: AppLocale;
 }) {
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [changePassword, setChangePassword] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const initialEventSeriesAssignments = assignmentData.assignments
+    .filter((assignment) => assignment.userId === user.id)
+    .map((assignment) => ({
+      eventSeriesId: assignment.eventSeriesId,
+      role: assignment.role,
+    }));
 
   function generateNewPassword() {
     setNewPassword(generateMemorablePassword());
@@ -106,26 +116,16 @@ export default function EditUserDialog({
                     />
                   </div>
 
-                  <fieldset>
-                    <legend className="mb-2 text-sm font-medium text-slate-700">
-                      {messages.fields.globalRoles}
-                    </legend>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm">
-                        <input type="checkbox" name="globalRoles" value="ADMIN" defaultChecked={user.globalRoles.includes("ADMIN")} className="h-4 w-4" />
-                        {messages.assignmentRoles.ADMIN}
-                      </label>
-                      <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm">
-                        <input type="checkbox" name="globalRoles" value="EDITOR" defaultChecked={user.globalRoles.includes("EDITOR")} className="h-4 w-4" />
-                        {messages.globalRoles.EDITOR}
-                      </label>
-                    </div>
-                    {user.globalRoles.length === 0 && (
-                      <p className="mt-2 text-xs text-slate-500">{messages.summaries.noGlobalRole}</p>
-                    )}
-                  </fieldset>
                 </div>
               </div>
+
+              <UserRoleFields
+                eventSeries={assignmentData.eventSeries}
+                initialGlobalRoles={user.globalRoles}
+                initialEventSeriesAssignments={initialEventSeriesAssignments}
+                locale={locale}
+                messages={messages}
+              />
 
               <div className="border-t border-slate-100 pt-4">
                 <h3 className="mb-3 text-sm font-semibold text-slate-900">
@@ -225,18 +225,6 @@ export default function EditUserDialog({
               </div>
             </form>
 
-            <section className="mt-6 border-t border-slate-200 pt-5">
-              <h3 className="text-sm font-semibold text-slate-900">
-                {messages.fields.eventSeriesRoles}
-              </h3>
-              <div className="mt-3">
-                <EventSeriesRoleAssignmentManager
-                  data={assignmentData}
-                  userId={user.id}
-                  messages={messages}
-                />
-              </div>
-            </section>
           </div>
         </div>
       )}
