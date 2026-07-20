@@ -40,6 +40,8 @@ export async function synchronizeFaceMorphPixelQuestions(
         select: {
           vorlage: { select: { code: true } },
           template_config_json: true,
+          geltungsbereich: true,
+          eventreihen: { select: { eventreihe_id: true } },
           fragen_kategorien: { select: { fragenkategorie_id: true } },
           antwortfelder: {
             orderBy: [{ sortierung: "asc" }, { antwortfeld_id: "asc" }],
@@ -198,6 +200,7 @@ export async function synchronizeFaceMorphPixelQuestions(
           const child = await tx.fragen.create({
             data: {
               frage: messages.templates.pixelImage.defaultQuestion,
+              geltungsbereich: parent.geltungsbereich,
               vorlage_id: pixelTemplate!.vorlage_id,
               template_config_json: DEFAULT_PIXEL_TEMPLATE_CONFIG,
               ist_archiviert: false,
@@ -215,6 +218,9 @@ export async function synchronizeFaceMorphPixelQuestions(
                   },
                 })),
               },
+              eventreihen: parent.geltungsbereich === "EVENT_SERIES"
+                ? { create: parent.eventreihen.map((entry) => ({ eventreihe_id: entry.eventreihe_id })) }
+                : undefined,
               antwortfelder: {
                 create: {
                   label: messages.templateFields.solution,

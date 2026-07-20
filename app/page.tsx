@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   CalendarDaysIcon,
+  BuildingOffice2Icon,
   CheckBadgeIcon,
   ClipboardDocumentCheckIcon,
   ClockIcon,
@@ -36,6 +37,7 @@ import {
   requireSession,
 } from "@/app/lib/permissions";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import AppHeader from "@/app/components/AppHeader";
 
 const dateFormatter = new Intl.DateTimeFormat("de-DE", {
   dateStyle: "long",
@@ -229,7 +231,7 @@ export default async function HomePage() {
         };
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 md:px-8 md:py-10">
+    <><AppHeader /><main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 md:px-8 md:py-10">
       <div className="mx-auto max-w-6xl space-y-7">
         <DashboardHero {...hero} />
 
@@ -255,12 +257,20 @@ export default async function HomePage() {
               />
             )}
             {capabilities.canManageQuizzes && (
-              <QuickActionCard
-                href="/quiz"
-                title="Quizverwaltung"
-                description="Quiz-Abende und Fragenzuordnung verwalten."
-                icon={CalendarDaysIcon}
-              />
+              <>
+                <QuickActionCard
+                  href="/quiz"
+                  title="Quizverwaltung"
+                  description="Quiz-Abende und Fragenzuordnung verwalten."
+                  icon={CalendarDaysIcon}
+                />
+                <QuickActionCard
+                  href="/admin/eventreihen"
+                  title="Eventreihen"
+                  description="Veranstaltungsreihen und ihre Termine verwalten."
+                  icon={BuildingOffice2Icon}
+                />
+              </>
             )}
           </div>
         </section>
@@ -407,6 +417,6 @@ export default async function HomePage() {
           </section>
         )}
       </div>
-    </main>
+    </main></>
   );
 }

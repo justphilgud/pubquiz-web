@@ -42,8 +42,15 @@ export function QuestionReviewPanel({
           />
         </div>
 
-        {(record.submittedAt || record.reviewedAt || record.templateName) && (
           <dl className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+            <div>
+              <dt className="font-medium text-slate-800">{messages.editor.scopeTitle}</dt>
+              <dd>{record.scope === "GLOBAL" ? messages.editor.scopeGlobal : record.eventSeriesNames.join(", ") || messages.editor.scopeRequired}</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-slate-800">{messages.editor.scopeApprover}</dt>
+              <dd>{record.scope === "GLOBAL" ? messages.editor.scopeApproverGlobal : messages.editor.scopeApproverEventSeries}</dd>
+            </div>
             {record.submittedAt && (
               <div>
                 <dt className="font-medium text-slate-800">{messages.review.submitted}</dt>
@@ -78,7 +85,6 @@ export function QuestionReviewPanel({
               </div>
             )}
           </dl>
-        )}
       </section>
 
       {record.reviewFeedback && (

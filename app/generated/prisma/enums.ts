@@ -17,6 +17,22 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const EventSeriesRole = {
+  EVENT_MANAGER: 'EVENT_MANAGER',
+  EDITOR: 'EDITOR'
+} as const
+
+export type EventSeriesRole = (typeof EventSeriesRole)[keyof typeof EventSeriesRole]
+
+
+export const QuestionScope = {
+  GLOBAL: 'GLOBAL',
+  EVENT_SERIES: 'EVENT_SERIES'
+} as const
+
+export type QuestionScope = (typeof QuestionScope)[keyof typeof QuestionScope]
+
+
 export const QuestionReviewStatus = {
   DRAFT: 'DRAFT',
   IN_REVIEW: 'IN_REVIEW',

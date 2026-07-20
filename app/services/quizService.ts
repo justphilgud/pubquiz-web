@@ -1,36 +1,37 @@
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
-import { canAssignQuestionsToQuiz } from "@/app/lib/permissions";
 import { FACE_MORPH_PIXEL_RELATION_TYPE } from "@/app/fragen/editor/faceMorphPixelQuestionPlan";
 import { getBerlinDate } from "@/app/lib/berlinDate";
+import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 
 type QuizQuestionCreateData = Parameters<
   typeof prisma.quiz_fragen.create
 >[0]["data"];
 
-type QuizDb = Pick<typeof prisma, "fragen" | "fragen_relationen" | "quiz_fragen">;
+type QuizDb = Pick<typeof prisma, "fragen" | "fragen_relationen" | "quiz" | "quiz_fragen">;
 
 export async function addQuestionToQuiz(
   data: QuizQuestionCreateData,
   session: Session,
   db: QuizDb = prisma,
 ) {
-  if (!canAssignQuestionsToQuiz(session)) {
-    throw new Error("Keine Berechtigung, Fragen einem Quiz hinzuzufügen.");
-  }
-
-  const frage = await db.fragen.findUnique({
-    where: { fragen_id: data.fragen_id },
-    select: { freigegeben: true, gueltig_bis: true },
+  void session;
+  const quiz = await db.quiz.findUnique({
+    where: { quiz_id: data.quiz_id },
+    select: { eventreihe_id: true },
   });
-
-  if (!frage?.freigegeben) {
+  if (!quiz) throw new Error("Quiz nicht gefunden.");
+  const frage = await db.fragen.findFirst({
+    where: {
+      fragen_id: data.fragen_id,
+      ...buildQuestionEligibilityWhere(quiz.eventreihe_id, getBerlinDate()),
+    },
+    select: { fragen_id: true },
+  });
+  if (!frage) {
     throw new Error(
-      "Diese Frage ist noch nicht freigegeben und kann keinem Quiz hinzugefügt werden.",
+      "Diese Frage ist für die Eventreihe des Quiz nicht freigegeben oder nicht mehr verfügbar.",
     );
-  }
-  if (frage.gueltig_bis && frage.gueltig_bis < getBerlinDate()) {
-    throw new Error("Diese Frage ist abgelaufen und kann keinem neuen Quiz hinzugefügt werden.");
   }
 
   const relations = await db.fragen_relationen.findMany({

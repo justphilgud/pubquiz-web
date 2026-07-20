@@ -28,6 +28,7 @@ export type AggregateQuiz = {
 
 export type QuizAvgAggregateOutputType = {
   quiz_id: number | null
+  eventreihe_id: number | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
   manuelle_bewertungen: number | null
@@ -35,6 +36,7 @@ export type QuizAvgAggregateOutputType = {
 
 export type QuizSumAggregateOutputType = {
   quiz_id: number | null
+  eventreihe_id: number | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
   manuelle_bewertungen: number | null
@@ -42,8 +44,13 @@ export type QuizSumAggregateOutputType = {
 
 export type QuizMinAggregateOutputType = {
   quiz_id: number | null
+  eventreihe_id: number | null
   quiz_datum: Date | null
   titel: string | null
+  veranstaltungszeit: string | null
+  veranstaltungsname: string | null
+  karten_url: string | null
+  oeffentliche_url: string | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
   bemerkung: string | null
@@ -61,12 +68,19 @@ export type QuizMinAggregateOutputType = {
   intro_video_url: string | null
   outro_bekanntmachungen: string | null
   manuelle_bewertungen: number | null
+  presentation_template_id: string | null
+  answer_form_template_id: string | null
 }
 
 export type QuizMaxAggregateOutputType = {
   quiz_id: number | null
+  eventreihe_id: number | null
   quiz_datum: Date | null
   titel: string | null
+  veranstaltungszeit: string | null
+  veranstaltungsname: string | null
+  karten_url: string | null
+  oeffentliche_url: string | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
   bemerkung: string | null
@@ -84,12 +98,19 @@ export type QuizMaxAggregateOutputType = {
   intro_video_url: string | null
   outro_bekanntmachungen: string | null
   manuelle_bewertungen: number | null
+  presentation_template_id: string | null
+  answer_form_template_id: string | null
 }
 
 export type QuizCountAggregateOutputType = {
   quiz_id: number
+  eventreihe_id: number
   quiz_datum: number
   titel: number
+  veranstaltungszeit: number
+  veranstaltungsname: number
+  karten_url: number
+  oeffentliche_url: number
   team_anzahl: number
   teilnehmer_anzahl: number
   bemerkung: number
@@ -107,12 +128,15 @@ export type QuizCountAggregateOutputType = {
   intro_video_url: number
   outro_bekanntmachungen: number
   manuelle_bewertungen: number
+  presentation_template_id: number
+  answer_form_template_id: number
   _all: number
 }
 
 
 export type QuizAvgAggregateInputType = {
   quiz_id?: true
+  eventreihe_id?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
   manuelle_bewertungen?: true
@@ -120,6 +144,7 @@ export type QuizAvgAggregateInputType = {
 
 export type QuizSumAggregateInputType = {
   quiz_id?: true
+  eventreihe_id?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
   manuelle_bewertungen?: true
@@ -127,8 +152,13 @@ export type QuizSumAggregateInputType = {
 
 export type QuizMinAggregateInputType = {
   quiz_id?: true
+  eventreihe_id?: true
   quiz_datum?: true
   titel?: true
+  veranstaltungszeit?: true
+  veranstaltungsname?: true
+  karten_url?: true
+  oeffentliche_url?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
   bemerkung?: true
@@ -146,12 +176,19 @@ export type QuizMinAggregateInputType = {
   intro_video_url?: true
   outro_bekanntmachungen?: true
   manuelle_bewertungen?: true
+  presentation_template_id?: true
+  answer_form_template_id?: true
 }
 
 export type QuizMaxAggregateInputType = {
   quiz_id?: true
+  eventreihe_id?: true
   quiz_datum?: true
   titel?: true
+  veranstaltungszeit?: true
+  veranstaltungsname?: true
+  karten_url?: true
+  oeffentliche_url?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
   bemerkung?: true
@@ -169,12 +206,19 @@ export type QuizMaxAggregateInputType = {
   intro_video_url?: true
   outro_bekanntmachungen?: true
   manuelle_bewertungen?: true
+  presentation_template_id?: true
+  answer_form_template_id?: true
 }
 
 export type QuizCountAggregateInputType = {
   quiz_id?: true
+  eventreihe_id?: true
   quiz_datum?: true
   titel?: true
+  veranstaltungszeit?: true
+  veranstaltungsname?: true
+  karten_url?: true
+  oeffentliche_url?: true
   team_anzahl?: true
   teilnehmer_anzahl?: true
   bemerkung?: true
@@ -192,6 +236,8 @@ export type QuizCountAggregateInputType = {
   intro_video_url?: true
   outro_bekanntmachungen?: true
   manuelle_bewertungen?: true
+  presentation_template_id?: true
+  answer_form_template_id?: true
   _all?: true
 }
 
@@ -283,8 +329,13 @@ export type quizGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type QuizGroupByOutputType = {
   quiz_id: number
+  eventreihe_id: number
   quiz_datum: Date | null
   titel: string | null
+  veranstaltungszeit: string | null
+  veranstaltungsname: string | null
+  karten_url: string | null
+  oeffentliche_url: string | null
   team_anzahl: number | null
   teilnehmer_anzahl: number | null
   bemerkung: string | null
@@ -302,6 +353,8 @@ export type QuizGroupByOutputType = {
   intro_video_url: string | null
   outro_bekanntmachungen: string | null
   manuelle_bewertungen: number | null
+  presentation_template_id: string | null
+  answer_form_template_id: string | null
   _count: QuizCountAggregateOutputType | null
   _avg: QuizAvgAggregateOutputType | null
   _sum: QuizSumAggregateOutputType | null
@@ -329,8 +382,13 @@ export type quizWhereInput = {
   OR?: Prisma.quizWhereInput[]
   NOT?: Prisma.quizWhereInput | Prisma.quizWhereInput[]
   quiz_id?: Prisma.IntFilter<"quiz"> | number
+  eventreihe_id?: Prisma.IntFilter<"quiz"> | number
   quiz_datum?: Prisma.DateTimeNullableFilter<"quiz"> | Date | string | null
   titel?: Prisma.StringNullableFilter<"quiz"> | string | null
+  veranstaltungszeit?: Prisma.StringNullableFilter<"quiz"> | string | null
+  veranstaltungsname?: Prisma.StringNullableFilter<"quiz"> | string | null
+  karten_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  oeffentliche_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   team_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
   teilnehmer_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
   bemerkung?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -348,6 +406,8 @@ export type quizWhereInput = {
   intro_video_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
+  presentation_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
+  answer_form_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
   quiz_abschnitte?: Prisma.Quiz_abschnitteListRelationFilter
   quiz_block_freigaben?: Prisma.Quiz_block_freigabenListRelationFilter
   quiz_fragen?: Prisma.Quiz_fragenListRelationFilter
@@ -355,12 +415,18 @@ export type quizWhereInput = {
   quiz_team_sessions?: Prisma.Quiz_team_sessionsListRelationFilter
   quiz_teams?: Prisma.Quiz_teamsListRelationFilter
   team_antworten?: Prisma.Team_antwortenListRelationFilter
+  eventreihe?: Prisma.XOR<Prisma.EventreihenScalarRelationFilter, Prisma.eventreihenWhereInput>
 }
 
 export type quizOrderByWithRelationInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   quiz_datum?: Prisma.SortOrderInput | Prisma.SortOrder
   titel?: Prisma.SortOrderInput | Prisma.SortOrder
+  veranstaltungszeit?: Prisma.SortOrderInput | Prisma.SortOrder
+  veranstaltungsname?: Prisma.SortOrderInput | Prisma.SortOrder
+  karten_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  oeffentliche_url?: Prisma.SortOrderInput | Prisma.SortOrder
   team_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
   bemerkung?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -378,6 +444,8 @@ export type quizOrderByWithRelationInput = {
   intro_video_url?: Prisma.SortOrderInput | Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrderInput | Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrderInput | Prisma.SortOrder
+  presentation_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  answer_form_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_abschnitte?: Prisma.quiz_abschnitteOrderByRelationAggregateInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenOrderByRelationAggregateInput
   quiz_fragen?: Prisma.quiz_fragenOrderByRelationAggregateInput
@@ -385,6 +453,7 @@ export type quizOrderByWithRelationInput = {
   quiz_team_sessions?: Prisma.quiz_team_sessionsOrderByRelationAggregateInput
   quiz_teams?: Prisma.quiz_teamsOrderByRelationAggregateInput
   team_antworten?: Prisma.team_antwortenOrderByRelationAggregateInput
+  eventreihe?: Prisma.eventreihenOrderByWithRelationInput
 }
 
 export type quizWhereUniqueInput = Prisma.AtLeast<{
@@ -392,8 +461,13 @@ export type quizWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.quizWhereInput | Prisma.quizWhereInput[]
   OR?: Prisma.quizWhereInput[]
   NOT?: Prisma.quizWhereInput | Prisma.quizWhereInput[]
+  eventreihe_id?: Prisma.IntFilter<"quiz"> | number
   quiz_datum?: Prisma.DateTimeNullableFilter<"quiz"> | Date | string | null
   titel?: Prisma.StringNullableFilter<"quiz"> | string | null
+  veranstaltungszeit?: Prisma.StringNullableFilter<"quiz"> | string | null
+  veranstaltungsname?: Prisma.StringNullableFilter<"quiz"> | string | null
+  karten_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  oeffentliche_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   team_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
   teilnehmer_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
   bemerkung?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -411,6 +485,8 @@ export type quizWhereUniqueInput = Prisma.AtLeast<{
   intro_video_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
+  presentation_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
+  answer_form_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
   quiz_abschnitte?: Prisma.Quiz_abschnitteListRelationFilter
   quiz_block_freigaben?: Prisma.Quiz_block_freigabenListRelationFilter
   quiz_fragen?: Prisma.Quiz_fragenListRelationFilter
@@ -418,12 +494,18 @@ export type quizWhereUniqueInput = Prisma.AtLeast<{
   quiz_team_sessions?: Prisma.Quiz_team_sessionsListRelationFilter
   quiz_teams?: Prisma.Quiz_teamsListRelationFilter
   team_antworten?: Prisma.Team_antwortenListRelationFilter
+  eventreihe?: Prisma.XOR<Prisma.EventreihenScalarRelationFilter, Prisma.eventreihenWhereInput>
 }, "quiz_id">
 
 export type quizOrderByWithAggregationInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   quiz_datum?: Prisma.SortOrderInput | Prisma.SortOrder
   titel?: Prisma.SortOrderInput | Prisma.SortOrder
+  veranstaltungszeit?: Prisma.SortOrderInput | Prisma.SortOrder
+  veranstaltungsname?: Prisma.SortOrderInput | Prisma.SortOrder
+  karten_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  oeffentliche_url?: Prisma.SortOrderInput | Prisma.SortOrder
   team_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrderInput | Prisma.SortOrder
   bemerkung?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -441,6 +523,8 @@ export type quizOrderByWithAggregationInput = {
   intro_video_url?: Prisma.SortOrderInput | Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrderInput | Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrderInput | Prisma.SortOrder
+  presentation_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  answer_form_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.quizCountOrderByAggregateInput
   _avg?: Prisma.quizAvgOrderByAggregateInput
   _max?: Prisma.quizMaxOrderByAggregateInput
@@ -453,8 +537,13 @@ export type quizScalarWhereWithAggregatesInput = {
   OR?: Prisma.quizScalarWhereWithAggregatesInput[]
   NOT?: Prisma.quizScalarWhereWithAggregatesInput | Prisma.quizScalarWhereWithAggregatesInput[]
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz"> | number
+  eventreihe_id?: Prisma.IntWithAggregatesFilter<"quiz"> | number
   quiz_datum?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz"> | Date | string | null
   titel?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
+  veranstaltungszeit?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
+  veranstaltungsname?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
+  karten_url?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
+  oeffentliche_url?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   team_anzahl?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
   teilnehmer_anzahl?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
   bemerkung?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
@@ -472,11 +561,17 @@ export type quizScalarWhereWithAggregatesInput = {
   intro_video_url?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
+  presentation_template_id?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
+  answer_form_template_id?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
 }
 
 export type quizCreateInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -494,6 +589,8 @@ export type quizCreateInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
@@ -501,12 +598,18 @@ export type quizCreateInput = {
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -524,6 +627,8 @@ export type quizUncheckedCreateInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
@@ -536,6 +641,10 @@ export type quizUncheckedCreateInput = {
 export type quizUpdateInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -553,6 +662,8 @@ export type quizUpdateInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
@@ -560,12 +671,18 @@ export type quizUpdateInput = {
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -583,6 +700,8 @@ export type quizUncheckedUpdateInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
@@ -594,8 +713,13 @@ export type quizUncheckedUpdateInput = {
 
 export type quizCreateManyInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -613,11 +737,17 @@ export type quizCreateManyInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
 }
 
 export type quizUpdateManyMutationInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -635,12 +765,19 @@ export type quizUpdateManyMutationInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type quizUncheckedUpdateManyInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -658,12 +795,19 @@ export type quizUncheckedUpdateManyInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type quizCountOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   quiz_datum?: Prisma.SortOrder
   titel?: Prisma.SortOrder
+  veranstaltungszeit?: Prisma.SortOrder
+  veranstaltungsname?: Prisma.SortOrder
+  karten_url?: Prisma.SortOrder
+  oeffentliche_url?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrder
@@ -681,10 +825,13 @@ export type quizCountOrderByAggregateInput = {
   intro_video_url?: Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
+  presentation_template_id?: Prisma.SortOrder
+  answer_form_template_id?: Prisma.SortOrder
 }
 
 export type quizAvgOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
@@ -692,8 +839,13 @@ export type quizAvgOrderByAggregateInput = {
 
 export type quizMaxOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   quiz_datum?: Prisma.SortOrder
   titel?: Prisma.SortOrder
+  veranstaltungszeit?: Prisma.SortOrder
+  veranstaltungsname?: Prisma.SortOrder
+  karten_url?: Prisma.SortOrder
+  oeffentliche_url?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrder
@@ -711,12 +863,19 @@ export type quizMaxOrderByAggregateInput = {
   intro_video_url?: Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
+  presentation_template_id?: Prisma.SortOrder
+  answer_form_template_id?: Prisma.SortOrder
 }
 
 export type quizMinOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   quiz_datum?: Prisma.SortOrder
   titel?: Prisma.SortOrder
+  veranstaltungszeit?: Prisma.SortOrder
+  veranstaltungsname?: Prisma.SortOrder
+  karten_url?: Prisma.SortOrder
+  oeffentliche_url?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
   bemerkung?: Prisma.SortOrder
@@ -734,18 +893,73 @@ export type quizMinOrderByAggregateInput = {
   intro_video_url?: Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
+  presentation_template_id?: Prisma.SortOrder
+  answer_form_template_id?: Prisma.SortOrder
 }
 
 export type quizSumOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
+  eventreihe_id?: Prisma.SortOrder
   team_anzahl?: Prisma.SortOrder
   teilnehmer_anzahl?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
+}
+
+export type QuizListRelationFilter = {
+  every?: Prisma.quizWhereInput
+  some?: Prisma.quizWhereInput
+  none?: Prisma.quizWhereInput
+}
+
+export type quizOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type QuizScalarRelationFilter = {
   is?: Prisma.quizWhereInput
   isNot?: Prisma.quizWhereInput
+}
+
+export type quizCreateNestedManyWithoutEventreiheInput = {
+  create?: Prisma.XOR<Prisma.quizCreateWithoutEventreiheInput, Prisma.quizUncheckedCreateWithoutEventreiheInput> | Prisma.quizCreateWithoutEventreiheInput[] | Prisma.quizUncheckedCreateWithoutEventreiheInput[]
+  connectOrCreate?: Prisma.quizCreateOrConnectWithoutEventreiheInput | Prisma.quizCreateOrConnectWithoutEventreiheInput[]
+  createMany?: Prisma.quizCreateManyEventreiheInputEnvelope
+  connect?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+}
+
+export type quizUncheckedCreateNestedManyWithoutEventreiheInput = {
+  create?: Prisma.XOR<Prisma.quizCreateWithoutEventreiheInput, Prisma.quizUncheckedCreateWithoutEventreiheInput> | Prisma.quizCreateWithoutEventreiheInput[] | Prisma.quizUncheckedCreateWithoutEventreiheInput[]
+  connectOrCreate?: Prisma.quizCreateOrConnectWithoutEventreiheInput | Prisma.quizCreateOrConnectWithoutEventreiheInput[]
+  createMany?: Prisma.quizCreateManyEventreiheInputEnvelope
+  connect?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+}
+
+export type quizUpdateManyWithoutEventreiheNestedInput = {
+  create?: Prisma.XOR<Prisma.quizCreateWithoutEventreiheInput, Prisma.quizUncheckedCreateWithoutEventreiheInput> | Prisma.quizCreateWithoutEventreiheInput[] | Prisma.quizUncheckedCreateWithoutEventreiheInput[]
+  connectOrCreate?: Prisma.quizCreateOrConnectWithoutEventreiheInput | Prisma.quizCreateOrConnectWithoutEventreiheInput[]
+  upsert?: Prisma.quizUpsertWithWhereUniqueWithoutEventreiheInput | Prisma.quizUpsertWithWhereUniqueWithoutEventreiheInput[]
+  createMany?: Prisma.quizCreateManyEventreiheInputEnvelope
+  set?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  disconnect?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  delete?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  connect?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  update?: Prisma.quizUpdateWithWhereUniqueWithoutEventreiheInput | Prisma.quizUpdateWithWhereUniqueWithoutEventreiheInput[]
+  updateMany?: Prisma.quizUpdateManyWithWhereWithoutEventreiheInput | Prisma.quizUpdateManyWithWhereWithoutEventreiheInput[]
+  deleteMany?: Prisma.quizScalarWhereInput | Prisma.quizScalarWhereInput[]
+}
+
+export type quizUncheckedUpdateManyWithoutEventreiheNestedInput = {
+  create?: Prisma.XOR<Prisma.quizCreateWithoutEventreiheInput, Prisma.quizUncheckedCreateWithoutEventreiheInput> | Prisma.quizCreateWithoutEventreiheInput[] | Prisma.quizUncheckedCreateWithoutEventreiheInput[]
+  connectOrCreate?: Prisma.quizCreateOrConnectWithoutEventreiheInput | Prisma.quizCreateOrConnectWithoutEventreiheInput[]
+  upsert?: Prisma.quizUpsertWithWhereUniqueWithoutEventreiheInput | Prisma.quizUpsertWithWhereUniqueWithoutEventreiheInput[]
+  createMany?: Prisma.quizCreateManyEventreiheInputEnvelope
+  set?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  disconnect?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  delete?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  connect?: Prisma.quizWhereUniqueInput | Prisma.quizWhereUniqueInput[]
+  update?: Prisma.quizUpdateWithWhereUniqueWithoutEventreiheInput | Prisma.quizUpdateWithWhereUniqueWithoutEventreiheInput[]
+  updateMany?: Prisma.quizUpdateManyWithWhereWithoutEventreiheInput | Prisma.quizUpdateManyWithWhereWithoutEventreiheInput[]
+  deleteMany?: Prisma.quizScalarWhereInput | Prisma.quizScalarWhereInput[]
 }
 
 export type quizCreateNestedOneWithoutQuiz_fragenInput = {
@@ -846,9 +1060,13 @@ export type quizUpdateOneRequiredWithoutPraesentation_statusNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.quizUpdateToOneWithWhereWithoutPraesentation_statusInput, Prisma.quizUpdateWithoutPraesentation_statusInput>, Prisma.quizUncheckedUpdateWithoutPraesentation_statusInput>
 }
 
-export type quizCreateWithoutQuiz_fragenInput = {
+export type quizCreateWithoutEventreiheInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -866,18 +1084,25 @@ export type quizCreateWithoutQuiz_fragenInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
+  quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
 }
 
-export type quizUncheckedCreateWithoutQuiz_fragenInput = {
+export type quizUncheckedCreateWithoutEventreiheInput = {
   quiz_id?: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -895,6 +1120,139 @@ export type quizUncheckedCreateWithoutQuiz_fragenInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
+  quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
+  quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
+  quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
+  praesentation_status?: Prisma.quiz_praesentation_statusUncheckedCreateNestedOneWithoutQuizInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedCreateNestedManyWithoutQuizInput
+  quiz_teams?: Prisma.quiz_teamsUncheckedCreateNestedManyWithoutQuizInput
+  team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuizInput
+}
+
+export type quizCreateOrConnectWithoutEventreiheInput = {
+  where: Prisma.quizWhereUniqueInput
+  create: Prisma.XOR<Prisma.quizCreateWithoutEventreiheInput, Prisma.quizUncheckedCreateWithoutEventreiheInput>
+}
+
+export type quizCreateManyEventreiheInputEnvelope = {
+  data: Prisma.quizCreateManyEventreiheInput | Prisma.quizCreateManyEventreiheInput[]
+  skipDuplicates?: boolean
+}
+
+export type quizUpsertWithWhereUniqueWithoutEventreiheInput = {
+  where: Prisma.quizWhereUniqueInput
+  update: Prisma.XOR<Prisma.quizUpdateWithoutEventreiheInput, Prisma.quizUncheckedUpdateWithoutEventreiheInput>
+  create: Prisma.XOR<Prisma.quizCreateWithoutEventreiheInput, Prisma.quizUncheckedCreateWithoutEventreiheInput>
+}
+
+export type quizUpdateWithWhereUniqueWithoutEventreiheInput = {
+  where: Prisma.quizWhereUniqueInput
+  data: Prisma.XOR<Prisma.quizUpdateWithoutEventreiheInput, Prisma.quizUncheckedUpdateWithoutEventreiheInput>
+}
+
+export type quizUpdateManyWithWhereWithoutEventreiheInput = {
+  where: Prisma.quizScalarWhereInput
+  data: Prisma.XOR<Prisma.quizUpdateManyMutationInput, Prisma.quizUncheckedUpdateManyWithoutEventreiheInput>
+}
+
+export type quizScalarWhereInput = {
+  AND?: Prisma.quizScalarWhereInput | Prisma.quizScalarWhereInput[]
+  OR?: Prisma.quizScalarWhereInput[]
+  NOT?: Prisma.quizScalarWhereInput | Prisma.quizScalarWhereInput[]
+  quiz_id?: Prisma.IntFilter<"quiz"> | number
+  eventreihe_id?: Prisma.IntFilter<"quiz"> | number
+  quiz_datum?: Prisma.DateTimeNullableFilter<"quiz"> | Date | string | null
+  titel?: Prisma.StringNullableFilter<"quiz"> | string | null
+  veranstaltungszeit?: Prisma.StringNullableFilter<"quiz"> | string | null
+  veranstaltungsname?: Prisma.StringNullableFilter<"quiz"> | string | null
+  karten_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  oeffentliche_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  team_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
+  teilnehmer_anzahl?: Prisma.IntNullableFilter<"quiz"> | number | null
+  bemerkung?: Prisma.StringNullableFilter<"quiz"> | string | null
+  ist_archiviert?: Prisma.BoolFilter<"quiz"> | boolean
+  archivierungsgrund?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_begruessungstext?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_begruessungstitel?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_logo_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_musik_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_preise?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_regeln?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_wartetext?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_startsequenz_text?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_startzeit?: Prisma.StringNullableFilter<"quiz"> | string | null
+  intro_video_url?: Prisma.StringNullableFilter<"quiz"> | string | null
+  outro_bekanntmachungen?: Prisma.StringNullableFilter<"quiz"> | string | null
+  manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
+  presentation_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
+  answer_form_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
+}
+
+export type quizCreateWithoutQuiz_fragenInput = {
+  quiz_datum?: Date | string | null
+  titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
+  team_anzahl?: number | null
+  teilnehmer_anzahl?: number | null
+  bemerkung?: string | null
+  ist_archiviert?: boolean
+  archivierungsgrund?: string | null
+  intro_begruessungstext?: string | null
+  intro_begruessungstitel?: string | null
+  intro_logo_url?: string | null
+  intro_musik_url?: string | null
+  intro_preise?: string | null
+  intro_regeln?: string | null
+  intro_wartetext?: string | null
+  intro_startsequenz_text?: string | null
+  intro_startzeit?: string | null
+  intro_video_url?: string | null
+  outro_bekanntmachungen?: string | null
+  manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
+  quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
+  quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
+  praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
+  quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
+  team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
+}
+
+export type quizUncheckedCreateWithoutQuiz_fragenInput = {
+  quiz_id?: number
+  eventreihe_id: number
+  quiz_datum?: Date | string | null
+  titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
+  team_anzahl?: number | null
+  teilnehmer_anzahl?: number | null
+  bemerkung?: string | null
+  ist_archiviert?: boolean
+  archivierungsgrund?: string | null
+  intro_begruessungstext?: string | null
+  intro_begruessungstitel?: string | null
+  intro_logo_url?: string | null
+  intro_musik_url?: string | null
+  intro_preise?: string | null
+  intro_regeln?: string | null
+  intro_wartetext?: string | null
+  intro_startsequenz_text?: string | null
+  intro_startzeit?: string | null
+  intro_video_url?: string | null
+  outro_bekanntmachungen?: string | null
+  manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusUncheckedCreateNestedOneWithoutQuizInput
@@ -922,6 +1280,10 @@ export type quizUpdateToOneWithWhereWithoutQuiz_fragenInput = {
 export type quizUpdateWithoutQuiz_fragenInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -939,18 +1301,26 @@ export type quizUpdateWithoutQuiz_fragenInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutQuiz_fragenInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -968,6 +1338,8 @@ export type quizUncheckedUpdateWithoutQuiz_fragenInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput
@@ -979,6 +1351,10 @@ export type quizUncheckedUpdateWithoutQuiz_fragenInput = {
 export type quizCreateWithoutQuiz_teamsInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -996,18 +1372,26 @@ export type quizCreateWithoutQuiz_teamsInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateWithoutQuiz_teamsInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1025,6 +1409,8 @@ export type quizUncheckedCreateWithoutQuiz_teamsInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
@@ -1052,6 +1438,10 @@ export type quizUpdateToOneWithWhereWithoutQuiz_teamsInput = {
 export type quizUpdateWithoutQuiz_teamsInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1069,18 +1459,26 @@ export type quizUpdateWithoutQuiz_teamsInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutQuiz_teamsInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1098,6 +1496,8 @@ export type quizUncheckedUpdateWithoutQuiz_teamsInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
@@ -1109,6 +1509,10 @@ export type quizUncheckedUpdateWithoutQuiz_teamsInput = {
 export type quizCreateWithoutQuiz_abschnitteInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1126,18 +1530,26 @@ export type quizCreateWithoutQuiz_abschnitteInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateWithoutQuiz_abschnitteInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1155,6 +1567,8 @@ export type quizUncheckedCreateWithoutQuiz_abschnitteInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusUncheckedCreateNestedOneWithoutQuizInput
@@ -1182,6 +1596,10 @@ export type quizUpdateToOneWithWhereWithoutQuiz_abschnitteInput = {
 export type quizUpdateWithoutQuiz_abschnitteInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1199,18 +1617,26 @@ export type quizUpdateWithoutQuiz_abschnitteInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutQuiz_abschnitteInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1228,6 +1654,8 @@ export type quizUncheckedUpdateWithoutQuiz_abschnitteInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput
@@ -1239,6 +1667,10 @@ export type quizUncheckedUpdateWithoutQuiz_abschnitteInput = {
 export type quizCreateWithoutQuiz_team_sessionsInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1256,18 +1688,26 @@ export type quizCreateWithoutQuiz_team_sessionsInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateWithoutQuiz_team_sessionsInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1285,6 +1725,8 @@ export type quizUncheckedCreateWithoutQuiz_team_sessionsInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
@@ -1312,6 +1754,10 @@ export type quizUpdateToOneWithWhereWithoutQuiz_team_sessionsInput = {
 export type quizUpdateWithoutQuiz_team_sessionsInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1329,18 +1775,26 @@ export type quizUpdateWithoutQuiz_team_sessionsInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1358,6 +1812,8 @@ export type quizUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
@@ -1369,6 +1825,10 @@ export type quizUncheckedUpdateWithoutQuiz_team_sessionsInput = {
 export type quizCreateWithoutQuiz_block_freigabenInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1386,18 +1846,26 @@ export type quizCreateWithoutQuiz_block_freigabenInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateWithoutQuiz_block_freigabenInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1415,6 +1883,8 @@ export type quizUncheckedCreateWithoutQuiz_block_freigabenInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusUncheckedCreateNestedOneWithoutQuizInput
@@ -1442,6 +1912,10 @@ export type quizUpdateToOneWithWhereWithoutQuiz_block_freigabenInput = {
 export type quizUpdateWithoutQuiz_block_freigabenInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1459,18 +1933,26 @@ export type quizUpdateWithoutQuiz_block_freigabenInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutQuiz_block_freigabenInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1488,6 +1970,8 @@ export type quizUncheckedUpdateWithoutQuiz_block_freigabenInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput
@@ -1499,6 +1983,10 @@ export type quizUncheckedUpdateWithoutQuiz_block_freigabenInput = {
 export type quizCreateWithoutTeam_antwortenInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1516,18 +2004,26 @@ export type quizCreateWithoutTeam_antwortenInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   praesentation_status?: Prisma.quiz_praesentation_statusCreateNestedOneWithoutQuizInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateWithoutTeam_antwortenInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1545,6 +2041,8 @@ export type quizUncheckedCreateWithoutTeam_antwortenInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
@@ -1572,6 +2070,10 @@ export type quizUpdateToOneWithWhereWithoutTeam_antwortenInput = {
 export type quizUpdateWithoutTeam_antwortenInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1589,18 +2091,26 @@ export type quizUpdateWithoutTeam_antwortenInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
   praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutTeam_antwortenInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1618,6 +2128,8 @@ export type quizUncheckedUpdateWithoutTeam_antwortenInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
@@ -1629,6 +2141,10 @@ export type quizUncheckedUpdateWithoutTeam_antwortenInput = {
 export type quizCreateWithoutPraesentation_statusInput = {
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1646,18 +2162,26 @@ export type quizCreateWithoutPraesentation_statusInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutQuizInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutQuizInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutQuizInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuizInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutQuizInput
 }
 
 export type quizUncheckedCreateWithoutPraesentation_statusInput = {
   quiz_id?: number
+  eventreihe_id: number
   quiz_datum?: Date | string | null
   titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
   team_anzahl?: number | null
   teilnehmer_anzahl?: number | null
   bemerkung?: string | null
@@ -1675,6 +2199,8 @@ export type quizUncheckedCreateWithoutPraesentation_statusInput = {
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
   manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedCreateNestedManyWithoutQuizInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedCreateNestedManyWithoutQuizInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutQuizInput
@@ -1702,6 +2228,10 @@ export type quizUpdateToOneWithWhereWithoutPraesentation_statusInput = {
 export type quizUpdateWithoutPraesentation_statusInput = {
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1719,18 +2249,26 @@ export type quizUpdateWithoutPraesentation_statusInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutQuizNestedInput
 }
 
 export type quizUncheckedUpdateWithoutPraesentation_statusInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1748,12 +2286,143 @@ export type quizUncheckedUpdateWithoutPraesentation_statusInput = {
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
   quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedUpdateManyWithoutQuizNestedInput
   quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutQuizNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuizNestedInput
+}
+
+export type quizCreateManyEventreiheInput = {
+  quiz_id?: number
+  quiz_datum?: Date | string | null
+  titel?: string | null
+  veranstaltungszeit?: string | null
+  veranstaltungsname?: string | null
+  karten_url?: string | null
+  oeffentliche_url?: string | null
+  team_anzahl?: number | null
+  teilnehmer_anzahl?: number | null
+  bemerkung?: string | null
+  ist_archiviert?: boolean
+  archivierungsgrund?: string | null
+  intro_begruessungstext?: string | null
+  intro_begruessungstitel?: string | null
+  intro_logo_url?: string | null
+  intro_musik_url?: string | null
+  intro_preise?: string | null
+  intro_regeln?: string | null
+  intro_wartetext?: string | null
+  intro_startsequenz_text?: string | null
+  intro_startzeit?: string | null
+  intro_video_url?: string | null
+  outro_bekanntmachungen?: string | null
+  manuelle_bewertungen?: number | null
+  presentation_template_id?: string | null
+  answer_form_template_id?: string | null
+}
+
+export type quizUpdateWithoutEventreiheInput = {
+  quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_begruessungstext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_begruessungstitel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_preise?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_regeln?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_wartetext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_startsequenz_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quiz_abschnitte?: Prisma.quiz_abschnitteUpdateManyWithoutQuizNestedInput
+  quiz_block_freigaben?: Prisma.quiz_block_freigabenUpdateManyWithoutQuizNestedInput
+  quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutQuizNestedInput
+  praesentation_status?: Prisma.quiz_praesentation_statusUpdateOneWithoutQuizNestedInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutQuizNestedInput
+  quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutQuizNestedInput
+  team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuizNestedInput
+}
+
+export type quizUncheckedUpdateWithoutEventreiheInput = {
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_begruessungstext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_begruessungstitel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_preise?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_regeln?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_wartetext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_startsequenz_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quiz_abschnitte?: Prisma.quiz_abschnitteUncheckedUpdateManyWithoutQuizNestedInput
+  quiz_block_freigaben?: Prisma.quiz_block_freigabenUncheckedUpdateManyWithoutQuizNestedInput
+  quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutQuizNestedInput
+  praesentation_status?: Prisma.quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedUpdateManyWithoutQuizNestedInput
+  quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutQuizNestedInput
+  team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuizNestedInput
+}
+
+export type quizUncheckedUpdateManyWithoutEventreiheInput = {
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  titel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungszeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  veranstaltungsname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  karten_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oeffentliche_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teilnehmer_anzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_begruessungstext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_begruessungstitel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_preise?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_regeln?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_wartetext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_startsequenz_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1834,8 +2503,13 @@ export type QuizCountOutputTypeCountTeam_antwortenArgs<ExtArgs extends runtime.T
 
 export type quizSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
+  eventreihe_id?: boolean
   quiz_datum?: boolean
   titel?: boolean
+  veranstaltungszeit?: boolean
+  veranstaltungsname?: boolean
+  karten_url?: boolean
+  oeffentliche_url?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
   bemerkung?: boolean
@@ -1853,6 +2527,8 @@ export type quizSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
   manuelle_bewertungen?: boolean
+  presentation_template_id?: boolean
+  answer_form_template_id?: boolean
   quiz_abschnitte?: boolean | Prisma.quiz$quiz_abschnitteArgs<ExtArgs>
   quiz_block_freigaben?: boolean | Prisma.quiz$quiz_block_freigabenArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz$quiz_fragenArgs<ExtArgs>
@@ -1860,13 +2536,19 @@ export type quizSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   quiz_team_sessions?: boolean | Prisma.quiz$quiz_team_sessionsArgs<ExtArgs>
   quiz_teams?: boolean | Prisma.quiz$quiz_teamsArgs<ExtArgs>
   team_antworten?: boolean | Prisma.quiz$team_antwortenArgs<ExtArgs>
+  eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.QuizCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz"]>
 
 export type quizSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
+  eventreihe_id?: boolean
   quiz_datum?: boolean
   titel?: boolean
+  veranstaltungszeit?: boolean
+  veranstaltungsname?: boolean
+  karten_url?: boolean
+  oeffentliche_url?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
   bemerkung?: boolean
@@ -1884,12 +2566,20 @@ export type quizSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
   manuelle_bewertungen?: boolean
+  presentation_template_id?: boolean
+  answer_form_template_id?: boolean
+  eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz"]>
 
 export type quizSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
+  eventreihe_id?: boolean
   quiz_datum?: boolean
   titel?: boolean
+  veranstaltungszeit?: boolean
+  veranstaltungsname?: boolean
+  karten_url?: boolean
+  oeffentliche_url?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
   bemerkung?: boolean
@@ -1907,12 +2597,20 @@ export type quizSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
   manuelle_bewertungen?: boolean
+  presentation_template_id?: boolean
+  answer_form_template_id?: boolean
+  eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz"]>
 
 export type quizSelectScalar = {
   quiz_id?: boolean
+  eventreihe_id?: boolean
   quiz_datum?: boolean
   titel?: boolean
+  veranstaltungszeit?: boolean
+  veranstaltungsname?: boolean
+  karten_url?: boolean
+  oeffentliche_url?: boolean
   team_anzahl?: boolean
   teilnehmer_anzahl?: boolean
   bemerkung?: boolean
@@ -1930,9 +2628,11 @@ export type quizSelectScalar = {
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
   manuelle_bewertungen?: boolean
+  presentation_template_id?: boolean
+  answer_form_template_id?: boolean
 }
 
-export type quizOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "quiz_datum" | "titel" | "team_anzahl" | "teilnehmer_anzahl" | "bemerkung" | "ist_archiviert" | "archivierungsgrund" | "intro_begruessungstext" | "intro_begruessungstitel" | "intro_logo_url" | "intro_musik_url" | "intro_preise" | "intro_regeln" | "intro_wartetext" | "intro_startsequenz_text" | "intro_startzeit" | "intro_video_url" | "outro_bekanntmachungen" | "manuelle_bewertungen", ExtArgs["result"]["quiz"]>
+export type quizOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "eventreihe_id" | "quiz_datum" | "titel" | "veranstaltungszeit" | "veranstaltungsname" | "karten_url" | "oeffentliche_url" | "team_anzahl" | "teilnehmer_anzahl" | "bemerkung" | "ist_archiviert" | "archivierungsgrund" | "intro_begruessungstext" | "intro_begruessungstitel" | "intro_logo_url" | "intro_musik_url" | "intro_preise" | "intro_regeln" | "intro_wartetext" | "intro_startsequenz_text" | "intro_startzeit" | "intro_video_url" | "outro_bekanntmachungen" | "manuelle_bewertungen" | "presentation_template_id" | "answer_form_template_id", ExtArgs["result"]["quiz"]>
 export type quizInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz_abschnitte?: boolean | Prisma.quiz$quiz_abschnitteArgs<ExtArgs>
   quiz_block_freigaben?: boolean | Prisma.quiz$quiz_block_freigabenArgs<ExtArgs>
@@ -1941,10 +2641,15 @@ export type quizInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   quiz_team_sessions?: boolean | Prisma.quiz$quiz_team_sessionsArgs<ExtArgs>
   quiz_teams?: boolean | Prisma.quiz$quiz_teamsArgs<ExtArgs>
   team_antworten?: boolean | Prisma.quiz$team_antwortenArgs<ExtArgs>
+  eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.QuizCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type quizIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type quizIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type quizIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
+}
+export type quizIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
+}
 
 export type $quizPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "quiz"
@@ -1956,11 +2661,17 @@ export type $quizPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     quiz_team_sessions: Prisma.$quiz_team_sessionsPayload<ExtArgs>[]
     quiz_teams: Prisma.$quiz_teamsPayload<ExtArgs>[]
     team_antworten: Prisma.$team_antwortenPayload<ExtArgs>[]
+    eventreihe: Prisma.$eventreihenPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     quiz_id: number
+    eventreihe_id: number
     quiz_datum: Date | null
     titel: string | null
+    veranstaltungszeit: string | null
+    veranstaltungsname: string | null
+    karten_url: string | null
+    oeffentliche_url: string | null
     team_anzahl: number | null
     teilnehmer_anzahl: number | null
     bemerkung: string | null
@@ -1978,6 +2689,8 @@ export type $quizPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     intro_video_url: string | null
     outro_bekanntmachungen: string | null
     manuelle_bewertungen: number | null
+    presentation_template_id: string | null
+    answer_form_template_id: string | null
   }, ExtArgs["result"]["quiz"]>
   composites: {}
 }
@@ -2379,6 +3092,7 @@ export interface Prisma__quizClient<T, Null = never, ExtArgs extends runtime.Typ
   quiz_team_sessions<T extends Prisma.quiz$quiz_team_sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz$quiz_team_sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_team_sessionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quiz_teams<T extends Prisma.quiz$quiz_teamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz$quiz_teamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_teamsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   team_antworten<T extends Prisma.quiz$team_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz$team_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  eventreihe<T extends Prisma.eventreihenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihenDefaultArgs<ExtArgs>>): Prisma.Prisma__eventreihenClient<runtime.Types.Result.GetResult<Prisma.$eventreihenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2409,8 +3123,13 @@ export interface Prisma__quizClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface quizFieldRefs {
   readonly quiz_id: Prisma.FieldRef<"quiz", 'Int'>
+  readonly eventreihe_id: Prisma.FieldRef<"quiz", 'Int'>
   readonly quiz_datum: Prisma.FieldRef<"quiz", 'DateTime'>
   readonly titel: Prisma.FieldRef<"quiz", 'String'>
+  readonly veranstaltungszeit: Prisma.FieldRef<"quiz", 'String'>
+  readonly veranstaltungsname: Prisma.FieldRef<"quiz", 'String'>
+  readonly karten_url: Prisma.FieldRef<"quiz", 'String'>
+  readonly oeffentliche_url: Prisma.FieldRef<"quiz", 'String'>
   readonly team_anzahl: Prisma.FieldRef<"quiz", 'Int'>
   readonly teilnehmer_anzahl: Prisma.FieldRef<"quiz", 'Int'>
   readonly bemerkung: Prisma.FieldRef<"quiz", 'String'>
@@ -2428,6 +3147,8 @@ export interface quizFieldRefs {
   readonly intro_video_url: Prisma.FieldRef<"quiz", 'String'>
   readonly outro_bekanntmachungen: Prisma.FieldRef<"quiz", 'String'>
   readonly manuelle_bewertungen: Prisma.FieldRef<"quiz", 'Int'>
+  readonly presentation_template_id: Prisma.FieldRef<"quiz", 'String'>
+  readonly answer_form_template_id: Prisma.FieldRef<"quiz", 'String'>
 }
     
 
@@ -2651,7 +3372,7 @@ export type quizCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   /**
    * The data needed to create a quiz.
    */
-  data?: Prisma.XOR<Prisma.quizCreateInput, Prisma.quizUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.quizCreateInput, Prisma.quizUncheckedCreateInput>
 }
 
 /**
@@ -2682,6 +3403,10 @@ export type quizCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.quizCreateManyInput | Prisma.quizCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.quizIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2752,6 +3477,10 @@ export type quizUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many quizzes to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.quizIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

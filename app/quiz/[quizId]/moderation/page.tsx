@@ -5,7 +5,9 @@ import {
   getAntwortStatus,
 } from "../praesentation/statusActions";
 import ModerationClient from "./ModerationClient";
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireQuizLiveController } from "../../quizAccess.server";
+import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
 
 type Props = {
   params: Promise<{
@@ -14,13 +16,13 @@ type Props = {
 };
 
 export default async function ModerationPage({ params }: Props) {
-  await requireAdmin();
   const resolvedParams = await params;
   const quizId = Number(resolvedParams.quizId);
 
   if (Number.isNaN(quizId)) {
     notFound();
   }
+  await requireQuizLiveController(quizId);
 
   const quiz = await getQuizPraesentation(quizId);
 
@@ -53,6 +55,7 @@ export default async function ModerationPage({ params }: Props) {
           ? antwortStatus.letzteAntwortAt.toISOString()
           : null,
       }}
+      backToQuizLabel={loadRenderingMessages(getDefaultLocale()).fields.backToQuiz}
     />
   );
 }

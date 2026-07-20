@@ -83,18 +83,21 @@ export default function UserMenu({
   const iconClass = "h-5 w-5 shrink-0 text-slate-600";
 
   return (
-    <div ref={menuRef} className="relative">
+    <div ref={menuRef} className="relative shrink-0">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-left shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label="Benutzermenü öffnen"
+        className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-2 py-2 text-left shadow-sm outline-none transition hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 sm:px-3"
       >
         <InitialsAvatar name={name} email={email} size="sm" />
         <ChevronDownIcon className="h-4 w-4 text-slate-500" />
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
           <div className="flex gap-3 px-4 py-4">
             <InitialsAvatar name={name} email={email} size="lg" />
 

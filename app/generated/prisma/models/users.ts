@@ -256,6 +256,8 @@ export type usersWhereInput = {
   must_change_password?: Prisma.BoolFilter<"users"> | boolean
   created_at?: Prisma.DateTimeFilter<"users"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"users"> | Date | string
+  eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
+  zugewiesene_eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -269,6 +271,8 @@ export type usersOrderByWithRelationInput = {
   must_change_password?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenOrderByRelationAggregateInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -285,6 +289,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   must_change_password?: Prisma.BoolFilter<"users"> | boolean
   created_at?: Prisma.DateTimeFilter<"users"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"users"> | Date | string
+  eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
+  zugewiesene_eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
 }, "id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -331,6 +337,8 @@ export type usersCreateInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -344,6 +352,8 @@ export type usersUncheckedCreateInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
 }
 
 export type usersUpdateInput = {
@@ -356,6 +366,8 @@ export type usersUpdateInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -369,6 +381,8 @@ export type usersUncheckedUpdateInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -456,10 +470,228 @@ export type usersSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
+export type UsersScalarRelationFilter = {
+  is?: Prisma.usersWhereInput
+  isNot?: Prisma.usersWhereInput
+}
+
+export type UsersNullableScalarRelationFilter = {
+  is?: Prisma.usersWhereInput | null
+  isNot?: Prisma.usersWhereInput | null
+}
+
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
 
+export type usersCreateNestedOneWithoutEventreihenrollenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutEventreihenrollenInput, Prisma.usersUncheckedCreateWithoutEventreihenrollenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutEventreihenrollenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedOneWithoutZugewiesene_eventreihenrollenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutEventreihenrollenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutEventreihenrollenInput, Prisma.usersUncheckedCreateWithoutEventreihenrollenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutEventreihenrollenInput
+  upsert?: Prisma.usersUpsertWithoutEventreihenrollenInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutEventreihenrollenInput, Prisma.usersUpdateWithoutEventreihenrollenInput>, Prisma.usersUncheckedUpdateWithoutEventreihenrollenInput>
+}
+
+export type usersUpdateOneWithoutZugewiesene_eventreihenrollenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput
+  upsert?: Prisma.usersUpsertWithoutZugewiesene_eventreihenrollenInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUpdateWithoutZugewiesene_eventreihenrollenInput>, Prisma.usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput>
+}
+
+export type usersCreateWithoutEventreihenrollenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+}
+
+export type usersUncheckedCreateWithoutEventreihenrollenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+}
+
+export type usersCreateOrConnectWithoutEventreihenrollenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutEventreihenrollenInput, Prisma.usersUncheckedCreateWithoutEventreihenrollenInput>
+}
+
+export type usersCreateWithoutZugewiesene_eventreihenrollenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+}
+
+export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+}
+
+export type usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput>
+}
+
+export type usersUpsertWithoutEventreihenrollenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutEventreihenrollenInput, Prisma.usersUncheckedUpdateWithoutEventreihenrollenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutEventreihenrollenInput, Prisma.usersUncheckedCreateWithoutEventreihenrollenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutEventreihenrollenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutEventreihenrollenInput, Prisma.usersUncheckedUpdateWithoutEventreihenrollenInput>
+}
+
+export type usersUpdateWithoutEventreihenrollenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+}
+
+export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+}
+
+export type usersUpsertWithoutZugewiesene_eventreihenrollenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutZugewiesene_eventreihenrollenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput>
+}
+
+export type usersUpdateWithoutZugewiesene_eventreihenrollenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+}
+
+export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+}
+
+
+/**
+ * Count Type UsersCountOutputType
+ */
+
+export type UsersCountOutputType = {
+  eventreihenrollen: number
+  zugewiesene_eventreihenrollen: number
+}
+
+export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  eventreihenrollen?: boolean | UsersCountOutputTypeCountEventreihenrollenArgs
+  zugewiesene_eventreihenrollen?: boolean | UsersCountOutputTypeCountZugewiesene_eventreihenrollenArgs
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UsersCountOutputType
+   */
+  select?: Prisma.UsersCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountEventreihenrollenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.eventreihe_benutzerrollenWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountZugewiesene_eventreihenrollenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.eventreihe_benutzerrollenWhereInput
+}
 
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -473,6 +705,9 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   must_change_password?: boolean
   created_at?: boolean
   updated_at?: boolean
+  eventreihenrollen?: boolean | Prisma.users$eventreihenrollenArgs<ExtArgs>
+  zugewiesene_eventreihenrollen?: boolean | Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs>
+  _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
 export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -515,10 +750,20 @@ export type usersSelectScalar = {
 }
 
 export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "avatar_url" | "password_hash" | "role" | "is_active" | "must_change_password" | "created_at" | "updated_at", ExtArgs["result"]["users"]>
+export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  eventreihenrollen?: boolean | Prisma.users$eventreihenrollenArgs<ExtArgs>
+  zugewiesene_eventreihenrollen?: boolean | Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs>
+  _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type usersIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "users"
-  objects: {}
+  objects: {
+    eventreihenrollen: Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>[]
+    zugewiesene_eventreihenrollen: Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string | null
@@ -924,6 +1169,8 @@ readonly fields: usersFieldRefs;
  */
 export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  eventreihenrollen<T extends Prisma.users$eventreihenrollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$eventreihenrollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  zugewiesene_eventreihenrollen<T extends Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -980,6 +1227,10 @@ export type usersFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  /**
    * Filter, which users to fetch.
    */
   where: Prisma.usersWhereUniqueInput
@@ -998,6 +1249,10 @@ export type usersFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  /**
    * Filter, which users to fetch.
    */
   where: Prisma.usersWhereUniqueInput
@@ -1015,6 +1270,10 @@ export type usersFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the users
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
   /**
    * Filter, which users to fetch.
    */
@@ -1064,6 +1323,10 @@ export type usersFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  /**
    * Filter, which users to fetch.
    */
   where?: Prisma.usersWhereInput
@@ -1111,6 +1374,10 @@ export type usersFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the users
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
   /**
    * Filter, which users to fetch.
    */
@@ -1160,6 +1427,10 @@ export type usersCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  /**
    * The data needed to create a users.
    */
   data: Prisma.XOR<Prisma.usersCreateInput, Prisma.usersUncheckedCreateInput>
@@ -1207,6 +1478,10 @@ export type usersUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the users
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
   /**
    * The data needed to update a users.
    */
@@ -1274,6 +1549,10 @@ export type usersUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  /**
    * The filter to search for the users to update in case it exists.
    */
   where: Prisma.usersWhereUniqueInput
@@ -1300,6 +1579,10 @@ export type usersDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  /**
    * Filter which users to delete.
    */
   where: Prisma.usersWhereUniqueInput
@@ -1320,6 +1603,54 @@ export type usersDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * users.eventreihenrollen
+ */
+export type users$eventreihenrollenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the eventreihe_benutzerrollen
+   */
+  select?: Prisma.eventreihe_benutzerrollenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the eventreihe_benutzerrollen
+   */
+  omit?: Prisma.eventreihe_benutzerrollenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.eventreihe_benutzerrollenInclude<ExtArgs> | null
+  where?: Prisma.eventreihe_benutzerrollenWhereInput
+  orderBy?: Prisma.eventreihe_benutzerrollenOrderByWithRelationInput | Prisma.eventreihe_benutzerrollenOrderByWithRelationInput[]
+  cursor?: Prisma.eventreihe_benutzerrollenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Eventreihe_benutzerrollenScalarFieldEnum | Prisma.Eventreihe_benutzerrollenScalarFieldEnum[]
+}
+
+/**
+ * users.zugewiesene_eventreihenrollen
+ */
+export type users$zugewiesene_eventreihenrollenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the eventreihe_benutzerrollen
+   */
+  select?: Prisma.eventreihe_benutzerrollenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the eventreihe_benutzerrollen
+   */
+  omit?: Prisma.eventreihe_benutzerrollenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.eventreihe_benutzerrollenInclude<ExtArgs> | null
+  where?: Prisma.eventreihe_benutzerrollenWhereInput
+  orderBy?: Prisma.eventreihe_benutzerrollenOrderByWithRelationInput | Prisma.eventreihe_benutzerrollenOrderByWithRelationInput[]
+  cursor?: Prisma.eventreihe_benutzerrollenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Eventreihe_benutzerrollenScalarFieldEnum | Prisma.Eventreihe_benutzerrollenScalarFieldEnum[]
+}
+
+/**
  * users without action
  */
 export type usersDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1331,4 +1662,8 @@ export type usersDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the users
    */
   omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
 }

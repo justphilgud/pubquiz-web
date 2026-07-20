@@ -10,6 +10,8 @@ import {
 import { loadOwnQuestionWorklists, loadReviewQueue } from "./questionWorklists";
 import { QuestionWorklist } from "./components/QuestionWorklist";
 import { ReviewQueue } from "./components/ReviewQueue";
+import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
+import { getQuestionActor } from "./editor/questionAccess.server";
 
 type QuestionView = "drafts" | "review" | "changes-requested";
 
@@ -30,21 +32,22 @@ export default async function FragenPage({
   const view = getQuestionView(params?.view);
   const session = await requireQuestionEditor();
   const capabilities = getQuestionOverviewCapabilities(session);
+  const actor = await getQuestionActor(session);
+  const managedEventSeriesIds = await getEventSeriesIdsForCapability("REVIEW_QUESTION", session);
+  const canReview = actor.globalRole === "ADMIN" || (managedEventSeriesIds?.length ?? 0) > 0;
   const userId = Number(session.user.id);
 
   const ownWorklists = capabilities.canViewOwnQuestionWorklist
-    ? await loadOwnQuestionWorklists(userId)
+    ? await loadOwnQuestionWorklists(userId, [...actor.assignments.keys()])
     : null;
-  const reviewQueue = capabilities.canViewReviewQueue
-    ? await loadReviewQueue()
+  const reviewQueue = canReview
+    ? await loadReviewQueue(managedEventSeriesIds)
     : null;
 
-  const searchData = capabilities.canViewReviewQueue
-      ? await Promise.all([
+  const searchData = await Promise.all([
         prisma.fragenkategorie.findMany({ orderBy: { kategorie: "asc" } }),
-        getAktiveQuizListe(),
-      ])
-    : null;
+        canReview ? getAktiveQuizListe() : Promise.resolve([]),
+      ]);
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 md:p-8">

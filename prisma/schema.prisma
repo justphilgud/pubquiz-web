@@ -34,18 +34,18 @@ model antworttyp {
 }
 
 model fragen {
-  fragen_id                Int                   @id @default(autoincrement())
+  fragen_id                Int                      @id @default(autoincrement())
   frage                    String
   quelle                   String?
   fragentyp                String?
-  schwierigkeitslevel      Decimal?              @db.Decimal(5, 2)
-  erstellungsdatum         DateTime              @default(dbgenerated("CURRENT_DATE")) @db.Date
-  ist_archiviert           Boolean               @default(false)
+  schwierigkeitslevel      Decimal?                 @db.Decimal(5, 2)
+  erstellungsdatum         DateTime                 @default(dbgenerated("CURRENT_DATE")) @db.Date
+  ist_archiviert           Boolean                  @default(false)
   archivierungsgrund       String?
   vorlage_id               Int?
   antworten                antworten[]
   antwortfelder            frage_antwortfelder[]
-  vorlage                  frage_vorlagen?       @relation(fields: [vorlage_id], references: [vorlage_id])
+  vorlage                  frage_vorlagen?          @relation(fields: [vorlage_id], references: [vorlage_id])
   fragen_kategorien        fragen_kategorien[]
   medien                   medien[]
   generator_laefe          medien_generator_laefe[]
@@ -53,23 +53,25 @@ model fragen {
   relationen_als_ziel      fragen_relationen[]      @relation("fragen_relation_ziel")
   quiz_fragen              quiz_fragen[]
   created_by_user_id       Int?
-  created_at               DateTime              @default(now())
+  created_at               DateTime                 @default(now())
   last_modified_by_user_id Int?
-  updated_at               DateTime              @default(now()) @updatedAt
+  updated_at               DateTime                 @default(now()) @updatedAt
   approved_by_user_id      Int?
   approved_at              DateTime?
-  freigegeben              Boolean               @default(false)
-  ist_unfertig             Boolean               @default(false)
+  freigegeben              Boolean                  @default(false)
+  ist_unfertig             Boolean                  @default(false)
   moderationsnotizen       String?
   kategorienwunsch         String?
-  gueltig_bis              DateTime?              @db.Date
-  review_status            QuestionReviewStatus   @default(DRAFT)
+  gueltig_bis              DateTime?                @db.Date
+  review_status            QuestionReviewStatus     @default(DRAFT)
   submitted_at             DateTime?
   submitted_by_user_id     Int?
   review_feedback          String?
   reviewed_at              DateTime?
   reviewed_by_user_id      Int?
   template_config_json     Json?
+  geltungsbereich          QuestionScope            @default(GLOBAL)
+  eventreihen              fragen_eventreihen[]
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
@@ -80,7 +82,7 @@ model fragen_relationen {
   fragen_relation_id Int      @id @default(autoincrement())
   quell_fragen_id    Int
   ziel_fragen_id     Int
-  antwort_position  Int
+  antwort_position   Int
   typ                String   @db.VarChar(80)
   ist_aktiv          Boolean  @default(true)
   created_at         DateTime @default(now())
@@ -118,19 +120,19 @@ model fragenkategorie {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model medien {
-  medien_id      Int                  @id @default(autoincrement())
-  fragen_id      Int?
-  antwort_id     Int?
-  medientyp_id   Int
-  datei          String
-  sortierung     Int                  @default(1)
-  bemerkung      String?
-  antwortfeld_id Int?
-  slot_key       String?              @db.VarChar(80)
-  antworten      antworten?           @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
-  fragen         fragen?              @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
-  medientyp      medientyp            @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
-  antwortfeld    frage_antwortfelder? @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+  medien_id             Int                            @id @default(autoincrement())
+  fragen_id             Int?
+  antwort_id            Int?
+  medientyp_id          Int
+  datei                 String
+  sortierung            Int                            @default(1)
+  bemerkung             String?
+  antwortfeld_id        Int?
+  slot_key              String?                        @db.VarChar(80)
+  antworten             antworten?                     @relation(fields: [antwort_id], references: [antwort_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_antworten")
+  fragen                fragen?                        @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_medien_fragen")
+  medientyp             medientyp                      @relation(fields: [medientyp_id], references: [medientyp_id], onUpdate: NoAction, map: "fk_medien_medientyp")
+  antwortfeld           frage_antwortfelder?           @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
   generator_lauf_medien medien_generator_lauf_medien[]
 
   @@index([antwort_id], map: "idx_medien_antwort_id")
@@ -146,38 +148,38 @@ model medien {
 }
 
 model medien_generator_laefe {
-  generator_lauf_id Int       @id @default(autoincrement())
-  fragen_id          Int
-  generator_id       String    @db.VarChar(80)
-  generator_version  Int
-  status             String    @db.VarChar(20)
-  input_fingerprint  String?   @db.VarChar(64)
-  error_code         String?   @db.VarChar(80)
-  error_message      String?
-  parameters_json    Json?
-  started_at         DateTime?
-  finished_at        DateTime?
-  created_at         DateTime  @default(now())
-  updated_at         DateTime  @default(now()) @updatedAt
-  fragen             fragen    @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
-  medien             medien_generator_lauf_medien[]
+  generator_lauf_id Int                            @id @default(autoincrement())
+  fragen_id         Int
+  generator_id      String                         @db.VarChar(80)
+  generator_version Int
+  status            String                         @db.VarChar(20)
+  input_fingerprint String?                        @db.VarChar(64)
+  error_code        String?                        @db.VarChar(80)
+  error_message     String?
+  parameters_json   Json?
+  started_at        DateTime?
+  finished_at       DateTime?
+  created_at        DateTime                       @default(now())
+  updated_at        DateTime                       @default(now()) @updatedAt
+  fragen            fragen                         @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  medien            medien_generator_lauf_medien[]
 
+  @@unique([fragen_id, generator_id], map: "uq_generator_lauf_active", where: raw("(status IN ('PENDING', 'PROCESSING'))"))
   @@index([fragen_id, generator_id, created_at], map: "idx_generator_laefe_frage_generator")
   @@index([fragen_id, generator_id, input_fingerprint], map: "idx_generator_laefe_fingerprint")
   @@index([status, updated_at], map: "idx_generator_laefe_status")
-  @@unique([fragen_id, generator_id], map: "uq_generator_lauf_active", where: raw("(status IN ('PENDING', 'PROCESSING'))"))
   @@schema("pubquiz")
 }
 
 model medien_generator_lauf_medien {
-  generator_lauf_medium_id Int       @id @default(autoincrement())
+  generator_lauf_medium_id Int                    @id @default(autoincrement())
   generator_lauf_id        Int
-  medien_id                 Int
-  rolle                     String    @db.VarChar(10)
-  slot_key                  String    @db.VarChar(80)
-  created_at                DateTime  @default(now())
-  generator_lauf            medien_generator_laefe @relation(fields: [generator_lauf_id], references: [generator_lauf_id], onDelete: Cascade)
-  medium                    medien    @relation(fields: [medien_id], references: [medien_id], onDelete: Cascade)
+  medien_id                Int
+  rolle                    String                 @db.VarChar(10)
+  slot_key                 String                 @db.VarChar(80)
+  created_at               DateTime               @default(now())
+  generator_lauf           medien_generator_laefe @relation(fields: [generator_lauf_id], references: [generator_lauf_id], onDelete: Cascade)
+  medium                   medien                 @relation(fields: [medien_id], references: [medien_id], onDelete: Cascade)
 
   @@unique([generator_lauf_id, medien_id, rolle], map: "uq_generator_lauf_medium_rolle")
   @@index([medien_id, rolle], map: "idx_generator_lauf_medien_medium")
@@ -196,8 +198,13 @@ model medientyp {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz {
   quiz_id                 Int                        @id @default(autoincrement())
+  eventreihe_id           Int
   quiz_datum              DateTime?                  @db.Date
   titel                   String?
+  veranstaltungszeit      String?                    @db.VarChar(5)
+  veranstaltungsname      String?                    @db.VarChar(200)
+  karten_url              String?                    @db.VarChar(2048)
+  oeffentliche_url        String?                    @db.VarChar(2048)
   team_anzahl             Int?
   teilnehmer_anzahl       Int?
   bemerkung               String?
@@ -215,6 +222,8 @@ model quiz {
   intro_video_url         String?
   outro_bekanntmachungen  String?
   manuelle_bewertungen    Int?                       @default(0)
+  presentation_template_id String?                   @db.VarChar(64)
+  answer_form_template_id  String?                   @db.VarChar(64)
   quiz_abschnitte         quiz_abschnitte[]
   quiz_block_freigaben    quiz_block_freigaben[]
   quiz_fragen             quiz_fragen[]
@@ -222,7 +231,31 @@ model quiz {
   quiz_team_sessions      quiz_team_sessions[]
   quiz_teams              quiz_teams[]
   team_antworten          team_antworten[]
+  eventreihe              eventreihen                @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
 
+  @@index([eventreihe_id], map: "idx_quiz_eventreihe_id")
+  @@schema("pubquiz")
+}
+
+model eventreihen {
+  eventreihe_id      Int                         @id @default(autoincrement())
+  name               String                      @db.VarChar(150)
+  slug               String                      @unique @db.VarChar(180)
+  oeffentlicher_name String?                     @db.VarChar(150)
+  beschreibung       String?                     @db.VarChar(2000)
+  interne_bemerkung  String?                     @db.VarChar(2000)
+  ist_oeffentlich    Boolean                     @default(false)
+  ist_archiviert     Boolean                     @default(false)
+  archiviert_am      DateTime?
+  created_at         DateTime                    @default(now())
+  updated_at         DateTime                    @default(now()) @updatedAt
+  default_presentation_template_id String        @default("ungegoogelt-default") @db.VarChar(64)
+  default_answer_form_template_id  String        @default("ungegoogelt-default") @db.VarChar(64)
+  quiz               quiz[]
+  benutzerrollen     eventreihe_benutzerrollen[]
+  fragen             fragen_eventreihen[]
+
+  @@index([ist_archiviert, name], map: "idx_eventreihen_status_name")
   @@schema("pubquiz")
 }
 
@@ -375,13 +408,13 @@ model team_antwortfelder {
 }
 
 model frage_antwortfeld_loesungen {
-  loesung_id         Int                 @id @default(autoincrement())
-  antwortfeld_id     Int
-  loesung_text       String
-  sortierung         Int
-  ist_akzeptiert     Boolean             @default(true)
+  loesung_id        Int                 @id @default(autoincrement())
+  antwortfeld_id    Int
+  loesung_text      String
+  sortierung        Int
+  ist_akzeptiert    Boolean             @default(true)
   zusatzinformation String?
-  antwortfeld        frage_antwortfelder @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
+  antwortfeld       frage_antwortfelder @relation(fields: [antwortfeld_id], references: [antwortfeld_id], onDelete: Cascade)
 
   @@schema("pubquiz")
 }
@@ -438,6 +471,20 @@ enum UserRole {
   @@schema("pubquiz")
 }
 
+enum EventSeriesRole {
+  EVENT_MANAGER
+  EDITOR
+
+  @@schema("pubquiz")
+}
+
+enum QuestionScope {
+  GLOBAL
+  EVENT_SERIES
+
+  @@schema("pubquiz")
+}
+
 enum QuestionReviewStatus {
   DRAFT
   IN_REVIEW
@@ -466,5 +513,40 @@ model users {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  eventreihenrollen             eventreihe_benutzerrollen[] @relation("EventSeriesMembershipUser")
+  zugewiesene_eventreihenrollen eventreihe_benutzerrollen[] @relation("EventSeriesMembershipAssigner")
+
+  @@schema("pubquiz")
+}
+
+model eventreihe_benutzerrollen {
+  eventreihe_benutzerrolle_id Int             @id @default(autoincrement())
+  eventreihe_id               Int
+  benutzer_id                 Int
+  rolle                       EventSeriesRole
+  zugewiesen_von_user_id      Int?
+  created_at                  DateTime        @default(now())
+  updated_at                  DateTime        @default(now()) @updatedAt
+  eventreihe                  eventreihen     @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  benutzer                    users           @relation("EventSeriesMembershipUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
+  zugewiesen_von              users?          @relation("EventSeriesMembershipAssigner", fields: [zugewiesen_von_user_id], references: [id], onDelete: SetNull)
+
+  @@unique([benutzer_id, eventreihe_id], map: "uq_eventreihe_benutzerrolle_benutzer_eventreihe")
+  @@index([benutzer_id], map: "idx_eventreihe_benutzerrollen_benutzer")
+  @@index([eventreihe_id], map: "idx_eventreihe_benutzerrollen_eventreihe")
+  @@schema("pubquiz")
+}
+
+model fragen_eventreihen {
+  fragen_eventreihe_id Int         @id @default(autoincrement())
+  fragen_id            Int
+  eventreihe_id        Int
+  created_at           DateTime    @default(now())
+  frage                fragen      @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  eventreihe           eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
+
+  @@unique([fragen_id, eventreihe_id], map: "uq_fragen_eventreihen_frage_eventreihe")
+  @@index([fragen_id], map: "idx_fragen_eventreihen_frage")
+  @@index([eventreihe_id], map: "idx_fragen_eventreihen_eventreihe")
   @@schema("pubquiz")
 }

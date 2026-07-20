@@ -2,10 +2,6 @@ import { issueSignedToken } from "@vercel/blob";
 import { handleUploadPresigned } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import {
-  canCreateQuestions,
-  canEditQuestion,
-} from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import {
   getMediaUploadServerConfig,
@@ -20,6 +16,7 @@ import type { MediaSlotKey } from "@/app/fragen/editor/types";
 import { getMediaSlotDefinition, isMediaSlotKey } from "@/app/fragen/editor/mediaSlots";
 import { questionTemplateDefinitions } from "@/app/fragen/editor/templates/questionTemplates";
 import { findQuestionTemplate, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { getQuestionActor, requireQuestionAccess } from "@/app/fragen/editor/questionAccess.server";
 
 type UploadContext =
   | {
@@ -188,10 +185,12 @@ export async function POST(request: Request) {
         let effectiveTemplateId = context.target === "QUESTION" ? context.templateId : null;
 
         if (context.questionId === null) {
-          if (!canCreateQuestions(session)) {
+          const actor = await getQuestionActor(session);
+          if (actor.globalRole !== "ADMIN" && actor.assignments.size === 0) {
             throw new Error("Frage darf nicht erstellt werden.");
           }
         } else {
+          await requireQuestionAccess(context.questionId, "EDIT");
           const question = await prisma.fragen.findUnique({
             where: { fragen_id: context.questionId },
             select: {
@@ -202,14 +201,7 @@ export async function POST(request: Request) {
             },
           });
 
-          if (
-            !question ||
-            !canEditQuestion(session, {
-              createdByUserId: question.created_by_user_id,
-              reviewStatus: question.review_status,
-              isArchived: question.ist_archiviert,
-            })
-          ) {
+          if (!question) {
             throw new Error("Frage darf nicht bearbeitet werden.");
           }
 

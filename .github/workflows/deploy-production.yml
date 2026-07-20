@@ -1,0 +1,124 @@
+name: Deploy Production
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    name: Approve, migrate and deploy Production
+    if: >-
+      vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
+      (
+        (
+          github.event_name == 'workflow_run' &&
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_repository.full_name == github.repository &&
+          github.event.workflow_run.head_branch == 'main'
+        ) ||
+        (
+          github.event_name == 'workflow_dispatch' &&
+          github.ref == 'refs/heads/main'
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      DEPLOYMENT_ENV: production
+      DEPLOYMENT_EVENT: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event || github.event_name }}
+      DEPLOYMENT_REF: ${{ github.event_name == 'workflow_run' && format('refs/heads/{0}', github.event.workflow_run.head_branch) || github.ref }}
+      DEPLOYMENT_REPOSITORY: ${{ github.repository }}
+      DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
+      EXPECTED_DATABASE_NAME: ${{ vars.EXPECTED_DATABASE_NAME }}
+      EXPECTED_DATABASE_BRANCH: ${{ vars.EXPECTED_DATABASE_BRANCH }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout approved CI revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOYMENT_SHA }}
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate GitHub Production database identity
+        run: npm run deployment:validate
+
+      - name: Inspect migration status before deploy
+        continue-on-error: true
+        run: npm run db:status
+
+      - name: Deploy committed migrations to Production
+        run: npm run db:deploy
+
+      - name: Verify migration status after deploy
+        run: npm run db:status
+
+      - name: Pull Vercel Production configuration
+        run: >-
+          npx --yes vercel@56.3.2 pull --yes --environment=production
+          --token="$VERCEL_TOKEN"
+
+      - name: Validate Vercel Production database identity
+        run: >-
+          npm run deployment:validate --
+          --env-file=.vercel/.env.production.local
+
+      - name: Build Vercel Production
+        run: npx --yes vercel@56.3.2 build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy Vercel Production
+        id: deploy
+        shell: bash
+        run: |
+          deployment_url="$(npx --yes vercel@56.3.2 deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          if [[ ! "$deployment_url" =~ ^https://[A-Za-z0-9.-]+$ ]]; then
+            echo "Vercel hat keine plausible HTTPS-Deployment-URL geliefert." >&2
+            exit 1
+          fi
+          printf 'url=%s\n' "$deployment_url" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test Production
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+        shell: bash
+        run: |
+          status="$(curl --silent --show-error --location --max-time 30 --retry 3 --output /dev/null --write-out '%{http_code}' "$DEPLOYMENT_URL/")"
+          if (( status < 200 || status >= 400 )); then
+            echo "Production-Smoke-Test fehlgeschlagen (HTTP $status)." >&2
+            exit 1
+          fi
+
+      - name: Write Production summary
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+        shell: bash
+        run: |
+          {
+            echo "## Production deployment"
+            echo "- URL: $DEPLOYMENT_URL"
+            echo "- Commit: $DEPLOYMENT_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -210,6 +210,10 @@ export function canManageUsers(session: Session | null) {
   return isAdmin(session);
 }
 
+export function canManageEventSeries(session: Session | null) {
+  return isAdmin(session);
+}
+
 export function canViewAdminTools(session: Session | null) {
   return isAdmin(session);
 }

@@ -28,6 +28,7 @@ import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
 import { TemplateSelector } from "./TemplateSelector";
+import { QuestionScopeSection, type QuestionScopeOption } from "./QuestionScopeSection";
 import { evaluateQuestionQuality } from "../questionQuality";
 import type {
   QuestionAnswerDraft,
@@ -95,8 +96,14 @@ function createAnswer(
   };
 }
 
-function createInitialDraft(): QuestionEditorDraft {
+function createInitialDraft(scopeOptions: { canSelectGlobal: boolean; eventSeries: QuestionScopeOption[] }): QuestionEditorDraft {
   return {
+    scope: scopeOptions.canSelectGlobal ? "GLOBAL" : "EVENT_SERIES",
+    eventSeriesIds: scopeOptions.canSelectGlobal
+      ? []
+      : scopeOptions.eventSeries.length === 1
+        ? [scopeOptions.eventSeries[0].id]
+        : [],
     templateId: null,
     questionText: "",
     questionMedia: [],
@@ -128,6 +135,7 @@ type QuestionEditorProps = {
   locale: AppLocale;
   messages: QuestionEditorMessages;
   templates: QuestionTemplate[];
+  scopeOptions: { canSelectGlobal: boolean; eventSeries: QuestionScopeOption[] };
 };
 
 export function QuestionEditor({
@@ -140,20 +148,21 @@ export function QuestionEditor({
   locale,
   messages,
   templates,
+  scopeOptions,
 }: QuestionEditorProps) {
   const specialQuestionTemplates = templates.filter(
     (template) => template.selectable,
   );
   const router = useRouter();
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
-    initialDraft ?? createInitialDraft(),
+    initialDraft ?? createInitialDraft(scopeOptions),
   );
   const retainedFaceMorphPixelOptionsRef = useRef(
     initialDraft?.templateConfig.createPixelQuestionByAnswer ??
       NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
   );
   const [savedDraftFingerprint, setSavedDraftFingerprint] = useState(() =>
-    getQuestionDraftFingerprint(initialDraft ?? createInitialDraft()),
+    getQuestionDraftFingerprint(initialDraft ?? createInitialDraft(scopeOptions)),
   );
   const [savedQuestionId, setSavedQuestionId] = useState<number | null>(
     questionRecord?.questionId ?? null,
@@ -519,6 +528,8 @@ export function QuestionEditor({
       const result = await saveQuestion({
         questionId: savedQuestionId ?? undefined,
         intent,
+        scope: draft.scope,
+        eventSeriesIds: draft.eventSeriesIds,
         questionText: draft.questionText,
         questionMedia: draft.questionMedia,
         answers: draft.answers.map((answer) => ({
@@ -576,7 +587,7 @@ export function QuestionEditor({
           router.push("/fragen");
           router.refresh();
         } else if (options?.resetAfterSuccess) {
-          const resetDraft = createInitialDraft();
+          const resetDraft = createInitialDraft(scopeOptions);
           retainedFaceMorphPixelOptionsRef.current = {
             ...NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
           };
@@ -789,6 +800,14 @@ export function QuestionEditor({
         aria-busy={pendingAction !== null}
         className="min-w-0 space-y-6 border-0 p-0 disabled:opacity-90"
       >
+        <QuestionScopeSection
+          scope={draft.scope}
+          eventSeriesIds={draft.eventSeriesIds}
+          eventSeries={scopeOptions.eventSeries}
+          canSelectGlobal={scopeOptions.canSelectGlobal}
+          onChange={(scope, eventSeriesIds) => setDraft((current) => ({ ...current, scope, eventSeriesIds }))}
+        />
+
         <TemplateSelector
           templates={specialQuestionTemplates}
           selectedTemplateId={draft.templateId}

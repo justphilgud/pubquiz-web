@@ -5,7 +5,7 @@ import type { QuestionEditorDraft, SaveQuestionResult } from "./types";
 
 function draft(): QuestionEditorDraft {
   return {
-    templateId: null,
+    scope: "GLOBAL", eventSeriesIds: [], templateId: null,
     questionText: "Frage",
     questionMedia: [],
     templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },

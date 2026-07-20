@@ -2,12 +2,10 @@ import {
   archiveQuiz,
   getQuizDetails,
   restoreQuiz,
-  copyQuiz
 } from "../actions";
 
 import {
   ArchiveBoxIcon,
-  DocumentDuplicateIcon,
   LockOpenIcon,
   PlayIcon,
   ArrowLeftIcon,
@@ -16,9 +14,11 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-import { requireAdmin } from "@/app/lib/permissions";
+import { requireQuizViewer } from "../quizAccess.server";
 import Link from "next/link";
 import QuizFragenSortableTable from "./QuizFragenSortableTable";
+import { QuizCopyDialog } from "../QuizCopyDialog";
+import AppHeader from "@/app/components/AppHeader";
 
 type Props = {
   params: Promise<{
@@ -29,8 +29,8 @@ type Props = {
 export default async function QuizDetailPage({
   params,
 }: Props) {
-  await requireAdmin();
   const { quizId } = await params;
+  await requireQuizViewer(Number(quizId));
 
   const quiz = await getQuizDetails(Number(quizId));
 
@@ -60,23 +60,35 @@ export default async function QuizDetailPage({
     await restoreQuiz(quizIdValue);
   }
 
-  async function copyAction() {
-    "use server";
-
-    await copyQuiz({
-      quizId: quizIdValue,
-      neuerTitel: `${quizTitelValue} (Kopie)`,
-    });
-  }
-
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 md:px-8">
+    <><AppHeader /><main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 md:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {quiz.titel}
             </h1>
+
+            <div className="mt-3 flex flex-wrap gap-2 text-sm text-slate-600">
+              <span className="rounded-full bg-white px-3 py-1 ring-1 ring-slate-200">{quiz.eventreihe_name}</span>
+              <span className={`rounded-full px-3 py-1 font-semibold ring-1 ${quiz.quiz_datum ? "bg-white ring-slate-200" : "bg-amber-50 text-amber-900 ring-amber-300"}`}>
+                {quiz.quiz_datum ? `${quiz.quiz_datum}${quiz.veranstaltungszeit ? `, ${quiz.veranstaltungszeit}` : ""}` : "Datum fehlt"}
+              </span>
+              {quiz.veranstaltungsname && <span className="rounded-full bg-white px-3 py-1 ring-1 ring-slate-200">{quiz.veranstaltungsname}</span>}
+            </div>
+
+            {(quiz.karten_url || quiz.oeffentliche_url) && (
+              <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
+                {quiz.karten_url && <a href={quiz.karten_url} target="_blank" rel="noopener noreferrer" className="underline">Route öffnen</a>}
+                {quiz.oeffentliche_url && <a href={quiz.oeffentliche_url} target="_blank" rel="noopener noreferrer" className="underline">Veranstaltungsseite öffnen</a>}
+              </div>
+            )}
+
+            {!quiz.quiz_datum && (
+              <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+                Dieses Bestandsquiz besitzt noch kein Datum. Es bleibt lesbar, muss aber vor dem nächsten Speichern in der Quizverwaltung ergänzt werden.
+              </div>
+            )}
 
             {quiz.ist_archiviert && (
               <div className="mt-3 rounded-xl border border-orange-300 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-700">
@@ -97,15 +109,10 @@ export default async function QuizDetailPage({
               <ArrowLeftIcon className="h-5 w-5" />
             </Link>
 
-            <form action={copyAction}>
-              <button
-                type="submit"
-                title="Quiz kopieren"
-                className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white p-3 text-slate-700 shadow-sm transition hover:bg-slate-50"
-              >
-                <DocumentDuplicateIcon className="h-5 w-5" />
-              </button>
-            </form>
+            <QuizCopyDialog
+              quizId={quizIdValue}
+              quizTitle={quizTitelValue ?? `Quiz ${quizIdValue}`}
+            />
 
             {quiz.ist_archiviert ? (
               <form action={restoreAction}>
@@ -176,6 +183,6 @@ export default async function QuizDetailPage({
           abschnitte={quiz.abschnitte}
         />
       </div>
-    </main>
+    </main></>
   );
 }

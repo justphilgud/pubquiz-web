@@ -2,14 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
-import {
-  canArchiveQuestion,
-  canCloneQuestion,
-  canDeleteQuestion,
-  requireQuestionEditor,
-} from "@/app/lib/permissions";
+import { requireQuestionEditor } from "@/app/lib/permissions";
 import { getCurrentUserId } from "@/app/services/questionService";
 import { getQuestionDeletionBlocker } from "./questionDeletionPolicy";
+import { getQuestionActor, mapQuestionAccessContext } from "./questionAccess.server";
+import { canApproveScopedQuestion, canCloneScopedQuestion, canEditScopedQuestion } from "./questionScopePolicy";
 
 export type QuestionManagementErrorCode =
   | "QUESTION_NOT_FOUND"
@@ -30,6 +27,9 @@ const accessSelect = {
   created_by_user_id: true,
   review_status: true,
   ist_archiviert: true,
+  freigegeben: true,
+  geltungsbereich: true,
+  eventreihen: { select: { eventreihe_id: true } },
 } as const;
 
 export async function cloneQuestion(questionId: number): Promise<ManagementResult> {
@@ -112,16 +112,16 @@ export async function cloneQuestion(questionId: number): Promise<ManagementResul
       },
     });
     if (!source) return { ok: false, code: "QUESTION_NOT_FOUND" };
-    if (!canCloneQuestion(session, {
-      createdByUserId: source.created_by_user_id,
-      reviewStatus: source.review_status,
-      isArchived: source.ist_archiviert,
-    })) return { ok: false, code: "PERMISSION_DENIED" };
+    const actor = await getQuestionActor(session);
+    if (!canCloneScopedQuestion(actor, mapQuestionAccessContext(source))) {
+      return { ok: false, code: "PERMISSION_DENIED" };
+    }
 
     const userId = getCurrentUserId(session);
     const clone = await prisma.fragen.create({
       data: {
         frage: source.frage,
+        geltungsbereich: source.geltungsbereich,
         quelle: source.quelle,
         fragentyp: source.fragentyp,
         schwierigkeitslevel: source.schwierigkeitslevel,
@@ -144,6 +144,9 @@ export async function cloneQuestion(questionId: number): Promise<ManagementResul
             },
           })),
         },
+        eventreihen: source.geltungsbereich === "EVENT_SERIES"
+          ? { create: source.eventreihen.map((entry) => ({ eventreihe_id: entry.eventreihe_id })) }
+          : undefined,
         medien: {
           create: source.medien.map((medium) => ({
             medientyp_id: medium.medientyp_id,
@@ -212,7 +215,8 @@ export async function setQuestionArchived(
     select: accessSelect,
   });
   if (!question) return { ok: false, code: "QUESTION_NOT_FOUND" };
-  if (!canArchiveQuestion(session, { createdByUserId: question.created_by_user_id })) {
+  const actor = await getQuestionActor(session);
+  if (!canEditScopedQuestion(actor, mapQuestionAccessContext(question))) {
     return { ok: false, code: "PERMISSION_DENIED" };
   }
   await prisma.fragen.update({
@@ -232,11 +236,11 @@ export async function deleteQuestionPermanently(
   questionId: number,
 ): Promise<ManagementResult> {
   const session = await requireQuestionEditor();
-  if (!canDeleteQuestion(session)) return { ok: false, code: "PERMISSION_DENIED" };
   const question = await prisma.fragen.findUnique({
     where: { fragen_id: questionId },
     select: {
       fragen_id: true,
+      ...accessSelect,
       _count: {
         select: {
           quiz_fragen: true,
@@ -251,6 +255,10 @@ export async function deleteQuestionPermanently(
     },
   });
   if (!question) return { ok: false, code: "QUESTION_NOT_FOUND" };
+  const actor = await getQuestionActor(session);
+  if (!canApproveScopedQuestion(actor, mapQuestionAccessContext(question))) {
+    return { ok: false, code: "PERMISSION_DENIED" };
+  }
   const blocker = getQuestionDeletionBlocker({
     quizAssignments: question._count.quiz_fragen,
     teamAnswers:

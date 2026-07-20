@@ -6,18 +6,23 @@ import { getUserInitials, getUserRoleLabel } from "@/app/lib/userDisplay";
 import { ArchiveUser } from "./ArchiveUser";
 import { ReactivateUser } from "./ReactivateUser";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { getEventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
+import { EventSeriesMembershipManager } from "@/app/eventreihen/EventSeriesMembershipManager";
 
 export default async function UsersPage() {
   await requireAdmin();
 
-  const users = await prisma.users.findMany({
-    orderBy: [
-      { is_active: "desc" },
-      { role: "asc" },
-      { name: "asc" },
-      { email: "asc" },
-    ],
-  });
+  const [users, membershipData] = await Promise.all([
+    prisma.users.findMany({
+      orderBy: [
+        { is_active: "desc" },
+        { role: "asc" },
+        { name: "asc" },
+        { email: "asc" },
+      ],
+    }),
+    getEventSeriesMembershipOptions(),
+  ]);
 
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900">
@@ -35,11 +40,12 @@ export default async function UsersPage() {
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {users.map((user) => (
-            <div
+            <article
               key={user.id}
-              className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 last:border-b-0"
+              className="border-b border-slate-100 px-4 py-4 last:border-b-0 sm:px-5"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-700">
                   {getUserInitials(user.name, user.email)}
                 </div>
@@ -50,7 +56,7 @@ export default async function UsersPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                   {getUserRoleLabel(user.role)}
                 </span>
@@ -81,7 +87,16 @@ export default async function UsersPage() {
                   )}
                 </div>
               </div>
-            </div>
+              </div>
+              {user.is_active && (
+                <details className="mt-4 rounded-xl border border-slate-200 p-3">
+                  <summary className="min-h-11 cursor-pointer py-2 font-semibold">Eventreihenzuordnungen</summary>
+                  <div className="mt-3">
+                    <EventSeriesMembershipManager data={membershipData} fixedUserId={user.id} compact />
+                  </div>
+                </details>
+              )}
+            </article>
           ))}
         </div>
       </div>

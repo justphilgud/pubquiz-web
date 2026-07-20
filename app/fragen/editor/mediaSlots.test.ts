@@ -70,7 +70,7 @@ test("media ownership requires exactly one parent", () => {
 
 test("optional standard media does not block while required template media does", () => {
   const base: QuestionEditorDraft = {
-    templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
+    scope: "GLOBAL", eventSeriesIds: [], templateId: null, templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "Frage",
     questionMedia: [],
     answers: [{ id: "a", text: "Antwort", isCorrect: true, additionalInfo: "", media: null }],
@@ -84,7 +84,7 @@ test("optional standard media does not block while required template media does"
 
 test("whitespace-only question text is rejected by the central quality check", () => {
   const draft: QuestionEditorDraft = {
-    templateId: null,
+    scope: "GLOBAL", eventSeriesIds: [], templateId: null,
     templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "   ",
     questionMedia: [],
@@ -106,7 +106,7 @@ test("whitespace-only question text is rejected by the central quality check", (
 
 test("an empty correct-answer card is not accepted as a correct solution", () => {
   const draft: QuestionEditorDraft = {
-    templateId: null,
+    scope: "GLOBAL", eventSeriesIds: [], templateId: null,
     templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "Frage",
     questionMedia: [],
@@ -136,7 +136,7 @@ test("FaceMorph requires its result and both answer images", () => {
     existingMediaCount: 1,
   });
   const draft: QuestionEditorDraft = {
-    templateId: "face_morph",
+    scope: "GLOBAL", eventSeriesIds: [], templateId: "face_morph",
     templateConfig: { stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 }, createPixelQuestionByAnswer: { answer1: false, answer2: false } },
     questionText: "Wer ist zu sehen?",
     questionMedia: [{

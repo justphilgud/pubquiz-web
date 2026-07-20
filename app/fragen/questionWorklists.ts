@@ -51,12 +51,20 @@ function toWorklistEntry(
 function loadQuestionsByStatus(
   userId: number,
   status: QuestionReviewStatusType,
+  accessibleEventSeriesIds: number[],
 ) {
   return prisma.fragen.findMany({
     where: {
       created_by_user_id: userId,
       review_status: status,
       ist_archiviert: false,
+      OR: [
+        { geltungsbereich: "GLOBAL" },
+        {
+          geltungsbereich: "EVENT_SERIES",
+          eventreihen: { some: { eventreihe_id: { in: accessibleEventSeriesIds } } },
+        },
+      ],
     },
     orderBy: { updated_at: "desc" },
     take: OWN_WORKLIST_LIMIT,
@@ -64,11 +72,11 @@ function loadQuestionsByStatus(
   });
 }
 
-export async function loadOwnQuestionWorklists(userId: number) {
+export async function loadOwnQuestionWorklists(userId: number, accessibleEventSeriesIds: number[]) {
   const [drafts, submitted, changesRequested] = await Promise.all([
-    loadQuestionsByStatus(userId, QuestionReviewStatus.DRAFT),
-    loadQuestionsByStatus(userId, QuestionReviewStatus.IN_REVIEW),
-    loadQuestionsByStatus(userId, QuestionReviewStatus.CHANGES_REQUESTED),
+    loadQuestionsByStatus(userId, QuestionReviewStatus.DRAFT, accessibleEventSeriesIds),
+    loadQuestionsByStatus(userId, QuestionReviewStatus.IN_REVIEW, accessibleEventSeriesIds),
+    loadQuestionsByStatus(userId, QuestionReviewStatus.CHANGES_REQUESTED, accessibleEventSeriesIds),
   ]);
 
   return {
@@ -93,11 +101,20 @@ export type ReviewQueueEntry = {
   categories: string[];
 };
 
-export async function loadReviewQueue(): Promise<ReviewQueueEntry[]> {
+export async function loadReviewQueue(managedEventSeriesIds: number[] | null): Promise<ReviewQueueEntry[]> {
   const questions = await prisma.fragen.findMany({
     where: {
       review_status: QuestionReviewStatus.IN_REVIEW,
       ist_archiviert: false,
+      ...(managedEventSeriesIds === null
+        ? {}
+        : {
+            geltungsbereich: "EVENT_SERIES" as const,
+            eventreihen: {
+              some: { eventreihe_id: { in: managedEventSeriesIds } },
+              none: { eventreihe_id: { notIn: managedEventSeriesIds } },
+            },
+          }),
     },
     orderBy: [{ submitted_at: "asc" }, { updated_at: "asc" }],
     take: REVIEW_QUEUE_LIMIT,

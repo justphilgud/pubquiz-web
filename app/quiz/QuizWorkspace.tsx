@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import QuizForm from "./QuizForm";
 import SchnellQuizForm from "./SchnellQuizForm";
 import type { QuizResult } from "./actions";
+import type { EventSeriesOption } from "@/app/eventreihen/actions";
+import type { RenderingMessages } from "@/app/i18n/renderingMessages";
 
 type Kategorie = {
   fragenkategorie_id: number;
@@ -16,9 +18,15 @@ type Tab = "verwaltung" | "schnellquiz";
 export default function QuizWorkspace({
   quizze,
   kategorien,
+  eventSeries,
+  initialEventSeriesId,
+  renderingMessages,
 }: {
   quizze: QuizResult[];
   kategorien: Kategorie[];
+  eventSeries: EventSeriesOption[];
+  initialEventSeriesId?: number;
+  renderingMessages: RenderingMessages;
 }) {
   const searchParams = useSearchParams();
 
@@ -33,11 +41,11 @@ export default function QuizWorkspace({
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Quiz-Verwaltung
+              Alle Quizze
             </h1>
 
             <p className="mt-2 text-slate-600">
-              Lege Quiz-Abende an, verwalte bestehende Quizze oder erstelle ein Schnellquiz.
+              Verwalte alle Quizze über sämtliche Eventreihen hinweg oder erstelle ein Schnellquiz.
             </p>
           </div>
 
@@ -67,11 +75,20 @@ export default function QuizWorkspace({
         </div>
 
         <div className={activeTab === "verwaltung" ? "block" : "hidden"}>
-          <QuizForm quizze={quizze} />
+          <QuizForm
+            quizze={quizze}
+            eventSeries={eventSeries}
+            initialEventSeriesId={initialEventSeriesId}
+            messages={renderingMessages}
+          />
         </div>
 
         <div className={activeTab === "schnellquiz" ? "block" : "hidden"}>
-          <SchnellQuizForm kategorien={kategorien} />
+          <SchnellQuizForm
+            kategorien={kategorien}
+            eventSeries={eventSeries.filter((entry) => !entry.isArchived)}
+            initialEventSeriesId={initialEventSeriesId}
+          />
         </div>
       </div>
     </main>

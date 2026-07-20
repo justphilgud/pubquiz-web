@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "description": "Known findings present before the CI/CD package. Counts may only decrease and must never be increased.",
+  "findings": {
+    "app/quiz/[quizId]/antworten/QuizAntwortClient.tsx": {
+      "1:@next/next/no-img-element": 1,
+      "1:@typescript-eslint/no-unused-vars": 3,
+      "2:react-hooks/set-state-in-effect": 2
+    },
+    "app/quiz/[quizId]/moderation/ModerationClient.tsx": {
+      "1:@typescript-eslint/no-unused-vars": 1,
+      "1:react-hooks/exhaustive-deps": 2
+    },
+    "app/quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx": {
+      "1:@next/next/no-img-element": 4,
+      "1:@typescript-eslint/no-unused-vars": 6,
+      "1:react-hooks/exhaustive-deps": 6,
+      "2:react-hooks/set-state-in-effect": 4
+    }
+  }
+}

@@ -200,6 +200,13 @@ export type JsonNullableFilterBase<$PrismaModel = never> = {
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
 }
 
+export type EnumQuestionScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuestionScope | Prisma.EnumQuestionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuestionScopeFilter<$PrismaModel> | $Enums.QuestionScope
+}
+
 export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
@@ -297,6 +304,16 @@ export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
   _max?: Prisma.NestedJsonNullableFilter<$PrismaModel>
 }
 
+export type EnumQuestionScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuestionScope | Prisma.EnumQuestionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuestionScopeWithAggregatesFilter<$PrismaModel> | $Enums.QuestionScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumQuestionScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumQuestionScopeFilter<$PrismaModel>
+}
+
 export type DecimalFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -339,6 +356,23 @@ export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
+}
+
+export type EnumEventSeriesRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.EventSeriesRole | Prisma.EnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel> | $Enums.EventSeriesRole
+}
+
+export type EnumEventSeriesRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EventSeriesRole | Prisma.EnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEventSeriesRoleWithAggregatesFilter<$PrismaModel> | $Enums.EventSeriesRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel>
 }
 
 export type NestedIntFilter<$PrismaModel = never> = {
@@ -505,6 +539,13 @@ export type NestedEnumQuestionReviewStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumQuestionReviewStatusFilter<$PrismaModel> | $Enums.QuestionReviewStatus
 }
 
+export type NestedEnumQuestionScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuestionScope | Prisma.EnumQuestionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuestionScopeFilter<$PrismaModel> | $Enums.QuestionScope
+}
+
 export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
@@ -610,6 +651,16 @@ export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
 }
 
+export type NestedEnumQuestionScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuestionScope | Prisma.EnumQuestionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuestionScope[] | Prisma.ListEnumQuestionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuestionScopeWithAggregatesFilter<$PrismaModel> | $Enums.QuestionScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumQuestionScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumQuestionScopeFilter<$PrismaModel>
+}
+
 export type NestedDecimalFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -652,6 +703,23 @@ export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumEventSeriesRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.EventSeriesRole | Prisma.EnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel> | $Enums.EventSeriesRole
+}
+
+export type NestedEnumEventSeriesRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EventSeriesRole | Prisma.EnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEventSeriesRoleWithAggregatesFilter<$PrismaModel> | $Enums.EventSeriesRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel>
 }
 
 
