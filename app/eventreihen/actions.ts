@@ -15,6 +15,8 @@ import {
   type EventSeriesInput,
 } from "./eventSeriesPolicy";
 import { getQuizTemporalStatus } from "@/app/quiz/quizMasterData";
+import { getActorForSession } from "@/app/roles/roleAssignments.server";
+import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 
 export type EventSeriesOption = {
   id: number;
@@ -84,6 +86,7 @@ function toListItem(series: {
 
 export async function getEventSeriesList(): Promise<EventSeriesListItem[]> {
   const session = await requireSession();
+  const actor = await getActorForSession(session);
   const visibleIds = await getEventSeriesIdsForCapability("VIEW", session);
   const editableIds = await getEventSeriesIdsForCapability("EDIT", session);
   const series = await prisma.eventreihen.findMany({
@@ -93,7 +96,7 @@ export async function getEventSeriesList(): Promise<EventSeriesListItem[]> {
   });
   return series.map((entry) => toListItem(entry, {
     canEdit: editableIds === null || editableIds.includes(entry.eventreihe_id),
-    canChangeArchiveState: session.user?.role === "ADMIN",
+    canChangeArchiveState: isAdministrator(actor),
   }));
 }
 
@@ -265,8 +268,8 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
     include: {
       _count: { select: { quiz: true } },
       quiz: { orderBy: [{ quiz_datum: "desc" }, { quiz_id: "desc" }] },
-      benutzerrollen: {
-        where: { benutzer: { is_active: true } },
+      rollenzuweisungen: {
+        where: { scope_typ: "EVENT_SERIES", benutzer: { is_active: true } },
         orderBy: [{ rolle: "asc" }, { benutzer: { name: "asc" } }],
         select: {
           rolle: true,
@@ -278,17 +281,17 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
   if (!series) return null;
   return {
     ...toListItem(series, {
-      canEdit: access.session.user?.role === "ADMIN" || access.assignmentRole === "EVENT_MANAGER",
-      canChangeArchiveState: access.session.user?.role === "ADMIN",
+      canEdit: isAdministrator(access.actor) || access.assignmentRole === "EVENT_MANAGER",
+      canChangeArchiveState: isAdministrator(access.actor),
     }),
-    canManageQuizzes: access.session.user?.role === "ADMIN" || access.assignmentRole === "EVENT_MANAGER",
-    canManageMemberships: access.session.user?.role === "ADMIN",
+    canManageQuizzes: isAdministrator(access.actor) || access.assignmentRole === "EVENT_MANAGER",
+    canManageMemberships: isAdministrator(access.actor),
     accessSummary: {
-      managerCount: series.benutzerrollen.filter(
+      managerCount: series.rollenzuweisungen.filter(
         ({ rolle }) => rolle === "EVENT_MANAGER",
       ).length,
-      editorCount: series.benutzerrollen.filter(
-        ({ rolle }) => rolle === "EVENT_EDITOR",
+      editorCount: series.rollenzuweisungen.filter(
+        ({ rolle }) => rolle === "EDITOR",
       ).length,
     },
     quizzes: series.quiz.map((quiz) => ({

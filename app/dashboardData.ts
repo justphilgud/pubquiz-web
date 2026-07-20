@@ -434,8 +434,12 @@ export async function loadAdminUserDashboardData(): Promise<AdminUserDashboardDa
   const [activeUsers, editors, admins, passwordChangeRequired, inactiveUsers] =
     await Promise.all([
       prisma.users.count({ where: { is_active: true } }),
-      prisma.users.count({ where: { is_active: true, role: "EDITOR" } }),
-      prisma.users.count({ where: { is_active: true, role: "ADMIN" } }),
+      prisma.benutzer_rollenzuweisungen.count({
+        where: { scope_typ: "GLOBAL", rolle: "EDITOR", benutzer: { is_active: true } },
+      }),
+      prisma.benutzer_rollenzuweisungen.count({
+        where: { scope_typ: "GLOBAL", rolle: "ADMIN", benutzer: { is_active: true } },
+      }),
       prisma.users.count({
         where: { is_active: true, must_change_password: true },
       }),

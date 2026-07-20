@@ -1,16 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
+import { deRoleMessages } from "@/app/i18n/messages/de/roles";
+import { logRoleAudit } from "@/app/roles/roleAudit.server";
+import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
+import { isLastActiveRoleHolder } from "@/app/roles/roleAssignmentPolicy";
 import {
   isEventSeriesAssignmentRole,
-  removingAssignmentLeavesNoEventManager,
   type EventSeriesAssignmentRole,
 } from "./eventSeriesAccessPolicy";
-import { deRoleMessages } from "@/app/i18n/messages/de/roles";
 
-export type EventSeriesMembership = {
+export type EventSeriesRoleAssignment = {
   id: number;
   eventSeriesId: number;
   eventSeriesName: string;
@@ -21,27 +24,36 @@ export type EventSeriesMembership = {
   role: EventSeriesAssignmentRole;
 };
 
-export type EventSeriesMembershipOptions = {
+export type RoleAssignmentOptions = {
   users: { id: number; name: string | null; email: string }[];
   eventSeries: { id: number; name: string }[];
-  memberships: EventSeriesMembership[];
+  assignments: EventSeriesRoleAssignment[];
 };
 
-export type MembershipActionResult = {
+export type RoleAssignmentActionResult = {
   success: boolean;
   message: string;
-  requiresConfirmation?: boolean;
 };
 
-function revalidateMembershipPages(eventSeriesId: number) {
+function revalidateRolePages(eventSeriesId: number) {
   revalidatePath("/admin/users");
   revalidatePath("/admin/eventreihen");
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`);
 }
 
-export async function getEventSeriesMembershipOptions(): Promise<EventSeriesMembershipOptions> {
+function legacyEventSeriesRole(role: EventSeriesAssignmentRole) {
+  return role === "EDITOR" ? "EVENT_EDITOR" as const : "EVENT_MANAGER" as const;
+}
+
+function actorId(session: { user?: { id?: string } }) {
+  const id = Number(session.user?.id);
+  if (!Number.isInteger(id) || id <= 0) throw new Error("Ungültige Anmeldung.");
+  return id;
+}
+
+export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions> {
   await requireAdmin();
-  const [users, eventSeries, memberships] = await Promise.all([
+  const [users, eventSeries, assignments] = await Promise.all([
     prisma.users.findMany({
       where: { is_active: true },
       orderBy: [{ name: "asc" }, { email: "asc" }],
@@ -52,10 +64,11 @@ export async function getEventSeriesMembershipOptions(): Promise<EventSeriesMemb
       orderBy: { name: "asc" },
       select: { eventreihe_id: true, name: true },
     }),
-    prisma.eventreihe_benutzerrollen.findMany({
+    prisma.benutzer_rollenzuweisungen.findMany({
+      where: { scope_typ: "EVENT_SERIES" },
       orderBy: [{ eventreihe: { name: "asc" } }, { benutzer: { name: "asc" } }],
       select: {
-        eventreihe_benutzerrolle_id: true,
+        rollenzuweisung_id: true,
         eventreihe_id: true,
         benutzer_id: true,
         rolle: true,
@@ -64,166 +77,227 @@ export async function getEventSeriesMembershipOptions(): Promise<EventSeriesMemb
       },
     }),
   ]);
-
   return {
     users,
     eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
-    memberships: memberships.map((membership) => ({
-      id: membership.eventreihe_benutzerrolle_id,
-      eventSeriesId: membership.eventreihe_id,
-      eventSeriesName: membership.eventreihe.name,
-      eventSeriesArchived: membership.eventreihe.ist_archiviert,
-      userId: membership.benutzer_id,
-      userName: membership.benutzer.name,
-      userEmail: membership.benutzer.email,
-      role: membership.rolle as EventSeriesAssignmentRole,
-    })),
+    assignments: assignments.flatMap((assignment) =>
+      assignment.eventreihe_id !== null && isEventSeriesAssignmentRole(assignment.rolle)
+        ? [{
+            id: assignment.rollenzuweisung_id,
+            eventSeriesId: assignment.eventreihe_id,
+            eventSeriesName: assignment.eventreihe?.name ?? "",
+            eventSeriesArchived: assignment.eventreihe?.ist_archiviert ?? false,
+            userId: assignment.benutzer_id,
+            userName: assignment.benutzer.name,
+            userEmail: assignment.benutzer.email,
+            role: assignment.rolle,
+          }]
+        : [],
+    ),
   };
 }
 
-export async function addEventSeriesMembership(input: {
+export async function addEventSeriesRoleAssignment(input: {
   userId: number;
   eventSeriesId: number;
   role: string;
-}): Promise<MembershipActionResult> {
+}): Promise<RoleAssignmentActionResult> {
   const session = await requireAdmin();
-  if (!Number.isInteger(input.userId) || !Number.isInteger(input.eventSeriesId) || !isEventSeriesAssignmentRole(input.role)) {
-    return { success: false, message: "Ungültige Zuordnung." };
+  if (!Number.isInteger(input.userId) || !Number.isInteger(input.eventSeriesId) ||
+    !isEventSeriesAssignmentRole(input.role)) {
+    logRoleAudit("invalid_role_assignment_rejected", { scope: "EVENT_SERIES" });
+    return { success: false, message: deRoleMessages.messages.invalidAssignment };
   }
-
-  const [user, eventSeries] = await Promise.all([
-    prisma.users.findFirst({ where: { id: input.userId, is_active: true }, select: { id: true } }),
-    prisma.eventreihen.findFirst({
-      where: { eventreihe_id: input.eventSeriesId, ist_archiviert: false },
-      select: { eventreihe_id: true },
-    }),
-  ]);
-  if (!user || !eventSeries) {
-    return { success: false, message: "Aktiver Benutzer oder aktive Eventreihe nicht gefunden." };
-  }
-
-  const existing = await prisma.eventreihe_benutzerrollen.findUnique({
-    where: { benutzer_id_eventreihe_id: { benutzer_id: input.userId, eventreihe_id: input.eventSeriesId } },
-    select: { rolle: true },
-  });
-  if (existing) {
-    return {
-      success: false,
-      message: deRoleMessages.messages.duplicateAssignment,
-    };
-  }
-
-  const assignedBy = Number(session.user?.id);
+  const role = input.role;
+  const assignedById = actorId(session);
   try {
-    await prisma.eventreihe_benutzerrollen.create({
-      data: {
-        benutzer_id: input.userId,
-        eventreihe_id: input.eventSeriesId,
-        rolle: input.role,
-        zugewiesen_von_user_id: Number.isInteger(assignedBy) ? assignedBy : null,
-      },
+    const result = await withSerializableTransaction(async (transaction) => {
+      const [user, eventSeries, assignment, legacy] = await Promise.all([
+        transaction.users.findFirst({ where: { id: input.userId, is_active: true }, select: { id: true } }),
+        transaction.eventreihen.findFirst({
+          where: { eventreihe_id: input.eventSeriesId, ist_archiviert: false },
+          select: { eventreihe_id: true },
+        }),
+        transaction.benutzer_rollenzuweisungen.findFirst({
+          where: {
+            benutzer_id: input.userId,
+            eventreihe_id: input.eventSeriesId,
+            scope_typ: "EVENT_SERIES",
+          },
+          select: { rollenzuweisung_id: true },
+        }),
+        transaction.eventreihe_benutzerrollen.findUnique({
+          where: {
+            benutzer_id_eventreihe_id: {
+              benutzer_id: input.userId,
+              eventreihe_id: input.eventSeriesId,
+            },
+          },
+          select: { eventreihe_benutzerrolle_id: true },
+        }),
+      ]);
+      if (!user || !eventSeries) return "missing" as const;
+      if (Boolean(assignment) !== Boolean(legacy)) return "inconsistent" as const;
+      if (assignment) return "duplicate" as const;
+      await transaction.benutzer_rollenzuweisungen.create({
+        data: {
+          benutzer_id: input.userId,
+          eventreihe_id: input.eventSeriesId,
+          rolle: role,
+          scope_typ: "EVENT_SERIES",
+          zugewiesen_von_user_id: assignedById,
+        },
+      });
+      await transaction.eventreihe_benutzerrollen.create({
+        data: {
+          benutzer_id: input.userId,
+          eventreihe_id: input.eventSeriesId,
+          rolle: legacyEventSeriesRole(role),
+          zugewiesen_von_user_id: assignedById,
+        },
+      });
+      return "created" as const;
     });
+    if (result === "missing") return { success: false, message: deRoleMessages.messages.inactiveTarget };
+    if (result === "duplicate") return { success: false, message: deRoleMessages.messages.duplicateAssignment };
+    if (result === "inconsistent") {
+      logRoleAudit("legacy_assignment_inconsistency", {
+        userId: input.userId,
+        eventSeriesId: input.eventSeriesId,
+      });
+      return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
+    }
   } catch (error) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002"
-    ) {
-      return {
-        success: false,
-        message: deRoleMessages.messages.duplicateAssignment,
-      };
+    if (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") {
+      return { success: false, message: deRoleMessages.messages.duplicateAssignment };
     }
     throw error;
   }
-  revalidateMembershipPages(input.eventSeriesId);
-  return { success: true, message: deRoleMessages.messages.addSuccess };
+  logRoleAudit("role_assignment_added", {
+    userId: input.userId,
+    eventSeriesId: input.eventSeriesId,
+    role,
+  });
+  revalidateRolePages(input.eventSeriesId);
+  return { success: true, message: deRoleMessages.messages.assignmentSaved };
 }
 
-export async function changeEventSeriesMembershipRole(input: {
-  membershipId: number;
-  role: string;
-  confirmedWithoutManager?: boolean;
-}): Promise<MembershipActionResult> {
-  const session = await requireAdmin();
-  if (
-    !Number.isInteger(input.membershipId) ||
-    input.membershipId <= 0 ||
-    !isEventSeriesAssignmentRole(input.role)
-  ) {
-    return { success: false, message: "Ungültige Zuordnung." };
-  }
-
-  const existing = await prisma.eventreihe_benutzerrollen.findUnique({
-    where: { eventreihe_benutzerrolle_id: input.membershipId },
-    select: { eventreihe_id: true, rolle: true },
-  });
-  if (!existing) {
-    return { success: false, message: "Zuordnung nicht gefunden." };
-  }
-  if (
-    existing.rolle === "EVENT_MANAGER" &&
-    input.role === "EVENT_EDITOR"
-  ) {
-    const managerCount = await prisma.eventreihe_benutzerrollen.count({
-      where: { eventreihe_id: existing.eventreihe_id, rolle: "EVENT_MANAGER" },
-    });
-    if (managerCount <= 1 && !input.confirmedWithoutManager) {
-      return {
-        success: false,
-        requiresConfirmation: true,
-        message: deRoleMessages.messages.noManagerWarning,
-      };
-    }
-  }
-
-  const assignedBy = Number(session.user?.id);
-  await prisma.eventreihe_benutzerrollen.update({
-    where: { eventreihe_benutzerrolle_id: input.membershipId },
-    data: {
-      rolle: input.role,
-      zugewiesen_von_user_id: Number.isInteger(assignedBy) ? assignedBy : null,
+async function activeManagerCount(
+  transaction: Prisma.TransactionClient,
+  eventSeriesId: number,
+) {
+  return transaction.benutzer_rollenzuweisungen.count({
+    where: {
+      eventreihe_id: eventSeriesId,
+      scope_typ: "EVENT_SERIES",
+      rolle: "EVENT_MANAGER",
+      benutzer: { is_active: true },
     },
   });
-  revalidateMembershipPages(existing.eventreihe_id);
-  return { success: true, message: deRoleMessages.messages.changeSuccess };
 }
 
-export async function removeEventSeriesMembership(
-  membershipId: number,
-  confirmedWithoutManager = false,
-): Promise<MembershipActionResult> {
+export async function changeEventSeriesRoleAssignment(input: {
+  assignmentId: number;
+  role: string;
+}): Promise<RoleAssignmentActionResult> {
+  const session = await requireAdmin();
+  if (!Number.isInteger(input.assignmentId) || input.assignmentId <= 0 ||
+    !isEventSeriesAssignmentRole(input.role)) {
+    return { success: false, message: deRoleMessages.messages.invalidAssignment };
+  }
+  const role = input.role;
+  const assignedById = actorId(session);
+  const result = await withSerializableTransaction(async (transaction) => {
+    const existing = await transaction.benutzer_rollenzuweisungen.findUnique({
+      where: { rollenzuweisung_id: input.assignmentId },
+      select: {
+        benutzer_id: true,
+        eventreihe_id: true,
+        rolle: true,
+        benutzer: { select: { is_active: true } },
+        eventreihe: { select: { ist_archiviert: true } },
+      },
+    });
+    if (!existing || existing.eventreihe_id === null ||
+      !isEventSeriesAssignmentRole(existing.rolle)) return { kind: "missing" as const };
+    if (existing.rolle === role) {
+      return { kind: "unchanged" as const, eventSeriesId: existing.eventreihe_id };
+    }
+    if (existing.rolle === "EVENT_MANAGER" && role === "EDITOR" &&
+      existing.benutzer.is_active &&
+      !existing.eventreihe?.ist_archiviert &&
+      isLastActiveRoleHolder(await activeManagerCount(transaction, existing.eventreihe_id))) {
+      return { kind: "lastManager" as const, eventSeriesId: existing.eventreihe_id };
+    }
+    const legacy = await transaction.eventreihe_benutzerrollen.updateMany({
+      where: { benutzer_id: existing.benutzer_id, eventreihe_id: existing.eventreihe_id },
+      data: { rolle: legacyEventSeriesRole(role), zugewiesen_von_user_id: assignedById },
+    });
+    if (legacy.count !== 1) return { kind: "inconsistent" as const, eventSeriesId: existing.eventreihe_id };
+    await transaction.benutzer_rollenzuweisungen.update({
+      where: { rollenzuweisung_id: input.assignmentId },
+      data: { rolle: role, zugewiesen_von_user_id: assignedById },
+    });
+    return { kind: "changed" as const, eventSeriesId: existing.eventreihe_id };
+  });
+  if (result.kind === "missing") return { success: false, message: deRoleMessages.messages.assignmentNotFound };
+  if (result.kind === "lastManager") {
+    logRoleAudit("last_event_manager_protected", { eventSeriesId: result.eventSeriesId });
+    return { success: false, message: deRoleMessages.messages.lastManagerProtected };
+  }
+  if (result.kind === "inconsistent") {
+    logRoleAudit("legacy_assignment_inconsistency", { eventSeriesId: result.eventSeriesId });
+    return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
+  }
+  revalidateRolePages(result.eventSeriesId);
+  if (result.kind === "changed") {
+    logRoleAudit("role_assignment_changed", { eventSeriesId: result.eventSeriesId, role });
+  }
+  return { success: true, message: deRoleMessages.messages.assignmentSaved };
+}
+
+export async function removeEventSeriesRoleAssignment(
+  assignmentId: number,
+): Promise<RoleAssignmentActionResult> {
   await requireAdmin();
-  if (!Number.isInteger(membershipId) || membershipId <= 0) {
-    return { success: false, message: "Ungültige Zuordnung." };
+  if (!Number.isInteger(assignmentId) || assignmentId <= 0) {
+    return { success: false, message: deRoleMessages.messages.invalidAssignment };
   }
-
-  const membership = await prisma.eventreihe_benutzerrollen.findUnique({
-    where: { eventreihe_benutzerrolle_id: membershipId },
-    select: { eventreihe_id: true, rolle: true },
+  const result = await withSerializableTransaction(async (transaction) => {
+    const assignment = await transaction.benutzer_rollenzuweisungen.findUnique({
+      where: { rollenzuweisung_id: assignmentId },
+      select: {
+        benutzer_id: true,
+        eventreihe_id: true,
+        rolle: true,
+        benutzer: { select: { is_active: true } },
+        eventreihe: { select: { ist_archiviert: true } },
+      },
+    });
+    if (!assignment || assignment.eventreihe_id === null ||
+      !isEventSeriesAssignmentRole(assignment.rolle)) return { kind: "missing" as const };
+    if (assignment.rolle === "EVENT_MANAGER" && assignment.benutzer.is_active &&
+      !assignment.eventreihe?.ist_archiviert &&
+      isLastActiveRoleHolder(await activeManagerCount(transaction, assignment.eventreihe_id))) {
+      return { kind: "lastManager" as const, eventSeriesId: assignment.eventreihe_id };
+    }
+    const legacy = await transaction.eventreihe_benutzerrollen.deleteMany({
+      where: { benutzer_id: assignment.benutzer_id, eventreihe_id: assignment.eventreihe_id },
+    });
+    if (legacy.count !== 1) return { kind: "inconsistent" as const, eventSeriesId: assignment.eventreihe_id };
+    await transaction.benutzer_rollenzuweisungen.delete({ where: { rollenzuweisung_id: assignmentId } });
+    return { kind: "removed" as const, eventSeriesId: assignment.eventreihe_id };
   });
-  if (!membership) return { success: false, message: "Zuordnung nicht gefunden." };
-
-  const managers = await prisma.eventreihe_benutzerrollen.findMany({
-    where: { eventreihe_id: membership.eventreihe_id, rolle: "EVENT_MANAGER" },
-    select: { rolle: true },
-  });
-  const leavesNoManager = removingAssignmentLeavesNoEventManager(
-    managers.map(() => ({ role: "EVENT_MANAGER" as const })),
-    membership.rolle as EventSeriesAssignmentRole,
-  );
-  if (leavesNoManager && !confirmedWithoutManager) {
-    return {
-      success: false,
-      requiresConfirmation: true,
-      message: deRoleMessages.messages.noManagerWarning,
-    };
+  if (result.kind === "missing") return { success: false, message: deRoleMessages.messages.assignmentNotFound };
+  if (result.kind === "lastManager") {
+    logRoleAudit("last_event_manager_protected", { eventSeriesId: result.eventSeriesId });
+    return { success: false, message: deRoleMessages.messages.lastManagerProtected };
   }
-
-  await prisma.eventreihe_benutzerrollen.delete({
-    where: { eventreihe_benutzerrolle_id: membershipId },
-  });
-  revalidateMembershipPages(membership.eventreihe_id);
-  return { success: true, message: deRoleMessages.messages.removeSuccess };
+  if (result.kind === "inconsistent") {
+    logRoleAudit("legacy_assignment_inconsistency", { eventSeriesId: result.eventSeriesId });
+    return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
+  }
+  logRoleAudit("role_assignment_removed", { eventSeriesId: result.eventSeriesId });
+  revalidateRolePages(result.eventSeriesId);
+  return { success: true, message: deRoleMessages.messages.assignmentRemoved };
 }

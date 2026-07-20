@@ -6,8 +6,8 @@ import { getUserInitials } from "@/app/lib/userDisplay";
 import { ArchiveUser } from "./ArchiveUser";
 import { ReactivateUser } from "./ReactivateUser";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { getEventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
-import { countMembershipRoles } from "@/app/eventreihen/membershipPolicy";
+import { getRoleAssignmentOptions } from "@/app/eventreihen/membershipActions";
+import { countEventSeriesRoleAssignments } from "@/app/eventreihen/membershipPolicy";
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { formatMessage } from "@/app/i18n/formatMessage";
@@ -16,7 +16,7 @@ export default async function UsersPage() {
   await requireAdmin();
   const messages = loadRoleMessages(getDefaultLocale());
 
-  const [users, membershipData] = await Promise.all([
+  const [users, assignmentData] = await Promise.all([
     prisma.users.findMany({
       orderBy: [
         { is_active: "desc" },
@@ -24,8 +24,14 @@ export default async function UsersPage() {
         { name: "asc" },
         { email: "asc" },
       ],
+      include: {
+        rollenzuweisungen: {
+          where: { scope_typ: "GLOBAL" },
+          select: { rolle: true },
+        },
+      },
     }),
-    getEventSeriesMembershipOptions(),
+    getRoleAssignmentOptions(),
   ]);
 
   return (
@@ -44,10 +50,13 @@ export default async function UsersPage() {
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {users.map((user) => {
-            const memberships = membershipData.memberships.filter(
-              (membership) => membership.userId === user.id,
+            const assignments = assignmentData.assignments.filter(
+              (assignment) => assignment.userId === user.id,
             );
-            const counts = countMembershipRoles(memberships);
+            const counts = countEventSeriesRoleAssignments(assignments);
+            const globalRoles = user.rollenzuweisungen.flatMap(({ rolle }) =>
+              rolle === "ADMIN" || rolle === "EDITOR" ? [rolle] : [],
+            );
             return (
             <article
               key={user.id}
@@ -67,7 +76,9 @@ export default async function UsersPage() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                  {messages.fields.globalRole}: {messages.globalRoles[user.role]}
+                  {messages.fields.globalRoles}: {globalRoles.length > 0
+                    ? globalRoles.map((role) => messages.assignmentRoles[role]).join(", ")
+                    : messages.summaries.noGlobalRole}
                 </span>
 
                 <span
@@ -90,8 +101,8 @@ export default async function UsersPage() {
 
                 <div className="flex items-center gap-2">
                   <EditUserDialog
-                    user={user}
-                    membershipData={membershipData}
+                    user={{ ...user, globalRoles }}
+                    assignmentData={assignmentData}
                     messages={messages}
                   />
 
@@ -104,15 +115,15 @@ export default async function UsersPage() {
                 </div>
               </div>
               <div className="mt-3 text-sm text-slate-600">
-                {memberships.length === 0 ? (
+                {assignments.length === 0 ? (
                   messages.summaries.noAssignment
                 ) : (
                   <>
                     <p className="font-medium">
-                      {memberships.length === 1
+                      {assignments.length === 1
                         ? messages.summaries.oneAssignment
                         : formatMessage(messages.summaries.multipleAssignments, {
-                            count: memberships.length,
+                            count: assignments.length,
                           })}
                     </p>
                     <p className="mt-1 break-words text-xs text-slate-500">
@@ -121,7 +132,7 @@ export default async function UsersPage() {
                       })}
                       {" · "}
                       {formatMessage(messages.summaries.editors, {
-                        count: counts.EVENT_EDITOR,
+                        count: counts.EDITOR,
                       })}
                     </p>
                   </>

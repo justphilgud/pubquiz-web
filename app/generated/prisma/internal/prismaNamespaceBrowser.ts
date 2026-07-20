@@ -77,6 +77,7 @@ export const ModelName = {
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
   users: 'users',
+  benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
   fragen_eventreihen: 'fragen_eventreihen'
 } as const
@@ -477,6 +478,20 @@ export const UsersScalarFieldEnum = {
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const Benutzer_rollenzuweisungenScalarFieldEnum = {
+  rollenzuweisung_id: 'rollenzuweisung_id',
+  benutzer_id: 'benutzer_id',
+  rolle: 'rolle',
+  scope_typ: 'scope_typ',
+  eventreihe_id: 'eventreihe_id',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_rollenzuweisungenScalarFieldEnum = (typeof Benutzer_rollenzuweisungenScalarFieldEnum)[keyof typeof Benutzer_rollenzuweisungenScalarFieldEnum]
 
 
 export const Eventreihe_benutzerrollenScalarFieldEnum = {

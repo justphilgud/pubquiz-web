@@ -9,7 +9,7 @@ import { createQuestion } from "@/app/services/questionService";
 import { requireAdmin, requireQuestionEditor } from "@/app/lib/permissions";
 import { getQuestionActor, mapQuestionAccessContext } from "./editor/questionAccess.server";
 import { canCloneScopedQuestion } from "./editor/questionScopePolicy";
-import { requireUser } from "../lib/auth-guard";
+import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 
 function getMedientypIdAusDatei(datei: string) {
   const lower = datei.toLowerCase();
@@ -176,7 +176,7 @@ export async function searchFragen(data: {
       : undefined,
   };
 
-  const where = actor.globalRole === "ADMIN"
+  const where = isAdministrator(actor)
     ? baseWhere
     : {
         AND: [
@@ -187,7 +187,7 @@ export async function searchFragen(data: {
               { geltungsbereich: "GLOBAL" as const, created_by_user_id: actor.userId ?? -1 },
               {
                 geltungsbereich: "EVENT_SERIES" as const,
-                eventreihen: { some: { eventreihe_id: { in: [...actor.assignments.keys()] } } },
+                eventreihen: { some: { eventreihe_id: { in: getActorEventSeriesIds(actor) } } },
               },
             ],
           },
@@ -671,7 +671,7 @@ export async function pruefeFragenImport(zeilen: FragenImportZeile[]) {
 }
 
 export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
-  await requireAdmin();
+  const session = await requireAdmin();
   let importiert = 0;
   let uebersprungen = 0;
 
@@ -680,12 +680,6 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
     frage: string;
     grund: string;
   }[] = [];
-
-  const session = await requireUser();
-
-  if (!session?.user) {
-    throw new Error("Nicht eingeloggt.");
-  }
 
   for (const [index, zeile] of zeilen.entries()) {
     const frageText = zeile.frage.trim();
@@ -724,7 +718,7 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
         quelle: zeile.quelle.trim() || null,
         ist_archiviert: false,
       },
-      session,
+      session.actor,
       false,
     );
 

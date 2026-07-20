@@ -2,138 +2,120 @@ import type { Session } from "next-auth";
 import type { QuestionReviewStatus } from "@/app/generated/prisma/enums";
 import { redirect } from "next/navigation";
 import { requireUser } from "./auth-guard";
-import { prisma } from "./prisma";
+import { getActorForSession } from "@/app/roles/roleAssignments.server";
+import {
+  canEditGlobalQuestions,
+  getActorEventSeriesIds,
+  canManageUsers as actorCanManageUsers,
+  hasAnyEditorialAssignment,
+  isAdministrator,
+  type AuthorizationActor,
+} from "@/app/roles/roleAssignmentPolicy";
 
-export function isAdmin(session: Session | null) {
-  return session?.user?.role === "ADMIN";
+export function isAdmin(actor: AuthorizationActor) {
+  return isAdministrator(actor);
 }
 
-export function isEditor(session: Session | null) {
-  return session?.user?.role === "EDITOR";
+export function isEditor(actor: AuthorizationActor) {
+  return canEditGlobalQuestions(actor) && !isAdministrator(actor);
 }
 
-export function canManageEverything(session: Session | null) {
-  return isAdmin(session);
+export function canManageEverything(actor: AuthorizationActor) {
+  return isAdministrator(actor);
 }
 
-export function canCreateQuestions(session: Session | null) {
-  return isAdmin(session) || isEditor(session);
+export function canCreateQuestions(actor: AuthorizationActor) {
+  return hasAnyEditorialAssignment(actor);
 }
 
-export function canEditQuestions(session: Session | null) {
-  return isAdmin(session) || isEditor(session);
+export function canEditQuestions(actor: AuthorizationActor) {
+  return hasAnyEditorialAssignment(actor);
 }
 
 export function canEditQuestion(
-  session: Session | null,
+  actor: AuthorizationActor,
   question: {
     createdByUserId: number | null;
     reviewStatus: QuestionReviewStatus;
     isArchived?: boolean;
   },
 ) {
-  if (!canEditQuestions(session)) {
-    return false;
-  }
-
-  if (canManageEverything(session)) {
-    return true;
-  }
-
-  const currentUserId = Number(session?.user?.id);
-
-  return (
-    isEditor(session) &&
-    Number.isInteger(currentUserId) &&
-    question.createdByUserId === currentUserId &&
-    !question.isArchived &&
-    (question.reviewStatus === "DRAFT" ||
-      question.reviewStatus === "CHANGES_REQUESTED")
-  );
+  if (!canEditGlobalQuestions(actor)) return false;
+  if (canManageEverything(actor)) return true;
+  return question.createdByUserId === actor.userId && !question.isArchived &&
+    (question.reviewStatus === "DRAFT" || question.reviewStatus === "CHANGES_REQUESTED");
 }
 
 export function canViewQuestion(
-  session: Session | null,
+  actor: AuthorizationActor,
   question: {
     createdByUserId: number | null;
     reviewStatus: QuestionReviewStatus;
     isArchived?: boolean;
   },
 ) {
-  if (canManageEverything(session)) {
-    return true;
-  }
-
-  const currentUserId = Number(session?.user?.id);
-
-  return (
-    isEditor(session) &&
-    Number.isInteger(currentUserId) &&
-    question.createdByUserId === currentUserId &&
-    (question.reviewStatus === "DRAFT" ||
-      question.reviewStatus === "CHANGES_REQUESTED" ||
-      question.reviewStatus === "IN_REVIEW")
-  );
+  if (canManageEverything(actor)) return true;
+  return canEditGlobalQuestions(actor) && question.createdByUserId === actor.userId &&
+    (question.reviewStatus === "DRAFT" || question.reviewStatus === "CHANGES_REQUESTED" ||
+      question.reviewStatus === "IN_REVIEW");
 }
 
 export function canCloneQuestion(
-  session: Session | null,
+  actor: AuthorizationActor,
   question: Parameters<typeof canViewQuestion>[1],
 ) {
-  return canCreateQuestions(session) && canViewQuestion(session, question);
+  return canEditGlobalQuestions(actor) && canViewQuestion(actor, question);
 }
 
 export function canArchiveQuestion(
-  session: Session | null,
+  actor: AuthorizationActor,
   question: { createdByUserId: number | null },
 ) {
-  if (canManageEverything(session)) return true;
-  const currentUserId = Number(session?.user?.id);
-  return isEditor(session) && Number.isInteger(currentUserId) &&
-    question.createdByUserId === currentUserId;
+  return canManageEverything(actor) ||
+    (canEditGlobalQuestions(actor) && question.createdByUserId === actor.userId);
 }
 
-export function canDeleteQuestion(session: Session | null) {
-  return canManageEverything(session);
+export function canDeleteQuestion(actor: AuthorizationActor) {
+  return canManageEverything(actor);
 }
 
-export function canManageCategories(session: Session | null) {
-  return canManageEverything(session);
+export function canManageCategories(actor: AuthorizationActor) {
+  return canManageEverything(actor);
 }
 
-export function canSearchQuestions(session: Session | null) {
-  return isAdmin(session) || isEditor(session);
+export function canSearchQuestions(actor: AuthorizationActor) {
+  return hasAnyEditorialAssignment(actor);
 }
 
-export function canApproveQuestions(session: Session | null) {
-  return isAdmin(session);
+export function canApproveQuestions(actor: AuthorizationActor) {
+  return canManageEverything(actor);
 }
 
-export function canSubmitForReview(session: Session | null) {
-  return isEditor(session);
+export function canSubmitForReview(actor: AuthorizationActor) {
+  return hasAnyEditorialAssignment(actor) && !isAdministrator(actor);
 }
 
-export function canViewOwnQuestionWorklist(session: Session | null) {
-  return isEditor(session);
+export function canViewOwnQuestionWorklist(actor: AuthorizationActor) {
+  return hasAnyEditorialAssignment(actor);
 }
 
-export function canViewReviewQueue(session: Session | null) {
-  return canReviewQuestions(session);
+export function canViewReviewQueue(actor: AuthorizationActor) {
+  return canReviewQuestions(actor);
 }
 
-export function canReviewQuestions(session: Session | null) {
-  return isAdmin(session);
+export function canReviewQuestions(actor: AuthorizationActor) {
+  return canManageEverything(actor) || getActorEventSeriesIds(actor, "EVENT_MANAGER").length > 0;
 }
 
-export function canApproveQuestion(session: Session | null) {
-  return canReviewQuestions(session);
+export function canApproveQuestion(actor: AuthorizationActor) {
+  return canReviewQuestions(actor);
 }
 
 export function canRequestQuestionChanges(
-  session: Session | null,
+  actor: AuthorizationActor,
   reviewStatus: QuestionReviewStatus,
 ) {
-  return canReviewQuestions(session) && reviewStatus === "IN_REVIEW";
+  return canReviewQuestions(actor) && reviewStatus === "IN_REVIEW";
 }
 
 export type QuestionOverviewCapabilities = {
@@ -142,11 +124,11 @@ export type QuestionOverviewCapabilities = {
 };
 
 export function getQuestionOverviewCapabilities(
-  session: Session | null,
+  actor: AuthorizationActor,
 ): QuestionOverviewCapabilities {
   return {
-    canViewOwnQuestionWorklist: canViewOwnQuestionWorklist(session),
-    canViewReviewQueue: canViewReviewQueue(session),
+    canViewOwnQuestionWorklist: canViewOwnQuestionWorklist(actor),
+    canViewReviewQueue: canViewReviewQueue(actor),
   };
 }
 
@@ -162,7 +144,7 @@ export type QuestionEditorCapabilities = {
 };
 
 export function getQuestionEditorCapabilities(
-  session: Session | null,
+  actor: AuthorizationActor,
   question?: {
     createdByUserId: number | null;
     reviewStatus: QuestionReviewStatus;
@@ -170,53 +152,48 @@ export function getQuestionEditorCapabilities(
   },
 ): QuestionEditorCapabilities {
   if (question) {
-    const canEdit = canEditQuestion(session, question);
-
+    const canEdit = canEditQuestion(actor, question);
     return {
       canSaveDraft: canEdit,
-      canSubmitForReview: canEdit && canSubmitForReview(session),
-      canApproveQuestion: canApproveQuestion(session),
-      canRequestQuestionChanges: canRequestQuestionChanges(
-        session,
-        question.reviewStatus,
-      ),
-      canCloneQuestion: canCloneQuestion(session, question),
-      canArchiveQuestion: canArchiveQuestion(session, question),
-      canDeleteQuestion: canDeleteQuestion(session),
-      canManageCategories: canManageCategories(session),
+      canSubmitForReview: canEdit && canSubmitForReview(actor),
+      canApproveQuestion: canApproveQuestion(actor),
+      canRequestQuestionChanges: canRequestQuestionChanges(actor, question.reviewStatus),
+      canCloneQuestion: canCloneQuestion(actor, question),
+      canArchiveQuestion: canArchiveQuestion(actor, question),
+      canDeleteQuestion: canDeleteQuestion(actor),
+      canManageCategories: canManageCategories(actor),
     };
   }
-
   return {
-    canSaveDraft: canCreateQuestions(session),
-    canSubmitForReview: canSubmitForReview(session),
-    canApproveQuestion: canReviewQuestions(session),
+    canSaveDraft: canCreateQuestions(actor),
+    canSubmitForReview: canSubmitForReview(actor),
+    canApproveQuestion: canReviewQuestions(actor),
     canRequestQuestionChanges: false,
     canCloneQuestion: false,
     canArchiveQuestion: false,
     canDeleteQuestion: false,
-    canManageCategories: canManageCategories(session),
+    canManageCategories: canManageCategories(actor),
   };
 }
 
-export function canAssignQuestionsToQuiz(session: Session | null) {
-  return isAdmin(session);
+export function canAssignQuestionsToQuiz(actor: AuthorizationActor) {
+  return canManageEverything(actor);
 }
 
-export function canManageQuizzes(session: Session | null) {
-  return isAdmin(session);
+export function canManageQuizzes(actor: AuthorizationActor) {
+  return canManageEverything(actor) || getActorEventSeriesIds(actor, "EVENT_MANAGER").length > 0;
 }
 
-export function canManageUsers(session: Session | null) {
-  return isAdmin(session);
+export function canManageUsers(actor: AuthorizationActor) {
+  return actorCanManageUsers(actor);
 }
 
-export function canManageEventSeries(session: Session | null) {
-  return isAdmin(session);
+export function canManageEventSeries(actor: AuthorizationActor) {
+  return canManageQuizzes(actor);
 }
 
-export function canViewAdminTools(session: Session | null) {
-  return isAdmin(session);
+export function canViewAdminTools(actor: AuthorizationActor) {
+  return canManageEverything(actor);
 }
 
 export type DashboardCapabilities = {
@@ -229,77 +206,57 @@ export type DashboardCapabilities = {
   canViewAdminTools: boolean;
 };
 
-export function getDashboardCapabilities(
-  session: Session | null,
-): DashboardCapabilities {
+export function getDashboardCapabilities(actor: AuthorizationActor): DashboardCapabilities {
   return {
-    canCreateQuestion: canCreateQuestions(session),
-    canViewQuestionEditorial: canSearchQuestions(session),
-    canViewOwnQuestionWorklist: canViewOwnQuestionWorklist(session),
-    canViewReviewQueue: canViewReviewQueue(session),
-    canManageQuizzes: canManageQuizzes(session),
-    canManageUsers: canManageUsers(session),
-    canViewAdminTools: canViewAdminTools(session),
+    canCreateQuestion: canCreateQuestions(actor),
+    canViewQuestionEditorial: canSearchQuestions(actor),
+    canViewOwnQuestionWorklist: canViewOwnQuestionWorklist(actor),
+    canViewReviewQueue: canViewReviewQueue(actor),
+    canManageQuizzes: canManageQuizzes(actor),
+    canManageUsers: canManageUsers(actor),
+    canViewAdminTools: canViewAdminTools(actor),
   };
 }
 
-export function canModerateQuiz(session: Session | null) {
-  return isAdmin(session);
+export function canModerateQuiz(actor: AuthorizationActor) {
+  return canManageQuizzes(actor);
 }
 
-export function canViewEvaluation(session: Session | null) {
-  return isAdmin(session);
+export function canViewEvaluation(actor: AuthorizationActor) {
+  return canManageQuizzes(actor);
 }
 
-export function canSearchUnapprovedQuestions(session: Session | null) {
-  return isAdmin(session);
+export function canSearchUnapprovedQuestions(actor: AuthorizationActor) {
+  return canReviewQuestions(actor);
 }
 
-export function canCreateApprovedQuestion(session: Session | null) {
-  return isAdmin(session);
+export function canCreateApprovedQuestion(actor: AuthorizationActor) {
+  return canManageEverything(actor);
 }
 
 export async function requireSession() {
   const session = await requireUser();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
+  if (!session?.user) redirect("/login");
   return session;
+}
+
+export async function requireActor() {
+  const session = await requireSession();
+  const actor = await getActorForSession(session);
+  return { session, actor };
 }
 
 export async function requireAdmin() {
-  const session = await requireSession();
-
-  if (!canManageEverything(session)) {
-    redirect("/fragen");
-  }
-
-  return session;
+  const { session, actor } = await requireActor();
+  if (!canManageEverything(actor)) redirect("/fragen");
+  return Object.assign(session, { actor });
 }
 
 export async function requireQuestionEditor() {
-  const session = await requireSession();
-
-  if (canCreateQuestions(session)) {
-    return session;
-  }
-
-  const userId = Number(session.user?.id);
-  const membershipCount = Number.isInteger(userId)
-    ? await prisma.eventreihe_benutzerrollen.count({
-        where: {
-          benutzer_id: userId,
-          benutzer: { is_active: true },
-          rolle: { in: ["EVENT_MANAGER", "EVENT_EDITOR"] },
-        },
-      })
-    : 0;
-
-  if (membershipCount === 0) {
-    redirect("/login");
-  }
-
-  return session;
+  const { session, actor } = await requireActor();
+  if (!canCreateQuestions(actor)) redirect("/login");
+  return Object.assign(session, { actor });
 }
+
+export type { AuthorizationActor };
+export type { Session };

@@ -11,9 +11,11 @@ import {
 } from "./questionScopePolicy";
 
 const manager: QuestionActorContext = {
-  globalRole: "USER",
   userId: 5,
-  assignments: new Map([[10, "EVENT_MANAGER"], [20, "EVENT_EDITOR"]]),
+  assignments: [
+    { role: "EVENT_MANAGER", scopeType: "EVENT_SERIES", eventSeriesId: 10 },
+    { role: "EDITOR", scopeType: "EVENT_SERIES", eventSeriesId: 20 },
+  ],
 };
 const question = (overrides: Partial<QuestionScopeAccessContext> = {}): QuestionScopeAccessContext => ({
   scope: "EVENT_SERIES",
@@ -26,7 +28,10 @@ const question = (overrides: Partial<QuestionScopeAccessContext> = {}): Question
 });
 
 test("ADMIN can use global and event-series scopes", () => {
-  const admin = { globalRole: "ADMIN", userId: 1, assignments: new Map() };
+  const admin: QuestionActorContext = {
+    userId: 1,
+    assignments: [{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }],
+  };
   assert.equal(canUseQuestionScope(admin, "GLOBAL", []), true);
   assert.equal(canUseQuestionScope(admin, "EVENT_SERIES", [10]), true);
 });
@@ -38,14 +43,20 @@ test("manager can edit and approve only questions fully inside managed series", 
   assert.equal(canApproveScopedQuestion(manager, question({ scope: "GLOBAL" })), false);
 });
 
-test("editor can edit own drafts but cannot approve", () => {
+test("scoped editor can edit own drafts but cannot approve", () => {
   const ownDraft = question({ eventSeriesIds: [20], createdByUserId: 5, reviewStatus: "DRAFT" });
   assert.equal(canEditScopedQuestion(manager, ownDraft), true);
   assert.equal(canApproveScopedQuestion(manager, ownDraft), false);
 });
 
-test("global EDITOR can keep own drafts while USER cannot edit global drafts", () => {
-  const globalEditor = { ...manager, globalRole: "EDITOR" };
+test("global EDITOR can keep own drafts while an actor without global assignment cannot", () => {
+  const globalEditor: QuestionActorContext = {
+    ...manager,
+    assignments: [
+      ...manager.assignments,
+      { role: "EDITOR", scopeType: "GLOBAL", eventSeriesId: null },
+    ],
+  };
   assert.equal(canViewScopedQuestion(manager, question({ scope: "GLOBAL", eventSeriesIds: [], isApproved: true })), true);
   assert.equal(canViewScopedQuestion(globalEditor, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5 })), true);
   assert.equal(canEditScopedQuestion(globalEditor, question({ scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 5, reviewStatus: "DRAFT" })), true);
@@ -53,7 +64,10 @@ test("global EDITOR can keep own drafts while USER cannot edit global drafts", (
 });
 
 test("global EDITOR can use global scope without receiving event-series rights", () => {
-  const editor = { globalRole: "EDITOR", userId: 6, assignments: new Map() };
+  const editor: QuestionActorContext = {
+    userId: 6,
+    assignments: [{ role: "EDITOR", scopeType: "GLOBAL", eventSeriesId: null }],
+  };
   assert.equal(canUseQuestionScope(editor, "GLOBAL", []), true);
   assert.equal(canUseQuestionScope(editor, "EVENT_SERIES", [10]), false);
 });

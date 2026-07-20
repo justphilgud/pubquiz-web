@@ -28,7 +28,7 @@ export async function findSimilarQuestions(
   const candidates = await prisma.fragen.findMany({
     where: {
       fragen_id: excludeQuestionId ? { not: excludeQuestionId } : undefined,
-      created_by_user_id: isAdmin(session) ? undefined : Number(session.user.id),
+      created_by_user_id: isAdmin(session.actor) ? undefined : Number(session.user.id),
       ist_archiviert: false,
       OR: terms.map((term) => ({
         frage: { contains: term, mode: "insensitive" as const },

@@ -358,6 +358,40 @@ export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
 }
 
+export type EnumRoleAssignmentRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleAssignmentRole | Prisma.EnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleAssignmentRoleFilter<$PrismaModel> | $Enums.RoleAssignmentRole
+}
+
+export type EnumRoleScopeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleScopeType | Prisma.EnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleScopeTypeFilter<$PrismaModel> | $Enums.RoleScopeType
+}
+
+export type EnumRoleAssignmentRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleAssignmentRole | Prisma.EnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleAssignmentRoleWithAggregatesFilter<$PrismaModel> | $Enums.RoleAssignmentRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRoleAssignmentRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRoleAssignmentRoleFilter<$PrismaModel>
+}
+
+export type EnumRoleScopeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleScopeType | Prisma.EnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleScopeTypeWithAggregatesFilter<$PrismaModel> | $Enums.RoleScopeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRoleScopeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRoleScopeTypeFilter<$PrismaModel>
+}
+
 export type EnumEventSeriesRoleFilter<$PrismaModel = never> = {
   equals?: $Enums.EventSeriesRole | Prisma.EnumEventSeriesRoleFieldRefInput<$PrismaModel>
   in?: $Enums.EventSeriesRole[] | Prisma.ListEnumEventSeriesRoleFieldRefInput<$PrismaModel>
@@ -703,6 +737,40 @@ export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumRoleAssignmentRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleAssignmentRole | Prisma.EnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleAssignmentRoleFilter<$PrismaModel> | $Enums.RoleAssignmentRole
+}
+
+export type NestedEnumRoleScopeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleScopeType | Prisma.EnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleScopeTypeFilter<$PrismaModel> | $Enums.RoleScopeType
+}
+
+export type NestedEnumRoleAssignmentRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleAssignmentRole | Prisma.EnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleAssignmentRole[] | Prisma.ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleAssignmentRoleWithAggregatesFilter<$PrismaModel> | $Enums.RoleAssignmentRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRoleAssignmentRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRoleAssignmentRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumRoleScopeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RoleScopeType | Prisma.EnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RoleScopeType[] | Prisma.ListEnumRoleScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRoleScopeTypeWithAggregatesFilter<$PrismaModel> | $Enums.RoleScopeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRoleScopeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRoleScopeTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumEventSeriesRoleFilter<$PrismaModel = never> = {

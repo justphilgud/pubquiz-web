@@ -34,7 +34,7 @@ import {
 } from "@/app/dashboardData";
 import {
   getDashboardCapabilities,
-  requireSession,
+  requireActor,
 } from "@/app/lib/permissions";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import AppHeader from "@/app/components/AppHeader";
@@ -184,8 +184,8 @@ function adminHero(
 }
 
 export default async function HomePage() {
-  const session = await requireSession();
-  const capabilities = getDashboardCapabilities(session);
+  const { session, actor } = await requireActor();
+  const capabilities = getDashboardCapabilities(actor);
   const userId = Number(session.user.id);
   const greetingName = getGreetingName(
     session.user.name,

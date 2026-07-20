@@ -1,52 +1,51 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import {
   hasEventSeriesCapability,
   isEventSeriesAssignmentRole,
   removingAssignmentLeavesNoEventManager,
 } from "./eventSeriesAccessPolicy";
 
+const actor = (
+  assignments: AuthorizationActor["assignments"],
+): AuthorizationActor => ({ userId: 5, assignments });
+
 test("ADMIN has global event-series access", () => {
+  const admin = actor([{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }]);
   for (const capability of [
-    "VIEW",
-    "EDIT",
-    "MANAGE_QUIZZES",
-    "CONTROL_LIVE",
-    "CREATE_QUESTION",
-    "REVIEW_QUESTION",
-    "MANAGE_MEMBERS",
-    "CHANGE_ARCHIVE_STATE",
+    "VIEW", "EDIT", "MANAGE_QUIZZES", "CONTROL_LIVE", "CREATE_QUESTION",
+    "REVIEW_QUESTION", "MANAGE_MEMBERS", "CHANGE_ARCHIVE_STATE",
   ] as const) {
-    assert.equal(
-      hasEventSeriesCapability({ globalRole: "ADMIN", assignmentRole: null, capability }),
-      true,
-    );
+    assert.equal(hasEventSeriesCapability({ actor: admin, eventSeriesId: 10, capability }), true);
   }
 });
 
-test("EVENT_MANAGER is limited to assigned operational capabilities", () => {
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_MANAGER", capability: "EDIT" }), true);
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_MANAGER", capability: "REVIEW_QUESTION" }), true);
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_MANAGER", capability: "MANAGE_MEMBERS" }), false);
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_MANAGER", capability: "CHANGE_ARCHIVE_STATE" }), false);
+test("EVENT_MANAGER is limited to its assigned series", () => {
+  const manager = actor([{ role: "EVENT_MANAGER", scopeType: "EVENT_SERIES", eventSeriesId: 10 }]);
+  assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "EDIT" }), true);
+  assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "REVIEW_QUESTION" }), true);
+  assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "MANAGE_MEMBERS" }), false);
+  assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 20, capability: "VIEW" }), false);
 });
 
-test("EVENT_EDITOR receives scoped question rights without quiz or review rights", () => {
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_EDITOR", capability: "VIEW" }), true);
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_EDITOR", capability: "CREATE_QUESTION" }), true);
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_EDITOR", capability: "MANAGE_QUIZZES" }), false);
-  assert.equal(hasEventSeriesCapability({ globalRole: "USER", assignmentRole: "EVENT_EDITOR", capability: "REVIEW_QUESTION" }), false);
+test("scoped EDITOR receives question rights without quiz or review rights", () => {
+  const editor = actor([{ role: "EDITOR", scopeType: "EVENT_SERIES", eventSeriesId: 10 }]);
+  assert.equal(hasEventSeriesCapability({ actor: editor, eventSeriesId: 10, capability: "VIEW" }), true);
+  assert.equal(hasEventSeriesCapability({ actor: editor, eventSeriesId: 10, capability: "CREATE_QUESTION" }), true);
+  assert.equal(hasEventSeriesCapability({ actor: editor, eventSeriesId: 10, capability: "MANAGE_QUIZZES" }), false);
+  assert.equal(hasEventSeriesCapability({ actor: editor, eventSeriesId: 10, capability: "REVIEW_QUESTION" }), false);
 });
 
-test("global EDITOR receives no event-series rights without a membership", () => {
-  assert.equal(hasEventSeriesCapability({ globalRole: "EDITOR", assignmentRole: null, capability: "VIEW" }), false);
-  assert.equal(hasEventSeriesCapability({ globalRole: "EDITOR", assignmentRole: null, capability: "EDIT" }), false);
+test("global EDITOR receives no event-series rights without a scoped assignment", () => {
+  const editor = actor([{ role: "EDITOR", scopeType: "GLOBAL", eventSeriesId: null }]);
+  assert.equal(hasEventSeriesCapability({ actor: editor, eventSeriesId: 10, capability: "VIEW" }), false);
 });
 
-test("assignment roles are closed and last-manager warning is deterministic", () => {
+test("event roles are closed and last-manager detection is deterministic", () => {
   assert.equal(isEventSeriesAssignmentRole("EVENT_MANAGER"), true);
-  assert.equal(isEventSeriesAssignmentRole("EVENT_EDITOR"), true);
-  assert.equal(isEventSeriesAssignmentRole("EDITOR"), false);
+  assert.equal(isEventSeriesAssignmentRole("EDITOR"), true);
+  assert.equal(isEventSeriesAssignmentRole("EVENT_EDITOR"), false);
   assert.equal(isEventSeriesAssignmentRole("ADMIN"), false);
   assert.equal(removingAssignmentLeavesNoEventManager([{ role: "EVENT_MANAGER" }], "EVENT_MANAGER"), true);
   assert.equal(removingAssignmentLeavesNoEventManager([{ role: "EVENT_MANAGER" }, { role: "EVENT_MANAGER" }], "EVENT_MANAGER"), false);

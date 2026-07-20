@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { Session } from "next-auth";
+import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import {
   getAppNavigationItems,
   isAppNavigationItemActive,
@@ -11,27 +11,27 @@ import {
   canManageUsers,
 } from "@/app/lib/permissions";
 
-const adminSession = {
-  user: { id: "1", role: "ADMIN" },
-  expires: "2099-01-01T00:00:00.000Z",
-} as Session;
+const adminActor: AuthorizationActor = {
+  userId: 1,
+  assignments: [{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }],
+};
 
-const editorSession = {
-  user: { id: "2", role: "EDITOR" },
-  expires: "2099-01-01T00:00:00.000Z",
-} as Session;
+const editorActor: AuthorizationActor = {
+  userId: 2,
+  assignments: [{ role: "EDITOR", scopeType: "GLOBAL", eventSeriesId: null }],
+};
 
-function navigationItemsFor(session: Session) {
+function navigationItemsFor(actor: AuthorizationActor) {
   return getAppNavigationItems({
     canAccessQuestions: true,
-    canManageQuizzes: canManageQuizzes(session),
-    canManageEventSeries: canManageEventSeries(session),
-    canManageUsers: canManageUsers(session),
+    canManageQuizzes: canManageQuizzes(actor),
+    canManageEventSeries: canManageEventSeries(actor),
+    canManageUsers: canManageUsers(actor),
   });
 }
 
 test("admin navigation contains event series between quiz and user management", () => {
-  assert.deepEqual(navigationItemsFor(adminSession), [
+  assert.deepEqual(navigationItemsFor(adminActor), [
     { href: "/fragen", label: "Fragen" },
     { href: "/quiz", label: "Quiz" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
@@ -40,7 +40,7 @@ test("admin navigation contains event series between quiz and user management", 
 });
 
 test("editor navigation does not expose admin destinations", () => {
-  assert.deepEqual(navigationItemsFor(editorSession), [
+  assert.deepEqual(navigationItemsFor(editorActor), [
     { href: "/fragen", label: "Fragen" },
   ]);
 });

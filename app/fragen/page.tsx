@@ -12,6 +12,7 @@ import { QuestionWorklist } from "./components/QuestionWorklist";
 import { ReviewQueue } from "./components/ReviewQueue";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { getQuestionActor } from "./editor/questionAccess.server";
+import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 
 type QuestionView = "drafts" | "review" | "changes-requested";
 
@@ -31,16 +32,16 @@ export default async function FragenPage({
   const params = await searchParams;
   const view = getQuestionView(params?.view);
   const session = await requireQuestionEditor();
-  const capabilities = getQuestionOverviewCapabilities(session);
+  const capabilities = getQuestionOverviewCapabilities(session.actor);
   const actor = await getQuestionActor(session);
   const canViewOwnWorklists =
-    capabilities.canViewOwnQuestionWorklist || actor.assignments.size > 0;
+    capabilities.canViewOwnQuestionWorklist || actor.assignments.length > 0;
   const managedEventSeriesIds = await getEventSeriesIdsForCapability("REVIEW_QUESTION", session);
-  const canReview = actor.globalRole === "ADMIN" || (managedEventSeriesIds?.length ?? 0) > 0;
+  const canReview = isAdministrator(actor) || (managedEventSeriesIds?.length ?? 0) > 0;
   const userId = Number(session.user.id);
 
   const ownWorklists = canViewOwnWorklists
-    ? await loadOwnQuestionWorklists(userId, [...actor.assignments.keys()])
+    ? await loadOwnQuestionWorklists(userId, getActorEventSeriesIds(actor))
     : null;
   const reviewQueue = canReview
     ? await loadReviewQueue(managedEventSeriesIds)

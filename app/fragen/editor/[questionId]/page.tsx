@@ -16,6 +16,7 @@ import {
   canRequestChangesForScopedQuestion,
   canViewScopedQuestion,
 } from "../questionScopePolicy";
+import { canEditGlobalQuestions, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -64,9 +65,9 @@ export default async function ExistingQuestionEditorPage({
   return (
     <QuestionEditor
       capabilities={{
-        ...getQuestionEditorCapabilities(session, loadedQuestion.access),
+        ...getQuestionEditorCapabilities(actor, loadedQuestion.access),
         canSaveDraft: canEditScopedQuestion(actor, loadedQuestion.access),
-        canSubmitForReview: canEditScopedQuestion(actor, loadedQuestion.access) && actor.globalRole !== "ADMIN",
+        canSubmitForReview: canEditScopedQuestion(actor, loadedQuestion.access) && !isAdministrator(actor),
         canApproveQuestion: canApproveScopedQuestion(actor, loadedQuestion.access),
         canRequestQuestionChanges: canRequestChangesForScopedQuestion(actor, loadedQuestion.access),
         canCloneQuestion: canCloneScopedQuestion(actor, loadedQuestion.access),
@@ -85,7 +86,7 @@ export default async function ExistingQuestionEditorPage({
         name: category.kategorie,
       }))}
       scopeOptions={{
-        canSelectGlobal: actor.globalRole === "ADMIN",
+        canSelectGlobal: canEditGlobalQuestions(actor),
         eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
       }}
     />

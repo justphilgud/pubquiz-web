@@ -4,25 +4,25 @@ import { updateUserAction } from "./actions";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
 import { BeakerIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useTransition } from "react";
-import type { EventSeriesMembershipOptions } from "@/app/eventreihen/membershipActions";
-import { EventSeriesMembershipManager } from "@/app/eventreihen/EventSeriesMembershipManager";
+import type { RoleAssignmentOptions } from "@/app/eventreihen/membershipActions";
+import { EventSeriesRoleAssignmentManager } from "@/app/eventreihen/EventSeriesMembershipManager";
 import type { RoleMessages } from "@/app/i18n/roleMessages";
 
 type User = {
   id: number;
   name: string | null;
   email: string;
-  role: "ADMIN" | "EDITOR" | "USER";
+  globalRoles: ("ADMIN" | "EDITOR")[];
   is_active: boolean;
 };
 
 export default function EditUserDialog({
   user,
-  membershipData,
+  assignmentData,
   messages,
 }: {
   user: User;
-  membershipData: EventSeriesMembershipOptions;
+  assignmentData: RoleAssignmentOptions;
   messages: RoleMessages;
 }) {
   const [open, setOpen] = useState(false);
@@ -56,7 +56,7 @@ export default function EditUserDialog({
             <div className="mb-5">
               <h2 className="text-xl font-bold">Benutzer bearbeiten</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Ändere Stammdaten, Rolle, Status oder setze ein neues
+                Ändere Stammdaten, Rollen, Status oder setze ein neues
                 Startpasswort.
               </p>
               <p className="mt-2 text-xs text-slate-500">
@@ -106,23 +106,24 @@ export default function EditUserDialog({
                     />
                   </div>
 
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-slate-700">
-                      {messages.fields.globalRole}
-                    </label>
-                    <select
-                      name="role"
-                      defaultValue={user.role}
-                      className="min-h-11 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
-                    >
-                      <option value="USER">{messages.globalRoles.USER}</option>
-                      <option value="EDITOR">{messages.globalRoles.EDITOR}</option>
-                      <option value="ADMIN">{messages.globalRoles.ADMIN}</option>
-                    </select>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {messages.globalRoleDescriptions[user.role]}
-                    </p>
-                  </div>
+                  <fieldset>
+                    <legend className="mb-2 text-sm font-medium text-slate-700">
+                      {messages.fields.globalRoles}
+                    </legend>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                        <input type="checkbox" name="globalRoles" value="ADMIN" defaultChecked={user.globalRoles.includes("ADMIN")} className="h-4 w-4" />
+                        {messages.assignmentRoles.ADMIN}
+                      </label>
+                      <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                        <input type="checkbox" name="globalRoles" value="EDITOR" defaultChecked={user.globalRoles.includes("EDITOR")} className="h-4 w-4" />
+                        {messages.globalRoles.EDITOR}
+                      </label>
+                    </div>
+                    {user.globalRoles.length === 0 && (
+                      <p className="mt-2 text-xs text-slate-500">{messages.summaries.noGlobalRole}</p>
+                    )}
+                  </fieldset>
                 </div>
               </div>
 
@@ -226,11 +227,11 @@ export default function EditUserDialog({
 
             <section className="mt-6 border-t border-slate-200 pt-5">
               <h3 className="text-sm font-semibold text-slate-900">
-                {messages.fields.eventSeriesAccess}
+                {messages.fields.eventSeriesRoles}
               </h3>
               <div className="mt-3">
-                <EventSeriesMembershipManager
-                  data={membershipData}
+                <EventSeriesRoleAssignmentManager
+                  data={assignmentData}
                   userId={user.id}
                   messages={messages}
                 />

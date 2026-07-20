@@ -1,4 +1,10 @@
-import type { EventSeriesAssignmentRole } from "@/app/eventreihen/eventSeriesAccessPolicy";
+import {
+  canEditEventSeriesQuestions,
+  canEditGlobalQuestions,
+  canReviewEventSeriesQuestions,
+  isAdministrator,
+  type AuthorizationActor,
+} from "@/app/roles/roleAssignmentPolicy";
 
 export type QuestionScopeValue = "GLOBAL" | "EVENT_SERIES";
 export type QuestionReviewStatusValue = "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
@@ -12,23 +18,18 @@ export type QuestionScopeAccessContext = {
   isApproved: boolean;
 };
 
-export type QuestionActorContext = {
-  globalRole: string | null | undefined;
-  userId: number | null;
-  assignments: ReadonlyMap<number, EventSeriesAssignmentRole>;
-};
+export type QuestionActorContext = AuthorizationActor;
 
 function hasEverySeries(
   actor: QuestionActorContext,
   eventSeriesIds: readonly number[],
-  requiredRole?: EventSeriesAssignmentRole,
+  capability: "EDIT" | "REVIEW" = "EDIT",
 ) {
-  return eventSeriesIds.length > 0 && eventSeriesIds.every((id) => {
-    const role = actor.assignments.get(id);
-    return requiredRole
-      ? role === requiredRole
-      : role === "EVENT_MANAGER" || role === "EVENT_EDITOR";
-  });
+  return eventSeriesIds.length > 0 && eventSeriesIds.every((id) =>
+    capability === "REVIEW"
+      ? canReviewEventSeriesQuestions(actor, id)
+      : canEditEventSeriesQuestions(actor, id),
+  );
 }
 
 export function canUseQuestionScope(
@@ -36,47 +37,38 @@ export function canUseQuestionScope(
   scope: QuestionScopeValue,
   eventSeriesIds: readonly number[],
 ) {
-  if (actor.globalRole === "ADMIN") {
-    return scope === "GLOBAL" || eventSeriesIds.length > 0;
-  }
   if (scope === "GLOBAL") {
-    return actor.globalRole === "EDITOR" && eventSeriesIds.length === 0;
+    return eventSeriesIds.length === 0 && canEditGlobalQuestions(actor);
   }
   return scope === "EVENT_SERIES" && hasEverySeries(actor, eventSeriesIds);
 }
 
 export function canViewScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
-  if (actor.globalRole === "ADMIN") return true;
+  if (isAdministrator(actor)) return true;
   if (question.scope === "GLOBAL") {
     if (question.isApproved) return true;
-    return actor.globalRole === "EDITOR" &&
-      actor.userId !== null &&
-      actor.userId === question.createdByUserId;
+    return canEditGlobalQuestions(actor) && actor.userId === question.createdByUserId;
   }
-  return question.eventSeriesIds.some((id) => actor.assignments.has(id));
+  return question.eventSeriesIds.some((id) => canEditEventSeriesQuestions(actor, id));
 }
 
 export function canEditScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
-  if (actor.globalRole === "ADMIN") return true;
+  if (isAdministrator(actor)) return true;
   if (question.isArchived) return false;
   if (question.scope === "GLOBAL") {
-    return actor.globalRole === "EDITOR" &&
-      actor.userId !== null &&
-      actor.userId === question.createdByUserId &&
+    return canEditGlobalQuestions(actor) && actor.userId === question.createdByUserId &&
       (question.reviewStatus === "DRAFT" || question.reviewStatus === "CHANGES_REQUESTED");
   }
-  if (hasEverySeries(actor, question.eventSeriesIds, "EVENT_MANAGER")) return true;
-  return actor.userId !== null &&
-    actor.userId === question.createdByUserId &&
+  if (hasEverySeries(actor, question.eventSeriesIds, "REVIEW")) return true;
+  return actor.userId === question.createdByUserId &&
     (question.reviewStatus === "DRAFT" || question.reviewStatus === "CHANGES_REQUESTED") &&
     hasEverySeries(actor, question.eventSeriesIds);
 }
 
 export function canApproveScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
-  if (actor.globalRole === "ADMIN") return true;
-  return question.scope === "EVENT_SERIES" &&
-    !question.isArchived &&
-    hasEverySeries(actor, question.eventSeriesIds, "EVENT_MANAGER");
+  if (isAdministrator(actor)) return true;
+  return question.scope === "EVENT_SERIES" && !question.isArchived &&
+    hasEverySeries(actor, question.eventSeriesIds, "REVIEW");
 }
 
 export function canRequestChangesForScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
@@ -85,7 +77,7 @@ export function canRequestChangesForScopedQuestion(actor: QuestionActorContext, 
 
 export function canCloneScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
   if (!canViewScopedQuestion(actor, question)) return false;
-  if (actor.globalRole === "ADMIN") return true;
+  if (isAdministrator(actor)) return true;
   return question.scope === "EVENT_SERIES" && hasEverySeries(actor, question.eventSeriesIds);
 }
 

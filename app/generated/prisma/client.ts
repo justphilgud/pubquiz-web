@@ -172,6 +172,11 @@ export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel
  */
 export type users = Prisma.usersModel
 /**
+ * Model benutzer_rollenzuweisungen
+ * Role/scope validity is additionally enforced by database check constraints in the migration.
+ */
+export type benutzer_rollenzuweisungen = Prisma.benutzer_rollenzuweisungenModel
+/**
  * Model eventreihe_benutzerrollen
  * 
  */

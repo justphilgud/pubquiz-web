@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import type { Session } from "next-auth";
+import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import { canCreateQuestions, canManageUsers } from "@/app/lib/permissions";
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import {
-  canAddMembership,
-  countMembershipRoles,
+  canAddEventSeriesRole,
+  countEventSeriesRoleAssignments,
   getAvailableEventSeries,
 } from "./membershipPolicy";
 
@@ -26,10 +26,7 @@ const eventSeriesPage = readFileSync(
   "utf8",
 );
 
-const userSession = {
-  user: { id: "3", role: "USER" },
-  expires: "2099-01-01T00:00:00.000Z",
-} as Session;
+const userActor: AuthorizationActor = { userId: 3, assignments: [] };
 
 test("role migration is additive and preserves existing users and memberships", () => {
   assert.match(migration, /UserRole" ADD VALUE 'USER'/);
@@ -40,21 +37,21 @@ test("role migration is additive and preserves existing users and memberships", 
 });
 
 test("USER has no global editorial or user-management rights", () => {
-  assert.equal(canCreateQuestions(userSession), false);
-  assert.equal(canManageUsers(userSession), false);
+  assert.equal(canCreateQuestions(userActor), false);
+  assert.equal(canManageUsers(userActor), false);
 });
 
-test("multiple memberships allow different roles and reject duplicate targets", () => {
+test("multiple event-series assignments allow different roles and reject duplicate targets", () => {
   const memberships = [
     { eventSeriesId: 1, role: "EVENT_MANAGER" as const },
-    { eventSeriesId: 2, role: "EVENT_EDITOR" as const },
+    { eventSeriesId: 2, role: "EDITOR" as const },
   ];
-  assert.deepEqual(countMembershipRoles(memberships), {
+  assert.deepEqual(countEventSeriesRoleAssignments(memberships), {
     EVENT_MANAGER: 1,
-    EVENT_EDITOR: 1,
+    EDITOR: 1,
   });
-  assert.equal(canAddMembership(memberships, 1), false);
-  assert.equal(canAddMembership(memberships, 3), true);
+  assert.equal(canAddEventSeriesRole(memberships, 1), false);
+  assert.equal(canAddEventSeriesRole(memberships, 3), true);
   assert.deepEqual(
     getAvailableEventSeries([{ id: 1 }, { id: 2 }, { id: 3 }], memberships),
     [{ id: 3 }],
@@ -62,9 +59,9 @@ test("multiple memberships allow different roles and reject duplicate targets", 
 });
 
 test("membership actions separate add, role change and removal", () => {
-  assert.match(membershipActions, /addEventSeriesMembership/);
-  assert.match(membershipActions, /changeEventSeriesMembershipRole/);
-  assert.match(membershipActions, /removeEventSeriesMembership/);
+  assert.match(membershipActions, /addEventSeriesRoleAssignment/);
+  assert.match(membershipActions, /changeEventSeriesRoleAssignment/);
+  assert.match(membershipActions, /removeEventSeriesRoleAssignment/);
   assert.match(membershipActions, /\.create\(/);
   assert.match(membershipActions, /\.update\(/);
   assert.match(membershipActions, /\.delete\(/);
@@ -73,9 +70,9 @@ test("membership actions separate add, role change and removal", () => {
 
 test("user overview is compact and editing owns the full membership list", () => {
   assert.doesNotMatch(userOverview, /<details|EventSeriesMembershipManager/);
-  assert.match(userOverview, /countMembershipRoles/);
-  assert.match(userEditor, /EventSeriesMembershipManager/);
-  assert.match(userEditor, /eventSeriesAccess/);
+  assert.match(userOverview, /countEventSeriesRoleAssignments/);
+  assert.match(userEditor, /EventSeriesRoleAssignmentManager/);
+  assert.match(userEditor, /eventSeriesRoles/);
 });
 
 test("event-series page exposes only a compact access summary", () => {
@@ -90,8 +87,8 @@ test("German and English role and membership messages are complete", () => {
     for (const role of ["USER", "EDITOR", "ADMIN"] as const) {
       assert.ok(messages.globalRoles[role]);
     }
-    for (const role of ["EVENT_MANAGER", "EVENT_EDITOR"] as const) {
-      assert.ok(messages.eventSeriesRoles[role]);
+    for (const role of ["EVENT_MANAGER", "EDITOR"] as const) {
+      assert.ok(messages.assignmentRoles[role]);
     }
     for (const key of ["eventSeriesAccess", "access", "eventSeries", "eventSeriesRole"] as const) {
       assert.ok(messages.fields[key]);

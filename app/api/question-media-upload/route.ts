@@ -17,6 +17,7 @@ import { getMediaSlotDefinition, isMediaSlotKey } from "@/app/fragen/editor/medi
 import { questionTemplateDefinitions } from "@/app/fragen/editor/templates/questionTemplates";
 import { findQuestionTemplate, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { getQuestionActor, requireQuestionAccess } from "@/app/fragen/editor/questionAccess.server";
+import { hasAnyEditorialAssignment } from "@/app/roles/roleAssignmentPolicy";
 
 type UploadContext =
   | {
@@ -186,7 +187,7 @@ export async function POST(request: Request) {
 
         if (context.questionId === null) {
           const actor = await getQuestionActor(session);
-          if (actor.globalRole !== "ADMIN" && actor.assignments.size === 0) {
+          if (!hasAnyEditorialAssignment(actor)) {
             throw new Error("Frage darf nicht erstellt werden.");
           }
         } else {

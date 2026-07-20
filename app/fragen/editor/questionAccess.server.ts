@@ -3,7 +3,8 @@ import "server-only";
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
 import { requireSession } from "@/app/lib/permissions";
-import { getCurrentEventSeriesAssignments } from "@/app/eventreihen/eventSeriesAccess.server";
+import { getActorForSession } from "@/app/roles/roleAssignments.server";
+import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import {
   canApproveScopedQuestion,
   canEditScopedQuestion,
@@ -17,19 +18,9 @@ import {
 
 export type QuestionCapability = "VIEW" | "EDIT" | "APPROVE" | "REQUEST_CHANGES";
 
-function userIdFromSession(session: Session) {
-  const userId = Number(session.user?.id);
-  return Number.isInteger(userId) && userId > 0 ? userId : null;
-}
-
 export async function getQuestionActor(session?: Session): Promise<QuestionActorContext> {
   const currentSession = session ?? await requireSession();
-  const assignments = await getCurrentEventSeriesAssignments(currentSession);
-  return {
-    globalRole: currentSession.user?.role,
-    userId: userIdFromSession(currentSession),
-    assignments: new Map(assignments.map((assignment) => [assignment.eventSeriesId, assignment.role])),
-  };
+  return getActorForSession(currentSession);
 }
 
 export function mapQuestionAccessContext(question: {
@@ -106,7 +97,7 @@ export async function getAssignableQuestionEventSeries(session?: Session) {
   return prisma.eventreihen.findMany({
     where: {
       ist_archiviert: false,
-      ...(actor.globalRole === "ADMIN" ? {} : { eventreihe_id: { in: [...actor.assignments.keys()] } }),
+      ...(isAdministrator(actor) ? {} : { eventreihe_id: { in: getActorEventSeriesIds(actor) } }),
     },
     orderBy: { name: "asc" },
     select: { eventreihe_id: true, name: true },

@@ -69,6 +69,7 @@ import {
   canRequestChangesForScopedQuestion,
   canUseQuestionScope,
 } from "./questionScopePolicy";
+import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -754,7 +755,7 @@ export async function saveQuestion(
   const keepsLegacyGlobalScope = currentContext?.scope === "GLOBAL" && payload.scope === "GLOBAL";
 
   try {
-    if (!keepsLegacyGlobalScope || actor.globalRole === "ADMIN" || payload.questionId === undefined) {
+    if (!keepsLegacyGlobalScope || isAdministrator(actor) || payload.questionId === undefined) {
       await requireQuestionScopeSelection(payload.scope, payload.eventSeriesIds, session);
     }
   } catch {
@@ -767,7 +768,7 @@ export async function saveQuestion(
 
   const mayPerformIntent = payload.questionId === undefined
     ? payload.intent === "DRAFT" ||
-      (payload.intent === "SUBMIT_FOR_REVIEW" && actor.globalRole !== "ADMIN") ||
+      (payload.intent === "SUBMIT_FOR_REVIEW" && !isAdministrator(actor)) ||
       (payload.intent === "APPROVE" && canApproveScopedQuestion(actor, targetContext))
     : payload.intent === "APPROVE"
       ? canApproveScopedQuestion(actor, targetContext)
@@ -776,7 +777,7 @@ export async function saveQuestion(
         : (
             canEditScopedQuestion(actor, currentContext!) &&
             (canUseQuestionScope(actor, payload.scope, targetContext.eventSeriesIds) || keepsLegacyGlobalScope) &&
-            (payload.intent !== "SUBMIT_FOR_REVIEW" || actor.globalRole !== "ADMIN")
+            (payload.intent !== "SUBMIT_FOR_REVIEW" || !isAdministrator(actor))
           );
   if (!mayPerformIntent) {
     return {

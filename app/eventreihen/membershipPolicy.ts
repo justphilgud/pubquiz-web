@@ -1,34 +1,34 @@
 import type { EventSeriesAssignmentRole } from "./eventSeriesAccessPolicy";
 
-export type MembershipRoleCount = Record<EventSeriesAssignmentRole, number>;
+export type AssignmentRoleCount = Record<EventSeriesAssignmentRole, number>;
 
-export function countMembershipRoles(
-  memberships: readonly { role: EventSeriesAssignmentRole }[],
-): MembershipRoleCount {
-  return memberships.reduce<MembershipRoleCount>(
-    (counts, membership) => ({
+export function countEventSeriesRoleAssignments(
+  assignments: readonly { role: EventSeriesAssignmentRole }[],
+): AssignmentRoleCount {
+  return assignments.reduce<AssignmentRoleCount>(
+    (counts, assignment) => ({
       ...counts,
-      [membership.role]: counts[membership.role] + 1,
+      [assignment.role]: counts[assignment.role] + 1,
     }),
-    { EVENT_MANAGER: 0, EVENT_EDITOR: 0 },
+    { EVENT_MANAGER: 0, EDITOR: 0 },
   );
 }
 
-export function canAddMembership(
-  memberships: readonly { eventSeriesId: number }[],
+export function canAddEventSeriesRole(
+  assignments: readonly { eventSeriesId: number }[],
   eventSeriesId: number,
 ) {
-  return !memberships.some(
-    (membership) => membership.eventSeriesId === eventSeriesId,
+  return !assignments.some(
+    (assignment) => assignment.eventSeriesId === eventSeriesId,
   );
 }
 
 export function getAvailableEventSeries<T extends { id: number }>(
   eventSeries: readonly T[],
-  memberships: readonly { eventSeriesId: number }[],
+  assignments: readonly { eventSeriesId: number }[],
 ) {
   const assignedIds = new Set(
-    memberships.map((membership) => membership.eventSeriesId),
+    assignments.map((assignment) => assignment.eventSeriesId),
   );
   return eventSeries.filter((series) => !assignedIds.has(series.id));
 }

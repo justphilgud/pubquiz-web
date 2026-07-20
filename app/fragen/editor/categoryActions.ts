@@ -30,7 +30,7 @@ type DeleteCategoryResult =
 
 async function authorizeCategoryManagement() {
   const session = await requireQuestionEditor();
-  return canManageCategories(session);
+  return canManageCategories(session.actor);
 }
 
 async function categoryNameExists(name: string, excludeId?: number) {

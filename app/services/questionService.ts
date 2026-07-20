@@ -1,4 +1,5 @@
 import type { Session } from "next-auth";
+import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import { prisma } from "@/app/lib/prisma";
 import {
   canApproveQuestions,
@@ -21,14 +22,14 @@ export function getCurrentUserId(session: Session) {
 }
 
 export function resolveQuestionApprovalOnCreate(
-  session: Session,
+  actor: AuthorizationActor,
   requestedApproval: boolean,
 ) {
-  if (!canCreateQuestions(session)) {
+  if (!canCreateQuestions(actor)) {
     throw new Error("Keine Berechtigung zum Erstellen von Fragen.");
   }
 
-  if (!canCreateApprovedQuestion(session)) {
+  if (!canCreateApprovedQuestion(actor)) {
     return {
       freigegeben: false,
       approved_by_user_id: null,
@@ -36,7 +37,7 @@ export function resolveQuestionApprovalOnCreate(
     };
   }
 
-  const userId = getCurrentUserId(session);
+  const userId = actor.userId;
 
   return {
     freigegeben: requestedApproval,
@@ -46,15 +47,15 @@ export function resolveQuestionApprovalOnCreate(
 }
 
 export function resolveQuestionApprovalOnUpdate(
-  session: Session,
+  actor: AuthorizationActor,
   currentFreigegeben: boolean,
   requestedApproval: boolean,
 ) {
-  if (!canEditQuestions(session)) {
+  if (!canEditQuestions(actor)) {
     throw new Error("Keine Berechtigung zum Bearbeiten von Fragen.");
   }
 
-  if (!canApproveQuestions(session)) {
+  if (!canApproveQuestions(actor)) {
     return {
       freigegeben: currentFreigegeben,
       approved_by_user_id: undefined,
@@ -62,7 +63,7 @@ export function resolveQuestionApprovalOnUpdate(
     };
   }
 
-  const userId = getCurrentUserId(session);
+  const userId = actor.userId;
 
   if (requestedApproval) {
     return {
@@ -79,12 +80,12 @@ export function resolveQuestionApprovalOnUpdate(
   };
 }
 
-export async function approveQuestion(questionId: number, session: Session) {
-  if (!canApproveQuestions(session)) {
+export async function approveQuestion(questionId: number, actor: AuthorizationActor) {
+  if (!canApproveQuestions(actor)) {
     throw new Error("Keine Berechtigung zum Freigeben von Fragen.");
   }
 
-  const userId = getCurrentUserId(session);
+  const userId = actor.userId;
 
   return prisma.fragen.update({
     where: { fragen_id: questionId },
@@ -97,12 +98,12 @@ export async function approveQuestion(questionId: number, session: Session) {
   });
 }
 
-export async function unapproveQuestion(questionId: number, session: Session) {
-  if (!canApproveQuestions(session)) {
+export async function unapproveQuestion(questionId: number, actor: AuthorizationActor) {
+  if (!canApproveQuestions(actor)) {
     throw new Error("Keine Berechtigung zum Zurücknehmen der Freigabe.");
   }
 
-  const userId = getCurrentUserId(session);
+  const userId = actor.userId;
 
   return prisma.fragen.update({
     where: { fragen_id: questionId },
@@ -117,15 +118,15 @@ export async function unapproveQuestion(questionId: number, session: Session) {
 
 export async function createQuestion(
   data: QuestionCreateData,
-  session: Session,
+  actor: AuthorizationActor,
   requestedApproval = false,
 ) {
-  if (!canCreateQuestions(session)) {
+  if (!canCreateQuestions(actor)) {
     throw new Error("Keine Berechtigung zum Erstellen von Fragen.");
   }
 
-  const userId = getCurrentUserId(session);
-  const approval = resolveQuestionApprovalOnCreate(session, requestedApproval);
+  const userId = actor.userId;
+  const approval = resolveQuestionApprovalOnCreate(actor, requestedApproval);
 
   return prisma.fragen.create({
     data: {
@@ -142,14 +143,14 @@ export async function createQuestion(
 export async function updateQuestion(
   questionId: number,
   data: QuestionUpdateData,
-  session: Session,
+  actor: AuthorizationActor,
   requestedApproval?: boolean,
 ) {
-  if (!canEditQuestions(session)) {
+  if (!canEditQuestions(actor)) {
     throw new Error("Keine Berechtigung zum Bearbeiten von Fragen.");
   }
 
-  const userId = getCurrentUserId(session);
+  const userId = actor.userId;
 
   const currentQuestion = await prisma.fragen.findUnique({
     where: { fragen_id: questionId },
@@ -168,7 +169,7 @@ export async function updateQuestion(
           approved_at: undefined,
         }
       : resolveQuestionApprovalOnUpdate(
-          session,
+          actor,
           currentQuestion.freigegeben,
           requestedApproval,
         );

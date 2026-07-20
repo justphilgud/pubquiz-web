@@ -30,7 +30,7 @@ export default function CreateUserDialog({ messages }: { messages: RoleMessages 
             <div className="mb-5">
               <h2 className="text-xl font-bold">Neuer Benutzer</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Lege einen neuen Benutzer mit Rolle und Passwort an.
+                Lege einen neuen Benutzer mit Rollen und Passwort an.
               </p>
               <p className="mt-2 text-xs text-slate-500">
                 <span className="text-red-500">*</span> Pflichtfeld
@@ -101,20 +101,22 @@ export default function CreateUserDialog({ messages }: { messages: RoleMessages 
                 </p>
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  {messages.fields.globalRole} <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="role"
-                  defaultValue="EDITOR"
-                  className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
-                >
-                  <option value="USER">{messages.globalRoles.USER}</option>
-                  <option value="EDITOR">{messages.globalRoles.EDITOR}</option>
-                  <option value="ADMIN">{messages.globalRoles.ADMIN}</option>
-                </select>
-              </div>
+              <fieldset>
+                <legend className="mb-2 text-sm font-medium text-slate-700">
+                  {messages.fields.globalRoles}
+                </legend>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                    <input type="checkbox" name="globalRoles" value="ADMIN" className="h-4 w-4" />
+                    {messages.assignmentRoles.ADMIN}
+                  </label>
+                  <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                    <input type="checkbox" name="globalRoles" value="EDITOR" defaultChecked className="h-4 w-4" />
+                    {messages.globalRoles.EDITOR}
+                  </label>
+                </div>
+                <p className="mt-2 text-xs text-slate-500">{messages.summaries.noGlobalRole} ist ebenfalls zulässig.</p>
+              </fieldset>
 
               <div className="flex justify-end gap-3 pt-4">
                 <button

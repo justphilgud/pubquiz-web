@@ -1,4 +1,15 @@
-export type EventSeriesAssignmentRole = "EVENT_MANAGER" | "EVENT_EDITOR";
+import {
+  canControlEventSeriesLive,
+  canEditEventSeriesQuestions,
+  canManageEventSeries,
+  canManageEventSeriesQuizzes,
+  canReviewEventSeriesQuestions,
+  canViewEventSeries,
+  isAdministrator,
+  type AuthorizationActor,
+} from "@/app/roles/roleAssignmentPolicy";
+
+export type EventSeriesAssignmentRole = "EVENT_MANAGER" | "EDITOR";
 
 export type EventSeriesCapability =
   | "VIEW"
@@ -10,45 +21,29 @@ export type EventSeriesCapability =
   | "MANAGE_MEMBERS"
   | "CHANGE_ARCHIVE_STATE";
 
-const EVENT_MANAGER_CAPABILITIES = new Set<EventSeriesCapability>([
-  "VIEW",
-  "EDIT",
-  "MANAGE_QUIZZES",
-  "CONTROL_LIVE",
-  "CREATE_QUESTION",
-  "REVIEW_QUESTION",
-]);
-
-const EVENT_EDITOR_CAPABILITIES = new Set<EventSeriesCapability>([
-  "VIEW",
-  "CREATE_QUESTION",
-]);
-
-export function isEventSeriesAssignmentRole(
-  value: unknown,
-): value is EventSeriesAssignmentRole {
-  return value === "EVENT_MANAGER" || value === "EVENT_EDITOR";
+export function isEventSeriesAssignmentRole(value: unknown): value is EventSeriesAssignmentRole {
+  return value === "EVENT_MANAGER" || value === "EDITOR";
 }
 
 export function hasEventSeriesCapability(input: {
-  globalRole: string | null | undefined;
-  assignmentRole: EventSeriesAssignmentRole | null | undefined;
+  actor: AuthorizationActor;
+  eventSeriesId: number;
   capability: EventSeriesCapability;
 }) {
-  if (input.globalRole === "ADMIN") return true;
-  if (input.assignmentRole === "EVENT_MANAGER") {
-    return EVENT_MANAGER_CAPABILITIES.has(input.capability);
-  }
-  if (input.assignmentRole === "EVENT_EDITOR") {
-    return EVENT_EDITOR_CAPABILITIES.has(input.capability);
-  }
-  return false;
+  const { actor, eventSeriesId, capability } = input;
+  if (capability === "VIEW") return canViewEventSeries(actor, eventSeriesId);
+  if (capability === "EDIT") return canManageEventSeries(actor, eventSeriesId);
+  if (capability === "MANAGE_QUIZZES") return canManageEventSeriesQuizzes(actor, eventSeriesId);
+  if (capability === "CONTROL_LIVE") return canControlEventSeriesLive(actor, eventSeriesId);
+  if (capability === "CREATE_QUESTION") return canEditEventSeriesQuestions(actor, eventSeriesId);
+  if (capability === "REVIEW_QUESTION") return canReviewEventSeriesQuestions(actor, eventSeriesId);
+  return isAdministrator(actor);
 }
 
 export function removingAssignmentLeavesNoEventManager(
   assignments: readonly { role: EventSeriesAssignmentRole }[],
   removedRole: EventSeriesAssignmentRole,
 ) {
-  if (removedRole !== "EVENT_MANAGER") return false;
-  return assignments.filter((assignment) => assignment.role === "EVENT_MANAGER").length <= 1;
+  return removedRole === "EVENT_MANAGER" &&
+    assignments.filter((assignment) => assignment.role === "EVENT_MANAGER").length <= 1;
 }

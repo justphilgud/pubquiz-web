@@ -12,13 +12,15 @@ import UserMenu from "@/app/components/UserMenu";
 import AppNav from "@/app/components/AppNav";
 import { getAppNavigationItems } from "@/app/components/appNavigation";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
+import { getActorForSession } from "@/app/roles/roleAssignments.server";
 
 export default async function AppHeader() {
   const session = await auth();
 
   if (!session?.user) return null;
 
-  const admin = isAdmin(session);
+  const actor = await getActorForSession(session);
+  const admin = isAdmin(actor);
   const [questionSeriesIds, quizSeriesIds, editableSeriesIds] = await Promise.all([
     getEventSeriesIdsForCapability("CREATE_QUESTION", session),
     getEventSeriesIdsForCapability("MANAGE_QUIZZES", session),
@@ -35,10 +37,10 @@ export default async function AppHeader() {
 
   const navItems = getAppNavigationItems({
     canAccessQuestions:
-      canCreateQuestions(session) || (questionSeriesIds?.length ?? 0) > 0,
-    canManageQuizzes: canManageQuizzes(session) || (quizSeriesIds?.length ?? 0) > 0,
-    canManageEventSeries: canManageEventSeries(session) || (editableSeriesIds?.length ?? 0) > 0,
-    canManageUsers: canManageUsers(session),
+      canCreateQuestions(actor) || (questionSeriesIds?.length ?? 0) > 0,
+    canManageQuizzes: canManageQuizzes(actor) || (quizSeriesIds?.length ?? 0) > 0,
+    canManageEventSeries: canManageEventSeries(actor) || (editableSeriesIds?.length ?? 0) > 0,
+    canManageUsers: canManageUsers(actor),
   });
 
   return (

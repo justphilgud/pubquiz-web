@@ -9,6 +9,7 @@ import { getDefaultLocale } from "@/app/i18n/locale";
 import { getQuestionEditorMessages } from "@/app/i18n/getMessages";
 import { localizeQuestionTemplates } from "./templates/questionTemplates";
 import { getAssignableQuestionEventSeries, getQuestionActor } from "./questionAccess.server";
+import { canEditGlobalQuestions, getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 
 export default async function QuestionEditorPage() {
   const session = await requireQuestionEditor();
@@ -20,8 +21,8 @@ export default async function QuestionEditorPage() {
       kategorie: true,
     },
   }), getAssignableQuestionEventSeries(session), getQuestionActor(session)]);
-  const baseCapabilities = getQuestionEditorCapabilities(session);
-  const canApproveInAnySeries = actor.globalRole === "ADMIN" || [...actor.assignments.values()].includes("EVENT_MANAGER");
+  const baseCapabilities = getQuestionEditorCapabilities(actor);
+  const canApproveInAnySeries = isAdministrator(actor) || getActorEventSeriesIds(actor, "EVENT_MANAGER").length > 0;
 
   return (
     <QuestionEditor
@@ -29,7 +30,7 @@ export default async function QuestionEditorPage() {
         ...baseCapabilities,
         canSaveDraft: true,
         canApproveQuestion: canApproveInAnySeries,
-        canSubmitForReview: actor.globalRole !== "ADMIN",
+        canSubmitForReview: !isAdministrator(actor),
       }}
       editorContext="create"
       mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
@@ -41,8 +42,7 @@ export default async function QuestionEditorPage() {
         name: category.kategorie,
       }))}
       scopeOptions={{
-        canSelectGlobal:
-          actor.globalRole === "ADMIN" || actor.globalRole === "EDITOR",
+        canSelectGlobal: canEditGlobalQuestions(actor),
         eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
       }}
     />
