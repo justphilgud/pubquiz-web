@@ -5,11 +5,44 @@ import { revalidatePath } from "next/cache";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { Buffer } from "buffer";
-import { createQuestion } from "@/app/services/questionService";
-import { requireAdmin, requireQuestionEditor } from "@/app/lib/permissions";
+import {
+  createQuestion,
+  getCurrentUserId,
+} from "@/app/services/questionService";
+import {
+  canManageCategories,
+  requireAdmin,
+  requireQuestionEditor,
+} from "@/app/lib/permissions";
 import { getQuestionActor, mapQuestionAccessContext } from "./editor/questionAccess.server";
 import { canCloneScopedQuestion } from "./editor/questionScopePolicy";
 import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import { createCategoryRecord } from "./editor/categoryService.server";
+import {
+  normalizeCategoryComparisonKey,
+  normalizeCategoryName,
+} from "./editor/categoryPolicy";
+import {
+  getQuestionTemplatePersistenceIds,
+  resolveCanonicalQuestionTemplateId,
+} from "./editor/templates/questionTemplateRegistry";
+import {
+  questionOverviewStatuses,
+  type QuestionAnswerModeFilter,
+  type QuestionMediaState,
+  type QuestionSourceState,
+  type QuestionOverviewStatus,
+} from "./questionOverviewFilters";
+import { Prisma } from "@/app/generated/prisma/client";
+import { getBerlinDate } from "@/app/lib/berlinDate";
+import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
+import { questionTemplateDefinitions } from "./editor/templates/questionTemplates";
+import {
+  getClosedQuestionTemplatePersistenceIds,
+  getQuestionAnswerMode,
+  getQuestionAnswerModeWhereInput,
+  type DerivedQuestionAnswerMode,
+} from "./questionAnswerMode";
 
 function getMedientypIdAusDatei(datei: string) {
   const lower = datei.toLowerCase();
@@ -61,6 +94,7 @@ export type FrageSuchResult = {
   quelle: string | null;
   schwierigkeitslevel: string | null;
   kategorien: string[];
+  pending_kategorien: string[];
   antworten_anzahl: number;
   medien_anzahl: number;
   medien_frage_anzahl: number;
@@ -73,6 +107,8 @@ export type FrageSuchResult = {
   can_clone: boolean;
   geltungsbereich: "GLOBAL" | "EVENT_SERIES";
   eventreihen: string[];
+  template_id: string | null;
+  answer_mode: DerivedQuestionAnswerMode;
   quizze: {
     quiz_id: number;
     titel: string | null;
@@ -121,19 +157,180 @@ export type FrageDetailsResult = {
 export async function searchFragen(data: {
   suchtext: string;
   kategorieId: number | null;
-  quelle: string;
-  nurOhneMedien: boolean;
-  nurOhneAntworten: boolean;
-  archivStatus: "alle" | "aktiv" | "archiviert";
+  sourceState: QuestionSourceState | null;
+  mediaState: QuestionMediaState | null;
+  answerMode: QuestionAnswerModeFilter | null;
+  statuses: QuestionOverviewStatus[];
+  templateIds: string[];
   limit?: number;
   offset?: number;
 }) {
   const session = await requireQuestionEditor();
   const actor = await getQuestionActor(session);
-  const limit = data.limit ?? 50;
-  const offset = data.offset ?? 0;
+  const limit =
+    Number.isInteger(data.limit) && Number(data.limit) > 0
+      ? Math.min(Number(data.limit), 50)
+      : 50;
+  const offset =
+    Number.isInteger(data.offset) && Number(data.offset) >= 0
+      ? Number(data.offset)
+      : 0;
+  const allowedStatuses = new Set<string>(questionOverviewStatuses);
+  const statuses = Array.isArray(data.statuses)
+    ? data.statuses.filter(
+        (status): status is QuestionOverviewStatus =>
+          typeof status === "string" && allowedStatuses.has(status),
+      )
+    : [];
+  const allowedTemplateIds = new Set(
+    questionTemplateDefinitions
+      .filter((template) => template.availableForFiltering)
+      .map((template) => template.id),
+  );
+  const templateIds = Array.isArray(data.templateIds)
+    ? data.templateIds.filter(
+        (templateId): templateId is string =>
+          typeof templateId === "string" &&
+          allowedTemplateIds.has(templateId),
+      )
+    : [];
+  const sourceState =
+    data.sourceState === "with" || data.sourceState === "without"
+      ? data.sourceState
+      : null;
+  const sourceQuestionIds = sourceState
+    ? await prisma.$queryRaw<Array<{ fragen_id: number }>>(
+        sourceState === "with"
+          ? Prisma.sql`
+              SELECT "fragen_id"
+              FROM "pubquiz"."fragen"
+              WHERE BTRIM(COALESCE("quelle", '')) <> ''
+            `
+          : Prisma.sql`
+              SELECT "fragen_id"
+              FROM "pubquiz"."fragen"
+              WHERE BTRIM(COALESCE("quelle", '')) = ''
+            `,
+      )
+    : null;
+  const managedEventSeriesIds = statuses.includes("REVIEW_QUEUE")
+    ? await getEventSeriesIdsForCapability("REVIEW_QUESTION", session)
+    : [];
+  const statusConditions: Prisma.fragenWhereInput[] = statuses.map(
+    (status) => {
+      if (status === "MY_DRAFTS") {
+        return {
+          created_by_user_id: actor.userId,
+          review_status: "DRAFT",
+          ist_archiviert: false,
+        };
+      }
+      if (status === "MY_SUBMITTED") {
+        return {
+          created_by_user_id: actor.userId,
+          review_status: "IN_REVIEW",
+          ist_archiviert: false,
+        };
+      }
+      if (status === "CHANGES_REQUESTED") {
+        return {
+          created_by_user_id: actor.userId,
+          review_status: "CHANGES_REQUESTED",
+          ist_archiviert: false,
+        };
+      }
+      if (status === "REVIEW_QUEUE") {
+        return {
+          review_status: "IN_REVIEW",
+          ist_archiviert: false,
+          ...(managedEventSeriesIds === null
+            ? {}
+            : {
+                geltungsbereich: "EVENT_SERIES" as const,
+                eventreihen: {
+                  some: {
+                    eventreihe_id: { in: managedEventSeriesIds },
+                  },
+                  none: {
+                    eventreihe_id: { notIn: managedEventSeriesIds },
+                  },
+                },
+              }),
+        };
+      }
+      if (status === "APPROVED") {
+        return { review_status: "APPROVED", ist_archiviert: false };
+      }
+      if (status === "ARCHIVED") {
+        return { ist_archiviert: true };
+      }
+      return {
+        gueltig_bis: { lt: getBerlinDate() },
+        ist_archiviert: false,
+      };
+    },
+  );
+  const templateConditions: Prisma.fragenWhereInput[] =
+    templateIds.map((templateId) =>
+      templateId === "standard"
+        ? {
+            OR: [
+              { vorlage_id: null },
+              { vorlage: { code: "standard" } },
+              {
+                vorlage: {
+                  code: {
+                    in: [...getClosedQuestionTemplatePersistenceIds()],
+                  },
+                },
+              },
+            ],
+          }
+        : {
+            vorlage: {
+              code: {
+                in: [...getQuestionTemplatePersistenceIds(templateId)],
+              },
+            },
+          },
+    );
+  const mediaState =
+    data.mediaState === "with" || data.mediaState === "without"
+      ? data.mediaState
+      : null;
+  const mediaCondition: Prisma.fragenWhereInput | null =
+    mediaState === "with"
+      ? {
+          OR: [
+            { medien: { some: {} } },
+            { antworten: { some: { medien: { some: {} } } } },
+            { antwortfelder: { some: { medien: { some: {} } } } },
+          ],
+        }
+      : mediaState === "without"
+        ? {
+            AND: [
+              { medien: { none: {} } },
+              { antworten: { none: { medien: { some: {} } } } },
+              { antwortfelder: { none: { medien: { some: {} } } } },
+            ],
+          }
+        : null;
+  const answerMode =
+    data.answerMode === "open" || data.answerMode === "closed"
+      ? data.answerMode
+      : null;
+  const answerModeCondition: Prisma.fragenWhereInput | null =
+    answerMode === "closed"
+      ? getQuestionAnswerModeWhereInput("CLOSED")
+      : answerMode === "open"
+        ? getQuestionAnswerModeWhereInput("OPEN")
+        : null;
 
-  const baseWhere = {
+  const baseWhere: Prisma.fragenWhereInput = {
+    fragen_id: sourceQuestionIds
+      ? { in: sourceQuestionIds.map(({ fragen_id }) => fragen_id) }
+      : undefined,
     frage: data.suchtext.trim()
       ? {
           contains: data.suchtext.trim(),
@@ -141,19 +338,12 @@ export async function searchFragen(data: {
         }
       : undefined,
 
-    quelle: data.quelle.trim()
-      ? {
-          contains: data.quelle.trim(),
-          mode: "insensitive" as const,
-        }
-      : undefined,
-
-    ist_archiviert:
-      data.archivStatus === "aktiv"
-        ? false
-        : data.archivStatus === "archiviert"
-          ? true
-          : undefined,
+    AND: [
+      ...(statusConditions.length > 0 ? [{ OR: statusConditions }] : []),
+      ...(templateConditions.length > 0 ? [{ OR: templateConditions }] : []),
+      ...(mediaCondition ? [mediaCondition] : []),
+      ...(answerModeCondition ? [answerModeCondition] : []),
+    ],
 
     fragen_kategorien: data.kategorieId
       ? {
@@ -163,17 +353,6 @@ export async function searchFragen(data: {
         }
       : undefined,
 
-    medien: data.nurOhneMedien
-      ? {
-          none: {},
-        }
-      : undefined,
-
-    antworten: data.nurOhneAntworten
-      ? {
-          none: {},
-        }
-      : undefined,
   };
 
   const where = isAdministrator(actor)
@@ -207,6 +386,11 @@ export async function searchFragen(data: {
           medien: true,
         },
       },
+      antwortfelder: {
+        include: {
+          medien: true,
+        },
+      },
       medien: true,
       quiz_fragen: {
         include: {
@@ -214,6 +398,7 @@ export async function searchFragen(data: {
         },
       },
       eventreihen: { include: { eventreihe: true } },
+      vorlage: { select: { code: true } },
     },
     orderBy: {
       fragen_id: "desc",
@@ -229,6 +414,9 @@ export async function searchFragen(data: {
     const medienAntwortenAnzahl = frage.antworten.reduce(
       (summe, antwort) => summe + antwort.medien.length,
       0,
+    ) + frage.antwortfelder.reduce(
+      (summe, antwortfeld) => summe + antwortfeld.medien.length,
+      0,
     );
 
     return {
@@ -243,8 +431,22 @@ export async function searchFragen(data: {
       can_clone: canCloneScopedQuestion(actor, mapQuestionAccessContext(frage)),
       geltungsbereich: frage.geltungsbereich,
       eventreihen: frage.eventreihen.map((entry) => entry.eventreihe.name),
+      template_id:
+        resolveCanonicalQuestionTemplateId(frage.vorlage?.code ?? null) ??
+        "standard",
+      answer_mode: getQuestionAnswerMode({
+        templateId: frage.vorlage?.code ?? null,
+        answers: frage.antworten.map((answer) => ({
+          isCorrect: answer.ist_richtig,
+        })),
+      }),
       kategorien: frage.fragen_kategorien.map(
         (k) => k.fragenkategorie.kategorie,
+      ),
+      pending_kategorien: frage.fragen_kategorien.flatMap((entry) =>
+        entry.fragenkategorie.status === "PENDING"
+          ? [entry.fragenkategorie.kategorie]
+          : [],
       ),
       antworten_anzahl: frage.antworten.length,
       medien_frage_anzahl: frage.medien.length,
@@ -416,7 +618,7 @@ export async function updateFrage(data: {
     }[];
   }[];
 }) {
-  await requireQuestionEditor();
+  const session = await requireQuestionEditor();
   await prisma.fragen.update({
     where: {
       fragen_id: data.fragenId,
@@ -436,22 +638,18 @@ export async function updateFrage(data: {
   const kategorieIds = [...data.kategorieIds];
 
   for (const neueKategorieName of data.neueKategorien) {
-    const name = neueKategorieName.trim();
+    const name = normalizeCategoryName(neueKategorieName);
 
     if (!name) continue;
 
-    const neueKategorie = await prisma.fragenkategorie.upsert({
-      where: {
-        kategorie: name,
-      },
-      update: {},
-      create: {
-        kategorie: name,
-      },
+    const neueKategorie = await createCategoryRecord({
+      name,
+      status: canManageCategories(session.actor) ? "ACTIVE" : "PENDING",
+      createdByUserId: getCurrentUserId(session),
     });
 
-    if (!kategorieIds.includes(neueKategorie.fragenkategorie_id)) {
-      kategorieIds.push(neueKategorie.fragenkategorie_id);
+    if (!kategorieIds.includes(neueKategorie.id)) {
+      kategorieIds.push(neueKategorie.id);
     }
   }
 
@@ -723,15 +921,30 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
     );
 
     if (zeile.kategorie.trim()) {
-      const kategorie = await prisma.fragenkategorie.upsert({
-        where: {
-          kategorie: zeile.kategorie.trim(),
-        },
-        update: {},
-        create: {
-          kategorie: zeile.kategorie.trim(),
+      const categoryName = normalizeCategoryName(zeile.kategorie);
+      const categoryKey = normalizeCategoryComparisonKey(categoryName, "de");
+      const existingCategories = await prisma.fragenkategorie.findMany({
+        select: {
+          fragenkategorie_id: true,
+          kategorie: true,
         },
       });
+      const existingCategory = existingCategories.find(
+        (category) =>
+          normalizeCategoryComparisonKey(category.kategorie, "de") ===
+          categoryKey,
+      );
+      const kategorie = existingCategory ??
+        await prisma.fragenkategorie.create({
+          data: {
+            kategorie: categoryName,
+            status: "ACTIVE",
+            created_by_user_id: getCurrentUserId(session),
+          },
+          select: {
+            fragenkategorie_id: true,
+          },
+        });
 
       await prisma.fragen_kategorien.create({
         data: {

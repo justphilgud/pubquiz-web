@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { useDismissiblePopover } from "@/app/components/useDismissiblePopover";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type {
   PendingQuestionSaveAction,
@@ -37,37 +38,12 @@ export function EditorSaveActions({
 }: EditorSaveActionsProps) {
   const { messages } = useQuestionEditorMessages();
   const [isDraftMenuOpen, setIsDraftMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const isPending = pendingAction !== null;
-
-  useEffect(() => {
-    if (!isDraftMenuOpen) {
-      return;
-    }
-
-    function closeOnOutsideClick(event: MouseEvent) {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
-        setIsDraftMenuOpen(false);
-      }
-    }
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setIsDraftMenuOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", closeOnOutsideClick);
-    document.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.removeEventListener("mousedown", closeOnOutsideClick);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [isDraftMenuOpen]);
+  const { containerRef: menuRef, triggerRef: menuTriggerRef } =
+    useDismissiblePopover({
+      open: isDraftMenuOpen,
+      onClose: () => setIsDraftMenuOpen(false),
+    });
 
   const workflowLabel = capabilities.canApproveQuestion
     ? pendingAction === "APPROVE"
@@ -150,6 +126,7 @@ export function EditorSaveActions({
               </button>
               {allowStartNewQuestion && (
                 <button
+                  ref={menuTriggerRef}
                   type="button"
                   aria-label={messages.save.openDraftActions}
                   aria-haspopup="menu"

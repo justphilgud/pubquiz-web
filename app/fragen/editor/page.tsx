@@ -14,13 +14,19 @@ import { canEditGlobalQuestions, getActorEventSeriesIds, isAdministrator } from 
 export default async function QuestionEditorPage() {
   const session = await requireQuestionEditor();
   const { locale, messages } = getQuestionEditorMessages(getDefaultLocale());
-  const [categories, eventSeries, actor] = await Promise.all([prisma.fragenkategorie.findMany({
-    orderBy: { kategorie: "asc" },
-    select: {
-      fragenkategorie_id: true,
-      kategorie: true,
-    },
-  }), getAssignableQuestionEventSeries(session), getQuestionActor(session)]);
+  const [categories, eventSeries, actor] = await Promise.all([
+    prisma.fragenkategorie.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { kategorie: "asc" },
+      select: {
+        fragenkategorie_id: true,
+        kategorie: true,
+        status: true,
+      },
+    }),
+    getAssignableQuestionEventSeries(session),
+    getQuestionActor(session),
+  ]);
   const baseCapabilities = getQuestionEditorCapabilities(actor);
   const canApproveInAnySeries = isAdministrator(actor) || getActorEventSeriesIds(actor, "EVENT_MANAGER").length > 0;
 
@@ -40,6 +46,7 @@ export default async function QuestionEditorPage() {
       categories={categories.map((category) => ({
         id: category.fragenkategorie_id,
         name: category.kategorie,
+        status: category.status,
       }))}
       scopeOptions={{
         canSelectGlobal: canEditGlobalQuestions(actor),

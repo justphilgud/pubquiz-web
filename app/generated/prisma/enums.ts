@@ -59,3 +59,12 @@ export const QuestionReviewStatus = {
 } as const
 
 export type QuestionReviewStatus = (typeof QuestionReviewStatus)[keyof typeof QuestionReviewStatus]
+
+
+export const CategoryStatus = {
+  ACTIVE: 'ACTIVE',
+  PENDING: 'PENDING',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus]

@@ -35,8 +35,22 @@ export default async function ExistingQuestionEditorPage({
   const [loadedQuestion, categories, actor, eventSeries] = await Promise.all([
     loadQuestionForEditor(questionId),
     prisma.fragenkategorie.findMany({
+      where: {
+        OR: [
+          { status: "ACTIVE" },
+          {
+            fragen_kategorien: {
+              some: { fragen_id: questionId },
+            },
+          },
+        ],
+      },
       orderBy: { kategorie: "asc" },
-      select: { fragenkategorie_id: true, kategorie: true },
+      select: {
+        fragenkategorie_id: true,
+        kategorie: true,
+        status: true,
+      },
     }),
     getQuestionActor(session),
     getAssignableQuestionEventSeries(session),
@@ -84,6 +98,7 @@ export default async function ExistingQuestionEditorPage({
       categories={categories.map((category) => ({
         id: category.fragenkategorie_id,
         name: category.kategorie,
+        status: category.status,
       }))}
       scopeOptions={{
         canSelectGlobal: canEditGlobalQuestions(actor),

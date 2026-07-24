@@ -186,11 +186,15 @@ Permissions should remain extensible.
 
 ## Categories
 
-Editors may select categories.
+Editors select categories through the searchable category field.
 
-Editors may NOT create categories.
+Administrators create immediately active categories. Editors may propose a new
+category from the same field; proposals start in `PENDING`, can immediately be
+assigned to the current question, and require an administrator's review.
 
-Category requests are communicated via reviewer notes.
+Archived categories remain attached to existing questions but are not offered
+for new assignments. Category lifecycle and merge operations belong to the
+administration area, not to the question-editor UI.
 
 ---
 

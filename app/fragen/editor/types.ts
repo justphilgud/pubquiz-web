@@ -19,6 +19,7 @@ export type QuestionAnswerDraft = {
 export type QuestionCategory = {
   id: number;
   name: string;
+  status: "ACTIVE" | "PENDING" | "ARCHIVED";
 };
 
 export type QuestionMediaType = "IMAGE" | "AUDIO" | "VIDEO";
@@ -155,6 +156,7 @@ export type QuestionEditorDraft = {
 export type QuestionTemplate = {
   id: string;
   selectable: boolean;
+  availableForFiltering: boolean;
   requiresAnswerImages: boolean;
   name: string;
   description: string;
@@ -180,6 +182,7 @@ export type QuestionTemplate = {
 export type QuestionTemplateDefinition = {
   id: string;
   selectable: boolean;
+  availableForFiltering: boolean;
   requiresAnswerImages: boolean;
   translationKey: "standard" | "multipleChoice" | "faceMorph" | "musicReverse" | "musicEightBit" | "pixelImage";
   allowsOptionalQuestionImage: boolean;
@@ -196,6 +199,11 @@ export type QuestionSaveIntent =
   | "SUBMIT_FOR_REVIEW"
   | "APPROVE"
   | "REQUEST_CHANGES";
+
+export type PendingCategoryDecision = {
+  categoryId: number;
+  action: "APPROVE" | "DISCARD";
+};
 
 export type QuestionEditorErrorCode =
   | "INVALID_SAVE_ACTION"
@@ -283,6 +291,7 @@ export type SaveQuestionPayload = {
   templateConfig: QuestionTemplateConfig;
   reviewReasonCodes?: ReviewReasonCode[];
   reviewComment?: string;
+  categoryReviewDecisions?: PendingCategoryDecision[];
 };
 
 export type FaceMorphPixelQuestionSyncResult = {

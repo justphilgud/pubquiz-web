@@ -113,8 +113,15 @@ model fragen_kategorien {
 model fragenkategorie {
   fragenkategorie_id Int                 @id @default(autoincrement())
   kategorie          String              @unique
+  status             CategoryStatus      @default(ACTIVE)
+  created_by_user_id Int?
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @default(now()) @updatedAt
   fragen_kategorien  fragen_kategorien[]
+  created_by         users?              @relation("CategoryCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
 
+  @@index([status, kategorie], map: "idx_fragenkategorie_status_name")
+  @@index([created_by_user_id], map: "idx_fragenkategorie_created_by")
   @@schema("pubquiz")
 }
 
@@ -511,6 +518,14 @@ enum QuestionReviewStatus {
   @@schema("pubquiz")
 }
 
+enum CategoryStatus {
+  ACTIVE
+  PENDING
+  ARCHIVED
+
+  @@schema("pubquiz")
+}
+
 model users {
   id Int @id @default(autoincrement())
 
@@ -534,6 +549,7 @@ model users {
   zugewiesene_eventreihenrollen eventreihe_benutzerrollen[]  @relation("EventSeriesMembershipAssigner")
   rollenzuweisungen             benutzer_rollenzuweisungen[] @relation("RoleAssignmentUser")
   zugewiesene_rollen            benutzer_rollenzuweisungen[] @relation("RoleAssignmentAssigner")
+  erstellte_kategorien          fragenkategorie[]             @relation("CategoryCreator")
 
   @@schema("pubquiz")
 }

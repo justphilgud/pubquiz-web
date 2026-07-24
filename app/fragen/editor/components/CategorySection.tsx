@@ -1,15 +1,19 @@
-import { useMemo, useState } from "react";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Modal } from "@/components/ui/Modal";
-import { SearchInput } from "@/components/ui/SearchInput";
+"use client";
+
+import { useId, useMemo, useState } from "react";
+import { useDismissiblePopover } from "@/app/components/useDismissiblePopover";
 import type { QuestionCategory } from "../types";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
-import { normalizeEditorSearch } from "@/app/i18n/formatting";
 import { formatMessage } from "@/app/i18n/formatMessage";
 import {
-  CategoryCreateControl,
-  CategoryRowActions,
-} from "./CategoryAdminControls";
+  isValidCategoryName,
+  normalizeCategoryName,
+  rankCategoryMatches,
+} from "../categoryPolicy";
+import {
+  createOrSuggestCategory,
+  type CategoryActionErrorCode,
+} from "../categoryActions";
 
 type CategorySectionProps = {
   categories: QuestionCategory[];
@@ -18,11 +22,10 @@ type CategorySectionProps = {
   canManageCategories: boolean;
 };
 
-function haveSameCategoryIds(left: number[], right: number[]): boolean {
-  return (
-    left.length === right.length &&
-    left.every((categoryId) => right.includes(categoryId))
-  );
+function statusBadgeClass(status: QuestionCategory["status"]) {
+  if (status === "PENDING") return "bg-amber-100 text-amber-900";
+  if (status === "ARCHIVED") return "bg-slate-200 text-slate-700";
+  return "bg-emerald-100 text-emerald-800";
 }
 
 export function CategorySection({
@@ -32,13 +35,14 @@ export function CategorySection({
   canManageCategories,
 }: CategorySectionProps) {
   const { locale, messages } = useQuestionEditorMessages();
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [isDiscardConfirmationOpen, setIsDiscardConfirmationOpen] =
-    useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [initialCategoryIds, setInitialCategoryIds] = useState<number[]>([]);
-  const [pendingCategoryIds, setPendingCategoryIds] = useState<number[]>([]);
+  const listboxId = useId();
   const [availableCategories, setAvailableCategories] = useState(categories);
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isCreating, setIsCreating] = useState(false);
+  const [errorCode, setErrorCode] =
+    useState<CategoryActionErrorCode | null>(null);
 
   const selectedCategories = useMemo(
     () =>
@@ -47,227 +51,243 @@ export function CategorySection({
       ),
     [availableCategories, selectedCategoryIds],
   );
-
-  const filteredCategories = useMemo(() => {
-    const normalizedQuery = normalizeEditorSearch(locale, searchQuery);
-
-    return availableCategories.filter((category) =>
-      normalizeEditorSearch(locale, category.name).includes(normalizedQuery),
-    );
-  }, [availableCategories, locale, searchQuery]);
-
-  function sortCategories(nextCategories: QuestionCategory[]) {
-    return [...nextCategories].sort((left, right) =>
-      left.name.localeCompare(right.name, locale),
-    );
-  }
-
-  function addAvailableCategory(category: QuestionCategory) {
-    setAvailableCategories((current) => sortCategories([...current, category]));
-    setPendingCategoryIds((current) => [...new Set([...current, category.id])]);
-  }
-
-  function renameAvailableCategory(category: QuestionCategory) {
-    setAvailableCategories((current) =>
-      sortCategories(
-        current.map((candidate) =>
-          candidate.id === category.id ? category : candidate,
-        ),
+  const selectableCategories = useMemo(
+    () =>
+      availableCategories.filter(
+        (category) =>
+          category.status === "ACTIVE" ||
+          selectedCategoryIds.includes(category.id),
       ),
-    );
-  }
-
-  function removeAvailableCategory(categoryId: number) {
-    setAvailableCategories((current) =>
-      current.filter((category) => category.id !== categoryId),
-    );
-    setPendingCategoryIds((current) => current.filter((id) => id !== categoryId));
-    setInitialCategoryIds((current) => current.filter((id) => id !== categoryId));
-    onChangeCategories(selectedCategoryIds.filter((id) => id !== categoryId));
-  }
-
-  const hasPendingChanges = !haveSameCategoryIds(
-    initialCategoryIds,
-    pendingCategoryIds,
+    [availableCategories, selectedCategoryIds],
   );
+  const matches = useMemo(
+    () => rankCategoryMatches(selectableCategories, query, locale),
+    [locale, query, selectableCategories],
+  );
+  const normalizedQuery = normalizeCategoryName(query);
+  const hasExactMatch = matches.some(({ match }) => match === "EXACT");
+  const canCreate =
+    isValidCategoryName(normalizedQuery) && !hasExactMatch;
+  const similarMatches = matches.filter(({ match }) => match === "SIMILAR");
+  const { containerRef, triggerRef } =
+    useDismissiblePopover<HTMLInputElement>({
+      open: isOpen,
+      onClose: () => setIsOpen(false),
+    });
 
-  function openPicker() {
-    const currentCategoryIds = [...selectedCategoryIds];
-
-    setInitialCategoryIds(currentCategoryIds);
-    setPendingCategoryIds(currentCategoryIds);
-    setSearchQuery("");
-    setIsPickerOpen(true);
+  function toggleCategory(categoryId: number) {
+    onChangeCategories(
+      selectedCategoryIds.includes(categoryId)
+        ? selectedCategoryIds.filter((id) => id !== categoryId)
+        : [...selectedCategoryIds, categoryId],
+    );
+    setQuery("");
+    setActiveIndex(0);
   }
 
-  function resetPickerState() {
-    setIsPickerOpen(false);
-    setIsDiscardConfirmationOpen(false);
-    setSearchQuery("");
-    setInitialCategoryIds([]);
-    setPendingCategoryIds([]);
-  }
-
-  function requestCancelPicker() {
-    if (!hasPendingChanges) {
-      resetPickerState();
+  async function createFromQuery() {
+    if (!canCreate || isCreating) return;
+    setIsCreating(true);
+    setErrorCode(null);
+    const result = await createOrSuggestCategory(normalizedQuery);
+    setIsCreating(false);
+    if (!result.ok) {
+      setErrorCode(result.code);
       return;
     }
-
-    setIsPickerOpen(false);
-    setIsDiscardConfirmationOpen(true);
-  }
-
-  function continueSelecting() {
-    setIsDiscardConfirmationOpen(false);
-    setIsPickerOpen(true);
-  }
-
-  function togglePendingCategory(categoryId: number) {
-    setPendingCategoryIds((current) =>
-      current.includes(categoryId)
-        ? current.filter((id) => id !== categoryId)
-        : [...current, categoryId],
+    setAvailableCategories((current) =>
+      [...current, result.category].sort((left, right) =>
+        left.name.localeCompare(right.name, locale),
+      ),
     );
+    onChangeCategories([
+      ...new Set([...selectedCategoryIds, result.category.id]),
+    ]);
+    setQuery("");
+    setIsOpen(false);
+    setActiveIndex(0);
   }
 
-  function applyCategories() {
-    onChangeCategories([...pendingCategoryIds]);
-    resetPickerState();
+  function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setIsOpen(true);
+      setActiveIndex((current) =>
+        Math.min(current + 1, Math.max(matches.length - 1, 0)),
+      );
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((current) => Math.max(current - 1, 0));
+      return;
+    }
+    if (event.key === "Escape") {
+      setIsOpen(false);
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const activeMatch = matches[activeIndex];
+      if (activeMatch) {
+        toggleCategory(activeMatch.category.id);
+      } else if (canCreate) {
+        void createFromQuery();
+      }
+    }
   }
 
   return (
-    <>
-      <section className="rounded-2xl border border-slate-200 bg-white p-4">
-        <h2 className="font-semibold text-slate-950">{messages.categories.title}</h2>
+    <section
+      ref={containerRef}
+      className="rounded-2xl border border-slate-200 bg-white p-4"
+    >
+      <h2 className="font-semibold text-slate-950">
+        {messages.categories.title}
+      </h2>
 
-        {selectedCategories.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {selectedCategories.map((category) => (
+      {selectedCategories.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {selectedCategories.map((category) => (
+            <span
+              key={category.id}
+              className="inline-flex min-h-10 max-w-full items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-800"
+            >
+              <span className="truncate">{category.name}</span>
+              {category.status !== "ACTIVE" && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs ${statusBadgeClass(category.status)}`}
+                >
+                  {category.status === "PENDING"
+                    ? messages.categories.pending
+                    : messages.categories.archived}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => toggleCategory(category.id)}
+                aria-label={formatMessage(messages.categories.remove, {
+                  name: category.name,
+                })}
+                className="min-h-8 min-w-8 rounded-full text-lg leading-none hover:bg-slate-100"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      <label className="mt-4 block">
+        <span className="text-sm font-medium text-slate-900">
+          {messages.categories.searchLabel}
+        </span>
+        <input
+          ref={triggerRef}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={isOpen}
+          value={query}
+          maxLength={100}
+          onFocus={() => setIsOpen(true)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setErrorCode(null);
+            setActiveIndex(0);
+            setIsOpen(true);
+          }}
+          onKeyDown={handleInputKeyDown}
+          placeholder={messages.categories.searchPlaceholder}
+          className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-200"
+        />
+      </label>
+
+      {isOpen && (
+        <div
+          id={listboxId}
+          role="listbox"
+          aria-multiselectable="true"
+          className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+        >
+          {matches.map(({ category, match }, index) => {
+            const selected = selectedCategoryIds.includes(category.id);
+            return (
               <button
                 key={category.id}
                 type="button"
-                onClick={() =>
-                  onChangeCategories(
-                    selectedCategoryIds.filter((id) => id !== category.id),
-                  )
-                }
-                aria-label={formatMessage(messages.categories.remove, { name: category.name })}
-                className="min-h-10 rounded-full border border-slate-300 bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-200"
+                role="option"
+                aria-selected={selected}
+                onMouseDown={(event) => event.preventDefault()}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => toggleCategory(category.id)}
+                className={[
+                  "flex min-h-12 w-full min-w-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm",
+                  index === activeIndex ? "bg-slate-100" : "bg-white",
+                ].join(" ")}
               >
-                {category.name} <span aria-hidden="true">×</span>
+                <span className="min-w-0">
+                  <span className="block truncate font-medium text-slate-900">
+                    {category.name}
+                  </span>
+                  {match === "SIMILAR" && (
+                    <span className="text-xs text-slate-500">
+                      {messages.categories.possibleMatch}
+                    </span>
+                  )}
+                </span>
+                <span aria-hidden="true">{selected ? "✓" : "+"}</span>
               </button>
-            ))}
-          </div>
-        )}
+            );
+          })}
 
-        <button
-          type="button"
-          onClick={openPicker}
-          className="mt-3 min-h-11 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-500"
-        >
-          {messages.categories.select}
-        </button>
-      </section>
-
-      <Modal
-        open={isPickerOpen}
-        title={messages.categories.select}
-        onClose={requestCancelPicker}
-        footer={
-          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <button
-              type="button"
-              onClick={requestCancelPicker}
-              className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-medium text-slate-800"
-            >
-              {messages.common.cancel}
-            </button>
-            <button
-              type="button"
-              onClick={applyCategories}
-              className="min-h-11 rounded-xl bg-slate-950 px-4 py-2 font-medium text-white"
-            >
-              {formatMessage(messages.categories.done, { count: pendingCategoryIds.length })}
-            </button>
-          </div>
-        }
-      >
-        <div className="flex max-h-[calc(100dvh-12rem)] min-h-0 flex-col">
-          <label className="block shrink-0">
-            <span className="text-sm font-medium text-slate-900">
-              {messages.categories.searchLabel}
-            </span>
-            <SearchInput
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={messages.categories.searchPlaceholder}
-              className="mt-2 min-h-11 rounded-xl border-slate-300 px-4 py-3 focus:border-slate-950 focus:ring-slate-200"
-            />
-          </label>
-
-          {canManageCategories && (
-            <CategoryCreateControl onCreated={addAvailableCategory} />
+          {similarMatches.length > 0 && canCreate && (
+            <p className="px-3 py-2 text-xs font-medium text-amber-800">
+              {messages.categories.similarWarning}
+            </p>
           )}
 
-          <div className="mt-4 min-h-0 space-y-2 overflow-y-auto pr-1">
-            {filteredCategories.map((category) => {
-              const isSelected = pendingCategoryIds.includes(category.id);
+          {canCreate && (
+            <button
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => void createFromQuery()}
+              disabled={isCreating}
+              className="min-h-12 w-full rounded-lg border border-dashed border-slate-400 px-3 py-2 text-left text-sm font-semibold text-slate-900 disabled:opacity-60"
+            >
+              {formatMessage(
+                canManageCategories
+                  ? messages.categories.createFromQuery
+                  : messages.categories.suggestFromQuery,
+                { name: normalizedQuery },
+              )}
+            </button>
+          )}
 
-              return (
-                <div
-                  key={category.id}
-                  className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-start"
-                >
-                  <button
-                    type="button"
-                    onClick={() => togglePendingCategory(category.id)}
-                    aria-pressed={isSelected}
-                    className={[
-                      "flex min-h-12 min-w-0 flex-1 items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
-                      isSelected
-                        ? "border-slate-950 bg-slate-950 text-white"
-                        : "border-slate-300 bg-white text-slate-800 hover:border-slate-500",
-                    ].join(" ")}
-                  >
-                    <span>{category.name}</span>
-                    <span aria-hidden="true">{isSelected ? "✓" : "+"}</span>
-                  </button>
-                  {canManageCategories && (
-                    <CategoryRowActions
-                      category={category}
-                      onRenamed={renameAvailableCategory}
-                      onDeleted={removeAvailableCategory}
-                    />
-                  )}
-                </div>
-              );
-            })}
-
-            {filteredCategories.length === 0 && (
-              <p className="py-3 text-sm text-slate-500">
-                {availableCategories.length === 0
-                  ? messages.categories.none
-                  : messages.categories.notFound}
-              </p>
-            )}
-          </div>
+          {matches.length === 0 && !canCreate && (
+            <p className="px-3 py-4 text-sm text-slate-500">
+              {query.trim()
+                ? messages.categories.notFound
+                : messages.categories.none}
+            </p>
+          )}
         </div>
-      </Modal>
+      )}
 
-      <ConfirmDialog
-        open={isDiscardConfirmationOpen}
-        title={messages.categories.discardTitle}
-        cancelLabel={messages.categories.continue}
-        confirmLabel={messages.categories.discard}
-        danger
-        onClose={continueSelecting}
-        onConfirm={resetPickerState}
-      >
-        <p>
-          {messages.categories.discardDescription}
-        </p>
-      </ConfirmDialog>
-    </>
+      <div aria-live="polite">
+        {isCreating && (
+          <p role="status" className="mt-2 text-sm text-slate-600">
+            {canManageCategories
+              ? messages.categories.creating
+              : messages.categories.suggesting}
+          </p>
+        )}
+        {errorCode && (
+          <p role="alert" className="mt-2 text-sm font-medium text-red-700">
+            {messages.categories.errors[errorCode]}
+          </p>
+        )}
+      </div>
+    </section>
   );
 }

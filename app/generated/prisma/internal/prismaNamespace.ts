@@ -2696,7 +2696,11 @@ export type Fragen_kategorienScalarFieldEnum = (typeof Fragen_kategorienScalarFi
 
 export const FragenkategorieScalarFieldEnum = {
   fragenkategorie_id: 'fragenkategorie_id',
-  kategorie: 'kategorie'
+  kategorie: 'kategorie',
+  status: 'status',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type FragenkategorieScalarFieldEnum = (typeof FragenkategorieScalarFieldEnum)[keyof typeof FragenkategorieScalarFieldEnum]
@@ -3185,21 +3189,30 @@ export type EnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'QuestionScope[]'
  */
 export type ListEnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionScope[]'>
-    
+
+
+/**
+ * Reference to a field of type 'CategoryStatus'
+ */
+export type EnumCategoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryStatus'>
+
+
+/**
+ * Reference to a field of type 'CategoryStatus[]'
+ */
+export type ListEnumCategoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryStatus[]'>
 
 
 /**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
-    
 
 
 /**
  * Reference to a field of type 'UserRole[]'
  */
 export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
-    
 
 
 /**
@@ -3208,12 +3221,10 @@ export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 export type EnumRoleAssignmentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleAssignmentRole'>
 
 
-
 /**
  * Reference to a field of type 'RoleAssignmentRole[]'
  */
 export type ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleAssignmentRole[]'>
-
 
 
 /**
@@ -3222,12 +3233,10 @@ export type ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel> = FieldRefInpu
 export type EnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType'>
 
 
-
 /**
  * Reference to a field of type 'RoleScopeType[]'
  */
 export type ListEnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType[]'>
-
 
 
 /**

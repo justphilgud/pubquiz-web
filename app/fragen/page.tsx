@@ -1,60 +1,67 @@
+import Link from "next/link";
+import { Suspense } from "react";
 import { prisma } from "@/app/lib/prisma";
 import FragenWorkspace from "./FragenWorkspace";
 import { getAktiveQuizListe } from "@/app/quiz/actions";
-import { Suspense } from "react";
-import Link from "next/link";
 import {
   getQuestionOverviewCapabilities,
   requireQuestionEditor,
 } from "@/app/lib/permissions";
-import { loadOwnQuestionWorklists, loadReviewQueue } from "./questionWorklists";
-import { QuestionWorklist } from "./components/QuestionWorklist";
-import { ReviewQueue } from "./components/ReviewQueue";
+import { loadQuestionStatusCounts } from "./questionWorklists";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { getQuestionActor } from "./editor/questionAccess.server";
-import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import {
+  getActorEventSeriesIds,
+  isAdministrator,
+} from "@/app/roles/roleAssignmentPolicy";
+import { localizeQuestionTemplates } from "./editor/templates/questionTemplates";
+import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
 
-type QuestionView = "drafts" | "review" | "changes-requested";
-
-function getQuestionView(view: string | undefined): QuestionView | null {
-  if (view === "drafts" || view === "review" || view === "changes-requested") {
-    return view;
-  }
-
-  return null;
-}
-
-export default async function FragenPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ view?: string }>;
-}) {
-  const params = await searchParams;
-  const view = getQuestionView(params?.view);
+export default async function FragenPage() {
   const session = await requireQuestionEditor();
   const capabilities = getQuestionOverviewCapabilities(session.actor);
   const actor = await getQuestionActor(session);
   const canViewOwnWorklists =
     capabilities.canViewOwnQuestionWorklist || actor.assignments.length > 0;
-  const managedEventSeriesIds = await getEventSeriesIdsForCapability("REVIEW_QUESTION", session);
-  const canReview = isAdministrator(actor) || (managedEventSeriesIds?.length ?? 0) > 0;
+  const managedEventSeriesIds = await getEventSeriesIdsForCapability(
+    "REVIEW_QUESTION",
+    session,
+  );
+  const canReview =
+    isAdministrator(actor) || (managedEventSeriesIds?.length ?? 0) > 0;
   const userId = Number(session.user.id);
 
-  const ownWorklists = canViewOwnWorklists
-    ? await loadOwnQuestionWorklists(userId, getActorEventSeriesIds(actor))
-    : null;
-  const reviewQueue = canReview
-    ? await loadReviewQueue(managedEventSeriesIds)
-    : null;
-
-  const searchData = await Promise.all([
-        prisma.fragenkategorie.findMany({ orderBy: { kategorie: "asc" } }),
-        canReview ? getAktiveQuizListe() : Promise.resolve([]),
-      ]);
+  const [categories, quizzes, statusCounts] = await Promise.all([
+    prisma.fragenkategorie.findMany({
+      where: { status: { in: ["ACTIVE", "ARCHIVED"] } },
+      orderBy: { kategorie: "asc" },
+    }),
+    canReview ? getAktiveQuizListe() : Promise.resolve([]),
+    loadQuestionStatusCounts({
+      userId,
+      accessibleEventSeriesIds: getActorEventSeriesIds(actor),
+      managedEventSeriesIds: canReview ? managedEventSeriesIds : [],
+    }),
+  ]);
+  const templates = localizeQuestionTemplates(
+    loadQuestionEditorMessages("de"),
+  )
+    .filter(({ availableForFiltering }) => availableForFiltering)
+    .map(({ id, name }) => ({ id, name }));
+  const visibleStatusCounts = {
+    ...(canViewOwnWorklists
+      ? {
+          MY_DRAFTS: statusCounts.MY_DRAFTS,
+          MY_SUBMITTED: statusCounts.MY_SUBMITTED,
+          CHANGES_REQUESTED: statusCounts.CHANGES_REQUESTED,
+        }
+      : {}),
+    ...(canReview ? { REVIEW_QUEUE: statusCounts.REVIEW_QUEUE } : {}),
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto max-w-5xl space-y-5">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Fragen</h1>
@@ -70,62 +77,15 @@ export default async function FragenPage({
           </Link>
         </header>
 
-        {view && (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
-            <span className="font-medium text-slate-700">
-              Gefilterte Ansicht: {view === "drafts" ? "Entwürfe" : view === "review" ? "Prüfung" : "Überarbeitung"}
-            </span>
-            <Link href="/fragen" className="font-semibold text-slate-700 hover:text-slate-950">
-              Alle Bereiche anzeigen
-            </Link>
-          </div>
-        )}
-
-        {ownWorklists && (
-          <div className="space-y-8">
-            {(!view || view === "changes-requested") && (
-              <QuestionWorklist
-                title="Zur Überarbeitung zurückgegeben"
-                description="Fragen mit einem Rückgabehinweis aus der Prüfung."
-                emptyTitle="Aktuell ist keine Überarbeitung erforderlich."
-                entries={ownWorklists.changesRequested}
-                timestampLabel="Zurückgegeben"
-              />
-            )}
-            {(!view || view === "drafts") && (
-              <QuestionWorklist
-                title="Meine Entwürfe"
-                description="Noch nicht zur Prüfung eingereichte Fragen."
-                emptyTitle="Du hast aktuell keine Entwürfe."
-                entries={ownWorklists.drafts}
-                timestampLabel="Zuletzt geändert"
-              />
-            )}
-            {(!view || view === "review") && (
-              <QuestionWorklist
-                title="Zur Prüfung eingereicht"
-                description="Fertige Fragen, die auf eine Prüfung warten."
-                emptyTitle="Du hast aktuell keine eingereichten Fragen."
-                entries={ownWorklists.submitted}
-                timestampLabel="Eingereicht"
-              />
-            )}
-          </div>
-        )}
-
-        {reviewQueue && (!view || view === "review") && (
-          <ReviewQueue entries={reviewQueue} />
-        )}
-
-        {searchData && (
-          <Suspense fallback={<div className="p-8">Lade Fragensuche...</div>}>
-            <FragenWorkspace
-              embedded
-              kategorien={searchData[0]}
-              quizze={searchData[1]}
-            />
-          </Suspense>
-        )}
+        <Suspense fallback={<div className="p-6">Lade Fragenfilter …</div>}>
+          <FragenWorkspace
+            embedded
+            kategorien={categories}
+            quizze={quizzes}
+            templates={templates}
+            statusCounts={visibleStatusCounts}
+          />
+        </Suspense>
       </div>
     </main>
   );

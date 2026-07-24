@@ -70,6 +70,10 @@ import {
   canUseQuestionScope,
 } from "./questionScopePolicy";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import {
+  PendingCategoryReviewError,
+  resolvePendingCategoryReview,
+} from "./pendingCategoryReview";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -927,19 +931,118 @@ export async function saveQuestion(
   try {
     const userId = getCurrentUserId(session);
     const question = await prisma.$transaction(async (tx) => {
-      const existingCategoryCount = await tx.fragenkategorie.count({
+      const selectedCategories = await tx.fragenkategorie.findMany({
         where: {
           fragenkategorie_id: {
             in: draft.categoryIds,
           },
         },
+        select: {
+          fragenkategorie_id: true,
+          status: true,
+        },
       });
 
-      if (existingCategoryCount !== draft.categoryIds.length) {
+      if (selectedCategories.length !== draft.categoryIds.length) {
         throw new DraftValidationError(
           "Mindestens eine ausgewählte Kategorie existiert nicht mehr.",
           "categories",
         );
+      }
+      const categoryReview = (() => {
+        try {
+          return resolvePendingCategoryReview({
+            intent: payload.intent,
+            isAdministrator: isAdministrator(actor),
+            selectedCategoryIds: draft.categoryIds,
+            pendingCategoryIds: selectedCategories.flatMap((category) =>
+              category.status === "PENDING"
+                ? [category.fragenkategorie_id]
+                : [],
+            ),
+            decisions: payload.categoryReviewDecisions,
+          });
+        } catch (error) {
+          if (error instanceof PendingCategoryReviewError) {
+            throw new DraftValidationError(
+              error.code === "ADMIN_REQUIRED"
+                ? "Offene Kategorien müssen vor der Freigabe durch einen Administrator geprüft werden."
+                : "Für jede offene Kategorie ist vor der Freigabe eine Entscheidung erforderlich.",
+              "categories",
+              error.code === "ADMIN_REQUIRED"
+                ? "PERMISSION_DENIED"
+                : "VALIDATION_ERROR",
+            );
+          }
+          throw error;
+        }
+      })();
+
+      if (categoryReview.approvedCategoryIds.length > 0) {
+        const approvedCategories = await tx.fragenkategorie.updateMany({
+          where: {
+            fragenkategorie_id: {
+              in: categoryReview.approvedCategoryIds,
+            },
+            status: "PENDING",
+          },
+          data: { status: "ACTIVE" },
+        });
+        if (
+          approvedCategories.count !==
+          categoryReview.approvedCategoryIds.length
+        ) {
+          throw new DraftValidationError(
+            "Mindestens eine offene Kategorie wurde zwischenzeitlich geändert.",
+            "categories",
+            "CONFLICT",
+          );
+        }
+      }
+
+      async function finalizeDiscardedCategories() {
+        for (const categoryId of categoryReview.discardedCategoryIds) {
+          const otherReferenceCount = await tx.fragen_kategorien.count({
+            where: {
+              fragenkategorie_id: categoryId,
+              ...(payload.questionId
+                ? { fragen_id: { not: payload.questionId } }
+                : {}),
+            },
+          });
+          if (otherReferenceCount === 0) {
+            await tx.fragenkategorie.delete({
+              where: { fragenkategorie_id: categoryId },
+            });
+          } else {
+            await tx.fragenkategorie.update({
+              where: { fragenkategorie_id: categoryId },
+              data: { status: "ARCHIVED" },
+            });
+          }
+        }
+      }
+
+      const archivedCategoryIds = selectedCategories.flatMap((category) =>
+        category.status === "ARCHIVED"
+          ? [category.fragenkategorie_id]
+          : [],
+      );
+      if (archivedCategoryIds.length > 0) {
+        const retainedArchivedCount = payload.questionId
+          ? await tx.fragen_kategorien.count({
+              where: {
+                fragen_id: payload.questionId,
+                fragenkategorie_id: { in: archivedCategoryIds },
+              },
+            })
+          : 0;
+        if (retainedArchivedCount !== archivedCategoryIds.length) {
+          throw new DraftValidationError(
+            "Archivierte Kategorien können nur an bestehenden Fragen beibehalten werden.",
+            "categories",
+          );
+        }
       }
 
       const persistedTemplates = draft.templateId
@@ -1034,7 +1137,7 @@ export async function saveQuestion(
       const answerImageTypeId =
         matchingAnswerImageTypes[0]?.medientyp_id ?? null;
 
-      const categoryCreates = draft.categoryIds.map((categoryId) => ({
+      const categoryCreates = categoryReview.retainedCategoryIds.map((categoryId) => ({
         fragenkategorie: {
           connect: {
             fragenkategorie_id: categoryId,
@@ -1194,6 +1297,7 @@ export async function saveQuestion(
       }
 
       if (payload.questionId === undefined) {
+        await finalizeDiscardedCategories();
         if (draft.questionMedia.some((media) => media.operation === "UNCHANGED" || media.existingMediaId !== null)) {
           throw new DraftValidationError(
             "Ein vorhandenes Medium kann keiner neuen Frage zugeordnet werden.",
@@ -1787,6 +1891,7 @@ export async function saveQuestion(
       await tx.fragen_kategorien.deleteMany({
         where: { fragen_id: payload.questionId },
       });
+      await finalizeDiscardedCategories();
 
       for (const media of draft.questionMedia) {
         const existing = media.existingMediaId === null

@@ -2685,6 +2685,9 @@ export async function getSchaetzfrageById(quizId: number, fragenId: number) {
 export async function getSchnellQuizKategorien() {
   await requireSession();
   return prisma.fragenkategorie.findMany({
+    where: {
+      status: "ACTIVE",
+    },
     orderBy: {
       kategorie: "asc",
     },

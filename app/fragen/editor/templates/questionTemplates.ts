@@ -10,6 +10,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.standard,
     selectable: false,
+    availableForFiltering: true,
     requiresAnswerImages: false,
     translationKey: "standard",
     allowsOptionalQuestionImage: true,
@@ -23,6 +24,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.multipleChoice,
     selectable: false,
+    availableForFiltering: false,
     requiresAnswerImages: false,
     translationKey: "multipleChoice",
     allowsOptionalQuestionImage: true,
@@ -41,6 +43,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.faceMorph,
     selectable: true,
+    availableForFiltering: true,
     requiresAnswerImages: true,
     translationKey: "faceMorph",
     allowsOptionalQuestionImage: false,
@@ -54,6 +57,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.musicReverse,
     selectable: true,
+    availableForFiltering: true,
     requiresAnswerImages: false,
     translationKey: "musicReverse",
     allowsOptionalQuestionImage: false,
@@ -70,6 +74,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.musicEightBit,
     selectable: false,
+    availableForFiltering: false,
     requiresAnswerImages: false,
     translationKey: "musicEightBit",
     allowsOptionalQuestionImage: false,
@@ -83,6 +88,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.pixelImage,
     selectable: true,
+    availableForFiltering: true,
     requiresAnswerImages: false,
     translationKey: "pixelImage",
     allowsOptionalQuestionImage: false,
@@ -106,6 +112,7 @@ export function localizeQuestionTemplates(
     return {
       id: definition.id,
       selectable: definition.selectable,
+      availableForFiltering: definition.availableForFiltering,
       requiresAnswerImages: definition.requiresAnswerImages,
       name: translation.name,
       description: translation.description,

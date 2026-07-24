@@ -7,6 +7,7 @@ export type AppNavigationCapabilities = {
   canAccessQuestions: boolean;
   canManageQuizzes: boolean;
   canManageEventSeries: boolean;
+  canManageCategories: boolean;
   canManageUsers: boolean;
 };
 
@@ -22,6 +23,9 @@ export function getAppNavigationItems(
       : []),
     ...(capabilities.canManageEventSeries
       ? [{ href: "/admin/eventreihen", label: "Eventreihen" }]
+      : []),
+    ...(capabilities.canManageCategories
+      ? [{ href: "/admin/kategorien", label: "Kategorien" }]
       : []),
     ...(capabilities.canManageUsers
       ? [{ href: "/admin/users", label: "Benutzer" }]

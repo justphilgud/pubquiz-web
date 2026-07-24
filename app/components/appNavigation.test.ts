@@ -7,6 +7,7 @@ import {
 } from "./appNavigation";
 import {
   canManageEventSeries,
+  canManageCategories,
   canManageQuizzes,
   canManageUsers,
 } from "@/app/lib/permissions";
@@ -26,6 +27,7 @@ function navigationItemsFor(actor: AuthorizationActor) {
     canAccessQuestions: true,
     canManageQuizzes: canManageQuizzes(actor),
     canManageEventSeries: canManageEventSeries(actor),
+    canManageCategories: canManageCategories(actor),
     canManageUsers: canManageUsers(actor),
   });
 }
@@ -35,6 +37,7 @@ test("admin navigation contains event series between quiz and user management", 
     { href: "/fragen", label: "Fragen" },
     { href: "/quiz", label: "Quiz" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
+    { href: "/admin/kategorien", label: "Kategorien" },
     { href: "/admin/users", label: "Benutzer" },
   ]);
 });
@@ -51,6 +54,7 @@ test("USER without global or event-series rights has no functional navigation", 
       canAccessQuestions: false,
       canManageQuizzes: false,
       canManageEventSeries: false,
+      canManageCategories: false,
       canManageUsers: false,
     }),
     [],
@@ -63,6 +67,7 @@ test("membership capabilities expose operational navigation without users", () =
       canAccessQuestions: true,
       canManageQuizzes: true,
       canManageEventSeries: true,
+      canManageCategories: false,
       canManageUsers: false,
     }),
     [

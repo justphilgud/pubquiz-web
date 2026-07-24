@@ -19,6 +19,7 @@ import type { MediaSlotKey, QuestionMediaDraft, QuestionMediaType } from "../typ
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import { ImageSourceInputs } from "./ImageSourceInputs";
 
 export type MediaUploadStatus = "IDLE" | "UPLOADING" | "ERROR";
 
@@ -174,6 +175,19 @@ export function MediaUploadSlot({
     changeUploadState({ status: "IDLE" });
   }
 
+  function handleFileInputChange(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    void uploadFile(file).finally(() => {
+      input.value = "";
+    });
+  }
+
   if (!isOpen && !media && !required) {
     if (disabled) {
       return null;
@@ -269,25 +283,27 @@ export function MediaUploadSlot({
                   if (file) void uploadFile(file);
                 }}
               >
-                <FileUpload
-                  compact={compact}
-                  label={visibleMedia ? messages.media.replace : messages.media.choose}
-                  description={`${mediaType === "IMAGE" ? messages.media.imageFormats : messages.media.audioFormats} · ${formatMessage(messages.media.maximum, { size: rule.sizeLabel })}`}
-                  accept={rule.accept}
-                  capture={mediaType === "IMAGE" ? "environment" : undefined}
-                  disabled={uploadState.status === "UPLOADING"}
-                  className={compact ? "min-w-40 flex-1" : "w-full"}
-                  onChange={(event) => {
-                    const input = event.currentTarget;
-                    const file = input.files?.[0];
-
-                    if (file) {
-                      void uploadFile(file).finally(() => {
-                        input.value = "";
-                      });
-                    }
-                  }}
-                />
+                {mediaType === "IMAGE" ? (
+                  <ImageSourceInputs
+                    compact={compact}
+                    galleryLabel={messages.media.chooseImage}
+                    cameraLabel={messages.media.takePhoto}
+                    description={`${messages.media.imageFormats} · ${formatMessage(messages.media.maximum, { size: rule.sizeLabel })}`}
+                    accept={rule.accept}
+                    disabled={uploadState.status === "UPLOADING"}
+                    onFileChange={handleFileInputChange}
+                  />
+                ) : (
+                  <FileUpload
+                    compact={compact}
+                    label={visibleMedia ? messages.media.replace : messages.media.choose}
+                    description={`${messages.media.audioFormats} · ${formatMessage(messages.media.maximum, { size: rule.sizeLabel })}`}
+                    accept={rule.accept}
+                    disabled={uploadState.status === "UPLOADING"}
+                    className={compact ? "min-w-40 flex-1" : "w-full"}
+                    onChange={handleFileInputChange}
+                  />
+                )}
                 {visibleMedia && (
                   <button
                     type="button"

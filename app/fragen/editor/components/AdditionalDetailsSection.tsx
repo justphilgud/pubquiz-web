@@ -95,7 +95,8 @@ export function AdditionalDetailsSection({
             canManageCategories={canManageCategories}
           />
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          {categoryRequest.trim() && (
+          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
             <label className="block">
               <span className="font-medium text-slate-950">
                 {messages.details.categoryRequest}
@@ -112,6 +113,7 @@ export function AdditionalDetailsSection({
               />
             </label>
           </section>
+          )}
 
           <section className="rounded-2xl border border-slate-200 p-4">
             <NotesSection

@@ -28,50 +28,78 @@ export type AggregateFragenkategorie = {
 
 export type FragenkategorieAvgAggregateOutputType = {
   fragenkategorie_id: number | null
+  created_by_user_id: number | null
 }
 
 export type FragenkategorieSumAggregateOutputType = {
   fragenkategorie_id: number | null
+  created_by_user_id: number | null
 }
 
 export type FragenkategorieMinAggregateOutputType = {
   fragenkategorie_id: number | null
   kategorie: string | null
+  status: $Enums.CategoryStatus | null
+  created_by_user_id: number | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type FragenkategorieMaxAggregateOutputType = {
   fragenkategorie_id: number | null
   kategorie: string | null
+  status: $Enums.CategoryStatus | null
+  created_by_user_id: number | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type FragenkategorieCountAggregateOutputType = {
   fragenkategorie_id: number
   kategorie: number
+  status: number
+  created_by_user_id: number
+  created_at: number
+  updated_at: number
   _all: number
 }
 
 
 export type FragenkategorieAvgAggregateInputType = {
   fragenkategorie_id?: true
+  created_by_user_id?: true
 }
 
 export type FragenkategorieSumAggregateInputType = {
   fragenkategorie_id?: true
+  created_by_user_id?: true
 }
 
 export type FragenkategorieMinAggregateInputType = {
   fragenkategorie_id?: true
   kategorie?: true
+  status?: true
+  created_by_user_id?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type FragenkategorieMaxAggregateInputType = {
   fragenkategorie_id?: true
   kategorie?: true
+  status?: true
+  created_by_user_id?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type FragenkategorieCountAggregateInputType = {
   fragenkategorie_id?: true
   kategorie?: true
+  status?: true
+  created_by_user_id?: true
+  created_at?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -164,6 +192,10 @@ export type fragenkategorieGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type FragenkategorieGroupByOutputType = {
   fragenkategorie_id: number
   kategorie: string
+  status: $Enums.CategoryStatus
+  created_by_user_id: number | null
+  created_at: Date
+  updated_at: Date
   _count: FragenkategorieCountAggregateOutputType | null
   _avg: FragenkategorieAvgAggregateOutputType | null
   _sum: FragenkategorieSumAggregateOutputType | null
@@ -192,13 +224,23 @@ export type fragenkategorieWhereInput = {
   NOT?: Prisma.fragenkategorieWhereInput | Prisma.fragenkategorieWhereInput[]
   fragenkategorie_id?: Prisma.IntFilter<"fragenkategorie"> | number
   kategorie?: Prisma.StringFilter<"fragenkategorie"> | string
+  status?: Prisma.EnumCategoryStatusFilter<"fragenkategorie"> | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.IntNullableFilter<"fragenkategorie"> | number | null
+  created_at?: Prisma.DateTimeFilter<"fragenkategorie"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"fragenkategorie"> | Date | string
   fragen_kategorien?: Prisma.Fragen_kategorienListRelationFilter
+  created_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
 }
 
 export type fragenkategorieOrderByWithRelationInput = {
   fragenkategorie_id?: Prisma.SortOrder
   kategorie?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
   fragen_kategorien?: Prisma.fragen_kategorienOrderByRelationAggregateInput
+  created_by?: Prisma.usersOrderByWithRelationInput
 }
 
 export type fragenkategorieWhereUniqueInput = Prisma.AtLeast<{
@@ -207,12 +249,21 @@ export type fragenkategorieWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.fragenkategorieWhereInput | Prisma.fragenkategorieWhereInput[]
   OR?: Prisma.fragenkategorieWhereInput[]
   NOT?: Prisma.fragenkategorieWhereInput | Prisma.fragenkategorieWhereInput[]
+  status?: Prisma.EnumCategoryStatusFilter<"fragenkategorie"> | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.IntNullableFilter<"fragenkategorie"> | number | null
+  created_at?: Prisma.DateTimeFilter<"fragenkategorie"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"fragenkategorie"> | Date | string
   fragen_kategorien?: Prisma.Fragen_kategorienListRelationFilter
+  created_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
 }, "fragenkategorie_id" | "kategorie">
 
 export type fragenkategorieOrderByWithAggregationInput = {
   fragenkategorie_id?: Prisma.SortOrder
   kategorie?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
   _count?: Prisma.fragenkategorieCountOrderByAggregateInput
   _avg?: Prisma.fragenkategorieAvgOrderByAggregateInput
   _max?: Prisma.fragenkategorieMaxOrderByAggregateInput
@@ -226,42 +277,73 @@ export type fragenkategorieScalarWhereWithAggregatesInput = {
   NOT?: Prisma.fragenkategorieScalarWhereWithAggregatesInput | Prisma.fragenkategorieScalarWhereWithAggregatesInput[]
   fragenkategorie_id?: Prisma.IntWithAggregatesFilter<"fragenkategorie"> | number
   kategorie?: Prisma.StringWithAggregatesFilter<"fragenkategorie"> | string
+  status?: Prisma.EnumCategoryStatusWithAggregatesFilter<"fragenkategorie"> | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"fragenkategorie"> | number | null
+  created_at?: Prisma.DateTimeWithAggregatesFilter<"fragenkategorie"> | Date | string
+  updated_at?: Prisma.DateTimeWithAggregatesFilter<"fragenkategorie"> | Date | string
 }
 
 export type fragenkategorieCreateInput = {
   kategorie: string
+  status?: $Enums.CategoryStatus
+  created_at?: Date | string
+  updated_at?: Date | string
   fragen_kategorien?: Prisma.fragen_kategorienCreateNestedManyWithoutFragenkategorieInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_kategorienInput
 }
 
 export type fragenkategorieUncheckedCreateInput = {
   fragenkategorie_id?: number
   kategorie: string
+  status?: $Enums.CategoryStatus
+  created_by_user_id?: number | null
+  created_at?: Date | string
+  updated_at?: Date | string
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenkategorieInput
 }
 
 export type fragenkategorieUpdateInput = {
   kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fragen_kategorien?: Prisma.fragen_kategorienUpdateManyWithoutFragenkategorieNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_kategorienNestedInput
 }
 
 export type fragenkategorieUncheckedUpdateInput = {
   fragenkategorie_id?: Prisma.IntFieldUpdateOperationsInput | number
   kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenkategorieNestedInput
 }
 
 export type fragenkategorieCreateManyInput = {
   fragenkategorie_id?: number
   kategorie: string
+  status?: $Enums.CategoryStatus
+  created_by_user_id?: number | null
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type fragenkategorieUpdateManyMutationInput = {
   kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type fragenkategorieUncheckedUpdateManyInput = {
   fragenkategorie_id?: Prisma.IntFieldUpdateOperationsInput | number
   kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FragenkategorieScalarRelationFilter = {
@@ -272,24 +354,48 @@ export type FragenkategorieScalarRelationFilter = {
 export type fragenkategorieCountOrderByAggregateInput = {
   fragenkategorie_id?: Prisma.SortOrder
   kategorie?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type fragenkategorieAvgOrderByAggregateInput = {
   fragenkategorie_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
 }
 
 export type fragenkategorieMaxOrderByAggregateInput = {
   fragenkategorie_id?: Prisma.SortOrder
   kategorie?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type fragenkategorieMinOrderByAggregateInput = {
   fragenkategorie_id?: Prisma.SortOrder
   kategorie?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type fragenkategorieSumOrderByAggregateInput = {
   fragenkategorie_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+}
+
+export type FragenkategorieListRelationFilter = {
+  every?: Prisma.fragenkategorieWhereInput
+  some?: Prisma.fragenkategorieWhereInput
+  none?: Prisma.fragenkategorieWhereInput
+}
+
+export type fragenkategorieOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type fragenkategorieCreateNestedOneWithoutFragen_kategorienInput = {
@@ -306,13 +412,67 @@ export type fragenkategorieUpdateOneRequiredWithoutFragen_kategorienNestedInput 
   update?: Prisma.XOR<Prisma.XOR<Prisma.fragenkategorieUpdateToOneWithWhereWithoutFragen_kategorienInput, Prisma.fragenkategorieUpdateWithoutFragen_kategorienInput>, Prisma.fragenkategorieUncheckedUpdateWithoutFragen_kategorienInput>
 }
 
+export type EnumCategoryStatusFieldUpdateOperationsInput = {
+  set?: $Enums.CategoryStatus
+}
+
+export type fragenkategorieCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.fragenkategorieCreateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput> | Prisma.fragenkategorieCreateWithoutCreated_byInput[] | Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput | Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.fragenkategorieCreateManyCreated_byInputEnvelope
+  connect?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+}
+
+export type fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.fragenkategorieCreateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput> | Prisma.fragenkategorieCreateWithoutCreated_byInput[] | Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput | Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.fragenkategorieCreateManyCreated_byInputEnvelope
+  connect?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+}
+
+export type fragenkategorieUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.fragenkategorieCreateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput> | Prisma.fragenkategorieCreateWithoutCreated_byInput[] | Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput | Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.fragenkategorieUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.fragenkategorieUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.fragenkategorieCreateManyCreated_byInputEnvelope
+  set?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  disconnect?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  delete?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  connect?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  update?: Prisma.fragenkategorieUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.fragenkategorieUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.fragenkategorieUpdateManyWithWhereWithoutCreated_byInput | Prisma.fragenkategorieUpdateManyWithWhereWithoutCreated_byInput[]
+  deleteMany?: Prisma.fragenkategorieScalarWhereInput | Prisma.fragenkategorieScalarWhereInput[]
+}
+
+export type fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.fragenkategorieCreateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput> | Prisma.fragenkategorieCreateWithoutCreated_byInput[] | Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput | Prisma.fragenkategorieCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.fragenkategorieUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.fragenkategorieUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.fragenkategorieCreateManyCreated_byInputEnvelope
+  set?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  disconnect?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  delete?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  connect?: Prisma.fragenkategorieWhereUniqueInput | Prisma.fragenkategorieWhereUniqueInput[]
+  update?: Prisma.fragenkategorieUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.fragenkategorieUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.fragenkategorieUpdateManyWithWhereWithoutCreated_byInput | Prisma.fragenkategorieUpdateManyWithWhereWithoutCreated_byInput[]
+  deleteMany?: Prisma.fragenkategorieScalarWhereInput | Prisma.fragenkategorieScalarWhereInput[]
+}
+
 export type fragenkategorieCreateWithoutFragen_kategorienInput = {
   kategorie: string
+  status?: $Enums.CategoryStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_kategorienInput
 }
 
 export type fragenkategorieUncheckedCreateWithoutFragen_kategorienInput = {
   fragenkategorie_id?: number
   kategorie: string
+  status?: $Enums.CategoryStatus
+  created_by_user_id?: number | null
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type fragenkategorieCreateOrConnectWithoutFragen_kategorienInput = {
@@ -333,11 +493,107 @@ export type fragenkategorieUpdateToOneWithWhereWithoutFragen_kategorienInput = {
 
 export type fragenkategorieUpdateWithoutFragen_kategorienInput = {
   kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_kategorienNestedInput
 }
 
 export type fragenkategorieUncheckedUpdateWithoutFragen_kategorienInput = {
   fragenkategorie_id?: Prisma.IntFieldUpdateOperationsInput | number
   kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type fragenkategorieCreateWithoutCreated_byInput = {
+  kategorie: string
+  status?: $Enums.CategoryStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+  fragen_kategorien?: Prisma.fragen_kategorienCreateNestedManyWithoutFragenkategorieInput
+}
+
+export type fragenkategorieUncheckedCreateWithoutCreated_byInput = {
+  fragenkategorie_id?: number
+  kategorie: string
+  status?: $Enums.CategoryStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+  fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenkategorieInput
+}
+
+export type fragenkategorieCreateOrConnectWithoutCreated_byInput = {
+  where: Prisma.fragenkategorieWhereUniqueInput
+  create: Prisma.XOR<Prisma.fragenkategorieCreateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput>
+}
+
+export type fragenkategorieCreateManyCreated_byInputEnvelope = {
+  data: Prisma.fragenkategorieCreateManyCreated_byInput | Prisma.fragenkategorieCreateManyCreated_byInput[]
+  skipDuplicates?: boolean
+}
+
+export type fragenkategorieUpsertWithWhereUniqueWithoutCreated_byInput = {
+  where: Prisma.fragenkategorieWhereUniqueInput
+  update: Prisma.XOR<Prisma.fragenkategorieUpdateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedUpdateWithoutCreated_byInput>
+  create: Prisma.XOR<Prisma.fragenkategorieCreateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedCreateWithoutCreated_byInput>
+}
+
+export type fragenkategorieUpdateWithWhereUniqueWithoutCreated_byInput = {
+  where: Prisma.fragenkategorieWhereUniqueInput
+  data: Prisma.XOR<Prisma.fragenkategorieUpdateWithoutCreated_byInput, Prisma.fragenkategorieUncheckedUpdateWithoutCreated_byInput>
+}
+
+export type fragenkategorieUpdateManyWithWhereWithoutCreated_byInput = {
+  where: Prisma.fragenkategorieScalarWhereInput
+  data: Prisma.XOR<Prisma.fragenkategorieUpdateManyMutationInput, Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byInput>
+}
+
+export type fragenkategorieScalarWhereInput = {
+  AND?: Prisma.fragenkategorieScalarWhereInput | Prisma.fragenkategorieScalarWhereInput[]
+  OR?: Prisma.fragenkategorieScalarWhereInput[]
+  NOT?: Prisma.fragenkategorieScalarWhereInput | Prisma.fragenkategorieScalarWhereInput[]
+  fragenkategorie_id?: Prisma.IntFilter<"fragenkategorie"> | number
+  kategorie?: Prisma.StringFilter<"fragenkategorie"> | string
+  status?: Prisma.EnumCategoryStatusFilter<"fragenkategorie"> | $Enums.CategoryStatus
+  created_by_user_id?: Prisma.IntNullableFilter<"fragenkategorie"> | number | null
+  created_at?: Prisma.DateTimeFilter<"fragenkategorie"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"fragenkategorie"> | Date | string
+}
+
+export type fragenkategorieCreateManyCreated_byInput = {
+  fragenkategorie_id?: number
+  kategorie: string
+  status?: $Enums.CategoryStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type fragenkategorieUpdateWithoutCreated_byInput = {
+  kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fragen_kategorien?: Prisma.fragen_kategorienUpdateManyWithoutFragenkategorieNestedInput
+}
+
+export type fragenkategorieUncheckedUpdateWithoutCreated_byInput = {
+  fragenkategorie_id?: Prisma.IntFieldUpdateOperationsInput | number
+  kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenkategorieNestedInput
+}
+
+export type fragenkategorieUncheckedUpdateManyWithoutCreated_byInput = {
+  fragenkategorie_id?: Prisma.IntFieldUpdateOperationsInput | number
+  kategorie?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCategoryStatusFieldUpdateOperationsInput | $Enums.CategoryStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -374,41 +630,70 @@ export type FragenkategorieCountOutputTypeCountFragen_kategorienArgs<ExtArgs ext
 export type fragenkategorieSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   fragenkategorie_id?: boolean
   kategorie?: boolean
+  status?: boolean
+  created_by_user_id?: boolean
+  created_at?: boolean
+  updated_at?: boolean
   fragen_kategorien?: boolean | Prisma.fragenkategorie$fragen_kategorienArgs<ExtArgs>
+  created_by?: boolean | Prisma.fragenkategorie$created_byArgs<ExtArgs>
   _count?: boolean | Prisma.FragenkategorieCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fragenkategorie"]>
 
 export type fragenkategorieSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   fragenkategorie_id?: boolean
   kategorie?: boolean
+  status?: boolean
+  created_by_user_id?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  created_by?: boolean | Prisma.fragenkategorie$created_byArgs<ExtArgs>
 }, ExtArgs["result"]["fragenkategorie"]>
 
 export type fragenkategorieSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   fragenkategorie_id?: boolean
   kategorie?: boolean
+  status?: boolean
+  created_by_user_id?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  created_by?: boolean | Prisma.fragenkategorie$created_byArgs<ExtArgs>
 }, ExtArgs["result"]["fragenkategorie"]>
 
 export type fragenkategorieSelectScalar = {
   fragenkategorie_id?: boolean
   kategorie?: boolean
+  status?: boolean
+  created_by_user_id?: boolean
+  created_at?: boolean
+  updated_at?: boolean
 }
 
-export type fragenkategorieOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragenkategorie_id" | "kategorie", ExtArgs["result"]["fragenkategorie"]>
+export type fragenkategorieOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragenkategorie_id" | "kategorie" | "status" | "created_by_user_id" | "created_at" | "updated_at", ExtArgs["result"]["fragenkategorie"]>
 export type fragenkategorieInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fragen_kategorien?: boolean | Prisma.fragenkategorie$fragen_kategorienArgs<ExtArgs>
+  created_by?: boolean | Prisma.fragenkategorie$created_byArgs<ExtArgs>
   _count?: boolean | Prisma.FragenkategorieCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type fragenkategorieIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type fragenkategorieIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type fragenkategorieIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  created_by?: boolean | Prisma.fragenkategorie$created_byArgs<ExtArgs>
+}
+export type fragenkategorieIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  created_by?: boolean | Prisma.fragenkategorie$created_byArgs<ExtArgs>
+}
 
 export type $fragenkategoriePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "fragenkategorie"
   objects: {
     fragen_kategorien: Prisma.$fragen_kategorienPayload<ExtArgs>[]
+    created_by: Prisma.$usersPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     fragenkategorie_id: number
     kategorie: string
+    status: $Enums.CategoryStatus
+    created_by_user_id: number | null
+    created_at: Date
+    updated_at: Date
   }, ExtArgs["result"]["fragenkategorie"]>
   composites: {}
 }
@@ -804,6 +1089,7 @@ readonly fields: fragenkategorieFieldRefs;
 export interface Prisma__fragenkategorieClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   fragen_kategorien<T extends Prisma.fragenkategorie$fragen_kategorienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragenkategorie$fragen_kategorienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragen_kategorienPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  created_by<T extends Prisma.fragenkategorie$created_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragenkategorie$created_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -835,6 +1121,10 @@ export interface Prisma__fragenkategorieClient<T, Null = never, ExtArgs extends 
 export interface fragenkategorieFieldRefs {
   readonly fragenkategorie_id: Prisma.FieldRef<"fragenkategorie", 'Int'>
   readonly kategorie: Prisma.FieldRef<"fragenkategorie", 'String'>
+  readonly status: Prisma.FieldRef<"fragenkategorie", 'CategoryStatus'>
+  readonly created_by_user_id: Prisma.FieldRef<"fragenkategorie", 'Int'>
+  readonly created_at: Prisma.FieldRef<"fragenkategorie", 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<"fragenkategorie", 'DateTime'>
 }
     
 
@@ -1089,6 +1379,10 @@ export type fragenkategorieCreateManyAndReturnArgs<ExtArgs extends runtime.Types
    */
   data: Prisma.fragenkategorieCreateManyInput | Prisma.fragenkategorieCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.fragenkategorieIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1159,6 +1453,10 @@ export type fragenkategorieUpdateManyAndReturnArgs<ExtArgs extends runtime.Types
    * Limit how many fragenkategories to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.fragenkategorieIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1249,6 +1547,25 @@ export type fragenkategorie$fragen_kategorienArgs<ExtArgs extends runtime.Types.
   take?: number
   skip?: number
   distinct?: Prisma.Fragen_kategorienScalarFieldEnum | Prisma.Fragen_kategorienScalarFieldEnum[]
+}
+
+/**
+ * fragenkategorie.created_by
+ */
+export type fragenkategorie$created_byArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
 }
 
 /**

@@ -11,6 +11,7 @@ import {
   PencilSquareIcon,
   PlusIcon,
   QueueListIcon,
+  TagIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import {
@@ -79,7 +80,7 @@ function editorHero(data: EditorDashboardData, greeting: string) {
       description: "Die Rückmeldung aus der Prüfung hat Vorrang vor neuen Entwürfen.",
       actionHref: firstChange
         ? `/fragen/editor/${firstChange.id}`
-        : "/fragen?view=changes-requested",
+        : "/fragen?status=CHANGES_REQUESTED",
       actionLabel: "Jetzt überarbeiten",
       icon: ExclamationTriangleIcon,
       tone: "amber" as const,
@@ -93,7 +94,7 @@ function editorHero(data: EditorDashboardData, greeting: string) {
       description: "Setze den zuletzt bearbeiteten Entwurf fort oder erfasse eine neue Frage.",
       actionHref: firstDraft
         ? `/fragen/editor/${firstDraft.id}`
-        : "/fragen?view=drafts",
+        : "/fragen?status=MY_DRAFTS",
       actionLabel: "Entwurf fortsetzen",
       icon: PencilSquareIcon,
       tone: "sky" as const,
@@ -133,7 +134,7 @@ function adminHero(
       eyebrow: greeting,
       title: `${data.counts.awaitingReview} ${data.counts.awaitingReview === 1 ? "Frage wartet" : "Fragen warten"} auf deine Freigabe.`,
       description: "Die ältesten Einreichungen stehen in der Warteschlange zuerst.",
-      actionHref: "/fragen?view=review",
+      actionHref: "/fragen?status=REVIEW_QUEUE",
       actionLabel: "Freigaben prüfen",
       icon: ClipboardDocumentCheckIcon,
       tone: "amber" as const,
@@ -288,10 +289,10 @@ export default async function HomePage() {
               <p className="mt-1 text-sm text-slate-500">Offene Aufgaben und dein aktueller Redaktionsfortschritt.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <StatCard href="/fragen?view=changes-requested" label="Überarbeitung" value={editorData.counts.changesRequested} icon={ExclamationTriangleIcon} tone={editorData.counts.changesRequested > 0 ? "amber" : "slate"} />
-              <StatCard href="/fragen?view=drafts" label="Entwürfe" value={editorData.counts.drafts} icon={PencilSquareIcon} tone="sky" />
-              <StatCard href="/fragen?view=review" label="In Prüfung" value={editorData.counts.inReview} icon={ClockIcon} />
-              <StatCard href="/fragen" label="Freigegeben" value={editorData.counts.approved} icon={CheckBadgeIcon} tone="emerald" />
+              <StatCard href="/fragen?status=CHANGES_REQUESTED" label="Überarbeitung" value={editorData.counts.changesRequested} icon={ExclamationTriangleIcon} tone={editorData.counts.changesRequested > 0 ? "amber" : "slate"} />
+              <StatCard href="/fragen?status=MY_DRAFTS" label="Entwürfe" value={editorData.counts.drafts} icon={PencilSquareIcon} tone="sky" />
+              <StatCard href="/fragen?status=MY_SUBMITTED" label="In Prüfung" value={editorData.counts.inReview} icon={ClockIcon} />
+              <StatCard href="/fragen?status=APPROVED" label="Freigegeben" value={editorData.counts.approved} icon={CheckBadgeIcon} tone="emerald" />
             </div>
             <DashboardPanel
               title="Deine nächsten Aufgaben"
@@ -334,15 +335,15 @@ export default async function HomePage() {
               <p className="mt-1 text-sm text-slate-500">Die wichtigsten redaktionellen Aufgaben auf einen Blick.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <StatCard href="/fragen?view=review" label="Offene Freigaben" value={questionData.counts.awaitingReview} icon={ClipboardDocumentCheckIcon} tone={questionData.counts.awaitingReview > 0 ? "amber" : "slate"} />
+              <StatCard href="/fragen?status=REVIEW_QUEUE" label="Offene Freigaben" value={questionData.counts.awaitingReview} icon={ClipboardDocumentCheckIcon} tone={questionData.counts.awaitingReview > 0 ? "amber" : "slate"} />
               <StatCard href="/fragen" label="Zurückgegeben" value={questionData.counts.changesRequested} icon={ExclamationTriangleIcon} />
               <StatCard href="/fragen" label="Ohne Quelle" value={questionData.counts.missingSource} icon={DocumentMagnifyingGlassIcon} />
-              <StatCard href="/fragen" label="Abgelaufen" value={questionData.counts.outdated} icon={ClockIcon} />
+              <StatCard href="/fragen?status=OUTDATED" label="Abgelaufen" value={questionData.counts.outdated} icon={ClockIcon} />
             </div>
             <DashboardPanel
               title="Freigabewarteschlange"
               description="Maximal fünf Einreichungen, älteste zuerst."
-              action={<Link href="/fragen?view=review" className={panelActionClassName}>Alle Freigaben</Link>}
+              action={<Link href="/fragen?status=REVIEW_QUEUE" className={panelActionClassName}>Alle Freigaben</Link>}
             >
               <QuestionTaskList entries={questionData.reviewQueue} emptyTitle="Aktuell wartet keine Frage auf Prüfung." showQualityWarnings />
             </DashboardPanel>
@@ -409,6 +410,7 @@ export default async function HomePage() {
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <QuickActionCard href="/admin/users" title="Benutzerverwaltung" description="Konten, Rollen und Zugänge verwalten." icon={UserGroupIcon} />
+                  <QuickActionCard href="/admin/kategorien" title="Kategorien" description="Kategorien und Vorschläge verwalten." icon={TagIcon} />
                   <QuickActionCard href="/admin/styleguide" title="Styleguide" description="UI-Bausteine und Zustände prüfen." icon={PaintBrushIcon} />
                 </div>
               </div>

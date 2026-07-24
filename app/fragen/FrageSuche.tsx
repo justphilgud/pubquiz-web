@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   searchFragen,
   getFrageDetails,
@@ -15,6 +16,14 @@ import QuizVerwendungPopover from "./QuizVerwendungPopover";
 import type { QuizOption } from "./FragenWorkspace";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { CloneQuestionButton } from "./editor/components/CloneQuestionButton";
+import {
+  getPendingCategoryBadgeLabel,
+  parseQuestionOverviewFilters,
+  serializeQuestionOverviewFilters,
+  type QuestionOverviewFilters,
+} from "./questionOverviewFilters";
+import type { QuestionFilterCategory } from "./components/CategoryFilterCombobox";
+import { QuestionOverviewControls } from "./components/QuestionOverviewControls";
 
 const cloneErrorMessages = {
   QUESTION_NOT_FOUND: "Die Frage wurde nicht gefunden.",
@@ -25,16 +34,7 @@ const cloneErrorMessages = {
   UNEXPECTED_ERROR: "Die Frage konnte nicht geklont werden.",
 };
 
-type Kategorie = {
-  fragenkategorie_id: number;
-  kategorie: string;
-};
-
-const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-200";
-
-const buttonPrimaryClass =
-  "rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-slate-700 active:scale-[0.99]";
+type Kategorie = QuestionFilterCategory;
 
 const buttonSecondaryClass =
   "rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50 active:scale-[0.99]";
@@ -88,16 +88,32 @@ function StatBox({
 export default function FrageSuche({
   kategorien,
   quizze,
+  templates,
+  statusCounts,
 }: {
   kategorien: Kategorie[];
   quizze: QuizOption[];
+  templates: Array<{ id: string; name: string }>;
+  statusCounts: Partial<
+    Record<
+      "MY_DRAFTS" | "MY_SUBMITTED" | "REVIEW_QUEUE" | "CHANGES_REQUESTED",
+      number
+    >
+  >;
 }) {
-  const [suchtext, setSuchtext] = useState("");
-  const [quelle, setQuelle] = useState("");
-  const [kategorieId, setKategorieId] = useState<number | null>(null);
-  const [nurOhneMedien, setNurOhneMedien] = useState(false);
-  const [nurOhneAntworten, setNurOhneAntworten] = useState(false);
-
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+  const filters = useMemo(
+    () =>
+      parseQuestionOverviewFilters(
+        new URLSearchParams(queryString),
+        templates.map((template) => template.id),
+        kategorien.map((category) => category.fragenkategorie_id),
+      ),
+    [kategorien, queryString, templates],
+  );
   const [ergebnisse, setErgebnisse] = useState<FrageSuchResult[]>([]);
   const [meldung, setMeldung] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -109,56 +125,72 @@ export default function FrageSuche({
     {}
   );
   const [detailsLoadingId, setDetailsLoadingId] = useState<number | null>(null);
-  const [archivStatus, setArchivStatus] = useState<"alle" | "aktiv" | "archiviert">("alle");
+  function updateFilters(next: QuestionOverviewFilters) {
+    const params = serializeQuestionOverviewFilters(next);
+    const nextQuery = params.toString();
+    router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
+  }
 
-  async function handleSearch() {
+  function replaceFilters(next: QuestionOverviewFilters) {
+    const params = serializeQuestionOverviewFilters(next);
+    const nextQuery = params.toString();
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname);
+  }
+
+  async function runSearch(
+    activeFilters: QuestionOverviewFilters,
+    offset = 0,
+  ) {
     setMeldung("");
     setIsLoading(true);
+    try {
+      const result = await searchFragen({
+        suchtext: activeFilters.query,
+        sourceState: activeFilters.sourceState,
+        mediaState: activeFilters.mediaState,
+        answerMode: activeFilters.answerMode,
+        kategorieId: activeFilters.categoryId,
+        statuses: activeFilters.statuses,
+        templateIds: activeFilters.templateIds,
+        limit: 50,
+        offset,
+      });
 
-    const result = await searchFragen({
-      suchtext,
-      quelle,
-      kategorieId,
-      nurOhneMedien,
-      nurOhneAntworten,
-      archivStatus,
-      limit: 50,
-      offset: 0,
-    });
-
-    setErgebnisse(result.results);
-    setHasMore(result.hasMore);
-    setNextOffset(result.nextOffset);
-
-    setDetails({});
-    setDetailsLoadingId(null);
-    setIsLoading(false);
-
-    if (result.results.length === 0) {
-      setMeldung("Keine passenden Fragen gefunden.");
+      setErgebnisse((current) =>
+        offset === 0 ? result.results : [...current, ...result.results],
+      );
+      setHasMore(result.hasMore);
+      setNextOffset(result.nextOffset);
+      setDetails({});
+      setDetailsLoadingId(null);
+      if (offset === 0 && result.results.length === 0) {
+        setMeldung("Keine passenden Fragen gefunden.");
+      }
+    } catch (error) {
+      console.error("Fragensuche fehlgeschlagen", {
+        errorClass: error instanceof Error ? error.name : "UnknownError",
+      });
+      setMeldung("Die Fragen konnten nicht geladen werden.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      void runSearch(filters);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+    // `filters` is derived from this stable URL representation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryString]);
+
+  function handleSearch() {
+    void runSearch(filters);
+  }
+
   async function handleLoadMore() {
-    setIsLoading(true);
-
-    const result = await searchFragen({
-      suchtext,
-      quelle,
-      kategorieId,
-      nurOhneMedien,
-      nurOhneAntworten,
-      archivStatus,
-      limit: 50,
-      offset: nextOffset,
-    });
-
-    setErgebnisse((current) => [...current, ...result.results]);
-
-    setHasMore(result.hasMore);
-    setNextOffset(result.nextOffset);
-
-    setIsLoading(false);
+    await runSearch(filters, nextOffset);
   }
 
   async function toggleDetails(fragenId: number) {
@@ -208,139 +240,35 @@ export default function FrageSuche({
   }
 
   function resetSearch() {
-    setSuchtext("");
-    setQuelle("");
-    setKategorieId(null);
-    setNurOhneMedien(false);
-    setNurOhneAntworten(false);
-    setErgebnisse([]);
-    setMeldung("");
-    setHasMore(false);
-    setNextOffset(0);
+    updateFilters({
+      query: filters.query,
+      sourceState: null,
+      statuses: [],
+      templateIds: [],
+      categoryId: null,
+      mediaState: null,
+      answerMode: null,
+    });
   }
+
+  const suchtext = filters.query;
+  const setSuchtext = (query: string) =>
+    replaceFilters({ ...filters, query });
 
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-      <div className="mb-5">
-        <h2 className="text-xl font-semibold text-slate-900">Fragen suchen</h2>
-
-        <p className="mt-1 text-sm text-slate-500">
-          Suche bestehende Fragen nach Text, Kategorie oder Pflegezustand.
-        </p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-[1fr_240px]">
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">
-            Suchtext
-          </span>
-          <input
-            value={suchtext}
-            onChange={(e) => setSuchtext(e.target.value)}
-            className={inputClass}
-            placeholder="Text aus der Frage..."
-          />
-        </label>
-
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">
-            Kategorie
-          </span>
-          <select
-            value={kategorieId ?? ""}
-            onChange={(e) =>
-              setKategorieId(e.target.value ? Number(e.target.value) : null)
-            }
-            className={inputClass}
-          >
-            <option value="">Alle Kategorien</option>
-            {kategorien.map((kat) => (
-              <option
-                key={kat.fragenkategorie_id}
-                value={kat.fragenkategorie_id}
-              >
-                {kat.kategorie}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-[1fr_220px_220px_220px]">
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">
-            Quelle
-          </span>
-          <input
-            value={quelle}
-            onChange={(e) => setQuelle(e.target.value)}
-            className={inputClass}
-            placeholder="z. B. Musikrunde"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">
-            Archivstatus
-          </span>
-
-          <select
-            value={archivStatus}
-            onChange={(e) =>
-              setArchivStatus(
-                e.target.value as "alle" | "aktiv" | "archiviert"
-              )
-            }
-            className={inputClass}
-          >
-            <option value="alle">Alle Fragen</option>
-            <option value="aktiv">Nur aktive Fragen</option>
-            <option value="archiviert">Nur archivierte Fragen</option>
-          </select>
-        </label>
-        <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-          <input
-            type="checkbox"
-            checked={nurOhneMedien}
-            onChange={(e) => setNurOhneMedien(e.target.checked)}
-            className="h-5 w-5 accent-slate-900"
-          />
-          <span className="text-sm font-medium text-slate-700">
-            nur ohne Medien
-          </span>
-        </label>
-
-        <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-          <input
-            type="checkbox"
-            checked={nurOhneAntworten}
-            onChange={(e) => setNurOhneAntworten(e.target.checked)}
-            className="h-5 w-5 accent-slate-900"
-          />
-          <span className="text-sm font-medium text-slate-700">
-            nur ohne Antworten
-          </span>
-        </label>
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={handleSearch}
-          className={buttonPrimaryClass}
-          disabled={isLoading}
-        >
-          {isLoading ? "Suche läuft..." : "Suchen"}
-        </button>
-
-        <button
-          type="button"
-          onClick={resetSearch}
-          className={buttonSecondaryClass}
-        >
-          Zurücksetzen
-        </button>
-      </div>
-
+      <QuestionOverviewControls
+        filters={filters}
+        categories={kategorien}
+        templates={templates}
+        statusCounts={statusCounts}
+        query={suchtext}
+        loading={isLoading}
+        onQueryChange={setSuchtext}
+        onApplySearch={handleSearch}
+        onChange={updateFilters}
+        onReset={resetSearch}
+      />
       {meldung && (
         <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-700">
           {meldung}
@@ -356,6 +284,8 @@ export default function FrageSuche({
           </div>
 
           {ergebnisse.map((frage) => {
+            const pendingCategoryBadgeLabel =
+              getPendingCategoryBadgeLabel(frage.pending_kategorien);
             const hatKeineMedien = frage.medien_anzahl === 0;
             const hatKeineAntworten = frage.antworten_anzahl === 0;
             const wurdeNochNieVerwendet = frage.quiz_anzahl === 0;
@@ -402,6 +332,15 @@ export default function FrageSuche({
                         <StatusPill label="keine Medien" tone="orange" />
                       )}
 
+                      {pendingCategoryBadgeLabel && (
+                        <span
+                          title={frage.pending_kategorien.join(", ")}
+                          className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800"
+                        >
+                          {pendingCategoryBadgeLabel}
+                        </span>
+                      )}
+
                       {wurdeNochNieVerwendet && (
                         <StatusPill label="noch nie verwendet" tone="blue" />
                       )}
@@ -439,6 +378,14 @@ export default function FrageSuche({
                     </p>
                     <p className="mt-1 break-words text-sm text-slate-500">
                       Geltungsbereich: {frage.geltungsbereich === "GLOBAL" ? "Global" : frage.eventreihen.join(", ") || "Keine Eventreihe"}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Antwortart:{" "}
+                      {frage.answer_mode === "OPEN"
+                        ? "Offen"
+                        : frage.answer_mode === "CLOSED"
+                          ? "Geschlossen"
+                          : "Nicht eindeutig"}
                     </p>
                   </div>
 

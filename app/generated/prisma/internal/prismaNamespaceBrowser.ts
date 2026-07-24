@@ -177,7 +177,11 @@ export type Fragen_kategorienScalarFieldEnum = (typeof Fragen_kategorienScalarFi
 
 export const FragenkategorieScalarFieldEnum = {
   fragenkategorie_id: 'fragenkategorie_id',
-  kategorie: 'kategorie'
+  kategorie: 'kategorie',
+  status: 'status',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type FragenkategorieScalarFieldEnum = (typeof FragenkategorieScalarFieldEnum)[keyof typeof FragenkategorieScalarFieldEnum]

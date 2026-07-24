@@ -165,3 +165,66 @@ export async function loadReviewQueue(managedEventSeriesIds: number[] | null): P
     ),
   }));
 }
+
+export async function loadQuestionStatusCounts(input: {
+  userId: number;
+  accessibleEventSeriesIds: number[];
+  managedEventSeriesIds: number[] | null;
+}) {
+  const ownScope = {
+    OR: [
+      { geltungsbereich: "GLOBAL" as const },
+      {
+        geltungsbereich: "EVENT_SERIES" as const,
+        eventreihen: {
+          some: {
+            eventreihe_id: { in: input.accessibleEventSeriesIds },
+          },
+        },
+      },
+    ],
+  };
+  const ownWhere = (reviewStatus: QuestionReviewStatusType) => ({
+    created_by_user_id: input.userId,
+    review_status: reviewStatus,
+    ist_archiviert: false,
+    ...ownScope,
+  });
+  const reviewWhere = {
+    review_status: QuestionReviewStatus.IN_REVIEW,
+    ist_archiviert: false,
+    ...(input.managedEventSeriesIds === null
+      ? {}
+      : {
+          geltungsbereich: "EVENT_SERIES" as const,
+          eventreihen: {
+            some: {
+              eventreihe_id: { in: input.managedEventSeriesIds },
+            },
+            none: {
+              eventreihe_id: { notIn: input.managedEventSeriesIds },
+            },
+          },
+        }),
+  };
+  const [drafts, submitted, changesRequested, reviewQueue] =
+    await Promise.all([
+      prisma.fragen.count({
+        where: ownWhere(QuestionReviewStatus.DRAFT),
+      }),
+      prisma.fragen.count({
+        where: ownWhere(QuestionReviewStatus.IN_REVIEW),
+      }),
+      prisma.fragen.count({
+        where: ownWhere(QuestionReviewStatus.CHANGES_REQUESTED),
+      }),
+      prisma.fragen.count({ where: reviewWhere }),
+    ]);
+
+  return {
+    MY_DRAFTS: drafts,
+    MY_SUBMITTED: submitted,
+    CHANGES_REQUESTED: changesRequested,
+    REVIEW_QUEUE: reviewQueue,
+  };
+}

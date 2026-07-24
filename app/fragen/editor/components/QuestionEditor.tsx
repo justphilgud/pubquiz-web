@@ -23,6 +23,7 @@ import { EditorSaveActions } from "./EditorSaveActions";
 import { QuestionReviewPanel } from "./QuestionReviewPanel";
 import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
+import { PendingCategoryReviewDialog } from "./PendingCategoryReviewDialog";
 import { QuestionSection } from "./QuestionSection";
 import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
@@ -41,6 +42,7 @@ import type {
   QuestionTemplate,
   QuestionValidationTarget,
   PendingQuestionSaveAction,
+  PendingCategoryDecision,
   ReviewReasonCode,
 } from "../types";
 import type { AppLocale } from "@/app/i18n/locale";
@@ -168,6 +170,8 @@ export function QuestionEditor({
     questionRecord?.questionId ?? null,
   );
   const [isReviewFeedbackOpen, setIsReviewFeedbackOpen] = useState(false);
+  const [isPendingCategoryReviewOpen, setIsPendingCategoryReviewOpen] =
+    useState(false);
   const [reviewFeedbackError, setReviewFeedbackError] = useState<string | null>(
     null,
   );
@@ -475,6 +479,7 @@ export function QuestionEditor({
       resetAfterSuccess?: boolean;
       reviewReasonCodes?: ReviewReasonCode[];
       reviewComment?: string;
+      categoryReviewDecisions?: PendingCategoryDecision[];
     },
   ) {
     if (selectedTemplate?.requiresAnswerImages) {
@@ -555,6 +560,7 @@ export function QuestionEditor({
         templateConfig: draft.templateConfig,
         reviewReasonCodes: options?.reviewReasonCodes,
         reviewComment: options?.reviewComment,
+        categoryReviewDecisions: options?.categoryReviewDecisions,
       });
 
       setSaveMessage({
@@ -713,6 +719,24 @@ export function QuestionEditor({
         return;
       }
 
+      const pendingCategories = categories.filter(
+        (category) =>
+          category.status === "PENDING" &&
+          draft.categoryIds.includes(category.id),
+      );
+      if (pendingCategories.length > 0) {
+        if (!capabilities.canManageCategories) {
+          setSaveMessage({
+            tone: "error",
+            text: messages.pendingCategoryReview.adminRequired,
+          });
+          return;
+        }
+        setSaveMessage(null);
+        setIsPendingCategoryReviewOpen(true);
+        return;
+      }
+
       void handleSave("APPROVE", "APPROVE");
       return;
     }
@@ -729,6 +753,14 @@ export function QuestionEditor({
     void handleSave("REQUEST_CHANGES", "REQUEST_CHANGES", {
       reviewReasonCodes,
       reviewComment,
+    });
+  }
+
+  function approveWithCategoryDecisions(
+    decisions: PendingCategoryDecision[],
+  ) {
+    void handleSave("APPROVE", "APPROVE", {
+      categoryReviewDecisions: decisions,
     });
   }
 
@@ -1043,6 +1075,20 @@ export function QuestionEditor({
         submissionError={reviewFeedbackError}
         onClose={() => setIsReviewFeedbackOpen(false)}
         onConfirm={requestChanges}
+      />
+      <PendingCategoryReviewDialog
+        open={isPendingCategoryReviewOpen}
+        categories={categories.filter(
+          (category) =>
+            category.status === "PENDING" &&
+            draft.categoryIds.includes(category.id),
+        )}
+        isPending={pendingAction === "APPROVE"}
+        submissionError={
+          saveMessage?.tone === "error" ? saveMessage.text : null
+        }
+        onClose={() => setIsPendingCategoryReviewOpen(false)}
+        onConfirm={approveWithCategoryDecisions}
       />
     </main>
     </QuestionEditorMessagesProvider>

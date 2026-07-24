@@ -6,6 +6,7 @@ import FrageSuche from "./FrageSuche";
 type Kategorie = {
   fragenkategorie_id: number;
   kategorie: string;
+  status: "ACTIVE" | "PENDING" | "ARCHIVED";
 };
 
 export type QuizOption = {
@@ -19,10 +20,19 @@ export default function FragenWorkspace({
   kategorien,
   quizze,
   embedded = false,
+  templates,
+  statusCounts,
 }: {
   kategorien: Kategorie[];
   quizze: QuizOption[];
   embedded?: boolean;
+  templates: Array<{ id: string; name: string }>;
+  statusCounts: Partial<
+    Record<
+      "MY_DRAFTS" | "MY_SUBMITTED" | "REVIEW_QUEUE" | "CHANGES_REQUESTED",
+      number
+    >
+  >;
 }) {
   const Wrapper = embedded ? "div" : "main";
 
@@ -64,6 +74,8 @@ export default function FragenWorkspace({
           <FrageSuche
             kategorien={kategorien}
             quizze={quizze}
+            templates={templates}
+            statusCounts={statusCounts}
           />
         </div>
 

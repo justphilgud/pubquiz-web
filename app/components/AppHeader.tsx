@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import {
   canManageEventSeries,
+  canManageCategories,
   canManageQuizzes,
   canManageUsers,
   canCreateQuestions,
@@ -46,6 +47,7 @@ export default async function AppHeader() {
       canCreateQuestions(actor) || (questionSeriesIds?.length ?? 0) > 0,
     canManageQuizzes: canManageQuizzes(actor) || (quizSeriesIds?.length ?? 0) > 0,
     canManageEventSeries: canManageEventSeries(actor) || (editableSeriesIds?.length ?? 0) > 0,
+    canManageCategories: canManageCategories(actor),
     canManageUsers: canManageUsers(actor),
   });
 
