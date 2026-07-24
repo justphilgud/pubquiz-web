@@ -644,13 +644,17 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     }
     generatorParameters[generatorId] = parameters;
   }
-  const specificTemplateIssue = requiresCompleteQuestion
-    ? getQuestionTemplateValidationIssue(
-        payload.templateConfig.templateData,
-        templateId,
-      )
-    : null;
-  if (specificTemplateIssue) {
+  const specificTemplateIssue = getQuestionTemplateValidationIssue(
+    payload.templateConfig.templateData,
+    templateId,
+  );
+  if (
+    specificTemplateIssue &&
+    (
+      requiresCompleteQuestion ||
+      specificTemplateIssue.code !== "ESTIMATE_UNIT_REQUIRED"
+    )
+  ) {
     throw new DraftValidationError(
       specificTemplateIssue.message,
       specificTemplateIssue.field,

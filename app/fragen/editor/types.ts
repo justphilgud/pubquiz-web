@@ -77,6 +77,8 @@ export type QuestionTemplateData =
       placeId: string;
       placeName: string;
       placeAdditionalLabel: string;
+      placeAverageRating: number | null;
+      placeReviewCount: number | null;
       placeMapsUrl: string;
       placeImportedOrEditedAt: string;
       reviews: Array<{
@@ -397,6 +399,8 @@ export type QuestionValidationTarget =
   | "questionText"
   | "questionMedia"
   | "templateUnit"
+  | "templatePlaceAverageRating"
+  | "templatePlaceReviewCount"
   | "answers"
   | "categories"
   | "validUntil";

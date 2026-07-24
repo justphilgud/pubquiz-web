@@ -9,6 +9,8 @@ import {
   getAnswersForTemplateData,
   isAllowedGoogleMapsUrl,
   isExactAnagram,
+  parseGooglePlaceAverageRatingInput,
+  parseGooglePlaceReviewCountInput,
   QUESTION_LANGUAGE_CODES,
   TRANSLATION_TEXT_MAX_LENGTH,
 } from "../templates/questionTemplateData";
@@ -23,11 +25,12 @@ import {
   type GoogleReviewPreview,
 } from "../googlePlaces";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Checkbox, Input } from "@/components/ui";
 import type {
   QuestionAnswerDraft,
   QuestionTemplateData,
   QuestionTemplateSurfaceKind,
+  QuestionValidationTarget,
 } from "../types";
 
 type Props = {
@@ -37,6 +40,7 @@ type Props = {
   onChange: (data: QuestionTemplateData, answers: QuestionAnswerDraft[]) => void;
   answers: readonly QuestionAnswerDraft[];
   validationError?: string | null;
+  validationTarget?: QuestionValidationTarget;
   googlePlacesFeature: GooglePlacesFeature;
 };
 
@@ -250,13 +254,28 @@ function AnagramEditor(props: EditorProps) {
 }
 
 function ReviewsEditor(props: EditorProps) {
+  const initialGoogleData = props.data?.kind === "GOOGLE_REVIEWS"
+    ? props.data
+    : null;
   const [placePreviews, setPlacePreviews] = useState<GooglePlacePreview[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<GooglePlacePreview | null>(null);
   const [reviewPreviews, setReviewPreviews] = useState<GoogleReviewPreview[]>([]);
   const [loading, setLoading] = useState<"place" | "reviews" | null>(null);
   const [researchMessage, setResearchMessage] = useState("");
+  const [averageRatingInput, setAverageRatingInput] = useState(
+    initialGoogleData?.placeAverageRating?.toLocaleString("de-DE", {
+      maximumFractionDigits: 1,
+    }) ?? "",
+  );
+  const [reviewCountInput, setReviewCountInput] = useState(
+    initialGoogleData?.placeReviewCount?.toLocaleString("de-DE") ?? "",
+  );
   if (props.data?.kind !== "GOOGLE_REVIEWS") return null;
   const data = props.data;
+  const averageRatingInvalid =
+    parseGooglePlaceAverageRatingInput(averageRatingInput) === undefined;
+  const reviewCountInvalid =
+    parseGooglePlaceReviewCountInput(reviewCountInput) === undefined;
   const updateReviews = (reviews: typeof data.reviews) => commit(props, { ...data, reviews });
   const errorMessage = (code: GooglePlacesErrorCode) => ({
     INVALID_MAPS_URL: "Bitte gib einen gültigen HTTPS-Link zu Google Maps ein.",
@@ -335,6 +354,90 @@ function ReviewsEditor(props: EditorProps) {
   return <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4">
     <h2 className="font-semibold">Google-Rezensionen</h2>
     <div className="grid gap-3 sm:grid-cols-2">
+      <label className="text-sm font-medium">Gesuchter Ort
+        <input className={`${inputClass} mt-1`} value={data.placeName} disabled={props.disabled}
+          onChange={(event) => commit(props, { ...data, placeName: event.target.value, placeImportedOrEditedAt: new Date().toISOString() })} />
+      </label>
+      <label className="text-sm font-medium">Zusatzangabe (optional)
+        <input className={`${inputClass} mt-1`} value={data.placeAdditionalLabel} disabled={props.disabled}
+          onChange={(event) => commit(props, { ...data, placeAdditionalLabel: event.target.value, placeImportedOrEditedAt: new Date().toISOString() })} />
+      </label>
+      <label className="text-sm font-medium">Durchschnittliche Bewertung
+        <Input
+          data-template-place-average-rating
+          className={`mt-1 min-h-11 ${averageRatingInvalid ? "border-red-500" : ""}`}
+          inputMode="decimal"
+          placeholder="4,4"
+          value={averageRatingInput}
+          disabled={props.disabled}
+          aria-invalid={averageRatingInvalid}
+          aria-describedby={averageRatingInvalid ? "place-average-rating-error" : undefined}
+          onChange={(event) => {
+            const rawValue = event.target.value;
+            const parsed = parseGooglePlaceAverageRatingInput(rawValue);
+            setAverageRatingInput(rawValue);
+            commit(props, {
+              ...data,
+              placeAverageRating: parsed === undefined ? Number.NaN : parsed,
+              placeImportedOrEditedAt: new Date().toISOString(),
+            });
+          }}
+          onBlur={() => {
+            const parsed = parseGooglePlaceAverageRatingInput(averageRatingInput);
+            if (typeof parsed === "number") {
+              setAverageRatingInput(parsed.toLocaleString("de-DE", {
+                maximumFractionDigits: 1,
+              }));
+            }
+          }}
+        />
+        <span className="mt-1 block text-xs font-normal text-slate-600">
+          Aktuelle durchschnittliche Bewertung des Ortes
+        </span>
+        {(averageRatingInvalid ||
+          props.validationTarget === "templatePlaceAverageRating") && (
+          <span id="place-average-rating-error" role="alert" className="mt-1 block text-xs font-normal text-red-700">
+            Die durchschnittliche Bewertung muss zwischen 0 und 5 liegen.
+          </span>
+        )}
+      </label>
+      <label className="text-sm font-medium">Anzahl der Rezensionen
+        <Input
+          data-template-place-review-count
+          className={`mt-1 min-h-11 ${reviewCountInvalid ? "border-red-500" : ""}`}
+          inputMode="numeric"
+          placeholder="12.345"
+          value={reviewCountInput}
+          disabled={props.disabled}
+          aria-invalid={reviewCountInvalid}
+          aria-describedby={reviewCountInvalid ? "place-review-count-error" : undefined}
+          onChange={(event) => {
+            const rawValue = event.target.value;
+            const parsed = parseGooglePlaceReviewCountInput(rawValue);
+            setReviewCountInput(rawValue);
+            commit(props, {
+              ...data,
+              placeReviewCount: parsed === undefined ? Number.NaN : parsed,
+              placeImportedOrEditedAt: new Date().toISOString(),
+            });
+          }}
+          onBlur={() => {
+            const parsed = parseGooglePlaceReviewCountInput(reviewCountInput);
+            if (typeof parsed === "number") {
+              setReviewCountInput(parsed.toLocaleString("de-DE"));
+            }
+          }}
+        />
+        <span className="mt-1 block text-xs font-normal text-slate-600">
+          Gesamtzahl der bei Google angezeigten Rezensionen
+        </span>
+        {(reviewCountInvalid ||
+          props.validationTarget === "templatePlaceReviewCount") && (
+          <span id="place-review-count-error" role="alert" className="mt-1 block text-xs font-normal text-red-700">
+            Die Anzahl der Rezensionen muss eine nicht negative ganze Zahl sein.
+          </span>
+        )}
+      </label>
       <label className="text-sm font-medium sm:col-span-2">Google-Maps-Link zum Ort
         <input type="url" className={`${inputClass} mt-1 ${isAllowedGoogleMapsUrl(data.placeMapsUrl) ? "" : "border-red-500"}`} value={data.placeMapsUrl} disabled={props.disabled}
           onChange={(event) => commit(props, { ...data, placeMapsUrl: event.target.value, placeImportedOrEditedAt: new Date().toISOString() })} />
@@ -360,14 +463,6 @@ function ReviewsEditor(props: EditorProps) {
           </article>)}
         </div>}
       </>}
-      <label className="text-sm font-medium">Gesuchter Ort
-        <input className={`${inputClass} mt-1`} value={data.placeName} disabled={props.disabled}
-          onChange={(event) => commit(props, { ...data, placeName: event.target.value, placeImportedOrEditedAt: new Date().toISOString() })} />
-      </label>
-      <label className="text-sm font-medium">Zusatzangabe (optional)
-        <input className={`${inputClass} mt-1`} value={data.placeAdditionalLabel} disabled={props.disabled}
-          onChange={(event) => commit(props, { ...data, placeAdditionalLabel: event.target.value, placeImportedOrEditedAt: new Date().toISOString() })} />
-      </label>
     </div>
     {props.googlePlacesFeature.available && reviewPreviews.length > 0 && <div className="space-y-2 rounded-xl border border-blue-200 bg-blue-50 p-3">
       <h3 className="font-semibold">Temporär geladene Rezensionen</h3>

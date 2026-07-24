@@ -34,6 +34,8 @@ export type QuestionQualityIssueCode =
   | "GENERATOR_CONFLICT"
   | "PIXEL_STAGE_DURATIONS_INVALID"
   | "ESTIMATE_UNIT_REQUIRED"
+  | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
+  | "GOOGLE_PLACE_REVIEW_COUNT_INVALID"
   | "CORRECT_ANSWER_REQUIRED"
   | "ANSWER_MEDIA_REQUIRED"
   | "REQUIRED_LABELED_ANSWER_EMPTY"
@@ -46,7 +48,15 @@ export type QuestionQualityIssueCode =
 export type QuestionQualityIssue = {
   code: QuestionQualityIssueCode;
   params?: Record<string, string | number>;
-  field?: "questionText" | "questionMedia" | "templateUnit" | "answers" | "categories" | "validUntil";
+  field?:
+    | "questionText"
+    | "questionMedia"
+    | "templateUnit"
+    | "templatePlaceAverageRating"
+    | "templatePlaceReviewCount"
+    | "answers"
+    | "categories"
+    | "validUntil";
 };
 
 export type QuestionQualityResult = {

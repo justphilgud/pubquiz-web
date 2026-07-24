@@ -32,14 +32,26 @@ function navigationItemsFor(actor: AuthorizationActor) {
   });
 }
 
-test("admin navigation contains event series between quiz and user management", () => {
+test("admin navigation omits categories and keeps event series before users", () => {
   assert.deepEqual(navigationItemsFor(adminActor), [
     { href: "/fragen", label: "Fragen" },
     { href: "/quiz", label: "Quiz" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
-    { href: "/admin/kategorien", label: "Kategorien" },
     { href: "/admin/users", label: "Benutzer" },
   ]);
+});
+
+test("category capability never exposes the dashboard-only category route", () => {
+  assert.equal(
+    getAppNavigationItems({
+      canAccessQuestions: false,
+      canManageQuizzes: false,
+      canManageEventSeries: false,
+      canManageCategories: true,
+      canManageUsers: false,
+    }).some(({ href }) => href === "/admin/kategorien"),
+    false,
+  );
 });
 
 test("editor navigation does not expose admin destinations", () => {

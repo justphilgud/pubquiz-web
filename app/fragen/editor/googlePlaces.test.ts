@@ -19,8 +19,15 @@ import {
 } from "./googlePlaces.server";
 import {
   getDefaultQuestionTemplateData,
+  getQuestionTemplateValidationIssue,
+  parseGooglePlaceAverageRatingInput,
+  parseGooglePlaceReviewCountInput,
   parseQuestionTemplateData,
 } from "./templates/questionTemplateData";
+import {
+  buildQuestionTemplateRuntimeModel,
+  formatGooglePlaceRatingSummary,
+} from "./templates/questionTemplateRuntime";
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
 import { resolveGooglePlacesFeature } from "./googlePlacesFeature";
 
@@ -290,6 +297,136 @@ test("manual Google review data is complete without API-only references", () => 
   assert.equal(parsed.explanation, "Wird in der Auflösung gezeigt.");
 });
 
+test("Google location metrics accept localized input and reject invalid values", () => {
+  assert.equal(parseGooglePlaceAverageRatingInput(""), null);
+  assert.equal(parseGooglePlaceAverageRatingInput("0"), 0);
+  assert.equal(parseGooglePlaceAverageRatingInput("4,4"), 4.4);
+  assert.equal(parseGooglePlaceAverageRatingInput("4.4"), 4.4);
+  assert.equal(parseGooglePlaceAverageRatingInput("5"), 5);
+  assert.equal(parseGooglePlaceAverageRatingInput("-0,1"), undefined);
+  assert.equal(parseGooglePlaceAverageRatingInput("5,1"), undefined);
+  assert.equal(parseGooglePlaceAverageRatingInput("4,44"), undefined);
+
+  assert.equal(parseGooglePlaceReviewCountInput(""), null);
+  assert.equal(parseGooglePlaceReviewCountInput("0"), 0);
+  assert.equal(parseGooglePlaceReviewCountInput("18763"), 18_763);
+  assert.equal(parseGooglePlaceReviewCountInput("18.763"), 18_763);
+  assert.equal(parseGooglePlaceReviewCountInput("18 763"), 18_763);
+  assert.equal(parseGooglePlaceReviewCountInput("-1"), undefined);
+  assert.equal(parseGooglePlaceReviewCountInput("1,5"), undefined);
+});
+
+test("Google location metrics normalize, persist and remain legacy-compatible", () => {
+  const defaults = getDefaultQuestionTemplateData(
+    questionTemplateIds.googleReviews,
+  );
+  assert.ok(defaults && defaults.kind === "GOOGLE_REVIEWS");
+  const configured = {
+    ...defaults,
+    placeName: "Wilhelma Stuttgart",
+    placeAverageRating: 4.4,
+    placeReviewCount: 18_763,
+    reviews: [{ ...defaults.reviews[0], text: "Ein schöner Ort" }],
+  };
+  const parsed = parseQuestionTemplateData(
+    JSON.parse(JSON.stringify(configured)),
+    questionTemplateIds.googleReviews,
+    true,
+  );
+  assert.ok(parsed && parsed.kind === "GOOGLE_REVIEWS");
+  assert.equal(parsed.placeAverageRating, 4.4);
+  assert.equal(parsed.placeReviewCount, 18_763);
+  assert.deepEqual(structuredClone(parsed), parsed);
+
+  const legacy: Record<string, unknown> = structuredClone(configured);
+  delete legacy.placeAverageRating;
+  delete legacy.placeReviewCount;
+  const parsedLegacy = parseQuestionTemplateData(
+    legacy,
+    questionTemplateIds.googleReviews,
+    true,
+  );
+  assert.ok(parsedLegacy && parsedLegacy.kind === "GOOGLE_REVIEWS");
+  assert.equal(parsedLegacy.placeAverageRating, null);
+  assert.equal(parsedLegacy.placeReviewCount, null);
+});
+
+test("Google location metric validation returns qualified field errors", () => {
+  const defaults = getDefaultQuestionTemplateData(
+    questionTemplateIds.googleReviews,
+  );
+  assert.ok(defaults && defaults.kind === "GOOGLE_REVIEWS");
+  assert.deepEqual(getQuestionTemplateValidationIssue({
+    ...defaults,
+    placeAverageRating: 5.1,
+  }, questionTemplateIds.googleReviews), {
+    code: "GOOGLE_PLACE_AVERAGE_RATING_INVALID",
+    field: "templatePlaceAverageRating",
+    message: "Die durchschnittliche Bewertung muss zwischen 0 und 5 liegen.",
+  });
+  assert.deepEqual(getQuestionTemplateValidationIssue({
+    ...defaults,
+    placeReviewCount: 1.5,
+  }, questionTemplateIds.googleReviews), {
+    code: "GOOGLE_PLACE_REVIEW_COUNT_INVALID",
+    field: "templatePlaceReviewCount",
+    message: "Die Anzahl der Rezensionen muss eine nicht negative ganze Zahl sein.",
+  });
+  assert.equal(parseQuestionTemplateData({
+    ...defaults,
+    placeReviewCount: -1,
+  }, questionTemplateIds.googleReviews, false), null);
+});
+
+test("Google location metrics are formatted only for the solution runtime", () => {
+  assert.equal(formatGooglePlaceRatingSummary({
+    placeAverageRating: 4.4,
+    placeReviewCount: 18_763,
+  }), "4,4 von 5 Sternen · 18.763 Rezensionen");
+  assert.equal(formatGooglePlaceRatingSummary({
+    placeAverageRating: 5,
+    placeReviewCount: null,
+  }), "5 von 5 Sternen");
+  assert.equal(formatGooglePlaceRatingSummary({
+    placeAverageRating: null,
+    placeReviewCount: 1,
+  }), "1 Rezension");
+  assert.equal(formatGooglePlaceRatingSummary({
+    placeAverageRating: null,
+    placeReviewCount: null,
+  }), "");
+
+  const defaults = getDefaultQuestionTemplateData(
+    questionTemplateIds.googleReviews,
+  );
+  assert.ok(defaults && defaults.kind === "GOOGLE_REVIEWS");
+  const runtime = buildQuestionTemplateRuntimeModel({
+    templateId: questionTemplateIds.googleReviews,
+    questionText: "Welcher Ort ist gesucht?",
+    templateConfig: {
+      stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 },
+      createPixelQuestionByAnswer: { answer1: false, answer2: false },
+      templateData: {
+        ...defaults,
+        placeName: "Wilhelma Stuttgart",
+        placeAverageRating: 4.4,
+        placeReviewCount: 18_763,
+      },
+    },
+    correctAnswers: [],
+  });
+  assert.deepEqual(runtime.solutionLines.slice(0, 2), [
+    "Wilhelma Stuttgart",
+    "4,4 von 5 Sternen · 18.763 Rezensionen",
+  ]);
+
+  const player = readFileSync(
+    "app/quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",
+    "utf8",
+  );
+  assert.doesNotMatch(player, /placeAverageRating|placeReviewCount/);
+});
+
 test("research is authorized server-side and absent from presentation", () => {
   const actions = readFileSync(
     "app/fragen/editor/googlePlacesActions.ts",
@@ -339,6 +476,17 @@ test("Google review editor keeps compact manual controls", () => {
   );
   const checkbox = readFileSync("components/ui/Checkbox.tsx", "utf8");
   assert.match(editor, /sm:grid-cols-\[minmax\(0,1fr\)_8rem_minmax\(0,1fr\)\]/);
+  assert.match(editor, /Durchschnittliche Bewertung/);
+  assert.match(editor, /Anzahl der Rezensionen/);
+  assert.match(editor, /sm:grid-cols-2/);
+  assert.ok(
+    editor.indexOf("Gesuchter Ort") <
+      editor.indexOf("Durchschnittliche Bewertung"),
+  );
+  assert.ok(
+    editor.indexOf("Anzahl der Rezensionen") <
+      editor.indexOf("Google-Maps-Link zum Ort"),
+  );
   assert.match(editor, /<legend className="text-sm font-semibold">Darstellung/);
   assert.match(editor, /sm:grid-cols-3/);
   assert.match(editor, /<Checkbox/);

@@ -50,6 +50,8 @@ const defaults: Record<string, QuestionTemplateData> = {
     placeId: "",
     placeName: "",
     placeAdditionalLabel: "",
+    placeAverageRating: null,
+    placeReviewCount: null,
     placeMapsUrl: "",
     placeImportedOrEditedAt: "",
     reviews: [{
@@ -96,15 +98,84 @@ export const QUESTION_LANGUAGE_CODES = ["de", "en", "fr", "es", "it", "nl"] as c
 export const ANAGRAM_WORD_COUNT_PREFERENCES = ["AUTO", "2", "3", "4", "5", "ANY"] as const;
 
 export type QuestionTemplateValidationIssue = {
-  code: "ESTIMATE_UNIT_REQUIRED";
-  field: "templateUnit";
+  code:
+    | "ESTIMATE_UNIT_REQUIRED"
+    | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
+    | "GOOGLE_PLACE_REVIEW_COUNT_INVALID";
+  field:
+    | "templateUnit"
+    | "templatePlaceAverageRating"
+    | "templatePlaceReviewCount";
   message: string;
 };
+
+function isValidGooglePlaceAverageRating(value: unknown): boolean {
+  return value === null ||
+    typeof value === "number" &&
+      Number.isFinite(value) &&
+      value >= 0 &&
+      value <= 5 &&
+      Number.isInteger(value * 10);
+}
+
+function isValidGooglePlaceReviewCount(value: unknown): boolean {
+  return value === null ||
+    typeof value === "number" &&
+      Number.isSafeInteger(value) &&
+      value >= 0;
+}
+
+export function parseGooglePlaceAverageRatingInput(
+  value: string,
+): number | null | undefined {
+  const normalized = value.trim().replace(",", ".");
+  if (!normalized) return null;
+  if (!/^\d(?:[.,]\d)?$/.test(value.trim())) return undefined;
+  const parsed = Number(normalized);
+  return isValidGooglePlaceAverageRating(parsed) ? parsed : undefined;
+}
+
+export function parseGooglePlaceReviewCountInput(
+  value: string,
+): number | null | undefined {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const normalized = /^\d+$/.test(trimmed)
+    ? trimmed
+    : /^\d{1,3}(?:[.\s]\d{3})+$/.test(trimmed)
+    ? trimmed.replace(/[.\s]/g, "")
+    : "";
+  if (!normalized) return undefined;
+  const parsed = Number(normalized);
+  return isValidGooglePlaceReviewCount(parsed) ? parsed : undefined;
+}
 
 export function getQuestionTemplateValidationIssue(
   value: unknown,
   templateId: string | null,
 ): QuestionTemplateValidationIssue | null {
+  if (
+    templateId === questionTemplateIds.googleReviews &&
+    isRecord(value) &&
+    value.kind === "GOOGLE_REVIEWS"
+  ) {
+    const averageRating = value.placeAverageRating ?? null;
+    if (!isValidGooglePlaceAverageRating(averageRating)) {
+      return {
+        code: "GOOGLE_PLACE_AVERAGE_RATING_INVALID",
+        field: "templatePlaceAverageRating",
+        message: "Die durchschnittliche Bewertung muss zwischen 0 und 5 liegen.",
+      };
+    }
+    const reviewCount = value.placeReviewCount ?? null;
+    if (!isValidGooglePlaceReviewCount(reviewCount)) {
+      return {
+        code: "GOOGLE_PLACE_REVIEW_COUNT_INVALID",
+        field: "templatePlaceReviewCount",
+        message: "Die Anzahl der Rezensionen muss eine nicht negative ganze Zahl sein.",
+      };
+    }
+  }
   const parsed = parseQuestionTemplateData(value, templateId, false);
   if (parsed?.kind === "ESTIMATE" && !parsed.unit.trim()) {
     return {
@@ -219,6 +290,8 @@ export function parseQuestionTemplateData(
         }
       : null;
   } else if (value.kind === "GOOGLE_REVIEWS") {
+    const placeAverageRating = value.placeAverageRating ?? null;
+    const placeReviewCount = value.placeReviewCount ?? null;
     const reviews = Array.isArray(value.reviews)
       ? value.reviews.map((review) => isRecord(review) && text(review.id) !== null && text(review.text) !== null &&
         (review.authorName === undefined || text(review.authorName) !== null) &&
@@ -245,6 +318,8 @@ export function parseQuestionTemplateData(
     const legacySourceUrl = text(value.sourceUrl) ?? "";
     parsed = (value.placeId === undefined || text(value.placeId) !== null) && text(value.placeName) !== null &&
       (value.placeAdditionalLabel === undefined || text(value.placeAdditionalLabel) !== null) &&
+      isValidGooglePlaceAverageRating(placeAverageRating) &&
+      isValidGooglePlaceReviewCount(placeReviewCount) &&
       (value.placeMapsUrl === undefined || text(value.placeMapsUrl) !== null) &&
       (value.mapsUrl === undefined || text(value.mapsUrl) !== null) &&
       (value.placeImportedOrEditedAt === undefined || text(value.placeImportedOrEditedAt) !== null) &&
@@ -258,6 +333,8 @@ export function parseQuestionTemplateData(
           placeId: text(value.placeId) ?? "",
           placeName: text(value.placeName)!,
           placeAdditionalLabel: text(value.placeAdditionalLabel) ?? "",
+          placeAverageRating: placeAverageRating as number | null,
+          placeReviewCount: placeReviewCount as number | null,
           placeMapsUrl: text(value.placeMapsUrl) || text(value.mapsUrl) || legacySourceUrl,
           placeImportedOrEditedAt: text(value.placeImportedOrEditedAt) ?? text(value.accessedAt) ?? "",
           explanation: text(value.explanation)!,

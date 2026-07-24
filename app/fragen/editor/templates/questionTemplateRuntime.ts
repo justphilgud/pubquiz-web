@@ -15,6 +15,30 @@ export type QuestionTemplateRuntimeModel = {
   templateData?: QuestionTemplateData;
 };
 
+export function formatGooglePlaceRatingSummary(
+  data: Pick<
+    Extract<QuestionTemplateData, { kind: "GOOGLE_REVIEWS" }>,
+    "placeAverageRating" | "placeReviewCount"
+  >,
+): string {
+  const parts: string[] = [];
+  if (data.placeAverageRating !== null) {
+    parts.push(
+      `${data.placeAverageRating.toLocaleString("de-DE", {
+        maximumFractionDigits: 1,
+      })} von 5 Sternen`,
+    );
+  }
+  if (data.placeReviewCount !== null) {
+    parts.push(
+      `${data.placeReviewCount.toLocaleString("de-DE")} ${
+        data.placeReviewCount === 1 ? "Rezension" : "Rezensionen"
+      }`,
+    );
+  }
+  return parts.join(" · ");
+}
+
 export function buildQuestionTemplateRuntimeModel(input: {
   templateId: string | null;
   questionText: string;
@@ -60,6 +84,7 @@ export function buildQuestionTemplateRuntimeModel(input: {
       ...base,
       solutionLines: [
         [data.placeName, data.placeAdditionalLabel].filter(Boolean).join(" · "),
+        formatGooglePlaceRatingSummary(data),
         data.explanation,
         source
           ? `Google Maps: ${source}${data.placeImportedOrEditedAt ? ` (redaktionell übernommen/bearbeitet am ${data.placeImportedOrEditedAt.slice(0, 10)})` : ""}`

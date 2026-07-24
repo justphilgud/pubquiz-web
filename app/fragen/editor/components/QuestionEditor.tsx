@@ -480,6 +480,18 @@ export function QuestionEditor({
         ?.focus();
       return;
     }
+    if (target === "templatePlaceAverageRating") {
+      document
+        .querySelector<HTMLInputElement>("[data-template-place-average-rating]")
+        ?.focus();
+      return;
+    }
+    if (target === "templatePlaceReviewCount") {
+      document
+        .querySelector<HTMLInputElement>("[data-template-place-review-count]")
+        ?.focus();
+      return;
+    }
 
     if (target === "questionMedia") {
       const mediaSection = document.querySelector<HTMLElement>(
@@ -957,10 +969,13 @@ export function QuestionEditor({
             data={draft.templateConfig.templateData}
             answers={draft.answers}
             disabled={isEditorDisabled}
-            validationError={fieldError?.target === "templateUnit" ? fieldError.text : null}
+            validationError={fieldError?.target?.startsWith("template")
+              ? fieldError.text
+              : null}
+            validationTarget={fieldError?.target}
             googlePlacesFeature={googlePlacesFeature}
             onChange={(templateData, answers) => {
-              if (fieldError?.target === "templateUnit") setFieldError(null);
+              if (fieldError?.target?.startsWith("template")) setFieldError(null);
               setDraft((current) => ({
                 ...current,
                 templateConfig: { ...current.templateConfig, templateData },

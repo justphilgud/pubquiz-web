@@ -24,9 +24,6 @@ export function getAppNavigationItems(
     ...(capabilities.canManageEventSeries
       ? [{ href: "/admin/eventreihen", label: "Eventreihen" }]
       : []),
-    ...(capabilities.canManageCategories
-      ? [{ href: "/admin/kategorien", label: "Kategorien" }]
-      : []),
     ...(capabilities.canManageUsers
       ? [{ href: "/admin/users", label: "Benutzer" }]
       : []),
