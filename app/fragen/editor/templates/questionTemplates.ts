@@ -3,16 +3,27 @@ import type {
   QuestionTemplate,
   QuestionTemplateDefinition,
 } from "../types";
-import { questionTemplateIds } from "./questionTemplateRegistry";
+import {
+  findQuestionTemplate,
+  questionTemplateIds,
+} from "./questionTemplateRegistry";
 import { getMediaSlotDefinition } from "../mediaSlots";
 
 export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
     id: questionTemplateIds.standard,
+    icon: "message-square",
+    enabled: true,
+    answerMode: "OPEN_TEXT",
+    evaluationMode: "MANUAL",
+    editorKind: "STANDARD",
+    presentationKind: "STANDARD",
+    answerFormKind: "STANDARD",
     selectable: false,
     availableForFiltering: true,
     requiresAnswerImages: false,
     translationKey: "standard",
+    questionLabelKey: "question",
     allowsOptionalQuestionImage: true,
     initialAnswers: [{ isCorrect: true }],
     mediaSlots: [
@@ -20,13 +31,18 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
       { slotKey: "question_audio", required: false },
     ],
     generators: [],
+    contentGenerators: [],
   },
   {
     id: questionTemplateIds.multipleChoice,
+    icon: "list-checks", enabled: true, answerMode: "MULTIPLE_CHOICE",
+    evaluationMode: "EXACT_MATCH", editorKind: "STANDARD",
+    presentationKind: "STANDARD", answerFormKind: "STANDARD",
     selectable: false,
     availableForFiltering: false,
     requiresAnswerImages: false,
     translationKey: "multipleChoice",
+    questionLabelKey: "question",
     allowsOptionalQuestionImage: true,
     initialAnswers: [
       { isCorrect: false },
@@ -39,13 +55,18 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
       { slotKey: "question_audio", required: false },
     ],
     generators: [],
+    contentGenerators: [],
   },
   {
     id: questionTemplateIds.faceMorph,
+    icon: "scan-face", enabled: true, answerMode: "OPEN_TEXT",
+    evaluationMode: "MANUAL", editorKind: "STANDARD",
+    presentationKind: "STANDARD", answerFormKind: "STANDARD",
     selectable: true,
     availableForFiltering: true,
     requiresAnswerImages: true,
     translationKey: "faceMorph",
+    questionLabelKey: "question",
     allowsOptionalQuestionImage: false,
     initialAnswers: [
       { fieldLabelKey: "personA", isCorrect: true },
@@ -53,13 +74,18 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
     ],
     mediaSlots: [{ slotKey: "face_morph_result", required: true }],
     generators: [],
+    contentGenerators: [],
   },
   {
     id: questionTemplateIds.musicReverse,
+    icon: "audio-lines", enabled: true, answerMode: "OPEN_TEXT",
+    evaluationMode: "MANUAL", editorKind: "STANDARD",
+    presentationKind: "STANDARD", answerFormKind: "STANDARD",
     selectable: true,
     availableForFiltering: true,
     requiresAnswerImages: false,
     translationKey: "musicReverse",
+    questionLabelKey: "question",
     allowsOptionalQuestionImage: false,
     initialAnswers: [
       { fieldLabelKey: "artist", isCorrect: true },
@@ -70,13 +96,18 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
       { slotKey: "music_reverse_audio", required: true },
     ],
     generators: ["audio_reverse"],
+    contentGenerators: [],
   },
   {
     id: questionTemplateIds.musicEightBit,
+    icon: "music", enabled: true, answerMode: "OPEN_TEXT",
+    evaluationMode: "MANUAL", editorKind: "STANDARD",
+    presentationKind: "STANDARD", answerFormKind: "STANDARD",
     selectable: false,
     availableForFiltering: false,
     requiresAnswerImages: false,
     translationKey: "musicEightBit",
+    questionLabelKey: "question",
     allowsOptionalQuestionImage: false,
     initialAnswers: [{ fieldLabelKey: "title", isCorrect: true }],
     mediaSlots: [
@@ -84,13 +115,18 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
       { slotKey: "music_bitcrush_audio", required: true },
     ],
     generators: ["audio_bitcrush"],
+    contentGenerators: [],
   },
   {
     id: questionTemplateIds.pixelImage,
+    icon: "image", enabled: true, answerMode: "OPEN_TEXT",
+    evaluationMode: "MANUAL", editorKind: "STANDARD",
+    presentationKind: "STANDARD", answerFormKind: "STANDARD",
     selectable: true,
     availableForFiltering: true,
     requiresAnswerImages: false,
     translationKey: "pixelImage",
+    questionLabelKey: "question",
     allowsOptionalQuestionImage: false,
     initialAnswers: [{ fieldLabelKey: "solution", isCorrect: true }],
     mediaSlots: [
@@ -100,8 +136,109 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
       { slotKey: "pixel_stage_1_image", required: true },
     ],
     generators: ["image_pixelate"],
+    contentGenerators: [],
+  },
+  {
+    id: questionTemplateIds.trueFalse,
+    icon: "badge-check", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false,
+    answerMode: "BOOLEAN", evaluationMode: "BOOLEAN_MATCH",
+    editorKind: "TRUE_FALSE", presentationKind: "TRUE_FALSE",
+    answerFormKind: "TRUE_FALSE", translationKey: "trueFalse",
+    questionLabelKey: "statement",
+    allowsOptionalQuestionImage: true,
+    initialAnswers: [{ isCorrect: true }, { isCorrect: false }],
+    mediaSlots: [{ slotKey: "question_image", required: false }],
+    generators: [],
+    contentGenerators: [],
+  },
+  {
+    id: questionTemplateIds.estimate,
+    icon: "gauge", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false,
+    answerMode: "NUMBER", evaluationMode: "NUMERIC_CLOSEST",
+    editorKind: "ESTIMATE", presentationKind: "ESTIMATE",
+    answerFormKind: "ESTIMATE", translationKey: "estimate",
+    questionLabelKey: "question",
+    allowsOptionalQuestionImage: true, initialAnswers: [{ isCorrect: true }],
+    mediaSlots: [{ slotKey: "question_image", required: false }], generators: [],
+    contentGenerators: [],
+  },
+  {
+    id: questionTemplateIds.ordering,
+    icon: "list-ordered", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false,
+    answerMode: "ORDERING", evaluationMode: "ORDER_EXACT",
+    editorKind: "ORDERING", presentationKind: "ORDERING",
+    answerFormKind: "ORDERING", translationKey: "ordering",
+    questionLabelKey: "task",
+    allowsOptionalQuestionImage: true,
+    initialAnswers: [{ isCorrect: true }, { isCorrect: true }],
+    mediaSlots: [{ slotKey: "question_image", required: false }], generators: [],
+    contentGenerators: [],
+  },
+  {
+    id: questionTemplateIds.translationReadAloud,
+    icon: "languages", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false,
+    answerMode: "OPEN_TEXT", evaluationMode: "MANUAL",
+    editorKind: "TRANSLATION_READ_ALOUD",
+    presentationKind: "TRANSLATION_READ_ALOUD",
+    answerFormKind: "TRANSLATION_READ_ALOUD",
+    translationKey: "translationReadAloud",
+    questionLabelKey: "question",
+    allowsOptionalQuestionImage: false, initialAnswers: [{ isCorrect: true }],
+    mediaSlots: [{ slotKey: "lyrics_tts_audio", required: false }],
+    generators: [],
+    contentGenerators: ["text_translation", "text_to_speech"],
+  },
+  {
+    id: questionTemplateIds.anagram,
+    icon: "shuffle", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false,
+    answerMode: "OPEN_TEXT", evaluationMode: "EXACT_MATCH",
+    editorKind: "ANAGRAM", presentationKind: "ANAGRAM",
+    answerFormKind: "ANAGRAM", translationKey: "anagram",
+    questionLabelKey: "searchTarget",
+    allowsOptionalQuestionImage: false, initialAnswers: [{ isCorrect: true }],
+    mediaSlots: [], generators: [],
+    contentGenerators: ["anagram_generate"],
+  },
+  {
+    id: questionTemplateIds.googleReviews,
+    icon: "star", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false,
+    answerMode: "OPEN_TEXT", evaluationMode: "MANUAL",
+    editorKind: "GOOGLE_REVIEWS", presentationKind: "GOOGLE_REVIEWS",
+    answerFormKind: "GOOGLE_REVIEWS", translationKey: "googleReviews",
+    questionLabelKey: "question",
+    allowsOptionalQuestionImage: false, initialAnswers: [{ isCorrect: true }],
+    mediaSlots: [{ slotKey: "lyrics_tts_audio", required: false }],
+    generators: [],
+    contentGenerators: ["text_to_speech"],
   },
 ];
+
+export function getQuestionTemplateDefinition(templateId: string | null) {
+  return findQuestionTemplate(
+    questionTemplateDefinitions,
+    templateId ?? questionTemplateIds.standard,
+  );
+}
+
+export function validateQuestionTemplateDefinitions(): string[] {
+  const errors: string[] = [];
+  const ids = new Set<string>();
+  for (const definition of questionTemplateDefinitions) {
+    if (ids.has(definition.id)) errors.push(`Doppelte Template-ID: ${definition.id}`);
+    ids.add(definition.id);
+    if (!definition.icon.trim()) errors.push(`Icon fehlt: ${definition.id}`);
+    if (!definition.editorKind || !definition.presentationKind || !definition.answerFormKind) {
+      errors.push(`Oberflächenzuordnung fehlt: ${definition.id}`);
+    }
+  }
+  return errors;
+}
 
 export function localizeQuestionTemplates(
   messages: QuestionEditorMessages,
@@ -111,14 +248,23 @@ export function localizeQuestionTemplates(
 
     return {
       id: definition.id,
+      icon: definition.icon,
+      enabled: definition.enabled,
+      answerMode: definition.answerMode,
+      evaluationMode: definition.evaluationMode,
+      editorKind: definition.editorKind,
+      presentationKind: definition.presentationKind,
+      answerFormKind: definition.answerFormKind,
       selectable: definition.selectable,
       availableForFiltering: definition.availableForFiltering,
       requiresAnswerImages: definition.requiresAnswerImages,
       name: translation.name,
       description: translation.description,
       defaultQuestionText: translation.defaultQuestion,
+      questionLabel: messages.question.labels[definition.questionLabelKey],
       allowsOptionalQuestionImage: definition.allowsOptionalQuestionImage,
       generators: definition.generators,
+      contentGenerators: definition.contentGenerators,
       initialAnswers: definition.initialAnswers.map((answer) => ({
         fieldLabel: answer.fieldLabelKey
           ? messages.templateFields[answer.fieldLabelKey]

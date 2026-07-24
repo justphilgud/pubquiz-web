@@ -15,6 +15,8 @@ type ImportZeile = {
 
   frage_medien: string[];
   antwort_medien: Record<number, string[]>;
+  template_id?: string;
+  template_config_json?: string;
 };
 
 type DryRunResult = {
@@ -26,8 +28,6 @@ type DryRunResult = {
     grund: string;
   }[];
 };
-
-const pflichtfelder: (keyof ImportZeile)[] = ["frage"];
 
 function normalisiereZeile(row: Record<string, unknown>): ImportZeile {
   const antworten = Object.entries(row)
@@ -84,6 +84,8 @@ function normalisiereZeile(row: Record<string, unknown>): ImportZeile {
     quelle: String(row.quelle ?? "").trim(),
     frage_medien: frageMedien,
     antwort_medien: antwortMedien,
+    template_id: String(row.template_id ?? "").trim(),
+    template_config_json: String(row.template_config_json ?? "").trim(),
   };
 }
 

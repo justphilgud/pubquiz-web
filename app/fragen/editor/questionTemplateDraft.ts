@@ -7,6 +7,10 @@ import type {
 } from "./types";
 import type { QuestionEditorMessages } from "@/app/i18n/messageTypes";
 import { getMediaSlotDefinition } from "./mediaSlots";
+import {
+  getAnswersForTemplateData,
+  getDefaultQuestionTemplateData,
+} from "./templates/questionTemplateData";
 
 export type QuestionTemplateChangeImpact = {
   overwritesContent: boolean;
@@ -41,23 +45,33 @@ export function applyQuestionTemplateToDraft(
   template: QuestionTemplate,
   createId: () => string,
 ): QuestionEditorDraft {
+  const templateData = getDefaultQuestionTemplateData(template.id);
+  const answers = template.initialAnswers.map((answer) => {
+    const id = createId();
+    return {
+      id,
+      fieldGroupId: answer.fieldLabel ? id : undefined,
+      fieldLabel: answer.fieldLabel,
+      isRequired: answer.fieldLabel ? true : undefined,
+      text: answer.text ?? "",
+      isCorrect: answer.isCorrect ?? false,
+      additionalInfo: "",
+      media: null,
+    } satisfies QuestionAnswerDraft;
+  });
   return {
     ...draft,
     templateId: template.id,
-    questionText: template.defaultQuestionText,
-    answers: template.initialAnswers.map((answer) => {
-      const id = createId();
-      return {
-        id,
-        fieldGroupId: answer.fieldLabel ? id : undefined,
-        fieldLabel: answer.fieldLabel,
-        isRequired: answer.fieldLabel ? true : undefined,
-        text: answer.text ?? "",
-        isCorrect: answer.isCorrect ?? false,
-        additionalInfo: "",
-        media: null,
-      } satisfies QuestionAnswerDraft;
-    }),
+    questionText: draft.questionText.trim()
+      ? draft.questionText
+      : template.defaultQuestionText,
+    templateConfig: {
+      ...draft.templateConfig,
+      ...(templateData ? { templateData } : {}),
+    },
+    answers: templateData
+      ? getAnswersForTemplateData(templateData, answers)
+      : answers,
   };
 }
 

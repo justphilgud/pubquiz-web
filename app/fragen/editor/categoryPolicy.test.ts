@@ -359,6 +359,12 @@ test("only productive standalone templates are available for filtering", () => {
   assert.ok(filterableIds.includes(questionTemplateIds.faceMorph));
   assert.ok(filterableIds.includes(questionTemplateIds.musicReverse));
   assert.ok(filterableIds.includes(questionTemplateIds.pixelImage));
+  assert.ok(filterableIds.includes(questionTemplateIds.trueFalse));
+  assert.ok(filterableIds.includes(questionTemplateIds.estimate));
+  assert.ok(filterableIds.includes(questionTemplateIds.ordering));
+  assert.ok(filterableIds.includes(questionTemplateIds.translationReadAloud));
+  assert.ok(filterableIds.includes(questionTemplateIds.anagram));
+  assert.ok(filterableIds.includes(questionTemplateIds.googleReviews));
   assert.ok(!filterableIds.includes(questionTemplateIds.multipleChoice));
   assert.ok(!filterableIds.includes(questionTemplateIds.musicEightBit));
 });
@@ -367,6 +373,27 @@ test("answer mode is derived from central template semantics, not answer count",
   assert.equal(
     getQuestionAnswerMode({
       templateId: questionTemplateIds.standard,
+      answers: [],
+    }),
+    "OPEN",
+  );
+  assert.equal(
+    getQuestionAnswerMode({
+      templateId: questionTemplateIds.trueFalse,
+      answers: [],
+    }),
+    "CLOSED",
+  );
+  assert.equal(
+    getQuestionAnswerMode({
+      templateId: questionTemplateIds.ordering,
+      answers: [],
+    }),
+    "CLOSED",
+  );
+  assert.equal(
+    getQuestionAnswerMode({
+      templateId: questionTemplateIds.estimate,
       answers: [],
     }),
     "OPEN",

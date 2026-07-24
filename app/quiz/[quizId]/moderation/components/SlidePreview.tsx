@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import type { QuizPraesentationResult } from "../../../actions";
 import type { Slide } from "../../praesentation/buildPraesentationSlides";
+import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 
 type PunktestandEintrag = {
   teamname: string;
@@ -283,9 +285,12 @@ export default function SlidePreview({
 
           {bildMedien.length > 0 && (
             <div className="overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
-              <img
+              <Image
                 src={bildMedien[0].datei}
                 alt=""
+                width={800}
+                height={600}
+                unoptimized
                 className="max-h-320px w-full object-contain"
               />
             </div>
@@ -299,6 +304,12 @@ export default function SlidePreview({
     const richtigeAntworten = slide.frage.antworten
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => antwort.antwort);
+    const runtime = buildQuestionTemplateRuntimeModel({
+      templateId: slide.frage.templateId,
+      questionText: slide.frage.frage,
+      templateConfig: slide.frage.templateConfig,
+      correctAnswers: richtigeAntworten.map((text) => ({ text })),
+    });
 
     return (
       <div>
@@ -311,8 +322,8 @@ export default function SlidePreview({
         </div>
 
         <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/40 p-5 text-2xl font-bold text-emerald-100">
-          {richtigeAntworten.length > 0
-            ? richtigeAntworten.join(" / ")
+          {runtime.solutionLines.length > 0
+            ? runtime.solutionLines.join(" / ")
             : "Keine Antwort hinterlegt"}
         </div>
       </div>

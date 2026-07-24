@@ -66,6 +66,12 @@ export const deQuestionEditorMessages = {
       name: "Pixelbild", description: "Ein Motiv anhand einer erzeugten Pixelgrafik erkennen.",
       defaultQuestion: "Was ist auf diesem Pixelbild zu sehen?",
     },
+    trueFalse: { name: "Wahr oder falsch", description: "Eine Aussage wird eindeutig als wahr oder falsch beantwortet.", defaultQuestion: "" },
+    estimate: { name: "Schätzfrage", description: "Eine Zahl wird geschätzt; der nächstliegende Wert gewinnt.", defaultQuestion: "" },
+    ordering: { name: "Reihenfolge", description: "Begriffe werden in die fachlich richtige Reihenfolge gebracht.", defaultQuestion: "" },
+    translationReadAloud: { name: "Übersetzt vorgelesen", description: "Original, Übersetzung und Audio bleiben getrennt bearbeitbar.", defaultQuestion: "Welcher Songtext wurde hier übersetzt?" },
+    anagram: { name: "Anagramm", description: "Ein Name wird aus denselben Buchstaben neu angeordnet.", defaultQuestion: "Welcher Name verbirgt sich hinter diesem Anagramm?" },
+    googleReviews: { name: "Google-Rezensionen", description: "Manuell gepflegte Rezensionen führen schrittweise zu einem gesuchten Ort.", defaultQuestion: "Welcher Ort wird in diesen Rezensionen beschrieben?" },
   },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Interpret", title: "Titel", solution: "Lösung" },
   templateMedia: {
@@ -152,7 +158,11 @@ export const deQuestionEditorMessages = {
     selected: "Spezialfrage: {name}", required: "{label} ist erforderlich.", change: "Ändern", clear: "Auswahl lösen",
     select: "Spezialfrage auswählen", searchLabel: "Spezialfragen durchsuchen", searchPlaceholder: "Spezialfrage suchen", empty: "Keine Spezialfrage gefunden.",
   },
-  question: { label: "Frage", placeholder: "Formuliere deine Frage..." },
+  question: {
+    label: "Frage",
+    labels: { question: "Frage", statement: "Aussage", task: "Aufgabenstellung", searchTarget: "Was wird gesucht?" },
+    placeholder: "Formuliere deine Frage...",
+  },
   answers: {
     title: "Antworten", description: "Richtige und falsche Antworten bilden gemeinsam die fachliche Grundlage. Die Darstellung kann später im Quiz überschrieben werden.",
     answer: "Antwort", answers: "Antworten", correctShort: "richtig", inputPlaceholder: "Antwort eingeben", correct: "Diese Antwort ist richtig",
@@ -240,7 +250,7 @@ export const deQuestionEditorMessages = {
     LABELED_ANSWERS_INCONSISTENT: "Beschriftete Antwortdaten sind technisch inkonsistent", SOURCE_MISSING: "Quelle fehlt", CATEGORY_MISSING: "Kategorie fehlt",
     GENERATOR_INPUT_REQUIRED: "Das erforderliche Generator-Original fehlt", GENERATOR_OUTPUT_REQUIRED: "Die erzeugte Ausgabe fehlt", GENERATOR_IN_PROGRESS: "Die Generierung läuft noch",
     GENERATOR_FAILED: "Die Generierung ist fehlgeschlagen", GENERATOR_OUTPUT_STALE: "Die Generatorausgabe ist veraltet", GENERATOR_OUTPUT_MISMATCH: "Die Ausgabe gehört nicht zum aktuellen Original",
-    GENERATOR_OUTPUT_MISSING: "Ein erfolgreicher Generatorlauf besitzt keine Ausgabe", GENERATOR_LEGACY_OUTPUT: "Legacy-Ausgabe ohne Generatorlauf", GENERATOR_CONFLICT: "Die Generatordaten sind widersprüchlich", PIXEL_STAGE_DURATIONS_INVALID: "Die Dauer jeder Pixelstufe muss zwischen 1 und 120 Sekunden liegen",
+    GENERATOR_OUTPUT_MISSING: "Ein erfolgreicher Generatorlauf besitzt keine Ausgabe", GENERATOR_LEGACY_OUTPUT: "Legacy-Ausgabe ohne Generatorlauf", GENERATOR_CONFLICT: "Die Generatordaten sind widersprüchlich", PIXEL_STAGE_DURATIONS_INVALID: "Die Dauer jeder Pixelstufe muss zwischen 1 und 120 Sekunden liegen", ESTIMATE_UNIT_REQUIRED: "Bitte gib eine Einheit für die Schätzfrage an.",
     ADDITIONAL_INFO_MISSING: "Zusatzinformation für mehrere Vergleichswerte fehlt", UNKNOWN: "Unbekannter Qualitätshinweis",
   },
   errors: {

@@ -4,6 +4,7 @@ import {
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "./editor/templates/questionTemplateRegistry";
+import { questionTemplateDefinitions } from "./editor/templates/questionTemplates";
 
 export type QuestionAnswerMode = "OPEN" | "CLOSED";
 export type DerivedQuestionAnswerMode =
@@ -15,6 +16,15 @@ const openSpecialTemplateIds = [
   questionTemplateIds.musicReverse,
   questionTemplateIds.musicEightBit,
   questionTemplateIds.pixelImage,
+  questionTemplateIds.estimate,
+  questionTemplateIds.translationReadAloud,
+  questionTemplateIds.anagram,
+  questionTemplateIds.googleReviews,
+] as const;
+
+const closedSpecialTemplateIds = [
+  questionTemplateIds.trueFalse,
+  questionTemplateIds.ordering,
 ] as const;
 
 const openSpecialTemplateIdSet = new Set<string>(
@@ -29,6 +39,12 @@ export function getClosedQuestionTemplatePersistenceIds() {
 
 function getOpenSpecialTemplatePersistenceIds() {
   return openSpecialTemplateIds.flatMap((templateId) => [
+    ...getQuestionTemplatePersistenceIds(templateId),
+  ]);
+}
+
+function getClosedSpecialTemplatePersistenceIds() {
+  return closedSpecialTemplateIds.flatMap((templateId) => [
     ...getQuestionTemplatePersistenceIds(templateId),
   ]);
 }
@@ -55,6 +71,12 @@ export function getQuestionAnswerMode({
   ) {
     return "OPEN";
   }
+  if (
+    canonicalTemplateId !== null &&
+    closedSpecialTemplateIds.includes(canonicalTemplateId as never)
+  ) {
+    return "CLOSED";
+  }
   if (canonicalTemplateId !== null) return "UNCLASSIFIED";
 
   return answers.some((answer) => !answer.isCorrect)
@@ -78,7 +100,10 @@ export function getQuestionAnswerModeWhereInput(
         {
           vorlage: {
             code: {
-              in: [...getClosedQuestionTemplatePersistenceIds()],
+              in: [
+                ...getClosedQuestionTemplatePersistenceIds(),
+                ...getClosedSpecialTemplatePersistenceIds(),
+              ],
             },
           },
         },
@@ -109,4 +134,13 @@ export function getQuestionAnswerModeWhereInput(
       },
     ],
   };
+}
+
+export function getConfiguredQuestionAnswerMode(templateId: string | null) {
+  const canonicalTemplateId =
+    resolveCanonicalQuestionTemplateId(templateId) ??
+    questionTemplateIds.standard;
+  return questionTemplateDefinitions.find(
+    (template) => template.id === canonicalTemplateId,
+  )?.answerMode ?? null;
 }

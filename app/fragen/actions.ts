@@ -23,6 +23,7 @@ import {
   normalizeCategoryName,
 } from "./editor/categoryPolicy";
 import {
+  findQuestionTemplate,
   getQuestionTemplatePersistenceIds,
   resolveCanonicalQuestionTemplateId,
 } from "./editor/templates/questionTemplateRegistry";
@@ -37,6 +38,8 @@ import { Prisma } from "@/app/generated/prisma/client";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { questionTemplateDefinitions } from "./editor/templates/questionTemplates";
+import { normalizeQuestionTemplateConfig } from "./editor/pixelTemplateConfig";
+import { getQuestionTemplateValidationIssue } from "./editor/templates/questionTemplateData";
 import {
   getClosedQuestionTemplatePersistenceIds,
   getQuestionAnswerMode,
@@ -86,6 +89,8 @@ type FragenImportZeile = {
   quelle: string;
   frage_medien: string[];
   antwort_medien: Record<number, string[]>;
+  template_id?: string;
+  template_config_json?: string;
 };
 
 export type FrageSuchResult = {
@@ -184,7 +189,7 @@ export async function searchFragen(data: {
     : [];
   const allowedTemplateIds = new Set(
     questionTemplateDefinitions
-      .filter((template) => template.availableForFiltering)
+      .filter((template) => template.enabled && template.availableForFiltering)
       .map((template) => template.id),
   );
   const templateIds = Array.isArray(data.templateIds)
@@ -868,6 +873,40 @@ export async function pruefeFragenImport(zeilen: FragenImportZeile[]) {
   };
 }
 
+export async function exportFragenFuerTransfer(fragenIds: number[]) {
+  await requireAdmin();
+  const ids = [...new Set(fragenIds)].filter(
+    (id) => Number.isInteger(id) && id > 0,
+  );
+  const questions = await prisma.fragen.findMany({
+    where: { fragen_id: { in: ids } },
+    orderBy: { fragen_id: "asc" },
+    include: {
+      vorlage: { select: { code: true } },
+      antworten: { orderBy: { antwort_id: "asc" } },
+      fragen_kategorien: {
+        include: { fragenkategorie: { select: { kategorie: true } } },
+      },
+    },
+  });
+  return questions.map((question) => ({
+    frage: question.frage,
+    quelle: question.quelle ?? "",
+    kategorie:
+      question.fragen_kategorien[0]?.fragenkategorie.kategorie ?? "",
+    antworten: question.antworten.map((answer) => answer.antwort),
+    richtige_antworten: question.antworten.flatMap((answer, index) =>
+      answer.ist_richtig ? [String(index + 1)] : [],
+    ),
+    template_id:
+      resolveCanonicalQuestionTemplateId(question.vorlage?.code ?? null) ??
+      "standard",
+    template_config_json: question.template_config_json
+      ? JSON.stringify(question.template_config_json)
+      : "",
+  }));
+}
+
 export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
   const session = await requireAdmin();
   let importiert = 0;
@@ -919,6 +958,72 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
       session.actor,
       false,
     );
+
+    const templateId = resolveCanonicalQuestionTemplateId(
+      zeile.template_id?.trim() || null,
+    );
+    if (templateId) {
+      const definition = findQuestionTemplate(
+        questionTemplateDefinitions,
+        templateId,
+      );
+      const persistedTemplate = definition
+        ? await prisma.frage_vorlagen.findUnique({
+            where: { code: templateId },
+            select: { vorlage_id: true },
+          })
+        : null;
+      let templateConfig: Prisma.InputJsonValue | undefined;
+      if (zeile.template_config_json?.trim()) {
+        try {
+          const parsedConfig: unknown = JSON.parse(zeile.template_config_json);
+          const specificIssue = getQuestionTemplateValidationIssue(
+            parsedConfig && typeof parsedConfig === "object" &&
+              !Array.isArray(parsedConfig) &&
+              "templateData" in parsedConfig
+              ? (parsedConfig as { templateData?: unknown }).templateData
+              : undefined,
+            templateId,
+          );
+          if (specificIssue) throw new Error(specificIssue.message);
+          const normalizedConfig = normalizeQuestionTemplateConfig(
+            parsedConfig,
+            templateId,
+          );
+          if (!normalizedConfig) throw new Error("invalid template config");
+          templateConfig = normalizedConfig as Prisma.InputJsonValue;
+        } catch (error) {
+          await prisma.fragen.delete({ where: { fragen_id: frage.fragen_id } });
+          uebersprungen++;
+          duplikate.push({
+            zeile: index + 2,
+            frage: frageText,
+            grund: error instanceof Error &&
+              error.message === "Bitte gib eine Einheit für die Schätzfrage an."
+              ? "template_config_json: Feld Einheit fehlt."
+              : "template_config_json ist kein gültiges JSON.",
+          });
+          continue;
+        }
+      }
+      if (!persistedTemplate) {
+        await prisma.fragen.delete({ where: { fragen_id: frage.fragen_id } });
+        uebersprungen++;
+        duplikate.push({
+          zeile: index + 2,
+          frage: frageText,
+          grund: `Unbekannte oder nicht migrierte Vorlage: ${templateId}`,
+        });
+        continue;
+      }
+      await prisma.fragen.update({
+        where: { fragen_id: frage.fragen_id },
+        data: {
+          vorlage_id: persistedTemplate.vorlage_id,
+          ...(templateConfig ? { template_config_json: templateConfig } : {}),
+        },
+      });
+    }
 
     if (zeile.kategorie.trim()) {
       const categoryName = normalizeCategoryName(zeile.kategorie);

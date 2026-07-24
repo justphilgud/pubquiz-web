@@ -24,6 +24,7 @@ import QRCode from "react-qr-code";
 import type { ResolvedTemplate } from "@/app/rendering/templateResolver";
 import type { PresentationTemplate } from "@/app/rendering/templateRegistry";
 import { presentationTemplateStyle } from "@/app/rendering/templateStyles";
+import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 
 import {
   buildPraesentationSlides,
@@ -254,6 +255,10 @@ export default function QuizPraesentationPlayer({
 }: Props) {
   const praesentationQuiz = quiz as PraesentationQuiz;
   const [slideIndex, setSlideIndex] = useState(initialSlideIndex);
+  const [templateReveal, setTemplateReveal] = useState({
+    slideIndex: initialSlideIndex,
+    count: 1,
+  });
   const [overlayMedien, setOverlayMedien] = useState<Medium[] | null>(null);
   const [remoteAudioAktion, setRemoteAudioAktion] = useState<
     "play" | "pause" | "stop" | null
@@ -317,6 +322,8 @@ export default function QuizPraesentationPlayer({
 
 
   const slide = slides[slideIndex];
+  const templateRevealCount =
+    templateReveal.slideIndex === slideIndex ? templateReveal.count : 1;
 
   function getMedienFuerAktuellenSlide() {
     if (!slide) return [];
@@ -898,9 +905,107 @@ export default function QuizPraesentationPlayer({
 
   function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     const frage = slide.frage;
+    const templateData = frage.templateConfig?.templateData;
     const antworten = sortiereAntworten(frage);
     const hatAntwortmoeglichkeiten = antworten.length > 1;
     const layout = frage.praesentationslayout ?? "standard";
+
+    if (templateData?.kind === "GOOGLE_REVIEWS") {
+      const visibleReviews = templateData.sequentialReveal
+        ? templateData.reviews.slice(0, templateRevealCount)
+        : templateData.reviews;
+      return (
+        <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+          <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
+          <div className="mt-6 grid min-h-0 flex-1 gap-4 overflow-auto lg:grid-cols-2">
+            {visibleReviews.map((review, index) => (
+              <article key={review.id} className="rounded-2xl border-2 border-yellow-300 bg-white/10 p-5 text-xl text-white">
+                <div className="mb-3 flex items-center gap-3">
+                  <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full bg-cyan-300 font-black text-slate-950">
+                    {(review.authorName.trim()[0] || "?").toLocaleUpperCase("de-DE")}
+                  </span>
+                  <span className="font-bold">
+                    {templateData.hideAuthorUntilSolution
+                      ? "Google-Nutzer"
+                      : review.authorName || "Google-Nutzer"}
+                  </span>
+                </div>
+                <p>„{review.text}“</p>
+                {((review.rating && !templateData.hideRatingUntilSolution) || review.publishedLabel) && <p className="mt-3 text-sm text-yellow-200">
+                  {[review.rating && !templateData.hideRatingUntilSolution ? `${review.rating} ★` : "", review.publishedLabel].filter(Boolean).join(" · ")}
+                </p>}
+                <p className="mt-2 text-xs uppercase tracking-wide text-white/55">{review.attributionText || "Google Maps"}</p>
+                <span className="sr-only">Rezension {index + 1}</span>
+              </article>
+            ))}
+          </div>
+          {templateData.sequentialReveal && templateRevealCount < templateData.reviews.length && (
+            <button type="button" onClick={() => setTemplateReveal({
+              slideIndex,
+              count: Math.min(templateRevealCount + 1, templateData.reviews.length),
+            })}
+              className="mt-5 min-h-11 rounded-xl bg-yellow-300 px-5 py-3 font-black text-slate-950">
+              Nächste Rezension
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    if (templateData?.kind === "TRUE_FALSE") {
+      return (
+        <div className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+          <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
+          <div className="mt-10 grid grid-cols-2 gap-6 text-4xl font-black">
+            <div className="rounded-2xl border-4 border-emerald-300 p-6 text-emerald-200">Wahr</div>
+            <div className="rounded-2xl border-4 border-pink-400 p-6 text-pink-200">Falsch</div>
+          </div>
+        </div>
+      );
+    }
+
+    if (templateData?.kind === "ANAGRAM") {
+      return (
+        <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+          <h2 className="text-3xl font-black text-white">{frage.frage}</h2>
+          <p className="mt-10 break-words text-7xl font-black uppercase tracking-[0.2em] text-yellow-200 xl:text-9xl">{templateData.selectedSolution}</p>
+        </div>
+      );
+    }
+
+    if (templateData?.kind === "ORDERING") {
+      return (
+        <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+          <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {antworten.map((answer) => <div key={answer.antwort_id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{answer.antwort}</div>)}
+          </div>
+        </div>
+      );
+    }
+
+    if (templateData?.kind === "ESTIMATE") {
+      return (
+        <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+          <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
+          {templateData.unit && <p className="mt-8 rounded-2xl border-2 border-yellow-300 px-6 py-3 text-3xl font-black text-yellow-200">Antwort in {templateData.unit}</p>}
+        </div>
+      );
+    }
+
+    if (templateData?.kind === "TRANSLATION_READ_ALOUD") {
+      return (
+        <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+          <h2 className="text-5xl font-black leading-tight text-white">{frage.frage}</h2>
+          <p className="mt-8 text-2xl font-bold text-cyan-200">
+            {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.sourceLanguage)}
+            {" → "}
+            {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.targetLanguage)}
+          </p>
+          <p className="mt-4 text-lg text-white/60">Audio über den konfigurierten TTS-Ausgabeslot abspielen.</p>
+        </div>
+      );
+    }
 
     const effektivesLayout =
       layout !== "standard"
@@ -1381,6 +1486,12 @@ export default function QuizPraesentationPlayer({
     const frage = slide.frage;
     const antworten = sortiereAntworten(frage);
     const richtigeAntworten = antworten.filter((antwort) => antwort.ist_richtig);
+    const runtime = buildQuestionTemplateRuntimeModel({
+      templateId: frage.templateId,
+      questionText: frage.frage,
+      templateConfig: frage.templateConfig,
+      correctAnswers: richtigeAntworten.map((antwort) => ({ text: antwort.antwort })),
+    });
     const antwortMedien = richtigeAntworten.flatMap((antwort) => antwort.medien);
     const alleLoesungsMedien = [...frage.medien, ...antwortMedien];
     const hatAntwortmoeglichkeiten = antworten.length > 1;
@@ -1429,7 +1540,7 @@ export default function QuizPraesentationPlayer({
           </div>
 
           <div className="grid min-h-0 flex-1 gap-4 overflow-hidden">
-            {hatAntwortmoeglichkeiten &&
+            {hatAntwortmoeglichkeiten && !frage.templateConfig?.templateData &&
               antworten.map((antwort, index) => (
                 <div
                   key={antwort.antwort_id}
@@ -1445,15 +1556,34 @@ export default function QuizPraesentationPlayer({
                 </div>
               ))}
 
-            {!hatAntwortmoeglichkeiten &&
-              richtigeAntworten.map((antwort) => (
-                <div
-                  key={antwort.antwort_id}
-                  className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
-                >
-                  <div className="text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">
-                    {antwort.antwort}
+            {frage.templateConfig?.templateData &&
+              runtime.solutionLines.map((line, index) => {
+                const linkedUrl = line.match(/https:\/\/\S+/)?.[0]?.replace(/\)$/, "") ?? "";
+                return (
+                  <div
+                    key={`${index}-${line}`}
+                    className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
+                  >
+                    <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
+                      {linkedUrl ? (
+                        <a
+                          href={linkedUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="break-all underline"
+                        >
+                          {line}
+                        </a>
+                      ) : line}
+                    </div>
                   </div>
+                );
+              })}
+
+            {!frage.templateConfig?.templateData && !hatAntwortmoeglichkeiten &&
+              richtigeAntworten.map((antwort) => (
+                <div key={antwort.antwort_id} className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
+                  <div className="text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">{antwort.antwort}</div>
                 </div>
               ))}
 
@@ -1473,7 +1603,7 @@ export default function QuizPraesentationPlayer({
                 </div>
               ))}
 
-            {richtigeAntworten.length === 0 && !hatAntwortfelderLoesungen && (
+            {runtime.solutionLines.length === 0 && !hatAntwortfelderLoesungen && (
               <div className="flex flex-1 items-center justify-center text-2xl font-black text-white/50">
                 Keine richtige Antwort markiert
               </div>

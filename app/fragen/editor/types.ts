@@ -1,5 +1,100 @@
 export type QuestionPresentationMode = "AUTO" | "OPEN" | "CLOSED";
 
+export type QuestionAnswerMode =
+  | "OPEN_TEXT"
+  | "BOOLEAN"
+  | "NUMBER"
+  | "ORDERING"
+  | "SINGLE_CHOICE"
+  | "MULTIPLE_CHOICE";
+
+export type QuestionEvaluationMode =
+  | "MANUAL"
+  | "EXACT_MATCH"
+  | "BOOLEAN_MATCH"
+  | "NUMERIC_CLOSEST"
+  | "NUMERIC_TOLERANCE"
+  | "ORDER_EXACT"
+  | "ORDER_POSITION";
+
+export type QuestionTemplateSurfaceKind =
+  | "STANDARD"
+  | "TRUE_FALSE"
+  | "ESTIMATE"
+  | "ORDERING"
+  | "TRANSLATION_READ_ALOUD"
+  | "ANAGRAM"
+  | "GOOGLE_REVIEWS";
+
+export type AnagramWordCountPreference =
+  | "AUTO"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "ANY";
+
+export type QuestionTemplateData =
+  | {
+      kind: "TRUE_FALSE";
+      correctAnswer: boolean;
+      explanation: string;
+    }
+  | {
+      kind: "ESTIMATE";
+      correctValue: number | null;
+      unit: string;
+      numberFormat: "DECIMAL" | "INTEGER" | "YEAR" | "PERCENT";
+      explanation: string;
+      tolerance: number | null;
+    }
+  | {
+      kind: "ORDERING";
+      items: Array<{ id: string; text: string; explanation: string }>;
+      scoring: "EXACT";
+    }
+  | {
+      kind: "TRANSLATION_READ_ALOUD";
+      originalText: string;
+      sourceLanguage: string;
+      targetLanguage: string;
+      translation: string;
+      voiceProvider: "BROWSER";
+      voiceId: string;
+      voiceStyle: string;
+      voiceInstruction: string;
+      speed: number;
+    }
+  | {
+      kind: "ANAGRAM";
+      name: string;
+      suggestions: string[];
+      selectedSolution: string;
+      wordCountPreference: AnagramWordCountPreference;
+    }
+  | {
+      kind: "GOOGLE_REVIEWS";
+      placeId: string;
+      placeName: string;
+      placeAdditionalLabel: string;
+      placeMapsUrl: string;
+      placeImportedOrEditedAt: string;
+      reviews: Array<{
+        id: string;
+        text: string;
+        authorName: string;
+        rating: number | null;
+        publishedLabel: string;
+        sourceUrl: string;
+        attributionText: string;
+        importedOrEditedAt: string;
+      }>;
+      explanation: string;
+      sequentialReveal: boolean;
+      hideAuthorUntilSolution: boolean;
+      hideRatingUntilSolution: boolean;
+    };
+
 export type QuestionStatus = "DRAFT" | "READY" | "NOT_APPROVED" | "APPROVED";
 
 export type QuestionAnswerDraft = {
@@ -52,6 +147,11 @@ export type GeneratorId =
   | "image_face_morph"
   | "text_to_speech";
 
+export type QuestionContentGeneratorId =
+  | "text_translation"
+  | "text_to_speech"
+  | "anagram_generate";
+
 export type GeneratorRunStatus =
   | "PENDING"
   | "PROCESSING"
@@ -81,6 +181,7 @@ export type FaceMorphPixelQuestionOptions = Record<
 export type QuestionTemplateConfig = {
   stageDurationsSeconds: PixelStageDurationsSeconds;
   createPixelQuestionByAnswer: FaceMorphPixelQuestionOptions;
+  templateData?: QuestionTemplateData;
 };
 
 export type GeneratorParametersDraft = Partial<
@@ -155,12 +256,20 @@ export type QuestionEditorDraft = {
 
 export type QuestionTemplate = {
   id: string;
+  icon: string;
+  enabled: boolean;
+  answerMode: QuestionAnswerMode;
+  evaluationMode: QuestionEvaluationMode;
+  editorKind: QuestionTemplateSurfaceKind;
+  presentationKind: QuestionTemplateSurfaceKind;
+  answerFormKind: QuestionTemplateSurfaceKind;
   selectable: boolean;
   availableForFiltering: boolean;
   requiresAnswerImages: boolean;
   name: string;
   description: string;
   defaultQuestionText: string;
+  questionLabel: string;
 
   /**
    * Describes the future general question-media capability independently from
@@ -177,14 +286,35 @@ export type QuestionTemplate = {
 
   mediaSlots: QuestionMediaSlotConfig[];
   generators: GeneratorId[];
+  contentGenerators: QuestionContentGeneratorId[];
 };
 
 export type QuestionTemplateDefinition = {
   id: string;
+  icon: string;
+  enabled: boolean;
+  answerMode: QuestionAnswerMode;
+  evaluationMode: QuestionEvaluationMode;
+  editorKind: QuestionTemplateSurfaceKind;
+  presentationKind: QuestionTemplateSurfaceKind;
+  answerFormKind: QuestionTemplateSurfaceKind;
   selectable: boolean;
   availableForFiltering: boolean;
   requiresAnswerImages: boolean;
-  translationKey: "standard" | "multipleChoice" | "faceMorph" | "musicReverse" | "musicEightBit" | "pixelImage";
+  translationKey:
+    | "standard"
+    | "multipleChoice"
+    | "faceMorph"
+    | "musicReverse"
+    | "musicEightBit"
+    | "pixelImage"
+    | "trueFalse"
+    | "estimate"
+    | "ordering"
+    | "translationReadAloud"
+    | "anagram"
+    | "googleReviews";
+  questionLabelKey: "question" | "statement" | "task" | "searchTarget";
   allowsOptionalQuestionImage: boolean;
   initialAnswers: Array<{
     fieldLabelKey?: "personA" | "personB" | "artist" | "title" | "solution";
@@ -192,6 +322,7 @@ export type QuestionTemplateDefinition = {
   }>;
   mediaSlots: Array<{ slotKey: MediaSlotKey; required: boolean }>;
   generators: GeneratorId[];
+  contentGenerators: QuestionContentGeneratorId[];
 };
 
 export type QuestionSaveIntent =
@@ -265,6 +396,7 @@ export type QuestionEditorRecord = {
 export type QuestionValidationTarget =
   | "questionText"
   | "questionMedia"
+  | "templateUnit"
   | "answers"
   | "categories"
   | "validUntil";

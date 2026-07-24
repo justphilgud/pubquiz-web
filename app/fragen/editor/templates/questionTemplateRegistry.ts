@@ -5,6 +5,12 @@ export const questionTemplateIds = {
   musicReverse: "musik_rueckwaerts",
   musicEightBit: "eight_bit",
   pixelImage: "pixelbild",
+  trueFalse: "wahr_falsch",
+  estimate: "schaetzfrage",
+  ordering: "reihenfolge",
+  translationReadAloud: "uebersetzt_vorgelesen",
+  anagram: "anagramm",
+  googleReviews: "google_rezensionen",
 } as const;
 
 const questionTemplateAliases: Readonly<Record<string, string>> = {

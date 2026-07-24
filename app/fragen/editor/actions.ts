@@ -55,6 +55,7 @@ import {
   normalizeQuestionTemplateConfig,
   parseQuestionTemplateConfigDraft,
 } from "./pixelTemplateConfig";
+import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 import { hasRequiredTemplateAnswerImages } from "./questionQuality";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
 import { getAffectedQuestionIds } from "./questionSaveResult";
@@ -642,6 +643,18 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
       throw new DraftValidationError("Die Generatorparameter sind ungültig.", "questionMedia");
     }
     generatorParameters[generatorId] = parameters;
+  }
+  const specificTemplateIssue = requiresCompleteQuestion
+    ? getQuestionTemplateValidationIssue(
+        payload.templateConfig.templateData,
+        templateId,
+      )
+    : null;
+  if (specificTemplateIssue) {
+    throw new DraftValidationError(
+      specificTemplateIssue.message,
+      specificTemplateIssue.field,
+    );
   }
   const templateConfig = requiresCompleteQuestion
     ? normalizeQuestionTemplateConfig(payload.templateConfig, templateId)

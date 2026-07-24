@@ -11,6 +11,7 @@ import {
   normalizeGeneratorParameters,
 } from "./generators/parameters";
 import { normalizeQuestionTemplateConfig } from "./pixelTemplateConfig";
+import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 
 export type QuestionQualityIssueCode =
   | "QUESTION_TEXT_REQUIRED"
@@ -32,6 +33,7 @@ export type QuestionQualityIssueCode =
   | "GENERATOR_LEGACY_OUTPUT"
   | "GENERATOR_CONFLICT"
   | "PIXEL_STAGE_DURATIONS_INVALID"
+  | "ESTIMATE_UNIT_REQUIRED"
   | "CORRECT_ANSWER_REQUIRED"
   | "ANSWER_MEDIA_REQUIRED"
   | "REQUIRED_LABELED_ANSWER_EMPTY"
@@ -44,7 +46,7 @@ export type QuestionQualityIssueCode =
 export type QuestionQualityIssue = {
   code: QuestionQualityIssueCode;
   params?: Record<string, string | number>;
-  field?: "questionText" | "questionMedia" | "answers" | "categories" | "validUntil";
+  field?: "questionText" | "questionMedia" | "templateUnit" | "answers" | "categories" | "validUntil";
 };
 
 export type QuestionQualityResult = {
@@ -112,6 +114,10 @@ export function evaluateQuestionQuality(
     (medium) => medium.operation !== "REMOVE" && Boolean(medium.url),
   );
   const template = findQuestionTemplate(questionTemplateDefinitions, draft.templateId);
+  const specificTemplateIssue = getQuestionTemplateValidationIssue(
+    draft.templateConfig.templateData,
+    draft.templateId,
+  );
   const generatorSlotKeys = new Set(
     (template?.generators ?? []).flatMap((generatorId) => {
       const definition = getGeneratorDefinition(generatorId);
@@ -125,9 +131,23 @@ export function evaluateQuestionQuality(
 
   if (
     template?.id === questionTemplateIds.pixelImage &&
-    !normalizeQuestionTemplateConfig(draft.templateConfig)
+    !normalizeQuestionTemplateConfig(draft.templateConfig, draft.templateId)
   ) {
     blockers.push({ code: "PIXEL_STAGE_DURATIONS_INVALID", field: "questionMedia" });
+  }
+
+  if (
+    template?.editorKind !== "STANDARD" &&
+    !specificTemplateIssue &&
+    !normalizeQuestionTemplateConfig(draft.templateConfig, draft.templateId)
+  ) {
+    blockers.push({ code: "CORRECT_ANSWER_REQUIRED", field: "answers" });
+  }
+  if (specificTemplateIssue) {
+    blockers.push({
+      code: specificTemplateIssue.code,
+      field: specificTemplateIssue.field,
+    });
   }
 
   for (const mediaSlot of mediaSlots.filter((slot) => slot.required && !generatorSlotKeys.has(slot.slotKey))) {

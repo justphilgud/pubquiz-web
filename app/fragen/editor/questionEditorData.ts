@@ -10,7 +10,11 @@ import {
 } from "./questionMedia";
 import { resolveCanonicalQuestionTemplateId } from "./templates/questionTemplateRegistry";
 import { mapGeneratorRun } from "./generators/runState";
-import { normalizeQuestionTemplateConfig, DEFAULT_PIXEL_TEMPLATE_CONFIG } from "./pixelTemplateConfig";
+import {
+  DEFAULT_PIXEL_TEMPLATE_CONFIG,
+  parseQuestionTemplateConfigDraft,
+} from "./pixelTemplateConfig";
+import { resolveQuestionText } from "./templates/questionTemplateData";
 
 export async function loadQuestionForEditor(questionId: number) {
   const question = await prisma.fragen.findUnique({
@@ -196,20 +200,27 @@ export async function loadQuestionForEditor(questionId: number) {
   for (const run of generatorRuns) {
     generatorParameters[run.generatorId] ??= run.parameters;
   }
+  const templateConfig =
+    parseQuestionTemplateConfigDraft(
+      question.template_config_json,
+      templateId,
+    ) ?? DEFAULT_PIXEL_TEMPLATE_CONFIG;
+  // The canonical question text wins. Legacy statement is only adopted when
+  // the canonical field is empty, then disappears on the next save.
+  const questionText = resolveQuestionText(
+    question.frage,
+    question.template_config_json,
+  );
 
   const draft: QuestionEditorDraft = {
     scope: question.geltungsbereich,
     eventSeriesIds: question.eventreihen.map((entry) => entry.eventreihe_id),
     templateId,
-    questionText: question.frage,
+    questionText,
     questionMedia,
     generatorRuns,
     generatorParameters,
-    templateConfig:
-      normalizeQuestionTemplateConfig(
-        question.template_config_json,
-        templateId,
-      ) ?? DEFAULT_PIXEL_TEMPLATE_CONFIG,
+    templateConfig,
     answers:
       answers.length > 0
         ? answers

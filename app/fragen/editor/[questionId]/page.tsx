@@ -17,6 +17,7 @@ import {
   canViewScopedQuestion,
 } from "../questionScopePolicy";
 import { canEditGlobalQuestions, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import { resolveGooglePlacesFeature } from "../googlePlacesFeature";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -104,6 +105,10 @@ export default async function ExistingQuestionEditorPage({
         canSelectGlobal: canEditGlobalQuestions(actor),
         eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
       }}
+      googlePlacesFeature={resolveGooglePlacesFeature({
+        apiKey: process.env.GOOGLE_MAPS_API_KEY,
+        explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
+      })}
     />
   );
 }

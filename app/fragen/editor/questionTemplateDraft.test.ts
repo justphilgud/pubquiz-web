@@ -128,6 +128,28 @@ test("template switches preserve pixel stage durations", () => {
   assert.deepEqual(clearQuestionTemplateFromDraft(changed).templateConfig, original.templateConfig);
 });
 
+test("template switches preserve question text and only apply defaults to empty drafts", () => {
+  const translated = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.translationReadAloud,
+  );
+  assert.ok(translated);
+
+  const existing = applyQuestionTemplateToDraft(
+    createDraft(),
+    translated,
+    () => "answer-existing",
+  );
+  assert.equal(existing.questionText, "Bestehende Frage");
+
+  const empty = applyQuestionTemplateToDraft(
+    { ...createDraft(), questionText: "  " },
+    translated,
+    () => "answer-empty",
+  );
+  assert.equal(empty.questionText, "Welcher Songtext wurde hier übersetzt?");
+});
+
 test("applying the pixel template creates a canonical editable draft", () => {
   const pixel = findQuestionTemplate(
     questionTemplates,

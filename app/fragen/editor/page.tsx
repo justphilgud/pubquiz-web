@@ -10,6 +10,7 @@ import { getQuestionEditorMessages } from "@/app/i18n/getMessages";
 import { localizeQuestionTemplates } from "./templates/questionTemplates";
 import { getAssignableQuestionEventSeries, getQuestionActor } from "./questionAccess.server";
 import { canEditGlobalQuestions, getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import { resolveGooglePlacesFeature } from "./googlePlacesFeature";
 
 export default async function QuestionEditorPage() {
   const session = await requireQuestionEditor();
@@ -52,6 +53,10 @@ export default async function QuestionEditorPage() {
         canSelectGlobal: canEditGlobalQuestions(actor),
         eventSeries: eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name })),
       }}
+      googlePlacesFeature={resolveGooglePlacesFeature({
+        apiKey: process.env.GOOGLE_MAPS_API_KEY,
+        explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
+      })}
     />
   );
 }

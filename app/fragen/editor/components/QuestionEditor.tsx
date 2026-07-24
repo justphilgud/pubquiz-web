@@ -29,6 +29,7 @@ import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
 import { TemplateSelector } from "./TemplateSelector";
+import { StructuredTemplateEditor } from "./StructuredTemplateEditor";
 import { QuestionScopeSection, type QuestionScopeOption } from "./QuestionScopeSection";
 import { evaluateQuestionQuality } from "../questionQuality";
 import type {
@@ -70,6 +71,7 @@ import {
   removeAnswerById,
 } from "../questionDraftState";
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
+import type { GooglePlacesFeature } from "../googlePlacesFeature";
 
 function createId(): string {
   return crypto.randomUUID();
@@ -138,6 +140,7 @@ type QuestionEditorProps = {
   messages: QuestionEditorMessages;
   templates: QuestionTemplate[];
   scopeOptions: { canSelectGlobal: boolean; eventSeries: QuestionScopeOption[] };
+  googlePlacesFeature: GooglePlacesFeature;
 };
 
 export function QuestionEditor({
@@ -151,9 +154,10 @@ export function QuestionEditor({
   messages,
   templates,
   scopeOptions,
+  googlePlacesFeature,
 }: QuestionEditorProps) {
   const specialQuestionTemplates = templates.filter(
-    (template) => template.selectable,
+    (template) => template.enabled && template.selectable,
   );
   const router = useRouter();
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
@@ -206,6 +210,21 @@ export function QuestionEditor({
     [draft.templateId, templates],
   );
   const quality = useMemo(() => evaluateQuestionQuality(draft), [draft]);
+  const duplicateInput = useMemo(() => ({
+    questionText: draft.questionText,
+    templateId: draft.templateId,
+    templateConfig: draft.templateConfig,
+    answers: draft.answers.map((answer) => ({
+      text: answer.text,
+      isCorrect: answer.isCorrect,
+      additionalInfo: answer.additionalInfo,
+    })),
+  }), [
+    draft.answers,
+    draft.questionText,
+    draft.templateConfig,
+    draft.templateId,
+  ]);
   const currentDraftFingerprint = useMemo(
     () => getQuestionDraftFingerprint(draft),
     [draft],
@@ -221,13 +240,13 @@ export function QuestionEditor({
 
   useEffect(() => {
     let active = true;
-    const questionText = draft.questionText.trim();
+    const questionText = duplicateInput.questionText.trim();
     const timer = window.setTimeout(() => {
       if (questionText.length < 12) {
         setSimilarQuestions([]);
         return;
       }
-      void findSimilarQuestions(questionText, savedQuestionId ?? undefined)
+      void findSimilarQuestions(duplicateInput, savedQuestionId ?? undefined)
         .then((result) => {
           if (active) setSimilarQuestions(result);
         })
@@ -239,7 +258,7 @@ export function QuestionEditor({
       active = false;
       window.clearTimeout(timer);
     };
-  }, [draft.questionText, savedQuestionId]);
+  }, [duplicateInput, savedQuestionId]);
 
   useEffect(() => {
     if (!hasUnsavedChanges || isReadOnly) return;
@@ -452,6 +471,12 @@ export function QuestionEditor({
     if (target === "answers") {
       document
         .querySelector<HTMLInputElement>("[data-editor-answer-input]")
+        ?.focus();
+      return;
+    }
+    if (target === "templateUnit") {
+      document
+        .querySelector<HTMLInputElement>("[data-template-unit]")
         ?.focus();
       return;
     }
@@ -850,6 +875,7 @@ export function QuestionEditor({
 
         <QuestionSection
           questionText={draft.questionText}
+          label={selectedTemplate?.questionLabel}
           questionTextRef={questionTextRef}
           onQuestionTextChange={(questionText) => {
             if (fieldError?.target === "questionText") setFieldError(null);
@@ -925,6 +951,25 @@ export function QuestionEditor({
           }
         />
 
+        {selectedTemplate && selectedTemplate.editorKind !== "STANDARD" && (
+          <StructuredTemplateEditor
+            kind={selectedTemplate.editorKind}
+            data={draft.templateConfig.templateData}
+            answers={draft.answers}
+            disabled={isEditorDisabled}
+            validationError={fieldError?.target === "templateUnit" ? fieldError.text : null}
+            googlePlacesFeature={googlePlacesFeature}
+            onChange={(templateData, answers) => {
+              if (fieldError?.target === "templateUnit") setFieldError(null);
+              setDraft((current) => ({
+                ...current,
+                templateConfig: { ...current.templateConfig, templateData },
+                answers,
+              }));
+            }}
+          />
+        )}
+
         {similarQuestions.length > 0 && (
           <aside className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
             <h2 className="font-semibold">{messages.editor.duplicateTitle}</h2>
@@ -945,7 +990,7 @@ export function QuestionEditor({
           </aside>
         )}
 
-        <AnswersSection
+        {(!selectedTemplate || selectedTemplate.editorKind === "STANDARD") && <AnswersSection
           answers={draft.answers}
           questionId={savedQuestionId}
           pathnamePrefix={mediaUploadPathnamePrefix}
@@ -982,7 +1027,7 @@ export function QuestionEditor({
               [answerId]: status,
             }))
           }
-        />
+        />}
 
         <AdditionalDetailsSection
           categories={categories}

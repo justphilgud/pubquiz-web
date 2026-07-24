@@ -88,7 +88,7 @@ export const mediaSlotDefinitions = {
   pixel_stage_3_image: slot("pixel_stage_3_image", "QUESTION", "IMAGE", "pixelStage3Image", { origin: "GENERATED", manualUploadAllowed: false, generatorOutput: true }),
   pixel_stage_2_image: slot("pixel_stage_2_image", "QUESTION", "IMAGE", "pixelStage2Image", { origin: "GENERATED", manualUploadAllowed: false, generatorOutput: true }),
   pixel_stage_1_image: slot("pixel_stage_1_image", "QUESTION", "IMAGE", "pixelStage1Image", { origin: "GENERATED", manualUploadAllowed: false, generatorOutput: true }),
-  lyrics_tts_audio: slot("lyrics_tts_audio", "QUESTION", "AUDIO", "preparedSlot", { origin: "GENERATED", manualUploadAllowed: false, generatorOutput: true }),
+  lyrics_tts_audio: slot("lyrics_tts_audio", "QUESTION", "AUDIO", "preparedSlot", { origin: "USER_OR_GENERATED", manualUploadAllowed: true, generatorOutput: true }),
 } satisfies Record<MediaSlotKey, MediaSlotDefinition>;
 
 export function isMediaSlotKey(value: unknown): value is MediaSlotKey {

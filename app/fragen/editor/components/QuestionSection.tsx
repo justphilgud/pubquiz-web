@@ -8,6 +8,7 @@ type QuestionSectionProps = {
   onQuestionTextChange: (questionText: string) => void;
   mediaContent?: ReactNode;
   validationError?: string | null;
+  label?: string;
 };
 
 export function QuestionSection({
@@ -16,12 +17,13 @@ export function QuestionSection({
   onQuestionTextChange,
   mediaContent,
   validationError = null,
+  label,
 }: QuestionSectionProps) {
   const { messages } = useQuestionEditorMessages();
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4">
       <label htmlFor="questionText" className="font-semibold text-slate-950">
-        {messages.question.label}
+        {label ?? messages.question.label}
       </label>
 
       <textarea

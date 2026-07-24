@@ -35,6 +35,12 @@ export const enQuestionEditorMessages = {
     musicReverse: { name: "Music reversed", description: "Identify the artist and title of a song played backwards.", defaultQuestion: "Which song is being played backwards? Name the artist and title.", artist: "Artist", title: "Title" },
     musicEightBit: { name: "Bitcrush music", description: "Identify a song from a digitally reduced retro lo-fi version.", defaultQuestion: "Which song can you hear in this bitcrushed version?" },
     pixelImage: { name: "Pixel image", description: "Identify a subject from a generated pixel graphic.", defaultQuestion: "What can you see in this pixel image?" },
+    trueFalse: { name: "True or false", description: "Classify one statement as true or false.", defaultQuestion: "" },
+    estimate: { name: "Estimate", description: "Estimate a number; the closest value wins.", defaultQuestion: "" },
+    ordering: { name: "Ordering", description: "Put terms into the correct order.", defaultQuestion: "" },
+    translationReadAloud: { name: "Translated and read aloud", description: "Keep original text, translation and audio separately editable.", defaultQuestion: "Which song lyrics were translated here?" },
+    anagram: { name: "Anagram", description: "Rearrange a name using exactly the same letters.", defaultQuestion: "Which name is hidden in this anagram?" },
+    googleReviews: { name: "Google reviews", description: "Manually curated reviews reveal a place step by step.", defaultQuestion: "Which place is described by these reviews?" },
   },
   management: {
     title: "Manage question", clone: "Clone question", cloning: "Cloning …", archive: "Archive", restore: "Restore", delete: "Delete permanently", deleting: "Deleting …",
@@ -56,7 +62,11 @@ export const enQuestionEditorMessages = {
   },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", title: "Title", solution: "Solution" },
   templateSelector: { selected: "Special question: {name}", change: "Change", clear: "Clear selection", select: "Select special question", searchLabel: "Search special questions", searchPlaceholder: "Search special question", empty: "No special question found." },
-  question: { label: "Question", placeholder: "Write your question..." },
+  question: {
+    label: "Question",
+    labels: { question: "Question", statement: "Statement", task: "Task", searchTarget: "What are you looking for?" },
+    placeholder: "Write your question...",
+  },
   answers: { title: "Answers", answer: "Answer", answers: "Answers", correctShort: "correct", inputPlaceholder: "Enter answer", correct: "This answer is correct", add: "+ Add answer", removeConfirm: "This answer already contains data. Do you really want to remove it?", imageRequired: "An image is required for this FaceMorph answer.", createPixelQuestionLater: "Also create a pixel question from this image later" },
   media: { existingLabel: "Question media", replace: "Replace media", choose: "Choose file", chooseImage: "Choose image", takePhoto: "Take photo", uploading: "Uploading …" },
   mediaSlots: {
@@ -117,7 +127,7 @@ export const enQuestionEditorMessages = {
     LABELED_ANSWERS_INCONSISTENT: "Labelled answer data is technically inconsistent", SOURCE_MISSING: "Source is missing", CATEGORY_MISSING: "Category is missing",
     GENERATOR_INPUT_REQUIRED: "The required generator input is missing", GENERATOR_OUTPUT_REQUIRED: "The generated output is missing", GENERATOR_IN_PROGRESS: "Generation is still running",
     GENERATOR_FAILED: "Generation failed", GENERATOR_OUTPUT_STALE: "The generated output is stale", GENERATOR_OUTPUT_MISMATCH: "The output does not match the current input",
-    GENERATOR_OUTPUT_MISSING: "A successful generator run has no output", GENERATOR_LEGACY_OUTPUT: "Legacy output without a generator run", GENERATOR_CONFLICT: "Generator data is conflicting", PIXEL_STAGE_DURATIONS_INVALID: "Each pixel stage duration must be between 1 and 120 seconds",
+    GENERATOR_OUTPUT_MISSING: "A successful generator run has no output", GENERATOR_LEGACY_OUTPUT: "Legacy output without a generator run", GENERATOR_CONFLICT: "Generator data is conflicting", PIXEL_STAGE_DURATIONS_INVALID: "Each pixel stage duration must be between 1 and 120 seconds", ESTIMATE_UNIT_REQUIRED: "Please enter a unit for the estimate question.",
     ADDITIONAL_INFO_MISSING: "Additional information for multiple comparison values is missing", UNKNOWN: "Unknown quality issue",
   },
   errors: {

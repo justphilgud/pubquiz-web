@@ -55,6 +55,17 @@ async function createVorlage(data: {
 }
 
 async function main() {
+  for (const template of [
+    { code: "wahr_falsch", name: "Wahr oder falsch", slide_typ: "boolean" },
+    { code: "schaetzfrage", name: "Schätzfrage", slide_typ: "numeric" },
+    { code: "reihenfolge", name: "Reihenfolge", slide_typ: "ordering" },
+    { code: "uebersetzt_vorgelesen", name: "Übersetzt vorgelesen", slide_typ: "translated_audio" },
+    { code: "anagramm", name: "Anagramm", slide_typ: "anagram" },
+    { code: "google_rezensionen", name: "Google-Rezensionen", slide_typ: "review_sequence" },
+  ]) {
+    await createVorlage({ ...template, antwortfelder: [] });
+  }
+
   await createVorlage({
     code: "face_morph",
     name: "Face Morph",

@@ -4,6 +4,7 @@ import type {
   QuestionTemplateConfig,
 } from "./types";
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
+import { parseQuestionTemplateData } from "./templates/questionTemplateData";
 
 export const PIXEL_STAGE_DURATION_MIN_SECONDS = 1;
 export const PIXEL_STAGE_DURATION_MAX_SECONDS = 120;
@@ -26,11 +27,26 @@ export function parseQuestionTemplateConfigDraft(
   value: unknown,
   templateId: string | null = null,
 ): QuestionTemplateConfig | null {
-  if (value === undefined || value === null) return DEFAULT_PIXEL_TEMPLATE_CONFIG;
+  if (value === undefined || value === null) {
+    const templateData = parseQuestionTemplateData(
+      undefined,
+      templateId,
+      false,
+    );
+    return templateData
+      ? { ...DEFAULT_PIXEL_TEMPLATE_CONFIG, templateData }
+      : DEFAULT_PIXEL_TEMPLATE_CONFIG;
+  }
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const config = value as Record<string, unknown>;
   const durations = config.stageDurationsSeconds;
   const pixelQuestionOptions = config.createPixelQuestionByAnswer;
+  const templateData = parseQuestionTemplateData(
+    config.templateData,
+    templateId,
+    false,
+  );
+  if (templateData === null) return null;
 
   if (
     durations !== undefined &&
@@ -69,6 +85,7 @@ export function parseQuestionTemplateConfigDraft(
     return {
       ...DEFAULT_PIXEL_TEMPLATE_CONFIG,
       createPixelQuestionByAnswer: { answer1, answer2 },
+      ...(templateData ? { templateData } : {}),
     };
   }
 
@@ -84,6 +101,7 @@ export function parseQuestionTemplateConfigDraft(
       stage1: Number(candidate.stage1),
     },
     createPixelQuestionByAnswer: { answer1, answer2 },
+    ...(templateData ? { templateData } : {}),
   };
 }
 
@@ -97,7 +115,13 @@ export function normalizeQuestionTemplateConfig(
   if (!values.every((entry) => Number.isInteger(entry) && entry >= PIXEL_STAGE_DURATION_MIN_SECONDS && entry <= PIXEL_STAGE_DURATION_MAX_SECONDS)) {
     return null;
   }
-  return draft;
+  const templateData = parseQuestionTemplateData(
+    draft.templateData,
+    templateId,
+    true,
+  );
+  if (templateData === null) return null;
+  return templateData ? { ...draft, templateData } : draft;
 }
 
 export function updateFaceMorphPixelQuestionOption(

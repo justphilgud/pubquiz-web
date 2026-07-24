@@ -10,6 +10,8 @@ import {
 import type { ResolvedTemplate } from "@/app/rendering/templateResolver";
 import type { AnswerFormTemplate } from "@/app/rendering/templateRegistry";
 import { answerFormTemplateStyle } from "@/app/rendering/templateStyles";
+import type { QuestionTemplateData } from "@/app/fragen/editor/types";
+import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTemplateList";
 
 type TeamAntwortState = {
   antwortText: string | null;
@@ -47,6 +49,8 @@ type AntwortStatus = {
     quiz_fragen_id: number;
     fragen_id: number;
     frage: string;
+    templateId: string | null;
+    templateConfig: { templateData?: QuestionTemplateData } | null;
     istFreigegeben: boolean;
     punkte_modus: string;
 
@@ -111,6 +115,47 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
 
   const aktuellerBlock = liveDaten.aktuellerBlock;
   const blockIstGesperrt = liveDaten.blockIstGesperrt;
+
+  function updateOrderingAnswer(
+    quizFragenId: number,
+    items: Array<{ id: string; text: string }>,
+    index: number,
+    direction: -1 | 1,
+  ) {
+    const stored = antworten[quizFragenId]?.antwortText;
+    let order = items.map((item) => item.id);
+    if (stored) {
+      try {
+        const parsed: unknown = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.every((entry) => typeof entry === "string")) {
+          order = parsed;
+        }
+      } catch {
+        // Legacy free text is replaced by a structured ordering answer.
+      }
+    }
+    const target = index + direction;
+    if (target < 0 || target >= order.length) return;
+    [order[index], order[target]] = [order[target], order[index]];
+    setAntworten((current) => ({
+      ...current,
+      [quizFragenId]: {
+        antwortText: JSON.stringify(order),
+        antwortId: null,
+        antwortfelder: {},
+      },
+    }));
+  }
+
+  function setOrderingAnswer(
+    quizFragenId: number,
+    order: string[],
+  ) {
+    setAntworten((current) => ({
+      ...current,
+      [quizFragenId]: { antwortText: JSON.stringify(order), antwortId: null, antwortfelder: {} },
+    }));
+  }
 
   const speicherBlockId =
     liveDaten.offenerBlock?.quiz_abschnitt_id ??
@@ -224,7 +269,18 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
     const geladeneAntworten: Record<number, TeamAntwortState> = {};
 
     liveDaten.fragen.forEach((frage) => {
-      if (!frage.gespeicherteAntwort) return;
+      if (!frage.gespeicherteAntwort) {
+        if (frage.templateConfig?.templateData?.kind === "ORDERING") {
+          geladeneAntworten[frage.quiz_fragen_id] = {
+            antwortText: JSON.stringify(
+              frage.templateConfig.templateData.items.map((item) => item.id),
+            ),
+            antwortId: null,
+            antwortfelder: {},
+          };
+        }
+        return;
+      }
 
       const feldAntworten: Record<number, string> = {};
 
@@ -526,6 +582,71 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
                             </label>
                           ))}
                         </div>
+                      ) : frage.templateConfig?.templateData?.kind === "ORDERING" ? (
+                        <div className="mt-4 space-y-2">
+                          {(() => {
+                            const items = frage.templateConfig.templateData.items;
+                            let order = items.map((item) => item.id);
+                            const stored = antworten[frage.quiz_fragen_id]?.antwortText;
+                            if (stored) {
+                              try {
+                                const parsed: unknown = JSON.parse(stored);
+                                if (Array.isArray(parsed) && parsed.length === order.length) {
+                                  order = parsed as string[];
+                                }
+                              } catch {
+                                // Keep the configured order for legacy text.
+                              }
+                            }
+                            const itemMap = new Map(items.map((item) => [item.id, item]));
+                            return (
+                              <SortableTemplateList
+                                ids={order}
+                                disabled={blockIstGesperrt}
+                                onReorder={(ids) => setOrderingAnswer(frage.quiz_fragen_id, ids)}
+                              >
+                                {(id, index, dragHandle) => {
+                                  const item = itemMap.get(id);
+                                  if (!item) return null;
+                                  return (
+                                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3">
+                                      {dragHandle}
+                                      <span className="w-7 font-bold">{index + 1}.</span>
+                                      <span className="flex-1">{item.text}</span>
+                                      <button type="button" aria-label={`${item.text} nach oben`}
+                                        disabled={blockIstGesperrt || index === 0}
+                                        onClick={() => updateOrderingAnswer(frage.quiz_fragen_id, items, index, -1)}
+                                        className="min-h-11 min-w-11 rounded-lg border disabled:opacity-40">↑</button>
+                                      <button type="button" aria-label={`${item.text} nach unten`}
+                                        disabled={blockIstGesperrt || index === order.length - 1}
+                                        onClick={() => updateOrderingAnswer(frage.quiz_fragen_id, items, index, 1)}
+                                        className="min-h-11 min-w-11 rounded-lg border disabled:opacity-40">↓</button>
+                                    </div>
+                                  );
+                                }}
+                              </SortableTemplateList>
+                            );
+                          })()}
+                        </div>
+                      ) : frage.templateConfig?.templateData?.kind === "ESTIMATE" ? (
+                        <label className="mt-4 block text-sm font-semibold text-slate-700">
+                          Schätzwert
+                          <span className="mt-2 flex items-center gap-3">
+                            <input type="number" inputMode="decimal" disabled={blockIstGesperrt}
+                              step={["INTEGER", "YEAR"].includes(frage.templateConfig.templateData.numberFormat) ? 1 : "any"}
+                              value={antworten[frage.quiz_fragen_id]?.antwortText ?? ""}
+                              onChange={(event) => setAntworten((current) => ({
+                                ...current,
+                                [frage.quiz_fragen_id]: {
+                                  antwortText: event.target.value,
+                                  antwortId: null,
+                                  antwortfelder: {},
+                                },
+                              }))}
+                              className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 disabled:bg-slate-100" />
+                            <span>{frage.templateConfig.templateData.unit}</span>
+                          </span>
+                        </label>
                       ) : frage.antworten.length > 1 ? (
                         <div className="mt-4 space-y-2">
                           {frage.antworten.map((antwort, antwortIndex) => (

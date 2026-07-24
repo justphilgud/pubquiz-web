@@ -1017,6 +1017,8 @@ export type QuizPraesentationResult = {
 
     fragen_id: number;
     frage: string;
+    templateId: string | null;
+    templateConfig: import("@/app/fragen/editor/types").QuestionTemplateConfig | null;
 
     punkte_modus: string;
 
@@ -1149,6 +1151,7 @@ export async function getQuizPraesentation(
                   antwort_id: "asc",
                 },
               },
+              vorlage: { select: { code: true } },
             },
           },
         },
@@ -1192,6 +1195,10 @@ export async function getQuizPraesentation(
 
       fragen_id: eintrag.fragen.fragen_id,
       frage: eintrag.fragen.frage,
+      templateId: eintrag.fragen.vorlage?.code ?? null,
+      templateConfig: eintrag.fragen.template_config_json as
+        | import("@/app/fragen/editor/types").QuestionTemplateConfig
+        | null,
 
       punkte_modus: eintrag.punkte_modus ?? "standard",
 
@@ -1452,6 +1459,7 @@ export async function getQuizAntwortStatus(
                   sortierung: "asc",
                 },
               },
+              vorlage: { select: { code: true } },
             },
           },
         },
@@ -1572,6 +1580,10 @@ export async function getQuizAntwortStatus(
             quiz_fragen_id: eintrag.quiz_fragen_id,
             fragen_id: eintrag.fragen.fragen_id,
             frage: eintrag.fragen.frage,
+            templateId: eintrag.fragen.vorlage?.code ?? null,
+            templateConfig: eintrag.fragen.template_config_json as
+              | import("@/app/fragen/editor/types").QuestionTemplateConfig
+              | null,
             istFreigegeben: true,
             punkte_modus: eintrag.punkte_modus ?? "standard",
 
