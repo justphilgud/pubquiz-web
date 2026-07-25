@@ -7,6 +7,7 @@ export const deQuestionEditorMessages = {
     optional: "optional",
     image: "Bild",
     audio: "Audio",
+    video: "Video",
     unknownDate: "–",
     unknownUser: "Unbekannt",
   },
@@ -180,7 +181,7 @@ export const deQuestionEditorMessages = {
     transferError: "Die Datei konnte nicht übertragen werden. Das bisherige Medium und deine Eingaben bleiben erhalten.",
     blockedTitle: "Medium kann hier nicht bearbeitet werden.", blockedRetained: "Beim Speichern bleiben vorhandene Medien unverändert.",
     incompatible: "Das vorhandene Medium hat nicht den erforderlichen Typ.", removalPending: "Wird beim Speichern entfernt.", undoRemove: "Entfernen rückgängig machen",
-    replace: "Medium ersetzen", choose: "Datei auswählen", chooseImage: "Bild auswählen", takePhoto: "Foto aufnehmen", imageFormats: "JPEG, PNG oder WebP", audioFormats: "MP3, WAV oder OGG", maximum: "maximal {size}", uploading: "Upload läuft …",
+    replace: "Medium ersetzen", choose: "Datei auswählen", chooseImage: "Bild auswählen", takePhoto: "Foto aufnehmen", imageFormats: "JPEG, PNG oder WebP", audioFormats: "MP3, WAV oder OGG", maximum: "maximal {size}", uploading: "Upload läuft …", playbackError: "Die Audiodatei konnte nicht geladen werden.",
     invalidExtension: "Dieses Dateiformat wird nicht unterstützt. Erlaubt: {extensions}.", invalidMime: "Der gemeldete Dateityp wird nicht unterstützt.", tooLarge: "Die Datei darf höchstens {size} groß sein.",
     blockedReasons: {
       MULTIPLE_QUESTION_MEDIA: "Diese Frage besitzt {count} Fragenmedien. Der MVP unterstützt genau ein Medium.",

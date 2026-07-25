@@ -7,6 +7,7 @@ import {
   FileUpload,
   ImageViewer,
   MediaPreview,
+  VideoPlayer,
 } from "@/components/ui";
 import {
   getQuestionMediaFileName,
@@ -238,16 +239,30 @@ export function MediaUploadSlot({
           {visibleMedia && (
             <MediaPreview
               compact={compact}
+              layout={visibleMedia.mediaType === "AUDIO" ? "audio" : "visual"}
               title={visibleMedia.fileName ?? getQuestionMediaFileName(visibleMedia.url!)}
-              type={visibleMedia.mediaType === "IMAGE" ? messages.common.image : messages.common.audio}
+              type={
+                visibleMedia.mediaType === "IMAGE"
+                  ? messages.common.image
+                  : visibleMedia.mediaType === "VIDEO"
+                    ? messages.common.video
+                    : messages.common.audio
+              }
             >
               {visibleMedia.mediaType === "IMAGE" ? (
                 <ImageViewer
                   src={resolveQuestionMediaUrl(visibleMedia.url!)}
                   alt={previewAlt}
                 />
+              ) : visibleMedia.mediaType === "VIDEO" ? (
+                <VideoPlayer src={resolveQuestionMediaUrl(visibleMedia.url!)} />
               ) : (
-                <AudioPlayer src={resolveQuestionMediaUrl(visibleMedia.url!)} />
+                <AudioPlayer
+                  embedded
+                  src={resolveQuestionMediaUrl(visibleMedia.url!)}
+                  mimeType={visibleMedia.mimeType}
+                  errorMessage={messages.media.playbackError}
+                />
               )}
             </MediaPreview>
           )}

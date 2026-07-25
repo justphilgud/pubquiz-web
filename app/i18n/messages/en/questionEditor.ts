@@ -1,7 +1,7 @@
 import type { QuestionEditorMessageOverrides } from "../../messageTypes";
 
 export const enQuestionEditorMessages = {
-  common: { cancel: "Cancel", confirm: "Confirm", remove: "Remove", required: "Required", optional: "optional", image: "Image", audio: "Audio", unknownUser: "Unknown" },
+  common: { cancel: "Cancel", confirm: "Confirm", remove: "Remove", required: "Required", optional: "optional", image: "Image", audio: "Audio", video: "Video", unknownUser: "Unknown" },
   editor: {
     eyebrow: "Question management",
     titles: { create: "New question", edit: "Edit question", review: "Review question", readOnly: "Submitted question" },
@@ -68,7 +68,7 @@ export const enQuestionEditorMessages = {
     placeholder: "Write your question...",
   },
   answers: { title: "Answers", answer: "Answer", answers: "Answers", correctShort: "correct", inputPlaceholder: "Enter answer", correct: "This answer is correct", add: "+ Add answer", removeConfirm: "This answer already contains data. Do you really want to remove it?", imageRequired: "An image is required for this FaceMorph answer.", createPixelQuestionLater: "Also create a pixel question from this image later" },
-  media: { existingLabel: "Question media", replace: "Replace media", choose: "Choose file", chooseImage: "Choose image", takePhoto: "Take photo", uploading: "Uploading …" },
+  media: { existingLabel: "Question media", replace: "Replace media", choose: "Choose file", chooseImage: "Choose image", takePhoto: "Take photo", uploading: "Uploading …", playbackError: "The audio file could not be loaded." },
   mediaSlots: {
     musicOriginalAudio: { label: "Original audio", help: "A reversed version is generated from this audio." },
     musicBitcrushAudio: { label: "Bitcrushed audio", help: "The original is digitally reduced to create a rougher sound." },
