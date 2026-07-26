@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getQuizPraesentation } from "../../actions";
+import { getQuizPraesentation, getSchaetzfrageById } from "../../actions";
 import {
   getOrCreatePraesentationStatus,
   getAntwortStatus,
@@ -8,6 +8,8 @@ import ModerationClient from "./ModerationClient";
 import { requireQuizLiveController } from "../../quizAccess.server";
 import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
 import { getDefaultLocale } from "@/app/i18n/locale";
+import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
+import { resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 
 type Props = {
   params: Promise<{
@@ -30,23 +32,27 @@ export default async function ModerationPage({ params }: Props) {
     notFound();
   }
 
-  const status = await getOrCreatePraesentationStatus(quizId);
-  const antwortStatus = await getAntwortStatus(quizId, null);
+  const [status, antwortStatus, templates] = await Promise.all([
+    getOrCreatePraesentationStatus(quizId),
+    getAntwortStatus(quizId, null),
+    resolveQuizTemplates(quizId),
+  ]);
+  if (!templates) notFound();
+  const initialLiveState = resolvePresentationLiveState(status);
+  const initialEstimationQuestion =
+    initialLiveState.estimation.questionId === null
+      ? null
+      : await getSchaetzfrageById(
+          quizId,
+          initialLiveState.estimation.questionId,
+        );
 
   return (
     <ModerationClient
       quizId={quizId}
       quiz={quiz}
-      initialStatus={{
-        slide_index: status.slide_index,
-        slide_started_at: status.slide_started_at
-          ? status.slide_started_at.toISOString()
-          : null,
-        quiz_started_at: status.quiz_started_at
-          ? status.quiz_started_at.toISOString()
-          : null,
-        endstand_reveal_count: status.endstand_reveal_count ?? 1,
-      }}
+      initialLiveState={initialLiveState}
+      initialEstimationQuestion={initialEstimationQuestion}
       initialAntwortStatus={{
         teamsAngemeldet: antwortStatus.teamsAngemeldet,
         antwortenEingegangen: antwortStatus.antwortenEingegangen,
@@ -56,6 +62,7 @@ export default async function ModerationPage({ params }: Props) {
           : null,
       }}
       backToQuizLabel={loadRenderingMessages(getDefaultLocale()).fields.backToQuiz}
+      theme={templates.theme}
     />
   );
 }

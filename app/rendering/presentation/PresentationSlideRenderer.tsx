@@ -1,0 +1,1558 @@
+"use client";
+
+/* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
+
+import { useEffect, useRef, useState } from "react";
+import QRCode from "react-qr-code";
+
+import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
+import { parsePrizeSlots } from "@/app/quiz/fixedSlidesPolicy";
+import type { QuizPraesentationResult } from "../../quiz/actions";
+import { formatQuizPoints } from "../../quiz/formatQuizPoints";
+import {
+  type Medium,
+  type PraesentationQuiz,
+  type Slide,
+} from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
+import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
+import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
+import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
+import type { PresentationPlaybackCommand } from "./presentationLiveState";
+
+type ScoreEntry = {
+  teamname: string;
+  punkte: number;
+};
+
+type Abschnitt = QuizPraesentationResult["abschnitte"][number];
+
+export type PresentationSlideDisplayState = {
+  renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW";
+  templateRevealCount: number;
+  punktestand: ScoreEntry[];
+  endstandRevealCount: number;
+  now: number;
+  estimationPhase: "HIDDEN" | "RUNNING" | "SOLUTION";
+  schaetzfrage: {
+    fragen_id: number;
+    frage: string;
+    richtigeAntwort: string | null;
+  } | null;
+  isSchaetzfrageLoading: boolean;
+  remoteCountdownDauerSekunden: number | null;
+  remoteCountdownStartedAt: string | null;
+  remoteCountdownStatus: string | null;
+  mediaOverlayActive: boolean;
+  playbackCommand: PresentationPlaybackCommand;
+  playbackCommandId: number;
+};
+
+type Props = {
+  quiz: QuizPraesentationResult;
+  slide: Slide | undefined;
+  slides: Slide[];
+  slideIndex: number;
+  slideLabel: string;
+  theme: ResolvedQuizTheme;
+  displayState: PresentationSlideDisplayState;
+};
+
+function SynchronizedMedia({
+  kind,
+  src,
+  command,
+  commandId,
+  renderMode,
+  className,
+  loop = false,
+}: {
+  kind: "audio" | "video";
+  src: string;
+  command: PresentationPlaybackCommand;
+  commandId: number;
+  renderMode: PresentationSlideDisplayState["renderMode"];
+  className?: string;
+  loop?: boolean;
+}) {
+  const mediaRef = useRef<HTMLMediaElement | null>(null);
+  const handledCommandIdRef = useRef<number | null>(null);
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
+
+  async function play() {
+    try {
+      await mediaRef.current?.play();
+      setPlaybackBlocked(false);
+    } catch {
+      setPlaybackBlocked(true);
+    }
+  }
+
+  useEffect(() => {
+    if (renderMode !== "PRESENTATION") return;
+    const media = mediaRef.current;
+    if (!media) return;
+    if (command === null) {
+      media.pause();
+      handledCommandIdRef.current = null;
+      return;
+    }
+    if (handledCommandIdRef.current === commandId) return;
+    handledCommandIdRef.current = commandId;
+
+    if (command === "play") {
+      void media
+        .play()
+        .then(() => setPlaybackBlocked(false))
+        .catch(() => setPlaybackBlocked(true));
+    } else if (command === "pause") {
+      media.pause();
+    } else if (command === "stop") {
+      media.pause();
+      media.currentTime = 0;
+    }
+  }, [command, commandId, renderMode]);
+
+  const media =
+    kind === "audio" ? (
+      <audio
+        ref={(element) => {
+          mediaRef.current = element;
+        }}
+        src={src}
+        loop={loop}
+        preload="metadata"
+      />
+    ) : (
+      <video
+        ref={(element) => {
+          mediaRef.current = element;
+        }}
+        src={src}
+        loop={loop}
+        muted={renderMode !== "PRESENTATION"}
+        playsInline
+        className={className}
+        preload="metadata"
+      />
+    );
+
+  return (
+    <>
+      {media}
+      {playbackBlocked && renderMode === "PRESENTATION" && (
+        <button
+          type="button"
+          onClick={() => void play()}
+          className="rounded-xl border border-white/40 bg-black/80 px-4 py-3 text-sm font-bold text-white"
+        >
+          Medienwiedergabe einmalig aktivieren
+        </button>
+      )}
+    </>
+  );
+}
+
+export default function PresentationSlideRenderer({
+  quiz,
+  slide,
+  slides,
+  slideIndex,
+  slideLabel,
+  theme,
+  displayState,
+}: Props) {
+  const praesentationQuiz = quiz as PraesentationQuiz;
+  const {
+    renderMode,
+    templateRevealCount,
+    punktestand,
+    endstandRevealCount,
+    now,
+    estimationPhase,
+    schaetzfrage,
+    isSchaetzfrageLoading,
+    remoteCountdownDauerSekunden,
+    remoteCountdownStartedAt,
+    remoteCountdownStatus,
+    mediaOverlayActive,
+    playbackCommand,
+    playbackCommandId,
+  } = displayState;
+  const currentSlideMedia =
+    slide?.typ === "frage"
+      ? slide.frage.medien
+      : slide?.typ === "aufloesung"
+        ? [
+            ...slide.frage.medien,
+            ...slide.frage.antworten.flatMap((answer) => answer.medien),
+          ]
+        : [];
+  const primaryPlaybackMediaId =
+    currentSlideMedia.find(
+      (medium) => isAudio(medium.datei) || isVideo(medium.datei),
+    )?.medien_id ?? null;
+
+function getMediumUrl(datei: string) {
+  if (datei.startsWith("http://") || datei.startsWith("https://")) {
+    return datei;
+  }
+
+  return `/medien/${datei}`;
+}
+
+function isBild(datei: string) {
+  return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(datei);
+}
+
+function isAudio(datei: string) {
+  return /\.(mp3|wav|ogg|m4a)$/i.test(datei);
+}
+
+function isVideo(datei: string) {
+  return /\.(mp4|webm|mov)$/i.test(datei);
+}
+
+function sortiereAntworten(frage: QuizPraesentationResult["fragen"][number]) {
+  return [...frage.antworten].sort((a, b) => {
+    const indexA = frage.antwort_reihenfolge.indexOf(a.antwort_id);
+    const indexB = frage.antwort_reihenfolge.indexOf(b.antwort_id);
+
+    if (indexA === -1 && indexB === -1) return a.antwort_id - b.antwort_id;
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+
+    return indexA - indexB;
+  });
+}
+
+function zeigtAntwortoptionen(
+  frage: QuizPraesentationResult["fragen"][number],
+) {
+  if (frage.effektiver_antwortmodus === "OPEN") return false;
+  if (frage.effektiver_antwortmodus === "CLOSED") return true;
+  return frage.antworten.length > 1;
+}
+
+function renderMedienKarte(
+  medium: Medium,
+  variant: "small" | "large" | "overlay",
+) {
+  const isLarge = variant !== "small";
+  const src = getMediumUrl(medium.datei);
+  const isPlaybackTarget =
+    medium.medien_id === primaryPlaybackMediaId &&
+    (mediaOverlayActive ? variant === "overlay" : variant !== "overlay");
+  const effectivePlaybackCommand = isPlaybackTarget ? playbackCommand : null;
+
+  return (
+    <div
+      key={medium.medien_id}
+      className={`flex min-h-0 flex-col justify-center overflow-hidden rounded-[1.5rem] border-4 border-cyan-300 bg-black/65 p-4 shadow-[8px_8px_0_#ff00aa] ${isLarge ? "h-full" : ""
+        }`}
+    >
+      {isBild(medium.datei) ? (
+        <img
+          src={src}
+          alt={medium.bemerkung ?? medium.datei}
+          className="h-full max-h-full w-full rounded-2xl object-contain"
+        />
+      ) : isAudio(medium.datei) ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-6">
+          <div className="text-7xl font-black text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+            ▶
+          </div>
+          <SynchronizedMedia
+            kind="audio"
+            src={src}
+            command={effectivePlaybackCommand}
+            commandId={playbackCommandId}
+            renderMode={renderMode}
+          />
+        </div>
+      ) : isVideo(medium.datei) ? (
+        <SynchronizedMedia
+          kind="video"
+          src={src}
+          className="h-full max-h-full w-full rounded-2xl object-contain"
+          command={effectivePlaybackCommand}
+          commandId={playbackCommandId}
+          renderMode={renderMode}
+        />
+      ) : (
+        <div className="break-all text-3xl font-black text-yellow-200">
+          {medium.datei}
+        </div>
+      )}
+
+      {medium.bemerkung && (
+        <div className="mt-3 text-sm font-bold text-white/70">
+          {medium.bemerkung}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function renderAntwortOptionen(
+  frage: QuizPraesentationResult["fragen"][number]
+) {
+  const antworten = sortiereAntworten(frage);
+  const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
+
+  if (!hatAntwortmoeglichkeiten) {
+    return (
+      <div className="flex h-full items-center justify-center rounded-[1.5rem] border-4 border-dashed border-yellow-300 bg-black/40 p-8 text-center text-2xl font-black uppercase text-white/40">
+        Offene Frage
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid h-full min-h-0 content-center gap-4">
+      {antworten.map((antwort, index) => (
+        <div
+          key={antwort.antwort_id}
+          className="presentation-answer-option rounded-3xl border-4 border-yellow-300 bg-black/45 px-6 py-4 text-2xl font-black text-white shadow-[6px_6px_0_#ff00aa] xl:text-3xl"
+        >
+          <span className="mr-4 text-cyan-300">
+            {String.fromCharCode(65 + index)}.
+          </span>
+          {antwort.antwort}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function renderPunkteBadge(punkteModus?: string | null) {
+  if (!punkteModus || punkteModus === "standard") return null;
+
+  const label =
+    punkteModus === "expertenbonus"
+      ? "Expertenbonus"
+      : punkteModus === "risikofrage"
+        ? "Risikofrage"
+        : punkteModus;
+
+  return (
+    <span className="presentation-badge rounded-xl border-4 border-yellow-300 bg-yellow-300 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
+      {label}
+    </span>
+  );
+}
+
+function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
+  const frage = slide.frage;
+  const templateData = frage.templateConfig?.templateData;
+  const antworten = sortiereAntworten(frage);
+  const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
+  const layout = frage.praesentationslayout ?? "standard";
+
+  if (templateData?.kind === "GOOGLE_REVIEWS") {
+    const visibleReviews = templateData.sequentialReveal
+      ? templateData.reviews.slice(0, templateRevealCount)
+      : templateData.reviews;
+    return (
+      <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+        <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
+        <div className="mt-6 grid min-h-0 flex-1 gap-4 overflow-auto lg:grid-cols-2">
+          {visibleReviews.map((review, index) => (
+            <article key={review.id} className="rounded-2xl border-2 border-yellow-300 bg-white/10 p-5 text-xl text-white">
+              <div className="mb-3 flex items-center gap-3">
+                <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full bg-cyan-300 font-black text-slate-950">
+                  {(review.authorName.trim()[0] || "?").toLocaleUpperCase("de-DE")}
+                </span>
+                <span className="font-bold">
+                  {templateData.hideAuthorUntilSolution
+                    ? "Google-Nutzer"
+                    : review.authorName || "Google-Nutzer"}
+                </span>
+              </div>
+              <p>„{review.text}“</p>
+              {((review.rating && !templateData.hideRatingUntilSolution) || review.publishedLabel) && <p className="mt-3 text-sm text-yellow-200">
+                {[review.rating && !templateData.hideRatingUntilSolution ? `${review.rating} ★` : "", review.publishedLabel].filter(Boolean).join(" · ")}
+              </p>}
+              <p className="mt-2 text-xs uppercase tracking-wide text-white/55">{review.attributionText || "Google Maps"}</p>
+              <span className="sr-only">Rezension {index + 1}</span>
+            </article>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (templateData?.kind === "TRUE_FALSE") {
+    return (
+      <div className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+        <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
+        {hatAntwortmoeglichkeiten && (
+          <div className="mt-10 grid grid-cols-2 gap-6 text-4xl font-black">
+            <div className="rounded-2xl border-4 border-emerald-300 p-6 text-emerald-200">Wahr</div>
+            <div className="rounded-2xl border-4 border-pink-400 p-6 text-pink-200">Falsch</div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (templateData?.kind === "ANAGRAM") {
+    return (
+      <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+        <h2 className="text-3xl font-black text-white">{frage.frage}</h2>
+        <p className="mt-10 break-words text-7xl font-black uppercase tracking-[0.2em] text-yellow-200 xl:text-9xl">{templateData.selectedSolution}</p>
+      </div>
+    );
+  }
+
+  if (templateData?.kind === "ORDERING") {
+    return (
+      <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+        <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
+        {hatAntwortmoeglichkeiten && (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {antworten.map((answer) => <div key={answer.antwort_id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{answer.antwort}</div>)}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (templateData?.kind === "ESTIMATE") {
+    return (
+      <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+        <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
+        {templateData.unit && <p className="mt-8 rounded-2xl border-2 border-yellow-300 px-6 py-3 text-3xl font-black text-yellow-200">Antwort in {templateData.unit}</p>}
+      </div>
+    );
+  }
+
+  if (templateData?.kind === "TRANSLATION_READ_ALOUD") {
+    return (
+      <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        <h2 className="text-5xl font-black leading-tight text-white">{frage.frage}</h2>
+        <p className="mt-8 text-2xl font-bold text-cyan-200">
+          {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.sourceLanguage)}
+          {" → "}
+          {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.targetLanguage)}
+        </p>
+        <p className="mt-4 text-lg text-white/60">Audio über den konfigurierten TTS-Ausgabeslot abspielen.</p>
+      </div>
+    );
+  }
+
+  const effektivesLayout =
+    layout !== "standard"
+      ? layout
+      : hatAntwortmoeglichkeiten
+        ? "antworten_fokus"
+        : frage.medien.length > 0
+          ? "bild_fokus"
+          : "text_fokus";
+
+  if (effektivesLayout === "bild_fokus") {
+    return (
+      <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]">
+        <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
+              Frage {slide.frageIndexImBlock}
+            </div>
+
+            {renderPunkteBadge(frage.punkte_modus)}
+          </div>
+
+          <h2 className="text-3xl font-black leading-tight text-white drop-shadow-[3px_3px_0_#ff00aa] xl:text-4xl">
+            {frage.frage}
+          </h2>
+
+        </div>
+
+        <div className="min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-5 shadow-[8px_8px_0_#ff00aa]">
+          {frage.medien.length === 0 ? (
+            <div className="flex h-full items-center justify-center rounded-3xl border-4 border-dashed border-cyan-300 text-3xl font-black uppercase text-white/40">
+              Kein Medium
+            </div>
+          ) : (
+            <div className="grid h-full min-h-0 gap-4">
+              {frage.medien.slice(0, 1).map((medium) =>
+                renderMedienKarte(medium, "large")
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (effektivesLayout === "text_fokus") {
+    return (
+      <div className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
+            Frage {slide.frageIndexImBlock}
+          </div>
+
+          {renderPunkteBadge(frage.punkte_modus)}
+        </div>
+
+        <h2 className="text-5xl font-black leading-tight text-white drop-shadow-[5px_5px_0_#ff00aa] xl:text-7xl">
+          {frage.frage}
+        </h2>
+      </div>
+    );
+  }
+
+  if (effektivesLayout === "audio_fokus") {
+    const audioMedium = frage.medien[0];
+
+    return (
+      <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
+        <div className="mb-10 text-center">
+          <div className="mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
+            Audiofrage
+          </div>
+
+          <h2 className="mx-auto max-w-6xl text-6xl font-black leading-tight text-white drop-shadow-[0_0_10px_#FF3BD4]">
+            {frage.frage}
+          </h2>
+        </div>
+
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <div className="flex h-full max-h-[520px] w-full max-w-5xl flex-col items-center justify-center rounded-[2rem] border-4 border-[#FF3BD4] bg-[radial-gradient(circle_at_center,rgba(255,59,212,0.18),transparent_55%),linear-gradient(135deg,rgba(59,130,255,0.16),rgba(0,0,0,0.95))] p-10 text-center shadow-[0_0_20px_#FF3BD4,0_0_40px_rgba(255,59,212,0.35)]">
+            {!audioMedium ? (
+              <div className="text-4xl font-black uppercase text-white/40">
+                Keine Audiodatei
+              </div>
+            ) : (
+              <>
+                <SynchronizedMedia
+                  kind="audio"
+                  src={getMediumUrl(audioMedium.datei)}
+                  command={mediaOverlayActive ? null : playbackCommand}
+                  commandId={playbackCommandId}
+                  renderMode={renderMode}
+                />
+
+                <div className="mb-10 text-sm font-black uppercase tracking-[0.45em] text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                  Wiedergabe durch die Moderation
+                </div>
+
+                <div
+                  aria-hidden="true"
+                  className="flex h-40 w-40 items-center justify-center rounded-full border-4 border-[#FFD83B] bg-black text-7xl font-black text-[#FFD83B] shadow-[0_0_18px_#FFD83B,0_0_42px_rgba(255,216,59,0.55)]"
+                >
+                  ▶
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+      <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
+            Frage {slide.frageIndexImBlock}
+          </div>
+
+          {renderPunkteBadge(frage.punkte_modus)}
+        </div>
+
+        <h2 className="text-4xl font-black leading-tight text-white drop-shadow-[4px_4px_0_#ff00aa] xl:text-6xl">
+          {frage.frage}
+        </h2>
+
+      </div>
+
+      <div className="min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
+        {hatAntwortmoeglichkeiten ? (
+          renderAntwortOptionen(frage)
+        ) : frage.medien.length > 0 ? (
+          <div className="grid h-full min-h-0 gap-3">
+            {frage.medien.slice(0, 1).map((medium) =>
+              renderMedienKarte(medium, "large")
+            )}
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center rounded-3xl border-4 border-dashed border-cyan-300 bg-black/40 text-center text-xl font-black uppercase text-white/40">
+            Keine Antwortmöglichkeiten
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function renderRennPferd({
+  farbe,
+  nummer,
+}: {
+  farbe: string;
+  nummer: number;
+}) {
+  return (
+    <div className="relative h-20 w-32 animate-[pferdGalopp_0.55s_ease-in-out_infinite]">
+      <svg
+        viewBox="0 0 220 120"
+        className="h-full w-full drop-shadow-[4px_4px_0_#000]"
+      >
+        <g
+          fill={farbe}
+          stroke="#020617"
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <ellipse cx="94" cy="62" rx="54" ry="26" />
+          <path d="M125 54 L154 24 L174 34 L145 63 Z" />
+          <path d="M164 20 L199 29 L190 51 L158 44 Z" />
+          <path d="M171 20 L178 5 L185 22 Z" />
+
+          <path className="animate-[schweifWackel_0.45s_ease-in-out_infinite]" d="M42 55 Q8 34 18 78 Q32 66 50 69" />
+
+          <path d="M61 82 L38 108" />
+          <path d="M84 86 L74 114" />
+          <path d="M116 84 L135 111" />
+          <path d="M140 78 L176 101" />
+        </g>
+
+        <circle cx="181" cy="34" r="4" fill="#020617" />
+
+        <g>
+          <rect
+            x="76"
+            y="47"
+            width="36"
+            height="28"
+            rx="6"
+            fill="#f8fafc"
+            stroke="#020617"
+            strokeWidth="4"
+          />
+          <text
+            x="94"
+            y="68"
+            textAnchor="middle"
+            fontSize="20"
+            fontWeight="900"
+            fill="#020617"
+          >
+            {nummer}
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+function renderZwischenstandSlide() {
+  const sortiertePunkte = [...punktestand]
+    .sort((a, b) => b.punkte - a.punkte)
+    .slice(0, 5);
+
+  const maxPunkte = Math.max(
+    ...sortiertePunkte.map((team) => team.punkte),
+    1
+  );
+
+  const pferdeFarben = [
+    "#22d3ee",
+    "#fb7185",
+    "#84cc16",
+    "#60a5fa",
+    "#f59e0b",
+  ];
+
+  const bahnFarben = [
+    "from-cyan-900/80 to-cyan-700/60",
+    "from-pink-900/80 to-pink-700/60",
+    "from-emerald-900/80 to-emerald-700/60",
+    "from-blue-900/80 to-blue-700/60",
+    "from-orange-900/80 to-orange-700/60",
+    "from-purple-900/80 to-purple-700/60",
+  ];
+
+  return (
+    <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+          Zwischenstand
+        </div>
+
+        <div className="rounded-2xl border-4 border-yellow-300 bg-black/55 px-5 py-2 text-sm font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
+          Anonymer Zwischenstand
+        </div>
+      </div>
+
+      <h2 className="mb-5 text-center text-5xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa] xl:text-6xl">
+        So eng ist das Rennen
+      </h2>
+
+      <div className="min-h-0 flex-1 rounded-[1.5rem] border-4 border-cyan-300 bg-black/45 p-4 shadow-[6px_6px_0_#ff00aa]">
+        <div className="grid h-full gap-3">
+          {sortiertePunkte.map((team, index) => {
+            const prozent = Math.max(7, (team.punkte / maxPunkte) * 100);
+            const pferdLinks = `calc(${prozent}% - 5rem)`;
+
+            return (
+              <div
+                key={`${team.teamname}-${index}`}
+                className="grid grid-cols-[90px_1fr_130px] items-center gap-4"
+              >
+                <div className="flex h-full items-center justify-center rounded-2xl border-4 border-yellow-300 bg-slate-950/80 text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
+                  {index + 1}
+                </div>
+
+                <div className="relative h-full min-h-[72px] overflow-visible rounded-2xl border-4 border-cyan-300 bg-slate-950/70 shadow-[4px_4px_0_#ff00aa]">
+                  <div
+                    className={`absolute inset-y-0 left-0 rounded-r-xl bg-gradient-to-r ${bahnFarben[index % bahnFarben.length]
+                      }`}
+                    style={{
+                      width: `${prozent}%`,
+                      animation: `bahnWachsen 1.2s ease-out ${index * 0.12}s both`,
+                    }}
+                  />
+
+                  <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
+
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
+                    #{index + 1}
+                  </div>
+
+                  <div
+                    className="absolute top-1/2 z-30"
+                    style={{
+                      left: pferdLinks,
+                      animation: `pferdEinreiten 1.4s ease-out ${index * 0.12}s both`,
+                    }}
+                  >
+
+                    {renderRennPferd({
+                      farbe: pferdeFarben[index % pferdeFarben.length],
+                      nummer: index + 1,
+                    })}
+                  </div>
+
+                  <div
+                    className="absolute top-1/2 z-30 h-4 w-16 -translate-y-1/2 rounded-full bg-yellow-200/40 blur-xl"
+                    style={{
+                      left: `calc(${prozent}% - 9rem)`,
+                    }}
+                  />
+
+                  <div
+                    className="absolute right-3 top-1/2 z-10 h-[82%] w-6 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_18px_#facc15]"
+                    style={{
+                      backgroundImage:
+                        "conic-gradient(#fff 25%, #000 0 50%, #fff 0 75%, #000 0)",
+                      backgroundSize: "12px 12px",
+                    }}
+                  />
+                </div>
+
+                <div className="rounded-2xl border-4 border-yellow-300 bg-black/70 px-4 py-3 text-right text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
+                  {formatQuizPoints(team.punkte)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function renderEndstandSlide() {
+  const topTeams = punktestand.slice(0, 5);
+  const maxPunkte = Math.max(...topTeams.map((team) => team.punkte), 1);
+  const pferdeFarben = ["#22d3ee", "#fb7185", "#84cc16", "#60a5fa", "#f59e0b"];
+
+  const teamsMitPlatz = topTeams.map((team) => {
+    const ersterIndexMitDiesenPunkten = topTeams.findIndex(
+      (vergleichsTeam) => vergleichsTeam.punkte === team.punkte
+    );
+
+    return {
+      ...team,
+      platz: ersterIndexMitDiesenPunkten + 1,
+    };
+  });
+
+  const platzGruppen = Array.from(
+    new Set(teamsMitPlatz.map((team) => team.platz))
+  ).sort((a, b) => b - a);
+
+  const sichtbarePlaetze = platzGruppen.slice(
+    0,
+    Math.min(endstandRevealCount, platzGruppen.length)
+  );
+
+  return (
+    <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
+      <div className="mb-4 inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        Endstand
+      </div>
+
+      <h2 className="mb-5 text-center text-5xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+        Finale Tabelle
+      </h2>
+
+      <div className="min-h-0 flex-1 rounded-[1.5rem] border-4 border-cyan-300 bg-black/45 p-4 shadow-[6px_6px_0_#ff00aa]">
+        <div className="grid h-full gap-3">
+          {teamsMitPlatz.map((team, index) => {
+            const prozent = Math.max(8, (team.punkte / maxPunkte) * 100);
+            const pferdLinks = `calc(${prozent}% - 5rem)`;
+            const istSichtbar = sichtbarePlaetze.includes(team.platz);
+            const platz = team.platz;
+
+            const istGewinner =
+              team.punkte === topTeams[0].punkte;
+
+            const istTot = !istGewinner;
+
+            return (
+              <div
+                key={team.teamname}
+                className={`grid grid-cols-[90px_1fr_150px] items-center gap-4 transition ${istSichtbar ? "opacity-100" : "opacity-30 blur-sm"
+                  }`}
+              >
+                <div className="flex h-full items-center justify-center rounded-2xl border-4 border-yellow-300 bg-slate-950/80 text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
+                  #{platz}
+                </div>
+
+                <div className="relative h-full min-h-[68px] overflow-visible rounded-2xl border-4 border-cyan-300 bg-slate-950/70 shadow-[4px_4px_0_#ff00aa]">
+                  <div
+                    className={`absolute inset-y-0 left-0 rounded-r-xl bg-gradient-to-r ${index === 0
+                      ? "from-yellow-500/80 to-yellow-300/70"
+                      : index === 1
+                        ? "from-slate-400/80 to-slate-200/70"
+                        : index === 2
+                          ? "from-orange-700/80 to-orange-400/70"
+                          : "from-cyan-900/80 to-cyan-700/60"
+                      }`}
+                    style={{
+                      width: `${prozent}%`,
+                      animation: istSichtbar
+                        ? `bahnWachsen 1.2s ease-out ${index * 0.12}s both`
+                        : undefined,
+                    }}
+                  />
+
+                  <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
+
+                  <div className="absolute left-5 top-1/2 z-20 max-w-[45%] -translate-y-1/2 truncate text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
+                    {istSichtbar ? team.teamname : "???"}
+                  </div>
+
+                  {istSichtbar && (
+                    <div
+                      className={`absolute top-1/2 ${istTot
+                        ? "z-30 animate-[pferdEinreitenUndSterben_1.7s_ease-out_both]"
+                        : "z-30 animate-[pferdSieger_2.2s_ease-in-out_both]"
+                        }`}
+                      style={{
+                        left: pferdLinks,
+                        animationDelay: `${index * 0.12}s`,
+                      }}
+                    >
+
+                      {renderRennPferd({
+                        farbe: pferdeFarben[index % pferdeFarben.length],
+                        nummer: index + 1,
+                      })}
+                    </div>
+                  )}
+
+                  <div
+                    className="absolute right-3 top-1/2 z-10 h-[82%] w-6 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_18px_#facc15]"
+                    style={{
+                      backgroundImage:
+                        "conic-gradient(#fff 25%, #000 0 50%, #fff 0 75%, #000 0)",
+                      backgroundSize: "12px 12px",
+                    }}
+                  />
+                </div>
+
+                <div className="rounded-2xl border-4 border-yellow-300 bg-black/70 px-4 py-3 text-right text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
+                  {istSichtbar ? formatQuizPoints(team.punkte) : "?"}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
+  const frage = slide.frage;
+  const antworten = sortiereAntworten(frage);
+  const richtigeAntworten = antworten.filter((antwort) => antwort.ist_richtig);
+  const runtime = buildQuestionTemplateRuntimeModel({
+    templateId: frage.templateId,
+    questionText: frage.frage,
+    templateConfig: frage.templateConfig,
+    correctAnswers: richtigeAntworten.map((antwort) => ({ text: antwort.antwort })),
+  });
+  const hatAntwortmoeglichkeiten = antworten.length > 1;
+  const richtigeAntwortfeldLoesungen = (frage.antwortfelder ?? []).map((feld) => ({
+    label: feld.label,
+    loesungen: (feld.loesungen ?? []).filter((loesung) => loesung.ist_akzeptiert),
+  }));
+
+  const hatAntwortfelderLoesungen = richtigeAntwortfeldLoesungen.some(
+    (feld) => feld.loesungen.length > 0
+  );
+
+  return (
+    <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+      <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-6 shadow-[8px_8px_0_#00e5ff]">
+        <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-pink-300">
+          Frage
+        </div>
+
+        <h2 className="text-3xl font-black leading-tight text-white drop-shadow-[3px_3px_0_#ff00aa] xl:text-5xl">
+          {frage.frage}
+        </h2>
+
+        {frage.quelle && (
+          <div className="mt-auto pt-4 text-sm font-bold text-white/50">
+            Quelle: {frage.quelle}
+          </div>
+        )}
+      </div>
+
+      <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
+            Richtige Antwort
+          </div>
+
+        </div>
+
+        <div className="grid min-h-0 flex-1 gap-4 overflow-hidden">
+          {hatAntwortmoeglichkeiten && !frage.templateConfig?.templateData &&
+            antworten.map((antwort, index) => (
+              <div
+                key={antwort.antwort_id}
+                className={`rounded-3xl border-4 px-6 py-4 text-2xl font-black shadow-[6px_6px_0_#00e5ff] ${antwort.ist_richtig
+                  ? "border-emerald-300 bg-emerald-500/25 text-yellow-200"
+                  : "border-white/15 bg-black/35 text-white/45"
+                  }`}
+              >
+                <span className="mr-4 text-cyan-300">
+                  {String.fromCharCode(65 + index)}.
+                </span>
+                {antwort.antwort}
+              </div>
+            ))}
+
+          {frage.templateConfig?.templateData &&
+            runtime.solutionLines.map((line, index) => {
+              const linkedUrl = line.match(/https:\/\/\S+/)?.[0]?.replace(/\)$/, "") ?? "";
+              return (
+                <div
+                  key={`${index}-${line}`}
+                  className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
+                >
+                  <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
+                    {linkedUrl ? (
+                      <a
+                        href={linkedUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="break-all underline"
+                      >
+                        {line}
+                      </a>
+                    ) : line}
+                  </div>
+                </div>
+              );
+            })}
+
+          {!frage.templateConfig?.templateData && !hatAntwortmoeglichkeiten &&
+            richtigeAntworten.map((antwort) => (
+              <div key={antwort.antwort_id} className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
+                <div className="text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">{antwort.antwort}</div>
+              </div>
+            ))}
+
+          {hatAntwortfelderLoesungen &&
+            richtigeAntwortfeldLoesungen.map((feld) => (
+              <div
+                key={feld.label}
+                className="rounded-3xl border-4 border-emerald-300 bg-black/45 p-6 shadow-[6px_6px_0_#00e5ff]"
+              >
+                <div className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-emerald-300">
+                  {feld.label}
+                </div>
+
+                <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
+                  {feld.loesungen.map((loesung) => loesung.loesung_text).join(" / ")}
+                </div>
+              </div>
+            ))}
+
+          {runtime.solutionLines.length === 0 && !hatAntwortfelderLoesungen && (
+            <div className="flex flex-1 items-center justify-center text-2xl font-black text-white/50">
+              Keine richtige Antwort markiert
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function renderSchaetzfrageOverlay() {
+  return (
+    <div className="flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="mx-auto mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        Tie-Breaker
+      </div>
+
+      <h2 className="text-6xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+        Schätzfrage
+      </h2>
+
+      <div className="mx-auto mt-10 max-w-5xl rounded-3xl border-4 border-cyan-300 bg-slate-950/80 px-8 py-8 text-4xl font-black leading-tight text-white shadow-[6px_6px_0_#ff00aa]">
+        {isSchaetzfrageLoading
+          ? "Schätzfrage wird geladen..."
+          : schaetzfrage?.frage ?? "Keine Schätzfrage gefunden."}
+      </div>
+
+      {estimationPhase === "SOLUTION" && (
+        <div className="mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
+          {schaetzfrage?.richtigeAntwort ?? "Keine Lösung hinterlegt."}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function createVirtuellenAbschnitt(
+  titel: string,
+  abschnittTyp: string
+): Abschnitt {
+  return {
+    quiz_abschnitt_id: -1,
+    titel,
+    abschnitt_typ: abschnittTyp,
+    sortierung: 0,
+    dauer_sekunden: null,
+    qr_code_url: null,
+    medien_datei: null,
+    bemerkung: null,
+  };
+}
+
+function renderBekanntmachungenSlide() {
+  const bekanntmachungen = (
+    praesentationQuiz.outro_bekanntmachungen ??
+    "Danke fürs Mitspielen!\nNächster Quizabend: wird noch bekanntgegeben."
+  )
+    .split("\n")
+    .map((zeile) => zeile.trim())
+    .filter(Boolean);
+
+  return (
+    <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
+      <div className="mb-8">
+        <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+          Outro
+        </div>
+
+        <h2 className="mt-5 text-6xl font-black uppercase leading-none text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+          Bekanntmachungen
+        </h2>
+      </div>
+
+      <div className="grid flex-1 gap-5">
+        {bekanntmachungen.map((punkt, index) => (
+          <div
+            key={`${punkt}-${index}`}
+            className="grid grid-cols-[80px_1fr] items-center gap-6 rounded-3xl border-4 border-cyan-300 bg-black/45 px-8 py-5 shadow-[5px_5px_0_#ff00aa]"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-pink-500 text-3xl font-black text-yellow-200">
+              {index + 1}
+            </div>
+
+            <div className="text-3xl font-black leading-tight text-white">
+              {punkt}
+            </div>
+          </div>
+        ))}
+      </div>
+      {praesentationQuiz.outro_musik_url && (
+        <SynchronizedMedia
+          kind="audio"
+          src={praesentationQuiz.outro_musik_url}
+          loop
+          command={playbackCommand}
+          commandId={playbackCommandId}
+          renderMode={renderMode}
+        />
+      )}
+    </div>
+  );
+}
+
+function renderAnkommenSlide() {
+  return (
+    <div className="vor-dem-start-player relative h-full min-h-0 w-full overflow-hidden rounded-[1.5rem] bg-black">
+      {praesentationQuiz.intro_video_url && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-contain"
+        >
+          <source
+            src={praesentationQuiz.intro_video_url}
+            type="video/mp4"
+          />
+        </video>
+      )}
+
+      <div className="absolute bottom-8 right-8 z-20 rounded-2xl border-4 border-yellow-300 bg-black/70 px-7 py-4 text-3xl font-black text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
+        Beginn: {praesentationQuiz.intro_startzeit ?? "19:30"} Uhr
+      </div>
+    </div>
+  );
+}
+
+function renderStartsequenzSlide() {
+  return (
+    <section className="relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[#050510] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,140,0.2),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(0,245,255,0.18),transparent_40%)]" />
+      <div className="relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-400/80 bg-black/50 p-12 text-center shadow-[0_0_45px_rgba(0,240,255,0.9)]">
+        <p className="mb-10 max-w-5xl text-5xl font-black leading-tight text-white drop-shadow-[0_0_14px_rgba(255,255,255,0.8)]">
+          {praesentationQuiz.intro_startsequenz_text?.trim() ||
+            "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen."}
+        </p>
+        <div
+          aria-hidden="true"
+          className="rounded-3xl border-4 border-pink-500 px-20 py-10 text-[7rem] font-black leading-none text-pink-300 shadow-[0_0_45px_rgba(255,0,150,0.9)]"
+        >
+          ▶
+        </div>
+        <SynchronizedMedia
+          kind="audio"
+          src={
+            praesentationQuiz.intro_musik_url?.trim() ||
+            "/medien/audio/intro/mexico.mp3"
+          }
+          command={playbackCommand}
+          commandId={playbackCommandId}
+          renderMode={renderMode}
+        />
+      </div>
+    </section>
+  );
+}
+
+function renderFixenSlide(slide: Extract<Slide, { typ: "fixer-slide" }>) {
+  if (slide.slideTyp === "vor-dem-start") {
+    return renderAnkommenSlide();
+  }
+
+  if (slide.slideTyp === "startsequenz") {
+    return renderStartsequenzSlide();
+  }
+
+  if (slide.slideTyp === "bekanntmachungen") {
+    return renderBekanntmachungenSlide();
+  }
+
+  if (slide.slideTyp === "begruessung") {
+    return renderBlockSlide({
+      typ: "block",
+      abschnitt: createVirtuellenAbschnitt("Begrüßung", "intro_begruessung"),
+    });
+  }
+
+  if (slide.slideTyp === "preise") {
+    return renderBlockSlide({
+      typ: "block",
+      abschnitt: createVirtuellenAbschnitt("Preise", "intro_preise"),
+    });
+  }
+
+  if (slide.slideTyp === "regeln") {
+    return renderBlockSlide({
+      typ: "block",
+      abschnitt: createVirtuellenAbschnitt("Regeln", "intro_regeln"),
+    });
+  }
+
+  if (slide.slideTyp === "qrcode") {
+    return renderBlockSlide({
+      typ: "block",
+      abschnitt: createVirtuellenAbschnitt("QR-Code", "intro_qrcode"),
+    });
+  }
+
+  return null;
+}
+
+function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
+  const abschnitt = slide.abschnitt;
+
+  const zeilen = isQuestionSection(abschnitt)
+    ? []
+    : abschnitt.bemerkung
+        ?.split("\n")
+        .map((zeile) => zeile.trim())
+        .filter(Boolean) ?? [];
+
+  const regeln =
+    quiz.intro_regeln
+      ?.split("\n")
+      .map((zeile) => zeile.trim())
+      .filter(Boolean) ?? [
+      "Bildet Teams und gebt euch einen Namen",
+      "Scannt den QR-Code",
+      "Bestimmt einen Schreiber",
+      "Nutzt euren Kopf, nicht das Internet",
+      "Der Quizmaster hat immer recht",
+    ];
+
+  const preise = parsePrizeSlots(quiz.intro_preise);
+
+  if (abschnitt.abschnitt_typ === "intro_begruessung") {
+    return (
+      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+          Willkommen im
+        </div>
+
+        <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
+          {quiz.intro_begruessungstitel ?? quiz.titel}
+        </h2>
+
+        <div className="mt-10 max-w-5xl rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-5 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]">
+          {quiz.intro_begruessungstext ??
+            "Willkommen zum heutigen Quizabend!"}
+        </div>
+      </div>
+    );
+  }
+
+  if (abschnitt.abschnitt_typ === "intro_regeln") {
+    return (
+      <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
+        <div className="mb-8">
+          <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+            Rules are good!
+          </div>
+
+          <h2 className="mt-5 text-6xl font-black uppercase leading-none text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+            Rules help
+            <br />
+            control the fun!*
+          </h2>
+        </div>
+
+        <div className="grid flex-1 gap-5">
+          {regeln.map((regel, index) => (
+            <div
+              key={`${regel}-${index}`}
+              className="grid grid-cols-[80px_1fr] items-center gap-6 rounded-3xl border-4 border-cyan-300 bg-black/45 px-8 py-5 shadow-[5px_5px_0_#ff00aa]"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-pink-500 text-3xl font-black text-yellow-200">
+                {index + 1}
+              </div>
+
+              <div className="text-3xl font-black leading-tight text-white">
+                {regel}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 text-center text-lg font-bold text-white/50">
+          * Monica Geller (schlechte Verliererin)
+        </div>
+      </div>
+    );
+  }
+
+  if (abschnitt.abschnitt_typ === "intro_qrcode") {
+    return renderQrCodeSlide();
+  }
+
+  if (abschnitt.abschnitt_typ === "intro_preise") {
+    return (
+      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+          Preise
+        </div>
+
+        <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
+          Heute gibt es was zu gewinnen
+        </h2>
+
+        <div className="mt-10 grid gap-4">
+          {preise.length > 0 ? (
+            preise.map((preis, index) => (
+              <div
+                key={`${preis}-${index}`}
+                className="rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-4 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]"
+              >
+                Platz {index + 1}: {preis}
+              </div>
+            ))
+          ) : (
+            <div className="rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-4 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]">
+              Die Preise werden gleich live vorgestellt.
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (abschnitt.abschnitt_typ === "intro_vor_dem_start") {
+    return (
+      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        {praesentationQuiz.intro_logo_url ? (
+          <img
+            src={praesentationQuiz.intro_logo_url}
+            alt="Quiz Logo"
+            className="mb-10 max-h-72 max-w-3xl object-contain"
+          />
+        ) : (
+          <div className="mb-10 rounded-3xl border-4 border-cyan-300 bg-slate-950/70 px-12 py-8 text-5xl font-black uppercase text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
+            Logo
+          </div>
+        )}
+
+        <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
+          Das Quiz startet in Kürze
+        </h2>
+
+        {quiz.intro_wartetext && (
+          <div className="mt-10 max-w-5xl rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-5 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]">
+            {quiz.intro_wartetext}
+          </div>
+        )}
+
+        {quiz.intro_musik_url && (
+          <SynchronizedMedia
+            kind="audio"
+            src={quiz.intro_musik_url}
+            loop
+            command={playbackCommand}
+            commandId={playbackCommandId}
+            renderMode={renderMode}
+          />
+        )}
+      </div>
+    );
+  }
+
+  const blockTitel = isQuestionSection(abschnitt)
+    ? `Block ${slides
+        .filter(
+          (item) =>
+            item.typ === "block" &&
+            isQuestionSection(item.abschnitt)
+        )
+        .findIndex(
+          (item) =>
+            item.typ === "block" &&
+            item.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id
+        ) + 1}`
+    : abschnitt.titel;
+
+  return (
+    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+
+      <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
+        {blockTitel}
+      </h2>
+
+      {zeilen.length > 0 && (
+        <div className="mt-10 grid gap-4">
+          {zeilen.map((zeile, index) => (
+            <div
+              key={`${zeile}-${index}`}
+              className="rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-4 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]"
+            >
+              {zeile}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function renderQrCodeSlide() {
+  const antwortUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten`
+      : "";
+
+  return (
+    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="mb-10 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-8 py-4 text-2xl font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[5px_5px_0_#00e5ff]">
+        Jetzt scannen
+      </div>
+
+      <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
+        <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
+          <QRCode
+            value={antwortUrl}
+            size={500}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
+
+  const dauerSekunden =
+    remoteCountdownDauerSekunden ?? slide.dauerSekunden;
+
+  const verstrichen =
+    remoteCountdownStartedAt && remoteCountdownStatus === "running"
+      ? Math.max(
+        0,
+        Math.floor(
+          (now - new Date(remoteCountdownStartedAt).getTime()) / 1000
+        )
+      )
+      : 0;
+
+  const aktuelleSekunden =
+    remoteCountdownStatus === "running"
+      ? Math.max(0, dauerSekunden - verstrichen)
+      : dauerSekunden;
+
+  const minuten = Math.floor(aktuelleSekunden / 60);
+  const sekunden = aktuelleSekunden % 60;
+
+
+  return (
+    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        Abgabezeit
+      </div>
+
+      <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
+        Verbleibende Zeit zum Grübeln:
+      </h2>
+
+      <div className="mt-10 rounded-3xl border-4 border-cyan-300 bg-slate-950/70 px-10 py-6 shadow-[5px_5px_0_#ff00aa]">
+        <div className="text-7xl font-black text-white">
+          {String(minuten).padStart(2, "0")}:
+          {String(sekunden).padStart(2, "0")}
+        </div>
+      </div>
+
+      <div className="mt-8 text-2xl font-black uppercase tracking-wide text-white/70">
+        Am Ende des Countdowns wird das Formular automatisch gesperrt und abgeschickt.
+      </div>
+    </div>
+  );
+}
+
+function renderAktuellenSlide() {
+  if (!slide) {
+    return (
+      <div className="flex h-full items-center justify-center text-4xl font-black text-white/50">
+        Keine Slides vorhanden
+      </div>
+    );
+  }
+
+  if (slide.typ === "fixer-slide") {
+    return renderFixenSlide(slide);
+  }
+
+  if (slide.typ === "block") {
+    return renderBlockSlide(slide);
+  }
+  if (slide.typ === "pause") {
+    return renderPauseSlide(slide);
+  }
+
+  if (slide.typ === "frage") {
+    return renderFrageSlide(slide);
+  }
+
+  if (slide.typ === "zwischenstand") {
+    return renderZwischenstandSlide();
+  }
+
+  if (slide.typ === "endstand") {
+    return renderEndstandSlide();
+  }
+
+  return renderAufloesungSlide(slide);
+}
+
+  const overlayMedia = currentSlideMedia;
+
+  return (
+    <QuizThemeScope
+      theme={theme}
+      className="presentation-template relative flex h-full min-h-0 flex-col text-white"
+    >
+      {slideLabel !== "VOR DEM START" && (
+        <header className="presentation-chrome mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
+          <div className="flex items-center gap-6">
+            {theme.identity.logoUrl && (
+              <img
+                src={theme.identity.logoUrl}
+                alt=""
+                className="h-24 w-24 object-contain"
+              />
+            )}
+            <div className="presentation-divider h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
+            <div>
+              <div className="presentation-primary-text text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
+                {slideLabel}
+              </div>
+              <div className="presentation-accent-text text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                {theme.identity.displayName}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="rounded-2xl border-2 border-[#FF3BD4] px-6 py-3 text-2xl font-black text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4]">
+              {slideIndex + 1}
+            </div>
+            <div className="text-3xl font-black text-[#38E8FF]">/</div>
+            <div className="rounded-2xl border-2 border-[#FFD83B] px-6 py-3 text-2xl font-black text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
+              {slides.length}
+            </div>
+          </div>
+        </header>
+      )}
+      <section className="presentation-stage min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
+        {estimationPhase !== "HIDDEN"
+          ? renderSchaetzfrageOverlay()
+          : renderAktuellenSlide()}
+      </section>
+      {mediaOverlayActive && overlayMedia.length > 0 && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
+          <div className="grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">
+            {overlayMedia.slice(0, 2).map((medium) =>
+              renderMedienKarte(medium, "overlay"),
+            )}
+          </div>
+        </div>
+      )}
+    </QuizThemeScope>
+  );
+}

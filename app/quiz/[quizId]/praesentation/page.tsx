@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { getQuizPraesentation } from "../../actions";
-import { getOrCreatePraesentationStatus } from "./statusActions";
+import { getPraesentationStatus } from "./statusActions";
 import QuizPraesentationPlayer from "./QuizPraesentationPlayer";
 import { requireQuizLiveController } from "../../quizAccess.server";
 import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
+import { resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 
 type Props = {
   params: Promise<{
@@ -27,7 +28,7 @@ export default async function QuizPraesentationPage({ params }: Props) {
     notFound();
   }
   const [status, templates] = await Promise.all([
-    getOrCreatePraesentationStatus(quizId),
+    getPraesentationStatus(quizId),
     resolveQuizTemplates(quizId),
   ]);
   if (!templates) notFound();
@@ -36,8 +37,8 @@ export default async function QuizPraesentationPage({ params }: Props) {
     <QuizPraesentationPlayer
       quiz={quiz}
       quizId={quizId}
-      initialSlideIndex={status.slide_index}
-      templateContext={templates.presentation}
+      initialLiveState={resolvePresentationLiveState(status)}
+      theme={templates.theme}
     />
   );
 }

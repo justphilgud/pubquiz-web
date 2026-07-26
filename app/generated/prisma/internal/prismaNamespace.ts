@@ -2873,6 +2873,7 @@ export const QuizScalarFieldEnum = {
   intro_startzeit: 'intro_startzeit',
   intro_video_url: 'intro_video_url',
   outro_bekanntmachungen: 'outro_bekanntmachungen',
+  outro_musik_url: 'outro_musik_url',
   manuelle_bewertungen: 'manuelle_bewertungen',
   presentation_template_id: 'presentation_template_id',
   answer_form_template_id: 'answer_form_template_id'

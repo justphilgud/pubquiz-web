@@ -58,7 +58,7 @@ Enthält:
 
 Verwendet intern:
 
-- SlidePreview
+- den gemeinsamen `PresentationSlideRenderer` im stummen Vorschaumodus
 
 ---
 

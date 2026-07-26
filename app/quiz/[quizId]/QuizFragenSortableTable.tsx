@@ -92,38 +92,33 @@ function getAbschnittIdFromContainer(containerId: string) {
   return Number(containerId.replace("block-", ""));
 }
 
-function FixedSlideItem({
+function FixedSlidesCard({
   quizId,
-  slide,
   typ,
-  index,
+  count,
+  description,
 }: {
   quizId: number;
-  slide: readonly [string, string] | readonly [string, string, string];
   typ: "Intro" | "Outro";
-  index: number;
+  count: number;
+  description: string;
 }) {
-  const [key, titel, beschreibung] = slide;
-
   return (
-    <article className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
-      <span className="flex h-9 min-w-9 items-center justify-center self-start rounded-lg bg-slate-100 px-2 text-sm font-black text-slate-600">
-        {index + 1}
-      </span>
+    <article className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
       <div className="min-w-0 flex-1">
-        <div className="font-semibold text-slate-900">{titel}</div>
-        {beschreibung && (
-          <div className="mt-1 text-sm text-slate-500">{beschreibung}</div>
-        )}
+        <div className="font-bold text-slate-900">
+          {typ} konfigurieren
+        </div>
+        <div className="mt-1 text-sm text-slate-500">{description}</div>
         <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          {typ} · Fixiert
+          {count} {count === 1 ? "feste Slide" : "feste Slides"} · Fixiert
         </div>
       </div>
       <a
-        href={`/quiz/${quizId}/slides/${key}`}
+        href={`/quiz/${quizId}/slides/${typ === "Intro" ? "intro" : "outro"}`}
         className="inline-flex items-center justify-center self-start rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
       >
-        Konfigurieren
+        {typ} konfigurieren
       </a>
     </article>
   );
@@ -339,25 +334,19 @@ function DroppableBlock({
             strategy={verticalListSortingStrategy}
           >
             {gruppe.blockTyp === "intro" ? (
-              introSlides.map((slide, index) => (
-                <FixedSlideItem
-                  key={slide[0]}
-                  quizId={quizId}
-                  slide={slide}
-                  typ="Intro"
-                  index={index}
-                />
-              ))
+              <FixedSlidesCard
+                quizId={quizId}
+                typ="Intro"
+                count={introSlides.length}
+                description="Wartebildschirm, Countdown, Begrüßung, Regeln und Preise"
+              />
             ) : gruppe.blockTyp === "outro" ? (
-              outroSlides.map((slide, index) => (
-                <FixedSlideItem
-                  key={slide[0]}
-                  quizId={quizId}
-                  slide={slide}
-                  typ="Outro"
-                  index={index}
-                />
-              ))
+              <FixedSlidesCard
+                quizId={quizId}
+                typ="Outro"
+                count={outroSlides.length}
+                description="Bekanntmachungen und vorhandene Konfiguration"
+              />
             ) : gruppe.fragen.length === 0 ? (
               gruppe.blockTyp === "fragenblock" ? (
                 <div

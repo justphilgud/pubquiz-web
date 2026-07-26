@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/app/lib/prisma";
+import { Prisma } from "@/app/generated/prisma/client";
 import {
   requireQuizLiveController,
   requireQuizQuestion,
@@ -27,6 +28,40 @@ export async function getPraesentationStatus(quizId: number) {
   });
 }
 
+export async function getPraesentationPunktestand(quizId: number) {
+  await requireQuizViewer(quizId);
+  const [sessions, totals] = await Promise.all([
+    prisma.quiz_team_sessions.findMany({
+      where: { quiz_id: quizId },
+      select: { quiz_team_session_id: true, teamname: true },
+    }),
+    prisma.team_antworten.groupBy({
+      by: ["quiz_team_session_id"],
+      where: { quiz_id: quizId },
+      _sum: { vergebene_punkte: true },
+    }),
+  ]);
+  const totalsBySession = new Map(
+    totals.map((entry) => [
+      entry.quiz_team_session_id,
+      entry._sum.vergebene_punkte ?? new Prisma.Decimal(0),
+    ]),
+  );
+
+  return sessions
+    .map((session) => ({
+      teamname: session.teamname,
+      punkte:
+        totalsBySession.get(session.quiz_team_session_id) ??
+        new Prisma.Decimal(0),
+    }))
+    .sort((left, right) => right.punkte.cmp(left.punkte))
+    .map((entry) => ({
+      teamname: entry.teamname,
+      punkte: Number(entry.punkte),
+    }));
+}
+
 export async function setPraesentationSlideIndex(
   quizId: number,
   slideIndex: number,
@@ -38,12 +73,18 @@ export async function setPraesentationSlideIndex(
       slide_index: slideIndex,
       slide_started_at: new Date(),
       endstand_reveal_count: 1,
+      medium_overlay_aktiv: false,
+      audio_aktion: "stop",
+      audio_aktion_id: { increment: 1 },
     },
     create: {
       quiz_id: quizId,
       slide_index: slideIndex,
       slide_started_at: new Date(),
       endstand_reveal_count: 1,
+      medium_overlay_aktiv: false,
+      audio_aktion: "stop",
+      audio_aktion_id: 1,
     },
   });
   return status;

@@ -18,6 +18,7 @@ export async function POST(request: Request) {
       onBeforeGenerateToken: async (pathname) => {
         const erlaubtePraefixe = [
           `${mediaPrefix}audio/intro/`,
+          `${mediaPrefix}audio/outro/`,
           `${mediaPrefix}video/intro/`,
         ];
 

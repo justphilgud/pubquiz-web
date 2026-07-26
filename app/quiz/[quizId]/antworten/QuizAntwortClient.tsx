@@ -7,9 +7,8 @@ import {
   startQuizTeamSession,
   getQuizAntwortStatusLive,
 } from "../../actions";
-import type { ResolvedTemplate } from "@/app/rendering/templateResolver";
-import type { AnswerFormTemplate } from "@/app/rendering/templateRegistry";
-import { answerFormTemplateStyle } from "@/app/rendering/templateStyles";
+import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
+import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
 import type { QuestionTemplateData } from "@/app/fragen/editor/types";
 import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTemplateList";
 
@@ -95,7 +94,7 @@ type TeamSession = {
   sessionToken: string;
 };
 
-export default function QuizAntwortClient({ daten, templateContext }: { daten: AntwortStatus; templateContext: ResolvedTemplate<AnswerFormTemplate> }) {
+export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStatus; theme: ResolvedQuizTheme }) {
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
@@ -394,10 +393,10 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
   }
 
   return (
-    <main
+    <QuizThemeScope
+      as="main"
+      theme={theme}
       className="answer-template min-h-dvh px-4 py-6 text-slate-900 sm:py-8"
-      data-template-variant={templateContext.template.variant}
-      style={answerFormTemplateStyle(templateContext.template)}
     >
       <div className="mx-auto max-w-2xl space-y-6">
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -818,6 +817,6 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
           </div>
         </div>
       )}
-    </main>
+    </QuizThemeScope>
   );
 }

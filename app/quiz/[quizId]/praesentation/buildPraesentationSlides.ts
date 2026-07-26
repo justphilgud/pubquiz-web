@@ -22,6 +22,7 @@ export type PraesentationQuiz = QuizPraesentationResult & {
   intro_musik_url?: string | null;
   intro_startsequenz_text?: string | null;
   outro_bekanntmachungen?: string | null;
+  outro_musik_url?: string | null;
 };
 
 export type Abschnitt = QuizPraesentationResult["abschnitte"][number];

@@ -43,6 +43,15 @@ export default async function ShowBekanntmachungenPage({
             </li>
           ))}
         </ul>
+        {quiz.outro_musik_url && (
+          <audio
+            src={quiz.outro_musik_url}
+            autoPlay
+            loop
+            controls
+            className="mt-8 w-full"
+          />
+        )}
       </div>
     </section>
   );

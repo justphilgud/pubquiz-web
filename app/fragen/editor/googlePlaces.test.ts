@@ -421,7 +421,7 @@ test("Google location metrics are formatted only for the solution runtime", () =
   ]);
 
   const player = readFileSync(
-    "app/quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
     "utf8",
   );
   assert.doesNotMatch(player, /placeAverageRating|placeReviewCount/);
@@ -433,7 +433,7 @@ test("research is authorized server-side and absent from presentation", () => {
     "utf8",
   );
   const player = readFileSync(
-    "app/quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
     "utf8",
   );
   assert.match(actions, /await requireQuestionEditor\(\)/);

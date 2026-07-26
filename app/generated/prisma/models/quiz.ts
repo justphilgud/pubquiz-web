@@ -67,6 +67,7 @@ export type QuizMinAggregateOutputType = {
   intro_startzeit: string | null
   intro_video_url: string | null
   outro_bekanntmachungen: string | null
+  outro_musik_url: string | null
   manuelle_bewertungen: number | null
   presentation_template_id: string | null
   answer_form_template_id: string | null
@@ -97,6 +98,7 @@ export type QuizMaxAggregateOutputType = {
   intro_startzeit: string | null
   intro_video_url: string | null
   outro_bekanntmachungen: string | null
+  outro_musik_url: string | null
   manuelle_bewertungen: number | null
   presentation_template_id: string | null
   answer_form_template_id: string | null
@@ -127,6 +129,7 @@ export type QuizCountAggregateOutputType = {
   intro_startzeit: number
   intro_video_url: number
   outro_bekanntmachungen: number
+  outro_musik_url: number
   manuelle_bewertungen: number
   presentation_template_id: number
   answer_form_template_id: number
@@ -175,6 +178,7 @@ export type QuizMinAggregateInputType = {
   intro_startzeit?: true
   intro_video_url?: true
   outro_bekanntmachungen?: true
+  outro_musik_url?: true
   manuelle_bewertungen?: true
   presentation_template_id?: true
   answer_form_template_id?: true
@@ -205,6 +209,7 @@ export type QuizMaxAggregateInputType = {
   intro_startzeit?: true
   intro_video_url?: true
   outro_bekanntmachungen?: true
+  outro_musik_url?: true
   manuelle_bewertungen?: true
   presentation_template_id?: true
   answer_form_template_id?: true
@@ -235,6 +240,7 @@ export type QuizCountAggregateInputType = {
   intro_startzeit?: true
   intro_video_url?: true
   outro_bekanntmachungen?: true
+  outro_musik_url?: true
   manuelle_bewertungen?: true
   presentation_template_id?: true
   answer_form_template_id?: true
@@ -352,6 +358,7 @@ export type QuizGroupByOutputType = {
   intro_startzeit: string | null
   intro_video_url: string | null
   outro_bekanntmachungen: string | null
+  outro_musik_url: string | null
   manuelle_bewertungen: number | null
   presentation_template_id: string | null
   answer_form_template_id: string | null
@@ -405,6 +412,7 @@ export type quizWhereInput = {
   intro_startzeit?: Prisma.StringNullableFilter<"quiz"> | string | null
   intro_video_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableFilter<"quiz"> | string | null
+  outro_musik_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
   presentation_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
   answer_form_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -443,6 +451,7 @@ export type quizOrderByWithRelationInput = {
   intro_startzeit?: Prisma.SortOrderInput | Prisma.SortOrder
   intro_video_url?: Prisma.SortOrderInput | Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrderInput | Prisma.SortOrder
+  outro_musik_url?: Prisma.SortOrderInput | Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrderInput | Prisma.SortOrder
   presentation_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   answer_form_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -484,6 +493,7 @@ export type quizWhereUniqueInput = Prisma.AtLeast<{
   intro_startzeit?: Prisma.StringNullableFilter<"quiz"> | string | null
   intro_video_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableFilter<"quiz"> | string | null
+  outro_musik_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
   presentation_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
   answer_form_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -522,6 +532,7 @@ export type quizOrderByWithAggregationInput = {
   intro_startzeit?: Prisma.SortOrderInput | Prisma.SortOrder
   intro_video_url?: Prisma.SortOrderInput | Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrderInput | Prisma.SortOrder
+  outro_musik_url?: Prisma.SortOrderInput | Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrderInput | Prisma.SortOrder
   presentation_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   answer_form_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -560,6 +571,7 @@ export type quizScalarWhereWithAggregatesInput = {
   intro_startzeit?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   intro_video_url?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
+  outro_musik_url?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableWithAggregatesFilter<"quiz"> | number | null
   presentation_template_id?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
   answer_form_template_id?: Prisma.StringNullableWithAggregatesFilter<"quiz"> | string | null
@@ -588,6 +600,7 @@ export type quizCreateInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -626,6 +639,7 @@ export type quizUncheckedCreateInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -661,6 +675,7 @@ export type quizUpdateInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -699,6 +714,7 @@ export type quizUncheckedUpdateInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -736,6 +752,7 @@ export type quizCreateManyInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -764,6 +781,7 @@ export type quizUpdateManyMutationInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -794,6 +812,7 @@ export type quizUncheckedUpdateManyInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -824,6 +843,7 @@ export type quizCountOrderByAggregateInput = {
   intro_startzeit?: Prisma.SortOrder
   intro_video_url?: Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrder
+  outro_musik_url?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
   presentation_template_id?: Prisma.SortOrder
   answer_form_template_id?: Prisma.SortOrder
@@ -862,6 +882,7 @@ export type quizMaxOrderByAggregateInput = {
   intro_startzeit?: Prisma.SortOrder
   intro_video_url?: Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrder
+  outro_musik_url?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
   presentation_template_id?: Prisma.SortOrder
   answer_form_template_id?: Prisma.SortOrder
@@ -892,6 +913,7 @@ export type quizMinOrderByAggregateInput = {
   intro_startzeit?: Prisma.SortOrder
   intro_video_url?: Prisma.SortOrder
   outro_bekanntmachungen?: Prisma.SortOrder
+  outro_musik_url?: Prisma.SortOrder
   manuelle_bewertungen?: Prisma.SortOrder
   presentation_template_id?: Prisma.SortOrder
   answer_form_template_id?: Prisma.SortOrder
@@ -1083,6 +1105,7 @@ export type quizCreateWithoutEventreiheInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1119,6 +1142,7 @@ export type quizUncheckedCreateWithoutEventreiheInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1185,6 +1209,7 @@ export type quizScalarWhereInput = {
   intro_startzeit?: Prisma.StringNullableFilter<"quiz"> | string | null
   intro_video_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   outro_bekanntmachungen?: Prisma.StringNullableFilter<"quiz"> | string | null
+  outro_musik_url?: Prisma.StringNullableFilter<"quiz"> | string | null
   manuelle_bewertungen?: Prisma.IntNullableFilter<"quiz"> | number | null
   presentation_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
   answer_form_template_id?: Prisma.StringNullableFilter<"quiz"> | string | null
@@ -1213,6 +1238,7 @@ export type quizCreateWithoutQuiz_fragenInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1250,6 +1276,7 @@ export type quizUncheckedCreateWithoutQuiz_fragenInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1300,6 +1327,7 @@ export type quizUpdateWithoutQuiz_fragenInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1337,6 +1365,7 @@ export type quizUncheckedUpdateWithoutQuiz_fragenInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1371,6 +1400,7 @@ export type quizCreateWithoutQuiz_teamsInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1408,6 +1438,7 @@ export type quizUncheckedCreateWithoutQuiz_teamsInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1458,6 +1489,7 @@ export type quizUpdateWithoutQuiz_teamsInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1495,6 +1527,7 @@ export type quizUncheckedUpdateWithoutQuiz_teamsInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1529,6 +1562,7 @@ export type quizCreateWithoutQuiz_abschnitteInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1566,6 +1600,7 @@ export type quizUncheckedCreateWithoutQuiz_abschnitteInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1616,6 +1651,7 @@ export type quizUpdateWithoutQuiz_abschnitteInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1653,6 +1689,7 @@ export type quizUncheckedUpdateWithoutQuiz_abschnitteInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1687,6 +1724,7 @@ export type quizCreateWithoutQuiz_team_sessionsInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1724,6 +1762,7 @@ export type quizUncheckedCreateWithoutQuiz_team_sessionsInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1774,6 +1813,7 @@ export type quizUpdateWithoutQuiz_team_sessionsInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1811,6 +1851,7 @@ export type quizUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1845,6 +1886,7 @@ export type quizCreateWithoutQuiz_block_freigabenInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1882,6 +1924,7 @@ export type quizUncheckedCreateWithoutQuiz_block_freigabenInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -1932,6 +1975,7 @@ export type quizUpdateWithoutQuiz_block_freigabenInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1969,6 +2013,7 @@ export type quizUncheckedUpdateWithoutQuiz_block_freigabenInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2003,6 +2048,7 @@ export type quizCreateWithoutTeam_antwortenInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -2040,6 +2086,7 @@ export type quizUncheckedCreateWithoutTeam_antwortenInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -2090,6 +2137,7 @@ export type quizUpdateWithoutTeam_antwortenInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2127,6 +2175,7 @@ export type quizUncheckedUpdateWithoutTeam_antwortenInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2161,6 +2210,7 @@ export type quizCreateWithoutPraesentation_statusInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -2198,6 +2248,7 @@ export type quizUncheckedCreateWithoutPraesentation_statusInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -2248,6 +2299,7 @@ export type quizUpdateWithoutPraesentation_statusInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2285,6 +2337,7 @@ export type quizUncheckedUpdateWithoutPraesentation_statusInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2320,6 +2373,7 @@ export type quizCreateManyEventreiheInput = {
   intro_startzeit?: string | null
   intro_video_url?: string | null
   outro_bekanntmachungen?: string | null
+  outro_musik_url?: string | null
   manuelle_bewertungen?: number | null
   presentation_template_id?: string | null
   answer_form_template_id?: string | null
@@ -2348,6 +2402,7 @@ export type quizUpdateWithoutEventreiheInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2384,6 +2439,7 @@ export type quizUncheckedUpdateWithoutEventreiheInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2420,6 +2476,7 @@ export type quizUncheckedUpdateManyWithoutEventreiheInput = {
   intro_startzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intro_video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outro_bekanntmachungen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outro_musik_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   manuelle_bewertungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   presentation_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer_form_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2526,6 +2583,7 @@ export type quizSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   intro_startzeit?: boolean
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
+  outro_musik_url?: boolean
   manuelle_bewertungen?: boolean
   presentation_template_id?: boolean
   answer_form_template_id?: boolean
@@ -2565,6 +2623,7 @@ export type quizSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   intro_startzeit?: boolean
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
+  outro_musik_url?: boolean
   manuelle_bewertungen?: boolean
   presentation_template_id?: boolean
   answer_form_template_id?: boolean
@@ -2596,6 +2655,7 @@ export type quizSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   intro_startzeit?: boolean
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
+  outro_musik_url?: boolean
   manuelle_bewertungen?: boolean
   presentation_template_id?: boolean
   answer_form_template_id?: boolean
@@ -2627,12 +2687,13 @@ export type quizSelectScalar = {
   intro_startzeit?: boolean
   intro_video_url?: boolean
   outro_bekanntmachungen?: boolean
+  outro_musik_url?: boolean
   manuelle_bewertungen?: boolean
   presentation_template_id?: boolean
   answer_form_template_id?: boolean
 }
 
-export type quizOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "eventreihe_id" | "quiz_datum" | "titel" | "veranstaltungszeit" | "veranstaltungsname" | "karten_url" | "oeffentliche_url" | "team_anzahl" | "teilnehmer_anzahl" | "bemerkung" | "ist_archiviert" | "archivierungsgrund" | "intro_begruessungstext" | "intro_begruessungstitel" | "intro_logo_url" | "intro_musik_url" | "intro_preise" | "intro_regeln" | "intro_wartetext" | "intro_startsequenz_text" | "intro_startzeit" | "intro_video_url" | "outro_bekanntmachungen" | "manuelle_bewertungen" | "presentation_template_id" | "answer_form_template_id", ExtArgs["result"]["quiz"]>
+export type quizOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "eventreihe_id" | "quiz_datum" | "titel" | "veranstaltungszeit" | "veranstaltungsname" | "karten_url" | "oeffentliche_url" | "team_anzahl" | "teilnehmer_anzahl" | "bemerkung" | "ist_archiviert" | "archivierungsgrund" | "intro_begruessungstext" | "intro_begruessungstitel" | "intro_logo_url" | "intro_musik_url" | "intro_preise" | "intro_regeln" | "intro_wartetext" | "intro_startsequenz_text" | "intro_startzeit" | "intro_video_url" | "outro_bekanntmachungen" | "outro_musik_url" | "manuelle_bewertungen" | "presentation_template_id" | "answer_form_template_id", ExtArgs["result"]["quiz"]>
 export type quizInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz_abschnitte?: boolean | Prisma.quiz$quiz_abschnitteArgs<ExtArgs>
   quiz_block_freigaben?: boolean | Prisma.quiz$quiz_block_freigabenArgs<ExtArgs>
@@ -2688,6 +2749,7 @@ export type $quizPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     intro_startzeit: string | null
     intro_video_url: string | null
     outro_bekanntmachungen: string | null
+    outro_musik_url: string | null
     manuelle_bewertungen: number | null
     presentation_template_id: string | null
     answer_form_template_id: string | null
@@ -3146,6 +3208,7 @@ export interface quizFieldRefs {
   readonly intro_startzeit: Prisma.FieldRef<"quiz", 'String'>
   readonly intro_video_url: Prisma.FieldRef<"quiz", 'String'>
   readonly outro_bekanntmachungen: Prisma.FieldRef<"quiz", 'String'>
+  readonly outro_musik_url: Prisma.FieldRef<"quiz", 'String'>
   readonly manuelle_bewertungen: Prisma.FieldRef<"quiz", 'Int'>
   readonly presentation_template_id: Prisma.FieldRef<"quiz", 'String'>
   readonly answer_form_template_id: Prisma.FieldRef<"quiz", 'String'>

@@ -72,7 +72,7 @@ test("shared controls cover segmented boolean, sortable order and browser voices
     "utf8",
   );
   const presentation = readFileSync(
-    "app/quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
     "utf8",
   );
 

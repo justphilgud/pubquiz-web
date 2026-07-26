@@ -10,10 +10,10 @@ import {
   QuizPraesentationResult,
   getQuizPunktestand,
   getZufaelligeSchaetzfrage,
+  setAktuelleQuizFrage,
 } from "../../actions";
 import {
   buildPraesentationSlides,
-  type Slide,
 } from "../praesentation/buildPraesentationSlides";
 import {
   setPraesentationSlideIndex,
@@ -26,6 +26,7 @@ import {
   setEndstandRevealCount,
   setSchaetzfrageStatus,
   getAntwortStatus,
+  starteQuiz,
 } from "../praesentation/statusActions";
 
 import ModerationToolbar from "./components/ModerationToolbar";
@@ -34,12 +35,14 @@ import SlideNotes from "./components/SlideNotes";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
+import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
+import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
+import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 
-type ModerationStatus = {
-  slide_index: number;
-  slide_started_at: string | null;
-  quiz_started_at: string | null;
-  endstand_reveal_count: number;
+type EstimationQuestion = {
+  fragen_id: number;
+  frage: string;
+  richtigeAntwort: string | null;
 };
 
 type AntwortStatus = {
@@ -52,9 +55,11 @@ type AntwortStatus = {
 type Props = {
   quizId: number;
   quiz: QuizPraesentationResult;
-  initialStatus: ModerationStatus;
+  initialLiveState: PresentationLiveState;
+  initialEstimationQuestion: EstimationQuestion | null;
   initialAntwortStatus: AntwortStatus;
   backToQuizLabel: string;
+  theme: ResolvedQuizTheme;
 };
 
 function secondsSince(startAt: string | null, now: number) {
@@ -66,26 +71,30 @@ function secondsSince(startAt: string | null, now: number) {
 export default function ModerationClient({
   quizId,
   quiz,
-  initialStatus,
+  initialLiveState,
+  initialEstimationQuestion,
   initialAntwortStatus,
   backToQuizLabel,
+  theme,
 }: Props) {
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
 
   const [slideIndex, setSlideIndex] = useState(() =>
     Math.min(
-      Math.max(initialStatus.slide_index, 0),
+      Math.max(initialLiveState.slideIndex, 0),
       Math.max(slides.length - 1, 0),
     ),
   );
 
   const [slideStartedAt, setSlideStartedAt] = useState(
-    initialStatus.slide_started_at,
+    initialLiveState.slideStartedAt,
   );
-  const [quizStartedAt] = useState(initialStatus.quiz_started_at);
+  const [quizStartedAt] = useState(initialLiveState.quizStartedAt);
   const [antwortStatus, setAntwortStatus] = useState(initialAntwortStatus);
-  const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(false);
+  const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(
+    initialLiveState.mediaOverlayActive,
+  );
 
   const [confirmEndOpen, setConfirmEndOpen] = useState(false);
   const [quizBeendet, setQuizBeendet] = useState(false);
@@ -121,27 +130,49 @@ export default function ModerationClient({
 
   const hatMedien = aktuelleMedien.length > 0;
 
-  const hatAudio =
+  const hatAudioAufFixemSlide =
     aktuellerSlide?.typ === "fixer-slide" &&
-    aktuellerSlide.slideTyp === "startsequenz"
-      ? true
-      : aktuelleMedien.some((medium) =>
-          medium.medientyp.toLowerCase().includes("audio"),
-        );
+    (aktuellerSlide.slideTyp === "startsequenz" ||
+      (aktuellerSlide.slideTyp === "qrcode" &&
+        Boolean(quiz.intro_musik_url)) ||
+      (aktuellerSlide.slideTyp === "bekanntmachungen" &&
+        Boolean(quiz.outro_musik_url)));
+  const hatAudio =
+    hatAudioAufFixemSlide ||
+    aktuelleMedien.some((medium) =>
+      ["audio", "video"].some((type) =>
+        medium.medientyp.toLowerCase().includes(type),
+      ),
+    );
 
-  const [audioLaeuft, setAudioLaeuft] = useState(false);
+  const [audioLaeuft, setAudioLaeuft] = useState(
+    initialLiveState.playbackCommand === "play",
+  );
+  const [playbackCommand, setPlaybackCommand] = useState(
+    initialLiveState.playbackCommand,
+  );
+  const [playbackCommandId, setPlaybackCommandId] = useState(
+    initialLiveState.playbackCommandId,
+  );
 
   const [showAuswertungDialog, setShowAuswertungDialog] = useState(false);
 
   const [blockFreigegeben, setBlockFreigegeben] = useState(false);
 
-  const [countdownDauerMinuten, setCountdownDauerMinuten] = useState(5);
-
-  const [countdownStartedAt, setCountdownStartedAt] = useState<string | null>(
-    null,
+  const [countdownDauerMinuten, setCountdownDauerMinuten] = useState(
+    Math.max(
+      1,
+      Math.round((initialLiveState.countdownDurationSeconds ?? 300) / 60),
+    ),
   );
 
-  const [countdownStatus, setCountdownStatus] = useState<string | null>("idle");
+  const [countdownStartedAt, setCountdownStartedAt] = useState<string | null>(
+    initialLiveState.countdownStartedAt,
+  );
+
+  const [countdownStatus, setCountdownStatus] = useState<string | null>(
+    initialLiveState.countdownStatus,
+  );
 
   const [showAuswertungIframe, setShowAuswertungIframe] = useState(false);
 
@@ -158,8 +189,13 @@ export default function ModerationClient({
     useState(false);
 
   const [endstandRevealCount, setEndstandRevealCountLokal] = useState(
-    initialStatus.endstand_reveal_count ?? 1,
+    initialLiveState.revealCount,
   );
+  const [estimationPhase, setEstimationPhase] = useState(
+    initialLiveState.estimation.phase,
+  );
+  const [estimationQuestion, setEstimationQuestion] =
+    useState(initialEstimationQuestion);
 
   useEffect(() => {
     if (!istPauseAbgelaufen) return;
@@ -226,11 +262,32 @@ export default function ModerationClient({
     });
   }, [aktuellerSlide, quizId]);
 
-  const vorherigerSlide = useCallback(() => {
+  function vorherigerSlide() {
     void goToSlide(slideIndex - 1);
-  }, [slideIndex]);
+  }
 
-  const naechsterSlideAction = useCallback(async () => {
+  async function naechsterSlideAction() {
+    const templateData =
+      aktuellerSlide?.typ === "frage"
+        ? aktuellerSlide.frage.templateConfig?.templateData
+        : null;
+    if (
+      templateData?.kind === "GOOGLE_REVIEWS" &&
+      templateData.sequentialReveal &&
+      endstandRevealCount < templateData.reviews.length
+    ) {
+      const nextRevealCount = Math.min(
+        endstandRevealCount + 1,
+        templateData.reviews.length,
+      );
+      setEndstandRevealCountLokal(nextRevealCount);
+      await setEndstandRevealCount({
+        quizId,
+        revealCount: nextRevealCount,
+      });
+      return;
+    }
+
     if (aktuellerSlide?.typ === "endstand") {
       const punktestand = await getQuizPunktestand(quizId);
       const topTeams = punktestand.slice(0, 5);
@@ -264,7 +321,7 @@ export default function ModerationClient({
     }
 
     void goToSlide(slideIndex + 1);
-  }, [aktuellerSlide, quizId, endstandRevealCount, slideIndex]);
+  }
 
   const handleMediumToggle = useCallback(async () => {
     const neuerWert = !mediumOverlayAktiv;
@@ -281,12 +338,21 @@ export default function ModerationClient({
     const naechsteAktion = audioLaeuft ? "pause" : "play";
 
     setAudioLaeuft(!audioLaeuft);
+    setPlaybackCommand(naechsteAktion);
+    setPlaybackCommandId((current) => current + 1);
+    if (
+      naechsteAktion === "play" &&
+      aktuellerSlide?.typ === "fixer-slide" &&
+      aktuellerSlide.slideTyp === "startsequenz"
+    ) {
+      await starteQuiz(quizId);
+    }
 
     await setAudioAktion({
       quizId,
       aktion: naechsteAktion,
     });
-  }, [audioLaeuft, quizId]);
+  }, [aktuellerSlide, audioLaeuft, quizId]);
 
   const handleAuswertungOeffnen = useCallback(() => {
     setShowAuswertungIframe(true);
@@ -322,22 +388,29 @@ export default function ModerationClient({
 
     const newStartedAt = new Date().toISOString();
 
-    if (mediumOverlayAktiv) {
-      setMediumOverlayAktivLokal(false);
-
-      await setMediumOverlayAktiv({
-        quizId,
-        aktiv: false,
-      });
-    }
-
     setSlideIndex(safeIndex);
     setSlideStartedAt(newStartedAt);
     setShowAuswertungDialog(false);
     setAuswertungDialogBereitsGezeigt(false);
     setEndstandRevealCountLokal(1);
+    setMediumOverlayAktivLokal(false);
+    setAudioLaeuft(false);
+    setPlaybackCommand("stop");
+    setPlaybackCommandId((current) => current + 1);
 
     await setPraesentationSlideIndex(quizId, safeIndex);
+    const nextSlide = slides[safeIndex];
+    if (
+      nextSlide?.typ === "frage" &&
+      nextSlide.abschnitt &&
+      isQuestionSection(nextSlide.abschnitt)
+    ) {
+      await setAktuelleQuizFrage({
+        quizId,
+        quizAbschnittId: nextSlide.abschnitt.quiz_abschnitt_id,
+        quizFragenId: nextSlide.frage.quiz_fragen_id,
+      });
+    }
     await aktualisiereAntwortStatus();
   }
 
@@ -365,6 +438,8 @@ export default function ModerationClient({
 
   async function handleSchaetzfrageStarten() {
     const frage = await getZufaelligeSchaetzfrage(quizId);
+    setEstimationQuestion(frage);
+    setEstimationPhase("RUNNING");
 
     await setSchaetzfrageStatus({
       quizId,
@@ -375,6 +450,7 @@ export default function ModerationClient({
   }
 
   async function handleSchaetzfrageLoesungZeigen() {
+    setEstimationPhase("SOLUTION");
     await setSchaetzfrageStatus({
       quizId,
       showSchaetzfrage: true,
@@ -383,6 +459,8 @@ export default function ModerationClient({
   }
 
   async function handleSchaetzfrageZurueck() {
+    setEstimationPhase("HIDDEN");
+    setEstimationQuestion(null);
     await setSchaetzfrageStatus({
       quizId,
       showSchaetzfrage: false,
@@ -511,7 +589,13 @@ export default function ModerationClient({
               countdownRestSekunden={countdownRestSekunden}
               punktestand={punktestand}
               endstandRevealCount={endstandRevealCount}
-              preiseText={quiz.intro_preise}
+              quiz={quiz}
+              theme={theme}
+              mediaOverlayActive={mediumOverlayAktiv}
+              playbackCommand={playbackCommand}
+              playbackCommandId={playbackCommandId}
+              estimationPhase={estimationPhase}
+              estimationQuestion={estimationQuestion}
             />
 
             <SlideNotes />

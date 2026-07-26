@@ -124,8 +124,8 @@ export default function ModerationToolbar({
           icon={SpeakerWaveIcon}
           label={
             hatAudio
-              ? "Audio abspielen / pausieren"
-              : "Kein Audio auf diesem Slide"
+              ? "Audio/Video abspielen oder pausieren"
+              : "Kein abspielbares Medium auf diesem Slide"
           }
           tone="pink"
           active={audioLaeuft}

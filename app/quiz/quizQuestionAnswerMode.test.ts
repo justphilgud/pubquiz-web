@@ -153,21 +153,21 @@ test("server rejects selection answers for an effectively open question", () => 
 });
 
 test("presentation hides choices by effective mode but keeps solution answers", () => {
-  const player = readFileSync(
-    "app/quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",
+  const renderer = readFileSync(
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
     "utf8",
   );
 
-  assert.match(player, /effektiver_antwortmodus === "OPEN"\) return false/);
+  assert.match(renderer, /effektiver_antwortmodus === "OPEN"\) return false/);
   assert.match(
-    player,
+    renderer,
     /const richtigeAntworten = antworten\.filter\(\(antwort\) => antwort\.ist_richtig\)/,
   );
 });
 
 test("moderation preview follows the effective mode for question choices", () => {
   const preview = readFileSync(
-    "app/quiz/[quizId]/moderation/components/SlidePreview.tsx",
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
     "utf8",
   );
 
@@ -175,8 +175,8 @@ test("moderation preview follows the effective mode for question choices", () =>
     preview,
     /effektiver_antwortmodus === "CLOSED"/,
   );
-  assert.match(preview, /\{zeigtAntwortoptionen && \(/);
-  assert.match(preview, /slide\.frage\.antwort_reihenfolge/);
+  assert.match(preview, /\{hatAntwortmoeglichkeiten && \(/);
+  assert.match(preview, /frage\.antwort_reihenfolge/);
 });
 
 test("evaluation routes effective open answers to manual review", () => {

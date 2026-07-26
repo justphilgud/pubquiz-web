@@ -26,5 +26,5 @@ export default async function QuizAntwortPage({ params }: Props) {
     notFound();
   }
 
-  return <QuizAntwortClient daten={daten} templateContext={templates.answerForm} />;
+  return <QuizAntwortClient daten={daten} theme={templates.theme} />;
 }

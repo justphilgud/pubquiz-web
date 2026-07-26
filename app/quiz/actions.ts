@@ -34,6 +34,10 @@ import {
   OUTRO_SECTION_TYPE,
 } from "./quizSectionPolicy";
 import { resolveQuizQuestionAnswerMode } from "./quizQuestionAnswerMode";
+import {
+  parsePrizeSlots,
+  serializePrizeSlots,
+} from "./fixedSlidesPolicy";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 import { requireQuestionAccess } from "@/app/fragen/editor/questionAccess.server";
 import {
@@ -130,6 +134,7 @@ export type QuizDetailsResult = QuizResult & {
   intro_wartetext: string | null;
   intro_video_url: string | null;
   outro_bekanntmachungen: string | null;
+  outro_musik_url: string | null;
 
   abschnitte: {
     quiz_abschnitt_id: number;
@@ -510,6 +515,7 @@ export async function copyQuiz(data: {
         intro_preise: original.intro_preise,
         intro_startsequenz_text: original.intro_startsequenz_text,
         outro_bekanntmachungen: original.outro_bekanntmachungen,
+        outro_musik_url: original.outro_musik_url,
         ist_archiviert: false,
         archivierungsgrund: null,
       },
@@ -653,6 +659,7 @@ export async function getQuizDetails(
     intro_video_url: quiz.intro_video_url,
 
     outro_bekanntmachungen: quiz.outro_bekanntmachungen,
+    outro_musik_url: quiz.outro_musik_url,
 
     abschnitte: quiz.quiz_abschnitte.map((abschnitt) => ({
       quiz_abschnitt_id: abschnitt.quiz_abschnitt_id,
@@ -1076,6 +1083,8 @@ export type QuizPraesentationResult = {
   intro_wartetext: string | null;
   intro_video_url: string | null;
   intro_startzeit: string | null;
+  outro_bekanntmachungen: string | null;
+  outro_musik_url: string | null;
   titel: string | null;
   quiz_datum: string | null;
 
@@ -1246,6 +1255,8 @@ export async function getQuizPraesentation(
     intro_wartetext: quiz.intro_wartetext,
     intro_video_url: quiz.intro_video_url,
     intro_startzeit: quiz.intro_startzeit,
+    outro_bekanntmachungen: quiz.outro_bekanntmachungen,
+    outro_musik_url: quiz.outro_musik_url,
     titel: quiz.titel,
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
@@ -3469,12 +3480,14 @@ export async function updateIntroPreise(data: {
 }) {
   await requireQuizEditor(data.quizId);
 
+  const preise = serializePrizeSlots(parsePrizeSlots(data.preise));
+
   await prisma.quiz.update({
     where: {
       quiz_id: data.quizId,
     },
     data: {
-      intro_preise: data.preise.trim() || null,
+      intro_preise: preise || null,
     },
   });
 

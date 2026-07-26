@@ -229,6 +229,7 @@ model quiz {
   intro_startzeit          String?
   intro_video_url          String?
   outro_bekanntmachungen   String?
+  outro_musik_url          String?
   manuelle_bewertungen     Int?                       @default(0)
   presentation_template_id String?                    @db.VarChar(64)
   answer_form_template_id  String?                    @db.VarChar(64)

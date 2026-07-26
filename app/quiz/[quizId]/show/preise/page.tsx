@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getQuizDetails } from "@/app/quiz/actions";
+import { parsePrizeSlots } from "@/app/quiz/fixedSlidesPolicy";
 
 type Props = {
   params: Promise<{ quizId: string }>;
@@ -16,9 +17,7 @@ export default async function ShowPreisePage({
     notFound();
   }
 
-  const gespeichertePreise = (quiz.intro_preise ?? "")
-    .split("\n")
-    .map((preis) => preis.trim());
+  const gespeichertePreise = parsePrizeSlots(quiz.intro_preise);
 
   const preise = [
     {
