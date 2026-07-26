@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { QuizPraesentationResult } from "../../../actions";
 import type { Slide } from "../../praesentation/buildPraesentationSlides";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
+import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 
 type PunktestandEintrag = {
   teamname: string;
@@ -18,10 +19,6 @@ type Props = {
   endstandRevealCount: number;
   preiseText?: string | null;
 };
-
-function istFragenblockTyp(abschnittTyp: string | null | undefined) {
-  return abschnittTyp === "fragenrunde" || abschnittTyp === "fragenblock";
-}
 
 function formatSeconds(seconds: number | null | undefined) {
   if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
@@ -49,7 +46,7 @@ function getAbschnittAnzeigeTitel(
 ) {
   if (!abschnitt) return "Kein Block";
 
-  if (!istFragenblockTyp(abschnitt.abschnitt_typ)) {
+  if (!isQuestionSection(abschnitt)) {
     return abschnitt.titel;
   }
 
@@ -59,7 +56,7 @@ function getAbschnittAnzeigeTitel(
     .filter(
       (slide) =>
         slide.typ === "block" &&
-        istFragenblockTyp(slide.abschnitt.abschnitt_typ),
+        isQuestionSection(slide.abschnitt),
     )
     .findIndex(
       (slide) =>
@@ -271,6 +268,21 @@ export default function SlidePreview({
     const bildMedien = slide.frage.medien.filter((medium) =>
       medium.medientyp.toLowerCase().includes("bild"),
     );
+    const zeigtAntwortoptionen =
+      slide.frage.effektiver_antwortmodus === "CLOSED" ||
+      (slide.frage.effektiver_antwortmodus === "UNCLASSIFIED" &&
+        slide.frage.antworten.length > 1);
+    const antworten = [...slide.frage.antworten].sort((a, b) => {
+      const indexA = slide.frage.antwort_reihenfolge.indexOf(a.antwort_id);
+      const indexB = slide.frage.antwort_reihenfolge.indexOf(b.antwort_id);
+
+      if (indexA === -1 && indexB === -1) {
+        return a.antwort_id - b.antwort_id;
+      }
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
 
     return (
       <div className="flex h-full min-h-360px flex-col justify-center">
@@ -279,8 +291,26 @@ export default function SlidePreview({
         </div>
 
         <div className="grid items-center gap-8 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="text-4xl font-black leading-tight">
-            {slide.frage.frage}
+          <div>
+            <div className="text-4xl font-black leading-tight">
+              {slide.frage.frage}
+            </div>
+
+            {zeigtAntwortoptionen && (
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {antworten.map((antwort, index) => (
+                  <div
+                    key={antwort.antwort_id}
+                    className="rounded-xl border border-cyan-300/60 bg-cyan-950/30 p-3 text-lg font-bold"
+                  >
+                    <span className="mr-2 text-cyan-300">
+                      {String.fromCharCode(65 + index)}.
+                    </span>
+                    {antwort.antwort}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {bildMedien.length > 0 && (

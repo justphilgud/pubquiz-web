@@ -68,3 +68,23 @@ export const CategoryStatus = {
 } as const
 
 export type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus]
+
+
+export const QuizAnswerEvaluationStatus = {
+  UNANSWERED: 'UNANSWERED',
+  WRONG: 'WRONG',
+  PARTIAL: 'PARTIAL',
+  CORRECT: 'CORRECT',
+  REVIEW_REQUIRED: 'REVIEW_REQUIRED'
+} as const
+
+export type QuizAnswerEvaluationStatus = (typeof QuizAnswerEvaluationStatus)[keyof typeof QuizAnswerEvaluationStatus]
+
+
+export const QuizAnswerEvaluationSource = {
+  AUTO: 'AUTO',
+  MANUAL: 'MANUAL',
+  LEGACY: 'LEGACY'
+} as const
+
+export type QuizAnswerEvaluationSource = (typeof QuizAnswerEvaluationSource)[keyof typeof QuizAnswerEvaluationSource]

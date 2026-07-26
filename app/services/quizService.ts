@@ -3,6 +3,8 @@ import { prisma } from "@/app/lib/prisma";
 import { FACE_MORPH_PIXEL_RELATION_TYPE } from "@/app/fragen/editor/faceMorphPixelQuestionPlan";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
+import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
+import { getQuestionBaseMaximum } from "@/app/quiz/evaluation/questionPointPolicy";
 
 type QuizQuestionCreateData = Parameters<
   typeof prisma.quiz_fragen.create
@@ -26,7 +28,13 @@ export async function addQuestionToQuiz(
       fragen_id: data.fragen_id,
       ...buildQuestionEligibilityWhere(quiz.eventreihe_id, getBerlinDate()),
     },
-    select: { fragen_id: true },
+    select: {
+      fragen_id: true,
+      template_config_json: true,
+      vorlage: { select: { code: true } },
+      antworten: { select: { ist_richtig: true } },
+      antwortfelder: { select: { antwortfeld_id: true } },
+    },
   });
   if (!frage) {
     throw new Error(
@@ -59,8 +67,20 @@ export async function addQuestionToQuiz(
       })) > 0
     : false;
 
+  const config = frage.template_config_json as QuestionTemplateConfig | null;
   const assignment = await db.quiz_fragen.create({
-    data,
+    data: {
+      ...data,
+      punkte_basis: getQuestionBaseMaximum({
+        templateId: frage.vorlage?.code ?? null,
+        correctAnswerCount: frage.antworten.filter((answer) => answer.ist_richtig).length,
+        structuredFieldCount: frage.antwortfelder.length,
+        orderingItemCount:
+          config?.templateData?.kind === "ORDERING"
+            ? config.templateData.items.length
+            : 0,
+      }),
+    },
   });
 
   return { ...assignment, coupledQuestionAlreadyInQuiz };

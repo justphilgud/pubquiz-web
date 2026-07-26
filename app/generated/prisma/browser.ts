@@ -143,6 +143,11 @@ export type frage_vorlage_antwortfelder = Prisma.frage_vorlage_antwortfelderMode
  */
 export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel
 /**
+ * Model team_antwort_auswahlen
+ * 
+ */
+export type team_antwort_auswahlen = Prisma.team_antwort_auswahlenModel
+/**
  * Model users
  * 
  */

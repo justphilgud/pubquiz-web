@@ -25,6 +25,7 @@ import type { ResolvedTemplate } from "@/app/rendering/templateResolver";
 import type { PresentationTemplate } from "@/app/rendering/templateRegistry";
 import { presentationTemplateStyle } from "@/app/rendering/templateStyles";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
+import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 
 import {
   buildPraesentationSlides,
@@ -238,14 +239,6 @@ function StartsequenzSlideInPlayer({
     </section>
   );
 }
-
-function istFragenblock(abschnittTyp: string) {
-  return (
-    abschnittTyp === "fragenblock" ||
-    abschnittTyp === "fragenrunde"
-  );
-}
-
 
 export default function QuizPraesentationPlayer({
   quiz,
@@ -533,7 +526,7 @@ export default function QuizPraesentationPlayer({
     if (
       slide?.typ !== "frage" ||
       !slide.abschnitt ||
-      !istFragenblock(slide.abschnitt.abschnitt_typ)
+      !isQuestionSection(slide.abschnitt)
     ) {
       return;
     }
@@ -687,7 +680,7 @@ export default function QuizPraesentationPlayer({
 
     if (
       slide.typ === "block" &&
-      istFragenblock(slide.abschnitt.abschnitt_typ)
+      isQuestionSection(slide.abschnitt)
     ) {
       return slide.abschnitt;
     }
@@ -811,6 +804,14 @@ export default function QuizPraesentationPlayer({
     });
   }
 
+  function zeigtAntwortoptionen(
+    frage: QuizPraesentationResult["fragen"][number],
+  ) {
+    if (frage.effektiver_antwortmodus === "OPEN") return false;
+    if (frage.effektiver_antwortmodus === "CLOSED") return true;
+    return frage.antworten.length > 1;
+  }
+
   function renderMedienKarte(medium: Medium, variant: "small" | "large") {
     const isLarge = variant === "large";
     const src = getMediumUrl(medium.datei);
@@ -859,7 +860,7 @@ export default function QuizPraesentationPlayer({
     frage: QuizPraesentationResult["fragen"][number]
   ) {
     const antworten = sortiereAntworten(frage);
-    const hatAntwortmoeglichkeiten = antworten.length > 1;
+    const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
 
     if (!hatAntwortmoeglichkeiten) {
       return (
@@ -907,7 +908,7 @@ export default function QuizPraesentationPlayer({
     const frage = slide.frage;
     const templateData = frage.templateConfig?.templateData;
     const antworten = sortiereAntworten(frage);
-    const hatAntwortmoeglichkeiten = antworten.length > 1;
+    const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
     const layout = frage.praesentationslayout ?? "standard";
 
     if (templateData?.kind === "GOOGLE_REVIEWS") {
@@ -956,10 +957,12 @@ export default function QuizPraesentationPlayer({
       return (
         <div className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
           <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
-          <div className="mt-10 grid grid-cols-2 gap-6 text-4xl font-black">
-            <div className="rounded-2xl border-4 border-emerald-300 p-6 text-emerald-200">Wahr</div>
-            <div className="rounded-2xl border-4 border-pink-400 p-6 text-pink-200">Falsch</div>
-          </div>
+          {hatAntwortmoeglichkeiten && (
+            <div className="mt-10 grid grid-cols-2 gap-6 text-4xl font-black">
+              <div className="rounded-2xl border-4 border-emerald-300 p-6 text-emerald-200">Wahr</div>
+              <div className="rounded-2xl border-4 border-pink-400 p-6 text-pink-200">Falsch</div>
+            </div>
+          )}
         </div>
       );
     }
@@ -977,9 +980,11 @@ export default function QuizPraesentationPlayer({
       return (
         <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
           <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {antworten.map((answer) => <div key={answer.antwort_id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{answer.antwort}</div>)}
-          </div>
+          {hatAntwortmoeglichkeiten && (
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {antworten.map((answer) => <div key={answer.antwort_id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{answer.antwort}</div>)}
+            </div>
+          )}
         </div>
       );
     }
@@ -1792,11 +1797,9 @@ export default function QuizPraesentationPlayer({
   function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
     const abschnitt = slide.abschnitt;
 
-    const zeilen =
-      abschnitt.abschnitt_typ === "fragenrunde" ||
-        abschnitt.abschnitt_typ === "fragenblock"
-        ? []
-        : abschnitt.bemerkung
+    const zeilen = isQuestionSection(abschnitt)
+      ? []
+      : abschnitt.bemerkung
           ?.split("\n")
           .map((zeile) => zeile.trim())
           .filter(Boolean) ?? [];
@@ -1950,22 +1953,19 @@ export default function QuizPraesentationPlayer({
       );
     }
 
-    const blockTitel =
-      abschnitt.abschnitt_typ === "fragenrunde" ||
-        abschnitt.abschnitt_typ === "fragenblock"
-        ? `Block ${slides
+    const blockTitel = isQuestionSection(abschnitt)
+      ? `Block ${slides
           .filter(
             (item) =>
               item.typ === "block" &&
-              (item.abschnitt.abschnitt_typ === "fragenrunde" ||
-                item.abschnitt.abschnitt_typ === "fragenblock")
+              isQuestionSection(item.abschnitt)
           )
           .findIndex(
             (item) =>
               item.typ === "block" &&
               item.abschnitt.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id
           ) + 1}`
-        : abschnitt.titel;
+      : abschnitt.titel;
 
     return (
       <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
@@ -2100,16 +2100,12 @@ export default function QuizPraesentationPlayer({
   function getAbschnittAnzeigeTitel(abschnitt: Abschnitt | null | undefined) {
     if (!abschnitt) return "Kein Block";
 
-    if (
-      abschnitt.abschnitt_typ === "fragenrunde" ||
-      abschnitt.abschnitt_typ === "fragenblock"
-    ) {
+    if (isQuestionSection(abschnitt)) {
       const blockIndex = slides
         .filter(
           (item) =>
             item.typ === "block" &&
-            (item.abschnitt.abschnitt_typ === "fragenrunde" ||
-              item.abschnitt.abschnitt_typ === "fragenblock")
+            isQuestionSection(item.abschnitt)
         )
         .findIndex(
           (item) =>
@@ -2142,7 +2138,7 @@ export default function QuizPraesentationPlayer({
   const zeigtFreigabeButtons =
     slide?.typ === "pause" ||
     (slide?.typ === "block" &&
-      istFragenblock(slide.abschnitt.abschnitt_typ));
+      isQuestionSection(slide.abschnitt));
 
   const modusLabel =
     !slide

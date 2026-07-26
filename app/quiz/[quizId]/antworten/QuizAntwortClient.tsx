@@ -16,6 +16,7 @@ import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTem
 type TeamAntwortState = {
   antwortText: string | null;
   antwortId: number | null;
+  antwortIds?: number[];
   antwortfelder: Record<number, string>;
 };
 
@@ -53,6 +54,9 @@ type AntwortStatus = {
     templateConfig: { templateData?: QuestionTemplateData } | null;
     istFreigegeben: boolean;
     punkte_modus: string;
+    urspruenglicher_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
+    effektiver_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
+    freie_antwort_erlaubt: boolean;
 
     bildMedien: {
       medien_id: number;
@@ -69,6 +73,7 @@ type AntwortStatus = {
 
     gespeicherteAntwort: {
       antwortId: number | null;
+      antwortIds?: number[];
       antwortText: string | null;
       antwortfelder?: {
         antwortfeldId: number;
@@ -190,6 +195,8 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
         localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
         return;
       }
+      // Restore the external localStorage session into the client state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSession(parsedSession);
       setTeamname(parsedSession.teamname);
     } catch {
@@ -244,6 +251,7 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
             quizTeamSessionToken: session.sessionToken,
             antwortText: antwort.antwortText,
             antwortId: antwort.antwortId,
+            antwortIds: antwort.antwortIds,
             antwortfelder: Object.entries(antwort.antwortfelder).map(
               ([antwortfeldId, antwortText]) => ({
                 antwortfeldId: Number(antwortfeldId),
@@ -271,10 +279,18 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
     liveDaten.fragen.forEach((frage) => {
       if (!frage.gespeicherteAntwort) {
         if (frage.templateConfig?.templateData?.kind === "ORDERING") {
+          const original = frage.templateConfig.templateData.items.map(
+            (item) => item.id,
+          );
+          const randomized = [...original].sort(() => Math.random() - 0.5);
+          if (
+            randomized.length > 1 &&
+            randomized.every((id, index) => id === original[index])
+          ) {
+            randomized.push(randomized.shift()!);
+          }
           geladeneAntworten[frage.quiz_fragen_id] = {
-            antwortText: JSON.stringify(
-              frage.templateConfig.templateData.items.map((item) => item.id),
-            ),
+            antwortText: JSON.stringify(randomized),
             antwortId: null,
             antwortfelder: {},
           };
@@ -291,10 +307,13 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
       geladeneAntworten[frage.quiz_fragen_id] = {
         antwortText: frage.gespeicherteAntwort.antwortText,
         antwortId: frage.gespeicherteAntwort.antwortId,
+        antwortIds: frage.gespeicherteAntwort.antwortIds,
         antwortfelder: feldAntworten,
       };
     });
 
+    // Synchronize newly released server answers without overwriting local edits.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAntworten((current) => ({
       ...geladeneAntworten,
       ...current,
@@ -513,6 +532,9 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
 
                   const hatAntwortfelder = antwortfelder.length > 0;
                   const hatBild = bildMedien.length > 0;
+                  const freieAntwortErzwungen =
+                    frage.urspruenglicher_antwortmodus === "CLOSED" &&
+                    frage.effektiver_antwortmodus === "OPEN";
 
                   return (
                     <div
@@ -549,7 +571,26 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
                         </button>
                       )}
 
-                      {hatAntwortfelder ? (
+                      {freieAntwortErzwungen ? (
+                        <textarea
+                          disabled={blockIstGesperrt}
+                          value={
+                            antworten[frage.quiz_fragen_id]?.antwortText ?? ""
+                          }
+                          onChange={(event) =>
+                            setAntworten((current) => ({
+                              ...current,
+                              [frage.quiz_fragen_id]: {
+                                antwortText: event.target.value,
+                                antwortId: null,
+                                antwortfelder: {},
+                              },
+                            }))
+                          }
+                          className="mt-4 min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
+                          placeholder="Antwort eintragen..."
+                        />
+                      ) : hatAntwortfelder ? (
                         <div className="mt-4 space-y-3">
                           {antwortfelder.map((feld) => (
                             <label
@@ -655,11 +696,22 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
                               className="answer-option flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3"
                             >
                               <input
-                                type="radio"
+                                type={
+                                  frage.templateId === "multiple_choice" ||
+                                  frage.templateId === "multiple-choice"
+                                    ? "checkbox"
+                                    : "radio"
+                                }
                                 name={`frage-${frage.quiz_fragen_id}`}
                                 checked={
-                                  antworten[frage.quiz_fragen_id]
-                                    ?.antwortId === antwort.antwort_id
+                                  frage.templateId === "multiple_choice" ||
+                                  frage.templateId === "multiple-choice"
+                                    ? (
+                                        antworten[frage.quiz_fragen_id]
+                                          ?.antwortIds ?? []
+                                      ).includes(antwort.antwort_id)
+                                    : antworten[frage.quiz_fragen_id]
+                                        ?.antwortId === antwort.antwort_id
                                 }
                                 disabled={blockIstGesperrt}
                                 onChange={() =>
@@ -667,7 +719,31 @@ export default function QuizAntwortClient({ daten, templateContext }: { daten: A
                                     ...current,
                                     [frage.quiz_fragen_id]: {
                                       antwortText: null,
-                                      antwortId: antwort.antwort_id,
+                                      antwortId:
+                                        frage.templateId === "multiple_choice" ||
+                                        frage.templateId === "multiple-choice"
+                                          ? null
+                                          : antwort.antwort_id,
+                                      antwortIds:
+                                        frage.templateId === "multiple_choice" ||
+                                        frage.templateId === "multiple-choice"
+                                          ? (
+                                              current[frage.quiz_fragen_id]
+                                                ?.antwortIds ?? []
+                                            ).includes(antwort.antwort_id)
+                                            ? (
+                                                current[frage.quiz_fragen_id]
+                                                  ?.antwortIds ?? []
+                                              ).filter(
+                                                (id) => id !== antwort.antwort_id,
+                                              )
+                                            : [
+                                                ...(current[
+                                                  frage.quiz_fragen_id
+                                                ]?.antwortIds ?? []),
+                                                antwort.antwort_id,
+                                              ]
+                                          : [antwort.antwort_id],
                                       antwortfelder: {},
                                     },
                                   }))

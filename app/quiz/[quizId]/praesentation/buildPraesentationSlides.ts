@@ -1,4 +1,9 @@
 import type { QuizPraesentationResult } from "../../actions";
+import {
+  isIntroSection,
+  isOutroSection,
+  isQuestionSection,
+} from "../../quizSectionPolicy";
 
 export type Medium = {
   medien_id: number;
@@ -67,10 +72,6 @@ export type Slide =
     abschnitt: Abschnitt;
   };
 
-function istFragenblock(abschnittTyp: string) {
-  return abschnittTyp === "fragenrunde" || abschnittTyp === "fragenblock";
-}
-
 export function buildPraesentationSlides(
   quiz: QuizPraesentationResult
 ): Slide[] {
@@ -80,9 +81,7 @@ export function buildPraesentationSlides(
     (a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)
   );
 
-  const fragenrunden = sortierteAbschnitte.filter((abschnitt) =>
-    istFragenblock(abschnitt.abschnitt_typ)
-  );
+  const fragenrunden = sortierteAbschnitte.filter(isQuestionSection);
 
   for (const abschnitt of sortierteAbschnitte) {
     const fragenImBlock = quiz.fragen
@@ -93,7 +92,7 @@ export function buildPraesentationSlides(
       )
       .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0));
 
-    if (abschnitt.abschnitt_typ === "intro") {
+    if (isIntroSection(abschnitt)) {
       result.push({ typ: "fixer-slide", slideTyp: "vor-dem-start" });
       result.push({ typ: "fixer-slide", slideTyp: "startsequenz" });
       result.push({ typ: "fixer-slide", slideTyp: "begruessung" });
@@ -103,7 +102,7 @@ export function buildPraesentationSlides(
       continue;
     }
 
-    if (abschnitt.abschnitt_typ === "outro") {
+    if (isOutroSection(abschnitt)) {
       result.push({ typ: "fixer-slide", slideTyp: "bekanntmachungen" });
       continue;
     }
@@ -113,7 +112,7 @@ export function buildPraesentationSlides(
       abschnitt,
     });
 
-    if (istFragenblock(abschnitt.abschnitt_typ)) {
+    if (isQuestionSection(abschnitt)) {
       fragenImBlock.forEach((frage, index) => {
         result.push({
           typ: "frage",

@@ -236,6 +236,7 @@ export type antwortenWhereInput = {
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   medien?: Prisma.MedienListRelationFilter
   team_antworten?: Prisma.Team_antwortenListRelationFilter
+  team_antwort_auswahlen?: Prisma.Team_antwort_auswahlenListRelationFilter
 }
 
 export type antwortenOrderByWithRelationInput = {
@@ -249,6 +250,7 @@ export type antwortenOrderByWithRelationInput = {
   fragen?: Prisma.fragenOrderByWithRelationInput
   medien?: Prisma.medienOrderByRelationAggregateInput
   team_antworten?: Prisma.team_antwortenOrderByRelationAggregateInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenOrderByRelationAggregateInput
 }
 
 export type antwortenWhereUniqueInput = Prisma.AtLeast<{
@@ -265,6 +267,7 @@ export type antwortenWhereUniqueInput = Prisma.AtLeast<{
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   medien?: Prisma.MedienListRelationFilter
   team_antworten?: Prisma.Team_antwortenListRelationFilter
+  team_antwort_auswahlen?: Prisma.Team_antwort_auswahlenListRelationFilter
 }, "antwort_id">
 
 export type antwortenOrderByWithAggregationInput = {
@@ -301,6 +304,7 @@ export type antwortenCreateInput = {
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenUncheckedCreateInput = {
@@ -312,6 +316,7 @@ export type antwortenUncheckedCreateInput = {
   zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenUpdateInput = {
@@ -322,6 +327,7 @@ export type antwortenUpdateInput = {
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateInput = {
@@ -333,6 +339,7 @@ export type antwortenUncheckedUpdateInput = {
   zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenCreateManyInput = {
@@ -411,6 +418,11 @@ export type antwortenOrderByRelationAggregateInput = {
 export type AntwortenNullableScalarRelationFilter = {
   is?: Prisma.antwortenWhereInput | null
   isNot?: Prisma.antwortenWhereInput | null
+}
+
+export type AntwortenScalarRelationFilter = {
+  is?: Prisma.antwortenWhereInput
+  isNot?: Prisma.antwortenWhereInput
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -549,6 +561,20 @@ export type antwortenUpdateOneWithoutTeam_antwortenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.antwortenUpdateToOneWithWhereWithoutTeam_antwortenInput, Prisma.antwortenUpdateWithoutTeam_antwortenInput>, Prisma.antwortenUncheckedUpdateWithoutTeam_antwortenInput>
 }
 
+export type antwortenCreateNestedOneWithoutTeam_antwort_auswahlenInput = {
+  create?: Prisma.XOR<Prisma.antwortenCreateWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUncheckedCreateWithoutTeam_antwort_auswahlenInput>
+  connectOrCreate?: Prisma.antwortenCreateOrConnectWithoutTeam_antwort_auswahlenInput
+  connect?: Prisma.antwortenWhereUniqueInput
+}
+
+export type antwortenUpdateOneRequiredWithoutTeam_antwort_auswahlenNestedInput = {
+  create?: Prisma.XOR<Prisma.antwortenCreateWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUncheckedCreateWithoutTeam_antwort_auswahlenInput>
+  connectOrCreate?: Prisma.antwortenCreateOrConnectWithoutTeam_antwort_auswahlenInput
+  upsert?: Prisma.antwortenUpsertWithoutTeam_antwort_auswahlenInput
+  connect?: Prisma.antwortenWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.antwortenUpdateToOneWithWhereWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUpdateWithoutTeam_antwort_auswahlenInput>, Prisma.antwortenUncheckedUpdateWithoutTeam_antwort_auswahlenInput>
+}
+
 export type antwortenCreateWithoutAntworttypInput = {
   antwort: string
   ist_richtig?: boolean
@@ -556,6 +582,7 @@ export type antwortenCreateWithoutAntworttypInput = {
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenUncheckedCreateWithoutAntworttypInput = {
@@ -566,6 +593,7 @@ export type antwortenUncheckedCreateWithoutAntworttypInput = {
   zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenCreateOrConnectWithoutAntworttypInput = {
@@ -613,6 +641,7 @@ export type antwortenCreateWithoutFragenInput = {
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenUncheckedCreateWithoutFragenInput = {
@@ -623,6 +652,7 @@ export type antwortenUncheckedCreateWithoutFragenInput = {
   zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenCreateOrConnectWithoutFragenInput = {
@@ -658,6 +688,7 @@ export type antwortenCreateWithoutMedienInput = {
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenUncheckedCreateWithoutMedienInput = {
@@ -668,6 +699,7 @@ export type antwortenUncheckedCreateWithoutMedienInput = {
   antworttyp_id: number
   zusatzinformation?: string | null
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenCreateOrConnectWithoutMedienInput = {
@@ -693,6 +725,7 @@ export type antwortenUpdateWithoutMedienInput = {
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateWithoutMedienInput = {
@@ -703,6 +736,7 @@ export type antwortenUncheckedUpdateWithoutMedienInput = {
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenCreateWithoutTeam_antwortenInput = {
@@ -712,6 +746,7 @@ export type antwortenCreateWithoutTeam_antwortenInput = {
   antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
   fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
   medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenUncheckedCreateWithoutTeam_antwortenInput = {
@@ -722,6 +757,7 @@ export type antwortenUncheckedCreateWithoutTeam_antwortenInput = {
   antworttyp_id: number
   zusatzinformation?: string | null
   medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedCreateNestedManyWithoutAntwortInput
 }
 
 export type antwortenCreateOrConnectWithoutTeam_antwortenInput = {
@@ -747,6 +783,7 @@ export type antwortenUpdateWithoutTeam_antwortenInput = {
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateWithoutTeam_antwortenInput = {
@@ -757,6 +794,65 @@ export type antwortenUncheckedUpdateWithoutTeam_antwortenInput = {
   antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
   zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedUpdateManyWithoutAntwortNestedInput
+}
+
+export type antwortenCreateWithoutTeam_antwort_auswahlenInput = {
+  antwort: string
+  ist_richtig?: boolean
+  zusatzinformation?: string | null
+  antworttyp: Prisma.antworttypCreateNestedOneWithoutAntwortenInput
+  fragen: Prisma.fragenCreateNestedOneWithoutAntwortenInput
+  medien?: Prisma.medienCreateNestedManyWithoutAntwortenInput
+  team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutAntwortenInput
+}
+
+export type antwortenUncheckedCreateWithoutTeam_antwort_auswahlenInput = {
+  antwort_id?: number
+  fragen_id: number
+  antwort: string
+  ist_richtig?: boolean
+  antworttyp_id: number
+  zusatzinformation?: string | null
+  medien?: Prisma.medienUncheckedCreateNestedManyWithoutAntwortenInput
+  team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutAntwortenInput
+}
+
+export type antwortenCreateOrConnectWithoutTeam_antwort_auswahlenInput = {
+  where: Prisma.antwortenWhereUniqueInput
+  create: Prisma.XOR<Prisma.antwortenCreateWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUncheckedCreateWithoutTeam_antwort_auswahlenInput>
+}
+
+export type antwortenUpsertWithoutTeam_antwort_auswahlenInput = {
+  update: Prisma.XOR<Prisma.antwortenUpdateWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUncheckedUpdateWithoutTeam_antwort_auswahlenInput>
+  create: Prisma.XOR<Prisma.antwortenCreateWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUncheckedCreateWithoutTeam_antwort_auswahlenInput>
+  where?: Prisma.antwortenWhereInput
+}
+
+export type antwortenUpdateToOneWithWhereWithoutTeam_antwort_auswahlenInput = {
+  where?: Prisma.antwortenWhereInput
+  data: Prisma.XOR<Prisma.antwortenUpdateWithoutTeam_antwort_auswahlenInput, Prisma.antwortenUncheckedUpdateWithoutTeam_antwort_auswahlenInput>
+}
+
+export type antwortenUpdateWithoutTeam_antwort_auswahlenInput = {
+  antwort?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
+  fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
+  medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
+  team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
+}
+
+export type antwortenUncheckedUpdateWithoutTeam_antwort_auswahlenInput = {
+  antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
+  fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  antwort?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_richtig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  antworttyp_id?: Prisma.IntFieldUpdateOperationsInput | number
+  zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
+  team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
 }
 
 export type antwortenCreateManyAntworttypInput = {
@@ -774,6 +870,7 @@ export type antwortenUpdateWithoutAntworttypInput = {
   fragen?: Prisma.fragenUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateWithoutAntworttypInput = {
@@ -784,6 +881,7 @@ export type antwortenUncheckedUpdateWithoutAntworttypInput = {
   zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateManyWithoutAntworttypInput = {
@@ -809,6 +907,7 @@ export type antwortenUpdateWithoutFragenInput = {
   antworttyp?: Prisma.antworttypUpdateOneRequiredWithoutAntwortenNestedInput
   medien?: Prisma.medienUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateWithoutFragenInput = {
@@ -819,6 +918,7 @@ export type antwortenUncheckedUpdateWithoutFragenInput = {
   zusatzinformation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medien?: Prisma.medienUncheckedUpdateManyWithoutAntwortenNestedInput
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutAntwortenNestedInput
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenUncheckedUpdateManyWithoutAntwortNestedInput
 }
 
 export type antwortenUncheckedUpdateManyWithoutFragenInput = {
@@ -837,11 +937,13 @@ export type antwortenUncheckedUpdateManyWithoutFragenInput = {
 export type AntwortenCountOutputType = {
   medien: number
   team_antworten: number
+  team_antwort_auswahlen: number
 }
 
 export type AntwortenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   medien?: boolean | AntwortenCountOutputTypeCountMedienArgs
   team_antworten?: boolean | AntwortenCountOutputTypeCountTeam_antwortenArgs
+  team_antwort_auswahlen?: boolean | AntwortenCountOutputTypeCountTeam_antwort_auswahlenArgs
 }
 
 /**
@@ -868,6 +970,13 @@ export type AntwortenCountOutputTypeCountTeam_antwortenArgs<ExtArgs extends runt
   where?: Prisma.team_antwortenWhereInput
 }
 
+/**
+ * AntwortenCountOutputType without action
+ */
+export type AntwortenCountOutputTypeCountTeam_antwort_auswahlenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.team_antwort_auswahlenWhereInput
+}
+
 
 export type antwortenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   antwort_id?: boolean
@@ -880,6 +989,7 @@ export type antwortenSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   medien?: boolean | Prisma.antworten$medienArgs<ExtArgs>
   team_antworten?: boolean | Prisma.antworten$team_antwortenArgs<ExtArgs>
+  team_antwort_auswahlen?: boolean | Prisma.antworten$team_antwort_auswahlenArgs<ExtArgs>
   _count?: boolean | Prisma.AntwortenCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["antworten"]>
 
@@ -920,6 +1030,7 @@ export type antwortenInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   medien?: boolean | Prisma.antworten$medienArgs<ExtArgs>
   team_antworten?: boolean | Prisma.antworten$team_antwortenArgs<ExtArgs>
+  team_antwort_auswahlen?: boolean | Prisma.antworten$team_antwort_auswahlenArgs<ExtArgs>
   _count?: boolean | Prisma.AntwortenCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type antwortenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -938,6 +1049,7 @@ export type $antwortenPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     fragen: Prisma.$fragenPayload<ExtArgs>
     medien: Prisma.$medienPayload<ExtArgs>[]
     team_antworten: Prisma.$team_antwortenPayload<ExtArgs>[]
+    team_antwort_auswahlen: Prisma.$team_antwort_auswahlenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     antwort_id: number
@@ -1344,6 +1456,7 @@ export interface Prisma__antwortenClient<T, Null = never, ExtArgs extends runtim
   fragen<T extends Prisma.fragenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragenDefaultArgs<ExtArgs>>): Prisma.Prisma__fragenClient<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   medien<T extends Prisma.antworten$medienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.antworten$medienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$medienPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   team_antworten<T extends Prisma.antworten$team_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.antworten$team_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  team_antwort_auswahlen<T extends Prisma.antworten$team_antwort_auswahlenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.antworten$team_antwort_auswahlenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwort_auswahlenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1825,6 +1938,30 @@ export type antworten$team_antwortenArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.Team_antwortenScalarFieldEnum | Prisma.Team_antwortenScalarFieldEnum[]
+}
+
+/**
+ * antworten.team_antwort_auswahlen
+ */
+export type antworten$team_antwort_auswahlenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the team_antwort_auswahlen
+   */
+  select?: Prisma.team_antwort_auswahlenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the team_antwort_auswahlen
+   */
+  omit?: Prisma.team_antwort_auswahlenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.team_antwort_auswahlenInclude<ExtArgs> | null
+  where?: Prisma.team_antwort_auswahlenWhereInput
+  orderBy?: Prisma.team_antwort_auswahlenOrderByWithRelationInput | Prisma.team_antwort_auswahlenOrderByWithRelationInput[]
+  cursor?: Prisma.team_antwort_auswahlenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Team_antwort_auswahlenScalarFieldEnum | Prisma.Team_antwort_auswahlenScalarFieldEnum[]
 }
 
 /**

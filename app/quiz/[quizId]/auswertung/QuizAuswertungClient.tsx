@@ -26,6 +26,11 @@ type AuswertungsAntwort = {
   bewerteteAntwort: string | null;
   istSkurril: boolean;
   bewertungFinal: boolean;
+  autoBasisPunkte: number;
+  autoEndpunkte: number;
+  vergebenePunkte: number;
+  bewertungsstatus: "UNANSWERED" | "WRONG" | "PARTIAL" | "CORRECT" | "REVIEW_REQUIRED";
+  bewertungsquelle: "AUTO" | "MANUAL" | "LEGACY";
 };
 
 type PunktestandEintrag = {
@@ -35,6 +40,7 @@ type PunktestandEintrag = {
 
 type BewertungsAktion =
   | "richtig"
+  | "teilweise"
   | "falsch"
   | "skurril"
   | "zuruecksetzen";
@@ -56,6 +62,7 @@ export default function QuizAuswertungClient({
   const [nurFalscheAntworten, setNurFalscheAntworten] = useState(true);
   const [zeigeUnbeantwortete, setZeigeUnbeantwortete] = useState(false);
   const [teamIndex, setTeamIndex] = useState<number | null>(null);
+  const [punkteOverrides, setPunkteOverrides] = useState<Record<number, string>>({});
 
   const teamnamen = useMemo(
     () =>
@@ -80,12 +87,14 @@ export default function QuizAuswertungClient({
 
   async function handleBewertung(
     teamAntwortId: number,
-    aktion: BewertungsAktion
+    aktion: BewertungsAktion,
+    punkte?: string,
   ) {
     await updateTeamAntwortBewertung({
       quizId,
       teamAntwortId,
       aktion,
+      punkte,
     });
   }
 
@@ -341,6 +350,12 @@ export default function QuizAuswertungClient({
                           </div>
                         ) : (
                           <div className="flex flex-wrap gap-2">
+                            <div className="w-full text-xs text-slate-600">
+                              Automatisch: <strong>{antwort.autoEndpunkte}</strong> Punkte
+                              {" · "}Vergeben: <strong>{antwort.vergebenePunkte}</strong>
+                              {" · "}{antwort.bewertungsstatus}
+                              {antwort.bewertungsquelle === "MANUAL" ? " (manuell)" : ""}
+                            </div>
                             <button
                               type="button"
                               onClick={() =>
@@ -357,6 +372,39 @@ export default function QuizAuswertungClient({
                             >
                               Skurril
                             </button>
+
+                            <label className="flex items-center gap-1">
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                value={
+                                  punkteOverrides[antwort.team_antwort_id!] ??
+                                  String(antwort.vergebenePunkte)
+                                }
+                                onChange={(event) =>
+                                  setPunkteOverrides((current) => ({
+                                    ...current,
+                                    [antwort.team_antwort_id!]: event.target.value,
+                                  }))
+                                }
+                                aria-label="Manuelle Punkte"
+                                className="w-16 rounded-lg border border-amber-300 px-2 py-1.5 text-xs"
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleBewertung(
+                                    antwort.team_antwort_id!,
+                                    "teilweise",
+                                    punkteOverrides[antwort.team_antwort_id!] ??
+                                      String(antwort.vergebenePunkte),
+                                  )
+                                }
+                                className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800"
+                              >
+                                Teilweise
+                              </button>
+                            </label>
 
                             <button
                               type="button"

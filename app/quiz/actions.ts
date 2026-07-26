@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/app/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, requireSession } from "@/app/lib/permissions";
 import {
@@ -28,6 +29,11 @@ import {
 import { getTeamSessionSigningSecret } from "./teamSessionSecret.server";
 import { assertTeamAnswerAuthorized } from "./teamAnswerPolicy";
 import { buildDefaultQuizSections, buildQuickQuizSections } from "./quizStructure";
+import {
+  isQuestionSection,
+  OUTRO_SECTION_TYPE,
+} from "./quizSectionPolicy";
+import { resolveQuizQuestionAnswerMode } from "./quizQuestionAnswerMode";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 import { requireQuestionAccess } from "@/app/fragen/editor/questionAccess.server";
 import {
@@ -36,6 +42,16 @@ import {
   validateQuizMasterData,
   type QuizTemporalStatus,
 } from "./quizMasterData";
+import {
+  recalculateQuizEvaluation,
+  recalculateQuizQuestionEvaluation,
+} from "./evaluation/evaluation.server";
+import {
+  isPartialPointsCapable,
+  validateQuestionPointsMode,
+} from "./evaluation/questionPointPolicy";
+import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 
 export type QuizResult = {
   quiz_id: number;
@@ -129,7 +145,14 @@ export type QuizDetailsResult = QuizResult & {
     quiz_abschnitt_id: number | null;
     schwierigkeitslevel: string | null;
     praesentationslayout: string | null;
+    punkte_basis: number;
     punkte_modus: string;
+    freie_antwort_erlaubt: boolean;
+    kann_freie_antwort_aktivieren: boolean;
+    effektiver_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
+    vorlagenname: string;
+    templateId: string | null;
+    teilpunkte_faehig: boolean;
     kategorien: string[];
   }[];
 };
@@ -522,6 +545,7 @@ export async function copyQuiz(data: {
           punkte_modus: quizFrage.punkte_modus,
           praesentationslayout: quizFrage.praesentationslayout,
           antwort_reihenfolge: quizFrage.antwort_reihenfolge,
+          freie_antwort_erlaubt: quizFrage.freie_antwort_erlaubt,
         },
         session,
         tx,
@@ -562,6 +586,18 @@ export async function getQuizDetails(
         include: {
           fragen: {
             include: {
+              antworten: {
+                select: {
+                  ist_richtig: true,
+                },
+              },
+              antwortfelder: { select: { antwortfeld_id: true } },
+              vorlage: {
+                select: {
+                  code: true,
+                  name: true,
+                },
+              },
               fragen_kategorien: {
                 include: {
                   fragenkategorie: true,
@@ -624,22 +660,51 @@ export async function getQuizDetails(
       medien_datei: abschnitt.medien_datei,
       bemerkung: abschnitt.bemerkung,
     })),
-    fragen: quiz.quiz_fragen.map((eintrag) => ({
-      quiz_fragen_id: eintrag.quiz_fragen_id,
-      sortierung: eintrag.sortierung,
-      quiz_abschnitt_id: eintrag.quiz_abschnitt_id,
-      fragen_id: eintrag.fragen.fragen_id,
-      frage: eintrag.fragen.frage,
+    fragen: quiz.quiz_fragen.map((eintrag) => {
+      const answerMode = resolveQuizQuestionAnswerMode({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        answers: eintrag.fragen.antworten.map((antwort) => ({
+          isCorrect: antwort.ist_richtig,
+        })),
+        allowFreeAnswer: eintrag.freie_antwort_erlaubt,
+      });
+      const config = eintrag.fragen.template_config_json as
+        | QuestionTemplateConfig
+        | null;
+      const partialPointsCapable = isPartialPointsCapable({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        correctAnswerCount: eintrag.fragen.antworten.filter(
+          (answer) => answer.ist_richtig,
+        ).length,
+        structuredFieldCount: eintrag.fragen.antwortfelder.length,
+        orderingItemCount:
+          config?.templateData?.kind === "ORDERING"
+            ? config.templateData.items.length
+            : 0,
+      });
 
-      punkte_modus: eintrag.punkte_modus ?? "standard",
-
-      schwierigkeitslevel:
-        eintrag.fragen.schwierigkeitslevel?.toString() ?? null,
-      praesentationslayout: eintrag.praesentationslayout ?? "standard",
-      kategorien: eintrag.fragen.fragen_kategorien.map(
-        (k) => k.fragenkategorie.kategorie,
-      ),
-    })),
+      return {
+        quiz_fragen_id: eintrag.quiz_fragen_id,
+        sortierung: eintrag.sortierung,
+        quiz_abschnitt_id: eintrag.quiz_abschnitt_id,
+        fragen_id: eintrag.fragen.fragen_id,
+        frage: eintrag.fragen.frage,
+        punkte_basis: Number(eintrag.punkte_basis),
+        punkte_modus: eintrag.punkte_modus ?? "standard",
+        freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
+        kann_freie_antwort_aktivieren: answerMode.canEnableFreeAnswer,
+        effektiver_antwortmodus: answerMode.effectiveMode,
+        vorlagenname: eintrag.fragen.vorlage?.name ?? "Standard",
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        teilpunkte_faehig: partialPointsCapable,
+        schwierigkeitslevel:
+          eintrag.fragen.schwierigkeitslevel?.toString() ?? null,
+        praesentationslayout: eintrag.praesentationslayout ?? "standard",
+        kategorien: eintrag.fragen.fragen_kategorien.map(
+          (k) => k.fragenkategorie.kategorie,
+        ),
+      };
+    }),
   };
 }
 
@@ -1021,6 +1086,9 @@ export type QuizPraesentationResult = {
     templateConfig: import("@/app/fragen/editor/types").QuestionTemplateConfig | null;
 
     punkte_modus: string;
+    freie_antwort_erlaubt: boolean;
+    urspruenglicher_antwortmodus: import("@/app/fragen/questionAnswerMode").DerivedQuestionAnswerMode;
+    effektiver_antwortmodus: import("@/app/fragen/questionAnswerMode").DerivedQuestionAnswerMode;
 
     quelle: string | null;
     kategorien: string[];
@@ -1188,7 +1256,16 @@ export async function getQuizPraesentation(
       medien_datei: abschnitt.medien_datei,
       bemerkung: abschnitt.bemerkung,
     })),
-    fragen: quiz.quiz_fragen.map((eintrag) => ({
+    fragen: quiz.quiz_fragen.map((eintrag) => {
+      const answerMode = resolveQuizQuestionAnswerMode({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        answers: eintrag.fragen.antworten.map((antwort) => ({
+          isCorrect: antwort.ist_richtig,
+        })),
+        allowFreeAnswer: eintrag.freie_antwort_erlaubt,
+      });
+
+      return {
       quiz_fragen_id: eintrag.quiz_fragen_id,
       quiz_abschnitt_id: eintrag.quiz_abschnitt_id,
       sortierung: eintrag.sortierung,
@@ -1201,6 +1278,9 @@ export async function getQuizPraesentation(
         | null,
 
       punkte_modus: eintrag.punkte_modus ?? "standard",
+      freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
+      urspruenglicher_antwortmodus: answerMode.originalMode,
+      effektiver_antwortmodus: answerMode.effectiveMode,
 
       praesentationslayout: eintrag.praesentationslayout ?? "standard",
       antwort_reihenfolge: eintrag.antwort_reihenfolge,
@@ -1256,7 +1336,8 @@ export async function getQuizPraesentation(
           ist_akzeptiert: loesung.ist_akzeptiert,
         })),
       })),
-    })),
+      };
+    }),
   };
 }
 export async function updatePraesentationslayout(data: {
@@ -1277,6 +1358,34 @@ export async function updatePraesentationslayout(data: {
   });
 
   revalidatePath(`/quiz/${data.quizId}`);
+}
+
+export async function updateQuizQuestionFreeAnswerMode(data: {
+  quizId: number;
+  quizFragenId: number;
+  freieAntwortErlaubt: boolean;
+}) {
+  if (typeof data.freieAntwortErlaubt !== "boolean") {
+    throw new Error("Ung\u00fcltiger Wert f\u00fcr den freien Antwortmodus.");
+  }
+
+  await requireQuizEditor(data.quizId);
+  await requireQuizQuestion(data.quizId, data.quizFragenId);
+
+  await prisma.quiz_fragen.update({
+    where: {
+      quiz_fragen_id: data.quizFragenId,
+    },
+    data: {
+      freie_antwort_erlaubt: data.freieAntwortErlaubt,
+    },
+  });
+
+  revalidatePath(`/quiz/${data.quizId}`);
+  revalidatePath(`/quiz/${data.quizId}/antworten`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
+  revalidatePath(`/quiz/${data.quizId}/moderation`);
+  revalidatePath(`/quiz/${data.quizId}/auswertung`);
 }
 
 export async function updateQuizAbschnitteSortierung(data: {
@@ -1488,13 +1597,13 @@ export async function getQuizAntwortStatus(
   const aktuellerBlock =
     abschnitte.find(
       (abschnitt) =>
-        ["fragenrunde", "fragenblock"].includes(abschnitt.abschnitt_typ) &&
+        isQuestionSection(abschnitt) &&
         abschnitt.ist_freigegeben &&
         !abschnitt.ist_geschlossen,
     ) ??
     abschnitte.find(
       (abschnitt) =>
-        ["fragenrunde", "fragenblock"].includes(abschnitt.abschnitt_typ) &&
+        isQuestionSection(abschnitt) &&
         abschnitt.ist_geschlossen,
     );
 
@@ -1530,6 +1639,7 @@ export async function getQuizAntwortStatus(
           quiz_id: quizId,
         },
         include: {
+          antwortauswahlen: true,
           antwortfelder: {
             include: {
               antwortfeld: true,
@@ -1575,6 +1685,13 @@ export async function getQuizAntwortStatus(
           const gespeicherteAntwort = gespeicherteAntworten.find(
             (antwort) => antwort.quiz_fragen_id === eintrag.quiz_fragen_id,
           );
+          const answerMode = resolveQuizQuestionAnswerMode({
+            templateId: eintrag.fragen.vorlage?.code ?? null,
+            answers: eintrag.fragen.antworten.map((antwort) => ({
+              isCorrect: antwort.ist_richtig,
+            })),
+            allowFreeAnswer: eintrag.freie_antwort_erlaubt,
+          });
 
           return {
             quiz_fragen_id: eintrag.quiz_fragen_id,
@@ -1586,6 +1703,9 @@ export async function getQuizAntwortStatus(
               | null,
             istFreigegeben: true,
             punkte_modus: eintrag.punkte_modus ?? "standard",
+            urspruenglicher_antwortmodus: answerMode.originalMode,
+            effektiver_antwortmodus: answerMode.effectiveMode,
+            freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
 
             bildMedien: (eintrag.fragen.medien ?? [])
               .filter((medium) =>
@@ -1607,6 +1727,14 @@ export async function getQuizAntwortStatus(
             gespeicherteAntwort: gespeicherteAntwort
               ? {
                   antwortId: gespeicherteAntwort.antwort_id,
+                  antwortIds:
+                    gespeicherteAntwort.antwortauswahlen.length > 0
+                      ? gespeicherteAntwort.antwortauswahlen.map(
+                          (selection) => selection.antwort_id,
+                        )
+                      : gespeicherteAntwort.antwort_id === null
+                        ? []
+                        : [gespeicherteAntwort.antwort_id],
                   antwortText: gespeicherteAntwort.antwort_text,
                   antwortfelder: (gespeicherteAntwort.antwortfelder ?? []).map(
                     (feld) => ({
@@ -1617,7 +1745,7 @@ export async function getQuizAntwortStatus(
                 }
               : null,
 
-            antworten: antworten
+            antworten: (answerMode.effectiveMode === "OPEN" ? [] : antworten)
               .filter((antwort) => antwort.antworttyp.antworttyp !== "Freitext")
               .map((antwort) => ({
                 antwort_id: antwort.antwort_id,
@@ -1897,6 +2025,7 @@ export async function saveTeamAntwort(data: {
   quizTeamSessionToken: string;
   antwortText: string | null;
   antwortId: number | null;
+  antwortIds?: number[];
   antwortfelder?: {
     antwortfeldId: number;
     antwortText: string | null;
@@ -1919,8 +2048,15 @@ export async function saveTeamAntwort(data: {
       include: {
         fragen: {
           select: {
-            antworten: { select: { antwort_id: true } },
+            antworten: {
+              select: {
+                antwort_id: true,
+                ist_richtig: true,
+              },
+            },
             antwortfelder: { select: { antwortfeld_id: true } },
+            vorlage: { select: { code: true } },
+            template_config_json: true,
           },
         },
         quiz: { select: { ist_archiviert: true } },
@@ -1944,6 +2080,26 @@ export async function saveTeamAntwort(data: {
 
   if (!teamSession || !quizFrage || quizFrage.quiz.ist_archiviert) {
     throw new Error("Teamantwort kann nicht gespeichert werden.");
+  }
+
+  const answerMode = resolveQuizQuestionAnswerMode({
+    templateId: quizFrage.fragen.vorlage?.code ?? null,
+    answers: quizFrage.fragen.antworten.map((antwort) => ({
+      isCorrect: antwort.ist_richtig,
+    })),
+    allowFreeAnswer: quizFrage.freie_antwort_erlaubt,
+  });
+
+  const requestedAnswerIds = data.antwortIds ?? (
+    data.antwortId === null ? [] : [data.antwortId]
+  );
+  if (
+    answerMode.effectiveMode === "OPEN" &&
+    (data.antwortId !== null || requestedAnswerIds.length > 0)
+  ) {
+    throw new Error(
+      "F\u00fcr diese Quizfrage ist nur eine freie Textantwort zul\u00e4ssig.",
+    );
   }
 
   const currentIndex = blockFragen.findIndex(
@@ -1973,52 +2129,109 @@ export async function saveTeamAntwort(data: {
     ),
   });
 
-  const teamAntwort = await prisma.team_antworten.upsert({
-    where: {
-      quiz_fragen_id_quiz_team_session_id: {
+  const allowedAnswerIds = new Set(
+    quizFrage.fragen.antworten.map((entry) => entry.antwort_id),
+  );
+  if (
+    new Set(requestedAnswerIds).size !== requestedAnswerIds.length ||
+    requestedAnswerIds.some((id) => !allowedAnswerIds.has(id))
+  ) {
+    throw new Error("Die übermittelten Antwortoptionen sind ungültig.");
+  }
+
+  const templateId = resolveCanonicalQuestionTemplateId(
+    quizFrage.fragen.vorlage?.code ?? null,
+  );
+  const templateConfig = quizFrage.fragen.template_config_json as
+    | QuestionTemplateConfig
+    | null;
+  if (templateId === questionTemplateIds.ordering && data.antwortText !== null) {
+    const expected =
+      templateConfig?.templateData?.kind === "ORDERING"
+        ? templateConfig.templateData.items.map((item) => item.id)
+        : [];
+    let submitted: unknown;
+    try {
+      submitted = JSON.parse(data.antwortText);
+    } catch {
+      throw new Error("Die Reihenfolge ist kein gültiges JSON.");
+    }
+    if (
+      !Array.isArray(submitted) ||
+      !submitted.every((entry) => typeof entry === "string") ||
+      submitted.length !== expected.length ||
+      new Set(submitted).size !== submitted.length ||
+      submitted.some((entry) => !expected.includes(entry))
+    ) {
+      throw new Error("Die übermittelte Reihenfolge ist ungültig.");
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const teamAntwort = await tx.team_antworten.upsert({
+      where: {
+        quiz_fragen_id_quiz_team_session_id: {
+          quiz_fragen_id: data.quizFragenId,
+          quiz_team_session_id: tokenPayload.sessionId,
+        },
+      },
+      update: {
+        quiz_id: data.quizId,
+        quiz_abschnitt_id: data.quizAbschnittId,
+        antwort_text: data.antwortText,
+        antwort_id: requestedAnswerIds[0] ?? null,
+        aktualisiert_am: new Date(),
+        manuelle_punkte: null,
+        bewertet_am: null,
+        bewertet_von_user_id: null,
+        bewertungsquelle: "AUTO",
+        ist_manuell_falsch: false,
+        ist_manuell_richtig: false,
+        bewertung_final: false,
+      },
+      create: {
+        quiz_id: data.quizId,
+        quiz_abschnitt_id: data.quizAbschnittId,
         quiz_fragen_id: data.quizFragenId,
         quiz_team_session_id: tokenPayload.sessionId,
-      },
-    },
-    update: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.quizAbschnittId,
-      antwort_text: data.antwortText,
-      antwort_id: data.antwortId,
-      aktualisiert_am: new Date(),
-    },
-    create: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.quizAbschnittId,
-      quiz_fragen_id: data.quizFragenId,
-      quiz_team_session_id: tokenPayload.sessionId,
-      antwort_text: data.antwortText,
-      antwort_id: data.antwortId,
-      aktualisiert_am: new Date(),
-    },
-  });
-
-  if (data.antwortfelder) {
-    await prisma.team_antwortfelder.deleteMany({
-      where: {
-        team_antwort_id: teamAntwort.team_antwort_id,
+        antwort_text: data.antwortText,
+        antwort_id: requestedAnswerIds[0] ?? null,
+        aktualisiert_am: new Date(),
+        bewertungsquelle: "AUTO",
       },
     });
 
-    const gefuellteFelder = data.antwortfelder.filter((feld) =>
-      feld.antwortText?.trim(),
-    );
-
-    if (gefuellteFelder.length > 0) {
-      await prisma.team_antwortfelder.createMany({
-        data: gefuellteFelder.map((feld) => ({
+    await tx.team_antwort_auswahlen.deleteMany({
+      where: { team_antwort_id: teamAntwort.team_antwort_id },
+    });
+    if (requestedAnswerIds.length > 0) {
+      await tx.team_antwort_auswahlen.createMany({
+        data: requestedAnswerIds.map((antwortId) => ({
           team_antwort_id: teamAntwort.team_antwort_id,
-          antwortfeld_id: feld.antwortfeldId,
-          antwort_text: feld.antwortText?.trim() ?? null,
+          antwort_id: antwortId,
         })),
       });
     }
-  }
+
+    if (data.antwortfelder) {
+      await tx.team_antwortfelder.deleteMany({
+        where: { team_antwort_id: teamAntwort.team_antwort_id },
+      });
+      const gefuellteFelder = data.antwortfelder.filter((feld) =>
+        feld.antwortText?.trim(),
+      );
+      if (gefuellteFelder.length > 0) {
+        await tx.team_antwortfelder.createMany({
+          data: gefuellteFelder.map((feld) => ({
+            team_antwort_id: teamAntwort.team_antwort_id,
+            antwortfeld_id: feld.antwortfeldId,
+            antwort_text: feld.antwortText?.trim() ?? null,
+          })),
+        });
+      }
+    }
+    await recalculateQuizQuestionEvaluation(data.quizFragenId, tx);
+  });
 
   return {
     success: true,
@@ -2029,6 +2242,7 @@ export async function getQuizFrageAuswertung(
   quizFragenId: number,
 ) {
   await requireQuizViewer(quizId);
+  await recalculateQuizQuestionEvaluation(quizFragenId);
   const quizFrage = await prisma.quiz_fragen.findFirst({
     where: {
       quiz_fragen_id: quizFragenId,
@@ -2045,12 +2259,14 @@ export async function getQuizFrageAuswertung(
               antwort_id: "asc",
             },
           },
+          vorlage: { select: { code: true } },
         },
       },
       team_antworten: {
         include: {
           quiz_team_sessions: true,
           antworten: true,
+          antwortauswahlen: { include: { antwort: true } },
         },
         orderBy: {
           quiz_team_sessions: {
@@ -2068,8 +2284,17 @@ export async function getQuizFrageAuswertung(
   const auswertbareAntwortoptionen = quizFrage.fragen.antworten.filter(
     (antwort) => antwort.antworttyp?.antworttyp !== "Freitext",
   );
-
-  const istOffeneFrage = auswertbareAntwortoptionen.length === 0;
+  const answerMode = resolveQuizQuestionAnswerMode({
+    templateId: quizFrage.fragen.vorlage?.code ?? null,
+    answers: quizFrage.fragen.antworten.map((antwort) => ({
+      isCorrect: antwort.ist_richtig,
+    })),
+    allowFreeAnswer: quizFrage.freie_antwort_erlaubt,
+  });
+  const istOffeneFrage =
+    answerMode.effectiveMode === "OPEN" ||
+    (answerMode.effectiveMode === "UNCLASSIFIED" &&
+      auswertbareAntwortoptionen.length === 0);
 
   return {
     quiz_fragen_id: quizFrage.quiz_fragen_id,
@@ -2085,29 +2310,28 @@ export async function getQuizFrageAuswertung(
       })),
 
     teamAntworten: quizFrage.team_antworten.map((antwort) => {
-      const richtigeAntwortIds = quizFrage.fragen.antworten
-        .filter((antwortOption) => antwortOption.ist_richtig)
-        .map((antwortOption) => antwortOption.antwort_id);
-
-      const istAutomatischRichtig =
-        antwort.antwort_id !== null &&
-        richtigeAntwortIds.includes(antwort.antwort_id);
-
-      const istPruefpflichtig = istOffeneFrage || !istAutomatischRichtig;
-
       return {
         team_antwort_id: antwort.team_antwort_id,
         teamname: antwort.quiz_team_sessions.teamname,
         antwortText: antwort.antwort_text,
         antwortId: antwort.antwort_id,
         ausgewaehlteAntwort: antwort.antworten?.antwort ?? null,
-        istAutomatischRichtig,
-        istPruefpflichtig,
+        istAutomatischRichtig:
+          antwort.bewertungsquelle !== "MANUAL" &&
+          antwort.bewertungsstatus === "CORRECT",
+        istPruefpflichtig:
+          antwort.bewertungsstatus === "REVIEW_REQUIRED" &&
+          antwort.bewertungsquelle !== "MANUAL",
         istManuellRichtig: antwort.ist_manuell_richtig,
         istManuellFalsch: antwort.ist_manuell_falsch,
         bewerteteAntwort: antwort.bewertete_antwort,
         istSkurril: antwort.ist_skurril,
         bewertungFinal: antwort.bewertung_final,
+        autoBasisPunkte: Number(antwort.auto_basis_punkte),
+        autoEndpunkte: Number(antwort.auto_endpunkte),
+        vergebenePunkte: Number(antwort.vergebene_punkte),
+        bewertungsstatus: antwort.bewertungsstatus,
+        bewertungsquelle: antwort.bewertungsquelle,
       };
     }),
   };
@@ -2115,42 +2339,17 @@ export async function getQuizFrageAuswertung(
 export async function updateTeamAntwortBewertung(data: {
   quizId: number;
   teamAntwortId: number;
-  aktion: "richtig" | "falsch" | "skurril" | "zuruecksetzen";
+  aktion: "richtig" | "teilweise" | "falsch" | "skurril" | "zuruecksetzen";
+  punkte?: string;
 }) {
-  await requireQuizAdmin(data.quizId);
-  await requireQuizTeamAnswer(data.quizId, data.teamAntwortId);
-
-  if (data.aktion === "richtig") {
-    await prisma.team_antworten.update({
-      where: { team_antwort_id: data.teamAntwortId },
-      data: {
-        ist_manuell_richtig: true,
-        ist_manuell_falsch: false,
-        bewertung_final: true,
-      },
-    });
-  }
-
-  if (data.aktion === "falsch") {
-    await prisma.team_antworten.update({
-      where: { team_antwort_id: data.teamAntwortId },
-      data: {
-        ist_manuell_richtig: false,
-        ist_manuell_falsch: true,
-        bewertung_final: true,
-      },
-    });
-  }
+  const access = await requireQuizAdmin(data.quizId);
+  const existing = await requireQuizTeamAnswer(data.quizId, data.teamAntwortId);
 
   if (data.aktion === "skurril") {
-    const antwort = await prisma.team_antworten.findUnique({
-      where: { team_antwort_id: data.teamAntwortId },
-    });
-
     await prisma.team_antworten.update({
       where: { team_antwort_id: data.teamAntwortId },
       data: {
-        ist_skurril: !(antwort?.ist_skurril ?? false),
+        ist_skurril: !existing.ist_skurril,
       },
     });
   }
@@ -2164,9 +2363,65 @@ export async function updateTeamAntwortBewertung(data: {
         ist_skurril: false,
         bewertete_antwort: null,
         bewertung_final: false,
+        manuelle_punkte: null,
+        vergebene_punkte: existing.auto_endpunkte,
+        bewertungsstatus: "UNANSWERED",
+        bewertungsquelle: "AUTO",
+        bewertet_am: null,
+        bewertet_von_user_id: null,
       },
     });
   }
+
+  if (["richtig", "teilweise", "falsch"].includes(data.aktion)) {
+    const question = await prisma.quiz_fragen.findUniqueOrThrow({
+      where: { quiz_fragen_id: existing.quiz_fragen_id },
+      select: { punkte_basis: true, punkte_modus: true },
+    });
+    const maximum = question.punkte_modus === "expertenbonus"
+      ? question.punkte_basis.mul(2)
+      : question.punkte_basis;
+    let points: Prisma.Decimal;
+    try {
+      points =
+        data.punkte !== undefined
+          ? new Prisma.Decimal(data.punkte.replace(",", "."))
+          : data.aktion === "richtig"
+            ? maximum
+            : new Prisma.Decimal(0);
+    } catch {
+      throw new Error("Die Punktzahl ist ungültig.");
+    }
+    if (
+      points.lt(0) ||
+      points.gt(maximum) ||
+      (data.aktion === "falsch" && !points.eq(0)) ||
+      (data.aktion === "richtig" && !points.eq(maximum)) ||
+      (data.aktion === "teilweise" && (points.lte(0) || points.gte(maximum)))
+    ) {
+      throw new Error("Die Punktzahl passt nicht zum gewählten Bewertungsstatus.");
+    }
+    await prisma.team_antworten.update({
+      where: { team_antwort_id: data.teamAntwortId },
+      data: {
+        ist_manuell_richtig: data.aktion === "richtig",
+        ist_manuell_falsch: data.aktion === "falsch",
+        bewertung_final: true,
+        manuelle_punkte: points,
+        vergebene_punkte: points,
+        bewertungsstatus:
+          data.aktion === "richtig"
+            ? "CORRECT"
+            : data.aktion === "teilweise"
+              ? "PARTIAL"
+              : "WRONG",
+        bewertungsquelle: "MANUAL",
+        bewertet_am: new Date(),
+        bewertet_von_user_id: Number(access.session.user.id),
+      },
+    });
+  }
+  await recalculateQuizQuestionEvaluation(existing.quiz_fragen_id);
   await updateQuizFragenStatistiken();
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
 }
@@ -2176,35 +2431,15 @@ export async function updateQuizFragenStatistiken() {
 
   const quizFragen = await prisma.quiz_fragen.findMany({
     include: {
-      fragen: {
-        include: {
-          antworten: true,
-        },
-      },
-      team_antworten: {
-        include: {
-          antworten: true,
-        },
-      },
+      team_antworten: true,
     },
   });
 
   for (const quizFrage of quizFragen) {
-    const richtigeAntwortIds = quizFrage.fragen.antworten
-      .filter((antwort) => antwort.ist_richtig)
-      .map((antwort) => antwort.antwort_id);
-
     const beantworteteAntworten = quizFrage.team_antworten;
-
-    const richtigeantworten = beantworteteAntworten.filter((antwort) => {
-      if (antwort.ist_manuell_falsch) return false;
-      if (antwort.ist_manuell_richtig) return true;
-
-      return (
-        antwort.antwort_id !== null &&
-        richtigeAntwortIds.includes(antwort.antwort_id)
-      );
-    }).length;
+    const richtigeantworten = beantworteteAntworten.filter(
+      (antwort) => antwort.bewertungsstatus === "CORRECT",
+    ).length;
 
     const falscheantworten = beantworteteAntworten.length - richtigeantworten;
 
@@ -2278,6 +2513,7 @@ export async function updateQuizFragenStatistiken() {
 }
 export async function getQuizAuswertungUebersicht(quizId: number) {
   await requireQuizViewer(quizId);
+  await recalculateQuizEvaluation(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -2289,6 +2525,7 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
       fragen: {
         include: {
           antworten: true,
+          vorlage: { select: { code: true } },
         },
       },
       team_antworten: true,
@@ -2296,27 +2533,22 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
   });
 
   return quizFragen.map((quizFrage) => {
-    const richtigeAntwortIds = quizFrage.fragen.antworten
-      .filter((antwort) => antwort.ist_richtig)
-      .map((antwort) => antwort.antwort_id);
+    const answerMode = resolveQuizQuestionAnswerMode({
+      templateId: quizFrage.fragen.vorlage?.code ?? null,
+      answers: quizFrage.fragen.antworten.map((antwort) => ({
+        isCorrect: antwort.ist_richtig,
+      })),
+      allowFreeAnswer: quizFrage.freie_antwort_erlaubt,
+    });
+    const istOffeneFrage =
+      answerMode.effectiveMode === "OPEN" ||
+      (answerMode.effectiveMode === "UNCLASSIFIED" &&
+        quizFrage.fragen.antworten.length <= 1);
 
-    const istOffeneFrage = quizFrage.fragen.antworten.length <= 1;
-
-    const pruefpflichtigeAntworten = quizFrage.team_antworten.filter(
-      (antwort) => {
-        const istAutomatischRichtig =
-          antwort.antwort_id !== null &&
-          richtigeAntwortIds.includes(antwort.antwort_id);
-
-        return istOffeneFrage || !istAutomatischRichtig;
-      },
-    );
-
-    const offenePruefungen = pruefpflichtigeAntworten.filter(
+    const offenePruefungen = quizFrage.team_antworten.filter(
       (antwort) =>
-        !antwort.ist_manuell_richtig &&
-        !antwort.ist_manuell_falsch &&
-        !antwort.bewertung_final,
+        antwort.bewertungsstatus === "REVIEW_REQUIRED" &&
+        antwort.bewertungsquelle !== "MANUAL",
     ).length;
 
     const skurrileAntworten = quizFrage.team_antworten.filter(
@@ -2333,6 +2565,7 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
 }
 export async function getQuizAuswertungAlleAntworten(quizId: number) {
   await requireQuizViewer(quizId);
+  await recalculateQuizEvaluation(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -2363,12 +2596,14 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
               antwort_id: "asc",
             },
           },
+          vorlage: { select: { code: true } },
         },
       },
       team_antworten: {
         include: {
           quiz_team_sessions: true,
           antworten: true,
+          antwortauswahlen: { include: { antwort: true } },
         },
       },
     },
@@ -2421,10 +2656,6 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
   );
 
   return quizFragen.flatMap((quizFrage, frageIndex) => {
-    const richtigeAntwortIds = quizFrage.fragen.antworten
-      .filter((antwort) => antwort.ist_richtig)
-      .map((antwort) => antwort.antwort_id);
-
     const richtigeAntworten = quizFrage.fragen.antworten
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => antwort.antwort)
@@ -2450,9 +2681,18 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
       (antwort) => antwort.antworttyp?.antworttyp !== "Freitext",
     );
 
+    const answerMode = resolveQuizQuestionAnswerMode({
+      templateId: quizFrage.fragen.vorlage?.code ?? null,
+      answers: quizFrage.fragen.antworten.map((antwort) => ({
+        isCorrect: antwort.ist_richtig,
+      })),
+      allowFreeAnswer: quizFrage.freie_antwort_erlaubt,
+    });
     const istOffeneFrage =
-      auswertbareAntwortoptionen.length === 0 ||
-      quizFrage.fragen.antwortfelder.length > 0;
+      answerMode.effectiveMode === "OPEN" ||
+      (answerMode.effectiveMode === "UNCLASSIFIED" &&
+        (auswertbareAntwortoptionen.length === 0 ||
+          quizFrage.fragen.antwortfelder.length > 0));
 
     return sessions.map((session) => {
       const antwort = quizFrage.team_antworten.find(
@@ -2478,15 +2718,16 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
             .join(" | ")
         : null;
 
-      const istUnbeantwortet = !antwort && !offeneAntwortfelderText;
+      const istUnbeantwortet =
+        !antwort || antwort.bewertungsstatus === "UNANSWERED";
 
       const istAutomatischRichtig =
-        !!antwort &&
-        antwort.antwort_id !== null &&
-        richtigeAntwortIds.includes(antwort.antwort_id);
-
+        antwort?.bewertungsquelle !== "MANUAL" &&
+        antwort?.bewertungsstatus === "CORRECT";
       const istPruefpflichtig =
-        istUnbeantwortet || istOffeneFrage || !istAutomatischRichtig;
+        istUnbeantwortet ||
+        (antwort?.bewertungsstatus === "REVIEW_REQUIRED" &&
+          antwort.bewertungsquelle !== "MANUAL");
 
       return {
         quiz_fragen_id: quizFrage.quiz_fragen_id,
@@ -2499,7 +2740,12 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
         teamname: session.teamname,
         antwortText: offeneAntwortfelderText || antwort?.antwort_text || null,
         antwortId: antwort?.antwort_id ?? null,
-        ausgewaehlteAntwort: antwort?.antworten?.antwort ?? null,
+        ausgewaehlteAntwort:
+          antwort?.antwortauswahlen
+            .map((selection) => selection.antwort.antwort)
+            .join(", ") ||
+          antwort?.antworten?.antwort ||
+          null,
         punkte_modus: quizFrage.punkte_modus ?? "standard",
 
         istOffeneFrage,
@@ -2511,6 +2757,11 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
         bewerteteAntwort: antwort?.bewertete_antwort ?? null,
         istSkurril: antwort?.ist_skurril ?? false,
         bewertungFinal: antwort?.bewertung_final ?? false,
+        autoBasisPunkte: Number(antwort?.auto_basis_punkte ?? 0),
+        autoEndpunkte: Number(antwort?.auto_endpunkte ?? 0),
+        vergebenePunkte: Number(antwort?.vergebene_punkte ?? 0),
+        bewertungsstatus: antwort?.bewertungsstatus ?? "UNANSWERED",
+        bewertungsquelle: antwort?.bewertungsquelle ?? "AUTO",
       };
     });
   });
@@ -2522,6 +2773,32 @@ export async function updateQuizFragePunkteModus(data: {
 }) {
   await requireQuizAdmin(data.quizId);
   await requireQuizQuestion(data.quizId, data.quizFragenId);
+  if (!["standard", "expertenbonus", "risikofrage"].includes(data.punkteModus)) {
+    throw new Error("Unbekannter Punktemodus.");
+  }
+  const question = await prisma.quiz_fragen.findUniqueOrThrow({
+    where: { quiz_fragen_id: data.quizFragenId },
+    include: {
+      fragen: {
+        include: {
+          vorlage: { select: { code: true } },
+          antworten: { select: { ist_richtig: true } },
+          antwortfelder: { select: { antwortfeld_id: true } },
+        },
+      },
+    },
+  });
+  const config = question.fragen.template_config_json as QuestionTemplateConfig | null;
+  validateQuestionPointsMode({
+    templateId: question.fragen.vorlage?.code ?? null,
+    pointsMode: data.punkteModus,
+    correctAnswerCount: question.fragen.antworten.filter((answer) => answer.ist_richtig).length,
+    structuredFieldCount: question.fragen.antwortfelder.length,
+    orderingItemCount:
+      config?.templateData?.kind === "ORDERING"
+        ? config.templateData.items.length
+        : 0,
+  });
 
   await prisma.quiz_fragen.update({
     where: {
@@ -2531,6 +2808,7 @@ export async function updateQuizFragePunkteModus(data: {
       punkte_modus: data.punkteModus,
     },
   });
+  await recalculateQuizQuestionEvaluation(data.quizFragenId);
 
   revalidatePath(`/quiz/${data.quizId}`);
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
@@ -2540,88 +2818,58 @@ export async function updateQuizFragePunkteModus(data: {
   };
 }
 export async function getQuizPunktestand(quizId: number) {
-  const antworten = await getQuizAuswertungAlleAntworten(quizId);
-
-  const teams = Array.from(
-    new Set(antworten.map((antwort) => antwort.teamname)),
+  await requireQuizViewer(quizId);
+  await recalculateQuizEvaluation(quizId);
+  const [sessions, totals, answers] = await Promise.all([
+    prisma.quiz_team_sessions.findMany({
+      where: { quiz_id: quizId },
+      select: { quiz_team_session_id: true, teamname: true },
+    }),
+    prisma.team_antworten.groupBy({
+      by: ["quiz_team_session_id"],
+      where: { quiz_id: quizId },
+      _sum: { vergebene_punkte: true },
+    }),
+    prisma.team_antworten.findMany({
+      where: { quiz_id: quizId, vergebene_punkte: { not: 0 } },
+      select: {
+        quiz_team_session_id: true,
+        quiz_fragen_id: true,
+        vergebene_punkte: true,
+        quiz_fragen: { select: { sortierung: true, punkte_modus: true } },
+      },
+    }),
+  ]);
+  const totalsBySession = new Map(
+    totals.map((entry) => [
+      entry.quiz_team_session_id,
+      entry._sum.vergebene_punkte ?? new Prisma.Decimal(0),
+    ]),
   );
-
-  const fragen = Array.from(
-    new Map(
-      antworten.map((antwort) => [
-        antwort.quiz_fragen_id,
-        {
-          quiz_fragen_id: antwort.quiz_fragen_id,
-          frageIndex: antwort.frageIndex,
-          punkteModus: antwort.punkte_modus ?? "standard",
-        },
-      ]),
-    ).values(),
-  );
-
-  const punkteJeTeam = teams.map((teamname) => ({
-    teamname,
-    punkte: 0,
-    details: [] as {
-      quizFragenId: number;
-      frageIndex: number;
-      punkte: number;
-      punkteModus: string;
-    }[],
-  }));
-
-  for (const frage of fragen) {
-    const antwortenZurFrage = antworten.filter(
-      (antwort) => antwort.quiz_fragen_id === frage.quiz_fragen_id,
-    );
-
-    const richtigeAntworten = antwortenZurFrage.filter((antwort) => {
-      if (antwort.istUnbeantwortet) return false;
-      if (antwort.istManuellFalsch) return false;
-      if (antwort.istManuellRichtig) return true;
-      return antwort.istAutomatischRichtig;
-    });
-
-    const anzahlTeams = teams.length;
-    const anzahlRichtig = richtigeAntworten.length;
-
-    for (const antwort of antwortenZurFrage) {
-      const istRichtig = richtigeAntworten.some(
-        (richtigeAntwort) =>
-          richtigeAntwort.teamname === antwort.teamname &&
-          richtigeAntwort.quiz_fragen_id === antwort.quiz_fragen_id,
-      );
-
-      if (!istRichtig) continue;
-
-      let punkte = 1;
-
-      if (frage.punkteModus === "expertenbonus") {
-        punkte = anzahlRichtig === 1 ? 2 : 1;
-      }
-
-      if (frage.punkteModus === "risikofrage") {
-        punkte =
-          anzahlRichtig > 0 ? Math.max(1, anzahlTeams / anzahlRichtig) : 0;
-      }
-
-      const team = punkteJeTeam.find(
-        (eintrag) => eintrag.teamname === antwort.teamname,
-      );
-
-      if (team) {
-        team.punkte += punkte;
-        team.details.push({
-          quizFragenId: frage.quiz_fragen_id,
-          frageIndex: frage.frageIndex,
-          punkte,
-          punkteModus: frage.punkteModus,
-        });
-      }
-    }
-  }
-
-  return punkteJeTeam.sort((a, b) => b.punkte - a.punkte);
+  return sessions
+    .map((session) => {
+      const total =
+        totalsBySession.get(session.quiz_team_session_id) ?? new Prisma.Decimal(0);
+      return {
+        teamname: session.teamname,
+        punkte: Number(total),
+        details: answers
+          .filter((answer) => answer.quiz_team_session_id === session.quiz_team_session_id)
+          .map((answer) => ({
+            quizFragenId: answer.quiz_fragen_id,
+            frageIndex: answer.quiz_fragen.sortierung ?? 0,
+            punkte: Number(answer.vergebene_punkte),
+            punkteModus: answer.quiz_fragen.punkte_modus,
+          })),
+        _decimal: total,
+      };
+    })
+    .sort((left, right) => right._decimal.cmp(left._decimal))
+    .map((entry) => ({
+      teamname: entry.teamname,
+      punkte: entry.punkte,
+      details: entry.details,
+    }));
 }
 
 export async function getZufaelligeSchaetzfrage(quizId: number) {
@@ -2900,7 +3148,7 @@ export async function createQuizAbschnitt(data: {
     where: {
       quiz_id: data.quizId,
       abschnitt_typ: {
-        startsWith: "outro",
+        startsWith: OUTRO_SECTION_TYPE,
       },
     },
     orderBy: {
@@ -3140,11 +3388,7 @@ export async function updateAlleSchwierigkeitslevel() {
     include: {
       quiz_fragen: {
         include: {
-          team_antworten: {
-            include: {
-              antworten: true,
-            },
-          },
+          team_antworten: true,
         },
       },
     },
@@ -3152,7 +3396,13 @@ export async function updateAlleSchwierigkeitslevel() {
 
   for (const frage of fragen) {
     const alleFinalenAntworten = frage.quiz_fragen.flatMap((quizFrage) =>
-      quizFrage.team_antworten.filter((antwort) => antwort.bewertung_final),
+      quizFrage.team_antworten
+        .filter(
+          (antwort) =>
+            antwort.bewertungsstatus !== "UNANSWERED" &&
+            antwort.bewertungsstatus !== "REVIEW_REQUIRED",
+        )
+        .map((antwort) => ({ antwort, quizFrage })),
     );
 
     const teamsGesamt = alleFinalenAntworten.length;
@@ -3161,16 +3411,23 @@ export async function updateAlleSchwierigkeitslevel() {
       continue;
     }
 
-    const teamsRichtig = alleFinalenAntworten.filter((antwort) => {
-      if (antwort.ist_manuell_falsch) return false;
-      if (antwort.ist_manuell_richtig) return true;
-      if (antwort.antworten?.ist_richtig) return true;
-
-      return false;
-    }).length;
+    const erfuellungsgrad = alleFinalenAntworten.reduce(
+      (sum, { antwort, quizFrage }) => {
+        const maximum =
+          quizFrage.punkte_modus === "expertenbonus"
+            ? quizFrage.punkte_basis.mul(2)
+            : quizFrage.punkte_basis;
+        return maximum.eq(0)
+          ? sum
+          : sum.add(
+              Prisma.Decimal.min(1, antwort.vergebene_punkte.div(maximum)),
+            );
+      },
+      new Prisma.Decimal(0),
+    );
 
     const schwierigkeitslevel = Math.round(
-      100 - (teamsRichtig / teamsGesamt) * 100,
+      100 - Number(erfuellungsgrad.div(teamsGesamt).mul(100)),
     );
 
     await prisma.fragen.update({

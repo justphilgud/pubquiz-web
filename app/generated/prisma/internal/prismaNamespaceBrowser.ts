@@ -76,6 +76,7 @@ export const ModelName = {
   frage_vorlagen: 'frage_vorlagen',
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
+  team_antwort_auswahlen: 'team_antwort_auswahlen',
   users: 'users',
   benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
@@ -305,6 +306,7 @@ export const Quiz_fragenScalarFieldEnum = {
   quiz_abschnitt_id: 'quiz_abschnitt_id',
   punkte_basis: 'punkte_basis',
   punkte_modus: 'punkte_modus',
+  freie_antwort_erlaubt: 'freie_antwort_erlaubt',
   praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
 } as const
@@ -385,7 +387,16 @@ export const Team_antwortenScalarFieldEnum = {
   bewertung_final: 'bewertung_final',
   ist_manuell_falsch: 'ist_manuell_falsch',
   ist_manuell_richtig: 'ist_manuell_richtig',
-  ist_skurril: 'ist_skurril'
+  ist_skurril: 'ist_skurril',
+  auto_basis_punkte: 'auto_basis_punkte',
+  auto_endpunkte: 'auto_endpunkte',
+  vergebene_punkte: 'vergebene_punkte',
+  bewertungsstatus: 'bewertungsstatus',
+  bewertungsquelle: 'bewertungsquelle',
+  bewertungsdetails: 'bewertungsdetails',
+  manuelle_punkte: 'manuelle_punkte',
+  bewertet_am: 'bewertet_am',
+  bewertet_von_user_id: 'bewertet_von_user_id'
 } as const
 
 export type Team_antwortenScalarFieldEnum = (typeof Team_antwortenScalarFieldEnum)[keyof typeof Team_antwortenScalarFieldEnum]
@@ -466,6 +477,14 @@ export const Quiz_praesentation_statusScalarFieldEnum = {
 } as const
 
 export type Quiz_praesentation_statusScalarFieldEnum = (typeof Quiz_praesentation_statusScalarFieldEnum)[keyof typeof Quiz_praesentation_statusScalarFieldEnum]
+
+
+export const Team_antwort_auswahlenScalarFieldEnum = {
+  team_antwort_id: 'team_antwort_id',
+  antwort_id: 'antwort_id'
+} as const
+
+export type Team_antwort_auswahlenScalarFieldEnum = (typeof Team_antwort_auswahlenScalarFieldEnum)[keyof typeof Team_antwort_auswahlenScalarFieldEnum]
 
 
 export const UsersScalarFieldEnum = {

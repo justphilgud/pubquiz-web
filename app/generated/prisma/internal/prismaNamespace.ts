@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.8.0
- * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
+ * Prisma Client JS version: 7.9.0
+ * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.8.0",
-  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
+  client: "7.9.0",
+  engine: "e922089b7d7502aff4249d5da3420f6fa55fc6ad"
 }
 
 /**
@@ -156,6 +156,19 @@ export type Subset<T, U> = {
 };
 
 /**
+ * Resolved type of the argument passed to the `PrismaClient` constructor.
+ *
+ * When called without a narrower options type (the common case), this resolves
+ * to `PrismaClientOptions` directly, which produces a clear TypeScript error
+ * message (`not assignable to parameter of type 'PrismaClientOptions'`) when
+ * the argument is missing or incomplete. When the user supplies a narrower
+ * options type (e.g. via a literal), it falls back to `Subset` to keep
+ * filtering out unknown properties.
+ */
+export type PrismaClientConstructorArgs<Options extends PrismaClientOptions> =
+  [PrismaClientOptions] extends [Options] ? PrismaClientOptions : Subset<Options, PrismaClientOptions>;
+
+/**
  * SelectSubset
  * @desc From `T` pick properties that exist in `U`. Simple version of Intersection.
  * Additionally, it validates, if both select and include are present. If the case, it errors.
@@ -187,7 +200,7 @@ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 export type XOR<T, U> =
   T extends object ?
   U extends object ?
-    (Without<T, U> & U) | (Without<U, T> & T)
+    ((Without<T, U> & U) | (Without<U, T> & T)) & object
   : U : T
 
 
@@ -409,6 +422,7 @@ export const ModelName = {
   frage_vorlagen: 'frage_vorlagen',
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
+  team_antwort_auswahlen: 'team_antwort_auswahlen',
   users: 'users',
   benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
@@ -428,7 +442,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2282,6 +2296,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    team_antwort_auswahlen: {
+      payload: Prisma.$team_antwort_auswahlenPayload<ExtArgs>
+      fields: Prisma.team_antwort_auswahlenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.team_antwort_auswahlenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.team_antwort_auswahlenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>
+        }
+        findFirst: {
+          args: Prisma.team_antwort_auswahlenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.team_antwort_auswahlenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>
+        }
+        findMany: {
+          args: Prisma.team_antwort_auswahlenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>[]
+        }
+        create: {
+          args: Prisma.team_antwort_auswahlenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>
+        }
+        createMany: {
+          args: Prisma.team_antwort_auswahlenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.team_antwort_auswahlenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>[]
+        }
+        delete: {
+          args: Prisma.team_antwort_auswahlenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>
+        }
+        update: {
+          args: Prisma.team_antwort_auswahlenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>
+        }
+        deleteMany: {
+          args: Prisma.team_antwort_auswahlenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.team_antwort_auswahlenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.team_antwort_auswahlenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>[]
+        }
+        upsert: {
+          args: Prisma.team_antwort_auswahlenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_antwort_auswahlenPayload>
+        }
+        aggregate: {
+          args: Prisma.Team_antwort_auswahlenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTeam_antwort_auswahlen>
+        }
+        groupBy: {
+          args: Prisma.team_antwort_auswahlenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Team_antwort_auswahlenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.team_antwort_auswahlenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Team_antwort_auswahlenCountAggregateOutputType> | number
+        }
+      }
+    }
     users: {
       payload: Prisma.$usersPayload<ExtArgs>
       fields: Prisma.usersFieldRefs
@@ -2824,6 +2912,7 @@ export const Quiz_fragenScalarFieldEnum = {
   quiz_abschnitt_id: 'quiz_abschnitt_id',
   punkte_basis: 'punkte_basis',
   punkte_modus: 'punkte_modus',
+  freie_antwort_erlaubt: 'freie_antwort_erlaubt',
   praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
 } as const
@@ -2904,7 +2993,16 @@ export const Team_antwortenScalarFieldEnum = {
   bewertung_final: 'bewertung_final',
   ist_manuell_falsch: 'ist_manuell_falsch',
   ist_manuell_richtig: 'ist_manuell_richtig',
-  ist_skurril: 'ist_skurril'
+  ist_skurril: 'ist_skurril',
+  auto_basis_punkte: 'auto_basis_punkte',
+  auto_endpunkte: 'auto_endpunkte',
+  vergebene_punkte: 'vergebene_punkte',
+  bewertungsstatus: 'bewertungsstatus',
+  bewertungsquelle: 'bewertungsquelle',
+  bewertungsdetails: 'bewertungsdetails',
+  manuelle_punkte: 'manuelle_punkte',
+  bewertet_am: 'bewertet_am',
+  bewertet_von_user_id: 'bewertet_von_user_id'
 } as const
 
 export type Team_antwortenScalarFieldEnum = (typeof Team_antwortenScalarFieldEnum)[keyof typeof Team_antwortenScalarFieldEnum]
@@ -2985,6 +3083,14 @@ export const Quiz_praesentation_statusScalarFieldEnum = {
 } as const
 
 export type Quiz_praesentation_statusScalarFieldEnum = (typeof Quiz_praesentation_statusScalarFieldEnum)[keyof typeof Quiz_praesentation_statusScalarFieldEnum]
+
+
+export const Team_antwort_auswahlenScalarFieldEnum = {
+  team_antwort_id: 'team_antwort_id',
+  antwort_id: 'antwort_id'
+} as const
+
+export type Team_antwort_auswahlenScalarFieldEnum = (typeof Team_antwort_auswahlenScalarFieldEnum)[keyof typeof Team_antwort_auswahlenScalarFieldEnum]
 
 
 export const UsersScalarFieldEnum = {
@@ -3189,54 +3295,91 @@ export type EnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'QuestionScope[]'
  */
 export type ListEnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionScope[]'>
+    
 
 
 /**
  * Reference to a field of type 'CategoryStatus'
  */
 export type EnumCategoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryStatus'>
+    
 
 
 /**
  * Reference to a field of type 'CategoryStatus[]'
  */
 export type ListEnumCategoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'QuizAnswerEvaluationStatus'
+ */
+export type EnumQuizAnswerEvaluationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizAnswerEvaluationStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'QuizAnswerEvaluationStatus[]'
+ */
+export type ListEnumQuizAnswerEvaluationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizAnswerEvaluationStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'QuizAnswerEvaluationSource'
+ */
+export type EnumQuizAnswerEvaluationSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizAnswerEvaluationSource'>
+    
+
+
+/**
+ * Reference to a field of type 'QuizAnswerEvaluationSource[]'
+ */
+export type ListEnumQuizAnswerEvaluationSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizAnswerEvaluationSource[]'>
+    
 
 
 /**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
 
 
 /**
  * Reference to a field of type 'UserRole[]'
  */
 export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
 
 
 /**
  * Reference to a field of type 'RoleAssignmentRole'
  */
 export type EnumRoleAssignmentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleAssignmentRole'>
+    
 
 
 /**
  * Reference to a field of type 'RoleAssignmentRole[]'
  */
 export type ListEnumRoleAssignmentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleAssignmentRole[]'>
+    
 
 
 /**
  * Reference to a field of type 'RoleScopeType'
  */
 export type EnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType'>
+    
 
 
 /**
  * Reference to a field of type 'RoleScopeType[]'
  */
 export type ListEnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType[]'>
+    
 
 
 /**
@@ -3276,19 +3419,10 @@ export type BatchPayload = {
 export const defineExtension = runtime.Extensions.defineExtension as unknown as runtime.Types.Extensions.ExtendsHook<"define", TypeMapCb, runtime.Types.Extensions.DefaultArgs>
 export type DefaultPrismaClient = PrismaClient
 export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
-export type PrismaClientOptions = ({
-  /**
-   * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-pg`.
-   */
-  adapter: runtime.SqlDriverAdapterFactory
-  accelerateUrl?: never
-} | {
-  /**
-   * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
-   */
-  accelerateUrl: string
-  adapter?: never
-}) & {
+/**
+ * Options common to all variants of `PrismaClientOptions`, regardless of whether you connect to your database through a driver adapter or through Prisma Accelerate.
+ */
+export interface PrismaClientBaseOptions {
   /**
    * @default "colorless"
    */
@@ -3375,6 +3509,56 @@ export type PrismaClientOptions = ({
    */
   queryPlanCacheMaxSize?: number
 }
+
+/**
+ * `PrismaClient` options for connecting to your database through Prisma Accelerate instead of a driver adapter.
+ * 
+ * Learn more: https://pris.ly/d/accelerate
+ */
+export interface PrismaClientOptionsWithAccelerateUrl extends PrismaClientBaseOptions {
+  /**
+   * The Prisma Accelerate connection URL. Use this option to connect to your database through Prisma Accelerate instead of using a driver adapter to connect directly.
+   * 
+   * Learn more: https://pris.ly/d/accelerate
+   */
+  accelerateUrl: string
+  adapter?: never
+}
+
+/**
+ * `PrismaClient` options for connecting to your database through a driver adapter. This is the common case in Prisma 7.
+ * 
+ * Learn more: https://pris.ly/d/driver-adapters
+ */
+export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions {
+  /**
+   * A driver adapter that PrismaClient uses to connect to your database, such as the ones provided by `@prisma/adapter-pg`, `@prisma/adapter-libsql`, `@prisma/adapter-planetscale`, etc.
+   * 
+   * A driver adapter is **required** unless you connect to your database through Prisma Accelerate (in which case use `accelerateUrl` instead).
+   * 
+   * Learn more: https://pris.ly/d/driver-adapters
+   * 
+   * @example
+   * ```ts
+   * import { PrismaPg } from '@prisma/adapter-pg'
+   * import { PrismaClient } from './generated/prisma/client'
+   * 
+   * const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   * const prisma = new PrismaClient({ adapter })
+   * ```
+   */
+  adapter: runtime.SqlDriverAdapterFactory
+  accelerateUrl?: never
+}
+
+/**
+ * Options passed to the `PrismaClient` constructor.
+ * 
+ * A driver adapter (or, alternatively, a Prisma Accelerate URL) is **required**. See {@link PrismaClientOptionsWithAdapter} and {@link PrismaClientOptionsWithAccelerateUrl} for the two variants. All other properties live in {@link PrismaClientBaseOptions} and are optional.
+ * 
+ * Learn more about driver adapters: https://pris.ly/d/driver-adapters
+ */
+export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   antworten?: Prisma.antwortenOmit
   antworttyp?: Prisma.antworttypOmit
@@ -3401,6 +3585,7 @@ export type GlobalOmitConfig = {
   frage_vorlagen?: Prisma.frage_vorlagenOmit
   frage_vorlage_antwortfelder?: Prisma.frage_vorlage_antwortfelderOmit
   quiz_praesentation_status?: Prisma.quiz_praesentation_statusOmit
+  team_antwort_auswahlen?: Prisma.team_antwort_auswahlenOmit
   users?: Prisma.usersOmit
   benutzer_rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenOmit
   eventreihe_benutzerrollen?: Prisma.eventreihe_benutzerrollenOmit
@@ -3467,3 +3652,4 @@ export type PrismaAction =
  * `PrismaClient` proxy available in interactive transactions.
  */
 export type TransactionClient = Omit<DefaultPrismaClient, runtime.ITXClientDenyList>
+

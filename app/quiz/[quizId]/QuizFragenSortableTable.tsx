@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
+import { useState } from "react";
 import {
   DndContext,
-  DragEndEvent,
-  DragOverEvent,
+  type DragEndEvent,
+  type DragOverEvent,
   PointerSensor,
   closestCenter,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -18,32 +18,29 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import QuizFrageEntfernenButton from "./QuizFrageEntfernenButton";
-import QuizFrageVorschauButton from "./QuizFrageVorschauButton";
+import QuizQuestionItem, {
+  type QuizQuestion,
+} from "./QuizQuestionItem";
+import type { QuizQuestionSettingsActions } from "./QuizQuestionSettings";
+import {
+  isIntroSection,
+  isOutroSection,
+  isQuestionSection,
+} from "../quizSectionPolicy";
 import {
   createQuizAbschnitt,
   deleteQuizAbschnitt,
   updatePraesentationslayout,
   updateQuizAbschnitteSortierung,
   updateQuizFragePunkteModus,
+  updateQuizQuestionFreeAnswerMode,
   updateQuizFragenBlockSortierung,
 } from "../actions";
-
-type QuizFrage = {
-  quiz_fragen_id: number;
-  sortierung: number | null;
-  quiz_abschnitt_id: number | null;
-  fragen_id: number;
-  frage: string;
-  schwierigkeitslevel: string | null;
-  praesentationslayout: string | null;
-  punkte_modus: string | null;
-  kategorien: string[];
-};
 
 type Abschnitt = {
   quiz_abschnitt_id: number;
   titel: string;
+  abschnitt_typ: string;
 };
 
 type Gruppe = {
@@ -51,15 +48,35 @@ type Gruppe = {
   titel: string;
   containerId: string;
   quizAbschnittId: number | null;
-  fragen: QuizFrage[];
+  fragen: QuizQuestion[];
   blockTyp: "intro" | "outro" | "fragenblock" | "kein-block";
 };
 
 type Props = {
   quizId: number;
-  fragen: QuizFrage[];
+  fragen: QuizQuestion[];
   abschnitte: Abschnitt[];
 };
+
+const introSlides = [
+  ["vor-dem-start", "Wartebildschirm"],
+  ["startsequenz", "Countdown bis zum Start"],
+  ["begruessung", "Begrüßung", "Quizname und Willkommensgruß"],
+  ["regeln", "Regeln", "Quizregeln und Ablauf"],
+  ["preise", "Preise", "Preise für Platz 1 bis 3"],
+] as const;
+
+const outroSlides = [
+  [
+    "bekanntmachungen",
+    "Bekanntmachungen",
+    "Hinweise, nächste Termine und Abschlussinfos",
+  ],
+] as const;
+
+const numberFormatter = new Intl.NumberFormat("de-DE", {
+  maximumFractionDigits: 2,
+});
 
 function getContainerId(quizAbschnittId: number | null) {
   return quizAbschnittId === null
@@ -75,202 +92,63 @@ function getAbschnittIdFromContainer(containerId: string) {
   return Number(containerId.replace("block-", ""));
 }
 
-function getBlockTyp(titel: string): Gruppe["blockTyp"] {
-  const normalisiert = titel.trim().toLowerCase();
+function FixedSlideItem({
+  quizId,
+  slide,
+  typ,
+  index,
+}: {
+  quizId: number;
+  slide: readonly [string, string] | readonly [string, string, string];
+  typ: "Intro" | "Outro";
+  index: number;
+}) {
+  const [key, titel, beschreibung] = slide;
 
-  if (normalisiert === "intro") return "intro";
-  if (normalisiert === "outro") return "outro";
-
-  return "fragenblock";
+  return (
+    <article className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
+      <span className="flex h-9 min-w-9 items-center justify-center self-start rounded-lg bg-slate-100 px-2 text-sm font-black text-slate-600">
+        {index + 1}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="font-semibold text-slate-900">{titel}</div>
+        {beschreibung && (
+          <div className="mt-1 text-sm text-slate-500">{beschreibung}</div>
+        )}
+        <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {typ} · Fixiert
+        </div>
+      </div>
+      <a
+        href={`/quiz/${quizId}/slides/${key}`}
+        className="inline-flex items-center justify-center self-start rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
+      >
+        Konfigurieren
+      </a>
+    </article>
+  );
 }
 
-function DragHandle({
+function BlockDragHandle({
+  titel,
   attributes,
   listeners,
 }: {
-  attributes: React.HTMLAttributes<HTMLButtonElement>;
-  listeners: React.HTMLAttributes<HTMLButtonElement> | undefined;
+  titel: string;
+  attributes: HTMLAttributes<HTMLButtonElement>;
+  listeners: HTMLAttributes<HTMLButtonElement> | undefined;
 }) {
   return (
     <button
       type="button"
-      className="flex h-8 w-8 cursor-grab items-center justify-center rounded-full text-base font-semibold text-slate-400 transition hover:bg-slate-100 hover:text-slate-800 active:cursor-grabbing active:scale-95"
-      title="Zum Sortieren ziehen"
-      aria-label="Zum Sortieren ziehen"
+      className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-lg text-lg font-semibold text-slate-400 transition hover:bg-white hover:text-slate-800 active:cursor-grabbing"
+      title="Block zum Sortieren ziehen"
+      aria-label={`${titel} zum Sortieren ziehen`}
       {...attributes}
       {...listeners}
     >
-      ⋮⋮
+      ⠿
     </button>
-  );
-}
-
-function SortableRow({
-  frage,
-  index,
-  quizId,
-  onRemove,
-  onLayoutChange,
-  onPunkteModusChange,
-}: {
-  frage: QuizFrage;
-  index: number;
-  quizId: number;
-  onRemove: (quizFragenId: number) => void;
-  onLayoutChange: (
-    quizFragenId: number,
-    praesentationslayout: string
-  ) => void | Promise<void>;
-  onPunkteModusChange: (
-    quizFragenId: number,
-    punkteModus: string
-  ) => void | Promise<void>;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: frage.quiz_fragen_id,
-    data: {
-      type: "frage",
-      containerId: getContainerId(frage.quiz_abschnitt_id),
-    },
-  });
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <tr
-      ref={setNodeRef}
-      style={style}
-      className={`hover:bg-slate-50 ${isDragging ? "bg-slate-100" : ""}`}
-    >
-      <td className="px-4 py-3">{index + 1}</td>
-
-      <td className="px-4 py-3">
-        <DragHandle attributes={attributes} listeners={listeners} />
-      </td>
-
-      <td className="px-4 py-3 font-medium">{frage.frage}</td>
-
-      <td className="px-4 py-3">
-        {frage.kategorien.length > 0 ? frage.kategorien.join(", ") : "-"}
-      </td>
-
-      <td className="px-4 py-3">{frage.schwierigkeitslevel ?? "-"}</td>
-
-      <td className="px-4 py-3">
-        <select
-          value={frage.praesentationslayout ?? "standard"}
-          onChange={(e) =>
-            onLayoutChange(frage.quiz_fragen_id, e.target.value)
-          }
-          className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        >
-          <option value="standard">Standard</option>
-          <option value="bild_fokus">Bild-Fokus</option>
-          <option value="antworten_fokus">Antworten-Fokus</option>
-          <option value="audio_fokus">Audio-Fokus</option>
-          <option value="text_fokus">Text-Fokus</option>
-          <option value="hinweis_fokus">Hinweis-Fokus</option>
-        </select>
-      </td>
-
-      <td className="px-4 py-3">
-        <select
-          value={frage.punkte_modus ?? "standard"}
-          onChange={(e) =>
-            onPunkteModusChange(frage.quiz_fragen_id, e.target.value)
-          }
-          className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        >
-          <option value="standard">Standard</option>
-          <option value="expertenbonus">Expertenbonus</option>
-          <option value="risikofrage">Risikofrage</option>
-        </select>
-      </td>
-
-      <td className="px-4 py-3">
-        <div className="flex flex-wrap gap-2">
-          <QuizFrageVorschauButton fragenId={frage.fragen_id} />
-
-          <QuizFrageEntfernenButton
-            quizId={quizId}
-            quizFragenId={frage.quiz_fragen_id}
-            onRemoved={onRemove}
-          />
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-function SortableBlockHeader({
-  gruppe,
-  istEingeklappt,
-  onToggleGruppe,
-  onDeleteBlock,
-  fragenrundenAnzahl,
-}: {
-  gruppe: Gruppe;
-  istEingeklappt: boolean;
-  onToggleGruppe: (containerId: string) => void;
-  onDeleteBlock: (quizAbschnittId: number) => void | Promise<void>;
-  fragenrundenAnzahl: number;
-}) {
-  const istFragenrunde = gruppe.blockTyp === "fragenblock";
-
-  return (
-    <tr className="bg-slate-100">
-      <td colSpan={8} className="px-4 py-3">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-sm font-black uppercase tracking-wide text-slate-700">
-              {gruppe.titel}
-              {istFragenrunde && ` · ${gruppe.fragen.length} Fragen`}
-            </div>
-
-            {!istFragenrunde && (
-              <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Feste Slides
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onToggleGruppe(gruppe.containerId)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-900"
-            >
-              <span
-                className={`text-xl leading-none transition-transform duration-200 ${istEingeklappt ? "rotate-0" : "rotate-180"
-                  }`}
-              >
-                ⌄
-              </span>
-            </button>
-
-            {istFragenrunde && fragenrundenAnzahl > 1 && gruppe.quizAbschnittId && (
-              <button
-                type="button"
-                onClick={() => onDeleteBlock(gruppe.quizAbschnittId!)}
-                className="rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50"
-              >
-                Block löschen
-              </button>
-            )}
-          </div>
-        </div>
-      </td>
-    </tr>
   );
 }
 
@@ -279,8 +157,7 @@ function DroppableBlock({
   quizId,
   istEingeklappt,
   onToggleGruppe,
-  onLayoutChange,
-  onPunkteModusChange,
+  settingsActions,
   onRemove,
   onDeleteBlock,
   fragenrundenAnzahl,
@@ -289,143 +166,227 @@ function DroppableBlock({
   quizId: number;
   istEingeklappt: boolean;
   onToggleGruppe: (containerId: string) => void;
-  onLayoutChange: (
-    quizFragenId: number,
-    praesentationslayout: string
-  ) => void | Promise<void>;
-  onPunkteModusChange: (
-    quizFragenId: number,
-    punkteModus: string
-  ) => void | Promise<void>;
+  settingsActions: QuizQuestionSettingsActions;
   onRemove: (quizFragenId: number) => void;
   onDeleteBlock: (quizAbschnittId: number) => void | Promise<void>;
   fragenrundenAnzahl: number;
 }) {
-  const { setNodeRef, isOver } = useDroppable({
+  const istFragenrunde = gruppe.blockTyp === "fragenblock";
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+  } = useSortable({
     id: gruppe.containerId,
+    disabled: {
+      draggable: !istFragenrunde,
+      droppable: false,
+    },
+    data: {
+      type: istFragenrunde ? "block" : "block-container",
+    },
   });
-
-  const introSlides = [
-    ["vor-dem-start", "Wartebildschirm"],
-    ["startsequenz", "Countdown bis zum Start"],
-    ["begruessung", "Begrüßung", "Quizname und Willkommensgruß"],
-    ["regeln", "Regeln", "Quizregeln und Ablauf"],
-    ["preise", "Preise", "Preise für Platz 1 bis 3"],
-  ];
-
-  const outroSlides = [
-    ["bekanntmachungen", "Bekanntmachungen", "Hinweise, nächste Termine und Abschlussinfos"],
-  ];
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  const gesamtpunkte = gruppe.fragen.reduce(
+    (summe, frage) => summe + frage.punkte_basis,
+    0,
+  );
+  const unklareAntwortmodi = gruppe.fragen.filter(
+    (frage) => frage.effektiver_antwortmodus === "UNCLASSIFIED",
+  ).length;
+  const dynamischePunkte = gruppe.fragen.some(
+    (frage) =>
+      Boolean(frage.punkte_modus) && frage.punkte_modus !== "standard",
+  );
+  const festeSlides =
+    gruppe.blockTyp === "intro"
+      ? introSlides.length
+      : gruppe.blockTyp === "outro"
+        ? outroSlides.length
+        : null;
+  const farben =
+    gruppe.blockTyp === "intro"
+      ? "border-sky-200 bg-sky-50/70"
+      : gruppe.blockTyp === "outro"
+        ? "border-violet-200 bg-violet-50/70"
+        : gruppe.blockTyp === "kein-block"
+          ? "border-amber-200 bg-amber-50/70"
+          : "border-slate-200 bg-slate-50";
 
   return (
-    <React.Fragment>
-      <SortableBlockHeader
-        gruppe={gruppe}
-        istEingeklappt={istEingeklappt}
-        onToggleGruppe={onToggleGruppe}
-        onDeleteBlock={onDeleteBlock}
-        fragenrundenAnzahl={fragenrundenAnzahl}
-      />
+    <section
+      ref={setNodeRef}
+      style={style}
+      className={`rounded-2xl border shadow-sm transition ${farben} ${
+        isDragging ? "z-10 opacity-80 shadow-xl" : ""
+      } ${isOver ? "ring-2 ring-cyan-300" : ""}`}
+    >
+      <header className="flex items-start gap-2 p-3 sm:items-center">
+        {istFragenrunde ? (
+          <BlockDragHandle
+            titel={gruppe.titel}
+            attributes={attributes}
+            listeners={listeners}
+          />
+        ) : (
+          <span className="flex h-9 min-w-9 items-center justify-center rounded-lg bg-white/80 px-2 text-xs font-black uppercase text-slate-500">
+            {gruppe.blockTyp === "intro"
+              ? "IN"
+              : gruppe.blockTyp === "outro"
+                ? "OUT"
+                : "!"}
+          </span>
+        )}
+
+        <button
+          type="button"
+          onClick={() => onToggleGruppe(gruppe.containerId)}
+          className="min-w-0 flex-1 text-left"
+          aria-expanded={!istEingeklappt}
+        >
+          <span className="block font-black text-slate-900">
+            {gruppe.titel}
+          </span>
+          <span className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-500">
+            {festeSlides === null ? (
+              <>
+                <span>
+                  {gruppe.blockTyp === "fragenblock"
+                    ? "Fragenblock"
+                    : "Ohne Block"}
+                </span>
+                <span>
+                  {gruppe.fragen.length}{" "}
+                  {gruppe.fragen.length === 1 ? "Frage" : "Fragen"}
+                </span>
+                <span>
+                  {numberFormatter.format(gesamtpunkte)} Basispunkte
+                </span>
+              </>
+            ) : (
+              <>
+                <span>{festeSlides} feste Slides</span>
+                <span>{gruppe.blockTyp === "intro" ? "Intro" : "Outro"}</span>
+              </>
+            )}
+            {gruppe.blockTyp === "kein-block" &&
+              gruppe.fragen.length > 0 && (
+                <span className="text-amber-700">Nicht zugeordnet</span>
+              )}
+            {dynamischePunkte && (
+              <span className="text-amber-700">Dynamische Punkte</span>
+            )}
+            {unklareAntwortmodi > 0 && (
+              <span className="text-amber-700">
+                {unklareAntwortmodi}{" "}
+                {unklareAntwortmodi === 1 ? "Warnung" : "Warnungen"}
+              </span>
+            )}
+          </span>
+        </button>
+
+        {istFragenrunde &&
+          fragenrundenAnzahl > 1 &&
+          gruppe.quizAbschnittId !== null && (
+            <details className="relative">
+              <summary
+                className="flex h-9 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-300 bg-white text-xl font-bold leading-none text-slate-600 shadow-sm transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
+                aria-label={`Weitere Aktionen für ${gruppe.titel}`}
+              >
+                …
+              </summary>
+              <div className="absolute right-0 z-20 mt-2 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+                <button
+                  type="button"
+                  onClick={() =>
+                    onDeleteBlock(gruppe.quizAbschnittId as number)
+                  }
+                  className="whitespace-nowrap rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+                >
+                  Block löschen
+                </button>
+              </div>
+            </details>
+          )}
+
+        <button
+          type="button"
+          onClick={() => onToggleGruppe(gruppe.containerId)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white hover:text-slate-900"
+          aria-label={istEingeklappt ? "Block aufklappen" : "Block einklappen"}
+        >
+          <span
+            className={`text-lg leading-none transition-transform ${
+              istEingeklappt ? "" : "rotate-180"
+            }`}
+          >
+            ⌄
+          </span>
+        </button>
+      </header>
 
       {!istEingeklappt && (
-        <SortableContext
-          items={gruppe.fragen.map((frage) => frage.quiz_fragen_id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {gruppe.blockTyp === "intro" ? (
-            <>
-              {introSlides.map(([key, titel, beschreibung], index) => (
-                <tr key={key} className="bg-white hover:bg-slate-50">
-                  <td className="px-4 py-5 text-center font-semibold text-slate-400">
-                    {index + 1}
-                  </td>
-
-                  <td className="px-4 py-5 text-slate-300">—</td>
-
-                  <td className="px-4 py-5">
-                    <div className="font-semibold text-slate-900">{titel}</div>
-                    <div className="mt-1 text-sm text-slate-500">
-                      {beschreibung}
-                    </div>
-                  </td>
-
-                  <td className="px-4 py-5 text-sm text-slate-400">Intro</td>
-                  <td className="px-4 py-5 text-slate-300">—</td>
-                  <td className="px-4 py-5 text-slate-300">Fixiert</td>
-                  <td className="px-4 py-5 text-slate-300">—</td>
-
-                  <td className="px-4 py-5">
-                    <a
-                      href={`/quiz/${quizId}/slides/${key}`}
-                      className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
-                    >
-                      Konfigurieren
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </>
-          ) : gruppe.blockTyp === "outro" ? (
-            <>
-              {outroSlides.map(([key, titel, beschreibung], index) => (
-                <tr key={key} className="bg-white hover:bg-slate-50">
-                  <td className="px-4 py-5 text-center font-semibold text-slate-400">
-                    {index + 1}
-                  </td>
-
-                  <td className="px-4 py-5 text-slate-300">—</td>
-
-                  <td className="px-4 py-5">
-                    <div className="font-semibold text-slate-900">{titel}</div>
-                    <div className="mt-1 text-sm text-slate-500">
-                      {beschreibung}
-                    </div>
-                  </td>
-
-                  <td className="px-4 py-5 text-sm text-slate-400">Outro</td>
-                  <td className="px-4 py-5 text-slate-300">—</td>
-                  <td className="px-4 py-5 text-slate-300">Fixiert</td>
-                  <td className="px-4 py-5 text-slate-300">—</td>
-
-                  <td className="px-4 py-5">
-                    <a
-                      href={`/quiz/${quizId}/slides/${key}`}
-                      className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
-                    >
-                      Konfigurieren
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </>
-          ) : gruppe.fragen.length === 0 ? (
-            gruppe.blockTyp === "fragenblock" ? (
-              <tr ref={setNodeRef}>
-                <td
-                  colSpan={8}
-                  className={`px-4 py-6 text-sm font-medium transition ${isOver ? "bg-cyan-50 text-cyan-700" : "bg-white text-slate-400"
-                    }`}
+        <div className="space-y-2 border-t border-inherit p-3">
+          <SortableContext
+            items={gruppe.fragen.map((frage) => frage.quiz_fragen_id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {gruppe.blockTyp === "intro" ? (
+              introSlides.map((slide, index) => (
+                <FixedSlideItem
+                  key={slide[0]}
+                  quizId={quizId}
+                  slide={slide}
+                  typ="Intro"
+                  index={index}
+                />
+              ))
+            ) : gruppe.blockTyp === "outro" ? (
+              outroSlides.map((slide, index) => (
+                <FixedSlideItem
+                  key={slide[0]}
+                  quizId={quizId}
+                  slide={slide}
+                  typ="Outro"
+                  index={index}
+                />
+              ))
+            ) : gruppe.fragen.length === 0 ? (
+              gruppe.blockTyp === "fragenblock" ? (
+                <div
+                  className={`rounded-xl border border-dashed px-4 py-6 text-center text-sm font-medium transition ${
+                    isOver
+                      ? "border-cyan-400 bg-cyan-50 text-cyan-700"
+                      : "border-slate-300 bg-white text-slate-400"
+                  }`}
                 >
                   Frage hier ablegen
-                </td>
-              </tr>
-            ) : null
-          ) : (
-            gruppe.fragen.map((frage, index) => (
-              <SortableRow
-                key={frage.quiz_fragen_id}
-                frage={frage}
-                index={index}
-                quizId={quizId}
-                onLayoutChange={onLayoutChange}
-                onPunkteModusChange={onPunkteModusChange}
-                onRemove={onRemove}
-              />
-            ))
-          )}
-        </SortableContext>
+                </div>
+              ) : null
+            ) : (
+              gruppe.fragen.map((frage, index) => (
+                <QuizQuestionItem
+                  key={frage.quiz_fragen_id}
+                  frage={frage}
+                  index={index}
+                  quizId={quizId}
+                  containerId={gruppe.containerId}
+                  settingsActions={settingsActions}
+                  onRemove={onRemove}
+                />
+              ))
+            )}
+          </SortableContext>
+        </div>
       )}
-    </React.Fragment>
+    </section>
   );
 }
 
@@ -434,17 +395,15 @@ export default function QuizFragenSortableTable({
   fragen,
   abschnitte,
 }: Props) {
-  const [items, setItems] = useState<QuizFrage[]>(fragen);
-
+  const [items, setItems] = useState<QuizQuestion[]>(fragen);
   const [blockItems, setBlockItems] = useState(abschnitte);
   const [isCreatingBlock, setIsCreatingBlock] = useState(false);
   const [meldung, setMeldung] = useState("");
-  const [mounted, setMounted] = useState(false);
   const [eingeklappteGruppen, setEingeklappteGruppen] = useState<string[]>([]);
 
   function handleRemoveFrage(quizFragenId: number) {
     setItems((current) =>
-      current.filter((item) => item.quiz_fragen_id !== quizFragenId)
+      current.filter((item) => item.quiz_fragen_id !== quizFragenId),
     );
   }
 
@@ -452,59 +411,43 @@ export default function QuizFragenSortableTable({
     setEingeklappteGruppen((current) =>
       current.includes(containerId)
         ? current.filter((id) => id !== containerId)
-        : [...current, containerId]
+        : [...current, containerId],
     );
   }
-
-  useEffect(() => {
-    setBlockItems(abschnitte);
-  }, [abschnitte]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
   );
 
-  const introBlock =
-    blockItems.find((block) => getBlockTyp(block.titel) === "intro") ?? null;
-
-  const outroBlock =
-    blockItems.find((block) => getBlockTyp(block.titel) === "outro") ?? null;
-
-  const fragenrundeBlocks = blockItems.filter(
-    (block) => getBlockTyp(block.titel) === "fragenblock"
-  );
-
+  const introBlock = blockItems.find(isIntroSection) ?? null;
+  const outroBlock = blockItems.find(isOutroSection) ?? null;
+  const fragenrundeBlocks = blockItems.filter(isQuestionSection);
   const gruppen: Gruppe[] = [
     ...(introBlock
       ? [
-        {
-          key: `block-${introBlock.quiz_abschnitt_id}`,
-          titel: introBlock.titel,
-          containerId: getContainerId(introBlock.quiz_abschnitt_id),
-          quizAbschnittId: introBlock.quiz_abschnitt_id,
-          blockTyp: "intro" as const,
-          fragen: items
-            .filter(
-              (frage) =>
-                Number(frage.quiz_abschnitt_id) ===
-                Number(introBlock.quiz_abschnitt_id)
-            )
-            .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)),
-        },
-      ]
+          {
+            key: `block-${introBlock.quiz_abschnitt_id}`,
+            titel: introBlock.titel,
+            containerId: getContainerId(introBlock.quiz_abschnitt_id),
+            quizAbschnittId: introBlock.quiz_abschnitt_id,
+            blockTyp: "intro" as const,
+            fragen: items
+              .filter(
+                (frage) =>
+                  Number(frage.quiz_abschnitt_id) ===
+                  Number(introBlock.quiz_abschnitt_id),
+              )
+              .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)),
+          },
+        ]
       : []),
-
     ...fragenrundeBlocks.map((abschnitt, index) => ({
       key: `block-${abschnitt.quiz_abschnitt_id}`,
-      titel: `Block ${index + 1}`,
+      titel: abschnitt.titel || `Block ${index + 1}`,
       containerId: getContainerId(abschnitt.quiz_abschnitt_id),
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
       blockTyp: "fragenblock" as const,
@@ -512,30 +455,28 @@ export default function QuizFragenSortableTable({
         .filter(
           (frage) =>
             Number(frage.quiz_abschnitt_id) ===
-            Number(abschnitt.quiz_abschnitt_id)
+            Number(abschnitt.quiz_abschnitt_id),
         )
         .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)),
     })),
-
     ...(outroBlock
       ? [
-        {
-          key: `block-${outroBlock.quiz_abschnitt_id}`,
-          titel: outroBlock.titel,
-          containerId: getContainerId(outroBlock.quiz_abschnitt_id),
-          quizAbschnittId: outroBlock.quiz_abschnitt_id,
-          blockTyp: "outro" as const,
-          fragen: items
-            .filter(
-              (frage) =>
-                Number(frage.quiz_abschnitt_id) ===
-                Number(outroBlock.quiz_abschnitt_id)
-            )
-            .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)),
-        },
-      ]
+          {
+            key: `block-${outroBlock.quiz_abschnitt_id}`,
+            titel: outroBlock.titel,
+            containerId: getContainerId(outroBlock.quiz_abschnitt_id),
+            quizAbschnittId: outroBlock.quiz_abschnitt_id,
+            blockTyp: "outro" as const,
+            fragen: items
+              .filter(
+                (frage) =>
+                  Number(frage.quiz_abschnitt_id) ===
+                  Number(outroBlock.quiz_abschnitt_id),
+              )
+              .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)),
+          },
+        ]
       : []),
-
     {
       key: "kein-block",
       titel: "Kein Block",
@@ -552,7 +493,7 @@ export default function QuizFragenSortableTable({
     return items.find((item) => item.quiz_fragen_id === id);
   }
 
-  function saveBlockSortierung(newItems: QuizFrage[]) {
+  function saveBlockSortierung(newItems: QuizQuestion[]) {
     return updateQuizFragenBlockSortierung({
       quizId,
       items: newItems.map((item, index) => ({
@@ -563,39 +504,30 @@ export default function QuizFragenSortableTable({
     });
   }
 
-  async function handleDragOver(event: DragOverEvent) {
+  function handleDragOver(event: DragOverEvent) {
     const { active, over } = event;
 
-    if (!over || active.id === over.id) {
-      return;
-    }
-
-    if (active.data.current?.type === "block") {
+    if (!over || active.id === over.id || active.data.current?.type === "block") {
       return;
     }
 
     const activeId = Number(active.id);
     const activeItem = findItem(activeId);
-
     if (!activeItem) {
       return;
     }
 
-    const overId = String(over.id);
-
     const overItem =
       typeof over.id === "number" ? findItem(Number(over.id)) : undefined;
-
     const zielContainerId = overItem
       ? getContainerId(overItem.quiz_abschnitt_id)
-      : overId;
+      : String(over.id);
 
     if (!zielContainerId.startsWith("block-")) {
       return;
     }
 
     const zielAbschnittId = getAbschnittIdFromContainer(zielContainerId);
-
     if (activeItem.quiz_abschnitt_id === zielAbschnittId) {
       return;
     }
@@ -603,12 +535,9 @@ export default function QuizFragenSortableTable({
     setItems((current) =>
       current.map((item) =>
         item.quiz_fragen_id === activeId
-          ? {
-            ...item,
-            quiz_abschnitt_id: zielAbschnittId,
-          }
-          : item
-      )
+          ? { ...item, quiz_abschnitt_id: zielAbschnittId }
+          : item,
+      ),
     );
   }
 
@@ -620,22 +549,17 @@ export default function QuizFragenSortableTable({
         return;
       }
 
-      let zielBlockId = String(over.id);
-
       const overFrage = items.find(
-        (item) => item.quiz_fragen_id === Number(over.id)
+        (item) => item.quiz_fragen_id === Number(over.id),
       );
-
-      if (overFrage) {
-        zielBlockId = getContainerId(overFrage.quiz_abschnitt_id);
-      }
-
+      const zielBlockId = overFrage
+        ? getContainerId(overFrage.quiz_abschnitt_id)
+        : String(over.id);
       const oldIndex = fragenrundeBlocks.findIndex(
-        (block) => getContainerId(block.quiz_abschnitt_id) === active.id
+        (block) => getContainerId(block.quiz_abschnitt_id) === active.id,
       );
-
       const newIndex = fragenrundeBlocks.findIndex(
-        (block) => getContainerId(block.quiz_abschnitt_id) === zielBlockId
+        (block) => getContainerId(block.quiz_abschnitt_id) === zielBlockId,
       );
 
       if (oldIndex < 0 || newIndex < 0) {
@@ -645,9 +569,8 @@ export default function QuizFragenSortableTable({
       const neueFragenrunden = arrayMove(
         fragenrundeBlocks,
         oldIndex,
-        newIndex
+        newIndex,
       );
-
       const neueBlockItems = [
         ...(introBlock ? [introBlock] : []),
         ...neueFragenrunden,
@@ -658,7 +581,6 @@ export default function QuizFragenSortableTable({
       }));
 
       setBlockItems(neueBlockItems);
-
       await updateQuizAbschnitteSortierung({
         quizId,
         items: neueBlockItems.map((block) => ({
@@ -666,7 +588,6 @@ export default function QuizFragenSortableTable({
           sortierung: block.sortierung,
         })),
       });
-
       return;
     }
 
@@ -676,24 +597,21 @@ export default function QuizFragenSortableTable({
 
     const activeId = Number(active.id);
     const activeItem = findItem(activeId);
-
     if (!activeItem) {
       return;
     }
 
     const overItem =
       typeof over.id === "number" ? findItem(Number(over.id)) : undefined;
-
     let newItems = [...items];
 
     if (overItem) {
       const oldIndex = newItems.findIndex(
-        (item) => item.quiz_fragen_id === activeId
+        (item) => item.quiz_fragen_id === activeId,
       );
       const newIndex = newItems.findIndex(
-        (item) => item.quiz_fragen_id === overItem.quiz_fragen_id
+        (item) => item.quiz_fragen_id === overItem.quiz_fragen_id,
       );
-
       if (oldIndex >= 0 && newIndex >= 0) {
         newItems = arrayMove(newItems, oldIndex, newIndex);
       }
@@ -703,26 +621,21 @@ export default function QuizFragenSortableTable({
       ...item,
       sortierung: index + 1,
     }));
-
     setItems(newItems);
     await saveBlockSortierung(newItems);
   }
 
   async function handleLayoutChange(
     quizFragenId: number,
-    praesentationslayout: string
+    praesentationslayout: string,
   ) {
     setItems((current) =>
       current.map((item) =>
         item.quiz_fragen_id === quizFragenId
-          ? {
-            ...item,
-            praesentationslayout,
-          }
-          : item
-      )
+          ? { ...item, praesentationslayout }
+          : item,
+      ),
     );
-
     await updatePraesentationslayout({
       quizFragenId,
       praesentationslayout,
@@ -732,25 +645,54 @@ export default function QuizFragenSortableTable({
 
   async function handlePunkteModusChange(
     quizFragenId: number,
-    punkteModus: string
+    punkteModus: string,
   ) {
     setItems((current) =>
       current.map((item) =>
         item.quiz_fragen_id === quizFragenId
-          ? {
-            ...item,
-            punkte_modus: punkteModus,
-          }
-          : item
-      )
+          ? { ...item, punkte_modus: punkteModus }
+          : item,
+      ),
     );
-
     await updateQuizFragePunkteModus({
       quizId,
       quizFragenId,
       punkteModus,
     });
   }
+
+  async function handleFreeAnswerChange(
+    quizFragenId: number,
+    freieAntwortErlaubt: boolean,
+  ) {
+    setItems((current) =>
+      current.map((item) =>
+        item.quiz_fragen_id === quizFragenId
+          ? {
+              ...item,
+              freie_antwort_erlaubt: freieAntwortErlaubt,
+              effektiver_antwortmodus:
+                item.kann_freie_antwort_aktivieren
+                  ? freieAntwortErlaubt
+                    ? "OPEN"
+                    : "CLOSED"
+                  : item.effektiver_antwortmodus,
+            }
+          : item,
+      ),
+    );
+    await updateQuizQuestionFreeAnswerMode({
+      quizId,
+      quizFragenId,
+      freieAntwortErlaubt,
+    });
+  }
+
+  const settingsActions: QuizQuestionSettingsActions = {
+    onLayoutChange: handleLayoutChange,
+    onPunkteModusChange: handlePunkteModusChange,
+    onFreeAnswerChange: handleFreeAnswerChange,
+  };
 
   async function handleDeleteBlock(quizAbschnittId: number) {
     if (fragenrundeBlocks.length <= 1) {
@@ -759,45 +701,37 @@ export default function QuizFragenSortableTable({
     }
 
     const ok = window.confirm(
-      "Block wirklich löschen? Zugeordnete Fragen bleiben erhalten, sind danach aber ohne Block."
+      "Block wirklich löschen? Zugeordnete Fragen bleiben erhalten, sind danach aber ohne Block.",
     );
+    if (!ok) {
+      return;
+    }
 
-    if (!ok) return;
-
-    await deleteQuizAbschnitt({
-      quizId,
-      quizAbschnittId,
-    });
-
+    await deleteQuizAbschnitt({ quizId, quizAbschnittId });
     setBlockItems((current) =>
-      current.filter((block) => block.quiz_abschnitt_id !== quizAbschnittId)
+      current.filter((block) => block.quiz_abschnitt_id !== quizAbschnittId),
     );
-
     setItems((current) =>
       current.map((item) =>
         item.quiz_abschnitt_id === quizAbschnittId
-          ? {
-            ...item,
-            quiz_abschnitt_id: null,
-          }
-          : item
-      )
+          ? { ...item, quiz_abschnitt_id: null }
+          : item,
+      ),
     );
   }
 
   async function handleCreateBlock() {
-    if (isCreatingBlock) return;
+    if (isCreatingBlock) {
+      return;
+    }
 
     const titel = `Block ${fragenrundeBlocks.length + 1}`;
-
     setIsCreatingBlock(true);
-
     const result = await createQuizAbschnitt({
       quizId,
       titel,
       abschnittTyp: "fragenblock",
     });
-
     setIsCreatingBlock(false);
 
     if (!result.success) {
@@ -807,10 +741,6 @@ export default function QuizFragenSortableTable({
 
     setMeldung("Block wurde angelegt.");
     window.location.reload();
-  }
-
-  if (!mounted) {
-    return null;
   }
 
   return (
@@ -826,7 +756,6 @@ export default function QuizFragenSortableTable({
             {isCreatingBlock ? "Wird angelegt..." : "Block hinzufügen"}
           </button>
         </div>
-
         {meldung && (
           <div className="mt-3 text-sm font-medium text-slate-500">
             {meldung}
@@ -834,53 +763,38 @@ export default function QuizFragenSortableTable({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
+      <DndContext
+        id={`quiz-structure-${quizId}`}
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={fragenrundeBlocks.map((block) =>
+            getContainerId(block.quiz_abschnitt_id),
+          )}
+          strategy={verticalListSortingStrategy}
         >
-          <table className="w-full border-collapse bg-white text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Nr.</th>
-                <th className="px-4 py-3">Sort.</th>
-                <th className="px-4 py-3">Frage</th>
-                <th className="px-4 py-3">Kategorien</th>
-                <th className="px-4 py-3">Schwierigkeit</th>
-                <th className="px-4 py-3">Layout</th>
-                <th className="px-4 py-3">Punkte</th>
-                <th className="px-4 py-3">Aktionen</th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-slate-200">
-              <SortableContext
-                items={fragenrundeBlocks.map((block) =>
-                  getContainerId(block.quiz_abschnitt_id)
+          <div className="space-y-3">
+            {gruppen.map((gruppe) => (
+              <DroppableBlock
+                key={gruppe.key}
+                gruppe={gruppe}
+                quizId={quizId}
+                istEingeklappt={eingeklappteGruppen.includes(
+                  gruppe.containerId,
                 )}
-                strategy={verticalListSortingStrategy}
-              >
-                {gruppen.map((gruppe) => (
-                  <DroppableBlock
-                    key={gruppe.key}
-                    gruppe={gruppe}
-                    quizId={quizId}
-                    istEingeklappt={eingeklappteGruppen.includes(gruppe.containerId)}
-                    onToggleGruppe={toggleGruppe}
-                    onLayoutChange={handleLayoutChange}
-                    onPunkteModusChange={handlePunkteModusChange}
-                    onRemove={handleRemoveFrage}
-                    onDeleteBlock={handleDeleteBlock}
-                    fragenrundenAnzahl={fragenrundeBlocks.length}
-                  />
-                ))}
-              </SortableContext>
-            </tbody>
-          </table>
-        </DndContext>
-      </div>
+                onToggleGruppe={toggleGruppe}
+                settingsActions={settingsActions}
+                onRemove={handleRemoveFrage}
+                onDeleteBlock={handleDeleteBlock}
+                fragenrundenAnzahl={fragenrundeBlocks.length}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </>
   );
 }
