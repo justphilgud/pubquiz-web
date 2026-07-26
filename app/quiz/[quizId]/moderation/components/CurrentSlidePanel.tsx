@@ -1,11 +1,17 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { QuizPraesentationResult } from "../../../actions";
 import type { Slide } from "../../praesentation/buildPraesentationSlides";
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { getPresentationSlideTitle } from "@/app/rendering/presentation/presentationSlideMetadata";
 import type { PresentationPlaybackCommand } from "@/app/rendering/presentation/presentationLiveState";
+import {
+  MODERATION_PREVIEW_LOGICAL_HEIGHT,
+  MODERATION_PREVIEW_LOGICAL_WIDTH,
+  resolveModerationPreviewLayout,
+} from "../moderationPreviewLayout";
 
 type PunktestandEintrag = {
   teamname: string;
@@ -53,40 +59,91 @@ export default function CurrentSlidePanel({
       : aktuellerSlide?.typ === "aufloesung"
         ? "Auflösung"
         : getPresentationSlideTitle(aktuellerSlide, slides);
+  const previewHostRef = useRef<HTMLDivElement>(null);
+  const [previewLayout, setPreviewLayout] = useState(() =>
+    resolveModerationPreviewLayout(0, 0),
+  );
+
+  useEffect(() => {
+    const previewHost = previewHostRef.current;
+    if (!previewHost) return;
+
+    const updatePreviewLayout = () => {
+      setPreviewLayout(
+        resolveModerationPreviewLayout(
+          previewHost.clientWidth,
+          window.innerHeight,
+        ),
+      );
+    };
+
+    const resizeObserver = new ResizeObserver(updatePreviewLayout);
+    resizeObserver.observe(previewHost);
+    window.addEventListener("resize", updatePreviewLayout);
+    updatePreviewLayout();
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updatePreviewLayout);
+    };
+  }, []);
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 sm:p-5">
       <div className="mb-3 text-sm text-zinc-400">
         Aktueller Slide {slideIndex + 1} / {slides.length}
       </div>
 
-      <h1 className="text-3xl font-bold">{titel}</h1>
+      <h1 className="text-2xl font-bold">{titel}</h1>
 
-      <div className="mt-6 h-[min(58vh,620px)] min-h-[420px] overflow-hidden rounded-xl border border-zinc-800 bg-black p-3 text-zinc-100">
-        <PresentationSlideRenderer
-          quiz={quiz}
-          slide={aktuellerSlide}
-          slides={slides}
-          slideIndex={slideIndex}
-          slideLabel={getPresentationSlideTitle(aktuellerSlide, slides)}
-          theme={theme}
-          displayState={{
-            renderMode: "MODERATION_PREVIEW",
-            templateRevealCount: endstandRevealCount,
-            punktestand,
-            endstandRevealCount,
-            now: 0,
-            estimationPhase,
-            schaetzfrage: estimationQuestion,
-            isSchaetzfrageLoading: false,
-            remoteCountdownDauerSekunden: countdownRestSekunden,
-            remoteCountdownStartedAt: null,
-            remoteCountdownStatus: "idle",
-            mediaOverlayActive,
-            playbackCommand,
-            playbackCommandId,
+      <div
+        ref={previewHostRef}
+        className="mt-4 flex w-full justify-center"
+        data-testid="moderation-preview-host"
+      >
+        <div
+          aria-label="Präsentationsvorschau"
+          className="overflow-hidden rounded-xl border border-zinc-800 bg-black text-zinc-100"
+          data-testid="moderation-preview-viewport"
+          style={{
+            width: previewLayout.width,
+            height: previewLayout.height,
           }}
-        />
+        >
+          <div
+            style={{
+              width: MODERATION_PREVIEW_LOGICAL_WIDTH,
+              height: MODERATION_PREVIEW_LOGICAL_HEIGHT,
+              transform: `scale(${previewLayout.scale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            <PresentationSlideRenderer
+              quiz={quiz}
+              slide={aktuellerSlide}
+              slides={slides}
+              slideIndex={slideIndex}
+              slideLabel={getPresentationSlideTitle(aktuellerSlide, slides)}
+              theme={theme}
+              displayState={{
+                renderMode: "MODERATION_PREVIEW",
+                templateRevealCount: endstandRevealCount,
+                punktestand,
+                endstandRevealCount,
+                now: 0,
+                estimationPhase,
+                schaetzfrage: estimationQuestion,
+                isSchaetzfrageLoading: false,
+                remoteCountdownDauerSekunden: countdownRestSekunden,
+                remoteCountdownStartedAt: null,
+                remoteCountdownStatus: "idle",
+                mediaOverlayActive,
+                playbackCommand,
+                playbackCommandId,
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -581,7 +581,7 @@ export default function ModerationClient({
           </Link>
         </header>
         <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,2.4fr)_360px] lg:overflow-hidden">
-          <section className="flex flex-col gap-4">
+          <section className="flex min-h-0 flex-col gap-4 lg:overflow-y-auto lg:pr-1">
             <CurrentSlidePanel
               slideIndex={slideIndex}
               slides={slides}
