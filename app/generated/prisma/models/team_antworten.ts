@@ -36,6 +36,7 @@ export type Team_antwortenAvgAggregateOutputType = {
   auto_basis_punkte: runtime.Decimal | null
   auto_endpunkte: runtime.Decimal | null
   vergebene_punkte: runtime.Decimal | null
+  bewertungs_version: number | null
   manuelle_punkte: runtime.Decimal | null
   bewertet_von_user_id: number | null
 }
@@ -50,6 +51,7 @@ export type Team_antwortenSumAggregateOutputType = {
   auto_basis_punkte: runtime.Decimal | null
   auto_endpunkte: runtime.Decimal | null
   vergebene_punkte: runtime.Decimal | null
+  bewertungs_version: number | null
   manuelle_punkte: runtime.Decimal | null
   bewertet_von_user_id: number | null
 }
@@ -73,6 +75,7 @@ export type Team_antwortenMinAggregateOutputType = {
   vergebene_punkte: runtime.Decimal | null
   bewertungsstatus: $Enums.QuizAnswerEvaluationStatus | null
   bewertungsquelle: $Enums.QuizAnswerEvaluationSource | null
+  bewertungs_version: number | null
   manuelle_punkte: runtime.Decimal | null
   bewertet_am: Date | null
   bewertet_von_user_id: number | null
@@ -97,6 +100,7 @@ export type Team_antwortenMaxAggregateOutputType = {
   vergebene_punkte: runtime.Decimal | null
   bewertungsstatus: $Enums.QuizAnswerEvaluationStatus | null
   bewertungsquelle: $Enums.QuizAnswerEvaluationSource | null
+  bewertungs_version: number | null
   manuelle_punkte: runtime.Decimal | null
   bewertet_am: Date | null
   bewertet_von_user_id: number | null
@@ -122,6 +126,7 @@ export type Team_antwortenCountAggregateOutputType = {
   bewertungsstatus: number
   bewertungsquelle: number
   bewertungsdetails: number
+  bewertungs_version: number
   manuelle_punkte: number
   bewertet_am: number
   bewertet_von_user_id: number
@@ -139,6 +144,7 @@ export type Team_antwortenAvgAggregateInputType = {
   auto_basis_punkte?: true
   auto_endpunkte?: true
   vergebene_punkte?: true
+  bewertungs_version?: true
   manuelle_punkte?: true
   bewertet_von_user_id?: true
 }
@@ -153,6 +159,7 @@ export type Team_antwortenSumAggregateInputType = {
   auto_basis_punkte?: true
   auto_endpunkte?: true
   vergebene_punkte?: true
+  bewertungs_version?: true
   manuelle_punkte?: true
   bewertet_von_user_id?: true
 }
@@ -176,6 +183,7 @@ export type Team_antwortenMinAggregateInputType = {
   vergebene_punkte?: true
   bewertungsstatus?: true
   bewertungsquelle?: true
+  bewertungs_version?: true
   manuelle_punkte?: true
   bewertet_am?: true
   bewertet_von_user_id?: true
@@ -200,6 +208,7 @@ export type Team_antwortenMaxAggregateInputType = {
   vergebene_punkte?: true
   bewertungsstatus?: true
   bewertungsquelle?: true
+  bewertungs_version?: true
   manuelle_punkte?: true
   bewertet_am?: true
   bewertet_von_user_id?: true
@@ -225,6 +234,7 @@ export type Team_antwortenCountAggregateInputType = {
   bewertungsstatus?: true
   bewertungsquelle?: true
   bewertungsdetails?: true
+  bewertungs_version?: true
   manuelle_punkte?: true
   bewertet_am?: true
   bewertet_von_user_id?: true
@@ -337,6 +347,7 @@ export type Team_antwortenGroupByOutputType = {
   bewertungsstatus: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails: runtime.JsonValue | null
+  bewertungs_version: number
   manuelle_punkte: runtime.Decimal | null
   bewertet_am: Date | null
   bewertet_von_user_id: number | null
@@ -385,6 +396,7 @@ export type team_antwortenWhereInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.JsonNullableFilter<"team_antworten">
+  bewertungs_version?: Prisma.IntFilter<"team_antworten"> | number
   manuelle_punkte?: Prisma.DecimalNullableFilter<"team_antworten"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.DateTimeNullableFilter<"team_antworten"> | Date | string | null
   bewertet_von_user_id?: Prisma.IntNullableFilter<"team_antworten"> | number | null
@@ -418,6 +430,7 @@ export type team_antwortenOrderByWithRelationInput = {
   bewertungsstatus?: Prisma.SortOrder
   bewertungsquelle?: Prisma.SortOrder
   bewertungsdetails?: Prisma.SortOrderInput | Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrderInput | Prisma.SortOrder
   bewertet_am?: Prisma.SortOrderInput | Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -455,6 +468,7 @@ export type team_antwortenWhereUniqueInput = Prisma.AtLeast<{
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.JsonNullableFilter<"team_antworten">
+  bewertungs_version?: Prisma.IntFilter<"team_antworten"> | number
   manuelle_punkte?: Prisma.DecimalNullableFilter<"team_antworten"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.DateTimeNullableFilter<"team_antworten"> | Date | string | null
   bewertet_von_user_id?: Prisma.IntNullableFilter<"team_antworten"> | number | null
@@ -488,6 +502,7 @@ export type team_antwortenOrderByWithAggregationInput = {
   bewertungsstatus?: Prisma.SortOrder
   bewertungsquelle?: Prisma.SortOrder
   bewertungsdetails?: Prisma.SortOrderInput | Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrderInput | Prisma.SortOrder
   bewertet_am?: Prisma.SortOrderInput | Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -521,6 +536,7 @@ export type team_antwortenScalarWhereWithAggregatesInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusWithAggregatesFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceWithAggregatesFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.JsonNullableWithAggregatesFilter<"team_antworten">
+  bewertungs_version?: Prisma.IntWithAggregatesFilter<"team_antworten"> | number
   manuelle_punkte?: Prisma.DecimalNullableWithAggregatesFilter<"team_antworten"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.DateTimeNullableWithAggregatesFilter<"team_antworten"> | Date | string | null
   bewertet_von_user_id?: Prisma.IntNullableWithAggregatesFilter<"team_antworten"> | number | null
@@ -540,6 +556,7 @@ export type team_antwortenCreateInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -572,6 +589,7 @@ export type team_antwortenUncheckedCreateInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -593,6 +611,7 @@ export type team_antwortenUpdateInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -625,6 +644,7 @@ export type team_antwortenUncheckedUpdateInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -652,6 +672,7 @@ export type team_antwortenCreateManyInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -671,6 +692,7 @@ export type team_antwortenUpdateManyMutationInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -695,6 +717,7 @@ export type team_antwortenUncheckedUpdateManyInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -735,6 +758,7 @@ export type team_antwortenCountOrderByAggregateInput = {
   bewertungsstatus?: Prisma.SortOrder
   bewertungsquelle?: Prisma.SortOrder
   bewertungsdetails?: Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrder
   bewertet_am?: Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrder
@@ -750,6 +774,7 @@ export type team_antwortenAvgOrderByAggregateInput = {
   auto_basis_punkte?: Prisma.SortOrder
   auto_endpunkte?: Prisma.SortOrder
   vergebene_punkte?: Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrder
 }
@@ -773,6 +798,7 @@ export type team_antwortenMaxOrderByAggregateInput = {
   vergebene_punkte?: Prisma.SortOrder
   bewertungsstatus?: Prisma.SortOrder
   bewertungsquelle?: Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrder
   bewertet_am?: Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrder
@@ -797,6 +823,7 @@ export type team_antwortenMinOrderByAggregateInput = {
   vergebene_punkte?: Prisma.SortOrder
   bewertungsstatus?: Prisma.SortOrder
   bewertungsquelle?: Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrder
   bewertet_am?: Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrder
@@ -812,6 +839,7 @@ export type team_antwortenSumOrderByAggregateInput = {
   auto_basis_punkte?: Prisma.SortOrder
   auto_endpunkte?: Prisma.SortOrder
   vergebene_punkte?: Prisma.SortOrder
+  bewertungs_version?: Prisma.SortOrder
   manuelle_punkte?: Prisma.SortOrder
   bewertet_von_user_id?: Prisma.SortOrder
 }
@@ -1123,6 +1151,7 @@ export type team_antwortenCreateWithoutAntwortenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   quiz_abschnitte: Prisma.quiz_abschnitteCreateNestedOneWithoutTeam_antwortenInput
@@ -1153,6 +1182,7 @@ export type team_antwortenUncheckedCreateWithoutAntwortenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1209,6 +1239,7 @@ export type team_antwortenScalarWhereInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFilter<"team_antworten"> | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.JsonNullableFilter<"team_antworten">
+  bewertungs_version?: Prisma.IntFilter<"team_antworten"> | number
   manuelle_punkte?: Prisma.DecimalNullableFilter<"team_antworten"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.DateTimeNullableFilter<"team_antworten"> | Date | string | null
   bewertet_von_user_id?: Prisma.IntNullableFilter<"team_antworten"> | number | null
@@ -1228,6 +1259,7 @@ export type team_antwortenCreateWithoutQuizInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1258,6 +1290,7 @@ export type team_antwortenUncheckedCreateWithoutQuizInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1305,6 +1338,7 @@ export type team_antwortenCreateWithoutQuiz_fragenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1335,6 +1369,7 @@ export type team_antwortenUncheckedCreateWithoutQuiz_fragenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1382,6 +1417,7 @@ export type team_antwortenCreateWithoutQuiz_abschnitteInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1412,6 +1448,7 @@ export type team_antwortenUncheckedCreateWithoutQuiz_abschnitteInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1459,6 +1496,7 @@ export type team_antwortenCreateWithoutQuiz_team_sessionsInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1489,6 +1527,7 @@ export type team_antwortenUncheckedCreateWithoutQuiz_team_sessionsInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1536,6 +1575,7 @@ export type team_antwortenCreateWithoutAntwortfelderInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1567,6 +1607,7 @@ export type team_antwortenUncheckedCreateWithoutAntwortfelderInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1603,6 +1644,7 @@ export type team_antwortenUpdateWithoutAntwortfelderInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -1634,6 +1676,7 @@ export type team_antwortenUncheckedUpdateWithoutAntwortfelderInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1654,6 +1697,7 @@ export type team_antwortenCreateWithoutAntwortauswahlenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1685,6 +1729,7 @@ export type team_antwortenUncheckedCreateWithoutAntwortauswahlenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1721,6 +1766,7 @@ export type team_antwortenUpdateWithoutAntwortauswahlenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -1752,6 +1798,7 @@ export type team_antwortenUncheckedUpdateWithoutAntwortauswahlenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1772,6 +1819,7 @@ export type team_antwortenCreateWithoutBewertet_vonInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antworten?: Prisma.antwortenCreateNestedOneWithoutTeam_antwortenInput
@@ -1803,6 +1851,7 @@ export type team_antwortenUncheckedCreateWithoutBewertet_vonInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   antwortfelder?: Prisma.team_antwortfelderUncheckedCreateNestedManyWithoutTeam_antwortInput
@@ -1854,6 +1903,7 @@ export type team_antwortenCreateManyAntwortenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1873,6 +1923,7 @@ export type team_antwortenUpdateWithoutAntwortenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneRequiredWithoutTeam_antwortenNestedInput
@@ -1903,6 +1954,7 @@ export type team_antwortenUncheckedUpdateWithoutAntwortenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1929,6 +1981,7 @@ export type team_antwortenUncheckedUpdateManyWithoutAntwortenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1953,6 +2006,7 @@ export type team_antwortenCreateManyQuizInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -1972,6 +2026,7 @@ export type team_antwortenUpdateWithoutQuizInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -2002,6 +2057,7 @@ export type team_antwortenUncheckedUpdateWithoutQuizInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2028,6 +2084,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuizInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2052,6 +2109,7 @@ export type team_antwortenCreateManyQuiz_fragenInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -2071,6 +2129,7 @@ export type team_antwortenUpdateWithoutQuiz_fragenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -2101,6 +2160,7 @@ export type team_antwortenUncheckedUpdateWithoutQuiz_fragenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2127,6 +2187,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuiz_fragenInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2151,6 +2212,7 @@ export type team_antwortenCreateManyQuiz_abschnitteInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -2170,6 +2232,7 @@ export type team_antwortenUpdateWithoutQuiz_abschnitteInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -2200,6 +2263,7 @@ export type team_antwortenUncheckedUpdateWithoutQuiz_abschnitteInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2226,6 +2290,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2250,6 +2315,7 @@ export type team_antwortenCreateManyQuiz_team_sessionsInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
   bewertet_von_user_id?: number | null
@@ -2269,6 +2335,7 @@ export type team_antwortenUpdateWithoutQuiz_team_sessionsInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -2299,6 +2366,7 @@ export type team_antwortenUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2325,6 +2393,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bewertet_von_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2350,6 +2419,7 @@ export type team_antwortenCreateManyBewertet_vonInput = {
   bewertungsstatus?: $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: number
   manuelle_punkte?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Date | string | null
 }
@@ -2368,6 +2438,7 @@ export type team_antwortenUpdateWithoutBewertet_vonInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antworten?: Prisma.antwortenUpdateOneWithoutTeam_antwortenNestedInput
@@ -2399,6 +2470,7 @@ export type team_antwortenUncheckedUpdateWithoutBewertet_vonInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antwortfelder?: Prisma.team_antwortfelderUncheckedUpdateManyWithoutTeam_antwortNestedInput
@@ -2425,6 +2497,7 @@ export type team_antwortenUncheckedUpdateManyWithoutBewertet_vonInput = {
   bewertungsstatus?: Prisma.EnumQuizAnswerEvaluationStatusFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationStatus
   bewertungsquelle?: Prisma.EnumQuizAnswerEvaluationSourceFieldUpdateOperationsInput | $Enums.QuizAnswerEvaluationSource
   bewertungsdetails?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bewertungs_version?: Prisma.IntFieldUpdateOperationsInput | number
   manuelle_punkte?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bewertet_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -2489,6 +2562,7 @@ export type team_antwortenSelect<ExtArgs extends runtime.Types.Extensions.Intern
   bewertungsstatus?: boolean
   bewertungsquelle?: boolean
   bewertungsdetails?: boolean
+  bewertungs_version?: boolean
   manuelle_punkte?: boolean
   bewertet_am?: boolean
   bewertet_von_user_id?: boolean
@@ -2523,6 +2597,7 @@ export type team_antwortenSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   bewertungsstatus?: boolean
   bewertungsquelle?: boolean
   bewertungsdetails?: boolean
+  bewertungs_version?: boolean
   manuelle_punkte?: boolean
   bewertet_am?: boolean
   bewertet_von_user_id?: boolean
@@ -2554,6 +2629,7 @@ export type team_antwortenSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   bewertungsstatus?: boolean
   bewertungsquelle?: boolean
   bewertungsdetails?: boolean
+  bewertungs_version?: boolean
   manuelle_punkte?: boolean
   bewertet_am?: boolean
   bewertet_von_user_id?: boolean
@@ -2585,12 +2661,13 @@ export type team_antwortenSelectScalar = {
   bewertungsstatus?: boolean
   bewertungsquelle?: boolean
   bewertungsdetails?: boolean
+  bewertungs_version?: boolean
   manuelle_punkte?: boolean
   bewertet_am?: boolean
   bewertet_von_user_id?: boolean
 }
 
-export type team_antwortenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_antwort_id" | "quiz_id" | "quiz_abschnitt_id" | "quiz_fragen_id" | "quiz_team_session_id" | "antwort_text" | "antwort_id" | "aktualisiert_am" | "bewertete_antwort" | "bewertung_final" | "ist_manuell_falsch" | "ist_manuell_richtig" | "ist_skurril" | "auto_basis_punkte" | "auto_endpunkte" | "vergebene_punkte" | "bewertungsstatus" | "bewertungsquelle" | "bewertungsdetails" | "manuelle_punkte" | "bewertet_am" | "bewertet_von_user_id", ExtArgs["result"]["team_antworten"]>
+export type team_antwortenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_antwort_id" | "quiz_id" | "quiz_abschnitt_id" | "quiz_fragen_id" | "quiz_team_session_id" | "antwort_text" | "antwort_id" | "aktualisiert_am" | "bewertete_antwort" | "bewertung_final" | "ist_manuell_falsch" | "ist_manuell_richtig" | "ist_skurril" | "auto_basis_punkte" | "auto_endpunkte" | "vergebene_punkte" | "bewertungsstatus" | "bewertungsquelle" | "bewertungsdetails" | "bewertungs_version" | "manuelle_punkte" | "bewertet_am" | "bewertet_von_user_id", ExtArgs["result"]["team_antworten"]>
 export type team_antwortenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.team_antworten$antwortenArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_abschnitteDefaultArgs<ExtArgs>
@@ -2651,6 +2728,7 @@ export type $team_antwortenPayload<ExtArgs extends runtime.Types.Extensions.Inte
     bewertungsstatus: $Enums.QuizAnswerEvaluationStatus
     bewertungsquelle: $Enums.QuizAnswerEvaluationSource
     bewertungsdetails: runtime.JsonValue | null
+    bewertungs_version: number
     manuelle_punkte: runtime.Decimal | null
     bewertet_am: Date | null
     bewertet_von_user_id: number | null
@@ -3104,6 +3182,7 @@ export interface team_antwortenFieldRefs {
   readonly bewertungsstatus: Prisma.FieldRef<"team_antworten", 'QuizAnswerEvaluationStatus'>
   readonly bewertungsquelle: Prisma.FieldRef<"team_antworten", 'QuizAnswerEvaluationSource'>
   readonly bewertungsdetails: Prisma.FieldRef<"team_antworten", 'Json'>
+  readonly bewertungs_version: Prisma.FieldRef<"team_antworten", 'Int'>
   readonly manuelle_punkte: Prisma.FieldRef<"team_antworten", 'Decimal'>
   readonly bewertet_am: Prisma.FieldRef<"team_antworten", 'DateTime'>
   readonly bewertet_von_user_id: Prisma.FieldRef<"team_antworten", 'Int'>

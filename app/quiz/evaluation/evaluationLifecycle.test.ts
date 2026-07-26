@@ -16,6 +16,10 @@ const pointEvaluation = readFileSync(
   "app/quiz/evaluation/evaluateQuestionPoints.ts",
   "utf8",
 );
+const versionMigration = readFileSync(
+  "prisma/migrations/20260726120000_add_quiz_answer_evaluation_version/migration.sql",
+  "utf8",
+);
 
 test("schema persists automatic, awarded and auditable manual evaluation data", () => {
   for (const field of [
@@ -24,6 +28,7 @@ test("schema persists automatic, awarded and auditable manual evaluation data", 
     "vergebene_punkte",
     "bewertungsstatus",
     "bewertungsquelle",
+    "bewertungs_version",
     "manuelle_punkte",
     "bewertet_von_user_id",
     "bewertet_am",
@@ -31,6 +36,7 @@ test("schema persists automatic, awarded and auditable manual evaluation data", 
     assert.match(schema, new RegExp(`\\b${field}\\b`));
   }
   assert.match(schema, /model team_antwort_auswahlen/);
+  assert.match(versionMigration, /ADD COLUMN "bewertungs_version"/);
 });
 
 test("migration copies legacy selections and preserves binary historical points", () => {
@@ -49,7 +55,7 @@ test("answer writes recalculate while reset restores the automatic result", () =
     actions.indexOf("export async function updateTeamAntwortBewertung"),
     actions.indexOf("export async function updateQuizFragenStatistiken"),
   );
-  assert.match(save, /recalculateQuizQuestionEvaluation\(data\.quizFragenId, tx\)/);
+  assert.match(save, /recalculateQuizAnswerEvaluation\(teamAntwort\.team_antwort_id, tx\)/);
   assert.match(moderation, /vergebene_punkte: existing\.auto_endpunkte/);
   assert.match(moderation, /bewertet_von_user_id: Number\(access\.session\.user\.id\)/);
 });
@@ -64,5 +70,54 @@ test("ranking sums only persisted Decimal awarded points and keeps zero-point te
   assert.match(ranking, /right\._decimal\.cmp\(left\._decimal\)/);
   assert.doesNotMatch(ranking, /punkte \+=/);
   assert.match(evaluationService, /vergebene_punkte/);
+  assert.match(evaluationService, /ensureQuizEvaluation/);
+  assert.match(evaluationService, /preserveManualOverrides/);
+  assert.match(evaluationService, /bewertet_am: answer\.bewertet_am/);
   assert.match(pointEvaluation, /base\.basePoints\.mul\(2\)/);
+});
+
+test("read paths backfill only incomplete evaluations", () => {
+  for (const functionName of [
+    "getQuizAuswertungUebersicht",
+    "getQuizAuswertungAlleAntworten",
+    "getQuizPunktestand",
+  ]) {
+    const start = actions.indexOf(`export async function ${functionName}`);
+    const nextExport = actions.indexOf("export async function", start + 1);
+    const implementation = actions.slice(
+      start,
+      nextExport === -1 ? undefined : nextExport,
+    );
+    assert.match(implementation, /ensureQuizEvaluation\(quizId\)/);
+    assert.doesNotMatch(implementation, /recalculateQuizEvaluation\(quizId\)/);
+  }
+});
+
+test("manual recalculation is authorized and preserves overrides", () => {
+  const start = actions.indexOf(
+    "export async function recalculateQuizEvaluationsAction",
+  );
+  const end = actions.indexOf(
+    "export async function updateQuizFragenStatistiken",
+  );
+  const action = actions.slice(start, end);
+  assert.match(action, /requireQuizAdmin\(quizId\)/);
+  assert.match(action, /preserveManualOverrides: true/);
+  assert.match(evaluationService, /preserveManualOverrides !== false/);
+  assert.match(evaluationService, /manuelle_punkte: null/);
+});
+
+test("answer and manual evaluation writes stay in transactional recalculation", () => {
+  const save = actions.slice(
+    actions.indexOf("export async function saveTeamAntwort"),
+    actions.indexOf("export async function getQuizFrageAuswertung"),
+  );
+  const moderation = actions.slice(
+    actions.indexOf("export async function updateTeamAntwortBewertung"),
+    actions.indexOf("export async function recalculateQuizEvaluationsAction"),
+  );
+  assert.match(save, /hasAnswerContentChanged/);
+  assert.match(save, /prisma\.\$transaction/);
+  assert.match(moderation, /prisma\.\$transaction/);
+  assert.match(moderation, /recalculateQuizQuestionEvaluation\(existing\.quiz_fragen_id, tx\)/);
 });

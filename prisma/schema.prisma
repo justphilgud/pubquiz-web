@@ -281,6 +281,8 @@ model quiz_fragen {
   quiz_abschnitt_id             Int?
   punkte_basis                  Decimal          @default(1)
   punkte_modus                  String           @default("standard")
+  risiko_pool_teamanzahl        Int?
+  risiko_pool_fixiert_am        DateTime?
   freie_antwort_erlaubt         Boolean          @default(false)
   praesentationsdauer_messungen Int?             @default(0)
   praesentationsdauer_sekunden  Int?
@@ -386,6 +388,7 @@ model team_antworten {
   bewertungsstatus     QuizAnswerEvaluationStatus @default(UNANSWERED)
   bewertungsquelle     QuizAnswerEvaluationSource @default(LEGACY)
   bewertungsdetails    Json?
+  bewertungs_version    Int                  @default(0)
   manuelle_punkte      Decimal?             @db.Decimal(12, 4)
   bewertet_am          DateTime?
   bewertet_von_user_id Int?

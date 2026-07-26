@@ -1,7 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { updateTeamAntwortBewertung } from "../../actions";
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
+import {
+  recalculateQuizEvaluationsAction,
+  updateTeamAntwortBewertung,
+} from "../../actions";
+import { formatQuizPoints } from "../../formatQuizPoints";
 
 type AuswertungsAntwort = {
   quiz_fragen_id: number;
@@ -10,6 +15,10 @@ type AuswertungsAntwort = {
   frage: string;
   richtigeAntwort: string;
   punkte_modus?: string;
+  risikoPoolTeamanzahl: number | null;
+  risikoRichtigeTeams: number;
+  risikoPruefpflichtigeAntworten: number;
+  risikoPunkteJeRichtigemTeam: number;
 
   team_antwort_id: number | null;
   istUnbeantwortet: boolean;
@@ -41,6 +50,7 @@ type PunktestandEintrag = {
 type BewertungsAktion =
   | "richtig"
   | "teilweise"
+  | "punkte"
   | "falsch"
   | "skurril"
   | "zuruecksetzen";
@@ -63,6 +73,12 @@ export default function QuizAuswertungClient({
   const [zeigeUnbeantwortete, setZeigeUnbeantwortete] = useState(false);
   const [teamIndex, setTeamIndex] = useState<number | null>(null);
   const [punkteOverrides, setPunkteOverrides] = useState<Record<number, string>>({});
+  const [rekalkulationLaeuft, setRekalkulationLaeuft] = useState(false);
+  const [rekalkulationsmeldung, setRekalkulationsmeldung] = useState<string | null>(
+    null,
+  );
+  const rekalkulationLock = useRef(false);
+  const router = useRouter();
 
   const teamnamen = useMemo(
     () =>
@@ -96,6 +112,34 @@ export default function QuizAuswertungClient({
       aktion,
       punkte,
     });
+  }
+
+  async function handleRekalkulation() {
+    if (
+      rekalkulationLock.current ||
+      !window.confirm(
+        "Automatische Bewertungen dieses Quiz neu berechnen? Manuelle Punkte bleiben erhalten.",
+      )
+    ) {
+      return;
+    }
+    rekalkulationLock.current = true;
+    setRekalkulationLaeuft(true);
+    setRekalkulationsmeldung(null);
+    try {
+      const result = await recalculateQuizEvaluationsAction(quizId);
+      setRekalkulationsmeldung(
+        `${result.recalculatedAnswers} Antworten wurden neu berechnet.`,
+      );
+      router.refresh();
+    } catch {
+      setRekalkulationsmeldung(
+        "Die Bewertungen konnten nicht neu berechnet werden.",
+      );
+    } finally {
+      rekalkulationLock.current = false;
+      setRekalkulationLaeuft(false);
+    }
   }
 
   function vorherigesTeam() {
@@ -141,7 +185,29 @@ export default function QuizAuswertungClient({
           >
             Punktestand
           </button>
+
+          <div className="ml-auto flex flex-col items-end gap-1">
+            <button
+              type="button"
+              onClick={handleRekalkulation}
+              disabled={rekalkulationLaeuft}
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {rekalkulationLaeuft
+                ? "Bewertungen werden berechnet …"
+                : "Bewertungen neu berechnen"}
+            </button>
+            <span className="text-xs text-slate-500">
+              Automatische Bewertungen neu berechnen; manuelle Punkte bleiben
+              erhalten.
+            </span>
+          </div>
         </div>
+        {rekalkulationsmeldung && (
+          <p className="mt-2 text-sm font-semibold text-slate-700" role="status">
+            {rekalkulationsmeldung}
+          </p>
+        )}
       </div>
 
       {aktiverTab === "punktestand" && (
@@ -167,7 +233,7 @@ export default function QuizAuswertungClient({
                   </td>
 
                   <td className="px-4 py-3 text-lg font-black text-blue-700">
-                    {team.punkte.toFixed(1)}
+                    {formatQuizPoints(team.punkte)}
                   </td>
                 </tr>
               ))}
@@ -329,6 +395,34 @@ export default function QuizAuswertungClient({
                         </div>
 
                         {antwort.frage}
+                        {antwort.punkte_modus === "risikofrage" && (
+                          <div className="mt-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-900">
+                            <strong>Risikofrage</strong>
+                            <div>
+                              Pool:{" "}
+                              {antwort.risikoPoolTeamanzahl === null
+                                ? "noch nicht fixiert"
+                                : `${antwort.risikoPoolTeamanzahl} Punkte`}
+                            </div>
+                            <div>
+                              Richtige Teams: {antwort.risikoRichtigeTeams}
+                            </div>
+                            <div>
+                              {antwort.risikoRichtigeTeams === 0
+                                ? "Keine richtige Antwort · Vergeben: 0 Punkte"
+                                : `Automatisch: ${formatQuizPoints(
+                                    antwort.risikoPunkteJeRichtigemTeam,
+                                  )} Punkte je richtigem Team`}
+                            </div>
+                            {antwort.risikoPruefpflichtigeAntworten > 0 && (
+                              <div className="mt-1 font-bold">
+                                Verteilung vorläufig –{" "}
+                                {antwort.risikoPruefpflichtigeAntworten}{" "}
+                                Antworten müssen noch geprüft werden.
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
 
                       <td className="max-w-xs px-4 py-3 font-semibold text-green-900">
@@ -351,8 +445,8 @@ export default function QuizAuswertungClient({
                         ) : (
                           <div className="flex flex-wrap gap-2">
                             <div className="w-full text-xs text-slate-600">
-                              Automatisch: <strong>{antwort.autoEndpunkte}</strong> Punkte
-                              {" · "}Vergeben: <strong>{antwort.vergebenePunkte}</strong>
+                              Automatisch: <strong>{formatQuizPoints(antwort.autoEndpunkte)}</strong> Punkte
+                              {" · "}Vergeben: <strong>{formatQuizPoints(antwort.vergebenePunkte)}</strong>
                               {" · "}{antwort.bewertungsstatus}
                               {antwort.bewertungsquelle === "MANUAL" ? " (manuell)" : ""}
                             </div>
@@ -395,16 +489,26 @@ export default function QuizAuswertungClient({
                                 onClick={() =>
                                   handleBewertung(
                                     antwort.team_antwort_id!,
-                                    "teilweise",
+                                    antwort.punkte_modus === "risikofrage"
+                                      ? "punkte"
+                                      : "teilweise",
                                     punkteOverrides[antwort.team_antwort_id!] ??
                                       String(antwort.vergebenePunkte),
                                   )
                                 }
                                 className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800"
                               >
-                                Teilweise
+                                {antwort.punkte_modus === "risikofrage"
+                                  ? "Punkte setzen"
+                                  : "Teilweise"}
                               </button>
                             </label>
+                            {antwort.punkte_modus === "risikofrage" && (
+                              <div className="w-full text-xs text-slate-500">
+                                Richtig/Falsch steuert die Verteilung. Ein
+                                Punktewert überschreibt nur dieses Team.
+                              </div>
+                            )}
 
                             <button
                               type="button"

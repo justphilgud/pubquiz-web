@@ -75,6 +75,7 @@ import {
   PendingCategoryReviewError,
   resolvePendingCategoryReview,
 } from "./pendingCategoryReview";
+import { recalculateQuizQuestionEvaluation } from "@/app/quiz/evaluation/evaluation.server";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -2138,6 +2139,18 @@ export async function saveQuestion(
           where: { antwortfeld_id: { in: fieldIdsToDelete } },
         });
       }
+
+      const quizAssignments = await tx.quiz_fragen.findMany({
+        where: { fragen_id: payload.questionId },
+        select: { quiz_fragen_id: true },
+      });
+      for (const assignment of quizAssignments) {
+        await recalculateQuizQuestionEvaluation(
+          assignment.quiz_fragen_id,
+          tx,
+        );
+      }
+
       for (const answer of draft.answers) {
         if (!answerStates.some((state) => state.clientId === answer.clientId)) {
           answerStates.push({ clientId: answer.clientId, media: null });

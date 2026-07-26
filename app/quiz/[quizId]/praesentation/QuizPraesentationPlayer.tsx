@@ -9,6 +9,7 @@ import {
   getZufaelligeSchaetzfrage,
   getSchaetzfrageById,
 } from "../../actions";
+import { formatQuizPoints } from "../../formatQuizPoints";
 
 import {
   getPraesentationStatus,
@@ -1353,7 +1354,7 @@ export default function QuizPraesentationPlayer({
                   </div>
 
                   <div className="rounded-2xl border-4 border-yellow-300 bg-black/70 px-4 py-3 text-right text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
-                    {team.punkte.toFixed(1)}
+                    {formatQuizPoints(team.punkte)}
                   </div>
                 </div>
               );
@@ -1476,7 +1477,7 @@ export default function QuizPraesentationPlayer({
                   </div>
 
                   <div className="rounded-2xl border-4 border-yellow-300 bg-black/70 px-4 py-3 text-right text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
-                    {istSichtbar ? team.punkte.toFixed(1) : "?"}
+                    {istSichtbar ? formatQuizPoints(team.punkte) : "?"}
                   </div>
                 </div>
               );

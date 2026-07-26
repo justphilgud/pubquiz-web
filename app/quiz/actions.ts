@@ -43,9 +43,13 @@ import {
   type QuizTemporalStatus,
 } from "./quizMasterData";
 import {
+  ensureQuizEvaluation,
+  ensureQuizQuestionEvaluation,
   recalculateQuizEvaluation,
+  recalculateQuizAnswerEvaluation,
   recalculateQuizQuestionEvaluation,
 } from "./evaluation/evaluation.server";
+import { hasAnswerContentChanged } from "./evaluation/answerContent";
 import {
   isPartialPointsCapable,
   validateQuestionPointsMode,
@@ -1380,6 +1384,7 @@ export async function updateQuizQuestionFreeAnswerMode(data: {
       freie_antwort_erlaubt: data.freieAntwortErlaubt,
     },
   });
+  await recalculateQuizQuestionEvaluation(data.quizFragenId);
 
   revalidatePath(`/quiz/${data.quizId}`);
   revalidatePath(`/quiz/${data.quizId}/antworten`);
@@ -2168,6 +2173,52 @@ export async function saveTeamAntwort(data: {
   }
 
   await prisma.$transaction(async (tx) => {
+    const previousAnswer = await tx.team_antworten.findUnique({
+      where: {
+        quiz_fragen_id_quiz_team_session_id: {
+          quiz_fragen_id: data.quizFragenId,
+          quiz_team_session_id: tokenPayload.sessionId,
+        },
+      },
+      include: {
+        antwortauswahlen: true,
+        antwortfelder: true,
+      },
+    });
+    const nextStructuredAnswers =
+      data.antwortfelder ??
+      previousAnswer?.antwortfelder.map((field) => ({
+        antwortfeldId: field.antwortfeld_id,
+        antwortText: field.antwort_text,
+      })) ??
+      [];
+    const contentChanged =
+      previousAnswer === null ||
+      hasAnswerContentChanged(
+        {
+          answerText: previousAnswer.antwort_text,
+          selectedAnswerIds:
+            previousAnswer.antwortauswahlen.length > 0
+              ? previousAnswer.antwortauswahlen.map(
+                  (selection) => selection.antwort_id,
+                )
+              : previousAnswer.antwort_id === null
+                ? []
+                : [previousAnswer.antwort_id],
+          structuredAnswers: previousAnswer.antwortfelder.map((field) => ({
+            fieldId: field.antwortfeld_id,
+            answerText: field.antwort_text,
+          })),
+        },
+        {
+          answerText: data.antwortText,
+          selectedAnswerIds: requestedAnswerIds,
+          structuredAnswers: nextStructuredAnswers.map((field) => ({
+            fieldId: field.antwortfeldId,
+            answerText: field.antwortText,
+          })),
+        },
+      );
     const teamAntwort = await tx.team_antworten.upsert({
       where: {
         quiz_fragen_id_quiz_team_session_id: {
@@ -2181,13 +2232,17 @@ export async function saveTeamAntwort(data: {
         antwort_text: data.antwortText,
         antwort_id: requestedAnswerIds[0] ?? null,
         aktualisiert_am: new Date(),
-        manuelle_punkte: null,
-        bewertet_am: null,
-        bewertet_von_user_id: null,
-        bewertungsquelle: "AUTO",
-        ist_manuell_falsch: false,
-        ist_manuell_richtig: false,
-        bewertung_final: false,
+        ...(contentChanged
+          ? {
+              manuelle_punkte: null,
+              bewertet_am: null,
+              bewertet_von_user_id: null,
+              bewertungsquelle: "AUTO" as const,
+              ist_manuell_falsch: false,
+              ist_manuell_richtig: false,
+              bewertung_final: false,
+            }
+          : {}),
       },
       create: {
         quiz_id: data.quizId,
@@ -2230,7 +2285,7 @@ export async function saveTeamAntwort(data: {
         });
       }
     }
-    await recalculateQuizQuestionEvaluation(data.quizFragenId, tx);
+    await recalculateQuizAnswerEvaluation(teamAntwort.team_antwort_id, tx);
   });
 
   return {
@@ -2242,7 +2297,7 @@ export async function getQuizFrageAuswertung(
   quizFragenId: number,
 ) {
   await requireQuizViewer(quizId);
-  await recalculateQuizQuestionEvaluation(quizFragenId);
+  await ensureQuizQuestionEvaluation(quizFragenId);
   const quizFrage = await prisma.quiz_fragen.findFirst({
     where: {
       quiz_fragen_id: quizFragenId,
@@ -2339,91 +2394,151 @@ export async function getQuizFrageAuswertung(
 export async function updateTeamAntwortBewertung(data: {
   quizId: number;
   teamAntwortId: number;
-  aktion: "richtig" | "teilweise" | "falsch" | "skurril" | "zuruecksetzen";
+  aktion:
+    | "richtig"
+    | "teilweise"
+    | "punkte"
+    | "falsch"
+    | "skurril"
+    | "zuruecksetzen";
   punkte?: string;
 }) {
   const access = await requireQuizAdmin(data.quizId);
   const existing = await requireQuizTeamAnswer(data.quizId, data.teamAntwortId);
 
-  if (data.aktion === "skurril") {
-    await prisma.team_antworten.update({
-      where: { team_antwort_id: data.teamAntwortId },
-      data: {
-        ist_skurril: !existing.ist_skurril,
-      },
-    });
-  }
-
-  if (data.aktion === "zuruecksetzen") {
-    await prisma.team_antworten.update({
-      where: { team_antwort_id: data.teamAntwortId },
-      data: {
-        ist_manuell_richtig: false,
-        ist_manuell_falsch: false,
-        ist_skurril: false,
-        bewertete_antwort: null,
-        bewertung_final: false,
-        manuelle_punkte: null,
-        vergebene_punkte: existing.auto_endpunkte,
-        bewertungsstatus: "UNANSWERED",
-        bewertungsquelle: "AUTO",
-        bewertet_am: null,
-        bewertet_von_user_id: null,
-      },
-    });
-  }
-
-  if (["richtig", "teilweise", "falsch"].includes(data.aktion)) {
-    const question = await prisma.quiz_fragen.findUniqueOrThrow({
-      where: { quiz_fragen_id: existing.quiz_fragen_id },
-      select: { punkte_basis: true, punkte_modus: true },
-    });
-    const maximum = question.punkte_modus === "expertenbonus"
-      ? question.punkte_basis.mul(2)
-      : question.punkte_basis;
-    let points: Prisma.Decimal;
-    try {
-      points =
-        data.punkte !== undefined
-          ? new Prisma.Decimal(data.punkte.replace(",", "."))
-          : data.aktion === "richtig"
-            ? maximum
-            : new Prisma.Decimal(0);
-    } catch {
-      throw new Error("Die Punktzahl ist ungültig.");
+  await prisma.$transaction(async (tx) => {
+    if (data.aktion === "skurril") {
+      await tx.team_antworten.update({
+        where: { team_antwort_id: data.teamAntwortId },
+        data: {
+          ist_skurril: !existing.ist_skurril,
+        },
+      });
     }
+
+    if (data.aktion === "zuruecksetzen") {
+      await tx.team_antworten.update({
+        where: { team_antwort_id: data.teamAntwortId },
+        data: {
+          ist_manuell_richtig: false,
+          ist_manuell_falsch: false,
+          ist_skurril: false,
+          bewertete_antwort: null,
+          bewertung_final: false,
+          manuelle_punkte: null,
+          vergebene_punkte: existing.auto_endpunkte,
+          bewertungsstatus: "UNANSWERED",
+          bewertungsquelle: "AUTO",
+          bewertet_am: null,
+          bewertet_von_user_id: null,
+        },
+      });
+    }
+
     if (
-      points.lt(0) ||
-      points.gt(maximum) ||
-      (data.aktion === "falsch" && !points.eq(0)) ||
-      (data.aktion === "richtig" && !points.eq(maximum)) ||
-      (data.aktion === "teilweise" && (points.lte(0) || points.gte(maximum)))
+      ["richtig", "teilweise", "punkte", "falsch"].includes(data.aktion)
     ) {
-      throw new Error("Die Punktzahl passt nicht zum gewählten Bewertungsstatus.");
-    }
-    await prisma.team_antworten.update({
-      where: { team_antwort_id: data.teamAntwortId },
-      data: {
-        ist_manuell_richtig: data.aktion === "richtig",
-        ist_manuell_falsch: data.aktion === "falsch",
-        bewertung_final: true,
-        manuelle_punkte: points,
-        vergebene_punkte: points,
-        bewertungsstatus:
+      const question = await tx.quiz_fragen.findUniqueOrThrow({
+        where: { quiz_fragen_id: existing.quiz_fragen_id },
+        select: {
+          punkte_basis: true,
+          punkte_modus: true,
+          risiko_pool_teamanzahl: true,
+        },
+      });
+      const isRiskQuestion = question.punkte_modus === "risikofrage";
+      if (isRiskQuestion && data.aktion === "teilweise") {
+        throw new Error("Risikofragen unterstützen keine Teilbewertung.");
+      }
+      const maximum =
+        question.punkte_modus === "expertenbonus"
+          ? question.punkte_basis.mul(2)
+          : isRiskQuestion
+            ? new Prisma.Decimal(question.risiko_pool_teamanzahl ?? 0)
+            : question.punkte_basis;
+      let points: Prisma.Decimal;
+      try {
+        points =
+          data.punkte !== undefined
+            ? new Prisma.Decimal(data.punkte.replace(",", "."))
+            : data.aktion === "richtig"
+              ? maximum
+              : new Prisma.Decimal(0);
+      } catch {
+        throw new Error("Die Punktzahl ist ungültig.");
+      }
+      if (
+        points.lt(0) ||
+        points.gt(maximum) ||
+        (data.aktion === "falsch" && !points.eq(0)) ||
+        (!isRiskQuestion &&
+          data.aktion === "richtig" &&
+          !points.eq(maximum)) ||
+        (data.aktion === "teilweise" &&
+          (points.lte(0) || points.gte(maximum))) ||
+        (data.aktion === "punkte" && data.punkte === undefined)
+      ) {
+        throw new Error(
+          "Die Punktzahl passt nicht zum gewählten Bewertungsstatus.",
+        );
+      }
+
+      if (data.aktion === "punkte") {
+        await tx.team_antworten.update({
+          where: { team_antwort_id: data.teamAntwortId },
+          data: {
+            manuelle_punkte: points,
+            vergebene_punkte: points,
+            bewertungsquelle: "MANUAL",
+            bewertet_am: new Date(),
+            bewertet_von_user_id: Number(access.session.user.id),
+          },
+        });
+      } else {
+        const status =
           data.aktion === "richtig"
             ? "CORRECT"
             : data.aktion === "teilweise"
               ? "PARTIAL"
-              : "WRONG",
-        bewertungsquelle: "MANUAL",
-        bewertet_am: new Date(),
-        bewertet_von_user_id: Number(access.session.user.id),
-      },
-    });
-  }
-  await recalculateQuizQuestionEvaluation(existing.quiz_fragen_id);
+              : "WRONG";
+        await tx.team_antworten.update({
+          where: { team_antwort_id: data.teamAntwortId },
+          data: {
+            ist_manuell_richtig: status === "CORRECT",
+            ist_manuell_falsch: status === "WRONG",
+            bewertung_final: true,
+            manuelle_punkte: isRiskQuestion
+              ? existing.manuelle_punkte
+              : points,
+            vergebene_punkte: isRiskQuestion
+              ? (existing.manuelle_punkte ?? existing.auto_endpunkte)
+              : points,
+            bewertungsstatus: status,
+            bewertungsquelle: "MANUAL",
+            bewertet_am: new Date(),
+            bewertet_von_user_id: Number(access.session.user.id),
+          },
+        });
+      }
+    }
+    await recalculateQuizQuestionEvaluation(existing.quiz_fragen_id, tx);
+  });
   await updateQuizFragenStatistiken();
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
+}
+
+export async function recalculateQuizEvaluationsAction(quizId: number) {
+  await requireQuizAdmin(quizId);
+  const result = await recalculateQuizEvaluation(quizId, {
+    preserveManualOverrides: true,
+  });
+  revalidatePath(`/quiz/${quizId}/auswertung`);
+  revalidatePath(`/quiz/${quizId}/moderation`);
+  revalidatePath(`/quiz/${quizId}/praesentation`);
+  return {
+    success: true as const,
+    recalculatedAnswers: result.recalculatedAnswers,
+  };
 }
 
 export async function updateQuizFragenStatistiken() {
@@ -2431,17 +2546,33 @@ export async function updateQuizFragenStatistiken() {
 
   const quizFragen = await prisma.quiz_fragen.findMany({
     include: {
-      team_antworten: true,
+      team_antworten: {
+        include: {
+          quiz_team_sessions: {
+            select: { erstellt_am: true },
+          },
+        },
+      },
     },
   });
 
   for (const quizFrage of quizFragen) {
-    const beantworteteAntworten = quizFrage.team_antworten;
+    const beantworteteAntworten =
+      quizFrage.punkte_modus === "risikofrage" &&
+      quizFrage.risiko_pool_fixiert_am !== null
+        ? quizFrage.team_antworten.filter(
+            (antwort) =>
+              antwort.quiz_team_sessions.erstellt_am <=
+              quizFrage.risiko_pool_fixiert_am!,
+          )
+        : quizFrage.team_antworten;
     const richtigeantworten = beantworteteAntworten.filter(
       (antwort) => antwort.bewertungsstatus === "CORRECT",
     ).length;
 
-    const falscheantworten = beantworteteAntworten.length - richtigeantworten;
+    const falscheantworten = beantworteteAntworten.filter((antwort) =>
+      ["WRONG", "PARTIAL"].includes(antwort.bewertungsstatus),
+    ).length;
 
     await prisma.quiz_fragen.update({
       where: {
@@ -2495,7 +2626,7 @@ export async function updateQuizFragenStatistiken() {
     const manuelleBewertungen = await prisma.team_antworten.count({
       where: {
         quiz_id: quiz.quiz_id,
-        OR: [{ ist_manuell_richtig: true }, { ist_manuell_falsch: true }],
+        bewertungsquelle: "MANUAL",
       },
     });
 
@@ -2513,7 +2644,7 @@ export async function updateQuizFragenStatistiken() {
 }
 export async function getQuizAuswertungUebersicht(quizId: number) {
   await requireQuizViewer(quizId);
-  await recalculateQuizEvaluation(quizId);
+  await ensureQuizEvaluation(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -2565,7 +2696,7 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
 }
 export async function getQuizAuswertungAlleAntworten(quizId: number) {
   await requireQuizViewer(quizId);
-  await recalculateQuizEvaluation(quizId);
+  await ensureQuizEvaluation(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -2656,6 +2787,25 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
   );
 
   return quizFragen.flatMap((quizFrage, frageIndex) => {
+    const riskEligibleAnswers =
+      quizFrage.punkte_modus === "risikofrage" &&
+      quizFrage.risiko_pool_fixiert_am !== null
+        ? quizFrage.team_antworten.filter(
+            (answer) =>
+              answer.quiz_team_sessions.erstellt_am <=
+              quizFrage.risiko_pool_fixiert_am!,
+          )
+        : [];
+    const riskCorrectTeams = riskEligibleAnswers.filter(
+      (answer) => answer.bewertungsstatus === "CORRECT",
+    ).length;
+    const riskReviewRequired = riskEligibleAnswers.filter(
+      (answer) => answer.bewertungsstatus === "REVIEW_REQUIRED",
+    ).length;
+    const riskPointsPerCorrectTeam =
+      riskEligibleAnswers.find(
+        (answer) => answer.bewertungsstatus === "CORRECT",
+      )?.auto_endpunkte ?? new Prisma.Decimal(0);
     const richtigeAntworten = quizFrage.fragen.antworten
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => antwort.antwort)
@@ -2747,6 +2897,10 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
           antwort?.antworten?.antwort ||
           null,
         punkte_modus: quizFrage.punkte_modus ?? "standard",
+        risikoPoolTeamanzahl: quizFrage.risiko_pool_teamanzahl,
+        risikoRichtigeTeams: riskCorrectTeams,
+        risikoPruefpflichtigeAntworten: riskReviewRequired,
+        risikoPunkteJeRichtigemTeam: Number(riskPointsPerCorrectTeam),
 
         istOffeneFrage,
         istUnbeantwortet,
@@ -2806,6 +2960,12 @@ export async function updateQuizFragePunkteModus(data: {
     },
     data: {
       punkte_modus: data.punkteModus,
+      ...(question.punkte_modus !== data.punkteModus
+        ? {
+            risiko_pool_teamanzahl: null,
+            risiko_pool_fixiert_am: null,
+          }
+        : {}),
     },
   });
   await recalculateQuizQuestionEvaluation(data.quizFragenId);
@@ -2819,7 +2979,7 @@ export async function updateQuizFragePunkteModus(data: {
 }
 export async function getQuizPunktestand(quizId: number) {
   await requireQuizViewer(quizId);
-  await recalculateQuizEvaluation(quizId);
+  await ensureQuizEvaluation(quizId);
   const [sessions, totals, answers] = await Promise.all([
     prisma.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
@@ -3388,7 +3548,13 @@ export async function updateAlleSchwierigkeitslevel() {
     include: {
       quiz_fragen: {
         include: {
-          team_antworten: true,
+          team_antworten: {
+            include: {
+              quiz_team_sessions: {
+                select: { erstellt_am: true },
+              },
+            },
+          },
         },
       },
     },
@@ -3399,36 +3565,36 @@ export async function updateAlleSchwierigkeitslevel() {
       quizFrage.team_antworten
         .filter(
           (antwort) =>
+            (quizFrage.punkte_modus !== "risikofrage" ||
+              quizFrage.risiko_pool_fixiert_am === null ||
+              antwort.quiz_team_sessions.erstellt_am <=
+                quizFrage.risiko_pool_fixiert_am) &&
             antwort.bewertungsstatus !== "UNANSWERED" &&
             antwort.bewertungsstatus !== "REVIEW_REQUIRED",
         )
-        .map((antwort) => ({ antwort, quizFrage })),
+        .map((antwort) => antwort),
     );
 
-    const teamsGesamt = alleFinalenAntworten.length;
+    const richtigeAntworten = alleFinalenAntworten.filter(
+      (antwort) => antwort.bewertungsstatus === "CORRECT",
+    ).length;
+    const falscheAntworten = alleFinalenAntworten.filter((antwort) =>
+      ["WRONG", "PARTIAL"].includes(antwort.bewertungsstatus),
+    ).length;
+    const teamsGesamt = richtigeAntworten + falscheAntworten;
 
     if (teamsGesamt === 0) {
+      await prisma.fragen.update({
+        where: { fragen_id: frage.fragen_id },
+        data: { schwierigkeitslevel: null },
+      });
       continue;
     }
 
-    const erfuellungsgrad = alleFinalenAntworten.reduce(
-      (sum, { antwort, quizFrage }) => {
-        const maximum =
-          quizFrage.punkte_modus === "expertenbonus"
-            ? quizFrage.punkte_basis.mul(2)
-            : quizFrage.punkte_basis;
-        return maximum.eq(0)
-          ? sum
-          : sum.add(
-              Prisma.Decimal.min(1, antwort.vergebene_punkte.div(maximum)),
-            );
-      },
-      new Prisma.Decimal(0),
-    );
-
-    const schwierigkeitslevel = Math.round(
-      100 - Number(erfuellungsgrad.div(teamsGesamt).mul(100)),
-    );
+    const schwierigkeitslevel = new Prisma.Decimal(falscheAntworten)
+      .div(teamsGesamt)
+      .mul(100)
+      .toDecimalPlaces(0);
 
     await prisma.fragen.update({
       where: {

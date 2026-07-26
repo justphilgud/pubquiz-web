@@ -2912,6 +2912,8 @@ export const Quiz_fragenScalarFieldEnum = {
   quiz_abschnitt_id: 'quiz_abschnitt_id',
   punkte_basis: 'punkte_basis',
   punkte_modus: 'punkte_modus',
+  risiko_pool_teamanzahl: 'risiko_pool_teamanzahl',
+  risiko_pool_fixiert_am: 'risiko_pool_fixiert_am',
   freie_antwort_erlaubt: 'freie_antwort_erlaubt',
   praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
@@ -3000,6 +3002,7 @@ export const Team_antwortenScalarFieldEnum = {
   bewertungsstatus: 'bewertungsstatus',
   bewertungsquelle: 'bewertungsquelle',
   bewertungsdetails: 'bewertungsdetails',
+  bewertungs_version: 'bewertungs_version',
   manuelle_punkte: 'manuelle_punkte',
   bewertet_am: 'bewertet_am',
   bewertet_von_user_id: 'bewertet_von_user_id'

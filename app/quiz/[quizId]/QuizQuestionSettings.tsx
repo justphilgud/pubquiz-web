@@ -78,10 +78,13 @@ export default function QuizQuestionSettings({
           <option value="risikofrage" disabled={istPixelbild || teilpunkteFaehig}>
             Risikofrage
             {istPixelbild || teilpunkteFaehig
-              ? " (für diese Frage nicht erlaubt)"
+              ? " (nur ohne Teilpunkte möglich)"
               : ""}
           </option>
         </select>
+        <span className="block text-xs text-slate-500">
+          Risikofragen sind nur bei Fragen ohne Teilpunkte möglich.
+        </span>
       </label>
 
       {kannFreieAntwortAktivieren && (

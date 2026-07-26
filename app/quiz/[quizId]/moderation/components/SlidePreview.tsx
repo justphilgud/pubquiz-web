@@ -5,6 +5,7 @@ import type { QuizPraesentationResult } from "../../../actions";
 import type { Slide } from "../../praesentation/buildPraesentationSlides";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
+import { formatQuizPoints } from "../../../formatQuizPoints";
 
 type PunktestandEintrag = {
   teamname: string;
@@ -207,7 +208,7 @@ export default function SlidePreview({
                   </div>
 
                   <div className="text-right text-xl font-black">
-                    {istSichtbar ? team.punkte.toFixed(1) : "?"}
+                    {istSichtbar ? formatQuizPoints(team.punkte) : "?"}
                   </div>
                 </div>
               );

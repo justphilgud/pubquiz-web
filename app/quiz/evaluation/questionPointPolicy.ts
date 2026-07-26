@@ -30,7 +30,9 @@ export function isPartialPointsCapable(input: {
   orderingItemCount: number;
 }) {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
+  const maximum = getQuestionBaseMaximum(input);
   return (
+    !maximum.eq(1) ||
     input.structuredFieldCount > 1 ||
     (templateId === questionTemplateIds.multipleChoice &&
       input.correctAnswerCount > 1) ||
@@ -54,6 +56,8 @@ export function validateQuestionPointsMode(input: {
     throw new Error("Pixelbild-Fragen dürfen weder Expertenbonus noch Risikomodus verwenden.");
   }
   if (input.pointsMode === "risikofrage" && isPartialPointsCapable(input)) {
-    throw new Error("Teilbewertbare Fragen dürfen den Risikomodus nicht verwenden.");
+    throw new Error(
+      "Risikofragen sind nur bei Fragen ohne Teilpunkte möglich.",
+    );
   }
 }

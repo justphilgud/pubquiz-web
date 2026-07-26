@@ -229,4 +229,40 @@ test("pixel and partial-capable risk combinations are rejected", () => {
       orderingItemCount: 0,
     }),
   );
+  for (const input of [
+    {
+      templateId: "reihenfolge",
+      correctAnswerCount: 0,
+      structuredFieldCount: 0,
+      orderingItemCount: 4,
+    },
+    {
+      templateId: "multiple_choice",
+      correctAnswerCount: 2,
+      structuredFieldCount: 0,
+      orderingItemCount: 0,
+    },
+    {
+      templateId: "standard",
+      correctAnswerCount: 0,
+      structuredFieldCount: 1,
+      orderingItemCount: 0,
+    },
+  ]) {
+    assert.throws(() =>
+      validateQuestionPointsMode({
+        ...input,
+        pointsMode: "risikofrage",
+      }),
+    );
+  }
+  assert.doesNotThrow(() =>
+    validateQuestionPointsMode({
+      templateId: null,
+      pointsMode: "risikofrage",
+      correctAnswerCount: 1,
+      structuredFieldCount: 0,
+      orderingItemCount: 0,
+    }),
+  );
 });
