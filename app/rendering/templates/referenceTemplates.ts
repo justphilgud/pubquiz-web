@@ -44,6 +44,18 @@ const standardQuestionOverlay: TemplateContractOverlay = {
       defaultType: "MANUAL",
       allowedTypes: ["MANUAL", "NORMALIZED_TEXT_MATCH", "CHOICE_MATCH"],
     },
+    layout: {
+      defaultVariant: "CONTENT_CENTERED",
+      allowedVariants: [
+        "CONTENT_CENTERED",
+        "CONTENT_SPLIT",
+        "MEDIA_FOCUS",
+        "AUDIO_FOCUS",
+        "CHOICE_GRID",
+        "STRUCTURED_RESPONSE",
+        "SOLUTION_FOCUS",
+      ],
+    },
     overrides: {
       ...contract.overrides,
       properties: {
@@ -137,8 +149,12 @@ const pixelRevealOverlay: TemplateContractOverlay = {
       previousReveal: true,
     },
     layout: {
-      defaultVariant: "FULLSCREEN_MEDIA",
-      allowedVariants: ["FULLSCREEN_MEDIA", "MEDIA_TOP"],
+      defaultVariant: "REVEAL_SEQUENCE",
+      allowedVariants: [
+        "REVEAL_SEQUENCE",
+        "MEDIA_FOCUS",
+        "SOLUTION_FOCUS",
+      ],
     },
     overrides: {
       properties: {

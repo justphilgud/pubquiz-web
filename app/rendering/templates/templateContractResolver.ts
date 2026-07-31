@@ -1,5 +1,8 @@
 import { getMediaSlotDefinition } from "@/app/fragen/editor/mediaSlots";
-import { getQuestionTemplatePersistenceIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import {
+  getQuestionTemplatePersistenceIds,
+  questionTemplateIds,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type {
   GeneratorId,
   QuestionAnswerMode,
@@ -15,6 +18,7 @@ import type {
   TemplateDefinition,
   TemplateEvaluationType,
   TemplateInteractionType,
+  TemplateLayoutVariant,
 } from "./templateContract";
 
 export type TemplateContractOverlay = {
@@ -67,6 +71,87 @@ function contentGeneratorCapability(
   if (generatorId === "text_translation") return "TRANSLATION";
   if (generatorId === "text_to_speech") return "TTS_PREVIEW";
   return "ANAGRAM_GENERATOR";
+}
+
+function layoutContractForDefinition(
+  definition: QuestionTemplateDefinition,
+): {
+  defaultVariant: TemplateLayoutVariant;
+  allowedVariants: readonly TemplateLayoutVariant[];
+} {
+  const withSolution = (
+    ...variants: readonly TemplateLayoutVariant[]
+  ): readonly TemplateLayoutVariant[] =>
+    Array.from(new Set([...variants, "SOLUTION_FOCUS" as const]));
+
+  if (definition.id === questionTemplateIds.multipleChoice) {
+    return {
+      defaultVariant: "CHOICE_GRID",
+      allowedVariants: withSolution("CHOICE_GRID"),
+    };
+  }
+  if (definition.id === questionTemplateIds.trueFalse) {
+    return {
+      defaultVariant: "TRUE_FALSE",
+      allowedVariants: withSolution("TRUE_FALSE"),
+    };
+  }
+  if (definition.id === questionTemplateIds.ordering) {
+    return {
+      defaultVariant: "ORDERING",
+      allowedVariants: withSolution("ORDERING"),
+    };
+  }
+  if (
+    definition.id === questionTemplateIds.musicReverse ||
+    definition.id === questionTemplateIds.musicEightBit ||
+    definition.id === questionTemplateIds.translationReadAloud
+  ) {
+    return {
+      defaultVariant: "AUDIO_FOCUS",
+      allowedVariants: withSolution("AUDIO_FOCUS"),
+    };
+  }
+  if (definition.id === questionTemplateIds.pixelImage) {
+    return {
+      defaultVariant: "REVEAL_SEQUENCE",
+      allowedVariants: withSolution("REVEAL_SEQUENCE", "MEDIA_FOCUS"),
+    };
+  }
+  if (definition.id === questionTemplateIds.faceMorph) {
+    return {
+      defaultVariant: "MEDIA_FOCUS",
+      allowedVariants: withSolution("MEDIA_FOCUS"),
+    };
+  }
+  if (definition.id === questionTemplateIds.googleReviews) {
+    return {
+      defaultVariant: "REVEAL_SEQUENCE",
+      allowedVariants: withSolution("REVEAL_SEQUENCE", "CHOICE_GRID"),
+    };
+  }
+  if (definition.id === questionTemplateIds.estimate) {
+    return {
+      defaultVariant: "CONTENT_CENTERED",
+      allowedVariants: withSolution("CONTENT_CENTERED", "MEDIA_FOCUS"),
+    };
+  }
+  if (definition.id === questionTemplateIds.anagram) {
+    return {
+      defaultVariant: "CONTENT_CENTERED",
+      allowedVariants: withSolution("CONTENT_CENTERED"),
+    };
+  }
+  return {
+    defaultVariant: "CONTENT_CENTERED",
+    allowedVariants: withSolution(
+      "CONTENT_CENTERED",
+      "CONTENT_SPLIT",
+      "MEDIA_FOCUS",
+      "AUDIO_FOCUS",
+      "STRUCTURED_RESPONSE",
+    ),
+  };
 }
 
 function contentFieldsForDefinition(
@@ -350,10 +435,7 @@ export function resolveLegacyQuestionTemplateContract(
       showSolution: true,
       manuallyAdjustScores: true,
     },
-    layout: {
-      defaultVariant: "CONTENT_SPLIT",
-      allowedVariants: ["CONTENT_CENTERED", "CONTENT_SPLIT"],
-    },
+    layout: layoutContractForDefinition(definition),
     display: {
       densities: ["COMFORTABLE"],
       emphases: ["BALANCED", "CONTENT"],

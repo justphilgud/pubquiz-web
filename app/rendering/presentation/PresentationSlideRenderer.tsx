@@ -346,14 +346,14 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const templateData = frage.templateConfig?.templateData;
   const antworten = sortiereAntworten(frage);
   const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
-  const layout = frage.praesentationslayout ?? "standard";
+  const layoutVariant = frage.presentationLayouts.question.variant;
 
   if (templateData?.kind === "GOOGLE_REVIEWS") {
     const visibleReviews = templateData.sequentialReveal
       ? templateData.reviews.slice(0, templateRevealCount)
       : templateData.reviews;
     return (
-      <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
         <div className="mt-6 grid min-h-0 flex-1 gap-4 overflow-auto lg:grid-cols-2">
           {visibleReviews.map((review, index) => (
@@ -383,7 +383,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (templateData?.kind === "TRUE_FALSE") {
     return (
-      <div className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
         {hatAntwortmoeglichkeiten && (
           <div className="mt-10 grid grid-cols-2 gap-6 text-4xl font-black">
@@ -397,7 +397,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (templateData?.kind === "ANAGRAM") {
     return (
-      <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-3xl font-black text-white">{frage.frage}</h2>
         <p className="mt-10 break-words text-7xl font-black uppercase tracking-[0.2em] text-yellow-200 xl:text-9xl">{templateData.selectedSolution}</p>
       </div>
@@ -406,7 +406,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (templateData?.kind === "ORDERING") {
     return (
-      <div className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
         {hatAntwortmoeglichkeiten && (
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -419,7 +419,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (templateData?.kind === "ESTIMATE") {
     return (
-      <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
         {templateData.unit && <p className="mt-8 rounded-2xl border-2 border-yellow-300 px-6 py-3 text-3xl font-black text-yellow-200">Antwort in {templateData.unit}</p>}
       </div>
@@ -428,7 +428,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (templateData?.kind === "TRANSLATION_READ_ALOUD") {
     return (
-      <div className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
         <h2 className="text-5xl font-black leading-tight text-white">{frage.frage}</h2>
         <p className="mt-8 text-2xl font-bold text-cyan-200">
           {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.sourceLanguage)}
@@ -440,18 +440,16 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
-  const effektivesLayout =
-    layout !== "standard"
-      ? layout
-      : hatAntwortmoeglichkeiten
-        ? "antworten_fokus"
-        : frage.medien.length > 0
-          ? "bild_fokus"
-          : "text_fokus";
-
-  if (effektivesLayout === "bild_fokus") {
+  if (
+    layoutVariant === "MEDIA_FOCUS" ||
+    layoutVariant === "REVEAL_SEQUENCE" ||
+    layoutVariant === "FULLSCREEN_MEDIA" ||
+    layoutVariant === "MEDIA_LEFT" ||
+    layoutVariant === "MEDIA_RIGHT" ||
+    layoutVariant === "MEDIA_TOP"
+  ) {
     return (
-      <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]">
+      <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]">
         <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
@@ -484,9 +482,9 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
-  if (effektivesLayout === "text_fokus") {
+  if (layoutVariant === "CONTENT_CENTERED") {
     return (
-      <div className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
             Frage {slide.frageIndexImBlock}
@@ -502,11 +500,11 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
-  if (effektivesLayout === "audio_fokus") {
+  if (layoutVariant === "AUDIO_FOCUS") {
     const audioMedium = frage.medien[0];
 
     return (
-      <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
+      <div data-presentation-layout={layoutVariant} className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
         <div className="mb-10 text-center">
           <div className="mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
             Audiofrage
@@ -552,7 +550,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   return (
-    <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+    <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
       <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
@@ -890,6 +888,7 @@ function renderEndstandSlide() {
 
 function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const frage = slide.frage;
+  const layoutVariant = frage.presentationLayouts.solution.variant;
   const antworten = sortiereAntworten(frage);
   const richtigeAntworten = antworten.filter((antwort) => antwort.ist_richtig);
   const runtime = buildQuestionTemplateRuntimeModel({
@@ -909,7 +908,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   );
 
   return (
-    <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+    <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
       <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-6 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-pink-300">
           Frage

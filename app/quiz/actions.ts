@@ -61,6 +61,11 @@ import {
 } from "./evaluation/questionPointPolicy";
 import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
+import {
+  resolvePresentationLayout,
+  type PresentationLayoutMedium,
+  type ResolvedPresentationLayout,
+} from "@/app/rendering/presentation/presentationLayoutResolver";
 
 export type QuizResult = {
   quiz_id: number;
@@ -155,6 +160,7 @@ export type QuizDetailsResult = QuizResult & {
     quiz_abschnitt_id: number | null;
     schwierigkeitslevel: string | null;
     praesentationslayout: string | null;
+    resolvedPresentationLayout: ResolvedPresentationLayout;
     punkte_basis: number;
     punkte_modus: string;
     freie_antwort_erlaubt: boolean;
@@ -600,9 +606,31 @@ export async function getQuizDetails(
               antworten: {
                 select: {
                   ist_richtig: true,
+                  medien: {
+                    select: {
+                      datei: true,
+                      medientyp: { select: { medientyp: true } },
+                    },
+                  },
                 },
               },
-              antwortfelder: { select: { antwortfeld_id: true } },
+              antwortfelder: {
+                select: {
+                  antwortfeld_id: true,
+                  medien: {
+                    select: {
+                      datei: true,
+                      medientyp: { select: { medientyp: true } },
+                    },
+                  },
+                },
+              },
+              medien: {
+                select: {
+                  datei: true,
+                  medientyp: { select: { medientyp: true } },
+                },
+              },
               vorlage: {
                 select: {
                   code: true,
@@ -694,6 +722,37 @@ export async function getQuizDetails(
             ? config.templateData.items.length
             : 0,
       });
+      const presentationMedia: PresentationLayoutMedium[] = [
+        ...eintrag.fragen.medien.map((medium) => ({
+          fileName: medium.datei,
+          mediaType: medium.medientyp.medientyp,
+          scope: "QUESTION" as const,
+        })),
+        ...eintrag.fragen.antworten.flatMap((antwort) =>
+          antwort.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "ANSWER" as const,
+          })),
+        ),
+        ...eintrag.fragen.antwortfelder.flatMap((feld) =>
+          feld.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "STRUCTURED_FIELD" as const,
+          })),
+        ),
+      ];
+      const resolvedPresentationLayout = resolvePresentationLayout({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        phase: "QUESTION",
+        legacyLayout: eintrag.praesentationslayout,
+        questionText: eintrag.fragen.frage,
+        answerOptionCount: eintrag.fragen.antworten.length,
+        structuredFieldCount: eintrag.fragen.antwortfelder.length,
+        media: presentationMedia,
+        templateData: config?.templateData,
+      });
 
       return {
         quiz_fragen_id: eintrag.quiz_fragen_id,
@@ -712,6 +771,7 @@ export async function getQuizDetails(
         schwierigkeitslevel:
           eintrag.fragen.schwierigkeitslevel?.toString() ?? null,
         praesentationslayout: eintrag.praesentationslayout ?? "standard",
+        resolvedPresentationLayout,
         kategorien: eintrag.fragen.fragen_kategorien.map(
           (k) => k.fragenkategorie.kategorie,
         ),
@@ -1107,6 +1167,10 @@ export type QuizPraesentationResult = {
     quelle: string | null;
     kategorien: string[];
     praesentationslayout: string | null;
+    presentationLayouts: {
+      question: ResolvedPresentationLayout;
+      solution: ResolvedPresentationLayout;
+    };
     antwort_reihenfolge: number[];
 
     medien: {
@@ -1280,6 +1344,39 @@ export async function getQuizPraesentation(
         })),
         allowFreeAnswer: eintrag.freie_antwort_erlaubt,
       });
+      const templateConfig = eintrag.fragen.template_config_json as
+        | QuestionTemplateConfig
+        | null;
+      const presentationMedia: PresentationLayoutMedium[] = [
+        ...eintrag.fragen.medien.map((medium) => ({
+          fileName: medium.datei,
+          mediaType: medium.medientyp.medientyp,
+          scope: "QUESTION" as const,
+        })),
+        ...eintrag.fragen.antworten.flatMap((antwort) =>
+          antwort.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "ANSWER" as const,
+          })),
+        ),
+        ...eintrag.fragen.antwortfelder.flatMap((feld) =>
+          feld.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "STRUCTURED_FIELD" as const,
+          })),
+        ),
+      ];
+      const layoutInput = {
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        legacyLayout: eintrag.praesentationslayout,
+        questionText: eintrag.fragen.frage,
+        answerOptionCount: eintrag.fragen.antworten.length,
+        structuredFieldCount: eintrag.fragen.antwortfelder.length,
+        media: presentationMedia,
+        templateData: templateConfig?.templateData,
+      };
 
       return {
       quiz_fragen_id: eintrag.quiz_fragen_id,
@@ -1289,9 +1386,7 @@ export async function getQuizPraesentation(
       fragen_id: eintrag.fragen.fragen_id,
       frage: eintrag.fragen.frage,
       templateId: eintrag.fragen.vorlage?.code ?? null,
-      templateConfig: eintrag.fragen.template_config_json as
-        | import("@/app/fragen/editor/types").QuestionTemplateConfig
-        | null,
+      templateConfig,
 
       punkte_modus: eintrag.punkte_modus ?? "standard",
       freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
@@ -1299,6 +1394,16 @@ export async function getQuizPraesentation(
       effektiver_antwortmodus: answerMode.effectiveMode,
 
       praesentationslayout: eintrag.praesentationslayout ?? "standard",
+      presentationLayouts: {
+        question: resolvePresentationLayout({
+          ...layoutInput,
+          phase: "QUESTION",
+        }),
+        solution: resolvePresentationLayout({
+          ...layoutInput,
+          phase: "SOLUTION",
+        }),
+      },
       antwort_reihenfolge: eintrag.antwort_reihenfolge,
       quelle: eintrag.fragen.quelle,
       kategorien: eintrag.fragen.fragen_kategorien.map(
@@ -1356,26 +1461,6 @@ export async function getQuizPraesentation(
     }),
   };
 }
-export async function updatePraesentationslayout(data: {
-  quizFragenId: number;
-  praesentationslayout: string;
-  quizId: number;
-}) {
-  await requireQuizEditor(data.quizId);
-  await requireQuizQuestion(data.quizId, data.quizFragenId);
-
-  await prisma.quiz_fragen.update({
-    where: {
-      quiz_fragen_id: data.quizFragenId,
-    },
-    data: {
-      praesentationslayout: data.praesentationslayout,
-    },
-  });
-
-  revalidatePath(`/quiz/${data.quizId}`);
-}
-
 export async function updateQuizQuestionFreeAnswerMode(data: {
   quizId: number;
   quizFragenId: number;
