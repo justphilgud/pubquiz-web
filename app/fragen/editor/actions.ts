@@ -21,6 +21,7 @@ import { questionTemplateDefinitions } from "./templates/questionTemplates";
 import {
   findQuestionTemplate,
   getQuestionTemplatePersistenceIds,
+  representsSameQuestionTemplate,
   resolveCanonicalQuestionTemplateId,
 } from "./templates/questionTemplateRegistry";
 import type {
@@ -1453,6 +1454,9 @@ export async function saveQuestion(
           review_status: true,
           ist_archiviert: true,
           geltungsbereich: true,
+          vorlage: {
+            select: { vorlage_id: true, code: true },
+          },
           eventreihen: { select: { eventreihe_id: true } },
           medien: {
             orderBy: [{ sortierung: "asc" }, { medien_id: "asc" }],
@@ -1524,6 +1528,15 @@ export async function saveQuestion(
           "QUESTION_NOT_FOUND",
         );
       }
+
+      const persistedTemplateForUpdate =
+        existingQuestion.vorlage &&
+        representsSameQuestionTemplate(
+          existingQuestion.vorlage.code,
+          draft.templateId,
+        )
+          ? existingQuestion.vorlage
+          : persistedTemplate;
 
       if (!mayPerformIntent) {
         throw new DraftValidationError(
@@ -1984,7 +1997,7 @@ export async function saveQuestion(
           frage: draft.questionText,
           geltungsbereich: payload.scope,
           quelle: draft.sourceOrRemark || null,
-          vorlage_id: persistedTemplate?.vorlage_id ?? null,
+          vorlage_id: persistedTemplateForUpdate?.vorlage_id ?? null,
           template_config_json: draft.templateConfig,
           ist_unfertig: payload.intent === "DRAFT",
           moderationsnotizen: draft.moderationNotes || null,

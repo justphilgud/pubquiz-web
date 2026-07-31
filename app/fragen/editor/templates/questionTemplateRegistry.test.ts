@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { localizeQuestionTemplates } from "./questionTemplates";
 import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
@@ -6,8 +7,14 @@ import {
   findQuestionTemplate,
   getQuestionTemplatePersistenceIds,
   questionTemplateIds,
+  representsSameQuestionTemplate,
   resolveCanonicalQuestionTemplateId,
 } from "./questionTemplateRegistry";
+
+const editorActions = readFileSync(
+  new URL("../actions.ts", import.meta.url),
+  "utf8",
+);
 
 const questionTemplates = localizeQuestionTemplates(
   loadQuestionEditorMessages("de"),
@@ -28,6 +35,30 @@ test("legacy template aliases resolve to canonical database codes", () => {
   );
   assert.equal(resolveCanonicalQuestionTemplateId("music-8bit"), questionTemplateIds.musicEightBit);
   assert.equal(resolveCanonicalQuestionTemplateId("image_pixel"), questionTemplateIds.pixelImage);
+});
+
+test("read normalization identifies unchanged legacy IDs without migrating them", () => {
+  assert.equal(
+    representsSameQuestionTemplate("multiple-choice", "multiple_choice"),
+    true,
+  );
+  assert.equal(representsSameQuestionTemplate("image_pixel", "pixelbild"), true);
+  assert.equal(representsSameQuestionTemplate("standard", null), true);
+  assert.equal(
+    representsSameQuestionTemplate("multiple-choice", "pixelbild"),
+    false,
+  );
+});
+
+test("saving an unchanged legacy template preserves its persisted identity", () => {
+  assert.match(
+    editorActions,
+    /representsSameQuestionTemplate\(\s*existingQuestion\.vorlage\.code,\s*draft\.templateId,\s*\)/,
+  );
+  assert.match(
+    editorActions,
+    /vorlage_id: persistedTemplateForUpdate\?\.vorlage_id \?\? null/,
+  );
 });
 
 test("bitcrush and pixel templates expose separate generator input and output slots", () => {
