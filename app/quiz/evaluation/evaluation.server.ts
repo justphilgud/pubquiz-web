@@ -19,6 +19,8 @@ import {
 
 type EvaluationDb = Prisma.TransactionClient | typeof prisma;
 
+const QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS = 30_000;
+
 export type RecalculationOptions = {
   preserveManualOverrides?: boolean;
   answerIds?: readonly number[];
@@ -394,6 +396,9 @@ export async function recalculateQuizQuestionEvaluation(
       options,
       tx,
     ),
+    {
+      timeout: QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS,
+    },
   );
 }
 
@@ -494,21 +499,19 @@ export async function ensureQuizEvaluation(
   if (incomplete.length === 0) {
     return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
   }
-  return prisma.$transaction(async (tx) => {
-    let recalculatedAnswers = 0;
-    for (const question of incomplete) {
-      const result = await recalculateQuizQuestionEvaluationInTransaction(
-        question.quiz_fragen_id,
-        { preserveManualOverrides: true },
-        tx,
-      );
-      recalculatedAnswers += result.recalculatedAnswers;
-    }
-    return {
-      recalculatedAnswers,
-      recalculatedQuestions: incomplete.length,
-    };
-  });
+  let recalculatedAnswers = 0;
+  for (const question of incomplete) {
+    const result = await recalculateQuizQuestionEvaluation(
+      question.quiz_fragen_id,
+      undefined,
+      { preserveManualOverrides: true },
+    );
+    recalculatedAnswers += result.recalculatedAnswers;
+  }
+  return {
+    recalculatedAnswers,
+    recalculatedQuestions: incomplete.length,
+  };
 }
 
 export async function recalculateQuizEvaluation(

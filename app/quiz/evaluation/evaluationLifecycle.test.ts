@@ -20,6 +20,10 @@ const versionMigration = readFileSync(
   "prisma/migrations/20260726120000_add_quiz_answer_evaluation_version/migration.sql",
   "utf8",
 );
+const evaluationPage = readFileSync(
+  "app/quiz/[quizId]/auswertung/page.tsx",
+  "utf8",
+);
 
 test("schema persists automatic, awarded and auditable manual evaluation data", () => {
   for (const field of [
@@ -91,6 +95,63 @@ test("read paths backfill only incomplete evaluations", () => {
     assert.match(implementation, /ensureQuizEvaluation\(quizId\)/);
     assert.doesNotMatch(implementation, /recalculateQuizEvaluation\(quizId\)/);
   }
+});
+
+test("quiz backfill keeps each question in a bounded transaction", () => {
+  const start = evaluationService.indexOf(
+    "export async function ensureQuizEvaluation",
+  );
+  const end = evaluationService.indexOf(
+    "export async function recalculateQuizEvaluation",
+  );
+  const implementation = evaluationService.slice(start, end);
+
+  assert.match(
+    evaluationService,
+    /QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS = 30_000/,
+  );
+  assert.match(
+    evaluationService,
+    /timeout: QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS/,
+  );
+  assert.match(implementation, /for \(const question of incomplete\)/);
+  assert.match(implementation, /recalculateQuizQuestionEvaluation\(/);
+  assert.doesNotMatch(implementation, /prisma\.\$transaction/);
+});
+
+test("evaluation page authorizes and loads presentation, answers and ranking", () => {
+  const implementation = evaluationPage.slice(
+    evaluationPage.indexOf("export default async function"),
+  );
+  const authorization = implementation.indexOf("requireQuizAdmin");
+  const presentation = implementation.indexOf("getQuizPraesentation");
+  const answers = implementation.indexOf("getQuizAuswertungAlleAntworten");
+  const ranking = implementation.indexOf("getQuizPunktestand");
+
+  assert.ok(authorization > -1);
+  assert.ok(presentation > authorization);
+  assert.ok(answers > presentation);
+  assert.ok(ranking > answers);
+  assert.match(implementation, /if \(!quiz\)/);
+  assert.match(implementation, /<QuizAuswertungClient/);
+});
+
+test("evaluation answer loading safely represents missing and structured answers", () => {
+  const start = actions.indexOf(
+    "export async function getQuizAuswertungAlleAntworten",
+  );
+  const end = actions.indexOf(
+    "export async function updateQuizFragePunkteModus",
+  );
+  const implementation = actions.slice(start, end);
+
+  assert.match(implementation, /return quizFragen\.flatMap/);
+  assert.match(implementation, /return sessions\.map/);
+  assert.match(implementation, /antwortfelder/);
+  assert.match(implementation, /vorlage: \{ select: \{ code: true \} \}/);
+  assert.match(implementation, /!antwort \|\| antwort\.bewertungsstatus === "UNANSWERED"/);
+  assert.match(implementation, /bewertungsstatus: antwort\?\.bewertungsstatus \?\? "UNANSWERED"/);
+  assert.match(implementation, /vergebenePunkte: Number\(antwort\?\.vergebene_punkte \?\? 0\)/);
 });
 
 test("manual recalculation is authorized and preserves overrides", () => {
