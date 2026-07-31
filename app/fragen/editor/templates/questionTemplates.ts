@@ -8,6 +8,19 @@ import {
   questionTemplateIds,
 } from "./questionTemplateRegistry";
 import { getMediaSlotDefinition } from "../mediaSlots";
+import {
+  buildTemplateContractRegistry,
+  isTemplateContractAvailable,
+  resolveTemplateContract,
+} from "@/app/rendering/templates/templateContractResolver";
+import {
+  questionTemplateContractOverlays,
+  standaloneTemplateContracts,
+} from "@/app/rendering/templates/referenceTemplates";
+import {
+  validateQuestionTemplateContractCoverage,
+  validateTemplateContractRegistry,
+} from "@/app/rendering/templates/templateContractValidation";
 
 export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
@@ -219,6 +232,30 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
 ];
 
+export const questionTemplateContractRegistry =
+  buildTemplateContractRegistry(
+    questionTemplateDefinitions,
+    questionTemplateContractOverlays,
+    standaloneTemplateContracts,
+  );
+
+export function getQuestionTemplateContract(
+  templateId: string | null,
+  version?: number,
+) {
+  return resolveTemplateContract(
+    questionTemplateContractRegistry,
+    templateId,
+    version,
+  );
+}
+
+export function getCreatableQuestionTemplateContracts() {
+  return questionTemplateContractRegistry.filter((template) =>
+    isTemplateContractAvailable(template, "create"),
+  );
+}
+
 export function getQuestionTemplateDefinition(templateId: string | null) {
   return findQuestionTemplate(
     questionTemplateDefinitions,
@@ -237,6 +274,19 @@ export function validateQuestionTemplateDefinitions(): string[] {
       errors.push(`Oberflächenzuordnung fehlt: ${definition.id}`);
     }
   }
+  errors.push(
+    ...validateTemplateContractRegistry(questionTemplateContractRegistry).map(
+      (validationIssue) =>
+        `${validationIssue.code} (${validationIssue.path}): ${validationIssue.message}`,
+    ),
+    ...validateQuestionTemplateContractCoverage(
+      questionTemplateDefinitions,
+      questionTemplateContractRegistry,
+    ).map(
+      (validationIssue) =>
+        `${validationIssue.code} (${validationIssue.path}): ${validationIssue.message}`,
+    ),
+  );
   return errors;
 }
 

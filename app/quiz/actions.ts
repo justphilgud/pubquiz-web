@@ -47,8 +47,9 @@ import {
   type QuizTemporalStatus,
 } from "./quizMasterData";
 import {
-  ensureQuizEvaluation,
   ensureQuizQuestionEvaluation,
+  getQuizEvaluationBackfillStatus,
+  processQuizEvaluationBackfillBatch,
   recalculateQuizEvaluation,
   recalculateQuizAnswerEvaluation,
   recalculateQuizQuestionEvaluation,
@@ -60,6 +61,11 @@ import {
 } from "./evaluation/questionPointPolicy";
 import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
+import {
+  resolvePresentationLayout,
+  type PresentationLayoutMedium,
+  type ResolvedPresentationLayout,
+} from "@/app/rendering/presentation/presentationLayoutResolver";
 
 export type QuizResult = {
   quiz_id: number;
@@ -154,6 +160,7 @@ export type QuizDetailsResult = QuizResult & {
     quiz_abschnitt_id: number | null;
     schwierigkeitslevel: string | null;
     praesentationslayout: string | null;
+    resolvedPresentationLayout: ResolvedPresentationLayout;
     punkte_basis: number;
     punkte_modus: string;
     freie_antwort_erlaubt: boolean;
@@ -599,9 +606,31 @@ export async function getQuizDetails(
               antworten: {
                 select: {
                   ist_richtig: true,
+                  medien: {
+                    select: {
+                      datei: true,
+                      medientyp: { select: { medientyp: true } },
+                    },
+                  },
                 },
               },
-              antwortfelder: { select: { antwortfeld_id: true } },
+              antwortfelder: {
+                select: {
+                  antwortfeld_id: true,
+                  medien: {
+                    select: {
+                      datei: true,
+                      medientyp: { select: { medientyp: true } },
+                    },
+                  },
+                },
+              },
+              medien: {
+                select: {
+                  datei: true,
+                  medientyp: { select: { medientyp: true } },
+                },
+              },
               vorlage: {
                 select: {
                   code: true,
@@ -693,6 +722,37 @@ export async function getQuizDetails(
             ? config.templateData.items.length
             : 0,
       });
+      const presentationMedia: PresentationLayoutMedium[] = [
+        ...eintrag.fragen.medien.map((medium) => ({
+          fileName: medium.datei,
+          mediaType: medium.medientyp.medientyp,
+          scope: "QUESTION" as const,
+        })),
+        ...eintrag.fragen.antworten.flatMap((antwort) =>
+          antwort.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "ANSWER" as const,
+          })),
+        ),
+        ...eintrag.fragen.antwortfelder.flatMap((feld) =>
+          feld.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "STRUCTURED_FIELD" as const,
+          })),
+        ),
+      ];
+      const resolvedPresentationLayout = resolvePresentationLayout({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        phase: "QUESTION",
+        legacyLayout: eintrag.praesentationslayout,
+        questionText: eintrag.fragen.frage,
+        answerOptionCount: eintrag.fragen.antworten.length,
+        structuredFieldCount: eintrag.fragen.antwortfelder.length,
+        media: presentationMedia,
+        templateData: config?.templateData,
+      });
 
       return {
         quiz_fragen_id: eintrag.quiz_fragen_id,
@@ -711,6 +771,7 @@ export async function getQuizDetails(
         schwierigkeitslevel:
           eintrag.fragen.schwierigkeitslevel?.toString() ?? null,
         praesentationslayout: eintrag.praesentationslayout ?? "standard",
+        resolvedPresentationLayout,
         kategorien: eintrag.fragen.fragen_kategorien.map(
           (k) => k.fragenkategorie.kategorie,
         ),
@@ -1106,6 +1167,10 @@ export type QuizPraesentationResult = {
     quelle: string | null;
     kategorien: string[];
     praesentationslayout: string | null;
+    presentationLayouts: {
+      question: ResolvedPresentationLayout;
+      solution: ResolvedPresentationLayout;
+    };
     antwort_reihenfolge: number[];
 
     medien: {
@@ -1279,6 +1344,39 @@ export async function getQuizPraesentation(
         })),
         allowFreeAnswer: eintrag.freie_antwort_erlaubt,
       });
+      const templateConfig = eintrag.fragen.template_config_json as
+        | QuestionTemplateConfig
+        | null;
+      const presentationMedia: PresentationLayoutMedium[] = [
+        ...eintrag.fragen.medien.map((medium) => ({
+          fileName: medium.datei,
+          mediaType: medium.medientyp.medientyp,
+          scope: "QUESTION" as const,
+        })),
+        ...eintrag.fragen.antworten.flatMap((antwort) =>
+          antwort.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "ANSWER" as const,
+          })),
+        ),
+        ...eintrag.fragen.antwortfelder.flatMap((feld) =>
+          feld.medien.map((medium) => ({
+            fileName: medium.datei,
+            mediaType: medium.medientyp.medientyp,
+            scope: "STRUCTURED_FIELD" as const,
+          })),
+        ),
+      ];
+      const layoutInput = {
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        legacyLayout: eintrag.praesentationslayout,
+        questionText: eintrag.fragen.frage,
+        answerOptionCount: eintrag.fragen.antworten.length,
+        structuredFieldCount: eintrag.fragen.antwortfelder.length,
+        media: presentationMedia,
+        templateData: templateConfig?.templateData,
+      };
 
       return {
       quiz_fragen_id: eintrag.quiz_fragen_id,
@@ -1288,9 +1386,7 @@ export async function getQuizPraesentation(
       fragen_id: eintrag.fragen.fragen_id,
       frage: eintrag.fragen.frage,
       templateId: eintrag.fragen.vorlage?.code ?? null,
-      templateConfig: eintrag.fragen.template_config_json as
-        | import("@/app/fragen/editor/types").QuestionTemplateConfig
-        | null,
+      templateConfig,
 
       punkte_modus: eintrag.punkte_modus ?? "standard",
       freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
@@ -1298,6 +1394,16 @@ export async function getQuizPraesentation(
       effektiver_antwortmodus: answerMode.effectiveMode,
 
       praesentationslayout: eintrag.praesentationslayout ?? "standard",
+      presentationLayouts: {
+        question: resolvePresentationLayout({
+          ...layoutInput,
+          phase: "QUESTION",
+        }),
+        solution: resolvePresentationLayout({
+          ...layoutInput,
+          phase: "SOLUTION",
+        }),
+      },
       antwort_reihenfolge: eintrag.antwort_reihenfolge,
       quelle: eintrag.fragen.quelle,
       kategorien: eintrag.fragen.fragen_kategorien.map(
@@ -1355,26 +1461,6 @@ export async function getQuizPraesentation(
     }),
   };
 }
-export async function updatePraesentationslayout(data: {
-  quizFragenId: number;
-  praesentationslayout: string;
-  quizId: number;
-}) {
-  await requireQuizEditor(data.quizId);
-  await requireQuizQuestion(data.quizId, data.quizFragenId);
-
-  await prisma.quiz_fragen.update({
-    where: {
-      quiz_fragen_id: data.quizFragenId,
-    },
-    data: {
-      praesentationslayout: data.praesentationslayout,
-    },
-  });
-
-  revalidatePath(`/quiz/${data.quizId}`);
-}
-
 export async function updateQuizQuestionFreeAnswerMode(data: {
   quizId: number;
   quizFragenId: number;
@@ -2552,6 +2638,23 @@ export async function recalculateQuizEvaluationsAction(quizId: number) {
   };
 }
 
+export async function continueQuizEvaluationBackfillAction(
+  quizId: number,
+  afterQuestionId: number | null,
+) {
+  await requireQuizAdmin(quizId);
+  const result = await processQuizEvaluationBackfillBatch(quizId, {
+    afterQuestionId:
+      afterQuestionId !== null && Number.isInteger(afterQuestionId)
+        ? afterQuestionId
+        : null,
+  });
+  revalidatePath(`/quiz/${quizId}/auswertung`);
+  revalidatePath(`/quiz/${quizId}/moderation`);
+  revalidatePath(`/quiz/${quizId}/praesentation`);
+  return result;
+}
+
 export async function updateQuizFragenStatistiken() {
   await requireAdmin();
 
@@ -2655,7 +2758,6 @@ export async function updateQuizFragenStatistiken() {
 }
 export async function getQuizAuswertungUebersicht(quizId: number) {
   await requireQuizViewer(quizId);
-  await ensureQuizEvaluation(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -2705,93 +2807,67 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
     };
   });
 }
-export async function getQuizAuswertungAlleAntworten(quizId: number) {
-  await requireQuizViewer(quizId);
-  await ensureQuizEvaluation(quizId);
-  const quizFragen = await prisma.quiz_fragen.findMany({
-    where: {
-      quiz_id: quizId,
-    },
-    orderBy: {
-      sortierung: "asc",
-    },
-    include: {
-      fragen: {
-        include: {
-          antwortfelder: {
-            orderBy: {
-              sortierung: "asc",
-            },
-            include: {
-              loesungen: {
-                orderBy: {
-                  sortierung: "asc",
+async function loadQuizAuswertungAlleAntworten(quizId: number) {
+  const [quizFragen, sessions] = await Promise.all([
+    prisma.quiz_fragen.findMany({
+      where: {
+        quiz_id: quizId,
+      },
+      orderBy: {
+        sortierung: "asc",
+      },
+      include: {
+        fragen: {
+          include: {
+            antwortfelder: {
+              orderBy: {
+                sortierung: "asc",
+              },
+              include: {
+                loesungen: {
+                  orderBy: {
+                    sortierung: "asc",
+                  },
                 },
               },
             },
-          },
-          antworten: {
-            include: {
-              antworttyp: true,
+            antworten: {
+              include: {
+                antworttyp: true,
+              },
+              orderBy: {
+                antwort_id: "asc",
+              },
             },
-            orderBy: {
-              antwort_id: "asc",
-            },
+            vorlage: { select: { code: true } },
           },
-          vorlage: { select: { code: true } },
+        },
+        team_antworten: {
+          include: {
+            quiz_team_sessions: true,
+            antworten: true,
+            antwortfelder: true,
+            antwortauswahlen: { include: { antwort: true } },
+          },
         },
       },
-      team_antworten: {
-        include: {
-          quiz_team_sessions: true,
-          antworten: true,
-          antwortauswahlen: { include: { antwort: true } },
-        },
+    }),
+    prisma.quiz_team_sessions.findMany({
+      where: {
+        quiz_id: quizId,
       },
-    },
-  });
+      orderBy: {
+        teamname: "asc",
+      },
+    }),
+  ]);
 
-  const sessions = await prisma.quiz_team_sessions.findMany({
-    where: {
-      quiz_id: quizId,
-    },
-    orderBy: {
-      teamname: "asc",
-    },
-  });
-
-  const teamAntwortIds = quizFragen.flatMap((quizFrage) =>
-    quizFrage.team_antworten.map((antwort) => antwort.team_antwort_id),
+  const offeneAntworten = quizFragen.flatMap((quizFrage) =>
+    quizFrage.team_antworten.flatMap((antwort) => antwort.antwortfelder),
   );
-
-  const offeneAntworten =
-    teamAntwortIds.length > 0
-      ? await prisma.team_antwortfelder.findMany({
-          where: {
-            team_antwort_id: {
-              in: teamAntwortIds,
-            },
-          },
-          orderBy: {
-            antwortfeld_id: "asc",
-          },
-        })
-      : [];
-
-  const antwortfeldIds = Array.from(
-    new Set(offeneAntworten.map((feld) => feld.antwortfeld_id)),
+  const antwortfelder = quizFragen.flatMap(
+    (quizFrage) => quizFrage.fragen.antwortfelder,
   );
-
-  const antwortfelder =
-    antwortfeldIds.length > 0
-      ? await prisma.frage_antwortfelder.findMany({
-          where: {
-            antwortfeld_id: {
-              in: antwortfeldIds,
-            },
-          },
-        })
-      : [];
 
   const antwortfeldLabelMap = new Map(
     antwortfelder.map((feld) => [feld.antwortfeld_id, feld.label]),
@@ -2931,6 +3007,11 @@ export async function getQuizAuswertungAlleAntworten(quizId: number) {
     });
   });
 }
+
+export async function getQuizAuswertungAlleAntworten(quizId: number) {
+  await requireQuizViewer(quizId);
+  return loadQuizAuswertungAlleAntworten(quizId);
+}
 export async function updateQuizFragePunkteModus(data: {
   quizId: number;
   quizFragenId: number;
@@ -2988,9 +3069,7 @@ export async function updateQuizFragePunkteModus(data: {
     success: true,
   };
 }
-export async function getQuizPunktestand(quizId: number) {
-  await requireQuizViewer(quizId);
-  await ensureQuizEvaluation(quizId);
+async function loadQuizPunktestand(quizId: number) {
   const [sessions, totals, answers] = await Promise.all([
     prisma.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
@@ -3041,6 +3120,30 @@ export async function getQuizPunktestand(quizId: number) {
       punkte: entry.punkte,
       details: entry.details,
     }));
+}
+
+export async function getQuizPunktestand(quizId: number) {
+  await requireQuizViewer(quizId);
+  return loadQuizPunktestand(quizId);
+}
+
+export async function getQuizAuswertungPageData(quizId: number) {
+  await requireQuizAdmin(quizId);
+  const [quiz, antworten, punktestand, backfillStatus] = await Promise.all([
+    prisma.quiz.findUnique({
+      where: { quiz_id: quizId },
+      select: { quiz_id: true, titel: true },
+    }),
+    loadQuizAuswertungAlleAntworten(quizId),
+    loadQuizPunktestand(quizId),
+    getQuizEvaluationBackfillStatus(quizId),
+  ]);
+  return {
+    quiz,
+    antworten,
+    punktestand,
+    backfillStatus,
+  };
 }
 
 export async function getZufaelligeSchaetzfrage(quizId: number) {

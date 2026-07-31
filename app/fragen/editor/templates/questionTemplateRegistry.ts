@@ -55,6 +55,16 @@ export function resolveCanonicalQuestionTemplateId(
   return questionTemplateAliases[normalizedId] ?? normalizedId;
 }
 
+export function representsSameQuestionTemplate(
+  persistedTemplateId: string | null,
+  draftTemplateId: string | null,
+): boolean {
+  return (
+    resolveCanonicalQuestionTemplateId(persistedTemplateId) ===
+    resolveCanonicalQuestionTemplateId(draftTemplateId)
+  );
+}
+
 export function findQuestionTemplate<T extends { id: string }>(
   templates: readonly T[],
   templateId: string | null,

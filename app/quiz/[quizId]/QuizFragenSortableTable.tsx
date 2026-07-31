@@ -30,7 +30,6 @@ import {
 import {
   createQuizAbschnitt,
   deleteQuizAbschnitt,
-  updatePraesentationslayout,
   updateQuizAbschnitteSortierung,
   updateQuizFragePunkteModus,
   updateQuizQuestionFreeAnswerMode,
@@ -614,24 +613,6 @@ export default function QuizFragenSortableTable({
     await saveBlockSortierung(newItems);
   }
 
-  async function handleLayoutChange(
-    quizFragenId: number,
-    praesentationslayout: string,
-  ) {
-    setItems((current) =>
-      current.map((item) =>
-        item.quiz_fragen_id === quizFragenId
-          ? { ...item, praesentationslayout }
-          : item,
-      ),
-    );
-    await updatePraesentationslayout({
-      quizFragenId,
-      praesentationslayout,
-      quizId,
-    });
-  }
-
   async function handlePunkteModusChange(
     quizFragenId: number,
     punkteModus: string,
@@ -678,7 +659,6 @@ export default function QuizFragenSortableTable({
   }
 
   const settingsActions: QuizQuestionSettingsActions = {
-    onLayoutChange: handleLayoutChange,
     onPunkteModusChange: handlePunkteModusChange,
     onFreeAnswerChange: handleFreeAnswerChange,
   };

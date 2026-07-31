@@ -85,7 +85,9 @@ type StoredMedia = {
 };
 
 export function resolveQuestionMediaUrl(url: string) {
-  return url.startsWith("http://") || url.startsWith("https://")
+  return url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("/medien/")
     ? url
     : `/medien/${url.replace(/^\/+/, "")}`;
 }

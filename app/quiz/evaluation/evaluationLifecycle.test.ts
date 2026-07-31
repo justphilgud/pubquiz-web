@@ -20,6 +20,14 @@ const versionMigration = readFileSync(
   "prisma/migrations/20260726120000_add_quiz_answer_evaluation_version/migration.sql",
   "utf8",
 );
+const evaluationPage = readFileSync(
+  "app/quiz/[quizId]/auswertung/page.tsx",
+  "utf8",
+);
+const evaluationClient = readFileSync(
+  "app/quiz/[quizId]/auswertung/QuizAuswertungClient.tsx",
+  "utf8",
+);
 
 test("schema persists automatic, awarded and auditable manual evaluation data", () => {
   for (const field of [
@@ -62,8 +70,8 @@ test("answer writes recalculate while reset restores the automatic result", () =
 
 test("ranking sums only persisted Decimal awarded points and keeps zero-point teams", () => {
   const ranking = actions.slice(
+    actions.indexOf("async function loadQuizPunktestand"),
     actions.indexOf("export async function getQuizPunktestand"),
-    actions.indexOf("export async function getZufaelligeSchaetzfrage"),
   );
   assert.match(ranking, /_sum: \{ vergebene_punkte: true \}/);
   assert.match(ranking, /new Prisma\.Decimal\(0\)/);
@@ -76,7 +84,7 @@ test("ranking sums only persisted Decimal awarded points and keeps zero-point te
   assert.match(pointEvaluation, /base\.basePoints\.mul\(2\)/);
 });
 
-test("read paths backfill only incomplete evaluations", () => {
+test("read paths never backfill evaluations", () => {
   for (const functionName of [
     "getQuizAuswertungUebersicht",
     "getQuizAuswertungAlleAntworten",
@@ -88,9 +96,75 @@ test("read paths backfill only incomplete evaluations", () => {
       start,
       nextExport === -1 ? undefined : nextExport,
     );
-    assert.match(implementation, /ensureQuizEvaluation\(quizId\)/);
+    assert.doesNotMatch(implementation, /ensureQuizEvaluation\(quizId\)/);
     assert.doesNotMatch(implementation, /recalculateQuizEvaluation\(quizId\)/);
+    assert.doesNotMatch(
+      implementation,
+      /processQuizEvaluationBackfillBatch\(quizId/,
+    );
   }
+});
+
+test("quiz backfill keeps each question in a bounded transaction", () => {
+  const start = evaluationService.indexOf(
+    "export async function ensureQuizEvaluation",
+  );
+  const end = evaluationService.indexOf(
+    "export async function recalculateQuizEvaluation",
+  );
+  const implementation = evaluationService.slice(start, end);
+
+  assert.match(
+    evaluationService,
+    /QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS = 30_000/,
+  );
+  assert.match(
+    evaluationService,
+    /timeout: QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS/,
+  );
+  assert.match(implementation, /for \(const question of incomplete\)/);
+  assert.match(implementation, /recalculateQuizQuestionEvaluation\(/);
+  assert.doesNotMatch(implementation, /prisma\.\$transaction/);
+});
+
+test("evaluation page uses one authorized parallel page-data loader", () => {
+  const loaderStart = actions.indexOf(
+    "export async function getQuizAuswertungPageData",
+  );
+  const loaderEnd = actions.indexOf(
+    "export async function getZufaelligeSchaetzfrage",
+    loaderStart,
+  );
+  const loader = actions.slice(loaderStart, loaderEnd);
+
+  assert.match(loader, /await requireQuizAdmin\(quizId\)/);
+  assert.match(loader, /await Promise\.all\(/);
+  assert.match(loader, /loadQuizAuswertungAlleAntworten\(quizId\)/);
+  assert.match(loader, /loadQuizPunktestand\(quizId\)/);
+  assert.match(loader, /getQuizEvaluationBackfillStatus\(quizId\)/);
+  assert.match(evaluationPage, /getQuizAuswertungPageData/);
+  assert.doesNotMatch(evaluationPage, /getQuizPraesentation/);
+  assert.match(evaluationPage, /if \(!quiz\)/);
+  assert.match(evaluationPage, /backfillStatus=\{backfillStatus\}/);
+});
+
+test("evaluation answer loading safely represents missing and structured answers", () => {
+  const start = actions.indexOf(
+    "async function loadQuizAuswertungAlleAntworten",
+  );
+  const end = actions.indexOf(
+    "export async function getQuizAuswertungAlleAntworten",
+    start,
+  );
+  const implementation = actions.slice(start, end);
+
+  assert.match(implementation, /return quizFragen\.flatMap/);
+  assert.match(implementation, /return sessions\.map/);
+  assert.match(implementation, /antwortfelder/);
+  assert.match(implementation, /vorlage: \{ select: \{ code: true \} \}/);
+  assert.match(implementation, /!antwort \|\| antwort\.bewertungsstatus === "UNANSWERED"/);
+  assert.match(implementation, /bewertungsstatus: antwort\?\.bewertungsstatus \?\? "UNANSWERED"/);
+  assert.match(implementation, /vergebenePunkte: Number\(antwort\?\.vergebene_punkte \?\? 0\)/);
 });
 
 test("manual recalculation is authorized and preserves overrides", () => {
@@ -105,6 +179,75 @@ test("manual recalculation is authorized and preserves overrides", () => {
   assert.match(action, /preserveManualOverrides: true/);
   assert.match(evaluationService, /preserveManualOverrides !== false/);
   assert.match(evaluationService, /manuelle_punkte: null/);
+});
+
+test("backfill action authorizes before processing a bounded batch", () => {
+  const start = actions.indexOf(
+    "export async function continueQuizEvaluationBackfillAction",
+  );
+  const end = actions.indexOf(
+    "export async function updateQuizFragenStatistiken",
+    start,
+  );
+  const action = actions.slice(start, end);
+  const authorization = action.indexOf("requireQuizAdmin(quizId)");
+  const processing = action.indexOf(
+    "processQuizEvaluationBackfillBatch(quizId",
+  );
+
+  assert.ok(authorization > -1);
+  assert.ok(processing > authorization);
+  assert.match(action, /revalidatePath\(`\/quiz\/\$\{quizId\}\/auswertung`\)/);
+  assert.match(
+    evaluationService,
+    /QUIZ_EVALUATION_BACKFILL_BATCH_QUESTION_LIMIT/,
+  );
+  assert.match(evaluationService, /preserveManualOverrides: true/);
+});
+
+test("parallel backfill starts update existing unique answers instead of inserting", () => {
+  const start = evaluationService.indexOf(
+    "export async function processQuizEvaluationBackfillBatch",
+  );
+  const end = evaluationService.indexOf(
+    "export async function recalculateQuizEvaluation",
+    start,
+  );
+  const batch = evaluationService.slice(start, end);
+
+  assert.doesNotMatch(batch, /\.create(?:Many)?\(/);
+  assert.match(evaluationService, /team_antworten\.updateMany\(/);
+  assert.match(
+    schema,
+    /@@unique\(\[quiz_fragen_id, quiz_team_session_id\], map: "uq_team_antwort_pro_frage"\)/,
+  );
+  assert.match(evaluationService, /bewertungsquelle: answer\.bewertungsquelle/);
+  assert.match(evaluationService, /bewertet_am: answer\.bewertet_am/);
+});
+
+test("incomplete evaluation state marks existing results and ranking as provisional", () => {
+  assert.match(
+    evaluationClient,
+    /Vorhandene Ergebnisse werden bereits angezeigt/,
+  );
+  assert.match(evaluationClient, /Punktestand \(vorläufig\)/);
+  assert.match(evaluationClient, /Berechnung fortsetzen/);
+});
+
+test("answer loading uses two parallel queries without follow-up field lookups", () => {
+  const start = actions.indexOf(
+    "async function loadQuizAuswertungAlleAntworten",
+  );
+  const end = actions.indexOf(
+    "export async function getQuizAuswertungAlleAntworten",
+    start,
+  );
+  const implementation = actions.slice(start, end);
+
+  assert.match(implementation, /await Promise\.all\(/);
+  assert.match(implementation, /antwortfelder: true/);
+  assert.doesNotMatch(implementation, /team_antwortfelder\.findMany/);
+  assert.doesNotMatch(implementation, /frage_antwortfelder\.findMany/);
 });
 
 test("answer and manual evaluation writes stay in transactional recalculation", () => {

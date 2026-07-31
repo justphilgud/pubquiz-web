@@ -10,6 +10,7 @@ import QuizQuestionSettings, {
   type QuizQuestionSettingsActions,
 } from "./QuizQuestionSettings";
 import { getQuizQuestionPointsDisplay } from "@/app/quiz/evaluation/quizQuestionPointsDisplay";
+import type { ResolvedPresentationLayout } from "@/app/rendering/presentation/presentationLayoutResolver";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
@@ -18,7 +19,7 @@ export type QuizQuestion = {
   fragen_id: number;
   frage: string;
   schwierigkeitslevel: string | null;
-  praesentationslayout: string | null;
+  resolvedPresentationLayout: ResolvedPresentationLayout;
   punkte_basis: number;
   punkte_modus: string | null;
   freie_antwort_erlaubt: boolean;
@@ -196,7 +197,7 @@ export default function QuizQuestionItem({
       {isSettingsOpen && (
         <QuizQuestionSettings
           quizFragenId={frage.quiz_fragen_id}
-          praesentationslayout={frage.praesentationslayout}
+          resolvedPresentationLayout={frage.resolvedPresentationLayout}
           punkteModus={frage.punkte_modus}
           freieAntwortErlaubt={frage.freie_antwort_erlaubt}
           kannFreieAntwortAktivieren={frage.kann_freie_antwort_aktivieren}
