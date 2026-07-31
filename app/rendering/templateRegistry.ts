@@ -50,11 +50,46 @@ export type BrandTokens = {
   assets: BrandAssetTokens;
 };
 
+export type PresentationDesignStyle = "NEON" | "CORPORATE" | "BIRTHDAY";
+
+export type PresentationTemplateDesign = {
+  stylePreset: PresentationDesignStyle;
+  composition: {
+    layoutPreset: "CLASSIC" | "IMAGE_FOCUS" | "SPLIT" | "MAGAZINE" | "COLLAGE";
+    headerStyle: "BRAND_BAR" | "CORPORATE_BAND" | "BIRTHDAY_HERO";
+    footerStyle: "NONE" | "STATUS_LINE" | "PERSONAL_NOTE";
+    contentFrame: "NEON_FRAME" | "CORPORATE_PANEL" | "BIRTHDAY_ALBUM";
+    mediaTreatment: "GLOW_FRAME" | "RECTANGULAR" | "POLAROID";
+    answerTreatment: "NEON_CARDS" | "CORPORATE_ROWS" | "BIRTHDAY_CARDS";
+    solutionTreatment: "SPOTLIGHT" | "RESULT_BAND" | "MEMORY";
+    decoration: "NONE" | "NEON_ORBITS" | "GEOMETRIC_LINES" | "CONFETTI";
+  };
+  imagery: {
+    heroImage: RepositoryAssetPath | null;
+    decorativeImages: RepositoryAssetPath[];
+    personalImagePool: RepositoryAssetPath[];
+    overlay: "NONE" | "SOFT" | "STRONG";
+    placement: "BACKGROUND" | "SIDE" | "COLLAGE";
+  };
+  occasion: {
+    personName: string;
+    age: string;
+    subtitle: string;
+    eventTitle: string;
+    extraText: string;
+    identityPlacement: "HEADER" | "SIDE" | "FOOTER";
+  };
+};
+
 export type TemplateMessageKey =
   | "presentationDefault"
   | "presentationDark"
+  | "presentationCorporate"
+  | "presentationBirthday"
   | "answerDefault"
-  | "answerMinimal";
+  | "answerMinimal"
+  | "answerCorporate"
+  | "answerBirthday";
 
 type TemplateMetadata = {
   labelKey: TemplateMessageKey;
@@ -65,6 +100,7 @@ type TemplateMetadata = {
   };
   displayName?: string;
   moderationVariant?: "BRANDED" | "QUIET";
+  design: PresentationTemplateDesign;
 };
 
 export type PresentationTemplate = TemplateMetadata & {
@@ -92,6 +128,27 @@ const sharedSizing = {
   assets: { logo: "/logo_transparent.png", backgroundImage: null },
 } as const;
 
+export const presentationDesigns = {
+  NEON: {
+    stylePreset: "NEON",
+    composition: { layoutPreset: "CLASSIC", headerStyle: "BRAND_BAR", footerStyle: "STATUS_LINE", contentFrame: "NEON_FRAME", mediaTreatment: "GLOW_FRAME", answerTreatment: "NEON_CARDS", solutionTreatment: "SPOTLIGHT", decoration: "NEON_ORBITS" },
+    imagery: { heroImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "BACKGROUND" },
+    occasion: { personName: "", age: "", subtitle: "", eventTitle: "", extraText: "", identityPlacement: "HEADER" },
+  },
+  CORPORATE: {
+    stylePreset: "CORPORATE",
+    composition: { layoutPreset: "SPLIT", headerStyle: "CORPORATE_BAND", footerStyle: "STATUS_LINE", contentFrame: "CORPORATE_PANEL", mediaTreatment: "RECTANGULAR", answerTreatment: "CORPORATE_ROWS", solutionTreatment: "RESULT_BAND", decoration: "GEOMETRIC_LINES" },
+    imagery: { heroImage: null, decorativeImages: [], personalImagePool: [], overlay: "SOFT", placement: "SIDE" },
+    occasion: { personName: "", age: "", subtitle: "Wissen verbindet", eventTitle: "Corporate Quiz", extraText: "", identityPlacement: "HEADER" },
+  },
+  BIRTHDAY: {
+    stylePreset: "BIRTHDAY",
+    composition: { layoutPreset: "COLLAGE", headerStyle: "BIRTHDAY_HERO", footerStyle: "PERSONAL_NOTE", contentFrame: "BIRTHDAY_ALBUM", mediaTreatment: "POLAROID", answerTreatment: "BIRTHDAY_CARDS", solutionTreatment: "MEMORY", decoration: "CONFETTI" },
+    imagery: { heroImage: "/medien/template-preview.svg", decorativeImages: ["/medien/bilder/unsortiert/sabrage.png"], personalImagePool: ["/medien/template-preview.svg", "/medien/bilder/unsortiert/sabrage.png", "/medien/bilder/wahrzeichen/taipei-101_standard.jpg"], overlay: "SOFT", placement: "COLLAGE" },
+    occasion: { personName: "Alex", age: "40", subtitle: "Ein Quiz voller Erinnerungen", eventTitle: "Geburtstagsquiz", extraText: "Schön, dass ihr mitfeiert!", identityPlacement: "HEADER" },
+  },
+} as const satisfies Record<PresentationDesignStyle, PresentationTemplateDesign>;
+
 const presentation = [
   {
     id: "ungegoogelt-default",
@@ -101,6 +158,7 @@ const presentation = [
     category: "BRANDED",
     selectable: true,
     preview: { exampleButtonKey: "previewButton" },
+    design: presentationDesigns.NEON,
     tokens: {
       ...sharedSizing,
       colors: {
@@ -127,6 +185,7 @@ const presentation = [
     category: "MINIMAL",
     selectable: true,
     preview: { exampleButtonKey: "previewButton" },
+    design: presentationDesigns.CORPORATE,
     tokens: {
       ...sharedSizing,
       radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
@@ -146,6 +205,37 @@ const presentation = [
       },
     },
   },
+  {
+    id: "corporate-reference",
+    kind: "PRESENTATION",
+    variant: "DARK",
+    labelKey: "presentationCorporate",
+    category: "MINIMAL",
+    selectable: true,
+    preview: { exampleButtonKey: "previewButton" },
+    design: presentationDesigns.CORPORATE,
+    tokens: {
+      ...sharedSizing,
+      typography: { family: "system-ui, sans-serif", displayWeight: 800, bodyWeight: 400 },
+      radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
+      spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
+      colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", success: "#047857", warning: "#a16207", danger: "#b91c1c" },
+    },
+  },
+  {
+    id: "birthday-reference",
+    kind: "PRESENTATION",
+    variant: "NEON",
+    labelKey: "presentationBirthday",
+    category: "BRANDED",
+    selectable: true,
+    preview: { exampleButtonKey: "previewButton" },
+    design: presentationDesigns.BIRTHDAY,
+    tokens: {
+      ...sharedSizing,
+      colors: { primary: "#be185d", secondary: "#7c3aed", accent: "#f59e0b", background: "#fff7ed", surface: "#ffffff", surfaceStrong: "#fce7f3", text: "#4c1d3d", textMuted: "#7c2d5b", border: "#f9a8d4", success: "#15803d", warning: "#b45309", danger: "#be123c" },
+    },
+  },
 ] as const satisfies readonly PresentationTemplate[];
 
 const answerForm = [
@@ -157,6 +247,7 @@ const answerForm = [
     category: "BRANDED",
     selectable: true,
     preview: { exampleButtonKey: "previewButton" },
+    design: presentationDesigns.NEON,
     tokens: {
       ...sharedSizing,
       colors: {
@@ -183,6 +274,7 @@ const answerForm = [
     category: "MINIMAL",
     selectable: true,
     preview: { exampleButtonKey: "previewButton" },
+    design: presentationDesigns.CORPORATE,
     tokens: {
       ...sharedSizing,
       typography: {
@@ -208,6 +300,18 @@ const answerForm = [
         danger: "#b91c1c",
       },
     },
+  },
+  {
+    id: "corporate-reference", kind: "ANSWER_FORM", variant: "MINIMAL",
+    labelKey: "answerCorporate", category: "MINIMAL", selectable: true,
+    preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.CORPORATE,
+    tokens: { ...sharedSizing, typography: { family: "system-ui, sans-serif", displayWeight: 800, bodyWeight: 400 }, radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" }, colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", success: "#047857", warning: "#a16207", danger: "#b91c1c" } },
+  },
+  {
+    id: "birthday-reference", kind: "ANSWER_FORM", variant: "BRANDED",
+    labelKey: "answerBirthday", category: "BRANDED", selectable: true,
+    preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.BIRTHDAY,
+    tokens: { ...sharedSizing, colors: { primary: "#be185d", secondary: "#7c3aed", accent: "#f59e0b", background: "#fff7ed", surface: "#ffffff", surfaceStrong: "#fce7f3", text: "#4c1d3d", textMuted: "#7c2d5b", border: "#f9a8d4", success: "#15803d", warning: "#b45309", danger: "#be123c" } },
   },
 ] as const satisfies readonly AnswerFormTemplate[];
 

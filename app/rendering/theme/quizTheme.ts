@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type {
   AnswerFormTemplate,
   PresentationTemplate,
+  PresentationTemplateDesign,
   TemplateSource,
 } from "../templateRegistry";
 import type { ResolvedTemplate } from "../templateResolver";
@@ -60,6 +61,7 @@ export type ResolvedQuizTheme = {
   assets: {
     backgroundImageUrl: string | null;
   };
+  design: PresentationTemplateDesign;
   presentation: {
     variant: PresentationTemplate["variant"];
   };
@@ -138,6 +140,7 @@ export function resolveQuizTheme({
     assets: {
       backgroundImageUrl: identityTokens.assets.backgroundImage,
     },
+    design: structuredClone(presentation.template.design),
     presentation: {
       variant: presentation.template.variant,
     },
@@ -207,11 +210,13 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
   };
 
   if (theme.assets.backgroundImageUrl) {
-    style.backgroundImage = `url("${theme.assets.backgroundImageUrl}")`;
-  } else if (theme.presentation.variant === "NEON") {
+    style.backgroundImage = `linear-gradient(${theme.colors.background}99, ${theme.colors.background}99), url("${theme.assets.backgroundImageUrl}")`;
+  } else if (theme.design.stylePreset === "NEON") {
     style.backgroundImage = `radial-gradient(circle at 20% 20%, ${theme.colors.secondary} 0, ${theme.colors.secondary}22 24%, transparent 42%), radial-gradient(circle at 80% 10%, ${theme.colors.primary}66 0, ${theme.colors.primary}22 22%, transparent 38%), linear-gradient(135deg, #1a0033, ${theme.colors.background} 45%, #001a3a)`;
+  } else if (theme.design.stylePreset === "CORPORATE") {
+    style.backgroundImage = `linear-gradient(120deg, ${theme.colors.background}, ${theme.colors.surfaceStrong})`;
   } else {
-    style.backgroundImage = `radial-gradient(circle at 50% 0%, ${theme.colors.primary}22, transparent 42%), linear-gradient(145deg, ${theme.colors.background}, #000000)`;
+    style.backgroundImage = `radial-gradient(circle at 12% 15%, ${theme.colors.accent}33 0 7%, transparent 8%), radial-gradient(circle at 88% 10%, ${theme.colors.secondary}22 0 10%, transparent 11%), linear-gradient(145deg, ${theme.colors.background}, ${theme.colors.surfaceStrong})`;
   }
 
   return style;

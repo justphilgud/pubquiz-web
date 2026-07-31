@@ -13,6 +13,8 @@ export const enRenderingMessages: WidenMessageCatalog<
       label: "ungegoogelt Dark",
       description: "A calmer and distinctly darker projector variant.",
     },
+    presentationCorporate: { label: "Corporate", description: "Calm professional design with a clear hierarchy." },
+    presentationBirthday: { label: "Birthday", description: "Personal image-led design with festive details." },
     answerDefault: {
       label: "ungegoogelt Default",
       description: "The familiar mobile-first answer form.",
@@ -21,6 +23,8 @@ export const enRenderingMessages: WidenMessageCatalog<
       label: "Minimal",
       description: "Reduced branding with especially clear readability.",
     },
+    answerCorporate: { label: "Corporate", description: "Professional answer form for company events." },
+    answerBirthday: { label: "Birthday", description: "Personally branded answer form." },
   },
   fields: {
     presentationTemplate: "Presentation template",

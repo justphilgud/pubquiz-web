@@ -19,14 +19,18 @@ function systemTemplates(): ManagedPresentationTemplate[] {
     const runtimeTemplate: PresentationTemplate = template;
     return {
     id: template.id,
-    name:
-      template.id === "ungegoogelt-default"
-        ? "ungegoogelt Standard"
-        : "ungegoogelt Dunkel",
-    description:
-      template.id === "ungegoogelt-default"
-        ? "Systemtemplate mit dem etablierten ungegoogelt Neon-Auftritt."
-        : "Reduziertes dunkles Systemtemplate.",
+    name: ({
+      "ungegoogelt-default": "ungegoogelt Neon",
+      "ungegoogelt-dark": "ungegoogelt Dunkel",
+      "corporate-reference": "Corporate",
+      "birthday-reference": "Geburtstag",
+    } as Record<string, string>)[template.id] ?? template.id,
+    description: ({
+      "ungegoogelt-default": "Systemtemplate mit dem etablierten ungegoogelt Neon-Auftritt.",
+      "ungegoogelt-dark": "Reduziertes dunkles Systemtemplate.",
+      "corporate-reference": "Sachliches Referenzdesign für Unternehmen, Workshops und Kundenveranstaltungen.",
+      "birthday-reference": "Persönliches, bildbetontes Referenzdesign für Geburtstagsquizze.",
+    } as Record<string, string>)[template.id] ?? null,
     status: "SYSTEM",
     source: "SYSTEM",
     isSystem: true,
@@ -39,6 +43,7 @@ function systemTemplates(): ManagedPresentationTemplate[] {
         moderation: runtimeTemplate.moderationVariant ?? "BRANDED",
         answerForm: getAnswerFormTemplate(template.id)?.variant ?? "BRANDED",
       },
+      design: structuredClone(template.design),
     },
     tags: ["System"],
     sourceTemplateId: null,

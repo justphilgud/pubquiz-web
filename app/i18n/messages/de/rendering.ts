@@ -8,6 +8,8 @@ export const deRenderingMessages = {
       label: "ungegoogelt Dunkel",
       description: "Eine ruhigere, deutlich dunklere Beamer-Variante.",
     },
+    presentationCorporate: { label: "Corporate", description: "Ruhiges, professionelles Design mit klarer Hierarchie." },
+    presentationBirthday: { label: "Geburtstag", description: "Persönliches, bildbetontes Design mit festlichen Elementen." },
     answerDefault: {
       label: "ungegoogelt Standard",
       description: "Das vertraute, mobil optimierte Antwortformular.",
@@ -16,6 +18,8 @@ export const deRenderingMessages = {
       label: "Minimal",
       description: "Reduziertes Branding mit besonders klarer Lesbarkeit.",
     },
+    answerCorporate: { label: "Corporate", description: "Sachliches Antwortformular für Firmenveranstaltungen." },
+    answerBirthday: { label: "Geburtstag", description: "Persönlich gebrandetes Antwortformular." },
   },
   fields: {
     presentationTemplate: "Präsentationstemplate",

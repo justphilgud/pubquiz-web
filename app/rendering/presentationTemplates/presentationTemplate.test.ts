@@ -23,6 +23,9 @@ import {
 } from "./presentationTemplateLifecycle";
 import { filterPresentationTemplates } from "./templateOverviewPolicy";
 import { presentationPreviewScenarios } from "./PresentationTemplatePreview";
+import { selectDeterministicTemplateImage } from "./deterministicTemplateImage";
+import { applyPresentationStylePreset, createPresentationStylePreset } from "./presentationTemplatePresets";
+import { templateRegistry } from "@/app/rendering/templateRegistry";
 
 function draft(): PresentationTemplateDraft {
   return {
@@ -67,6 +70,53 @@ test("blocks severely unreadable active themes but only warns for drafts", () =>
 
 test("rejects incomplete stored configuration for safe resolver fallback", () => {
   assert.equal(parsePresentationTemplateConfig({ version: 1, tokens: {} }), null);
+});
+
+test("normalizes legacy configurations and validates all semantic design styles", () => {
+  const legacy = structuredClone(defaultPresentationTemplateConfig) as Partial<typeof defaultPresentationTemplateConfig>;
+  delete legacy.design;
+  assert.equal(parsePresentationTemplateConfig(legacy)?.design.stylePreset, "NEON");
+  for (const style of ["NEON", "CORPORATE", "BIRTHDAY"] as const) {
+    assert.equal(validatePresentationTemplateDraft({ ...draft(), config: createPresentationStylePreset(style) }).ok, true);
+  }
+});
+
+test("rejects unknown styles, external assets and executable design fields", () => {
+  const invalid = draft();
+  invalid.config.design.stylePreset = "SCRIPT" as typeof invalid.config.design.stylePreset;
+  invalid.config.design.imagery.heroImage = "https://example.test/a.jpg" as `/${string}`;
+  Object.assign(invalid.config.design.composition, { component: "<script>alert(1)</script>" });
+  Object.assign(invalid.config, { customCss: "body { display: none }" });
+  const result = validatePresentationTemplateDraft(invalid);
+  assert.equal(result.ok, false);
+  const injected = draft();
+  Object.assign(injected.config.design.composition, { component: "<script>alert(1)</script>" });
+  const injectedResult = validatePresentationTemplateDraft(injected);
+  assert.equal(injectedResult.ok, false);
+  if (!injectedResult.ok) assert.ok(injectedResult.errors.some(({ message }) => message.includes("ausführbare")));
+});
+
+test("presets are structurally distinct and preserve personal imagery when switching", () => {
+  const neon = createPresentationStylePreset("NEON");
+  const corporate = createPresentationStylePreset("CORPORATE");
+  const birthday = createPresentationStylePreset("BIRTHDAY");
+  assert.notDeepEqual(corporate.design.composition, neon.design.composition);
+  assert.equal(birthday.design.composition.mediaTreatment, "POLAROID");
+  birthday.design.imagery.personalImagePool = ["/medien/template-preview.svg"];
+  assert.deepEqual(applyPresentationStylePreset(birthday, "CORPORATE").design.imagery.personalImagePool, birthday.design.imagery.personalImagePool);
+  assert.ok(templateRegistry.presentation.some(({ id }) => id === "corporate-reference"));
+  assert.ok(templateRegistry.presentation.some(({ id }) => id === "birthday-reference"));
+});
+
+test("birthday image selection is deterministic with safe zero, one and multi-image fallbacks", () => {
+  const input = { quizId: 7, questionId: 11, phase: "QUESTION" as const };
+  assert.equal(selectDeterministicTemplateImage([], input), null);
+  assert.equal(selectDeterministicTemplateImage(["/one.jpg"], input), "/one.jpg");
+  const images = ["/two.jpg", "/one.jpg"];
+  const question = selectDeterministicTemplateImage(images, input);
+  assert.equal(question, selectDeterministicTemplateImage(images, input));
+  assert.notEqual(question, selectDeterministicTemplateImage(images, { ...input, phase: "SOLUTION" }));
+  assert.equal(selectDeterministicTemplateImage(["javascript:alert(1)"], input), null);
 });
 
 test("custom visual template resolves through the shared theme contract", () => {
@@ -123,11 +173,20 @@ test("used templates cannot be archived", () => {
 });
 
 test("preview matrix is complete and uses productive renderer and layout resolver", () => {
-  assert.deepEqual(presentationPreviewScenarios.map(([id]) => id), ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "TRUE_FALSE", "AUDIO", "ORDERING", "PIXEL", "SOLUTION", "MODERATION", "ANSWER_FORM"]);
+  assert.deepEqual(presentationPreviewScenarios.map(([id]) => id), ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "TRUE_FALSE", "AUDIO", "ORDERING", "PIXEL", "SOLUTION", "MODERATION", "ANSWER_FORM", "BIRTHDAY_IMAGE", "BIRTHDAY_SOLUTION", "BIRTHDAY_FALLBACK", "CORPORATE_LOGO", "CORPORATE_MEDIA", "CORPORATE_SOLUTION"]);
   const source = readFileSync("app/rendering/presentationTemplates/PresentationTemplatePreview.tsx", "utf8");
   assert.match(source, /PresentationSlideRenderer/);
   assert.match(source, /resolvePresentationLayout/);
   assert.doesNotMatch(source, /function resolve.*Layout/);
+  assert.doesNotMatch(source, /src=.["']\/medien\/vorschau\.mp3/);
+});
+
+test("semantic renderer variants remove corporate glow and expose birthday album treatment", () => {
+  const css = readFileSync("app/globals.css", "utf8");
+  assert.match(css, /data-design-style="CORPORATE"/);
+  assert.match(css, /CORPORATE[\s\S]+box-shadow: none !important/);
+  assert.match(css, /data-design-style="BIRTHDAY"/);
+  assert.match(css, /presentation-personal-image/);
 });
 
 test("routes and writes enforce admin authorization and migration remains additive", () => {

@@ -27,6 +27,12 @@ export const presentationPreviewScenarios = [
   ["SOLUTION", "Auflösung"],
   ["MODERATION", "Moderation"],
   ["ANSWER_FORM", "Antwortformular"],
+  ["BIRTHDAY_IMAGE", "Geburtstag · persönliches Bild"],
+  ["BIRTHDAY_SOLUTION", "Geburtstag · Auflösung"],
+  ["BIRTHDAY_FALLBACK", "Geburtstag · ohne Bilder"],
+  ["CORPORATE_LOGO", "Corporate · Logo"],
+  ["CORPORATE_MEDIA", "Corporate · Medienfrage"],
+  ["CORPORATE_SOLUTION", "Corporate · Auflösung"],
 ] as const;
 
 export type PresentationPreviewScenario =
@@ -59,7 +65,7 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
         ? ["Frühling", "Sommer", "Herbst", "Winter"]
         : ["Berlin", "Hamburg", "München", "Köln"];
   const media =
-    scenario === "IMAGE" || scenario === "PIXEL"
+    scenario === "IMAGE" || scenario === "PIXEL" || scenario === "BIRTHDAY_IMAGE" || scenario === "CORPORATE_MEDIA"
       ? [{ fileName: "template-preview.svg", mediaType: "Bild", scope: "QUESTION" as const }]
       : scenario === "AUDIO"
         ? [{ fileName: "vorschau.mp3", mediaType: "Audio", scope: "QUESTION" as const }]
@@ -174,7 +180,12 @@ export function PresentationTemplatePreview({
   scenario,
 }: Props) {
   const theme = useMemo(() => {
-    const managed = { id: templateId, name: templateName, config };
+    const effectiveConfig = structuredClone(config);
+    if (scenario === "BIRTHDAY_FALLBACK") {
+      effectiveConfig.design.imagery.heroImage = null;
+      effectiveConfig.design.imagery.personalImagePool = [];
+    }
+    const managed = { id: templateId, name: templateName, config: effectiveConfig };
     return resolveQuizTheme({
       displayName: templateName,
       presentation: {
@@ -190,7 +201,7 @@ export function PresentationTemplatePreview({
         usedFallback: false,
       },
     });
-  }, [config, templateId, templateName]);
+  }, [config, scenario, templateId, templateName]);
 
   if (scenario === "ANSWER_FORM") {
     return (
@@ -219,7 +230,7 @@ export function PresentationTemplatePreview({
 
   const quiz = buildPreviewQuiz(scenario);
   const slide: Slide = {
-    typ: scenario === "SOLUTION" ? "aufloesung" : "frage",
+    typ: scenario === "SOLUTION" || scenario === "BIRTHDAY_SOLUTION" || scenario === "CORPORATE_SOLUTION" ? "aufloesung" : "frage",
     abschnitt: quiz.abschnitte[0],
     frage: quiz.fragen[0],
     frageIndexImBlock: 1,

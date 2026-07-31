@@ -18,6 +18,7 @@ import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationPlaybackCommand } from "./presentationLiveState";
+import { selectDeterministicTemplateImage } from "@/app/rendering/presentationTemplates/deterministicTemplateImage";
 
 type ScoreEntry = {
   teamname: string;
@@ -247,7 +248,7 @@ function renderMedienKarte(
   return (
     <div
       key={medium.medien_id}
-      className={`flex min-h-0 flex-col justify-center overflow-hidden rounded-[1.5rem] border-4 border-cyan-300 bg-black/65 p-4 shadow-[8px_8px_0_#ff00aa] ${isLarge ? "h-full" : ""
+      className={`presentation-media-card flex min-h-0 flex-col justify-center overflow-hidden rounded-[1.5rem] border-4 border-cyan-300 bg-black/65 p-4 shadow-[8px_8px_0_#ff00aa] ${isLarge ? "h-full" : ""
         }`}
     >
       {isBild(medium.datei) ? (
@@ -261,13 +262,7 @@ function renderMedienKarte(
           <div className="text-7xl font-black text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
             ▶
           </div>
-          <SynchronizedMedia
-            kind="audio"
-            src={src}
-            command={effectivePlaybackCommand}
-            commandId={playbackCommandId}
-            renderMode={renderMode}
-          />
+          {renderMode === "PRESENTATION" ? <SynchronizedMedia kind="audio" src={src} command={effectivePlaybackCommand} commandId={playbackCommandId} renderMode={renderMode} /> : <PreviewAudioPlayer />}
         </div>
       ) : isVideo(medium.datei) ? (
         <SynchronizedMedia
@@ -320,6 +315,16 @@ function renderAntwortOptionen(
           {antwort.antwort}
         </div>
       ))}
+    </div>
+  );
+}
+
+function PreviewAudioPlayer() {
+  return (
+    <div className="presentation-preview-audio flex w-full max-w-xl items-center gap-4 rounded-2xl border border-white/30 bg-black/35 p-4" data-preview-audio>
+      <span aria-hidden="true" className="grid size-12 place-items-center rounded-full border-2 border-current">▶</span>
+      <div className="min-w-0 flex-1"><div className="font-black">Beispiel-Audio</div><div className="mt-2 h-2 rounded-full bg-white/20"><div className="h-full w-2/5 rounded-full bg-current" /></div></div>
+      <span className="text-sm opacity-70">stumm</span>
     </div>
   );
 }
@@ -504,7 +509,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     const audioMedium = frage.medien[0];
 
     return (
-      <div data-presentation-layout={layoutVariant} className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
         <div className="mb-10 text-center">
           <div className="mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
             Audiofrage
@@ -523,13 +528,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
               </div>
             ) : (
               <>
-                <SynchronizedMedia
-                  kind="audio"
-                  src={getMediumUrl(audioMedium.datei)}
-                  command={mediaOverlayActive ? null : playbackCommand}
-                  commandId={playbackCommandId}
-                  renderMode={renderMode}
-                />
+                {renderMode === "PRESENTATION" ? <SynchronizedMedia kind="audio" src={getMediumUrl(audioMedium.datei)} command={mediaOverlayActive ? null : playbackCommand} commandId={playbackCommandId} renderMode={renderMode} /> : <PreviewAudioPlayer />}
 
                 <div className="mb-10 text-sm font-black uppercase tracking-[0.45em] text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
                   Wiedergabe durch die Moderation
@@ -909,7 +908,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
 
   return (
     <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-      <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-6 shadow-[8px_8px_0_#00e5ff]">
+      <div className="presentation-solution-question flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-6 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-pink-300">
           Frage
         </div>
@@ -925,7 +924,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
         )}
       </div>
 
-      <div className="flex min-h-0 flex-col rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
+      <div className="presentation-solution-result flex min-h-0 flex-col rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
             Richtige Antwort
@@ -1501,12 +1500,25 @@ function renderAktuellenSlide() {
 }
 
   const overlayMedia = currentSlideMedia;
+  const personalImage = slide && (slide.typ === "frage" || slide.typ === "aufloesung")
+    ? selectDeterministicTemplateImage(theme.design.imagery.personalImagePool, {
+        quizId: quiz.quiz_id,
+        questionId: slide.frage.fragen_id,
+        phase: slide.typ === "aufloesung" ? "SOLUTION" : "QUESTION",
+        slideType: slide.typ,
+      })
+    : theme.design.imagery.heroImage;
+  const collageImages = theme.design.stylePreset === "BIRTHDAY" && personalImage
+    ? [personalImage, ...theme.design.imagery.personalImagePool.filter((image) => image !== personalImage)].slice(0, 3)
+    : [];
 
   return (
     <QuizThemeScope
       theme={theme}
       className="presentation-template relative flex h-full min-h-0 flex-col text-white"
     >
+      <div className="presentation-decoration pointer-events-none absolute inset-0" aria-hidden="true" />
+      {collageImages.length > 0 && <div className="presentation-photo-collage pointer-events-none absolute inset-y-28 right-5 z-10 w-40" aria-hidden="true">{collageImages.map((image, index) => <img key={`${image}-${index}`} src={image} alt="" className="presentation-personal-image absolute h-32 w-32 object-cover" />)}</div>}
       {slideLabel !== "VOR DEM START" && (
         <header className="presentation-chrome mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
           <div className="flex items-center gap-6">
@@ -1523,8 +1535,11 @@ function renderAktuellenSlide() {
                 {slideLabel}
               </div>
               <div className="presentation-accent-text text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
-                {theme.identity.displayName}
+                {theme.design.stylePreset === "BIRTHDAY" && theme.design.occasion.personName
+                  ? `${theme.design.occasion.personName}${theme.design.occasion.age ? ` · ${theme.design.occasion.age}` : ""}`
+                  : theme.design.occasion.eventTitle || theme.identity.displayName}
               </div>
+              {theme.design.occasion.subtitle && <div className="presentation-subtitle text-sm font-semibold opacity-75">{theme.design.occasion.subtitle}</div>}
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -1543,6 +1558,7 @@ function renderAktuellenSlide() {
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}
       </section>
+      {theme.design.composition.footerStyle === "PERSONAL_NOTE" && theme.design.occasion.extraText && <footer className="presentation-personal-footer absolute bottom-1 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white px-6 py-2 text-sm font-bold text-[var(--brand-text)] shadow-lg">{theme.design.occasion.extraText}</footer>}
       {mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
           <div className="grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">

@@ -1,8 +1,10 @@
 import type {
   AnswerFormTemplate,
   BrandTokens,
+  PresentationTemplateDesign,
   PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
+import { presentationDesigns } from "@/app/rendering/templateRegistry";
 
 export const PRESENTATION_TEMPLATE_CONTRACT_VERSION = 1 as const;
 
@@ -23,6 +25,7 @@ export type PresentationTemplateConfig = {
     moderation: "BRANDED" | "QUIET";
     answerForm: AnswerFormTemplate["variant"];
   };
+  design: PresentationTemplateDesign;
 };
 
 export type ManagedPresentationTemplate = {
@@ -151,6 +154,7 @@ export const defaultPresentationTemplateConfig: PresentationTemplateConfig = {
     moderation: "BRANDED",
     answerForm: "BRANDED",
   },
+  design: structuredClone(presentationDesigns.NEON),
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -161,12 +165,92 @@ function isHexColor(value: unknown): value is `#${string}` {
   return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value);
 }
 
+function rejectUnknownFields(record: Record<string, unknown>, allowed: readonly string[], field: string, errors: TemplateValidationIssue[]) {
+  for (const key of Object.keys(record)) if (!allowed.includes(key)) errors.push({ field: `${field}.${key}`, message: "Freie oder unbekannte Konfigurationsfelder sind nicht erlaubt." });
+}
+
 function isSafeAssetReference(value: unknown, nullable = false) {
   if (nullable && value === null) return true;
   return (
     typeof value === "string" &&
     /^\/(?!\/)[a-zA-Z0-9/_-]+\.(?:png|jpe?g|webp|svg)$/i.test(value)
   );
+}
+
+function normalizeDesign(value: unknown, presentationVariant: unknown) {
+  const fallback = presentationVariant === "DARK"
+    ? presentationDesigns.CORPORATE
+    : presentationDesigns.NEON;
+  if (!isRecord(value)) return structuredClone(fallback);
+  return {
+    ...structuredClone(fallback),
+    ...value,
+    composition: { ...fallback.composition, ...(isRecord(value.composition) ? value.composition : {}) },
+    imagery: { ...fallback.imagery, ...(isRecord(value.imagery) ? value.imagery : {}) },
+    occasion: { ...fallback.occasion, ...(isRecord(value.occasion) ? value.occasion : {}) },
+  } as PresentationTemplateDesign;
+}
+
+export function normalizePresentationTemplateConfig(value: unknown): PresentationTemplateConfig | null {
+  if (!isRecord(value) || !isRecord(value.surfaces)) return null;
+  return {
+    ...(value as unknown as Omit<PresentationTemplateConfig, "design">),
+    design: normalizeDesign(value.design, value.surfaces.presentation),
+  };
+}
+
+function validateDesign(value: unknown) {
+  const errors: TemplateValidationIssue[] = [];
+  if (!isRecord(value) || !isRecord(value.composition) || !isRecord(value.imagery) || !isRecord(value.occasion)) {
+    return [{ field: "config.design", message: "Semantische Designbausteine fehlen." }];
+  }
+  const style = value.stylePreset;
+  if (!["NEON", "CORPORATE", "BIRTHDAY"].includes(String(style))) {
+    errors.push({ field: "config.design.stylePreset", message: "Unbekannter Designstil." });
+    return errors;
+  }
+  const expected = presentationDesigns[style as keyof typeof presentationDesigns].composition;
+  const allowedKeys = {
+    design: ["stylePreset", "composition", "imagery", "occasion"],
+    composition: ["layoutPreset", "headerStyle", "footerStyle", "contentFrame", "mediaTreatment", "answerTreatment", "solutionTreatment", "decoration"],
+    imagery: ["heroImage", "decorativeImages", "personalImagePool", "overlay", "placement"],
+    occasion: ["personName", "age", "subtitle", "eventTitle", "extraText", "identityPlacement"],
+  } as const;
+  for (const [group, record] of [["design", value], ["composition", value.composition], ["imagery", value.imagery], ["occasion", value.occasion]] as const) {
+    for (const key of Object.keys(record)) if (!(allowedKeys[group] as readonly string[]).includes(key)) errors.push({ field: `config.design.${group}.${key}`, message: "Freie oder ausführbare Designfelder sind nicht erlaubt." });
+  }
+  for (const key of Object.keys(expected) as (keyof typeof expected)[]) {
+    const allowed = {
+      layoutPreset: ["CLASSIC", "IMAGE_FOCUS", "SPLIT", "MAGAZINE", "COLLAGE"], headerStyle: ["BRAND_BAR", "CORPORATE_BAND", "BIRTHDAY_HERO"], footerStyle: ["NONE", "STATUS_LINE", "PERSONAL_NOTE"],
+      contentFrame: ["NEON_FRAME", "CORPORATE_PANEL", "BIRTHDAY_ALBUM"], mediaTreatment: ["GLOW_FRAME", "RECTANGULAR", "POLAROID"],
+      answerTreatment: ["NEON_CARDS", "CORPORATE_ROWS", "BIRTHDAY_CARDS"], solutionTreatment: ["SPOTLIGHT", "RESULT_BAND", "MEMORY"],
+      decoration: ["NONE", "NEON_ORBITS", "GEOMETRIC_LINES", "CONFETTI"],
+    }[key] as readonly string[];
+    if (!allowed.includes(String(value.composition[key]))) errors.push({ field: `config.design.composition.${key}`, message: "Unbekannter Kompositionsbaustein." });
+  }
+  const compatibleLayouts = {
+    NEON: ["CLASSIC", "IMAGE_FOCUS", "SPLIT"],
+    CORPORATE: ["CLASSIC", "SPLIT", "MAGAZINE"],
+    BIRTHDAY: ["IMAGE_FOCUS", "MAGAZINE", "COLLAGE"],
+  }[style as "NEON" | "CORPORATE" | "BIRTHDAY"];
+  if (!compatibleLayouts.includes(String(value.composition.layoutPreset))) errors.push({ field: "config.design.composition.layoutPreset", message: "Der Aufbau passt nicht zum gewählten Designstil." });
+  for (const key of ["headerStyle", "contentFrame", "mediaTreatment", "answerTreatment", "solutionTreatment"] as const) {
+    if (value.composition[key] !== expected[key]) errors.push({ field: `config.design.composition.${key}`, message: "Der Baustein passt nicht zum gewählten Designstil." });
+  }
+  const imagery = value.imagery;
+  for (const key of ["decorativeImages", "personalImagePool"] as const) {
+    if (!Array.isArray(imagery[key]) || imagery[key].length > 24 || !imagery[key].every((asset) => isSafeAssetReference(asset))) {
+      errors.push({ field: `config.design.imagery.${key}`, message: "Der Bilderpool darf höchstens 24 sichere repository-relative Bildpfade enthalten." });
+    }
+  }
+  if (!isSafeAssetReference(imagery.heroImage, true) || !["NONE", "SOFT", "STRONG"].includes(String(imagery.overlay)) || !["BACKGROUND", "SIDE", "COLLAGE"].includes(String(imagery.placement))) {
+    errors.push({ field: "config.design.imagery", message: "Bildwelt enthält einen nicht unterstützten Wert." });
+  }
+  for (const key of ["personName", "age", "subtitle", "eventTitle", "extraText"] as const) {
+    if (typeof value.occasion[key] !== "string" || value.occasion[key].length > (key === "extraText" ? 240 : 120)) errors.push({ field: `config.design.occasion.${key}`, message: "Personalisierung ist zu lang oder ungültig." });
+  }
+  if (!["HEADER", "SIDE", "FOOTER"].includes(String(value.occasion.identityPlacement))) errors.push({ field: "config.design.occasion.identityPlacement", message: "Unbekannte Platzierung." });
+  return errors;
 }
 
 function hexLuminance(value: string) {
@@ -192,15 +276,18 @@ function validateConfig(value: unknown) {
   if (!isRecord(value)) {
     return { errors: [{ field: "config", message: "Theme-Konfiguration fehlt." }] };
   }
+  rejectUnknownFields(value, ["version", "tokens", "surfaces", "design"], "config", errors);
   if (value.version !== PRESENTATION_TEMPLATE_CONTRACT_VERSION) {
     errors.push({ field: "config.version", message: "Unbekannte Vertragsversion." });
   }
   const tokens = value.tokens;
   const surfaces = value.surfaces;
+  errors.push(...validateDesign(value.design));
   if (!isRecord(tokens)) {
     errors.push({ field: "config.tokens", message: "Theme-Tokens fehlen." });
     return { errors };
   }
+  rejectUnknownFields(tokens, ["colors", "typography", "radii", "spacing", "assets"], "config.tokens", errors);
   const colors = tokens.colors;
   const requiredColors = [
     "primary",
@@ -231,6 +318,7 @@ function validateConfig(value: unknown) {
     }
   }
   const typography = tokens.typography;
+  if (isRecord(typography)) rejectUnknownFields(typography, ["family", "displayWeight", "bodyWeight"], "config.tokens.typography", errors);
   if (
     !isRecord(typography) ||
     !allowedFonts.includes(typography.family as (typeof allowedFonts)[number]) ||
@@ -240,6 +328,7 @@ function validateConfig(value: unknown) {
     errors.push({ field: "config.tokens.typography", message: "Typografie enthält einen nicht unterstützten Wert." });
   }
   const radii = tokens.radii;
+  if (isRecord(radii)) rejectUnknownFields(radii, ["small", "medium", "large"], "config.tokens.radii", errors);
   if (
     !isRecord(radii) ||
     !smallRadii.includes(radii.small as (typeof smallRadii)[number]) ||
@@ -249,6 +338,7 @@ function validateConfig(value: unknown) {
     errors.push({ field: "config.tokens.radii", message: "Eckenprofil ist ungültig." });
   }
   const spacing = tokens.spacing;
+  if (isRecord(spacing)) rejectUnknownFields(spacing, ["small", "medium", "large"], "config.tokens.spacing", errors);
   if (
     !isRecord(spacing) ||
     !smallSpacing.includes(spacing.small as (typeof smallSpacing)[number]) ||
@@ -258,6 +348,7 @@ function validateConfig(value: unknown) {
     errors.push({ field: "config.tokens.spacing", message: "Abstandsprofil ist ungültig." });
   }
   const assets = tokens.assets;
+  if (isRecord(assets)) rejectUnknownFields(assets, ["logo", "backgroundImage"], "config.tokens.assets", errors);
   if (
     !isRecord(assets) ||
     !isSafeAssetReference(assets.logo) ||
@@ -265,6 +356,7 @@ function validateConfig(value: unknown) {
   ) {
     errors.push({ field: "config.tokens.assets", message: "Assets müssen sichere repository-relative Bildpfade verwenden." });
   }
+  if (isRecord(surfaces)) rejectUnknownFields(surfaces, ["presentation", "moderation", "answerForm"], "config.surfaces", errors);
   if (
     !isRecord(surfaces) ||
     !["NEON", "DARK"].includes(String(surfaces.presentation)) ||
@@ -336,6 +428,8 @@ export function validatePresentationTemplateDraft(
 export function parsePresentationTemplateConfig(
   value: unknown,
 ): PresentationTemplateConfig | null {
+  const normalizedConfig = normalizePresentationTemplateConfig(value);
+  if (!normalizedConfig) return null;
   const draft: PresentationTemplateDraft = {
     id: "parse-check",
     name: "Parse check",
@@ -343,7 +437,7 @@ export function parsePresentationTemplateConfig(
     status: "DRAFT",
     tags: [],
     sourceTemplateId: null,
-    config: value as PresentationTemplateConfig,
+    config: normalizedConfig,
   };
   const result = validatePresentationTemplateDraft(draft);
   return result.ok ? result.value.config : null;
@@ -363,6 +457,7 @@ export function toRuntimePresentationTemplate(
     tokens: template.config.tokens,
     displayName: template.name,
     moderationVariant: template.config.surfaces.moderation,
+    design: template.config.design,
   };
 }
 
@@ -379,5 +474,6 @@ export function toRuntimeAnswerFormTemplate(
     preview: { exampleButtonKey: "previewButton" },
     tokens: template.config.tokens,
     displayName: template.name,
+    design: template.config.design,
   };
 }
