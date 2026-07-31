@@ -13,6 +13,7 @@ import {
   getManagedPresentationTemplate,
   listManagedPresentationTemplates,
 } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import { getPresentationTemplateUploadContext } from "@/app/rendering/presentationTemplates/presentationTemplateUpload.server";
 
 type Props = { params: Promise<{ templateId: string }> };
 
@@ -26,6 +27,7 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
   if (!template) notFound();
 
   const pageMode = getPresentationTemplatePageMode(template);
+  const uploadContext = getPresentationTemplateUploadContext();
   const needsDraftRevision = requiresDraftRevision(template);
   const duplicateLabel = template.isSystem
     ? "Als eigenes Template verwenden"
@@ -93,6 +95,9 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
             originalId={template.isSystem ? null : template.id}
             pageMode={pageMode}
             persistenceAvailable={repository.persistenceAvailable}
+            mediaUploadPathnamePrefix={uploadContext.environmentPrefix}
+            templateUploadsEnabled={uploadContext.enabled}
+            templateUploadDisabledReason={uploadContext.disabledReason}
           />
         </div>
       </main>

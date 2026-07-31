@@ -20,6 +20,7 @@ Die fachliche Kategorie folgt direkt auf das Environment-Präfix:
 
 - Fragenmedium: `dev/question-media/image/...`
 - Antwortbild: `preview/answer-media/image/...`
+- Präsentationstemplate-Asset: `dev/template-media/<template-id>/<assetrolle>/...`
 - ältere, weiterhin aktive Uploadoberflächen: `prod/media/audio/intro/...`
 
 Bereits vorhandene Blobs und gespeicherte URLs werden weder verschoben noch
@@ -48,13 +49,22 @@ Pfad. Tokens, Cookies, signierte URLs und andere Secrets werden weder als Props
 
 | Route | Verwendung | Status |
 | --- | --- | --- |
-| `/api/question-media-upload` | gemeinsamer Upload für `QuestionMediaSlot` und `AnswerMediaSlot` | aktiv |
+| `/api/question-media-upload` | gemeinsamer signierter Upload für `QuestionMediaSlot`, `AnswerMediaSlot` und freigegebene Template-Assets | aktiv; Template-Assets zusätzlich opt-in |
 | `/api/blob-upload-token` | Intro-Audio und Intro-Video in den Slide-Einstellungen | aktiv, Legacy-API |
 | `/api/upload-medium` | altes Fragenformular | aktiv, Legacy-API |
 
 `/api/blob-upload-token` darf daher noch nicht entfernt werden. Alle Routen
 beziehen ihren `BLOB_READ_WRITE_TOKEN` ausdrücklich aus derselben zentralen
 Serverfunktion; das Blob-SDK darf kein Credential implizit auswählen.
+
+Template-Assets verwenden dieselbe Route, Credential-Auflösung und
+Environment-Präfixlogik. Weil sich die konkrete Store-Zuordnung nicht allein
+aus einem Tokenstatus ableiten lässt, bleibt dieser Teil ohne die zusätzliche
+serverseitige Bestätigung `TEMPLATE_MEDIA_UPLOAD_ENABLED=true` deaktiviert.
+Repository-relative Assets und sämtliche Designvorschauen funktionieren davon
+unabhängig. Die Route akzeptiert Template-Bilder ausschließlich für
+administrativ autorisierte, persistierte Entwürfe; aktive, archivierte und
+Systemtemplates bleiben unveränderlich.
 
 ## Optionale Validierung
 

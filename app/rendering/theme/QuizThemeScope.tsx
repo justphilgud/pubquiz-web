@@ -2,23 +2,29 @@ import type { ElementType, ReactNode } from "react";
 
 import { quizThemeStyle, type ResolvedQuizTheme } from "./quizTheme";
 
+type DataAttributes = {
+  [key: `data-${string}`]: string | number | boolean | undefined;
+};
+
 type Props<TElement extends ElementType> = {
   as?: TElement;
   theme: ResolvedQuizTheme;
   children: ReactNode;
   className?: string;
-};
+} & DataAttributes;
 
 export function QuizThemeScope<TElement extends ElementType = "div">({
   as,
   theme,
   children,
   className,
+  ...dataAttributes
 }: Props<TElement>) {
   const Component = as ?? "div";
 
   return (
     <Component
+      {...dataAttributes}
       className={className}
       data-quiz-theme-version={theme.version}
       data-theme-mode={theme.appearance.mode}

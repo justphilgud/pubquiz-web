@@ -25,8 +25,17 @@ import {
 import { filterPresentationTemplates } from "./templateOverviewPolicy";
 import { presentationPreviewScenarios } from "./PresentationTemplatePreview";
 import { selectDeterministicTemplateImage } from "./deterministicTemplateImage";
+import { getStorybookPeopleMode, getStorybookTitle } from "./storybook";
+import { resolveStorybookComposition } from "./storybookComposition";
 import { applyPresentationStylePreset, createPresentationStylePreset } from "./presentationTemplatePresets";
 import { templateRegistry } from "@/app/rendering/templateRegistry";
+import {
+  buildPresentationTemplateAssetPathname,
+  isAllowedPresentationTemplateAssetPathname,
+  isSafeTemplateAssetReference,
+  presentationTemplateAssetRolesByStyle,
+  validatePresentationTemplateAssetFile,
+} from "./presentationTemplateAssets";
 
 function draft(): PresentationTemplateDraft {
   return {
@@ -80,6 +89,9 @@ test("normalizes legacy configurations and validates all semantic design styles"
   for (const style of ["NEON", "CORPORATE", "BIRTHDAY"] as const) {
     assert.equal(validatePresentationTemplateDraft({ ...draft(), config: createPresentationStylePreset(style) }).ok, true);
   }
+  const legacyBirthday = createPresentationStylePreset("BIRTHDAY") as unknown as { design: { imagery: { solutionImage?: string | null } } };
+  delete legacyBirthday.design.imagery.solutionImage;
+  assert.equal(parsePresentationTemplateConfig(legacyBirthday)?.design.imagery.solutionImage, createPresentationStylePreset("BIRTHDAY").design.imagery.solutionImage);
 });
 
 test("rejects unknown styles, external assets and executable design fields", () => {
@@ -118,6 +130,152 @@ test("birthday image selection is deterministic with safe zero, one and multi-im
   assert.equal(question, selectDeterministicTemplateImage(images, input));
   assert.notEqual(question, selectDeterministicTemplateImage(images, { ...input, phase: "SOLUTION" }));
   assert.equal(selectDeterministicTemplateImage(["javascript:alert(1)"], input), null);
+  const blob = "https://assets.public.blob.vercel-storage.com/dev/template-media/example/image.webp";
+  assert.equal(selectDeterministicTemplateImage([blob], input), blob);
+});
+
+function storybookConfig(names: readonly string[]) {
+  const config = createPresentationStylePreset("BIRTHDAY");
+  assert.ok(config.design.storybook);
+  config.design.storybook.people = names.map((name) => ({ id: name.toLowerCase(), name, age: null, subtitle: null, portrait: null }));
+  config.design.storybook.sharedTitle = names.length > 0 ? names.join(" & ") : "Unsere gemeinsame Geschichte";
+  config.design.storybook.assets = [];
+  config.design.storybook.anecdotes = [];
+  config.design.storybook.chapters = [];
+  return config;
+}
+
+test("storybook normalizes the legacy birthday person into a stable one-person model", () => {
+  const legacy = createPresentationStylePreset("BIRTHDAY") as unknown as { design: Record<string, unknown> & { occasion: { personName: string; age: string }; imagery: { heroImage: string } } };
+  delete legacy.design.storybook;
+  legacy.design.occasion.personName = "Migge";
+  legacy.design.occasion.age = "40";
+  const parsed = parsePresentationTemplateConfig(legacy);
+  assert.ok(parsed?.design.storybook);
+  assert.deepEqual(parsed.design.storybook.people.map(({ id, name, age }) => ({ id, name, age })), [{ id: "migge", name: "Migge", age: "40" }]);
+});
+
+test("storybook supports one, two, three and larger equal-order person groups", () => {
+  for (const [names, mode] of [
+    [["Migge"], "SINGLE"],
+    [["Migge", "Paul"], "DUAL"],
+    [["Philipp", "Gabi", "Helena"], "TRIO"],
+    [["A", "B", "C", "D"], "GROUP"],
+  ] as const) {
+    const config = storybookConfig(names);
+    assert.equal(validatePresentationTemplateDraft({ ...draft(), config }).ok, true);
+    assert.equal(getStorybookPeopleMode(config.design.storybook!.people), mode);
+    assert.deepEqual(config.design.storybook!.people.map(({ name }) => name), names);
+  }
+  const titleOnly = storybookConfig([]);
+  assert.equal(validatePresentationTemplateDraft({ ...draft(), config: titleOnly }).ok, true);
+  assert.equal(getStorybookTitle(titleOnly.design.storybook!), "Unsere gemeinsame Geschichte");
+});
+
+test("storybook rejects duplicate people and orphaned or unsafe asset assignments", () => {
+  const config = storybookConfig(["Migge", "Paul"]);
+  config.design.storybook!.people[1].id = "migge";
+  config.design.storybook!.assets = [{ id: "bad", source: "https://example.test/bad.jpg" as `/${string}`, role: "PORTRAIT", personIds: ["unknown"], alt: "", caption: null, year: null, order: 0 }];
+  const result = validatePresentationTemplateDraft({ ...draft(), config });
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.errors.some(({ message }) => message.includes("eindeutig")));
+    assert.ok(result.errors.some(({ message }) => message.includes("unbekannte Person")));
+    assert.ok(result.errors.some(({ message }) => message.includes("Assetpfad")));
+  }
+});
+
+test("storybook composition is deterministic and uses curated data fallbacks", () => {
+  const config = storybookConfig(["Migge", "Paul"]);
+  const storybook = config.design.storybook!;
+  storybook.assets = [
+    { id: "migge", source: "/migge.jpg", role: "PORTRAIT", personIds: ["migge"], alt: "Migge", caption: null, year: null, order: 0 },
+    { id: "paul", source: "/paul.jpg", role: "PORTRAIT", personIds: ["paul"], alt: "Paul", caption: null, year: null, order: 1 },
+    { id: "together", source: "/together.jpg", role: "SOLUTION", personIds: ["migge", "paul"], alt: "Gemeinsam", caption: null, year: "2024", order: 2 },
+  ];
+  const context = { storybook, quizId: 7, questionId: 12, phase: "QUESTION" as const, contentKind: "IMAGE" as const, requestedPersonIds: ["migge", "paul"] };
+  const first = resolveStorybookComposition(context);
+  assert.deepEqual(resolveStorybookComposition(context), first);
+  assert.equal(first.peopleMode, "DUAL");
+  assert.equal(first.variant, "DUAL_PORTRAIT");
+  assert.equal(new Set(first.assets.map(({ source }) => source)).size, first.assets.length);
+  const solution = resolveStorybookComposition({ ...context, phase: "SOLUTION" });
+  assert.equal(solution.variant, "SOLUTION_MEMORY");
+  assert.equal(solution.assets[0].role, "SOLUTION");
+  const noImages = resolveStorybookComposition({ ...context, storybook: { ...storybook, assets: [] } });
+  assert.equal(noImages.variant, "TEXT_ALBUM");
+});
+
+test("storybook optional anecdotes and chapters never create empty render data", () => {
+  const config = storybookConfig(["Philipp", "Gabi", "Helena"]);
+  const storybook = config.design.storybook!;
+  const base = { storybook, quizId: 1, questionId: 1, phase: "QUESTION" as const };
+  assert.equal(resolveStorybookComposition(base).anecdote, null);
+  storybook.anecdotes = [{ id: "school", text: "Eine gemeinsame Erinnerung", personIds: [], year: null }];
+  storybook.chapters = [{ id: "childhood", title: "Kindheit", subtitle: null, personIds: [], order: 0 }];
+  assert.equal(resolveStorybookComposition(base).anecdote?.text, "Eine gemeinsame Erinnerung");
+  assert.equal(resolveStorybookComposition({ ...base, contentKind: "CHAPTER" }).variant, "CHAPTER_INTRO");
+  assert.doesNotMatch(readFileSync("app/rendering/presentationTemplates/storybookComposition.ts", "utf8"), /Math\.random/);
+});
+
+test("template asset roles use the central environment-prefixed blob model", () => {
+  assert.deepEqual(
+    presentationTemplateAssetRolesByStyle.BIRTHDAY.map(({ role }) => role),
+    ["LOGO", "HERO_IMAGE", "IMAGE_POOL", "SOLUTION_IMAGE", "DECORATION"],
+  );
+  assert.deepEqual(
+    presentationTemplateAssetRolesByStyle.CORPORATE.map(({ role }) => role),
+    ["LOGO", "HERO_IMAGE", "BACKGROUND", "DECORATION"],
+  );
+  const pathname = buildPresentationTemplateAssetPathname(
+    "dev",
+    "mein-template",
+    "HERO_IMAGE",
+    "bild.webp",
+  );
+  assert.equal(pathname, "dev/template-media/mein-template/hero_image/bild.webp");
+  assert.equal(
+    isAllowedPresentationTemplateAssetPathname(
+      pathname,
+      "dev",
+      "mein-template",
+      "HERO_IMAGE",
+    ),
+    true,
+  );
+  assert.equal(
+    isAllowedPresentationTemplateAssetPathname(
+      pathname,
+      "preview",
+      "mein-template",
+      "HERO_IMAGE",
+    ),
+    false,
+  );
+  assert.equal(isSafeTemplateAssetReference("/medien/bilder/Mein Bild.jpg"), true);
+  assert.equal(
+    isSafeTemplateAssetReference(
+      "https://assets.public.blob.vercel-storage.com/dev/template-media/mein-template/bild.webp",
+    ),
+    true,
+  );
+  assert.equal(isSafeTemplateAssetReference("https://example.test/bild.jpg"), false);
+  assert.equal(
+    validatePresentationTemplateAssetFile({
+      name: "bild.webp",
+      size: 1024,
+      type: "image/webp",
+    }),
+    null,
+  );
+  assert.match(
+    validatePresentationTemplateAssetFile({
+      name: "bild.gif",
+      size: 1024,
+      type: "image/gif",
+    }) ?? "",
+    /PNG/,
+  );
 });
 
 test("custom visual template resolves through the shared theme contract", () => {
@@ -178,7 +336,9 @@ test("used templates cannot be archived", () => {
 });
 
 test("preview matrix is complete and uses productive renderer and layout resolver", () => {
-  assert.deepEqual(presentationPreviewScenarios.map(([id]) => id), ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "TRUE_FALSE", "AUDIO", "ORDERING", "PIXEL", "SOLUTION", "MODERATION", "ANSWER_FORM", "BIRTHDAY_IMAGE", "BIRTHDAY_SOLUTION", "BIRTHDAY_FALLBACK", "CORPORATE_LOGO", "CORPORATE_MEDIA", "CORPORATE_SOLUTION"]);
+  for (const scenario of ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "AUDIO", "ORDERING", "SOLUTION", "MODERATION", "ANSWER_FORM", "STORYBOOK_SINGLE", "STORYBOOK_DUAL", "STORYBOOK_TRIO", "STORYBOOK_GROUP", "STORYBOOK_ANECDOTE", "STORYBOOK_PERSON", "STORYBOOK_SHARED", "STORYBOOK_CHAPTER"]) {
+    assert.ok(presentationPreviewScenarios.some(([id]) => id === scenario));
+  }
   const source = readFileSync("app/rendering/presentationTemplates/PresentationTemplatePreview.tsx", "utf8");
   assert.match(source, /PresentationSlideRenderer/);
   assert.match(source, /resolvePresentationLayout/);
@@ -191,12 +351,32 @@ test("preview matrix is complete and uses productive renderer and layout resolve
 
 test("semantic renderer variants remove corporate glow and expose birthday album treatment", () => {
   const css = readFileSync("app/globals.css", "utf8");
+  const designSystem = readFileSync("app/rendering/presentation/PresentationDesignSystem.tsx", "utf8");
   assert.match(css, /data-design-style="CORPORATE"/);
   assert.match(css, /CORPORATE[\s\S]+box-shadow: none !important/);
   assert.match(css, /CORPORATE[\s\S]+drop-shadow/);
   assert.match(css, /CORPORATE[\s\S]+text-pink/);
   assert.match(css, /data-design-style="BIRTHDAY"/);
   assert.match(css, /presentation-personal-image/);
+  assert.match(designSystem, /presentation-corporate-header/);
+  assert.match(designSystem, /presentation-birthday-header/);
+  assert.match(designSystem, /presentation-neon-header/);
+  assert.match(designSystem, /Knowledge · People · Progress/);
+  assert.match(designSystem, /Storybook/);
+  assert.match(designSystem, /data-storybook-people-mode/);
+  assert.match(css, /data-storybook-variant="DUAL_PORTRAIT"/);
+});
+
+test("template upload is integrated into the shared signed route but requires explicit store confirmation", () => {
+  const route = readFileSync("app/api/question-media-upload/route.ts", "utf8");
+  const uploadContext = readFileSync("app/rendering/presentationTemplates/presentationTemplateUpload.server.ts", "utf8");
+  const editor = readFileSync("app/rendering/presentationTemplates/PresentationTemplateAssetEditor.tsx", "utf8");
+  assert.match(route, /target: "TEMPLATE"/);
+  assert.match(route, /presentationTemplateAssetUploadRule/);
+  assert.match(route, /template\.status !== "DRAFT"/);
+  assert.match(uploadContext, /TEMPLATE_MEDIA_UPLOAD_ENABLED === "true"/);
+  assert.match(editor, /handleUploadUrl: "\/api\/question-media-upload"/);
+  assert.doesNotMatch(editor, /\/api\/template.*upload/);
 });
 
 test("routes and writes enforce admin authorization and migration remains additive", () => {

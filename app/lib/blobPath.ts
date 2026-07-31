@@ -1,6 +1,10 @@
 export type BlobEnvironmentPrefix = "dev" | "preview" | "prod";
 
-export type BlobPathArea = "question-media" | "answer-media" | "media";
+export type BlobPathArea =
+  | "question-media"
+  | "answer-media"
+  | "template-media"
+  | "media";
 
 function assertSafePathSegment(segment: string) {
   if (

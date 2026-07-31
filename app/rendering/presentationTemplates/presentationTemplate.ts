@@ -5,6 +5,11 @@ import type {
   PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
 import { presentationDesigns } from "@/app/rendering/templateRegistry";
+import { isSafeTemplateAssetReference } from "./presentationTemplateAssets";
+import {
+  normalizeStorybookConfiguration,
+  validateStorybookConfiguration,
+} from "./storybook";
 
 export const PRESENTATION_TEMPLATE_CONTRACT_VERSION = 1 as const;
 
@@ -171,23 +176,28 @@ function rejectUnknownFields(record: Record<string, unknown>, allowed: readonly 
 
 function isSafeAssetReference(value: unknown, nullable = false) {
   if (nullable && value === null) return true;
-  return (
-    typeof value === "string" &&
-    /^\/(?!\/)[a-zA-Z0-9/_-]+\.(?:png|jpe?g|webp|svg)$/i.test(value)
-  );
+  return isSafeTemplateAssetReference(value);
 }
 
 function normalizeDesign(value: unknown, presentationVariant: unknown) {
-  const fallback = presentationVariant === "DARK"
-    ? presentationDesigns.CORPORATE
-    : presentationDesigns.NEON;
+  const storedStyle = isRecord(value) ? value.stylePreset : null;
+  const fallback = storedStyle === "NEON" || storedStyle === "CORPORATE" || storedStyle === "BIRTHDAY"
+    ? presentationDesigns[storedStyle]
+    : presentationVariant === "DARK"
+      ? presentationDesigns.CORPORATE
+      : presentationDesigns.NEON;
   if (!isRecord(value)) return structuredClone(fallback);
+  const occasion = { ...fallback.occasion, ...(isRecord(value.occasion) ? value.occasion : {}) } as PresentationTemplateDesign["occasion"];
+  const imagery = { ...fallback.imagery, ...(isRecord(value.imagery) ? value.imagery : {}) } as PresentationTemplateDesign["imagery"];
   return {
     ...structuredClone(fallback),
     ...value,
     composition: { ...fallback.composition, ...(isRecord(value.composition) ? value.composition : {}) },
-    imagery: { ...fallback.imagery, ...(isRecord(value.imagery) ? value.imagery : {}) },
-    occasion: { ...fallback.occasion, ...(isRecord(value.occasion) ? value.occasion : {}) },
+    imagery,
+    occasion,
+    storybook: storedStyle === "BIRTHDAY"
+      ? normalizeStorybookConfiguration(value.storybook, occasion, imagery)
+      : null,
   } as PresentationTemplateDesign;
 }
 
@@ -211,9 +221,9 @@ function validateDesign(value: unknown) {
   }
   const expected = presentationDesigns[style as keyof typeof presentationDesigns].composition;
   const allowedKeys = {
-    design: ["stylePreset", "composition", "imagery", "occasion"],
+    design: ["stylePreset", "composition", "imagery", "occasion", "storybook"],
     composition: ["layoutPreset", "headerStyle", "footerStyle", "contentFrame", "mediaTreatment", "answerTreatment", "solutionTreatment", "decoration"],
-    imagery: ["heroImage", "decorativeImages", "personalImagePool", "overlay", "placement"],
+    imagery: ["heroImage", "solutionImage", "decorativeImages", "personalImagePool", "overlay", "placement"],
     occasion: ["personName", "age", "subtitle", "eventTitle", "extraText", "identityPlacement"],
   } as const;
   for (const [group, record] of [["design", value], ["composition", value.composition], ["imagery", value.imagery], ["occasion", value.occasion]] as const) {
@@ -243,13 +253,15 @@ function validateDesign(value: unknown) {
       errors.push({ field: `config.design.imagery.${key}`, message: "Der Bilderpool darf höchstens 24 sichere repository-relative Bildpfade enthalten." });
     }
   }
-  if (!isSafeAssetReference(imagery.heroImage, true) || !["NONE", "SOFT", "STRONG"].includes(String(imagery.overlay)) || !["BACKGROUND", "SIDE", "COLLAGE"].includes(String(imagery.placement))) {
+  if (!isSafeAssetReference(imagery.heroImage, true) || !isSafeAssetReference(imagery.solutionImage, true) || !["NONE", "SOFT", "STRONG"].includes(String(imagery.overlay)) || !["BACKGROUND", "SIDE", "COLLAGE"].includes(String(imagery.placement))) {
     errors.push({ field: "config.design.imagery", message: "Bildwelt enthält einen nicht unterstützten Wert." });
   }
   for (const key of ["personName", "age", "subtitle", "eventTitle", "extraText"] as const) {
     if (typeof value.occasion[key] !== "string" || value.occasion[key].length > (key === "extraText" ? 240 : 120)) errors.push({ field: `config.design.occasion.${key}`, message: "Personalisierung ist zu lang oder ungültig." });
   }
   if (!["HEADER", "SIDE", "FOOTER"].includes(String(value.occasion.identityPlacement))) errors.push({ field: "config.design.occasion.identityPlacement", message: "Unbekannte Platzierung." });
+  if (style === "BIRTHDAY") errors.push(...validateStorybookConfiguration(value.storybook));
+  else if (value.storybook !== null) errors.push({ field: "config.design.storybook", message: "Storybook-Daten sind ausschließlich im Geburtstagsstil erlaubt." });
   return errors;
 }
 

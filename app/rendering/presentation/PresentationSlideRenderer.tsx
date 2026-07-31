@@ -16,9 +16,19 @@ import {
 } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
 import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
+import {
+  PresentationDesignBackdrop,
+  PresentationDesignFooter,
+  PresentationDesignHeader,
+  PresentationDesignStage,
+} from "./PresentationDesignSystem";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationPlaybackCommand } from "./presentationLiveState";
 import { selectDeterministicTemplateImage } from "@/app/rendering/presentationTemplates/deterministicTemplateImage";
+import {
+  resolveStorybookComposition,
+  type ResolveStorybookCompositionInput,
+} from "@/app/rendering/presentationTemplates/storybookComposition";
 
 type ScoreEntry = {
   teamname: string;
@@ -56,6 +66,10 @@ type Props = {
   slideLabel: string;
   theme: ResolvedQuizTheme;
   displayState: PresentationSlideDisplayState;
+  storybookContext?: {
+    personIds?: readonly string[];
+    contentKind?: ResolveStorybookCompositionInput["contentKind"];
+  };
 };
 
 function SynchronizedMedia({
@@ -161,6 +175,7 @@ export default function PresentationSlideRenderer({
   slideLabel,
   theme,
   displayState,
+  storybookContext,
 }: Props) {
   const praesentationQuiz = quiz as PraesentationQuiz;
   const {
@@ -565,7 +580,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
       </div>
 
-      <div className="min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-answer-panel min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
         {hatAntwortmoeglichkeiten ? (
           renderAntwortOptionen(frage)
         ) : frage.medien.length > 0 ? (
@@ -1500,65 +1515,68 @@ function renderAktuellenSlide() {
 }
 
   const overlayMedia = currentSlideMedia;
-  const personalImage = slide && (slide.typ === "frage" || slide.typ === "aufloesung")
+  const selectedPoolImage = slide && (slide.typ === "frage" || slide.typ === "aufloesung")
     ? selectDeterministicTemplateImage(theme.design.imagery.personalImagePool, {
         quizId: quiz.quiz_id,
         questionId: slide.frage.fragen_id,
         phase: slide.typ === "aufloesung" ? "SOLUTION" : "QUESTION",
+        assetRole: "IMAGE_POOL",
         slideType: slide.typ,
       })
     : theme.design.imagery.heroImage;
+  const personalImage = slide?.typ === "aufloesung" && theme.design.imagery.solutionImage
+    ? theme.design.imagery.solutionImage
+    : selectedPoolImage;
   const collageImages = theme.design.stylePreset === "BIRTHDAY" && personalImage
     ? [personalImage, ...theme.design.imagery.personalImagePool.filter((image) => image !== personalImage)].slice(0, 3)
     : [];
+  const storybookPhase = slide?.typ === "aufloesung" ? "SOLUTION" : "QUESTION";
+  const storybookQuestionId = slide && (slide.typ === "frage" || slide.typ === "aufloesung")
+    ? slide.frage.fragen_id
+    : slide?.typ === "block"
+      ? slide.abschnitt.quiz_abschnitt_id
+      : slideIndex;
+  const inferredStorybookContentKind: ResolveStorybookCompositionInput["contentKind"] =
+    slide?.typ === "block" ? "CHAPTER"
+      : slide && (slide.typ === "frage" || slide.typ === "aufloesung")
+        ? slide.frage.templateId === "musik_rueckwaerts" ? "AUDIO"
+          : slide.frage.templateId === "reihenfolge" ? "ORDERING"
+            : slide.frage.antworten.length > 1 ? "MULTIPLE_CHOICE"
+              : slide.frage.medien.some((medium) => isBild(medium.datei)) ? "IMAGE" : "TEXT"
+        : "TEXT";
+  const storybookComposition = theme.design.stylePreset === "BIRTHDAY" && theme.design.storybook
+    ? resolveStorybookComposition({
+        storybook: theme.design.storybook,
+        quizId: quiz.quiz_id,
+        questionId: storybookQuestionId,
+        phase: storybookPhase,
+        slideType: slide?.typ ?? "EMPTY",
+        requestedPersonIds: storybookContext?.personIds,
+        contentKind: storybookContext?.contentKind ?? inferredStorybookContentKind,
+      })
+    : null;
 
   return (
     <QuizThemeScope
       theme={theme}
       className="presentation-template relative flex h-full min-h-0 flex-col text-white"
     >
-      <div className="presentation-decoration pointer-events-none absolute inset-0" aria-hidden="true" />
-      {collageImages.length > 0 && <div className="presentation-photo-collage pointer-events-none absolute inset-y-28 right-5 z-10 w-40" aria-hidden="true">{collageImages.map((image, index) => <img key={`${image}-${index}`} src={image} alt="" className="presentation-personal-image absolute h-32 w-32 object-cover" />)}</div>}
+      <PresentationDesignBackdrop theme={theme} images={collageImages} storybookComposition={storybookComposition} />
       {slideLabel !== "VOR DEM START" && (
-        <header className="presentation-chrome mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
-          <div className="flex items-center gap-6">
-            {theme.identity.logoUrl && (
-              <img
-                src={theme.identity.logoUrl}
-                alt=""
-                className="h-24 w-24 object-contain"
-              />
-            )}
-            <div className="presentation-divider h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
-            <div>
-              <div className="presentation-primary-text text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
-                {slideLabel}
-              </div>
-              <div className="presentation-accent-text text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
-                {theme.design.stylePreset === "BIRTHDAY" && theme.design.occasion.personName
-                  ? `${theme.design.occasion.personName}${theme.design.occasion.age ? ` · ${theme.design.occasion.age}` : ""}`
-                  : theme.design.occasion.eventTitle || theme.identity.displayName}
-              </div>
-              {theme.design.occasion.subtitle && <div className="presentation-subtitle text-sm font-semibold opacity-75">{theme.design.occasion.subtitle}</div>}
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="rounded-2xl border-2 border-[#FF3BD4] px-6 py-3 text-2xl font-black text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4]">
-              {slideIndex + 1}
-            </div>
-            <div className="text-3xl font-black text-[#38E8FF]">/</div>
-            <div className="rounded-2xl border-2 border-[#FFD83B] px-6 py-3 text-2xl font-black text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
-              {slides.length}
-            </div>
-          </div>
-        </header>
+        <PresentationDesignHeader
+          theme={theme}
+          slideLabel={slideLabel}
+          slideNumber={slideIndex + 1}
+          slideCount={slides.length}
+          storybookComposition={storybookComposition}
+        />
       )}
-      <section className="presentation-stage min-h-0 flex-1 rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]">
+      <PresentationDesignStage theme={theme} storybookComposition={storybookComposition}>
         {estimationPhase !== "HIDDEN"
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}
-      </section>
-      {theme.design.composition.footerStyle === "PERSONAL_NOTE" && theme.design.occasion.extraText && <footer className="presentation-personal-footer absolute bottom-1 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white px-6 py-2 text-sm font-bold text-[var(--brand-text)] shadow-lg">{theme.design.occasion.extraText}</footer>}
+      </PresentationDesignStage>
+      <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
       {mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
           <div className="grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">

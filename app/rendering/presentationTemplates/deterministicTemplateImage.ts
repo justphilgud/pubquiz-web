@@ -1,6 +1,5 @@
-import type { RepositoryAssetPath } from "@/app/rendering/templateRegistry";
-
-const safeAssetPattern = /^\/(?!\/)[a-zA-Z0-9/_-]+\.(?:png|jpe?g|webp|svg)$/i;
+import type { TemplateAssetReference } from "@/app/rendering/templateRegistry";
+import { isSafeTemplateAssetReference } from "./presentationTemplateAssets";
 
 export type TemplateImagePhase = "QUESTION" | "SOLUTION";
 
@@ -13,14 +12,44 @@ function stableHash(value: string) {
   return hash >>> 0;
 }
 
+export type DeterministicTemplateContext = {
+  quizId: string | number;
+  questionId: string | number;
+  phase: TemplateImagePhase;
+  assetRole?: string;
+  slideType?: string;
+  personIds?: readonly string[];
+};
+
+function deterministicKey(input: DeterministicTemplateContext) {
+  return [
+    input.quizId,
+    input.questionId,
+    input.phase,
+    input.assetRole ?? "IMAGE_POOL",
+    input.slideType ?? "QUESTION",
+    [...(input.personIds ?? [])].sort().join(","),
+  ].join(":");
+}
+
+export function selectDeterministicTemplateValue<T>(
+  values: readonly T[],
+  input: DeterministicTemplateContext,
+  stableKey: (value: T) => string,
+): T | null {
+  const unique = new Map(values.map((value) => [stableKey(value), value]));
+  const ordered = [...unique.entries()].sort(([left], [right]) => left.localeCompare(right));
+  if (ordered.length === 0) return null;
+  if (ordered.length === 1) return ordered[0][1];
+  return ordered[stableHash(deterministicKey(input)) % ordered.length][1];
+}
+
 export function selectDeterministicTemplateImage(
   images: readonly string[],
-  input: { quizId: string | number; questionId: string | number; phase: TemplateImagePhase; slideType?: string },
-): RepositoryAssetPath | null {
-  const safeImages = Array.from(new Set(images.filter((image): image is RepositoryAssetPath => safeAssetPattern.test(image)))).sort();
+  input: DeterministicTemplateContext,
+): TemplateAssetReference | null {
+  const safeImages = Array.from(new Set(images.filter(isSafeTemplateAssetReference))).sort();
   if (safeImages.length === 0) return null;
   if (safeImages.length === 1) return safeImages[0];
-  const base = stableHash(`${input.quizId}:${input.questionId}:${input.slideType ?? "QUESTION"}`);
-  const offset = input.phase === "SOLUTION" ? 1 : 0;
-  return safeImages[(base + offset) % safeImages.length];
+  return safeImages[stableHash(deterministicKey(input)) % safeImages.length];
 }

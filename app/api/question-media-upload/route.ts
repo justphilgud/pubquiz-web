@@ -17,9 +17,23 @@ import { getMediaSlotDefinition, isMediaSlotKey } from "@/app/fragen/editor/medi
 import { questionTemplateDefinitions } from "@/app/fragen/editor/templates/questionTemplates";
 import { findQuestionTemplate, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { getQuestionActor, requireQuestionAccess } from "@/app/fragen/editor/questionAccess.server";
-import { hasAnyEditorialAssignment } from "@/app/roles/roleAssignmentPolicy";
+import {
+  hasAnyEditorialAssignment,
+  isAdministrator,
+} from "@/app/roles/roleAssignmentPolicy";
+import {
+  isAllowedPresentationTemplateAssetPathname,
+  isPresentationTemplateAssetRole,
+  presentationTemplateAssetUploadRule,
+  type PresentationTemplateAssetRole,
+} from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
 
 type UploadContext =
+  | {
+      target: "TEMPLATE";
+      templateId: string;
+      assetRole: PresentationTemplateAssetRole;
+    }
   | {
       target: "QUESTION";
       questionId: number | null;
@@ -79,9 +93,22 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
     throw new Error("Uploadkontext ist ungültig.");
   }
 
+  const target = Reflect.get(value, "target");
+  if (target === "TEMPLATE") {
+    const templateId = Reflect.get(value, "templateId");
+    const assetRole = Reflect.get(value, "assetRole");
+    if (
+      typeof templateId !== "string" ||
+      !/^[a-z][a-z0-9-]{2,63}$/.test(templateId) ||
+      !isPresentationTemplateAssetRole(assetRole)
+    ) {
+      throw new Error("Template-Uploadkontext ist ungültig.");
+    }
+    return { target, templateId, assetRole };
+  }
+
   const questionId = Reflect.get(value, "questionId");
   const mediaType = Reflect.get(value, "mediaType");
-  const target = Reflect.get(value, "target");
   const slotKey = Reflect.get(value, "slotKey");
   const rawTemplateId = Reflect.get(value, "templateId");
 
@@ -183,6 +210,48 @@ export async function POST(request: Request) {
       getSignedToken: async (pathname, clientPayload) => {
         phase = "context-authorization";
         const context = parseUploadContext(clientPayload);
+        if (context.target === "TEMPLATE") {
+          const actor = await getQuestionActor(session);
+          if (!isAdministrator(actor)) {
+            throw new Error("Template-Assets dürfen nur von Administratoren hochgeladen werden.");
+          }
+          const template = await prisma.presentation_templates.findUnique({
+            where: { presentation_template_id: context.templateId },
+            select: { status: true, ist_systemtemplate: true },
+          });
+          if (!template || template.ist_systemtemplate || template.status !== "DRAFT") {
+            throw new Error("Template-Assets dürfen nur zu bearbeitbaren Entwürfen hochgeladen werden.");
+          }
+          if (
+            !isAllowedPresentationTemplateAssetPathname(
+              pathname,
+              uploadConfig.environmentPrefix,
+              context.templateId,
+              context.assetRole,
+            )
+          ) {
+            throw new Error("Template-Assetpfad oder Dateiendung ist ungültig.");
+          }
+          const validUntil = Date.now() + 10 * 60 * 1000;
+          phase = "signed-token";
+          const token = await issueSignedToken({
+            ...uploadConfig.blobAuthentication,
+            pathname,
+            operations: ["put"],
+            allowedContentTypes: [...presentationTemplateAssetUploadRule.mimeTypes],
+            maximumSizeInBytes: presentationTemplateAssetUploadRule.maximumSizeInBytes,
+            validUntil,
+          });
+          return {
+            token,
+            urlOptions: {
+              allowedContentTypes: [...presentationTemplateAssetUploadRule.mimeTypes],
+              maximumSizeInBytes: presentationTemplateAssetUploadRule.maximumSizeInBytes,
+              addRandomSuffix: true,
+              validUntil,
+            },
+          };
+        }
         let effectiveTemplateId = context.target === "QUESTION" ? context.templateId : null;
 
         if (context.questionId === null) {

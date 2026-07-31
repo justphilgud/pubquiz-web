@@ -37,9 +37,58 @@ export type BrandSpacingTokens = {
 
 export type RepositoryAssetPath = `/${string}`;
 
+export type ManagedBlobAssetUrl = `https://${string}.blob.vercel-storage.com/${string}`;
+export type TemplateAssetReference = RepositoryAssetPath | ManagedBlobAssetUrl;
+
+export type StorybookPerson = {
+  id: string;
+  name: string;
+  age: string | null;
+  subtitle: string | null;
+  portrait: TemplateAssetReference | null;
+};
+
+export type StorybookMemoryAsset = {
+  id: string;
+  source: TemplateAssetReference;
+  role: "PORTRAIT" | "GROUP" | "MEMORY" | "SOLUTION";
+  personIds: string[];
+  alt: string;
+  caption: string | null;
+  year: string | null;
+  order: number;
+};
+
+export type StorybookAnecdote = {
+  id: string;
+  text: string;
+  personIds: string[];
+  year: string | null;
+};
+
+export type StorybookChapter = {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  personIds: string[];
+  order: number;
+};
+
+export type StorybookConfiguration = {
+  occasion: "BIRTHDAY";
+  sharedTitle: string;
+  motto: string;
+  subtitle: string;
+  people: StorybookPerson[];
+  assets: StorybookMemoryAsset[];
+  anecdotes: StorybookAnecdote[];
+  chapters: StorybookChapter[];
+  material: "CREAM_PAPER" | "LIGHT_ALBUM" | "LINEN" | "DARK_ALBUM" | "MAGAZINE_WHITE";
+};
+
 export type BrandAssetTokens = {
-  logo: RepositoryAssetPath;
-  backgroundImage: RepositoryAssetPath | null;
+  logo: TemplateAssetReference;
+  backgroundImage: TemplateAssetReference | null;
 };
 
 export type BrandTokens = {
@@ -65,9 +114,10 @@ export type PresentationTemplateDesign = {
     decoration: "NONE" | "NEON_ORBITS" | "GEOMETRIC_LINES" | "CONFETTI";
   };
   imagery: {
-    heroImage: RepositoryAssetPath | null;
-    decorativeImages: RepositoryAssetPath[];
-    personalImagePool: RepositoryAssetPath[];
+    heroImage: TemplateAssetReference | null;
+    solutionImage: TemplateAssetReference | null;
+    decorativeImages: TemplateAssetReference[];
+    personalImagePool: TemplateAssetReference[];
     overlay: "NONE" | "SOFT" | "STRONG";
     placement: "BACKGROUND" | "SIDE" | "COLLAGE";
   };
@@ -79,6 +129,7 @@ export type PresentationTemplateDesign = {
     extraText: string;
     identityPlacement: "HEADER" | "SIDE" | "FOOTER";
   };
+  storybook: StorybookConfiguration | null;
 };
 
 export type TemplateMessageKey =
@@ -132,20 +183,36 @@ export const presentationDesigns = {
   NEON: {
     stylePreset: "NEON",
     composition: { layoutPreset: "CLASSIC", headerStyle: "BRAND_BAR", footerStyle: "STATUS_LINE", contentFrame: "NEON_FRAME", mediaTreatment: "GLOW_FRAME", answerTreatment: "NEON_CARDS", solutionTreatment: "SPOTLIGHT", decoration: "NEON_ORBITS" },
-    imagery: { heroImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "BACKGROUND" },
+    imagery: { heroImage: null, solutionImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "BACKGROUND" },
     occasion: { personName: "", age: "", subtitle: "", eventTitle: "", extraText: "", identityPlacement: "HEADER" },
+    storybook: null,
   },
   CORPORATE: {
     stylePreset: "CORPORATE",
     composition: { layoutPreset: "SPLIT", headerStyle: "CORPORATE_BAND", footerStyle: "STATUS_LINE", contentFrame: "CORPORATE_PANEL", mediaTreatment: "RECTANGULAR", answerTreatment: "CORPORATE_ROWS", solutionTreatment: "RESULT_BAND", decoration: "GEOMETRIC_LINES" },
-    imagery: { heroImage: null, decorativeImages: [], personalImagePool: [], overlay: "SOFT", placement: "SIDE" },
+    imagery: { heroImage: null, solutionImage: null, decorativeImages: [], personalImagePool: [], overlay: "SOFT", placement: "SIDE" },
     occasion: { personName: "", age: "", subtitle: "Wissen verbindet", eventTitle: "Corporate Quiz", extraText: "", identityPlacement: "HEADER" },
+    storybook: null,
   },
   BIRTHDAY: {
     stylePreset: "BIRTHDAY",
     composition: { layoutPreset: "COLLAGE", headerStyle: "BIRTHDAY_HERO", footerStyle: "PERSONAL_NOTE", contentFrame: "BIRTHDAY_ALBUM", mediaTreatment: "POLAROID", answerTreatment: "BIRTHDAY_CARDS", solutionTreatment: "MEMORY", decoration: "CONFETTI" },
-    imagery: { heroImage: "/medien/template-preview.svg", decorativeImages: ["/medien/bilder/unsortiert/sabrage.png"], personalImagePool: ["/medien/template-preview.svg", "/medien/bilder/unsortiert/sabrage.png", "/medien/bilder/wahrzeichen/taipei-101_standard.jpg"], overlay: "SOFT", placement: "COLLAGE" },
+    imagery: { heroImage: "/medien/bilder/unsortiert/1778762143603-img_20140530_143045.jpg", solutionImage: "/medien/bilder/unsortiert/1778787308845-20220503_095407.jpg", decorativeImages: [], personalImagePool: ["/medien/bilder/unsortiert/1778762143603-img_20140530_143045.jpg", "/medien/bilder/unsortiert/1778762097227-20190714_112415.jpg", "/medien/bilder/unsortiert/1778787308845-20220503_095407.jpg"], overlay: "SOFT", placement: "COLLAGE" },
     occasion: { personName: "Alex", age: "40", subtitle: "Ein Quiz voller Erinnerungen", eventTitle: "Geburtstagsquiz", extraText: "Schön, dass ihr mitfeiert!", identityPlacement: "HEADER" },
+    storybook: {
+      occasion: "BIRTHDAY",
+      sharedTitle: "Alex’ Erinnerungsquiz",
+      motto: "Ein Quiz voller Erinnerungen",
+      subtitle: "Schön, dass ihr mitfeiert!",
+      people: [{ id: "alex", name: "Alex", age: "40", subtitle: null, portrait: "/medien/bilder/unsortiert/1778762143603-img_20140530_143045.jpg" }],
+      assets: [
+        { id: "alex-portrait", source: "/medien/bilder/unsortiert/1778762143603-img_20140530_143045.jpg", role: "PORTRAIT", personIds: ["alex"], alt: "Porträt von Alex", caption: null, year: "2014", order: 0 },
+        { id: "birthday-memory", source: "/medien/bilder/unsortiert/1778787308845-20220503_095407.jpg", role: "SOLUTION", personIds: ["alex"], alt: "Gemeinsame Reiseerinnerung", caption: "Ein Tag, den niemand vergisst", year: "2022", order: 1 },
+      ],
+      anecdotes: [],
+      chapters: [],
+      material: "CREAM_PAPER",
+    },
   },
 } as const satisfies Record<PresentationDesignStyle, PresentationTemplateDesign>;
 
