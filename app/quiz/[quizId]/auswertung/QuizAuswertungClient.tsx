@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import {
+  continueQuizEvaluationBackfillAction,
   recalculateQuizEvaluationsAction,
   updateTeamAntwortBewertung,
 } from "../../actions";
@@ -47,6 +48,12 @@ type PunktestandEintrag = {
   punkte: number;
 };
 
+type EvaluationBackfillStatus = {
+  isComplete: boolean;
+  incompleteAnswers: number;
+  affectedQuestions: number;
+};
+
 type BewertungsAktion =
   | "richtig"
   | "teilweise"
@@ -59,10 +66,12 @@ export default function QuizAuswertungClient({
   quizId,
   antworten,
   punktestand,
+  backfillStatus,
 }: {
   quizId: number;
   antworten: AuswertungsAntwort[];
   punktestand: PunktestandEintrag[];
+  backfillStatus: EvaluationBackfillStatus;
 }) {
   const [aktiverTab, setAktiverTab] = useState<"antworten" | "punktestand">(
     "antworten"
@@ -77,7 +86,11 @@ export default function QuizAuswertungClient({
   const [rekalkulationsmeldung, setRekalkulationsmeldung] = useState<string | null>(
     null,
   );
+  const [backfillLaeuft, setBackfillLaeuft] = useState(false);
+  const [backfillMeldung, setBackfillMeldung] = useState<string | null>(null);
+  const [backfillCursor, setBackfillCursor] = useState<number | null>(null);
   const rekalkulationLock = useRef(false);
+  const backfillLock = useRef(false);
   const router = useRouter();
 
   const teamnamen = useMemo(
@@ -142,6 +155,35 @@ export default function QuizAuswertungClient({
     }
   }
 
+  async function handleBackfill() {
+    if (backfillLock.current) return;
+    backfillLock.current = true;
+    setBackfillLaeuft(true);
+    setBackfillMeldung(null);
+    try {
+      const result = await continueQuizEvaluationBackfillAction(
+        quizId,
+        backfillCursor,
+      );
+      setBackfillCursor(result.nextQuestionCursor);
+      setBackfillMeldung(
+        result.failedQuestions > 0
+          ? `${result.recalculatedAnswers} Bewertungen berechnet; ${result.failedQuestions} Frage konnte nicht berechnet werden.`
+          : result.status.isComplete
+            ? "Alle fehlenden Bewertungen wurden berechnet."
+            : `${result.recalculatedAnswers} Bewertungen wurden berechnet. ${result.status.incompleteAnswers} sind noch offen.`,
+      );
+      router.refresh();
+    } catch {
+      setBackfillMeldung(
+        "Die fehlenden Bewertungen konnten nicht weiter berechnet werden.",
+      );
+    } finally {
+      backfillLock.current = false;
+      setBackfillLaeuft(false);
+    }
+  }
+
   function vorherigesTeam() {
     setTeamIndex((current) => {
       if (teamnamen.length === 0) return null;
@@ -160,6 +202,41 @@ export default function QuizAuswertungClient({
 
   return (
     <div className="space-y-4">
+      {!backfillStatus.isComplete && (
+        <div
+          className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-sm"
+          role="status"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="font-black">
+                {backfillStatus.incompleteAnswers} Bewertungen werden noch
+                berechnet
+              </p>
+              <p className="mt-1 text-sm">
+                Betroffen sind {backfillStatus.affectedQuestions} Fragen.
+                Vorhandene Ergebnisse werden bereits angezeigt; der Punktestand
+                ist bis zum Abschluss vorläufig.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleBackfill}
+              disabled={backfillLaeuft}
+              className="rounded-xl bg-amber-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {backfillLaeuft
+                ? "Berechnung läuft …"
+                : "Berechnung fortsetzen"}
+            </button>
+          </div>
+          {backfillMeldung && (
+            <p className="mt-3 text-sm font-semibold" role="status">
+              {backfillMeldung}
+            </p>
+          )}
+        </div>
+      )}
       <div className="rounded-2xl bg-white p-3 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <button
@@ -183,7 +260,9 @@ export default function QuizAuswertungClient({
                 : "bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
-            Punktestand
+            {backfillStatus.isComplete
+              ? "Punktestand"
+              : "Punktestand (vorläufig)"}
           </button>
 
           <div className="ml-auto flex flex-col items-end gap-1">

@@ -1,10 +1,4 @@
-import {
-  getQuizAuswertungAlleAntworten,
-  getQuizPunktestand,
-  getQuizPraesentation,
-} from "../../actions";
-
-import { requireQuizAdmin } from "../../quizAccess.server";
+import { getQuizAuswertungPageData } from "../../actions";
 import QuizAuswertungClient from "./QuizAuswertungClient";
 
 type Props = {
@@ -21,17 +15,13 @@ export default async function QuizAuswertungPage({
   searchParams,
 }: Props) {
   const { quizId } = await params;
-  await requireQuizAdmin(Number(quizId));
   await searchParams;
-
-  const quiz = await getQuizPraesentation(Number(quizId));
+  const { quiz, antworten, punktestand, backfillStatus } =
+    await getQuizAuswertungPageData(Number(quizId));
 
   if (!quiz) {
     return <div className="p-10 text-xl font-bold">Quiz nicht gefunden</div>;
   }
-
-  const alleAntworten = await getQuizAuswertungAlleAntworten(Number(quizId));
-  const punktestand = await getQuizPunktestand(Number(quizId));
 
   return (
     <main className="min-h-screen bg-slate-100 p-8">
@@ -46,8 +36,9 @@ export default async function QuizAuswertungPage({
 
         <QuizAuswertungClient
           quizId={quiz.quiz_id}
-          antworten={alleAntworten}
+          antworten={antworten}
           punktestand={punktestand}
+          backfillStatus={backfillStatus}
         />
       </div>
     </main>

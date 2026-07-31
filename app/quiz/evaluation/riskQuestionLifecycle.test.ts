@@ -61,8 +61,8 @@ test("quiz copy keeps risk mode but never copies its historical snapshot", () =>
 });
 
 test("ranking has no risk formula and evaluation explains the persisted allocation", () => {
-  const start = actions.indexOf("export async function getQuizPunktestand");
-  const end = actions.indexOf("export async function getZufaelligeSchaetzfrage");
+  const start = actions.indexOf("async function loadQuizPunktestand");
+  const end = actions.indexOf("export async function getQuizPunktestand");
   const ranking = actions.slice(start, end);
   assert.match(ranking, /_sum: \{ vergebene_punkte: true \}/);
   assert.doesNotMatch(ranking, /risiko_pool|risikofrage.*div|correctCount/);

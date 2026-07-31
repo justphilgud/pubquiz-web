@@ -10,6 +10,12 @@ import {
   isEvaluationComplete,
 } from "./evaluationCompleteness";
 import { evaluateQuestionPoints } from "./evaluateQuestionPoints";
+import {
+  processEvaluationBackfillCandidates,
+  QUIZ_EVALUATION_BACKFILL_BATCH_QUESTION_LIMIT,
+  selectEvaluationBackfillBatch,
+  summarizeIncompleteEvaluations,
+} from "./evaluationBackfillPolicy";
 import { getQuestionBaseMaximum } from "./questionPointPolicy";
 import { allocateRiskQuestionPoints } from "./riskQuestionAllocation";
 import {
@@ -20,6 +26,7 @@ import {
 type EvaluationDb = Prisma.TransactionClient | typeof prisma;
 
 const QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS = 30_000;
+export { QUIZ_EVALUATION_BACKFILL_BATCH_QUESTION_LIMIT };
 
 export type RecalculationOptions = {
   preserveManualOverrides?: boolean;
@@ -31,6 +38,70 @@ export type RecalculationResult = {
   recalculatedAnswers: number;
   recalculatedQuestions: number;
 };
+
+export type QuizEvaluationBackfillStatus = {
+  isComplete: boolean;
+  incompleteAnswers: number;
+  affectedQuestions: number;
+};
+
+export type QuizEvaluationBackfillBatchResult = RecalculationResult & {
+  attemptedQuestions: number;
+  failedQuestions: number;
+  nextQuestionCursor: number | null;
+  status: QuizEvaluationBackfillStatus;
+};
+
+function incompleteQuizEvaluationWhere(
+  quizId: number,
+): Prisma.team_antwortenWhereInput {
+  return {
+    quiz_id: quizId,
+    OR: [
+      {
+        bewertungs_version: {
+          not: CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,
+        },
+      },
+      {
+        bewertungsquelle: "AUTO",
+        bewertungsdetails: { equals: Prisma.DbNull },
+      },
+      {
+        quiz_fragen: {
+          punkte_modus: "risikofrage",
+          OR: [
+            { risiko_pool_teamanzahl: null },
+            { risiko_pool_fixiert_am: null },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+async function getIncompleteQuizEvaluationGroups(
+  quizId: number,
+) {
+  return prisma.team_antworten.groupBy({
+    by: ["quiz_fragen_id"],
+    where: incompleteQuizEvaluationWhere(quizId),
+    _count: { _all: true },
+    orderBy: { quiz_fragen_id: "asc" },
+  });
+}
+
+export async function getQuizEvaluationBackfillStatus(
+  quizId: number,
+): Promise<QuizEvaluationBackfillStatus> {
+  const groups = await getIncompleteQuizEvaluationGroups(quizId);
+  return summarizeIncompleteEvaluations(
+    groups.map((group) => ({
+      quizQuestionId: group.quiz_fragen_id,
+      incompleteAnswers: group._count._all,
+    })),
+  );
+}
 
 function orderingItems(config: Prisma.JsonValue | null) {
   const typed = config as QuestionTemplateConfig | null;
@@ -511,6 +582,48 @@ export async function ensureQuizEvaluation(
   return {
     recalculatedAnswers,
     recalculatedQuestions: incomplete.length,
+  };
+}
+
+export async function processQuizEvaluationBackfillBatch(
+  quizId: number,
+  options: {
+    afterQuestionId?: number | null;
+  } = {},
+): Promise<QuizEvaluationBackfillBatchResult> {
+  const incompleteGroups = await getIncompleteQuizEvaluationGroups(quizId);
+  const candidates = selectEvaluationBackfillBatch(
+    incompleteGroups.map((group) => ({
+      quizQuestionId: group.quiz_fragen_id,
+      incompleteAnswers: group._count._all,
+    })),
+    options.afterQuestionId ?? null,
+  );
+  const processed = await processEvaluationBackfillCandidates(
+    candidates,
+    (quizQuestionId) =>
+      recalculateQuizQuestionEvaluation(quizQuestionId, undefined, {
+        preserveManualOverrides: true,
+      }),
+  );
+  for (const quizQuestionId of processed.failedQuestionIds) {
+    console.error("Quiz evaluation backfill question failed.", {
+      quizId,
+      quizQuestionId,
+    });
+  }
+
+  const status = await getQuizEvaluationBackfillStatus(quizId);
+  return {
+    recalculatedAnswers: processed.recalculatedAnswers,
+    recalculatedQuestions: processed.recalculatedQuestions,
+    attemptedQuestions: processed.attemptedQuestions,
+    failedQuestions: processed.failedQuestionIds.length,
+    nextQuestionCursor:
+      status.isComplete || candidates.length === 0
+        ? null
+        : candidates.at(-1)!.quizQuestionId,
+    status,
   };
 }
 
