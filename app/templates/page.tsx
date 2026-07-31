@@ -3,9 +3,9 @@ import Link from "next/link";
 import AppHeader from "@/app/components/AppHeader";
 import { requireAdmin } from "@/app/lib/permissions";
 import {
-  duplicatePresentationTemplate,
   setPresentationTemplateArchived,
 } from "@/app/rendering/presentationTemplates/actions";
+import { DuplicatePresentationTemplateButton } from "@/app/rendering/presentationTemplates/DuplicatePresentationTemplateButton";
 import {
   canArchivePresentationTemplate,
   requiresDraftRevision,
@@ -38,18 +38,17 @@ export default async function TemplatesPage({ searchParams }: Props) {
     </form>
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {templates.map((template) => {
-        const duplicateAction = duplicatePresentationTemplate.bind(null, template.id);
         const archiveAction = setPresentationTemplateArchived.bind(null, template.id, template.status !== "ARCHIVED");
         const canArchive = canArchivePresentationTemplate(template);
         const duplicateLabel = template.isSystem
-          ? "Duplizieren"
+          ? "Als eigenes Template verwenden"
           : requiresDraftRevision(template)
             ? "Neue Version bearbeiten"
             : "Als Entwurf kopieren";
         return <article key={template.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="aspect-[16/7] p-5" style={{ background: `linear-gradient(135deg, ${template.config.tokens.colors.background}, ${template.config.tokens.colors.primary}55)`, color: template.config.tokens.colors.text }}><div className="flex h-full flex-col justify-between rounded-xl border p-4" style={{ background: template.config.tokens.colors.surface, borderColor: template.config.tokens.colors.border }}><span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: template.config.tokens.colors.primary }}>Designvorschau</span><strong className="text-2xl">{template.name}</strong><span className="h-2 w-24 rounded-full" style={{ background: template.config.tokens.colors.accent }} /></div></div>
           <div className="space-y-3 p-5"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold">{statusLabel[template.status]}</span><span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold">{template.source === "SYSTEM" ? "Systemtemplate" : "Eigenes Template"}</span></div><div><h2 className="text-lg font-bold">{template.name}</h2><p className="font-mono text-xs text-slate-500">{template.id}</p></div><p className="min-h-10 text-sm text-slate-600">{template.description ?? "Keine Beschreibung"}</p><p className="text-xs text-slate-500">Verwendungen: {template.usageCount} · Vertrag v{template.contractVersion}</p><p className="text-xs text-slate-500">{template.updatedAt ? `Geändert: ${new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(template.updatedAt)}` : "Unverändertes Systemtemplate"}{template.creatorName ? ` · Verantwortlich: ${template.creatorName}` : ""}</p>
-            <div className="flex flex-wrap gap-2"><Link href={`/templates/${template.id}`} className="inline-flex min-h-10 items-center rounded-xl bg-slate-900 px-3 font-semibold text-white">Öffnen</Link>{repository.persistenceAvailable && <form action={duplicateAction}><button className="min-h-10 rounded-xl border border-slate-300 px-3 font-semibold">{duplicateLabel}</button></form>}{!template.isSystem && repository.persistenceAvailable && (template.status === "ARCHIVED" || canArchive) && <form action={archiveAction}><button className="min-h-10 rounded-xl border border-slate-300 px-3 font-semibold">{template.status === "ARCHIVED" ? "Reaktivieren" : "Archivieren"}</button></form>}{!template.isSystem && template.status !== "ARCHIVED" && template.usageCount > 0 && <span className="inline-flex min-h-10 items-center rounded-xl bg-amber-50 px-3 text-xs font-semibold text-amber-900">Vor Archivierung Zuordnungen lösen</span>}</div>
+            <div className="flex flex-wrap gap-2"><Link href={`/templates/${template.id}`} className="inline-flex min-h-10 items-center rounded-xl bg-slate-900 px-3 font-semibold text-white">Öffnen</Link>{repository.persistenceAvailable && <DuplicatePresentationTemplateButton sourceId={template.id} label={duplicateLabel} className="min-h-10 rounded-xl border border-slate-300 px-3 font-semibold disabled:cursor-wait disabled:opacity-60" />}{!template.isSystem && repository.persistenceAvailable && (template.status === "ARCHIVED" || canArchive) && <form action={archiveAction}><button className="min-h-10 rounded-xl border border-slate-300 px-3 font-semibold">{template.status === "ARCHIVED" ? "Reaktivieren" : "Archivieren"}</button></form>}{!template.isSystem && template.status !== "ARCHIVED" && template.usageCount > 0 && <span className="inline-flex min-h-10 items-center rounded-xl bg-amber-50 px-3 text-xs font-semibold text-amber-900">Vor Archivierung Zuordnungen lösen</span>}</div>
           </div></article>;
       })}
     </div>

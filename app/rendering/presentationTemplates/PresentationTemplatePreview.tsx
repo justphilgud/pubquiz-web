@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { QuizPraesentationResult } from "@/app/quiz/actions";
 import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
@@ -44,6 +44,47 @@ type Props = {
   templateName: string;
   scenario: PresentationPreviewScenario;
 };
+
+const PREVIEW_STAGE_WIDTH = 1600;
+const PREVIEW_STAGE_HEIGHT = 900;
+
+function ScaledPreviewStage({ children }: { children: ReactNode }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const updateScale = () => {
+      setScale(container.clientWidth / PREVIEW_STAGE_WIDTH);
+    };
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      data-preview-scale-container
+      className="relative aspect-video min-h-0 w-full overflow-hidden rounded-2xl bg-black"
+    >
+      <div
+        data-preview-fixed-stage
+        className="absolute left-0 top-0"
+        style={{
+          width: PREVIEW_STAGE_WIDTH,
+          height: PREVIEW_STAGE_HEIGHT,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function questionForScenario(scenario: PresentationPreviewScenario) {
   const templateId =
@@ -205,11 +246,12 @@ export function PresentationTemplatePreview({
 
   if (scenario === "ANSWER_FORM") {
     return (
-      <QuizThemeScope
-        theme={theme}
-        data-preview-surface={scenario}
-        className="flex aspect-video min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--quiz-border)] bg-[var(--quiz-background)] p-6"
-      >
+      <ScaledPreviewStage>
+        <QuizThemeScope
+          theme={theme}
+          data-preview-surface={scenario}
+          className="flex h-full w-full min-h-0 flex-col overflow-hidden border border-[var(--quiz-border)] bg-[var(--quiz-background)] p-12"
+        >
         <div className="text-xs font-black uppercase tracking-[0.25em]" style={{ color: theme.colors.primary }}>
           Antwortformular
         </div>
@@ -224,7 +266,8 @@ export function PresentationTemplatePreview({
         <button type="button" className="mt-4 min-h-11 rounded-xl px-5 font-bold" style={{ background: theme.colors.primary, color: theme.colors.background }}>
           Antwort abgeben
         </button>
-      </QuizThemeScope>
+        </QuizThemeScope>
+      </ScaledPreviewStage>
     );
   }
 
@@ -237,7 +280,7 @@ export function PresentationTemplatePreview({
     fragenAnzahlImBlock: 1,
   };
   return (
-    <div className="aspect-video min-h-0 overflow-hidden rounded-2xl bg-black p-2">
+    <ScaledPreviewStage>
       <PresentationSlideRenderer
         quiz={quiz}
         slide={slide}
@@ -253,6 +296,6 @@ export function PresentationTemplatePreview({
               : "DESIGN_PREVIEW",
         }}
       />
-    </div>
+    </ScaledPreviewStage>
   );
 }

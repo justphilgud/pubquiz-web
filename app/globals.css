@@ -56,6 +56,20 @@ button {
   cursor: pointer;
 }
 
+[data-generator-active-section] > section {
+  display: none;
+}
+
+[data-generator-active-section="style"] > #style,
+[data-generator-active-section="layout"] > #layout,
+[data-generator-active-section="imagery"] > #imagery,
+[data-generator-active-section="personalization"] > #personalization,
+[data-generator-active-section="branding"] > #branding,
+[data-generator-active-section="surfaces"] > #surfaces,
+[data-generator-active-section="status"] > #status {
+  display: block;
+}
+
 .presentation-template {
   background-color: var(--brand-background);
   color: var(--brand-text);
@@ -154,6 +168,35 @@ button {
 }
 .presentation-template[data-design-style="CORPORATE"] h2,
 .presentation-template[data-design-style="CORPORATE"] .text-white { color: var(--brand-text) !important; text-shadow: none !important; }
+.presentation-template[data-design-style="CORPORATE"] [class*="shadow-"],
+.presentation-template[data-design-style="CORPORATE"] [class*="drop-shadow-"] {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+.presentation-template[data-design-style="CORPORATE"] [class*="rotate-"] {
+  transform: none !important;
+}
+.presentation-template[data-design-style="CORPORATE"] [class*="text-pink"],
+.presentation-template[data-design-style="CORPORATE"] [class*="text-cyan"],
+.presentation-template[data-design-style="CORPORATE"] [class*="text-yellow"] {
+  color: var(--brand-primary) !important;
+}
+.presentation-template[data-design-style="CORPORATE"] [class*="border-pink"],
+.presentation-template[data-design-style="CORPORATE"] [class*="border-cyan"],
+.presentation-template[data-design-style="CORPORATE"] [class*="border-yellow"] {
+  border-color: var(--brand-border) !important;
+}
+.presentation-template[data-design-style="CORPORATE"] [class*="bg-pink"],
+.presentation-template[data-design-style="CORPORATE"] [class*="bg-black"],
+.presentation-template[data-design-style="CORPORATE"] [class*="bg-slate-9"],
+.presentation-template[data-design-style="CORPORATE"] [class*="bg-gradient"] {
+  background: var(--brand-surface) !important;
+}
+.presentation-template[data-design-style="CORPORATE"] [class*="uppercase"] {
+  text-transform: none !important;
+  letter-spacing: .04em !important;
+}
 .presentation-template[data-design-style="CORPORATE"] .presentation-decoration {
   background: linear-gradient(115deg, transparent 0 76%, color-mix(in srgb, var(--brand-primary) 8%, transparent) 76% 78%, transparent 78%);
 }

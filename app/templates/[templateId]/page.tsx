@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 
 import AppHeader from "@/app/components/AppHeader";
 import { requireAdmin } from "@/app/lib/permissions";
-import { duplicatePresentationTemplate } from "@/app/rendering/presentationTemplates/actions";
+import { DuplicatePresentationTemplateButton } from "@/app/rendering/presentationTemplates/DuplicatePresentationTemplateButton";
 import { PresentationTemplateGenerator } from "@/app/rendering/presentationTemplates/PresentationTemplateGenerator";
 import {
-  canEditPresentationTemplate,
+  getPresentationTemplatePageMode,
   requiresDraftRevision,
 } from "@/app/rendering/presentationTemplates/presentationTemplateLifecycle";
 import {
@@ -25,11 +25,10 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
   ]);
   if (!template) notFound();
 
-  const duplicateAction = duplicatePresentationTemplate.bind(null, template.id);
-  const editable = canEditPresentationTemplate(template);
+  const pageMode = getPresentationTemplatePageMode(template);
   const needsDraftRevision = requiresDraftRevision(template);
   const duplicateLabel = template.isSystem
-    ? "Systemtemplate duplizieren"
+    ? "Als eigenes Template verwenden"
     : needsDraftRevision
       ? "Neue Version bearbeiten"
       : "Als Entwurf kopieren";
@@ -52,13 +51,21 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
               </p>
             </div>
             {repository.persistenceAvailable && (
-              <form action={duplicateAction}>
-                <button className="min-h-11 rounded-xl border border-slate-300 bg-white px-5 font-bold">
-                  {duplicateLabel}
-                </button>
-              </form>
+              <DuplicatePresentationTemplateButton
+                sourceId={template.id}
+                label={duplicateLabel}
+                className="min-h-11 rounded-xl border border-slate-300 bg-white px-5 font-bold disabled:cursor-wait disabled:opacity-60"
+              />
             )}
           </header>
+
+          {pageMode === "SYSTEM_READ_ONLY" && (
+            <p className="rounded-xl border border-indigo-300 bg-indigo-50 p-4 text-indigo-950">
+              <strong>Systemtemplate – schreibgeschützte Vorschau.</strong>{" "}
+              Szenarien und Fokusansicht bleiben bedienbar. Für Änderungen
+              erstellst du über „Als eigenes Template verwenden“ einen unabhängigen Entwurf.
+            </p>
+          )}
 
           {needsDraftRevision && (
             <p className="rounded-xl border border-sky-300 bg-sky-50 p-4 text-sky-950">
@@ -84,7 +91,7 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
           <PresentationTemplateGenerator
             initialTemplate={template}
             originalId={template.isSystem ? null : template.id}
-            readOnly={!editable}
+            pageMode={pageMode}
             persistenceAvailable={repository.persistenceAvailable}
           />
         </div>

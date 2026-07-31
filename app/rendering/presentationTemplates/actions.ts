@@ -5,7 +5,6 @@ import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
 import { templateRegistry } from "@/app/rendering/templateRegistry";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import {
   validatePresentationTemplateDraft,
   type PresentationTemplateDraft,
@@ -120,7 +119,10 @@ export async function savePresentationTemplate(
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
       return { success: false, message: "Die lokale Template-Migration ist noch nicht angewendet. Speichern ist daher bewusst deaktiviert." };
     }
-    throw error;
+    return {
+      success: false,
+      message: "Das Template konnte nicht gespeichert werden. Bitte erneut versuchen.",
+    };
   }
 
   revalidatePath("/templates");
@@ -143,38 +145,55 @@ export async function savePresentationTemplate(
 export async function duplicatePresentationTemplate(sourceId: string) {
   const session = await requireAdmin();
   const source = await getManagedPresentationTemplate(sourceId);
-  if (!source) redirect("/templates");
-
-  const base = `${source.id}-kopie`.slice(0, 58).replace(/-+$/, "");
-  let id = base;
-  let suffix = 2;
-  while (
-    isSystemId(id) ||
-    (await prisma.presentation_templates.findUnique({
-      where: { presentation_template_id: id },
-      select: { presentation_template_id: true },
-    }))
-  ) {
-    id = `${base}-${suffix}`.slice(0, 64);
-    suffix += 1;
+  if (!source) {
+    return {
+      success: false,
+      message: "Das Ausgangstemplate wurde nicht gefunden.",
+    } satisfies PresentationTemplateActionState;
   }
 
-  await prisma.presentation_templates.create({
-    data: {
-      presentation_template_id: id,
-      name: `${source.name} – Kopie`,
-      beschreibung: source.description,
-      status: "DRAFT",
-      ist_systemtemplate: false,
-      contract_version: source.config.version,
-      theme_config_json: source.config as unknown as Prisma.InputJsonValue,
-      tags: [...source.tags.filter((tag) => tag !== "System")],
-      source_template_id: source.id,
-      created_by_user_id: session.actor.userId,
-    },
-  });
-  revalidatePath("/templates");
-  redirect(`/templates/${id}`);
+  const base = `${source.id}-kopie`.slice(0, 58).replace(/-+$/, "");
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const id = attempt === 0 ? base : `${base}-${attempt + 1}`.slice(0, 64);
+    if (isSystemId(id)) continue;
+    try {
+      await prisma.presentation_templates.create({
+        data: {
+          presentation_template_id: id,
+          name: `${source.name} – Kopie`,
+          beschreibung: source.description,
+          status: "DRAFT",
+          ist_systemtemplate: false,
+          contract_version: source.config.version,
+          theme_config_json: source.config as unknown as Prisma.InputJsonValue,
+          tags: [...source.tags.filter((tag) => tag !== "System")],
+          source_template_id: source.id,
+          created_by_user_id: session.actor.userId,
+        },
+      });
+      revalidatePath("/templates");
+      return {
+        success: true,
+        message: "Bearbeitbarer Entwurf wurde erstellt.",
+        templateId: id,
+      } satisfies PresentationTemplateActionState;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        continue;
+      }
+      return {
+        success: false,
+        message: "Der Entwurf konnte nicht erstellt werden. Bitte erneut versuchen.",
+      } satisfies PresentationTemplateActionState;
+    }
+  }
+  return {
+    success: false,
+    message: "Es konnte keine eindeutige Template-ID erzeugt werden.",
+  } satisfies PresentationTemplateActionState;
 }
 
 export async function setPresentationTemplateArchived(id: string, archived: boolean) {
