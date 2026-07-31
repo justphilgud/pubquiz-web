@@ -47,6 +47,20 @@ test("a stored slug is independent from later name validation", () => {
   assert.equal(storedSlug, "alter-name");
 });
 
+test("event series assignment accepts only explicitly authorized managed templates", () => {
+  const input = {
+    name: "Sommerquiz",
+    isPublic: false,
+    defaultPresentationTemplateId: "sommer-2026",
+    defaultAnswerFormTemplateId: "sommer-2026",
+  };
+  assert.equal(validateEventSeriesInput(input).ok, false);
+  assert.equal(validateEventSeriesInput(input, {
+    additionalPresentationTemplateIds: ["sommer-2026"],
+    additionalAnswerFormTemplateIds: ["sommer-2026"],
+  }).ok, true);
+});
+
 test("archive state is reversible and archived series stay selectable only for their current quiz", () => {
   const now = new Date("2026-07-20T12:00:00.000Z");
   assert.deepEqual(eventSeriesArchiveState(true, now), {

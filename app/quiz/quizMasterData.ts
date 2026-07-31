@@ -80,6 +80,10 @@ function isSafeHttpUrl(value: string | null) {
 
 export function validateQuizMasterData(
   input: QuizMasterDataInput,
+  options?: {
+    additionalPresentationTemplateIds?: readonly string[];
+    additionalAnswerFormTemplateIds?: readonly string[];
+  },
 ): QuizMasterDataValidationResult {
   const title = input.title.trim();
   const date = input.date.trim();
@@ -116,10 +120,18 @@ export function validateQuizMasterData(
   if ((internalNote?.length ?? 0) > QUIZ_MASTER_DATA_LIMITS.internalNote) {
     errors.internalNote = `Interne Bemerkung darf maximal ${QUIZ_MASTER_DATA_LIMITS.internalNote} Zeichen enthalten.`;
   }
-  if (presentationTemplateId && !isSelectablePresentationTemplateId(presentationTemplateId)) {
+  if (
+    presentationTemplateId &&
+    !isSelectablePresentationTemplateId(presentationTemplateId) &&
+    !options?.additionalPresentationTemplateIds?.includes(presentationTemplateId)
+  ) {
     errors.presentationTemplateId = deRenderingMessages.validation.unknownPresentation;
   }
-  if (answerFormTemplateId && !isSelectableAnswerFormTemplateId(answerFormTemplateId)) {
+  if (
+    answerFormTemplateId &&
+    !isSelectableAnswerFormTemplateId(answerFormTemplateId) &&
+    !options?.additionalAnswerFormTemplateIds?.includes(answerFormTemplateId)
+  ) {
     errors.answerFormTemplateId = deRenderingMessages.validation.unknownAnswerForm;
   }
 

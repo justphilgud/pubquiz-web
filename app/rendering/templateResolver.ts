@@ -18,12 +18,17 @@ export type ResolvedTemplate<T> = {
 type ResolveInput = {
   quizTemplateId?: string | null;
   eventSeriesTemplateId?: string | null;
+  additionalPresentationTemplates?: readonly PresentationTemplate[];
+  additionalAnswerFormTemplates?: readonly AnswerFormTemplate[];
 };
 
 export function resolvePresentationTemplate(
   input: ResolveInput,
 ): ResolvedTemplate<PresentationTemplate> {
-  const quizTemplate = getPresentationTemplate(input.quizTemplateId);
+  const getTemplate = (id: string | null | undefined) =>
+    getPresentationTemplate(id) ??
+    input.additionalPresentationTemplates?.find((template) => template.id === id);
+  const quizTemplate = getTemplate(input.quizTemplateId);
   if (quizTemplate) {
     return {
       template: quizTemplate,
@@ -33,9 +38,7 @@ export function resolvePresentationTemplate(
     };
   }
 
-  const eventSeriesTemplate = getPresentationTemplate(
-    input.eventSeriesTemplateId,
-  );
+  const eventSeriesTemplate = getTemplate(input.eventSeriesTemplateId);
   if (eventSeriesTemplate) {
     return {
       template: eventSeriesTemplate,
@@ -59,7 +62,10 @@ export function resolvePresentationTemplate(
 export function resolveAnswerFormTemplate(
   input: ResolveInput,
 ): ResolvedTemplate<AnswerFormTemplate> {
-  const quizTemplate = getAnswerFormTemplate(input.quizTemplateId);
+  const getTemplate = (id: string | null | undefined) =>
+    getAnswerFormTemplate(id) ??
+    input.additionalAnswerFormTemplates?.find((template) => template.id === id);
+  const quizTemplate = getTemplate(input.quizTemplateId);
   if (quizTemplate) {
     return {
       template: quizTemplate,
@@ -69,9 +75,7 @@ export function resolveAnswerFormTemplate(
     };
   }
 
-  const eventSeriesTemplate = getAnswerFormTemplate(
-    input.eventSeriesTemplateId,
-  );
+  const eventSeriesTemplate = getTemplate(input.eventSeriesTemplateId);
   if (eventSeriesTemplate) {
     return {
       template: eventSeriesTemplate,

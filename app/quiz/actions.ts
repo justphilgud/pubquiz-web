@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { revalidatePath } from "next/cache";
-import { requireAdmin, requireSession } from "@/app/lib/permissions";
+import { isAdmin, requireActor, requireAdmin, requireSession } from "@/app/lib/permissions";
 import {
   getEventSeriesIdsForCapability,
   requireEventSeriesAccess,
@@ -66,6 +66,21 @@ import {
   type PresentationLayoutMedium,
   type ResolvedPresentationLayout,
 } from "@/app/rendering/presentation/presentationLayoutResolver";
+import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+
+async function getPresentationTemplateValidationOptions(
+  additionallyAllowed: readonly string[] = [],
+) {
+  const { actor } = await requireActor();
+  const templates = isAdmin(actor)
+    ? await listAssignablePresentationTemplates()
+    : [];
+  const ids = [...templates.map((template) => template.id), ...additionallyAllowed];
+  return {
+    additionalPresentationTemplateIds: ids,
+    additionalAnswerFormTemplateIds: ids,
+  };
+}
 
 export type QuizResult = {
   quiz_id: number;
@@ -272,6 +287,7 @@ export async function createQuiz(data: {
   presentationTemplateId?: string | null;
   answerFormTemplateId?: string | null;
 }) {
+  const templateOptions = await getPresentationTemplateValidationOptions();
   const validated = validateQuizMasterData({
     eventSeriesId: data.eventSeriesId,
     title: data.titel,
@@ -283,7 +299,7 @@ export async function createQuiz(data: {
     internalNote: data.bemerkung,
     presentationTemplateId: data.presentationTemplateId,
     answerFormTemplateId: data.answerFormTemplateId,
-  });
+  }, templateOptions);
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
   const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId);
@@ -333,9 +349,17 @@ export async function updateQuiz(data: {
   await requireQuizEditor(data.quizId);
   const existing = await prisma.quiz.findUnique({
     where: { quiz_id: data.quizId },
-    select: { eventreihe_id: true },
+    select: {
+      eventreihe_id: true,
+      presentation_template_id: true,
+      answer_form_template_id: true,
+    },
   });
   if (!existing) return { success: false, message: "Quiz nicht gefunden." };
+  const templateOptions = await getPresentationTemplateValidationOptions([
+    existing.presentation_template_id ?? "",
+    existing.answer_form_template_id ?? "",
+  ]);
   const validated = validateQuizMasterData({
     eventSeriesId: data.eventSeriesId,
     title: data.titel,
@@ -347,7 +371,7 @@ export async function updateQuiz(data: {
     internalNote: data.bemerkung,
     presentationTemplateId: data.presentationTemplateId,
     answerFormTemplateId: data.answerFormTemplateId,
-  });
+  }, templateOptions);
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
   const eventSeries = await getEventSeriesForQuizSave(validated.value.eventSeriesId, {
@@ -476,6 +500,10 @@ export async function copyQuiz(data: {
       message: "Original-Quiz wurde nicht gefunden.",
     };
   }
+  const templateOptions = await getPresentationTemplateValidationOptions([
+    original.presentation_template_id ?? "",
+    original.answer_form_template_id ?? "",
+  ]);
   const validated = validateQuizMasterData(
     buildQuizCopyMasterData(
       {
@@ -489,6 +517,7 @@ export async function copyQuiz(data: {
       },
       { title: data.neuerTitel, date: data.quizDatum },
     ),
+    templateOptions,
   );
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   if (original.eventreihe.ist_archiviert) {

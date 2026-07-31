@@ -27,16 +27,18 @@ function navigationItemsFor(actor: AuthorizationActor) {
     canAccessQuestions: true,
     canManageQuizzes: canManageQuizzes(actor),
     canManageEventSeries: canManageEventSeries(actor),
+    canViewPresentationTemplates: canManageUsers(actor),
     canManageCategories: canManageCategories(actor),
     canManageUsers: canManageUsers(actor),
   });
 }
 
-test("admin navigation omits categories and keeps event series before users", () => {
+test("admin navigation orders event series, quiz and templates before users", () => {
   assert.deepEqual(navigationItemsFor(adminActor), [
     { href: "/fragen", label: "Fragen" },
-    { href: "/quiz", label: "Quiz" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
+    { href: "/quiz", label: "Quiz" },
+    { href: "/templates", label: "Templates" },
     { href: "/admin/users", label: "Benutzer" },
   ]);
 });
@@ -47,6 +49,7 @@ test("category capability never exposes the dashboard-only category route", () =
       canAccessQuestions: false,
       canManageQuizzes: false,
       canManageEventSeries: false,
+      canViewPresentationTemplates: false,
       canManageCategories: true,
       canManageUsers: false,
     }).some(({ href }) => href === "/admin/kategorien"),
@@ -66,6 +69,7 @@ test("USER without global or event-series rights has no functional navigation", 
       canAccessQuestions: false,
       canManageQuizzes: false,
       canManageEventSeries: false,
+      canViewPresentationTemplates: false,
       canManageCategories: false,
       canManageUsers: false,
     }),
@@ -79,13 +83,14 @@ test("membership capabilities expose operational navigation without users", () =
       canAccessQuestions: true,
       canManageQuizzes: true,
       canManageEventSeries: true,
+      canViewPresentationTemplates: false,
       canManageCategories: false,
       canManageUsers: false,
     }),
     [
       { href: "/fragen", label: "Fragen" },
-      { href: "/quiz", label: "Quiz" },
       { href: "/admin/eventreihen", label: "Eventreihen" },
+      { href: "/quiz", label: "Quiz" },
     ],
   );
 });
@@ -103,4 +108,10 @@ test("event series navigation stays active on detail pages", () => {
     isAppNavigationItemActive("/admin/users", "/admin/eventreihen"),
     false,
   );
+});
+
+test("template navigation stays active throughout the generator", () => {
+  assert.equal(isAppNavigationItemActive("/templates", "/templates"), true);
+  assert.equal(isAppNavigationItemActive("/templates/new", "/templates"), true);
+  assert.equal(isAppNavigationItemActive("/quiz", "/templates"), false);
 });

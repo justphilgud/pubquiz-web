@@ -409,6 +409,7 @@ export const ModelName = {
   medientyp: 'medientyp',
   quiz: 'quiz',
   eventreihen: 'eventreihen',
+  presentation_templates: 'presentation_templates',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
   teams: 'teams',
@@ -442,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1331,6 +1332,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.eventreihenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.EventreihenCountAggregateOutputType> | number
+        }
+      }
+    }
+    presentation_templates: {
+      payload: Prisma.$presentation_templatesPayload<ExtArgs>
+      fields: Prisma.presentation_templatesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.presentation_templatesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.presentation_templatesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>
+        }
+        findFirst: {
+          args: Prisma.presentation_templatesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.presentation_templatesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>
+        }
+        findMany: {
+          args: Prisma.presentation_templatesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>[]
+        }
+        create: {
+          args: Prisma.presentation_templatesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>
+        }
+        createMany: {
+          args: Prisma.presentation_templatesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.presentation_templatesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>[]
+        }
+        delete: {
+          args: Prisma.presentation_templatesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>
+        }
+        update: {
+          args: Prisma.presentation_templatesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>
+        }
+        deleteMany: {
+          args: Prisma.presentation_templatesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.presentation_templatesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.presentation_templatesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>[]
+        }
+        upsert: {
+          args: Prisma.presentation_templatesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$presentation_templatesPayload>
+        }
+        aggregate: {
+          args: Prisma.Presentation_templatesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePresentation_templates>
+        }
+        groupBy: {
+          args: Prisma.presentation_templatesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Presentation_templatesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.presentation_templatesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Presentation_templatesCountAggregateOutputType> | number
         }
       }
     }
@@ -2901,6 +2976,24 @@ export const EventreihenScalarFieldEnum = {
 export type EventreihenScalarFieldEnum = (typeof EventreihenScalarFieldEnum)[keyof typeof EventreihenScalarFieldEnum]
 
 
+export const Presentation_templatesScalarFieldEnum = {
+  presentation_template_id: 'presentation_template_id',
+  name: 'name',
+  beschreibung: 'beschreibung',
+  status: 'status',
+  ist_systemtemplate: 'ist_systemtemplate',
+  contract_version: 'contract_version',
+  theme_config_json: 'theme_config_json',
+  tags: 'tags',
+  source_template_id: 'source_template_id',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Presentation_templatesScalarFieldEnum = (typeof Presentation_templatesScalarFieldEnum)[keyof typeof Presentation_templatesScalarFieldEnum]
+
+
 export const Quiz_fragenScalarFieldEnum = {
   quiz_fragen_id: 'quiz_fragen_id',
   quiz_id: 'quiz_id',
@@ -3164,6 +3257,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -3576,6 +3676,7 @@ export type GlobalOmitConfig = {
   medientyp?: Prisma.medientypOmit
   quiz?: Prisma.quizOmit
   eventreihen?: Prisma.eventreihenOmit
+  presentation_templates?: Prisma.presentation_templatesOmit
   quiz_fragen?: Prisma.quiz_fragenOmit
   quiz_teams?: Prisma.quiz_teamsOmit
   teams?: Prisma.teamsOmit

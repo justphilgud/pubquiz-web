@@ -23,6 +23,7 @@ export function QuizThemeScope<TElement extends ElementType = "div">({
       data-quiz-theme-version={theme.version}
       data-theme-mode={theme.appearance.mode}
       data-presentation-variant={theme.presentation.variant}
+      data-moderation-variant={theme.moderation.variant}
       data-answer-form-variant={theme.answerForm.variant}
       style={quizThemeStyle(theme)}
     >

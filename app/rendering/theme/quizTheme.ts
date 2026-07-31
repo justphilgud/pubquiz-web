@@ -63,6 +63,9 @@ export type ResolvedQuizTheme = {
   presentation: {
     variant: PresentationTemplate["variant"];
   };
+  moderation: {
+    variant: "BRANDED" | "QUIET";
+  };
   answerForm: {
     variant: AnswerFormTemplate["variant"];
   };
@@ -74,13 +77,6 @@ export type ResolveQuizThemeInput = {
   presentation: ResolvedTemplate<PresentationTemplate>;
   answerForm: ResolvedTemplate<AnswerFormTemplate>;
 };
-
-const SYSTEM_SEMANTIC_COLORS = {
-  success: "#16a34a",
-  warning: "#ca8a04",
-  danger: "#dc2626",
-  focus: "#38e8ff",
-} as const;
 
 export function resolveQuizTheme({
   displayName,
@@ -116,7 +112,12 @@ export function resolveQuizTheme({
       textMuted: identityTokens.colors.textMuted,
       border: identityTokens.colors.border,
     },
-    semantic: SYSTEM_SEMANTIC_COLORS,
+    semantic: {
+      success: identityTokens.colors.success,
+      warning: identityTokens.colors.warning,
+      danger: identityTokens.colors.danger,
+      focus: identityTokens.colors.primary,
+    },
     appearance: {
       mode: presentation.template.variant === "DARK" ? "DARK" : "LIGHT",
       typographyPreset:
@@ -139,6 +140,9 @@ export function resolveQuizTheme({
     },
     presentation: {
       variant: presentation.template.variant,
+    },
+    moderation: {
+      variant: presentation.template.moderationVariant ?? "BRANDED",
     },
     answerForm: {
       variant: answerForm.template.variant,

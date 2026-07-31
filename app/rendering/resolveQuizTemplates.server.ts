@@ -6,6 +6,11 @@ import {
   resolvePresentationTemplate,
 } from "./templateResolver";
 import { resolveQuizTheme } from "./theme/quizTheme";
+import {
+  toRuntimeAnswerFormTemplate,
+  toRuntimePresentationTemplate,
+} from "./presentationTemplates/presentationTemplate";
+import { loadStoredPresentationTemplateConfigs } from "./presentationTemplates/presentationTemplateRepository.server";
 
 export async function resolveQuizTemplates(quizId: number) {
   const quiz = await prisma.quiz.findUnique({
@@ -26,14 +31,37 @@ export async function resolveQuizTemplates(quizId: number) {
 
   if (!quiz) return null;
 
+  const requestedTemplateIds = [
+    quiz.presentation_template_id,
+    quiz.answer_form_template_id,
+    quiz.eventreihe.default_presentation_template_id,
+    quiz.eventreihe.default_answer_form_template_id,
+  ].filter((id): id is string => Boolean(id));
+  const storedConfigs = await loadStoredPresentationTemplateConfigs(
+    requestedTemplateIds,
+  );
+  const storedTemplates = Array.from(storedConfigs, ([id, config]) => ({
+    id,
+    name: id,
+    config,
+  }));
+  const additionalPresentationTemplates = storedTemplates.map(
+    toRuntimePresentationTemplate,
+  );
+  const additionalAnswerFormTemplates = storedTemplates.map(
+    toRuntimeAnswerFormTemplate,
+  );
+
   const presentation = resolvePresentationTemplate({
       quizTemplateId: quiz.presentation_template_id,
       eventSeriesTemplateId:
         quiz.eventreihe.default_presentation_template_id,
+      additionalPresentationTemplates,
     });
   const answerForm = resolveAnswerFormTemplate({
       quizTemplateId: quiz.answer_form_template_id,
       eventSeriesTemplateId: quiz.eventreihe.default_answer_form_template_id,
+      additionalAnswerFormTemplates,
     });
 
   return {

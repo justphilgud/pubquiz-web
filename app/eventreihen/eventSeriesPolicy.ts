@@ -47,6 +47,10 @@ function optional(value: string | undefined) {
 
 export function validateEventSeriesInput(
   input: EventSeriesInput,
+  options?: {
+    additionalPresentationTemplateIds?: readonly string[];
+    additionalAnswerFormTemplateIds?: readonly string[];
+  },
 ): EventSeriesValidationResult {
   const value: NormalizedEventSeriesInput = {
     name: input.name.trim(),
@@ -72,10 +76,16 @@ export function validateEventSeriesInput(
   if ((value.internalNote?.length ?? 0) > EVENT_SERIES_LIMITS.internalNote) {
     errors.internalNote = `Interne Bemerkung darf maximal ${EVENT_SERIES_LIMITS.internalNote} Zeichen enthalten.`;
   }
-  if (!isSelectablePresentationTemplateId(value.defaultPresentationTemplateId)) {
+  if (
+    !isSelectablePresentationTemplateId(value.defaultPresentationTemplateId) &&
+    !options?.additionalPresentationTemplateIds?.includes(value.defaultPresentationTemplateId)
+  ) {
     errors.defaultPresentationTemplateId = deRenderingMessages.validation.unknownPresentation;
   }
-  if (!isSelectableAnswerFormTemplateId(value.defaultAnswerFormTemplateId)) {
+  if (
+    !isSelectableAnswerFormTemplateId(value.defaultAnswerFormTemplateId) &&
+    !options?.additionalAnswerFormTemplateIds?.includes(value.defaultAnswerFormTemplateId)
+  ) {
     errors.defaultAnswerFormTemplateId = deRenderingMessages.validation.unknownAnswerForm;
   }
 

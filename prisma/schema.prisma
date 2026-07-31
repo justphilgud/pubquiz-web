@@ -269,6 +269,28 @@ model eventreihen {
   @@schema("pubquiz")
 }
 
+/// User-managed visual branding templates. System templates remain code-owned
+/// and are resolved through the same runtime contract.
+model presentation_templates {
+  presentation_template_id String   @id @db.VarChar(64)
+  name                     String   @db.VarChar(120)
+  beschreibung             String?  @db.VarChar(1000)
+  status                   String   @default("DRAFT") @db.VarChar(16)
+  ist_systemtemplate       Boolean  @default(false)
+  contract_version         Int      @default(1)
+  theme_config_json        Json
+  tags                     String[] @default([])
+  source_template_id       String?  @db.VarChar(64)
+  created_by_user_id       Int?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @default(now()) @updatedAt
+  created_by               users?   @relation("PresentationTemplateCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([status, updated_at], map: "idx_presentation_templates_status_updated")
+  @@index([created_by_user_id], map: "idx_presentation_templates_creator")
+  @@schema("pubquiz")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz_fragen {
   quiz_fragen_id                Int              @id @default(autoincrement())
@@ -596,6 +618,7 @@ model users {
   zugewiesene_rollen            benutzer_rollenzuweisungen[] @relation("RoleAssignmentAssigner")
   erstellte_kategorien          fragenkategorie[]             @relation("CategoryCreator")
   bewertete_team_antworten      team_antworten[]               @relation("TeamAnswerEvaluator")
+  erstellte_praesentationstemplates presentation_templates[]    @relation("PresentationTemplateCreator")
 
   @@schema("pubquiz")
 }

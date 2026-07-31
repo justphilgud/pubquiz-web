@@ -36,6 +36,15 @@ test("quiz creation preselects only the requested active event series", () => {
   assert.equal(resolveInitialEventSeriesId("not-a-number", eventSeries), undefined);
 });
 
+test("quiz assignment accepts only explicitly authorized managed templates", () => {
+  const input = { ...validInput, presentationTemplateId: "sommer-2026", answerFormTemplateId: "sommer-2026" };
+  assert.equal(validateQuizMasterData(input).ok, false);
+  assert.equal(validateQuizMasterData(input, {
+    additionalPresentationTemplateIds: ["sommer-2026"],
+    additionalAnswerFormTemplateIds: ["sommer-2026"],
+  }).ok, true);
+});
+
 test("quiz URLs allow only HTTP and HTTPS", () => {
   assert.equal(validateQuizMasterData({ ...validInput, mapUrl: "javascript:alert(1)" }).ok, false);
   assert.equal(validateQuizMasterData({ ...validInput, publicUrl: "ftp://example.test" }).ok, false);

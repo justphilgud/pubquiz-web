@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
-import { requireAdmin, requireSession } from "@/app/lib/permissions";
+import { isAdmin, requireActor, requireAdmin, requireSession } from "@/app/lib/permissions";
 import {
   getEventSeriesIdsForCapability,
   requireEventSeriesEditor,
@@ -17,6 +17,19 @@ import {
 import { getQuizTemporalStatus } from "@/app/quiz/quizMasterData";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+
+async function getTemplateValidationOptions(additionallyAllowed: readonly string[] = []) {
+  const { actor } = await requireActor();
+  const templates = isAdmin(actor)
+    ? await listAssignablePresentationTemplates()
+    : [];
+  const ids = [...templates.map((template) => template.id), ...additionallyAllowed];
+  return {
+    additionalPresentationTemplateIds: ids,
+    additionalAnswerFormTemplateIds: ids,
+  };
+}
 
 export type EventSeriesOption = {
   id: number;
@@ -143,7 +156,10 @@ export async function createEventSeries(
   input: EventSeriesInput,
 ): Promise<EventSeriesActionResult> {
   await requireAdmin();
-  const validated = validateEventSeriesInput(input);
+  const validated = validateEventSeriesInput(
+    input,
+    await getTemplateValidationOptions(),
+  );
   if (!validated.ok) {
     return { success: false, message: "Bitte Eingaben prüfen.", errors: validated.errors };
   }
@@ -195,7 +211,22 @@ export async function updateEventSeries(
     return { success: false, message: "Ungültige Eventreihe." };
   }
   await requireEventSeriesEditor(eventSeriesId);
-  const validated = validateEventSeriesInput(input);
+  const existing = await prisma.eventreihen.findUnique({
+    where: { eventreihe_id: eventSeriesId },
+    select: {
+      eventreihe_id: true,
+      default_presentation_template_id: true,
+      default_answer_form_template_id: true,
+    },
+  });
+  if (!existing) return { success: false, message: "Eventreihe nicht gefunden." };
+  const validated = validateEventSeriesInput(
+    input,
+    await getTemplateValidationOptions([
+      existing.default_presentation_template_id,
+      existing.default_answer_form_template_id,
+    ]),
+  );
   if (!validated.ok) {
     return { success: false, message: "Bitte Eingaben prüfen.", errors: validated.errors };
   }
@@ -206,12 +237,6 @@ export async function updateEventSeries(
       errors: { name: "Name ist bereits vergeben." },
     };
   }
-  const existing = await prisma.eventreihen.findUnique({
-    where: { eventreihe_id: eventSeriesId },
-    select: { eventreihe_id: true },
-  });
-  if (!existing) return { success: false, message: "Eventreihe nicht gefunden." };
-
   await prisma.eventreihen.update({
     where: { eventreihe_id: eventSeriesId },
     data: {

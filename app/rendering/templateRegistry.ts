@@ -63,17 +63,19 @@ type TemplateMetadata = {
   preview: {
     exampleButtonKey: "previewButton";
   };
+  displayName?: string;
+  moderationVariant?: "BRANDED" | "QUIET";
 };
 
 export type PresentationTemplate = TemplateMetadata & {
-  id: "ungegoogelt-default" | "ungegoogelt-dark";
+  id: string;
   kind: "PRESENTATION";
   variant: "NEON" | "DARK";
   tokens: BrandTokens;
 };
 
 export type AnswerFormTemplate = TemplateMetadata & {
-  id: "ungegoogelt-default" | "minimal";
+  id: string;
   kind: "ANSWER_FORM";
   variant: "BRANDED" | "MINIMAL";
   tokens: BrandTokens;

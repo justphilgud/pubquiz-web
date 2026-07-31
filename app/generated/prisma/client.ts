@@ -102,6 +102,12 @@ export type quiz = Prisma.quizModel
  */
 export type eventreihen = Prisma.eventreihenModel
 /**
+ * Model presentation_templates
+ * User-managed visual branding templates. System templates remain code-owned
+ * and are resolved through the same runtime contract.
+ */
+export type presentation_templates = Prisma.presentation_templatesModel
+/**
  * Model quiz_fragen
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */

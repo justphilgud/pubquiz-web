@@ -12,6 +12,7 @@ export function TemplatePreview({
   messages: RenderingMessages;
 }) {
   const copy = messages.templates[template.labelKey];
+  const displayName = template.displayName ?? copy.label;
   const colors = template.tokens.colors;
 
   return (
@@ -24,13 +25,13 @@ export function TemplatePreview({
         borderRadius: template.tokens.radii.medium,
         fontFamily: template.tokens.typography.family,
       }}
-      aria-label={`${messages.fields.preview}: ${copy.label}`}
+      aria-label={`${messages.fields.preview}: ${displayName}`}
     >
       <div
         className="rounded-xl border p-3"
         style={{ background: colors.surface, borderColor: colors.border }}
       >
-        <div className="break-words font-bold">{copy.label}</div>
+        <div className="break-words font-bold">{displayName}</div>
         <div className="mt-1 break-words text-sm" style={{ color: colors.textMuted }}>
           {copy.description}
         </div>

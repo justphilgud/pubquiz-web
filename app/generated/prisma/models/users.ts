@@ -262,6 +262,7 @@ export type usersWhereInput = {
   zugewiesene_rollen?: Prisma.Benutzer_rollenzuweisungenListRelationFilter
   erstellte_kategorien?: Prisma.FragenkategorieListRelationFilter
   bewertete_team_antworten?: Prisma.Team_antwortenListRelationFilter
+  erstellte_praesentationstemplates?: Prisma.Presentation_templatesListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -281,6 +282,7 @@ export type usersOrderByWithRelationInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenOrderByRelationAggregateInput
   erstellte_kategorien?: Prisma.fragenkategorieOrderByRelationAggregateInput
   bewertete_team_antworten?: Prisma.team_antwortenOrderByRelationAggregateInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -303,6 +305,7 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   zugewiesene_rollen?: Prisma.Benutzer_rollenzuweisungenListRelationFilter
   erstellte_kategorien?: Prisma.FragenkategorieListRelationFilter
   bewertete_team_antworten?: Prisma.Team_antwortenListRelationFilter
+  erstellte_praesentationstemplates?: Prisma.Presentation_templatesListRelationFilter
 }, "id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -355,6 +358,7 @@ export type usersCreateInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -374,6 +378,7 @@ export type usersUncheckedCreateInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUpdateInput = {
@@ -392,6 +397,7 @@ export type usersUpdateInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -411,6 +417,7 @@ export type usersUncheckedUpdateInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -524,6 +531,22 @@ export type usersUpdateOneWithoutErstellte_kategorienNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutErstellte_kategorienInput, Prisma.usersUpdateWithoutErstellte_kategorienInput>, Prisma.usersUncheckedUpdateWithoutErstellte_kategorienInput>
 }
 
+export type usersCreateNestedOneWithoutErstellte_praesentationstemplatesInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_praesentationstemplatesInput, Prisma.usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_praesentationstemplatesInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneWithoutErstellte_praesentationstemplatesNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_praesentationstemplatesInput, Prisma.usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_praesentationstemplatesInput
+  upsert?: Prisma.usersUpsertWithoutErstellte_praesentationstemplatesInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutErstellte_praesentationstemplatesInput, Prisma.usersUpdateWithoutErstellte_praesentationstemplatesInput>, Prisma.usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput>
+}
+
 export type usersCreateNestedOneWithoutBewertete_team_antwortenInput = {
   create?: Prisma.XOR<Prisma.usersCreateWithoutBewertete_team_antwortenInput, Prisma.usersUncheckedCreateWithoutBewertete_team_antwortenInput>
   connectOrCreate?: Prisma.usersCreateOrConnectWithoutBewertete_team_antwortenInput
@@ -619,6 +642,7 @@ export type usersCreateWithoutErstellte_kategorienInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
   bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
@@ -637,6 +661,7 @@ export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_kategorienInput = {
@@ -670,6 +695,7 @@ export type usersUpdateWithoutErstellte_kategorienInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
@@ -688,6 +714,97 @@ export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+}
+
+export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+}
+
+export type usersCreateOrConnectWithoutErstellte_praesentationstemplatesInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_praesentationstemplatesInput, Prisma.usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput>
+}
+
+export type usersUpsertWithoutErstellte_praesentationstemplatesInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_praesentationstemplatesInput, Prisma.usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_praesentationstemplatesInput, Prisma.usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutErstellte_praesentationstemplatesInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_praesentationstemplatesInput, Prisma.usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput>
+}
+
+export type usersUpdateWithoutErstellte_praesentationstemplatesInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+}
+
+export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
 }
 
 export type usersCreateWithoutBewertete_team_antwortenInput = {
@@ -705,6 +822,7 @@ export type usersCreateWithoutBewertete_team_antwortenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
@@ -723,6 +841,7 @@ export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersCreateOrConnectWithoutBewertete_team_antwortenInput = {
@@ -756,6 +875,7 @@ export type usersUpdateWithoutBewertete_team_antwortenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
@@ -774,6 +894,7 @@ export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersCreateWithoutRollenzuweisungenInput = {
@@ -791,6 +912,7 @@ export type usersCreateWithoutRollenzuweisungenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
@@ -809,6 +931,7 @@ export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersCreateOrConnectWithoutRollenzuweisungenInput = {
@@ -831,6 +954,7 @@ export type usersCreateWithoutZugewiesene_rollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
   erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
@@ -849,6 +973,7 @@ export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_rollenInput = {
@@ -882,6 +1007,7 @@ export type usersUpdateWithoutRollenzuweisungenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
@@ -900,6 +1026,7 @@ export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_rollenInput = {
@@ -928,6 +1055,7 @@ export type usersUpdateWithoutZugewiesene_rollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
@@ -946,6 +1074,7 @@ export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersCreateWithoutEventreihenrollenInput = {
@@ -963,6 +1092,7 @@ export type usersCreateWithoutEventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateWithoutEventreihenrollenInput = {
@@ -981,6 +1111,7 @@ export type usersUncheckedCreateWithoutEventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersCreateOrConnectWithoutEventreihenrollenInput = {
@@ -1003,6 +1134,7 @@ export type usersCreateWithoutZugewiesene_eventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
@@ -1021,6 +1153,7 @@ export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput = {
@@ -1054,6 +1187,7 @@ export type usersUpdateWithoutEventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
@@ -1072,6 +1206,7 @@ export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_eventreihenrollenInput = {
@@ -1100,6 +1235,7 @@ export type usersUpdateWithoutZugewiesene_eventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
@@ -1118,6 +1254,7 @@ export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 
@@ -1132,6 +1269,7 @@ export type UsersCountOutputType = {
   zugewiesene_rollen: number
   erstellte_kategorien: number
   bewertete_team_antworten: number
+  erstellte_praesentationstemplates: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1141,6 +1279,7 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   zugewiesene_rollen?: boolean | UsersCountOutputTypeCountZugewiesene_rollenArgs
   erstellte_kategorien?: boolean | UsersCountOutputTypeCountErstellte_kategorienArgs
   bewertete_team_antworten?: boolean | UsersCountOutputTypeCountBewertete_team_antwortenArgs
+  erstellte_praesentationstemplates?: boolean | UsersCountOutputTypeCountErstellte_praesentationstemplatesArgs
 }
 
 /**
@@ -1195,6 +1334,13 @@ export type UsersCountOutputTypeCountBewertete_team_antwortenArgs<ExtArgs extend
   where?: Prisma.team_antwortenWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountErstellte_praesentationstemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.presentation_templatesWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1213,6 +1359,7 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   zugewiesene_rollen?: boolean | Prisma.users$zugewiesene_rollenArgs<ExtArgs>
   erstellte_kategorien?: boolean | Prisma.users$erstellte_kategorienArgs<ExtArgs>
   bewertete_team_antworten?: boolean | Prisma.users$bewertete_team_antwortenArgs<ExtArgs>
+  erstellte_praesentationstemplates?: boolean | Prisma.users$erstellte_praesentationstemplatesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -1263,6 +1410,7 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   zugewiesene_rollen?: boolean | Prisma.users$zugewiesene_rollenArgs<ExtArgs>
   erstellte_kategorien?: boolean | Prisma.users$erstellte_kategorienArgs<ExtArgs>
   bewertete_team_antworten?: boolean | Prisma.users$bewertete_team_antwortenArgs<ExtArgs>
+  erstellte_praesentationstemplates?: boolean | Prisma.users$erstellte_praesentationstemplatesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1277,6 +1425,7 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     zugewiesene_rollen: Prisma.$benutzer_rollenzuweisungenPayload<ExtArgs>[]
     erstellte_kategorien: Prisma.$fragenkategoriePayload<ExtArgs>[]
     bewertete_team_antworten: Prisma.$team_antwortenPayload<ExtArgs>[]
+    erstellte_praesentationstemplates: Prisma.$presentation_templatesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1689,6 +1838,7 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   zugewiesene_rollen<T extends Prisma.users$zugewiesene_rollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$zugewiesene_rollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$benutzer_rollenzuweisungenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   erstellte_kategorien<T extends Prisma.users$erstellte_kategorienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_kategorienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragenkategoriePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bewertete_team_antworten<T extends Prisma.users$bewertete_team_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$bewertete_team_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  erstellte_praesentationstemplates<T extends Prisma.users$erstellte_praesentationstemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_praesentationstemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$presentation_templatesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2262,6 +2412,30 @@ export type users$bewertete_team_antwortenArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.Team_antwortenScalarFieldEnum | Prisma.Team_antwortenScalarFieldEnum[]
+}
+
+/**
+ * users.erstellte_praesentationstemplates
+ */
+export type users$erstellte_praesentationstemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the presentation_templates
+   */
+  select?: Prisma.presentation_templatesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the presentation_templates
+   */
+  omit?: Prisma.presentation_templatesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.presentation_templatesInclude<ExtArgs> | null
+  where?: Prisma.presentation_templatesWhereInput
+  orderBy?: Prisma.presentation_templatesOrderByWithRelationInput | Prisma.presentation_templatesOrderByWithRelationInput[]
+  cursor?: Prisma.presentation_templatesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Presentation_templatesScalarFieldEnum | Prisma.Presentation_templatesScalarFieldEnum[]
 }
 
 /**

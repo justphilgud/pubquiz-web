@@ -29,6 +29,11 @@ import {
   resolveAnswerFormTemplate,
   resolvePresentationTemplate,
 } from "@/app/rendering/templateResolver";
+import type { AssignablePresentationTemplate } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import {
+  toRuntimeAnswerFormTemplate,
+  toRuntimePresentationTemplate,
+} from "@/app/rendering/presentationTemplates/presentationTemplate";
 
 const inputClass =
   "min-h-11 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200";
@@ -74,17 +79,27 @@ export default function QuizForm({
   eventSeries,
   initialEventSeriesId,
   messages,
+  presentationTemplates,
+  canAssignPresentationTemplates,
 }: {
   quizze: QuizResult[];
   eventSeries: EventSeriesOption[];
   initialEventSeriesId?: number;
   messages: RenderingMessages;
+  presentationTemplates: AssignablePresentationTemplate[];
+  canAssignPresentationTemplates: boolean;
 }) {
   const [editingQuizId, setEditingQuizId] = useState<number | null>(null);
   const [form, setForm] = useState(() => emptyForm(initialEventSeriesId));
   const [message, setMessage] = useState("");
   const [eventSeriesFilter, setEventSeriesFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const customPresentationTemplates = presentationTemplates
+    .filter((template) => !templateRegistry.presentation.some(({ id }) => id === template.id))
+    .map(toRuntimePresentationTemplate);
+  const customAnswerFormTemplates = presentationTemplates
+    .filter((template) => !templateRegistry.answerForm.some(({ id }) => id === template.id))
+    .map(toRuntimeAnswerFormTemplate);
 
   const activeEventSeries = eventSeries.filter((entry) => !entry.isArchived);
   const filteredQuizzes = useMemo(
@@ -167,10 +182,12 @@ export default function QuizForm({
   const effectivePresentation = resolvePresentationTemplate({
     quizTemplateId: form.presentationTemplateId || null,
     eventSeriesTemplateId: selectedEventSeries?.defaultPresentationTemplateId,
+    additionalPresentationTemplates: customPresentationTemplates,
   });
   const effectiveAnswerForm = resolveAnswerFormTemplate({
     quizTemplateId: form.answerFormTemplateId || null,
     eventSeriesTemplateId: selectedEventSeries?.defaultAnswerFormTemplateId,
+    additionalAnswerFormTemplates: customAnswerFormTemplates,
   });
 
   return (
@@ -236,8 +253,9 @@ export default function QuizForm({
               <select value={form.presentationTemplateId} onChange={(event) => updateField("presentationTemplateId", event.target.value)} className={inputClass}>
                 <option value="">{messages.fields.eventSeriesDefault}</option>
                 {templateRegistry.presentation.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
+                {customPresentationTemplates.map((template) => <option key={template.id} value={template.id} disabled={!canAssignPresentationTemplates}>{template.displayName}</option>)}
               </select>
-              <p className="mt-2 break-words text-sm text-slate-600">{messages.fields.effectiveTemplate}: <strong>{messages.templates[effectivePresentation.template.labelKey].label}</strong> · {messages.fields.templateSource}: {messages.sources[effectivePresentation.source]}</p>
+              <p className="mt-2 break-words text-sm text-slate-600">{messages.fields.effectiveTemplate}: <strong>{effectivePresentation.template.displayName ?? messages.templates[effectivePresentation.template.labelKey].label}</strong> · {messages.fields.templateSource}: {messages.sources[effectivePresentation.source]}</p>
               {effectivePresentation.usedFallback && <p role="status" className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</p>}
               <div className="mt-3"><TemplatePreview template={effectivePresentation.template} messages={messages} /></div>
             </label>
@@ -246,8 +264,9 @@ export default function QuizForm({
               <select value={form.answerFormTemplateId} onChange={(event) => updateField("answerFormTemplateId", event.target.value)} className={inputClass}>
                 <option value="">{messages.fields.eventSeriesDefault}</option>
                 {templateRegistry.answerForm.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
+                {customAnswerFormTemplates.map((template) => <option key={template.id} value={template.id} disabled={!canAssignPresentationTemplates}>{template.displayName}</option>)}
               </select>
-              <p className="mt-2 break-words text-sm text-slate-600">{messages.fields.effectiveTemplate}: <strong>{messages.templates[effectiveAnswerForm.template.labelKey].label}</strong> · {messages.fields.templateSource}: {messages.sources[effectiveAnswerForm.source]}</p>
+              <p className="mt-2 break-words text-sm text-slate-600">{messages.fields.effectiveTemplate}: <strong>{effectiveAnswerForm.template.displayName ?? messages.templates[effectiveAnswerForm.template.labelKey].label}</strong> · {messages.fields.templateSource}: {messages.sources[effectiveAnswerForm.source]}</p>
               {effectiveAnswerForm.usedFallback && <p role="status" className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</p>}
               <div className="mt-3"><TemplatePreview template={effectiveAnswerForm.template} messages={messages} /></div>
             </label>

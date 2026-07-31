@@ -15,7 +15,14 @@ import {
   getAnswerFormTemplate,
   getPresentationTemplate,
   templateRegistry,
+  type AnswerFormTemplate,
+  type PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
+import type { AssignablePresentationTemplate } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import {
+  toRuntimeAnswerFormTemplate,
+  toRuntimePresentationTemplate,
+} from "@/app/rendering/presentationTemplates/presentationTemplate";
 
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3";
 
@@ -39,13 +46,29 @@ const emptyForm: FormState = {
   defaultAnswerFormTemplateId: "ungegoogelt-default",
 };
 
-export function EventSeriesManager({ series, canCreate, messages }: { series: EventSeriesListItem[]; canCreate: boolean; messages: RenderingMessages }) {
+export function EventSeriesManager({ series, canCreate, messages, presentationTemplates, canAssignPresentationTemplates }: { series: EventSeriesListItem[]; canCreate: boolean; messages: RenderingMessages; presentationTemplates: AssignablePresentationTemplate[]; canAssignPresentationTemplates: boolean }) {
   const [filter, setFilter] = useState<"active" | "archived" | "all">("active");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [archiveTarget, setArchiveTarget] = useState<EventSeriesListItem | null>(null);
+  const customPresentationTemplates = presentationTemplates
+    .filter((template) => !templateRegistry.presentation.some(({ id }) => id === template.id))
+    .map(toRuntimePresentationTemplate);
+  const customAnswerFormTemplates = presentationTemplates
+    .filter((template) => !templateRegistry.answerForm.some(({ id }) => id === template.id))
+    .map(toRuntimeAnswerFormTemplate);
+  const selectedPresentation = getPresentationTemplate(form.defaultPresentationTemplateId) ?? customPresentationTemplates.find(({ id }) => id === form.defaultPresentationTemplateId);
+  const selectedAnswerForm = getAnswerFormTemplate(form.defaultAnswerFormTemplateId) ?? customAnswerFormTemplates.find(({ id }) => id === form.defaultAnswerFormTemplateId);
+  const presentationName = (id: string) => {
+    const template: PresentationTemplate | undefined = getPresentationTemplate(id) ?? customPresentationTemplates.find((entry) => entry.id === id);
+    return template?.displayName ?? messages.templates[template?.labelKey ?? "presentationDefault"].label;
+  };
+  const answerFormName = (id: string) => {
+    const template: AnswerFormTemplate | undefined = getAnswerFormTemplate(id) ?? customAnswerFormTemplates.find((entry) => entry.id === id);
+    return template?.displayName ?? messages.templates[template?.labelKey ?? "answerDefault"].label;
+  };
   const cancelArchiveRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -106,19 +129,21 @@ export function EventSeriesManager({ series, canCreate, messages }: { series: Ev
               <span className="mb-1 block text-sm font-semibold">{messages.fields.defaultPresentation}</span>
               <select value={form.defaultPresentationTemplateId} onChange={(event) => setForm((current) => ({ ...current, defaultPresentationTemplateId: event.target.value }))} className={inputClass}>
                 {templateRegistry.presentation.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
+                {customPresentationTemplates.map((template) => <option key={template.id} value={template.id} disabled={!canAssignPresentationTemplates}>{template.displayName}</option>)}
               </select>
               {errors.defaultPresentationTemplateId && <span className="mt-1 block text-sm text-red-700">{errors.defaultPresentationTemplateId}</span>}
-              {getPresentationTemplate(form.defaultPresentationTemplateId) && <div className="mt-3"><TemplatePreview template={getPresentationTemplate(form.defaultPresentationTemplateId)!} messages={messages} /></div>}
-              {!getPresentationTemplate(form.defaultPresentationTemplateId) && <span role="status" className="mt-2 block rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</span>}
+              {selectedPresentation && <div className="mt-3"><TemplatePreview template={selectedPresentation} messages={messages} /></div>}
+              {!selectedPresentation && <span role="status" className="mt-2 block rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</span>}
             </label>
             <label className="min-w-0">
               <span className="mb-1 block text-sm font-semibold">{messages.fields.defaultAnswerForm}</span>
               <select value={form.defaultAnswerFormTemplateId} onChange={(event) => setForm((current) => ({ ...current, defaultAnswerFormTemplateId: event.target.value }))} className={inputClass}>
                 {templateRegistry.answerForm.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
+                {customAnswerFormTemplates.map((template) => <option key={template.id} value={template.id} disabled={!canAssignPresentationTemplates}>{template.displayName}</option>)}
               </select>
               {errors.defaultAnswerFormTemplateId && <span className="mt-1 block text-sm text-red-700">{errors.defaultAnswerFormTemplateId}</span>}
-              {getAnswerFormTemplate(form.defaultAnswerFormTemplateId) && <div className="mt-3"><TemplatePreview template={getAnswerFormTemplate(form.defaultAnswerFormTemplateId)!} messages={messages} /></div>}
-              {!getAnswerFormTemplate(form.defaultAnswerFormTemplateId) && <span role="status" className="mt-2 block rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</span>}
+              {selectedAnswerForm && <div className="mt-3"><TemplatePreview template={selectedAnswerForm} messages={messages} /></div>}
+              {!selectedAnswerForm && <span role="status" className="mt-2 block rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</span>}
             </label>
           </div>
           {message && <p role="status" className="rounded-xl bg-slate-100 p-3 text-sm">{message}</p>}
@@ -140,7 +165,7 @@ export function EventSeriesManager({ series, canCreate, messages }: { series: Ev
               <div className="flex flex-wrap items-start justify-between gap-2"><div className="min-w-0"><h3 className="break-words text-lg font-bold">{entry.name}</h3><p className="break-all text-sm text-slate-500">/{entry.slug}</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{entry.isArchived ? "Archiviert" : "Aktiv"}</span></div>
               {entry.publicName && <p className="mt-2 break-words text-sm text-slate-700">Öffentlich: {entry.publicName}</p>}
               <p className="mt-2 text-sm text-slate-600">{entry.quizCount} {entry.quizCount === 1 ? "Quiz" : "Quizze"} · {entry.isPublic ? "öffentlich vorbereitet" : messages.fields.internalOnly}</p>
-              <p className="mt-2 break-words text-xs text-slate-500">{messages.fields.defaultPresentation}: {messages.templates[getPresentationTemplate(entry.defaultPresentationTemplateId)?.labelKey ?? "presentationDefault"].label} · {messages.fields.defaultAnswerForm}: {messages.templates[getAnswerFormTemplate(entry.defaultAnswerFormTemplateId)?.labelKey ?? "answerDefault"].label}</p>
+              <p className="mt-2 break-words text-xs text-slate-500">{messages.fields.defaultPresentation}: {presentationName(entry.defaultPresentationTemplateId)} · {messages.fields.defaultAnswerForm}: {answerFormName(entry.defaultAnswerFormTemplateId)}</p>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Link href={`/admin/eventreihen/${entry.id}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 font-semibold">Öffnen</Link>
                 {entry.canEdit && !entry.isArchived && <button type="button" onClick={() => edit(entry)} className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-semibold">Bearbeiten</button>}

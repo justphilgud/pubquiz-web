@@ -15,6 +15,7 @@ import { getAppNavigationItems } from "@/app/components/appNavigation";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { hasGlobalRole } from "@/app/roles/roleAssignmentPolicy";
+import { getPresentationTemplateCapabilities } from "@/app/rendering/presentationTemplates/presentationTemplatePermissions";
 
 export default async function AppHeader() {
   const session = await auth();
@@ -47,6 +48,8 @@ export default async function AppHeader() {
       canCreateQuestions(actor) || (questionSeriesIds?.length ?? 0) > 0,
     canManageQuizzes: canManageQuizzes(actor) || (quizSeriesIds?.length ?? 0) > 0,
     canManageEventSeries: canManageEventSeries(actor) || (editableSeriesIds?.length ?? 0) > 0,
+    canViewPresentationTemplates:
+      getPresentationTemplateCapabilities(actor).canView,
     canManageCategories: canManageCategories(actor),
     canManageUsers: canManageUsers(actor),
   });

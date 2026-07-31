@@ -63,6 +63,7 @@ export const ModelName = {
   medientyp: 'medientyp',
   quiz: 'quiz',
   eventreihen: 'eventreihen',
+  presentation_templates: 'presentation_templates',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
   teams: 'teams',
@@ -293,6 +294,24 @@ export const EventreihenScalarFieldEnum = {
 } as const
 
 export type EventreihenScalarFieldEnum = (typeof EventreihenScalarFieldEnum)[keyof typeof EventreihenScalarFieldEnum]
+
+
+export const Presentation_templatesScalarFieldEnum = {
+  presentation_template_id: 'presentation_template_id',
+  name: 'name',
+  beschreibung: 'beschreibung',
+  status: 'status',
+  ist_systemtemplate: 'ist_systemtemplate',
+  contract_version: 'contract_version',
+  theme_config_json: 'theme_config_json',
+  tags: 'tags',
+  source_template_id: 'source_template_id',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Presentation_templatesScalarFieldEnum = (typeof Presentation_templatesScalarFieldEnum)[keyof typeof Presentation_templatesScalarFieldEnum]
 
 
 export const Quiz_fragenScalarFieldEnum = {
@@ -558,6 +577,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
