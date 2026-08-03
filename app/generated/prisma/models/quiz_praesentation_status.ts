@@ -47,6 +47,7 @@ export type Quiz_praesentation_statusSumAggregateOutputType = {
 export type Quiz_praesentation_statusMinAggregateOutputType = {
   quiz_id: number | null
   slide_index: number | null
+  slide_key: string | null
   slide_started_at: Date | null
   quiz_started_at: Date | null
   updated_at: Date | null
@@ -66,6 +67,7 @@ export type Quiz_praesentation_statusMinAggregateOutputType = {
 export type Quiz_praesentation_statusMaxAggregateOutputType = {
   quiz_id: number | null
   slide_index: number | null
+  slide_key: string | null
   slide_started_at: Date | null
   quiz_started_at: Date | null
   updated_at: Date | null
@@ -85,6 +87,7 @@ export type Quiz_praesentation_statusMaxAggregateOutputType = {
 export type Quiz_praesentation_statusCountAggregateOutputType = {
   quiz_id: number
   slide_index: number
+  slide_key: number
   slide_started_at: number
   quiz_started_at: number
   updated_at: number
@@ -124,6 +127,7 @@ export type Quiz_praesentation_statusSumAggregateInputType = {
 export type Quiz_praesentation_statusMinAggregateInputType = {
   quiz_id?: true
   slide_index?: true
+  slide_key?: true
   slide_started_at?: true
   quiz_started_at?: true
   updated_at?: true
@@ -143,6 +147,7 @@ export type Quiz_praesentation_statusMinAggregateInputType = {
 export type Quiz_praesentation_statusMaxAggregateInputType = {
   quiz_id?: true
   slide_index?: true
+  slide_key?: true
   slide_started_at?: true
   quiz_started_at?: true
   updated_at?: true
@@ -162,6 +167,7 @@ export type Quiz_praesentation_statusMaxAggregateInputType = {
 export type Quiz_praesentation_statusCountAggregateInputType = {
   quiz_id?: true
   slide_index?: true
+  slide_key?: true
   slide_started_at?: true
   quiz_started_at?: true
   updated_at?: true
@@ -268,6 +274,7 @@ export type quiz_praesentation_statusGroupByArgs<ExtArgs extends runtime.Types.E
 export type Quiz_praesentation_statusGroupByOutputType = {
   quiz_id: number
   slide_index: number
+  slide_key: string | null
   slide_started_at: Date
   quiz_started_at: Date | null
   updated_at: Date
@@ -310,6 +317,7 @@ export type quiz_praesentation_statusWhereInput = {
   NOT?: Prisma.quiz_praesentation_statusWhereInput | Prisma.quiz_praesentation_statusWhereInput[]
   quiz_id?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_index?: Prisma.IntFilter<"quiz_praesentation_status"> | number
+  slide_key?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
   slide_started_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
   quiz_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   updated_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
@@ -330,6 +338,7 @@ export type quiz_praesentation_statusWhereInput = {
 export type quiz_praesentation_statusOrderByWithRelationInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
+  slide_key?: Prisma.SortOrderInput | Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -353,6 +362,7 @@ export type quiz_praesentation_statusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.quiz_praesentation_statusWhereInput[]
   NOT?: Prisma.quiz_praesentation_statusWhereInput | Prisma.quiz_praesentation_statusWhereInput[]
   slide_index?: Prisma.IntFilter<"quiz_praesentation_status"> | number
+  slide_key?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
   slide_started_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
   quiz_started_at?: Prisma.DateTimeNullableFilter<"quiz_praesentation_status"> | Date | string | null
   updated_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
@@ -373,6 +383,7 @@ export type quiz_praesentation_statusWhereUniqueInput = Prisma.AtLeast<{
 export type quiz_praesentation_statusOrderByWithAggregationInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
+  slide_key?: Prisma.SortOrderInput | Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -400,6 +411,7 @@ export type quiz_praesentation_statusScalarWhereWithAggregatesInput = {
   NOT?: Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput | Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput[]
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
   slide_index?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
+  slide_key?: Prisma.StringNullableWithAggregatesFilter<"quiz_praesentation_status"> | string | null
   slide_started_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_praesentation_status"> | Date | string
   quiz_started_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_praesentation_status"> | Date | string | null
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_praesentation_status"> | Date | string
@@ -418,6 +430,7 @@ export type quiz_praesentation_statusScalarWhereWithAggregatesInput = {
 
 export type quiz_praesentation_statusCreateInput = {
   slide_index?: number
+  slide_key?: string | null
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
@@ -438,6 +451,7 @@ export type quiz_praesentation_statusCreateInput = {
 export type quiz_praesentation_statusUncheckedCreateInput = {
   quiz_id: number
   slide_index?: number
+  slide_key?: string | null
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
@@ -456,6 +470,7 @@ export type quiz_praesentation_statusUncheckedCreateInput = {
 
 export type quiz_praesentation_statusUpdateInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
+  slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -476,6 +491,7 @@ export type quiz_praesentation_statusUpdateInput = {
 export type quiz_praesentation_statusUncheckedUpdateInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
+  slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -495,6 +511,7 @@ export type quiz_praesentation_statusUncheckedUpdateInput = {
 export type quiz_praesentation_statusCreateManyInput = {
   quiz_id: number
   slide_index?: number
+  slide_key?: string | null
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
@@ -513,6 +530,7 @@ export type quiz_praesentation_statusCreateManyInput = {
 
 export type quiz_praesentation_statusUpdateManyMutationInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
+  slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -532,6 +550,7 @@ export type quiz_praesentation_statusUpdateManyMutationInput = {
 export type quiz_praesentation_statusUncheckedUpdateManyInput = {
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
+  slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -556,6 +575,7 @@ export type Quiz_praesentation_statusNullableScalarRelationFilter = {
 export type quiz_praesentation_statusCountOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
+  slide_key?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -584,6 +604,7 @@ export type quiz_praesentation_statusAvgOrderByAggregateInput = {
 export type quiz_praesentation_statusMaxOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
+  slide_key?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -603,6 +624,7 @@ export type quiz_praesentation_statusMaxOrderByAggregateInput = {
 export type quiz_praesentation_statusMinOrderByAggregateInput = {
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
+  slide_key?: Prisma.SortOrder
   slide_started_at?: Prisma.SortOrder
   quiz_started_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -662,6 +684,7 @@ export type quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput = 
 
 export type quiz_praesentation_statusCreateWithoutQuizInput = {
   slide_index?: number
+  slide_key?: string | null
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
@@ -680,6 +703,7 @@ export type quiz_praesentation_statusCreateWithoutQuizInput = {
 
 export type quiz_praesentation_statusUncheckedCreateWithoutQuizInput = {
   slide_index?: number
+  slide_key?: string | null
   slide_started_at?: Date | string
   quiz_started_at?: Date | string | null
   updated_at?: Date | string
@@ -714,6 +738,7 @@ export type quiz_praesentation_statusUpdateToOneWithWhereWithoutQuizInput = {
 
 export type quiz_praesentation_statusUpdateWithoutQuizInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
+  slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -732,6 +757,7 @@ export type quiz_praesentation_statusUpdateWithoutQuizInput = {
 
 export type quiz_praesentation_statusUncheckedUpdateWithoutQuizInput = {
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
+  slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_started_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -753,6 +779,7 @@ export type quiz_praesentation_statusUncheckedUpdateWithoutQuizInput = {
 export type quiz_praesentation_statusSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
   slide_index?: boolean
+  slide_key?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
@@ -773,6 +800,7 @@ export type quiz_praesentation_statusSelect<ExtArgs extends runtime.Types.Extens
 export type quiz_praesentation_statusSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
   slide_index?: boolean
+  slide_key?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
@@ -793,6 +821,7 @@ export type quiz_praesentation_statusSelectCreateManyAndReturn<ExtArgs extends r
 export type quiz_praesentation_statusSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_id?: boolean
   slide_index?: boolean
+  slide_key?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
@@ -813,6 +842,7 @@ export type quiz_praesentation_statusSelectUpdateManyAndReturn<ExtArgs extends r
 export type quiz_praesentation_statusSelectScalar = {
   quiz_id?: boolean
   slide_index?: boolean
+  slide_key?: boolean
   slide_started_at?: boolean
   quiz_started_at?: boolean
   updated_at?: boolean
@@ -829,7 +859,7 @@ export type quiz_praesentation_statusSelectScalar = {
   schaetzfrage_id?: boolean
 }
 
-export type quiz_praesentation_statusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "slide_index" | "slide_started_at" | "quiz_started_at" | "updated_at" | "audio_aktion" | "audio_aktion_id" | "countdown_dauer_sekunden" | "countdown_ended_at" | "countdown_started_at" | "countdown_status" | "medium_overlay_aktiv" | "endstand_reveal_count" | "show_schaetzfrage" | "zeige_schaetzantwort" | "schaetzfrage_id", ExtArgs["result"]["quiz_praesentation_status"]>
+export type quiz_praesentation_statusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_id" | "slide_index" | "slide_key" | "slide_started_at" | "quiz_started_at" | "updated_at" | "audio_aktion" | "audio_aktion_id" | "countdown_dauer_sekunden" | "countdown_ended_at" | "countdown_started_at" | "countdown_status" | "medium_overlay_aktiv" | "endstand_reveal_count" | "show_schaetzfrage" | "zeige_schaetzantwort" | "schaetzfrage_id", ExtArgs["result"]["quiz_praesentation_status"]>
 export type quiz_praesentation_statusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
 }
@@ -848,6 +878,7 @@ export type $quiz_praesentation_statusPayload<ExtArgs extends runtime.Types.Exte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     quiz_id: number
     slide_index: number
+    slide_key: string | null
     slide_started_at: Date
     quiz_started_at: Date | null
     updated_at: Date
@@ -1288,6 +1319,7 @@ export interface Prisma__quiz_praesentation_statusClient<T, Null = never, ExtArg
 export interface quiz_praesentation_statusFieldRefs {
   readonly quiz_id: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
   readonly slide_index: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
+  readonly slide_key: Prisma.FieldRef<"quiz_praesentation_status", 'String'>
   readonly slide_started_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
   readonly quiz_started_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"quiz_praesentation_status", 'DateTime'>

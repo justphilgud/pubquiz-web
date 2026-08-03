@@ -51,7 +51,10 @@ test("existing moderation owns navigation, releases and live decisions", () => {
   assert.match(toolbar, /Schätzfrage starten/);
   assert.match(toolbar, /Audio\/Video abspielen oder pausieren/);
   assert.match(moderation, /setPraesentationSlideIndex/);
-  assert.match(moderation, /setAktuelleQuizFrage/);
+  assert.doesNotMatch(moderation, /setAktuelleQuizFrage/);
+  assert.match(statusActions, /parsePresentationSlideKey/);
+  assert.match(statusActions, /prisma\.\$transaction/);
+  assert.match(statusActions, /quiz_block_freigaben\.upsert/);
   assert.match(moderation, /templateData\?\.kind === "GOOGLE_REVIEWS"/);
   assert.match(moderation, /await starteQuiz\(quizId\)/);
 });

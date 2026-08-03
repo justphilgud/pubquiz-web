@@ -36,6 +36,20 @@ test("renderer covers the central slide types without player orchestration", () 
 
   assert.match(rendererSource, /templateData\?\.kind === "GOOGLE_REVIEWS"/);
   assert.match(rendererSource, /renderMedienKarte/);
+  for (const editorialType of [
+    "IMAGE",
+    "IMAGE_GALLERY",
+    "TEXT",
+    "QUOTE",
+    "PORTRAIT",
+    "MEDIA_SEQUENCE",
+    "AUDIO",
+    "VIDEO",
+  ]) {
+    assert.match(rendererSource, new RegExp(`type === "${editorialType}"`));
+  }
+  assert.match(rendererSource, /SynchronizedMedia kind="audio"/);
+  assert.match(rendererSource, /SynchronizedMedia kind="video"/);
   assert.doesNotMatch(rendererSource, /statusActions/);
   assert.doesNotMatch(
     rendererSource,

@@ -28,16 +28,16 @@ function displayIdentity(theme: ResolvedQuizTheme) {
   return theme.design.occasion.eventTitle || theme.identity.displayName;
 }
 
-function StorybookPeopleMarks({ composition }: { composition: StorybookComposition | null }) {
-  if (!composition || composition.people.length === 0) return <span className="presentation-storybook-mark">ER</span>;
-  return (
-    <div className="presentation-storybook-people-marks" data-storybook-people-mode={composition.peopleMode}>
-      {composition.people.slice(0, 3).map((person) => (
-        <span key={person.id} title={person.name}>{person.name.slice(0, 1).toUpperCase()}</span>
-      ))}
-      {composition.people.length > 3 && <span>+{composition.people.length - 3}</span>}
-    </div>
-  );
+function storybookPageKind(composition: StorybookComposition | null) {
+  return {
+    COVER: "Auftakt",
+    CHAPTER: "Kapitel",
+    EDITORIAL: "Editorial",
+    PORTRAIT: "Porträt",
+    SPLIT: "Begegnung",
+    SEQUENCE: "Sequenz",
+    MEMORY: "Erinnerung",
+  }[composition?.variant ?? "EDITORIAL"];
 }
 
 export function PresentationDesignHeader({
@@ -83,21 +83,19 @@ export function PresentationDesignHeader({
 
   if (theme.design.stylePreset === "BIRTHDAY") {
     return (
-      <header className="presentation-chrome presentation-birthday-header relative mb-4 flex h-28 shrink-0 items-center justify-between px-10">
-        <span className="presentation-album-tape presentation-album-tape-left" aria-hidden="true" />
-        <div className="flex min-w-0 items-center gap-5">
-          <StorybookPeopleMarks composition={storybookComposition} />
-          <div className="min-w-0">
-            <div className="presentation-primary-text text-xs font-bold uppercase tracking-[0.22em]">
-              {slideLabel} · Storybook
-            </div>
-            <div className="presentation-birthday-title mt-1 truncate text-4xl font-black">
-              {displayIdentity(theme)}
-            </div>
+      <header className="presentation-chrome presentation-birthday-header relative shrink-0">
+        <div className="presentation-storybook-running-head min-w-0">
+          <div className="presentation-birthday-title truncate">
+            {displayIdentity(theme)}
+          </div>
+          <div className="presentation-primary-text">
+            {slideLabel} <span aria-hidden="true">/</span> {storybookPageKind(storybookComposition)}
           </div>
         </div>
-        <div className="presentation-birthday-page rounded-full px-5 py-3 text-base font-bold">
-          Seite {slideNumber} von {slideCount}
+        <div className="presentation-birthday-page" aria-label={`Seite ${slideNumber} von ${slideCount}`}>
+          <span>{String(slideNumber).padStart(2, "0")}</span>
+          <span aria-hidden="true">—</span>
+          <span>{String(slideCount).padStart(2, "0")}</span>
         </div>
       </header>
     );
@@ -158,28 +156,30 @@ export function PresentationDesignBackdrop({
   }
 
   if (theme.design.stylePreset === "BIRTHDAY") {
-    const storyImages = storybookComposition && ["TEXT_ALBUM", "CHAPTER_INTRO"].includes(storybookComposition.variant)
+    const fallbackVariant = images.length > 0 ? "PORTRAIT" : "EDITORIAL";
+    const variant = storybookComposition?.variant ?? fallbackVariant;
+    const storyImages = ["EDITORIAL", "CHAPTER"].includes(variant)
       ? []
       : storybookComposition?.assets ?? images.map((source, index) => ({
-      id: `legacy-${index}`,
-      source,
-      role: "MEMORY" as const,
-      personIds: [],
-      alt: "",
-      caption: null,
-      year: null,
-      order: index,
+          id: `legacy-${index}`,
+          source,
+          role: "MEMORY" as const,
+          personIds: [],
+          alt: "",
+          caption: null,
+          year: null,
+          order: index,
         }));
     return (
-      <div className="presentation-decoration presentation-birthday-decoration pointer-events-none absolute inset-0" data-storybook-variant={storybookComposition?.variant ?? "TEXT_ALBUM"}>
-        <span className="presentation-album-ring presentation-album-ring-one" />
-        <span className="presentation-album-ring presentation-album-ring-two" />
+      <div className="presentation-decoration presentation-birthday-decoration pointer-events-none absolute inset-0" data-storybook-variant={variant}>
         {storyImages.length > 0 && (
-          <div className="presentation-storybook-gallery absolute inset-y-32 right-8 z-10 w-56">
+          <div className="presentation-storybook-gallery">
             {storyImages.map((asset, index) => (
-              <figure key={asset.id} className="presentation-personal-image absolute m-0 bg-white p-2 pb-8" data-storybook-photo={index + 1}>
-                <img src={asset.source} alt={asset.alt} className="h-full w-full object-cover" />
-                {(asset.year || asset.caption) && <figcaption>{asset.year || asset.caption}</figcaption>}
+              <figure key={asset.id} className="presentation-personal-image" data-storybook-photo={index + 1}>
+                <img src={asset.source} alt={asset.alt} />
+                {(asset.year || asset.caption) && (
+                  <figcaption>{asset.year && <span>{asset.year}</span>}{asset.caption}</figcaption>
+                )}
               </figure>
             ))}
           </div>
@@ -217,7 +217,7 @@ export function PresentationDesignStage({
   return (
     <section
       className={`presentation-stage relative z-20 min-h-0 flex-1 ${styleClass}`}
-      data-storybook-variant={theme.design.stylePreset === "BIRTHDAY" ? storybookComposition?.variant ?? "TEXT_ALBUM" : undefined}
+      data-storybook-variant={theme.design.stylePreset === "BIRTHDAY" ? storybookComposition?.variant ?? "EDITORIAL" : undefined}
       data-storybook-people-mode={theme.design.stylePreset === "BIRTHDAY" ? storybookComposition?.peopleMode ?? "TITLE_ONLY" : undefined}
       data-storybook-material={theme.design.stylePreset === "BIRTHDAY" ? theme.design.storybook?.material : undefined}
     >
@@ -226,7 +226,7 @@ export function PresentationDesignStage({
       )}
       <div className="presentation-storybook-content h-full min-h-0">{children}</div>
       {theme.design.stylePreset === "BIRTHDAY" && storybookComposition?.anecdote && (
-        <aside className="presentation-storybook-anecdote"><span>{storybookComposition.anecdote.year || "Erinnerung"}</span>{storybookComposition.anecdote.text}</aside>
+        <aside className="presentation-storybook-anecdote"><span>{storybookComposition.anecdote.year || "Erinnert ihr euch?"}</span><q>{storybookComposition.anecdote.text}</q></aside>
       )}
     </section>
   );
@@ -234,7 +234,6 @@ export function PresentationDesignStage({
 
 export function PresentationDesignFooter({
   theme,
-  storybookComposition = null,
 }: {
   theme: ResolvedQuizTheme;
   storybookComposition?: StorybookComposition | null;
@@ -244,16 +243,6 @@ export function PresentationDesignFooter({
       <footer className="presentation-corporate-footer relative z-20 mt-3 flex h-9 shrink-0 items-center justify-between border-t px-2 text-xs font-semibold uppercase tracking-[0.12em]">
         <span>{theme.design.occasion.eventTitle || theme.identity.displayName}</span>
         <span>Knowledge · People · Progress</span>
-      </footer>
-    );
-  }
-  if (
-    theme.design.stylePreset === "BIRTHDAY" &&
-    (storybookComposition?.anecdote || theme.design.storybook?.subtitle || theme.design.occasion.extraText)
-  ) {
-    return (
-      <footer className="presentation-personal-footer relative z-30 mx-auto -mt-4 mb-1 rotate-[-1deg] bg-white px-8 py-2 text-sm font-bold shadow-lg">
-        {storybookComposition?.anecdote?.text || theme.design.storybook?.subtitle || theme.design.occasion.extraText}
       </footer>
     );
   }

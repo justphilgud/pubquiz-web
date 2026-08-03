@@ -16,6 +16,7 @@ export type DeterministicTemplateContext = {
   quizId: string | number;
   questionId: string | number;
   phase: TemplateImagePhase;
+  sequenceIndex?: number;
   assetRole?: string;
   slideType?: string;
   personIds?: readonly string[];
@@ -26,6 +27,7 @@ function deterministicKey(input: DeterministicTemplateContext) {
     input.quizId,
     input.questionId,
     input.phase,
+    input.sequenceIndex ?? "NO_SEQUENCE",
     input.assetRole ?? "IMAGE_POOL",
     input.slideType ?? "QUESTION",
     [...(input.personIds ?? [])].sort().join(","),

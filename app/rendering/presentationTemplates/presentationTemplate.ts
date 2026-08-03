@@ -261,7 +261,7 @@ function validateDesign(value: unknown) {
   }
   if (!["HEADER", "SIDE", "FOOTER"].includes(String(value.occasion.identityPlacement))) errors.push({ field: "config.design.occasion.identityPlacement", message: "Unbekannte Platzierung." });
   if (style === "BIRTHDAY") errors.push(...validateStorybookConfiguration(value.storybook));
-  else if (value.storybook !== null) errors.push({ field: "config.design.storybook", message: "Storybook-Daten sind ausschließlich im Geburtstagsstil erlaubt." });
+  else if (value.storybook !== null) errors.push({ field: "config.design.storybook", message: "Storybook-Daten sind ausschließlich in der Storybook-Designwelt erlaubt." });
   return errors;
 }
 

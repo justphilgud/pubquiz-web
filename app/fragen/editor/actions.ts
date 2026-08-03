@@ -77,6 +77,12 @@ import {
   resolvePendingCategoryReview,
 } from "./pendingCategoryReview";
 import { recalculateQuizQuestionEvaluation } from "@/app/quiz/evaluation/evaluation.server";
+import {
+  isStoryQuestionRelationship,
+  PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS,
+  type StoryQuestionRelationshipValue,
+} from "@/app/story-elemente/storyElement";
+import { loadStoryElement } from "@/app/story-elemente/storyElementRepository.server";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -810,6 +816,49 @@ export async function saveQuestion(
     };
   }
 
+  const requestedStoryLinks = payload.questionId === undefined
+    ? (payload.storyElementLinks ?? [])
+    : [];
+  if (
+    requestedStoryLinks.length > 20 ||
+    new Set(requestedStoryLinks.map((link) => link.storyElementId)).size !== requestedStoryLinks.length ||
+    requestedStoryLinks.some((link) =>
+      !Number.isSafeInteger(link.storyElementId) ||
+      link.storyElementId <= 0 ||
+      !isStoryQuestionRelationship(link.relationship) ||
+      !PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS.some((value) => value === link.relationship),
+    )
+  ) {
+    return {
+      success: false,
+      errorCode: "VALIDATION_ERROR",
+      fallbackMessage: "Die Story-Element-Verknüpfungen sind ungültig.",
+    };
+  }
+  const storyLinks: Array<{ storyElementId: number; relationship: StoryQuestionRelationshipValue }> = [];
+  for (const link of requestedStoryLinks) {
+    const story = await loadStoryElement(actor, link.storyElementId);
+    const scopeMatches = story && (
+      story.scope === "GLOBAL" ||
+      (story.scope === "EVENT_SERIES" &&
+        targetContext.scope === "EVENT_SERIES" &&
+        story.eventSeriesId !== null &&
+        targetContext.eventSeriesIds.includes(story.eventSeriesId))
+    );
+    const selectable = story && (
+      story.status === "ACTIVE" ||
+      (story.status === "DRAFT" && story.createdByUserId === actor.userId)
+    );
+    if (!story || !scopeMatches || !selectable) {
+      return {
+        success: false,
+        errorCode: "PERMISSION_DENIED",
+        fallbackMessage: "Mindestens ein Story-Element ist für diese Frage nicht auswählbar.",
+      };
+    }
+    storyLinks.push(link);
+  }
+
   let draft: NormalizedDraft;
 
   try {
@@ -1388,6 +1437,18 @@ export async function saveQuestion(
             fragen_id: true,
           },
         });
+
+        if (storyLinks.length > 0) {
+          await tx.frage_story_elemente.createMany({
+            data: storyLinks.map((link, index) => ({
+              fragen_id: createdQuestion.fragen_id,
+              story_element_id: link.storyElementId,
+              beziehung: link.relationship,
+              sortierung: (index + 1) * 10,
+              created_by_user_id: userId,
+            })),
+          });
+        }
 
         for (const media of draft.questionMedia) {
           if (media.operation !== "NEW" || !media.url || !media.mediaType) continue;

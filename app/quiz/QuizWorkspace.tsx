@@ -24,6 +24,7 @@ export default function QuizWorkspace({
   renderingMessages,
   presentationTemplates,
   canAssignPresentationTemplates,
+  initialEditingQuizId,
 }: {
   quizze: QuizResult[];
   kategorien: Kategorie[];
@@ -32,6 +33,7 @@ export default function QuizWorkspace({
   renderingMessages: RenderingMessages;
   presentationTemplates: AssignablePresentationTemplate[];
   canAssignPresentationTemplates: boolean;
+  initialEditingQuizId?: number;
 }) {
   const searchParams = useSearchParams();
 
@@ -87,6 +89,7 @@ export default function QuizWorkspace({
             messages={renderingMessages}
             presentationTemplates={presentationTemplates}
             canAssignPresentationTemplates={canAssignPresentationTemplates}
+            initialEditingQuizId={initialEditingQuizId}
           />
         </div>
 

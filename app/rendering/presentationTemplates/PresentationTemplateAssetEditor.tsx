@@ -137,7 +137,7 @@ export function PresentationTemplateAssetEditor({
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <h3 className="font-bold">Bildwelt für {style === "NEON" ? "ungegoogelt" : style === "CORPORATE" ? "Corporate" : "Geburtstag"}</h3>
+        <h3 className="font-bold">Bildwelt für {style === "NEON" ? "ungegoogelt" : style === "CORPORATE" ? "Corporate" : "Storybook"}</h3>
         <p className="mt-1 text-sm text-slate-600">
           Jede Designwelt verwendet Bilder in eigenen Rollen und Kompositionen.
           Repository-Pfade funktionieren sofort; Uploads verwenden ausschließlich

@@ -10,7 +10,10 @@ import {
   toRuntimeAnswerFormTemplate,
   toRuntimePresentationTemplate,
 } from "./presentationTemplates/presentationTemplate";
-import { loadStoredPresentationTemplateConfigs } from "./presentationTemplates/presentationTemplateRepository.server";
+import {
+  getManagedPresentationTemplate,
+  loadStoredPresentationTemplateConfigs,
+} from "./presentationTemplates/presentationTemplateRepository.server";
 
 export async function resolveQuizTemplates(quizId: number) {
   const quiz = await prisma.quiz.findUnique({
@@ -22,6 +25,7 @@ export async function resolveQuizTemplates(quizId: number) {
       answer_form_template_id: true,
       eventreihe: {
         select: {
+          name: true,
           default_presentation_template_id: true,
           default_answer_form_template_id: true,
         },
@@ -63,6 +67,9 @@ export async function resolveQuizTemplates(quizId: number) {
       eventSeriesTemplateId: quiz.eventreihe.default_answer_form_template_id,
       additionalAnswerFormTemplates,
     });
+  const managedPresentation = await getManagedPresentationTemplate(
+    presentation.template.id,
+  );
 
   return {
     presentation,
@@ -73,5 +80,17 @@ export async function resolveQuizTemplates(quizId: number) {
       presentation,
       answerForm,
     }),
+    presentationInfo: {
+      id: presentation.template.id,
+      name:
+        managedPresentation?.name ??
+        presentation.template.displayName ??
+        presentation.template.id,
+      status: managedPresentation?.status ?? "SYSTEM",
+      isSystem: managedPresentation?.isSystem ?? true,
+      source: presentation.source,
+      eventSeriesName: quiz.eventreihe.name,
+      usedFallback: presentation.usedFallback,
+    },
   };
 }

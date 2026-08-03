@@ -6,13 +6,11 @@ import {
   searchFragenForQuiz,
 } from "../actions";
 import type { QuizFrageSuchResult } from "../actions";
+import ContentSearchControls from "@/app/components/content/ContentSearchControls";
 
 type Props = {
   quizId: number;
 };
-
-const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-200";
 
 const buttonPrimaryClass =
   "rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-slate-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300";
@@ -26,6 +24,7 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
   const [ergebnisse, setErgebnisse] = useState<QuizFrageSuchResult[]>([]);
   const [meldung, setMeldung] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [includeLinkedStoryElements, setIncludeLinkedStoryElements] = useState(true);
 
   async function handleSearch() {
     setMeldung("");
@@ -46,6 +45,7 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
     const assignment = await addFrageToQuiz({
       quizId,
       fragenId,
+      includeLinkedStoryElements,
     });
 
     setMeldung(
@@ -93,22 +93,18 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
         </button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-        <input
-          value={suchtext}
-          onChange={(e) => setSuchtext(e.target.value)}
-          className={inputClass}
-          placeholder="Fragetext suchen..."
-        />
+      <ContentSearchControls
+        query={suchtext}
+        loading={isLoading}
+        placeholder="Fragen durchsuchen …"
+        onQueryChange={setSuchtext}
+        onSubmit={() => void handleSearch()}
+      />
 
-        <button
-          type="button"
-          onClick={handleSearch}
-          className={buttonPrimaryClass}
-        >
-          {isLoading ? "Suche..." : "Suchen"}
-        </button>
-      </div>
+      <label className="mt-3 flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800">
+        <input type="checkbox" checked={includeLinkedStoryElements} onChange={(event) => setIncludeLinkedStoryElements(event.target.checked)} className="h-5 w-5 rounded border-slate-300" />
+        Verknüpfte Story-Elemente ebenfalls hinzufügen
+      </label>
 
       {meldung && (
         <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3 text-sm font-medium text-slate-800">

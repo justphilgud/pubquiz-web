@@ -197,13 +197,39 @@ test("storybook composition is deterministic and uses curated data fallbacks", (
   const first = resolveStorybookComposition(context);
   assert.deepEqual(resolveStorybookComposition(context), first);
   assert.equal(first.peopleMode, "DUAL");
-  assert.equal(first.variant, "DUAL_PORTRAIT");
+  assert.equal(first.variant, "SPLIT");
   assert.equal(new Set(first.assets.map(({ source }) => source)).size, first.assets.length);
   const solution = resolveStorybookComposition({ ...context, phase: "SOLUTION" });
-  assert.equal(solution.variant, "SOLUTION_MEMORY");
+  assert.equal(solution.variant, "MEMORY");
   assert.equal(solution.assets[0].role, "SOLUTION");
   const noImages = resolveStorybookComposition({ ...context, storybook: { ...storybook, assets: [] } });
-  assert.equal(noImages.variant, "TEXT_ALBUM");
+  assert.equal(noImages.variant, "EDITORIAL");
+});
+
+test("storybook rotates leading people and portrait assets fairly across the quiz sequence", () => {
+  const config = storybookConfig(["Migge", "Paul", "Philipp", "Gabi", "Helena"]);
+  const storybook = config.design.storybook!;
+  storybook.assets = storybook.people.map((person, index) => ({
+    id: `portrait-${person.id}`,
+    source: `/portrait-${index}.jpg` as `/${string}`,
+    role: "PORTRAIT",
+    personIds: [person.id],
+    alt: person.name,
+    caption: null,
+    year: null,
+    order: index,
+  }));
+  const compositions = storybook.people.map((_, sequenceIndex) => resolveStorybookComposition({
+    storybook,
+    quizId: 7,
+    questionId: sequenceIndex + 1,
+    sequenceIndex,
+    phase: "QUESTION",
+    contentKind: "IMAGE",
+  }));
+  assert.deepEqual(compositions.map(({ people }) => people[0].name), storybook.people.map(({ name }) => name));
+  assert.ok(compositions.every(({ people, assets }) => assets[0].personIds.includes(people[0].id)));
+  assert.ok(compositions.every(({ variant }) => variant === "SEQUENCE"));
 });
 
 test("storybook optional anecdotes and chapters never create empty render data", () => {
@@ -213,8 +239,9 @@ test("storybook optional anecdotes and chapters never create empty render data",
   assert.equal(resolveStorybookComposition(base).anecdote, null);
   storybook.anecdotes = [{ id: "school", text: "Eine gemeinsame Erinnerung", personIds: [], year: null }];
   storybook.chapters = [{ id: "childhood", title: "Kindheit", subtitle: null, personIds: [], order: 0 }];
-  assert.equal(resolveStorybookComposition(base).anecdote?.text, "Eine gemeinsame Erinnerung");
-  assert.equal(resolveStorybookComposition({ ...base, contentKind: "CHAPTER" }).variant, "CHAPTER_INTRO");
+  assert.equal(resolveStorybookComposition(base).anecdote, null);
+  assert.equal(resolveStorybookComposition({ ...base, phase: "SOLUTION" }).anecdote?.text, "Eine gemeinsame Erinnerung");
+  assert.equal(resolveStorybookComposition({ ...base, contentKind: "CHAPTER" }).variant, "CHAPTER");
   assert.doesNotMatch(readFileSync("app/rendering/presentationTemplates/storybookComposition.ts", "utf8"), /Math\.random/);
 });
 
@@ -336,7 +363,7 @@ test("used templates cannot be archived", () => {
 });
 
 test("preview matrix is complete and uses productive renderer and layout resolver", () => {
-  for (const scenario of ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "AUDIO", "ORDERING", "SOLUTION", "MODERATION", "ANSWER_FORM", "STORYBOOK_SINGLE", "STORYBOOK_DUAL", "STORYBOOK_TRIO", "STORYBOOK_GROUP", "STORYBOOK_ANECDOTE", "STORYBOOK_PERSON", "STORYBOOK_SHARED", "STORYBOOK_CHAPTER"]) {
+  for (const scenario of ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "AUDIO", "ORDERING", "SOLUTION", "MODERATION", "ANSWER_FORM", "STORYBOOK_COVER", "STORYBOOK_CHAPTER", "STORYBOOK_EDITORIAL", "STORYBOOK_PORTRAIT", "STORYBOOK_SPLIT", "STORYBOOK_SEQUENCE", "STORYBOOK_MEMORY"]) {
     assert.ok(presentationPreviewScenarios.some(([id]) => id === scenario));
   }
   const source = readFileSync("app/rendering/presentationTemplates/PresentationTemplatePreview.tsx", "utf8");
@@ -349,7 +376,7 @@ test("preview matrix is complete and uses productive renderer and layout resolve
   assert.match(source, /transformOrigin: "top left"/);
 });
 
-test("semantic renderer variants remove corporate glow and expose birthday album treatment", () => {
+test("semantic renderer variants keep corporate treatment and expose the editorial storybook system", () => {
   const css = readFileSync("app/globals.css", "utf8");
   const designSystem = readFileSync("app/rendering/presentation/PresentationDesignSystem.tsx", "utf8");
   assert.match(css, /data-design-style="CORPORATE"/);
@@ -362,9 +389,13 @@ test("semantic renderer variants remove corporate glow and expose birthday album
   assert.match(designSystem, /presentation-birthday-header/);
   assert.match(designSystem, /presentation-neon-header/);
   assert.match(designSystem, /Knowledge · People · Progress/);
-  assert.match(designSystem, /Storybook/);
+  assert.match(designSystem, /storybookPageKind/);
   assert.match(designSystem, /data-storybook-people-mode/);
-  assert.match(css, /data-storybook-variant="DUAL_PORTRAIT"/);
+  for (const variant of ["COVER", "CHAPTER", "EDITORIAL", "PORTRAIT", "SPLIT", "SEQUENCE", "MEMORY"]) {
+    assert.match(readFileSync("app/rendering/presentationTemplates/storybookComposition.ts", "utf8"), new RegExp(`"${variant}"`));
+  }
+  assert.match(css, /data-storybook-variant="SEQUENCE"/);
+  assert.doesNotMatch(designSystem, /presentation-album-tape|presentation-album-ring|StorybookPeopleMarks/);
 });
 
 test("template upload is integrated into the shared signed route but requires explicit store confirmation", () => {

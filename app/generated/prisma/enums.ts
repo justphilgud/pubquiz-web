@@ -61,6 +61,35 @@ export const QuestionReviewStatus = {
 export type QuestionReviewStatus = (typeof QuestionReviewStatus)[keyof typeof QuestionReviewStatus]
 
 
+export const StoryElementStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type StoryElementStatus = (typeof StoryElementStatus)[keyof typeof StoryElementStatus]
+
+
+export const StoryElementScope = {
+  GLOBAL: 'GLOBAL',
+  EVENT_SERIES: 'EVENT_SERIES',
+  QUIZ: 'QUIZ'
+} as const
+
+export type StoryElementScope = (typeof StoryElementScope)[keyof typeof StoryElementScope]
+
+
+export const StoryQuestionRelationship = {
+  CONTEXT: 'CONTEXT',
+  AFTER_SOLUTION: 'AFTER_SOLUTION',
+  RELATED: 'RELATED',
+  REVEAL: 'REVEAL',
+  FOLLOW_UP: 'FOLLOW_UP'
+} as const
+
+export type StoryQuestionRelationship = (typeof StoryQuestionRelationship)[keyof typeof StoryQuestionRelationship]
+
+
 export const CategoryStatus = {
   ACTIVE: 'ACTIVE',
   PENDING: 'PENDING',

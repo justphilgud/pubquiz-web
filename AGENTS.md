@@ -22,6 +22,12 @@ For work on the new Question Editor, Presentation, Moderation and future feature
 
 docs/architecture/editor-principles.md
 
+Before any work on presentation templates, Storybook, Corporate, ungegoogelt design worlds, renderers, design systems, generators, UX, animation, typography, or imagery, read and follow:
+
+docs/design/ungegoogelt-design-manifest.md
+
+New designs may consciously evolve the manifest, but must not silently contradict it. If a request conflicts with the manifest, identify and explain the conflict before implementation begins.
+
 ## Working style
 
 When implementing a task:

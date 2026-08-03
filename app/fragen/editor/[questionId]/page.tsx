@@ -18,6 +18,8 @@ import {
 } from "../questionScopePolicy";
 import { canEditGlobalQuestions, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { resolveGooglePlacesFeature } from "../googlePlacesFeature";
+import QuestionStoryElementPanel from "@/app/story-elemente/QuestionStoryElementPanel";
+import { loadQuestionStoryElementPanel } from "@/app/story-elemente/questionStoryElements.server";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -76,17 +78,20 @@ export default async function ExistingQuestionEditorPage({
   } else {
     editorContext = "readOnly";
   }
+  const storyElements = await loadQuestionStoryElementPanel(actor, questionId);
+  const canEditQuestion = canEditScopedQuestion(actor, loadedQuestion.access);
 
   return (
+    <>
     <QuestionEditor
       capabilities={{
         ...getQuestionEditorCapabilities(actor, loadedQuestion.access),
-        canSaveDraft: canEditScopedQuestion(actor, loadedQuestion.access),
-        canSubmitForReview: canEditScopedQuestion(actor, loadedQuestion.access) && !isAdministrator(actor),
+        canSaveDraft: canEditQuestion,
+        canSubmitForReview: canEditQuestion && !isAdministrator(actor),
         canApproveQuestion: canApproveScopedQuestion(actor, loadedQuestion.access),
         canRequestQuestionChanges: canRequestChangesForScopedQuestion(actor, loadedQuestion.access),
         canCloneQuestion: canCloneScopedQuestion(actor, loadedQuestion.access),
-        canArchiveQuestion: canEditScopedQuestion(actor, loadedQuestion.access),
+        canArchiveQuestion: canEditQuestion,
         canDeleteQuestion: canApproveScopedQuestion(actor, loadedQuestion.access),
       }}
       editorContext={editorContext}
@@ -110,5 +115,12 @@ export default async function ExistingQuestionEditorPage({
         explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
       })}
     />
+    <QuestionStoryElementPanel
+      questionId={questionId}
+      links={storyElements.links}
+      options={storyElements.options}
+      canEdit={canEditQuestion}
+    />
+    </>
   );
 }

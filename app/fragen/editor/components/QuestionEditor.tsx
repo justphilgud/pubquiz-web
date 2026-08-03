@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import ContentEditorHeader from "@/app/components/content/ContentEditorHeader";
 import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
@@ -72,6 +73,7 @@ import {
 } from "../questionDraftState";
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
+import QuestionStoryElementDraftSection, { type QuestionStoryElementDraftOption } from "@/app/story-elemente/QuestionStoryElementDraftSection";
 
 function createId(): string {
   return crypto.randomUUID();
@@ -126,6 +128,7 @@ function createInitialDraft(scopeOptions: { canSelectGlobal: boolean; eventSerie
     isIncomplete: true,
     validUntil: null,
     status: "DRAFT",
+    storyElementLinks: [],
   };
 }
 
@@ -141,6 +144,7 @@ type QuestionEditorProps = {
   templates: QuestionTemplate[];
   scopeOptions: { canSelectGlobal: boolean; eventSeries: QuestionScopeOption[] };
   googlePlacesFeature: GooglePlacesFeature;
+  storyElementOptions?: QuestionStoryElementDraftOption[];
 };
 
 export function QuestionEditor({
@@ -155,6 +159,7 @@ export function QuestionEditor({
   templates,
   scopeOptions,
   googlePlacesFeature,
+  storyElementOptions = [],
 }: QuestionEditorProps) {
   const specialQuestionTemplates = templates.filter(
     (template) => template.enabled && template.selectable,
@@ -598,6 +603,7 @@ export function QuestionEditor({
         reviewReasonCodes: options?.reviewReasonCodes,
         reviewComment: options?.reviewComment,
         categoryReviewDecisions: options?.categoryReviewDecisions,
+        storyElementLinks: draft.storyElementLinks,
       });
 
       setSaveMessage({
@@ -821,20 +827,7 @@ export function QuestionEditor({
         showSaveActions ? "pb-64 sm:pb-28" : "pb-8"
       }`}
     >
-      <header>
-        <p className="text-sm text-slate-500">{messages.editor.eyebrow}</p>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-slate-950">{pageTitle}</h1>
-          {editorContext !== "create" && (
-            <Link
-              href="/fragen"
-              className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
-            >
-              {messages.editor.back}
-            </Link>
-          )}
-        </div>
-      </header>
+      <ContentEditorHeader eyebrow={messages.editor.eyebrow} title={pageTitle} fallbackHref="/content" />
 
       {questionRecord && (
         <QuestionReviewPanel
@@ -1079,6 +1072,17 @@ export function QuestionEditor({
           }
           canManageCategories={capabilities.canManageCategories}
         />
+
+        {editorContext === "create" && (
+          <QuestionStoryElementDraftSection
+            options={storyElementOptions}
+            links={draft.storyElementLinks ?? []}
+            questionScope={draft.scope}
+            questionEventSeriesIds={draft.eventSeriesIds}
+            disabled={isEditorDisabled}
+            onChange={(storyElementLinks) => setDraft((current) => ({ ...current, storyElementLinks }))}
+          />
+        )}
       </fieldset>
 
       {pixelQuestionSync &&

@@ -253,7 +253,7 @@ function DroppableBlock({
               <>
                 <span>
                   {gruppe.blockTyp === "fragenblock"
-                    ? "Fragenblock"
+                    ? "Block"
                     : "Ohne Block"}
                 </span>
                 <span>
@@ -433,9 +433,9 @@ export default function QuizFragenSortableTable({
           },
         ]
       : []),
-    ...fragenrundeBlocks.map((abschnitt, index) => ({
+    ...fragenrundeBlocks.map((abschnitt) => ({
       key: `block-${abschnitt.quiz_abschnitt_id}`,
-      titel: abschnitt.titel || `Block ${index + 1}`,
+      titel: abschnitt.titel || "Block",
       containerId: getContainerId(abschnitt.quiz_abschnitt_id),
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
       blockTyp: "fragenblock" as const,
@@ -694,7 +694,7 @@ export default function QuizFragenSortableTable({
       return;
     }
 
-    const titel = `Block ${fragenrundeBlocks.length + 1}`;
+    const titel = "Block";
     setIsCreatingBlock(true);
     const result = await createQuizAbschnitt({
       quizId,

@@ -8,10 +8,15 @@ import {
   getPraesentationPunktestand,
   getPraesentationStatus,
 } from "./statusActions";
-import { buildPraesentationSlides } from "./buildPraesentationSlides";
+import {
+  buildPraesentationSlides,
+  getPresentationSlideKey,
+  isStandingsSlide,
+} from "./buildPraesentationSlides";
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
 import {
   resolvePresentationLiveState,
+  resolvePresentationSequenceIndex,
   type PresentationLiveState,
 } from "@/app/rendering/presentation/presentationLiveState";
 import { getPresentationSlideTitle } from "@/app/rendering/presentation/presentationSlideMetadata";
@@ -47,10 +52,10 @@ export default function QuizPraesentationPlayer({
   const [now, setNow] = useState(() => Date.now());
   const [syncError, setSyncError] = useState(false);
 
-  const slideIndex = Math.min(
-    Math.max(liveState.slideIndex, 0),
-    Math.max(slides.length - 1, 0),
-  );
+  const slideIndex = resolvePresentationSequenceIndex(
+    liveState,
+    slides.map(getPresentationSlideKey),
+  ).index;
   const slide = slides[slideIndex];
 
   useEffect(() => {
@@ -86,7 +91,7 @@ export default function QuizPraesentationPlayer({
   }, [quizId]);
 
   useEffect(() => {
-    if (slide?.typ !== "zwischenstand" && slide?.typ !== "endstand") return;
+    if (!isStandingsSlide(slide)) return;
     let active = true;
 
     void getPraesentationPunktestand(quizId).then((result) => {
@@ -96,7 +101,7 @@ export default function QuizPraesentationPlayer({
     return () => {
       active = false;
     };
-  }, [quizId, slide?.typ, liveState.updatedAt]);
+  }, [quizId, slide, liveState.updatedAt]);
 
   useEffect(() => {
     const questionId = liveState.estimation.questionId;

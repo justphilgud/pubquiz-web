@@ -9,7 +9,7 @@ export const deRenderingMessages = {
       description: "Eine ruhigere, deutlich dunklere Beamer-Variante.",
     },
     presentationCorporate: { label: "Corporate", description: "Ruhiges, professionelles Design mit klarer Hierarchie." },
-    presentationBirthday: { label: "Geburtstag", description: "Persönliches, bildbetontes Design mit festlichen Elementen." },
+    presentationBirthday: { label: "Storybook", description: "Persönliches Fotobuch-Design mit redaktioneller Bildsprache." },
     answerDefault: {
       label: "ungegoogelt Standard",
       description: "Das vertraute, mobil optimierte Antwortformular.",
@@ -19,7 +19,7 @@ export const deRenderingMessages = {
       description: "Reduziertes Branding mit besonders klarer Lesbarkeit.",
     },
     answerCorporate: { label: "Corporate", description: "Sachliches Antwortformular für Firmenveranstaltungen." },
-    answerBirthday: { label: "Geburtstag", description: "Persönlich gebrandetes Antwortformular." },
+    answerBirthday: { label: "Storybook", description: "Ruhiges Antwortformular im persönlichen Fotobuch-Stil." },
   },
   fields: {
     presentationTemplate: "Präsentationstemplate",

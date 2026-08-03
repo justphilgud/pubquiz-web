@@ -11,6 +11,7 @@ import {
   type QuestionFilterCategory,
 } from "./CategoryFilterCombobox";
 import { TemplateFilterCombobox } from "./TemplateFilterCombobox";
+import ContentSearchControls from "@/app/components/content/ContentSearchControls";
 
 const statusShortcuts = [
   ["MY_DRAFTS", "Meine Entwürfe"],
@@ -135,47 +136,82 @@ export function QuestionOverviewControls({
         )}
       </div>
 
-      <form
-        className="mt-3 flex flex-col gap-2 sm:flex-row"
-        onSubmit={(event) => {
-          event.preventDefault();
-          onApplySearch();
-        }}
-      >
-        <input
-          aria-label="Suchtext"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
+      <div className="mt-3">
+        <ContentSearchControls
+          query={query}
+          loading={loading}
           placeholder="Fragen durchsuchen …"
-          className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="min-h-11 rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white disabled:opacity-60"
+          filterCount={activeAdvancedCount}
+          filtersOpen={open}
+          onQueryChange={onQueryChange}
+          onSubmit={onApplySearch}
+          onToggleFilters={() => setOpen((current) => !current)}
+          onReset={onReset}
         >
-          {loading ? "Suche läuft …" : "Suchen"}
-        </button>
-      </form>
+          <div className="mt-3 grid gap-4 rounded-2xl bg-slate-50 p-3 md:grid-cols-2">
+            <fieldset>
+              <legend className="text-sm font-medium">Weitere Status</legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {additionalStatuses.map(([status, label]) => (
+                  <button
+                    key={status}
+                    type="button"
+                    aria-pressed={filters.statuses.includes(status)}
+                    onClick={() => toggleStatus(status)}
+                    className={toggleClass(filters.statuses.includes(status))}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((current) => !current)}
-          className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-semibold"
-        >
-          Filter{activeAdvancedCount > 0 ? ` (${activeAdvancedCount})` : ""}
-        </button>
-        {activeAdvancedCount > 0 && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="min-h-11 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700"
-          >
-            Filter zurücksetzen
-          </button>
-        )}
+            <TemplateFilterCombobox
+              templates={templates}
+              value={filters.templateIds}
+              onChange={(templateIds) => onChange({ ...filters, templateIds })}
+            />
+
+            <CategoryFilterCombobox
+              categories={categories}
+              value={filters.categoryId}
+              onChange={(categoryId) => onChange({ ...filters, categoryId })}
+            />
+
+            <SegmentedFilter
+              label="Quelle"
+              value={filters.sourceState}
+              options={[
+                { value: null, label: "Alle" },
+                { value: "with", label: "Mit Quelle" },
+                { value: "without", label: "Ohne Quelle" },
+              ]}
+              onChange={(sourceState) => onChange({ ...filters, sourceState })}
+            />
+
+            <SegmentedFilter
+              label="Medien"
+              value={filters.mediaState}
+              options={[
+                { value: null, label: "Alle" },
+                { value: "with", label: "Mit Medien" },
+                { value: "without", label: "Ohne Medien" },
+              ]}
+              onChange={(mediaState) => onChange({ ...filters, mediaState })}
+            />
+
+            <SegmentedFilter
+              label="Antwortart"
+              value={filters.answerMode}
+              options={[
+                { value: null, label: "Alle" },
+                { value: "open", label: "Offen" },
+                { value: "closed", label: "Geschlossen" },
+              ]}
+              onChange={(answerMode) => onChange({ ...filters, answerMode })}
+            />
+          </div>
+        </ContentSearchControls>
       </div>
       {activeAdvancedCount > 0 && (
         <div className="mt-2 flex flex-wrap gap-2" aria-label="Aktive Filter">
@@ -251,71 +287,6 @@ export function QuestionOverviewControls({
         </div>
       )}
 
-      {open && (
-        <div className="mt-3 grid gap-4 rounded-2xl bg-slate-50 p-3 md:grid-cols-2">
-          <fieldset>
-            <legend className="text-sm font-medium">Weitere Status</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {additionalStatuses.map(([status, label]) => (
-                <button
-                  key={status}
-                  type="button"
-                  aria-pressed={filters.statuses.includes(status)}
-                  onClick={() => toggleStatus(status)}
-                  className={toggleClass(filters.statuses.includes(status))}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          <TemplateFilterCombobox
-            templates={templates}
-            value={filters.templateIds}
-            onChange={(templateIds) => onChange({ ...filters, templateIds })}
-          />
-
-          <CategoryFilterCombobox
-            categories={categories}
-            value={filters.categoryId}
-            onChange={(categoryId) => onChange({ ...filters, categoryId })}
-          />
-
-          <SegmentedFilter
-            label="Quelle"
-            value={filters.sourceState}
-            options={[
-              { value: null, label: "Alle" },
-              { value: "with", label: "Mit Quelle" },
-              { value: "without", label: "Ohne Quelle" },
-            ]}
-            onChange={(sourceState) => onChange({ ...filters, sourceState })}
-          />
-
-          <SegmentedFilter
-            label="Medien"
-            value={filters.mediaState}
-            options={[
-              { value: null, label: "Alle" },
-              { value: "with", label: "Mit Medien" },
-              { value: "without", label: "Ohne Medien" },
-            ]}
-            onChange={(mediaState) => onChange({ ...filters, mediaState })}
-          />
-
-          <SegmentedFilter
-            label="Antwortart"
-            value={filters.answerMode}
-            options={[
-              { value: null, label: "Alle" },
-              { value: "open", label: "Offen" },
-              { value: "closed", label: "Geschlossen" },
-            ]}
-            onChange={(answerMode) => onChange({ ...filters, answerMode })}
-          />
-        </div>
-      )}
     </>
   );
 }

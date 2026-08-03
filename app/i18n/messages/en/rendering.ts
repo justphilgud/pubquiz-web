@@ -14,7 +14,7 @@ export const enRenderingMessages: WidenMessageCatalog<
       description: "A calmer and distinctly darker projector variant.",
     },
     presentationCorporate: { label: "Corporate", description: "Calm professional design with a clear hierarchy." },
-    presentationBirthday: { label: "Birthday", description: "Personal image-led design with festive details." },
+    presentationBirthday: { label: "Storybook", description: "Personal photo-book design with an editorial visual language." },
     answerDefault: {
       label: "ungegoogelt Default",
       description: "The familiar mobile-first answer form.",
@@ -24,7 +24,7 @@ export const enRenderingMessages: WidenMessageCatalog<
       description: "Reduced branding with especially clear readability.",
     },
     answerCorporate: { label: "Corporate", description: "Professional answer form for company events." },
-    answerBirthday: { label: "Birthday", description: "Personally branded answer form." },
+    answerBirthday: { label: "Storybook", description: "Quiet answer form in the personal photo-book style." },
   },
   fields: {
     presentationTemplate: "Presentation template",

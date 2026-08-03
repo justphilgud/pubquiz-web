@@ -64,10 +64,14 @@ export const ModelName = {
   quiz: 'quiz',
   eventreihen: 'eventreihen',
   presentation_templates: 'presentation_templates',
+  story_elemente: 'story_elemente',
+  story_element_revisionen: 'story_element_revisionen',
+  frage_story_elemente: 'frage_story_elemente',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
   teams: 'teams',
   quiz_abschnitte: 'quiz_abschnitte',
+  quiz_ablauf_elemente: 'quiz_ablauf_elemente',
   quiz_team_sessions: 'quiz_team_sessions',
   quiz_block_freigaben: 'quiz_block_freigaben',
   team_antworten: 'team_antworten',
@@ -270,6 +274,7 @@ export const QuizScalarFieldEnum = {
   outro_bekanntmachungen: 'outro_bekanntmachungen',
   outro_musik_url: 'outro_musik_url',
   manuelle_bewertungen: 'manuelle_bewertungen',
+  aufloesungsstrategie: 'aufloesungsstrategie',
   presentation_template_id: 'presentation_template_id',
   answer_form_template_id: 'answer_form_template_id'
 } as const
@@ -314,6 +319,55 @@ export const Presentation_templatesScalarFieldEnum = {
 export type Presentation_templatesScalarFieldEnum = (typeof Presentation_templatesScalarFieldEnum)[keyof typeof Presentation_templatesScalarFieldEnum]
 
 
+export const Story_elementeScalarFieldEnum = {
+  story_element_id: 'story_element_id',
+  stable_key: 'stable_key',
+  status: 'status',
+  geltungsbereich: 'geltungsbereich',
+  eventreihe_id: 'eventreihe_id',
+  quiz_id: 'quiz_id',
+  created_by_user_id: 'created_by_user_id',
+  source_story_element_id: 'source_story_element_id',
+  archived_at: 'archived_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Story_elementeScalarFieldEnum = (typeof Story_elementeScalarFieldEnum)[keyof typeof Story_elementeScalarFieldEnum]
+
+
+export const Story_element_revisionenScalarFieldEnum = {
+  story_element_revision_id: 'story_element_revision_id',
+  story_element_id: 'story_element_id',
+  revisionsnummer: 'revisionsnummer',
+  typ: 'typ',
+  titel: 'titel',
+  beschreibung: 'beschreibung',
+  kategorie: 'kategorie',
+  tags: 'tags',
+  moderationsnotiz: 'moderationsnotiz',
+  konfigurations_version: 'konfigurations_version',
+  konfiguration: 'konfiguration',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at'
+} as const
+
+export type Story_element_revisionenScalarFieldEnum = (typeof Story_element_revisionenScalarFieldEnum)[keyof typeof Story_element_revisionenScalarFieldEnum]
+
+
+export const Frage_story_elementeScalarFieldEnum = {
+  frage_story_element_id: 'frage_story_element_id',
+  fragen_id: 'fragen_id',
+  story_element_id: 'story_element_id',
+  beziehung: 'beziehung',
+  sortierung: 'sortierung',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at'
+} as const
+
+export type Frage_story_elementeScalarFieldEnum = (typeof Frage_story_elementeScalarFieldEnum)[keyof typeof Frage_story_elementeScalarFieldEnum]
+
+
 export const Quiz_fragenScalarFieldEnum = {
   quiz_fragen_id: 'quiz_fragen_id',
   quiz_id: 'quiz_id',
@@ -329,6 +383,7 @@ export const Quiz_fragenScalarFieldEnum = {
   risiko_pool_teamanzahl: 'risiko_pool_teamanzahl',
   risiko_pool_fixiert_am: 'risiko_pool_fixiert_am',
   freie_antwort_erlaubt: 'freie_antwort_erlaubt',
+  verknuepfte_story_elemente_uebernehmen: 'verknuepfte_story_elemente_uebernehmen',
   praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
 } as const
@@ -365,10 +420,35 @@ export const Quiz_abschnitteScalarFieldEnum = {
   dauer_sekunden: 'dauer_sekunden',
   qr_code_url: 'qr_code_url',
   medien_datei: 'medien_datei',
-  bemerkung: 'bemerkung'
+  bemerkung: 'bemerkung',
+  aufloesungsstrategie: 'aufloesungsstrategie'
 } as const
 
 export type Quiz_abschnitteScalarFieldEnum = (typeof Quiz_abschnitteScalarFieldEnum)[keyof typeof Quiz_abschnitteScalarFieldEnum]
+
+
+export const Quiz_ablauf_elementeScalarFieldEnum = {
+  quiz_ablauf_element_id: 'quiz_ablauf_element_id',
+  quiz_id: 'quiz_id',
+  typ: 'typ',
+  anker_typ: 'anker_typ',
+  anker_schluessel: 'anker_schluessel',
+  quiz_abschnitt_id: 'quiz_abschnitt_id',
+  quiz_fragen_id: 'quiz_fragen_id',
+  sortierung: 'sortierung',
+  ist_sichtbar: 'ist_sichtbar',
+  bezeichnung: 'bezeichnung',
+  konfiguration: 'konfiguration',
+  konfigurations_version: 'konfigurations_version',
+  ist_standard: 'ist_standard',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  story_element_revision_id: 'story_element_revision_id',
+  story_bezugs_quiz_fragen_id: 'story_bezugs_quiz_fragen_id',
+  story_beziehung: 'story_beziehung'
+} as const
+
+export type Quiz_ablauf_elementeScalarFieldEnum = (typeof Quiz_ablauf_elementeScalarFieldEnum)[keyof typeof Quiz_ablauf_elementeScalarFieldEnum]
 
 
 export const Quiz_team_sessionsScalarFieldEnum = {
@@ -483,6 +563,7 @@ export type Frage_vorlage_antwortfelderScalarFieldEnum = (typeof Frage_vorlage_a
 export const Quiz_praesentation_statusScalarFieldEnum = {
   quiz_id: 'quiz_id',
   slide_index: 'slide_index',
+  slide_key: 'slide_key',
   slide_started_at: 'slide_started_at',
   quiz_started_at: 'quiz_started_at',
   updated_at: 'updated_at',

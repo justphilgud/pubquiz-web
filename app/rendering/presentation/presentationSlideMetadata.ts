@@ -1,6 +1,7 @@
 import type { QuizPraesentationResult } from "@/app/quiz/actions";
 import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
 import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
+import { getQuizFlowTypeLabel } from "@/app/quiz/flow/quizFlow";
 
 function getSectionDisplayTitle(
   section: QuizPraesentationResult["abschnitte"][number] | null | undefined,
@@ -28,6 +29,10 @@ export function getPresentationSlideTitle(
   slides: Slide[],
 ) {
   if (!slide) return "Kein Slide";
+
+  if (slide.typ === "ablauf") {
+    return slide.element.label ?? getQuizFlowTypeLabel(slide.element.type);
+  }
 
   if (slide.typ === "fixer-slide") {
     const titles = {

@@ -254,6 +254,10 @@ export type QuestionEditorDraft = {
   isIncomplete: boolean;
   validUntil: string | null;
   status: QuestionStatus;
+  storyElementLinks?: Array<{
+    storyElementId: number;
+    relationship: import("@/app/story-elemente/storyElement").StoryQuestionRelationshipValue;
+  }>;
 };
 
 export type QuestionTemplate = {
@@ -428,6 +432,10 @@ export type SaveQuestionPayload = {
   reviewReasonCodes?: ReviewReasonCode[];
   reviewComment?: string;
   categoryReviewDecisions?: PendingCategoryDecision[];
+  storyElementLinks?: Array<{
+    storyElementId: number;
+    relationship: import("@/app/story-elemente/storyElement").StoryQuestionRelationshipValue;
+  }>;
 };
 
 export type FaceMorphPixelQuestionSyncResult = {

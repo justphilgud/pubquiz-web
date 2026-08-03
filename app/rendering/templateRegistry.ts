@@ -300,7 +300,7 @@ const presentation = [
     design: presentationDesigns.BIRTHDAY,
     tokens: {
       ...sharedSizing,
-      colors: { primary: "#be185d", secondary: "#7c3aed", accent: "#f59e0b", background: "#fff7ed", surface: "#ffffff", surfaceStrong: "#fce7f3", text: "#4c1d3d", textMuted: "#7c2d5b", border: "#f9a8d4", success: "#15803d", warning: "#b45309", danger: "#be123c" },
+      colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" },
     },
   },
 ] as const satisfies readonly PresentationTemplate[];
@@ -378,7 +378,7 @@ const answerForm = [
     id: "birthday-reference", kind: "ANSWER_FORM", variant: "BRANDED",
     labelKey: "answerBirthday", category: "BRANDED", selectable: true,
     preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.BIRTHDAY,
-    tokens: { ...sharedSizing, colors: { primary: "#be185d", secondary: "#7c3aed", accent: "#f59e0b", background: "#fff7ed", surface: "#ffffff", surfaceStrong: "#fce7f3", text: "#4c1d3d", textMuted: "#7c2d5b", border: "#f9a8d4", success: "#15803d", warning: "#b45309", danger: "#be123c" } },
+    tokens: { ...sharedSizing, colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" } },
   },
 ] as const satisfies readonly AnswerFormTemplate[];
 

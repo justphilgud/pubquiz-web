@@ -84,6 +84,22 @@ export type eventreihen = Prisma.eventreihenModel
  */
 export type presentation_templates = Prisma.presentation_templatesModel
 /**
+ * Model story_elemente
+ * Stable editorial identity. Content changes are stored as immutable revisions;
+ * quiz placements reference one concrete revision so completed quizzes never drift.
+ */
+export type story_elemente = Prisma.story_elementeModel
+/**
+ * Model story_element_revisionen
+ * Immutable, validated content snapshot of a story element.
+ */
+export type story_element_revisionen = Prisma.story_element_revisionenModel
+/**
+ * Model frage_story_elemente
+ * Optional editorial relationship. It suggests placement but never changes scoring.
+ */
+export type frage_story_elemente = Prisma.frage_story_elementeModel
+/**
  * Model quiz_fragen
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */
@@ -103,6 +119,12 @@ export type teams = Prisma.teamsModel
  * 
  */
 export type quiz_abschnitte = Prisma.quiz_abschnitteModel
+/**
+ * Model quiz_ablauf_elemente
+ * Template-neutral non-question elements which are combined with the
+ * question sequence derived from quiz sections at runtime.
+ */
+export type quiz_ablauf_elemente = Prisma.quiz_ablauf_elementeModel
 /**
  * Model quiz_team_sessions
  * 

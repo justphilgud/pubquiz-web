@@ -25,6 +25,7 @@ const editorActor: AuthorizationActor = {
 function navigationItemsFor(actor: AuthorizationActor) {
   return getAppNavigationItems({
     canAccessQuestions: true,
+    canAccessStoryElements: true,
     canManageQuizzes: canManageQuizzes(actor),
     canManageEventSeries: canManageEventSeries(actor),
     canViewPresentationTemplates: canManageUsers(actor),
@@ -35,7 +36,7 @@ function navigationItemsFor(actor: AuthorizationActor) {
 
 test("admin navigation orders event series, quiz and templates before users", () => {
   assert.deepEqual(navigationItemsFor(adminActor), [
-    { href: "/fragen", label: "Fragen" },
+    { href: "/content", label: "Content" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
     { href: "/quiz", label: "Quiz" },
     { href: "/templates", label: "Templates" },
@@ -47,6 +48,7 @@ test("category capability never exposes the dashboard-only category route", () =
   assert.equal(
     getAppNavigationItems({
       canAccessQuestions: false,
+      canAccessStoryElements: false,
       canManageQuizzes: false,
       canManageEventSeries: false,
       canViewPresentationTemplates: false,
@@ -59,7 +61,7 @@ test("category capability never exposes the dashboard-only category route", () =
 
 test("editor navigation does not expose admin destinations", () => {
   assert.deepEqual(navigationItemsFor(editorActor), [
-    { href: "/fragen", label: "Fragen" },
+    { href: "/content", label: "Content" },
   ]);
 });
 
@@ -67,6 +69,7 @@ test("USER without global or event-series rights has no functional navigation", 
   assert.deepEqual(
     getAppNavigationItems({
       canAccessQuestions: false,
+      canAccessStoryElements: false,
       canManageQuizzes: false,
       canManageEventSeries: false,
       canViewPresentationTemplates: false,
@@ -81,6 +84,7 @@ test("membership capabilities expose operational navigation without users", () =
   assert.deepEqual(
     getAppNavigationItems({
       canAccessQuestions: true,
+      canAccessStoryElements: true,
       canManageQuizzes: true,
       canManageEventSeries: true,
       canViewPresentationTemplates: false,
@@ -88,7 +92,7 @@ test("membership capabilities expose operational navigation without users", () =
       canManageUsers: false,
     }),
     [
-      { href: "/fragen", label: "Fragen" },
+      { href: "/content", label: "Content" },
       { href: "/admin/eventreihen", label: "Eventreihen" },
       { href: "/quiz", label: "Quiz" },
     ],
@@ -114,4 +118,30 @@ test("template navigation stays active throughout the generator", () => {
   assert.equal(isAppNavigationItemActive("/templates", "/templates"), true);
   assert.equal(isAppNavigationItemActive("/templates/new", "/templates"), true);
   assert.equal(isAppNavigationItemActive("/quiz", "/templates"), false);
+});
+
+test("content navigation owns all content library and editor routes", () => {
+  for (const pathname of [
+    "/content",
+    "/content/new",
+    "/fragen",
+    "/fragen/editor/12",
+    "/story-elemente",
+    "/story-elemente/42",
+  ]) {
+    assert.equal(isAppNavigationItemActive(pathname, "/content"), true, pathname);
+  }
+  assert.equal(isAppNavigationItemActive("/quiz", "/content"), false);
+});
+
+test("either existing content capability exposes one shared navigation item", () => {
+  const base = {
+    canManageQuizzes: false,
+    canManageEventSeries: false,
+    canViewPresentationTemplates: false,
+    canManageCategories: false,
+    canManageUsers: false,
+  };
+  assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: true, canAccessStoryElements: false }), [{ href: "/content", label: "Content" }]);
+  assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: false, canAccessStoryElements: true }), [{ href: "/content", label: "Content" }]);
 });

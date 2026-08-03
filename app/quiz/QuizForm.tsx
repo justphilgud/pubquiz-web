@@ -34,6 +34,11 @@ import {
   toRuntimeAnswerFormTemplate,
   toRuntimePresentationTemplate,
 } from "@/app/rendering/presentationTemplates/presentationTemplate";
+import {
+  getQuizSolutionStrategyLabel,
+  QUIZ_STANDARD_SOLUTION_STRATEGIES,
+  type QuizSolutionStrategy,
+} from "./flow/quizFlow";
 
 const inputClass =
   "min-h-11 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200";
@@ -57,6 +62,7 @@ type FormState = {
   internalNote: string;
   presentationTemplateId: string;
   answerFormTemplateId: string;
+  solutionStrategy: QuizSolutionStrategy;
 };
 
 function emptyForm(initialEventSeriesId?: number): FormState {
@@ -71,6 +77,23 @@ function emptyForm(initialEventSeriesId?: number): FormState {
     internalNote: "",
     presentationTemplateId: "",
     answerFormTemplateId: "",
+    solutionStrategy: "AFTER_EACH_QUESTION",
+  };
+}
+
+function formFromQuiz(quiz: QuizResult): FormState {
+  return {
+    eventSeriesId: String(quiz.eventreihe_id),
+    title: quiz.titel ?? "",
+    date: quiz.quiz_datum ?? "",
+    time: quiz.veranstaltungszeit ?? "",
+    venueName: quiz.veranstaltungsname ?? "",
+    mapUrl: quiz.karten_url ?? "",
+    publicUrl: quiz.oeffentliche_url ?? "",
+    internalNote: quiz.bemerkung ?? "",
+    presentationTemplateId: quiz.presentation_template_id ?? "",
+    answerFormTemplateId: quiz.answer_form_template_id ?? "",
+    solutionStrategy: quiz.aufloesungsstrategie,
   };
 }
 
@@ -81,6 +104,7 @@ export default function QuizForm({
   messages,
   presentationTemplates,
   canAssignPresentationTemplates,
+  initialEditingQuizId,
 }: {
   quizze: QuizResult[];
   eventSeries: EventSeriesOption[];
@@ -88,9 +112,13 @@ export default function QuizForm({
   messages: RenderingMessages;
   presentationTemplates: AssignablePresentationTemplate[];
   canAssignPresentationTemplates: boolean;
+  initialEditingQuizId?: number;
 }) {
-  const [editingQuizId, setEditingQuizId] = useState<number | null>(null);
-  const [form, setForm] = useState(() => emptyForm(initialEventSeriesId));
+  const initialEditingQuiz = quizze.find((quiz) => quiz.quiz_id === initialEditingQuizId);
+  const [editingQuizId, setEditingQuizId] = useState<number | null>(initialEditingQuiz?.quiz_id ?? null);
+  const [form, setForm] = useState(() =>
+    initialEditingQuiz ? formFromQuiz(initialEditingQuiz) : emptyForm(initialEventSeriesId),
+  );
   const [message, setMessage] = useState("");
   const [eventSeriesFilter, setEventSeriesFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -123,18 +151,7 @@ export default function QuizForm({
 
   function startEdit(quiz: QuizResult) {
     setEditingQuizId(quiz.quiz_id);
-    setForm({
-      eventSeriesId: String(quiz.eventreihe_id),
-      title: quiz.titel ?? "",
-      date: quiz.quiz_datum ?? "",
-      time: quiz.veranstaltungszeit ?? "",
-      venueName: quiz.veranstaltungsname ?? "",
-      mapUrl: quiz.karten_url ?? "",
-      publicUrl: quiz.oeffentliche_url ?? "",
-      internalNote: quiz.bemerkung ?? "",
-      presentationTemplateId: quiz.presentation_template_id ?? "",
-      answerFormTemplateId: quiz.answer_form_template_id ?? "",
-    });
+    setForm(formFromQuiz(quiz));
     setMessage(
       quiz.quiz_datum
         ? `Quiz ${quiz.quiz_id} wird bearbeitet.`
@@ -156,6 +173,7 @@ export default function QuizForm({
       bemerkung: form.internalNote,
       presentationTemplateId: form.presentationTemplateId || null,
       answerFormTemplateId: form.answerFormTemplateId || null,
+      solutionStrategy: form.solutionStrategy,
     };
     const result = editingQuizId === null
       ? await createQuiz(data)
@@ -271,6 +289,29 @@ export default function QuizForm({
               <div className="mt-3"><TemplatePreview template={effectiveAnswerForm.template} messages={messages} /></div>
             </label>
           </div>
+          <label className="block max-w-xl">
+            <span className="mb-1 block text-sm font-semibold">Standard für Auflösungen</span>
+            <select
+              value={form.solutionStrategy}
+              onChange={(event) =>
+                updateField(
+                  "solutionStrategy",
+                  event.target.value as QuizSolutionStrategy,
+                )
+              }
+              className={inputClass}
+            >
+              {form.solutionStrategy === "MANUAL" && <option value="MANUAL" disabled>Legacy: Manuell im Ablauf</option>}
+              {QUIZ_STANDARD_SOLUTION_STRATEGIES.map((strategy) => (
+                <option key={strategy} value={strategy}>
+                  {getQuizSolutionStrategyLabel(strategy)}
+                </option>
+              ))}
+            </select>
+            <p className="mt-2 text-sm text-slate-600">
+              Einzelne Fragenblöcke können im redaktionellen Ablauf davon abweichen.
+            </p>
+          </label>
           <label className="block">
             <span className="mb-1 block text-sm font-semibold">Interne Bemerkung</span>
             <textarea maxLength={2000} value={form.internalNote} onChange={(event) => updateField("internalNote", event.target.value)} className={`${inputClass} min-h-28 resize-y`} />

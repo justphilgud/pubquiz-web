@@ -45,7 +45,7 @@ export const presentationTemplateAssetRolesByStyle: Record<
   BIRTHDAY: [
     { role: "LOGO", label: "Anlass-Signet", helpText: "Optionales persönliches Signet oder Monogramm.", multiple: false },
     { role: "HERO_IMAGE", label: "Hauptbild", helpText: "Das prägende Foto der Titelseite.", multiple: false },
-    { role: "IMAGE_POOL", label: "Erinnerungsalbum", helpText: "Bilderpool für deterministische Collagen.", multiple: true },
+    { role: "IMAGE_POOL", label: "Bildarchiv", helpText: "Kuratierte Bilder für deterministische Storybook-Seiten.", multiple: true },
     { role: "SOLUTION_IMAGE", label: "Auflösungsbild", helpText: "Besonderes Erinnerungsfoto für Lösungen.", multiple: false },
     { role: "DECORATION", label: "Album-Dekoration", helpText: "Optionale Papier-, Karten- oder Erinnerungsmotive.", multiple: true },
   ],

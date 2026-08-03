@@ -7,6 +7,7 @@ import {
   requireQuizQuestion,
   requireQuizViewer,
 } from "../../quizAccess.server";
+import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
@@ -65,29 +66,62 @@ export async function getPraesentationPunktestand(quizId: number) {
 export async function setPraesentationSlideIndex(
   quizId: number,
   slideIndex: number,
+  slideKey: string,
 ) {
   await requireQuizLiveController(quizId);
-  const status = await prisma.quiz_praesentation_status.upsert({
-    where: { quiz_id: quizId },
-    update: {
-      slide_index: slideIndex,
-      slide_started_at: new Date(),
-      endstand_reveal_count: 1,
-      medium_overlay_aktiv: false,
-      audio_aktion: "stop",
-      audio_aktion_id: { increment: 1 },
-    },
-    create: {
-      quiz_id: quizId,
-      slide_index: slideIndex,
-      slide_started_at: new Date(),
-      endstand_reveal_count: 1,
-      medium_overlay_aktiv: false,
-      audio_aktion: "stop",
-      audio_aktion_id: 1,
-    },
+  const identity = parsePresentationSlideKey(slideKey);
+  const question = identity?.kind === "QUESTION"
+    ? await requireQuizQuestion(quizId, identity.questionAssignmentId)
+    : null;
+
+  return prisma.$transaction(async (tx) => {
+    const status = await tx.quiz_praesentation_status.upsert({
+      where: { quiz_id: quizId },
+      update: {
+        slide_index: slideIndex,
+        slide_key: slideKey,
+        slide_started_at: new Date(),
+        endstand_reveal_count: 1,
+        medium_overlay_aktiv: false,
+        audio_aktion: "stop",
+        audio_aktion_id: { increment: 1 },
+        countdown_dauer_sekunden: null,
+        countdown_started_at: null,
+        countdown_ended_at: null,
+        countdown_status: "idle",
+      },
+      create: {
+        quiz_id: quizId,
+        slide_index: slideIndex,
+        slide_key: slideKey,
+        slide_started_at: new Date(),
+        endstand_reveal_count: 1,
+        medium_overlay_aktiv: false,
+        audio_aktion: "stop",
+        audio_aktion_id: 1,
+        countdown_status: "idle",
+      },
+    });
+
+    if (question?.quiz_abschnitt_id) {
+      await tx.quiz_block_freigaben.upsert({
+        where: {
+          quiz_id_quiz_abschnitt_id: {
+            quiz_id: quizId,
+            quiz_abschnitt_id: question.quiz_abschnitt_id,
+          },
+        },
+        update: { aktuelle_quiz_fragen_id: question.quiz_fragen_id },
+        create: {
+          quiz_id: quizId,
+          quiz_abschnitt_id: question.quiz_abschnitt_id,
+          aktuelle_quiz_fragen_id: question.quiz_fragen_id,
+        },
+      });
+    }
+
+    return status;
   });
-  return status;
 }
 export async function getAntwortStatus(
   quizId: number,

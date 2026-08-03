@@ -434,6 +434,7 @@ export type fragenWhereInput = {
   relationen_als_ziel?: Prisma.Fragen_relationenListRelationFilter
   quiz_fragen?: Prisma.Quiz_fragenListRelationFilter
   eventreihen?: Prisma.Fragen_eventreihenListRelationFilter
+  story_element_verknuepfungen?: Prisma.Frage_story_elementeListRelationFilter
 }
 
 export type fragenOrderByWithRelationInput = {
@@ -475,6 +476,7 @@ export type fragenOrderByWithRelationInput = {
   relationen_als_ziel?: Prisma.fragen_relationenOrderByRelationAggregateInput
   quiz_fragen?: Prisma.quiz_fragenOrderByRelationAggregateInput
   eventreihen?: Prisma.fragen_eventreihenOrderByRelationAggregateInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeOrderByRelationAggregateInput
 }
 
 export type fragenWhereUniqueInput = Prisma.AtLeast<{
@@ -519,6 +521,7 @@ export type fragenWhereUniqueInput = Prisma.AtLeast<{
   relationen_als_ziel?: Prisma.Fragen_relationenListRelationFilter
   quiz_fragen?: Prisma.Quiz_fragenListRelationFilter
   eventreihen?: Prisma.Fragen_eventreihenListRelationFilter
+  story_element_verknuepfungen?: Prisma.Frage_story_elementeListRelationFilter
 }, "fragen_id">
 
 export type fragenOrderByWithAggregationInput = {
@@ -628,6 +631,7 @@ export type fragenCreateInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateInput = {
@@ -668,6 +672,7 @@ export type fragenUncheckedCreateInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUpdateInput = {
@@ -707,6 +712,7 @@ export type fragenUpdateInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateInput = {
@@ -747,6 +753,7 @@ export type fragenUncheckedUpdateInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateManyInput = {
@@ -1091,6 +1098,20 @@ export type fragenUpdateOneRequiredWithoutGenerator_laefeNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.fragenUpdateToOneWithWhereWithoutGenerator_laefeInput, Prisma.fragenUpdateWithoutGenerator_laefeInput>, Prisma.fragenUncheckedUpdateWithoutGenerator_laefeInput>
 }
 
+export type fragenCreateNestedOneWithoutStory_element_verknuepfungenInput = {
+  create?: Prisma.XOR<Prisma.fragenCreateWithoutStory_element_verknuepfungenInput, Prisma.fragenUncheckedCreateWithoutStory_element_verknuepfungenInput>
+  connectOrCreate?: Prisma.fragenCreateOrConnectWithoutStory_element_verknuepfungenInput
+  connect?: Prisma.fragenWhereUniqueInput
+}
+
+export type fragenUpdateOneRequiredWithoutStory_element_verknuepfungenNestedInput = {
+  create?: Prisma.XOR<Prisma.fragenCreateWithoutStory_element_verknuepfungenInput, Prisma.fragenUncheckedCreateWithoutStory_element_verknuepfungenInput>
+  connectOrCreate?: Prisma.fragenCreateOrConnectWithoutStory_element_verknuepfungenInput
+  upsert?: Prisma.fragenUpsertWithoutStory_element_verknuepfungenInput
+  connect?: Prisma.fragenWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.fragenUpdateToOneWithWhereWithoutStory_element_verknuepfungenInput, Prisma.fragenUpdateWithoutStory_element_verknuepfungenInput>, Prisma.fragenUncheckedUpdateWithoutStory_element_verknuepfungenInput>
+}
+
 export type fragenCreateNestedOneWithoutQuiz_fragenInput = {
   create?: Prisma.XOR<Prisma.fragenCreateWithoutQuiz_fragenInput, Prisma.fragenUncheckedCreateWithoutQuiz_fragenInput>
   connectOrCreate?: Prisma.fragenCreateOrConnectWithoutQuiz_fragenInput
@@ -1211,6 +1232,7 @@ export type fragenCreateWithoutAntwortenInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutAntwortenInput = {
@@ -1250,6 +1272,7 @@ export type fragenUncheckedCreateWithoutAntwortenInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutAntwortenInput = {
@@ -1304,6 +1327,7 @@ export type fragenUpdateWithoutAntwortenInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutAntwortenInput = {
@@ -1343,6 +1367,7 @@ export type fragenUncheckedUpdateWithoutAntwortenInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateWithoutRelationen_als_quelleInput = {
@@ -1381,6 +1406,7 @@ export type fragenCreateWithoutRelationen_als_quelleInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutRelationen_als_quelleInput = {
@@ -1420,6 +1446,7 @@ export type fragenUncheckedCreateWithoutRelationen_als_quelleInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutRelationen_als_quelleInput = {
@@ -1463,6 +1490,7 @@ export type fragenCreateWithoutRelationen_als_zielInput = {
   relationen_als_quelle?: Prisma.fragen_relationenCreateNestedManyWithoutQuell_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutRelationen_als_zielInput = {
@@ -1502,6 +1530,7 @@ export type fragenUncheckedCreateWithoutRelationen_als_zielInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutQuell_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutRelationen_als_zielInput = {
@@ -1556,6 +1585,7 @@ export type fragenUpdateWithoutRelationen_als_quelleInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutRelationen_als_quelleInput = {
@@ -1595,6 +1625,7 @@ export type fragenUncheckedUpdateWithoutRelationen_als_quelleInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUpsertWithoutRelationen_als_zielInput = {
@@ -1644,6 +1675,7 @@ export type fragenUpdateWithoutRelationen_als_zielInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUpdateManyWithoutQuell_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutRelationen_als_zielInput = {
@@ -1683,6 +1715,7 @@ export type fragenUncheckedUpdateWithoutRelationen_als_zielInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedUpdateManyWithoutQuell_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateWithoutFragen_kategorienInput = {
@@ -1721,6 +1754,7 @@ export type fragenCreateWithoutFragen_kategorienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutFragen_kategorienInput = {
@@ -1760,6 +1794,7 @@ export type fragenUncheckedCreateWithoutFragen_kategorienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutFragen_kategorienInput = {
@@ -1814,6 +1849,7 @@ export type fragenUpdateWithoutFragen_kategorienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutFragen_kategorienInput = {
@@ -1853,6 +1889,7 @@ export type fragenUncheckedUpdateWithoutFragen_kategorienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateWithoutMedienInput = {
@@ -1891,6 +1928,7 @@ export type fragenCreateWithoutMedienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutMedienInput = {
@@ -1930,6 +1968,7 @@ export type fragenUncheckedCreateWithoutMedienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutMedienInput = {
@@ -1984,6 +2023,7 @@ export type fragenUpdateWithoutMedienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutMedienInput = {
@@ -2023,6 +2063,7 @@ export type fragenUncheckedUpdateWithoutMedienInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateWithoutGenerator_laefeInput = {
@@ -2061,6 +2102,7 @@ export type fragenCreateWithoutGenerator_laefeInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutGenerator_laefeInput = {
@@ -2100,6 +2142,7 @@ export type fragenUncheckedCreateWithoutGenerator_laefeInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutGenerator_laefeInput = {
@@ -2154,6 +2197,7 @@ export type fragenUpdateWithoutGenerator_laefeInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutGenerator_laefeInput = {
@@ -2189,6 +2233,181 @@ export type fragenUncheckedUpdateWithoutGenerator_laefeInput = {
   antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
   fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
   medien?: Prisma.medienUncheckedUpdateManyWithoutFragenNestedInput
+  relationen_als_quelle?: Prisma.fragen_relationenUncheckedUpdateManyWithoutQuell_frageNestedInput
+  relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
+  quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
+  eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
+}
+
+export type fragenCreateWithoutStory_element_verknuepfungenInput = {
+  frage: string
+  quelle?: string | null
+  fragentyp?: string | null
+  schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  erstellungsdatum?: Date | string
+  ist_archiviert?: boolean
+  archivierungsgrund?: string | null
+  created_by_user_id?: number | null
+  created_at?: Date | string
+  last_modified_by_user_id?: number | null
+  updated_at?: Date | string
+  approved_by_user_id?: number | null
+  approved_at?: Date | string | null
+  freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
+  template_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  geltungsbereich?: $Enums.QuestionScope
+  antworten?: Prisma.antwortenCreateNestedManyWithoutFragenInput
+  antwortfelder?: Prisma.frage_antwortfelderCreateNestedManyWithoutFrageInput
+  vorlage?: Prisma.frage_vorlagenCreateNestedOneWithoutFragenInput
+  fragen_kategorien?: Prisma.fragen_kategorienCreateNestedManyWithoutFragenInput
+  medien?: Prisma.medienCreateNestedManyWithoutFragenInput
+  generator_laefe?: Prisma.medien_generator_laefeCreateNestedManyWithoutFragenInput
+  relationen_als_quelle?: Prisma.fragen_relationenCreateNestedManyWithoutQuell_frageInput
+  relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
+  quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
+  eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+}
+
+export type fragenUncheckedCreateWithoutStory_element_verknuepfungenInput = {
+  fragen_id?: number
+  frage: string
+  quelle?: string | null
+  fragentyp?: string | null
+  schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  erstellungsdatum?: Date | string
+  ist_archiviert?: boolean
+  archivierungsgrund?: string | null
+  vorlage_id?: number | null
+  created_by_user_id?: number | null
+  created_at?: Date | string
+  last_modified_by_user_id?: number | null
+  updated_at?: Date | string
+  approved_by_user_id?: number | null
+  approved_at?: Date | string | null
+  freigegeben?: boolean
+  ist_unfertig?: boolean
+  moderationsnotizen?: string | null
+  kategorienwunsch?: string | null
+  gueltig_bis?: Date | string | null
+  review_status?: $Enums.QuestionReviewStatus
+  submitted_at?: Date | string | null
+  submitted_by_user_id?: number | null
+  review_feedback?: string | null
+  reviewed_at?: Date | string | null
+  reviewed_by_user_id?: number | null
+  template_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  geltungsbereich?: $Enums.QuestionScope
+  antworten?: Prisma.antwortenUncheckedCreateNestedManyWithoutFragenInput
+  antwortfelder?: Prisma.frage_antwortfelderUncheckedCreateNestedManyWithoutFrageInput
+  fragen_kategorien?: Prisma.fragen_kategorienUncheckedCreateNestedManyWithoutFragenInput
+  medien?: Prisma.medienUncheckedCreateNestedManyWithoutFragenInput
+  generator_laefe?: Prisma.medien_generator_laefeUncheckedCreateNestedManyWithoutFragenInput
+  relationen_als_quelle?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutQuell_frageInput
+  relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
+  quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
+  eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+}
+
+export type fragenCreateOrConnectWithoutStory_element_verknuepfungenInput = {
+  where: Prisma.fragenWhereUniqueInput
+  create: Prisma.XOR<Prisma.fragenCreateWithoutStory_element_verknuepfungenInput, Prisma.fragenUncheckedCreateWithoutStory_element_verknuepfungenInput>
+}
+
+export type fragenUpsertWithoutStory_element_verknuepfungenInput = {
+  update: Prisma.XOR<Prisma.fragenUpdateWithoutStory_element_verknuepfungenInput, Prisma.fragenUncheckedUpdateWithoutStory_element_verknuepfungenInput>
+  create: Prisma.XOR<Prisma.fragenCreateWithoutStory_element_verknuepfungenInput, Prisma.fragenUncheckedCreateWithoutStory_element_verknuepfungenInput>
+  where?: Prisma.fragenWhereInput
+}
+
+export type fragenUpdateToOneWithWhereWithoutStory_element_verknuepfungenInput = {
+  where?: Prisma.fragenWhereInput
+  data: Prisma.XOR<Prisma.fragenUpdateWithoutStory_element_verknuepfungenInput, Prisma.fragenUncheckedUpdateWithoutStory_element_verknuepfungenInput>
+}
+
+export type fragenUpdateWithoutStory_element_verknuepfungenInput = {
+  frage?: Prisma.StringFieldUpdateOperationsInput | string
+  quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  last_modified_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  template_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  geltungsbereich?: Prisma.EnumQuestionScopeFieldUpdateOperationsInput | $Enums.QuestionScope
+  antworten?: Prisma.antwortenUpdateManyWithoutFragenNestedInput
+  antwortfelder?: Prisma.frage_antwortfelderUpdateManyWithoutFrageNestedInput
+  vorlage?: Prisma.frage_vorlagenUpdateOneWithoutFragenNestedInput
+  fragen_kategorien?: Prisma.fragen_kategorienUpdateManyWithoutFragenNestedInput
+  medien?: Prisma.medienUpdateManyWithoutFragenNestedInput
+  generator_laefe?: Prisma.medien_generator_laefeUpdateManyWithoutFragenNestedInput
+  relationen_als_quelle?: Prisma.fragen_relationenUpdateManyWithoutQuell_frageNestedInput
+  relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
+  quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
+  eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+}
+
+export type fragenUncheckedUpdateWithoutStory_element_verknuepfungenInput = {
+  fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  frage?: Prisma.StringFieldUpdateOperationsInput | string
+  quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vorlage_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  last_modified_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  approved_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_unfertig?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  moderationsnotizen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kategorienwunsch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gueltig_bis?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  review_status?: Prisma.EnumQuestionReviewStatusFieldUpdateOperationsInput | $Enums.QuestionReviewStatus
+  submitted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  submitted_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  template_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  geltungsbereich?: Prisma.EnumQuestionScopeFieldUpdateOperationsInput | $Enums.QuestionScope
+  antworten?: Prisma.antwortenUncheckedUpdateManyWithoutFragenNestedInput
+  antwortfelder?: Prisma.frage_antwortfelderUncheckedUpdateManyWithoutFrageNestedInput
+  fragen_kategorien?: Prisma.fragen_kategorienUncheckedUpdateManyWithoutFragenNestedInput
+  medien?: Prisma.medienUncheckedUpdateManyWithoutFragenNestedInput
+  generator_laefe?: Prisma.medien_generator_laefeUncheckedUpdateManyWithoutFragenNestedInput
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedUpdateManyWithoutQuell_frageNestedInput
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
@@ -2231,6 +2450,7 @@ export type fragenCreateWithoutQuiz_fragenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenCreateNestedManyWithoutQuell_frageInput
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutQuiz_fragenInput = {
@@ -2270,6 +2490,7 @@ export type fragenUncheckedCreateWithoutQuiz_fragenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutQuell_frageInput
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutQuiz_fragenInput = {
@@ -2324,6 +2545,7 @@ export type fragenUpdateWithoutQuiz_fragenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUpdateManyWithoutQuell_frageNestedInput
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutQuiz_fragenInput = {
@@ -2363,6 +2585,7 @@ export type fragenUncheckedUpdateWithoutQuiz_fragenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedUpdateManyWithoutQuell_frageNestedInput
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateWithoutAntwortfelderInput = {
@@ -2401,6 +2624,7 @@ export type fragenCreateWithoutAntwortfelderInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutAntwortfelderInput = {
@@ -2440,6 +2664,7 @@ export type fragenUncheckedCreateWithoutAntwortfelderInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutAntwortfelderInput = {
@@ -2494,6 +2719,7 @@ export type fragenUpdateWithoutAntwortfelderInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutAntwortfelderInput = {
@@ -2533,6 +2759,7 @@ export type fragenUncheckedUpdateWithoutAntwortfelderInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateWithoutVorlageInput = {
@@ -2571,6 +2798,7 @@ export type fragenCreateWithoutVorlageInput = {
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutVorlageInput = {
@@ -2610,6 +2838,7 @@ export type fragenUncheckedCreateWithoutVorlageInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutFrageInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutVorlageInput = {
@@ -2708,6 +2937,7 @@ export type fragenCreateWithoutEventreihenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenCreateNestedManyWithoutQuell_frageInput
   relationen_als_ziel?: Prisma.fragen_relationenCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedManyWithoutFragenInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutFrageInput
 }
 
 export type fragenUncheckedCreateWithoutEventreihenInput = {
@@ -2747,6 +2977,7 @@ export type fragenUncheckedCreateWithoutEventreihenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutQuell_frageInput
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedCreateNestedManyWithoutZiel_frageInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedCreateNestedManyWithoutFragenInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutFrageInput
 }
 
 export type fragenCreateOrConnectWithoutEventreihenInput = {
@@ -2801,6 +3032,7 @@ export type fragenUpdateWithoutEventreihenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUpdateManyWithoutQuell_frageNestedInput
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutEventreihenInput = {
@@ -2840,6 +3072,7 @@ export type fragenUncheckedUpdateWithoutEventreihenInput = {
   relationen_als_quelle?: Prisma.fragen_relationenUncheckedUpdateManyWithoutQuell_frageNestedInput
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenCreateManyVorlageInput = {
@@ -2908,6 +3141,7 @@ export type fragenUpdateWithoutVorlageInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateWithoutVorlageInput = {
@@ -2947,6 +3181,7 @@ export type fragenUncheckedUpdateWithoutVorlageInput = {
   relationen_als_ziel?: Prisma.fragen_relationenUncheckedUpdateManyWithoutZiel_frageNestedInput
   quiz_fragen?: Prisma.quiz_fragenUncheckedUpdateManyWithoutFragenNestedInput
   eventreihen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutFrageNestedInput
+  story_element_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutFrageNestedInput
 }
 
 export type fragenUncheckedUpdateManyWithoutVorlageInput = {
@@ -2994,6 +3229,7 @@ export type FragenCountOutputType = {
   relationen_als_ziel: number
   quiz_fragen: number
   eventreihen: number
+  story_element_verknuepfungen: number
 }
 
 export type FragenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3006,6 +3242,7 @@ export type FragenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   relationen_als_ziel?: boolean | FragenCountOutputTypeCountRelationen_als_zielArgs
   quiz_fragen?: boolean | FragenCountOutputTypeCountQuiz_fragenArgs
   eventreihen?: boolean | FragenCountOutputTypeCountEventreihenArgs
+  story_element_verknuepfungen?: boolean | FragenCountOutputTypeCountStory_element_verknuepfungenArgs
 }
 
 /**
@@ -3081,6 +3318,13 @@ export type FragenCountOutputTypeCountEventreihenArgs<ExtArgs extends runtime.Ty
   where?: Prisma.fragen_eventreihenWhereInput
 }
 
+/**
+ * FragenCountOutputType without action
+ */
+export type FragenCountOutputTypeCountStory_element_verknuepfungenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.frage_story_elementeWhereInput
+}
+
 
 export type fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   fragen_id?: boolean
@@ -3121,6 +3365,7 @@ export type fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   relationen_als_ziel?: boolean | Prisma.fragen$relationen_als_zielArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.fragen$quiz_fragenArgs<ExtArgs>
   eventreihen?: boolean | Prisma.fragen$eventreihenArgs<ExtArgs>
+  story_element_verknuepfungen?: boolean | Prisma.fragen$story_element_verknuepfungenArgs<ExtArgs>
   _count?: boolean | Prisma.FragenCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fragen"]>
 
@@ -3231,6 +3476,7 @@ export type fragenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   relationen_als_ziel?: boolean | Prisma.fragen$relationen_als_zielArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.fragen$quiz_fragenArgs<ExtArgs>
   eventreihen?: boolean | Prisma.fragen$eventreihenArgs<ExtArgs>
+  story_element_verknuepfungen?: boolean | Prisma.fragen$story_element_verknuepfungenArgs<ExtArgs>
   _count?: boolean | Prisma.FragenCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type fragenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3253,6 +3499,7 @@ export type $fragenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     relationen_als_ziel: Prisma.$fragen_relationenPayload<ExtArgs>[]
     quiz_fragen: Prisma.$quiz_fragenPayload<ExtArgs>[]
     eventreihen: Prisma.$fragen_eventreihenPayload<ExtArgs>[]
+    story_element_verknuepfungen: Prisma.$frage_story_elementePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     fragen_id: number
@@ -3687,6 +3934,7 @@ export interface Prisma__fragenClient<T, Null = never, ExtArgs extends runtime.T
   relationen_als_ziel<T extends Prisma.fragen$relationen_als_zielArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragen$relationen_als_zielArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragen_relationenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quiz_fragen<T extends Prisma.fragen$quiz_fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragen$quiz_fragenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_fragenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   eventreihen<T extends Prisma.fragen$eventreihenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragen$eventreihenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragen_eventreihenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  story_element_verknuepfungen<T extends Prisma.fragen$story_element_verknuepfungenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.fragen$story_element_verknuepfungenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_story_elementePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4377,6 +4625,30 @@ export type fragen$eventreihenArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.Fragen_eventreihenScalarFieldEnum | Prisma.Fragen_eventreihenScalarFieldEnum[]
+}
+
+/**
+ * fragen.story_element_verknuepfungen
+ */
+export type fragen$story_element_verknuepfungenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the frage_story_elemente
+   */
+  select?: Prisma.frage_story_elementeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the frage_story_elemente
+   */
+  omit?: Prisma.frage_story_elementeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.frage_story_elementeInclude<ExtArgs> | null
+  where?: Prisma.frage_story_elementeWhereInput
+  orderBy?: Prisma.frage_story_elementeOrderByWithRelationInput | Prisma.frage_story_elementeOrderByWithRelationInput[]
+  cursor?: Prisma.frage_story_elementeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Frage_story_elementeScalarFieldEnum | Prisma.Frage_story_elementeScalarFieldEnum[]
 }
 
 /**

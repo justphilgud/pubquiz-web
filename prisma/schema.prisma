@@ -10,16 +10,16 @@ datasource db {
 }
 
 model antworten {
-  antwort_id        Int              @id @default(autoincrement())
-  fragen_id         Int
-  antwort           String
-  ist_richtig       Boolean          @default(false)
-  antworttyp_id     Int
-  zusatzinformation String?
-  antworttyp        antworttyp       @relation(fields: [antworttyp_id], references: [antworttyp_id], onUpdate: NoAction, map: "fk_antworten_antworttyp")
-  fragen            fragen           @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_antworten_fragen")
-  medien            medien[]
-  team_antworten    team_antworten[]
+  antwort_id             Int                      @id @default(autoincrement())
+  fragen_id              Int
+  antwort                String
+  ist_richtig            Boolean                  @default(false)
+  antworttyp_id          Int
+  zusatzinformation      String?
+  antworttyp             antworttyp               @relation(fields: [antworttyp_id], references: [antworttyp_id], onUpdate: NoAction, map: "fk_antworten_antworttyp")
+  fragen                 fragen                   @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_antworten_fragen")
+  medien                 medien[]
+  team_antworten         team_antworten[]
   team_antwort_auswahlen team_antwort_auswahlen[]
 
   @@index([fragen_id], map: "idx_antworten_fragen_id")
@@ -35,44 +35,45 @@ model antworttyp {
 }
 
 model fragen {
-  fragen_id                Int                      @id @default(autoincrement())
-  frage                    String
-  quelle                   String?
-  fragentyp                String?
-  schwierigkeitslevel      Decimal?                 @db.Decimal(5, 2)
-  erstellungsdatum         DateTime                 @default(dbgenerated("CURRENT_DATE")) @db.Date
-  ist_archiviert           Boolean                  @default(false)
-  archivierungsgrund       String?
-  vorlage_id               Int?
-  antworten                antworten[]
-  antwortfelder            frage_antwortfelder[]
-  vorlage                  frage_vorlagen?          @relation(fields: [vorlage_id], references: [vorlage_id])
-  fragen_kategorien        fragen_kategorien[]
-  medien                   medien[]
-  generator_laefe          medien_generator_laefe[]
-  relationen_als_quelle    fragen_relationen[]      @relation("fragen_relation_quelle")
-  relationen_als_ziel      fragen_relationen[]      @relation("fragen_relation_ziel")
-  quiz_fragen              quiz_fragen[]
-  created_by_user_id       Int?
-  created_at               DateTime                 @default(now())
-  last_modified_by_user_id Int?
-  updated_at               DateTime                 @default(now()) @updatedAt
-  approved_by_user_id      Int?
-  approved_at              DateTime?
-  freigegeben              Boolean                  @default(false)
-  ist_unfertig             Boolean                  @default(false)
-  moderationsnotizen       String?
-  kategorienwunsch         String?
-  gueltig_bis              DateTime?                @db.Date
-  review_status            QuestionReviewStatus     @default(DRAFT)
-  submitted_at             DateTime?
-  submitted_by_user_id     Int?
-  review_feedback          String?
-  reviewed_at              DateTime?
-  reviewed_by_user_id      Int?
-  template_config_json     Json?
-  geltungsbereich          QuestionScope            @default(GLOBAL)
-  eventreihen              fragen_eventreihen[]
+  fragen_id                    Int                      @id @default(autoincrement())
+  frage                        String
+  quelle                       String?
+  fragentyp                    String?
+  schwierigkeitslevel          Decimal?                 @db.Decimal(5, 2)
+  erstellungsdatum             DateTime                 @default(dbgenerated("CURRENT_DATE")) @db.Date
+  ist_archiviert               Boolean                  @default(false)
+  archivierungsgrund           String?
+  vorlage_id                   Int?
+  antworten                    antworten[]
+  antwortfelder                frage_antwortfelder[]
+  vorlage                      frage_vorlagen?          @relation(fields: [vorlage_id], references: [vorlage_id])
+  fragen_kategorien            fragen_kategorien[]
+  medien                       medien[]
+  generator_laefe              medien_generator_laefe[]
+  relationen_als_quelle        fragen_relationen[]      @relation("fragen_relation_quelle")
+  relationen_als_ziel          fragen_relationen[]      @relation("fragen_relation_ziel")
+  quiz_fragen                  quiz_fragen[]
+  created_by_user_id           Int?
+  created_at                   DateTime                 @default(now())
+  last_modified_by_user_id     Int?
+  updated_at                   DateTime                 @default(now()) @updatedAt
+  approved_by_user_id          Int?
+  approved_at                  DateTime?
+  freigegeben                  Boolean                  @default(false)
+  ist_unfertig                 Boolean                  @default(false)
+  moderationsnotizen           String?
+  kategorienwunsch             String?
+  gueltig_bis                  DateTime?                @db.Date
+  review_status                QuestionReviewStatus     @default(DRAFT)
+  submitted_at                 DateTime?
+  submitted_by_user_id         Int?
+  review_feedback              String?
+  reviewed_at                  DateTime?
+  reviewed_by_user_id          Int?
+  template_config_json         Json?
+  geltungsbereich              QuestionScope            @default(GLOBAL)
+  eventreihen                  fragen_eventreihen[]
+  story_element_verknuepfungen frage_story_elemente[]
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
@@ -231,11 +232,14 @@ model quiz {
   outro_bekanntmachungen   String?
   outro_musik_url          String?
   manuelle_bewertungen     Int?                       @default(0)
+  aufloesungsstrategie     String                     @default("AFTER_EACH_QUESTION") @db.VarChar(32)
   presentation_template_id String?                    @db.VarChar(64)
   answer_form_template_id  String?                    @db.VarChar(64)
   quiz_abschnitte          quiz_abschnitte[]
   quiz_block_freigaben     quiz_block_freigaben[]
   quiz_fragen              quiz_fragen[]
+  quiz_ablauf_elemente     quiz_ablauf_elemente[]
+  story_elemente           story_elemente[]
   praesentation_status     quiz_praesentation_status?
   quiz_team_sessions       quiz_team_sessions[]
   quiz_teams               quiz_teams[]
@@ -264,6 +268,7 @@ model eventreihen {
   benutzerrollen                   eventreihe_benutzerrollen[]
   rollenzuweisungen                benutzer_rollenzuweisungen[]
   fragen                           fragen_eventreihen[]
+  story_elemente                   story_elemente[]
 
   @@index([ist_archiviert, name], map: "idx_eventreihen_status_name")
   @@schema("pubquiz")
@@ -291,28 +296,103 @@ model presentation_templates {
   @@schema("pubquiz")
 }
 
+/// Stable editorial identity. Content changes are stored as immutable revisions;
+/// quiz placements reference one concrete revision so completed quizzes never drift.
+model story_elemente {
+  story_element_id        Int                        @id @default(autoincrement())
+  stable_key              String                     @unique @db.VarChar(64)
+  status                  StoryElementStatus         @default(DRAFT)
+  geltungsbereich         StoryElementScope          @default(EVENT_SERIES)
+  eventreihe_id           Int?
+  quiz_id                 Int?
+  created_by_user_id      Int?
+  source_story_element_id Int?
+  archived_at             DateTime?
+  created_at              DateTime                   @default(now())
+  updated_at              DateTime                   @default(now()) @updatedAt
+  eventreihe              eventreihen?               @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
+  quiz                    quiz?                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  created_by              users?                     @relation("StoryElementCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  source                  story_elemente?            @relation("StoryElementSource", fields: [source_story_element_id], references: [story_element_id], onDelete: SetNull)
+  ableitungen             story_elemente[]           @relation("StoryElementSource")
+  revisionen              story_element_revisionen[]
+  fragen_verknuepfungen   frage_story_elemente[]
+
+  @@index([status, updated_at], map: "idx_story_elemente_status_updated")
+  @@index([geltungsbereich, eventreihe_id], map: "idx_story_elemente_scope_eventreihe")
+  @@index([quiz_id], map: "idx_story_elemente_quiz")
+  @@index([created_by_user_id], map: "idx_story_elemente_creator")
+  @@schema("pubquiz")
+}
+
+/// Immutable, validated content snapshot of a story element.
+model story_element_revisionen {
+  story_element_revision_id Int                    @id @default(autoincrement())
+  story_element_id          Int
+  revisionsnummer           Int
+  typ                       String                 @db.VarChar(40)
+  titel                     String                 @db.VarChar(160)
+  beschreibung              String?                @db.VarChar(1000)
+  kategorie                 String?                @db.VarChar(120)
+  tags                      String[]               @default([])
+  moderationsnotiz          String?                @db.VarChar(2000)
+  konfigurations_version    Int                    @default(1)
+  konfiguration             Json
+  created_by_user_id        Int?
+  created_at                DateTime               @default(now())
+  story_element             story_elemente         @relation(fields: [story_element_id], references: [story_element_id], onDelete: Cascade)
+  created_by                users?                 @relation("StoryElementRevisionCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  quiz_ablauf_elemente      quiz_ablauf_elemente[]
+
+  @@unique([story_element_id, revisionsnummer], map: "uq_story_element_revision")
+  @@index([story_element_id, created_at], map: "idx_story_element_revision_created")
+  @@schema("pubquiz")
+}
+
+/// Optional editorial relationship. It suggests placement but never changes scoring.
+model frage_story_elemente {
+  frage_story_element_id Int                       @id @default(autoincrement())
+  fragen_id              Int
+  story_element_id       Int
+  beziehung              StoryQuestionRelationship @default(RELATED)
+  sortierung             Int                       @default(0)
+  created_by_user_id     Int?
+  created_at             DateTime                  @default(now())
+  frage                  fragen                    @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+  story_element          story_elemente            @relation(fields: [story_element_id], references: [story_element_id], onDelete: Cascade)
+  created_by             users?                    @relation("StoryQuestionLinkCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+
+  @@unique([fragen_id, story_element_id], map: "uq_frage_story_element")
+  @@index([story_element_id, beziehung], map: "idx_frage_story_element_story")
+  @@index([fragen_id, sortierung, frage_story_element_id], map: "idx_frage_story_element_order")
+  @@schema("pubquiz")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz_fragen {
-  quiz_fragen_id                Int              @id @default(autoincrement())
-  quiz_id                       Int
-  fragen_id                     Int
-  sortierung                    Int?
-  richtigeantworten             Int?             @default(0)
-  falscheantworten              Int?             @default(0)
-  antwort_reihenfolge           Int[]            @default([])
-  praesentationslayout          String?          @default("standard")
-  quiz_abschnitt_id             Int?
-  punkte_basis                  Decimal          @default(1)
-  punkte_modus                  String           @default("standard")
-  risiko_pool_teamanzahl        Int?
-  risiko_pool_fixiert_am        DateTime?
-  freie_antwort_erlaubt         Boolean          @default(false)
-  praesentationsdauer_messungen Int?             @default(0)
-  praesentationsdauer_sekunden  Int?
-  fragen                        fragen           @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
-  quiz                          quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
-  quiz_abschnitte               quiz_abschnitte? @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
-  team_antworten                team_antworten[]
+  quiz_fragen_id                         Int                    @id @default(autoincrement())
+  quiz_id                                Int
+  fragen_id                              Int
+  sortierung                             Int?
+  richtigeantworten                      Int?                   @default(0)
+  falscheantworten                       Int?                   @default(0)
+  antwort_reihenfolge                    Int[]                  @default([])
+  praesentationslayout                   String?                @default("standard")
+  quiz_abschnitt_id                      Int?
+  punkte_basis                           Decimal                @default(1)
+  punkte_modus                           String                 @default("standard")
+  risiko_pool_teamanzahl                 Int?
+  risiko_pool_fixiert_am                 DateTime?
+  freie_antwort_erlaubt                  Boolean                @default(false)
+  verknuepfte_story_elemente_uebernehmen Boolean                @default(true)
+  praesentationsdauer_messungen          Int?                   @default(0)
+  praesentationsdauer_sekunden           Int?
+  fragen                                 fragen                 @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
+  quiz                                   quiz                   @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
+  quiz_abschnitte                        quiz_abschnitte?       @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
+  team_antworten                         team_antworten[]
+  quiz_ablauf_elemente                   quiz_ablauf_elemente[] @relation("QuizFlowQuestionItem")
+  story_ablauf_elemente                  quiz_ablauf_elemente[] @relation("QuizFlowStoryQuestionReference")
 
   @@unique([quiz_id, fragen_id], map: "uq_quiz_fragen")
   @@unique([quiz_id, sortierung], map: "uq_quiz_fragen_sortierung")
@@ -354,11 +434,50 @@ model quiz_abschnitte {
   qr_code_url          String?
   medien_datei         String?
   bemerkung            String?
+  aufloesungsstrategie String?                @db.VarChar(32)
   quiz                 quiz                   @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
   quiz_block_freigaben quiz_block_freigaben[]
   quiz_fragen          quiz_fragen[]
+  quiz_ablauf_elemente quiz_ablauf_elemente[]
   team_antworten       team_antworten[]
 
+  @@schema("pubquiz")
+}
+
+/// Template-neutral non-question elements which are combined with the
+/// question sequence derived from quiz sections at runtime.
+model quiz_ablauf_elemente {
+  quiz_ablauf_element_id      Int                        @id @default(autoincrement())
+  quiz_id                     Int
+  typ                         String                     @db.VarChar(40)
+  anker_typ                   String                     @db.VarChar(24)
+  anker_schluessel            String                     @db.VarChar(64)
+  quiz_abschnitt_id           Int?
+  quiz_fragen_id              Int?
+  sortierung                  Int
+  ist_sichtbar                Boolean                    @default(true)
+  bezeichnung                 String?                    @db.VarChar(160)
+  konfiguration               Json
+  konfigurations_version      Int                        @default(1)
+  ist_standard                Boolean                    @default(false)
+  created_at                  DateTime                   @default(now())
+  updated_at                  DateTime                   @default(now()) @updatedAt
+  quiz                        quiz                       @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  quiz_abschnitte             quiz_abschnitte?           @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id], onDelete: Cascade)
+  quiz_fragen                 quiz_fragen?               @relation("QuizFlowQuestionItem", fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
+  story_element_revision_id   Int?
+  story_element_revision      story_element_revisionen?  @relation(fields: [story_element_revision_id], references: [story_element_revision_id], onDelete: Restrict)
+  story_bezugs_quiz_fragen_id Int?
+  story_beziehung             StoryQuestionRelationship?
+  story_bezugs_frage          quiz_fragen?               @relation("QuizFlowStoryQuestionReference", fields: [story_bezugs_quiz_fragen_id], references: [quiz_fragen_id], onDelete: SetNull)
+
+  @@unique([quiz_id, anker_typ, anker_schluessel, sortierung], map: "uq_quiz_ablauf_slot_sortierung")
+  @@unique([quiz_id, typ, quiz_fragen_id], map: "uq_quiz_ablauf_frage_typ")
+  @@index([quiz_id, anker_typ, anker_schluessel], map: "idx_quiz_ablauf_anchor")
+  @@index([quiz_abschnitt_id], map: "idx_quiz_ablauf_abschnitt")
+  @@index([quiz_fragen_id], map: "idx_quiz_ablauf_frage")
+  @@index([story_element_revision_id], map: "idx_quiz_ablauf_story_revision")
+  @@index([story_bezugs_quiz_fragen_id], map: "idx_quiz_ablauf_story_question")
   @@schema("pubquiz")
 }
 
@@ -392,37 +511,37 @@ model quiz_block_freigaben {
 }
 
 model team_antworten {
-  team_antwort_id      Int                  @id @default(autoincrement())
+  team_antwort_id      Int                        @id @default(autoincrement())
   quiz_id              Int
   quiz_abschnitt_id    Int
   quiz_fragen_id       Int
   quiz_team_session_id Int
   antwort_text         String?
   antwort_id           Int?
-  aktualisiert_am      DateTime             @default(now())
+  aktualisiert_am      DateTime                   @default(now())
   bewertete_antwort    String?
-  bewertung_final      Boolean              @default(false)
-  ist_manuell_falsch   Boolean              @default(false)
-  ist_manuell_richtig  Boolean              @default(false)
-  ist_skurril          Boolean              @default(false)
-  auto_basis_punkte    Decimal              @default(0) @db.Decimal(12, 4)
-  auto_endpunkte       Decimal              @default(0) @db.Decimal(12, 4)
-  vergebene_punkte     Decimal              @default(0) @db.Decimal(12, 4)
+  bewertung_final      Boolean                    @default(false)
+  ist_manuell_falsch   Boolean                    @default(false)
+  ist_manuell_richtig  Boolean                    @default(false)
+  ist_skurril          Boolean                    @default(false)
+  auto_basis_punkte    Decimal                    @default(0) @db.Decimal(12, 4)
+  auto_endpunkte       Decimal                    @default(0) @db.Decimal(12, 4)
+  vergebene_punkte     Decimal                    @default(0) @db.Decimal(12, 4)
   bewertungsstatus     QuizAnswerEvaluationStatus @default(UNANSWERED)
   bewertungsquelle     QuizAnswerEvaluationSource @default(LEGACY)
   bewertungsdetails    Json?
-  bewertungs_version    Int                  @default(0)
-  manuelle_punkte      Decimal?             @db.Decimal(12, 4)
+  bewertungs_version   Int                        @default(0)
+  manuelle_punkte      Decimal?                   @db.Decimal(12, 4)
   bewertet_am          DateTime?
   bewertet_von_user_id Int?
-  antworten            antworten?           @relation(fields: [antwort_id], references: [antwort_id])
-  quiz_abschnitte      quiz_abschnitte      @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id], onDelete: Cascade)
-  quiz_fragen          quiz_fragen          @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
-  quiz                 quiz                 @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
-  quiz_team_sessions   quiz_team_sessions   @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
+  antworten            antworten?                 @relation(fields: [antwort_id], references: [antwort_id])
+  quiz_abschnitte      quiz_abschnitte            @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id], onDelete: Cascade)
+  quiz_fragen          quiz_fragen                @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
+  quiz                 quiz                       @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  quiz_team_sessions   quiz_team_sessions         @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
   antwortfelder        team_antwortfelder[]
   antwortauswahlen     team_antwort_auswahlen[]
-  bewertet_von         users?               @relation("TeamAnswerEvaluator", fields: [bewertet_von_user_id], references: [id], onDelete: SetNull)
+  bewertet_von         users?                     @relation("TeamAnswerEvaluator", fields: [bewertet_von_user_id], references: [id], onDelete: SetNull)
 
   @@unique([quiz_fragen_id, quiz_team_session_id], map: "uq_team_antwort_pro_frage")
   @@schema("pubquiz")
@@ -492,6 +611,7 @@ model frage_vorlage_antwortfelder {
 model quiz_praesentation_status {
   quiz_id                  Int       @id
   slide_index              Int       @default(0)
+  slide_key                String?   @db.VarChar(160)
   slide_started_at         DateTime  @default(now())
   quiz_started_at          DateTime?
   updated_at               DateTime  @updatedAt
@@ -557,6 +677,32 @@ enum QuestionReviewStatus {
   @@schema("pubquiz")
 }
 
+enum StoryElementStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+
+  @@schema("pubquiz")
+}
+
+enum StoryElementScope {
+  GLOBAL
+  EVENT_SERIES
+  QUIZ
+
+  @@schema("pubquiz")
+}
+
+enum StoryQuestionRelationship {
+  CONTEXT
+  AFTER_SOLUTION
+  RELATED
+  REVEAL
+  FOLLOW_UP
+
+  @@schema("pubquiz")
+}
+
 model team_antwort_auswahlen {
   team_antwort_id Int
   antwort_id      Int
@@ -612,13 +758,16 @@ model users {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  eventreihenrollen             eventreihe_benutzerrollen[]  @relation("EventSeriesMembershipUser")
-  zugewiesene_eventreihenrollen eventreihe_benutzerrollen[]  @relation("EventSeriesMembershipAssigner")
-  rollenzuweisungen             benutzer_rollenzuweisungen[] @relation("RoleAssignmentUser")
-  zugewiesene_rollen            benutzer_rollenzuweisungen[] @relation("RoleAssignmentAssigner")
-  erstellte_kategorien          fragenkategorie[]             @relation("CategoryCreator")
-  bewertete_team_antworten      team_antworten[]               @relation("TeamAnswerEvaluator")
-  erstellte_praesentationstemplates presentation_templates[]    @relation("PresentationTemplateCreator")
+  eventreihenrollen                 eventreihe_benutzerrollen[]  @relation("EventSeriesMembershipUser")
+  zugewiesene_eventreihenrollen     eventreihe_benutzerrollen[]  @relation("EventSeriesMembershipAssigner")
+  rollenzuweisungen                 benutzer_rollenzuweisungen[] @relation("RoleAssignmentUser")
+  zugewiesene_rollen                benutzer_rollenzuweisungen[] @relation("RoleAssignmentAssigner")
+  erstellte_kategorien              fragenkategorie[]            @relation("CategoryCreator")
+  bewertete_team_antworten          team_antworten[]             @relation("TeamAnswerEvaluator")
+  erstellte_praesentationstemplates presentation_templates[]     @relation("PresentationTemplateCreator")
+  erstellte_story_elemente          story_elemente[]             @relation("StoryElementCreator")
+  erstellte_story_revisionen        story_element_revisionen[]   @relation("StoryElementRevisionCreator")
+  erstellte_story_verknuepfungen    frage_story_elemente[]       @relation("StoryQuestionLinkCreator")
 
   @@schema("pubquiz")
 }

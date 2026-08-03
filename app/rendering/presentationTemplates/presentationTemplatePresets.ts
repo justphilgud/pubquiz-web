@@ -4,7 +4,7 @@ import type { PresentationTemplateConfig } from "./presentationTemplate";
 export const presentationStylePresets = [
   { id: "NEON", name: "ungegoogelt Neon", description: "Leuchtende Eventoptik mit starken Kontrasten und markanten Statusanzeigen.", useCase: "Pubquiz, Bühne und Live-Event", swatches: ["#080014", "#38e8ff", "#ff3bd4"] },
   { id: "CORPORATE", name: "Corporate", description: "Klare Flächen, sachliche Typografie und ein ruhiger Markenbereich.", useCase: "Firmenquiz, Workshop und Kundenevent", swatches: ["#f1f5f9", "#1d4ed8", "#334155"] },
-  { id: "BIRTHDAY", name: "Geburtstag", description: "Persönliche Bilder, Albumrahmen und eine warme festliche Anmutung.", useCase: "Geburtstag, Jubiläum und Familienfest", swatches: ["#fff7ed", "#be185d", "#f59e0b"] },
+  { id: "BIRTHDAY", name: "Storybook", description: "Eine ruhige, persönliche Fotobuch-Welt mit redaktioneller Typografie und kuratierten Erinnerungen.", useCase: "Geburtstag, Jubiläum und gemeinsamer Rückblick", swatches: ["#f5f0e8", "#8f2f4f", "#b89a68"] },
 ] as const satisfies readonly { id: PresentationDesignStyle; name: string; description: string; useCase: string; swatches: readonly string[] }[];
 
 const templateIdByStyle: Record<PresentationDesignStyle, string> = {

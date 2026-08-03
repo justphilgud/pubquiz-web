@@ -13,6 +13,7 @@ type Props = {
   searchParams: Promise<{
     tab?: string;
     eventreiheId?: string;
+    editQuizId?: string;
   }>;
 };
 
@@ -45,6 +46,11 @@ export default async function QuizPage({ searchParams }: Props) {
       renderingMessages={renderingMessages}
       presentationTemplates={presentationTemplates}
       canAssignPresentationTemplates={isAdmin(actor)}
+      initialEditingQuizId={
+        resolvedSearchParams.editQuizId && /^\d+$/.test(resolvedSearchParams.editQuizId)
+          ? Number(resolvedSearchParams.editQuizId)
+          : undefined
+      }
     /></>
   );
 }

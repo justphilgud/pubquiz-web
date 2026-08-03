@@ -244,67 +244,67 @@ button {
 }
 
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-chrome {
-  height: 6.5rem !important;
-  margin-inline: 2rem;
+  height: 6.75rem !important;
+  margin-inline: 4.5rem;
   border: 0 !important;
-  border-radius: 0 0 2rem 2rem !important;
-  background: color-mix(in srgb, var(--brand-surface) 92%, transparent) !important;
-  box-shadow: 0 .75rem 0 color-mix(in srgb, var(--brand-accent) 35%, transparent) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--brand-border) 68%, transparent) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-header {
-  background-image: repeating-linear-gradient(0deg, transparent 0 1.65rem, color-mix(in srgb, var(--brand-border) 20%, transparent) 1.65rem 1.7rem) !important;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-monogram {
-  border: .3rem double var(--brand-primary);
-  background: var(--brand-surface-strong);
-  box-shadow: .25rem .35rem 0 color-mix(in srgb, var(--brand-secondary) 22%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 1.55rem 0 1.2rem;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-title {
   font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
-  letter-spacing: -.025em;
+  font-size: 1.65rem;
+  font-weight: 500;
+  letter-spacing: -.018em;
+  line-height: 1.05;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-running-head .presentation-primary-text {
+  margin-top: .5rem;
+  color: var(--brand-text-muted);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .19em;
+  text-transform: uppercase;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-page {
-  border: 1px dashed var(--brand-border);
-  background: var(--brand-surface-strong);
-  transform: rotate(2deg);
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-album-tape {
-  position: absolute;
-  width: 5.5rem;
-  height: 1.4rem;
-  background: color-mix(in srgb, var(--brand-accent) 34%, white);
-  opacity: .75;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-album-tape-left {
-  top: -.4rem;
-  left: 4rem;
-  transform: rotate(-4deg);
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--brand-text-muted);
+  font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: .12em;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-stage {
-  margin: .75rem 2rem 1.5rem;
-  border: .6rem solid white !important;
-  border-radius: 1rem !important;
-  background: color-mix(in srgb, var(--brand-surface) 90%, transparent) !important;
-  box-shadow: 0 1rem 2.5rem rgb(76 29 61 / 22%) !important;
-  transform: rotate(-.2deg);
+  margin: 1.5rem 4.5rem 2.75rem;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-stage {
-  background-image:
-    linear-gradient(90deg, transparent 4.5rem, color-mix(in srgb, var(--brand-danger) 15%, transparent) 4.5rem 4.62rem, transparent 4.62rem),
-    repeating-linear-gradient(0deg, transparent 0 2.4rem, color-mix(in srgb, var(--brand-border) 16%, transparent) 2.4rem 2.48rem) !important;
-  padding-left: 6rem !important;
+  padding: 0 !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-decoration {
-  z-index: 25;
+  z-index: 30;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-question-card,
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-question,
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result {
-  border: .35rem solid white !important;
-  background: var(--brand-surface) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   color: var(--brand-text) !important;
-  box-shadow: .5rem .65rem 0 color-mix(in srgb, var(--brand-secondary) 25%, transparent) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 .presentation-template[data-layout-preset="IMAGE_FOCUS"] .presentation-stage {
@@ -324,241 +324,670 @@ button {
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-media-card,
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-image {
-  border: .7rem solid white !important;
-  border-bottom-width: 1.8rem !important;
-  border-radius: .25rem !important;
-  background: white !important;
-  box-shadow: .45rem .6rem 1rem rgb(76 29 61 / 25%) !important;
-  transform: rotate(2.5deg);
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-image:nth-child(1) { right: 0; top: 0; transform: rotate(4deg); }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-image:nth-child(2) { right: 1.5rem; top: 8.5rem; transform: rotate(-5deg); }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-image:nth-child(3) { right: -.5rem; top: 17rem; transform: rotate(3deg); }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-image::after {
-  content: "Erinnerung";
-  position: absolute;
-  inset: auto .5rem .25rem;
-  color: var(--brand-text-muted);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: .7rem;
-  font-style: italic;
-  text-align: center;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-album-ring {
-  position: absolute;
-  z-index: 30;
-  left: 1.2rem;
-  width: 3.5rem;
-  height: 1rem;
-  border: .3rem solid color-mix(in srgb, var(--brand-text-muted) 65%, white);
-  border-radius: 999px;
-  background: transparent;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-album-ring-one { top: 34%; }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-album-ring-two { top: 67%; }
-
-/* Storybook is a restrained editorial system: composition comes from data, never random transforms. */
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage,
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-image,
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-birthday-page,
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-personal-footer {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--brand-surface-strong) 60%, transparent) !important;
+  box-shadow: none !important;
   transform: none !important;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-people-marks {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 3.2rem;
-  gap: .35rem;
-  flex: none;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-people-marks span,
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-mark {
-  display: grid;
-  width: 3.2rem;
-  height: 3.2rem;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--brand-primary) 65%, white);
-  border-radius: 999px;
-  background: var(--brand-surface-strong);
-  color: var(--brand-primary);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  box-shadow: 0 .2rem .5rem rgb(76 29 61 / 10%);
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-people-marks[data-storybook-people-mode="GROUP"] {
-  grid-auto-columns: 2.65rem;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-people-marks[data-storybook-people-mode="GROUP"] span {
-  width: 2.65rem;
-  height: 2.65rem;
-}
+
+/* Storybook is an editorial photo-book system. Every page has one clear intention. */
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-content {
   position: relative;
   z-index: 20;
-  transition: padding-right .2s ease;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage:not([data-storybook-variant="TEXT_ALBUM"]):not([data-storybook-variant="CHAPTER_INTRO"]) .presentation-storybook-content {
-  padding-right: 23rem;
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage:is(
+  [data-storybook-variant="COVER"],
+  [data-storybook-variant="PORTRAIT"],
+  [data-storybook-variant="SPLIT"],
+  [data-storybook-variant="SEQUENCE"],
+  [data-storybook-variant="MEMORY"]
+) .presentation-storybook-content {
+  padding-right: 50%;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="COVER"] .presentation-storybook-content,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content {
+  padding-right: 57%;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="COVER"] .presentation-question-card > div:first-child {
+  display: none;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-gallery {
-  width: 22rem;
+  position: absolute;
+  top: 8.25rem;
+  right: 4.5rem;
+  bottom: 2.75rem;
+  display: grid;
+  width: calc(50% - 5rem);
+  gap: 1rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="COVER"] .presentation-storybook-gallery,
+.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="MEMORY"] .presentation-storybook-gallery {
+  width: calc(57% - 5rem);
+}
+.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SPLIT"] .presentation-storybook-gallery {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SEQUENCE"] .presentation-storybook-gallery {
+  grid-template-columns: 1.12fr .88fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SEQUENCE"] .presentation-personal-image:first-child {
+  grid-row: 1 / -1;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-gallery .presentation-personal-image {
+  position: relative;
   overflow: hidden;
-  width: 18rem;
-  height: 23rem;
-  border-width: .55rem !important;
-  border-bottom-width: 2.4rem !important;
-  box-shadow: 0 .8rem 2rem rgb(76 29 61 / 18%) !important;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-gallery figcaption {
   position: absolute;
-  inset: auto .5rem .45rem;
-  overflow: hidden;
-  color: #5f4b49;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: .75rem;
-  font-style: italic;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  inset: auto 0 0;
+  padding: 2.8rem 1.1rem .9rem;
+  background: linear-gradient(transparent, rgb(0 0 0 / 68%));
+  color: white;
+  font-size: .72rem;
+  line-height: 1.35;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-gallery .presentation-personal-image::after {
-  content: none;
-}
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SINGLE_PORTRAIT"] .presentation-personal-image:first-child,
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SOLUTION_MEMORY"] .presentation-personal-image:first-child {
-  inset: 0 1rem auto auto;
-}
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SINGLE_PORTRAIT"] .presentation-personal-image:not(:first-child),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="SOLUTION_MEMORY"] .presentation-personal-image:not(:first-child) {
-  display: none;
-}
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="DUAL_PORTRAIT"] .presentation-personal-image,
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="PHOTO_PAIR"] .presentation-personal-image {
-  width: 10.25rem;
-  height: 16rem;
-}
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="DUAL_PORTRAIT"] .presentation-personal-image:nth-child(1),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="PHOTO_PAIR"] .presentation-personal-image:nth-child(1) { inset: 1rem auto auto 0; }
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="DUAL_PORTRAIT"] .presentation-personal-image:nth-child(2),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="PHOTO_PAIR"] .presentation-personal-image:nth-child(2) { inset: 4rem 0 auto auto; }
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="DUAL_PORTRAIT"] .presentation-personal-image:nth-child(n+3),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="PHOTO_PAIR"] .presentation-personal-image:nth-child(n+3) { display: none; }
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="GROUP_PORTRAIT"] .presentation-personal-image,
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="MEMORY_COLLAGE"] .presentation-personal-image {
-  width: 10rem;
-  height: 12.5rem;
-}
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="GROUP_PORTRAIT"] .presentation-personal-image:nth-child(1),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="MEMORY_COLLAGE"] .presentation-personal-image:nth-child(1) { inset: 0 auto auto 0; }
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="GROUP_PORTRAIT"] .presentation-personal-image:nth-child(2),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="MEMORY_COLLAGE"] .presentation-personal-image:nth-child(2) { inset: 2rem 0 auto auto; }
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="GROUP_PORTRAIT"] .presentation-personal-image:nth-child(3),
-.presentation-template[data-design-style="BIRTHDAY"] [data-storybook-variant="MEMORY_COLLAGE"] .presentation-personal-image:nth-child(3) { inset: 13rem auto auto 5.5rem; }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-anecdote {
-  position: absolute;
-  z-index: 35;
-  right: 2rem;
-  bottom: 1.5rem;
-  width: 21rem;
-  border-left: .2rem solid var(--brand-primary);
-  background: color-mix(in srgb, var(--brand-surface-strong) 94%, white);
-  padding: 1rem 1.25rem;
-  color: var(--brand-text);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: .9rem;
-  line-height: 1.45;
-  box-shadow: 0 .4rem 1rem rgb(76 29 61 / 12%);
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-anecdote span {
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-gallery figcaption span {
   display: block;
-  margin-bottom: .3rem;
-  color: var(--brand-primary);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: .65rem;
+  margin-bottom: .2rem;
+  font-size: .62rem;
   font-weight: 800;
-  letter-spacing: .14em;
+  letter-spacing: .16em;
   text-transform: uppercase;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-chapter {
   position: absolute;
   z-index: 40;
-  inset: 15% 12%;
+  inset: 0 20% 0 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  border-block: 1px solid color-mix(in srgb, var(--brand-border) 55%, transparent);
-  background: color-mix(in srgb, var(--brand-surface) 92%, transparent);
-  text-align: center;
+  border-block: 1px solid color-mix(in srgb, var(--brand-border) 62%, transparent);
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-chapter span {
   color: var(--brand-primary);
-  font-size: .8rem;
+  font-size: .72rem;
   font-weight: 800;
-  letter-spacing: .25em;
+  letter-spacing: .24em;
   text-transform: uppercase;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-chapter strong {
-  margin-top: 1rem;
+  margin-top: 1.2rem;
+  max-width: 12ch;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 3.5rem;
-  font-style: italic;
+  font-size: 5.25rem;
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: .98;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="CHAPTER_INTRO"] .presentation-storybook-content {
-  opacity: 0;
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-chapter small {
+  max-width: 34rem;
+  margin-top: 1.25rem;
+  color: var(--brand-text-muted);
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="CHAPTER"] .presentation-storybook-content {
+  visibility: hidden;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content {
+  height: auto !important;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content > [data-presentation-layout] {
+  display: block;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-solution-question {
+  display: none;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-anecdote {
+  position: relative;
+  z-index: 35;
+  width: 40%;
+  border-top: 1px solid var(--brand-border);
+  padding-top: 1rem;
+  color: var(--brand-text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-anecdote span {
+  display: block;
+  margin-bottom: .45rem;
+  color: var(--brand-primary);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-anecdote q::before,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-anecdote q::after {
+  content: none;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-material="LINEN"] {
-  background-image: repeating-linear-gradient(90deg, rgb(100 85 70 / 4%) 0 1px, transparent 1px 4px) !important;
+  background: #f0ece3 !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-material="DARK_ALBUM"] {
-  background: #272320 !important;
+  background: #1c1c1a !important;
   color: #fffaf0 !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-material="MAGAZINE_WHITE"] {
   background: #fff !important;
-  box-shadow: 0 .3rem 1.4rem rgb(15 23 42 / 12%) !important;
-}
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-option {
-  border: 2px solid var(--brand-border) !important;
-  background: linear-gradient(135deg, var(--brand-surface), var(--brand-surface-strong)) !important;
-  color: var(--brand-text) !important;
-  box-shadow: .3rem .35rem 0 color-mix(in srgb, var(--brand-accent) 45%, transparent) !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-panel {
   border: 0 !important;
+  border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
-  padding: .5rem !important;
+  padding: 0 !important;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-option,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="rounded-"] {
+  border: 0 !important;
+  border-top: 1px solid color-mix(in srgb, var(--brand-border) 72%, transparent) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--brand-text) !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-question-card h2,
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-question h2 {
+  max-width: 16ch;
   color: var(--brand-text) !important;
   font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
+  font-size: clamp(3rem, 4.2vw, 4.8rem) !important;
+  font-style: normal;
+  font-weight: 500 !important;
+  letter-spacing: -.04em;
+  line-height: 1.05 !important;
   text-shadow: none !important;
   filter: none !important;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-question-card article {
+  border: 0 !important;
+  border-top: 1px solid var(--brand-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-question-card [class*="rotate-"],
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="rotate-"] {
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--brand-primary) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.presentation-template[data-design-style="BIRTHDAY"] [class*="shadow-"],
+.presentation-template[data-design-style="BIRTHDAY"] [class*="drop-shadow-"] {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-option [class*="text-cyan"],
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="text-cyan"] {
   color: var(--brand-primary) !important;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="bg-black"],
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="bg-slate"] {
-  background: color-mix(in srgb, var(--brand-surface-strong) 65%, white) !important;
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result .text-yellow-200 {
+  color: var(--brand-text) !important;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-option:nth-child(odd) { transform: rotate(-.45deg); }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-option:nth-child(even) { transform: rotate(.35deg); }
 .presentation-template[data-design-style="BIRTHDAY"] h2,
-.presentation-template[data-design-style="BIRTHDAY"] .text-white { color: var(--brand-text) !important; text-shadow: none !important; }
+.presentation-template[data-design-style="BIRTHDAY"] .text-white {
+  color: var(--brand-text) !important;
+  text-shadow: none !important;
+}
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-decoration {
   background: none !important;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result {
-  border-color: var(--brand-accent) !important;
-  background: linear-gradient(145deg, var(--brand-surface), var(--brand-surface-strong)) !important;
+
+/* Storybook question types use editorial components instead of inheriting the
+   show-oriented surfaces of the shared Neon renderer. */
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution {
+  height: 100%;
+  min-height: 0;
+  color: var(--brand-text);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question {
+  display: grid;
+  align-items: center;
+  gap: clamp(2rem, 4vw, 5rem);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question--open {
+  max-width: 72rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question--split,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question--audio,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question--estimate {
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question--media {
+  grid-template-columns: minmax(24rem, .7fr) minmax(0, 1.3fr);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question-lead {
+  min-width: 0;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-kicker {
+  color: var(--brand-primary);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question-lead h2 {
+  max-width: 17ch;
+  margin-top: 1.35rem;
+  color: var(--brand-text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3.15rem, 4.4vw, 5.3rem);
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: 1.02;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices li,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence li,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices li {
+  display: grid;
+  grid-template-columns: 3.75rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 1.15rem;
+  border-top: 1px solid color-mix(in srgb, var(--brand-border) 78%, transparent);
+  padding: 1.25rem .25rem 1.2rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices li:last-child,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence li:last-child,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices li:last-child {
+  border-bottom: 1px solid color-mix(in srgb, var(--brand-border) 78%, transparent);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices li > span,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence li > span,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices li > span {
+  color: var(--brand-primary);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices strong,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence strong,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices strong {
+  color: var(--brand-text);
+  font-size: clamp(1.65rem, 2.05vw, 2.45rem);
+  font-weight: 600;
+  letter-spacing: -.025em;
+  line-height: 1.18;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices--binary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices--binary li {
+  grid-template-columns: 1fr;
+  min-height: 11rem;
+  align-content: space-between;
+  border-bottom: 1px solid var(--brand-border);
+  padding: 1.5rem 0;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-choices--binary strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 4vw, 4.8rem);
+  font-weight: 500;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-estimate {
+  display: grid;
+  align-content: center;
+  min-height: 23rem;
+  border-block: 1px solid var(--brand-border);
+  padding: 2.25rem 0;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-estimate-mark {
+  color: var(--brand-primary);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 8rem;
+  font-weight: 500;
+  line-height: .85;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-estimate-scale {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 3.5rem;
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--brand-text-muted);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-estimate-scale i {
+  display: block;
+  width: 1px;
+  height: 1rem;
+  background: var(--brand-text-muted);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-estimate-scale i:nth-child(odd) {
+  height: 2rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-estimate p {
+  margin-top: 1.1rem;
+  color: var(--brand-text-muted);
+  font-size: 1.15rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-fields {
+  display: grid;
+  gap: 0;
+  border-bottom: 1px solid var(--brand-border);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-fields section {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: .45rem 1rem;
+  border-top: 1px solid var(--brand-border);
+  padding: 1.4rem .2rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-fields span,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-fields small {
+  color: var(--brand-text-muted);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-fields strong {
+  font-size: 2.1rem;
+  font-weight: 600;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-fields small {
+  grid-column: 2;
+  letter-spacing: .05em;
+  text-transform: none;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-audio {
+  min-width: 0;
+  border-block: 1px solid var(--brand-border);
+  background: color-mix(in srgb, var(--brand-surface-strong) 42%, transparent);
+  padding: 2rem 0;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-audio-heading {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1.25rem;
+  padding-inline: 1.75rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-audio-play {
+  display: grid;
+  width: 3.4rem;
+  height: 3.4rem;
+  place-items: center;
+  border: 1px solid var(--brand-text);
+  border-radius: 50%;
+  color: var(--brand-text);
+  font-size: 1rem;
+  line-height: 1;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-audio-heading strong {
+  display: block;
+  margin-top: .35rem;
+  overflow: hidden;
+  color: var(--brand-text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-audio-wave {
+  height: 5.5rem;
+  margin: 2.1rem 1.75rem 1.25rem;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--brand-primary) 62%, transparent) 0 2px,
+    transparent 2px 11px
+  );
+  clip-path: polygon(0 43%, 4% 30%, 8% 58%, 12% 20%, 17% 68%, 22% 34%, 28% 55%, 34% 14%, 40% 70%, 47% 28%, 54% 61%, 61% 19%, 68% 72%, 75% 35%, 82% 63%, 89% 24%, 94% 54%, 100% 42%, 100% 58%, 94% 46%, 89% 76%, 82% 37%, 75% 65%, 68% 28%, 61% 81%, 54% 39%, 47% 72%, 40% 30%, 34% 86%, 28% 45%, 22% 66%, 17% 32%, 12% 80%, 8% 42%, 4% 70%, 0 57%);
+  opacity: .75;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-audio-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--brand-border) 65%, transparent);
+  padding: 1rem 1.75rem 0;
+  color: var(--brand-text-muted);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-media-activation {
+  margin: 0 1.75rem 1rem;
+  border: 1px solid var(--brand-border);
+  background: transparent;
+  padding: .7rem 1rem;
+  color: var(--brand-text);
+  font-size: .75rem;
+  font-weight: 700;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-question-media {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-media {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr) auto;
+  margin: 0;
+  border: 1px solid var(--brand-border);
+  background: color-mix(in srgb, var(--brand-surface-strong) 55%, transparent);
+  padding: .75rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-media img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-media figcaption {
+  padding: .75rem .15rem 0;
+  color: var(--brand-text-muted);
+  font-size: .75rem;
+  line-height: 1.35;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-media figcaption span {
+  margin-right: .65rem;
+  color: var(--brand-primary);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-media--empty {
+  align-content: center;
+  justify-items: center;
+  gap: 1rem;
+  color: var(--brand-text-muted);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-reveal-progress {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding-top: 1rem;
+  color: var(--brand-text-muted);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-reveal-progress > div {
+  display: flex;
+  gap: .35rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-reveal-progress i {
+  display: block;
+  height: 2px;
+  flex: 1;
+  background: var(--brand-border);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-reveal-progress i[data-active="true"] {
+  background: var(--brand-primary);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 2rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-lead {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--brand-border);
+  padding-bottom: 1rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-lead p {
+  margin: 0;
+  color: var(--brand-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-content {
+  display: grid;
+  min-height: 0;
+  align-items: center;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution--media .presentation-storybook-solution-content {
+  grid-template-columns: minmax(0, 1.25fr) minmax(18rem, .75fr);
+  gap: 2.5rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution {
+  align-self: center;
+  max-width: 56rem;
+  border-block: 1px solid var(--brand-border);
+  padding: 2.5rem 0;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution strong {
+  color: var(--brand-text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(4rem, 6.2vw, 7.4rem);
+  font-weight: 500;
+  letter-spacing: -.055em;
+  line-height: .96;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution--audio strong {
+  font-size: clamp(3.5rem, 5vw, 6rem);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution p {
+  max-width: 44rem;
+  margin: 1.5rem 0 0;
+  color: var(--brand-text-muted);
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices li {
+  grid-template-columns: 3.75rem minmax(0, 1fr) auto;
+  opacity: .46;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices li[data-correct="true"] {
+  border-color: var(--brand-primary);
+  opacity: 1;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-choices small {
+  color: var(--brand-primary);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-solution-note {
+  max-width: 52rem;
+  margin: 1.35rem 0 0;
+  color: var(--brand-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence--resolved li {
+  grid-template-columns: 3.75rem minmax(0, 1fr);
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-sequence--resolved small {
+  display: block;
+  margin-top: .35rem;
+  color: var(--brand-text-muted);
+  font-size: .82rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-structured-solution {
+  display: grid;
+  align-self: center;
+  gap: 1.5rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-structured-solution section {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 2rem;
+  border-top: 1px solid var(--brand-border);
+  padding-top: 1.25rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-structured-solution span {
+  color: var(--brand-primary);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-structured-solution strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.8rem, 4vw, 4.8rem);
+  font-weight: 500;
+  letter-spacing: -.04em;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage:is(
+  [data-storybook-variant="COVER"],
+  [data-storybook-variant="PORTRAIT"],
+  [data-storybook-variant="SPLIT"],
+  [data-storybook-variant="SEQUENCE"],
+  [data-storybook-variant="MEMORY"]
+) .presentation-storybook-question--split {
+  grid-template-columns: 1fr;
+  align-content: center;
+  gap: 2rem;
+}
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-storybook-content:has(
+  [data-storybook-question-kind="IMAGE"],
+  [data-storybook-question-kind="PIXEL_REVEAL"]
+) {
+  padding-right: 0 !important;
+}
+.presentation-template[data-design-style="BIRTHDAY"]:has(
+  [data-storybook-question-kind="IMAGE"],
+  [data-storybook-question-kind="PIXEL_REVEAL"]
+) .presentation-storybook-gallery {
+  display: none;
 }
 
 .presentation-template[data-design-style="NEON"] .presentation-neon-orbit {
@@ -598,8 +1027,386 @@ button {
   box-shadow: 0 2px 12px rgb(15 23 42 / 10%);
 }
 .answer-template[data-design-style="BIRTHDAY"] .answer-surface {
-  border: .45rem solid white !important;
-  box-shadow: .45rem .6rem 0 color-mix(in srgb, var(--brand-secondary) 24%, transparent);
+  border-width: 1px 0 0 !important;
+  border-style: solid !important;
+  border-color: var(--brand-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.answer-template[data-design-style="BIRTHDAY"] button {
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Template-neutral show-plan content. The flow decides what is shown; the
+   resolved presentation design decides how the same semantic structure looks. */
+.presentation-flow-slide {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  border: 4px solid var(--brand-accent);
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--brand-surface) 92%, transparent);
+  padding: clamp(2rem, 4vw, 5rem);
+  color: var(--brand-text);
+}
+
+.presentation-flow-kicker {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brand-accent);
+}
+
+.presentation-flow-slide h2 {
+  max-width: 18ch;
+  font-size: clamp(3.5rem, 6vw, 7rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.presentation-flow-subtitle,
+.presentation-flow-lead {
+  margin-top: 1.5rem;
+  max-width: 46ch;
+  white-space: pre-line;
+  font-size: clamp(1.5rem, 2.4vw, 2.75rem);
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.presentation-flow-subtitle { color: var(--brand-muted); }
+
+.presentation-flow-rules {
+  display: grid;
+  min-height: 0;
+  margin-top: 2rem;
+  gap: 0.8rem;
+  overflow: hidden;
+}
+
+.presentation-flow-rules li,
+.presentation-flow-ranking-list li {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  border: 2px solid color-mix(in srgb, var(--brand-accent) 55%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--brand-surface-strong) 88%, transparent);
+  padding: 0.85rem 1.25rem;
+  font-size: clamp(1.25rem, 1.8vw, 2rem);
+}
+
+.presentation-flow-rules li > span,
+.presentation-flow-rank {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--brand-accent);
+  color: var(--brand-surface);
+  font-weight: 900;
+}
+
+.presentation-flow-qr-layout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 3rem;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+}
+
+.presentation-flow-qr {
+  border-radius: 1.5rem;
+  background: white;
+  padding: 1.5rem;
+}
+
+.presentation-flow-qr-layout strong { overflow-wrap: anywhere; }
+.presentation-flow-qr-layout p { margin-top: 1rem; color: var(--brand-muted); }
+
+.presentation-flow-countdown {
+  align-self: flex-start;
+  margin-top: 2.5rem;
+  border: 3px solid var(--brand-accent);
+  border-radius: 1.5rem;
+  padding: 1rem 2rem;
+  font-size: clamp(4rem, 8vw, 8rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.presentation-flow-ranking-list {
+  display: grid;
+  min-height: 0;
+  margin-top: 1.75rem;
+  gap: 0.65rem;
+  overflow: hidden;
+}
+
+.presentation-flow-ranking-list[data-many="true"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.presentation-flow-ranking-list li > span:last-child {
+  color: var(--brand-muted);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.presentation-flow-message {
+  margin-top: 2.5rem;
+  border-left: 0.4rem solid var(--brand-accent);
+  padding: 1.5rem 2rem;
+  font-size: 2rem;
+  font-weight: 750;
+}
+
+.presentation-flow-image {
+  position: absolute;
+  top: 50%;
+  right: 4rem;
+  width: min(38%, 34rem);
+  max-height: 72%;
+  transform: translateY(-50%);
+  border-radius: 1.25rem;
+  object-fit: cover;
+}
+
+.presentation-flow-contact { margin-top: 2rem; font-size: 1.5rem; font-weight: 800; }
+
+.presentation-flow-editorial {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: clamp(2rem, 4vw, 5rem);
+}
+
+.presentation-flow-copy { min-width: 0; }
+
+.presentation-flow-hero-figure,
+.presentation-flow-portrait-figure {
+  display: grid;
+  min-height: 0;
+  gap: .85rem;
+}
+
+.presentation-flow-hero-figure img,
+.presentation-flow-portrait-figure img,
+.presentation-flow-gallery-grid img,
+.presentation-flow-video-player {
+  width: 100%;
+  border-radius: 1rem;
+  object-fit: cover;
+}
+
+.presentation-flow-hero-figure img {
+  max-height: 31rem;
+  aspect-ratio: 4 / 3;
+}
+
+.presentation-flow-portrait-figure img {
+  max-height: 32rem;
+  aspect-ratio: 3 / 4;
+}
+
+.presentation-flow-hero-figure figcaption,
+.presentation-flow-portrait-figure figcaption,
+.presentation-flow-gallery-grid figcaption {
+  color: var(--brand-muted);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.presentation-flow-gallery {
+  grid-template-columns: minmax(15rem, .62fr) minmax(0, 1.38fr);
+}
+
+.presentation-flow-gallery-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.presentation-flow-gallery-grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.presentation-flow-gallery-grid[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.presentation-flow-gallery-grid figure { min-width: 0; }
+.presentation-flow-gallery-grid img { height: 15rem; }
+.presentation-flow-gallery-grid figcaption { margin-top: .55rem; }
+.presentation-flow-gallery-grid figcaption span { margin-right: .5rem; color: var(--brand-accent); font-weight: 900; }
+
+.presentation-flow-text {
+  display: flex;
+  align-items: flex-start;
+  padding-inline: clamp(5rem, 12vw, 13rem);
+}
+
+.presentation-flow-editorial-body {
+  max-width: 42ch;
+  margin-top: 2rem;
+  white-space: pre-line;
+  font-size: clamp(1.75rem, 3vw, 3.2rem);
+  font-weight: 520;
+  line-height: 1.35;
+}
+
+.presentation-flow-quote {
+  display: flex;
+  align-items: flex-start;
+  padding-inline: clamp(5rem, 11vw, 12rem);
+}
+
+.presentation-flow-quote blockquote {
+  max-width: 30ch;
+  font-family: var(--presentation-font-display);
+  font-size: clamp(3rem, 5.3vw, 6.5rem);
+  font-weight: 600;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.presentation-flow-quote-source {
+  margin-top: 2rem;
+  color: var(--brand-muted);
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+
+.presentation-flow-audio {
+  display: flex;
+  align-items: flex-start;
+  padding-inline: clamp(5rem, 10vw, 11rem);
+}
+
+.presentation-flow-audio-mark {
+  display: flex;
+  align-items: center;
+  width: min(42rem, 78%);
+  height: 9rem;
+  gap: .55rem;
+  margin-top: 2.5rem;
+}
+
+.presentation-flow-audio-mark span {
+  width: .65rem;
+  height: calc(18% + (var(--wave-index, 1) * 1%));
+  max-height: 100%;
+  flex: 1;
+  border-radius: 999px;
+  background: var(--brand-accent);
+}
+
+.presentation-flow-audio-mark span:nth-child(3n + 1) { height: 34%; }
+.presentation-flow-audio-mark span:nth-child(3n + 2) { height: 78%; }
+.presentation-flow-audio-mark span:nth-child(5n) { height: 52%; }
+
+.presentation-flow-video-player {
+  max-height: 31rem;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.presentation-template[data-design-style="CORPORATE"] .presentation-flow-editorial img,
+.presentation-template[data-design-style="CORPORATE"] .presentation-flow-video-player {
+  border-radius: .25rem;
+}
+
+.presentation-template[data-design-style="NEON"] .presentation-flow-editorial img,
+.presentation-template[data-design-style="NEON"] .presentation-flow-video-player {
+  border: 2px solid #67e8f9;
+  box-shadow: 8px 8px 0 #ec4899;
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-editorial {
+  background: color-mix(in srgb, var(--brand-surface) 96%, transparent);
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-quote blockquote,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-editorial-body {
+  font-family: var(--presentation-font-display);
+}
+
+.presentation-template[data-design-style="NEON"] .presentation-flow-slide {
+  border-color: #67e8f9;
+  background: radial-gradient(circle at 85% 15%, rgb(236 72 153 / 0.22), transparent 32%), rgb(2 6 23 / 0.88);
+  box-shadow: 8px 8px 0 #ec4899;
+}
+
+.presentation-template[data-design-style="NEON"] .presentation-flow-kicker,
+.presentation-template[data-design-style="NEON"] .presentation-flow-slide h2 {
+  color: #fef08a;
+  text-transform: uppercase;
+}
+
+.presentation-template[data-design-style="CORPORATE"] .presentation-flow-slide {
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--brand-muted) 35%, transparent);
+  border-radius: 0.35rem;
+  background: var(--brand-surface);
+}
+
+.presentation-template[data-design-style="CORPORATE"] .presentation-flow-slide h2 {
+  font-weight: 780;
+  letter-spacing: -0.025em;
+}
+
+.presentation-template[data-design-style="CORPORATE"] .presentation-flow-rules li,
+.presentation-template[data-design-style="CORPORATE"] .presentation-flow-ranking-list li {
+  border-radius: 0.25rem;
+  box-shadow: none;
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-slide {
+  align-items: flex-start;
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--brand-surface) 94%, transparent);
+  padding-inline: clamp(3rem, 7vw, 8rem);
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-kicker {
+  font-family: var(--presentation-font-display);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-slide h2 {
+  max-width: 15ch;
+  font-family: var(--presentation-font-display);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-rules li,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-ranking-list li {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+  padding-inline: 0;
+}
+
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-rules li > span,
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-rank {
+  border-radius: 0;
+  background: transparent;
+  color: var(--brand-accent);
+  font-family: var(--presentation-font-display);
+  font-size: 1.6em;
 }
 
 .answer-template {

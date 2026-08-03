@@ -5,6 +5,7 @@ export type AppNavigationItem = {
 
 export type AppNavigationCapabilities = {
   canAccessQuestions: boolean;
+  canAccessStoryElements: boolean;
   canManageQuizzes: boolean;
   canManageEventSeries: boolean;
   canViewPresentationTemplates: boolean;
@@ -16,8 +17,8 @@ export function getAppNavigationItems(
   capabilities: AppNavigationCapabilities,
 ): AppNavigationItem[] {
   return [
-    ...(capabilities.canAccessQuestions
-      ? [{ href: "/fragen", label: "Fragen" }]
+    ...(capabilities.canAccessQuestions || capabilities.canAccessStoryElements
+      ? [{ href: "/content", label: "Content" }]
       : []),
     ...(capabilities.canManageEventSeries
       ? [{ href: "/admin/eventreihen", label: "Eventreihen" }]
@@ -35,5 +36,10 @@ export function getAppNavigationItems(
 }
 
 export function isAppNavigationItemActive(pathname: string, href: string) {
+  if (href === "/content") {
+    return ["/content", "/fragen", "/story-elemente"].some(
+      (contentRoot) => pathname === contentRoot || pathname.startsWith(`${contentRoot}/`),
+    );
+  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

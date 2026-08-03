@@ -4,6 +4,12 @@ import {
   isOutroSection,
   isQuestionSection,
 } from "../../quizSectionPolicy";
+import {
+  resolveQuizFlow,
+  type QuizFlowItem,
+  type QuizFlowItemType,
+} from "../../flow/quizFlow";
+import { resolveQuizBlockSequence } from "../../flow/quizBlockSequence";
 
 export type Medium = {
   medien_id: number;
@@ -38,6 +44,11 @@ export type FixerSlideTyp =
 
 export type Slide =
   | {
+    typ: "ablauf";
+    element: QuizFlowItem;
+    abschnitt: Abschnitt | null;
+  }
+  | {
     typ: "fixer-slide";
     slideTyp: FixerSlideTyp;
   }
@@ -51,6 +62,8 @@ export type Slide =
     frage: QuizPraesentationResult["fragen"][number];
     frageIndexImBlock: number;
     fragenAnzahlImBlock: number;
+    blockItem?: QuizFlowItem | null;
+    solutionStrategy?: import("../../flow/quizFlow").QuizSolutionStrategy;
   }
   | {
     typ: "aufloesung";
@@ -58,6 +71,8 @@ export type Slide =
     frage: QuizPraesentationResult["fragen"][number];
     frageIndexImBlock: number;
     fragenAnzahlImBlock: number;
+    blockItem?: QuizFlowItem | null;
+    solutionStrategy?: import("../../flow/quizFlow").QuizSolutionStrategy;
   }
   | {
     typ: "pause";
@@ -74,7 +89,8 @@ export type Slide =
   };
 
 export function buildPraesentationSlides(
-  quiz: QuizPraesentationResult
+  quiz: QuizPraesentationResult,
+  options: { includeDisabledFlowItems?: boolean } = {},
 ): Slide[] {
   const result: Slide[] = [];
 
@@ -82,7 +98,28 @@ export function buildPraesentationSlides(
     (a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)
   );
 
-  const fragenrunden = sortierteAbschnitte.filter(isQuestionSection);
+  const flow = resolveQuizFlow(quiz, quiz.ablaufElemente).filter(
+    (item) => options.includeDisabledFlowItems || item.enabled,
+  );
+
+  const appendFlowItems = (
+    anchorType: QuizFlowItem["anchorType"],
+    anchorKey: string,
+    abschnitt: Abschnitt | null,
+  ) => {
+    flow
+      .filter(
+        (item) =>
+          item.anchorType === anchorType && item.anchorKey === anchorKey,
+      )
+      .sort((left, right) => left.order - right.order)
+      .forEach((element) => result.push({ typ: "ablauf", element, abschnitt }));
+  };
+
+  appendFlowItems("BEFORE_QUIZ", "QUIZ", null);
+  if (options.includeDisabledFlowItems) {
+    appendFlowItems("BEFORE_QUIZ", "UNASSIGNED", null);
+  }
 
   for (const abschnitt of sortierteAbschnitte) {
     const fragenImBlock = quiz.fragen
@@ -93,18 +130,52 @@ export function buildPraesentationSlides(
       )
       .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0));
 
-    if (isIntroSection(abschnitt)) {
-      result.push({ typ: "fixer-slide", slideTyp: "vor-dem-start" });
-      result.push({ typ: "fixer-slide", slideTyp: "startsequenz" });
-      result.push({ typ: "fixer-slide", slideTyp: "begruessung" });
-      result.push({ typ: "fixer-slide", slideTyp: "preise" });
-      result.push({ typ: "fixer-slide", slideTyp: "regeln" });
-      result.push({ typ: "fixer-slide", slideTyp: "qrcode" });
-      continue;
-    }
+    if (isIntroSection(abschnitt) || isOutroSection(abschnitt)) continue;
 
-    if (isOutroSection(abschnitt)) {
-      result.push({ typ: "fixer-slide", slideTyp: "bekanntmachungen" });
+    if (isQuestionSection(abschnitt)) {
+      appendFlowItems(
+        "ROUND_START",
+        String(abschnitt.quiz_abschnitt_id),
+        abschnitt,
+      );
+
+      const blockSequence = resolveQuizBlockSequence({
+        sectionId: abschnitt.quiz_abschnitt_id,
+        quizStrategy: quiz.aufloesungsstrategie,
+        sectionStrategy: abschnitt.aufloesungsstrategie,
+        questions: fragenImBlock,
+        blockItems: flow,
+        includeDisabledItems: options.includeDisabledFlowItems,
+      });
+      const questionIndexById = new Map(
+        fragenImBlock.map((frage, index) => [frage.quiz_fragen_id, index + 1]),
+      );
+      for (const entry of blockSequence.entries) {
+        if (entry.kind === "CONTENT") {
+          result.push({ typ: "ablauf", element: entry.item, abschnitt });
+          continue;
+        }
+        const shared = {
+          abschnitt,
+          frage: entry.question,
+          frageIndexImBlock:
+            questionIndexById.get(entry.question.quiz_fragen_id) ?? 1,
+          fragenAnzahlImBlock: fragenImBlock.length,
+          blockItem: entry.item,
+          solutionStrategy: blockSequence.strategy,
+        };
+        result.push(
+          entry.kind === "QUESTION"
+            ? { typ: "frage", ...shared }
+            : { typ: "aufloesung", ...shared },
+        );
+      }
+
+      appendFlowItems(
+        "ROUND_END",
+        String(abschnitt.quiz_abschnitt_id),
+        abschnitt,
+      );
       continue;
     }
 
@@ -113,57 +184,15 @@ export function buildPraesentationSlides(
       abschnitt,
     });
 
-    if (isQuestionSection(abschnitt)) {
-      fragenImBlock.forEach((frage, index) => {
-        result.push({
-          typ: "frage",
-          abschnitt,
-          frage,
-          frageIndexImBlock: index + 1,
-          fragenAnzahlImBlock: fragenImBlock.length,
-        });
-      });
-
-      if (fragenImBlock.length > 0) {
-        result.push({
-          typ: "pause",
-          abschnitt,
-          dauerSekunden: abschnitt.dauer_sekunden ?? 300,
-        });
-      }
-
-      fragenImBlock.forEach((frage, index) => {
-        result.push({
-          typ: "aufloesung",
-          abschnitt,
-          frage,
-          frageIndexImBlock: index + 1,
-          fragenAnzahlImBlock: fragenImBlock.length,
-        });
-      });
-
-      if (fragenImBlock.length > 0) {
-        const istLetzteFragenrunde =
-          fragenrunden[fragenrunden.length - 1]?.quiz_abschnitt_id ===
-          abschnitt.quiz_abschnitt_id;
-
-        result.push({
-          typ: istLetzteFragenrunde ? "endstand" : "zwischenstand",
-          abschnitt,
-        });
-      }
-
-      continue;
-    }
-
     fragenImBlock.forEach((frage, index) => {
-      result.push({
-        typ: "frage",
+      const shared = {
         abschnitt,
         frage,
         frageIndexImBlock: index + 1,
         fragenAnzahlImBlock: fragenImBlock.length,
-      });
+      };
+      result.push({ typ: "frage", ...shared });
+      result.push({ typ: "aufloesung", ...shared });
     });
   }
 
@@ -191,5 +220,82 @@ export function buildPraesentationSlides(
     });
   }
 
+  appendFlowItems("AFTER_QUIZ", "QUIZ", null);
+
   return result;
+}
+
+export function getPresentationSlideKey(slide: Slide) {
+  if (slide.typ === "ablauf") {
+    if (
+      slide.element.anchorType === "BLOCK" &&
+      slide.element.persistentId !== null
+    ) {
+      return slide.element.storyElementRevisionId
+        ? `story-placement:${slide.element.persistentId}`
+        : `block-item:${slide.element.persistentId}`;
+    }
+    return `${slide.element.id}:${slide.element.type}`;
+  }
+  if (slide.typ === "fixer-slide") return `fixed:${slide.slideTyp}`;
+  if (slide.typ === "block") {
+    return `section:${slide.abschnitt.quiz_abschnitt_id}:intro`;
+  }
+  if (slide.typ === "frage") {
+    return `question:${slide.frage.quiz_fragen_id}:question`;
+  }
+  if (slide.typ === "aufloesung") {
+    return `question:${slide.frage.quiz_fragen_id}:solution`;
+  }
+  if (slide.typ === "pause") {
+    return `section:${slide.abschnitt.quiz_abschnitt_id}:break`;
+  }
+  if (slide.typ === "zwischenstand") {
+    return `section:${slide.abschnitt.quiz_abschnitt_id}:standings`;
+  }
+  return `section:${slide.abschnitt.quiz_abschnitt_id}:final`;
+}
+
+export function getSlideFlowType(slide: Slide | undefined): QuizFlowItemType | null {
+  return slide?.typ === "ablauf" ? slide.element.type : null;
+}
+
+export function isPauseSlide(slide: Slide | undefined) {
+  return (
+    slide?.typ === "pause" ||
+    (slide?.typ === "ablauf" &&
+      (slide.element.type === "BREAK" || slide.element.type === "COUNTDOWN"))
+  );
+}
+
+export function getPauseDurationSeconds(slide: Slide | undefined) {
+  if (slide?.typ === "pause") return slide.dauerSekunden;
+  if (isPauseSlide(slide) && slide?.typ === "ablauf") {
+    return slide.element.config.durationSeconds ?? 300;
+  }
+  return 0;
+}
+
+export function isStandingsSlide(slide: Slide | undefined) {
+  return (
+    slide?.typ === "zwischenstand" ||
+    slide?.typ === "endstand" ||
+    (slide?.typ === "ablauf" &&
+      ["INTERMEDIATE_STANDINGS", "FINAL_STANDINGS", "WINNER"].includes(
+        slide.element.type,
+      ))
+  );
+}
+
+export function isFinalStandingsSlide(slide: Slide | undefined) {
+  return (
+    slide?.typ === "endstand" ||
+    (slide?.typ === "ablauf" && slide.element.type === "FINAL_STANDINGS")
+  );
+}
+
+export function getSlideModeratorNote(slide: Slide | undefined) {
+  return slide?.typ === "ablauf"
+    ? (slide.element.config.moderatorNote ?? null)
+    : null;
 }

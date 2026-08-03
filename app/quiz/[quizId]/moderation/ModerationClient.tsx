@@ -10,10 +10,15 @@ import {
   QuizPraesentationResult,
   getQuizPunktestand,
   getZufaelligeSchaetzfrage,
-  setAktuelleQuizFrage,
 } from "../../actions";
 import {
   buildPraesentationSlides,
+  getPauseDurationSeconds,
+  getPresentationSlideKey,
+  getSlideModeratorNote,
+  isPauseSlide,
+  isFinalStandingsSlide,
+  isStandingsSlide,
 } from "../praesentation/buildPraesentationSlides";
 import {
   setPraesentationSlideIndex,
@@ -37,7 +42,11 @@ import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
-import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
+import { resolvePresentationSequenceIndex } from "@/app/rendering/presentation/presentationLiveState";
+import {
+  getQuizFlowTypeLabel,
+  getQuizSolutionStrategyLabel,
+} from "@/app/quiz/flow/quizFlow";
 
 type EstimationQuestion = {
   fragen_id: number;
@@ -80,12 +89,12 @@ export default function ModerationClient({
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
 
-  const [slideIndex, setSlideIndex] = useState(() =>
-    Math.min(
-      Math.max(initialLiveState.slideIndex, 0),
-      Math.max(slides.length - 1, 0),
-    ),
-  );
+  const [slideIndex, setSlideIndex] = useState(() => {
+    return resolvePresentationSequenceIndex(
+      initialLiveState,
+      slides.map(getPresentationSlideKey),
+    ).index;
+  });
 
   const [slideStartedAt, setSlideStartedAt] = useState(
     initialLiveState.slideStartedAt,
@@ -101,16 +110,16 @@ export default function ModerationClient({
 
   const aktuellerSlide = slides[slideIndex];
   const pauseVerstrichen =
-    aktuellerSlide?.typ === "pause"
+    isPauseSlide(aktuellerSlide)
       ? (secondsSince(slideStartedAt, now) ?? 0)
       : 0;
 
   const istPauseAbgelaufen =
-    aktuellerSlide?.typ === "pause" &&
-    pauseVerstrichen >= aktuellerSlide.dauerSekunden;
+    isPauseSlide(aktuellerSlide) &&
+    pauseVerstrichen >= getPauseDurationSeconds(aktuellerSlide);
 
   const naechsterSlide = slides[slideIndex + 1];
-  const istCountdownSlide = aktuellerSlide?.typ === "pause";
+  const istCountdownSlide = isPauseSlide(aktuellerSlide);
 
   const aktuelleMedien =
     aktuellerSlide?.typ === "frage"
@@ -122,6 +131,10 @@ export default function ModerationClient({
               (antwort) => antwort.medien,
             ),
           ]
+        : aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "AUDIO" && aktuellerSlide.element.config.audioUrl
+          ? [{ medien_id: aktuellerSlide.element.persistentId ?? -1, datei: aktuellerSlide.element.config.audioUrl, medientyp: "Audio", sortierung: 1, bemerkung: aktuellerSlide.element.config.description ?? null }]
+          : aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "VIDEO" && aktuellerSlide.element.config.videoUrl
+            ? [{ medien_id: aktuellerSlide.element.persistentId ?? -1, datei: aktuellerSlide.element.config.videoUrl, medientyp: "Video", sortierung: 1, bemerkung: aktuellerSlide.element.config.description ?? null }]
         : [];
 
   const [punktestand, setPunktestand] = useState<
@@ -137,8 +150,15 @@ export default function ModerationClient({
         Boolean(quiz.intro_musik_url)) ||
       (aktuellerSlide.slideTyp === "bekanntmachungen" &&
         Boolean(quiz.outro_musik_url)));
+  const hatAudioAufAblaufSlide =
+    aktuellerSlide?.typ === "ablauf" &&
+    ((aktuellerSlide.element.type === "START_SEQUENCE" && Boolean(quiz.intro_musik_url)) ||
+      (aktuellerSlide.element.type === "CLOSING" && Boolean(quiz.outro_musik_url)) ||
+      (aktuellerSlide.element.type === "AUDIO" && Boolean(aktuellerSlide.element.config.audioUrl)) ||
+      (aktuellerSlide.element.type === "VIDEO" && Boolean(aktuellerSlide.element.config.videoUrl)));
   const hatAudio =
     hatAudioAufFixemSlide ||
+    hatAudioAufAblaufSlide ||
     aktuelleMedien.some((medium) =>
       ["audio", "video"].some((type) =>
         medium.medientyp.toLowerCase().includes(type),
@@ -288,9 +308,16 @@ export default function ModerationClient({
       return;
     }
 
-    if (aktuellerSlide?.typ === "endstand") {
+    if (isFinalStandingsSlide(aktuellerSlide)) {
       const punktestand = await getQuizPunktestand(quizId);
-      const topTeams = punktestand.slice(0, 5);
+      const standingsSize = aktuellerSlide?.typ === "ablauf"
+        ? aktuellerSlide.element.config.standingsSize
+        : "TOP_5";
+      const topTeams = standingsSize === "TOP_3"
+        ? punktestand.slice(0, 3)
+        : standingsSize === "ALL"
+          ? punktestand
+          : punktestand.slice(0, 5);
 
       const platzGruppen = Array.from(
         new Set(
@@ -397,20 +424,21 @@ export default function ModerationClient({
     setAudioLaeuft(false);
     setPlaybackCommand("stop");
     setPlaybackCommandId((current) => current + 1);
+    setCountdownStartedAt(null);
+    setCountdownStatus("idle");
 
-    await setPraesentationSlideIndex(quizId, safeIndex);
     const nextSlide = slides[safeIndex];
-    if (
-      nextSlide?.typ === "frage" &&
-      nextSlide.abschnitt &&
-      isQuestionSection(nextSlide.abschnitt)
-    ) {
-      await setAktuelleQuizFrage({
-        quizId,
-        quizAbschnittId: nextSlide.abschnitt.quiz_abschnitt_id,
-        quizFragenId: nextSlide.frage.quiz_fragen_id,
-      });
+    if (!nextSlide) return;
+    if (isPauseSlide(nextSlide)) {
+      setCountdownDauerMinuten(
+        Math.max(1, Math.round(getPauseDurationSeconds(nextSlide) / 60)),
+      );
     }
+    await setPraesentationSlideIndex(
+      quizId,
+      safeIndex,
+      getPresentationSlideKey(nextSlide),
+    );
     await aktualisiereAntwortStatus();
   }
 
@@ -510,8 +538,7 @@ export default function ModerationClient({
 
   useEffect(() => {
     if (
-      aktuellerSlide?.typ !== "zwischenstand" &&
-      aktuellerSlide?.typ !== "endstand"
+      !isStandingsSlide(aktuellerSlide)
     ) {
       return;
     }
@@ -522,7 +549,7 @@ export default function ModerationClient({
     }
 
     void ladePunktestand();
-  }, [aktuellerSlide?.typ, quizId]);
+  }, [aktuellerSlide, quizId]);
 
   useModerationHotkeys({
     hatMedien,
@@ -598,7 +625,20 @@ export default function ModerationClient({
               estimationQuestion={estimationQuestion}
             />
 
-            <SlideNotes />
+            <SlideNotes>
+              <div className="space-y-2">
+                {aktuellerSlide?.typ === "ablauf" && (
+                  <p><strong>Typ:</strong> {getQuizFlowTypeLabel(aktuellerSlide.element.type)}</p>
+                )}
+                {(aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && aktuellerSlide.solutionStrategy && (
+                  <p><strong>Auflösungsstrategie:</strong> {getQuizSolutionStrategyLabel(aktuellerSlide.solutionStrategy)}</p>
+                )}
+                {aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.config.durationSeconds !== undefined && (
+                  <p><strong>Geplante Verweildauer:</strong> {aktuellerSlide.element.config.durationSeconds} Sekunden</p>
+                )}
+                {getSlideModeratorNote(aktuellerSlide) && <p>{getSlideModeratorNote(aktuellerSlide)}</p>}
+              </div>
+            </SlideNotes>
 
             <ModerationToolbar
               blockFreigegeben={blockFreigegeben}

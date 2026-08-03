@@ -67,6 +67,19 @@ import {
   type ResolvedPresentationLayout,
 } from "@/app/rendering/presentation/presentationLayoutResolver";
 import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import {
+  resolvePresentationAudienceState,
+  resolvePresentationLiveState,
+} from "@/app/rendering/presentation/presentationLiveState";
+import {
+  canSaveQuizAnswerForPresentation,
+  selectQuizAnswerAssignments,
+} from "./quizAnswerLiveState";
+import {
+  isQuizSolutionStrategy,
+  type QuizSolutionStrategy,
+} from "./flow/quizFlow";
+import { toStoredQuizFlowItem } from "./flow/quizFlowRepository.server";
 
 async function getPresentationTemplateValidationOptions(
   additionallyAllowed: readonly string[] = [],
@@ -89,6 +102,7 @@ export type QuizResult = {
   eventreihe_archiviert: boolean;
   titel: string | null;
   quiz_datum: string | null;
+  aufloesungsstrategie: QuizSolutionStrategy;
   veranstaltungszeit: string | null;
   veranstaltungsname: string | null;
   karten_url: string | null;
@@ -166,6 +180,7 @@ export type QuizDetailsResult = QuizResult & {
     qr_code_url: string | null;
     medien_datei: string | null;
     bemerkung: string | null;
+    aufloesungsstrategie: QuizSolutionStrategy | null;
   }[];
   fragen: {
     quiz_fragen_id: number;
@@ -211,6 +226,9 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
+    aufloesungsstrategie: isQuizSolutionStrategy(quiz.aufloesungsstrategie)
+      ? quiz.aufloesungsstrategie
+      : "AFTER_EACH_QUESTION",
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
@@ -272,6 +290,9 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
     fragen_anzahl: 0,
     presentation_template_id: quiz.presentation_template_id,
     answer_form_template_id: quiz.answer_form_template_id,
+    aufloesungsstrategie: isQuizSolutionStrategy(quiz.aufloesungsstrategie)
+      ? quiz.aufloesungsstrategie
+      : "AFTER_EACH_QUESTION",
   }));
 }
 
@@ -286,7 +307,11 @@ export async function createQuiz(data: {
   bemerkung: string;
   presentationTemplateId?: string | null;
   answerFormTemplateId?: string | null;
+  solutionStrategy?: QuizSolutionStrategy;
 }) {
+  if (!isQuizSolutionStrategy(data.solutionStrategy ?? "AFTER_EACH_QUESTION")) {
+    return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
+  }
   const templateOptions = await getPresentationTemplateValidationOptions();
   const validated = validateQuizMasterData({
     eventSeriesId: data.eventSeriesId,
@@ -319,6 +344,7 @@ export async function createQuiz(data: {
       bemerkung: validated.value.internalNote,
       presentation_template_id: validated.value.presentationTemplateId,
       answer_form_template_id: validated.value.answerFormTemplateId,
+      aufloesungsstrategie: data.solutionStrategy ?? "AFTER_EACH_QUESTION",
     },
   });
 
@@ -345,7 +371,11 @@ export async function updateQuiz(data: {
   bemerkung: string;
   presentationTemplateId?: string | null;
   answerFormTemplateId?: string | null;
+  solutionStrategy?: QuizSolutionStrategy;
 }) {
+  if (!isQuizSolutionStrategy(data.solutionStrategy ?? "AFTER_EACH_QUESTION")) {
+    return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
+  }
   await requireQuizEditor(data.quizId);
   const existing = await prisma.quiz.findUnique({
     where: { quiz_id: data.quizId },
@@ -353,6 +383,7 @@ export async function updateQuiz(data: {
       eventreihe_id: true,
       presentation_template_id: true,
       answer_form_template_id: true,
+      aufloesungsstrategie: true,
     },
   });
   if (!existing) return { success: false, message: "Quiz nicht gefunden." };
@@ -394,6 +425,11 @@ export async function updateQuiz(data: {
       bemerkung: validated.value.internalNote,
       presentation_template_id: validated.value.presentationTemplateId,
       answer_form_template_id: validated.value.answerFormTemplateId,
+      aufloesungsstrategie:
+        data.solutionStrategy ??
+        (isQuizSolutionStrategy(existing.aufloesungsstrategie)
+          ? existing.aufloesungsstrategie
+          : "AFTER_EACH_QUESTION"),
     },
   });
 
@@ -491,6 +527,13 @@ export async function copyQuiz(data: {
           sortierung: "asc",
         },
       },
+      quiz_ablauf_elemente: {
+        orderBy: [
+          { anker_typ: "asc" },
+          { anker_schluessel: "asc" },
+          { sortierung: "asc" },
+        ],
+      },
     },
   });
 
@@ -539,6 +582,7 @@ export async function copyQuiz(data: {
         bemerkung: validated.value.internalNote,
         presentation_template_id: validated.value.presentationTemplateId,
         answer_form_template_id: validated.value.answerFormTemplateId,
+        aufloesungsstrategie: original.aufloesungsstrategie,
 
         intro_logo_url: original.intro_logo_url,
         intro_musik_url: original.intro_musik_url,
@@ -570,6 +614,7 @@ export async function copyQuiz(data: {
           qr_code_url: abschnitt.qr_code_url,
           medien_datei: abschnitt.medien_datei,
           bemerkung: abschnitt.bemerkung,
+          aufloesungsstrategie: abschnitt.aufloesungsstrategie,
         },
       });
 
@@ -579,8 +624,42 @@ export async function copyQuiz(data: {
       );
     }
 
+    if (original.quiz_ablauf_elemente.length > 0) {
+      await tx.quiz_ablauf_elemente.createMany({
+        data: original.quiz_ablauf_elemente
+          .filter((item) =>
+            item.quiz_fragen_id === null &&
+            item.story_bezugs_quiz_fragen_id === null,
+          )
+          .map((item) => {
+          const neuerAbschnittId = item.quiz_abschnitt_id
+            ? (abschnittIdMap.get(item.quiz_abschnitt_id) ?? null)
+            : null;
+          return {
+            quiz_id: neuesQuiz.quiz_id,
+            typ: item.typ,
+            anker_typ: item.anker_typ,
+            anker_schluessel:
+              neuerAbschnittId === null
+                ? item.anker_schluessel
+                : String(neuerAbschnittId),
+            quiz_abschnitt_id: neuerAbschnittId,
+            story_element_revision_id: item.story_element_revision_id,
+            story_beziehung: item.story_beziehung,
+            sortierung: item.sortierung,
+            ist_sichtbar: item.ist_sichtbar,
+            bezeichnung: item.bezeichnung,
+            konfiguration: item.konfiguration as Prisma.InputJsonValue,
+            konfigurations_version: item.konfigurations_version,
+            ist_standard: item.ist_standard,
+          };
+        }),
+      });
+    }
+
+    const questionAssignmentIdMap = new Map<number, number>();
     for (const quizFrage of original.quiz_fragen) {
-      await addQuestionToQuiz(
+      const createdAssignment = await addQuestionToQuiz(
         {
           quiz_id: neuesQuiz.quiz_id,
           fragen_id: quizFrage.fragen_id,
@@ -596,6 +675,67 @@ export async function copyQuiz(data: {
         session,
         tx,
       );
+      await tx.quiz_fragen.update({
+        where: { quiz_fragen_id: createdAssignment.quiz_fragen_id },
+        data: {
+          verknuepfte_story_elemente_uebernehmen:
+            quizFrage.verknuepfte_story_elemente_uebernehmen,
+        },
+      });
+      questionAssignmentIdMap.set(
+        quizFrage.quiz_fragen_id,
+        createdAssignment.quiz_fragen_id,
+      );
+    }
+
+    const questionFlowItems = original.quiz_ablauf_elemente.filter(
+      (item) =>
+        item.quiz_fragen_id !== null ||
+        item.story_bezugs_quiz_fragen_id !== null,
+    );
+    if (questionFlowItems.length > 0) {
+      await tx.quiz_ablauf_elemente.createMany({
+        data: questionFlowItems.map((item) => {
+          const neuerAbschnittId = item.quiz_abschnitt_id
+            ? (abschnittIdMap.get(item.quiz_abschnitt_id) ?? null)
+            : null;
+          const neueQuizFragenId = item.quiz_fragen_id
+            ? (questionAssignmentIdMap.get(item.quiz_fragen_id) ?? null)
+            : null;
+          const neueStoryBezugsFragenId = item.story_bezugs_quiz_fragen_id
+            ? (questionAssignmentIdMap.get(item.story_bezugs_quiz_fragen_id) ?? null)
+            : null;
+          if (item.quiz_fragen_id !== null && neueQuizFragenId === null) {
+            throw new Error("Fragenbezug des kopierten Ablaufelements fehlt.");
+          }
+          if (
+            item.story_bezugs_quiz_fragen_id !== null &&
+            neueStoryBezugsFragenId === null
+          ) {
+            throw new Error("Story-Fragenbezug des kopierten Ablaufelements fehlt.");
+          }
+          return {
+            quiz_id: neuesQuiz.quiz_id,
+            typ: item.typ,
+            anker_typ: item.anker_typ,
+            anker_schluessel:
+              neuerAbschnittId === null
+                ? item.anker_schluessel
+                : String(neuerAbschnittId),
+            quiz_abschnitt_id: neuerAbschnittId,
+            quiz_fragen_id: neueQuizFragenId,
+            story_element_revision_id: item.story_element_revision_id,
+            story_bezugs_quiz_fragen_id: neueStoryBezugsFragenId,
+            story_beziehung: item.story_beziehung,
+            sortierung: item.sortierung,
+            ist_sichtbar: item.ist_sichtbar,
+            bezeichnung: item.bezeichnung,
+            konfiguration: item.konfiguration as Prisma.InputJsonValue,
+            konfigurations_version: item.konfigurations_version,
+            ist_standard: item.ist_standard,
+          };
+        }),
+      });
     }
 
     return neuesQuiz;
@@ -704,6 +844,9 @@ export async function getQuizDetails(
     fragen_anzahl: quiz.quiz_fragen.length,
     presentation_template_id: quiz.presentation_template_id,
     answer_form_template_id: quiz.answer_form_template_id,
+    aufloesungsstrategie: isQuizSolutionStrategy(quiz.aufloesungsstrategie)
+      ? quiz.aufloesungsstrategie
+      : "AFTER_EACH_QUESTION",
 
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,
@@ -728,6 +871,11 @@ export async function getQuizDetails(
       qr_code_url: abschnitt.qr_code_url,
       medien_datei: abschnitt.medien_datei,
       bemerkung: abschnitt.bemerkung,
+      aufloesungsstrategie: isQuizSolutionStrategy(
+        abschnitt.aufloesungsstrategie,
+      )
+        ? abschnitt.aufloesungsstrategie
+        : null,
     })),
     fragen: quiz.quiz_fragen.map((eintrag) => {
       const answerMode = resolveQuizQuestionAnswerMode({
@@ -865,6 +1013,7 @@ export async function searchFragenForQuiz(data: {
 export async function addFrageToQuiz(data: {
   quizId: number;
   fragenId: number;
+  includeLinkedStoryElements?: boolean;
 }) {
   const { session } = await requireQuizEditor(data.quizId);
 
@@ -904,8 +1053,11 @@ export async function addFrageToQuiz(data: {
     {
       quiz_id: data.quizId,
       fragen_id: data.fragenId,
+      quiz_abschnitt_id: null,
       sortierung: naechsteSortierung,
       antwort_reihenfolge: gemischteAntwortIds,
+      verknuepfte_story_elemente_uebernehmen:
+        data.includeLinkedStoryElements !== false,
     },
     session,
   );
@@ -1173,10 +1325,12 @@ export type QuizPraesentationResult = {
   intro_wartetext: string | null;
   intro_video_url: string | null;
   intro_startzeit: string | null;
+  intro_startsequenz_text: string | null;
   outro_bekanntmachungen: string | null;
   outro_musik_url: string | null;
   titel: string | null;
   quiz_datum: string | null;
+  aufloesungsstrategie?: QuizSolutionStrategy;
 
   fragen: {
     quiz_fragen_id: number;
@@ -1252,7 +1406,10 @@ export type QuizPraesentationResult = {
     qr_code_url: string | null;
     medien_datei: string | null;
     bemerkung: string | null;
+    aufloesungsstrategie?: QuizSolutionStrategy | null;
   }[];
+
+  ablaufElemente: import("./flow/quizFlow").StoredQuizFlowItem[];
 };
 
 export async function getQuizPraesentation(
@@ -1267,6 +1424,25 @@ export async function getQuizPraesentation(
       quiz_abschnitte: {
         orderBy: {
           sortierung: "asc",
+        },
+      },
+      quiz_ablauf_elemente: {
+        orderBy: [
+          { anker_typ: "asc" },
+          { anker_schluessel: "asc" },
+          { sortierung: "asc" },
+        ],
+        include: {
+          story_element_revision: {
+            select: {
+              story_element_revision_id: true,
+              story_element_id: true,
+              typ: true,
+              titel: true,
+              moderationsnotiz: true,
+              konfiguration: true,
+            },
+          },
         },
       },
 
@@ -1349,12 +1525,16 @@ export async function getQuizPraesentation(
     intro_wartetext: quiz.intro_wartetext,
     intro_video_url: quiz.intro_video_url,
     intro_startzeit: quiz.intro_startzeit,
+    intro_startsequenz_text: quiz.intro_startsequenz_text,
     outro_bekanntmachungen: quiz.outro_bekanntmachungen,
     outro_musik_url: quiz.outro_musik_url,
     titel: quiz.titel,
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
+    aufloesungsstrategie: isQuizSolutionStrategy(quiz.aufloesungsstrategie)
+      ? quiz.aufloesungsstrategie
+      : "AFTER_EACH_QUESTION",
     abschnitte: quiz.quiz_abschnitte.map((abschnitt) => ({
       quiz_abschnitt_id: abschnitt.quiz_abschnitt_id,
       titel: abschnitt.titel,
@@ -1364,7 +1544,13 @@ export async function getQuizPraesentation(
       qr_code_url: abschnitt.qr_code_url,
       medien_datei: abschnitt.medien_datei,
       bemerkung: abschnitt.bemerkung,
+      aufloesungsstrategie: isQuizSolutionStrategy(
+        abschnitt.aufloesungsstrategie,
+      )
+        ? abschnitt.aufloesungsstrategie
+        : null,
     })),
+    ablaufElemente: quiz.quiz_ablauf_elemente.map(toStoredQuizFlowItem),
     fragen: quiz.quiz_fragen.map((eintrag) => {
       const answerMode = resolveQuizQuestionAnswerMode({
         templateId: eintrag.fragen.vorlage?.code ?? null,
@@ -1704,6 +1890,7 @@ export async function getQuizAntwortStatus(
           },
         },
       },
+      praesentation_status: true,
     },
   });
 
@@ -1725,7 +1912,7 @@ export async function getQuizAntwortStatus(
       abschnitt.quiz_block_freigaben[0]?.ist_geschlossen ?? false,
   }));
 
-  const aktuellerBlock =
+  const legacyAktuellerBlock =
     abschnitte.find(
       (abschnitt) =>
         isQuestionSection(abschnitt) &&
@@ -1738,14 +1925,47 @@ export async function getQuizAntwortStatus(
         abschnitt.ist_geschlossen,
     );
 
-  const blockIstGesperrt = aktuellerBlock?.ist_geschlossen ?? false;
+  const liveState = resolvePresentationLiveState(quiz.praesentation_status);
+  const audienceState = resolvePresentationAudienceState(
+    liveState,
+    quiz.quiz_fragen.map((entry) => ({
+      questionAssignmentId: entry.quiz_fragen_id,
+      questionId: entry.fragen_id,
+      sectionId: entry.quiz_abschnitt_id,
+    })),
+  );
+
+  const stableQuestion = audienceState.kind === "QUESTION"
+    ? audienceState
+    : null;
+  const stableCurrentBlock = stableQuestion
+    ? abschnitte.find(
+        (section) => section.quiz_abschnitt_id === stableQuestion.sectionId,
+      )
+    : undefined;
+  const aktuellerBlock = stableQuestion && stableCurrentBlock
+    ? {
+        ...stableCurrentBlock,
+        ist_freigegeben: stableQuestion.phase === "QUESTION",
+        ist_geschlossen: stableQuestion.phase === "SOLUTION",
+      }
+    : audienceState.kind === "LEGACY"
+      ? legacyAktuellerBlock
+      : undefined;
+  const blockIstGesperrt = stableQuestion
+    ? stableQuestion.phase === "SOLUTION"
+    : audienceState.kind === "LEGACY"
+      ? (aktuellerBlock?.ist_geschlossen ?? false)
+      : true;
 
   const blockFreigabe = quiz.quiz_abschnitte.find(
     (abschnitt) =>
       abschnitt.quiz_abschnitt_id === aktuellerBlock?.quiz_abschnitt_id,
   )?.quiz_block_freigaben[0];
 
-  const aktuelleQuizFragenId = blockFreigabe?.aktuelle_quiz_fragen_id ?? null;
+  const aktuelleQuizFragenId = stableQuestion?.questionAssignmentId ??
+    blockFreigabe?.aktuelle_quiz_fragen_id ??
+    null;
 
   const tokenPayload = quizTeamSessionToken
     ? verifyTeamSessionToken(
@@ -1794,11 +2014,22 @@ export async function getQuizAntwortStatus(
     (eintrag) => eintrag.quiz_fragen_id === aktuelleQuizFragenId,
   );
 
-  const fragen =
-    aktuellerBlock && !blockIstGesperrt
+  const legacyVisibleAssignmentIds =
+    audienceState.kind === "LEGACY" && aktuellerBlock && !blockIstGesperrt
       ? fragenImAktuellenBlock
-          .filter((_, index) => aktuelleFrageIndex >= 0 && index <= aktuelleFrageIndex)
-          .map((eintrag) => {
+          .filter(
+            (_, index) =>
+              aktuelleFrageIndex >= 0 && index <= aktuelleFrageIndex,
+          )
+          .map((entry) => entry.quiz_fragen_id)
+      : [];
+  const fragenZurAnzeige = selectQuizAnswerAssignments(
+    audienceState,
+    quiz.quiz_fragen,
+    legacyVisibleAssignmentIds,
+  );
+
+  const fragen = fragenZurAnzeige.map((eintrag) => {
           const antworten = [...eintrag.fragen.antworten].sort((a, b) => {
             const indexA = eintrag.antwort_reihenfolge.indexOf(a.antwort_id);
             const indexB = eintrag.antwort_reihenfolge.indexOf(b.antwort_id);
@@ -1883,8 +2114,13 @@ export async function getQuizAntwortStatus(
                 antwort: antwort.antwort,
               })),
           };
-        })
-      : [];
+        });
+
+  const presentationStatusText = stableQuestion?.phase === "SOLUTION"
+    ? "Die Auflösung wird gezeigt"
+    : audienceState.kind === "NON_QUESTION" || audienceState.kind === "UNKNOWN"
+      ? audienceState.statusText
+      : null;
 
   return {
     quiz_id: quiz.quiz_id,
@@ -1894,6 +2130,8 @@ export async function getQuizAntwortStatus(
       aktuellerBlock && !blockIstGesperrt ? aktuellerBlock : undefined,
     aktuellerBlock,
     blockIstGesperrt,
+    answerPhase: audienceState.phase,
+    presentationStatusText,
     fragen,
   };
 }
@@ -2179,6 +2417,7 @@ export async function saveTeamAntwort(data: {
       include: {
         fragen: {
           select: {
+            fragen_id: true,
             antworten: {
               select: {
                 antwort_id: true,
@@ -2190,7 +2429,12 @@ export async function saveTeamAntwort(data: {
             template_config_json: true,
           },
         },
-        quiz: { select: { ist_archiviert: true } },
+        quiz: {
+          select: {
+            ist_archiviert: true,
+            praesentation_status: true,
+          },
+        },
       },
     }),
     prisma.quiz_fragen.findMany({
@@ -2236,6 +2480,25 @@ export async function saveTeamAntwort(data: {
   const currentIndex = blockFragen.findIndex(
     (entry) => entry.quiz_fragen_id === blockFreigabe?.aktuelle_quiz_fragen_id,
   );
+  const audienceState = resolvePresentationAudienceState(
+    resolvePresentationLiveState(quizFrage.quiz.praesentation_status),
+    [{
+      questionAssignmentId: quizFrage.quiz_fragen_id,
+      questionId: quizFrage.fragen.fragen_id,
+      sectionId: quizFrage.quiz_abschnitt_id,
+    }],
+  );
+  const stableQuestionIsOpen = canSaveQuizAnswerForPresentation(
+    audienceState,
+    data.quizFragenId,
+  );
+  const usesLegacyRelease = audienceState.kind === "LEGACY";
+  if (!stableQuestionIsOpen && !usesLegacyRelease) {
+    return {
+      success: false,
+      reason: "LIVE_STATE_CHANGED" as const,
+    };
+  }
   assertTeamAnswerAuthorized({
     requestedQuizId: data.quizId,
     requestedSectionId: data.quizAbschnittId,
@@ -2243,11 +2506,21 @@ export async function saveTeamAntwort(data: {
     sessionQuizId: teamSession.quiz_id,
     assignmentQuizId: quizFrage.quiz_id,
     assignmentSectionId: quizFrage.quiz_abschnitt_id,
-    releasedSectionId: blockFreigabe?.quiz_abschnitt_id ?? null,
-    blockIsReleased: blockFreigabe?.ist_freigegeben ?? false,
-    blockIsClosed: blockFreigabe?.ist_geschlossen ?? true,
-    visibleQuizQuestionIds:
-      currentIndex >= 0
+    releasedSectionId: stableQuestionIsOpen
+      ? quizFrage.quiz_abschnitt_id
+      : usesLegacyRelease
+        ? (blockFreigabe?.quiz_abschnitt_id ?? null)
+        : null,
+    blockIsReleased: stableQuestionIsOpen ||
+      (usesLegacyRelease && (blockFreigabe?.ist_freigegeben ?? false)),
+    blockIsClosed: stableQuestionIsOpen
+      ? false
+      : usesLegacyRelease
+        ? (blockFreigabe?.ist_geschlossen ?? true)
+        : true,
+    visibleQuizQuestionIds: stableQuestionIsOpen
+      ? [data.quizFragenId]
+      : usesLegacyRelease && currentIndex >= 0
         ? blockFragen.slice(0, currentIndex + 1).map((entry) => entry.quiz_fragen_id)
         : [],
     requestedAnswerId: data.antwortId,

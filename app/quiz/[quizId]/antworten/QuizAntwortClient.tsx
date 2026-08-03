@@ -44,6 +44,8 @@ type AntwortStatus = {
   | undefined;
 
   blockIstGesperrt: boolean;
+  answerPhase: "QUESTION" | "SOLUTION" | "NON_QUESTION" | "LEGACY" | "UNKNOWN";
+  presentationStatusText: string | null;
 
   fragen: {
     quiz_fragen_id: number;
@@ -241,25 +243,53 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       return;
     }
     const timeout = window.setTimeout(async () => {
-      await Promise.all(
-        Object.entries(antworten).map(([quizFragenId, antwort]) =>
-          saveTeamAntwort({
-            quizId: liveDaten.quiz_id,
-            quizAbschnittId: speicherBlockId,
-            quizFragenId: Number(quizFragenId),
-            quizTeamSessionToken: session.sessionToken,
-            antwortText: antwort.antwortText,
-            antwortId: antwort.antwortId,
-            antwortIds: antwort.antwortIds,
-            antwortfelder: Object.entries(antwort.antwortfelder).map(
-              ([antwortfeldId, antwortText]) => ({
-                antwortfeldId: Number(antwortfeldId),
-                antwortText,
-              })
-            ),
-          })
-        )
+      const visibleQuestionIds = new Set(
+        liveDaten.fragen.map((frage) => frage.quiz_fragen_id),
       );
+      try {
+        const results = await Promise.all(
+          Object.entries(antworten)
+            .filter(([quizFragenId]) =>
+              visibleQuestionIds.has(Number(quizFragenId)),
+            )
+            .map(([quizFragenId, antwort]) =>
+              saveTeamAntwort({
+                quizId: liveDaten.quiz_id,
+                quizAbschnittId: speicherBlockId,
+                quizFragenId: Number(quizFragenId),
+                quizTeamSessionToken: session.sessionToken,
+                antwortText: antwort.antwortText,
+                antwortId: antwort.antwortId,
+                antwortIds: antwort.antwortIds,
+                antwortfelder: Object.entries(antwort.antwortfelder).map(
+                  ([antwortfeldId, antwortText]) => ({
+                    antwortfeldId: Number(antwortfeldId),
+                    antwortText,
+                  }),
+                ),
+              }),
+            ),
+        );
+        if (results.some((result) => !result.success)) {
+          const aktuelleDaten = await getQuizAntwortStatusLive(
+            liveDaten.quiz_id,
+            session.sessionToken,
+          );
+          if (aktuelleDaten) setLiveDaten(aktuelleDaten as AntwortStatus);
+          setMeldung(
+            "Die Frage hat inzwischen gewechselt. Der aktuelle Stand wurde neu geladen.",
+          );
+        }
+      } catch {
+        const aktuelleDaten = await getQuizAntwortStatusLive(
+          liveDaten.quiz_id,
+          session.sessionToken,
+        );
+        if (aktuelleDaten) setLiveDaten(aktuelleDaten as AntwortStatus);
+        setMeldung(
+          "Die Frage hat inzwischen gewechselt. Der aktuelle Stand wurde neu geladen.",
+        );
+      }
     }, 1200);
 
     return () => window.clearTimeout(timeout);
@@ -269,6 +299,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     speicherBlockId,
     liveDaten.offenerBlock,
     liveDaten.quiz_id,
+    liveDaten.fragen,
     blockIstGesperrt,
   ]);
 
@@ -368,6 +399,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
     setSession(null);
     setTeamname("");
+    setTeamPasswort("");
+    setGeneriertesPasswort(null);
     setSpielerAnzahl("1");
     setTeamVorschlaege([]);
     setMeldung("");
@@ -400,7 +433,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     >
       <div className="mx-auto max-w-2xl space-y-6">
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h1 className="text-3xl font-bold">
+          <h1 className="break-words text-3xl font-bold">
             {liveDaten.titel ?? `Quiz ${liveDaten.quiz_id}`}
           </h1>
 
@@ -464,10 +497,14 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
               <button
                 type="button"
                 onClick={handleStartSession}
-                disabled={isStartingSession || !teamname.trim()}
+                disabled={isLoadingTeams || isStartingSession || !teamname.trim()}
                 className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
-                {isStartingSession ? "Verbinde..." : "Team starten"}
+                {isLoadingTeams
+                  ? "Suche Team..."
+                  : isStartingSession
+                    ? "Verbinde..."
+                    : "Team starten"}
               </button>
             </div>
           ) : (
@@ -489,19 +526,17 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                     </span>
                   </div>
                 )}
+
+                {generiertesPasswort && (
+                  <div className="mt-1 text-xs text-emerald-800">
+                    Dieses Passwort wurde für das neue Team erzeugt.
+                  </div>
+                )}
               </div>
 
               <button
                 type="button"
-                onClick={() => {
-                  localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
-                  setSession(null);
-                  setTeamname("");
-                  setTeamPasswort("");
-                  setGeneriertesPasswort(null);
-                  setSpielerAnzahl("1");
-                  setMeldung("");
-                }}
+                onClick={handleTeamWechseln}
                 className="shrink-0 rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-800"
               >
                 Team wechseln
@@ -511,18 +546,23 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
         </section>
 
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {aktuellerBlock ? (
+          {(liveDaten.answerPhase === "QUESTION" ||
+            (liveDaten.answerPhase === "LEGACY" &&
+              aktuellerBlock &&
+              !liveDaten.presentationStatusText)) ? (
             <>
               <div className="text-sm font-semibold uppercase tracking-wide text-green-600">
-                Aktuell freigegeben
+                {liveDaten.answerPhase === "QUESTION"
+                  ? "Aktuelle Frage"
+                  : "Aktuell freigegeben"}
               </div>
 
               <h2 className="mt-2 text-2xl font-bold">
-                {aktuellerBlock.titel}
+                {aktuellerBlock?.titel ?? "Aktuelle Frage"}
               </h2>
 
               <div className="mt-6 space-y-5">
-                {(!aktuellerBlock || blockIstGesperrt
+                {(blockIstGesperrt
                   ? []
                   : liveDaten.fragen.filter((frage) => frage.istFreigegeben)
                 ).map((frage, frageIndex) => {
@@ -787,11 +827,11 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
           ) : (
             <>
               <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                Noch kein Block freigegeben
+                {liveDaten.presentationStatusText ? "Aktueller Quizstatus" : "Noch kein Block freigegeben"}
               </div>
 
-              <p className="mt-2 text-slate-600">
-                Bitte warte, bis der Moderator die nächste Fragenrunde freigibt.
+              <p className="mt-2 text-lg font-semibold text-slate-700">
+                {liveDaten.presentationStatusText ?? "Bitte warte, bis der Moderator die nächste Fragenrunde freigibt."}
               </p>
             </>
           )}
@@ -809,6 +849,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
               Bild schließen
             </button>
 
+            {/* Arbitrary repository and managed-Blob media must remain directly renderable. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={bildModalUrl}
               alt="Bild zur Frage"

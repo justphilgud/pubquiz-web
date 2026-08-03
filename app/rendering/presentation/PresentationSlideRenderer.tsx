@@ -22,13 +22,22 @@ import {
   PresentationDesignHeader,
   PresentationDesignStage,
 } from "./PresentationDesignSystem";
+import {
+  PresentationStorybookQuestionSlide,
+  PresentationStorybookSolutionSlide,
+  resolveStorybookQuestionKind,
+  type StorybookPresentationMedium,
+} from "./PresentationStorybookQuestionTypes";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationPlaybackCommand } from "./presentationLiveState";
 import { selectDeterministicTemplateImage } from "@/app/rendering/presentationTemplates/deterministicTemplateImage";
+import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
 import {
   resolveStorybookComposition,
   type ResolveStorybookCompositionInput,
+  type StorybookCompositionVariant,
 } from "@/app/rendering/presentationTemplates/storybookComposition";
+import type { StorybookMemoryAsset } from "@/app/rendering/templateRegistry";
 
 type ScoreEntry = {
   teamname: string;
@@ -69,6 +78,8 @@ type Props = {
   storybookContext?: {
     personIds?: readonly string[];
     contentKind?: ResolveStorybookCompositionInput["contentKind"];
+    composition?: StorybookCompositionVariant;
+    preferredAssetRoles?: readonly StorybookMemoryAsset["role"][];
   };
 };
 
@@ -79,6 +90,8 @@ function SynchronizedMedia({
   commandId,
   renderMode,
   className,
+  activationClassName,
+  poster,
   loop = false,
 }: {
   kind: "audio" | "video";
@@ -87,6 +100,8 @@ function SynchronizedMedia({
   commandId: number;
   renderMode: PresentationSlideDisplayState["renderMode"];
   className?: string;
+  activationClassName?: string;
+  poster?: string;
   loop?: boolean;
 }) {
   const mediaRef = useRef<HTMLMediaElement | null>(null);
@@ -143,6 +158,7 @@ function SynchronizedMedia({
           mediaRef.current = element;
         }}
         src={src}
+        poster={poster}
         loop={loop}
         muted={renderMode !== "PRESENTATION"}
         playsInline
@@ -158,7 +174,7 @@ function SynchronizedMedia({
         <button
           type="button"
           onClick={() => void play()}
-          className="rounded-xl border border-white/40 bg-black/80 px-4 py-3 text-sm font-bold text-white"
+          className={activationClassName ?? "rounded-xl border border-white/40 bg-black/80 px-4 py-3 text-sm font-bold text-white"}
         >
           Medienwiedergabe einmalig aktivieren
         </button>
@@ -226,6 +242,23 @@ function isAudio(datei: string) {
 
 function isVideo(datei: string) {
   return /\.(mp4|webm|mov)$/i.test(datei);
+}
+
+function toStorybookMedium(medium: Medium | undefined): StorybookPresentationMedium | null {
+  if (!medium) return null;
+  return {
+    id: medium.medien_id,
+    kind: isBild(medium.datei)
+      ? "IMAGE"
+      : isAudio(medium.datei)
+        ? "AUDIO"
+        : isVideo(medium.datei)
+          ? "VIDEO"
+          : "FILE",
+    src: getMediumUrl(medium.datei),
+    alt: medium.bemerkung || medium.datei,
+    caption: medium.bemerkung,
+  };
 }
 
 function sortiereAntworten(frage: QuizPraesentationResult["fragen"][number]) {
@@ -367,6 +400,44 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const antworten = sortiereAntworten(frage);
   const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
   const layoutVariant = frage.presentationLayouts.question.variant;
+  const pixelRevealMedia = frage.templateId === "pixelbild" && layoutVariant === "REVEAL_SEQUENCE"
+    ? frage.medien.filter((medium) => isBild(medium.datei)).sort((left, right) => left.sortierung - right.sortierung)
+    : [];
+  const pixelRevealStep = pixelRevealMedia.length > 0
+    ? Math.min(pixelRevealMedia.length, Math.max(1, templateRevealCount))
+    : null;
+  const questionMedia = pixelRevealStep === null
+    ? frage.medien
+    : [pixelRevealMedia[pixelRevealStep - 1]];
+  const storybookKind = resolveStorybookQuestionKind(frage);
+
+  if (theme.design.stylePreset === "BIRTHDAY" && storybookKind) {
+    const audioMedium = frage.medien.find((medium) => isAudio(medium.datei));
+    const selectedMedium = storybookKind === "AUDIO" ? audioMedium : questionMedia[0];
+    const audioElement = renderMode === "PRESENTATION" && audioMedium ? (
+      <SynchronizedMedia
+        kind="audio"
+        src={getMediumUrl(audioMedium.datei)}
+        command={mediaOverlayActive ? null : playbackCommand}
+        commandId={playbackCommandId}
+        renderMode={renderMode}
+        activationClassName="presentation-storybook-media-activation"
+      />
+    ) : null;
+    return (
+      <PresentationStorybookQuestionSlide
+        question={frage}
+        questionNumber={slide.frageIndexImBlock}
+        layoutVariant={layoutVariant}
+        kind={storybookKind}
+        medium={toStorybookMedium(selectedMedium)}
+        audioElement={audioElement}
+        isPreview={renderMode !== "PRESENTATION"}
+        pixelRevealStep={pixelRevealStep}
+        pixelRevealTotal={pixelRevealMedia.length}
+      />
+    );
+  }
 
   if (templateData?.kind === "GOOGLE_REVIEWS") {
     const visibleReviews = templateData.sequentialReveal
@@ -446,6 +517,26 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
+  if (layoutVariant === "STRUCTURED_RESPONSE") {
+    return (
+      <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="presentation-question-card flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
+          <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-pink-300">Mehrteilige Antwort</div>
+          <h2 className="text-4xl font-black leading-tight text-white xl:text-6xl">{frage.frage}</h2>
+        </div>
+        <div className="grid min-h-0 content-center gap-4 rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-6 shadow-[8px_8px_0_#ff00aa]">
+          {frage.antwortfelder.map((field, index) => (
+            <div key={field.antwortfeld_id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-white">
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-cyan-200">Antwortteil {index + 1}</div>
+              <div className="mt-2 text-3xl font-black">{field.label}</div>
+              {field.ist_pflicht && <div className="mt-2 text-sm font-bold text-white/55">Pflichtangabe</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (templateData?.kind === "TRANSLATION_READ_ALOUD") {
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
@@ -469,7 +560,11 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     layoutVariant === "MEDIA_TOP"
   ) {
     return (
-      <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]">
+      <div
+        data-presentation-layout={layoutVariant}
+        data-pixel-reveal-step={pixelRevealStep ?? undefined}
+        className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]"
+      >
         <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
@@ -486,13 +581,13 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         </div>
 
         <div className="min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-5 shadow-[8px_8px_0_#ff00aa]">
-          {frage.medien.length === 0 ? (
+          {questionMedia.length === 0 ? (
             <div className="flex h-full items-center justify-center rounded-3xl border-4 border-dashed border-cyan-300 text-3xl font-black uppercase text-white/40">
               Kein Medium
             </div>
           ) : (
             <div className="grid h-full min-h-0 gap-4">
-              {frage.medien.slice(0, 1).map((medium) =>
+              {questionMedia.slice(0, 1).map((medium) =>
                 renderMedienKarte(medium, "large")
               )}
             </div>
@@ -921,6 +1016,25 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
     (feld) => feld.loesungen.length > 0
   );
 
+  const storybookKind = resolveStorybookQuestionKind(frage);
+  if (theme.design.stylePreset === "BIRTHDAY" && storybookKind) {
+    const imageMedia = frage.medien
+      .filter((medium) => isBild(medium.datei))
+      .sort((left, right) => left.sortierung - right.sortierung);
+    const selectedMedium = storybookKind === "PIXEL_REVEAL"
+      ? imageMedia.at(-1)
+      : imageMedia[0];
+    return (
+      <PresentationStorybookSolutionSlide
+        question={frage}
+        layoutVariant={layoutVariant}
+        kind={storybookKind}
+        medium={toStorybookMedium(selectedMedium)}
+        solutionLines={runtime.solutionLines}
+      />
+    );
+  }
+
   return (
     <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
       <div className="presentation-solution-question flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-6 shadow-[8px_8px_0_#00e5ff]">
@@ -942,7 +1056,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
       <div className="presentation-solution-result flex min-h-0 flex-col rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
-            Richtige Antwort
+            {theme.design.stylePreset === "BIRTHDAY" ? "Erinnerung" : "Richtige Antwort"}
           </div>
 
         </div>
@@ -1479,6 +1593,294 @@ function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
   );
 }
 
+function renderFlowStandingsSlide(
+  slide: Extract<Slide, { typ: "ablauf" }>,
+) {
+  const { config, type } = slide.element;
+  const sorted = [...punktestand].sort((left, right) => right.punkte - left.punkte);
+  const limit =
+    config.standingsSize === "TOP_3"
+      ? 3
+      : config.standingsSize === "TOP_5"
+        ? 5
+        : sorted.length;
+  const teams = type === "WINNER"
+    ? sorted.filter((team) => team.punkte === sorted[0]?.punkte)
+    : sorted.slice(0, limit);
+  const placeGroups = Array.from(
+    new Set(
+      teams.map(
+        (team) => sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1,
+      ),
+    ),
+  ).sort((left, right) => right - left);
+  const visiblePlaces = type === "FINAL_STANDINGS"
+    ? placeGroups.slice(0, Math.min(endstandRevealCount, placeGroups.length))
+    : placeGroups;
+  const hidden = config.standingsSize === "HIDDEN";
+  const showPoints = config.showPoints !== false;
+
+  return (
+    <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
+      <p className="presentation-flow-kicker">
+        {type === "INTERMEDIATE_STANDINGS"
+          ? "Zwischenstand"
+          : type === "WINNER"
+            ? "Gewinner"
+            : "Endstand"}
+      </p>
+      <h2>{config.title ?? (type === "WINNER" ? "Herzlichen Glückwunsch" : "Aktueller Punktestand")}</h2>
+      {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+      {hidden ? (
+        <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
+      ) : teams.length === 0 ? (
+        <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
+      ) : (
+        <ol className="presentation-flow-ranking-list" data-many={teams.length > 6}>
+          {teams.map((team) => {
+            const place = sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1;
+            return (
+              <li
+                key={team.teamname}
+                className={visiblePlaces.includes(place) ? "opacity-100" : "opacity-25 blur-sm"}
+              >
+                <span className="presentation-flow-rank">{type === "WINNER" ? "★" : place}</span>
+                <strong>{team.teamname}</strong>
+                {showPoints && <span>{formatQuizPoints(team.punkte)} Punkte</span>}
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </section>
+  );
+}
+
+function renderFlowPauseSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
+  const config = slide.element.config;
+  const duration = remoteCountdownDauerSekunden ?? config.durationSeconds ?? 300;
+  const elapsed =
+    remoteCountdownStartedAt && remoteCountdownStatus === "running"
+      ? Math.max(
+          0,
+          Math.floor((now - new Date(remoteCountdownStartedAt).getTime()) / 1000),
+        )
+      : 0;
+  const remaining = remoteCountdownStatus === "running"
+    ? Math.max(0, duration - elapsed)
+    : duration;
+
+  return (
+    <section className="presentation-flow-slide presentation-flow-pause" data-flow-type={slide.element.type}>
+      <p className="presentation-flow-kicker">
+        {slide.element.type === "COUNTDOWN" ? "Countdown" : "Pause"}
+      </p>
+      <h2>{config.title ?? "Kurze Pause"}</h2>
+      {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+      {config.showCountdown !== false && (
+        <div className="presentation-flow-countdown" aria-label={`${remaining} Sekunden verbleibend`}>
+          {String(Math.floor(remaining / 60)).padStart(2, "0")}:
+          {String(remaining % 60).padStart(2, "0")}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
+  const { config, type } = slide.element;
+  const activeRules = config.rules?.filter((rule) => rule.enabled) ?? [];
+  const answerUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten`
+      : `/quiz/${quiz.quiz_id}/antworten`;
+
+  if (type === "WAITING") return renderAnkommenSlide();
+  if (type === "START_SEQUENCE") return renderStartsequenzSlide();
+  if (type === "PRIZES") {
+    return renderFixenSlide({ typ: "fixer-slide", slideTyp: "preise" });
+  }
+  if (type === "BREAK" || type === "COUNTDOWN") {
+    return renderFlowPauseSlide(slide);
+  }
+  if (
+    type === "INTERMEDIATE_STANDINGS" ||
+    type === "FINAL_STANDINGS" ||
+    type === "WINNER"
+  ) {
+    return renderFlowStandingsSlide(slide);
+  }
+
+  if (type === "IMAGE") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-single-image" data-flow-type={type}>
+        <div className="presentation-flow-copy">
+          <p className="presentation-flow-kicker">Bildmoment</p>
+          {config.title && <h2>{config.title}</h2>}
+          {config.subtitle && <p className="presentation-flow-subtitle">{config.subtitle}</p>}
+        </div>
+        <figure className="presentation-flow-hero-figure">
+          <img src={config.imageUrl} alt={config.altText ?? ""} />
+          {config.caption && <figcaption>{config.caption}</figcaption>}
+        </figure>
+      </section>
+    );
+  }
+
+  if (type === "IMAGE_GALLERY" || type === "MEDIA_SEQUENCE") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-gallery" data-flow-type={type}>
+        <div className="presentation-flow-copy">
+          <p className="presentation-flow-kicker">{type === "MEDIA_SEQUENCE" ? "Bildsequenz" : "Bildergalerie"}</p>
+          {config.title && <h2>{config.title}</h2>}
+          {config.subtitle && <p className="presentation-flow-subtitle">{config.subtitle}</p>}
+        </div>
+        <div className="presentation-flow-gallery-grid" data-count={config.images?.length ?? 0}>
+          {config.images?.map((image, index) => (
+            <figure key={image.id}>
+              <img src={image.url} alt={image.altText} />
+              {image.caption && <figcaption><span>{index + 1}</span>{image.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (type === "TEXT" || type === "ANECDOTE") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-text" data-flow-type={type}>
+        <p className="presentation-flow-kicker">{type === "ANECDOTE" ? "Anekdote" : "Text"}</p>
+        {config.title && <h2>{config.title}</h2>}
+        <p className="presentation-flow-editorial-body">{config.body}</p>
+      </section>
+    );
+  }
+
+  if (type === "QUOTE") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-quote" data-flow-type={type}>
+        <p className="presentation-flow-kicker">Zitat</p>
+        <blockquote>„{config.body}“</blockquote>
+        {(config.quoteSource || config.yearOrContext) && (
+          <p className="presentation-flow-quote-source">
+            {[config.quoteSource, config.yearOrContext].filter(Boolean).join(" · ")}
+          </p>
+        )}
+      </section>
+    );
+  }
+
+  if (type === "PORTRAIT") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-portrait" data-flow-type={type}>
+        <figure className="presentation-flow-portrait-figure">
+          <img src={config.imageUrl} alt={config.altText ?? ""} />
+          {config.caption && <figcaption>{config.caption}</figcaption>}
+        </figure>
+        <div className="presentation-flow-copy">
+          <p className="presentation-flow-kicker">Portrait</p>
+          <h2>{config.personName}</h2>
+          {config.subtitle && <p className="presentation-flow-subtitle">{config.subtitle}</p>}
+          {config.description && <p className="presentation-flow-lead">{config.description}</p>}
+        </div>
+      </section>
+    );
+  }
+
+  if (type === "AUDIO") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-audio" data-flow-type={type}>
+        <p className="presentation-flow-kicker">Audiomoment</p>
+        <h2>{config.title}</h2>
+        {config.description && <p className="presentation-flow-lead">{config.description}</p>}
+        <div className="presentation-flow-audio-mark" aria-hidden="true">
+          {Array.from({ length: 22 }, (_, index) => <span key={index} />)}
+        </div>
+        {config.audioUrl && (
+          <SynchronizedMedia kind="audio" src={config.audioUrl} command={playbackCommand} commandId={playbackCommandId} renderMode={renderMode} />
+        )}
+      </section>
+    );
+  }
+
+  if (type === "VIDEO") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-editorial presentation-flow-video" data-flow-type={type}>
+        <div className="presentation-flow-copy">
+          <p className="presentation-flow-kicker">Videomoment</p>
+          <h2>{config.title}</h2>
+          {config.description && <p className="presentation-flow-lead">{config.description}</p>}
+        </div>
+        {config.videoUrl && (
+          <SynchronizedMedia kind="video" src={config.videoUrl} poster={config.posterImageUrl} command={playbackCommand} commandId={playbackCommandId} renderMode={renderMode} className="presentation-flow-video-player" />
+        )}
+      </section>
+    );
+  }
+
+  return (
+    <section className="presentation-flow-slide" data-flow-type={type}>
+      <p className="presentation-flow-kicker">
+        {type === "WELCOME"
+          ? "Willkommen"
+          : type === "QR_CODE"
+            ? "Mitspielen"
+            : type === "RULES"
+              ? "Gut zu wissen"
+              : type === "ROUND_INTRO"
+                ? "Nächste Runde"
+                : type === "CHAPTER_INTRO"
+                  ? "Kapitel"
+                : type === "CLOSING"
+                  ? "Zum Abschluss"
+                  : "Hinweis"}
+      </p>
+      <h2>{config.title ?? slide.element.label ?? "Quizabend"}</h2>
+      {config.subtitle && <p className="presentation-flow-subtitle">{config.subtitle}</p>}
+      {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+
+      {type === "QR_CODE" && (
+        <div className="presentation-flow-qr-layout">
+          <div className="presentation-flow-qr">
+            <QRCode value={answerUrl} size={360} />
+          </div>
+          <div>
+            <strong>{answerUrl}</strong>
+            {config.teamHint && <p>{config.teamHint}</p>}
+          </div>
+        </div>
+      )}
+
+      {type === "RULES" && (
+        <ol className="presentation-flow-rules">
+          {activeRules.map((rule, index) => (
+            <li key={rule.id}>
+              <span>{index + 1}</span>
+              <strong>{rule.text}</strong>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {config.imageUrl && (
+        <img className="presentation-flow-image" src={config.imageUrl} alt="" />
+      )}
+      {config.contact && <p className="presentation-flow-contact">{config.contact}</p>}
+      {type === "CLOSING" && praesentationQuiz.outro_musik_url && (
+        <SynchronizedMedia
+          kind="audio"
+          src={praesentationQuiz.outro_musik_url}
+          loop
+          command={playbackCommand}
+          commandId={playbackCommandId}
+          renderMode={renderMode}
+        />
+      )}
+    </section>
+  );
+}
+
 function renderAktuellenSlide() {
   if (!slide) {
     return (
@@ -1486,6 +1888,10 @@ function renderAktuellenSlide() {
         Keine Slides vorhanden
       </div>
     );
+  }
+
+  if (slide.typ === "ablauf") {
+    return renderFlowContentSlide(slide);
   }
 
   if (slide.typ === "fixer-slide") {
@@ -1515,11 +1921,17 @@ function renderAktuellenSlide() {
 }
 
   const overlayMedia = currentSlideMedia;
-  const selectedPoolImage = slide && (slide.typ === "frage" || slide.typ === "aufloesung")
+  const editorialFlowImage = slide?.typ === "ablauf"
+    ? slide.element.config.imageUrl ?? slide.element.config.images?.[0]?.url
+    : null;
+  const selectedPoolImage = slide?.typ === "ablauf" && isSafeTemplateAssetReference(editorialFlowImage)
+    ? editorialFlowImage
+    : slide && (slide.typ === "frage" || slide.typ === "aufloesung")
     ? selectDeterministicTemplateImage(theme.design.imagery.personalImagePool, {
         quizId: quiz.quiz_id,
         questionId: slide.frage.fragen_id,
         phase: slide.typ === "aufloesung" ? "SOLUTION" : "QUESTION",
+        sequenceIndex: slideIndex,
         assetRole: "IMAGE_POOL",
         slideType: slide.typ,
       })
@@ -1533,11 +1945,18 @@ function renderAktuellenSlide() {
   const storybookPhase = slide?.typ === "aufloesung" ? "SOLUTION" : "QUESTION";
   const storybookQuestionId = slide && (slide.typ === "frage" || slide.typ === "aufloesung")
     ? slide.frage.fragen_id
+    : slide?.typ === "ablauf"
+      ? (slide.element.persistentId ?? slideIndex)
     : slide?.typ === "block"
       ? slide.abschnitt.quiz_abschnitt_id
       : slideIndex;
   const inferredStorybookContentKind: ResolveStorybookCompositionInput["contentKind"] =
-    slide?.typ === "block" ? "CHAPTER"
+    slide?.typ === "ablauf" && ["WAITING", "START_SEQUENCE", "WELCOME", "WINNER", "CLOSING"].includes(slide.element.type) ? "COVER"
+      : slide?.typ === "ablauf" && ["ROUND_INTRO", "CHAPTER_INTRO"].includes(slide.element.type) ? "CHAPTER"
+      : slide?.typ === "ablauf" && slide.element.type === "AUDIO" ? "AUDIO"
+      : slide?.typ === "ablauf" && ["IMAGE", "IMAGE_GALLERY", "MEDIA_SEQUENCE", "PORTRAIT", "VIDEO"].includes(slide.element.type) ? "IMAGE"
+      : slide?.typ === "fixer-slide" && ["vor-dem-start", "startsequenz", "begruessung"].includes(slide.slideTyp) ? "COVER"
+      : slide?.typ === "block" ? "CHAPTER"
       : slide && (slide.typ === "frage" || slide.typ === "aufloesung")
         ? slide.frage.templateId === "musik_rueckwaerts" ? "AUDIO"
           : slide.frage.templateId === "reihenfolge" ? "ORDERING"
@@ -1550,9 +1969,12 @@ function renderAktuellenSlide() {
         quizId: quiz.quiz_id,
         questionId: storybookQuestionId,
         phase: storybookPhase,
+        sequenceIndex: slideIndex,
         slideType: slide?.typ ?? "EMPTY",
         requestedPersonIds: storybookContext?.personIds,
         contentKind: storybookContext?.contentKind ?? inferredStorybookContentKind,
+        preferredVariant: storybookContext?.composition,
+        preferredAssetRoles: storybookContext?.preferredAssetRoles,
       })
     : null;
 
