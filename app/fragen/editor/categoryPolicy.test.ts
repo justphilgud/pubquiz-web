@@ -66,8 +66,8 @@ const dismissiblePopover = readFileSync(
   "app/components/useDismissiblePopover.ts",
   "utf8",
 );
-const questionScopeSection = readFileSync(
-  "app/fragen/editor/components/QuestionScopeSection.tsx",
+const contentScopeSection = readFileSync(
+  "app/components/content/ContentScopeSection.tsx",
   "utf8",
 );
 const templateFilter = readFileSync(
@@ -506,11 +506,12 @@ test("dismissible popovers close outside and keep inside selection clicks", () =
 });
 
 test("scope control is compact and preserves event-series choices while toggling", () => {
-  assert.match(questionScopeSection, /role="radiogroup"/);
-  assert.match(questionScopeSection, /onChange\("GLOBAL", eventSeriesIds\)/);
-  assert.match(questionScopeSection, /scope === "EVENT_SERIES"/);
-  assert.match(questionScopeSection, /role="combobox"/);
-  assert.doesNotMatch(questionScopeSection, /onChange\("GLOBAL", \[\]\)/);
+  assert.match(questionEditor, /<ContentScopeSection/);
+  assert.match(questionEditor, /@\/app\/components\/content\/ContentScopeSection/);
+  assert.match(contentScopeSection, /role="radiogroup"/);
+  assert.match(contentScopeSection, /scope === "EVENT_SERIES"/);
+  assert.match(contentScopeSection, /role="combobox"/);
+  assert.doesNotMatch(contentScopeSection, /eventSeriesIds: \[\]/);
 });
 
 test("question overview maps pending categories without per-card queries", () => {
@@ -537,7 +538,8 @@ test("question overview combines database filters and keeps URL state", () => {
   assert.match(questionOverview, /serializeQuestionOverviewFilters/);
   assert.match(questionSearchActions, /statusConditions/);
   assert.match(questionSearchActions, /templateConditions/);
-  assert.match(questionSearchActions, /fragen_kategorien: data\.kategorieId/);
+  assert.match(questionSearchActions, /fragen_kategorien: \(data\.kategorieIds\?\.length \?\? 0\) > 0 \|\| data\.kategorieId/);
+  assert.match(questionSearchActions, /fragenkategorie_id: data\.kategorieIds\?\.length/);
   assert.match(questionSearchActions, /take: limit \+ 1/);
   assert.doesNotMatch(dashboard, /\/fragen\?view=/);
   assert.match(dashboard, /\/fragen\?status=REVIEW_QUEUE/);

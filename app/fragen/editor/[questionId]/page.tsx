@@ -20,6 +20,7 @@ import { canEditGlobalQuestions, isAdministrator } from "@/app/roles/roleAssignm
 import { resolveGooglePlacesFeature } from "../googlePlacesFeature";
 import QuestionStoryElementPanel from "@/app/story-elemente/QuestionStoryElementPanel";
 import { loadQuestionStoryElementPanel } from "@/app/story-elemente/questionStoryElements.server";
+import { getStoryElementEditorOptions } from "@/app/story-elemente/storyElementRepository.server";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -78,7 +79,10 @@ export default async function ExistingQuestionEditorPage({
   } else {
     editorContext = "readOnly";
   }
-  const storyElements = await loadQuestionStoryElementPanel(actor, questionId);
+  const [storyElements, storyEditorOptions] = await Promise.all([
+    loadQuestionStoryElementPanel(actor, questionId),
+    getStoryElementEditorOptions(actor),
+  ]);
   const canEditQuestion = canEditScopedQuestion(actor, loadedQuestion.access);
 
   return (
@@ -120,6 +124,7 @@ export default async function ExistingQuestionEditorPage({
       links={storyElements.links}
       options={storyElements.options}
       canEdit={canEditQuestion}
+      editorOptions={storyEditorOptions}
     />
     </>
   );

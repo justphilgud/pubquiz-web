@@ -307,6 +307,7 @@ export type QuestionTemplateDefinition = {
   selectable: boolean;
   availableForFiltering: boolean;
   requiresAnswerImages: boolean;
+  questionTextIsTemplateStatic?: boolean;
   translationKey:
     | "standard"
     | "multipleChoice"

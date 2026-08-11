@@ -108,3 +108,15 @@ test("template fingerprints retain their business-specific duplicate core", () =
   });
   assert.equal(standard, "wer schrieb den roman der prozess");
 });
+
+test("static template prompts are excluded while content-specific answers remain duplicate signals", () => {
+  const pixel = (answer: string) => getQuestionDuplicateFingerprint({
+    questionText: "Was ist auf diesem Pixelbild zu sehen?",
+    templateId: questionTemplateIds.pixelImage,
+    templateConfig: baseConfig,
+    answers: [{ text: answer, isCorrect: true }],
+  });
+  assert.notEqual(pixel("Eiffelturm"), pixel("Brandenburger Tor"));
+  assert.equal(calculateQuestionSimilarity(pixel("Eiffelturm"), pixel("Brandenburger Tor")) < 0.58, true);
+  assert.equal(pixel("Eiffelturm"), pixel("Eiffelturm"));
+});

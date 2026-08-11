@@ -105,13 +105,16 @@ export type FrageSuchResult = {
   medien_frage_anzahl: number;
   medien_antworten_anzahl: number;
   quiz_anzahl: number;
+  story_elemente_anzahl: number;
   ist_archiviert: boolean;
   archivierungsgrund: string | null;
   review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
+  freigegeben: boolean;
   gueltig_bis: string | null;
   can_clone: boolean;
   geltungsbereich: "GLOBAL" | "EVENT_SERIES";
   eventreihen: string[];
+  eventreihe_ids: number[];
   template_id: string | null;
   answer_mode: DerivedQuestionAnswerMode;
   quizze: {
@@ -162,11 +165,14 @@ export type FrageDetailsResult = {
 export async function searchFragen(data: {
   suchtext: string;
   kategorieId: number | null;
+  kategorieIds?: number[];
   sourceState: QuestionSourceState | null;
   mediaState: QuestionMediaState | null;
   answerMode: QuestionAnswerModeFilter | null;
   statuses: QuestionOverviewStatus[];
   templateIds: string[];
+  eventSeriesId?: number | null;
+  usageState?: "USED" | "UNUSED" | null;
   limit?: number;
   offset?: number;
 }) {
@@ -350,13 +356,25 @@ export async function searchFragen(data: {
       ...(answerModeCondition ? [answerModeCondition] : []),
     ],
 
-    fragen_kategorien: data.kategorieId
+    fragen_kategorien: (data.kategorieIds?.length ?? 0) > 0 || data.kategorieId
       ? {
           some: {
-            fragenkategorie_id: data.kategorieId,
+            fragenkategorie_id: data.kategorieIds?.length
+              ? { in: data.kategorieIds }
+              : data.kategorieId!,
           },
         }
       : undefined,
+
+    eventreihen: data.eventSeriesId
+      ? { some: { eventreihe_id: data.eventSeriesId } }
+      : undefined,
+
+    quiz_fragen: data.usageState === "USED"
+      ? { some: {} }
+      : data.usageState === "UNUSED"
+        ? { none: {} }
+        : undefined,
 
   };
 
@@ -378,7 +396,7 @@ export async function searchFragen(data: {
         ],
       };
 
-  const fragen = await prisma.fragen.findMany({
+  const [fragen, total] = await Promise.all([prisma.fragen.findMany({
     where,
     include: {
       fragen_kategorien: {
@@ -404,13 +422,14 @@ export async function searchFragen(data: {
       },
       eventreihen: { include: { eventreihe: true } },
       vorlage: { select: { code: true } },
+      _count: { select: { story_element_verknuepfungen: true } },
     },
     orderBy: {
       fragen_id: "desc",
     },
     skip: offset,
     take: limit + 1,
-  });
+  }), prisma.fragen.count({ where })]);
 
   const hasMore = fragen.length > limit;
   const sichtbareFragen = fragen.slice(0, limit);
@@ -432,10 +451,12 @@ export async function searchFragen(data: {
       ist_archiviert: frage.ist_archiviert,
       archivierungsgrund: frage.archivierungsgrund,
       review_status: frage.review_status,
+      freigegeben: frage.freigegeben,
       gueltig_bis: frage.gueltig_bis?.toISOString().slice(0, 10) ?? null,
       can_clone: canCloneScopedQuestion(actor, mapQuestionAccessContext(frage)),
       geltungsbereich: frage.geltungsbereich,
       eventreihen: frage.eventreihen.map((entry) => entry.eventreihe.name),
+      eventreihe_ids: frage.eventreihen.map((entry) => entry.eventreihe_id),
       template_id:
         resolveCanonicalQuestionTemplateId(frage.vorlage?.code ?? null) ??
         "standard",
@@ -458,6 +479,7 @@ export async function searchFragen(data: {
       medien_antworten_anzahl: medienAntwortenAnzahl,
       medien_anzahl: frage.medien.length + medienAntwortenAnzahl,
       quiz_anzahl: frage.quiz_fragen.length,
+      story_elemente_anzahl: frage._count.story_element_verknuepfungen,
       quizze: frage.quiz_fragen.map((qf) => ({
         quiz_id: qf.quiz.quiz_id,
         titel: qf.quiz.titel,
@@ -473,6 +495,7 @@ export async function searchFragen(data: {
     results,
     hasMore,
     nextOffset: offset + results.length,
+    total,
   };
 }
 

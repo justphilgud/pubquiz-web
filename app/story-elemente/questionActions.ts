@@ -17,6 +17,7 @@ type LinkResult = { success: true } | { success: false; message: string };
 
 function revalidateQuestionStoryLinks(questionId: number) {
   revalidatePath(`/fragen/editor/${questionId}`);
+  revalidatePath(`/content/questions/${questionId}`);
   revalidatePath("/story-elemente");
 }
 
@@ -47,30 +48,38 @@ export async function linkQuestionStoryElement(input: {
   if (!story || !storyMatchesQuestion(story, actor, context)) {
     return { success: false, message: "Story-Element ist für diese Frage nicht auswählbar." };
   }
-  const last = await prisma.frage_story_elemente.findFirst({
-    where: { fragen_id: input.questionId },
-    orderBy: [{ sortierung: "desc" }, { frage_story_element_id: "desc" }],
-    select: { sortierung: true },
-  });
-  await prisma.frage_story_elemente.upsert({
-    where: {
-      fragen_id_story_element_id: {
+  const linked = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${input.storyElementId})`;
+    const existingStoryLink = await tx.frage_story_elemente.findFirst({
+      where: { story_element_id: input.storyElementId },
+      select: { fragen_id: true },
+    });
+    if (existingStoryLink && existingStoryLink.fragen_id !== input.questionId) return false;
+    const last = await tx.frage_story_elemente.findFirst({
+      where: { fragen_id: input.questionId },
+      orderBy: [{ sortierung: "desc" }, { frage_story_element_id: "desc" }],
+      select: { sortierung: true },
+    });
+    await tx.frage_story_elemente.upsert({
+      where: { fragen_id_story_element_id: {
         fragen_id: input.questionId,
         story_element_id: input.storyElementId,
+      } },
+      create: {
+        fragen_id: input.questionId,
+        story_element_id: input.storyElementId,
+        beziehung: getNewStoryQuestionRelationship(),
+        sortierung: (last?.sortierung ?? 0) + 10,
+        created_by_user_id: actor.userId,
       },
-    },
-    create: {
-      fragen_id: input.questionId,
-      story_element_id: input.storyElementId,
-      beziehung: getNewStoryQuestionRelationship(),
-      sortierung: (last?.sortierung ?? 0) + 10,
-      created_by_user_id: actor.userId,
-    },
-    update: {
-      beziehung: getNewStoryQuestionRelationship(),
-      created_by_user_id: actor.userId,
-    },
+      update: {
+        beziehung: getNewStoryQuestionRelationship(),
+        created_by_user_id: actor.userId,
+      },
+    });
+    return true;
   });
+  if (!linked) return { success: false, message: "Dieses Story-Element ist bereits mit einer anderen Frage verknüpft." };
   revalidateQuestionStoryLinks(input.questionId);
   return { success: true };
 }

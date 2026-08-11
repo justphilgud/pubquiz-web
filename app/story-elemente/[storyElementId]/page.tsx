@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import ContentEditorHeader from "@/app/components/content/ContentEditorHeader";
+import ContentEditorShell from "@/app/components/content/ContentEditorShell";
 import { requireActor } from "@/app/lib/permissions";
 import StoryElementEditor from "../StoryElementEditor";
 import {
@@ -29,5 +29,5 @@ export default async function StoryElementPage({
   if (!story) notFound();
   const canEdit = canEditStoryElement(actor, story.access);
   const questionLinks = await loadStoryQuestionLinksPanel(actor, story);
-  return <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950 md:px-8"><div className="mx-auto max-w-7xl space-y-6"><ContentEditorHeader eyebrow="Content · Story-Elemente" title={story.title} fallbackHref="/content" description={canEdit ? "Bearbeitungen erzeugen eine neue Revision; bestehende Quizverwendungen bleiben unverändert." : "Schreibgeschützte Ansicht aufgrund von Status oder Berechtigung."} /><StoryElementEditor options={options} initialStory={story} canEdit={canEdit} canArchive={canArchiveStoryElement(actor, story.access)} /><StoryQuestionLinksPanel storyElementId={story.id} links={questionLinks.links} options={questionLinks.options} canEditStory={canEdit} /></div></main>;
+  return <ContentEditorShell maxWidth="max-w-7xl" eyebrow="Content · Story-Elemente" title={story.title} fallbackHref="/content" description={canEdit ? "Bearbeitungen erzeugen eine neue Revision; bestehende Quizverwendungen bleiben unverändert." : "Schreibgeschützte Ansicht aufgrund von Status oder Berechtigung."} footerSpace={canEdit}><StoryElementEditor options={options} initialStory={story} canEdit={canEdit} canArchive={canArchiveStoryElement(actor, story.access)} /><StoryQuestionLinksPanel storyElementId={story.id} links={questionLinks.links} options={questionLinks.options} canEditStory={canEdit} /></ContentEditorShell>;
 }

@@ -47,6 +47,11 @@ export function TemplateSelector({
     }
   }
 
+  function selectStandardQuestion() {
+    onClearSelection();
+    closePicker();
+  }
+
   return (
     <>
       <section className="rounded-2xl border border-slate-200 bg-white p-3">
@@ -121,6 +126,20 @@ export function TemplateSelector({
         </label>
 
         <div className="mt-4 max-h-[55vh] space-y-2 overflow-y-auto">
+          <button
+            type="button"
+            onClick={selectStandardQuestion}
+            aria-pressed={selectedTemplateId === null}
+            className={[
+              "min-h-11 w-full rounded-xl border px-4 py-3 text-left transition",
+              selectedTemplateId === null
+                ? "border-slate-950 bg-slate-950 text-white"
+                : "border-slate-300 bg-white text-slate-800 hover:border-slate-500",
+            ].join(" ")}
+          >
+            <span className="block font-medium">Standardfrage</span>
+            <span className={selectedTemplateId === null ? "mt-1 block text-sm text-slate-200" : "mt-1 block text-sm text-slate-600"}>Keine Spezialvorlage</span>
+          </button>
           {filteredTemplates.map((template) => {
             const isSelected = template.id === selectedTemplateId;
 

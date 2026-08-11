@@ -86,7 +86,7 @@ export async function loadStoryQuestionLinksPanel(
       relationship: link.beziehung as StoryQuestionRelationshipValue,
       canEdit: canEditScopedQuestion(actor, mapQuestionAccessContext(link.frage)),
     })),
-    options: candidates
+    options: (links.length > 0 ? [] : candidates)
       .filter((question) =>
         !linkedIds.has(question.fragen_id) &&
         canEditScopedQuestion(actor, mapQuestionAccessContext(question)) &&

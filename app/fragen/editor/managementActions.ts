@@ -229,6 +229,7 @@ export async function setQuestionArchived(
   });
   revalidatePath("/fragen");
   revalidatePath(`/fragen/editor/${questionId}`);
+  revalidatePath(`/content/questions/${questionId}`);
   return { ok: true, questionId };
 }
 

@@ -70,6 +70,10 @@ const storyElementInclude = {
       _count: { select: { quiz_ablauf_elemente: true } },
     },
   },
+  fragen_verknuepfungen: {
+    orderBy: { created_at: "asc" as const },
+    select: { frage: { select: { fragen_id: true, frage: true } } },
+  },
   _count: { select: { fragen_verknuepfungen: true } },
 } satisfies Prisma.story_elementeInclude;
 
@@ -152,6 +156,7 @@ function mapStoryElement(
         }] as const),
     ).values()],
     questionLinkCount: story._count.fragen_verknuepfungen,
+    linkedQuestion: story.fragen_verknuepfungen[0]?.frage ?? null,
     revisionCount: story.revisionen.length,
     access: toAccessContext(story),
   };
@@ -328,6 +333,7 @@ export async function listSelectableStoryElementsForQuestionCreation(
   ]);
   return [...active, ...drafts].filter((story, index, all) =>
     story.scope !== "QUIZ" &&
+    story.questionLinkCount === 0 &&
     all.findIndex((candidate) => candidate.id === story.id) === index,
   );
 }

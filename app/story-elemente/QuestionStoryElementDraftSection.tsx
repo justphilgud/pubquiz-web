@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import ContentSearchControls from "@/app/components/content/ContentSearchControls";
+import StoryElementCreateDialog, { type CreatedStoryElement } from "./StoryElementCreateDialog";
+import type { StoryElementEditorOptions } from "./StoryElementEditor";
 import {
   getStoryElementStatusLabel,
   getStoryElementTypeLabel,
-  getStoryQuestionRelationshipLabel,
-  PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS,
+  getNewStoryQuestionRelationship,
   type StoryElementScopeValue,
   type StoryElementStatusValue,
   type StoryElementType,
@@ -37,6 +38,7 @@ export default function QuestionStoryElementDraftSection({
   questionEventSeriesIds,
   disabled,
   onChange,
+  editorOptions,
 }: {
   options: QuestionStoryElementDraftOption[];
   links: QuestionStoryElementDraftLink[];
@@ -44,25 +46,28 @@ export default function QuestionStoryElementDraftSection({
   questionEventSeriesIds: number[];
   disabled: boolean;
   onChange: (links: QuestionStoryElementDraftLink[]) => void;
+  editorOptions: StoryElementEditorOptions;
 }) {
   const [query, setQuery] = useState("");
   const [storyElementId, setStoryElementId] = useState("");
-  const [relationship, setRelationship] = useState<StoryQuestionRelationshipValue>("AFTER_SOLUTION");
-  const eligible = useMemo(() => options.filter((option) =>
+  const [createdOptions, setCreatedOptions] = useState<QuestionStoryElementDraftOption[]>([]);
+  const [createOpen, setCreateOpen] = useState(false);
+  const allOptions = useMemo(() => [...options, ...createdOptions], [createdOptions, options]);
+  const eligible = useMemo(() => allOptions.filter((option) =>
     !links.some((link) => link.storyElementId === option.id) &&
     (option.scope === "GLOBAL" ||
       (questionScope === "EVENT_SERIES" && option.eventSeriesId !== null && questionEventSeriesIds.includes(option.eventSeriesId))) &&
     `${option.title} ${option.description ?? ""} ${getStoryElementTypeLabel(option.type)}`.toLocaleLowerCase("de-DE").includes(query.trim().toLocaleLowerCase("de-DE")),
-  ), [links, options, query, questionEventSeriesIds, questionScope]);
+  ), [allOptions, links, query, questionEventSeriesIds, questionScope]);
   const selectedLinks = links.flatMap((link) => {
-    const option = options.find((candidate) => candidate.id === link.storyElementId);
+    const option = allOptions.find((candidate) => candidate.id === link.storyElementId);
     return option ? [{ ...option, relationship: link.relationship }] : [];
   });
 
   function add() {
     const id = Number(storyElementId);
     if (!eligible.some((option) => option.id === id)) return;
-    onChange([...links, { storyElementId: id, relationship }]);
+    onChange([...links, { storyElementId: id, relationship: getNewStoryQuestionRelationship() }]);
     setStoryElementId("");
   }
 
@@ -74,11 +79,19 @@ export default function QuestionStoryElementDraftSection({
     onChange(next);
   }
 
+  function addCreated(story: CreatedStoryElement) {
+    setCreatedOptions((current) => [...current, story]);
+    onChange([...links, { storyElementId: story.id, relationship: getNewStoryQuestionRelationship() }]);
+    setCreateOpen(false);
+  }
+
   return (
-    <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-      <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="font-semibold text-slate-950">Story-Elemente</h2><p className="mt-1 text-sm text-slate-600">Story-Elemente sind unbewertete Inhalte wie Anekdoten, Bilder, Zitate, Audio oder Video.</p></div><Link href="/story-elemente/new" target="_blank" className="inline-flex min-h-11 items-center rounded-xl border border-emerald-300 bg-white px-4 text-sm font-bold text-emerald-950">Neues Story-Element anlegen</Link></div>
-      <div className="mt-4 space-y-2">{selectedLinks.map((link, index) => <article key={link.id} className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between"><div><strong>{link.title}</strong><p className="text-xs text-slate-500">{getStoryElementTypeLabel(link.type)} · {getStoryElementStatusLabel(link.status)} · {getStoryQuestionRelationshipLabel(link.relationship)}</p></div><div className="flex flex-wrap gap-2"><Link href={`/story-elemente/${link.id}`} target="_blank" className="inline-flex min-h-10 items-center rounded-xl border border-slate-300 px-3 text-sm font-semibold">Vorschau</Link><button type="button" disabled={disabled || index === 0} onClick={() => move(index, -1)} className="min-h-10 rounded-xl border border-slate-300 px-3 disabled:opacity-40" aria-label={`${link.title} nach oben`}>↑</button><button type="button" disabled={disabled || index === selectedLinks.length - 1} onClick={() => move(index, 1)} className="min-h-10 rounded-xl border border-slate-300 px-3 disabled:opacity-40" aria-label={`${link.title} nach unten`}>↓</button><button type="button" disabled={disabled} onClick={() => onChange(links.filter((candidate) => candidate.storyElementId !== link.id))} className="min-h-10 rounded-xl border border-red-200 px-3 text-sm font-semibold text-red-700 disabled:opacity-50">Entfernen</button></div></article>)}{selectedLinks.length === 0 && <p className="rounded-xl border border-dashed border-emerald-300 bg-white/70 p-4 text-sm text-slate-600">Zu dieser Frage sind keine Story-Elemente verknüpft.</p>}</div>
-      <div className="mt-4 rounded-xl border border-emerald-200 bg-white p-3"><ContentSearchControls query={query} placeholder="Story-Elemente durchsuchen …" onQueryChange={setQuery} onSubmit={() => undefined} /><div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(190px,0.7fr)_auto]"><select aria-label="Story-Element auswählen" value={storyElementId} onChange={(event) => setStoryElementId(event.target.value)} disabled={disabled} className="min-h-11 min-w-0 rounded-xl border border-slate-300 px-3"><option value="">Story-Element auswählen</option>{eligible.map((option) => <option key={option.id} value={option.id}>{option.title} · {getStoryElementTypeLabel(option.type)}{option.status === "DRAFT" ? " · eigener Entwurf" : ""}</option>)}</select><select aria-label="Beziehungsart" value={relationship} onChange={(event) => setRelationship(event.target.value as StoryQuestionRelationshipValue)} disabled={disabled} className="min-h-11 rounded-xl border border-slate-300 px-3">{PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS.map((value) => <option key={value} value={value}>{getStoryQuestionRelationshipLabel(value)}</option>)}</select><button type="button" onClick={add} disabled={disabled || !storyElementId} className="min-h-11 rounded-xl bg-emerald-800 px-4 font-bold text-white disabled:opacity-50">Hinzufügen</button></div>{eligible.length === 0 && <p className="mt-3 text-sm text-slate-500">Keine passenden Story-Elemente. Suche zurücksetzen oder ein neues Element in einem zweiten Tab anlegen.</p>}</div>
-    </section>
+    <details className="rounded-2xl border border-slate-200 bg-white p-4">
+      <summary className="min-h-11 cursor-pointer font-semibold text-slate-950">Story-Elemente ({selectedLinks.length})</summary>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-3"><p className="text-sm text-slate-600">Verknüpfte, unbewertete Inhalte. Der Anzeigezeitpunkt wird vom Präsentationstemplate bestimmt.</p><button type="button" onClick={() => setCreateOpen(true)} className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-bold">Neues Story-Element anlegen</button></div>
+      <div className="mt-4 space-y-2">{selectedLinks.map((link, index) => <article key={link.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between"><div><strong>{link.title}</strong><p className="text-xs text-slate-500">{getStoryElementTypeLabel(link.type)} · {getStoryElementStatusLabel(link.status)}</p></div><div className="flex flex-wrap gap-2"><Link href={`/content/story-elements/${link.id}`} className="inline-flex min-h-10 items-center rounded-xl border border-slate-300 px-3 text-sm font-semibold">Öffnen</Link><button type="button" disabled={disabled || index === 0} onClick={() => move(index, -1)} className="min-h-10 rounded-xl border border-slate-300 px-3 disabled:opacity-40" aria-label={`${link.title} nach oben`}>↑</button><button type="button" disabled={disabled || index === selectedLinks.length - 1} onClick={() => move(index, 1)} className="min-h-10 rounded-xl border border-slate-300 px-3 disabled:opacity-40" aria-label={`${link.title} nach unten`}>↓</button><button type="button" disabled={disabled} onClick={() => onChange(links.filter((candidate) => candidate.storyElementId !== link.id))} className="min-h-10 rounded-xl border border-red-200 px-3 text-sm font-semibold text-red-700 disabled:opacity-50">Entfernen</button></div></article>)}{selectedLinks.length === 0 && <p className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-600">Zu dieser Frage sind keine Story-Elemente verknüpft.</p>}</div>
+      <div className="mt-4 rounded-xl border border-slate-200 p-3"><ContentSearchControls query={query} placeholder="Story-Elemente durchsuchen …" onQueryChange={setQuery} onSubmit={() => undefined} /><div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]"><select aria-label="Story-Element auswählen" value={storyElementId} onChange={(event) => setStoryElementId(event.target.value)} disabled={disabled} className="min-h-11 min-w-0 rounded-xl border border-slate-300 px-3"><option value="">Story-Element auswählen</option>{eligible.map((option) => <option key={option.id} value={option.id}>{option.title} · {getStoryElementTypeLabel(option.type)}{option.status === "DRAFT" ? " · eigener Entwurf" : ""}</option>)}</select><button type="button" onClick={add} disabled={disabled || !storyElementId} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white disabled:opacity-50">Hinzufügen</button></div>{eligible.length === 0 && <p className="mt-3 text-sm text-slate-500">Keine passenden unverknüpften Story-Elemente.</p>}</div>
+      <StoryElementCreateDialog open={createOpen} options={editorOptions} onClose={() => setCreateOpen(false)} onCreated={addCreated} />
+    </details>
   );
 }

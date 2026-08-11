@@ -856,6 +856,13 @@ export async function saveQuestion(
         fallbackMessage: "Mindestens ein Story-Element ist für diese Frage nicht auswählbar.",
       };
     }
+    if (story.questionLinkCount > 0) {
+      return {
+        success: false,
+        errorCode: "CONFLICT",
+        fallbackMessage: "Mindestens ein Story-Element ist bereits mit einer anderen Frage verknüpft.",
+      };
+    }
     storyLinks.push(link);
   }
 
@@ -1439,6 +1446,16 @@ export async function saveQuestion(
         });
 
         if (storyLinks.length > 0) {
+          for (const storyElementId of storyLinks.map((link) => link.storyElementId).sort((left, right) => left - right)) {
+            await tx.$executeRaw`SELECT pg_advisory_xact_lock(${storyElementId})`;
+          }
+          const existingLink = await tx.frage_story_elemente.findFirst({
+            where: { story_element_id: { in: storyLinks.map((link) => link.storyElementId) } },
+            select: { story_element_id: true },
+          });
+          if (existingLink) {
+            throw new DraftValidationError("Ein Story-Element ist bereits mit einer anderen Frage verknüpft.");
+          }
           await tx.frage_story_elemente.createMany({
             data: storyLinks.map((link, index) => ({
               fragen_id: createdQuestion.fragen_id,

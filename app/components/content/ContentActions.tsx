@@ -20,7 +20,7 @@ export default function ContentActions({ item, quizzes, detailsId }: { item: Con
       {item.canArchive && <button type="button" disabled={pending} onClick={runArchive} className="min-h-11 rounded-xl border border-slate-300 px-3 text-sm font-semibold disabled:opacity-50">{item.archived ? "Reaktivieren" : "Archivieren"}</button>}
       <button type="button" aria-controls={detailsId} onClick={() => document.getElementById(detailsId)?.toggleAttribute("hidden")} className="min-h-11 rounded-xl border border-slate-300 px-3 text-sm font-semibold">Details</button>
     </div>
-    <ContentQuizAssignment contentType={item.contentType} contentId={item.id} quizzes={quizzes} assignedQuizIds={item.quizUsages.map((usage) => usage.quizId)} disabled={item.archived} />
+    <ContentQuizAssignment contentType={item.contentType} contentId={item.id} quizzes={quizzes} assignedQuizIds={item.quizUsages.map((usage) => usage.quizId)} assignableQuizIds={item.assignableQuizIds} disabled={item.archived} />
     {message && <p role="status" className="text-xs font-semibold text-slate-700">{message}</p>}
   </div>;
 }

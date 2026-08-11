@@ -116,6 +116,7 @@ test("clearing a template preserves existing question media unchanged", () => {
   const changedDraft = clearQuestionTemplateFromDraft(draft);
 
   assert.equal(changedDraft.templateId, null);
+  assert.equal(changedDraft.questionText, "");
   assert.strictEqual(changedDraft.questionMedia, media);
   assert.equal(changedDraft.questionMedia[0].operation, "UNCHANGED");
 });
@@ -126,6 +127,48 @@ test("template switches preserve pixel stage durations", () => {
   const changed = applyQuestionTemplateToDraft(original, questionTemplates[0], () => "new-answer");
   assert.deepEqual(changed.templateConfig, original.templateConfig);
   assert.deepEqual(clearQuestionTemplateFromDraft(changed).templateConfig, original.templateConfig);
+});
+
+test("clearing a special template returns a persistable standard-question draft", () => {
+  const draft = {
+    ...createDraft(),
+    templateId: questionTemplateIds.ordering,
+    templateConfig: {
+      ...createDraft().templateConfig,
+      templateData: {
+        kind: "ORDERING" as const,
+        items: [{ id: "one", text: "Eins", explanation: "" }],
+        scoring: "EXACT" as const,
+      },
+    },
+    answers: [{
+      id: "answer-1",
+      fieldGroupId: "group-1",
+      fieldLabel: "Position 1",
+      isRequired: true,
+      text: "Eins",
+      isCorrect: true,
+      additionalInfo: "",
+      media: null,
+    }],
+  };
+
+  const changedDraft = clearQuestionTemplateFromDraft(draft);
+
+  assert.equal(changedDraft.templateId, null);
+  assert.equal(changedDraft.questionText, "");
+  assert.equal(changedDraft.templateConfig.templateData, undefined);
+  assert.equal(changedDraft.answers[0]?.text, "Eins");
+  assert.equal(changedDraft.answers[0]?.fieldGroupId, undefined);
+  assert.equal(changedDraft.answers[0]?.fieldLabel, undefined);
+  assert.equal(changedDraft.answers[0]?.isRequired, undefined);
+});
+
+test("clearing an already standard question keeps its question text", () => {
+  const changedDraft = clearQuestionTemplateFromDraft(createDraft());
+
+  assert.equal(changedDraft.templateId, null);
+  assert.equal(changedDraft.questionText, "Bestehende Frage");
 });
 
 test("template switches preserve question text and only apply defaults to empty drafts", () => {

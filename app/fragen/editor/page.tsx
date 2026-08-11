@@ -11,7 +11,7 @@ import { localizeQuestionTemplates } from "./templates/questionTemplates";
 import { getAssignableQuestionEventSeries, getQuestionActor } from "./questionAccess.server";
 import { canEditGlobalQuestions, getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { resolveGooglePlacesFeature } from "./googlePlacesFeature";
-import { listSelectableStoryElementsForQuestionCreation } from "@/app/story-elemente/storyElementRepository.server";
+import { getStoryElementEditorOptions, listSelectableStoryElementsForQuestionCreation } from "@/app/story-elemente/storyElementRepository.server";
 
 export default async function QuestionEditorPage() {
   const session = await requireQuestionEditor();
@@ -30,7 +30,10 @@ export default async function QuestionEditorPage() {
     getQuestionActor(session),
   ]);
   const baseCapabilities = getQuestionEditorCapabilities(actor);
-  const storyElements = await listSelectableStoryElementsForQuestionCreation(actor);
+  const [storyElements, storyEditorOptions] = await Promise.all([
+    listSelectableStoryElementsForQuestionCreation(actor),
+    getStoryElementEditorOptions(actor),
+  ]);
   const canApproveInAnySeries = isAdministrator(actor) || getActorEventSeriesIds(actor, "EVENT_MANAGER").length > 0;
 
   return (
@@ -60,6 +63,7 @@ export default async function QuestionEditorPage() {
         explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
       })}
       storyElementOptions={storyElements.map((story) => ({ id: story.id, title: story.title, description: story.description, type: story.type, status: story.status, scope: story.scope, eventSeriesId: story.eventSeriesId, eventSeriesName: story.eventSeriesName }))}
+      storyEditorOptions={storyEditorOptions}
     />
   );
 }

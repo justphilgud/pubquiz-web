@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import ContentEditorHeader from "@/app/components/content/ContentEditorHeader";
+import ContentEditorShell from "@/app/components/content/ContentEditorShell";
 import { requireActor } from "@/app/lib/permissions";
 import { requireQuizEditor, requireQuizSection } from "@/app/quiz/quizAccess.server";
 import StoryElementEditor from "../StoryElementEditor";
@@ -37,7 +37,7 @@ export default async function NewStoryElementPage({
     await requireQuizEditor(quizId);
     await requireQuizSection(quizId, sectionId);
   }
-  const safeQuestionReturn = query.returnTo?.startsWith("/fragen/editor/");
+  const safeQuestionReturn = query.returnTo?.startsWith("/content/questions/");
   const safeQuizReturn = hasQuizContext &&
     query.returnTo?.startsWith(`/quiz/${quizId}/ablauf`);
   const returnTo = safeQuestionReturn || safeQuizReturn
@@ -46,9 +46,7 @@ export default async function NewStoryElementPage({
   const options = await getStoryElementEditorOptions(actor);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950 md:px-8">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <ContentEditorHeader eyebrow="Content · Story-Elemente" title="Neues Story-Element" fallbackHref={returnTo ?? "/content"} description={linkedQuestionId ? `Wird nach dem Speichern mit Frage #${linkedQuestionId} verknüpft.` : hasQuizContext ? "Wird nach dem Speichern automatisch im ausgewählten Quizblock platziert." : undefined} />
+    <ContentEditorShell maxWidth="max-w-7xl" eyebrow="Content · Story-Elemente" title="Neues Story-Element" fallbackHref={returnTo ?? "/content"} description={linkedQuestionId ? `Wird nach dem Speichern mit Frage #${linkedQuestionId} verknüpft.` : hasQuizContext ? "Wird nach dem Speichern automatisch im ausgewählten Quizblock platziert." : undefined} footerSpace>
         <StoryElementEditor
           options={options}
           canEdit
@@ -58,7 +56,6 @@ export default async function NewStoryElementPage({
           returnTo={returnTo}
           quizContext={hasQuizContext ? { quizId, sectionId } : undefined}
         />
-      </div>
-    </main>
+    </ContentEditorShell>
   );
 }

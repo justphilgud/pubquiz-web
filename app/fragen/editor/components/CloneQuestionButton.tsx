@@ -37,7 +37,7 @@ export function CloneQuestionButton({
     try {
       const result = await cloneQuestion(questionId);
       if (result.ok) {
-        router.push(`/fragen/editor/${result.questionId}`);
+        router.push(`/content/questions/${result.questionId}`);
         router.refresh();
         return;
       }

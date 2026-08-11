@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import ContentEditorHeader from "@/app/components/content/ContentEditorHeader";
+import ContentEditorShell from "@/app/components/content/ContentEditorShell";
 import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
@@ -31,7 +31,9 @@ import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
 import { TemplateSelector } from "./TemplateSelector";
 import { StructuredTemplateEditor } from "./StructuredTemplateEditor";
-import { QuestionScopeSection, type QuestionScopeOption } from "./QuestionScopeSection";
+import ContentScopeSection, {
+  type ContentScopeEventSeriesOption,
+} from "@/app/components/content/ContentScopeSection";
 import { evaluateQuestionQuality } from "../questionQuality";
 import type {
   QuestionAnswerDraft,
@@ -74,6 +76,7 @@ import {
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
 import QuestionStoryElementDraftSection, { type QuestionStoryElementDraftOption } from "@/app/story-elemente/QuestionStoryElementDraftSection";
+import type { StoryElementEditorOptions } from "@/app/story-elemente/StoryElementEditor";
 
 function createId(): string {
   return crypto.randomUUID();
@@ -102,7 +105,7 @@ function createAnswer(
   };
 }
 
-function createInitialDraft(scopeOptions: { canSelectGlobal: boolean; eventSeries: QuestionScopeOption[] }): QuestionEditorDraft {
+function createInitialDraft(scopeOptions: { canSelectGlobal: boolean; eventSeries: ContentScopeEventSeriesOption[] }): QuestionEditorDraft {
   return {
     scope: scopeOptions.canSelectGlobal ? "GLOBAL" : "EVENT_SERIES",
     eventSeriesIds: scopeOptions.canSelectGlobal
@@ -142,9 +145,10 @@ type QuestionEditorProps = {
   locale: AppLocale;
   messages: QuestionEditorMessages;
   templates: QuestionTemplate[];
-  scopeOptions: { canSelectGlobal: boolean; eventSeries: QuestionScopeOption[] };
+  scopeOptions: { canSelectGlobal: boolean; eventSeries: ContentScopeEventSeriesOption[] };
   googlePlacesFeature: GooglePlacesFeature;
   storyElementOptions?: QuestionStoryElementDraftOption[];
+  storyEditorOptions?: StoryElementEditorOptions;
 };
 
 export function QuestionEditor({
@@ -160,6 +164,7 @@ export function QuestionEditor({
   scopeOptions,
   googlePlacesFeature,
   storyElementOptions = [],
+  storyEditorOptions,
 }: QuestionEditorProps) {
   const specialQuestionTemplates = templates.filter(
     (template) => template.enabled && template.selectable,
@@ -167,6 +172,9 @@ export function QuestionEditor({
   const router = useRouter();
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
     initialDraft ?? createInitialDraft(scopeOptions),
+  );
+  const savedDraftRef = useRef<QuestionEditorDraft>(
+    structuredClone(initialDraft ?? createInitialDraft(scopeOptions)),
   );
   const retainedFaceMorphPixelOptionsRef = useRef(
     initialDraft?.templateConfig.createPixelQuestionByAnswer ??
@@ -633,7 +641,7 @@ export function QuestionEditor({
         if (intent !== "DRAFT" && !pixelSyncFailed) {
           allowNavigationRef.current = true;
           setIsReviewFeedbackOpen(false);
-          router.push("/fragen");
+          router.push("/content");
           router.refresh();
         } else if (options?.resetAfterSuccess) {
           const resetDraft = createInitialDraft(scopeOptions);
@@ -641,6 +649,7 @@ export function QuestionEditor({
             ...NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
           };
           setDraft(resetDraft);
+          savedDraftRef.current = structuredClone(resetDraft);
           setSavedDraftFingerprint(getQuestionDraftFingerprint(resetDraft));
           setSavedQuestionId(null);
           requestAnimationFrame(() => questionTextRef.current?.focus());
@@ -651,6 +660,7 @@ export function QuestionEditor({
             questionMedia: result.questionMedia,
             answers: applySavedAnswerState(submittedDraft.answers, result),
           };
+          savedDraftRef.current = structuredClone(savedDraft);
           setSavedDraftFingerprint(getQuestionDraftFingerprint(savedDraft));
           setDraft((current) => ({
             ...current,
@@ -789,6 +799,14 @@ export function QuestionEditor({
     }
   }
 
+  function cancelChanges() {
+    if (hasUnsavedChanges && !window.confirm(messages.editor.unsavedChanges)) return;
+    setDraft(structuredClone(savedDraftRef.current));
+    setSaveMessage(null);
+    setFieldError(null);
+    setSimilarQuestions([]);
+  }
+
   function requestChanges(
     reviewReasonCodes: ReviewReasonCode[],
     reviewComment: string,
@@ -822,12 +840,7 @@ export function QuestionEditor({
 
   return (
     <QuestionEditorMessagesProvider locale={locale} messages={messages}>
-    <main
-      className={`mx-auto flex w-full max-w-4xl flex-col gap-6 overflow-x-clip px-3 py-4 sm:px-4 sm:py-6 ${
-        showSaveActions ? "pb-64 sm:pb-28" : "pb-8"
-      }`}
-    >
-      <ContentEditorHeader eyebrow={messages.editor.eyebrow} title={pageTitle} fallbackHref="/content" />
+    <ContentEditorShell eyebrow={messages.editor.eyebrow} title={pageTitle} fallbackHref="/content" footerSpace={showSaveActions}>
 
       {questionRecord && (
         <QuestionReviewPanel
@@ -862,12 +875,18 @@ export function QuestionEditor({
         aria-busy={pendingAction !== null}
         className="min-w-0 space-y-6 border-0 p-0 disabled:opacity-90"
       >
-        <QuestionScopeSection
+        <ContentScopeSection
           scope={draft.scope}
           eventSeriesIds={draft.eventSeriesIds}
           eventSeries={scopeOptions.eventSeries}
-          canSelectGlobal={scopeOptions.canSelectGlobal}
-          onChange={(scope, eventSeriesIds) => setDraft((current) => ({ ...current, scope, eventSeriesIds }))}
+          availableScopes={scopeOptions.canSelectGlobal || draft.scope === "GLOBAL"
+            ? ["GLOBAL", "EVENT_SERIES"]
+            : ["EVENT_SERIES"]}
+          onChange={(value) => setDraft((current) => ({
+            ...current,
+            scope: value.scope as QuestionEditorDraft["scope"],
+            eventSeriesIds: value.eventSeriesIds,
+          }))}
         />
 
         <TemplateSelector
@@ -986,7 +1005,7 @@ export function QuestionEditor({
               {similarQuestions.map((question) => (
                 <li key={question.questionId}>
                   <Link
-                    href={`/fragen/editor/${question.questionId}`}
+                    href={`/content/questions/${question.questionId}`}
                     target="_blank"
                     className="font-medium underline"
                   >
@@ -1073,7 +1092,7 @@ export function QuestionEditor({
           canManageCategories={capabilities.canManageCategories}
         />
 
-        {editorContext === "create" && (
+        {editorContext === "create" && storyEditorOptions && (
           <QuestionStoryElementDraftSection
             options={storyElementOptions}
             links={draft.storyElementLinks ?? []}
@@ -1081,6 +1100,7 @@ export function QuestionEditor({
             questionEventSeriesIds={draft.eventSeriesIds}
             disabled={isEditorDisabled}
             onChange={(storyElementLinks) => setDraft((current) => ({ ...current, storyElementLinks }))}
+            editorOptions={storyEditorOptions}
           />
         )}
       </fieldset>
@@ -1098,7 +1118,7 @@ export function QuestionEditor({
               .map((child) => (
                 <Link
                   key={child.questionId}
-                  href={`/fragen/editor/${child.questionId}`}
+                  href={`/content/questions/${child.questionId}`}
                   className="mt-2 block font-semibold underline"
                 >
                   {formatMessage(messages.editor.openPixelQuestion, {
@@ -1118,6 +1138,7 @@ export function QuestionEditor({
           showDraftActions={editorContext !== "review"}
           allowStartNewQuestion={editorContext === "create"}
           workflowIdleLabel={workflowIdleLabel}
+          onCancel={cancelChanges}
           onSaveDraft={(startNewQuestion) =>
             void handleSave(
               "DRAFT",
@@ -1154,7 +1175,7 @@ export function QuestionEditor({
         onClose={() => setIsPendingCategoryReviewOpen(false)}
         onConfirm={approveWithCategoryDecisions}
       />
-    </main>
+    </ContentEditorShell>
     </QuestionEditorMessagesProvider>
   );
 }

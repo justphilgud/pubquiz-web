@@ -47,6 +47,10 @@ test("story scope presentation hides impossible choices and prefers quiz context
   );
   assert.deepEqual(
     getAvailableStoryElementScopes({ canUseGlobalScope: true, hasQuizContext: false }),
+    ["GLOBAL", "EVENT_SERIES"],
+  );
+  assert.deepEqual(
+    getAvailableStoryElementScopes({ canUseGlobalScope: true, hasQuizContext: true }),
     ["GLOBAL", "EVENT_SERIES", "QUIZ"],
   );
   assert.equal(
@@ -227,15 +231,24 @@ test("workflow surfaces share search controls and preserve legacy metadata witho
   assert.match(backButton, /router\.push\(fallbackHref\)/);
 });
 
-test("mobile creation workflow keeps content before scope and preview after the form", () => {
+test("mobile creation workflow keeps content before scope and omits a template-less preview", () => {
   const editor = readFileSync("app/story-elemente/StoryElementEditor.tsx", "utf8");
   const titleIndex = editor.indexOf("Titel *");
   const contentIndex = editor.indexOf(">Inhalt<");
-  const scopeIndex = editor.indexOf(">Geltungsbereich<");
-  const saveIndex = editor.indexOf("Story-Element speichern");
-  const previewIndex = editor.indexOf(">Inhaltsvorschau<");
+  const scopeIndex = editor.indexOf("<ContentScopeSection");
   assert.ok(titleIndex > 0 && titleIndex < contentIndex);
-  assert.ok(contentIndex < scopeIndex && scopeIndex < saveIndex && saveIndex < previewIndex);
-  assert.match(editor, /grid min-w-0 gap-6 xl:grid-cols/);
+  assert.ok(contentIndex < scopeIndex);
+  assert.doesNotMatch(editor, /Inhaltsvorschau|StoryPreview/);
+  assert.match(editor, /ContentEditorActionBar/);
   assert.doesNotMatch(editor, /overflow-x-auto/);
+});
+
+test("question context creates story elements inline and cardinality rejects silent reassignment", () => {
+  const draft = readFileSync("app/story-elemente/QuestionStoryElementDraftSection.tsx", "utf8");
+  const existing = readFileSync("app/story-elemente/QuestionStoryElementPanel.tsx", "utf8");
+  const actions = readFileSync("app/story-elemente/questionActions.ts", "utf8");
+  assert.match(draft, /StoryElementCreateDialog/);
+  assert.match(existing, /StoryElementCreateDialog/);
+  assert.doesNotMatch(draft, /target="_blank"/);
+  assert.match(actions, /bereits mit einer anderen Frage verknüpft/);
 });

@@ -72,6 +72,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.faceMorph,
+    questionTextIsTemplateStatic: true,
     icon: "scan-face", enabled: true, answerMode: "OPEN_TEXT",
     evaluationMode: "MANUAL", editorKind: "STANDARD",
     presentationKind: "STANDARD", answerFormKind: "STANDARD",
@@ -91,6 +92,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.musicReverse,
+    questionTextIsTemplateStatic: true,
     icon: "audio-lines", enabled: true, answerMode: "OPEN_TEXT",
     evaluationMode: "MANUAL", editorKind: "STANDARD",
     presentationKind: "STANDARD", answerFormKind: "STANDARD",
@@ -113,6 +115,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.musicEightBit,
+    questionTextIsTemplateStatic: true,
     icon: "music", enabled: true, answerMode: "OPEN_TEXT",
     evaluationMode: "MANUAL", editorKind: "STANDARD",
     presentationKind: "STANDARD", answerFormKind: "STANDARD",
@@ -132,6 +135,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.pixelImage,
+    questionTextIsTemplateStatic: true,
     icon: "image", enabled: true, answerMode: "OPEN_TEXT",
     evaluationMode: "MANUAL", editorKind: "STANDARD",
     presentationKind: "STANDARD", answerFormKind: "STANDARD",
@@ -192,6 +196,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.translationReadAloud,
+    questionTextIsTemplateStatic: true,
     icon: "languages", enabled: true, selectable: true,
     availableForFiltering: true, requiresAnswerImages: false,
     answerMode: "OPEN_TEXT", evaluationMode: "MANUAL",
@@ -207,6 +212,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.anagram,
+    questionTextIsTemplateStatic: true,
     icon: "shuffle", enabled: true, selectable: true,
     availableForFiltering: true, requiresAnswerImages: false,
     answerMode: "OPEN_TEXT", evaluationMode: "EXACT_MATCH",
@@ -219,6 +225,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   },
   {
     id: questionTemplateIds.googleReviews,
+    questionTextIsTemplateStatic: true,
     icon: "star", enabled: true, selectable: true,
     availableForFiltering: true, requiresAnswerImages: false,
     answerMode: "OPEN_TEXT", evaluationMode: "MANUAL",

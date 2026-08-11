@@ -11,6 +11,7 @@ import {
   getAnswersForTemplateData,
   getDefaultQuestionTemplateData,
 } from "./templates/questionTemplateData";
+import { resolveCanonicalQuestionTemplateId } from "./templates/questionTemplateRegistry";
 
 export type QuestionTemplateChangeImpact = {
   overwritesContent: boolean;
@@ -76,7 +77,25 @@ export function applyQuestionTemplateToDraft(
 }
 
 export function clearQuestionTemplateFromDraft(draft: QuestionEditorDraft): QuestionEditorDraft {
-  return { ...draft, templateId: null };
+  const switchesFromSpecialTemplate =
+    resolveCanonicalQuestionTemplateId(draft.templateId) !== null;
+  return {
+    ...draft,
+    templateId: null,
+    questionText: switchesFromSpecialTemplate ? "" : draft.questionText,
+    templateConfig: {
+      stageDurationsSeconds: draft.templateConfig.stageDurationsSeconds,
+      createPixelQuestionByAnswer: draft.templateConfig.createPixelQuestionByAnswer,
+    },
+    answers: draft.answers.map((answer) => ({
+      id: answer.id,
+      answerId: answer.answerId,
+      text: answer.text,
+      isCorrect: answer.isCorrect,
+      additionalInfo: answer.additionalInfo,
+      media: answer.media,
+    })),
+  };
 }
 
 export function getActiveQuestionMediaSlots(

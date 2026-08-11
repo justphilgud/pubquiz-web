@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   createStoryElement,
@@ -12,10 +12,7 @@ import {
 } from "./actions";
 import {
   getInitialStoryElementConfig,
-  getStoryElementScopeLabel,
-  getStoryElementStatusLabel,
   getStoryElementTypeLabel,
-  STORY_ELEMENT_STATUSES,
   STORY_ELEMENT_TYPES,
   type StoryElementScopeValue,
   type StoryElementStatusValue,
@@ -26,8 +23,10 @@ import { linkQuestionStoryElement } from "./questionActions";
 import { addStoryElementToQuizBlock } from "@/app/quiz/[quizId]/ablauf/actions";
 import type { StoryQuestionRelationshipValue } from "./storyElement";
 import { getAvailableStoryElementScopes, getDefaultStoryElementScope } from "./storyElementScopePresentation";
+import ContentEditorActionBar from "@/app/components/content/ContentEditorActionBar";
+import ContentScopeSection from "@/app/components/content/ContentScopeSection";
 
-type EditorOptions = {
+export type StoryElementEditorOptions = {
   eventSeries: { eventreihe_id: number; name: string }[];
   quizzes: {
     quiz_id: number;
@@ -60,7 +59,7 @@ type InitialStory = {
 };
 
 type Props = {
-  options: EditorOptions;
+  options: StoryElementEditorOptions;
   initialStory?: InitialStory;
   canEdit: boolean;
   canArchive: boolean;
@@ -68,6 +67,8 @@ type Props = {
   returnTo?: string;
   quizContext?: { quizId: number; sectionId: number };
   linkRelationship?: StoryQuestionRelationshipValue;
+  onCreated?: (story: { id: number; title: string; description: string | null; type: StoryElementType; status: StoryElementStatusValue; scope: StoryElementScopeValue; eventSeriesId: number | null; eventSeriesName: string | null }) => void;
+  onCancel?: () => void;
 };
 
 const inputClass =
@@ -82,45 +83,6 @@ function asConfig(value: unknown, type: StoryElementType): QuizFlowConfig {
   return getInitialStoryElementConfig(type);
 }
 
-function StoryPreview({ type, title, config }: {
-  type: StoryElementType;
-  title: string;
-  config: QuizFlowConfig;
-}) {
-  const image = config.imageUrl ?? config.images?.[0]?.url;
-  return (
-    <div className="aspect-video overflow-hidden rounded-2xl bg-slate-950 p-5 text-white shadow-lg sm:p-7">
-      <div className="flex h-full min-w-0 flex-col justify-between overflow-hidden rounded-xl border border-white/15 bg-gradient-to-br from-slate-900 to-emerald-950 p-5">
-        <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-            {getStoryElementTypeLabel(type)}
-          </p>
-          <h2 className="mt-2 line-clamp-2 break-words text-2xl font-black sm:text-3xl">
-            {title || "Unbenanntes Story-Element"}
-          </h2>
-          {(config.subtitle || config.body || config.description) && (
-            <p className="mt-3 line-clamp-4 max-w-2xl whitespace-pre-line text-sm leading-relaxed text-slate-200 sm:text-base">
-              {config.subtitle ?? config.body ?? config.description}
-            </p>
-          )}
-        </div>
-        <div className="mt-3 min-h-0 flex-1">
-          {image && (
-            // Safe repository/blob references are validated again on the server.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={image} alt={config.altText ?? ""} className="h-full max-h-52 w-full rounded-xl object-cover" />
-          )}
-          {type === "QUOTE" && config.body && (
-            <blockquote className="line-clamp-4 text-xl font-semibold italic">„{config.body}“</blockquote>
-          )}
-          {type === "AUDIO" && <div className="mt-4 text-5xl" aria-label="Audio">◖)))</div>}
-          {type === "VIDEO" && <div className="mt-4 text-5xl" aria-label="Video">▶</div>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function StoryElementEditor({
   options,
   initialStory,
@@ -130,6 +92,8 @@ export default function StoryElementEditor({
   returnTo,
   quizContext,
   linkRelationship = "AFTER_SOLUTION",
+  onCreated,
+  onCancel,
 }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -168,12 +132,6 @@ export default function StoryElementEditor({
   );
   const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
 
-  const relevantQuizzes = useMemo(
-    () => scope === "QUIZ"
-      ? options.quizzes.filter((quiz) => !eventSeriesId || quiz.eventreihe_id === Number(eventSeriesId))
-      : options.quizzes,
-    [eventSeriesId, options.quizzes, scope],
-  );
   const isGallery = type === "IMAGE_GALLERY" || type === "MEDIA_SEQUENCE";
   const galleryText = config.images
     ?.map((image) => [image.url, image.altText, image.caption ?? ""].join(" | "))
@@ -188,7 +146,22 @@ export default function StoryElementEditor({
     setConfig(getInitialStoryElementConfig(nextType));
   }
 
-  function submit() {
+  const initialSavedState = {
+    type: initialType,
+    title: initialStory?.title ?? "",
+    description: initialStory?.description ?? "",
+    moderatorNote: initialStory?.moderatorNote ?? "",
+    status: initialStory?.status === "ACTIVE" ? "ACTIVE" as const : "DRAFT" as const,
+    scope,
+    eventSeriesId,
+    quizId,
+    config: structuredClone(config),
+  };
+  const savedStateRef = useRef(initialSavedState);
+  const [savedFingerprint, setSavedFingerprint] = useState(() => JSON.stringify(initialSavedState));
+  const currentFingerprint = JSON.stringify({ type, title, description, moderatorNote, status, scope, eventSeriesId, quizId, config });
+
+  function submit(targetStatus: "DRAFT" | "ACTIVE") {
     setMessage(null);
     const value = {
       type,
@@ -199,7 +172,7 @@ export default function StoryElementEditor({
       category: initialStory?.category ?? null,
       tags: initialStory?.tags ?? [],
       moderatorNote,
-      status,
+      status: targetStatus,
       scope,
       eventSeriesId: scope === "EVENT_SERIES" ? eventSeriesId : null,
       quizId: scope === "QUIZ" ? quizId : null,
@@ -218,7 +191,25 @@ export default function StoryElementEditor({
         return;
       }
       setExpectedUpdatedAt(result.updatedAt);
+      setStatus(targetStatus);
+      const savedState = { type, title, description, moderatorNote, status: targetStatus, scope, eventSeriesId, quizId, config: structuredClone(config) };
+      savedStateRef.current = savedState;
+      setSavedFingerprint(JSON.stringify(savedState));
       setMessage({ tone: "success", text: result.message });
+      if (!initialStory && onCreated) {
+        onCreated({
+          id: result.storyElementId,
+          title: title.trim(),
+          description: description.trim() || null,
+          type,
+          status: targetStatus,
+          scope,
+          eventSeriesId: scope === "EVENT_SERIES" ? Number(eventSeriesId) : null,
+          eventSeriesName: scope === "EVENT_SERIES" ? options.eventSeries.find((series) => series.eventreihe_id === Number(eventSeriesId))?.name ?? null : null,
+        });
+        router.refresh();
+        return;
+      }
       if (!initialStory && quizContext) {
         const placement = await addStoryElementToQuizBlock({
           quizId: quizContext.quizId,
@@ -245,10 +236,26 @@ export default function StoryElementEditor({
           router.push(returnTo);
         }
       } else if (!initialStory) {
-        router.push(`/story-elemente/${result.storyElementId}`);
+        router.push(`/content/story-elements/${result.storyElementId}`);
       }
       router.refresh();
     });
+  }
+
+  function cancelChanges() {
+    if (currentFingerprint !== savedFingerprint && !window.confirm("Ungespeicherte Änderungen verwerfen?")) return;
+    const saved = savedStateRef.current;
+    setType(saved.type);
+    setTitle(saved.title);
+    setDescription(saved.description);
+    setModeratorNote(saved.moderatorNote);
+    setStatus(saved.status);
+    setScope(saved.scope);
+    setEventSeriesId(saved.eventSeriesId);
+    setQuizId(saved.quizId);
+    setConfig(structuredClone(saved.config));
+    setMessage(null);
+    onCancel?.();
   }
 
   function runLifecycle(action: () => Promise<StoryElementActionResult>, redirectToList = false) {
@@ -262,14 +269,14 @@ export default function StoryElementEditor({
       setExpectedUpdatedAt(result.updatedAt);
       if (redirectToList) router.push("/story-elemente");
       else if (result.storyElementId && result.storyElementId !== initialStory?.id) {
-        router.push(`/story-elemente/${result.storyElementId}`);
+        router.push(`/content/story-elements/${result.storyElementId}`);
       }
       router.refresh();
     });
   }
 
   return (
-    <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,0.72fr)]">
+    <div className="min-w-0">
       <section className="min-w-0 space-y-5 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-950">
           <strong>Story-Element</strong>
@@ -329,38 +336,47 @@ export default function StoryElementEditor({
           </div>
         </section>
 
-        <fieldset className="rounded-2xl border border-slate-200 p-4" disabled={!canEdit || pending}>
-          <legend className="px-2 font-bold">Geltungsbereich</legend>
-          <div className="grid gap-3 md:grid-cols-2">
-            {allowedScopes.length > 1 && <label><span className="mb-1 block text-sm font-semibold">Verfügbarkeit</span><select value={scope} onChange={(event) => setScope(event.target.value as StoryElementScopeValue)} className={inputClass}>{allowedScopes.map((value) => <option key={value} value={value}>{getStoryElementScopeLabel(value)}</option>)}</select></label>}
-            {scope === "EVENT_SERIES" && (options.eventSeries.length > 1 && !contextQuiz ? <label><span className="mb-1 block text-sm font-semibold">Eventreihe *</span><select value={eventSeriesId} onChange={(event) => setEventSeriesId(event.target.value)} className={inputClass}>{options.eventSeries.map((series) => <option key={series.eventreihe_id} value={series.eventreihe_id}>{series.name}</option>)}</select></label> : <p className="self-end rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">Eventreihe: <strong>{contextQuiz?.eventreihe.name ?? options.eventSeries.find((series) => series.eventreihe_id === Number(eventSeriesId))?.name}</strong></p>)}
-            {scope === "QUIZ" && (contextQuiz ? <p className="self-end rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">Quiz: <strong>{contextQuiz.titel ?? `Quiz ${contextQuiz.quiz_id}`}</strong></p> : <label><span className="mb-1 block text-sm font-semibold">Quiz *</span><select value={quizId} onChange={(event) => setQuizId(event.target.value)} className={inputClass}>{relevantQuizzes.map((quiz) => <option key={quiz.quiz_id} value={quiz.quiz_id}>{quiz.titel ?? `Quiz ${quiz.quiz_id}`} · {quiz.eventreihe.name}</option>)}</select></label>)}
-          </div>
-        </fieldset>
+        <ContentScopeSection
+          scope={scope}
+          eventSeriesIds={eventSeriesId ? [Number(eventSeriesId)] : []}
+          eventSeries={options.eventSeries.map((series) => ({
+            id: series.eventreihe_id,
+            name: series.name,
+          }))}
+          availableScopes={allowedScopes}
+          quizzes={(contextQuiz ? [contextQuiz] : options.quizzes).map((quiz) => ({
+            id: quiz.quiz_id,
+            title: quiz.titel ?? `Quiz ${quiz.quiz_id}`,
+            eventSeriesId: quiz.eventreihe_id,
+            eventSeriesName: quiz.eventreihe.name,
+          }))}
+          quizId={quizId ? Number(quizId) : null}
+          multipleEventSeries={false}
+          disabled={!canEdit || pending}
+          onChange={(value) => {
+            setScope(value.scope as StoryElementScopeValue);
+            setEventSeriesId(value.eventSeriesIds[0]?.toString() ?? "");
+            setQuizId(value.quizId?.toString() ?? "");
+          }}
+        />
 
         <details className="rounded-2xl border border-slate-200 p-4">
           <summary className="min-h-11 cursor-pointer font-bold">Weitere Angaben</summary>
           <div className="mt-3 grid gap-4">
-            <label><span className="mb-1 block text-sm font-semibold">Status</span><select value={initialStory?.status === "ARCHIVED" ? "ARCHIVED" : status} onChange={(event) => setStatus(event.target.value as typeof status)} className={inputClass} disabled={!canEdit || pending || initialStory?.status === "ARCHIVED"}>{STORY_ELEMENT_STATUSES.filter((value) => value !== "ARCHIVED" || initialStory?.status === "ARCHIVED").map((value) => <option key={value} value={value}>{getStoryElementStatusLabel(value)}</option>)}</select></label>
             <label><span className="mb-1 block text-sm font-semibold">Moderationsnotiz (nicht öffentlich)</span><textarea value={moderatorNote} onChange={(event) => setModeratorNote(event.target.value)} maxLength={2000} className={`${inputClass} min-h-24 resize-y`} disabled={!canEdit || pending} /></label>
           </div>
         </details>
 
         {message && <p role="alert" className={`rounded-xl px-4 py-3 text-sm font-semibold ${message.tone === "error" ? "bg-red-50 text-red-800" : "bg-emerald-50 text-emerald-900"}`}>{message.text}</p>}
         <div className="flex flex-wrap gap-3">
-          {canEdit && initialStory?.status !== "ARCHIVED" && <button type="button" onClick={submit} disabled={pending} className="min-h-11 rounded-xl bg-slate-950 px-5 py-2 font-bold text-white disabled:opacity-50">{pending ? "Speichert …" : initialStory ? "Neue Revision speichern" : "Story-Element speichern"}</button>}
           {initialStory && <button type="button" onClick={() => runLifecycle(() => duplicateStoryElement(initialStory.id))} disabled={pending} className={secondaryButtonClass}>Duplizieren</button>}
           {initialStory && canArchive && <button type="button" onClick={() => runLifecycle(() => setStoryElementArchived(initialStory.id, initialStory.status !== "ARCHIVED"))} disabled={pending} className={secondaryButtonClass}>{initialStory.status === "ARCHIVED" ? "Als Entwurf reaktivieren" : "Archivieren"}</button>}
           {initialStory && canArchive && initialStory.status === "DRAFT" && initialStory.usageCount === 0 && initialStory.questionLinkCount === 0 && <button type="button" onClick={() => { if (window.confirm("Diesen ungenutzten Entwurf endgültig löschen?")) runLifecycle(() => deleteUnusedStoryElement(initialStory.id), true); }} disabled={pending} className={`${secondaryButtonClass} border-red-200 text-red-700`}>Entwurf löschen</button>}
         </div>
       </section>
 
-      <aside className="min-w-0 xl:sticky xl:top-4 xl:self-start">
-        <h2 className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-slate-500">Inhaltsvorschau</h2>
-        <StoryPreview type={type} title={title} config={config} />
-        <p className="mt-3 text-xs leading-relaxed text-slate-500">Die Vorschau prüft Hierarchie und Medien. Im Quiz gestaltet das gewählte Präsentationstemplate denselben validierten Inhalt über den gemeinsamen Renderer.</p>
-        {initialStory && <dl className="mt-4 grid grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm"><div><dt className="text-slate-500">Revision</dt><dd className="font-bold">{initialStory.revisionNumber}</dd></div><div><dt className="text-slate-500">Verwendungen</dt><dd className="font-bold">{initialStory.usageCount}</dd></div><div><dt className="text-slate-500">Fragenlinks</dt><dd className="font-bold">{initialStory.questionLinkCount}</dd></div><div><dt className="text-slate-500">Herkunft</dt><dd className="font-bold">{initialStory.sourceStoryElementId ? `Kopie von #${initialStory.sourceStoryElementId}` : "Original"}</dd></div></dl>}
-      </aside>
+      {initialStory && <dl className="mt-4 grid grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm sm:grid-cols-4"><div><dt className="text-slate-500">Revision</dt><dd className="font-bold">{initialStory.revisionNumber}</dd></div><div><dt className="text-slate-500">Verwendungen</dt><dd className="font-bold">{initialStory.usageCount}</dd></div><div><dt className="text-slate-500">Fragenlinks</dt><dd className="font-bold">{initialStory.questionLinkCount}</dd></div><div><dt className="text-slate-500">Herkunft</dt><dd className="font-bold">{initialStory.sourceStoryElementId ? `Kopie von #${initialStory.sourceStoryElementId}` : "Original"}</dd></div></dl>}
+      {canEdit && initialStory?.status !== "ARCHIVED" && <ContentEditorActionBar pending={pending} onCancel={cancelChanges} onSaveDraft={() => submit("DRAFT")} onPublish={() => submit("ACTIVE")} />}
     </div>
   );
 }

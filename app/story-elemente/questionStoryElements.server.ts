@@ -44,15 +44,16 @@ export async function loadQuestionStoryElementPanel(
   const eventSeriesIds = new Set(
     question.eventreihen.map((entry) => entry.eventreihe_id),
   );
+  const linkedIds = new Set(links.map((link) => link.story_element_id));
   const selectable = [...activeStories, ...ownDrafts].filter((story, index, all) =>
     all.findIndex((candidate) => candidate.id === story.id) === index &&
+    (story.questionLinkCount === 0 || linkedIds.has(story.id)) &&
     story.scope !== "QUIZ" &&
     (story.scope === "GLOBAL" ||
       (question.geltungsbereich === "EVENT_SERIES" &&
         story.eventSeriesId !== null &&
         eventSeriesIds.has(story.eventSeriesId))),
   );
-  const linkedIds = new Set(links.map((link) => link.story_element_id));
   return {
     links: links.flatMap((link) => {
       const revision = link.story_element.revisionen[0];

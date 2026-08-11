@@ -1017,6 +1017,14 @@ export async function addFrageToQuiz(data: {
 }) {
   const { session } = await requireQuizEditor(data.quizId);
 
+  const existingAssignment = await prisma.quiz_fragen.findFirst({
+    where: { quiz_id: data.quizId, fragen_id: data.fragenId },
+    select: { quiz_fragen_id: true },
+  });
+  if (existingAssignment) {
+    return { coupledQuestionAlreadyInQuiz: false, alreadyAssigned: true };
+  }
+
   const letzterEintrag = await prisma.quiz_fragen.findFirst({
     where: {
       quiz_id: data.quizId,
@@ -1064,7 +1072,10 @@ export async function addFrageToQuiz(data: {
 
   revalidatePath(`/quiz/${data.quizId}`);
   revalidatePath("/fragen");
-  return { coupledQuestionAlreadyInQuiz: assignment.coupledQuestionAlreadyInQuiz };
+  return {
+    coupledQuestionAlreadyInQuiz: assignment.coupledQuestionAlreadyInQuiz,
+    alreadyAssigned: false,
+  };
 }
 
 export async function removeFrageFromQuiz(data: {

@@ -52,7 +52,10 @@ export function getQuestionDuplicateFingerprint(
       .filter((answer) => answer.isCorrect !== false)
       .map((answer) => answer.text),
   );
-  const question = normalizeQuestionForSimilarity(input.questionText);
+  const definition = getQuestionTemplateDefinition(input.templateId);
+  const question = definition?.questionTextIsTemplateStatic
+    ? ""
+    : normalizeQuestionForSimilarity(input.questionText);
 
   if (data?.kind === "TRANSLATION_READ_ALOUD") {
     return ["translation", ...normalizedParts([data.originalText]), ...correctAnswers]
@@ -91,10 +94,14 @@ export function getQuestionDuplicateFingerprint(
   if (data?.kind === "TRUE_FALSE") {
     return ["true false", question].join(" ");
   }
+  if (definition?.questionTextIsTemplateStatic) {
+    return [definition.id, ...correctAnswers].filter(Boolean).join(" ");
+  }
   return question;
 }
 import type { QuestionTemplateConfig } from "./types";
 import { parseQuestionTemplateData } from "./templates/questionTemplateData";
+import { getQuestionTemplateDefinition } from "./templates/questionTemplates";
 
 export type QuestionDuplicateInput = {
   questionText: string;

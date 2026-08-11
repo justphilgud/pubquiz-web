@@ -10,11 +10,15 @@ export type ContentUsageFilter = "ALL" | "USED" | "UNUSED";
 export type ContentFiltersState = {
   query: string;
   contentType: ContentTypeFilter;
+  categoryIds: number[];
   storyType: string;
   status: ContentStatusFilter;
   media: ContentBinaryFilter;
   usage: ContentUsageFilter;
+  eventSeriesId: number | null;
 };
+
+export type ContentFilterOption = { id: number; name: string };
 
 export type ContentQuizUsage = {
   quizId: number;
@@ -34,6 +38,7 @@ export type ContentSearchItem = {
   scope: string;
   mediaCount: number;
   quizUsages: ContentQuizUsage[];
+  assignableQuizIds: number[];
   editHref: string;
   canClone: boolean;
   canArchive: boolean;
@@ -41,17 +46,27 @@ export type ContentSearchItem = {
     answerCount: number;
     difficulty: string | null;
     answerMode: string;
+    categories: string[];
+    source: string | null;
+    template: string;
+    questionMediaCount: number;
+    answerMediaCount: number;
+    storyElementCount: number;
   };
   storyMetrics?: {
     linkedQuestionCount: number;
+    linkedQuestionTitle: string | null;
     revision: number;
   };
 };
+
+export type ContentSearchResult = { items: ContentSearchItem[]; total: number };
 
 export type ContentQuizOption = {
   quizId: number;
   title: string;
   date: string | null;
+  eventSeriesId: number;
 };
 
 export function parseContentFilters(
@@ -62,11 +77,14 @@ export function parseContentFilters(
   const requestedStatus = params.get("status");
   const requestedMedia = params.get("media");
   const requestedUsage = params.get("usage");
-  return {
+  return normalizeContentFiltersForType({
     query: (params.get("q") ?? "").slice(0, 300),
     contentType: CONTENT_TYPES.includes(requestedType as ContentTypeFilter)
       ? requestedType as ContentTypeFilter
       : initialType ?? "ALL",
+    categoryIds: [...new Set(params.getAll("categoryId")
+      .map((value) => parsePositiveId(value))
+      .filter((value): value is number => value !== null))],
     storyType: params.get("storyType") ?? "ALL",
     status: ["ALL", "DRAFT", "ACTIVE", "ARCHIVED"].includes(requestedStatus ?? "")
       ? requestedStatus as ContentStatusFilter
@@ -77,7 +95,19 @@ export function parseContentFilters(
     usage: ["ALL", "USED", "UNUSED"].includes(requestedUsage ?? "")
       ? requestedUsage as ContentUsageFilter
       : "ALL",
-  };
+    eventSeriesId: parsePositiveId(params.get("eventSeriesId")),
+  });
+}
+
+function parsePositiveId(value: string | null) {
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
+export function normalizeContentFiltersForType(filters: ContentFiltersState) {
+  if (filters.contentType === "QUESTION") return { ...filters, storyType: "ALL" };
+  if (filters.contentType === "STORY_ELEMENT") return { ...filters, categoryIds: [] };
+  return filters;
 }
 
 export type ContentFilterDraft = {
@@ -100,9 +130,13 @@ export function serializeContentFilters(filters: ContentFiltersState) {
   const params = new URLSearchParams();
   if (filters.query.trim()) params.set("q", filters.query.trim());
   if (filters.contentType !== "ALL") params.set("contentType", filters.contentType);
+  if (filters.contentType !== "STORY_ELEMENT") {
+    for (const categoryId of filters.categoryIds) params.append("categoryId", String(categoryId));
+  }
   if (filters.storyType !== "ALL") params.set("storyType", filters.storyType);
   if (filters.status !== "ALL") params.set("status", filters.status);
   if (filters.media !== "ALL") params.set("media", filters.media);
   if (filters.usage !== "ALL") params.set("usage", filters.usage);
+  if (filters.eventSeriesId !== null) params.set("eventSeriesId", String(filters.eventSeriesId));
   return params;
 }

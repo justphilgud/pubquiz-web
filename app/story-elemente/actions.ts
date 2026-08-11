@@ -28,7 +28,10 @@ export type StoryElementActionResult =
 
 function revalidateStoryElement(storyElementId?: number) {
   revalidatePath("/story-elemente");
-  if (storyElementId) revalidatePath(`/story-elemente/${storyElementId}`);
+  if (storyElementId) {
+    revalidatePath(`/story-elemente/${storyElementId}`);
+    revalidatePath(`/content/story-elements/${storyElementId}`);
+  }
   revalidatePath("/fragen", "layout");
   revalidatePath("/quiz/[quizId]/ablauf", "page");
 }
