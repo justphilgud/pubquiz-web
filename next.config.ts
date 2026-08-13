@@ -7,6 +7,7 @@ if (!process.env.VERCEL) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["127.0.0.1"],
   async redirects() {
     return [
       { source: "/fragen/editor", destination: "/content/questions/new", permanent: true },

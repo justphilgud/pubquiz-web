@@ -57,7 +57,16 @@ export function UserRoleFields({
         {messages.fields.rolesAndPermissions}
       </legend>
 
-      <div className="mt-2 min-w-0">
+      <a
+        href="/admin/users/roles"
+        target="_blank"
+        rel="noreferrer"
+        className="mt-2 inline-flex min-h-11 items-center text-xs font-semibold text-slate-600 underline-offset-4 hover:text-slate-950 hover:underline"
+      >
+        {messages.roleConfiguration.viewAllPermissions}
+      </a>
+
+      <div className="min-w-0">
         <section className={roleRowClass}>
           <label className="flex min-h-11 items-start gap-3">
             <input

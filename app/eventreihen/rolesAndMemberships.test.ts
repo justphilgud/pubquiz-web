@@ -26,6 +26,10 @@ const membershipActions = readFileSync(
   "utf8",
 );
 const userOverview = readFileSync("app/admin/users/page.tsx", "utf8");
+const userManagementList = readFileSync(
+  "app/admin/users/UserManagementList.tsx",
+  "utf8",
+);
 const userEditor = readFileSync("app/admin/users/EditUserDialog.tsx", "utf8");
 const eventSeriesPage = readFileSync(
   "app/admin/eventreihen/[eventSeriesId]/page.tsx",
@@ -306,7 +310,8 @@ test("membership actions separate add, role change and removal", () => {
 
 test("user overview is compact and editing owns the full membership list", () => {
   assert.doesNotMatch(userOverview, /<details|EventSeriesMembershipManager/);
-  assert.match(userOverview, /countEventSeriesRoleAssignments/);
+  assert.match(userOverview, /UserManagementList/);
+  assert.match(userManagementList, /countEventSeriesRoleAssignments/);
   assert.match(userEditor, /UserRoleFields/);
   assert.match(roleFields, /EventSeriesPicker/);
 });

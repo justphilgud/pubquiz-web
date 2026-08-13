@@ -1,4 +1,6 @@
-export type RoleAssignmentRoleValue = "ADMIN" | "EDITOR" | "EVENT_MANAGER";
+export const ROLE_ASSIGNMENT_ROLES = ["ADMIN", "EDITOR", "EVENT_MANAGER"] as const;
+
+export type RoleAssignmentRoleValue = (typeof ROLE_ASSIGNMENT_ROLES)[number];
 export type RoleScopeTypeValue = "GLOBAL" | "EVENT_SERIES";
 
 export type RoleAssignmentSnapshot = {
@@ -14,7 +16,7 @@ export type AuthorizationActor = {
 };
 
 export function isRoleAssignmentRole(value: unknown): value is RoleAssignmentRoleValue {
-  return value === "ADMIN" || value === "EDITOR" || value === "EVENT_MANAGER";
+  return ROLE_ASSIGNMENT_ROLES.some((role) => role === value);
 }
 
 export function isRoleScopeType(value: unknown): value is RoleScopeTypeValue {

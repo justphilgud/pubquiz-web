@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/app/lib/prisma";
+import { getPasswordValidationError } from "@/app/lib/passwordPolicy";
 
 export type ChangePasswordState = {
   success?: boolean;
@@ -28,9 +29,8 @@ export async function changePassword(
     return { error: "Bitte fülle alle Felder aus." };
   }
 
-  if (newPassword.length < 8) {
-    return { error: "Das neue Passwort muss mindestens 8 Zeichen lang sein." };
-  }
+  const passwordError = getPasswordValidationError(newPassword);
+  if (passwordError) return { error: passwordError };
 
   if (newPassword !== confirmPassword) {
     return { error: "Die neuen Passwörter stimmen nicht überein." };

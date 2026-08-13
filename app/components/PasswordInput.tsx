@@ -1,54 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type InputHTMLAttributes } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { Input } from "@/components/ui";
 
-type Props = {
+type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
   label: string;
-  name: string;
-  required?: boolean;
-  minLength?: number;
 };
 
-export function PasswordInput({ label, name, required, minLength }: Props) {
+export function PasswordInput({ label, id, className = "", ...props }: Props) {
   const [visible, setVisible] = useState(false);
+  const inputId = id ?? `password-${props.name}`;
 
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium">{label}</label>
-
+      <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-slate-700">
+        {label}
+      </label>
       <div className="relative">
-        <PasswordInput
-          label="Aktuelles Passwort"
-          name="currentPassword"
-          required
+        <Input
+          {...props}
+          id={inputId}
+          type={visible ? "text" : "password"}
+          className={`min-h-11 pr-12 ${className}`}
         />
-
-        <PasswordInput
-          label="Neues Passwort"
-          name="newPassword"
-          required
-          minLength={8}
-        />
-
-        <PasswordInput
-          label="Neues Passwort wiederholen"
-          name="confirmPassword"
-          required
-          minLength={8}
-        />
-
         <button
           type="button"
           onClick={() => setVisible((value) => !value)}
-          className="absolute inset-y-0 right-2 flex items-center text-slate-500 hover:text-slate-800"
-          aria-label={visible ? "Passwort verbergen" : "Passwort anzeigen"}
+          className="absolute inset-y-0 right-1 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          aria-label={visible ? `${label} verbergen` : `${label} anzeigen`}
+          aria-pressed={visible}
         >
-          {visible ? (
-            <EyeSlashIcon className="h-5 w-5" />
-          ) : (
-            <EyeIcon className="h-5 w-5" />
-          )}
+          {visible ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
         </button>
       </div>
     </div>

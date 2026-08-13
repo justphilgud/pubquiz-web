@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
+import { getPasswordValidationError } from "@/app/lib/passwordPolicy";
 import { logRoleAudit } from "@/app/roles/roleAudit.server";
 import {
   assertCanDeactivateUser,
@@ -126,9 +127,8 @@ async function createUser(formData: FormData) {
   if (!name || !email || !password) {
     throw new UserFormValidationError("Name, E-Mail und Passwort sind Pflichtfelder.");
   }
-  if (password.length < 8) {
-    throw new UserFormValidationError("Das Passwort muss mindestens 8 Zeichen lang sein.");
-  }
+  const passwordError = getPasswordValidationError(password);
+  if (passwordError) throw new UserFormValidationError(passwordError);
   const passwordHash = await bcrypt.hash(password, 12);
   const assignedById = actorId(session);
   const user = await withSerializableTransaction(async (transaction) => {
@@ -185,6 +185,8 @@ async function updateUser(formData: FormData) {
   if (!Number.isInteger(id) || id <= 0 || !name || !email) {
     throw new UserFormValidationError("Ungültige Benutzerdaten.");
   }
+  const newPasswordError = newPassword ? getPasswordValidationError(newPassword) : null;
+  if (newPasswordError) throw new UserFormValidationError(newPasswordError);
   const passwordData = newPassword
     ? { password_hash: await bcrypt.hash(newPassword, 12), must_change_password: true }
     : {};
