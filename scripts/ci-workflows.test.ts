@@ -79,6 +79,8 @@ test("changed-file ESLint handles pull requests, feature pushes and main pushes"
 test("CI/CD package TypeScript is enforced with zero warnings", () => {
   for (const path of [
     "scripts/ci-workflows.test.ts",
+    "scripts/deploy-vercel-git-preview.ts",
+    "scripts/deploy-vercel-git-preview.test.ts",
     "scripts/lint-changed-files.ts",
     "scripts/lint-changed-files.test.ts",
     "scripts/validate-deployment-environment.ts",
@@ -98,7 +100,7 @@ test("full repository ESLint remains visible and explicitly non-blocking", () =>
   assert.match(repositoryLintJob, /does not gate deployments during the transition/);
 });
 
-test("Preview is gated, serialized and deploys only after migrate deploy", () => {
+test("Preview is gated, serialized and deploys a targeted Git SHA after migrations", () => {
   assert.match(preview, /environment: preview/);
   assert.match(preview, /group: preview-deployment/);
   assert.match(preview, /cancel-in-progress: false/);
@@ -110,10 +112,10 @@ test("Preview is gated, serialized and deploys only after migrate deploy", () =>
   );
   assert.ok(
     preview.indexOf("npm run db:deploy") <
-      preview.indexOf("vercel@56.3.2 deploy"),
+      preview.indexOf("deploy-vercel-git-preview.ts"),
   );
   assert.ok(
-    preview.indexOf("vercel@56.3.2 deploy") <
+    preview.indexOf("deploy-vercel-git-preview.ts") <
       preview.indexOf("Smoke-test Preview"),
   );
   assert.match(
@@ -121,12 +123,12 @@ test("Preview is gated, serialized and deploys only after migrate deploy", () =>
     /DEPLOYMENT_BRANCH: \$\{\{ github\.event_name == 'workflow_run' && github\.event\.workflow_run\.head_branch \|\| github\.ref_name \}\}/,
   );
   assert.match(preview, /ref: \$\{\{ env\.DEPLOYMENT_SHA \}\}/);
-  assert.match(preview, /deploy --yes --token/);
+  assert.match(preview, /DEPLOYMENT_REPOSITORY_ID: \$\{\{ github\.repository_id \}\}/);
   assert.match(
     preview,
-    /--meta "githubCommitRef=\$DEPLOYMENT_BRANCH"/,
+    /node --import tsx scripts\/deploy-vercel-git-preview\.ts/,
   );
-  assert.match(preview, /--meta "githubCommitSha=\$DEPLOYMENT_SHA"/);
+  assert.doesNotMatch(preview, /--meta|vercel@56\.3\.2 deploy/);
   assert.doesNotMatch(
     preview,
     /--prod|--prebuilt|vercel@56\.3\.2 (?:pull|build)/,

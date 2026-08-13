@@ -42,6 +42,7 @@ jobs:
       DEPLOYMENT_EVENT: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event || github.event_name }}
       DEPLOYMENT_REF: ${{ github.event_name == 'workflow_run' && format('refs/heads/{0}', github.event.workflow_run.head_branch) || github.ref }}
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
+      DEPLOYMENT_REPOSITORY_ID: ${{ github.repository_id }}
       DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       EXPECTED_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
@@ -78,16 +79,9 @@ jobs:
       - name: Verify migration status after deploy
         run: npm run db:status
 
-      - name: Build and deploy Vercel Preview
+      - name: Deploy targeted Vercel Git Preview
         id: deploy
-        shell: bash
-        run: |
-          deployment_url="$(npx --yes vercel@56.3.2 deploy --yes --token="$VERCEL_TOKEN" --meta "githubCommitRef=$DEPLOYMENT_BRANCH" --meta "githubCommitSha=$DEPLOYMENT_SHA")"
-          if [[ ! "$deployment_url" =~ ^https://[A-Za-z0-9.-]+$ ]]; then
-            echo "Vercel hat keine plausible HTTPS-Deployment-URL geliefert." >&2
-            exit 1
-          fi
-          printf 'url=%s\n' "$deployment_url" >> "$GITHUB_OUTPUT"
+        run: node --import tsx scripts/deploy-vercel-git-preview.ts
 
       - name: Smoke-test Preview
         env:
@@ -102,12 +96,14 @@ jobs:
 
       - name: Write Preview summary
         env:
+          DEPLOYMENT_ID: ${{ steps.deploy.outputs.deployment_id }}
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
         shell: bash
         run: |
           {
             echo "## Preview deployment"
             echo "- URL: $DEPLOYMENT_URL"
+            echo "- Deployment ID: $DEPLOYMENT_ID"
             echo "- Branch: $DEPLOYMENT_BRANCH"
             echo "- Commit: $DEPLOYMENT_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
