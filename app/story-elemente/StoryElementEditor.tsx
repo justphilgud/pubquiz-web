@@ -20,7 +20,7 @@ import {
 } from "./storyElement";
 import type { QuizFlowConfig } from "@/app/quiz/flow/quizFlow";
 import { linkQuestionStoryElement } from "./questionActions";
-import { addStoryElementToQuizBlock } from "@/app/quiz/[quizId]/ablauf/actions";
+import { addStoryElementToQuizBlock } from "@/app/quiz/[quizId]/quizStructureActions";
 import type { StoryQuestionRelationshipValue } from "./storyElement";
 import { getAvailableStoryElementScopes, getDefaultStoryElementScope } from "./storyElementScopePresentation";
 import ContentEditorActionBar from "@/app/components/content/ContentEditorActionBar";
@@ -220,7 +220,7 @@ export default function StoryElementEditor({
           setMessage({ tone: "error", text: `${result.message} Die automatische Platzierung ist fehlgeschlagen: ${placement.message}` });
           return;
         }
-        router.push(returnTo ?? `/quiz/${quizContext.quizId}/ablauf#block-${quizContext.sectionId}`);
+        router.push(returnTo ?? `/quiz/${quizContext.quizId}#block-${quizContext.sectionId}`);
       } else if (!initialStory && linkQuestionId) {
         const linkResult = await linkQuestionStoryElement({
           questionId: linkQuestionId,
@@ -232,7 +232,7 @@ export default function StoryElementEditor({
             tone: "error",
             text: `${result.message} Die Fragenverknüpfung konnte nicht gespeichert werden: ${linkResult.message}`,
           });
-        } else if (returnTo?.startsWith("/fragen/editor/")) {
+        } else if (returnTo) {
           router.push(returnTo);
         }
       } else if (!initialStory) {

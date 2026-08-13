@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored Python tool runtimes contain third-party JavaScript artifacts.
+    "tools/**/.runtime/**",
   ]),
 ]);
 

@@ -1,3 +1,6 @@
+// This primitive accepts arbitrary local, uploaded and signed preview URLs.
+/* eslint-disable @next/next/no-img-element */
+
 export function ImageViewer({
   src,
   alt,

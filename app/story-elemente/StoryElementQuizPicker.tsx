@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import ContentSearchControls from "@/app/components/content/ContentSearchControls";
 import QuizElementSearchResult from "@/app/quiz/[quizId]/QuizElementSearchResult";
-import { addStoryElementToQuizBlock } from "@/app/quiz/[quizId]/ablauf/actions";
+import { addStoryElementToQuizBlock } from "@/app/quiz/[quizId]/quizStructureActions";
 import { addStoryElementToQuiz } from "./actions";
 import {
   getStoryElementScopeLabel,

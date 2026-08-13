@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import type {
@@ -29,25 +29,25 @@ export function PendingCategoryReviewDialog({
     Record<number, PendingCategoryDecision["action"]>
   >({});
 
-  useEffect(() => {
-    if (!open) setDecisions({});
-  }, [open]);
-
   const allDecided = categories.every((category) => decisions[category.id]);
+  const closeDialog = () => {
+    setDecisions({});
+    onClose();
+  };
 
   return (
     <Modal
       open={open}
       title={messages.pendingCategoryReview.title}
       onClose={() => {
-        if (!isPending) onClose();
+        if (!isPending) closeDialog();
       }}
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             variant="secondary"
             disabled={isPending}
-            onClick={onClose}
+            onClick={closeDialog}
           >
             {messages.common.cancel}
           </Button>

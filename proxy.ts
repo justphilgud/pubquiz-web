@@ -16,7 +16,7 @@ function isPublicPath(pathname: string) {
   return false;
 }
 
-export default auth((req) => {
+export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
 
   if (isPublicPath(pathname)) {

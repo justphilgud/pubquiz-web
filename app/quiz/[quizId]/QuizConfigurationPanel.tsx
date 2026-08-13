@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Select } from "@/components/ui/Select";
-import { updateQuizDefaultSolutionStrategy } from "./ablauf/actions";
+import { updateQuizDefaultSolutionStrategy } from "./quizStructureActions";
 import type { QuizSolutionStrategy } from "@/app/quiz/flow/quizFlow";
 
 export default function QuizConfigurationPanel({ quizId, initialStrategy }: {

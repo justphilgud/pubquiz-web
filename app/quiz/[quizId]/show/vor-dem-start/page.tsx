@@ -20,8 +20,6 @@ export default async function ShowVorDemStartPage({
     notFound();
   }
 
-  const qrCodePfad = `/medien/bilder/qr_codes/${quiz.quiz_id}.png`;
-
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
       {quiz.intro_video_url && (

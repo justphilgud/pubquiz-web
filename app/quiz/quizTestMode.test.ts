@@ -20,10 +20,10 @@ test("test mode links every productive surface and identifies hidden flow items"
     "praesentation",
     "antworten",
     "auswertung",
-    "ablauf",
   ]) {
     assert.match(client, new RegExp(`/\\$\\{quizId\\}/${route}`));
   }
+  assert.match(client, /\["Quizinhalt öffnen", `\/quiz\/\$\{quizId\}`\]/);
   assert.match(client, /Ausgeblendete Elemente/);
   assert.match(client, /slide_key/);
   assert.match(client, /Quizfrage-Zuordnung/);

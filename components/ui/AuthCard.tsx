@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 import { Card } from "./Card";
 
+// The transparent brand asset must keep its intrinsic proportions in this card.
+/* eslint-disable @next/next/no-img-element */
+
 export function AuthCard({
   title,
   children,

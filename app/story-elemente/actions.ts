@@ -33,7 +33,7 @@ function revalidateStoryElement(storyElementId?: number) {
     revalidatePath(`/content/story-elements/${storyElementId}`);
   }
   revalidatePath("/fragen", "layout");
-  revalidatePath("/quiz/[quizId]/ablauf", "page");
+  revalidatePath("/quiz/[quizId]", "page");
 }
 
 export async function createStoryElement(
@@ -337,6 +337,5 @@ export async function addStoryElementToQuiz(input: {
   if (!added) return { success: false, message: "Bereits in diesem Quiz vorhanden." };
   revalidateStoryElement(story.id);
   revalidatePath(`/quiz/${input.quizId}`);
-  revalidatePath(`/quiz/${input.quizId}/ablauf`);
   return { success: true, message: "Zum Quiz hinzugefügt. Die Blockzuordnung ist noch offen." };
 }

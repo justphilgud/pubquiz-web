@@ -5,7 +5,6 @@ import {
   Accordion,
   Alert,
   AnswerCard,
-  AudioPlayer,
   Badge,
   Button,
   Card,
@@ -40,7 +39,6 @@ import {
   TeamCard,
   Textarea,
   Tooltip,
-  VideoPlayer,
 } from "@/components/ui";
 
 type ExampleRow = {

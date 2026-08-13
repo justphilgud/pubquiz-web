@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, ReactNode } from "react";
+import { ReactNode } from "react";
 
 type RadioOption = {
   value: string;

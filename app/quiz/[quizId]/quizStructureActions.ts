@@ -41,7 +41,6 @@ type FlowActionResult = { success: true } | { success: false; message: string };
 
 function revalidateQuizFlow(quizId: number) {
   revalidatePath(`/quiz/${quizId}`);
-  revalidatePath(`/quiz/${quizId}/ablauf`);
   revalidatePath(`/quiz/${quizId}/moderation`);
   revalidatePath(`/quiz/${quizId}/praesentation`);
   revalidatePath(`/quiz/${quizId}/antworten`);

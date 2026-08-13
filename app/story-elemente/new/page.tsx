@@ -38,8 +38,10 @@ export default async function NewStoryElementPage({
     await requireQuizSection(quizId, sectionId);
   }
   const safeQuestionReturn = query.returnTo?.startsWith("/content/questions/");
-  const safeQuizReturn = hasQuizContext &&
-    query.returnTo?.startsWith(`/quiz/${quizId}/ablauf`);
+  const safeQuizReturn = hasQuizContext && (
+    query.returnTo === `/quiz/${quizId}` ||
+    query.returnTo?.startsWith(`/quiz/${quizId}#`)
+  );
   const returnTo = safeQuestionReturn || safeQuizReturn
     ? query.returnTo
     : undefined;

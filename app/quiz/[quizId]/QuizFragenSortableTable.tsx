@@ -40,7 +40,7 @@ import { synchronizeAutomaticBlockTitles } from "../quizStructure";
 import {
   moveStandaloneStoryElementToSection,
   updateQuizStoryPlacementOverride,
-} from "./ablauf/actions";
+} from "./quizStructureActions";
 import {
   getStoryElementTypeLabel,
   type StoryElementType,
@@ -280,6 +280,7 @@ function DroppableBlock({
 
   return (
     <section
+      id={gruppe.containerId}
       ref={setNodeRef}
       style={style}
       className={`rounded-2xl border shadow-sm transition ${farben} ${

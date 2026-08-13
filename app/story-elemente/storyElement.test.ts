@@ -232,6 +232,8 @@ test("workflow surfaces share search controls and preserve legacy metadata witho
   assert.match(linkActions, /frage_story_elemente\.deleteMany/);
   assert.match(backButton, /router\.back\(\)/);
   assert.match(backButton, /router\.push\(fallbackHref\)/);
+  assert.match(editor, /else if \(returnTo\) \{\s*router\.push\(returnTo\)/);
+  assert.doesNotMatch(editor, /returnTo\?\.startsWith\("\/fragen\/editor\/"\)/);
 });
 
 test("mobile creation workflow keeps the shared scope directly above content fields", () => {

@@ -210,7 +210,7 @@ export default function QuizTestClient({
                 ["Präsentation öffnen", `/quiz/${quizId}/praesentation`],
                 ["Antwortformular öffnen", `/quiz/${quizId}/antworten`],
                 ["Auswertung öffnen", `/quiz/${quizId}/auswertung`],
-                ["Ablauf öffnen", `/quiz/${quizId}/ablauf`],
+                ["Quizinhalt öffnen", `/quiz/${quizId}`],
               ].map(([label, href]) => (
                 <a
                   key={href}

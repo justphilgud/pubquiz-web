@@ -106,6 +106,8 @@ test("Preview is gated, serialized and deploys a targeted Git SHA after migratio
   assert.match(preview, /cancel-in-progress: false/);
   assert.match(preview, /ACTIONS_DEPLOYMENTS_ENABLED/);
   assert.match(preview, /head_repository\.full_name == github\.repository/);
+  assert.match(preview, /head_branch == 'preview\/content-and-quiz-flow'/);
+  assert.match(preview, /github\.ref == 'refs\/heads\/preview\/content-and-quiz-flow'/);
   assert.ok(
     preview.indexOf("Validate GitHub Preview database identity") <
       preview.indexOf("npm run db:deploy"),
