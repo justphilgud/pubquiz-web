@@ -116,7 +116,17 @@ test("Preview is gated, serialized and deploys only after migrate deploy", () =>
     preview.indexOf("vercel@56.3.2 deploy") <
       preview.indexOf("Smoke-test Preview"),
   );
+  assert.match(
+    preview,
+    /DEPLOYMENT_BRANCH: \$\{\{ github\.event_name == 'workflow_run' && github\.event\.workflow_run\.head_branch \|\| github\.ref_name \}\}/,
+  );
+  assert.match(preview, /ref: \$\{\{ env\.DEPLOYMENT_SHA \}\}/);
   assert.match(preview, /deploy --yes --token/);
+  assert.match(
+    preview,
+    /--meta "githubCommitRef=\$DEPLOYMENT_BRANCH"/,
+  );
+  assert.match(preview, /--meta "githubCommitSha=\$DEPLOYMENT_SHA"/);
   assert.doesNotMatch(
     preview,
     /--prod|--prebuilt|vercel@56\.3\.2 (?:pull|build)/,

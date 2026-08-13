@@ -38,6 +38,7 @@ jobs:
     environment: preview
     env:
       DEPLOYMENT_ENV: preview
+      DEPLOYMENT_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
       DEPLOYMENT_EVENT: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event || github.event_name }}
       DEPLOYMENT_REF: ${{ github.event_name == 'workflow_run' && format('refs/heads/{0}', github.event.workflow_run.head_branch) || github.ref }}
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
@@ -81,7 +82,7 @@ jobs:
         id: deploy
         shell: bash
         run: |
-          deployment_url="$(npx --yes vercel@56.3.2 deploy --yes --token="$VERCEL_TOKEN")"
+          deployment_url="$(npx --yes vercel@56.3.2 deploy --yes --token="$VERCEL_TOKEN" --meta "githubCommitRef=$DEPLOYMENT_BRANCH" --meta "githubCommitSha=$DEPLOYMENT_SHA")"
           if [[ ! "$deployment_url" =~ ^https://[A-Za-z0-9.-]+$ ]]; then
             echo "Vercel hat keine plausible HTTPS-Deployment-URL geliefert." >&2
             exit 1
@@ -107,5 +108,6 @@ jobs:
           {
             echo "## Preview deployment"
             echo "- URL: $DEPLOYMENT_URL"
+            echo "- Branch: $DEPLOYMENT_BRANCH"
             echo "- Commit: $DEPLOYMENT_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
