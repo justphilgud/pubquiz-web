@@ -40,6 +40,7 @@ type Abschnitt = {
   quiz_abschnitt_id: number;
   titel: string;
   abschnitt_typ: string;
+  sortierung: number;
 };
 
 type Gruppe = {
@@ -178,7 +179,8 @@ function DroppableBlock({
     id: gruppe.containerId,
     disabled: {
       draggable: !istFragenrunde,
-      droppable: false,
+      droppable:
+        !istFragenrunde && gruppe.blockTyp !== "kein-block",
     },
     data: {
       type: istFragenrunde ? "block" : "block-container",
@@ -516,6 +518,11 @@ export default function QuizFragenSortableTable({
     }
 
     const zielAbschnittId = getAbschnittIdFromContainer(zielContainerId);
+    const zielAbschnitt = blockItems.find(
+      (block) => block.quiz_abschnitt_id === zielAbschnittId,
+    );
+    if (zielAbschnittId !== null && !zielAbschnitt) return;
+    if (zielAbschnitt && !isQuestionSection(zielAbschnitt)) return;
     if (activeItem.quiz_abschnitt_id === zielAbschnittId) {
       return;
     }
@@ -571,9 +578,9 @@ export default function QuizFragenSortableTable({
       setBlockItems(neueBlockItems);
       await updateQuizAbschnitteSortierung({
         quizId,
-        items: neueBlockItems.map((block) => ({
+        items: neueFragenrunden.map((block, index) => ({
           quizAbschnittId: block.quiz_abschnitt_id,
-          sortierung: block.sortierung,
+          sortierung: index + 2,
         })),
       });
       return;
@@ -694,11 +701,10 @@ export default function QuizFragenSortableTable({
       return;
     }
 
-    const titel = "Block";
     setIsCreatingBlock(true);
     const result = await createQuizAbschnitt({
       quizId,
-      titel,
+      titel: "",
       abschnittTyp: "fragenblock",
     });
     setIsCreatingBlock(false);
@@ -709,7 +715,11 @@ export default function QuizFragenSortableTable({
     }
 
     setMeldung("Block wurde angelegt.");
-    window.location.reload();
+    setBlockItems((current) =>
+      [...current, result.abschnitt].sort(
+        (left, right) => left.sortierung - right.sortierung,
+      ),
+    );
   }
 
   return (

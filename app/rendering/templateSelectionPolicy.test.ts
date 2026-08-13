@@ -11,7 +11,6 @@ test("event series accepts registered defaults and rejects unknown IDs", () => {
     name: "Reihe",
     isPublic: false,
     defaultPresentationTemplateId: "ungegoogelt-dark",
-    defaultAnswerFormTemplateId: "minimal",
   });
   assert.equal(valid.ok, true);
 
@@ -19,7 +18,6 @@ test("event series accepts registered defaults and rejects unknown IDs", () => {
     name: "Reihe",
     isPublic: false,
     defaultPresentationTemplateId: "custom-css",
-    defaultAnswerFormTemplateId: "minimal",
   });
   assert.equal(invalid.ok, false);
   if (!invalid.ok) assert.ok(invalid.errors.defaultPresentationTemplateId);
@@ -31,7 +29,6 @@ test("quiz accepts inheritance and registered overrides but rejects unknown IDs"
     title: "Quiz",
     date: "2026-07-20",
     presentationTemplateId: null,
-    answerFormTemplateId: null,
   });
   assert.equal(inherited.ok, true);
 
@@ -40,13 +37,12 @@ test("quiz accepts inheritance and registered overrides but rejects unknown IDs"
     title: "Quiz",
     date: "2026-07-20",
     presentationTemplateId: "unknown",
-    answerFormTemplateId: "minimal",
   });
   assert.equal(invalid.ok, false);
   if (!invalid.ok) assert.ok(invalid.errors.presentationTemplateId);
 });
 
-test("quiz copies preserve both independent overrides", () => {
+test("quiz copies preserve the presentation override", () => {
   const copy = buildQuizCopyMasterData(
     {
       eventSeriesId: 1,
@@ -55,10 +51,8 @@ test("quiz copies preserve both independent overrides", () => {
       mapUrl: null,
       internalNote: null,
       presentationTemplateId: "ungegoogelt-dark",
-      answerFormTemplateId: "minimal",
     },
     { title: "Kopie", date: "2026-07-21" },
   );
   assert.equal(copy.presentationTemplateId, "ungegoogelt-dark");
-  assert.equal(copy.answerFormTemplateId, "minimal");
 });

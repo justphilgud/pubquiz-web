@@ -21,12 +21,10 @@ export async function resolveQuizTemplates(quizId: number) {
     select: {
       titel: true,
       presentation_template_id: true,
-      answer_form_template_id: true,
       eventreihe: {
         select: {
           name: true,
           default_presentation_template_id: true,
-          default_answer_form_template_id: true,
         },
       },
     },
@@ -36,9 +34,7 @@ export async function resolveQuizTemplates(quizId: number) {
 
   const requestedTemplateIds = [
     quiz.presentation_template_id,
-    quiz.answer_form_template_id,
     quiz.eventreihe.default_presentation_template_id,
-    quiz.eventreihe.default_answer_form_template_id,
   ].filter((id): id is string => Boolean(id));
   const storedConfigs = await loadStoredPresentationTemplateConfigs(
     requestedTemplateIds,
@@ -62,8 +58,8 @@ export async function resolveQuizTemplates(quizId: number) {
       additionalPresentationTemplates,
     });
   const answerForm = resolveAnswerFormTemplate({
-      quizTemplateId: quiz.answer_form_template_id,
-      eventSeriesTemplateId: quiz.eventreihe.default_answer_form_template_id,
+      quizTemplateId: quiz.presentation_template_id,
+      eventSeriesTemplateId: quiz.eventreihe.default_presentation_template_id,
       additionalAnswerFormTemplates,
     });
   const managedPresentation = await getManagedPresentationTemplate(

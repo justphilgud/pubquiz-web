@@ -61,6 +61,9 @@ export const QUIZ_STANDARD_SOLUTION_STRATEGIES = [
 export type QuizSolutionStrategy =
   (typeof QUIZ_SOLUTION_STRATEGIES)[number];
 
+export const DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY: QuizSolutionStrategy =
+  "END_OF_BLOCK";
+
 export const QUIZ_GLOBAL_FLOW_ITEM_TYPES = [
   "WAITING",
   "START_SEQUENCE",

@@ -1,9 +1,7 @@
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { deRenderingMessages } from "@/app/i18n/messages/de/rendering";
 import {
-  isSelectableAnswerFormTemplateId,
   isSelectablePresentationTemplateId,
-  type AnswerFormTemplate,
   type PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
 
@@ -24,7 +22,6 @@ export type QuizMasterDataInput = {
   publicUrl?: string;
   internalNote?: string;
   presentationTemplateId?: string | null;
-  answerFormTemplateId?: string | null;
 };
 
 export type NormalizedQuizMasterData = {
@@ -38,7 +35,6 @@ export type NormalizedQuizMasterData = {
   publicUrl: string | null;
   internalNote: string | null;
   presentationTemplateId: PresentationTemplate["id"] | null;
-  answerFormTemplateId: AnswerFormTemplate["id"] | null;
 };
 
 export type QuizMasterDataValidationResult =
@@ -82,7 +78,6 @@ export function validateQuizMasterData(
   input: QuizMasterDataInput,
   options?: {
     additionalPresentationTemplateIds?: readonly string[];
-    additionalAnswerFormTemplateIds?: readonly string[];
   },
 ): QuizMasterDataValidationResult {
   const title = input.title.trim();
@@ -93,7 +88,6 @@ export function validateQuizMasterData(
   const publicUrl = optional(input.publicUrl);
   const internalNote = optional(input.internalNote);
   const presentationTemplateId = optional(input.presentationTemplateId ?? undefined);
-  const answerFormTemplateId = optional(input.answerFormTemplateId ?? undefined);
   const errors: Record<string, string> = {};
 
   if (!Number.isInteger(input.eventSeriesId) || input.eventSeriesId <= 0) {
@@ -127,14 +121,6 @@ export function validateQuizMasterData(
   ) {
     errors.presentationTemplateId = deRenderingMessages.validation.unknownPresentation;
   }
-  if (
-    answerFormTemplateId &&
-    !isSelectableAnswerFormTemplateId(answerFormTemplateId) &&
-    !options?.additionalAnswerFormTemplateIds?.includes(answerFormTemplateId)
-  ) {
-    errors.answerFormTemplateId = deRenderingMessages.validation.unknownAnswerForm;
-  }
-
   if (Object.keys(errors).length > 0) {
     return {
       ok: false,
@@ -156,7 +142,6 @@ export function validateQuizMasterData(
       publicUrl,
       internalNote,
       presentationTemplateId: presentationTemplateId as PresentationTemplate["id"] | null,
-      answerFormTemplateId: answerFormTemplateId as AnswerFormTemplate["id"] | null,
     },
   };
 }
@@ -169,7 +154,6 @@ export function buildQuizCopyMasterData(
     mapUrl: string | null;
     internalNote: string | null;
     presentationTemplateId?: string | null;
-    answerFormTemplateId?: string | null;
   },
   target: { title: string; date: string },
 ): QuizMasterDataInput {
@@ -183,7 +167,6 @@ export function buildQuizCopyMasterData(
     publicUrl: undefined,
     internalNote: original.internalNote ?? undefined,
     presentationTemplateId: original.presentationTemplateId ?? null,
-    answerFormTemplateId: original.answerFormTemplateId ?? null,
   };
 }
 

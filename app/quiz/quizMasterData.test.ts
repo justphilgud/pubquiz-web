@@ -36,12 +36,11 @@ test("quiz creation preselects only the requested active event series", () => {
   assert.equal(resolveInitialEventSeriesId("not-a-number", eventSeries), undefined);
 });
 
-test("quiz assignment accepts only explicitly authorized managed templates", () => {
-  const input = { ...validInput, presentationTemplateId: "sommer-2026", answerFormTemplateId: "sommer-2026" };
+test("quiz assignment accepts only explicitly authorized managed presentation templates", () => {
+  const input = { ...validInput, presentationTemplateId: "sommer-2026" };
   assert.equal(validateQuizMasterData(input).ok, false);
   assert.equal(validateQuizMasterData(input, {
     additionalPresentationTemplateIds: ["sommer-2026"],
-    additionalAnswerFormTemplateIds: ["sommer-2026"],
   }).ok, true);
 });
 

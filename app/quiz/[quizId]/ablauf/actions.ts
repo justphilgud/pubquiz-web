@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
-import { requireQuizEditor, requireQuizSection } from "@/app/quiz/quizAccess.server";
+import {
+  requireQuizEditor,
+  requireQuizQuestionSection,
+} from "@/app/quiz/quizAccess.server";
 import {
   getInitialQuizFlowConfig,
   getEffectiveQuizSolutionStrategy,
@@ -61,7 +64,7 @@ async function validateAnchor(
   if (!isSectionAnchor && sectionId !== null) {
     throw new Error("Dieser Anker darf keinen Quizblock referenzieren.");
   }
-  if (sectionId !== null) await requireQuizSection(quizId, sectionId);
+  if (sectionId !== null) await requireQuizQuestionSection(quizId, sectionId);
 }
 
 export async function updateQuizFlowItem(data: {
@@ -177,7 +180,7 @@ export async function addStoryElementToQuizBlock(data: {
   storyElementId: number;
 }): Promise<FlowActionResult> {
   const access = await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.sectionId);
+  await requireQuizQuestionSection(data.quizId, data.sectionId);
   const actor = await getActorForSession(access.session);
   const story = await loadStoryElement(actor, data.storyElementId);
   const eventSeriesId = access.ownership.eventSeriesId;
@@ -238,7 +241,7 @@ export async function assignUnassignedStoryElementToBlock(data: {
   placementId: number;
 }): Promise<FlowActionResult> {
   await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.sectionId);
+  await requireQuizQuestionSection(data.quizId, data.sectionId);
   const placement = await prisma.quiz_ablauf_elemente.findFirst({
     where: {
       quiz_ablauf_element_id: data.placementId,
@@ -330,7 +333,7 @@ export async function moveQuizBlockSequenceItem(data: {
   direction: -1 | 1;
 }): Promise<FlowActionResult> {
   await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.sectionId);
+  await requireQuizQuestionSection(data.quizId, data.sectionId);
   await materializeQuizBlockQuestionItems(data.quizId, data.sectionId);
 
   const [quiz, section] = await Promise.all([
@@ -482,7 +485,7 @@ export async function updateQuizBlockSolutionStrategy(data: {
   strategy: QuizSolutionStrategy | null;
 }): Promise<FlowActionResult> {
   await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.sectionId);
+  await requireQuizQuestionSection(data.quizId, data.sectionId);
   if (data.strategy !== null && !isQuizSolutionStrategy(data.strategy)) {
     return { success: false, message: "Die Auflösungsstrategie ist ungültig." };
   }
@@ -512,7 +515,7 @@ export async function updateQuizBlockEditorialDetails(data: {
   note: string;
 }): Promise<FlowActionResult> {
   await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.sectionId);
+  await requireQuizQuestionSection(data.quizId, data.sectionId);
   const title = data.title.trim();
   const note = data.note.trim();
   if (!title || title.length > 200 || note.length > 2_000) {

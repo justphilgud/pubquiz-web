@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   addFrageToQuiz,
   searchFragenForQuiz,
@@ -19,6 +21,7 @@ const buttonSecondaryClass =
   "rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-900 shadow-sm transition hover:bg-slate-50 active:scale-[0.99]";
 
 export default function QuizFragenHinzufuegen({ quizId }: Props) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [suchtext, setSuchtext] = useState("");
   const [ergebnisse, setErgebnisse] = useState<QuizFrageSuchResult[]>([]);
@@ -41,25 +44,23 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
 
   async function handleAdd(fragenId: number) {
     setMeldung("");
-
-    const assignment = await addFrageToQuiz({
-      quizId,
-      fragenId,
-      includeLinkedStoryElements,
-    });
-
-    setMeldung(
-      assignment.coupledQuestionAlreadyInQuiz
-        ? "Frage wurde hinzugefügt. Hinweis: Die gekoppelte FaceMorph-/Pixelfrage ist ebenfalls in diesem Quiz."
-        : "Frage wurde zum Quiz hinzugefügt.",
-    );
-
-    const result = await searchFragenForQuiz({
-      quizId,
-      suchtext,
-    });
-
-    setErgebnisse(result);
+    try {
+      const assignment = await addFrageToQuiz({
+        quizId,
+        fragenId,
+        includeLinkedStoryElements,
+      });
+      setMeldung(
+        assignment.coupledQuestionAlreadyInQuiz
+          ? "Frage wurde hinzugefügt. Hinweis: Die gekoppelte FaceMorph-/Pixelfrage ist ebenfalls in diesem Quiz."
+          : "Frage wurde zum Quiz hinzugefügt.",
+      );
+      const result = await searchFragenForQuiz({ quizId, suchtext });
+      setErgebnisse(result);
+      router.refresh();
+    } catch (error) {
+      setMeldung(error instanceof Error ? error.message : "Frage konnte nicht hinzugefügt werden.");
+    }
   }
 
   if (!isOpen) {
@@ -69,18 +70,18 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
         onClick={() => setIsOpen(true)}
         className={buttonPrimaryClass}
       >
-        Frage hinzufügen
+        Quiz-Element hinzufügen
       </button>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+    <div className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-semibold">Frage zum Quiz hinzufügen</h3>
+          <h3 className="font-semibold">Quiz-Element hinzufügen</h3>
           <p className="mt-1 text-sm text-slate-500">
-            Suche im Fragenpool und füge passende Fragen direkt diesem Quiz hinzu.
+            Wähle eine Frage aus oder wechsle zu den Story-Elementen im Quizablauf.
           </p>
         </div>
 
@@ -91,6 +92,18 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
         >
           Schließen
         </button>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        <span className="inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
+          Frage auswählen
+        </span>
+        <Link
+          href={`/quiz/${quizId}/ablauf`}
+          className={`${buttonSecondaryClass} inline-flex min-h-11 items-center`}
+        >
+          Story-Element auswählen
+        </Link>
       </div>
 
       <ContentSearchControls
@@ -125,6 +138,15 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
                 </div>
 
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+                  <span
+                    className={`rounded-full px-2 py-1 font-semibold ${
+                      frage.ist_verwendbar
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-amber-50 text-amber-800"
+                    }`}
+                  >
+                    {frage.status_hinweis}
+                  </span>
                   <span>Quelle: {frage.quelle ?? "-"}</span>
                   <span>Schwierigkeit: {frage.schwierigkeitslevel ?? "-"}</span>
                   <span>
@@ -139,12 +161,14 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
               <button
                 type="button"
                 onClick={() => handleAdd(frage.fragen_id)}
-                disabled={frage.ist_bereits_im_quiz}
+                disabled={frage.ist_bereits_im_quiz || !frage.ist_verwendbar}
                 className={buttonPrimaryClass}
               >
                 {frage.ist_bereits_im_quiz
                   ? "Bereits im Quiz"
-                  : "Hinzufügen"}
+                  : frage.ist_verwendbar
+                    ? "Hinzufügen"
+                    : "Noch nicht verwendbar"}
               </button>
             </div>
           </div>

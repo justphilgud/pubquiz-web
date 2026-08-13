@@ -18,7 +18,7 @@ import {
   requireQuizLiveController,
   requireQuizQuestion,
   requireQuizQuestionInSection,
-  requireQuizSection,
+  requireQuizQuestionSection,
   requireQuizTeamAnswer,
   requireQuizViewer,
 } from "./quizAccess.server";
@@ -28,10 +28,15 @@ import {
 } from "./teamSessionToken";
 import { getTeamSessionSigningSecret } from "./teamSessionSecret.server";
 import { assertTeamAnswerAuthorized } from "./teamAnswerPolicy";
-import { buildDefaultQuizSections, buildQuickQuizSections } from "./quizStructure";
+import {
+  buildDefaultQuizSections,
+  buildQuickQuizSections,
+  getNextAutomaticBlockTitle,
+} from "./quizStructure";
 import {
   isQuestionSection,
   OUTRO_SECTION_TYPE,
+  QUESTION_SECTION_TYPES,
 } from "./quizSectionPolicy";
 import { resolveQuizQuestionAnswerMode } from "./quizQuestionAnswerMode";
 import {
@@ -76,10 +81,17 @@ import {
   selectQuizAnswerAssignments,
 } from "./quizAnswerLiveState";
 import {
+  DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
   isQuizSolutionStrategy,
   type QuizSolutionStrategy,
 } from "./flow/quizFlow";
 import { toStoredQuizFlowItem } from "./flow/quizFlowRepository.server";
+import { getActorForSession } from "@/app/roles/roleAssignments.server";
+import {
+  getActorEventSeriesIds,
+  isAdministrator,
+} from "@/app/roles/roleAssignmentPolicy";
+import { isQuestionEligibleForQuiz } from "@/app/fragen/editor/questionScopePolicy";
 
 async function getPresentationTemplateValidationOptions(
   additionallyAllowed: readonly string[] = [],
@@ -91,7 +103,6 @@ async function getPresentationTemplateValidationOptions(
   const ids = [...templates.map((template) => template.id), ...additionallyAllowed];
   return {
     additionalPresentationTemplateIds: ids,
-    additionalAnswerFormTemplateIds: ids,
   };
 }
 
@@ -306,10 +317,9 @@ export async function createQuiz(data: {
   oeffentlicheUrl?: string;
   bemerkung: string;
   presentationTemplateId?: string | null;
-  answerFormTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
 }) {
-  if (!isQuizSolutionStrategy(data.solutionStrategy ?? "AFTER_EACH_QUESTION")) {
+  if (!isQuizSolutionStrategy(data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY)) {
     return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
   }
   const templateOptions = await getPresentationTemplateValidationOptions();
@@ -323,7 +333,6 @@ export async function createQuiz(data: {
     publicUrl: data.oeffentlicheUrl,
     internalNote: data.bemerkung,
     presentationTemplateId: data.presentationTemplateId,
-    answerFormTemplateId: data.answerFormTemplateId,
   }, templateOptions);
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
@@ -343,8 +352,9 @@ export async function createQuiz(data: {
       teilnehmer_anzahl: 0,
       bemerkung: validated.value.internalNote,
       presentation_template_id: validated.value.presentationTemplateId,
-      answer_form_template_id: validated.value.answerFormTemplateId,
-      aufloesungsstrategie: data.solutionStrategy ?? "AFTER_EACH_QUESTION",
+      answer_form_template_id: validated.value.presentationTemplateId,
+      aufloesungsstrategie:
+        data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
     },
   });
 
@@ -370,10 +380,9 @@ export async function updateQuiz(data: {
   oeffentlicheUrl?: string;
   bemerkung: string;
   presentationTemplateId?: string | null;
-  answerFormTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
 }) {
-  if (!isQuizSolutionStrategy(data.solutionStrategy ?? "AFTER_EACH_QUESTION")) {
+  if (!isQuizSolutionStrategy(data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY)) {
     return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
   }
   await requireQuizEditor(data.quizId);
@@ -401,7 +410,6 @@ export async function updateQuiz(data: {
     publicUrl: data.oeffentlicheUrl,
     internalNote: data.bemerkung,
     presentationTemplateId: data.presentationTemplateId,
-    answerFormTemplateId: data.answerFormTemplateId,
   }, templateOptions);
   if (!validated.ok) return { success: false, message: validated.message, errors: validated.errors };
   await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
@@ -424,7 +432,7 @@ export async function updateQuiz(data: {
       oeffentliche_url: validated.value.publicUrl,
       bemerkung: validated.value.internalNote,
       presentation_template_id: validated.value.presentationTemplateId,
-      answer_form_template_id: validated.value.answerFormTemplateId,
+      answer_form_template_id: validated.value.presentationTemplateId,
       aufloesungsstrategie:
         data.solutionStrategy ??
         (isQuizSolutionStrategy(existing.aufloesungsstrategie)
@@ -556,7 +564,6 @@ export async function copyQuiz(data: {
         mapUrl: original.karten_url,
         internalNote: original.bemerkung,
         presentationTemplateId: original.presentation_template_id,
-        answerFormTemplateId: original.answer_form_template_id,
       },
       { title: data.neuerTitel, date: data.quizDatum },
     ),
@@ -581,7 +588,7 @@ export async function copyQuiz(data: {
         teilnehmer_anzahl: 0,
         bemerkung: validated.value.internalNote,
         presentation_template_id: validated.value.presentationTemplateId,
-        answer_form_template_id: validated.value.answerFormTemplateId,
+        answer_form_template_id: validated.value.presentationTemplateId,
         aufloesungsstrategie: original.aufloesungsstrategie,
 
         intro_logo_url: original.intro_logo_url,
@@ -964,6 +971,9 @@ export type QuizFrageSuchResult = {
   schwierigkeitslevel: string | null;
   kategorien: string[];
   ist_bereits_im_quiz: boolean;
+  review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
+  ist_verwendbar: boolean;
+  status_hinweis: string;
 };
 
 export async function searchFragenForQuiz(data: {
@@ -972,15 +982,30 @@ export async function searchFragenForQuiz(data: {
 }): Promise<QuizFrageSuchResult[]> {
   const quizAccess = await requireQuizEditor(data.quizId);
   const eventSeriesId = quizAccess.ownership.eventSeriesId!;
+  const actor = await getActorForSession(quizAccess.session);
+  const actorEventSeriesIds = getActorEventSeriesIds(actor);
+  const now = getBerlinDate();
   const fragen = await prisma.fragen.findMany({
     where: {
-      ...buildQuestionEligibilityWhere(eventSeriesId, getBerlinDate()),
+      ist_archiviert: false,
       frage: data.suchtext.trim()
         ? {
             contains: data.suchtext.trim(),
             mode: "insensitive",
           }
         : undefined,
+      ...(isAdministrator(actor)
+        ? {}
+        : {
+            OR: [
+              { geltungsbereich: "GLOBAL" as const, freigegeben: true },
+              { geltungsbereich: "GLOBAL" as const, created_by_user_id: actor.userId },
+              {
+                geltungsbereich: "EVENT_SERIES" as const,
+                eventreihen: { some: { eventreihe_id: { in: actorEventSeriesIds } } },
+              },
+            ],
+          }),
     },
     orderBy: {
       fragen_id: "desc",
@@ -992,6 +1017,9 @@ export async function searchFragenForQuiz(data: {
           fragenkategorie: true,
         },
       },
+      eventreihen: {
+        select: { eventreihe_id: true },
+      },
       quiz_fragen: {
         where: {
           quiz_id: data.quizId,
@@ -1000,14 +1028,36 @@ export async function searchFragenForQuiz(data: {
     },
   });
 
-  return fragen.map((frage) => ({
-    fragen_id: frage.fragen_id,
-    frage: frage.frage,
-    quelle: frage.quelle,
-    schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
-    kategorien: frage.fragen_kategorien.map((k) => k.fragenkategorie.kategorie),
-    ist_bereits_im_quiz: frage.quiz_fragen.length > 0,
-  }));
+  return fragen.map((frage) => {
+    const istVerwendbar = isQuestionEligibleForQuiz({
+      scope: frage.geltungsbereich,
+      eventSeriesIds: frage.eventreihen.map((entry) => entry.eventreihe_id),
+      quizEventSeriesId: eventSeriesId,
+      isApproved: frage.freigegeben,
+      isArchived: frage.ist_archiviert,
+      validUntil: frage.gueltig_bis,
+      now,
+    });
+    return {
+      fragen_id: frage.fragen_id,
+      frage: frage.frage,
+      quelle: frage.quelle,
+      schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
+      kategorien: frage.fragen_kategorien.map((k) => k.fragenkategorie.kategorie),
+      ist_bereits_im_quiz: frage.quiz_fragen.length > 0,
+      review_status: frage.review_status,
+      ist_verwendbar: istVerwendbar,
+      status_hinweis: istVerwendbar
+        ? "Freigegeben"
+        : frage.review_status === "DRAFT"
+          ? "Entwurf – noch nicht freigegeben"
+          : frage.review_status === "IN_REVIEW"
+            ? "Zur Prüfung eingereicht – noch nicht freigegeben"
+            : frage.review_status === "CHANGES_REQUESTED"
+              ? "Änderungen angefordert – noch nicht freigegeben"
+              : "Für diese Eventreihe nicht verwendbar",
+    };
+  });
 }
 
 export async function addFrageToQuiz(data: {
@@ -1015,7 +1065,10 @@ export async function addFrageToQuiz(data: {
   fragenId: number;
   includeLinkedStoryElements?: boolean;
 }) {
-  const { session } = await requireQuizEditor(data.quizId);
+  const access = await requireQuizEditor(data.quizId);
+  const { session } = access;
+  const eventSeriesId = access.ownership.eventSeriesId;
+  if (eventSeriesId === null) throw new Error("Quiz besitzt keine Eventreihe.");
 
   const existingAssignment = await prisma.quiz_fragen.findFirst({
     where: { quiz_id: data.quizId, fragen_id: data.fragenId },
@@ -1034,9 +1087,10 @@ export async function addFrageToQuiz(data: {
     },
   });
 
-  const frage = await prisma.fragen.findUnique({
+  const frage = await prisma.fragen.findFirst({
     where: {
       fragen_id: data.fragenId,
+      ...buildQuestionEligibilityWhere(eventSeriesId, getBerlinDate()),
     },
     include: {
       antworten: {
@@ -1048,7 +1102,7 @@ export async function addFrageToQuiz(data: {
   });
 
   if (!frage) {
-    throw new Error("Frage nicht gefunden.");
+    throw new Error("Nur freigegebene, für diese Eventreihe gültige Fragen können hinzugefügt werden.");
   }
 
   const antwortIds = frage.antworten.map((antwort) => antwort.antwort_id);
@@ -1724,9 +1778,28 @@ export async function updateQuizAbschnitteSortierung(data: {
   }[];
 }) {
   await requireQuizEditor(data.quizId);
+  const questionSections = await prisma.quiz_abschnitte.findMany({
+    where: {
+      quiz_id: data.quizId,
+      abschnitt_typ: { in: [...QUESTION_SECTION_TYPES] },
+    },
+    select: { quiz_abschnitt_id: true },
+  });
+  const submittedIds = data.items.map((item) => item.quizAbschnittId);
+  const submittedIdSet = new Set(submittedIds);
+  if (
+    submittedIdSet.size !== submittedIds.length ||
+    submittedIds.length !== questionSections.length ||
+    questionSections.some(
+      (section) => !submittedIdSet.has(section.quiz_abschnitt_id),
+    )
+  ) {
+    throw new Error("Die Blockreihenfolge ist unvollständig oder ungültig.");
+  }
+
   await Promise.all(
-    data.items.map((item) =>
-      requireQuizSection(data.quizId, item.quizAbschnittId),
+    submittedIds.map((sectionId) =>
+      requireQuizQuestionSection(data.quizId, sectionId),
     ),
   );
 
@@ -1746,13 +1819,13 @@ export async function updateQuizAbschnitteSortierung(data: {
   );
 
   await prisma.$transaction(
-    data.items.map((item) =>
+    data.items.map((item, index) =>
       prisma.quiz_abschnitte.update({
         where: {
           quiz_abschnitt_id: item.quizAbschnittId,
         },
         data: {
-          sortierung: item.sortierung,
+          sortierung: index + 2,
         },
       }),
     ),
@@ -1768,7 +1841,7 @@ export async function updateQuizFrageAbschnitt(data: {
   await requireQuizEditor(data.quizId);
   await requireQuizQuestion(data.quizId, data.quizFragenId);
   if (data.quizAbschnittId !== null) {
-    await requireQuizSection(data.quizId, data.quizAbschnittId);
+    await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
   }
 
   await prisma.quiz_fragen.update({
@@ -1796,7 +1869,7 @@ export async function updateQuizFragenBlockSortierung(data: {
       requireQuizQuestion(data.quizId, item.quizFragenId),
       ...(item.quizAbschnittId === null
         ? []
-        : [requireQuizSection(data.quizId, item.quizAbschnittId)]),
+        : [requireQuizQuestionSection(data.quizId, item.quizAbschnittId)]),
     ]),
   );
 
@@ -2289,7 +2362,7 @@ export async function freigabeQuizBlock(data: {
   quizAbschnittId: number;
 }) {
   await requireQuizLiveController(data.quizId);
-  await requireQuizSection(data.quizId, data.quizAbschnittId);
+  await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
 
   await prisma.quiz_block_freigaben.updateMany({
     where: {
@@ -2333,7 +2406,7 @@ export async function schliesseQuizBlock(data: {
   quizAbschnittId: number;
 }) {
   await requireQuizLiveController(data.quizId);
-  await requireQuizSection(data.quizId, data.quizAbschnittId);
+  await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
 
   await prisma.quiz_block_freigaben.upsert({
     where: {
@@ -3649,6 +3722,7 @@ export async function createSchnellQuiz(data: {
       bemerkung: validated.value.internalNote ?? "Automatisch erstelltes Schnellquiz",
       intro_startzeit: "19:30",
       intro_video_url: "/medien/video/intro/intro.mp4",
+      aufloesungsstrategie: DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
     },
   });
 
@@ -3722,14 +3796,22 @@ export async function createQuizAbschnitt(data: {
 > {
   await requireQuizEditor(data.quizId);
 
-  const titel = data.titel.trim();
-
-  if (!titel) {
+  if (!isQuestionSection({ abschnitt_typ: data.abschnittTyp })) {
     return {
       success: false,
-      message: "Bitte einen Titel für den Abschnitt eingeben.",
+      message: "Intro und Outro sind geschützte Systemabschnitte.",
     };
   }
+
+  const vorhandeneAbschnitte = await prisma.quiz_abschnitte.findMany({
+    where: { quiz_id: data.quizId },
+    select: { abschnitt_typ: true, titel: true },
+  });
+  const eingegebenerTitel = data.titel.trim();
+  const titel =
+    !eingegebenerTitel || eingegebenerTitel.toLocaleLowerCase("de-DE") === "block"
+      ? getNextAutomaticBlockTitle(vorhandeneAbschnitte)
+      : eingegebenerTitel;
 
   const ersterOutroAbschnitt = await prisma.quiz_abschnitte.findFirst({
     where: {
@@ -3804,7 +3886,11 @@ export async function updateQuizAbschnitt(data: {
   medienDatei: string;
 }) {
   await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.quizAbschnittId);
+  await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
+
+  if (!isQuestionSection({ abschnitt_typ: data.abschnittTyp })) {
+    throw new Error("Intro und Outro sind geschützte Systemabschnitte.");
+  }
 
   await prisma.quiz_abschnitte.update({
     where: {
@@ -3831,7 +3917,7 @@ export async function deleteQuizAbschnitt(data: {
   quizAbschnittId: number;
 }) {
   await requireQuizEditor(data.quizId);
-  await requireQuizSection(data.quizId, data.quizAbschnittId);
+  await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
 
   await prisma.quiz_abschnitte.delete({
     where: {

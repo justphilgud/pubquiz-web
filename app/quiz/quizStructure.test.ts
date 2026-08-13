@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDefaultQuizSections, buildQuickQuizSections } from "./quizStructure";
+import {
+  buildDefaultQuizSections,
+  buildQuickQuizSections,
+  getNextAutomaticBlockTitle,
+} from "./quizStructure";
 import {
   isIntroSection,
   isOutroSection,
@@ -14,7 +18,7 @@ test("regular quiz creation keeps the default intro, question and outro sections
     "fragenblock",
     "outro",
   ]);
-  assert.equal(sections[1].titel, "Block");
+  assert.equal(sections[1].titel, "Block 1");
 });
 
 test("quick quiz creation creates exactly the configured question blocks", () => {
@@ -23,7 +27,7 @@ test("quick quiz creation creates exactly the configured question blocks", () =>
   assert.deepEqual(sections.map((entry) => entry.sortierung), [1, 2, 3, 4, 5]);
   assert.deepEqual(
     sections.filter(isQuestionSection).map((entry) => entry.titel),
-    ["Block", "Block", "Block"],
+    ["Block 1", "Block 2", "Block 3"],
   );
 });
 
@@ -32,10 +36,25 @@ test("automatic block naming is independent of the presentation template", () =>
     const sections = buildDefaultQuizSections(9);
     assert.equal(
       sections.find(isQuestionSection)?.titel,
-      "Block",
+      "Block 1",
       templateId ?? "without template",
     );
   }
+});
+
+test("automatic block naming ignores intro, outro and custom titles", () => {
+  const sections = [
+    { abschnitt_typ: "intro", titel: "Block 1" },
+    { abschnitt_typ: "fragenblock", titel: "Block 1" },
+    { abschnitt_typ: "fragenrunde", titel: "Musik & Erinnerungen" },
+    { abschnitt_typ: "fragenblock", titel: "Block 3" },
+    { abschnitt_typ: "outro", titel: "Block 2" },
+  ];
+  assert.equal(getNextAutomaticBlockTitle(sections), "Block 2");
+  assert.equal(getNextAutomaticBlockTitle([
+    ...sections,
+    { abschnitt_typ: "fragenblock", titel: "Block 2" },
+  ]), "Block 4");
 });
 
 test("existing and individually renamed block titles are not rewritten", () => {

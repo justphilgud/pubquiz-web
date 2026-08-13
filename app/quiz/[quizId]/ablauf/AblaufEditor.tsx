@@ -483,7 +483,7 @@ function BlockEditorSection({
 
       {canEdit && (
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">Inhalt hinzufügen</h3><p className="mt-1 text-sm text-slate-500">Fragen und Story-Elemente folgen getrennten, vertrauten Auswahlwegen.</p></div></div>
+          <div className="flex flex-wrap items-start justify-end gap-3"><div className="text-right"><h3 className="font-bold">Quiz-Element hinzufügen</h3><p className="mt-1 text-sm text-slate-500">Fragen und Story-Elemente folgen getrennten, vertrauten Auswahlwegen.</p></div></div>
           <div className="mt-3 grid gap-3 md:grid-cols-2"><div className="rounded-xl border border-cyan-200 bg-cyan-50 p-3"><strong>Frage hinzufügen</strong><p className="mt-1 text-sm text-slate-600">Bewertbare Frage mit Antwort und Punkten auswählen.</p><Link href={`/quiz/${quiz.quiz_id}#fragen-hinzufuegen`} className={`${buttonClass} mt-3`}>Frage hinzufügen</Link></div><div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3"><strong>Story-Element hinzufügen</strong><p className="mt-1 text-sm text-slate-600">Nicht bewerteten Inhalt wie Bild, Anekdote, Zitat, Audio oder Video auswählen.</p><StoryElementQuizPicker quizId={quiz.quiz_id} sectionId={section.quiz_abschnitt_id} options={storyElements} /></div></div>
         </div>
       )}

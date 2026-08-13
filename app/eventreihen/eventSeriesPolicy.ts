@@ -1,10 +1,7 @@
 import { deRenderingMessages } from "@/app/i18n/messages/de/rendering";
 import {
-  SYSTEM_ANSWER_FORM_TEMPLATE_ID,
   SYSTEM_PRESENTATION_TEMPLATE_ID,
-  isSelectableAnswerFormTemplateId,
   isSelectablePresentationTemplateId,
-  type AnswerFormTemplate,
   type PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
 
@@ -23,7 +20,6 @@ export type EventSeriesInput = {
   internalNote?: string;
   isPublic: boolean;
   defaultPresentationTemplateId?: string;
-  defaultAnswerFormTemplateId?: string;
 };
 
 export type NormalizedEventSeriesInput = {
@@ -33,7 +29,7 @@ export type NormalizedEventSeriesInput = {
   internalNote: string | null;
   isPublic: boolean;
   defaultPresentationTemplateId: PresentationTemplate["id"];
-  defaultAnswerFormTemplateId: AnswerFormTemplate["id"];
+  defaultAnswerFormTemplateId: PresentationTemplate["id"];
 };
 
 export type EventSeriesValidationResult =
@@ -49,7 +45,6 @@ export function validateEventSeriesInput(
   input: EventSeriesInput,
   options?: {
     additionalPresentationTemplateIds?: readonly string[];
-    additionalAnswerFormTemplateIds?: readonly string[];
   },
 ): EventSeriesValidationResult {
   const value: NormalizedEventSeriesInput = {
@@ -59,7 +54,7 @@ export function validateEventSeriesInput(
     internalNote: optional(input.internalNote),
     isPublic: input.isPublic,
     defaultPresentationTemplateId: (input.defaultPresentationTemplateId?.trim() || SYSTEM_PRESENTATION_TEMPLATE_ID) as PresentationTemplate["id"],
-    defaultAnswerFormTemplateId: (input.defaultAnswerFormTemplateId?.trim() || SYSTEM_ANSWER_FORM_TEMPLATE_ID) as AnswerFormTemplate["id"],
+    defaultAnswerFormTemplateId: (input.defaultPresentationTemplateId?.trim() || SYSTEM_PRESENTATION_TEMPLATE_ID) as PresentationTemplate["id"],
   };
   const errors: Record<string, string> = {};
 
@@ -82,13 +77,6 @@ export function validateEventSeriesInput(
   ) {
     errors.defaultPresentationTemplateId = deRenderingMessages.validation.unknownPresentation;
   }
-  if (
-    !isSelectableAnswerFormTemplateId(value.defaultAnswerFormTemplateId) &&
-    !options?.additionalAnswerFormTemplateIds?.includes(value.defaultAnswerFormTemplateId)
-  ) {
-    errors.defaultAnswerFormTemplateId = deRenderingMessages.validation.unknownAnswerForm;
-  }
-
   return Object.keys(errors).length > 0
     ? { ok: false, errors }
     : { ok: true, value };

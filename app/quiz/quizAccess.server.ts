@@ -5,6 +5,7 @@ import { prisma } from "@/app/lib/prisma";
 import { requireSession } from "@/app/lib/permissions";
 import { requireEventSeriesAccess } from "@/app/eventreihen/eventSeriesAccess.server";
 import { buildQuizOwnershipContext } from "./quizOwnershipPolicy";
+import { isQuestionSection } from "./quizSectionPolicy";
 
 export type QuizCapability = "VIEW" | "EDIT" | "ADMIN" | "CONTROL_LIVE";
 
@@ -91,6 +92,17 @@ export async function requireQuizSection(quizId: number, quizSectionId: number) 
     throw new Error("Quizabschnitt gehört nicht zu diesem Quiz.");
   }
 
+  return section;
+}
+
+export async function requireQuizQuestionSection(
+  quizId: number,
+  quizSectionId: number,
+) {
+  const section = await requireQuizSection(quizId, quizSectionId);
+  if (!isQuestionSection(section)) {
+    throw new Error("Intro und Outro sind geschützte Systemabschnitte.");
+  }
   return section;
 }
 

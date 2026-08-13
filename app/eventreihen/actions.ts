@@ -27,7 +27,6 @@ async function getTemplateValidationOptions(additionallyAllowed: readonly string
   const ids = [...templates.map((template) => template.id), ...additionallyAllowed];
   return {
     additionalPresentationTemplateIds: ids,
-    additionalAnswerFormTemplateIds: ids,
   };
 }
 
@@ -36,7 +35,6 @@ export type EventSeriesOption = {
   name: string;
   isArchived: boolean;
   defaultPresentationTemplateId: string;
-  defaultAnswerFormTemplateId: string;
 };
 
 export type EventSeriesListItem = EventSeriesOption & {
@@ -46,7 +44,6 @@ export type EventSeriesListItem = EventSeriesOption & {
   internalNote: string | null;
   isPublic: boolean;
   defaultPresentationTemplateId: string;
-  defaultAnswerFormTemplateId: string;
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -67,7 +64,6 @@ export type EventSeriesActionResult = {
     internalNote: string | null;
     isPublic: boolean;
     defaultPresentationTemplateId: string;
-    defaultAnswerFormTemplateId: string;
   };
 };
 
@@ -80,7 +76,6 @@ function toListItem(series: {
   interne_bemerkung: string | null;
   ist_oeffentlich: boolean;
   default_presentation_template_id: string;
-  default_answer_form_template_id: string;
   ist_archiviert: boolean;
   archiviert_am: Date | null;
   created_at: Date;
@@ -96,7 +91,6 @@ function toListItem(series: {
     internalNote: series.interne_bemerkung,
     isPublic: series.ist_oeffentlich,
     defaultPresentationTemplateId: series.default_presentation_template_id,
-    defaultAnswerFormTemplateId: series.default_answer_form_template_id,
     isArchived: series.ist_archiviert,
     archivedAt: series.archiviert_am?.toISOString() ?? null,
     createdAt: series.created_at.toISOString(),
@@ -138,7 +132,6 @@ export async function getEventSeriesOptions(
       name: true,
       ist_archiviert: true,
       default_presentation_template_id: true,
-      default_answer_form_template_id: true,
     },
   });
   return series.map((entry) => ({
@@ -146,7 +139,6 @@ export async function getEventSeriesOptions(
     name: entry.name,
     isArchived: entry.ist_archiviert,
     defaultPresentationTemplateId: entry.default_presentation_template_id,
-    defaultAnswerFormTemplateId: entry.default_answer_form_template_id,
   }));
 }
 
@@ -225,7 +217,6 @@ export async function updateEventSeries(
     select: {
       eventreihe_id: true,
       default_presentation_template_id: true,
-      default_answer_form_template_id: true,
     },
   });
   if (!existing) return { success: false, message: "Eventreihe nicht gefunden." };
@@ -233,7 +224,6 @@ export async function updateEventSeries(
     input,
     await getTemplateValidationOptions([
       existing.default_presentation_template_id,
-      existing.default_answer_form_template_id,
     ]),
   );
   if (!validated.ok) {
@@ -264,7 +254,6 @@ export async function updateEventSeries(
       interne_bemerkung: true,
       ist_oeffentlich: true,
       default_presentation_template_id: true,
-      default_answer_form_template_id: true,
     },
   });
   revalidatePath("/admin/eventreihen");
@@ -281,7 +270,6 @@ export async function updateEventSeries(
       internalNote: saved.interne_bemerkung,
       isPublic: saved.ist_oeffentlich,
       defaultPresentationTemplateId: saved.default_presentation_template_id,
-      defaultAnswerFormTemplateId: saved.default_answer_form_template_id,
     },
   };
 }

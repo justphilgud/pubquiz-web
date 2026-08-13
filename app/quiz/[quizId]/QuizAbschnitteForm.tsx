@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   PointerSensor,
@@ -23,6 +23,7 @@ import {
   createQuizAbschnitt,
   updateQuizAbschnitteSortierung,
 } from "../actions";
+import { isQuestionSection } from "../quizSectionPolicy";
 
 type Abschnitt = {
   quiz_abschnitt_id: number;
@@ -93,19 +94,8 @@ export default function QuizAbschnitteForm({
   abschnitte: Abschnitt[];
 }) {
   const [titel, setTitel] = useState("");
-  const [abschnittTyp, setAbschnittTyp] = useState("fragenblock");
   const [meldung, setMeldung] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const [items, setItems] = useState(abschnitte);
-
-  useEffect(() => {
-    setItems(abschnitte);
-  }, [abschnitte]);
+  const [items, setItems] = useState(abschnitte.filter(isQuestionSection));
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -119,7 +109,7 @@ export default function QuizAbschnitteForm({
     const result = await createQuizAbschnitt({
       quizId,
       titel: titel.trim(),
-      abschnittTyp,
+      abschnittTyp: "fragenblock",
       bemerkung: "",
       qrCodeUrl: "",
       medienDatei: "",
@@ -132,8 +122,11 @@ export default function QuizAbschnitteForm({
 
     setTitel("");
     setMeldung("Block wurde angelegt.");
-
-    window.location.reload();
+    setItems((current) =>
+      [...current, result.abschnitt].sort(
+        (left, right) => left.sortierung - right.sortierung,
+      ),
+    );
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -168,34 +161,17 @@ export default function QuizAbschnitteForm({
       })),
     });
   }
-  if (!mounted) {
-    return null;
-  }
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
       <h2 className="text-xl font-semibold">Blöcke</h2>
 
-      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_220px_auto]">
+      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
         <input
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           className="rounded-xl border border-slate-300 bg-white px-4 py-3"
           placeholder="z. B. Block 1"
         />
-
-        <select
-          value={abschnittTyp}
-          onChange={(e) => setAbschnittTyp(e.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-4 py-3"
-        >
-          <option value="intro">Intro</option>
-          <option value="regeln">Regeln</option>
-          <option value="qr_code">QR-Code</option>
-          <option value="fragenblock">Block</option>
-          <option value="pause">Pause</option>
-          <option value="aufloesung">Auflösung</option>
-          <option value="siegerehrung">Siegerehrung</option>
-        </select>
 
         <button
           type="button"

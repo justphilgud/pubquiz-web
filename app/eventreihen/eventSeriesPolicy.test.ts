@@ -53,13 +53,23 @@ test("event series assignment accepts only explicitly authorized managed templat
     name: "Sommerquiz",
     isPublic: false,
     defaultPresentationTemplateId: "sommer-2026",
-    defaultAnswerFormTemplateId: "sommer-2026",
   };
   assert.equal(validateEventSeriesInput(input).ok, false);
   assert.equal(validateEventSeriesInput(input, {
     additionalPresentationTemplateIds: ["sommer-2026"],
-    additionalAnswerFormTemplateIds: ["sommer-2026"],
   }).ok, true);
+});
+
+test("event series answer form follows the selected presentation", () => {
+  const result = validateEventSeriesInput({
+    name: "Sommerquiz",
+    isPublic: false,
+    defaultPresentationTemplateId: "ungegoogelt-dark",
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.value.defaultAnswerFormTemplateId, "ungegoogelt-dark");
+  }
 });
 
 test("event series editor keeps the database-confirmed template value after saving", () => {
