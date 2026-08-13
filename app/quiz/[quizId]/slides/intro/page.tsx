@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
-import { getQuizDetails } from "@/app/quiz/actions";
+import {
+  getQuizDetails,
+  getQuizFixedSlideVisibility,
+} from "@/app/quiz/actions";
 import {
   getIntroSlideStatus,
   INTRO_SLIDES,
@@ -9,6 +12,7 @@ import {
 import BlobUploadField from "../BlobUploadField";
 import {
   FixedSlideEditor,
+  FixedSlideEnabledField,
   FixedSlideField,
   FixedSlideForm,
 } from "../FixedSlideEditor";
@@ -47,7 +51,10 @@ function HiddenSlideFields({
 
 export default async function IntroEditorPage({ params, searchParams }: Props) {
   const [{ quizId }, query] = await Promise.all([params, searchParams]);
-  const quiz = await getQuizDetails(Number(quizId));
+  const [quiz, slideVisibility] = await Promise.all([
+    getQuizDetails(Number(quizId)),
+    getQuizFixedSlideVisibility(Number(quizId)),
+  ]);
 
   if (!quiz) {
     notFound();
@@ -68,6 +75,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("vor-dem-start")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="waiting" />
+        <FixedSlideEnabledField defaultEnabled={slideVisibility.waiting} />
         <BlobUploadField
           label="Intro-Video"
           hiddenFieldName="introVideoUrl"
@@ -103,6 +111,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("startsequenz")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="countdown" />
+        <FixedSlideEnabledField defaultEnabled={slideVisibility.countdown} />
         <BlobUploadField
           label="Intro-Musik"
           hiddenFieldName="introMusikUrl"
@@ -129,6 +138,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("begruessung")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="welcome" />
+        <FixedSlideEnabledField defaultEnabled={slideVisibility.welcome} />
         <FixedSlideField label="Titel">
           <input
             name="titel"
@@ -159,6 +169,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("regeln")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="rules" />
+        <FixedSlideEnabledField defaultEnabled={slideVisibility.rules} />
         <FixedSlideField
           label="Regeln"
           helpText="Eine Regel pro Zeile."
@@ -178,6 +189,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("preise")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="prizes" />
+        <FixedSlideEnabledField defaultEnabled={slideVisibility.prizes} />
         {[
           ["platz1", "1. Platz", platz1, "z. B. Gutschein über 50 €"],
           ["platz2", "2. Platz", platz2, "z. B. Getränkerunde"],

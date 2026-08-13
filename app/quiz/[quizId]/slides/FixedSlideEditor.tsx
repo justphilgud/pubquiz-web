@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import type {
   FixedSlideActionState,
 } from "./fixedSlideActions";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 const INITIAL_FIXED_SLIDE_ACTION_STATE: FixedSlideActionState = {
   status: "idle",
@@ -222,5 +223,17 @@ export function FixedSlideField({
       {children}
       {helpText && <span className="text-xs text-slate-500">{helpText}</span>}
     </label>
+  );
+}
+
+export function FixedSlideEnabledField({ defaultEnabled }: { defaultEnabled: boolean }) {
+  return (
+    <Checkbox
+      name="enabled"
+      defaultChecked={defaultEnabled}
+      variant="card"
+      label="Slide in der Präsentation anzeigen"
+      hint="Die Konfiguration bleibt beim Ausblenden vollständig erhalten."
+    />
   );
 }

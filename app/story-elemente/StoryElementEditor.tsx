@@ -278,6 +278,30 @@ export default function StoryElementEditor({
   return (
     <div className="min-w-0">
       <section className="min-w-0 space-y-5 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <ContentScopeSection
+          scope={scope}
+          eventSeriesIds={eventSeriesId ? [Number(eventSeriesId)] : []}
+          eventSeries={options.eventSeries.map((series) => ({
+            id: series.eventreihe_id,
+            name: series.name,
+          }))}
+          availableScopes={allowedScopes}
+          quizzes={(contextQuiz ? [contextQuiz] : options.quizzes).map((quiz) => ({
+            id: quiz.quiz_id,
+            title: quiz.titel ?? `Quiz ${quiz.quiz_id}`,
+            eventSeriesId: quiz.eventreihe_id,
+            eventSeriesName: quiz.eventreihe.name,
+          }))}
+          quizId={quizId ? Number(quizId) : null}
+          multipleEventSeries={false}
+          disabled={!canEdit || pending}
+          onChange={(value) => {
+            setScope(value.scope as StoryElementScopeValue);
+            setEventSeriesId(value.eventSeriesIds[0]?.toString() ?? "");
+            setQuizId(value.quizId?.toString() ?? "");
+          }}
+        />
+
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-950">
           <strong>Story-Element</strong>
           <p className="mt-1">Ein nicht bewerteter Inhalt wie Bild, Anekdote, Zitat, Audio oder Video. Punkte, Antworten und Bewertungsregeln gehören ausschließlich zu Fragen.</p>
@@ -335,30 +359,6 @@ export default function StoryElementEditor({
             )}
           </div>
         </section>
-
-        <ContentScopeSection
-          scope={scope}
-          eventSeriesIds={eventSeriesId ? [Number(eventSeriesId)] : []}
-          eventSeries={options.eventSeries.map((series) => ({
-            id: series.eventreihe_id,
-            name: series.name,
-          }))}
-          availableScopes={allowedScopes}
-          quizzes={(contextQuiz ? [contextQuiz] : options.quizzes).map((quiz) => ({
-            id: quiz.quiz_id,
-            title: quiz.titel ?? `Quiz ${quiz.quiz_id}`,
-            eventSeriesId: quiz.eventreihe_id,
-            eventSeriesName: quiz.eventreihe.name,
-          }))}
-          quizId={quizId ? Number(quizId) : null}
-          multipleEventSeries={false}
-          disabled={!canEdit || pending}
-          onChange={(value) => {
-            setScope(value.scope as StoryElementScopeValue);
-            setEventSeriesId(value.eventSeriesIds[0]?.toString() ?? "");
-            setQuizId(value.quizId?.toString() ?? "");
-          }}
-        />
 
         <details className="rounded-2xl border border-slate-200 p-4">
           <summary className="min-h-11 cursor-pointer font-bold">Weitere Angaben</summary>

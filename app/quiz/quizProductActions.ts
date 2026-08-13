@@ -1,5 +1,4 @@
 export type QuizProductActionId =
-  | "FLOW"
   | "MODERATION"
   | "PRESENTATION"
   | "ANSWER_FORM"
@@ -8,7 +7,6 @@ export type QuizProductActionId =
 export function getQuizProductActions(quizId: number) {
   const base = `/quiz/${quizId}`;
   return [
-    { id: "FLOW", label: "Ablauf bearbeiten", href: `${base}/ablauf`, opensNewTab: false },
     { id: "MODERATION", label: "Moderieren", href: `${base}/moderation`, opensNewTab: true },
     { id: "PRESENTATION", label: "Präsentation öffnen", href: `${base}/praesentation`, opensNewTab: true },
     { id: "ANSWER_FORM", label: "Antwortformular öffnen", href: `${base}/antworten`, opensNewTab: true },

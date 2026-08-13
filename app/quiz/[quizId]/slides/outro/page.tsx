@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
-import { getQuizDetails } from "@/app/quiz/actions";
+import {
+  getQuizDetails,
+  getQuizFixedSlideVisibility,
+} from "@/app/quiz/actions";
 import {
   FixedSlideEditor,
+  FixedSlideEnabledField,
   FixedSlideField,
   FixedSlideForm,
 } from "../FixedSlideEditor";
@@ -15,7 +19,10 @@ type Props = {
 
 export default async function OutroEditorPage({ params }: Props) {
   const { quizId } = await params;
-  const quiz = await getQuizDetails(Number(quizId));
+  const [quiz, slideVisibility] = await Promise.all([
+    getQuizDetails(Number(quizId)),
+    getQuizFixedSlideVisibility(Number(quizId)),
+  ]);
 
   if (!quiz) {
     notFound();
@@ -46,6 +53,8 @@ export default async function OutroEditorPage({ params }: Props) {
               previewHref={`/quiz/${quizIdValue}/show/bekanntmachungen`}
             >
               <input type="hidden" name="quizId" value={quizIdValue} />
+              <input type="hidden" name="slideId" value="announcements" />
+              <FixedSlideEnabledField defaultEnabled={slideVisibility.announcements} />
               <BlobUploadField
                 label="Outro-Musik"
                 hiddenFieldName="outroMusikUrl"

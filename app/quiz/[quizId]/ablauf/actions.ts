@@ -23,12 +23,19 @@ import {
 import {
   materializeManualQuizBlockSequence,
   materializeQuizBlockQuestionItems,
+  materializeQuizQuestionStoryItems,
   materializeDefaultQuizFlow,
   resolveEditableQuizFlowItem,
 } from "@/app/quiz/flow/quizFlowRepository.server";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { loadStoryElement } from "@/app/story-elemente/storyElementRepository.server";
 import { canAttachStoryElementToQuiz } from "@/app/story-elemente/storyElementPolicy";
+import {
+  isStoryPlacement,
+  storyPlacementConfig,
+  storyPlacementToRelationship,
+  type StoryPlacementOverride,
+} from "@/app/story-elemente/storyPlacement";
 
 type FlowActionResult = { success: true } | { success: false; message: string };
 
@@ -194,43 +201,133 @@ export async function addStoryElementToQuizBlock(data: {
   ) {
     return { success: false, message: "Story-Element ist für dieses Quiz nicht auswählbar." };
   }
-  await materializeQuizBlockQuestionItems(data.quizId, data.sectionId);
-  const duplicate = await prisma.quiz_ablauf_elemente.findFirst({
-    where: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.sectionId,
-      story_element_revision: { story_element_id: story.id },
+  const questionLink = await prisma.frage_story_elemente.findFirst({
+    where: { story_element_id: story.id },
+    select: {
+      fragen_id: true,
+      frage: { select: { frage: true } },
     },
-    select: { quiz_ablauf_element_id: true },
   });
-  if (duplicate) {
-    return { success: false, message: "Dieses Story-Element ist bereits in diesem Block vorhanden." };
+  if (questionLink) {
+    const assignment = await prisma.quiz_fragen.findFirst({
+      where: { quiz_id: data.quizId, fragen_id: questionLink.fragen_id },
+      select: { quiz_fragen_id: true, quiz_abschnitt_id: true },
+    });
+    if (!assignment) {
+      return {
+        success: false,
+        message: `Gehört zur Frage „${questionLink.frage.frage}“. Diese Frage ist noch nicht im Quiz.`,
+      };
+    }
+    if (assignment.quiz_abschnitt_id === null) {
+      return {
+        success: false,
+        message: `Gehört zur Frage „${questionLink.frage.frage}“. Weise die Frage zuerst einem Block zu.`,
+      };
+    }
+    await materializeQuizBlockQuestionItems(
+      data.quizId,
+      assignment.quiz_abschnitt_id,
+    );
+    const placementConflict = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(${story.id})`;
+      const existingPlacement = await tx.quiz_ablauf_elemente.findFirst({
+        where: {
+          quiz_id: data.quizId,
+          story_element_revision: { story_element_id: story.id },
+        },
+        select: {
+          quiz_ablauf_element_id: true,
+          story_bezugs_quiz_fragen_id: true,
+        },
+      });
+      if (
+        existingPlacement &&
+        existingPlacement.story_bezugs_quiz_fragen_id !== assignment.quiz_fragen_id
+      ) {
+        return true;
+      }
+      if (existingPlacement) return false;
+      const last = await tx.quiz_ablauf_elemente.findFirst({
+        where: {
+          quiz_id: data.quizId,
+          quiz_abschnitt_id: assignment.quiz_abschnitt_id,
+          anker_typ: "BLOCK",
+        },
+        orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
+        select: { sortierung: true },
+      });
+      await tx.quiz_ablauf_elemente.create({
+        data: {
+          quiz_id: data.quizId,
+          typ: story.type,
+          anker_typ: "BLOCK",
+          anker_schluessel: String(assignment.quiz_abschnitt_id),
+          quiz_abschnitt_id: assignment.quiz_abschnitt_id,
+          story_element_revision_id: story.revisionId,
+          story_bezugs_quiz_fragen_id: assignment.quiz_fragen_id,
+          story_beziehung: null,
+          sortierung: (last?.sortierung ?? 0) + 1_000,
+          ist_sichtbar: true,
+          bezeichnung: story.title,
+          konfiguration: { version: 1 },
+          konfigurations_version: 1,
+          ist_standard: false,
+        },
+      });
+      return false;
+    });
+    if (placementConflict) {
+      return {
+        success: false,
+        message: "Dieses Story-Element besitzt ein historisches freies Placement. Es wurde nicht automatisch verändert.",
+      };
+    }
+    revalidateQuizFlow(data.quizId);
+    return { success: true };
   }
-  const last = await prisma.quiz_ablauf_elemente.findFirst({
-    where: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.sectionId,
-      anker_typ: "BLOCK",
-    },
-    orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
-    select: { sortierung: true },
+
+  await materializeQuizBlockQuestionItems(data.quizId, data.sectionId);
+  const added = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${story.id})`;
+    const duplicate = await tx.quiz_ablauf_elemente.findFirst({
+      where: {
+        quiz_id: data.quizId,
+        story_element_revision: { story_element_id: story.id },
+      },
+      select: { quiz_ablauf_element_id: true },
+    });
+    if (duplicate) return false;
+    const last = await tx.quiz_ablauf_elemente.findFirst({
+      where: {
+        quiz_id: data.quizId,
+        quiz_abschnitt_id: data.sectionId,
+        anker_typ: "BLOCK",
+      },
+      orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
+      select: { sortierung: true },
+    });
+    await tx.quiz_ablauf_elemente.create({
+      data: {
+        quiz_id: data.quizId,
+        typ: story.type,
+        anker_typ: "BLOCK",
+        anker_schluessel: String(data.sectionId),
+        quiz_abschnitt_id: data.sectionId,
+        story_element_revision_id: story.revisionId,
+        sortierung: (last?.sortierung ?? 0) + 1_000,
+        ist_sichtbar: true,
+        bezeichnung: story.title,
+        konfiguration: { version: 1 },
+        konfigurations_version: 1,
+        ist_standard: false,
+      },
+    });
+    return true;
   });
-  await prisma.quiz_ablauf_elemente.create({
-    data: {
-      quiz_id: data.quizId,
-      typ: story.type,
-      anker_typ: "BLOCK",
-      anker_schluessel: String(data.sectionId),
-      quiz_abschnitt_id: data.sectionId,
-      story_element_revision_id: story.revisionId,
-      sortierung: (last?.sortierung ?? 0) + 1_000,
-      ist_sichtbar: true,
-      bezeichnung: story.title,
-      konfiguration: { version: 1 },
-      konfigurations_version: 1,
-      ist_standard: false,
-    },
-  });
+  if (!added) {
+    return { success: false, message: "Dieses Story-Element ist bereits im Quiz vorhanden." };
+  }
   revalidateQuizFlow(data.quizId);
   return { success: true };
 }
@@ -251,9 +348,24 @@ export async function assignUnassignedStoryElementToBlock(data: {
       quiz_abschnitt_id: null,
       story_element_revision_id: { not: null },
     },
-    select: { quiz_ablauf_element_id: true },
+    select: {
+      quiz_ablauf_element_id: true,
+      story_element_revision: { select: { story_element_id: true } },
+    },
   });
   if (!placement) return { success: false, message: "Die offene Story-Zuordnung wurde nicht gefunden." };
+  const linkedQuestion = await prisma.frage_story_elemente.findFirst({
+    where: {
+      story_element_id: placement.story_element_revision!.story_element_id,
+    },
+    select: { fragen_id: true },
+  });
+  if (linkedQuestion) {
+    return {
+      success: false,
+      message: "Ein mit einer Frage verknüpftes Story-Element darf nicht frei als Standalone platziert werden.",
+    };
+  }
   await materializeQuizBlockQuestionItems(data.quizId, data.sectionId);
   const last = await prisma.quiz_ablauf_elemente.findFirst({
     where: { quiz_id: data.quizId, quiz_abschnitt_id: data.sectionId, anker_typ: "BLOCK" },
@@ -374,6 +486,12 @@ export async function moveQuizBlockSequenceItem(data: {
   if (!current) {
     return { success: false, message: "Blockelement wurde nicht gefunden." };
   }
+  if (current.story_bezugs_quiz_fragen_id !== null) {
+    return {
+      success: false,
+      message: "Verknüpfte Story-Elemente werden über ihre Position an der Frage angeordnet.",
+    };
+  }
   if (current.typ === "QUESTION_SOLUTION" && strategy !== "MANUAL") {
     return {
       success: false,
@@ -427,12 +545,6 @@ export async function moveQuizBlockSequenceItem(data: {
       where: { quiz_ablauf_element_id: current.quiz_ablauf_element_id },
       data: {
         sortierung: -1_000_000 - current.quiz_ablauf_element_id,
-        ...(current.story_element_revision_id !== null
-          ? {
-              story_bezugs_quiz_fragen_id: null,
-              story_beziehung: null,
-            }
-          : {}),
       },
     });
     await tx.quiz_ablauf_elemente.update({
@@ -442,6 +554,135 @@ export async function moveQuizBlockSequenceItem(data: {
     await tx.quiz_ablauf_elemente.update({
       where: { quiz_ablauf_element_id: current.quiz_ablauf_element_id },
       data: { sortierung: target.sortierung },
+    });
+  });
+  revalidateQuizFlow(data.quizId);
+  return { success: true };
+}
+
+export async function updateQuizStoryPlacementOverride(data: {
+  quizId: number;
+  quizFragenId: number;
+  storyElementId: number;
+  placementOverride: StoryPlacementOverride;
+}): Promise<FlowActionResult> {
+  await requireQuizEditor(data.quizId);
+  if (
+    data.placementOverride !== null &&
+    data.placementOverride !== "HIDDEN" &&
+    !isStoryPlacement(data.placementOverride)
+  ) {
+    return { success: false, message: "Die Story-Position ist ungültig." };
+  }
+  const assignment = await prisma.quiz_fragen.findFirst({
+    where: {
+      quiz_fragen_id: data.quizFragenId,
+      quiz_id: data.quizId,
+      fragen: {
+        story_element_verknuepfungen: {
+          some: { story_element_id: data.storyElementId },
+        },
+      },
+    },
+    select: { quiz_abschnitt_id: true },
+  });
+  if (!assignment) {
+    return {
+      success: false,
+      message: "Frage oder verknüpftes Story-Element wurde im Quiz nicht gefunden.",
+    };
+  }
+  await materializeQuizQuestionStoryItems(data.quizId, data.quizFragenId);
+  const placement = await prisma.quiz_ablauf_elemente.findFirst({
+    where: {
+      quiz_id: data.quizId,
+      story_bezugs_quiz_fragen_id: data.quizFragenId,
+      story_element_revision: { story_element_id: data.storyElementId },
+    },
+    select: { quiz_ablauf_element_id: true },
+  });
+  if (!placement) {
+    return {
+      success: false,
+      message: "Die Story-Position konnte nicht materialisiert werden.",
+    };
+  }
+  await prisma.quiz_ablauf_elemente.update({
+    where: { quiz_ablauf_element_id: placement.quiz_ablauf_element_id },
+    data: {
+      story_beziehung: data.placementOverride === null ||
+          data.placementOverride === "HIDDEN"
+        ? null
+        : storyPlacementToRelationship(data.placementOverride),
+      ist_sichtbar:
+        data.placementOverride !== "HIDDEN" &&
+        assignment.quiz_abschnitt_id !== null,
+      konfiguration: storyPlacementConfig(
+        data.placementOverride === "HIDDEN",
+      ),
+    },
+  });
+  revalidateQuizFlow(data.quizId);
+  return { success: true };
+}
+
+export async function moveStandaloneStoryElementToSection(data: {
+  quizId: number;
+  placementId: number;
+  sectionId: number | null;
+}): Promise<FlowActionResult> {
+  await requireQuizEditor(data.quizId);
+  if (data.sectionId !== null) {
+    await requireQuizQuestionSection(data.quizId, data.sectionId);
+  }
+
+  const placement = await prisma.quiz_ablauf_elemente.findFirst({
+    where: {
+      quiz_ablauf_element_id: data.placementId,
+      quiz_id: data.quizId,
+      story_element_revision_id: { not: null },
+      story_bezugs_quiz_fragen_id: null,
+    },
+    select: {
+      quiz_ablauf_element_id: true,
+      story_element_revision: { select: { story_element_id: true } },
+    },
+  });
+  if (!placement?.story_element_revision) {
+    return { success: false, message: "Standalone-Story wurde nicht gefunden." };
+  }
+  const linkedQuestion = await prisma.frage_story_elemente.findFirst({
+    where: { story_element_id: placement.story_element_revision.story_element_id },
+    select: { frage_story_element_id: true },
+  });
+  if (linkedQuestion) {
+    return {
+      success: false,
+      message: "Ein mit einer Frage verknüpftes Story-Element darf nicht frei verschoben werden.",
+    };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const anchorType = data.sectionId === null ? "BEFORE_QUIZ" : "BLOCK";
+    const anchorKey = data.sectionId === null ? "UNASSIGNED" : String(data.sectionId);
+    const last = await tx.quiz_ablauf_elemente.findFirst({
+      where: {
+        quiz_id: data.quizId,
+        anker_typ: anchorType,
+        anker_schluessel: anchorKey,
+      },
+      orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
+      select: { sortierung: true },
+    });
+    await tx.quiz_ablauf_elemente.update({
+      where: { quiz_ablauf_element_id: data.placementId },
+      data: {
+        anker_typ: anchorType,
+        anker_schluessel: anchorKey,
+        quiz_abschnitt_id: data.sectionId,
+        sortierung: (last?.sortierung ?? 0) + 1_000,
+        ist_sichtbar: data.sectionId !== null,
+      },
     });
   });
   revalidateQuizFlow(data.quizId);

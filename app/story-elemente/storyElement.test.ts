@@ -22,6 +22,13 @@ import {
   getAvailableStoryElementScopes,
   getDefaultStoryElementScope,
 } from "./storyElementScopePresentation";
+import {
+  isStoryPlacementHiddenConfig,
+  resolveStoryPlacement,
+  storyPlacementConfig,
+  storyPlacementFromRelationship,
+  storyPlacementToRelationship,
+} from "./storyPlacement";
 
 const admin: AuthorizationActor = {
   userId: 1,
@@ -59,20 +66,16 @@ test("story scope presentation hides impossible choices and prefers quiz context
   );
 });
 
-test("question links expose only productive relationships in editorial language", () => {
+test("question links expose only the two productive placement relationships", () => {
   assert.deepEqual(PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS, [
-    "CONTEXT",
-    "AFTER_SOLUTION",
-    "REVEAL",
     "RELATED",
+    "AFTER_SOLUTION",
   ]);
   assert.deepEqual(
     PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS.map(getStoryQuestionRelationshipLabel),
     [
-      "Einführung zur Frage",
-      "Nach der Auflösung zeigen",
-      "Zusatzmaterial zur Auflösung",
       "Inhaltlich verknüpft",
+      "Nach der Auflösung zeigen",
     ],
   );
 });
@@ -219,7 +222,7 @@ test("workflow surfaces share search controls and preserve legacy metadata witho
   assert.match(quizPicker, /ContentSearchControls/);
   assert.match(quizPicker, /addStoryElementToQuizBlock/);
   assert.match(quizQuestionPicker, /checked=\{includeLinkedStoryElements\}/);
-  assert.match(quizPage, /<QuizFragenHinzufuegen quizId=\{quiz\.quiz_id\} \/>/);
+  assert.match(quizPage, /<QuizFragenHinzufuegen[\s\S]*quizId=\{quiz\.quiz_id\}[\s\S]*storyElements=/);
   assert.match(quizActions, /verknuepfte_story_elemente_uebernehmen:\s*data\.includeLinkedStoryElements !== false/);
   assert.doesNotMatch(questionLinks, /Beziehungsart|PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS/);
   assert.doesNotMatch(storyLinks, /Beziehungsart|PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS/);
@@ -231,13 +234,14 @@ test("workflow surfaces share search controls and preserve legacy metadata witho
   assert.match(backButton, /router\.push\(fallbackHref\)/);
 });
 
-test("mobile creation workflow keeps content before scope and omits a template-less preview", () => {
+test("mobile creation workflow keeps the shared scope directly above content fields", () => {
   const editor = readFileSync("app/story-elemente/StoryElementEditor.tsx", "utf8");
   const titleIndex = editor.indexOf("Titel *");
   const contentIndex = editor.indexOf(">Inhalt<");
   const scopeIndex = editor.indexOf("<ContentScopeSection");
-  assert.ok(titleIndex > 0 && titleIndex < contentIndex);
-  assert.ok(contentIndex < scopeIndex);
+  assert.ok(scopeIndex > 0 && scopeIndex < titleIndex);
+  assert.ok(titleIndex < contentIndex);
+  assert.equal(editor.match(/<ContentScopeSection/g)?.length, 1);
   assert.doesNotMatch(editor, /Inhaltsvorschau|StoryPreview/);
   assert.match(editor, /ContentEditorActionBar/);
   assert.doesNotMatch(editor, /overflow-x-auto/);
@@ -251,4 +255,38 @@ test("question context creates story elements inline and cardinality rejects sil
   assert.match(existing, /StoryElementCreateDialog/);
   assert.doesNotMatch(draft, /target="_blank"/);
   assert.match(actions, /bereits mit einer anderen Frage verknüpft/);
+});
+
+test("question defaults map to the two productive placement values", () => {
+  assert.equal(storyPlacementFromRelationship("RELATED"), "BEFORE_QUESTION");
+  assert.equal(storyPlacementFromRelationship("AFTER_SOLUTION"), "AFTER_SOLUTION");
+  assert.equal(storyPlacementToRelationship("BEFORE_QUESTION"), "RELATED");
+  assert.equal(storyPlacementToRelationship("AFTER_SOLUTION"), "AFTER_SOLUTION");
+});
+
+test("quiz override wins and null falls back to the question default", () => {
+  assert.equal(resolveStoryPlacement({
+    defaultRelationship: "RELATED",
+    overrideRelationship: null,
+  }), "BEFORE_QUESTION");
+  assert.equal(resolveStoryPlacement({
+    defaultRelationship: "AFTER_SOLUTION",
+    overrideRelationship: "RELATED",
+  }), "BEFORE_QUESTION");
+  assert.equal(resolveStoryPlacement({
+    defaultRelationship: "RELATED",
+    overrideRelationship: "AFTER_SOLUTION",
+  }), "AFTER_SOLUTION");
+});
+
+test("quiz-specific hidden state uses the existing placement configuration", () => {
+  assert.equal(isStoryPlacementHiddenConfig(storyPlacementConfig(true)), true);
+  assert.equal(isStoryPlacementHiddenConfig(storyPlacementConfig(false)), false);
+  assert.equal(isStoryPlacementHiddenConfig(null), false);
+});
+
+test("historic editorial relationships remain readable without data mutation", () => {
+  assert.equal(storyPlacementFromRelationship("CONTEXT"), "BEFORE_QUESTION");
+  assert.equal(storyPlacementFromRelationship("REVEAL"), "AFTER_SOLUTION");
+  assert.equal(storyPlacementFromRelationship("FOLLOW_UP"), "AFTER_SOLUTION");
 });

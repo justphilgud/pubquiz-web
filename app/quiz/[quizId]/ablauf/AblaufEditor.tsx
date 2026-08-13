@@ -154,6 +154,7 @@ function FlowItemCard({
   const isTimed = item.type === "BREAK" || item.type === "COUNTDOWN";
   const isImage = item.type === "IMAGE" || item.type === "PORTRAIT";
   const isGallery = item.type === "IMAGE_GALLERY" || item.type === "MEDIA_SEQUENCE";
+  const isLinkedStory = item.storyQuestionAssignmentId != null;
   const imagesText = config.images
     ?.map((image) => [image.url, image.altText, image.caption ?? ""].join(" | "))
     .join("\n") ?? "";
@@ -178,12 +179,12 @@ function FlowItemCard({
           </button>
           {canEdit && (
             <>
-              <button type="button" disabled={pending} onClick={() => run(() => move(-1))} className={buttonClass} title="Nach oben">
+              {!isLinkedStory && <button type="button" disabled={pending} onClick={() => run(() => move(-1))} className={buttonClass} title="Nach oben">
                 <ArrowUpIcon className="h-4 w-4" />
-              </button>
-              <button type="button" disabled={pending} onClick={() => run(() => move(1))} className={buttonClass} title="Nach unten">
+              </button>}
+              {!isLinkedStory && <button type="button" disabled={pending} onClick={() => run(() => move(1))} className={buttonClass} title="Nach unten">
                 <ArrowDownIcon className="h-4 w-4" />
-              </button>
+              </button>}
               <button type="button" disabled={pending} onClick={() => run(() => toggleQuizFlowItem({ quizId, itemId: item.id, enabled: !item.enabled }))} className={buttonClass}>
                 {item.enabled ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                 {item.enabled ? "Ausblenden" : "Einblenden"}
@@ -525,7 +526,11 @@ export default function AblaufEditor({ quiz, theme, canEdit, storyElements }: Pr
   const [message, setMessage] = useState("");
   const questionSections = quiz.abschnitte.filter(isQuestionSection);
   const unassignedStories = slides.filter(
-    (slide): slide is Extract<Slide, { typ: "ablauf" }> => slide.typ === "ablauf" && slide.element.anchorType === "BEFORE_QUIZ" && slide.element.anchorKey === "UNASSIGNED",
+    (slide): slide is Extract<Slide, { typ: "ablauf" }> =>
+      slide.typ === "ablauf" &&
+      slide.element.anchorType === "BEFORE_QUIZ" &&
+      slide.element.anchorKey === "UNASSIGNED" &&
+      slide.element.storyQuestionAssignmentId === null,
   );
   const globalSlides = slides.filter(
     (slide) => slide.typ === "ablauf" && slide.abschnitt === null && !(slide.element.anchorType === "BEFORE_QUIZ" && slide.element.anchorKey === "UNASSIGNED"),

@@ -12,7 +12,6 @@ import {
   MegaphoneIcon,
   UsersIcon,
   ChartBarIcon,
-  ClipboardDocumentListIcon,
   BeakerIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
@@ -28,12 +27,13 @@ import {
   getQuizProductActions,
   type QuizProductActionId,
 } from "../quizProductActions";
+import { listSelectableStoryElementsForQuiz } from "@/app/story-elemente/storyElementRepository.server";
+import QuizConfigurationPanel from "./QuizConfigurationPanel";
 
 const productActionAppearance: Record<QuizProductActionId, {
   icon: typeof PlayIcon;
   className: string;
 }> = {
-  FLOW: { icon: ClipboardDocumentListIcon, className: "border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-400 hover:bg-white" },
   MODERATION: { icon: MegaphoneIcon, className: "border-violet-200 bg-violet-50 text-violet-900 hover:border-violet-400" },
   PRESENTATION: { icon: PlayIcon, className: "border-cyan-200 bg-cyan-50 text-cyan-900 hover:border-cyan-400" },
   ANSWER_FORM: { icon: UsersIcon, className: "border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-400" },
@@ -69,6 +69,13 @@ export default async function QuizDetailPage({
   const quizTitelValue = quiz.titel;
   const canManageTemplates = isAdmin(actorContext.actor);
   const productActions = getQuizProductActions(quiz.quiz_id);
+  const selectableStories = await listSelectableStoryElementsForQuiz(
+    actorContext.actor,
+    quiz.quiz_id,
+  );
+  const questionAssignmentById = new Map(
+    quiz.fragen.map((question) => [question.fragen_id, question]),
+  );
 
   async function archiveAction() {
     "use server";
@@ -200,14 +207,49 @@ export default async function QuizDetailPage({
         </div>
 
         <section id="fragen-hinzufuegen" className="mb-6 flex scroll-mt-24 justify-end">
-          <QuizFragenHinzufuegen quizId={quiz.quiz_id} />
+          <QuizFragenHinzufuegen
+            quizId={quiz.quiz_id}
+            storyElements={selectableStories.map((story) => {
+              const linkedAssignment = story.linkedQuestion
+                ? questionAssignmentById.get(story.linkedQuestion.fragen_id) ?? null
+                : null;
+              return {
+                id: story.id,
+                title: story.title,
+                description: story.description,
+                type: story.type,
+                status: story.status,
+                scope: story.scope,
+                eventSeriesName: story.eventSeriesName,
+                quizTitle: story.quizTitle,
+                usageCount: story.usageCount,
+                mediaCount: story.mediaCount,
+                isUsedInQuiz: story.quizUsages.some((usage) => usage.quizId === quiz.quiz_id),
+                linkedQuestion: story.linkedQuestion ? {
+                  id: story.linkedQuestion.fragen_id,
+                  title: story.linkedQuestion.frage,
+                  isInQuiz: linkedAssignment !== null,
+                  sectionId: linkedAssignment?.quiz_abschnitt_id ?? null,
+                } : null,
+              };
+            })}
+          />
         </section>
 
+        <QuizConfigurationPanel
+          quizId={quiz.quiz_id}
+          initialStrategy={quiz.aufloesungsstrategie}
+        />
+
         <QuizFragenSortableTable
-          key={quiz.fragen.map((frage) => frage.quiz_fragen_id).join("-")}
+          key={[
+            ...quiz.fragen.map((frage) => `q${frage.quiz_fragen_id}`),
+            ...quiz.standaloneStoryElements.map((story) => `s${story.placementId}-${story.quiz_abschnitt_id ?? "none"}`),
+          ].join("-")}
           quizId={quiz.quiz_id}
           fragen={quiz.fragen}
           abschnitte={quiz.abschnitte}
+          standaloneStories={quiz.standaloneStoryElements}
         />
       </div>
     </main></>

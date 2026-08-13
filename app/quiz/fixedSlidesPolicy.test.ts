@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   INTRO_SLIDES,
   OUTRO_SLIDES,
+  FIXED_SLIDE_FLOW_TYPES,
   parsePrizeSlots,
   serializePrizeSlots,
 } from "./fixedSlidesPolicy";
@@ -25,6 +26,18 @@ test("the outro contains only announcements", () => {
     OUTRO_SLIDES.map((slide) => slide.title),
     ["Bekanntmachungen"],
   );
+});
+
+test("every editable fixed slide maps to one productive flow item", () => {
+  assert.deepEqual(Object.keys(FIXED_SLIDE_FLOW_TYPES), [
+    "waiting",
+    "countdown",
+    "welcome",
+    "rules",
+    "prizes",
+    "announcements",
+  ]);
+  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 6);
 });
 
 test("multi-word prizes remain one prize per line", () => {

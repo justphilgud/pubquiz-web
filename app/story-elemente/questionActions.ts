@@ -10,8 +10,14 @@ import {
 import {
   getNewStoryQuestionRelationship,
   isStoryQuestionRelationship,
+  PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS,
   type StoryQuestionRelationshipValue,
 } from "./storyElement";
+import {
+  isStoryPlacement,
+  storyPlacementToRelationship,
+  type StoryPlacement,
+} from "./storyPlacement";
 
 type LinkResult = { success: true } | { success: false; message: string };
 
@@ -40,7 +46,13 @@ export async function linkQuestionStoryElement(input: {
   storyElementId: number;
   relationship?: StoryQuestionRelationshipValue;
 }): Promise<LinkResult> {
-  if (input.relationship !== undefined && !isStoryQuestionRelationship(input.relationship)) {
+  if (
+    input.relationship !== undefined &&
+    (!isStoryQuestionRelationship(input.relationship) ||
+      !PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS.some(
+        (relationship) => relationship === input.relationship,
+      ))
+  ) {
     return { success: false, message: "Die Beziehungsart ist ungültig." };
   }
   const { actor, context } = await requireQuestionAccess(input.questionId, "EDIT");
@@ -60,6 +72,7 @@ export async function linkQuestionStoryElement(input: {
       orderBy: [{ sortierung: "desc" }, { frage_story_element_id: "desc" }],
       select: { sortierung: true },
     });
+    const relationship = input.relationship ?? getNewStoryQuestionRelationship();
     await tx.frage_story_elemente.upsert({
       where: { fragen_id_story_element_id: {
         fragen_id: input.questionId,
@@ -68,18 +81,43 @@ export async function linkQuestionStoryElement(input: {
       create: {
         fragen_id: input.questionId,
         story_element_id: input.storyElementId,
-        beziehung: getNewStoryQuestionRelationship(),
+        beziehung: relationship,
         sortierung: (last?.sortierung ?? 0) + 10,
         created_by_user_id: actor.userId,
       },
       update: {
-        beziehung: getNewStoryQuestionRelationship(),
+        beziehung: relationship,
         created_by_user_id: actor.userId,
       },
     });
     return true;
   });
   if (!linked) return { success: false, message: "Dieses Story-Element ist bereits mit einer anderen Frage verknüpft." };
+  revalidateQuestionStoryLinks(input.questionId);
+  return { success: true };
+}
+
+export async function updateQuestionStoryElementPlacement(input: {
+  questionId: number;
+  storyElementId: number;
+  placement: StoryPlacement;
+}): Promise<LinkResult> {
+  if (!isStoryPlacement(input.placement)) {
+    return { success: false, message: "Die Standardposition ist ungültig." };
+  }
+  await requireQuestionAccess(input.questionId, "EDIT");
+  const updated = await prisma.frage_story_elemente.updateMany({
+    where: {
+      fragen_id: input.questionId,
+      story_element_id: input.storyElementId,
+    },
+    data: {
+      beziehung: storyPlacementToRelationship(input.placement),
+    },
+  });
+  if (updated.count !== 1) {
+    return { success: false, message: "Die Story-Verknüpfung wurde nicht gefunden." };
+  }
   revalidateQuestionStoryLinks(input.questionId);
   return { success: true };
 }

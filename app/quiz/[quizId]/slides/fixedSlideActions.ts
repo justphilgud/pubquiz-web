@@ -4,9 +4,12 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireQuizEditor } from "@/app/quiz/quizAccess.server";
 import {
+  FIXED_SLIDE_FLOW_TYPES,
   isIntroSlideId,
+  isOutroSlideId,
   serializePrizeSlots,
 } from "@/app/quiz/fixedSlidesPolicy";
+import { materializeDefaultQuizFlow } from "@/app/quiz/flow/quizFlowRepository.server";
 
 export type FixedSlideActionState = {
   status: "idle" | "success" | "error";
@@ -15,6 +18,24 @@ export type FixedSlideActionState = {
 
 function text(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
+}
+
+async function saveSlideVisibility(
+  quizId: number,
+  slideId: keyof typeof FIXED_SLIDE_FLOW_TYPES,
+  enabled: boolean,
+) {
+  const flow = await materializeDefaultQuizFlow(quizId);
+  const item = flow.find(
+    (candidate) =>
+      candidate.isStandard &&
+      candidate.type === FIXED_SLIDE_FLOW_TYPES[slideId],
+  );
+  if (!item?.persistentId) return;
+  await prisma.quiz_ablauf_elemente.update({
+    where: { quiz_ablauf_element_id: item.persistentId },
+    data: { ist_sichtbar: enabled },
+  });
 }
 
 export async function saveIntroSlide(
@@ -80,6 +101,12 @@ export async function saveIntroSlide(
       }
     }
 
+    await saveSlideVisibility(
+      quizId,
+      slideIdValue,
+      formData.get("enabled") === "on",
+    );
+
     revalidatePath(`/quiz/${quizId}`);
     revalidatePath(`/quiz/${quizId}/slides/intro`);
     return { status: "success", message: "Änderungen wurden gespeichert." };
@@ -97,8 +124,9 @@ export async function saveOutroSlide(
 ): Promise<FixedSlideActionState> {
   try {
     const quizId = Number(formData.get("quizId"));
+    const slideIdValue = String(formData.get("slideId") ?? "");
 
-    if (!Number.isInteger(quizId)) {
+    if (!Number.isInteger(quizId) || !isOutroSlideId(slideIdValue)) {
       return { status: "error", message: "Ungültige Quiz-ID." };
     }
 
@@ -111,6 +139,11 @@ export async function saveOutroSlide(
         outro_musik_url: text(formData, "outroMusikUrl") || null,
       },
     });
+    await saveSlideVisibility(
+      quizId,
+      slideIdValue,
+      formData.get("enabled") === "on",
+    );
 
     revalidatePath(`/quiz/${quizId}`);
     revalidatePath(`/quiz/${quizId}/slides/outro`);

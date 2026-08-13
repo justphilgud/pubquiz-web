@@ -146,6 +146,7 @@ export type QuizFlowItem = {
   storyElementRevisionId?: number | null;
   storyQuestionAssignmentId?: number | null;
   storyRelationship?: string | null;
+  storyDefaultRelationship?: string | null;
   isStandard: boolean;
 };
 
@@ -160,6 +161,7 @@ export type StoredQuizFlowItem = {
   story_element_revision_id?: number | null;
   story_bezugs_quiz_fragen_id?: number | null;
   story_beziehung?: string | null;
+  story_default_beziehung?: string | null;
   sortierung: number;
   ist_sichtbar: boolean;
   bezeichnung: string | null;
@@ -526,6 +528,7 @@ function defaultItem(
     storyElementRevisionId: null,
     storyQuestionAssignmentId: null,
     storyRelationship: null,
+    storyDefaultRelationship: null,
     isStandard: true,
   };
 }
@@ -740,6 +743,7 @@ export function parseStoredQuizFlowItem(
     storyElementRevisionId: item.story_element_revision_id ?? null,
     storyQuestionAssignmentId: item.story_bezugs_quiz_fragen_id ?? null,
     storyRelationship: item.story_beziehung ?? null,
+    storyDefaultRelationship: item.story_default_beziehung ?? null,
     isStandard: item.ist_standard,
   };
 }

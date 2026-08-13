@@ -41,6 +41,23 @@ export const OUTRO_SLIDES = [
   },
 ] as const;
 
+export type OutroSlideId = (typeof OUTRO_SLIDES)[number]["id"];
+
+export const FIXED_SLIDE_FLOW_TYPES = {
+  waiting: "WAITING",
+  countdown: "START_SEQUENCE",
+  welcome: "WELCOME",
+  rules: "RULES",
+  prizes: "PRIZES",
+  announcements: "CLOSING",
+} as const;
+
+export type FixedSlideId = keyof typeof FIXED_SLIDE_FLOW_TYPES;
+
+export function isOutroSlideId(value: string | undefined): value is OutroSlideId {
+  return OUTRO_SLIDES.some((slide) => slide.id === value);
+}
+
 export type FixedSlideStatus = "configured" | "notice";
 
 export function isIntroSlideId(value: string | undefined): value is IntroSlideId {

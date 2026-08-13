@@ -4,6 +4,8 @@ import {
   buildDefaultQuizSections,
   buildQuickQuizSections,
   getNextAutomaticBlockTitle,
+  isAutomaticBlockTitle,
+  synchronizeAutomaticBlockTitles,
 } from "./quizStructure";
 import {
   isIntroSection,
@@ -42,7 +44,7 @@ test("automatic block naming is independent of the presentation template", () =>
   }
 });
 
-test("automatic block naming ignores intro, outro and custom titles", () => {
+test("automatic block naming follows the number of question blocks", () => {
   const sections = [
     { abschnitt_typ: "intro", titel: "Block 1" },
     { abschnitt_typ: "fragenblock", titel: "Block 1" },
@@ -50,22 +52,58 @@ test("automatic block naming ignores intro, outro and custom titles", () => {
     { abschnitt_typ: "fragenblock", titel: "Block 3" },
     { abschnitt_typ: "outro", titel: "Block 2" },
   ];
-  assert.equal(getNextAutomaticBlockTitle(sections), "Block 2");
-  assert.equal(getNextAutomaticBlockTitle([
-    ...sections,
-    { abschnitt_typ: "fragenblock", titel: "Block 2" },
-  ]), "Block 4");
+  assert.equal(getNextAutomaticBlockTitle(sections), "Block 4");
 });
 
-test("existing and individually renamed block titles are not rewritten", () => {
-  const existing = [
-    { abschnitt_typ: "fragenblock", titel: "Fragenblock" },
+test("automatic block titles are synchronized after reordering", () => {
+  const reordered = synchronizeAutomaticBlockTitles([
+    { id: 90, abschnitt_typ: "intro", titel: "Intro" },
+    { id: 3, abschnitt_typ: "fragenblock", titel: "Block 3" },
+    { id: 1, abschnitt_typ: "fragenblock", titel: "Fragenblock 1" },
+    { id: 2, abschnitt_typ: "fragenrunde", titel: "Block 2" },
+    { id: 91, abschnitt_typ: "outro", titel: "Outro" },
+  ]);
+  assert.deepEqual(
+    reordered.map((section) => section.titel),
+    ["Intro", "Block 1", "Block 2", "Block 3", "Outro"],
+  );
+  assert.equal(new Set(reordered.map((section) => section.titel)).size, 5);
+});
+
+test("custom block titles remain unchanged while automatic neighbours follow order", () => {
+  const synchronized = synchronizeAutomaticBlockTitles([
+    { abschnitt_typ: "fragenblock", titel: "Block 3" },
     { abschnitt_typ: "fragenblock", titel: "Musik & Erinnerungen" },
-  ];
-  buildDefaultQuizSections(9);
-  assert.deepEqual(existing.map((entry) => entry.titel), [
+    { abschnitt_typ: "fragenblock", titel: "Fragenblock 1" },
+  ]);
+  assert.deepEqual(synchronized.map((entry) => entry.titel), [
+    "Block 1",
+    "Musik & Erinnerungen",
+    "Block 3",
+  ]);
+});
+
+test("only explicit generated title patterns count as automatic", () => {
+  const existing = [
+    "Block",
+    "Block 1",
+    "Fragenblock 1",
     "Fragenblock",
     "Musik & Erinnerungen",
+  ];
+  assert.deepEqual(existing.map(isAutomaticBlockTitle), [true, true, true, false, false]);
+});
+
+test("legacy bare Block is normalized while a custom title is preserved", () => {
+  const synchronized = synchronizeAutomaticBlockTitles([
+    { abschnitt_typ: "fragenblock", titel: "Block" },
+    { abschnitt_typ: "fragenblock", titel: "Meine Runde" },
+    { abschnitt_typ: "fragenblock", titel: "Block 7" },
+  ]);
+  assert.deepEqual(synchronized.map((entry) => entry.titel), [
+    "Block 1",
+    "Meine Runde",
+    "Block 3",
   ]);
 });
 

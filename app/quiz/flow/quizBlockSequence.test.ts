@@ -20,6 +20,7 @@ function item(input: {
   questionAssignmentId?: number;
   storyQuestionAssignmentId?: number;
   storyRelationship?: string;
+  storyDefaultRelationship?: string;
   storyElementRevisionId?: number;
   enabled?: boolean;
 }): QuizFlowItem {
@@ -40,6 +41,7 @@ function item(input: {
     questionAssignmentId: input.questionAssignmentId ?? null,
     storyQuestionAssignmentId: input.storyQuestionAssignmentId ?? null,
     storyRelationship: input.storyRelationship ?? null,
+    storyDefaultRelationship: input.storyDefaultRelationship ?? null,
     storyElementRevisionId: input.storyElementRevisionId ?? null,
     isStandard: input.type === "QUESTION" || input.type === "QUESTION_SOLUTION",
   };
@@ -224,4 +226,83 @@ test("linked AFTER_SOLUTION stories follow their solution in both standard strat
   ]);
   const content = direct.entries.find((entry) => entry.kind === "CONTENT");
   assert.equal(content ? getQuizBlockSequenceEntryKey(content) : null, "story-placement:19");
+});
+
+test("linked BEFORE_QUESTION stories precede their question", () => {
+  const result = resolveQuizBlockSequence({
+    sectionId: 7,
+    quizStrategy: "AFTER_EACH_QUESTION",
+    sectionStrategy: null,
+    questions,
+    blockItems: [
+      item({ id: 1, type: "QUESTION", order: 1_000, questionAssignmentId: 11 }),
+      item({
+        id: 20,
+        type: "QUOTE",
+        order: 1_100,
+        storyQuestionAssignmentId: 11,
+        storyDefaultRelationship: "RELATED",
+        storyElementRevisionId: 92,
+      }),
+      item({ id: 2, type: "QUESTION", order: 2_000, questionAssignmentId: 12 }),
+    ],
+  });
+  assert.deepEqual(compact(result.entries), [
+    "QUOTE",
+    "QUESTION:11",
+    "QUESTION_SOLUTION:11",
+    "QUESTION:12",
+    "QUESTION_SOLUTION:12",
+  ]);
+});
+
+test("quiz override wins and removing it restores the question default", () => {
+  const build = (storyRelationship: string | undefined) =>
+    resolveQuizBlockSequence({
+      sectionId: 7,
+      quizStrategy: "AFTER_EACH_QUESTION",
+      sectionStrategy: null,
+      questions: questions.slice(0, 1),
+      blockItems: [
+        item({ id: 1, type: "QUESTION", order: 1_000, questionAssignmentId: 11 }),
+        item({
+          id: 21,
+          type: "ANECDOTE",
+          order: 1_100,
+          storyQuestionAssignmentId: 11,
+          storyDefaultRelationship: "AFTER_SOLUTION",
+          storyRelationship,
+          storyElementRevisionId: 93,
+        }),
+      ],
+    });
+
+  assert.deepEqual(compact(build("RELATED").entries), [
+    "ANECDOTE",
+    "QUESTION:11",
+    "QUESTION_SOLUTION:11",
+  ]);
+  assert.deepEqual(compact(build(undefined).entries), [
+    "QUESTION:11",
+    "QUESTION_SOLUTION:11",
+    "ANECDOTE",
+  ]);
+});
+
+test("unlinked story elements remain freely ordered standalone content", () => {
+  const result = resolveQuizBlockSequence({
+    sectionId: 7,
+    quizStrategy: "AFTER_EACH_QUESTION",
+    sectionStrategy: null,
+    questions: questions.slice(0, 1),
+    blockItems: [
+      item({ id: 30, type: "TEXT", order: 500, storyElementRevisionId: 94 }),
+      item({ id: 1, type: "QUESTION", order: 1_000, questionAssignmentId: 11 }),
+    ],
+  });
+  assert.deepEqual(compact(result.entries), [
+    "TEXT",
+    "QUESTION:11",
+    "QUESTION_SOLUTION:11",
+  ]);
 });

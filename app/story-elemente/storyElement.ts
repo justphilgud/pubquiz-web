@@ -50,10 +50,8 @@ export function getNewStoryQuestionRelationship() {
 }
 
 export const PRODUCTIVE_STORY_QUESTION_RELATIONSHIPS = [
-  "CONTEXT",
-  "AFTER_SOLUTION",
-  "REVEAL",
   "RELATED",
+  "AFTER_SOLUTION",
 ] as const satisfies readonly StoryQuestionRelationshipValue[];
 
 export type StoryElementMutationInput = {

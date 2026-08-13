@@ -11,6 +11,8 @@ import QuizQuestionSettings, {
 } from "./QuizQuestionSettings";
 import { getQuizQuestionPointsDisplay } from "@/app/quiz/evaluation/quizQuestionPointsDisplay";
 import type { ResolvedPresentationLayout } from "@/app/rendering/presentation/presentationLayoutResolver";
+import type { StoryElementType } from "@/app/story-elemente/storyElement";
+import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
@@ -29,6 +31,13 @@ export type QuizQuestion = {
   templateId: string | null;
   teilpunkte_faehig: boolean;
   kategorien: string[];
+  storyElements: Array<{
+    id: number;
+    title: string;
+    type: StoryElementType;
+    defaultPlacement: "BEFORE_QUESTION" | "AFTER_SOLUTION";
+    placementOverride: StoryPlacementOverride;
+  }>;
 };
 
 type Props = {
@@ -161,6 +170,16 @@ export default function QuizQuestionItem({
               >
                 {getAnswerModeLabel(frage)}
               </span>
+              {frage.storyElements.length > 0 && (
+                <span
+                  className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-800"
+                  title={frage.storyElements.map((story) => story.title).join(" · ")}
+                >
+                  {frage.storyElements.length} {frage.storyElements.length === 1
+                    ? "Story-Element"
+                    : "Story-Elemente"}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -174,7 +193,10 @@ export default function QuizQuestionItem({
           >
             Konfigurieren
           </button>
-          <QuizFrageVorschauButton fragenId={frage.fragen_id} />
+          <QuizFrageVorschauButton
+            fragenId={frage.fragen_id}
+            storyElements={frage.storyElements}
+          />
 
           <details className="relative">
             <summary
@@ -203,6 +225,7 @@ export default function QuizQuestionItem({
           kannFreieAntwortAktivieren={frage.kann_freie_antwort_aktivieren}
           istPixelbild={frage.templateId === "pixelbild" || frage.templateId === "image_pixel"}
           teilpunkteFaehig={frage.teilpunkte_faehig}
+          storyElements={frage.storyElements}
           actions={settingsActions}
         />
       )}

@@ -5,20 +5,28 @@ type QuizSectionTitleSource = {
   titel: string;
 };
 
+const AUTOMATIC_BLOCK_TITLE = /^(?:Block(?:\s+\d+)?|Fragenblock\s+\d+)$/i;
+
+export function isAutomaticBlockTitle(title: string) {
+  return AUTOMATIC_BLOCK_TITLE.test(title.trim());
+}
+
+export function synchronizeAutomaticBlockTitles<
+  TSection extends QuizSectionTitleSource,
+>(sections: readonly TSection[]) {
+  let questionBlockNumber = 0;
+  return sections.map((section) => {
+    if (!isQuestionSection(section)) return section;
+    questionBlockNumber += 1;
+    if (!isAutomaticBlockTitle(section.titel)) return section;
+    return { ...section, titel: `Block ${questionBlockNumber}` };
+  });
+}
+
 export function getNextAutomaticBlockTitle(
   sections: readonly QuizSectionTitleSource[],
 ) {
-  const usedNumbers = new Set(
-    sections
-      .filter(isQuestionSection)
-      .map((section) => /^Block\s+(\d+)$/i.exec(section.titel.trim())?.[1])
-      .filter((value): value is string => value !== undefined)
-      .map(Number),
-  );
-
-  let nextNumber = 1;
-  while (usedNumbers.has(nextNumber)) nextNumber += 1;
-  return `Block ${nextNumber}`;
+  return `Block ${sections.filter(isQuestionSection).length + 1}`;
 }
 
 export function buildDefaultQuizSections(quizId: number) {

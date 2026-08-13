@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   addFrageToQuiz,
@@ -9,18 +8,26 @@ import {
 } from "../actions";
 import type { QuizFrageSuchResult } from "../actions";
 import ContentSearchControls from "@/app/components/content/ContentSearchControls";
+import StoryElementQuizPicker, {
+  type QuizStoryElementOption,
+} from "@/app/story-elemente/StoryElementQuizPicker";
+import QuizElementSearchResult, {
+  quizElementActionClass,
+} from "./QuizElementSearchResult";
+import { getStoryElementTypeLabel } from "@/app/story-elemente/storyElement";
 
 type Props = {
   quizId: number;
+  storyElements: QuizStoryElementOption[];
 };
-
-const buttonPrimaryClass =
-  "rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-slate-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300";
 
 const buttonSecondaryClass =
   "rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-900 shadow-sm transition hover:bg-slate-50 active:scale-[0.99]";
 
-export default function QuizFragenHinzufuegen({ quizId }: Props) {
+export default function QuizFragenHinzufuegen({
+  quizId,
+  storyElements,
+}: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [suchtext, setSuchtext] = useState("");
@@ -28,6 +35,7 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
   const [meldung, setMeldung] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [includeLinkedStoryElements, setIncludeLinkedStoryElements] = useState(true);
+  const [activeTab, setActiveTab] = useState<"QUESTION" | "STORY_ELEMENT">("QUESTION");
 
   async function handleSearch() {
     setMeldung("");
@@ -68,7 +76,7 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={buttonPrimaryClass}
+        className={quizElementActionClass}
       >
         Quiz-Element hinzufügen
       </button>
@@ -81,7 +89,7 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
         <div>
           <h3 className="font-semibold">Quiz-Element hinzufügen</h3>
           <p className="mt-1 text-sm text-slate-500">
-            Wähle eine Frage aus oder wechsle zu den Story-Elementen im Quizablauf.
+            Fragen und Story-Elemente aus derselben Content-Suche auswählen.
           </p>
         </div>
 
@@ -95,16 +103,29 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        <span className="inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
-          Frage auswählen
-        </span>
-        <Link
-          href={`/quiz/${quizId}/ablauf`}
-          className={`${buttonSecondaryClass} inline-flex min-h-11 items-center`}
+        <button
+          type="button"
+          aria-pressed={activeTab === "QUESTION"}
+          onClick={() => setActiveTab("QUESTION")}
+          className={activeTab === "QUESTION"
+            ? "inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+            : buttonSecondaryClass}
         >
-          Story-Element auswählen
-        </Link>
+          Fragen
+        </button>
+        <button
+          type="button"
+          aria-pressed={activeTab === "STORY_ELEMENT"}
+          onClick={() => setActiveTab("STORY_ELEMENT")}
+          className={activeTab === "STORY_ELEMENT"
+            ? "inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+            : buttonSecondaryClass}
+        >
+          Story-Elemente
+        </button>
       </div>
+
+      {activeTab === "QUESTION" ? <>
 
       <ContentSearchControls
         query={suchtext}
@@ -127,17 +148,15 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
 
       <div className="mt-4 space-y-3">
         {ergebnisse.map((frage) => (
-          <div
+          <QuizElementSearchResult
             key={frage.fragen_id}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div>
-                <div className="font-medium text-slate-900">
-                  {frage.frage}
-                </div>
-
-                <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+            title={frage.frage}
+            description={frage.storyElements.length > 0
+              ? frage.storyElements
+                  .map((story) => `${getStoryElementTypeLabel(story.type)}: ${story.title}`)
+                  .join(" · ")
+              : null}
+            metadata={<>
                   <span
                     className={`rounded-full px-2 py-1 font-semibold ${
                       frage.ist_verwendbar
@@ -155,23 +174,20 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
                       ? frage.kategorien.join(", ")
                       : "-"}
                   </span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleAdd(frage.fragen_id)}
-                disabled={frage.ist_bereits_im_quiz || !frage.ist_verwendbar}
-                className={buttonPrimaryClass}
-              >
-                {frage.ist_bereits_im_quiz
-                  ? "Bereits im Quiz"
-                  : frage.ist_verwendbar
-                    ? "Hinzufügen"
-                    : "Noch nicht verwendbar"}
-              </button>
-            </div>
-          </div>
+                  {frage.storyElements.length > 0 && (
+                    <span className="rounded-full bg-emerald-50 px-2 py-1 font-semibold text-emerald-800">
+                      Story-Elemente: {frage.storyElements.length}
+                    </span>
+                  )}
+                </>}
+            actionLabel={frage.ist_bereits_im_quiz
+              ? "Bereits im Quiz"
+              : frage.ist_verwendbar
+                ? "Hinzufügen"
+                : "Noch nicht verwendbar"}
+            disabled={frage.ist_bereits_im_quiz || !frage.ist_verwendbar}
+            onAction={() => void handleAdd(frage.fragen_id)}
+          />
         ))}
 
         {ergebnisse.length === 0 && !isLoading && (
@@ -180,6 +196,13 @@ export default function QuizFragenHinzufuegen({ quizId }: Props) {
           </p>
         )}
       </div>
+      </> : (
+        <StoryElementQuizPicker
+          quizId={quizId}
+          options={storyElements}
+          embedded
+        />
+      )}
     </div>
   );
 }

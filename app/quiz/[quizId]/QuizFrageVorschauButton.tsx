@@ -3,15 +3,27 @@
 import { useState } from "react";
 import { getFrageVorschau } from "../actions";
 import type { FrageVorschauResult } from "../actions";
+import { getStoryElementTypeLabel } from "@/app/story-elemente/storyElement";
+import {
+  getStoryPlacementLabel,
+  type StoryPlacementOverride,
+} from "@/app/story-elemente/storyPlacement";
 
 type Props = {
   fragenId: number;
+  storyElements: Array<{
+    id: number;
+    title: string;
+    type: Parameters<typeof getStoryElementTypeLabel>[0];
+    defaultPlacement: "BEFORE_QUESTION" | "AFTER_SOLUTION";
+    placementOverride: StoryPlacementOverride;
+  }>;
 };
 
 const buttonClass =
   "rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-900 shadow-sm transition hover:bg-slate-50 active:scale-[0.99]";
 
-export default function QuizFrageVorschauButton({ fragenId }: Props) {
+export default function QuizFrageVorschauButton({ fragenId, storyElements }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [frage, setFrage] = useState<FrageVorschauResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +98,29 @@ export default function QuizFrageVorschauButton({ fragenId }: Props) {
                     </span>
                   </div>
                 </section>
+
+                {storyElements.length > 0 && (
+                  <section>
+                    <h3 className="mb-3 font-semibold">Verknüpfte Story-Elemente</h3>
+                    <div className="space-y-2">
+                      {storyElements.map((story) => {
+                        const position = story.placementOverride === "HIDDEN"
+                          ? "Ausgeblendet"
+                          : story.placementOverride === null
+                            ? `Standard der Frage: ${getStoryPlacementLabel(story.defaultPlacement)}`
+                            : getStoryPlacementLabel(story.placementOverride);
+                        return (
+                          <div key={story.id} className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm">
+                            <strong className="block text-slate-900">{story.title}</strong>
+                            <span className="mt-1 block text-xs font-semibold text-emerald-900">
+                              {getStoryElementTypeLabel(story.type)} · {position}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
 
                 <section>
                   <h3 className="mb-3 font-semibold">Medien zur Frage</h3>

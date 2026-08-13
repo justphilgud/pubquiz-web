@@ -1,10 +1,16 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/Checkbox";
+import { Select } from "@/components/ui/Select";
 import type {
   PresentationLayoutReason,
   ResolvedPresentationLayout,
 } from "@/app/rendering/presentation/presentationLayoutResolver";
+import {
+  getStoryElementTypeLabel,
+  type StoryElementType,
+} from "@/app/story-elemente/storyElement";
+import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
 
 export type QuizQuestionSettingsActions = {
   onPunkteModusChange: (
@@ -15,6 +21,19 @@ export type QuizQuestionSettingsActions = {
     quizFragenId: number,
     freieAntwortErlaubt: boolean,
   ) => void | Promise<void>;
+  onStoryPlacementOverrideChange: (
+    quizFragenId: number,
+    storyElementId: number,
+    placementOverride: StoryPlacementOverride,
+  ) => void | Promise<void>;
+};
+
+type StoryElementSetting = {
+  id: number;
+  title: string;
+  type: StoryElementType;
+  defaultPlacement: "BEFORE_QUESTION" | "AFTER_SOLUTION";
+  placementOverride: StoryPlacementOverride;
 };
 
 type Props = {
@@ -25,6 +44,7 @@ type Props = {
   kannFreieAntwortAktivieren: boolean;
   istPixelbild: boolean;
   teilpunkteFaehig: boolean;
+  storyElements: StoryElementSetting[];
   actions: QuizQuestionSettingsActions;
 };
 
@@ -68,6 +88,61 @@ const reasonLabels: Record<PresentationLayoutReason, string> = {
   CONTRACT_FALLBACK: "Durch den Templatevertrag vorgegeben",
 };
 
+function StoryPlacementSelect({
+  quizFragenId,
+  story,
+  onChange,
+  compact,
+}: {
+  quizFragenId: number;
+  story: StoryElementSetting;
+  onChange: QuizQuestionSettingsActions["onStoryPlacementOverrideChange"];
+  compact: boolean;
+}) {
+  const defaultLabel = story.defaultPlacement === "BEFORE_QUESTION"
+    ? "Vor der Frage"
+    : "Nach der Auflösung";
+
+  return (
+    <label
+      className={compact
+        ? "space-y-2"
+        : "grid gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_minmax(15rem,20rem)] sm:items-center"}
+    >
+      <span className="min-w-0">
+        <span className="block text-xs font-bold uppercase tracking-wide text-slate-500">
+          {compact ? "Story-Position" : getStoryElementTypeLabel(story.type)}
+        </span>
+        <span className="mt-1 block break-words text-sm font-semibold text-slate-900">
+          {compact
+            ? `${getStoryElementTypeLabel(story.type)}: ${story.title}`
+            : story.title}
+        </span>
+      </span>
+      <Select
+        aria-label={`Story-Position für ${story.title}`}
+        value={story.placementOverride ?? "DEFAULT"}
+        onChange={(event) => {
+          const value = event.target.value;
+          void onChange(
+            quizFragenId,
+            story.id,
+            value === "DEFAULT"
+              ? null
+              : value as Exclude<StoryPlacementOverride, null>,
+          );
+        }}
+        className="min-h-11 rounded-xl font-semibold"
+      >
+        <option value="DEFAULT">Standard: {defaultLabel}</option>
+        <option value="BEFORE_QUESTION">Vor der Frage</option>
+        <option value="AFTER_SOLUTION">Nach der Auflösung</option>
+        <option value="HIDDEN">Story-Element nicht anzeigen</option>
+      </Select>
+    </label>
+  );
+}
+
 export default function QuizQuestionSettings({
   quizFragenId,
   resolvedPresentationLayout,
@@ -76,6 +151,7 @@ export default function QuizQuestionSettings({
   kannFreieAntwortAktivieren,
   istPixelbild,
   teilpunkteFaehig,
+  storyElements,
   actions,
 }: Props) {
   return (
@@ -101,12 +177,12 @@ export default function QuizQuestionSettings({
         <span className="block text-xs font-bold uppercase tracking-wide text-slate-500">
           Punktemodus
         </span>
-        <select
+        <Select
           value={punkteModus ?? "standard"}
           onChange={(event) =>
-            actions.onPunkteModusChange(quizFragenId, event.target.value)
+            void actions.onPunkteModusChange(quizFragenId, event.target.value)
           }
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+          className="min-h-11 rounded-xl font-semibold"
         >
           <option value="standard">Standard</option>
           <option value="expertenbonus" disabled={istPixelbild}>
@@ -118,11 +194,20 @@ export default function QuizQuestionSettings({
               ? " (nur ohne Teilpunkte möglich)"
               : ""}
           </option>
-        </select>
+        </Select>
         <span className="block text-xs text-slate-500">
           Risikofragen sind nur bei Fragen ohne Teilpunkte möglich.
         </span>
       </label>
+
+      {storyElements.length === 1 && (
+        <StoryPlacementSelect
+          quizFragenId={quizFragenId}
+          story={storyElements[0]}
+          onChange={actions.onStoryPlacementOverrideChange}
+          compact
+        />
+      )}
 
       {kannFreieAntwortAktivieren && (
         <div className="space-y-2">
@@ -144,12 +229,11 @@ export default function QuizQuestionSettings({
               </p>
             </details>
           </div>
-
           <Checkbox
             variant="card"
             checked={freieAntwortErlaubt}
             onChange={(event) =>
-              actions.onFreeAnswerChange(
+              void actions.onFreeAnswerChange(
                 quizFragenId,
                 event.target.checked,
               )
@@ -157,6 +241,30 @@ export default function QuizQuestionSettings({
             label="Als offene Frage stellen"
           />
         </div>
+      )}
+
+      {storyElements.length > 1 && (
+        <section className="space-y-3 sm:col-span-2 lg:col-span-3">
+          <div>
+            <span className="block text-xs font-bold uppercase tracking-wide text-slate-500">
+              Story-Elemente
+            </span>
+            <p className="mt-1 text-xs text-slate-500">
+              Die Quizposition kann je Story vom Standard der Frage abweichen.
+            </p>
+          </div>
+          <div className="space-y-2">
+            {storyElements.map((story) => (
+              <StoryPlacementSelect
+                key={story.id}
+                quizFragenId={quizFragenId}
+                story={story}
+                onChange={actions.onStoryPlacementOverrideChange}
+                compact={false}
+              />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );

@@ -3,6 +3,10 @@ import {
   type QuizFlowItem,
   type QuizSolutionStrategy,
 } from "./quizFlow";
+import {
+  resolveStoryPlacement,
+  type StoryPlacement,
+} from "@/app/story-elemente/storyPlacement";
 
 export type QuizBlockQuestionIdentity = {
   quiz_fragen_id: number;
@@ -85,27 +89,50 @@ function resolveOrderedQuestions<TQuestion extends QuizBlockQuestionIdentity>(
   return [...persisted, ...missing] satisfies OrderedQuestion<TQuestion>[];
 }
 
+function getLinkedStoryPlacement(item: QuizFlowItem): StoryPlacement | null {
+  if (
+    item.storyElementRevisionId === null ||
+    item.storyElementRevisionId === undefined ||
+    item.storyQuestionAssignmentId === null ||
+    item.storyQuestionAssignmentId === undefined
+  ) {
+    return null;
+  }
+  return resolveStoryPlacement({
+    defaultRelationship: item.storyDefaultRelationship,
+    overrideRelationship: item.storyRelationship,
+  });
+}
+
+function collectLinkedStories(blockItems: readonly QuizFlowItem[]) {
+  const before = new Map<number, QuizFlowItem[]>();
+  const after = new Map<number, QuizFlowItem[]>();
+  for (const item of blockItems) {
+    const placement = getLinkedStoryPlacement(item);
+    const questionId = item.storyQuestionAssignmentId;
+    if (placement === null || questionId === null || questionId === undefined) {
+      continue;
+    }
+    const target = placement === "BEFORE_QUESTION" ? before : after;
+    const entries = target.get(questionId) ?? [];
+    entries.push(item);
+    target.set(questionId, entries);
+  }
+  for (const entries of [...before.values(), ...after.values()]) {
+    entries.sort((left, right) =>
+      left.order - right.order || left.id.localeCompare(right.id)
+    );
+  }
+  return { before, after };
+}
+
 function resolveAutomaticSequence<TQuestion extends QuizBlockQuestionIdentity>(
   questions: readonly TQuestion[],
   blockItems: readonly QuizFlowItem[],
   strategy: Exclude<QuizSolutionStrategy, "MANUAL">,
 ) {
   const orderedQuestions = resolveOrderedQuestions(questions, blockItems);
-  const linkedAfterSolution = new Map<number, QuizFlowItem[]>();
-  for (const item of blockItems) {
-    if (
-      item.storyRelationship === "AFTER_SOLUTION" &&
-      item.storyQuestionAssignmentId !== null &&
-      item.storyQuestionAssignmentId !== undefined
-    ) {
-      const entries = linkedAfterSolution.get(item.storyQuestionAssignmentId) ?? [];
-      entries.push(item);
-      linkedAfterSolution.set(item.storyQuestionAssignmentId, entries);
-    }
-  }
-  for (const entries of linkedAfterSolution.values()) {
-    entries.sort((left, right) => left.order - right.order || left.id.localeCompare(right.id));
-  }
+  const linkedStories = collectLinkedStories(blockItems);
   const core = [
     ...orderedQuestions.map((entry) => ({
       order: entry.order,
@@ -121,7 +148,7 @@ function resolveAutomaticSequence<TQuestion extends QuizBlockQuestionIdentity>(
         (item) =>
           item.type !== "QUESTION" &&
           item.type !== "QUESTION_SOLUTION" &&
-          item.storyRelationship !== "AFTER_SOLUTION",
+          getLinkedStoryPlacement(item) === null,
       )
       .map((item) => ({
         order: item.order,
@@ -133,17 +160,23 @@ function resolveAutomaticSequence<TQuestion extends QuizBlockQuestionIdentity>(
   const result: QuizBlockSequenceEntry<TQuestion>[] = [];
   const solutions: QuizBlockSequenceEntry<TQuestion>[] = [];
   for (const entry of core) {
-    result.push(entry.value);
     if (entry.value.kind === "QUESTION") {
+      const before = linkedStories.before.get(
+        entry.value.question.quiz_fragen_id,
+      ) ?? [];
+      result.push(
+        ...before.map((item) => ({ kind: "CONTENT" as const, item })),
+        entry.value,
+      );
       const solution = {
         kind: "QUESTION_SOLUTION" as const,
         question: entry.value.question,
         item: null,
       };
-      const linkedStories = linkedAfterSolution.get(
+      const after = linkedStories.after.get(
         entry.value.question.quiz_fragen_id,
       ) ?? [];
-      const linkedEntries = linkedStories.map((item) => ({
+      const linkedEntries = after.map((item) => ({
         kind: "CONTENT" as const,
         item,
       }));
@@ -152,6 +185,8 @@ function resolveAutomaticSequence<TQuestion extends QuizBlockQuestionIdentity>(
       } else {
         solutions.push(solution, ...linkedEntries);
       }
+    } else {
+      result.push(entry.value);
     }
   }
   return strategy === "END_OF_BLOCK" ? [...result, ...solutions] : result;
@@ -167,6 +202,7 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
   const result: QuizBlockSequenceEntry<TQuestion>[] = [];
   const seenQuestions = new Set<number>();
   const seenSolutions = new Set<number>();
+  const linkedStories = collectLinkedStories(blockItems);
 
   for (const item of [...blockItems].sort((left, right) =>
     compareOrdered(
@@ -174,12 +210,15 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
       { order: right.order, stable: right.id },
     ),
   )) {
+    if (getLinkedStoryPlacement(item) !== null) continue;
     if (item.type === "QUESTION") {
       const question = item.questionAssignmentId === null
         ? null
         : questionById.get(item.questionAssignmentId) ?? null;
       if (!question || seenQuestions.has(question.quiz_fragen_id)) continue;
       seenQuestions.add(question.quiz_fragen_id);
+      result.push(...(linkedStories.before.get(question.quiz_fragen_id) ?? [])
+        .map((story) => ({ kind: "CONTENT" as const, item: story })));
       result.push({ kind: "QUESTION", question, item });
       continue;
     }
@@ -196,6 +235,8 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
       }
       seenSolutions.add(question.quiz_fragen_id);
       result.push({ kind: "QUESTION_SOLUTION", question, item });
+      result.push(...(linkedStories.after.get(question.quiz_fragen_id) ?? [])
+        .map((story) => ({ kind: "CONTENT" as const, item: story })));
       continue;
     }
     result.push({ kind: "CONTENT", item });
@@ -207,11 +248,15 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
       left.quiz_fragen_id - right.quiz_fragen_id,
   )) {
     if (!seenQuestions.has(question.quiz_fragen_id)) {
+      result.push(...(linkedStories.before.get(question.quiz_fragen_id) ?? [])
+        .map((story) => ({ kind: "CONTENT" as const, item: story })));
       result.push({ kind: "QUESTION", question, item: null });
       seenQuestions.add(question.quiz_fragen_id);
     }
     if (!seenSolutions.has(question.quiz_fragen_id)) {
       result.push({ kind: "QUESTION_SOLUTION", question, item: null });
+      result.push(...(linkedStories.after.get(question.quiz_fragen_id) ?? [])
+        .map((story) => ({ kind: "CONTENT" as const, item: story })));
       seenSolutions.add(question.quiz_fragen_id);
     }
   }

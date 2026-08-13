@@ -291,36 +291,50 @@ export async function addStoryElementToQuiz(input: {
   })) {
     return { success: false, message: "Story-Element ist für dieses Quiz nicht auswählbar." };
   }
-  const duplicate = await prisma.quiz_ablauf_elemente.findFirst({
-    where: {
-      quiz_id: input.quizId,
-      story_element_revision: { story_element_id: story.id },
-    },
-    select: { quiz_ablauf_element_id: true },
+  const linkedQuestion = await prisma.frage_story_elemente.findFirst({
+    where: { story_element_id: story.id },
+    select: { frage: { select: { frage: true } } },
   });
-  if (duplicate) return { success: false, message: "Bereits in diesem Quiz vorhanden." };
-
-  const last = await prisma.quiz_ablauf_elemente.findFirst({
-    where: { quiz_id: input.quizId, anker_typ: "BEFORE_QUIZ", anker_schluessel: "UNASSIGNED" },
-    orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
-    select: { sortierung: true },
+  if (linkedQuestion) {
+    return {
+      success: false,
+      message: `Gehört zur Frage „${linkedQuestion.frage.frage}“ und darf nicht frei als Standalone hinzugefügt werden.`,
+    };
+  }
+  const added = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${story.id})`;
+    const duplicate = await tx.quiz_ablauf_elemente.findFirst({
+      where: {
+        quiz_id: input.quizId,
+        story_element_revision: { story_element_id: story.id },
+      },
+      select: { quiz_ablauf_element_id: true },
+    });
+    if (duplicate) return false;
+    const last = await tx.quiz_ablauf_elemente.findFirst({
+      where: { quiz_id: input.quizId, anker_typ: "BEFORE_QUIZ", anker_schluessel: "UNASSIGNED" },
+      orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
+      select: { sortierung: true },
+    });
+    await tx.quiz_ablauf_elemente.create({
+      data: {
+        quiz_id: input.quizId,
+        typ: story.type,
+        anker_typ: "BEFORE_QUIZ",
+        anker_schluessel: "UNASSIGNED",
+        quiz_abschnitt_id: null,
+        story_element_revision_id: story.revisionId,
+        sortierung: (last?.sortierung ?? 0) + 1_000,
+        ist_sichtbar: false,
+        bezeichnung: story.title,
+        konfiguration: { version: 1 },
+        konfigurations_version: 1,
+        ist_standard: false,
+      },
+    });
+    return true;
   });
-  await prisma.quiz_ablauf_elemente.create({
-    data: {
-      quiz_id: input.quizId,
-      typ: story.type,
-      anker_typ: "BEFORE_QUIZ",
-      anker_schluessel: "UNASSIGNED",
-      quiz_abschnitt_id: null,
-      story_element_revision_id: story.revisionId,
-      sortierung: (last?.sortierung ?? 0) + 1_000,
-      ist_sichtbar: false,
-      bezeichnung: story.title,
-      konfiguration: { version: 1 },
-      konfigurations_version: 1,
-      ist_standard: false,
-    },
-  });
+  if (!added) return { success: false, message: "Bereits in diesem Quiz vorhanden." };
   revalidateStoryElement(story.id);
   revalidatePath(`/quiz/${input.quizId}`);
   revalidatePath(`/quiz/${input.quizId}/ablauf`);
