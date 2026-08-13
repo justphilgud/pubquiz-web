@@ -60,6 +60,15 @@ export type EventSeriesActionResult = {
   message: string;
   errors?: Record<string, string>;
   eventSeriesId?: number;
+  savedValue?: {
+    name: string;
+    publicName: string | null;
+    description: string | null;
+    internalNote: string | null;
+    isPublic: boolean;
+    defaultPresentationTemplateId: string;
+    defaultAnswerFormTemplateId: string;
+  };
 };
 
 function toListItem(series: {
@@ -237,7 +246,7 @@ export async function updateEventSeries(
       errors: { name: "Name ist bereits vergeben." },
     };
   }
-  await prisma.eventreihen.update({
+  const saved = await prisma.eventreihen.update({
     where: { eventreihe_id: eventSeriesId },
     data: {
       name: validated.value.name,
@@ -248,11 +257,33 @@ export async function updateEventSeries(
       default_presentation_template_id: validated.value.defaultPresentationTemplateId,
       default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
     },
+    select: {
+      name: true,
+      oeffentlicher_name: true,
+      beschreibung: true,
+      interne_bemerkung: true,
+      ist_oeffentlich: true,
+      default_presentation_template_id: true,
+      default_answer_form_template_id: true,
+    },
   });
   revalidatePath("/admin/eventreihen");
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`);
   revalidatePath("/quiz");
-  return { success: true, message: "Eventreihe wurde aktualisiert." };
+  return {
+    success: true,
+    message: "Eventreihe wurde aktualisiert.",
+    eventSeriesId,
+    savedValue: {
+      name: saved.name,
+      publicName: saved.oeffentlicher_name,
+      description: saved.beschreibung,
+      internalNote: saved.interne_bemerkung,
+      isPublic: saved.ist_oeffentlich,
+      defaultPresentationTemplateId: saved.default_presentation_template_id,
+      defaultAnswerFormTemplateId: saved.default_answer_form_template_id,
+    },
+  };
 }
 
 export async function archiveEventSeries(

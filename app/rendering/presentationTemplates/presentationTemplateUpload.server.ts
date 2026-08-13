@@ -1,27 +1,37 @@
 import "server-only";
 
 import {
-  getMediaUploadAuthenticationDiagnostics,
   getMediaUploadEnvironment,
   getMediaUploadEnvironmentPrefix,
+  MediaUploadConfigurationError,
 } from "@/app/fragen/editor/mediaUploadEnvironment";
+import { resolvePresentationTemplateUploadPolicy } from "./presentationTemplateUploadPolicy";
 
 export function getPresentationTemplateUploadContext() {
   const environment = getMediaUploadEnvironment();
   const environmentPrefix = getMediaUploadEnvironmentPrefix();
-  const diagnostics = getMediaUploadAuthenticationDiagnostics();
-  const storeBindingConfirmed =
-    process.env.TEMPLATE_MEDIA_UPLOAD_ENABLED === "true";
-  const enabled =
-    storeBindingConfirmed && diagnostics.blobReadWriteTokenPresent;
+  const policy = resolvePresentationTemplateUploadPolicy({
+    environment,
+    explicitlyEnabled: process.env.TEMPLATE_MEDIA_UPLOAD_ENABLED === "true",
+    readWriteToken: process.env.BLOB_READ_WRITE_TOKEN,
+    configuredStoreId: process.env.BLOB_STORE_ID,
+    configuredStoreEnvironment: process.env.MEDIA_UPLOAD_STORE_ENV,
+  });
 
   return {
     environmentPrefix,
-    enabled,
-    disabledReason: enabled
-      ? ""
-      : environment === "development"
-        ? "Development-Präfix und Credential sind vorhanden, die konkrete Non-Production-Store-Zuordnung ist aber noch nicht explizit bestätigt."
-        : "Template-Uploads müssen für diese Umgebung separat und ausdrücklich freigegeben werden.",
+    enabled: policy.enabled,
+    disabledReason: policy.enabled ? "" : policy.reason,
   } as const;
+}
+
+export function requirePresentationTemplateUploadContext() {
+  const context = getPresentationTemplateUploadContext();
+  if (!context.enabled) {
+    throw new MediaUploadConfigurationError(
+      "TEMPLATE_UPLOAD_STORE_NOT_CONFIRMED",
+      context.disabledReason,
+    );
+  }
+  return context;
 }

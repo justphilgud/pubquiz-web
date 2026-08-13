@@ -45,6 +45,10 @@ const categorySection = readFileSync(
   "app/fragen/editor/components/CategorySection.tsx",
   "utf8",
 );
+const creatableMultiSelect = readFileSync(
+  "components/ui/CreatableMultiSelect.tsx",
+  "utf8",
+);
 const adminPage = readFileSync("app/admin/kategorien/page.tsx", "utf8");
 const adminActions = readFileSync("app/admin/kategorien/actions.ts", "utf8");
 const dashboard = readFileSync("app/page.tsx", "utf8");
@@ -141,16 +145,14 @@ test("editor creation is server-authorized and derives active or pending status"
 });
 
 test("category combobox is searchable, keyboard operable, and immediately selects proposals", () => {
-  assert.match(categorySection, /role="combobox"/);
-  assert.match(categorySection, /role="listbox"/);
-  assert.match(categorySection, /event\.key === "ArrowDown"/);
-  assert.match(categorySection, /event\.key === "ArrowUp"/);
-  assert.match(categorySection, /event\.key === "Enter"/);
+  assert.match(categorySection, /CreatableMultiSelect/);
+  assert.match(creatableMultiSelect, /role="combobox"/);
+  assert.match(creatableMultiSelect, /role="listbox"/);
+  assert.match(creatableMultiSelect, /event\.key === "ArrowDown"/);
+  assert.match(creatableMultiSelect, /event\.key === "ArrowUp"/);
+  assert.match(creatableMultiSelect, /event\.key !== "Enter"/);
   assert.match(categorySection, /createOrSuggestCategory/);
-  assert.match(
-    categorySection,
-    /onChangeCategories\(\[\s+\.\.\.new Set\(\[\.\.\.selectedCategoryIds, result\.category\.id\]\),\s+\]\)/,
-  );
+  assert.match(creatableMultiSelect, /new Set\(\[\.\.\.selectedIds, result\.option\.id\]\)/);
   assert.doesNotMatch(categorySection, /CategoryAdminControls/);
 });
 

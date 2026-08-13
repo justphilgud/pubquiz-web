@@ -29,13 +29,43 @@ function isSystemId(id: string) {
   return templateRegistry.presentation.some((template) => template.id === id);
 }
 
+function slugifyTemplateName(name: string) {
+  const slug = name
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 56)
+    .replace(/-+$/g, "");
+  return /^[a-z]/.test(slug) && slug.length >= 3 ? slug : "template";
+}
+
+async function generateUniquePresentationTemplateId(name: string) {
+  const base = slugifyTemplateName(name);
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const suffix = attempt === 0 ? "" : `-${attempt + 1}`;
+    const id = `${base.slice(0, 64 - suffix.length).replace(/-+$/g, "")}${suffix}`;
+    if (isSystemId(id)) continue;
+    const exists = await prisma.presentation_templates.findUnique({
+      where: { presentation_template_id: id },
+      select: { presentation_template_id: true },
+    });
+    if (!exists) return id;
+  }
+  return `template-${crypto.randomUUID().slice(0, 8)}`;
+}
+
 export async function savePresentationTemplate(
   originalId: string | null,
   expectedUpdatedAt: string | null,
   draft: PresentationTemplateDraft,
 ): Promise<PresentationTemplateActionState> {
   const session = await requireAdmin();
-  const result = validatePresentationTemplateDraft(draft);
+  const effectiveDraft = originalId
+    ? draft
+    : { ...draft, id: await generateUniquePresentationTemplateId(draft.name) };
+  const result = validatePresentationTemplateDraft(effectiveDraft);
   if (!result.ok) {
     return {
       success: false,

@@ -4,6 +4,7 @@ import {
 } from "@/app/lib/blobPath";
 import type {
   PresentationDesignStyle,
+  PresentationTemplate,
   TemplateAssetReference,
 } from "@/app/rendering/templateRegistry";
 
@@ -24,6 +25,15 @@ export type PresentationTemplateAssetRoleDefinition = {
   label: string;
   helpText: string;
   multiple: boolean;
+};
+
+export type PresentationTemplateRuntimeAssets = {
+  logo: TemplateAssetReference | null;
+  backgroundImage: TemplateAssetReference | null;
+  heroImage: TemplateAssetReference | null;
+  solutionImage: TemplateAssetReference | null;
+  personalImagePool: TemplateAssetReference[];
+  decorativeImages: TemplateAssetReference[];
 };
 
 export const presentationTemplateAssetRolesByStyle: Record<
@@ -71,6 +81,28 @@ export function isSafeTemplateAssetReference(
     typeof value === "string" &&
     (localAssetPattern.test(value) || managedBlobPattern.test(value))
   );
+}
+
+/**
+ * Normalizes persisted template media into the single asset contract consumed
+ * by both the generator preview and the productive presentation renderer.
+ */
+export function resolvePresentationTemplateRuntimeAssets(
+  template: Pick<PresentationTemplate, "tokens" | "design">,
+): PresentationTemplateRuntimeAssets {
+  const safeReference = (value: unknown) =>
+    isSafeTemplateAssetReference(value) ? value : null;
+  const safeReferences = (values: readonly unknown[]) =>
+    values.filter(isSafeTemplateAssetReference);
+
+  return {
+    logo: safeReference(template.tokens.assets.logo),
+    backgroundImage: safeReference(template.tokens.assets.backgroundImage),
+    heroImage: safeReference(template.design.imagery.heroImage),
+    solutionImage: safeReference(template.design.imagery.solutionImage),
+    personalImagePool: safeReferences(template.design.imagery.personalImagePool),
+    decorativeImages: safeReferences(template.design.imagery.decorativeImages),
+  };
 }
 
 export function buildPresentationTemplateAssetPathname(

@@ -5,6 +5,7 @@ import { getEventSeriesDetails } from "@/app/eventreihen/actions";
 import { loadRenderingMessages } from "@/app/i18n/renderingMessages";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { getAnswerFormTemplate, getPresentationTemplate } from "@/app/rendering/templateRegistry";
+import { getManagedPresentationTemplate } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import { formatMessage } from "@/app/i18n/formatMessage";
 
@@ -25,6 +26,10 @@ export default async function EventSeriesDetailPage({
   const { eventSeriesId } = await params;
   const series = await getEventSeriesDetails(Number(eventSeriesId));
   if (!series) notFound();
+  const [managedPresentation, managedAnswerForm] = await Promise.all([
+    getManagedPresentationTemplate(series.defaultPresentationTemplateId),
+    getManagedPresentationTemplate(series.defaultAnswerFormTemplateId),
+  ]);
   const messages = loadRenderingMessages(getDefaultLocale());
   const roleMessages = loadRoleMessages(getDefaultLocale());
 
@@ -41,8 +46,8 @@ export default async function EventSeriesDetailPage({
         <section className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 md:p-6">
           <div><h2 className="font-semibold">Öffentlicher Name</h2><p className="mt-1 break-words text-slate-600">{series.publicName ?? "–"}</p></div>
           <div><h2 className="font-semibold">Sichtbarkeit</h2><p className="mt-1 text-slate-600">{series.isPublic ? "Öffentlich vorbereitet" : messages.fields.internalOnly}</p></div>
-          <div><h2 className="font-semibold">{messages.fields.defaultPresentation}</h2><p className="mt-1 text-slate-600">{messages.templates[getPresentationTemplate(series.defaultPresentationTemplateId)?.labelKey ?? "presentationDefault"].label}</p></div>
-          <div><h2 className="font-semibold">{messages.fields.defaultAnswerForm}</h2><p className="mt-1 text-slate-600">{messages.templates[getAnswerFormTemplate(series.defaultAnswerFormTemplateId)?.labelKey ?? "answerDefault"].label}</p></div>
+          <div><h2 className="font-semibold">{messages.fields.defaultPresentation}</h2><p className="mt-1 text-slate-600">{managedPresentation?.name ?? messages.templates[getPresentationTemplate(series.defaultPresentationTemplateId)?.labelKey ?? "presentationDefault"].label}</p></div>
+          <div><h2 className="font-semibold">{messages.fields.defaultAnswerForm}</h2><p className="mt-1 text-slate-600">{managedAnswerForm?.name ?? messages.templates[getAnswerFormTemplate(series.defaultAnswerFormTemplateId)?.labelKey ?? "answerDefault"].label}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>

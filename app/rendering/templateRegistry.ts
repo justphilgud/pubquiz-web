@@ -17,8 +17,25 @@ export type BrandColorTokens = {
   danger: `#${string}`;
 };
 
+export const brandFontOptions = [
+  { value: "var(--font-geist-sans), Arial, sans-serif", label: "Geist", character: "Neutral und modern" },
+  { value: "var(--font-source-sans-3), Arial, sans-serif", label: "Source Sans 3", character: "Offen und funktional" },
+  { value: "var(--font-space-grotesk), Arial, sans-serif", label: "Space Grotesk", character: "Geometrisch" },
+  { value: "var(--font-montserrat), Arial, sans-serif", label: "Montserrat", character: "Markant und klar" },
+  { value: "var(--font-nunito), Arial, sans-serif", label: "Nunito", character: "Freundlich und rund" },
+  { value: "var(--font-oswald), Arial, sans-serif", label: "Oswald", character: "Kompakt und plakativ" },
+  { value: "var(--font-roboto-slab), Georgia, serif", label: "Roboto Slab", character: "Technisch und redaktionell" },
+  { value: "var(--font-lora), Georgia, serif", label: "Lora", character: "Klassisch und warm" },
+  { value: "var(--font-playfair-display), Georgia, serif", label: "Playfair Display", character: "Elegant und charaktervoll" },
+  { value: "var(--font-geist-mono), Consolas, monospace", label: "Geist Mono", character: "Präzise und technisch" },
+  { value: "Arial, Helvetica, sans-serif", label: "Arial (Bestand)", character: "Neutral" },
+  { value: "system-ui, sans-serif", label: "System UI (Bestand)", character: "Funktional" },
+] as const;
+
+export type BrandFontFamily = (typeof brandFontOptions)[number]["value"];
+
 export type BrandTypographyTokens = {
-  family: "Arial, Helvetica, sans-serif" | "system-ui, sans-serif";
+  family: BrandFontFamily;
   displayWeight: 700 | 800 | 900;
   bodyWeight: 400 | 500 | 600;
 };
@@ -87,7 +104,7 @@ export type StorybookConfiguration = {
 };
 
 export type BrandAssetTokens = {
-  logo: TemplateAssetReference;
+  logo: TemplateAssetReference | null;
   backgroundImage: TemplateAssetReference | null;
 };
 

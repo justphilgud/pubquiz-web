@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import { resolveAnswerFormTemplate, resolvePresentationTemplate } from "@/app/rendering/templateResolver";
-import { resolveQuizTheme } from "@/app/rendering/theme/quizTheme";
+import { quizThemeStyle, resolveQuizTheme } from "@/app/rendering/theme/quizTheme";
+import {
+  PresentationDesignBackdrop,
+  PresentationDesignHeader,
+} from "@/app/rendering/presentation/PresentationDesignSystem";
 import {
   defaultPresentationTemplateConfig,
+  normalizeTemplateTags,
+  presentationTemplateOptions,
   parsePresentationTemplateConfig,
   toRuntimeAnswerFormTemplate,
   toRuntimePresentationTemplate,
@@ -23,7 +31,10 @@ import {
   requiresDraftRevision,
 } from "./presentationTemplateLifecycle";
 import { filterPresentationTemplates } from "./templateOverviewPolicy";
-import { presentationPreviewScenarios } from "./PresentationTemplatePreview";
+import {
+  PresentationTemplatePreview,
+  presentationPreviewScenarios,
+} from "./PresentationTemplatePreview";
 import { selectDeterministicTemplateImage } from "./deterministicTemplateImage";
 import { getStorybookPeopleMode, getStorybookTitle } from "./storybook";
 import { resolveStorybookComposition } from "./storybookComposition";
@@ -34,8 +45,13 @@ import {
   isAllowedPresentationTemplateAssetPathname,
   isSafeTemplateAssetReference,
   presentationTemplateAssetRolesByStyle,
+  resolvePresentationTemplateRuntimeAssets,
   validatePresentationTemplateAssetFile,
 } from "./presentationTemplateAssets";
+import {
+  readBlobStoreIdFromToken,
+  resolvePresentationTemplateUploadPolicy,
+} from "./presentationTemplateUploadPolicy";
 
 function draft(): PresentationTemplateDraft {
   return {
@@ -119,6 +135,28 @@ test("presets are structurally distinct and preserve personal imagery when switc
   assert.deepEqual(applyPresentationStylePreset(birthday, "CORPORATE").design.imagery.personalImagePool, birthday.design.imagery.personalImagePool);
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "corporate-reference"));
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "birthday-reference"));
+});
+
+test("style changes own composition and surfaces without creating event personalization", () => {
+  const current = createPresentationStylePreset("NEON");
+  current.design.imagery.heroImage = "/hero.jpg";
+  const birthday = applyPresentationStylePreset(current, "BIRTHDAY");
+  assert.equal(birthday.design.composition.layoutPreset, "COLLAGE");
+  assert.deepEqual(birthday.surfaces, createPresentationStylePreset("BIRTHDAY").surfaces);
+  assert.equal(birthday.design.imagery.heroImage, "/hero.jpg");
+  assert.equal(birthday.design.storybook?.sharedTitle, "Unsere gemeinsame Geschichte");
+  assert.deepEqual(birthday.design.storybook?.people, []);
+});
+
+test("legacy personalization and layout values remain parseable after their controls are removed", () => {
+  const legacy = createPresentationStylePreset("CORPORATE");
+  legacy.design.composition.layoutPreset = "MAGAZINE";
+  legacy.design.occasion.personName = "Bestandswert";
+  legacy.design.occasion.eventTitle = "Bestehende Veranstaltung";
+  const parsed = parsePresentationTemplateConfig(legacy);
+  assert.equal(parsed?.design.composition.layoutPreset, "MAGAZINE");
+  assert.equal(parsed?.design.occasion.personName, "Bestandswert");
+  assert.equal(parsed?.design.occasion.eventTitle, "Bestehende Veranstaltung");
 });
 
 test("birthday image selection is deterministic with safe zero, one and multi-image fallbacks", () => {
@@ -303,6 +341,14 @@ test("template asset roles use the central environment-prefixed blob model", () 
     }) ?? "",
     /PNG/,
   );
+  assert.match(
+    validatePresentationTemplateAssetFile({
+      name: "zu-gross.png",
+      size: 10 * 1024 * 1024 + 1,
+      type: "image/png",
+    }) ?? "",
+    /höchstens 10 MB/,
+  );
 });
 
 test("custom visual template resolves through the shared theme contract", () => {
@@ -316,6 +362,161 @@ test("custom visual template resolves through the shared theme contract", () => 
   assert.equal(theme.source.answerFormTemplateId, managed.id);
   assert.equal(theme.colors.primary, managed.config.tokens.colors.primary);
   assert.equal(theme.moderation.variant, managed.config.surfaces.moderation);
+});
+
+test("template asset references survive persistence, replacement, removal and preset changes", () => {
+  const firstBlob = "https://assets.public.blob.vercel-storage.com/dev/template-media/sommer-2026/logo/first.png" as const;
+  const secondBlob = "https://assets.public.blob.vercel-storage.com/dev/template-media/sommer-2026/logo/second.png" as const;
+  const background = "/medien/bilder/hintergrund.jpg" as const;
+  const hero = "https://assets.public.blob.vercel-storage.com/dev/template-media/sommer-2026/hero_image/hero.webp" as const;
+  const decoration = "/medien/bilder/dekoration.png" as const;
+  const value = draft();
+  value.config.tokens.assets.logo = firstBlob;
+  value.config.tokens.assets.backgroundImage = background;
+  value.config.design.imagery.heroImage = hero;
+  value.config.design.imagery.decorativeImages = [decoration];
+
+  const reloaded = parsePresentationTemplateConfig(
+    JSON.parse(JSON.stringify(value.config)),
+  );
+  assert.ok(reloaded);
+  assert.equal(reloaded.tokens.assets.logo, firstBlob);
+  assert.equal(reloaded.tokens.assets.backgroundImage, background);
+  assert.equal(reloaded.design.imagery.heroImage, hero);
+  assert.deepEqual(reloaded.design.imagery.decorativeImages, [decoration]);
+
+  reloaded.tokens.assets.logo = secondBlob;
+  assert.equal(
+    parsePresentationTemplateConfig(JSON.parse(JSON.stringify(reloaded)))
+      ?.tokens.assets.logo,
+    secondBlob,
+  );
+  reloaded.tokens.assets.logo = null;
+  reloaded.tokens.assets.backgroundImage = null;
+  reloaded.design.imagery.heroImage = null;
+  reloaded.design.imagery.decorativeImages = [];
+  const removed = parsePresentationTemplateConfig(
+    JSON.parse(JSON.stringify(reloaded)),
+  );
+  assert.equal(removed?.tokens.assets.logo, null);
+  assert.equal(removed?.tokens.assets.backgroundImage, null);
+  assert.equal(removed?.design.imagery.heroImage, null);
+  assert.deepEqual(removed?.design.imagery.decorativeImages, []);
+
+  const switched = applyPresentationStylePreset(value.config, "CORPORATE");
+  assert.equal(switched.tokens.assets.logo, firstBlob);
+  assert.equal(switched.tokens.assets.backgroundImage, background);
+  assert.equal(switched.design.imagery.heroImage, hero);
+  assert.deepEqual(switched.design.imagery.decorativeImages, [decoration]);
+});
+
+test("preview and productive design renderer consume the same normalized asset contract", () => {
+  const logo = "https://assets.public.blob.vercel-storage.com/dev/template-media/sommer-2026/logo/logo.png" as const;
+  const background = "https://assets.public.blob.vercel-storage.com/dev/template-media/sommer-2026/background/background.jpg" as const;
+  const hero = "/medien/bilder/hero.webp" as const;
+  const decoration = "https://assets.public.blob.vercel-storage.com/dev/template-media/sommer-2026/decoration/deco.png" as const;
+  const config = structuredClone(defaultPresentationTemplateConfig);
+  config.tokens.assets.logo = logo;
+  config.tokens.assets.backgroundImage = background;
+  config.design.imagery.heroImage = hero;
+  config.design.imagery.decorativeImages = [decoration];
+  const managed = { id: "asset-contract", name: "Asset contract", config };
+  const presentation = {
+    template: toRuntimePresentationTemplate(managed),
+    source: "QUIZ" as const,
+    requestedId: managed.id,
+    usedFallback: false,
+  };
+  const theme = resolveQuizTheme({
+    displayName: "Asset quiz",
+    presentation,
+    answerForm: {
+      template: toRuntimeAnswerFormTemplate(managed),
+      source: "QUIZ",
+      requestedId: managed.id,
+      usedFallback: false,
+    },
+  });
+
+  assert.deepEqual(resolvePresentationTemplateRuntimeAssets(presentation.template), {
+    logo,
+    backgroundImage: background,
+    heroImage: hero,
+    solutionImage: null,
+    personalImagePool: [],
+    decorativeImages: [decoration],
+  });
+  assert.equal(theme.identity.logoUrl, theme.assets.logo);
+  assert.match(String(quizThemeStyle(theme).backgroundImage), new RegExp(background.replaceAll("/", "\\/")));
+
+  const productiveHtml = [
+    renderToStaticMarkup(createElement(PresentationDesignHeader, {
+      theme,
+      slideLabel: "Frage",
+      slideNumber: 1,
+      slideCount: 10,
+    })),
+    renderToStaticMarkup(createElement(PresentationDesignBackdrop, {
+      theme,
+      images: [],
+    })),
+  ].join("");
+  for (const reference of [logo, hero, decoration]) {
+    assert.ok(productiveHtml.includes(reference));
+  }
+  assert.match(productiveHtml, /data-template-asset-role="LOGO"/);
+  assert.match(productiveHtml, /data-template-asset-role="HERO_IMAGE"/);
+  assert.match(productiveHtml, /data-template-asset-role="DECORATION"/);
+
+  const previewHtml = renderToStaticMarkup(createElement(PresentationTemplatePreview, {
+    config,
+    templateId: managed.id,
+    templateName: managed.name,
+    scenario: "TEXT",
+  }));
+  for (const reference of [logo, background, hero, decoration]) {
+    assert.ok(previewHtml.includes(reference));
+  }
+});
+
+test("storybook cover prefers the uploaded hero over legacy composition images", () => {
+  const config = createPresentationStylePreset("BIRTHDAY");
+  const uploadedHero = "https://assets.public.blob.vercel-storage.com/dev/template-media/story/hero/uploaded.webp" as const;
+  config.design.imagery.heroImage = uploadedHero;
+  const managed = { id: "storybook-asset-contract", name: "Storybook assets", config };
+  const theme = resolveQuizTheme({
+    displayName: managed.name,
+    presentation: {
+      template: toRuntimePresentationTemplate(managed),
+      source: "QUIZ",
+      requestedId: managed.id,
+      usedFallback: false,
+    },
+    answerForm: {
+      template: toRuntimeAnswerFormTemplate(managed),
+      source: "QUIZ",
+      requestedId: managed.id,
+      usedFallback: false,
+    },
+  });
+  const storybook = theme.design.storybook;
+  assert.ok(storybook);
+  const composition = resolveStorybookComposition({
+    storybook,
+    quizId: 1,
+    questionId: 1,
+    phase: "QUESTION",
+    sequenceIndex: 0,
+    slideType: "frage",
+    contentKind: "COVER",
+  });
+  const html = renderToStaticMarkup(createElement(PresentationDesignBackdrop, {
+    theme,
+    images: [],
+    storybookComposition: composition,
+  }));
+  assert.ok(html.includes(uploadedHero));
+  assert.match(html, /data-template-asset-role="HERO_IMAGE"/);
 });
 
 test("overview filters by text, status and source", () => {
@@ -408,6 +609,108 @@ test("template upload is integrated into the shared signed route but requires ex
   assert.match(uploadContext, /TEMPLATE_MEDIA_UPLOAD_ENABLED === "true"/);
   assert.match(editor, /handleUploadUrl: "\/api\/question-media-upload"/);
   assert.doesNotMatch(editor, /\/api\/template.*upload/);
+});
+
+test("AP2 generator exposes only four visual steps with direct style selection", () => {
+  const generator = readFileSync("app/rendering/presentationTemplates/PresentationTemplateGenerator.tsx", "utf8");
+  assert.match(generator, /\["style", "Stil"\][\s\S]+\["imagery", "Bilder"\][\s\S]+\["branding", "Branding"\][\s\S]+\["activation", "Aktivieren"\]/);
+  assert.doesNotMatch(generator, /EditorSection id="layout"/);
+  assert.doesNotMatch(generator, /EditorSection id="personalization"/);
+  assert.doesNotMatch(generator, /EditorSection id="surfaces"/);
+  assert.doesNotMatch(generator, /EditorSection id="preview"/);
+  assert.doesNotMatch(generator, /Als Grundlage verwenden/);
+  assert.match(generator, /data-style-card/);
+  assert.match(generator, /aria-pressed={selected}/);
+  assert.match(generator, /← Zurück/);
+  assert.match(generator, /Weiter →/);
+});
+
+test("AP2 assets use upload thumbnails, removal and preview placement feedback without path fields", () => {
+  const editor = readFileSync("app/rendering/presentationTemplates/PresentationTemplateAssetEditor.tsx", "utf8");
+  const preview = readFileSync("app/rendering/presentationTemplates/PresentationTemplatePreview.tsx", "utf8");
+  assert.match(editor, /Bild hochladen/);
+  assert.match(editor, /Bild ersetzen/);
+  assert.match(editor, /Entfernen/);
+  assert.match(editor, /onFocusRole/);
+  assert.doesNotMatch(editor, /Bildpfad|Repository-Pfad|font-mono/);
+  assert.match(preview, /data-preview-asset-highlight/);
+  assert.match(preview, /Logo erscheint hier/);
+  assert.match(preview, /Key Visual erscheint hier/);
+});
+
+test("AP2 activation hides stable ids, uses category-like tags and explicit actions", () => {
+  const generator = readFileSync("app/rendering/presentationTemplates/PresentationTemplateGenerator.tsx", "utf8");
+  const actions = readFileSync("app/rendering/presentationTemplates/actions.ts", "utf8");
+  const tags = readFileSync("app/rendering/presentationTemplates/PresentationTemplateTagSelector.tsx", "utf8");
+  const multiSelect = readFileSync("components/ui/CreatableMultiSelect.tsx", "utf8");
+  assert.doesNotMatch(generator, /Stabile ID/);
+  assert.doesNotMatch(generator, /<select value={draft\.status}/);
+  assert.match(generator, /Als Entwurf speichern/);
+  assert.match(generator, /save\("ACTIVE"\)/);
+  assert.match(actions, /generateUniquePresentationTemplateId/);
+  assert.match(actions, /presentation_template_id: id/);
+  assert.match(tags, /CreatableMultiSelect/);
+  assert.match(tags, /Alle Tags entfernen/);
+  assert.match(multiSelect, /aria-multiselectable="true"/);
+  assert.match(multiSelect, /aria-selected={selected}/);
+  assert.match(multiSelect, /duplicateMessage/);
+});
+
+test("AP2 tags trim and collapse case-insensitive duplicates while preserving the first spelling", () => {
+  assert.deepEqual(
+    normalizeTemplateTags([" Versuch1 ", "versuch1", "VERSUCH1", "Quiz Abend"]),
+    ["Versuch1", "Quiz Abend"],
+  );
+  const validated = validatePresentationTemplateDraft({
+    ...draft(),
+    tags: ["Versuch1", " versuch1 ", "VERSUCH1"],
+  });
+  assert.equal(validated.ok, true);
+  if (validated.ok) assert.deepEqual(validated.value.tags, ["Versuch1"]);
+});
+
+test("template uploads require an exact environment-classified Blob store binding", () => {
+  const token = "vercel_blob_rw_store123_secret";
+  assert.equal(readBlobStoreIdFromToken(token), "store123");
+  assert.deepEqual(resolvePresentationTemplateUploadPolicy({
+    environment: "preview",
+    explicitlyEnabled: true,
+    readWriteToken: token,
+    configuredStoreId: "store123",
+    configuredStoreEnvironment: "nonproduction",
+  }), { enabled: true, storeId: "store123" });
+  assert.equal(resolvePresentationTemplateUploadPolicy({
+    environment: "preview",
+    explicitlyEnabled: true,
+    readWriteToken: token,
+    configuredStoreId: "production-store",
+    configuredStoreEnvironment: "nonproduction",
+  }).enabled, false);
+  assert.equal(resolvePresentationTemplateUploadPolicy({
+    environment: "preview",
+    explicitlyEnabled: true,
+    readWriteToken: token,
+    configuredStoreId: "store123",
+    configuredStoreEnvironment: "production",
+  }).enabled, false);
+  assert.equal(resolvePresentationTemplateUploadPolicy({
+    environment: "production",
+    explicitlyEnabled: true,
+    readWriteToken: token,
+    configuredStoreId: "store123",
+    configuredStoreEnvironment: "nonproduction",
+  }).enabled, false);
+});
+
+test("AP2 branding has two reset semantics and curated self-hosted font choices", () => {
+  const generator = readFileSync("app/rendering/presentationTemplates/PresentationTemplateGenerator.tsx", "utf8");
+  const layout = readFileSync("app/layout.tsx", "utf8");
+  assert.match(generator, /Änderungen zurücksetzen/);
+  assert.match(generator, /Auf Stil-Standard zurücksetzen/);
+  assert.match(generator, /window\.confirm\("Branding wirklich/);
+  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 12);
+  assert.match(layout, /Source_Sans_3/);
+  assert.match(layout, /Playfair_Display/);
 });
 
 test("routes and writes enforce admin authorization and migration remains additive", () => {

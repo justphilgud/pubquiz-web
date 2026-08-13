@@ -20,7 +20,6 @@ export async function resolveQuizTemplates(quizId: number) {
     where: { quiz_id: quizId },
     select: {
       titel: true,
-      intro_logo_url: true,
       presentation_template_id: true,
       answer_form_template_id: true,
       eventreihe: {
@@ -76,7 +75,6 @@ export async function resolveQuizTemplates(quizId: number) {
     answerForm,
     theme: resolveQuizTheme({
       displayName: quiz.titel ?? `Quiz ${quizId}`,
-      logoUrl: quiz.intro_logo_url,
       presentation,
       answerForm,
     }),

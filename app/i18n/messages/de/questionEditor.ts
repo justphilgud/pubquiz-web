@@ -201,13 +201,13 @@ export const deQuestionEditorMessages = {
     usableUntil: "Aktuell nutzbar bis einschließlich", expiryAfterHelp: "Ab dem folgenden Tag gilt die Frage als veraltet. Sie wird nicht gelöscht und kann weiterhin gefunden, bearbeitet oder bewusst verwendet werden.",
   },
   categories: {
-    title: "Kategorien", remove: "{name} entfernen", searchLabel: "Kategorie suchen oder eingeben",
+    title: "Kategorien", remove: "{name} entfernen", clearAll: "Alle Kategorien entfernen", searchLabel: "Kategorie suchen oder eingeben",
     searchPlaceholder: "Zum Beispiel: Film", none: "Keine aktiven Kategorien vorhanden.", notFound: "Keine passende Kategorie gefunden.",
     pending: "Noch zu prüfen", archived: "Archiviert", possibleMatch: "Möglicherweise passend",
     similarWarning: "Prüfe die ähnlichen Kategorien, bevor du eine neue anlegst.",
     createFromQuery: "+ „{name}“ als neue Kategorie anlegen",
     suggestFromQuery: "+ „{name}“ als neue Kategorie vorschlagen",
-    creating: "Kategorie wird angelegt …", suggesting: "Vorschlag wird angelegt …",
+    duplicate: "Kategorie „{name}“ existiert bereits.", creating: "Kategorie wird angelegt …", suggesting: "Vorschlag wird angelegt …",
     errors: {
       INVALID_NAME: "Der Kategoriename muss zwischen 1 und 100 Zeichen lang sein.", CATEGORY_EXISTS: "Eine Kategorie mit diesem Namen existiert bereits.", PERMISSION_DENIED: "Für diese Kategorieaktion fehlt die Berechtigung.", UNEXPECTED_ERROR: "Die Kategorieaktion konnte nicht abgeschlossen werden.",
     },

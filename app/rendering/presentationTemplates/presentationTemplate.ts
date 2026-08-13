@@ -4,7 +4,7 @@ import type {
   PresentationTemplateDesign,
   PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
-import { presentationDesigns } from "@/app/rendering/templateRegistry";
+import { brandFontOptions, presentationDesigns } from "@/app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "./presentationTemplateAssets";
 import {
   normalizeStorybookConfiguration,
@@ -76,10 +76,18 @@ export type TemplateValidationResult =
       warnings: TemplateValidationIssue[];
     };
 
-const allowedFonts = [
-  "Arial, Helvetica, sans-serif",
-  "system-ui, sans-serif",
-] as const;
+export function normalizeTemplateTags(tags: readonly string[]) {
+  const normalized = new Map<string, string>();
+  for (const rawTag of tags) {
+    const tag = rawTag.trim().replace(/\s+/g, " ");
+    if (!tag) continue;
+    const key = tag.toLocaleLowerCase("de-DE");
+    if (!normalized.has(key)) normalized.set(key, tag);
+  }
+  return [...normalized.values()];
+}
+
+const allowedFonts = brandFontOptions.map(({ value }) => value);
 
 const displayWeights = [700, 800, 900] as const;
 const bodyWeights = [400, 500, 600] as const;
@@ -91,7 +99,7 @@ const mediumSpacing = ["1rem", "1.5rem"] as const;
 const largeSpacing = ["1.5rem", "2rem", "2.5rem"] as const;
 
 export const presentationTemplateOptions = {
-  fonts: allowedFonts,
+  fonts: brandFontOptions,
   displayWeights,
   bodyWeights,
   radiusPresets: {
@@ -363,7 +371,7 @@ function validateConfig(value: unknown) {
   if (isRecord(assets)) rejectUnknownFields(assets, ["logo", "backgroundImage"], "config.tokens.assets", errors);
   if (
     !isRecord(assets) ||
-    !isSafeAssetReference(assets.logo) ||
+    !isSafeAssetReference(assets.logo, true) ||
     !isSafeAssetReference(assets.backgroundImage, true)
   ) {
     errors.push({ field: "config.tokens.assets", message: "Assets müssen sichere repository-relative Bildpfade verwenden." });
@@ -390,7 +398,7 @@ export function validatePresentationTemplateDraft(
     id: input.id.trim().toLowerCase(),
     name: input.name.trim(),
     description: input.description.trim(),
-    tags: Array.from(new Set(input.tags.map((tag) => tag.trim()).filter(Boolean))),
+    tags: normalizeTemplateTags(input.tags),
   };
 
   if (!normalized.name) errors.push({ field: "name", message: "Name ist erforderlich." });
@@ -400,6 +408,9 @@ export function validatePresentationTemplateDraft(
   }
   if (normalized.description.length > 1000) {
     errors.push({ field: "description", message: "Beschreibung darf maximal 1000 Zeichen enthalten." });
+  }
+  if (normalized.tags.length > 20 || normalized.tags.some((tag) => tag.length > 40)) {
+    errors.push({ field: "tags", message: "Es sind höchstens 20 Tags mit jeweils maximal 40 Zeichen erlaubt." });
   }
   if (!presentationTemplateStatuses.includes(normalized.status)) {
     errors.push({ field: "status", message: "Unbekannter Status." });

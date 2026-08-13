@@ -63,6 +63,7 @@ function parseLogicalEnvironment(value: string): LogicalEnvironment | null {
 
 export function getLogicalEnvironment(): LogicalEnvironment {
   const explicitEnvironment = process.env.MEDIA_UPLOAD_ENV;
+  const vercelEnvironment = process.env.VERCEL_ENV;
 
   if (explicitEnvironment) {
     const parsed = parseLogicalEnvironment(explicitEnvironment);
@@ -74,10 +75,24 @@ export function getLogicalEnvironment(): LogicalEnvironment {
       );
     }
 
+    if (vercelEnvironment) {
+      const parsedVercelEnvironment = parseLogicalEnvironment(vercelEnvironment);
+      if (!parsedVercelEnvironment) {
+        throw new EnvironmentConfigurationError(
+          "VERCEL_ENV_INVALID",
+          "VERCEL_ENV ist für diese Anwendung ungültig.",
+        );
+      }
+      if (parsedVercelEnvironment !== parsed) {
+        throw new EnvironmentConfigurationError(
+          "MEDIA_UPLOAD_ENV_MISMATCH",
+          "MEDIA_UPLOAD_ENV und VERCEL_ENV müssen dieselbe Umgebung bezeichnen.",
+        );
+      }
+    }
+
     return parsed;
   }
-
-  const vercelEnvironment = process.env.VERCEL_ENV;
 
   if (vercelEnvironment) {
     const parsed = parseLogicalEnvironment(vercelEnvironment);

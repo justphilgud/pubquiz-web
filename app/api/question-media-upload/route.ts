@@ -27,6 +27,7 @@ import {
   presentationTemplateAssetUploadRule,
   type PresentationTemplateAssetRole,
 } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
+import { requirePresentationTemplateUploadContext } from "@/app/rendering/presentationTemplates/presentationTemplateUpload.server";
 
 type UploadContext =
   | {
@@ -211,6 +212,7 @@ export async function POST(request: Request) {
         phase = "context-authorization";
         const context = parseUploadContext(clientPayload);
         if (context.target === "TEMPLATE") {
+          requirePresentationTemplateUploadContext();
           const actor = await getQuestionActor(session);
           if (!isAdministrator(actor)) {
             throw new Error("Template-Assets dürfen nur von Administratoren hochgeladen werden.");

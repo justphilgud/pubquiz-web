@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   archiveEventSeries,
   createEventSeries,
@@ -47,6 +48,7 @@ const emptyForm: FormState = {
 };
 
 export function EventSeriesManager({ series, canCreate, messages, presentationTemplates, canAssignPresentationTemplates }: { series: EventSeriesListItem[]; canCreate: boolean; messages: RenderingMessages; presentationTemplates: AssignablePresentationTemplate[]; canAssignPresentationTemplates: boolean }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<"active" | "archived" | "all">("active");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -110,7 +112,22 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
       : await updateEventSeries(editingId, input);
     setMessage(result.message);
     setErrors(result.errors ?? {});
-    if (result.success) window.location.reload();
+    if (!result.success) return;
+    if (result.savedValue) {
+      setForm({
+        name: result.savedValue.name,
+        publicName: result.savedValue.publicName ?? "",
+        description: result.savedValue.description ?? "",
+        internalNote: result.savedValue.internalNote ?? "",
+        isPublic: result.savedValue.isPublic,
+        defaultPresentationTemplateId: result.savedValue.defaultPresentationTemplateId,
+        defaultAnswerFormTemplateId: result.savedValue.defaultAnswerFormTemplateId,
+      });
+    } else {
+      setEditingId(null);
+      setForm(emptyForm);
+    }
+    router.refresh();
   }
 
   return (

@@ -17,6 +17,7 @@ import {
   toRuntimePresentationTemplate,
   type PresentationTemplateConfig,
 } from "./presentationTemplate";
+import type { PresentationTemplateAssetRole } from "./presentationTemplateAssets";
 
 const corePresentationPreviewScenarios = [
   ["TEXT", "Standardfrage"],
@@ -61,12 +62,22 @@ type Props = {
   templateId: string;
   templateName: string;
   scenario: PresentationPreviewScenario;
+  highlightedAssetRole?: PresentationTemplateAssetRole | null;
 };
 
 const PREVIEW_STAGE_WIDTH = 1600;
 const PREVIEW_STAGE_HEIGHT = 900;
 
-function ScaledPreviewStage({ children }: { children: ReactNode }) {
+const assetRoleLabels: Record<PresentationTemplateAssetRole, string> = {
+  LOGO: "Logo erscheint hier",
+  BACKGROUND: "Bühnenhintergrund füllt diese Fläche",
+  HERO_IMAGE: "Key Visual erscheint hier",
+  SOLUTION_IMAGE: "Auflösungsbild erscheint hier",
+  IMAGE_POOL: "Bilder werden in diesen Medienflächen kuratiert",
+  DECORATION: "Dekoration unterstützt die Bühnenränder",
+};
+
+function ScaledPreviewStage({ children, highlightedAssetRole }: { children: ReactNode; highlightedAssetRole?: PresentationTemplateAssetRole | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -100,6 +111,24 @@ function ScaledPreviewStage({ children }: { children: ReactNode }) {
       >
         {children}
       </div>
+      {highlightedAssetRole && (
+        <div
+          data-preview-asset-highlight={highlightedAssetRole}
+          className={`pointer-events-none absolute z-20 grid place-items-center rounded-xl border-2 border-dashed border-amber-300 bg-amber-100/20 p-2 text-center font-bold text-white shadow-[0_0_0_999px_rgba(15,23,42,0.28)] ${
+            highlightedAssetRole === "LOGO"
+              ? "left-[4%] top-[5%] h-[18%] w-[24%]"
+              : highlightedAssetRole === "BACKGROUND"
+                ? "inset-[3%]"
+                : highlightedAssetRole === "DECORATION"
+                  ? "inset-[7%]"
+                  : "right-[6%] top-[22%] h-[58%] w-[42%]"
+          }`}
+        >
+          <span className="rounded-lg bg-slate-950/85 px-3 py-2 text-xs sm:text-sm">
+            {assetRoleLabels[highlightedAssetRole]}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -349,6 +378,7 @@ export function PresentationTemplatePreview({
   templateId,
   templateName,
   scenario,
+  highlightedAssetRole,
 }: Props) {
   const theme = useMemo(() => {
     const effectiveConfig = structuredClone(config);
@@ -373,7 +403,7 @@ export function PresentationTemplatePreview({
 
   if (scenario === "ANSWER_FORM") {
     return (
-      <ScaledPreviewStage>
+      <ScaledPreviewStage highlightedAssetRole={highlightedAssetRole}>
         <AnswerFormDesignPreview theme={theme} />
       </ScaledPreviewStage>
     );
@@ -388,7 +418,7 @@ export function PresentationTemplatePreview({
     fragenAnzahlImBlock: 1,
   };
   return (
-    <ScaledPreviewStage>
+    <ScaledPreviewStage highlightedAssetRole={highlightedAssetRole}>
       <PresentationSlideRenderer
         quiz={quiz}
         slide={slide}

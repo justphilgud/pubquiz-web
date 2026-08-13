@@ -29,6 +29,9 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
   const pageMode = getPresentationTemplatePageMode(template);
   const uploadContext = getPresentationTemplateUploadContext();
   const needsDraftRevision = requiresDraftRevision(template);
+  const availableTags = Array.from(
+    new Set(repository.templates.flatMap((entry) => entry.tags).filter((tag) => tag !== "System")),
+  );
   const duplicateLabel = template.isSystem
     ? "Als eigenes Template verwenden"
     : needsDraftRevision
@@ -98,6 +101,7 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
             mediaUploadPathnamePrefix={uploadContext.environmentPrefix}
             templateUploadsEnabled={uploadContext.enabled}
             templateUploadDisabledReason={uploadContext.disabledReason}
+            availableTags={availableTags}
           />
         </div>
       </main>

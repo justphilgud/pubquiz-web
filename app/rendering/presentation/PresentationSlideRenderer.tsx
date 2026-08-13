@@ -1927,7 +1927,7 @@ function renderAktuellenSlide() {
   const selectedPoolImage = slide?.typ === "ablauf" && isSafeTemplateAssetReference(editorialFlowImage)
     ? editorialFlowImage
     : slide && (slide.typ === "frage" || slide.typ === "aufloesung")
-    ? selectDeterministicTemplateImage(theme.design.imagery.personalImagePool, {
+    ? selectDeterministicTemplateImage(theme.assets.personalImagePool, {
         quizId: quiz.quiz_id,
         questionId: slide.frage.fragen_id,
         phase: slide.typ === "aufloesung" ? "SOLUTION" : "QUESTION",
@@ -1935,12 +1935,12 @@ function renderAktuellenSlide() {
         assetRole: "IMAGE_POOL",
         slideType: slide.typ,
       })
-    : theme.design.imagery.heroImage;
-  const personalImage = slide?.typ === "aufloesung" && theme.design.imagery.solutionImage
-    ? theme.design.imagery.solutionImage
+    : theme.assets.heroImage;
+  const personalImage = slide?.typ === "aufloesung" && theme.assets.solutionImage
+    ? theme.assets.solutionImage
     : selectedPoolImage;
   const collageImages = theme.design.stylePreset === "BIRTHDAY" && personalImage
-    ? [personalImage, ...theme.design.imagery.personalImagePool.filter((image) => image !== personalImage)].slice(0, 3)
+    ? [personalImage, ...theme.assets.personalImagePool.filter((image) => image !== personalImage)].slice(0, 3)
     : [];
   const storybookPhase = slide?.typ === "aufloesung" ? "SOLUTION" : "QUESTION";
   const storybookQuestionId = slide && (slide.typ === "frage" || slide.typ === "aufloesung")

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   eventSeriesSlugBase,
@@ -59,6 +60,22 @@ test("event series assignment accepts only explicitly authorized managed templat
     additionalPresentationTemplateIds: ["sommer-2026"],
     additionalAnswerFormTemplateIds: ["sommer-2026"],
   }).ok, true);
+});
+
+test("event series editor keeps the database-confirmed template value after saving", () => {
+  const actions = readFileSync("app/eventreihen/actions.ts", "utf8");
+  const manager = readFileSync("app/admin/eventreihen/EventSeriesManager.tsx", "utf8");
+  const detail = readFileSync("app/admin/eventreihen/[eventSeriesId]/page.tsx", "utf8");
+  const repository = readFileSync(
+    "app/rendering/presentationTemplates/presentationTemplateRepository.server.ts",
+    "utf8",
+  );
+  assert.match(actions, /savedValue:[\s\S]*defaultPresentationTemplateId: saved\.default_presentation_template_id/);
+  assert.match(manager, /setForm\(\{[\s\S]*result\.savedValue\.defaultPresentationTemplateId/);
+  assert.match(manager, /router\.refresh\(\)/);
+  assert.match(detail, /getManagedPresentationTemplate/);
+  assert.match(detail, /managedPresentation\?\.name/);
+  assert.match(repository, /template\.status === "SYSTEM" \|\| template\.status === "ACTIVE"/);
 });
 
 test("archive state is reversible and archived series stay selectable only for their current quiz", () => {

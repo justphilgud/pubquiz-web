@@ -46,3 +46,11 @@ export { ScoreCard } from "./ScoreCard";
 export { ImageViewer } from "./ImageViewer";
 export { AudioPlayer } from "./AudioPlayer";
 export { VideoPlayer } from "./VideoPlayer";
+export {
+  CreatableMultiSelect,
+  normalizeMultiSelectComparisonKey,
+} from "./CreatableMultiSelect";
+export type {
+  CreatableMultiSelectCreateResult,
+  CreatableMultiSelectOption,
+} from "./CreatableMultiSelect";

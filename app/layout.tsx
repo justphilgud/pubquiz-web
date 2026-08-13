@@ -1,5 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Lora,
+  Montserrat,
+  Nunito,
+  Oswald,
+  Playfair_Display,
+  Roboto_Slab,
+  Source_Sans_3,
+  Space_Grotesk,
+} from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +22,15 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const sourceSans = Source_Sans_3({ variable: "--font-source-sans-3", subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: ["latin"] });
+const montserrat = Montserrat({ variable: "--font-montserrat", subsets: ["latin"] });
+const nunito = Nunito({ variable: "--font-nunito", subsets: ["latin"] });
+const oswald = Oswald({ variable: "--font-oswald", subsets: ["latin"] });
+const robotoSlab = Roboto_Slab({ variable: "--font-roboto-slab", subsets: ["latin"] });
+const lora = Lora({ variable: "--font-lora", subsets: ["latin"] });
+const playfairDisplay = Playfair_Display({ variable: "--font-playfair-display", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${nunito.variable} ${oswald.variable} ${robotoSlab.variable} ${lora.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

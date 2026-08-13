@@ -52,7 +52,7 @@ export function PresentationDesignHeader({
       <header className="presentation-chrome presentation-corporate-header mb-4 grid h-24 shrink-0 grid-cols-[auto_1fr_auto] items-stretch bg-white">
         <div className="presentation-corporate-logo grid min-w-28 place-items-center border-r px-5">
           {theme.identity.logoUrl ? (
-            <img src={theme.identity.logoUrl} alt="" className="h-14 max-w-32 object-contain" />
+            <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="h-14 max-w-32 object-contain" />
           ) : (
             <span className="text-lg font-black">CQ</span>
           )}
@@ -84,12 +84,17 @@ export function PresentationDesignHeader({
   if (theme.design.stylePreset === "BIRTHDAY") {
     return (
       <header className="presentation-chrome presentation-birthday-header relative shrink-0">
-        <div className="presentation-storybook-running-head min-w-0">
-          <div className="presentation-birthday-title truncate">
-            {displayIdentity(theme)}
-          </div>
-          <div className="presentation-primary-text">
-            {slideLabel} <span aria-hidden="true">/</span> {storybookPageKind(storybookComposition)}
+        <div className="presentation-storybook-running-head flex min-w-0 items-center gap-4">
+          {theme.identity.logoUrl && (
+            <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="h-14 w-14 shrink-0 object-contain" />
+          )}
+          <div className="min-w-0">
+            <div className="presentation-birthday-title truncate">
+              {displayIdentity(theme)}
+            </div>
+            <div className="presentation-primary-text">
+              {slideLabel} <span aria-hidden="true">/</span> {storybookPageKind(storybookComposition)}
+            </div>
           </div>
         </div>
         <div className="presentation-birthday-page" aria-label={`Seite ${slideNumber} von ${slideCount}`}>
@@ -105,7 +110,7 @@ export function PresentationDesignHeader({
     <header className="presentation-chrome presentation-neon-header mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
       <div className="flex items-center gap-6">
         {theme.identity.logoUrl && (
-          <img src={theme.identity.logoUrl} alt="" className="h-24 w-24 object-contain" />
+          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="h-24 w-24 object-contain" />
         )}
         <div className="presentation-divider h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
         <div>
@@ -144,23 +149,58 @@ export function PresentationDesignBackdrop({
   images: readonly TemplateAssetReference[];
   storybookComposition?: StorybookComposition | null;
 }) {
+  const decorativeImages = theme.design.composition.decoration === "NONE"
+    ? []
+    : theme.assets.decorativeImages.slice(0, 4);
+  const decorations = decorativeImages.map((source, index) => (
+    <img
+      key={`${source}-${index}`}
+      data-template-asset-role="DECORATION"
+      data-template-decoration-index={index + 1}
+      src={source}
+      alt=""
+      className="presentation-template-decoration-image"
+    />
+  ));
+
   if (theme.design.stylePreset === "CORPORATE") {
     return (
       <div className="presentation-decoration presentation-corporate-decoration pointer-events-none absolute inset-0" aria-hidden="true">
         <span className="presentation-corporate-rule" />
-        {theme.design.imagery.heroImage && (
-          <img src={theme.design.imagery.heroImage} alt="" className="presentation-corporate-brand-image" />
+        {theme.assets.heroImage && (
+          <img data-template-asset-role="HERO_IMAGE" src={theme.assets.heroImage} alt="" className="presentation-corporate-brand-image" />
         )}
+        {decorations}
       </div>
     );
   }
 
   if (theme.design.stylePreset === "BIRTHDAY") {
-    const fallbackVariant = images.length > 0 ? "PORTRAIT" : "EDITORIAL";
+    const fallbackImages = images.length > 0
+      ? images
+      : theme.assets.heroImage
+        ? [theme.assets.heroImage]
+        : [];
+    const fallbackVariant = fallbackImages.length > 0 ? "PORTRAIT" : "EDITORIAL";
     const variant = storybookComposition?.variant ?? fallbackVariant;
+    const compositionAssets = storybookComposition?.assets ?? [];
+    const coverAssets = theme.assets.heroImage && variant === "COVER"
+      ? [{
+          id: "template-hero",
+          source: theme.assets.heroImage,
+          role: "MEMORY" as const,
+          personIds: [],
+          alt: "",
+          caption: null,
+          year: null,
+          order: -1,
+        }]
+      : compositionAssets;
     const storyImages = ["EDITORIAL", "CHAPTER"].includes(variant)
       ? []
-      : storybookComposition?.assets ?? images.map((source, index) => ({
+      : coverAssets.length > 0
+        ? coverAssets
+        : fallbackImages.map((source, index) => ({
           id: `legacy-${index}`,
           source,
           role: "MEMORY" as const,
@@ -176,7 +216,7 @@ export function PresentationDesignBackdrop({
           <div className="presentation-storybook-gallery">
             {storyImages.map((asset, index) => (
               <figure key={asset.id} className="presentation-personal-image" data-storybook-photo={index + 1}>
-                <img src={asset.source} alt={asset.alt} />
+                <img data-template-asset-role={asset.source === theme.assets.heroImage ? "HERO_IMAGE" : "IMAGE_POOL"} src={asset.source} alt={asset.alt} />
                 {(asset.year || asset.caption) && (
                   <figcaption>{asset.year && <span>{asset.year}</span>}{asset.caption}</figcaption>
                 )}
@@ -184,6 +224,7 @@ export function PresentationDesignBackdrop({
             ))}
           </div>
         )}
+        {decorations}
       </div>
     );
   }
@@ -192,9 +233,10 @@ export function PresentationDesignBackdrop({
     <div className="presentation-decoration presentation-neon-decoration pointer-events-none absolute inset-0" aria-hidden="true">
       <span className="presentation-neon-orbit presentation-neon-orbit-one" />
       <span className="presentation-neon-orbit presentation-neon-orbit-two" />
-      {theme.design.imagery.heroImage && (
-        <img src={theme.design.imagery.heroImage} alt="" className="presentation-neon-key-visual" />
+      {theme.assets.heroImage && (
+        <img data-template-asset-role="HERO_IMAGE" src={theme.assets.heroImage} alt="" className="presentation-neon-key-visual" />
       )}
+      {decorations}
     </div>
   );
 }

@@ -12,10 +12,10 @@ import { getPresentationTemplateUploadContext } from "@/app/rendering/presentati
 
 export default async function NewPresentationTemplatePage() {
   await requireAdmin();
-  const { persistenceAvailable } = await listManagedPresentationTemplates();
+  const { persistenceAvailable, templates } = await listManagedPresentationTemplates();
   const uploadContext = getPresentationTemplateUploadContext();
   const initialTemplate: ManagedPresentationTemplate = {
-    id: "mein-template",
+    id: "new-template",
     name: "Mein Template",
     description: "",
     status: "DRAFT",
@@ -29,6 +29,33 @@ export default async function NewPresentationTemplatePage() {
     updatedAt: null,
     usageCount: 0,
   };
+  const availableTags = Array.from(
+    new Set(templates.flatMap((template) => template.tags).filter((tag) => tag !== "System")),
+  );
 
-  return <><AppHeader /><main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8"><div className="mx-auto max-w-7xl space-y-6"><header><Link href="/templates" className="text-sm font-semibold text-slate-600">← Zur Übersicht</Link><h1 className="mt-3 text-3xl font-bold">Template-Generator</h1><p className="mt-2 text-slate-600">Gestalte das visuelle Erscheinungsbild von Präsentation, Moderation und Antwortformular. Der passende Aufbau einer Frage wird weiterhin automatisch gewählt.</p></header>{!persistenceAvailable && <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950">Speichern ist deaktiviert, solange die neue lokale Migration nicht kontrolliert angewendet wurde.</p>}<PresentationTemplateGenerator initialTemplate={initialTemplate} originalId={null} pageMode="DRAFT_EDIT" persistenceAvailable={persistenceAvailable} mediaUploadPathnamePrefix={uploadContext.environmentPrefix} templateUploadsEnabled={uploadContext.enabled} templateUploadDisabledReason={uploadContext.disabledReason} /></div></main></>;
+  return (
+    <>
+      <AppHeader />
+      <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <header>
+            <Link href="/templates" className="text-sm font-semibold text-slate-600">← Zur Übersicht</Link>
+            <h1 className="mt-3 text-3xl font-bold">Template-Generator</h1>
+            <p className="mt-2 text-slate-600">Gestalte ein wiederverwendbares Design aus Stil, Bildern und Branding. Aufbau und Bedienlogik werden automatisch passend gewählt.</p>
+          </header>
+          {!persistenceAvailable && <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950">Speichern ist deaktiviert, solange die lokale Template-Migration nicht kontrolliert angewendet wurde.</p>}
+          <PresentationTemplateGenerator
+            initialTemplate={initialTemplate}
+            originalId={null}
+            pageMode="DRAFT_EDIT"
+            persistenceAvailable={persistenceAvailable}
+            mediaUploadPathnamePrefix={uploadContext.environmentPrefix}
+            templateUploadsEnabled={uploadContext.enabled}
+            templateUploadDisabledReason={uploadContext.disabledReason}
+            availableTags={availableTags}
+          />
+        </div>
+      </main>
+    </>
+  );
 }

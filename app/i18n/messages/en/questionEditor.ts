@@ -50,9 +50,9 @@ export const enQuestionEditorMessages = {
     },
   },
   categories: {
-    searchLabel: "Search or enter a category", searchPlaceholder: "For example: Film", none: "No active categories available.", notFound: "No matching category found.",
+    clearAll: "Remove all categories", searchLabel: "Search or enter a category", searchPlaceholder: "For example: Film", none: "No active categories available.", notFound: "No matching category found.",
     pending: "Pending review", archived: "Archived", possibleMatch: "Possible match", similarWarning: "Check the similar categories before creating a new one.",
-    createFromQuery: "+ Create “{name}” as a new category", suggestFromQuery: "+ Suggest “{name}” as a new category", creating: "Creating category …", suggesting: "Creating suggestion …",
+    createFromQuery: "+ Create “{name}” as a new category", suggestFromQuery: "+ Suggest “{name}” as a new category", duplicate: "Category “{name}” already exists.", creating: "Creating category …", suggesting: "Creating suggestion …",
     errors: { INVALID_NAME: "The category name must contain 1 to 100 characters.", CATEGORY_EXISTS: "A category with this name already exists.", PERMISSION_DENIED: "You are not allowed to perform this category action.", UNEXPECTED_ERROR: "The category action could not be completed." },
   },
   details: {

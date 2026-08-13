@@ -7,6 +7,10 @@ import type {
   TemplateSource,
 } from "../templateRegistry";
 import type { ResolvedTemplate } from "../templateResolver";
+import {
+  resolvePresentationTemplateRuntimeAssets,
+  type PresentationTemplateRuntimeAssets,
+} from "../presentationTemplates/presentationTemplateAssets";
 
 export type ResolvedQuizTheme = {
   version: 1;
@@ -58,9 +62,7 @@ export type ResolvedQuizTheme = {
       large: string;
     };
   };
-  assets: {
-    backgroundImageUrl: string | null;
-  };
+  assets: PresentationTemplateRuntimeAssets;
   design: PresentationTemplateDesign;
   presentation: {
     variant: PresentationTemplate["variant"];
@@ -75,25 +77,26 @@ export type ResolvedQuizTheme = {
 
 export type ResolveQuizThemeInput = {
   displayName: string;
-  logoUrl?: string | null;
   presentation: ResolvedTemplate<PresentationTemplate>;
   answerForm: ResolvedTemplate<AnswerFormTemplate>;
 };
 
 export function resolveQuizTheme({
   displayName,
-  logoUrl,
   presentation,
   answerForm,
 }: ResolveQuizThemeInput): ResolvedQuizTheme {
   const identityTokens = presentation.template.tokens;
   const answerFormIsCompact = answerForm.template.variant === "MINIMAL";
+  const assets = resolvePresentationTemplateRuntimeAssets(
+    presentation.template,
+  );
 
   return {
     version: 1,
     identity: {
       displayName,
-      logoUrl: logoUrl?.trim() || identityTokens.assets.logo || null,
+      logoUrl: assets.logo,
     },
     source: {
       presentationTemplateId: presentation.template.id,
@@ -137,9 +140,7 @@ export function resolveQuizTheme({
         ? answerForm.template.tokens.spacing
         : identityTokens.spacing,
     },
-    assets: {
-      backgroundImageUrl: identityTokens.assets.backgroundImage,
-    },
+    assets,
     design: structuredClone(presentation.template.design),
     presentation: {
       variant: presentation.template.variant,
@@ -209,8 +210,8 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     fontFamily: theme.appearance.fontFamily,
   };
 
-  if (theme.assets.backgroundImageUrl) {
-    style.backgroundImage = `linear-gradient(${theme.colors.background}99, ${theme.colors.background}99), url("${theme.assets.backgroundImageUrl}")`;
+  if (theme.assets.backgroundImage) {
+    style.backgroundImage = `linear-gradient(${theme.colors.background}66, ${theme.colors.background}66), url("${theme.assets.backgroundImage}")`;
   } else if (theme.design.stylePreset === "NEON") {
     style.backgroundImage = `radial-gradient(circle at 20% 20%, ${theme.colors.secondary} 0, ${theme.colors.secondary}22 24%, transparent 42%), radial-gradient(circle at 80% 10%, ${theme.colors.primary}66 0, ${theme.colors.primary}22 22%, transparent 38%), linear-gradient(135deg, #1a0033, ${theme.colors.background} 45%, #001a3a)`;
   } else if (theme.design.stylePreset === "CORPORATE") {

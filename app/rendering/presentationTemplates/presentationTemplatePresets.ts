@@ -31,7 +31,17 @@ export function applyPresentationStylePreset(current: PresentationTemplateConfig
   preset.design.imagery = structuredClone(current.design.imagery);
   preset.design.occasion = structuredClone(current.design.occasion);
   preset.design.storybook = style === "BIRTHDAY"
-    ? structuredClone(current.design.storybook ?? presentationDesigns.BIRTHDAY.storybook)
+    ? structuredClone(current.design.storybook ?? {
+        occasion: "BIRTHDAY",
+        sharedTitle: "Unsere gemeinsame Geschichte",
+        motto: "",
+        subtitle: "",
+        people: [],
+        assets: [],
+        anecdotes: [],
+        chapters: [],
+        material: "CREAM_PAPER",
+      })
     : null;
   preset.design.stylePreset = style;
   preset.design.composition = structuredClone(presentationDesigns[style].composition);
