@@ -243,6 +243,7 @@ model quiz {
   praesentation_status     quiz_praesentation_status?
   quiz_team_sessions       quiz_team_sessions[]
   quiz_teams               quiz_teams[]
+  interaction_runs         quiz_interaction_runs[]
   team_antworten           team_antworten[]
   eventreihe               eventreihen                @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
 
@@ -370,29 +371,30 @@ model frage_story_elemente {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz_fragen {
-  quiz_fragen_id                         Int                    @id @default(autoincrement())
+  quiz_fragen_id                         Int                     @id @default(autoincrement())
   quiz_id                                Int
   fragen_id                              Int
   sortierung                             Int?
-  richtigeantworten                      Int?                   @default(0)
-  falscheantworten                       Int?                   @default(0)
-  antwort_reihenfolge                    Int[]                  @default([])
-  praesentationslayout                   String?                @default("standard")
+  richtigeantworten                      Int?                    @default(0)
+  falscheantworten                       Int?                    @default(0)
+  antwort_reihenfolge                    Int[]                   @default([])
+  praesentationslayout                   String?                 @default("standard")
   quiz_abschnitt_id                      Int?
-  punkte_basis                           Decimal                @default(1)
-  punkte_modus                           String                 @default("standard")
+  punkte_basis                           Decimal                 @default(1)
+  punkte_modus                           String                  @default("standard")
   risiko_pool_teamanzahl                 Int?
   risiko_pool_fixiert_am                 DateTime?
-  freie_antwort_erlaubt                  Boolean                @default(false)
-  verknuepfte_story_elemente_uebernehmen Boolean                @default(true)
-  praesentationsdauer_messungen          Int?                   @default(0)
+  freie_antwort_erlaubt                  Boolean                 @default(false)
+  verknuepfte_story_elemente_uebernehmen Boolean                 @default(true)
+  praesentationsdauer_messungen          Int?                    @default(0)
   praesentationsdauer_sekunden           Int?
-  fragen                                 fragen                 @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
-  quiz                                   quiz                   @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
-  quiz_abschnitte                        quiz_abschnitte?       @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
+  fragen                                 fragen                  @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
+  quiz                                   quiz                    @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
+  quiz_abschnitte                        quiz_abschnitte?        @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])
   team_antworten                         team_antworten[]
-  quiz_ablauf_elemente                   quiz_ablauf_elemente[] @relation("QuizFlowQuestionItem")
-  story_ablauf_elemente                  quiz_ablauf_elemente[] @relation("QuizFlowStoryQuestionReference")
+  quiz_ablauf_elemente                   quiz_ablauf_elemente[]  @relation("QuizFlowQuestionItem")
+  story_ablauf_elemente                  quiz_ablauf_elemente[]  @relation("QuizFlowStoryQuestionReference")
+  interaction_runs                       quiz_interaction_runs[]
 
   @@unique([quiz_id, fragen_id], map: "uq_quiz_fragen")
   @@unique([quiz_id, sortierung], map: "uq_quiz_fragen_sortierung")
@@ -470,6 +472,7 @@ model quiz_ablauf_elemente {
   story_bezugs_quiz_fragen_id Int?
   story_beziehung             StoryQuestionRelationship?
   story_bezugs_frage          quiz_fragen?               @relation("QuizFlowStoryQuestionReference", fields: [story_bezugs_quiz_fragen_id], references: [quiz_fragen_id], onDelete: SetNull)
+  interaction_runs            quiz_interaction_runs[]
 
   @@unique([quiz_id, anker_typ, anker_schluessel, sortierung], map: "uq_quiz_ablauf_slot_sortierung")
   @@unique([quiz_id, typ, quiz_fragen_id], map: "uq_quiz_ablauf_frage_typ")
@@ -482,13 +485,14 @@ model quiz_ablauf_elemente {
 }
 
 model quiz_team_sessions {
-  quiz_team_session_id Int              @id @default(autoincrement())
+  quiz_team_session_id Int                       @id @default(autoincrement())
   quiz_id              Int
   teamname             String
-  erstellt_am          DateTime         @default(now())
-  spieler_anzahl       Int              @default(1)
-  quiz                 quiz             @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  erstellt_am          DateTime                  @default(now())
+  spieler_anzahl       Int                       @default(1)
+  quiz                 quiz                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
   team_antworten       team_antworten[]
+  answer_submissions   team_answer_submissions[]
 
   @@unique([quiz_id, teamname], map: "uq_quiz_team_session_teamname")
   @@schema("pubquiz")
@@ -534,6 +538,9 @@ model team_antworten {
   manuelle_punkte      Decimal?                   @db.Decimal(12, 4)
   bewertet_am          DateTime?
   bewertet_von_user_id Int?
+  interaction_run_id   Int?
+  draft_revision       Int                        @default(0)
+  draft_updated_at     DateTime?
   antworten            antworten?                 @relation(fields: [antwort_id], references: [antwort_id])
   quiz_abschnitte      quiz_abschnitte            @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id], onDelete: Cascade)
   quiz_fragen          quiz_fragen                @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
@@ -542,8 +549,60 @@ model team_antworten {
   antwortfelder        team_antwortfelder[]
   antwortauswahlen     team_antwort_auswahlen[]
   bewertet_von         users?                     @relation("TeamAnswerEvaluator", fields: [bewertet_von_user_id], references: [id], onDelete: SetNull)
+  interaction_run      quiz_interaction_runs?     @relation(fields: [interaction_run_id], references: [interaction_run_id], onDelete: SetNull)
+  submissions          team_answer_submissions[]
 
   @@unique([quiz_fragen_id, quiz_team_session_id], map: "uq_team_antwort_pro_frage")
+  @@index([interaction_run_id, quiz_team_session_id], map: "idx_team_antworten_interaction_team")
+  @@schema("pubquiz")
+}
+
+model quiz_interaction_runs {
+  interaction_run_id     Int                       @id @default(autoincrement())
+  quiz_id                Int
+  quiz_fragen_id         Int?
+  quiz_ablauf_element_id Int?
+  interaction_type       String                    @db.VarChar(32)
+  state                  QuizInteractionState      @default(LOCKED)
+  is_current             Boolean                   @default(false)
+  opened_at              DateTime?
+  deadline_at            DateTime?
+  closed_at              DateTime?
+  revealed_at            DateTime?
+  revision               Int                       @default(0)
+  config_snapshot        Json
+  created_at             DateTime                  @default(now())
+  updated_at             DateTime                  @default(now()) @updatedAt
+  quiz                   quiz                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  quiz_fragen            quiz_fragen?              @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
+  quiz_ablauf_elemente   quiz_ablauf_elemente?     @relation(fields: [quiz_ablauf_element_id], references: [quiz_ablauf_element_id], onDelete: Cascade)
+  team_antworten         team_antworten[]
+  answer_submissions     team_answer_submissions[]
+
+  @@unique([quiz_id], map: "uq_quiz_interaction_runs_current", where: raw("(is_current = true)"))
+  @@index([quiz_id, created_at], map: "idx_quiz_interaction_runs_quiz_created")
+  @@index([quiz_fragen_id], map: "idx_quiz_interaction_runs_question")
+  @@schema("pubquiz")
+}
+
+model team_answer_submissions {
+  team_answer_submission_id Int                        @id @default(autoincrement())
+  interaction_run_id        Int
+  team_antwort_id           Int
+  quiz_team_session_id      Int
+  status                    TeamAnswerSubmissionStatus
+  interaction_type          String                     @db.VarChar(32)
+  payload                   Json
+  draft_revision            Int
+  submitted_at              DateTime                   @default(now())
+  finalization_reason       String?                    @db.VarChar(64)
+  interaction_run           quiz_interaction_runs      @relation(fields: [interaction_run_id], references: [interaction_run_id], onDelete: Cascade)
+  team_antwort              team_antworten             @relation(fields: [team_antwort_id], references: [team_antwort_id], onDelete: Cascade)
+  quiz_team_session         quiz_team_sessions         @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
+
+  @@unique([interaction_run_id, quiz_team_session_id], map: "uq_team_answer_submission_run_team")
+  @@index([team_antwort_id], map: "idx_team_answer_submissions_answer")
+  @@index([quiz_team_session_id, submitted_at], map: "idx_team_answer_submissions_team_time")
   @@schema("pubquiz")
 }
 
@@ -735,6 +794,23 @@ enum QuizAnswerEvaluationSource {
   AUTO
   MANUAL
   LEGACY
+
+  @@schema("pubquiz")
+}
+
+enum QuizInteractionState {
+  LOCKED
+  OPEN
+  COUNTDOWN
+  CLOSED
+  REVEALED
+
+  @@schema("pubquiz")
+}
+
+enum TeamAnswerSubmissionStatus {
+  SUBMITTED
+  AUTO_FINALIZED
 
   @@schema("pubquiz")
 }

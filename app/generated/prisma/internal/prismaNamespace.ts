@@ -421,6 +421,8 @@ export const ModelName = {
   quiz_team_sessions: 'quiz_team_sessions',
   quiz_block_freigaben: 'quiz_block_freigaben',
   team_antworten: 'team_antworten',
+  quiz_interaction_runs: 'quiz_interaction_runs',
+  team_answer_submissions: 'team_answer_submissions',
   frage_antwortfelder: 'frage_antwortfelder',
   team_antwortfelder: 'team_antwortfelder',
   frage_antwortfeld_loesungen: 'frage_antwortfeld_loesungen',
@@ -447,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2227,6 +2229,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    quiz_interaction_runs: {
+      payload: Prisma.$quiz_interaction_runsPayload<ExtArgs>
+      fields: Prisma.quiz_interaction_runsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.quiz_interaction_runsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.quiz_interaction_runsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>
+        }
+        findFirst: {
+          args: Prisma.quiz_interaction_runsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.quiz_interaction_runsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>
+        }
+        findMany: {
+          args: Prisma.quiz_interaction_runsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>[]
+        }
+        create: {
+          args: Prisma.quiz_interaction_runsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>
+        }
+        createMany: {
+          args: Prisma.quiz_interaction_runsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.quiz_interaction_runsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>[]
+        }
+        delete: {
+          args: Prisma.quiz_interaction_runsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>
+        }
+        update: {
+          args: Prisma.quiz_interaction_runsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>
+        }
+        deleteMany: {
+          args: Prisma.quiz_interaction_runsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.quiz_interaction_runsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.quiz_interaction_runsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>[]
+        }
+        upsert: {
+          args: Prisma.quiz_interaction_runsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$quiz_interaction_runsPayload>
+        }
+        aggregate: {
+          args: Prisma.Quiz_interaction_runsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuiz_interaction_runs>
+        }
+        groupBy: {
+          args: Prisma.quiz_interaction_runsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Quiz_interaction_runsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.quiz_interaction_runsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Quiz_interaction_runsCountAggregateOutputType> | number
+        }
+      }
+    }
+    team_answer_submissions: {
+      payload: Prisma.$team_answer_submissionsPayload<ExtArgs>
+      fields: Prisma.team_answer_submissionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.team_answer_submissionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.team_answer_submissionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>
+        }
+        findFirst: {
+          args: Prisma.team_answer_submissionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.team_answer_submissionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>
+        }
+        findMany: {
+          args: Prisma.team_answer_submissionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>[]
+        }
+        create: {
+          args: Prisma.team_answer_submissionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>
+        }
+        createMany: {
+          args: Prisma.team_answer_submissionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.team_answer_submissionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>[]
+        }
+        delete: {
+          args: Prisma.team_answer_submissionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>
+        }
+        update: {
+          args: Prisma.team_answer_submissionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.team_answer_submissionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.team_answer_submissionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.team_answer_submissionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.team_answer_submissionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$team_answer_submissionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Team_answer_submissionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTeam_answer_submissions>
+        }
+        groupBy: {
+          args: Prisma.team_answer_submissionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Team_answer_submissionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.team_answer_submissionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Team_answer_submissionsCountAggregateOutputType> | number
+        }
+      }
+    }
     frage_antwortfelder: {
       payload: Prisma.$frage_antwortfelderPayload<ExtArgs>
       fields: Prisma.frage_antwortfelderFieldRefs
@@ -3475,10 +3625,50 @@ export const Team_antwortenScalarFieldEnum = {
   bewertungs_version: 'bewertungs_version',
   manuelle_punkte: 'manuelle_punkte',
   bewertet_am: 'bewertet_am',
-  bewertet_von_user_id: 'bewertet_von_user_id'
+  bewertet_von_user_id: 'bewertet_von_user_id',
+  interaction_run_id: 'interaction_run_id',
+  draft_revision: 'draft_revision',
+  draft_updated_at: 'draft_updated_at'
 } as const
 
 export type Team_antwortenScalarFieldEnum = (typeof Team_antwortenScalarFieldEnum)[keyof typeof Team_antwortenScalarFieldEnum]
+
+
+export const Quiz_interaction_runsScalarFieldEnum = {
+  interaction_run_id: 'interaction_run_id',
+  quiz_id: 'quiz_id',
+  quiz_fragen_id: 'quiz_fragen_id',
+  quiz_ablauf_element_id: 'quiz_ablauf_element_id',
+  interaction_type: 'interaction_type',
+  state: 'state',
+  is_current: 'is_current',
+  opened_at: 'opened_at',
+  deadline_at: 'deadline_at',
+  closed_at: 'closed_at',
+  revealed_at: 'revealed_at',
+  revision: 'revision',
+  config_snapshot: 'config_snapshot',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Quiz_interaction_runsScalarFieldEnum = (typeof Quiz_interaction_runsScalarFieldEnum)[keyof typeof Quiz_interaction_runsScalarFieldEnum]
+
+
+export const Team_answer_submissionsScalarFieldEnum = {
+  team_answer_submission_id: 'team_answer_submission_id',
+  interaction_run_id: 'interaction_run_id',
+  team_antwort_id: 'team_antwort_id',
+  quiz_team_session_id: 'quiz_team_session_id',
+  status: 'status',
+  interaction_type: 'interaction_type',
+  payload: 'payload',
+  draft_revision: 'draft_revision',
+  submitted_at: 'submitted_at',
+  finalization_reason: 'finalization_reason'
+} as const
+
+export type Team_answer_submissionsScalarFieldEnum = (typeof Team_answer_submissionsScalarFieldEnum)[keyof typeof Team_answer_submissionsScalarFieldEnum]
 
 
 export const Frage_antwortfelderScalarFieldEnum = {
@@ -3864,6 +4054,34 @@ export type ListEnumQuizAnswerEvaluationSourceFieldRefInput<$PrismaModel> = Fiel
 
 
 /**
+ * Reference to a field of type 'QuizInteractionState'
+ */
+export type EnumQuizInteractionStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizInteractionState'>
+
+
+
+/**
+ * Reference to a field of type 'QuizInteractionState[]'
+ */
+export type ListEnumQuizInteractionStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizInteractionState[]'>
+
+
+
+/**
+ * Reference to a field of type 'TeamAnswerSubmissionStatus'
+ */
+export type EnumTeamAnswerSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamAnswerSubmissionStatus'>
+
+
+
+/**
+ * Reference to a field of type 'TeamAnswerSubmissionStatus[]'
+ */
+export type ListEnumTeamAnswerSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TeamAnswerSubmissionStatus[]'>
+
+
+
+/**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -4107,6 +4325,8 @@ export type GlobalOmitConfig = {
   quiz_team_sessions?: Prisma.quiz_team_sessionsOmit
   quiz_block_freigaben?: Prisma.quiz_block_freigabenOmit
   team_antworten?: Prisma.team_antwortenOmit
+  quiz_interaction_runs?: Prisma.quiz_interaction_runsOmit
+  team_answer_submissions?: Prisma.team_answer_submissionsOmit
   frage_antwortfelder?: Prisma.frage_antwortfelderOmit
   team_antwortfelder?: Prisma.team_antwortfelderOmit
   frage_antwortfeld_loesungen?: Prisma.frage_antwortfeld_loesungenOmit

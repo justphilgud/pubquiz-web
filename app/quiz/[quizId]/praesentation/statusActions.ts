@@ -8,17 +8,27 @@ import {
   requireQuizViewer,
 } from "../../quizAccess.server";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
+import { syncInteractionForPresentation } from "@/app/quiz/interaction/interaction.server";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
-  return prisma.quiz_praesentation_status.upsert({
-    where: { quiz_id: quizId },
-    update: {},
-    create: {
-      quiz_id: quizId,
-      slide_index: 0,
-      slide_started_at: new Date(),
-    },
+  return prisma.$transaction(async (tx) => {
+    const status = await tx.quiz_praesentation_status.upsert({
+      where: { quiz_id: quizId },
+      update: {},
+      create: {
+        quiz_id: quizId,
+        slide_index: 0,
+        slide_started_at: new Date(),
+      },
+    });
+    if (status.slide_key) {
+      await syncInteractionForPresentation(tx, {
+        quizId,
+        slideKey: status.slide_key,
+      });
+    }
+    return status;
   });
 }
 
@@ -120,6 +130,8 @@ export async function setPraesentationSlideIndex(
       });
     }
 
+    await syncInteractionForPresentation(tx, { quizId, slideKey });
+
     return status;
   });
 }
@@ -146,25 +158,39 @@ export async function getAntwortStatus(
     };
   }
 
-  const antwortenEingegangen = await prisma.team_antworten.count({
-    where: {
-      quiz_id: quizId,
-      quiz_fragen_id: quizFragenId,
-    },
+  const currentRun = await prisma.quiz_interaction_runs.findFirst({
+    where: { quiz_id: quizId, quiz_fragen_id: quizFragenId, is_current: true },
+    select: { interaction_run_id: true },
   });
-
-  const letzteAntwort = await prisma.team_antworten.findFirst({
-    where: {
-      quiz_id: quizId,
-      quiz_fragen_id: quizFragenId,
-    },
-    orderBy: {
-      aktualisiert_am: "desc",
-    },
-    select: {
-      aktualisiert_am: true,
-    },
-  });
+  let antwortenEingegangen: number;
+  let letzteAntwortAt: Date | null;
+  if (currentRun) {
+    const [count, last] = await Promise.all([
+        prisma.team_answer_submissions.count({
+          where: { interaction_run_id: currentRun.interaction_run_id },
+        }),
+        prisma.team_answer_submissions.findFirst({
+          where: { interaction_run_id: currentRun.interaction_run_id },
+          orderBy: { submitted_at: "desc" },
+          select: { submitted_at: true },
+        }),
+      ]);
+    antwortenEingegangen = count;
+    letzteAntwortAt = last?.submitted_at ?? null;
+  } else {
+    const [count, last] = await Promise.all([
+        prisma.team_antworten.count({
+          where: { quiz_id: quizId, quiz_fragen_id: quizFragenId },
+        }),
+        prisma.team_antworten.findFirst({
+          where: { quiz_id: quizId, quiz_fragen_id: quizFragenId },
+          orderBy: { aktualisiert_am: "desc" },
+          select: { aktualisiert_am: true },
+        }),
+      ]);
+    antwortenEingegangen = count;
+    letzteAntwortAt = last?.aktualisiert_am ?? null;
+  }
 
   return {
     teamsAngemeldet,
@@ -173,7 +199,7 @@ export async function getAntwortStatus(
       teamsAngemeldet > 0
         ? Math.round((antwortenEingegangen / teamsAngemeldet) * 100)
         : 0,
-    letzteAntwortAt: letzteAntwort?.aktualisiert_am ?? null,
+    letzteAntwortAt,
   };
 }
 export async function starteQuiz(quizId: number) {

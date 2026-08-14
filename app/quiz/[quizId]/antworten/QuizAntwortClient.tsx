@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import {
   searchTeamsForAntworten,
-  saveTeamAntwort,
+  saveTeamAntwortDraft,
   startQuizTeamSession,
   getQuizAntwortStatusLive,
+  getQuizLiveSnapshot,
+  submitTeamAntwort,
 } from "../../actions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
@@ -13,6 +15,10 @@ import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction
 import GenericAnswerRenderer, {
   type TeamAnswerDraft,
 } from "./GenericAnswerRenderer";
+import {
+  interactionPayloadToDraft,
+  type QuizInteractionPayload,
+} from "@/app/quiz/interaction/interactionPayload";
 
 type TeamAntwortState = TeamAnswerDraft;
 
@@ -41,6 +47,14 @@ type AntwortStatus = {
   | undefined;
 
   blockIstGesperrt: boolean;
+  interactionRun: {
+    id: number;
+    type: string;
+    state: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
+    deadlineAt: string | null;
+    revision: number;
+  } | null;
+  interactionState: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
   answerPhase: "QUESTION" | "SOLUTION" | "NON_QUESTION" | "LEGACY" | "UNKNOWN";
   presentationStatusText: string | null;
 
@@ -73,6 +87,9 @@ type AntwortStatus = {
       antwortId: number | null;
       antwortIds?: number[];
       antwortText: string | null;
+      draftRevision: number;
+      draftUpdatedAt: string;
+      submissionStatus: "SUBMITTED" | "AUTO_FINALIZED" | null;
       antwortfelder?: {
         antwortfeldId: number;
         antwortText: string | null;
@@ -110,6 +127,16 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
   const [antworten, setAntworten] = useState<Record<number, TeamAntwortState>>(
     {}
   );
+  const [draftRevisions, setDraftRevisions] = useState<Record<number, number>>(
+    {},
+  );
+  const [submissionStatuses, setSubmissionStatuses] = useState<
+    Record<number, "SUBMITTED" | "AUTO_FINALIZED" | undefined>
+  >({});
+  const [currentSubmissionStatus, setCurrentSubmissionStatus] = useState<
+    "SUBMITTED" | "AUTO_FINALIZED" | null
+  >(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isLoadingTeams, setIsLoadingTeams] = useState(false);
   const [isStartingSession, setIsStartingSession] = useState(false);
@@ -180,22 +207,94 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
   }, [teamname, session]);
 
   useEffect(() => {
-    const interval = window.setInterval(async () => {
-      const aktuelleDaten = await getQuizAntwortStatusLive(
+    let active = true;
+    async function refresh() {
+      const snapshot = await getQuizLiveSnapshot(
         liveDaten.quiz_id,
-        session?.sessionToken
+        session?.sessionToken,
       );
-
-      if (aktuelleDaten) {
-        setLiveDaten(aktuelleDaten as AntwortStatus);
+      if (!active) return;
+      setCurrentSubmissionStatus(
+        snapshot.teamSpecificState?.submission?.status ?? null,
+      );
+      const currentQuestionId = liveDaten.fragen[0]?.quiz_fragen_id ?? null;
+      const nextQuestionId = snapshot.activeQuestionReference?.quizFragenId ?? null;
+      const needsFullRefresh =
+        currentQuestionId !== nextQuestionId ||
+        liveDaten.interactionState !== snapshot.publicState ||
+        liveDaten.interactionRun?.revision !== snapshot.interactionRun?.revision;
+      if (needsFullRefresh) {
+        const aktuelleDaten = await getQuizAntwortStatusLive(
+          liveDaten.quiz_id,
+          session?.sessionToken,
+        );
+        if (active && aktuelleDaten) {
+          const nextLiveData = aktuelleDaten as AntwortStatus;
+          if (liveDaten.interactionRun?.id !== nextLiveData.interactionRun?.id) {
+            setAntworten({});
+            setDraftRevisions({});
+            setSubmissionStatuses({});
+          }
+          setLiveDaten(nextLiveData);
+        }
+        return;
       }
-    }, 2000);
-
-    return () => window.clearInterval(interval);
-  }, [liveDaten.quiz_id, session?.sessionToken]);
+      const teamState = snapshot.teamSpecificState;
+      const question = liveDaten.fragen[0];
+      if (
+        question &&
+        teamState?.draft &&
+        teamState.draft.revision >
+          (draftRevisions[question.quiz_fragen_id] ?? 0)
+      ) {
+        const serverDraft = interactionPayloadToDraft(
+          question.interaction,
+          teamState.draft.payload as QuizInteractionPayload,
+        );
+        setAntworten((current) => ({
+          ...current,
+          [question.quiz_fragen_id]:
+            (draftRevisions[question.quiz_fragen_id] ?? 0) >
+            teamState.draft!.revision
+              ? current[question.quiz_fragen_id]
+              : serverDraft,
+        }));
+        setDraftRevisions((current) => ({
+          ...current,
+          [question.quiz_fragen_id]: teamState.draft!.revision,
+        }));
+      }
+      if (question && teamState?.submission?.status) {
+        setSubmissionStatuses((current) => ({
+          ...current,
+          [question.quiz_fragen_id]: teamState.submission!.status,
+        }));
+      }
+    }
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 1500);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [
+    draftRevisions,
+    liveDaten.fragen,
+    liveDaten.interactionRun?.id,
+    liveDaten.interactionRun?.revision,
+    liveDaten.interactionState,
+    liveDaten.quiz_id,
+    session?.sessionToken,
+  ]);
 
   useEffect(() => {
-    if (!session || !speicherBlockId || blockIstGesperrt) {
+    if (
+      !session ||
+      !speicherBlockId ||
+      blockIstGesperrt ||
+      isSubmitting ||
+      !liveDaten.interactionRun
+    ) {
       return;
     }
     const timeout = window.setTimeout(async () => {
@@ -205,15 +304,21 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       try {
         const results = await Promise.all(
           Object.entries(antworten)
-            .filter(([quizFragenId]) =>
-              visibleQuestionIds.has(Number(quizFragenId)),
-            )
-            .map(([quizFragenId, antwort]) =>
-              saveTeamAntwort({
+            .filter(([quizFragenId]) => {
+              const id = Number(quizFragenId);
+              return (
+                visibleQuestionIds.has(id) && !submissionStatuses[id]
+              );
+            })
+            .map(async ([quizFragenId, antwort]) => {
+              const questionId = Number(quizFragenId);
+              const result = await saveTeamAntwortDraft({
                 quizId: liveDaten.quiz_id,
                 quizAbschnittId: speicherBlockId,
-                quizFragenId: Number(quizFragenId),
+                quizFragenId: questionId,
                 quizTeamSessionToken: session.sessionToken,
+                interactionRunId: liveDaten.interactionRun!.id,
+                expectedDraftRevision: draftRevisions[questionId] ?? 0,
                 antwortText: antwort.antwortText,
                 antwortId: antwort.antwortId,
                 antwortIds: antwort.antwortIds,
@@ -223,10 +328,57 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                     antwortText,
                   }),
                 ),
-              }),
-            ),
+              });
+              return { questionId, result };
+            }),
         );
-        if (results.some((result) => !result.success)) {
+        for (const { questionId, result } of results) {
+          if (result.success) {
+            setDraftRevisions((current) => ({
+              ...current,
+              [questionId]: result.draftRevision,
+            }));
+          } else if (result.reason === "FINALIZED") {
+            setSubmissionStatuses((current) => ({
+              ...current,
+              [questionId]: "SUBMITTED",
+            }));
+          }
+        }
+        const conflict = results.find(
+          ({ result }) => !result.success && result.reason === "REVISION_CONFLICT",
+        );
+        if (conflict) {
+          const snapshot = await getQuizLiveSnapshot(
+            liveDaten.quiz_id,
+            session.sessionToken,
+          );
+          const question = liveDaten.fragen.find(
+            (entry) => entry.quiz_fragen_id === conflict.questionId,
+          );
+          if (question && snapshot.teamSpecificState?.draft) {
+            setAntworten((current) => ({
+              ...current,
+              [conflict.questionId]: interactionPayloadToDraft(
+                question.interaction,
+                snapshot.teamSpecificState!.draft!.payload as QuizInteractionPayload,
+              ),
+            }));
+            setDraftRevisions((current) => ({
+              ...current,
+              [conflict.questionId]: snapshot.teamSpecificState!.draft!.revision,
+            }));
+          }
+          setMeldung(
+            "Die Antwort wurde in einem anderen Tab ge\u00e4ndert. Der aktuelle Serverstand wurde geladen.",
+          );
+          return;
+        }
+        if (
+          results.some(
+            ({ result }) => !result.success && result.reason !== "FINALIZED",
+          )
+        ) {
           const aktuelleDaten = await getQuizAntwortStatusLive(
             liveDaten.quiz_id,
             session.sessionToken,
@@ -256,11 +408,20 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     liveDaten.offenerBlock,
     liveDaten.quiz_id,
     liveDaten.fragen,
+    liveDaten.interactionRun,
     blockIstGesperrt,
+    draftRevisions,
+    submissionStatuses,
+    isSubmitting,
   ]);
 
   useEffect(() => {
     const geladeneAntworten: Record<number, TeamAntwortState> = {};
+    const geladeneRevisionen: Record<number, number> = {};
+    const geladeneStatus: Record<
+      number,
+      "SUBMITTED" | "AUTO_FINALIZED"
+    > = {};
 
     liveDaten.fragen.forEach((frage) => {
       if (!frage.gespeicherteAntwort) {
@@ -285,6 +446,12 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       }
 
       const feldAntworten: Record<number, string> = {};
+      geladeneRevisionen[frage.quiz_fragen_id] =
+        frage.gespeicherteAntwort.draftRevision;
+      if (frage.gespeicherteAntwort.submissionStatus) {
+        geladeneStatus[frage.quiz_fragen_id] =
+          frage.gespeicherteAntwort.submissionStatus;
+      }
 
       frage.gespeicherteAntwort.antwortfelder?.forEach((feld) => {
         feldAntworten[feld.antwortfeldId] = feld.antwortText ?? "";
@@ -304,6 +471,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       ...geladeneAntworten,
       ...current,
     }));
+    setDraftRevisions((current) => ({ ...current, ...geladeneRevisionen }));
+    setSubmissionStatuses((current) => ({ ...current, ...geladeneStatus }));
   }, [liveDaten.fragen]);
 
   async function handleStartSession() {
@@ -335,6 +504,10 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     setTeamname(result.session.teamname);
     setGeneriertesPasswort(result.generiertesPasswort ?? null);
     setTeamVorschlaege([]);
+    setAntworten({});
+    setDraftRevisions({});
+    setSubmissionStatuses({});
+    setCurrentSubmissionStatus(null);
 
     localStorage.setItem(
       `quiz-session-${liveDaten.quiz_id}`,
@@ -360,6 +533,98 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     setSpielerAnzahl("1");
     setTeamVorschlaege([]);
     setMeldung("");
+    setAntworten({});
+    setDraftRevisions({});
+    setSubmissionStatuses({});
+    setCurrentSubmissionStatus(null);
+  }
+
+  async function handleSubmit(quizFragenId: number) {
+    const draft = antworten[quizFragenId];
+    const run = liveDaten.interactionRun;
+    if (!session || !draft || !run || !speicherBlockId) {
+      setMeldung("Bitte zuerst eine Antwort eintragen.");
+      return;
+    }
+    setIsSubmitting(true);
+    setMeldung("");
+    try {
+      const saved = await saveTeamAntwortDraft({
+        quizId: liveDaten.quiz_id,
+        quizAbschnittId: speicherBlockId,
+        quizFragenId,
+        quizTeamSessionToken: session.sessionToken,
+        interactionRunId: run.id,
+        expectedDraftRevision: draftRevisions[quizFragenId] ?? 0,
+        antwortText: draft.antwortText,
+        antwortId: draft.antwortId,
+        antwortIds: draft.antwortIds,
+        antwortfelder: Object.entries(draft.antwortfelder).map(
+          ([antwortfeldId, antwortText]) => ({
+            antwortfeldId: Number(antwortfeldId),
+            antwortText,
+          }),
+        ),
+      });
+      if (!saved.success) {
+        if (saved.reason === "REVISION_CONFLICT") {
+          const snapshot = await getQuizLiveSnapshot(
+            liveDaten.quiz_id,
+            session.sessionToken,
+          );
+          const question = liveDaten.fragen.find(
+            (entry) => entry.quiz_fragen_id === quizFragenId,
+          );
+          if (question && snapshot.teamSpecificState?.draft) {
+            setAntworten((current) => ({
+              ...current,
+              [quizFragenId]: interactionPayloadToDraft(
+                question.interaction,
+                snapshot.teamSpecificState!.draft!.payload as QuizInteractionPayload,
+              ),
+            }));
+            setDraftRevisions((current) => ({
+              ...current,
+              [quizFragenId]: snapshot.teamSpecificState!.draft!.revision,
+            }));
+          }
+        }
+        setMeldung(
+          saved.reason === "REVISION_CONFLICT"
+            ? "Die Antwort wurde in einem anderen Tab ge\u00e4ndert. Der aktuelle Serverstand wurde geladen; bitte pr\u00fcfen und erneut absenden."
+            : "Die Antwortzeit ist inzwischen beendet.",
+        );
+        return;
+      }
+      setDraftRevisions((current) => ({
+        ...current,
+        [quizFragenId]: saved.draftRevision,
+      }));
+      const submitted = await submitTeamAntwort({
+        quizId: liveDaten.quiz_id,
+        quizFragenId,
+        interactionRunId: run.id,
+        quizTeamSessionToken: session.sessionToken,
+      });
+      if (!submitted.success) {
+        setMeldung(
+          submitted.reason === "EMPTY_DRAFT"
+            ? "Bitte zuerst eine Antwort eintragen."
+            : "Die Antwortzeit ist inzwischen beendet.",
+        );
+        return;
+      }
+      setSubmissionStatuses((current) => ({
+        ...current,
+        [quizFragenId]: "SUBMITTED",
+      }));
+      setCurrentSubmissionStatus("SUBMITTED");
+      setMeldung("Antwort verbindlich abgegeben.");
+    } catch {
+      setMeldung("Die Antwort konnte nicht verbindlich abgegeben werden.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
 
@@ -499,14 +764,29 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                 {aktuellerBlock?.titel ?? "Aktuelle Frage"}
               </h2>
 
+              <p
+                role="status"
+                className="mt-3 inline-flex rounded-full border border-slate-300 bg-white px-3 py-1 text-sm font-semibold text-slate-700"
+              >
+                {liveDaten.interactionState === "OPEN"
+                  ? "Antwort offen"
+                  : liveDaten.interactionState === "COUNTDOWN"
+                    ? "Countdown l\u00e4uft"
+                    : liveDaten.interactionState === "CLOSED"
+                      ? "Antwortzeit beendet"
+                      : "Gesperrt"}
+              </p>
+
               <div className="mt-6 space-y-5">
-                {(blockIstGesperrt
-                  ? []
-                  : liveDaten.fragen.filter((frage) => frage.istFreigegeben)
-                ).map((frage, frageIndex) => {
+                {liveDaten.fragen
+                .filter((frage) => frage.istFreigegeben)
+                .map((frage, frageIndex) => {
                   const bildMedien = frage.bildMedien ?? [];
 
                   const hatBild = bildMedien.length > 0;
+                  const submissionStatus =
+                    submissionStatuses[frage.quiz_fragen_id];
+                  const isFinalized = Boolean(submissionStatus);
 
                   return (
                     <div
@@ -547,7 +827,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                         questionAssignmentId={frage.quiz_fragen_id}
                         interaction={frage.interaction}
                         value={antworten[frage.quiz_fragen_id]}
-                        disabled={blockIstGesperrt}
+                        disabled={blockIstGesperrt || isFinalized || !session}
                         onChange={(value) =>
                           setAntworten((current) => ({
                             ...current,
@@ -555,6 +835,32 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                           }))
                         }
                       />
+
+                      <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
+                        {submissionStatus ? (
+                          <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
+                            {submissionStatus === "SUBMITTED"
+                              ? "Verbindlich abgegeben"
+                              : "Beim Schlie\u00dfen automatisch \u00fcbernommen"}
+                          </p>
+                        ) : (draftRevisions[frage.quiz_fragen_id] ?? 0) > 0 ? (
+                          <p className="text-sm font-semibold text-slate-600">
+                            Entwurf automatisch gespeichert
+                          </p>
+                        ) : null}
+                        {session && !blockIstGesperrt && !isFinalized && (
+                          <button
+                            type="button"
+                            onClick={() => void handleSubmit(frage.quiz_fragen_id)}
+                            disabled={isSubmitting}
+                            className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                          >
+                            {isSubmitting
+                              ? "Wird verbindlich abgegeben..."
+                              : "Verbindlich absenden"}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -569,6 +875,14 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
               <p className="mt-2 text-lg font-semibold text-slate-700">
                 {liveDaten.presentationStatusText ?? "Bitte warte, bis der Moderator die nächste Fragenrunde freigibt."}
               </p>
+
+              {currentSubmissionStatus && (
+                <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
+                  {currentSubmissionStatus === "SUBMITTED"
+                    ? "Verbindlich abgegeben"
+                    : "Beim Schließen automatisch übernommen"}
+                </p>
+              )}
             </>
           )}
         </section>

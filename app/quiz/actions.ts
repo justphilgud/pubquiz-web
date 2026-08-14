@@ -83,6 +83,12 @@ import {
 } from "./quizAnswerLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
 import {
+  closeCurrentInteraction,
+  getQuizLiveSnapshotData,
+  saveTeamAnswerDraft,
+  submitTeamAnswer,
+} from "./interaction/interaction.server";
+import {
   DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
   isQuizSolutionStrategy,
   type QuizSolutionStrategy,
@@ -2179,6 +2185,10 @@ export async function getQuizAntwortStatus(
         },
       },
       praesentation_status: true,
+      interaction_runs: {
+        where: { is_current: true },
+        take: 1,
+      },
     },
   });
 
@@ -2223,9 +2233,26 @@ export async function getQuizAntwortStatus(
     })),
   );
 
-  const stableQuestion = audienceState.kind === "QUESTION"
-    ? audienceState
+  const currentRun = quiz.interaction_runs[0] ?? null;
+  const currentRunQuestion = currentRun?.quiz_fragen_id
+    ? quiz.quiz_fragen.find(
+        (entry) => entry.quiz_fragen_id === currentRun.quiz_fragen_id,
+      )
     : null;
+  const stableQuestion = currentRunQuestion
+    ? {
+        kind: "QUESTION" as const,
+        phase: currentRun?.state === "REVEALED"
+          ? ("SOLUTION" as const)
+          : ("QUESTION" as const),
+        slideKey: liveState.slideKey ?? "interaction-run",
+        questionAssignmentId: currentRunQuestion.quiz_fragen_id,
+        questionId: currentRunQuestion.fragen_id,
+        sectionId: currentRunQuestion.quiz_abschnitt_id,
+      }
+    : audienceState.kind === "QUESTION"
+      ? audienceState
+      : null;
   const stableCurrentBlock = stableQuestion
     ? abschnitte.find(
         (section) => section.quiz_abschnitt_id === stableQuestion.sectionId,
@@ -2240,8 +2267,10 @@ export async function getQuizAntwortStatus(
     : audienceState.kind === "LEGACY"
       ? legacyAktuellerBlock
       : undefined;
-  const blockIstGesperrt = stableQuestion
-    ? stableQuestion.phase === "SOLUTION"
+  const blockIstGesperrt = currentRun
+    ? !["OPEN", "COUNTDOWN"].includes(currentRun.state)
+    : stableQuestion
+      ? stableQuestion.phase === "SOLUTION"
     : audienceState.kind === "LEGACY"
       ? (aktuellerBlock?.ist_geschlossen ?? false)
       : true;
@@ -2276,9 +2305,18 @@ export async function getQuizAntwortStatus(
         where: {
           quiz_team_session_id: tokenPayload.sessionId,
           quiz_id: quizId,
+          ...(currentRun
+            ? { interaction_run_id: currentRun.interaction_run_id }
+            : {}),
         },
         include: {
           antwortauswahlen: true,
+          submissions: currentRun
+            ? {
+                where: { interaction_run_id: currentRun.interaction_run_id },
+                take: 1,
+              }
+            : false,
           antwortfelder: {
             include: {
               antwortfeld: true,
@@ -2407,6 +2445,14 @@ export async function getQuizAntwortStatus(
                         ? []
                         : [gespeicherteAntwort.antwort_id],
                   antwortText: gespeicherteAntwort.antwort_text,
+                  draftRevision: gespeicherteAntwort.draft_revision,
+                  draftUpdatedAt:
+                    gespeicherteAntwort.draft_updated_at?.toISOString() ??
+                    gespeicherteAntwort.aktualisiert_am.toISOString(),
+                  submissionStatus:
+                    ("submissions" in gespeicherteAntwort
+                      ? gespeicherteAntwort.submissions[0]?.status
+                      : null) ?? null,
                   antwortfelder: (gespeicherteAntwort.antwortfelder ?? []).map(
                     (feld) => ({
                       antwortfeldId: feld.antwortfeld_id,
@@ -2425,7 +2471,9 @@ export async function getQuizAntwortStatus(
           };
         });
 
-  const presentationStatusText = stableQuestion?.phase === "SOLUTION"
+  const presentationStatusText = currentRun?.state === "CLOSED"
+    ? "Die Antwortzeit ist beendet"
+    : currentRun?.state === "REVEALED" || stableQuestion?.phase === "SOLUTION"
     ? "Die Auflösung wird gezeigt"
     : audienceState.kind === "NON_QUESTION" || audienceState.kind === "UNKNOWN"
       ? audienceState.statusText
@@ -2439,7 +2487,21 @@ export async function getQuizAntwortStatus(
       aktuellerBlock && !blockIstGesperrt ? aktuellerBlock : undefined,
     aktuellerBlock,
     blockIstGesperrt,
-    answerPhase: audienceState.phase,
+    interactionRun: currentRun
+      ? {
+          id: currentRun.interaction_run_id,
+          type: currentRun.interaction_type,
+          state: currentRun.state,
+          deadlineAt: currentRun.deadline_at?.toISOString() ?? null,
+          revision: currentRun.revision,
+        }
+      : null,
+    interactionState: currentRun?.state ?? "LOCKED",
+    answerPhase: currentRun
+      ? currentRun.state === "REVEALED"
+        ? ("SOLUTION" as const)
+        : ("QUESTION" as const)
+      : audienceState.phase,
     presentationStatusText,
     fragen,
   };
@@ -2633,25 +2695,28 @@ export async function schliesseQuizBlock(data: {
   await requireQuizLiveController(data.quizId);
   await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
 
-  await prisma.quiz_block_freigaben.upsert({
-    where: {
-      quiz_id_quiz_abschnitt_id: {
+  await prisma.$transaction(async (tx) => {
+    await tx.quiz_block_freigaben.upsert({
+      where: {
+        quiz_id_quiz_abschnitt_id: {
+          quiz_id: data.quizId,
+          quiz_abschnitt_id: data.quizAbschnittId,
+        },
+      },
+      update: {
+        ist_freigegeben: false,
+        ist_geschlossen: true,
+        geschlossen_ab: new Date(),
+      },
+      create: {
         quiz_id: data.quizId,
         quiz_abschnitt_id: data.quizAbschnittId,
+        ist_freigegeben: false,
+        ist_geschlossen: true,
+        geschlossen_ab: new Date(),
       },
-    },
-    update: {
-      ist_freigegeben: false,
-      ist_geschlossen: true,
-      geschlossen_ab: new Date(),
-    },
-    create: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.quizAbschnittId,
-      ist_freigegeben: false,
-      ist_geschlossen: true,
-      geschlossen_ab: new Date(),
-    },
+    });
+    await closeCurrentInteraction(tx, data.quizId);
   });
 
   return {
@@ -2696,6 +2761,84 @@ export async function getQuizAntwortStatusLive(
 ) {
   return getQuizAntwortStatus(quizId, quizTeamSessionToken);
 }
+export async function getQuizLiveSnapshot(
+  quizId: number,
+  quizTeamSessionToken?: string,
+) {
+  const tokenPayload = quizTeamSessionToken
+    ? verifyTeamSessionToken(
+        quizTeamSessionToken,
+        getTeamSessionSigningSecret(),
+      )
+    : null;
+  const teamSessionId = tokenPayload?.quizId === quizId
+    ? tokenPayload.sessionId
+    : null;
+  return getQuizLiveSnapshotData(quizId, teamSessionId);
+}
+
+export async function submitTeamAntwort(data: {
+  quizId: number;
+  quizFragenId: number;
+  interactionRunId: number;
+  quizTeamSessionToken: string;
+}) {
+  const tokenPayload = verifyTeamSessionToken(
+    data.quizTeamSessionToken,
+    getTeamSessionSigningSecret(),
+  );
+  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+    throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
+  }
+  return submitTeamAnswer({
+    quizId: data.quizId,
+    quizFragenId: data.quizFragenId,
+    interactionRunId: data.interactionRunId,
+    quizTeamSessionId: tokenPayload.sessionId,
+  });
+}
+
+export async function saveTeamAntwortDraft(data: {
+  quizId: number;
+  quizAbschnittId: number;
+  quizFragenId: number;
+  interactionRunId: number;
+  expectedDraftRevision: number;
+  quizTeamSessionToken: string;
+  antwortText: string | null;
+  antwortId: number | null;
+  antwortIds?: number[];
+  antwortfelder?: {
+    antwortfeldId: number;
+    antwortText: string | null;
+  }[];
+}) {
+  const tokenPayload = verifyTeamSessionToken(
+    data.quizTeamSessionToken,
+    getTeamSessionSigningSecret(),
+  );
+  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+    throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
+  }
+  return saveTeamAnswerDraft({
+    quizId: data.quizId,
+    quizAbschnittId: data.quizAbschnittId,
+    quizFragenId: data.quizFragenId,
+    interactionRunId: data.interactionRunId,
+    quizTeamSessionId: tokenPayload.sessionId,
+    expectedDraftRevision: data.expectedDraftRevision,
+    draft: {
+      answerText: data.antwortText,
+      selectedAnswerIds:
+        data.antwortIds ?? (data.antwortId === null ? [] : [data.antwortId]),
+      structuredAnswers: (data.antwortfelder ?? []).map((field) => ({
+        fieldId: field.antwortfeldId,
+        answerText: field.antwortText,
+      })),
+    },
+  }, (teamAnswerId, tx) => recalculateQuizAnswerEvaluation(teamAnswerId, tx));
+}
+
 export async function saveTeamAntwort(data: {
   quizId: number;
   quizAbschnittId: number;
@@ -2708,7 +2851,23 @@ export async function saveTeamAntwort(data: {
     antwortfeldId: number;
     antwortText: string | null;
   }[];
+  interactionRunId?: number;
+  expectedDraftRevision?: number;
 }) {
+  if (data.interactionRunId !== undefined) {
+    return saveTeamAntwortDraft({
+      ...data,
+      interactionRunId: data.interactionRunId,
+      expectedDraftRevision: data.expectedDraftRevision ?? 0,
+    });
+  }
+  const currentInteraction = await prisma.quiz_interaction_runs.findFirst({
+    where: { quiz_id: data.quizId, is_current: true },
+    select: { interaction_run_id: true },
+  });
+  if (currentInteraction) {
+    return { success: false, reason: "LIVE_STATE_CHANGED" as const };
+  }
   const tokenPayload = verifyTeamSessionToken(
     data.quizTeamSessionToken,
     getTeamSessionSigningSecret(),
