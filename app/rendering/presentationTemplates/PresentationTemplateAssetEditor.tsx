@@ -8,6 +8,7 @@ import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import type { PresentationDesignStyle, TemplateAssetReference } from "@/app/rendering/templateRegistry";
 import { FileUpload } from "@/components/ui";
 import {
+  applyPresentationTemplateAssetUpload,
   buildPresentationTemplateAssetPathname,
   presentationTemplateAssetRolesByStyle,
   presentationTemplateAssetUploadRule,
@@ -86,7 +87,10 @@ export function PresentationTemplateAssetEditor({
       });
       const reference = blob.url as TemplateAssetReference;
       const current = roleValue(values, role);
-      onChange(role, multiple && Array.isArray(current) ? [...current, reference] : reference);
+      onChange(
+        role,
+        applyPresentationTemplateAssetUpload(current, multiple, reference),
+      );
     } catch {
       setError("Das Bild konnte nicht hochgeladen werden. Bitte erneut versuchen.");
     } finally {

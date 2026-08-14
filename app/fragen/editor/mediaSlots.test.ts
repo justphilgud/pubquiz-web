@@ -13,6 +13,14 @@ import {
 } from "./questionMedia";
 import { evaluateQuestionQuality } from "./questionQuality";
 import type { QuestionEditorDraft } from "./types";
+import { getBlobAreaPrefix } from "@/app/lib/blobPath";
+import {
+  buildSlideMediaUploadPathname,
+  isAllowedSlideMediaUploadPathname,
+  sanitizeSlideMediaFileName,
+  slideMediaUploadDefinitions,
+  validateSlideMediaUploadFile,
+} from "@/app/quiz/slideMediaUpload";
 
 test("the semantic slot registry contains all package 3A slot ids", () => {
   assert.deepEqual(Object.keys(mediaSlotDefinitions).sort(), [
@@ -59,6 +67,110 @@ test("upload paths bind environment, scope, slot and media type", () => {
   assert.equal(isAllowedQuestionMediaPathname(pathname, "IMAGE", "QUESTION", "preview", "question_image"), true);
   assert.equal(isAllowedQuestionMediaPathname(pathname, "IMAGE", "QUESTION", "prod", "question_image"), false);
   assert.equal(isAllowedQuestionMediaPathname(pathname, "IMAGE", "QUESTION", "preview", "face_morph_result"), false);
+  assert.equal(
+    isAllowedQuestionMediaPathname(
+      "preview/question-media/question_image/image/../other.jpg",
+      "IMAGE",
+      "QUESTION",
+      "preview",
+      "question_image",
+    ),
+    false,
+  );
+});
+
+test("blob area prefixes contain exactly one separator", () => {
+  assert.equal(getBlobAreaPrefix("dev", "media"), "dev/media/");
+  assert.equal(getBlobAreaPrefix("preview", "question-media"), "preview/question-media/");
+});
+
+test("intro video upload paths bind environment, slot and extension", () => {
+  const fileName = `${Date.now()}-${sanitizeSlideMediaFileName("Zusammen #1 (final).mp4")}`;
+  const pathname = buildSlideMediaUploadPathname(
+    "dev",
+    "INTRO_VIDEO",
+    fileName,
+  );
+
+  assert.equal(pathname.startsWith("dev/media/video/intro/"), true);
+  assert.equal(
+    isAllowedSlideMediaUploadPathname(pathname, "dev", "INTRO_VIDEO"),
+    true,
+  );
+  assert.equal(
+    isAllowedSlideMediaUploadPathname(pathname, "preview", "INTRO_VIDEO"),
+    false,
+  );
+  assert.equal(
+    isAllowedSlideMediaUploadPathname(
+      "dev/media/video/outro/clip.mp4",
+      "dev",
+      "INTRO_VIDEO",
+    ),
+    false,
+  );
+  assert.equal(
+    isAllowedSlideMediaUploadPathname(
+      "dev/media/video/intro/clip.exe",
+      "dev",
+      "INTRO_VIDEO",
+    ),
+    false,
+  );
+  assert.equal(
+    isAllowedSlideMediaUploadPathname(
+      "dev/media/video/intro/../clip.mp4",
+      "dev",
+      "INTRO_VIDEO",
+    ),
+    false,
+  );
+  assert.equal(
+    isAllowedSlideMediaUploadPathname(
+      "dev/media/video/intro/%2e%2e%2fclip.mp4",
+      "dev",
+      "INTRO_VIDEO",
+    ),
+    false,
+  );
+  assert.throws(() =>
+    buildSlideMediaUploadPathname("dev", "INTRO_VIDEO", "../clip.mp4"),
+  );
+});
+
+test("slide media MIME types and size limits remain slot-specific", () => {
+  assert.equal(
+    validateSlideMediaUploadFile(
+      { name: "clip.mp4", size: 1024, type: "video/mp4" },
+      "INTRO_VIDEO",
+    ),
+    null,
+  );
+  assert.match(
+    validateSlideMediaUploadFile(
+      { name: "clip.mp4", size: 1024, type: "application/octet-stream" },
+      "INTRO_VIDEO",
+    ) ?? "",
+    /Dateityp/,
+  );
+  assert.match(
+    validateSlideMediaUploadFile(
+      {
+        name: "clip.mp4",
+        size: slideMediaUploadDefinitions.INTRO_VIDEO.maximumSizeInBytes + 1,
+        type: "video/mp4",
+      },
+      "INTRO_VIDEO",
+    ) ?? "",
+    /100 MB/,
+  );
+  assert.equal(
+    validateSlideMediaUploadFile(
+      { name: "intro.mp3", size: 1024, type: "audio/mpeg" },
+      "INTRO_AUDIO",
+    ),
+    null,
+  );
 });
 
 test("media ownership requires exactly one parent", () => {

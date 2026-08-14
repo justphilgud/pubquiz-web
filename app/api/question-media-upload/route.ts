@@ -28,12 +28,24 @@ import {
   type PresentationTemplateAssetRole,
 } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
 import { requirePresentationTemplateUploadContext } from "@/app/rendering/presentationTemplates/presentationTemplateUpload.server";
+import { requireQuizEditor } from "@/app/quiz/quizAccess.server";
+import {
+  isAllowedSlideMediaUploadPathname,
+  isSlideMediaUploadSlot,
+  slideMediaUploadDefinitions,
+  type SlideMediaUploadSlot,
+} from "@/app/quiz/slideMediaUpload";
 
 type UploadContext =
   | {
       target: "TEMPLATE";
       templateId: string;
       assetRole: PresentationTemplateAssetRole;
+    }
+  | {
+      target: "QUIZ_SLIDE";
+      quizId: number;
+      slot: SlideMediaUploadSlot;
     }
   | {
       target: "QUESTION";
@@ -83,6 +95,14 @@ function parseOptionalId(value: unknown) {
   return Number(value);
 }
 
+function parseRequiredId(value: unknown) {
+  const parsed = parseOptionalId(value);
+  if (parsed === null) {
+    throw new Error("Uploadkontext ist ungültig.");
+  }
+  return parsed;
+}
+
 function parseUploadContext(clientPayload: string | null): UploadContext {
   if (!clientPayload) {
     throw new Error("Uploadkontext fehlt.");
@@ -106,6 +126,18 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
       throw new Error("Template-Uploadkontext ist ungültig.");
     }
     return { target, templateId, assetRole };
+  }
+
+  if (target === "QUIZ_SLIDE") {
+    const slot = Reflect.get(value, "slot");
+    if (!isSlideMediaUploadSlot(slot)) {
+      throw new Error("Slide-Medienkontext ist ungültig.");
+    }
+    return {
+      target,
+      quizId: parseRequiredId(Reflect.get(value, "quizId")),
+      slot,
+    };
   }
 
   const questionId = Reflect.get(value, "questionId");
@@ -249,6 +281,38 @@ export async function POST(request: Request) {
             urlOptions: {
               allowedContentTypes: [...presentationTemplateAssetUploadRule.mimeTypes],
               maximumSizeInBytes: presentationTemplateAssetUploadRule.maximumSizeInBytes,
+              addRandomSuffix: true,
+              validUntil,
+            },
+          };
+        }
+        if (context.target === "QUIZ_SLIDE") {
+          await requireQuizEditor(context.quizId);
+          const definition = slideMediaUploadDefinitions[context.slot];
+          if (
+            !isAllowedSlideMediaUploadPathname(
+              pathname,
+              uploadConfig.environmentPrefix,
+              context.slot,
+            )
+          ) {
+            throw new Error("Slide-Medienpfad oder Dateiendung ist ungültig.");
+          }
+          const validUntil = Date.now() + 10 * 60 * 1000;
+          phase = "signed-token";
+          const token = await issueSignedToken({
+            ...uploadConfig.blobAuthentication,
+            pathname,
+            operations: ["put"],
+            allowedContentTypes: [...definition.mimeTypes],
+            maximumSizeInBytes: definition.maximumSizeInBytes,
+            validUntil,
+          });
+          return {
+            token,
+            urlOptions: {
+              allowedContentTypes: [...definition.mimeTypes],
+              maximumSizeInBytes: definition.maximumSizeInBytes,
               addRandomSuffix: true,
               validUntil,
             },

@@ -14,9 +14,12 @@ export function FileUpload({
   ...props
 }: FileUploadProps) {
   const descriptionId = useId();
+  const generatedInputId = useId();
+  const inputId = props.id ?? generatedInputId;
 
   return (
     <label
+      htmlFor={inputId}
       className={[
         "flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed bg-white text-center transition hover:bg-gray-50",
         compact ? "min-h-11 px-3 py-2" : "p-6",
@@ -31,6 +34,7 @@ export function FileUpload({
         </span>
       )}
       <input
+        id={inputId}
         type="file"
         className="sr-only"
         aria-describedby={description ? descriptionId : undefined}

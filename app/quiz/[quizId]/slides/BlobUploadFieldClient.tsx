@@ -1,52 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import { upload } from "@vercel/blob/client";
+import { uploadPresigned } from "@vercel/blob/client";
 import {
   AudioPlayer,
   FileUpload,
   MediaPreview,
   VideoPlayer,
 } from "@/components/ui";
+import { getQuestionMediaFileName } from "@/app/fragen/editor/questionMedia";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import {
-  getQuestionMediaFileName,
-  validateQuestionMediaFile,
-} from "@/app/fragen/editor/questionMedia";
-import {
-  buildBlobPath,
-  type BlobEnvironmentPrefix,
-} from "@/app/lib/blobPath";
+  buildSlideMediaUploadPathname,
+  sanitizeSlideMediaFileName,
+  slideMediaUploadDefinitions,
+  validateSlideMediaUploadFile,
+  type SlideMediaUploadSlot,
+} from "@/app/quiz/slideMediaUpload";
 
 type BlobUploadFieldClientProps = {
   label: string;
+  quizId: number;
   hiddenFieldName: string;
   currentUrl?: string | null;
-  zielordner: string;
+  slot: SlideMediaUploadSlot;
   accept: string;
   environmentPrefix: BlobEnvironmentPrefix;
 };
 
 export default function BlobUploadFieldClient({
   label,
+  quizId,
   hiddenFieldName,
   currentUrl,
-  zielordner,
+  slot,
   accept,
   environmentPrefix,
 }: BlobUploadFieldClientProps) {
   const [url, setUrl] = useState(currentUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const mediaType = accept.includes("video") ? "VIDEO" : "AUDIO";
+  const definition = slideMediaUploadDefinitions[slot];
+  const mediaType = definition.mediaType;
 
   async function handleUpload(file: File) {
-    const validationError = validateQuestionMediaFile(file, mediaType);
+    const validationError = validateSlideMediaUploadFile(file, slot);
     if (validationError) {
-      setErrorMessage(
-        validationError.code === "TOO_LARGE"
-          ? `Die Datei ist zu groß (maximal ${validationError.params.size}).`
-          : "Dateiformat oder Dateityp wird nicht unterstützt.",
-      );
+      setErrorMessage(validationError);
       return;
     }
 
@@ -54,24 +54,46 @@ export default function BlobUploadFieldClient({
     setErrorMessage("");
 
     try {
-      const blob = await upload(
-        buildBlobPath(environmentPrefix, "media", [
-          ...zielordner.split("/"),
-          `${Date.now()}-${file.name}`,
-        ]),
+      const blob = await uploadPresigned(
+        buildSlideMediaUploadPathname(
+          environmentPrefix,
+          slot,
+          `${crypto.randomUUID()}-${sanitizeSlideMediaFileName(file.name)}`,
+        ),
         file,
         {
           access: "public",
-          handleUploadUrl: "/api/blob-upload-token",
+          handleUploadUrl: "/api/question-media-upload",
+          clientPayload: JSON.stringify({
+            target: "QUIZ_SLIDE",
+            quizId,
+            slot,
+          }),
         },
       );
 
       setUrl(blob.url);
     } catch (error) {
-      console.error("Legacy-Medienupload im Browser fehlgeschlagen", {
+      const isAuthorizationFailure =
+        error instanceof Error &&
+        error.message.includes("Failed to retrieve the presigned URL");
+      const errorCode =
+        isAuthorizationFailure
+          ? "SLIDE_MEDIA_UPLOAD_NOT_AUTHORIZED"
+          : error instanceof Error
+          ? error.message.match(/\b[A-Z][A-Z0-9_]{4,}\b/)?.[0] ??
+            "SLIDE_MEDIA_UPLOAD_FAILED"
+          : "SLIDE_MEDIA_UPLOAD_FAILED";
+      console.error("Slide-Medienupload im Browser fehlgeschlagen", {
         errorName: error instanceof Error ? error.name : "UnknownError",
+        errorCode,
       });
-      setErrorMessage("Upload fehlgeschlagen. Bitte versuche es erneut.");
+      setErrorMessage(
+        `${mediaType === "VIDEO" ? "Video" : "Audio"} konnte nicht hochgeladen werden. ` +
+          (isAuthorizationFailure
+            ? "Der Upload wurde vom Server nicht freigegeben."
+            : "Bitte erneut versuchen."),
+      );
     } finally {
       setUploading(false);
     }
@@ -112,8 +134,8 @@ export default function BlobUploadFieldClient({
         label={url ? "Datei ersetzen" : "Datei auswählen"}
         description={
           mediaType === "VIDEO"
-            ? "MP4, WebM oder MOV · maximal 100 MB"
-            : "MP3 · maximal 20 MB"
+            ? `MP4, WebM oder MOV · maximal ${definition.sizeLabel}`
+            : `MP3 · maximal ${definition.sizeLabel}`
         }
         onChange={(event) => {
           const file = event.target.files?.[0];
