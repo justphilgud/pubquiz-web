@@ -73,11 +73,11 @@ test("standard question interaction and evaluation compatibility is central", ()
     true,
   );
   assert.equal(
-    isInteractionEvaluationCompatible("CHOICE", "CHOICE_MATCH"),
+    isInteractionEvaluationCompatible("SINGLE_CHOICE", "CHOICE_MATCH"),
     true,
   );
   assert.equal(
-    isInteractionEvaluationCompatible("CHOICE", "CLOSEST_VALUE"),
+    isInteractionEvaluationCompatible("MULTI_CHOICE", "CLOSEST_VALUE"),
     false,
   );
   assert.equal(
@@ -94,9 +94,55 @@ test("standard question interaction and evaluation compatibility is central", ()
   );
 });
 
+test("every allowed interaction has one executable answer-form definition", () => {
+  for (const contract of questionTemplateContractRegistry) {
+    assert.deepEqual(
+      new Set(contract.interaction.answerForms.map((form) => form.type)),
+      new Set(contract.interaction.allowedTypes),
+      contract.identity.templateId,
+    );
+  }
+
+  const duplicate = cloneTemplate(standardQuestionTemplateContract);
+  duplicate.interaction.answerForms = [
+    ...duplicate.interaction.answerForms,
+    duplicate.interaction.answerForms[0],
+  ];
+  assert.ok(
+    validateTemplateContract(duplicate).some(
+      (validationIssue) => validationIssue.code === "DUPLICATE_ANSWER_FORM",
+    ),
+  );
+
+  const missing = cloneTemplate(standardQuestionTemplateContract);
+  missing.interaction.answerForms = missing.interaction.answerForms.filter(
+    (form) => form.type !== "TEXT",
+  );
+  assert.ok(
+    validateTemplateContract(missing).some(
+      (validationIssue) => validationIssue.code === "MISSING_ANSWER_FORM",
+    ),
+  );
+
+  const notAllowed = cloneTemplate(standardQuestionTemplateContract);
+  notAllowed.interaction.allowedTypes = ["TEXT"];
+  assert.ok(
+    validateTemplateContract(notAllowed).some(
+      (validationIssue) => validationIssue.code === "ANSWER_FORM_NOT_ALLOWED",
+    ),
+  );
+});
+
+test("planned poll and matching interactions remain centrally modelled", () => {
+  assert.equal(isInteractionEvaluationCompatible("POLL_SINGLE", "NONE"), true);
+  assert.equal(isInteractionEvaluationCompatible("POLL_MULTI", "NONE"), true);
+  assert.equal(isInteractionEvaluationCompatible("POLL_SCALE", "NONE"), true);
+  assert.equal(isInteractionEvaluationCompatible("MATCHING", "MANUAL"), true);
+});
+
 test("incompatible defaults and NONE mismatches are reported with stable codes", () => {
   const invalidStandard = cloneTemplate(standardQuestionTemplateContract);
-  invalidStandard.interaction.defaultType = "CHOICE";
+  invalidStandard.interaction.defaultType = "SINGLE_CHOICE";
   invalidStandard.evaluation.defaultType = "CLOSEST_VALUE";
   invalidStandard.evaluation.allowedTypes = ["CLOSEST_VALUE"];
 
@@ -203,7 +249,7 @@ test("contract validation rejects duplicate aliases inside one contract", () => 
   const duplicateAlias = cloneTemplate(standardQuestionTemplateContract);
   duplicateAlias.compatibility.legacyMappings = [
     ...duplicateAlias.compatibility.legacyMappings,
-    { templateId: "multiple-choice", interactionType: "CHOICE" },
+    { templateId: "multiple-choice", interactionType: "MULTI_CHOICE" },
   ];
 
   assert.ok(
@@ -250,7 +296,7 @@ test("podium is runtime-only, snapshot-backed and not a creation template", () =
   const rankingSlot = podiumTemplateContract.components.slots[0];
   const rankingSource = podiumTemplateContract.dataSources[0];
 
-  assert.equal(podiumTemplateContract.interaction.defaultType, "NONE");
+  assert.equal(podiumTemplateContract.interaction.defaultType, "NO_ANSWER");
   assert.equal(podiumTemplateContract.evaluation.defaultType, "NONE");
   assert.equal(rankingSlot.componentType, "RANKING");
   assert.equal(rankingSlot.minItems, 1);

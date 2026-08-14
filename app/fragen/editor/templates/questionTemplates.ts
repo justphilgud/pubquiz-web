@@ -185,7 +185,7 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
     id: questionTemplateIds.ordering,
     icon: "list-ordered", enabled: true, selectable: true,
     availableForFiltering: true, requiresAnswerImages: false,
-    answerMode: "ORDERING", evaluationMode: "ORDER_EXACT",
+    answerMode: "ORDERING", evaluationMode: "ORDER_POSITION",
     editorKind: "ORDERING", presentationKind: "ORDERING",
     answerFormKind: "ORDERING", translationKey: "ordering",
     questionLabelKey: "task",

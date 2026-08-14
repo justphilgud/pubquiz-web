@@ -21,6 +21,9 @@ export type TemplateContractValidationIssueCode =
   | "MISSING_EDITOR_RENDERER"
   | "MISSING_RUNTIME_RENDERER"
   | "DEFAULT_INTERACTION_NOT_ALLOWED"
+  | "DUPLICATE_ANSWER_FORM"
+  | "MISSING_ANSWER_FORM"
+  | "ANSWER_FORM_NOT_ALLOWED"
   | "DEFAULT_EVALUATION_NOT_ALLOWED"
   | "INCOMPATIBLE_INTERACTION_EVALUATION"
   | "INVALID_NONE_EVALUATION"
@@ -146,6 +149,42 @@ export function validateTemplateContract(
       ),
     );
   }
+  const answerFormTypes = new Set<
+    TemplateDefinition["interaction"]["allowedTypes"][number]
+  >(
+    template.interaction.answerForms.map((answerForm) => answerForm.type),
+  );
+  if (answerFormTypes.size !== template.interaction.answerForms.length) {
+    issues.push(
+      issue(
+        "DUPLICATE_ANSWER_FORM",
+        "interaction.answerForms",
+        "Jede Antwortinteraktion darf nur eine Formulardefinition besitzen.",
+      ),
+    );
+  }
+  template.interaction.allowedTypes.forEach((interaction, index) => {
+    if (!answerFormTypes.has(interaction)) {
+      issues.push(
+        issue(
+          "MISSING_ANSWER_FORM",
+          `interaction.allowedTypes.${index}`,
+          `Für ${interaction} fehlt eine ausführbare Formulardefinition.`,
+        ),
+      );
+    }
+  });
+  template.interaction.answerForms.forEach((answerForm, index) => {
+    if (!template.interaction.allowedTypes.includes(answerForm.type)) {
+      issues.push(
+        issue(
+          "ANSWER_FORM_NOT_ALLOWED",
+          `interaction.answerForms.${index}`,
+          `Die Formulardefinition ${answerForm.type} ist nicht als Interaktion erlaubt.`,
+        ),
+      );
+    }
+  });
   if (
     !template.evaluation.allowedTypes.includes(template.evaluation.defaultType)
   ) {
@@ -201,10 +240,13 @@ export function validateTemplateContract(
       );
     }
   });
-  if (
-    (template.interaction.defaultType === "NONE") !==
-    (template.evaluation.defaultType === "NONE")
-  ) {
+  const hasNonScoringDefault = [
+    "NO_ANSWER",
+    "POLL_SINGLE",
+    "POLL_MULTI",
+    "POLL_SCALE",
+  ].includes(template.interaction.defaultType);
+  if (hasNonScoringDefault !== (template.evaluation.defaultType === "NONE")) {
     issues.push(
       issue(
         "INVALID_NONE_EVALUATION",

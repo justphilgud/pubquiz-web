@@ -101,12 +101,17 @@ export type TemplateComponentSlot = {
 };
 
 export type TemplateInteractionType =
-  | "NONE"
+  | "NO_ANSWER"
   | "TEXT"
-  | "CHOICE"
-  | "BOOLEAN"
-  | "NUMERIC"
-  | "ORDERING"
+  | "STRUCTURED_TEXT"
+  | "NUMBER"
+  | "SINGLE_CHOICE"
+  | "MULTI_CHOICE"
+  | "ORDER"
+  | "MATCHING"
+  | "POLL_SINGLE"
+  | "POLL_MULTI"
+  | "POLL_SCALE"
   | "BUZZER";
 
 export type TemplateEvaluationType =
@@ -122,12 +127,17 @@ export type TemplateEvaluationType =
   | "ORDER_ADJACENCY";
 
 export const compatibleEvaluationTypes = {
-  NONE: ["NONE"],
+  NO_ANSWER: ["NONE"],
   TEXT: ["MANUAL", "NORMALIZED_TEXT_MATCH"],
-  CHOICE: ["CHOICE_MATCH"],
-  BOOLEAN: ["CHOICE_MATCH"],
-  NUMERIC: ["EXACT_NUMERIC", "NUMERIC_TOLERANCE", "CLOSEST_VALUE"],
-  ORDERING: ["ORDER_EXACT", "ORDER_POSITION", "ORDER_ADJACENCY"],
+  STRUCTURED_TEXT: ["MANUAL", "NORMALIZED_TEXT_MATCH"],
+  NUMBER: ["EXACT_NUMERIC", "NUMERIC_TOLERANCE", "CLOSEST_VALUE"],
+  SINGLE_CHOICE: ["CHOICE_MATCH"],
+  MULTI_CHOICE: ["CHOICE_MATCH"],
+  ORDER: ["ORDER_EXACT", "ORDER_POSITION", "ORDER_ADJACENCY"],
+  MATCHING: ["MANUAL"],
+  POLL_SINGLE: ["NONE"],
+  POLL_MULTI: ["NONE"],
+  POLL_SCALE: ["NONE"],
   BUZZER: ["MANUAL"],
 } as const satisfies Record<
   TemplateInteractionType,
@@ -143,11 +153,73 @@ export function isInteractionEvaluationCompatible(
   );
 }
 
+export type TemplateAnswerFormDefinition =
+  | {
+      type: "NO_ANSWER";
+      source: "NONE";
+    }
+  | {
+      type: "TEXT";
+      source: "ANSWER_TEXT";
+      multiline: true;
+      inputMode: "text";
+    }
+  | {
+      type: "STRUCTURED_TEXT";
+      source: "QUESTION_ANSWER_FIELDS";
+      multiline: false;
+      inputMode: "text";
+    }
+  | {
+      type: "NUMBER";
+      source: "ANSWER_TEXT";
+      inputMode: "decimal";
+    }
+  | {
+      type: "SINGLE_CHOICE";
+      source: "QUESTION_ANSWERS";
+      selectionMode: "SINGLE";
+    }
+  | {
+      type: "MULTI_CHOICE";
+      source: "QUESTION_ANSWERS";
+      selectionMode: "MULTIPLE";
+    }
+  | {
+      type: "ORDER";
+      source: "TEMPLATE_ORDER_ITEMS";
+      scoringPolicy: "POSITION";
+    }
+  | {
+      type: "MATCHING";
+      source: "QUESTION_MATCHING_ITEMS";
+    }
+  | {
+      type: "POLL_SINGLE";
+      source: "QUESTION_ANSWERS";
+      selectionMode: "SINGLE";
+    }
+  | {
+      type: "POLL_MULTI";
+      source: "QUESTION_ANSWERS";
+      selectionMode: "MULTIPLE";
+    }
+  | {
+      type: "POLL_SCALE";
+      source: "TEMPLATE_SCALE";
+      inputMode: "decimal";
+    }
+  | {
+      type: "BUZZER";
+      source: "RUNTIME_ACTION";
+    };
+
 export type TemplateInteractionContract = {
   defaultType: TemplateInteractionType;
   allowedTypes: readonly TemplateInteractionType[];
   required: boolean;
   quizOverrideAllowed: boolean;
+  answerForms: readonly TemplateAnswerFormDefinition[];
 };
 
 export type TemplateEvaluationContract = {

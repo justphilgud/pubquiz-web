@@ -9,15 +9,12 @@ import {
 } from "../../actions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
-import type { QuestionTemplateData } from "@/app/fragen/editor/types";
-import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTemplateList";
+import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
+import GenericAnswerRenderer, {
+  type TeamAnswerDraft,
+} from "./GenericAnswerRenderer";
 
-type TeamAntwortState = {
-  antwortText: string | null;
-  antwortId: number | null;
-  antwortIds?: number[];
-  antwortfelder: Record<number, string>;
-};
+type TeamAntwortState = TeamAnswerDraft;
 
 type AntwortStatus = {
   quiz_id: number;
@@ -52,7 +49,7 @@ type AntwortStatus = {
     fragen_id: number;
     frage: string;
     templateId: string | null;
-    templateConfig: { templateData?: QuestionTemplateData } | null;
+    interaction: ResolvedQuizAnswerInteraction;
     istFreigegeben: boolean;
     punkte_modus: string;
     urspruenglicher_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
@@ -121,47 +118,6 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
 
   const aktuellerBlock = liveDaten.aktuellerBlock;
   const blockIstGesperrt = liveDaten.blockIstGesperrt;
-
-  function updateOrderingAnswer(
-    quizFragenId: number,
-    items: Array<{ id: string; text: string }>,
-    index: number,
-    direction: -1 | 1,
-  ) {
-    const stored = antworten[quizFragenId]?.antwortText;
-    let order = items.map((item) => item.id);
-    if (stored) {
-      try {
-        const parsed: unknown = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.every((entry) => typeof entry === "string")) {
-          order = parsed;
-        }
-      } catch {
-        // Legacy free text is replaced by a structured ordering answer.
-      }
-    }
-    const target = index + direction;
-    if (target < 0 || target >= order.length) return;
-    [order[index], order[target]] = [order[target], order[index]];
-    setAntworten((current) => ({
-      ...current,
-      [quizFragenId]: {
-        antwortText: JSON.stringify(order),
-        antwortId: null,
-        antwortfelder: {},
-      },
-    }));
-  }
-
-  function setOrderingAnswer(
-    quizFragenId: number,
-    order: string[],
-  ) {
-    setAntworten((current) => ({
-      ...current,
-      [quizFragenId]: { antwortText: JSON.stringify(order), antwortId: null, antwortfelder: {} },
-    }));
-  }
 
   const speicherBlockId =
     liveDaten.offenerBlock?.quiz_abschnitt_id ??
@@ -308,8 +264,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
 
     liveDaten.fragen.forEach((frage) => {
       if (!frage.gespeicherteAntwort) {
-        if (frage.templateConfig?.templateData?.kind === "ORDERING") {
-          const original = frage.templateConfig.templateData.items.map(
+        if (frage.interaction.type === "ORDER") {
+          const original = frage.interaction.items.map(
             (item) => item.id,
           );
           const randomized = [...original].sort(() => Math.random() - 0.5);
@@ -406,24 +362,6 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     setMeldung("");
   }
 
-
-  function updateAntwortfeld(
-    quizFragenId: number,
-    antwortfeldId: number,
-    value: string
-  ) {
-    setAntworten((current) => ({
-      ...current,
-      [quizFragenId]: {
-        antwortText: null,
-        antwortId: null,
-        antwortfelder: {
-          ...(current[quizFragenId]?.antwortfelder ?? {}),
-          [antwortfeldId]: value,
-        },
-      },
-    }));
-  }
 
   return (
     <QuizThemeScope
@@ -566,14 +504,9 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                   ? []
                   : liveDaten.fragen.filter((frage) => frage.istFreigegeben)
                 ).map((frage, frageIndex) => {
-                  const antwortfelder = frage.antwortfelder ?? [];
                   const bildMedien = frage.bildMedien ?? [];
 
-                  const hatAntwortfelder = antwortfelder.length > 0;
                   const hatBild = bildMedien.length > 0;
-                  const freieAntwortErzwungen =
-                    frage.urspruenglicher_antwortmodus === "CLOSED" &&
-                    frage.effektiver_antwortmodus === "OPEN";
 
                   return (
                     <div
@@ -610,215 +543,18 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                         </button>
                       )}
 
-                      {freieAntwortErzwungen ? (
-                        <textarea
-                          disabled={blockIstGesperrt}
-                          value={
-                            antworten[frage.quiz_fragen_id]?.antwortText ?? ""
-                          }
-                          onChange={(event) =>
-                            setAntworten((current) => ({
-                              ...current,
-                              [frage.quiz_fragen_id]: {
-                                antwortText: event.target.value,
-                                antwortId: null,
-                                antwortfelder: {},
-                              },
-                            }))
-                          }
-                          className="mt-4 min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-                          placeholder="Antwort eintragen..."
-                        />
-                      ) : hatAntwortfelder ? (
-                        <div className="mt-4 space-y-3">
-                          {antwortfelder.map((feld) => (
-                            <label
-                              key={feld.antwortfeld_id}
-                              className="block"
-                            >
-                              <span className="mb-2 block text-sm font-semibold text-slate-700">
-                                {feld.label}
-                                {feld.ist_pflicht ? " *" : ""}
-                              </span>
-
-                              <input
-                                disabled={blockIstGesperrt}
-                                value={
-                                  antworten[frage.quiz_fragen_id]
-                                    ?.antwortfelder?.[
-                                  feld.antwortfeld_id
-                                  ] ?? ""
-                                }
-                                onChange={(e) =>
-                                  updateAntwortfeld(
-                                    frage.quiz_fragen_id,
-                                    feld.antwortfeld_id,
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-                                placeholder={`${feld.label} eintragen...`}
-                              />
-                            </label>
-                          ))}
-                        </div>
-                      ) : frage.templateConfig?.templateData?.kind === "ORDERING" ? (
-                        <div className="mt-4 space-y-2">
-                          {(() => {
-                            const items = frage.templateConfig.templateData.items;
-                            let order = items.map((item) => item.id);
-                            const stored = antworten[frage.quiz_fragen_id]?.antwortText;
-                            if (stored) {
-                              try {
-                                const parsed: unknown = JSON.parse(stored);
-                                if (Array.isArray(parsed) && parsed.length === order.length) {
-                                  order = parsed as string[];
-                                }
-                              } catch {
-                                // Keep the configured order for legacy text.
-                              }
-                            }
-                            const itemMap = new Map(items.map((item) => [item.id, item]));
-                            return (
-                              <SortableTemplateList
-                                ids={order}
-                                disabled={blockIstGesperrt}
-                                onReorder={(ids) => setOrderingAnswer(frage.quiz_fragen_id, ids)}
-                              >
-                                {(id, index, dragHandle) => {
-                                  const item = itemMap.get(id);
-                                  if (!item) return null;
-                                  return (
-                                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3">
-                                      {dragHandle}
-                                      <span className="w-7 font-bold">{index + 1}.</span>
-                                      <span className="flex-1">{item.text}</span>
-                                      <button type="button" aria-label={`${item.text} nach oben`}
-                                        disabled={blockIstGesperrt || index === 0}
-                                        onClick={() => updateOrderingAnswer(frage.quiz_fragen_id, items, index, -1)}
-                                        className="min-h-11 min-w-11 rounded-lg border disabled:opacity-40">↑</button>
-                                      <button type="button" aria-label={`${item.text} nach unten`}
-                                        disabled={blockIstGesperrt || index === order.length - 1}
-                                        onClick={() => updateOrderingAnswer(frage.quiz_fragen_id, items, index, 1)}
-                                        className="min-h-11 min-w-11 rounded-lg border disabled:opacity-40">↓</button>
-                                    </div>
-                                  );
-                                }}
-                              </SortableTemplateList>
-                            );
-                          })()}
-                        </div>
-                      ) : frage.templateConfig?.templateData?.kind === "ESTIMATE" ? (
-                        <label className="mt-4 block text-sm font-semibold text-slate-700">
-                          Schätzwert
-                          <span className="mt-2 flex items-center gap-3">
-                            <input type="number" inputMode="decimal" disabled={blockIstGesperrt}
-                              step={["INTEGER", "YEAR"].includes(frage.templateConfig.templateData.numberFormat) ? 1 : "any"}
-                              value={antworten[frage.quiz_fragen_id]?.antwortText ?? ""}
-                              onChange={(event) => setAntworten((current) => ({
-                                ...current,
-                                [frage.quiz_fragen_id]: {
-                                  antwortText: event.target.value,
-                                  antwortId: null,
-                                  antwortfelder: {},
-                                },
-                              }))}
-                              className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 disabled:bg-slate-100" />
-                            <span>{frage.templateConfig.templateData.unit}</span>
-                          </span>
-                        </label>
-                      ) : frage.antworten.length > 1 ? (
-                        <div className="mt-4 space-y-2">
-                          {frage.antworten.map((antwort, antwortIndex) => (
-                            <label
-                              key={antwort.antwort_id}
-                              className="answer-option flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3"
-                            >
-                              <input
-                                type={
-                                  frage.templateId === "multiple_choice" ||
-                                  frage.templateId === "multiple-choice"
-                                    ? "checkbox"
-                                    : "radio"
-                                }
-                                name={`frage-${frage.quiz_fragen_id}`}
-                                checked={
-                                  frage.templateId === "multiple_choice" ||
-                                  frage.templateId === "multiple-choice"
-                                    ? (
-                                        antworten[frage.quiz_fragen_id]
-                                          ?.antwortIds ?? []
-                                      ).includes(antwort.antwort_id)
-                                    : antworten[frage.quiz_fragen_id]
-                                        ?.antwortId === antwort.antwort_id
-                                }
-                                disabled={blockIstGesperrt}
-                                onChange={() =>
-                                  setAntworten((current) => ({
-                                    ...current,
-                                    [frage.quiz_fragen_id]: {
-                                      antwortText: null,
-                                      antwortId:
-                                        frage.templateId === "multiple_choice" ||
-                                        frage.templateId === "multiple-choice"
-                                          ? null
-                                          : antwort.antwort_id,
-                                      antwortIds:
-                                        frage.templateId === "multiple_choice" ||
-                                        frage.templateId === "multiple-choice"
-                                          ? (
-                                              current[frage.quiz_fragen_id]
-                                                ?.antwortIds ?? []
-                                            ).includes(antwort.antwort_id)
-                                            ? (
-                                                current[frage.quiz_fragen_id]
-                                                  ?.antwortIds ?? []
-                                              ).filter(
-                                                (id) => id !== antwort.antwort_id,
-                                              )
-                                            : [
-                                                ...(current[
-                                                  frage.quiz_fragen_id
-                                                ]?.antwortIds ?? []),
-                                                antwort.antwort_id,
-                                              ]
-                                          : [antwort.antwort_id],
-                                      antwortfelder: {},
-                                    },
-                                  }))
-                                }
-                                className="mt-1"
-                              />
-
-                              <span>
-                                <span className="mr-2 font-bold">
-                                  {String.fromCharCode(65 + antwortIndex)}.
-                                </span>
-                                {antwort.antwort}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      ) : (
-                        <textarea
-                          disabled={blockIstGesperrt}
-                          value={
-                            antworten[frage.quiz_fragen_id]?.antwortText ?? ""
-                          }
-                          onChange={(e) =>
-                            setAntworten((current) => ({
-                              ...current,
-                              [frage.quiz_fragen_id]: {
-                                antwortText: e.target.value,
-                                antwortId: null,
-                                antwortfelder: {},
-                              },
-                            }))
-                          }
-                          className="mt-4 min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-                          placeholder="Antwort eintragen..."
-                        />
-                      )}
+                      <GenericAnswerRenderer
+                        questionAssignmentId={frage.quiz_fragen_id}
+                        interaction={frage.interaction}
+                        value={antworten[frage.quiz_fragen_id]}
+                        disabled={blockIstGesperrt}
+                        onChange={(value) =>
+                          setAntworten((current) => ({
+                            ...current,
+                            [frage.quiz_fragen_id]: value,
+                          }))
+                        }
+                      />
                     </div>
                   );
                 })}

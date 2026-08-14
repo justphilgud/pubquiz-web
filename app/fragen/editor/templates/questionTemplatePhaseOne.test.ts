@@ -67,6 +67,10 @@ test("shared controls cover segmented boolean, sortable order and browser voices
     "app/quiz/[quizId]/antworten/QuizAntwortClient.tsx",
     "utf8",
   );
+  const answerRenderer = readFileSync(
+    "app/quiz/[quizId]/antworten/GenericAnswerRenderer.tsx",
+    "utf8",
+  );
   const voices = readFileSync(
     "app/fragen/editor/components/useSpeechVoices.ts",
     "utf8",
@@ -79,7 +83,8 @@ test("shared controls cover segmented boolean, sortable order and browser voices
   assert.match(editor, /aria-pressed=\{active\}/);
   assert.doesNotMatch(editor, /data\.statement/);
   assert.match(editor, /SortableTemplateList/);
-  assert.match(answerForm, /SortableTemplateList/);
+  assert.match(answerForm, /GenericAnswerRenderer/);
+  assert.match(answerRenderer, /SortableTemplateList/);
   assert.match(sortable, /PointerSensor/);
   assert.match(sortable, /KeyboardSensor/);
   assert.match(sortable, /touch-none/);
@@ -88,7 +93,7 @@ test("shared controls cover segmented boolean, sortable order and browser voices
   assert.match(editor, /Passend zur Zielsprache/);
   assert.match(editor, /Weitere Stimmen/);
   assert.match(editor, /voiceId/);
-  assert.match(answerForm, /templateData\.unit/);
+  assert.match(answerRenderer, /interaction\.unit/);
   assert.match(presentation, /Google-Nutzer/);
   assert.match(presentation, /review\.attributionText/);
   assert.match(presentation, /templateData\.unit/);
@@ -155,7 +160,7 @@ test("ordering evaluates exact order and prepares position scoring", () => {
   assert.ok(data && data.kind === "ORDERING");
   assert.equal(evaluateStructuredAnswer(data, '["a","b"]'), true);
   assert.equal(evaluateStructuredAnswer(data, '["b","a"]'), false);
-  assert.equal(getQuestionTemplateDefinition(questionTemplateIds.ordering)?.evaluationMode, "ORDER_EXACT");
+  assert.equal(getQuestionTemplateDefinition(questionTemplateIds.ordering)?.evaluationMode, "ORDER_POSITION");
 });
 
 test("anagram generator preserves letters and rejects invalid manual values", () => {

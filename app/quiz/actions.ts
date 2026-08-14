@@ -81,6 +81,7 @@ import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
 } from "./quizAnswerLiveState";
+import { resolveQuizAnswerInteraction } from "./answerInteraction";
 import {
   DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
   isQuizSolutionStrategy,
@@ -2341,15 +2342,36 @@ export async function getQuizAntwortStatus(
             })),
             allowFreeAnswer: eintrag.freie_antwort_erlaubt,
           });
+          const templateConfig = eintrag.fragen.template_config_json as
+            | QuestionTemplateConfig
+            | null;
+          const interaction = resolveQuizAnswerInteraction({
+            templateId: eintrag.fragen.vorlage?.code ?? null,
+            originalAnswerMode: answerMode.originalMode,
+            effectiveAnswerMode: answerMode.effectiveMode,
+            templateData: templateConfig?.templateData,
+            answerFields: eintrag.fragen.antwortfelder.map((field) => ({
+              id: field.antwortfeld_id,
+              label: field.label,
+              required: field.ist_pflicht,
+            })),
+            answerOptions: antworten
+              .filter(
+                (antwort) => antwort.antworttyp.antworttyp !== "Freitext",
+              )
+              .map((antwort) => ({
+                id: antwort.antwort_id,
+                label: antwort.antwort,
+              })),
+          });
 
           return {
             quiz_fragen_id: eintrag.quiz_fragen_id,
             fragen_id: eintrag.fragen.fragen_id,
             frage: eintrag.fragen.frage,
             templateId: eintrag.fragen.vorlage?.code ?? null,
-            templateConfig: eintrag.fragen.template_config_json as
-              | import("@/app/fragen/editor/types").QuestionTemplateConfig
-              | null,
+            templateConfig,
+            interaction,
             istFreigegeben: true,
             punkte_modus: eintrag.punkte_modus ?? "standard",
             urspruenglicher_antwortmodus: answerMode.originalMode,
