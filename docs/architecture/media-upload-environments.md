@@ -4,7 +4,7 @@ Stand: 17. Juli 2026
 
 ## Verbindliches Modell
 
-Alle drei Upload-Routen verwenden dieselbe serverseitige Auflösung für
+Alle aktiven Upload-Routen verwenden dieselbe serverseitige Auflösung für
 Umgebung, Blob-Credential und Pfade. Das Credential ist in jeder Umgebung ein
 explizit gesetzter `BLOB_READ_WRITE_TOKEN` des jeweils zugeordneten Stores.
 `VERCEL_OIDC_TOKEN` und `BLOB_STORE_ID` werden von der Anwendung nicht als
@@ -21,7 +21,7 @@ Die fachliche Kategorie folgt direkt auf das Environment-Präfix:
 - Fragenmedium: `dev/question-media/image/...`
 - Antwortbild: `preview/answer-media/image/...`
 - Präsentationstemplate-Asset: `dev/template-media/<template-id>/<assetrolle>/...`
-- ältere, weiterhin aktive Uploadoberflächen: `prod/media/audio/intro/...`
+- Intro-/Outro-Medium: `prod/media/audio/intro/...`
 
 Bereits vorhandene Blobs und gespeicherte URLs werden weder verschoben noch
 umbenannt. Die neue Regel gilt ausschließlich für neu erzeugte Pfade.
@@ -49,13 +49,14 @@ Pfad. Tokens, Cookies, signierte URLs und andere Secrets werden weder als Props
 
 | Route | Verwendung | Status |
 | --- | --- | --- |
-| `/api/question-media-upload` | gemeinsamer signierter Upload für `QuestionMediaSlot`, `AnswerMediaSlot` und freigegebene Template-Assets | aktiv; Template-Assets zusätzlich opt-in |
-| `/api/blob-upload-token` | Intro-Audio und Intro-Video in den Slide-Einstellungen | aktiv, Legacy-API |
+| `/api/question-media-upload` | gemeinsamer signierter Upload für `QuestionMediaSlot`, `AnswerMediaSlot`, Quiz-Intro/Outro und freigegebene Template-Assets | aktiv; Template-Assets zusätzlich opt-in |
 | `/api/upload-medium` | altes Fragenformular | aktiv, Legacy-API |
 
-`/api/blob-upload-token` darf daher noch nicht entfernt werden. Alle Routen
-beziehen ihren `BLOB_READ_WRITE_TOKEN` ausdrücklich aus derselben zentralen
-Serverfunktion; das Blob-SDK darf kein Credential implizit auswählen.
+Intro- und Outro-Medien verwenden denselben authentifizierten Presigned-Upload
+wie Fragen- und Template-Medien. Der Uploadkontext bindet den Pfad an das Quiz,
+den Medienslot und die aktuelle Umgebung. Alle Routen beziehen ihren
+`BLOB_READ_WRITE_TOKEN` ausdrücklich aus derselben zentralen Serverfunktion;
+das Blob-SDK darf kein Credential implizit auswählen.
 
 Template-Assets verwenden dieselbe Route, Credential-Auflösung und
 Environment-Präfixlogik. Weil sich die konkrete Store-Zuordnung nicht allein

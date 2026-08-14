@@ -57,9 +57,10 @@ export default async function OutroEditorPage({ params }: Props) {
               <FixedSlideEnabledField defaultEnabled={slideVisibility.announcements} />
               <BlobUploadField
                 label="Outro-Musik"
+                quizId={quizIdValue}
                 hiddenFieldName="outroMusikUrl"
                 currentUrl={quiz.outro_musik_url}
-                zielordner="audio/outro"
+                slot="OUTRO_AUDIO"
                 accept=".mp3,audio/mpeg,audio/mp3"
               />
               <FixedSlideField

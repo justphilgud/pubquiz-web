@@ -41,6 +41,7 @@ import { resolveStorybookComposition } from "./storybookComposition";
 import { applyPresentationStylePreset, createPresentationStylePreset } from "./presentationTemplatePresets";
 import { templateRegistry } from "@/app/rendering/templateRegistry";
 import {
+  applyPresentationTemplateAssetUpload,
   buildPresentationTemplateAssetPathname,
   isAllowedPresentationTemplateAssetPathname,
   isSafeTemplateAssetReference,
@@ -52,6 +53,7 @@ import {
   readBlobStoreIdFromToken,
   resolvePresentationTemplateUploadPolicy,
 } from "./presentationTemplateUploadPolicy";
+import { FileUpload } from "@/components/ui";
 
 function draft(): PresentationTemplateDraft {
   return {
@@ -317,6 +319,15 @@ test("template asset roles use the central environment-prefixed blob model", () 
     ),
     false,
   );
+  assert.equal(
+    isAllowedPresentationTemplateAssetPathname(
+      "dev/template-media/mein-template/hero_image/../bild.webp",
+      "dev",
+      "mein-template",
+      "HERO_IMAGE",
+    ),
+    false,
+  );
   assert.equal(isSafeTemplateAssetReference("/medien/bilder/Mein Bild.jpg"), true);
   assert.equal(
     isSafeTemplateAssetReference(
@@ -348,6 +359,36 @@ test("template asset roles use the central environment-prefixed blob model", () 
       type: "image/png",
     }) ?? "",
     /höchstens 10 MB/,
+  );
+});
+
+test("template add and replace share one accessible file input and consistent asset state", () => {
+  const markup = renderToStaticMarkup(
+    createElement(FileUpload, { label: "Bild ersetzen" }),
+  );
+  const labelTarget = markup.match(/for="([^"]+)"/)?.[1];
+  const inputId = markup.match(/<input id="([^"]+)"/)?.[1];
+  assert.ok(labelTarget);
+  assert.equal(inputId, labelTarget);
+  assert.match(markup, /type="file"/);
+
+  const oldReference = "/medien/bilder/alt.jpg" as const;
+  const newReference = "/medien/bilder/neu.jpg" as const;
+  assert.equal(
+    applyPresentationTemplateAssetUpload(
+      oldReference,
+      false,
+      newReference,
+    ),
+    newReference,
+  );
+  assert.deepEqual(
+    applyPresentationTemplateAssetUpload(
+      [oldReference],
+      true,
+      newReference,
+    ),
+    [oldReference, newReference],
   );
 });
 

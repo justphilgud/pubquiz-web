@@ -78,9 +78,10 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         <FixedSlideEnabledField defaultEnabled={slideVisibility.waiting} />
         <BlobUploadField
           label="Intro-Video"
+          quizId={quizIdValue}
           hiddenFieldName="introVideoUrl"
           currentUrl={quiz.intro_video_url}
-          zielordner="video/intro"
+          slot="INTRO_VIDEO"
           accept=".mp4,.webm,.mov,video/mp4,video/webm,video/quicktime"
         />
         <div className="grid gap-4 md:grid-cols-2">
@@ -114,9 +115,10 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         <FixedSlideEnabledField defaultEnabled={slideVisibility.countdown} />
         <BlobUploadField
           label="Intro-Musik"
+          quizId={quizIdValue}
           hiddenFieldName="introMusikUrl"
           currentUrl={quiz.intro_musik_url}
-          zielordner="audio/intro"
+          slot="INTRO_AUDIO"
           accept=".mp3,audio/mpeg,audio/mp3"
         />
         <FixedSlideField label="Countdowntext">

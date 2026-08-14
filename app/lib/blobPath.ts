@@ -6,14 +6,25 @@ export type BlobPathArea =
   | "template-media"
   | "media";
 
+export function isSafeBlobPathSegment(segment: string) {
+  let decodedSegment: string;
+  try {
+    decodedSegment = decodeURIComponent(segment);
+  } catch {
+    return false;
+  }
+
+  return Boolean(
+    decodedSegment &&
+      decodedSegment !== "." &&
+      decodedSegment !== ".." &&
+      !decodedSegment.includes("/") &&
+      !decodedSegment.includes("\\"),
+  );
+}
+
 function assertSafePathSegment(segment: string) {
-  if (
-    !segment ||
-    segment === "." ||
-    segment === ".." ||
-    segment.includes("/") ||
-    segment.includes("\\")
-  ) {
+  if (!isSafeBlobPathSegment(segment)) {
     throw new Error("Ungültiges Blob-Pfadsegment.");
   }
 }
@@ -25,7 +36,7 @@ export function buildBlobPath(
 ) {
   segments.forEach(assertSafePathSegment);
 
-  return `${environmentPrefix}/${area}/${segments.join("/")}`;
+  return [environmentPrefix, area, ...segments].join("/");
 }
 
 export function getBlobAreaPrefix(

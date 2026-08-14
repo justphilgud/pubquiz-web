@@ -8,6 +8,7 @@ import {
 } from "./mediaSlots";
 import {
   buildBlobPath,
+  isSafeBlobPathSegment,
   type BlobEnvironmentPrefix,
 } from "@/app/lib/blobPath";
 
@@ -54,9 +55,11 @@ export function isAllowedQuestionMediaPathname(
   const directory = mediaType.toLowerCase();
   const area = target === "QUESTION" ? "question-media" : "answer-media";
   const baseDirectory = `${buildBlobPath(environmentPrefix, area, [slotKey, directory])}/`;
+  const fileName = pathname.slice(baseDirectory.length);
 
   return (
     pathname.startsWith(baseDirectory) &&
+    isSafeBlobPathSegment(fileName) &&
     questionMediaRules[mediaType].extensions.includes(
       getFileExtension(pathname),
     )

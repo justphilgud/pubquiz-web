@@ -1,5 +1,6 @@
 import {
   buildBlobPath,
+  isSafeBlobPathSegment,
   type BlobEnvironmentPrefix,
 } from "@/app/lib/blobPath";
 import type {
@@ -125,9 +126,11 @@ export function isAllowedPresentationTemplateAssetPathname(
   role: PresentationTemplateAssetRole,
 ) {
   const prefix = `${buildBlobPath(environmentPrefix, "template-media", [templateId, role.toLowerCase()])}/`;
+  const fileName = pathname.slice(prefix.length);
   const extension = pathname.split(/[?#]/, 1)[0].split(".").pop()?.toLowerCase();
   return Boolean(
     pathname.startsWith(prefix) &&
+      isSafeBlobPathSegment(fileName) &&
       extension &&
       uploadExtensions.includes(extension as (typeof uploadExtensions)[number]),
   );
@@ -155,4 +158,14 @@ export function validatePresentationTemplateAssetFile(
     return `Das Bild darf höchstens ${presentationTemplateAssetUploadRule.sizeLabel} groß sein.`;
   }
   return null;
+}
+
+export function applyPresentationTemplateAssetUpload(
+  current: TemplateAssetReference | TemplateAssetReference[] | null,
+  multiple: boolean,
+  reference: TemplateAssetReference,
+) {
+  return multiple && Array.isArray(current)
+    ? [...current, reference]
+    : reference;
 }
