@@ -2163,33 +2163,14 @@ export async function getQuizAntwortStatus(
         orderBy: {
           sortierung: "asc",
         },
-        include: {
-          fragen: {
-            include: {
-              antworten: {
-                include: {
-                  antworttyp: true,
-                },
-                orderBy: {
-                  antwort_id: "asc",
-                },
-              },
-              medien: {
-                include: {
-                  medientyp: true,
-                },
-                orderBy: {
-                  sortierung: "asc",
-                },
-              },
-              antwortfelder: {
-                orderBy: {
-                  sortierung: "asc",
-                },
-              },
-              vorlage: { select: { code: true } },
-            },
-          },
+        select: {
+          quiz_fragen_id: true,
+          fragen_id: true,
+          quiz_abschnitt_id: true,
+          sortierung: true,
+          antwort_reihenfolge: true,
+          freie_antwort_erlaubt: true,
+          punkte_modus: true,
         },
       },
       praesentation_status: true,
@@ -2284,39 +2265,6 @@ export async function getQuizAntwortStatus(
         getTeamSessionSigningSecret(),
       )
     : null;
-  const teamSession = tokenPayload
-    ? await prisma.quiz_team_sessions.findFirst({
-        where: {
-          quiz_team_session_id: tokenPayload.sessionId,
-          quiz_id: quizId,
-        },
-      })
-    : null;
-
-  const gespeicherteAntworten =
-    tokenPayload?.quizId === quizId && teamSession
-      ? await prisma.team_antworten.findMany({
-        where: {
-          quiz_team_session_id: tokenPayload.sessionId,
-          quiz_id: quizId,
-        },
-        include: {
-          antwortauswahlen: true,
-          submissions: {
-            orderBy: [
-              { submitted_at: "desc" as const },
-              { team_answer_submission_id: "desc" as const },
-            ],
-            take: 1,
-          },
-          antwortfelder: {
-            include: {
-              antwortfeld: true,
-            },
-          },
-        },
-        })
-      : [];
 
   const fragenImAktuellenBlock = aktuellerBlock
     ? quiz.quiz_fragen
@@ -2342,7 +2290,62 @@ export async function getQuizAntwortStatus(
     releasedAssignmentIds,
   );
 
-  const fragen = fragenZurAnzeige.map((eintrag) => {
+  const detailPromise = fragenZurAnzeige.length > 0
+    ? prisma.quiz_fragen.findMany({
+        where: {
+          quiz_id: quizId,
+          quiz_fragen_id: {
+            in: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
+          },
+        },
+        orderBy: { sortierung: "asc" },
+        include: {
+          fragen: {
+            include: {
+              antworten: {
+                include: { antworttyp: true },
+                orderBy: { antwort_id: "asc" },
+              },
+              medien: {
+                include: { medientyp: true },
+                orderBy: { sortierung: "asc" },
+              },
+              antwortfelder: { orderBy: { sortierung: "asc" } },
+              vorlage: { select: { code: true } },
+            },
+          },
+        },
+      })
+    : Promise.resolve([]);
+  const answerPromise =
+    tokenPayload?.quizId === quizId && fragenZurAnzeige.length > 0
+      ? prisma.team_antworten.findMany({
+          where: {
+            quiz_team_session_id: tokenPayload.sessionId,
+            quiz_id: quizId,
+            quiz_fragen_id: {
+              in: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
+            },
+          },
+          include: {
+            antwortauswahlen: true,
+            submissions: {
+              orderBy: [
+                { submitted_at: "desc" as const },
+                { team_answer_submission_id: "desc" as const },
+              ],
+              take: 1,
+            },
+            antwortfelder: { include: { antwortfeld: true } },
+          },
+        })
+      : Promise.resolve([]);
+
+  const [detaillierteFragen, gespeicherteAntworten] = await Promise.all([
+    detailPromise,
+    answerPromise,
+  ]);
+  const fragen = detaillierteFragen.map((eintrag) => {
           const antworten = [...eintrag.fragen.antworten].sort((a, b) => {
             const indexA = eintrag.antwort_reihenfolge.indexOf(a.antwort_id);
             const indexB = eintrag.antwort_reihenfolge.indexOf(b.antwort_id);
