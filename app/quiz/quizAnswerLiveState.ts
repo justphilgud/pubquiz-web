@@ -35,6 +35,27 @@ export function selectQuizAnswerAssignments<
   return [];
 }
 
+export function selectReleasedQuizAnswerAssignmentIds(
+  blockAssignmentIds: readonly number[],
+  runs: readonly {
+    quiz_fragen_id: number | null;
+    opened_at: Date | null;
+    is_current: boolean;
+  }[],
+  releasedAt: Date | null,
+) {
+  if (!releasedAt) return [];
+  const openedIds = new Set(
+    runs.flatMap((run) =>
+      run.quiz_fragen_id !== null &&
+      (run.is_current || (run.opened_at !== null && run.opened_at >= releasedAt))
+        ? [run.quiz_fragen_id]
+        : [],
+    ),
+  );
+  return blockAssignmentIds.filter((assignmentId) => openedIds.has(assignmentId));
+}
+
 export function canSaveQuizAnswerForPresentation(
   audienceState: PresentationAudienceState,
   questionAssignmentId: number,

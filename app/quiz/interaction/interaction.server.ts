@@ -520,10 +520,10 @@ async function isRunReleasedForAnswerWrite(
   run: {
     is_current: boolean;
     config_snapshot: Prisma.JsonValue;
+    opened_at: Date | null;
   },
   assignment: {
     quiz_abschnitt_id: number | null;
-    sortierung: number | null;
   },
   quizId: number,
   requestedSectionId: number,
@@ -550,19 +550,10 @@ async function isRunReleasedForAnswerWrite(
   ) {
     return false;
   }
-  const currentAssignment = await db.quiz_fragen.findFirst({
-    where: {
-      quiz_id: quizId,
-      quiz_fragen_id: release.aktuelle_quiz_fragen_id,
-      quiz_abschnitt_id: requestedSectionId,
-    },
-    select: { sortierung: true },
-  });
-  return (
-    assignment.sortierung !== null &&
-    currentAssignment?.sortierung !== null &&
-    currentAssignment?.sortierung !== undefined &&
-    assignment.sortierung <= currentAssignment.sortierung
+  return run.is_current || Boolean(
+    run.opened_at &&
+    release.freigegeben_ab &&
+    run.opened_at >= release.freigegeben_ab
   );
 }
 

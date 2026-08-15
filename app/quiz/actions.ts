@@ -81,6 +81,7 @@ import {
 import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
+  selectReleasedQuizAnswerAssignmentIds,
 } from "./quizAnswerLiveState";
 import { serializeQuizBlockReleaseRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
@@ -2277,12 +2278,6 @@ export async function getQuizAntwortStatus(
         right.quiz_block_freigabe_id - left.quiz_block_freigabe_id,
     )[0] ?? null;
 
-  const aktuelleQuizFragenId = offenerFragenblock
-    ? (blockFreigabe?.aktuelle_quiz_fragen_id ?? null)
-    : stableQuestion?.sectionId === null
-      ? stableQuestion.questionAssignmentId
-      : null;
-
   const tokenPayload = quizTeamSessionToken
     ? verifyTeamSessionToken(
         quizTeamSessionToken,
@@ -2333,18 +2328,13 @@ export async function getQuizAntwortStatus(
         .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0))
     : [];
 
-  const aktuelleFrageIndex = fragenImAktuellenBlock.findIndex(
-    (eintrag) => eintrag.quiz_fragen_id === aktuelleQuizFragenId,
-  );
-
   const releasedAssignmentIds =
     offenerFragenblock && !blockIstGesperrt
-      ? fragenImAktuellenBlock
-          .filter(
-            (_, index) =>
-              aktuelleFrageIndex >= 0 && index <= aktuelleFrageIndex,
-          )
-          .map((entry) => entry.quiz_fragen_id)
+      ? selectReleasedQuizAnswerAssignmentIds(
+          fragenImAktuellenBlock.map((entry) => entry.quiz_fragen_id),
+          quiz.interaction_runs,
+          blockFreigabe?.freigegeben_ab ?? null,
+        )
       : [];
   const fragenZurAnzeige = selectQuizAnswerAssignments(
     audienceState,

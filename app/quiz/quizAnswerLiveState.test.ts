@@ -13,6 +13,7 @@ import {
 import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
+  selectReleasedQuizAnswerAssignmentIds,
 } from "./quizAnswerLiveState";
 import {
   parseQuizBlockPreviewSectionId,
@@ -143,6 +144,52 @@ test("an open keyed block accumulates every released question", () => {
   assert.deepEqual(
     selectQuizAnswerAssignments(state, assignments, [1, 2, 3]),
     assignments.slice(0, 3),
+  );
+});
+
+test("released questions follow opened runs instead of editorial sort order", () => {
+  const releasedAt = new Date("2026-08-15T12:00:00.000Z");
+  assert.deepEqual(
+    selectReleasedQuizAnswerAssignmentIds(
+      [1, 2, 3, 4],
+      [
+        {
+          quiz_fragen_id: 3,
+          opened_at: new Date("2026-08-15T12:00:03.000Z"),
+          is_current: true,
+        },
+        {
+          quiz_fragen_id: 1,
+          opened_at: new Date("2026-08-15T11:59:59.000Z"),
+          is_current: false,
+        },
+      ],
+      releasedAt,
+    ),
+    [3],
+  );
+});
+
+test("released question ids accumulate in stable block order", () => {
+  const releasedAt = new Date("2026-08-15T12:00:00.000Z");
+  assert.deepEqual(
+    selectReleasedQuizAnswerAssignmentIds(
+      [1, 2, 3],
+      [
+        {
+          quiz_fragen_id: 3,
+          opened_at: new Date("2026-08-15T12:00:03.000Z"),
+          is_current: false,
+        },
+        {
+          quiz_fragen_id: 1,
+          opened_at: new Date("2026-08-15T12:00:01.000Z"),
+          is_current: false,
+        },
+      ],
+      releasedAt,
+    ),
+    [1, 3],
   );
 });
 
