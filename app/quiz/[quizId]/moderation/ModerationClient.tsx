@@ -9,6 +9,7 @@ import {
   schliesseQuizBlock,
   QuizPraesentationResult,
   getQuizPunktestand,
+  getQuizLiveSnapshot,
   getZufaelligeSchaetzfrage,
 } from "../../actions";
 import {
@@ -47,6 +48,7 @@ import {
   getQuizFlowTypeLabel,
   getQuizSolutionStrategyLabel,
 } from "@/app/quiz/flow/quizFlow";
+import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 
 type EstimationQuestion = {
   fragen_id: number;
@@ -88,6 +90,7 @@ export default function ModerationClient({
 }: Props) {
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
+  const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
 
   const [slideIndex, setSlideIndex] = useState(() => {
     return resolvePresentationSequenceIndex(
@@ -236,6 +239,27 @@ export default function ModerationClient({
 
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    let refreshing = false;
+    async function refreshPixelState() {
+      if (refreshing) return;
+      refreshing = true;
+      try {
+      const snapshot = await getQuizLiveSnapshot(quizId);
+      if (active) setPixelState(snapshot.pixelState);
+      } finally {
+        refreshing = false;
+      }
+    }
+    void refreshPixelState();
+    const interval = window.setInterval(() => void refreshPixelState(), 750);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [quizId]);
 
   async function speichereDauerVomAktuellenSlide() {
     if (aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
@@ -551,6 +575,26 @@ export default function ModerationClient({
     void ladePunktestand();
   }, [aktuellerSlide, quizId]);
 
+  useEffect(() => {
+    let active = true;
+    let refreshing = false;
+    async function refresh() {
+      if (!active || refreshing) return;
+      refreshing = true;
+      try {
+        await aktualisiereAntwortStatus();
+      } finally {
+        refreshing = false;
+      }
+    }
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 1_500);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [aktualisiereAntwortStatus]);
+
   useModerationHotkeys({
     hatMedien,
     hatAudio,
@@ -623,10 +667,20 @@ export default function ModerationClient({
               playbackCommandId={playbackCommandId}
               estimationPhase={estimationPhase}
               estimationQuestion={estimationQuestion}
+              now={now}
+              pixelState={pixelState}
             />
 
             <SlideNotes>
               <div className="space-y-2">
+                {pixelState && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && (
+                  <div className="rounded-xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-3">
+                    <p><strong>Pixel-Stufe:</strong> {pixelState.effectivePixelStage} von 3</p>
+                    <p><strong>Stop:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} in Stufe ${pixelState.stoppedAtStage}` : pixelState.effectivePixelStage < 3 ? "möglich" : "in Stufe 3 deaktiviert"}</p>
+                    <p><strong>Finale Antworten:</strong> {antwortStatus.antwortenEingegangen} / {antwortStatus.teamsAngemeldet}</p>
+                    <p><strong>Zustand:</strong> {pixelState.submissionDeadlineAt && new Date(pixelState.submissionDeadlineAt).getTime() > now ? `${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden Restzeit` : pixelState.stopped ? "Countdown beendet" : "offen"}</p>
+                  </div>
+                )}
                 {aktuellerSlide?.typ === "ablauf" && (
                   <p><strong>Typ:</strong> {getQuizFlowTypeLabel(aktuellerSlide.element.type)}</p>
                 )}

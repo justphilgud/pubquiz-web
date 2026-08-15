@@ -32,7 +32,7 @@ test("central recalculation freezes sessions and batch-allocates every risk answ
   assert.match(service, /erstellt_am: \{ lte: candidateFixedAt \}/);
   assert.match(
     service,
-    /assignment\.punkte_modus === "risikofrage" \|\| requestedIds\.size === 0/,
+    /assignment\.punkte_modus === "risikofrage" \|\|\s+templateId === "pixelbild" \|\|\s+requestedIds\.size === 0/,
   );
   assert.doesNotMatch(service, /Decimal\.max\(\s*1/);
 });

@@ -25,6 +25,12 @@ import {
   resolveInteractionSubmissionPolicy,
   shouldAutoFinalizeDraft,
 } from "./interactionSubmissionPolicy";
+import {
+  canStopPixelQuestion,
+  createPixelLiveConfigSnapshot,
+  readPixelLiveConfigSnapshot,
+  resolveEffectivePixelStage,
+} from "./pixelLiveInteraction";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -41,6 +47,19 @@ function readInteractionSnapshot(value: Prisma.JsonValue) {
     throw new Error("Interaction-Snapshot enth\u00e4lt keinen Contract.");
   }
   return interaction as ResolvedQuizAnswerInteraction;
+}
+
+function buildInteractionConfigSnapshot(input: {
+  interaction: ResolvedQuizAnswerInteraction;
+  templateId: string | null;
+  templateConfig: QuestionTemplateConfig | null;
+}) {
+  return input.templateId === "pixelbild"
+    ? {
+        interaction: input.interaction,
+        liveInteraction: createPixelLiveConfigSnapshot(input.templateConfig),
+      }
+    : { interaction: input.interaction };
 }
 
 export async function resolveInteractionAssignment(
@@ -97,7 +116,12 @@ export async function resolveInteractionAssignment(
       .filter((answer) => answer.antworttyp.antworttyp !== "Freitext")
       .map((answer) => ({ id: answer.antwort_id, label: answer.antwort })),
   });
-  return { assignment, interaction };
+  return {
+    assignment,
+    interaction,
+    templateId: assignment.fragen.vorlage?.code ?? null,
+    templateConfig,
+  };
 }
 
 async function lockRun(db: DbClient, interactionRunId: number) {
@@ -157,26 +181,46 @@ async function autoFinalizeDrafts(
     });
   const existing = await db.team_answer_submissions.findMany({
       where: { interaction_run_id: run.interaction_run_id },
-      select: { quiz_team_session_id: true },
+      select: {
+        quiz_team_session_id: true,
+        submission_version: true,
+        draft_revision: true,
+      },
     });
   const finalizedTeams = new Set(existing.map((item) => item.quiz_team_session_id));
+  const pixelConfig = readPixelLiveConfigSnapshot(run.config_snapshot);
   const submissions: Prisma.team_answer_submissionsCreateManyInput[] = [];
   for (const draft of drafts) {
     const validated = validateInteractionPayload(
       interaction,
       draftInputFromStored(draft),
     );
+    const teamSubmissions = existing.filter(
+      (submission) => submission.quiz_team_session_id === draft.quiz_team_session_id,
+    );
     if (!shouldAutoFinalizeDraft({
-      hasExplicitSubmission: finalizedTeams.has(draft.quiz_team_session_id),
+      hasExplicitSubmission: pixelConfig
+        ? teamSubmissions.some(
+            (submission) => submission.draft_revision === draft.draft_revision,
+          )
+        : finalizedTeams.has(draft.quiz_team_session_id),
       hasContent: validated.hasContent,
     })) {
       continue;
     }
+    const versionPlan = planSubmissionVersion(
+      teamSubmissions.map((submission) => ({
+        submissionVersion: submission.submission_version,
+        draftRevision: submission.draft_revision,
+      })),
+      draft.draft_revision,
+    );
+    if (versionPlan.kind === "IDEMPOTENT") continue;
     submissions.push({
       interaction_run_id: run.interaction_run_id,
       team_antwort_id: draft.team_antwort_id,
       quiz_team_session_id: draft.quiz_team_session_id,
-      submission_version: 1,
+      submission_version: versionPlan.submissionVersion,
       status: "AUTO_FINALIZED",
       interaction_type: run.interaction_type,
       payload: toJson(validated.payload),
@@ -214,7 +258,7 @@ async function closeRun(
       data: {
         state: "CLOSED",
         closed_at: run.closed_at ?? new Date(),
-        deadline_at: null,
+        deadline_at: run.stopped_at ? run.deadline_at : null,
         is_current: options.keepCurrent,
         revision: { increment: 1 },
       },
@@ -253,8 +297,7 @@ export async function syncInteractionForPresentation(
 
   if (identity.phase === "QUESTION") {
     if (
-      currentRun?.quiz_fragen_id === identity.questionAssignmentId &&
-      (currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN")
+      currentRun?.quiz_fragen_id === identity.questionAssignmentId
     ) {
       return currentRun;
     }
@@ -264,7 +307,7 @@ export async function syncInteractionForPresentation(
         keepCurrent: false,
       });
     }
-    const { interaction } = await resolveInteractionAssignment(
+    const resolved = await resolveInteractionAssignment(
       db,
       input.quizId,
       identity.questionAssignmentId,
@@ -273,12 +316,12 @@ export async function syncInteractionForPresentation(
       data: {
         quiz_id: input.quizId,
         quiz_fragen_id: identity.questionAssignmentId,
-        interaction_type: interaction.type,
+        interaction_type: resolved.interaction.type,
         state: "OPEN",
         is_current: true,
         opened_at: new Date(),
         revision: 1,
-        config_snapshot: toJson({ interaction }),
+        config_snapshot: toJson(buildInteractionConfigSnapshot(resolved)),
       },
     });
   }
@@ -299,7 +342,7 @@ export async function syncInteractionForPresentation(
     });
   }
   if (!revealRun) {
-    const { interaction } = await resolveInteractionAssignment(
+    const resolved = await resolveInteractionAssignment(
       db,
       input.quizId,
       identity.questionAssignmentId,
@@ -308,12 +351,12 @@ export async function syncInteractionForPresentation(
       data: {
         quiz_id: input.quizId,
         quiz_fragen_id: identity.questionAssignmentId,
-        interaction_type: interaction.type,
+        interaction_type: resolved.interaction.type,
         state: "REVEALED",
         is_current: true,
         revealed_at: new Date(),
         revision: 1,
-        config_snapshot: toJson({ interaction }),
+        config_snapshot: toJson(buildInteractionConfigSnapshot(resolved)),
       },
     });
   }
@@ -426,6 +469,12 @@ export async function saveTeamAnswerDraft(input: {
       )
     ) {
       return { success: false, reason: "LIVE_STATE_CHANGED" };
+    }
+    if (
+      readPixelLiveConfigSnapshot(run.config_snapshot) &&
+      run.stopped_by_team_session_id === input.quizTeamSessionId
+    ) {
+      return { success: false, reason: "FINALIZED" };
     }
     const teamSession = await tx.quiz_team_sessions.findFirst({
         where: {
@@ -599,6 +648,12 @@ export async function submitTeamAnswer(input: {
     ) {
       return { success: false, reason: "LIVE_STATE_CHANGED" as const };
     }
+    if (
+      readPixelLiveConfigSnapshot(run.config_snapshot) &&
+      run.stopped_by_team_session_id === input.quizTeamSessionId
+    ) {
+      return { success: false, reason: "FINALIZED" as const };
+    }
     const draft = await tx.team_antworten.findUnique({
       where: {
         quiz_fragen_id_quiz_team_session_id: {
@@ -674,6 +729,145 @@ export async function submitTeamAnswer(input: {
   });
 }
 
+export type StopPixelQuestionResult =
+  | {
+      success: true;
+      stage: 1 | 2;
+      deadlineAt: string;
+      submissionVersion: number;
+    }
+  | {
+      success: false;
+      reason:
+        | "LIVE_STATE_CHANGED"
+        | "ALREADY_STOPPED"
+        | "STOP_NOT_AVAILABLE"
+        | "NO_DRAFT"
+        | "EMPTY_DRAFT";
+    };
+
+export async function stopPixelQuestion(input: {
+  quizId: number;
+  quizFragenId: number;
+  interactionRunId: number;
+  quizTeamSessionId: number;
+}): Promise<StopPixelQuestionResult> {
+  return prisma.$transaction(async (tx) => {
+    await lockRun(tx, input.interactionRunId);
+    let run = await tx.quiz_interaction_runs.findUnique({
+      where: { interaction_run_id: input.interactionRunId },
+    });
+    const now = new Date();
+    if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
+    if (
+      !run ||
+      !run.is_current ||
+      run.quiz_id !== input.quizId ||
+      run.quiz_fragen_id !== input.quizFragenId
+    ) {
+      return { success: false, reason: "LIVE_STATE_CHANGED" };
+    }
+    const config = readPixelLiveConfigSnapshot(run.config_snapshot);
+    if (!config) return { success: false, reason: "STOP_NOT_AVAILABLE" };
+    if (run.stopped_by_team_session_id !== null) {
+      return { success: false, reason: "ALREADY_STOPPED" };
+    }
+    const stage = resolveEffectivePixelStage({
+      openedAt: run.opened_at,
+      serverNow: now,
+      config,
+    });
+    if (run.state !== "OPEN" || stage === 3) {
+      return { success: false, reason: "STOP_NOT_AVAILABLE" };
+    }
+    const teamSession = await tx.quiz_team_sessions.findFirst({
+      where: {
+        quiz_team_session_id: input.quizTeamSessionId,
+        quiz_id: input.quizId,
+      },
+    });
+    if (!teamSession) return { success: false, reason: "LIVE_STATE_CHANGED" };
+    const draft = await tx.team_antworten.findUnique({
+      where: {
+        quiz_fragen_id_quiz_team_session_id: {
+          quiz_fragen_id: input.quizFragenId,
+          quiz_team_session_id: input.quizTeamSessionId,
+        },
+      },
+      include: { antwortauswahlen: true, antwortfelder: true },
+    });
+    if (!draft || draft.interaction_run_id !== run.interaction_run_id) {
+      return { success: false, reason: "NO_DRAFT" };
+    }
+    const validated = validateInteractionPayload(
+      readInteractionSnapshot(run.config_snapshot),
+      draftInputFromStored(draft),
+    );
+    if (!validated.hasContent) return { success: false, reason: "EMPTY_DRAFT" };
+
+    const deadlineAt = new Date(
+      now.getTime() + config.stopCountdownSeconds * 1_000,
+    );
+    const claimed = await tx.quiz_interaction_runs.updateMany({
+      where: {
+        interaction_run_id: run.interaction_run_id,
+        state: "OPEN",
+        stopped_by_team_session_id: null,
+      },
+      data: {
+        state: "COUNTDOWN",
+        deadline_at: deadlineAt,
+        stopped_by_team_session_id: input.quizTeamSessionId,
+        stopped_at: now,
+        stopped_at_stage: stage,
+        revision: { increment: 1 },
+      },
+    });
+    if (claimed.count !== 1) {
+      return { success: false, reason: "ALREADY_STOPPED" };
+    }
+    const existingSubmissions = await tx.team_answer_submissions.findMany({
+      where: {
+        interaction_run_id: run.interaction_run_id,
+        quiz_team_session_id: input.quizTeamSessionId,
+      },
+      select: { submission_version: true, draft_revision: true },
+    });
+    const versionPlan = planSubmissionVersion(
+      existingSubmissions.map((submission) => ({
+        submissionVersion: submission.submission_version,
+        draftRevision: submission.draft_revision,
+      })),
+      draft.draft_revision,
+    );
+    const submissionVersion = versionPlan.kind === "IDEMPOTENT"
+      ? versionPlan.submission.submissionVersion
+      : versionPlan.submissionVersion;
+    if (versionPlan.kind === "CREATE") {
+      await tx.team_answer_submissions.create({
+        data: {
+          interaction_run_id: run.interaction_run_id,
+          team_antwort_id: draft.team_antwort_id,
+          quiz_team_session_id: input.quizTeamSessionId,
+          submission_version: submissionVersion,
+          status: "SUBMITTED",
+          interaction_type: run.interaction_type,
+          payload: toJson(validated.payload),
+          draft_revision: draft.draft_revision,
+          finalization_reason: "PIXEL_STOPPED",
+        },
+      });
+    }
+    await recalculateQuizQuestionEvaluation(input.quizFragenId, tx);
+    return {
+      success: true,
+      stage,
+      deadlineAt: deadlineAt.toISOString(),
+      submissionVersion,
+    };
+  }, { timeout: 30_000 });
+}
+
 export async function getQuizLiveSnapshotData(
   quizId: number,
   quizTeamSessionId: number | null,
@@ -691,6 +885,7 @@ export async function getQuizLiveSnapshotData(
   const run = await prisma.quiz_interaction_runs.findFirst({
     where: { quiz_id: quizId, is_current: true },
     include: {
+      stopped_by_team_session: { select: { teamname: true } },
       quiz_fragen: {
         select: { quiz_fragen_id: true, fragen_id: true, quiz_abschnitt_id: true },
       },
@@ -724,6 +919,75 @@ export async function getQuizLiveSnapshotData(
     ).payload;
   }
   const submission = answer?.submissions[0] ?? null;
+  const pixelConfig = run
+    ? readPixelLiveConfigSnapshot(run.config_snapshot)
+    : null;
+  const pixelStage = run && pixelConfig
+    ? resolveEffectivePixelStage({
+        openedAt: run.opened_at,
+        serverNow,
+        config: pixelConfig,
+        stoppedAtStage: run.stopped_at_stage,
+      })
+    : null;
+  const isStopper = Boolean(
+    run &&
+    quizTeamSessionId &&
+    run.stopped_by_team_session_id === quizTeamSessionId,
+  );
+  const hasDraftContent = Boolean(
+    run &&
+    answer &&
+    validateInteractionPayload(
+      readInteractionSnapshot(run.config_snapshot),
+      draftInputFromStored(answer),
+    ).hasContent,
+  );
+  const writable = Boolean(
+    run &&
+    isQuizInteractionWritable(run.state, run.deadline_at, serverNow),
+  );
+  const pixelResolution = run && pixelConfig && run.state === "REVEALED" &&
+    run.stopped_by_team_session_id !== null
+    ? await prisma.team_antworten.findFirst({
+        where: {
+          interaction_run_id: run.interaction_run_id,
+          quiz_team_session_id: run.stopped_by_team_session_id,
+        },
+        select: {
+          bewertungsstatus: true,
+          vergebene_punkte: true,
+          bewertungsdetails: true,
+          submissions: {
+            where: { interaction_run_id: run.interaction_run_id },
+            orderBy: [
+              { submission_version: "desc" },
+              { team_answer_submission_id: "desc" },
+            ],
+            take: 1,
+            select: { payload: true },
+          },
+        },
+      })
+    : null;
+  const resolutionPayload = pixelResolution?.submissions[0]?.payload;
+  const resolutionAnswer = resolutionPayload &&
+    typeof resolutionPayload === "object" &&
+    !Array.isArray(resolutionPayload) &&
+    "text" in resolutionPayload &&
+    typeof resolutionPayload.text === "string"
+    ? resolutionPayload.text
+    : null;
+  const resolutionDetails = pixelResolution?.bewertungsdetails;
+  const resolutionPixelDetails = resolutionDetails &&
+    typeof resolutionDetails === "object" &&
+    !Array.isArray(resolutionDetails) &&
+    "pixel" in resolutionDetails &&
+    resolutionDetails.pixel &&
+    typeof resolutionDetails.pixel === "object" &&
+    !Array.isArray(resolutionDetails.pixel)
+    ? resolutionDetails.pixel as { outcome?: unknown }
+    : null;
   return {
     serverNow: serverNow.toISOString(),
     revision: run ? `${run.interaction_run_id}:${run.revision}` : "0:0",
@@ -744,8 +1008,50 @@ export async function getQuizLiveSnapshotData(
         }
       : null,
     publicState: run?.state ?? "LOCKED",
+    pixelState: run && pixelConfig && pixelStage
+      ? {
+          interactionType: pixelConfig.type,
+          state: run.state,
+          effectivePixelStage: pixelStage,
+          stopped: run.stopped_by_team_session_id !== null,
+          stoppedByTeamName: run.stopped_by_team_session?.teamname ?? null,
+          stoppedAt: run.stopped_at?.toISOString() ?? null,
+          stoppedAtStage:
+            run.stopped_at_stage === 1 || run.stopped_at_stage === 2
+              ? run.stopped_at_stage as 1 | 2
+              : null,
+          submissionDeadlineAt: run.deadline_at?.toISOString() ?? null,
+          resolution: pixelResolution
+            ? {
+                answer: resolutionAnswer,
+                status: pixelResolution.bewertungsstatus,
+                points: pixelResolution.vergebene_punkte.toString(),
+                outcome: ["NORMAL", "EXCLUSIVE_BONUS", "WRONG_STOP", "PENDING"].includes(
+                  String(resolutionPixelDetails?.outcome),
+                )
+                  ? resolutionPixelDetails!.outcome as "NORMAL" | "EXCLUSIVE_BONUS" | "WRONG_STOP" | "PENDING"
+                  : null,
+              }
+            : null,
+        }
+      : null,
     teamSpecificState: quizTeamSessionId
       ? {
+          isStopper,
+          canStop: Boolean(
+            run &&
+            pixelStage &&
+            pixelConfig &&
+            canStopPixelQuestion({
+              state: run.state,
+              stage: pixelStage,
+              stopped: run.stopped_by_team_session_id !== null,
+              hasDraftContent,
+              isStopper,
+            }),
+          ),
+          canEdit: writable && !isStopper,
+          canSubmit: writable && !isStopper,
           answerStatus: submission?.status ?? (answer ? "DRAFT" : null),
           draft: answer && draftPayload
             ? {

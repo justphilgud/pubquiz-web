@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- Pixel stages use dynamic question-media URLs. */
+
 import { useEffect, useState } from "react";
 import {
   searchTeamsForAntworten,
@@ -8,6 +10,7 @@ import {
   getQuizAntwortStatusLive,
   getQuizLiveSnapshot,
   submitTeamAntwort,
+  stopPixelbildAntwort,
 } from "../../actions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
@@ -23,6 +26,10 @@ import {
   isDraftChangedSinceSubmission,
   resolveInteractionSubmissionPolicy,
 } from "@/app/quiz/interaction/interactionSubmissionPolicy";
+import {
+  pixelRuntimeStageToMediaSlot,
+  type PixelLiveState,
+} from "@/app/quiz/interaction/pixelLiveInteraction";
 
 type TeamAntwortState = TeamAnswerDraft;
 
@@ -78,6 +85,7 @@ type AntwortStatus = {
       medien_id: number;
       datei: string;
       medientyp: string;
+      slotKey: string | null;
     }[];
 
     antwortfelder: {
@@ -148,11 +156,19 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     "SUBMITTED" | "AUTO_FINALIZED" | null
   >(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
+  const [pixelTeamState, setPixelTeamState] = useState<{
+    isStopper: boolean;
+    canStop: boolean;
+    canEdit: boolean;
+    canSubmit: boolean;
+  } | null>(null);
 
   const [isLoadingTeams, setIsLoadingTeams] = useState(false);
   const [isStartingSession, setIsStartingSession] = useState(false);
   const [meldung, setMeldung] = useState("");
   const [bildModalUrl, setBildModalUrl] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
   const aktuellerBlock = liveDaten.aktuellerBlock;
   const blockIstGesperrt = liveDaten.blockIstGesperrt;
@@ -218,13 +234,31 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
   }, [teamname, session]);
 
   useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 1_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     let active = true;
+    let refreshing = false;
     async function refresh() {
+      if (refreshing) return;
+      refreshing = true;
+      try {
       const snapshot = await getQuizLiveSnapshot(
         liveDaten.quiz_id,
         session?.sessionToken,
       );
       if (!active) return;
+      setPixelState(snapshot.pixelState);
+      setPixelTeamState(snapshot.pixelState && snapshot.teamSpecificState
+        ? {
+            isStopper: snapshot.teamSpecificState.isStopper,
+            canStop: snapshot.teamSpecificState.canStop,
+            canEdit: snapshot.teamSpecificState.canEdit,
+            canSubmit: snapshot.teamSpecificState.canSubmit,
+          }
+        : null);
       setCurrentSubmissionStatus(
         snapshot.teamSpecificState?.submission?.status ?? null,
       );
@@ -295,6 +329,9 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
             [question.quiz_fragen_id]: true,
           }));
         }
+      }
+      } finally {
+        refreshing = false;
       }
     }
     void refresh();
@@ -681,6 +718,83 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     }
   }
 
+  async function handlePixelStop(quizFragenId: number) {
+    const draft = antworten[quizFragenId];
+    const run = liveDaten.interactionRun;
+    if (!session || !draft || !run || !speicherBlockId) {
+      setMeldung("Bitte zuerst eine Antwort eintragen.");
+      return;
+    }
+    setIsSubmitting(true);
+    setMeldung("");
+    try {
+      const saved = await saveTeamAntwortDraft({
+        quizId: liveDaten.quiz_id,
+        quizAbschnittId: speicherBlockId,
+        quizFragenId,
+        quizTeamSessionToken: session.sessionToken,
+        interactionRunId: run.id,
+        expectedDraftRevision: draftRevisions[quizFragenId] ?? 0,
+        antwortText: draft.antwortText,
+        antwortId: draft.antwortId,
+        antwortIds: draft.antwortIds,
+        antwortfelder: Object.entries(draft.antwortfelder).map(
+          ([antwortfeldId, antwortText]) => ({
+            antwortfeldId: Number(antwortfeldId),
+            antwortText,
+          }),
+        ),
+      });
+      if (!saved.success) {
+        setMeldung("Die Antwort konnte vor dem Stoppen nicht gespeichert werden.");
+        return;
+      }
+      setDraftRevisions((current) => ({
+        ...current,
+        [quizFragenId]: saved.draftRevision,
+      }));
+      const stopped = await stopPixelbildAntwort({
+        quizId: liveDaten.quiz_id,
+        quizFragenId,
+        interactionRunId: run.id,
+        quizTeamSessionToken: session.sessionToken,
+      });
+      if (!stopped.success) {
+        setMeldung(
+          stopped.reason === "ALREADY_STOPPED"
+            ? "Ein anderes Team war beim Stoppen schneller."
+            : stopped.reason === "STOP_NOT_AVAILABLE"
+              ? "In dieser Stufe kann nicht mehr gestoppt werden."
+              : "Stoppen ist für den aktuellen Stand nicht möglich.",
+        );
+        return;
+      }
+      setSubmissionStatuses((current) => ({
+        ...current,
+        [quizFragenId]: "SUBMITTED",
+      }));
+      setCurrentSubmissionStatus("SUBMITTED");
+      const snapshot = await getQuizLiveSnapshot(
+        liveDaten.quiz_id,
+        session.sessionToken,
+      );
+      setPixelState(snapshot.pixelState);
+      if (snapshot.teamSpecificState) {
+        setPixelTeamState({
+          isStopper: snapshot.teamSpecificState.isStopper,
+          canStop: snapshot.teamSpecificState.canStop,
+          canEdit: snapshot.teamSpecificState.canEdit,
+          canSubmit: snapshot.teamSpecificState.canSubmit,
+        });
+      }
+      setMeldung(`In Stufe ${stopped.stage} gestoppt. Eure Antwort ist verbindlich abgegeben.`);
+    } catch {
+      setMeldung("Die Pixelbild-Frage konnte nicht gestoppt werden.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
 
   return (
     <QuizThemeScope
@@ -836,8 +950,24 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                 .filter((frage) => frage.istFreigegeben)
                 .map((frage, frageIndex) => {
                   const bildMedien = frage.bildMedien ?? [];
-
-                  const hatBild = bildMedien.length > 0;
+                  const pixelMedium = frage.templateId === "pixelbild" && pixelState
+                    ? bildMedien.find(
+                        (medium) => medium.slotKey === pixelRuntimeStageToMediaSlot(
+                          pixelState.effectivePixelStage,
+                        ),
+                      ) ?? null
+                    : null;
+                  const sichtbaresBild = pixelMedium ?? bildMedien[0] ?? null;
+                  const hatBild = sichtbaresBild !== null;
+                  const pixelCountdownRemaining = pixelState?.submissionDeadlineAt
+                    ? Math.max(
+                        0,
+                        Math.ceil(
+                          (new Date(pixelState.submissionDeadlineAt).getTime() - now) /
+                            1_000,
+                        ),
+                      )
+                    : null;
                   const submissionStatus =
                     submissionStatuses[frage.quiz_fragen_id];
                   const submissionPolicy = resolveInteractionSubmissionPolicy(
@@ -846,7 +976,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                   const submissionLocksEditing = Boolean(
                     submissionStatus &&
                       !submissionPolicy.resubmissionAllowedWhileOpen,
-                  );
+                  ) || Boolean(pixelState && pixelTeamState?.canEdit === false);
                   const changedSinceSubmission = Boolean(
                     submissionStatus === "SUBMITTED" &&
                       (locallyEditedSinceSubmission[frage.quiz_fragen_id] ||
@@ -871,6 +1001,47 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                         {frage.frage}
                       </h3>
 
+                      {frage.templateId === "pixelbild" && pixelState && (
+                        <div className="mt-4 space-y-3 rounded-2xl border-2 border-fuchsia-300 bg-fuchsia-50 p-4 text-slate-900">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <strong>Pixel-Stufe {pixelState.effectivePixelStage} von 3</strong>
+                            <span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-bold text-white">
+                              {4 - pixelState.effectivePixelStage} {4 - pixelState.effectivePixelStage === 1 ? "Punkt" : "Punkte"}
+                            </span>
+                          </div>
+                          {pixelState.stopped ? (
+                            pixelTeamState?.isStopper ? (
+                              <p className="font-semibold text-fuchsia-900">
+                                Ihr habt in Stufe {pixelState.stoppedAtStage} gestoppt. Eure Antwort ist abgegeben und gesperrt.
+                              </p>
+                            ) : (
+                              <p className="font-semibold text-fuchsia-900">
+                                {pixelState.stoppedByTeamName ?? "Ein anderes Team"} hat gestoppt. Ihr könnt bis zum Ende des 20-Sekunden-Countdowns weiter bearbeiten und absenden.
+                                {pixelCountdownRemaining !== null && ` Noch ${pixelCountdownRemaining} Sekunden.`}
+                              </p>
+                            )
+                          ) : pixelState.effectivePixelStage < 3 ? (
+                            <div className="space-y-2">
+                              <button
+                                type="button"
+                                onClick={() => void handlePixelStop(frage.quiz_fragen_id)}
+                                disabled={isSubmitting || !session}
+                                className="min-h-11 w-full rounded-xl bg-fuchsia-700 px-5 py-3 font-black text-white hover:bg-fuchsia-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                              >
+                                {isSubmitting ? "Stop wird geprüft..." : "Stop – Antwort jetzt verbindlich abgeben"}
+                              </button>
+                              <p className="text-sm font-semibold text-fuchsia-900">
+                                Falscher Stop: -1 Punkt. Als einziges richtiges Team sind bis zu {pixelState.effectivePixelStage === 1 ? 6 : 4} Punkte möglich.
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="font-semibold text-slate-700">
+                              Letzte Stufe: normal antworten und verbindlich absenden. Stoppen ist nicht mehr möglich.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       {frage.punkte_modus !== "standard" && (
                         <div className="answer-warning mt-3 rounded-xl bg-yellow-50 px-4 py-3 text-sm font-semibold text-yellow-900">
                           {frage.punkte_modus === "expertenbonus"
@@ -879,12 +1050,27 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                         </div>
                       )}
 
-                      {hatBild && (
+                      {hatBild && frage.templateId === "pixelbild" && (
+                        <button
+                          type="button"
+                          onClick={() => setBildModalUrl(getBildUrl(sichtbaresBild!.datei))}
+                          className="mt-4 block w-full overflow-hidden rounded-2xl border-2 border-slate-300 bg-slate-950"
+                          aria-label="Pixelbild vergrößern"
+                        >
+                          <img
+                            src={getBildUrl(sichtbaresBild!.datei)}
+                            alt={`Pixelbild in Stufe ${pixelState?.effectivePixelStage ?? 1}`}
+                            className="aspect-video w-full object-contain"
+                          />
+                        </button>
+                      )}
+
+                      {hatBild && frage.templateId !== "pixelbild" && (
                         <button
                           type="button"
                           onClick={() =>
                             setBildModalUrl(
-                              getBildUrl(bildMedien[0].datei)
+                              getBildUrl(sichtbaresBild!.datei)
                             )
                           }
                           className="mt-4 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm"
@@ -930,7 +1116,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                         ) : null}
                         {session &&
                           !blockIstGesperrt &&
-                          !submissionLocksEditing && (
+                          !submissionLocksEditing &&
+                          (!pixelState || pixelTeamState?.canSubmit !== false) && (
                           <button
                             type="button"
                             onClick={() => void handleSubmit(frage.quiz_fragen_id)}
@@ -988,7 +1175,6 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
             </button>
 
             {/* Arbitrary repository and managed-Blob media must remain directly renderable. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={bildModalUrl}
               alt="Bild zur Frage"

@@ -87,6 +87,7 @@ import {
   closeCurrentInteraction,
   getQuizLiveSnapshotData,
   saveTeamAnswerDraft,
+  stopPixelQuestion,
   submitTeamAnswer,
 } from "./interaction/interaction.server";
 import {
@@ -1612,6 +1613,7 @@ export type QuizPraesentationResult = {
       medientyp: string;
       sortierung: number;
       bemerkung: string | null;
+      slotKey?: string | null;
     }[];
 
     antwortfelder: {
@@ -1644,6 +1646,7 @@ export type QuizPraesentationResult = {
       medien_id: number;
       datei: string;
       medientyp: string;
+      slotKey?: string | null;
     }[];
   }[];
 
@@ -1891,6 +1894,7 @@ export async function getQuizPraesentation(
         medientyp: medium.medientyp.medientyp,
         sortierung: medium.sortierung,
         bemerkung: medium.bemerkung,
+        slotKey: medium.slot_key,
       })),
       antworten: eintrag.fragen.antworten.map((antwort) => ({
         antwort_id: antwort.antwort_id,
@@ -1913,6 +1917,7 @@ export async function getQuizPraesentation(
           medien_id: medium.medien_id,
           datei: medium.datei,
           medientyp: medium.medientyp.medientyp,
+          slotKey: medium.slot_key,
         })),
 
       antwortfelder: (eintrag.fragen.antwortfelder ?? []).map((feld) => ({
@@ -2429,6 +2434,7 @@ export async function getQuizAntwortStatus(
                 medien_id: medium.medien_id,
                 datei: medium.datei,
                 medientyp: medium.medientyp.medientyp,
+                slotKey: medium.slot_key,
               })),
 
             antwortfelder: (eintrag.fragen.antwortfelder ?? []).map((feld) => ({
@@ -2804,6 +2810,27 @@ export async function submitTeamAntwort(data: {
     throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
   }
   return submitTeamAnswer({
+    quizId: data.quizId,
+    quizFragenId: data.quizFragenId,
+    interactionRunId: data.interactionRunId,
+    quizTeamSessionId: tokenPayload.sessionId,
+  });
+}
+
+export async function stopPixelbildAntwort(data: {
+  quizId: number;
+  quizFragenId: number;
+  interactionRunId: number;
+  quizTeamSessionToken: string;
+}) {
+  const tokenPayload = verifyTeamSessionToken(
+    data.quizTeamSessionToken,
+    getTeamSessionSigningSecret(),
+  );
+  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+    throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
+  }
+  return stopPixelQuestion({
     quizId: data.quizId,
     quizFragenId: data.quizFragenId,
     interactionRunId: data.interactionRunId,
@@ -3357,9 +3384,11 @@ export async function updateTeamAntwortBewertung(data: {
           punkte_basis: true,
           punkte_modus: true,
           risiko_pool_teamanzahl: true,
+          fragen: { select: { vorlage: { select: { code: true } } } },
         },
       });
       const isRiskQuestion = question.punkte_modus === "risikofrage";
+      const isPixelQuestion = question.fragen.vorlage?.code === "pixelbild";
       if (isRiskQuestion && data.aktion === "teilweise") {
         throw new Error("Risikofragen unterstützen keine Teilbewertung.");
       }
@@ -3420,10 +3449,10 @@ export async function updateTeamAntwortBewertung(data: {
             ist_manuell_richtig: status === "CORRECT",
             ist_manuell_falsch: status === "WRONG",
             bewertung_final: true,
-            manuelle_punkte: isRiskQuestion
+            manuelle_punkte: isRiskQuestion || isPixelQuestion
               ? existing.manuelle_punkte
               : points,
-            vergebene_punkte: isRiskQuestion
+            vergebene_punkte: isRiskQuestion || isPixelQuestion
               ? (existing.manuelle_punkte ?? existing.auto_endpunkte)
               : points,
             bewertungsstatus: status,
@@ -3435,7 +3464,7 @@ export async function updateTeamAntwortBewertung(data: {
       }
     }
     await recalculateQuizQuestionEvaluation(existing.quiz_fragen_id, tx);
-  });
+  }, { timeout: 30_000 });
   await updateQuizFragenStatistiken();
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
 }
@@ -3803,6 +3832,20 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
           })
         : null;
       const evaluatedAnswer = effectiveSubmission ? antwort : null;
+      const evaluationDetails = evaluatedAnswer?.bewertungsdetails;
+      const pixelDetails = evaluationDetails &&
+        typeof evaluationDetails === "object" &&
+        !Array.isArray(evaluationDetails) &&
+        "pixel" in evaluationDetails &&
+        evaluationDetails.pixel &&
+        typeof evaluationDetails.pixel === "object" &&
+        !Array.isArray(evaluationDetails.pixel)
+        ? evaluationDetails.pixel as {
+            stage?: unknown;
+            isStopper?: unknown;
+            outcome?: unknown;
+          }
+        : null;
 
       const offeneAntwortfelderText = effectiveSubmission
         ? [...effectiveSubmission.structuredAnswers.entries()]
@@ -3837,6 +3880,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         fragen_id: quizFrage.fragen.fragen_id,
         frageIndex: frageIndex + 1,
         frage: quizFrage.fragen.frage,
+        templateId: quizFrage.fragen.vorlage?.code ?? null,
         richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
@@ -3877,6 +3921,17 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         vergebenePunkte: Number(evaluatedAnswer?.vergebene_punkte ?? 0),
         bewertungsstatus: evaluatedAnswer?.bewertungsstatus ?? "UNANSWERED",
         bewertungsquelle: evaluatedAnswer?.bewertungsquelle ?? "AUTO",
+        pixelStage:
+          pixelDetails?.stage === 1 || pixelDetails?.stage === 2 || pixelDetails?.stage === 3
+            ? pixelDetails.stage as 1 | 2 | 3
+            : null,
+        pixelIsStopper: pixelDetails?.isStopper === true,
+        pixelOutcome:
+          ["NORMAL", "EXCLUSIVE_BONUS", "WRONG_STOP", "PENDING"].includes(
+            String(pixelDetails?.outcome),
+          )
+            ? String(pixelDetails?.outcome)
+            : null,
       };
     });
   });

@@ -17,6 +17,7 @@ export type Medium = {
   medientyp: string;
   sortierung: number;
   bemerkung: string | null;
+  slotKey?: string | null;
 };
 
 

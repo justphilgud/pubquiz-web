@@ -493,6 +493,7 @@ model quiz_team_sessions {
   quiz                 quiz                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
   team_antworten       team_antworten[]
   answer_submissions   team_answer_submissions[]
+  stopped_pixel_runs   quiz_interaction_runs[]   @relation("PixelStopper")
 
   @@unique([quiz_id, teamname], map: "uq_quiz_team_session_teamname")
   @@schema("pubquiz")
@@ -558,30 +559,35 @@ model team_antworten {
 }
 
 model quiz_interaction_runs {
-  interaction_run_id     Int                       @id @default(autoincrement())
-  quiz_id                Int
-  quiz_fragen_id         Int?
-  quiz_ablauf_element_id Int?
-  interaction_type       String                    @db.VarChar(32)
-  state                  QuizInteractionState      @default(LOCKED)
-  is_current             Boolean                   @default(false)
-  opened_at              DateTime?
-  deadline_at            DateTime?
-  closed_at              DateTime?
-  revealed_at            DateTime?
-  revision               Int                       @default(0)
-  config_snapshot        Json
-  created_at             DateTime                  @default(now())
-  updated_at             DateTime                  @default(now()) @updatedAt
-  quiz                   quiz                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
-  quiz_fragen            quiz_fragen?              @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
-  quiz_ablauf_elemente   quiz_ablauf_elemente?     @relation(fields: [quiz_ablauf_element_id], references: [quiz_ablauf_element_id], onDelete: Cascade)
-  team_antworten         team_antworten[]
-  answer_submissions     team_answer_submissions[]
+  interaction_run_id         Int                       @id @default(autoincrement())
+  quiz_id                    Int
+  quiz_fragen_id             Int?
+  quiz_ablauf_element_id     Int?
+  interaction_type           String                    @db.VarChar(32)
+  state                      QuizInteractionState      @default(LOCKED)
+  is_current                 Boolean                   @default(false)
+  opened_at                  DateTime?
+  deadline_at                DateTime?
+  stopped_by_team_session_id Int?
+  stopped_at                 DateTime?
+  stopped_at_stage           Int?
+  closed_at                  DateTime?
+  revealed_at                DateTime?
+  revision                   Int                       @default(0)
+  config_snapshot            Json
+  created_at                 DateTime                  @default(now())
+  updated_at                 DateTime                  @default(now()) @updatedAt
+  quiz                       quiz                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  quiz_fragen                quiz_fragen?              @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
+  quiz_ablauf_elemente       quiz_ablauf_elemente?     @relation(fields: [quiz_ablauf_element_id], references: [quiz_ablauf_element_id], onDelete: Cascade)
+  stopped_by_team_session    quiz_team_sessions?       @relation("PixelStopper", fields: [stopped_by_team_session_id], references: [quiz_team_session_id], onDelete: SetNull)
+  team_antworten             team_antworten[]
+  answer_submissions         team_answer_submissions[]
 
   @@unique([quiz_id], map: "uq_quiz_interaction_runs_current", where: raw("(is_current = true)"))
   @@index([quiz_id, created_at], map: "idx_quiz_interaction_runs_quiz_created")
   @@index([quiz_fragen_id], map: "idx_quiz_interaction_runs_question")
+  @@index([stopped_by_team_session_id], map: "idx_quiz_interaction_runs_pixel_stopper")
   @@schema("pubquiz")
 }
 
