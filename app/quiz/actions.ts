@@ -1,6 +1,10 @@
 "use server";
 
 import { prisma } from "@/app/lib/prisma";
+import {
+  logLivePerformance,
+  withPrismaQueryDiagnostics,
+} from "@/app/lib/prismaQueryDiagnostics.server";
 import { Prisma } from "@/app/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { isAdmin, requireActor, requireAdmin, requireSession } from "@/app/lib/permissions";
@@ -2722,12 +2726,18 @@ export async function freigabeQuizBlock(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
-  await Promise.all([
-    requireQuizLiveController(data.quizId),
-    requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
-  ]);
+  const requestStartedAt = performance.now();
+  const phases: Record<string, number> = {};
+  const { result, diagnostics } = await withPrismaQueryDiagnostics(async () => {
+    let phaseStartedAt = performance.now();
+    await Promise.all([
+      requireQuizLiveController(data.quizId),
+      requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
+    ]);
+    phases.access = performance.now() - phaseStartedAt;
 
-  await prisma.$transaction(async (tx) => {
+    phaseStartedAt = performance.now();
+    await prisma.$transaction(async (tx) => {
     await tx.quiz_block_freigaben.updateMany({
       where: {
         quiz_id: data.quizId,
@@ -2785,23 +2795,37 @@ export async function freigabeQuizBlock(data: {
       }
     }
   }, { timeout: 30_000 });
-
-  return {
-    success: true,
-    message: "Block wurde freigegeben.",
-  };
+    phases.mutation = performance.now() - phaseStartedAt;
+    return {
+      success: true,
+      message: "Block wurde freigegeben.",
+    };
+  });
+  logLivePerformance("moderator-block-open", {
+    ...phases,
+    queryCount: diagnostics?.queryCount ?? null,
+    queryDurationMs: diagnostics?.queryDurationMs ?? null,
+    total: performance.now() - requestStartedAt,
+  });
+  return result;
 }
 
 export async function schliesseQuizBlock(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
-  await Promise.all([
-    requireQuizLiveController(data.quizId),
-    requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
-  ]);
+  const requestStartedAt = performance.now();
+  const phases: Record<string, number> = {};
+  const { result, diagnostics } = await withPrismaQueryDiagnostics(async () => {
+    let phaseStartedAt = performance.now();
+    await Promise.all([
+      requireQuizLiveController(data.quizId),
+      requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
+    ]);
+    phases.access = performance.now() - phaseStartedAt;
 
-  await prisma.quiz_block_freigaben.upsert({
+    phaseStartedAt = performance.now();
+    await prisma.quiz_block_freigaben.upsert({
     where: {
       quiz_id_quiz_abschnitt_id: {
         quiz_id: data.quizId,
@@ -2821,15 +2845,25 @@ export async function schliesseQuizBlock(data: {
       geschlossen_ab: new Date(),
     },
   });
+    phases.blockMutation = performance.now() - phaseStartedAt;
 
-  await prisma.$transaction(async (tx) => {
-    await closeBlockInteractions(tx, data.quizId, data.quizAbschnittId);
-  }, { timeout: 30_000 });
-
-  return {
-    success: true,
-    message: "Block wurde geschlossen.",
-  };
+    phaseStartedAt = performance.now();
+    await prisma.$transaction(async (tx) => {
+      await closeBlockInteractions(tx, data.quizId, data.quizAbschnittId);
+    }, { timeout: 30_000 });
+    phases.finalization = performance.now() - phaseStartedAt;
+    return {
+      success: true,
+      message: "Block wurde geschlossen.",
+    };
+  });
+  logLivePerformance("moderator-block-close", {
+    ...phases,
+    queryCount: diagnostics?.queryCount ?? null,
+    queryDurationMs: diagnostics?.queryDurationMs ?? null,
+    total: performance.now() - requestStartedAt,
+  });
+  return result;
 }
 export async function setAktuelleQuizFrage(data: {
   quizId: number;
