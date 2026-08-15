@@ -7,7 +7,7 @@ const { auth } = NextAuth(authConfig);
 const PUBLIC_PATHS = [
   "/login",
   "/api/auth",
-  "/api/quiz/live-snapshot",
+  "/api/quiz/team-live-snapshot",
 ];
 
 function isPublicPath(pathname: string) {

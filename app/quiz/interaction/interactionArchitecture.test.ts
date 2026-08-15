@@ -115,7 +115,9 @@ test("block finalization snapshots the latest draft revision for every open ques
 test("read-only participant polling uses an uncached route instead of serialized server actions", () => {
   const client = read("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx");
   const moderation = read("app/quiz/[quizId]/moderation/ModerationClient.tsx");
-  const route = read("app/api/quiz/live-snapshot/route.ts");
+  const controllerRoute = read("app/api/quiz/live-snapshot/route.ts");
+  const participantRoute = read("app/api/quiz/team-live-snapshot/route.ts");
+  const participantSession = read("app/quiz/participantSession.server.ts");
   const service = read("app/quiz/interaction/interaction.server.ts");
   const proxy = read("proxy.ts");
   assert.match(client, /fetchQuizLiveSnapshot/);
@@ -124,11 +126,51 @@ test("read-only participant polling uses an uncached route instead of serialized
   assert.doesNotMatch(client, /await getQuizAntwortStatusLive\(/);
   assert.match(moderation, /fetchQuizLiveSnapshot/);
   assert.doesNotMatch(moderation, /await getQuizLiveSnapshot\(/);
-  assert.match(client, /fetch\("\/api\/quiz\/live-snapshot"/);
-  assert.match(route, /getQuizLiveSnapshotData/);
-  assert.match(route, /verifyTeamSessionToken/);
-  assert.match(route, /includeAnswerStatus/);
+  assert.match(client, /fetch\("\/api\/quiz\/team-live-snapshot"/);
+  assert.match(controllerRoute, /await auth\(\)/);
+  assert.match(controllerRoute, /getQuizLiveSnapshotData\(quizId, null\)/);
+  assert.match(participantRoute, /resolveParticipantSession/);
+  assert.match(participantRoute, /INVALID_SESSION/);
+  assert.match(participantRoute, /includeAnswerStatus/);
+  assert.match(participantSession, /quiz_team_sessions\.findFirst/);
+  assert.match(participantSession, /quiz_team_session_id: payload\.sessionId/);
+  assert.match(participantSession, /quiz_id: quizId/);
   assert.match(service, /blockState:[\s\S]*isReleased:[\s\S]*isClosed:/);
-  assert.match(route, /"Cache-Control": "no-store"/);
-  assert.match(proxy, /"\/api\/quiz\/live-snapshot"/);
+  assert.match(participantRoute, /"Cache-Control": "no-store"/);
+  assert.match(proxy, /"\/api\/quiz\/team-live-snapshot"/);
+  assert.doesNotMatch(proxy, /"\/api\/quiz\/live-snapshot"/);
+});
+
+test("a stale presentation slide cannot reopen a manually locked block", () => {
+  const service = read("app/quiz/interaction/interaction.server.ts");
+  const sync = service.slice(
+    service.indexOf("export async function syncInteractionForPresentation"),
+    service.indexOf("export async function closeCurrentInteraction"),
+  );
+  assert.match(sync, /isQuizQuestionBlockOpen\(blockRelease\)/);
+  assert.match(sync, /reason: "BLOCK_LOCKED"/);
+  assert.ok(
+    sync.indexOf("isQuizQuestionBlockOpen(blockRelease)") <
+      sync.indexOf("quiz_interaction_runs.create"),
+  );
+  assert.match(
+    sync,
+    /currentRun\?\.quiz_fragen_id === identity\.questionAssignmentId &&[\s\S]*currentRun\.state === "OPEN"[\s\S]*currentRun\.state === "COUNTDOWN"/,
+  );
+});
+
+test("a conscious block reopen resynchronizes the current question", () => {
+  const actions = read("app/quiz/actions.ts");
+  const reopen = actions.slice(
+    actions.indexOf("export async function freigabeQuizBlock"),
+    actions.indexOf("export async function schliesseQuizBlock"),
+  );
+
+  assert.match(reopen, /prisma\.\$transaction/);
+  assert.match(reopen, /quiz_praesentation_status\.findUnique/);
+  assert.match(reopen, /syncInteractionForPresentation/);
+  assert.match(
+    reopen,
+    /aktuelle_quiz_fragen_id: interactionRun\.quiz_fragen_id/,
+  );
 });

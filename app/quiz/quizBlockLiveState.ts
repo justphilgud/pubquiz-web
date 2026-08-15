@@ -30,3 +30,29 @@ export function serializeQuizBlockReleaseRevision(
     release.geschlossen_ab?.getTime() ?? 0,
   ].join(":");
 }
+
+export function isQuizQuestionBlockOpen(
+  release: {
+    ist_freigegeben: boolean;
+    ist_geschlossen: boolean;
+  } | null | undefined,
+) {
+  return Boolean(release?.ist_freigegeben && !release.ist_geschlossen);
+}
+
+export function serializeQuizParticipantLiveRevision(
+  release: QuizBlockReleaseRevisionInput | null | undefined,
+  run: {
+    interaction_run_id: number;
+    state: string;
+    revision: number;
+  } | null | undefined,
+) {
+  return [
+    serializeQuizBlockReleaseRevision(release),
+    "run",
+    run?.interaction_run_id ?? 0,
+    run?.state ?? "LOCKED",
+    run?.revision ?? 0,
+  ].join(":");
+}

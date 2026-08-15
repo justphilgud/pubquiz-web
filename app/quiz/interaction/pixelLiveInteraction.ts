@@ -1,4 +1,5 @@
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
+import { isQuizInteractionWritable } from "./interactionStateMachine";
 
 export const PIXEL_LIVE_INTERACTION_TYPE = "PIXEL_STOP" as const;
 export const PIXEL_STAGE_COUNT = 3 as const;
@@ -124,6 +125,20 @@ export function canStopPixelQuestion(input: {
     !input.stopped &&
     input.hasDraftContent &&
     !input.isStopper;
+}
+
+export function resolvePixelTeamWriteAccess(input: {
+  state: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
+  deadlineAt: Date | null;
+  serverNow: Date;
+  isStopper: boolean;
+}) {
+  const writable = isQuizInteractionWritable(
+    input.state,
+    input.deadlineAt,
+    input.serverNow,
+  ) && !input.isStopper;
+  return { canEdit: writable, canSubmit: writable };
 }
 
 export function pixelRuntimeStageToMediaSlot(stage: PixelRuntimeStage) {

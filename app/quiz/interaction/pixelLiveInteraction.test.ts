@@ -7,6 +7,7 @@ import {
   createPixelLiveConfigSnapshot,
   pixelRuntimeStageToMediaSlot,
   resolveEffectivePixelStage,
+  resolvePixelTeamWriteAccess,
 } from "./pixelLiveInteraction";
 
 test("pixel live config defaults to 15 seconds and maps historic slots chronologically", () => {
@@ -42,6 +43,34 @@ test("stop capability requires an open early stage and a current draft", () => {
   assert.equal(canStopPixelQuestion({ state: "OPEN", stage: 3, stopped: false, hasDraftContent: true, isStopper: false }), false);
   assert.equal(canStopPixelQuestion({ state: "COUNTDOWN", stage: 2, stopped: true, hasDraftContent: true, isStopper: false }), false);
   assert.equal(canStopPixelQuestion({ state: "OPEN", stage: 2, stopped: false, hasDraftContent: false, isStopper: false }), false);
+});
+
+test("pixel editing stays available on mobile policy until stop deadline", () => {
+  const now = new Date("2026-08-15T18:00:00.000Z");
+  assert.deepEqual(resolvePixelTeamWriteAccess({
+    state: "OPEN",
+    deadlineAt: null,
+    serverNow: now,
+    isStopper: false,
+  }), { canEdit: true, canSubmit: true });
+  assert.deepEqual(resolvePixelTeamWriteAccess({
+    state: "COUNTDOWN",
+    deadlineAt: new Date(now.getTime() + 20_000),
+    serverNow: now,
+    isStopper: false,
+  }), { canEdit: true, canSubmit: true });
+  assert.deepEqual(resolvePixelTeamWriteAccess({
+    state: "COUNTDOWN",
+    deadlineAt: new Date(now.getTime() + 20_000),
+    serverNow: now,
+    isStopper: true,
+  }), { canEdit: false, canSubmit: false });
+  assert.deepEqual(resolvePixelTeamWriteAccess({
+    state: "COUNTDOWN",
+    deadlineAt: new Date(now.getTime() - 1),
+    serverNow: now,
+    isStopper: false,
+  }), { canEdit: false, canSubmit: false });
 });
 
 function points(stage: 1 | 2 | 3, evaluations: Parameters<typeof allocatePixelQuestionPoints>[0]["evaluations"]) {

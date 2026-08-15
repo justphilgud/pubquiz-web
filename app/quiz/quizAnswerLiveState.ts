@@ -66,3 +66,16 @@ export function canSaveQuizAnswerForPresentation(
     audienceState.questionAssignmentId === questionAssignmentId
   );
 }
+
+export function selectParticipantQuestionMedia<
+  TMedium extends { slot_key: string | null },
+>(
+  templateId: string | null,
+  interactionState: string | null | undefined,
+  media: readonly TMedium[],
+) {
+  if (templateId !== "pixelbild" || interactionState === "REVEALED") {
+    return media;
+  }
+  return media.filter((medium) => medium.slot_key !== "pixel_original_image");
+}

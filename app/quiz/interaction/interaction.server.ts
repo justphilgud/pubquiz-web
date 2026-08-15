@@ -9,7 +9,10 @@ import {
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
-import { serializeQuizBlockReleaseRevision } from "@/app/quiz/quizBlockLiveState";
+import {
+  isQuizQuestionBlockOpen,
+  serializeQuizParticipantLiveRevision,
+} from "@/app/quiz/quizBlockLiveState";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 import {
   type QuizInteractionPayload,
@@ -32,6 +35,7 @@ import {
   createPixelLiveConfigSnapshot,
   readPixelLiveConfigSnapshot,
   resolveEffectivePixelStage,
+  resolvePixelTeamWriteAccess,
 } from "./pixelLiveInteraction";
 
 type DbClient = Prisma.TransactionClient;
@@ -321,6 +325,39 @@ export async function syncInteractionForPresentation(
     return null;
   }
 
+  const assignment = await db.quiz_fragen.findFirst({
+    where: {
+      quiz_id: input.quizId,
+      quiz_fragen_id: identity.questionAssignmentId,
+    },
+    select: { quiz_abschnitt_id: true },
+  });
+  const blockRelease = assignment?.quiz_abschnitt_id
+    ? await db.quiz_block_freigaben.findUnique({
+        where: {
+          quiz_id_quiz_abschnitt_id: {
+            quiz_id: input.quizId,
+            quiz_abschnitt_id: assignment.quiz_abschnitt_id,
+          },
+        },
+        select: { ist_freigegeben: true, ist_geschlossen: true },
+      })
+    : null;
+  if (!isQuizQuestionBlockOpen(blockRelease)) {
+    if (currentRunId !== null) {
+      const currentRun = await db.quiz_interaction_runs.findUnique({
+        where: { interaction_run_id: currentRunId },
+      });
+      if (currentRun?.quiz_fragen_id === identity.questionAssignmentId) {
+        await closeRun(db, currentRunId, {
+          reason: "BLOCK_LOCKED",
+          keepCurrent: false,
+        });
+      }
+    }
+    return null;
+  }
+
   const currentRun = currentRunId === null
     ? null
     : await db.quiz_interaction_runs.findUnique({
@@ -329,7 +366,8 @@ export async function syncInteractionForPresentation(
 
   if (identity.phase === "QUESTION") {
     if (
-      currentRun?.quiz_fragen_id === identity.questionAssignmentId
+      currentRun?.quiz_fragen_id === identity.questionAssignmentId &&
+      (currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN")
     ) {
       return currentRun;
     }
@@ -1091,10 +1129,14 @@ export async function getQuizLiveSnapshotData(
       draftInputFromStored(answer),
     ).hasContent,
   );
-  const writable = Boolean(
-    run &&
-    isQuizInteractionWritable(run.state, run.deadline_at, serverNow),
-  );
+  const pixelTeamWriteAccess = run
+    ? resolvePixelTeamWriteAccess({
+        state: run.state,
+        deadlineAt: run.deadline_at,
+        serverNow,
+        isStopper,
+      })
+    : { canEdit: false, canSubmit: false };
   const pixelResolution = run && pixelConfig && run.state === "REVEALED" &&
     run.stopped_by_team_session_id !== null
     ? await prisma.team_antworten.findFirst({
@@ -1138,7 +1180,7 @@ export async function getQuizLiveSnapshotData(
     : null;
   return {
     serverNow: serverNow.toISOString(),
-    liveRevision: serializeQuizBlockReleaseRevision(blockRelease),
+    liveRevision: serializeQuizParticipantLiveRevision(blockRelease, run),
     blockState: blockRelease
       ? {
           quizAbschnittId: blockRelease.quiz_abschnitt_id,
@@ -1206,8 +1248,8 @@ export async function getQuizLiveSnapshotData(
               isStopper,
             }),
           ),
-          canEdit: writable && !isStopper,
-          canSubmit: writable && !isStopper,
+          canEdit: pixelTeamWriteAccess.canEdit,
+          canSubmit: pixelTeamWriteAccess.canSubmit,
           answerStatus: submission?.status ?? (answer ? "DRAFT" : null),
           draft: answer && draftPayload
             ? {

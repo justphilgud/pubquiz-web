@@ -34,16 +34,19 @@ type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
 >;
 
+class InvalidTeamSessionError extends Error {}
+
 async function fetchQuizLiveSnapshot(
   quizId: number,
   quizTeamSessionToken?: string,
 ) {
-  const response = await fetch("/api/quiz/live-snapshot", {
+  const response = await fetch("/api/quiz/team-live-snapshot", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ quizId, quizTeamSessionToken }),
   });
+  if (response.status === 401) throw new InvalidTeamSessionError();
   if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
   return await response.json() as QuizLiveSnapshot;
 }
@@ -52,7 +55,7 @@ async function fetchQuizAnswerStatus(
   quizId: number,
   quizTeamSessionToken?: string,
 ) {
-  const response = await fetch("/api/quiz/live-snapshot", {
+  const response = await fetch("/api/quiz/team-live-snapshot", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
@@ -62,6 +65,7 @@ async function fetchQuizAnswerStatus(
       includeAnswerStatus: true,
     }),
   });
+  if (response.status === 401) throw new InvalidTeamSessionError();
   if (!response.ok) throw new Error("Antwortstatus konnte nicht geladen werden.");
   return await response.json() as AntwortStatus | null;
 }
@@ -296,6 +300,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
   }, []);
 
   useEffect(() => {
+    if (!session) return;
+
     let active = true;
     let refreshing = false;
     async function refresh() {
@@ -384,7 +390,17 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
             }));
           }
         }
-      } catch {
+      } catch (error) {
+        if (error instanceof InvalidTeamSessionError && active) {
+          localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
+          hydratedSessionTokenRef.current = null;
+          setSession(null);
+          setLiveDaten(daten);
+          setPixelState(null);
+          setPixelTeamState(null);
+          setCurrentSubmissionStatus(null);
+          setMeldung("Die Team-Sitzung ist nicht mehr g\u00fcltig. Bitte erneut anmelden.");
+        }
         // A transient polling failure is retried by the next interval.
       } finally {
         refreshing = false;
@@ -401,7 +417,9 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     liveDaten.fragen,
     liveDaten.liveRevision,
     liveDaten.quiz_id,
+    session,
     session?.sessionToken,
+    daten,
   ]);
 
   useEffect(() => {
@@ -1036,8 +1054,9 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
           )}
         </section>
 
+        {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {(liveDaten.answerPhase === "QUESTION" ||
+          {!blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
             (liveDaten.answerPhase === "LEGACY" &&
               aktuellerBlock &&
               !liveDaten.presentationStatusText)) ? (
@@ -1086,8 +1105,12 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                   const bildMedien = frage.bildMedien ?? [];
                   const pixelMedium = frage.templateId === "pixelbild" && questionPixelState
                     ? bildMedien.find(
-                        (medium) => medium.slotKey === pixelRuntimeStageToMediaSlot(
-                          questionPixelState.effectivePixelStage,
+                        (medium) => medium.slotKey === (
+                          questionPixelState.state === "REVEALED"
+                            ? "pixel_original_image"
+                            : pixelRuntimeStageToMediaSlot(
+                                questionPixelState.effectivePixelStage,
+                              )
                         ),
                       ) ?? null
                     : null;
@@ -1144,7 +1167,11 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                       {frage.templateId === "pixelbild" && questionPixelState && (
                         <div className="mt-4 space-y-3 rounded-2xl border-2 border-fuchsia-300 bg-fuchsia-50 p-4 text-slate-900">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <strong>Pixel-Stufe {questionPixelState.effectivePixelStage} von 3</strong>
+                            <strong>
+                              {questionPixelState.state === "REVEALED"
+                                ? "Auflösung"
+                                : `Pixel-Stufe ${questionPixelState.effectivePixelStage} von 3`}
+                            </strong>
                             <span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-bold text-white">
                               {4 - questionPixelState.effectivePixelStage} {4 - questionPixelState.effectivePixelStage === 1 ? "Punkt" : "Punkte"}
                             </span>
@@ -1312,6 +1339,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
             </>
           )}
         </section>
+        )}
       </div>
 
       {bildModalUrl && (

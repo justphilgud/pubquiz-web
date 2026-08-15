@@ -24,9 +24,9 @@ import {
 } from "./quizAccess.server";
 import {
   issueTeamSessionToken,
-  verifyTeamSessionToken,
 } from "./teamSessionToken";
 import { getTeamSessionSigningSecret } from "./teamSessionSecret.server";
+import { resolveParticipantSession } from "./participantSession.server";
 import { assertTeamAnswerAuthorized } from "./teamAnswerPolicy";
 import {
   buildDefaultQuizSections,
@@ -81,14 +81,16 @@ import {
 import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
+  selectParticipantQuestionMedia,
   selectReleasedQuizAnswerAssignmentIds,
 } from "./quizAnswerLiveState";
-import { serializeQuizBlockReleaseRevision } from "./quizBlockLiveState";
+import { serializeQuizParticipantLiveRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
 import {
   closeBlockInteractions,
   getQuizLiveSnapshotData,
   saveTeamAnswerDraft,
+  syncInteractionForPresentation,
   stopPixelQuestion,
   submitTeamAnswer,
 } from "./interaction/interaction.server";
@@ -2146,6 +2148,33 @@ export async function getQuizAntwortStatus(
   quizId: number,
   quizTeamSessionToken?: string,
 ) {
+  const participantSession = await resolveParticipantSession(
+    quizId,
+    quizTeamSessionToken,
+  );
+  if (!participantSession) {
+    const joinSafeQuiz = await prisma.quiz.findFirst({
+      where: { quiz_id: quizId, ist_archiviert: false },
+      select: { quiz_id: true, titel: true },
+    });
+    if (!joinSafeQuiz) return null;
+    return {
+      quiz_id: joinSafeQuiz.quiz_id,
+      titel: joinSafeQuiz.titel,
+      liveRevision: "participant:join",
+      activeQuizFragenId: null,
+      abschnitte: [],
+      offenerBlock: undefined,
+      aktuellerBlock: undefined,
+      blockIstGesperrt: true,
+      interactionRun: null,
+      interactionState: "LOCKED" as const,
+      answerPhase: "NON_QUESTION" as const,
+      presentationStatusText: null,
+      fragen: [],
+    };
+  }
+
   const quiz = await prisma.quiz.findUnique({
     where: {
       quiz_id: quizId,
@@ -2259,13 +2288,6 @@ export async function getQuizAntwortStatus(
         right.quiz_block_freigabe_id - left.quiz_block_freigabe_id,
     )[0] ?? null;
 
-  const tokenPayload = quizTeamSessionToken
-    ? verifyTeamSessionToken(
-        quizTeamSessionToken,
-        getTeamSessionSigningSecret(),
-      )
-    : null;
-
   const fragenImAktuellenBlock = aktuellerBlock
     ? quiz.quiz_fragen
         .filter(
@@ -2284,11 +2306,13 @@ export async function getQuizAntwortStatus(
           blockFreigabe?.freigegeben_ab ?? null,
         )
       : [];
-  const fragenZurAnzeige = selectQuizAnswerAssignments(
-    audienceState,
-    quiz.quiz_fragen,
-    releasedAssignmentIds,
-  );
+  const fragenZurAnzeige = blockIstGesperrt
+    ? []
+    : selectQuizAnswerAssignments(
+        audienceState,
+        quiz.quiz_fragen,
+        releasedAssignmentIds,
+      );
 
   const detailPromise = fragenZurAnzeige.length > 0
     ? prisma.quiz_fragen.findMany({
@@ -2318,10 +2342,10 @@ export async function getQuizAntwortStatus(
       })
     : Promise.resolve([]);
   const answerPromise =
-    tokenPayload?.quizId === quizId && fragenZurAnzeige.length > 0
+    fragenZurAnzeige.length > 0
       ? prisma.team_antworten.findMany({
           where: {
-            quiz_team_session_id: tokenPayload.sessionId,
+            quiz_team_session_id: participantSession.quiz_team_session_id,
             quiz_id: quizId,
             quiz_fragen_id: {
               in: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
@@ -2423,7 +2447,11 @@ export async function getQuizAntwortStatus(
             effektiver_antwortmodus: answerMode.effectiveMode,
             freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
 
-            bildMedien: (eintrag.fragen.medien ?? [])
+            bildMedien: selectParticipantQuestionMedia(
+              eintrag.fragen.vorlage?.code ?? null,
+              interactionRun?.state,
+              eintrag.fragen.medien ?? [],
+            )
               .filter((medium) =>
                 medium.medientyp.medientyp.toLowerCase().includes("bild"),
               )
@@ -2494,8 +2522,9 @@ export async function getQuizAntwortStatus(
   return {
     quiz_id: quiz.quiz_id,
     titel: quiz.titel,
-    liveRevision: serializeQuizBlockReleaseRevision(
+    liveRevision: serializeQuizParticipantLiveRevision(
       blockFreigabe ?? letzteBlockFreigabe,
+      currentRun,
     ),
     activeQuizFragenId: currentRun?.quiz_fragen_id ?? null,
     abschnitte,
@@ -2669,37 +2698,63 @@ export async function freigabeQuizBlock(data: {
   await requireQuizLiveController(data.quizId);
   await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
 
-  await prisma.quiz_block_freigaben.updateMany({
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      ist_freigegeben: false,
-    },
-  });
+  await prisma.$transaction(async (tx) => {
+    await tx.quiz_block_freigaben.updateMany({
+      where: {
+        quiz_id: data.quizId,
+      },
+      data: {
+        ist_freigegeben: false,
+      },
+    });
 
-  await prisma.quiz_block_freigaben.upsert({
-    where: {
-      quiz_id_quiz_abschnitt_id: {
+    await tx.quiz_block_freigaben.upsert({
+      where: {
+        quiz_id_quiz_abschnitt_id: {
+          quiz_id: data.quizId,
+          quiz_abschnitt_id: data.quizAbschnittId,
+        },
+      },
+      update: {
+        ist_freigegeben: true,
+        ist_geschlossen: false,
+        freigegeben_ab: new Date(),
+        geschlossen_ab: null,
+        aktuelle_quiz_fragen_id: null,
+      },
+      create: {
         quiz_id: data.quizId,
         quiz_abschnitt_id: data.quizAbschnittId,
+        ist_freigegeben: true,
+        ist_geschlossen: false,
+        freigegeben_ab: new Date(),
       },
-    },
-    update: {
-      ist_freigegeben: true,
-      ist_geschlossen: false,
-      freigegeben_ab: new Date(),
-      geschlossen_ab: null,
-      aktuelle_quiz_fragen_id: null,
-    },
-    create: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.quizAbschnittId,
-      ist_freigegeben: true,
-      ist_geschlossen: false,
-      freigegeben_ab: new Date(),
-    },
-  });
+    });
+
+    const presentationStatus = await tx.quiz_praesentation_status.findUnique({
+      where: { quiz_id: data.quizId },
+      select: { slide_key: true },
+    });
+    if (presentationStatus?.slide_key) {
+      const interactionRun = await syncInteractionForPresentation(tx, {
+        quizId: data.quizId,
+        slideKey: presentationStatus.slide_key,
+      });
+      if (interactionRun?.quiz_fragen_id) {
+        await tx.quiz_block_freigaben.update({
+          where: {
+            quiz_id_quiz_abschnitt_id: {
+              quiz_id: data.quizId,
+              quiz_abschnitt_id: data.quizAbschnittId,
+            },
+          },
+          data: {
+            aktuelle_quiz_fragen_id: interactionRun.quiz_fragen_id,
+          },
+        });
+      }
+    }
+  }, { timeout: 30_000 });
 
   return {
     success: true,
@@ -2784,16 +2839,14 @@ export async function getQuizLiveSnapshot(
   quizId: number,
   quizTeamSessionToken?: string,
 ) {
-  const tokenPayload = quizTeamSessionToken
-    ? verifyTeamSessionToken(
-        quizTeamSessionToken,
-        getTeamSessionSigningSecret(),
-      )
-    : null;
-  const teamSessionId = tokenPayload?.quizId === quizId
-    ? tokenPayload.sessionId
-    : null;
-  return getQuizLiveSnapshotData(quizId, teamSessionId);
+  const participantSession = await resolveParticipantSession(
+    quizId,
+    quizTeamSessionToken,
+  );
+  return getQuizLiveSnapshotData(
+    quizId,
+    participantSession?.quiz_team_session_id ?? null,
+  );
 }
 
 export async function submitTeamAntwort(data: {
@@ -2802,18 +2855,18 @@ export async function submitTeamAntwort(data: {
   interactionRunId: number;
   quizTeamSessionToken: string;
 }) {
-  const tokenPayload = verifyTeamSessionToken(
+  const participantSession = await resolveParticipantSession(
+    data.quizId,
     data.quizTeamSessionToken,
-    getTeamSessionSigningSecret(),
   );
-  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+  if (!participantSession) {
     throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
   }
   return submitTeamAnswer({
     quizId: data.quizId,
     quizFragenId: data.quizFragenId,
     interactionRunId: data.interactionRunId,
-    quizTeamSessionId: tokenPayload.sessionId,
+    quizTeamSessionId: participantSession.quiz_team_session_id,
   });
 }
 
@@ -2823,18 +2876,18 @@ export async function stopPixelbildAntwort(data: {
   interactionRunId: number;
   quizTeamSessionToken: string;
 }) {
-  const tokenPayload = verifyTeamSessionToken(
+  const participantSession = await resolveParticipantSession(
+    data.quizId,
     data.quizTeamSessionToken,
-    getTeamSessionSigningSecret(),
   );
-  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+  if (!participantSession) {
     throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
   }
   return stopPixelQuestion({
     quizId: data.quizId,
     quizFragenId: data.quizFragenId,
     interactionRunId: data.interactionRunId,
-    quizTeamSessionId: tokenPayload.sessionId,
+    quizTeamSessionId: participantSession.quiz_team_session_id,
   });
 }
 
@@ -2853,11 +2906,11 @@ export async function saveTeamAntwortDraft(data: {
     antwortText: string | null;
   }[];
 }) {
-  const tokenPayload = verifyTeamSessionToken(
+  const participantSession = await resolveParticipantSession(
+    data.quizId,
     data.quizTeamSessionToken,
-    getTeamSessionSigningSecret(),
   );
-  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+  if (!participantSession) {
     throw new Error("Ung\u00fcltige oder abgelaufene Team-Sitzung.");
   }
   return saveTeamAnswerDraft({
@@ -2865,7 +2918,7 @@ export async function saveTeamAntwortDraft(data: {
     quizAbschnittId: data.quizAbschnittId,
     quizFragenId: data.quizFragenId,
     interactionRunId: data.interactionRunId,
-    quizTeamSessionId: tokenPayload.sessionId,
+    quizTeamSessionId: participantSession.quiz_team_session_id,
     expectedDraftRevision: data.expectedDraftRevision,
     draft: {
       answerText: data.antwortText,
@@ -2908,17 +2961,19 @@ export async function saveTeamAntwort(data: {
   if (currentInteraction) {
     return { success: false, reason: "LIVE_STATE_CHANGED" as const };
   }
-  const tokenPayload = verifyTeamSessionToken(
+  const participantSession = await resolveParticipantSession(
+    data.quizId,
     data.quizTeamSessionToken,
-    getTeamSessionSigningSecret(),
   );
-  if (!tokenPayload || tokenPayload.quizId !== data.quizId) {
+  if (!participantSession) {
     throw new Error("Ungültige oder abgelaufene Team-Sitzung.");
   }
 
   const [teamSession, quizFrage, blockFragen] = await Promise.all([
     prisma.quiz_team_sessions.findUnique({
-      where: { quiz_team_session_id: tokenPayload.sessionId },
+      where: {
+        quiz_team_session_id: participantSession.quiz_team_session_id,
+      },
     }),
     prisma.quiz_fragen.findUnique({
       where: { quiz_fragen_id: data.quizFragenId },
@@ -3084,7 +3139,7 @@ export async function saveTeamAntwort(data: {
       where: {
         quiz_fragen_id_quiz_team_session_id: {
           quiz_fragen_id: data.quizFragenId,
-          quiz_team_session_id: tokenPayload.sessionId,
+          quiz_team_session_id: participantSession.quiz_team_session_id,
         },
       },
       include: {
@@ -3130,7 +3185,7 @@ export async function saveTeamAntwort(data: {
       where: {
         quiz_fragen_id_quiz_team_session_id: {
           quiz_fragen_id: data.quizFragenId,
-          quiz_team_session_id: tokenPayload.sessionId,
+          quiz_team_session_id: participantSession.quiz_team_session_id,
         },
       },
       update: {
@@ -3155,7 +3210,7 @@ export async function saveTeamAntwort(data: {
         quiz_id: data.quizId,
         quiz_abschnitt_id: data.quizAbschnittId,
         quiz_fragen_id: data.quizFragenId,
-        quiz_team_session_id: tokenPayload.sessionId,
+        quiz_team_session_id: participantSession.quiz_team_session_id,
         antwort_text: data.antwortText,
         antwort_id: requestedAnswerIds[0] ?? null,
         aktualisiert_am: new Date(),
