@@ -2203,10 +2203,6 @@ export async function getQuizAntwortStatus(
         },
       },
       praesentation_status: true,
-      interaction_runs: {
-        where: { quiz_fragen_id: { not: null } },
-        orderBy: { interaction_run_id: "desc" },
-      },
     },
   });
 
@@ -2241,6 +2237,37 @@ export async function getQuizAntwortStatus(
         abschnitt.ist_geschlossen,
     );
 
+  const offenerBlockFreigabe = offenerFragenblock
+    ? quiz.quiz_abschnitte.find(
+        (abschnitt) =>
+          abschnitt.quiz_abschnitt_id ===
+          offenerFragenblock.quiz_abschnitt_id,
+      )?.quiz_block_freigaben[0] ?? null
+    : null;
+  const offeneBlockFragenIds = offenerFragenblock
+    ? quiz.quiz_fragen.flatMap((entry) =>
+        entry.quiz_abschnitt_id === offenerFragenblock.quiz_abschnitt_id
+          ? [entry.quiz_fragen_id]
+          : [],
+      )
+    : [];
+  const interactionRuns = await prisma.quiz_interaction_runs.findMany({
+    where: {
+      quiz_id: quizId,
+      OR: [
+        { is_current: true },
+        ...(offeneBlockFragenIds.length > 0 &&
+        offenerBlockFreigabe?.freigegeben_ab
+          ? [{
+              quiz_fragen_id: { in: offeneBlockFragenIds },
+              opened_at: { gte: offenerBlockFreigabe.freigegeben_ab },
+            }]
+          : []),
+      ],
+    },
+    orderBy: { interaction_run_id: "desc" },
+  });
+
   const liveState = resolvePresentationLiveState(quiz.praesentation_status);
   const audienceState = resolvePresentationAudienceState(
     liveState,
@@ -2251,7 +2278,7 @@ export async function getQuizAntwortStatus(
     })),
   );
 
-  const currentRun = quiz.interaction_runs.find((run) => run.is_current) ?? null;
+  const currentRun = interactionRuns.find((run) => run.is_current) ?? null;
   const currentRunQuestion = currentRun?.quiz_fragen_id
     ? quiz.quiz_fragen.find(
         (entry) => entry.quiz_fragen_id === currentRun.quiz_fragen_id,
@@ -2302,7 +2329,7 @@ export async function getQuizAntwortStatus(
     offenerFragenblock && !blockIstGesperrt
       ? selectReleasedQuizAnswerAssignmentIds(
           fragenImAktuellenBlock.map((entry) => entry.quiz_fragen_id),
-          quiz.interaction_runs,
+          interactionRuns,
           blockFreigabe?.freigegeben_ab ?? null,
         )
       : [];
@@ -2384,7 +2411,7 @@ export async function getQuizAntwortStatus(
             return indexA - indexB;
           });
 
-          const interactionRun = quiz.interaction_runs.find(
+          const interactionRun = interactionRuns.find(
             (run) => run.quiz_fragen_id === eintrag.quiz_fragen_id,
           ) ?? null;
           const gespeicherteAntwort = gespeicherteAntworten.find(

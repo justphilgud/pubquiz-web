@@ -18,17 +18,24 @@ export async function POST(request: Request) {
   const token = typeof body.quizTeamSessionToken === "string"
     ? body.quizTeamSessionToken
     : null;
+  if (body.includeAnswerStatus === true) {
+    const answerStatus = await getQuizAntwortStatus(quizId, token ?? undefined);
+    if (!answerStatus || answerStatus.liveRevision === "participant:join") {
+      return Response.json({ error: "INVALID_SESSION" }, { status: 401 });
+    }
+    return Response.json(answerStatus, {
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
   const participantSession = await resolveParticipantSession(quizId, token);
   if (!participantSession) {
     return Response.json({ error: "INVALID_SESSION" }, { status: 401 });
   }
-
-  const snapshot = body.includeAnswerStatus === true
-    ? await getQuizAntwortStatus(quizId, token ?? undefined)
-    : await getQuizLiveSnapshotData(
-        quizId,
-        participantSession.quiz_team_session_id,
-      );
+  const snapshot = await getQuizLiveSnapshotData(
+    quizId,
+    participantSession.quiz_team_session_id,
+  );
   return Response.json(snapshot, {
     headers: { "Cache-Control": "no-store" },
   });

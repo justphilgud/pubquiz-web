@@ -141,6 +141,27 @@ test("read-only participant polling uses an uncached route instead of serialized
   assert.doesNotMatch(proxy, /"\/api\/quiz\/live-snapshot"/);
 });
 
+test("full participant refresh does not hydrate the complete run history", () => {
+  const actions = read("app/quiz/actions.ts");
+  const participantStatus = actions.slice(
+    actions.indexOf("export async function getQuizAntwortStatus"),
+    actions.indexOf("export async function searchTeamsForAntworten"),
+  );
+  const participantRoute = read("app/api/quiz/team-live-snapshot/route.ts");
+
+  assert.doesNotMatch(participantStatus, /interaction_runs:\s*\{/);
+  assert.match(participantStatus, /quiz_interaction_runs\.findMany/);
+  assert.match(participantStatus, /\{ is_current: true \}/);
+  assert.match(
+    participantStatus,
+    /opened_at: \{ gte: offenerBlockFreigabe\.freigegeben_ab \}/,
+  );
+  assert.ok(
+    participantRoute.indexOf("includeAnswerStatus === true") <
+      participantRoute.indexOf("resolveParticipantSession(quizId, token)"),
+  );
+});
+
 test("a stale presentation slide cannot reopen a manually locked block", () => {
   const service = read("app/quiz/interaction/interaction.server.ts");
   const sync = service.slice(
