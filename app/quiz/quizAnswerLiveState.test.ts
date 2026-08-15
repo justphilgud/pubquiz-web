@@ -14,6 +14,10 @@ import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
 } from "./quizAnswerLiveState";
+import {
+  parseQuizBlockPreviewSectionId,
+  serializeQuizBlockReleaseRevision,
+} from "./quizBlockLiveState";
 
 const productiveQuestionKinds = [
   { templateId: null, label: "offene Frage" },
@@ -118,4 +122,89 @@ test("legacy quizzes retain their released-question list", () => {
     selectQuizAnswerAssignments(state, assignments, [1, 2]),
     assignments.slice(0, 2),
   );
+});
+
+test("an open keyed block accumulates every released question", () => {
+  const state = resolvePresentationAudienceState(
+    { slideKey: "question:3:question" },
+    [
+      { questionAssignmentId: 1, questionId: 11, sectionId: 4 },
+      { questionAssignmentId: 2, questionId: 12, sectionId: 4 },
+      { questionAssignmentId: 3, questionId: 13, sectionId: 4 },
+    ],
+  );
+  const assignments = [
+    { quiz_fragen_id: 1 },
+    { quiz_fragen_id: 2 },
+    { quiz_fragen_id: 3 },
+    { quiz_fragen_id: 4 },
+  ];
+
+  assert.deepEqual(
+    selectQuizAnswerAssignments(state, assignments, [1, 2, 3]),
+    assignments.slice(0, 3),
+  );
+});
+
+test("a released block remains visible during solution and editorial slides", () => {
+  const assignments = [
+    { quiz_fragen_id: 1 },
+    { quiz_fragen_id: 2 },
+    { quiz_fragen_id: 3 },
+  ];
+  const solution = resolvePresentationAudienceState(
+    { slideKey: "question:2:solution" },
+    [{ questionAssignmentId: 2, questionId: 12, sectionId: 4 }],
+  );
+  const editorial = resolvePresentationAudienceState(
+    { slideKey: "flow:7:CUSTOM_MESSAGE" },
+    [],
+  );
+
+  assert.deepEqual(
+    selectQuizAnswerAssignments(solution, assignments, [1, 2]),
+    assignments.slice(0, 2),
+  );
+  assert.deepEqual(
+    selectQuizAnswerAssignments(editorial, assignments, [1, 2]),
+    assignments.slice(0, 2),
+  );
+});
+
+test("block live revision changes for preview, question release and close", () => {
+  const base = {
+    quiz_block_freigabe_id: 9,
+    quiz_abschnitt_id: 4,
+    freigegeben_ab: new Date("2026-08-15T12:00:00.000Z"),
+    geschlossen_ab: null,
+  };
+  const preview = serializeQuizBlockReleaseRevision({
+    ...base,
+    ist_freigegeben: true,
+    ist_geschlossen: false,
+    aktuelle_quiz_fragen_id: null,
+  });
+  const firstQuestion = serializeQuizBlockReleaseRevision({
+    ...base,
+    ist_freigegeben: true,
+    ist_geschlossen: false,
+    aktuelle_quiz_fragen_id: 21,
+  });
+  const closed = serializeQuizBlockReleaseRevision({
+    ...base,
+    ist_freigegeben: false,
+    ist_geschlossen: true,
+    aktuelle_quiz_fragen_id: 21,
+    geschlossen_ab: new Date("2026-08-15T12:10:00.000Z"),
+  });
+
+  assert.notEqual(preview, firstQuestion);
+  assert.notEqual(firstQuestion, closed);
+});
+
+test("only a question-block intro key opens its section preview", () => {
+  assert.equal(parseQuizBlockPreviewSectionId("section:77:intro"), 77);
+  assert.equal(parseQuizBlockPreviewSectionId("section:77:break"), null);
+  assert.equal(parseQuizBlockPreviewSectionId("question:77:question"), null);
+  assert.equal(parseQuizBlockPreviewSectionId("section:0:intro"), null);
 });

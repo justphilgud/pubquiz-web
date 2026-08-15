@@ -9,7 +9,6 @@ import {
   schliesseQuizBlock,
   QuizPraesentationResult,
   getQuizPunktestand,
-  getQuizLiveSnapshot,
   getZufaelligeSchaetzfrage,
 } from "../../actions";
 import {
@@ -49,6 +48,22 @@ import {
   getQuizSolutionStrategyLabel,
 } from "@/app/quiz/flow/quizFlow";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
+import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
+
+type QuizLiveSnapshot = Awaited<
+  ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
+>;
+
+async function fetchQuizLiveSnapshot(quizId: number) {
+  const response = await fetch("/api/quiz/live-snapshot", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ quizId }),
+  });
+  if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
+  return await response.json() as QuizLiveSnapshot;
+}
 
 type EstimationQuestion = {
   fragen_id: number;
@@ -247,8 +262,13 @@ export default function ModerationClient({
       if (refreshing) return;
       refreshing = true;
       try {
-      const snapshot = await getQuizLiveSnapshot(quizId);
-      if (active) setPixelState(snapshot.pixelState);
+      const snapshot = await fetchQuizLiveSnapshot(quizId);
+      if (active) {
+        setPixelState(snapshot.pixelState);
+        setBlockFreigegeben(Boolean(
+          snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
+        ));
+      }
       } finally {
         refreshing = false;
       }
@@ -453,6 +473,7 @@ export default function ModerationClient({
 
     const nextSlide = slides[safeIndex];
     if (!nextSlide) return;
+    const nextSlideKey = getPresentationSlideKey(nextSlide);
     if (isPauseSlide(nextSlide)) {
       setCountdownDauerMinuten(
         Math.max(1, Math.round(getPauseDurationSeconds(nextSlide) / 60)),
@@ -461,8 +482,11 @@ export default function ModerationClient({
     await setPraesentationSlideIndex(
       quizId,
       safeIndex,
-      getPresentationSlideKey(nextSlide),
+      nextSlideKey,
     );
+    if (parseQuizBlockPreviewSectionId(nextSlideKey) !== null) {
+      setBlockFreigegeben(true);
+    }
     await aktualisiereAntwortStatus();
   }
 

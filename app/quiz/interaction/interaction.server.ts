@@ -9,6 +9,7 @@ import {
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
+import { serializeQuizBlockReleaseRevision } from "@/app/quiz/quizBlockLiveState";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 import {
   type QuizInteractionPayload,
@@ -23,6 +24,7 @@ import {
 import {
   planSubmissionVersion,
   resolveInteractionSubmissionPolicy,
+  shouldKeepInteractionOpenUntilBlockClose,
   shouldAutoFinalizeDraft,
 } from "./interactionSubmissionPolicy";
 import {
@@ -187,8 +189,6 @@ async function autoFinalizeDrafts(
         draft_revision: true,
       },
     });
-  const finalizedTeams = new Set(existing.map((item) => item.quiz_team_session_id));
-  const pixelConfig = readPixelLiveConfigSnapshot(run.config_snapshot);
   const submissions: Prisma.team_answer_submissionsCreateManyInput[] = [];
   for (const draft of drafts) {
     const validated = validateInteractionPayload(
@@ -199,11 +199,9 @@ async function autoFinalizeDrafts(
       (submission) => submission.quiz_team_session_id === draft.quiz_team_session_id,
     );
     if (!shouldAutoFinalizeDraft({
-      hasExplicitSubmission: pixelConfig
-        ? teamSubmissions.some(
-            (submission) => submission.draft_revision === draft.draft_revision,
-          )
-        : finalizedTeams.has(draft.quiz_team_session_id),
+      hasExplicitSubmission: teamSubmissions.some(
+        (submission) => submission.draft_revision === draft.draft_revision,
+      ),
       hasContent: validated.hasContent,
     })) {
       continue;
@@ -235,6 +233,30 @@ async function autoFinalizeDrafts(
     });
   }
   return submissions.length;
+}
+
+function isPixelInteractionRun(run: { config_snapshot: Prisma.JsonValue }) {
+  return readPixelLiveConfigSnapshot(run.config_snapshot) !== null;
+}
+
+function shouldKeepRunOpenUntilBlockClose(run: {
+  interaction_type: string;
+  config_snapshot: Prisma.JsonValue;
+}) {
+  return !isPixelInteractionRun(run) &&
+    shouldKeepInteractionOpenUntilBlockClose(run.interaction_type);
+}
+
+async function deactivateRunWithoutFinalizing(db: DbClient, runId: number) {
+  await lockRun(db, runId);
+  const run = await db.quiz_interaction_runs.findUnique({
+    where: { interaction_run_id: runId },
+  });
+  if (!run || !run.is_current) return run;
+  return db.quiz_interaction_runs.update({
+    where: { interaction_run_id: runId },
+    data: { is_current: false, revision: { increment: 1 } },
+  });
 }
 
 async function closeRun(
@@ -281,10 +303,20 @@ export async function syncInteractionForPresentation(
   const identity = parsePresentationSlideKey(input.slideKey);
   if (identity?.kind !== "QUESTION") {
     if (currentRunId !== null) {
-      await closeRun(db, currentRunId, {
-        reason: "PRESENTATION_ADVANCED",
-        keepCurrent: false,
+      const currentRun = await db.quiz_interaction_runs.findUnique({
+        where: { interaction_run_id: currentRunId },
       });
+      if (
+        currentRun &&
+        !shouldKeepRunOpenUntilBlockClose(currentRun)
+      ) {
+        await closeRun(db, currentRunId, {
+          reason: "PRESENTATION_ADVANCED",
+          keepCurrent: false,
+        });
+      } else {
+        await deactivateRunWithoutFinalizing(db, currentRunId);
+      }
     }
     return null;
   }
@@ -302,9 +334,27 @@ export async function syncInteractionForPresentation(
       return currentRun;
     }
     if (currentRun) {
-      await closeRun(db, currentRun.interaction_run_id, {
-        reason: "PRESENTATION_ADVANCED",
-        keepCurrent: false,
+      if (!shouldKeepRunOpenUntilBlockClose(currentRun)) {
+        await closeRun(db, currentRun.interaction_run_id, {
+          reason: "PRESENTATION_ADVANCED",
+          keepCurrent: false,
+        });
+      } else {
+        await deactivateRunWithoutFinalizing(db, currentRun.interaction_run_id);
+      }
+    }
+    const existingOpenRun = await db.quiz_interaction_runs.findFirst({
+      where: {
+        quiz_id: input.quizId,
+        quiz_fragen_id: identity.questionAssignmentId,
+        state: { in: ["OPEN", "COUNTDOWN"] },
+      },
+      orderBy: { interaction_run_id: "desc" },
+    });
+    if (existingOpenRun) {
+      return db.quiz_interaction_runs.update({
+        where: { interaction_run_id: existingOpenRun.interaction_run_id },
+        data: { is_current: true, revision: { increment: 1 } },
       });
     }
     const resolved = await resolveInteractionAssignment(
@@ -336,10 +386,14 @@ export async function syncInteractionForPresentation(
         orderBy: { interaction_run_id: "desc" },
       });
   if (currentRun && currentRun.interaction_run_id !== revealRun?.interaction_run_id) {
-    await closeRun(db, currentRun.interaction_run_id, {
-      reason: "PRESENTATION_ADVANCED",
-      keepCurrent: false,
-    });
+    if (!shouldKeepRunOpenUntilBlockClose(currentRun)) {
+      await closeRun(db, currentRun.interaction_run_id, {
+        reason: "PRESENTATION_ADVANCED",
+        keepCurrent: false,
+      });
+    } else {
+      await deactivateRunWithoutFinalizing(db, currentRun.interaction_run_id);
+    }
   }
   if (!revealRun) {
     const resolved = await resolveInteractionAssignment(
@@ -359,6 +413,10 @@ export async function syncInteractionForPresentation(
         config_snapshot: toJson(buildInteractionConfigSnapshot(resolved)),
       },
     });
+  }
+  if (shouldKeepRunOpenUntilBlockClose(revealRun)) {
+    await deactivateRunWithoutFinalizing(db, revealRun.interaction_run_id);
+    return revealRun;
   }
   if (revealRun.state === "OPEN" || revealRun.state === "COUNTDOWN") {
     revealRun = await closeRun(db, revealRun.interaction_run_id, {
@@ -390,6 +448,30 @@ export async function closeCurrentInteraction(
   return runId === null
     ? null
     : closeRun(db, runId, { reason, keepCurrent: true });
+}
+
+export async function closeBlockInteractions(
+  db: DbClient,
+  quizId: number,
+  quizAbschnittId: number,
+  reason = "MODERATOR_CLOSED_BLOCK",
+) {
+  const runs = await db.quiz_interaction_runs.findMany({
+    where: {
+      quiz_id: quizId,
+      state: { in: ["OPEN", "COUNTDOWN"] },
+      quiz_fragen: { quiz_abschnitt_id: quizAbschnittId },
+    },
+    orderBy: { interaction_run_id: "asc" },
+    select: { interaction_run_id: true },
+  });
+  for (const run of runs) {
+    await closeRun(db, run.interaction_run_id, {
+      reason,
+      keepCurrent: false,
+    });
+  }
+  return runs.length;
 }
 
 export async function startInteractionCountdown(
@@ -433,6 +515,57 @@ async function expireDeadlineIfNecessary(db: DbClient, runId: number, now: Date)
   return run;
 }
 
+async function isRunReleasedForAnswerWrite(
+  db: DbClient,
+  run: {
+    is_current: boolean;
+    config_snapshot: Prisma.JsonValue;
+  },
+  assignment: {
+    quiz_abschnitt_id: number | null;
+    sortierung: number | null;
+  },
+  quizId: number,
+  requestedSectionId: number,
+) {
+  if (assignment.quiz_abschnitt_id === null) return run.is_current;
+  if (
+    assignment.quiz_abschnitt_id !== requestedSectionId
+  ) {
+    return false;
+  }
+  if (isPixelInteractionRun(run) && !run.is_current) return false;
+  const release = await db.quiz_block_freigaben.findUnique({
+    where: {
+      quiz_id_quiz_abschnitt_id: {
+        quiz_id: quizId,
+        quiz_abschnitt_id: requestedSectionId,
+      },
+    },
+  });
+  if (
+    !release?.ist_freigegeben ||
+    release.ist_geschlossen ||
+    release.aktuelle_quiz_fragen_id === null
+  ) {
+    return false;
+  }
+  const currentAssignment = await db.quiz_fragen.findFirst({
+    where: {
+      quiz_id: quizId,
+      quiz_fragen_id: release.aktuelle_quiz_fragen_id,
+      quiz_abschnitt_id: requestedSectionId,
+    },
+    select: { sortierung: true },
+  });
+  return (
+    assignment.sortierung !== null &&
+    currentAssignment?.sortierung !== null &&
+    currentAssignment?.sortierung !== undefined &&
+    assignment.sortierung <= currentAssignment.sortierung
+  );
+}
+
 export type SaveTeamAnswerDraftResult =
   | { success: true; draftRevision: number; draftUpdatedAt: string }
   | {
@@ -459,7 +592,6 @@ export async function saveTeamAnswerDraft(input: {
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (
       !run ||
-      !run.is_current ||
       run.quiz_id !== input.quizId ||
       run.quiz_fragen_id !== input.quizFragenId ||
       !isQuizInteractionWritable(
@@ -476,17 +608,26 @@ export async function saveTeamAnswerDraft(input: {
     ) {
       return { success: false, reason: "FINALIZED" };
     }
+    const resolved = await resolveInteractionAssignment(
+      tx,
+      input.quizId,
+      input.quizFragenId,
+    );
+    if (!await isRunReleasedForAnswerWrite(
+      tx,
+      run,
+      resolved.assignment,
+      input.quizId,
+      input.quizAbschnittId,
+    )) {
+      return { success: false, reason: "LIVE_STATE_CHANGED" };
+    }
     const teamSession = await tx.quiz_team_sessions.findFirst({
         where: {
           quiz_team_session_id: input.quizTeamSessionId,
           quiz_id: input.quizId,
         },
       });
-    const resolved = await resolveInteractionAssignment(
-      tx,
-      input.quizId,
-      input.quizFragenId,
-    );
     const existingSubmission = await tx.team_answer_submissions.findFirst({
       where: {
         interaction_run_id: run.interaction_run_id,
@@ -873,24 +1014,40 @@ export async function getQuizLiveSnapshotData(
   quizTeamSessionId: number | null,
 ) {
   const serverNow = new Date();
-  const current = await prisma.quiz_interaction_runs.findFirst({
-    where: { quiz_id: quizId, is_current: true },
-    select: { interaction_run_id: true },
-  });
-  if (current) {
-    await prisma.$transaction((tx) =>
-      expireDeadlineIfNecessary(tx, current.interaction_run_id, serverNow),
-    );
-  }
-  const run = await prisma.quiz_interaction_runs.findFirst({
-    where: { quiz_id: quizId, is_current: true },
-    include: {
-      stopped_by_team_session: { select: { teamname: true } },
-      quiz_fragen: {
-        select: { quiz_fragen_id: true, fragen_id: true, quiz_abschnitt_id: true },
+  const runQuery = () => prisma.quiz_interaction_runs.findFirst({
+      where: { quiz_id: quizId, is_current: true },
+      include: {
+        stopped_by_team_session: { select: { teamname: true } },
+        quiz_fragen: {
+          select: {
+            quiz_fragen_id: true,
+            fragen_id: true,
+            quiz_abschnitt_id: true,
+          },
+        },
       },
-    },
-  });
+    });
+  const [initialRun, blockRelease] = await Promise.all([
+    runQuery(),
+    prisma.quiz_block_freigaben.findFirst({
+      where: { quiz_id: quizId },
+      orderBy: [
+        { freigegeben_ab: "desc" },
+        { quiz_block_freigabe_id: "desc" },
+      ],
+    }),
+  ]);
+  let run = initialRun;
+  if (
+    run?.state === "COUNTDOWN" &&
+    run.deadline_at &&
+    run.deadline_at <= serverNow
+  ) {
+    await prisma.$transaction((tx) =>
+      expireDeadlineIfNecessary(tx, run!.interaction_run_id, serverNow),
+    );
+    run = await runQuery();
+  }
   const answer = run && quizTeamSessionId
     ? await prisma.team_antworten.findFirst({
         where: {
@@ -990,6 +1147,14 @@ export async function getQuizLiveSnapshotData(
     : null;
   return {
     serverNow: serverNow.toISOString(),
+    liveRevision: serializeQuizBlockReleaseRevision(blockRelease),
+    blockState: blockRelease
+      ? {
+          quizAbschnittId: blockRelease.quiz_abschnitt_id,
+          isReleased: blockRelease.ist_freigegeben,
+          isClosed: blockRelease.ist_geschlossen,
+        }
+      : null,
     revision: run ? `${run.interaction_run_id}:${run.revision}` : "0:0",
     interactionRun: run
       ? {

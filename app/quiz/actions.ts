@@ -82,9 +82,10 @@ import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
 } from "./quizAnswerLiveState";
+import { serializeQuizBlockReleaseRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
 import {
-  closeCurrentInteraction,
+  closeBlockInteractions,
   getQuizLiveSnapshotData,
   saveTeamAnswerDraft,
   stopPixelQuestion,
@@ -2192,8 +2193,8 @@ export async function getQuizAntwortStatus(
       },
       praesentation_status: true,
       interaction_runs: {
-        where: { is_current: true },
-        take: 1,
+        where: { quiz_fragen_id: { not: null } },
+        orderBy: { interaction_run_id: "desc" },
       },
     },
   });
@@ -2216,13 +2217,13 @@ export async function getQuizAntwortStatus(
       abschnitt.quiz_block_freigaben[0]?.ist_geschlossen ?? false,
   }));
 
-  const legacyAktuellerBlock =
-    abschnitte.find(
-      (abschnitt) =>
-        isQuestionSection(abschnitt) &&
-        abschnitt.ist_freigegeben &&
-        !abschnitt.ist_geschlossen,
-    ) ??
+  const offenerFragenblock = abschnitte.find(
+    (abschnitt) =>
+      isQuestionSection(abschnitt) &&
+      abschnitt.ist_freigegeben &&
+      !abschnitt.ist_geschlossen,
+  );
+  const legacyAktuellerBlock = offenerFragenblock ??
     abschnitte.find(
       (abschnitt) =>
         isQuestionSection(abschnitt) &&
@@ -2239,7 +2240,7 @@ export async function getQuizAntwortStatus(
     })),
   );
 
-  const currentRun = quiz.interaction_runs[0] ?? null;
+  const currentRun = quiz.interaction_runs.find((run) => run.is_current) ?? null;
   const currentRunQuestion = currentRun?.quiz_fragen_id
     ? quiz.quiz_fragen.find(
         (entry) => entry.quiz_fragen_id === currentRun.quiz_fragen_id,
@@ -2259,36 +2260,28 @@ export async function getQuizAntwortStatus(
     : audienceState.kind === "QUESTION"
       ? audienceState
       : null;
-  const stableCurrentBlock = stableQuestion
-    ? abschnitte.find(
-        (section) => section.quiz_abschnitt_id === stableQuestion.sectionId,
-      )
-    : undefined;
-  const aktuellerBlock = stableQuestion && stableCurrentBlock
-    ? {
-        ...stableCurrentBlock,
-        ist_freigegeben: stableQuestion.phase === "QUESTION",
-        ist_geschlossen: stableQuestion.phase === "SOLUTION",
-      }
-    : audienceState.kind === "LEGACY"
-      ? legacyAktuellerBlock
-      : undefined;
-  const blockIstGesperrt = currentRun
-    ? !["OPEN", "COUNTDOWN"].includes(currentRun.state)
-    : stableQuestion
-      ? stableQuestion.phase === "SOLUTION"
-    : audienceState.kind === "LEGACY"
-      ? (aktuellerBlock?.ist_geschlossen ?? false)
-      : true;
+  const aktuellerBlock = offenerFragenblock ??
+    (audienceState.kind === "LEGACY" ? legacyAktuellerBlock : undefined);
+  const blockIstGesperrt = !offenerFragenblock;
 
   const blockFreigabe = quiz.quiz_abschnitte.find(
     (abschnitt) =>
       abschnitt.quiz_abschnitt_id === aktuellerBlock?.quiz_abschnitt_id,
   )?.quiz_block_freigaben[0];
+  const letzteBlockFreigabe = quiz.quiz_abschnitte
+    .flatMap((abschnitt) => abschnitt.quiz_block_freigaben)
+    .sort(
+      (left, right) =>
+        (right.freigegeben_ab?.getTime() ?? 0) -
+          (left.freigegeben_ab?.getTime() ?? 0) ||
+        right.quiz_block_freigabe_id - left.quiz_block_freigabe_id,
+    )[0] ?? null;
 
-  const aktuelleQuizFragenId = stableQuestion?.questionAssignmentId ??
-    blockFreigabe?.aktuelle_quiz_fragen_id ??
-    null;
+  const aktuelleQuizFragenId = offenerFragenblock
+    ? (blockFreigabe?.aktuelle_quiz_fragen_id ?? null)
+    : stableQuestion?.sectionId === null
+      ? stableQuestion.questionAssignmentId
+      : null;
 
   const tokenPayload = quizTeamSessionToken
     ? verifyTeamSessionToken(
@@ -2311,22 +2304,16 @@ export async function getQuizAntwortStatus(
         where: {
           quiz_team_session_id: tokenPayload.sessionId,
           quiz_id: quizId,
-          ...(currentRun
-            ? { interaction_run_id: currentRun.interaction_run_id }
-            : {}),
         },
         include: {
           antwortauswahlen: true,
-          submissions: currentRun
-            ? {
-                where: { interaction_run_id: currentRun.interaction_run_id },
-                orderBy: [
-                  { submission_version: "desc" as const },
-                  { team_answer_submission_id: "desc" as const },
-                ],
-                take: 1,
-              }
-            : false,
+          submissions: {
+            orderBy: [
+              { submitted_at: "desc" as const },
+              { team_answer_submission_id: "desc" as const },
+            ],
+            take: 1,
+          },
           antwortfelder: {
             include: {
               antwortfeld: true,
@@ -2350,8 +2337,8 @@ export async function getQuizAntwortStatus(
     (eintrag) => eintrag.quiz_fragen_id === aktuelleQuizFragenId,
   );
 
-  const legacyVisibleAssignmentIds =
-    audienceState.kind === "LEGACY" && aktuellerBlock && !blockIstGesperrt
+  const releasedAssignmentIds =
+    offenerFragenblock && !blockIstGesperrt
       ? fragenImAktuellenBlock
           .filter(
             (_, index) =>
@@ -2362,7 +2349,7 @@ export async function getQuizAntwortStatus(
   const fragenZurAnzeige = selectQuizAnswerAssignments(
     audienceState,
     quiz.quiz_fragen,
-    legacyVisibleAssignmentIds,
+    releasedAssignmentIds,
   );
 
   const fragen = fragenZurAnzeige.map((eintrag) => {
@@ -2380,8 +2367,17 @@ export async function getQuizAntwortStatus(
             return indexA - indexB;
           });
 
+          const interactionRun = quiz.interaction_runs.find(
+            (run) => run.quiz_fragen_id === eintrag.quiz_fragen_id,
+          ) ?? null;
           const gespeicherteAntwort = gespeicherteAntworten.find(
-            (antwort) => antwort.quiz_fragen_id === eintrag.quiz_fragen_id,
+            (antwort) =>
+              antwort.quiz_fragen_id === eintrag.quiz_fragen_id &&
+              antwort.interaction_run_id === interactionRun?.interaction_run_id,
+          );
+          const gespeicherteSubmission = gespeicherteAntwort?.submissions.find(
+            (submission) =>
+              submission.interaction_run_id === interactionRun?.interaction_run_id,
           );
           const answerMode = resolveQuizQuestionAnswerMode({
             templateId: eintrag.fragen.vorlage?.code ?? null,
@@ -2412,7 +2408,6 @@ export async function getQuizAntwortStatus(
                 label: antwort.antwort,
               })),
           });
-
           return {
             quiz_fragen_id: eintrag.quiz_fragen_id,
             fragen_id: eintrag.fragen.fragen_id,
@@ -2420,6 +2415,15 @@ export async function getQuizAntwortStatus(
             templateId: eintrag.fragen.vorlage?.code ?? null,
             templateConfig,
             interaction,
+            interactionRun: interactionRun
+              ? {
+                  id: interactionRun.interaction_run_id,
+                  type: interactionRun.interaction_type,
+                  state: interactionRun.state,
+                  deadlineAt: interactionRun.deadline_at?.toISOString() ?? null,
+                  revision: interactionRun.revision,
+                }
+              : null,
             istFreigegeben: true,
             punkte_modus: eintrag.punkte_modus ?? "standard",
             urspruenglicher_antwortmodus: answerMode.originalMode,
@@ -2461,17 +2465,11 @@ export async function getQuizAntwortStatus(
                     gespeicherteAntwort.draft_updated_at?.toISOString() ??
                     gespeicherteAntwort.aktualisiert_am.toISOString(),
                   submissionStatus:
-                    ("submissions" in gespeicherteAntwort
-                      ? gespeicherteAntwort.submissions[0]?.status
-                      : null) ?? null,
+                    gespeicherteSubmission?.status ?? null,
                   submissionDraftRevision:
-                    ("submissions" in gespeicherteAntwort
-                      ? gespeicherteAntwort.submissions[0]?.draft_revision
-                      : null) ?? null,
+                    gespeicherteSubmission?.draft_revision ?? null,
                   submissionVersion:
-                    ("submissions" in gespeicherteAntwort
-                      ? gespeicherteAntwort.submissions[0]?.submission_version
-                      : null) ?? null,
+                    gespeicherteSubmission?.submission_version ?? null,
                   antwortfelder: (gespeicherteAntwort.antwortfelder ?? []).map(
                     (feld) => ({
                       antwortfeldId: feld.antwortfeld_id,
@@ -2490,7 +2488,9 @@ export async function getQuizAntwortStatus(
           };
         });
 
-  const presentationStatusText = currentRun?.state === "CLOSED"
+  const presentationStatusText = offenerFragenblock
+    ? null
+    : currentRun?.state === "CLOSED"
     ? "Die Antwortzeit ist beendet"
     : currentRun?.state === "REVEALED" || stableQuestion?.phase === "SOLUTION"
     ? "Die Auflösung wird gezeigt"
@@ -2501,6 +2501,10 @@ export async function getQuizAntwortStatus(
   return {
     quiz_id: quiz.quiz_id,
     titel: quiz.titel,
+    liveRevision: serializeQuizBlockReleaseRevision(
+      blockFreigabe ?? letzteBlockFreigabe,
+    ),
+    activeQuizFragenId: currentRun?.quiz_fragen_id ?? null,
     abschnitte,
     offenerBlock:
       aktuellerBlock && !blockIstGesperrt ? aktuellerBlock : undefined,
@@ -2515,8 +2519,10 @@ export async function getQuizAntwortStatus(
           revision: currentRun.revision,
         }
       : null,
-    interactionState: currentRun?.state ?? "LOCKED",
-    answerPhase: currentRun
+    interactionState: currentRun?.state ?? (offenerFragenblock ? "OPEN" : "LOCKED"),
+    answerPhase: offenerFragenblock
+      ? ("QUESTION" as const)
+      : currentRun
       ? currentRun.state === "REVEALED"
         ? ("SOLUTION" as const)
         : ("QUESTION" as const)
@@ -2691,6 +2697,7 @@ export async function freigabeQuizBlock(data: {
       ist_geschlossen: false,
       freigegeben_ab: new Date(),
       geschlossen_ab: null,
+      aktuelle_quiz_fragen_id: null,
     },
     create: {
       quiz_id: data.quizId,
@@ -2735,8 +2742,8 @@ export async function schliesseQuizBlock(data: {
         geschlossen_ab: new Date(),
       },
     });
-    await closeCurrentInteraction(tx, data.quizId);
-  });
+    await closeBlockInteractions(tx, data.quizId, data.quizAbschnittId);
+  }, { timeout: 30_000 });
 
   return {
     success: true,

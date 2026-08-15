@@ -5,10 +5,12 @@ import { Prisma } from "@/app/generated/prisma/client";
 import {
   requireQuizLiveController,
   requireQuizQuestion,
+  requireQuizQuestionSection,
   requireQuizViewer,
 } from "../../quizAccess.server";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 import { syncInteractionForPresentation } from "@/app/quiz/interaction/interaction.server";
+import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
@@ -80,9 +82,13 @@ export async function setPraesentationSlideIndex(
 ) {
   await requireQuizLiveController(quizId);
   const identity = parsePresentationSlideKey(slideKey);
+  const previewSectionId = parseQuizBlockPreviewSectionId(slideKey);
   const question = identity?.kind === "QUESTION"
     ? await requireQuizQuestion(quizId, identity.questionAssignmentId)
     : null;
+  if (previewSectionId !== null) {
+    await requireQuizQuestionSection(quizId, previewSectionId);
+  }
 
   return prisma.$transaction(async (tx) => {
     const status = await tx.quiz_praesentation_status.upsert({
@@ -113,7 +119,35 @@ export async function setPraesentationSlideIndex(
       },
     });
 
-    if (question?.quiz_abschnitt_id) {
+    if (previewSectionId !== null) {
+      await tx.quiz_block_freigaben.upsert({
+        where: {
+          quiz_id_quiz_abschnitt_id: {
+            quiz_id: quizId,
+            quiz_abschnitt_id: previewSectionId,
+          },
+        },
+        update: {
+          ist_freigegeben: true,
+          ist_geschlossen: false,
+          freigegeben_ab: new Date(),
+          geschlossen_ab: null,
+          aktuelle_quiz_fragen_id: null,
+        },
+        create: {
+          quiz_id: quizId,
+          quiz_abschnitt_id: previewSectionId,
+          ist_freigegeben: true,
+          ist_geschlossen: false,
+          freigegeben_ab: new Date(),
+          aktuelle_quiz_fragen_id: null,
+        },
+      });
+    } else if (
+      identity?.kind === "QUESTION" &&
+      identity.phase === "QUESTION" &&
+      question?.quiz_abschnitt_id
+    ) {
       await tx.quiz_block_freigaben.upsert({
         where: {
           quiz_id_quiz_abschnitt_id: {

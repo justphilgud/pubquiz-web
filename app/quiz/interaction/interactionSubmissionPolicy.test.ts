@@ -5,6 +5,7 @@ import {
   isDraftChangedSinceSubmission,
   planSubmissionVersion,
   resolveInteractionSubmissionPolicy,
+  shouldKeepInteractionOpenUntilBlockClose,
   shouldAutoFinalizeDraft,
 } from "./interactionSubmissionPolicy";
 
@@ -29,6 +30,24 @@ test("allows normal productive interactions to be resubmitted while open", () =>
       .resubmissionAllowedWhileOpen,
     false,
   );
+});
+
+test("keeps normal questions editable until block close but not pixel stops", () => {
+  for (const interactionType of [
+    "TEXT",
+    "STRUCTURED_TEXT",
+    "NUMBER",
+    "SINGLE_CHOICE",
+    "MULTI_CHOICE",
+    "ORDER",
+  ]) {
+    assert.equal(
+      shouldKeepInteractionOpenUntilBlockClose(interactionType),
+      true,
+      interactionType,
+    );
+  }
+  assert.equal(shouldKeepInteractionOpenUntilBlockClose("PIXEL_STOP"), false);
 });
 
 test("recognizes a draft changed after the latest submission", () => {

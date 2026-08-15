@@ -20,6 +20,12 @@ export function resolveInteractionSubmissionPolicy(
   };
 }
 
+export function shouldKeepInteractionOpenUntilBlockClose(
+  interactionType: string,
+) {
+  return resubmittableInteractionTypes.has(interactionType);
+}
+
 export function isDraftChangedSinceSubmission(
   draftRevision: number,
   submittedDraftRevision: number | null,

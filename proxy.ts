@@ -4,7 +4,11 @@ import { authConfig } from "./auth.config";
 
 const { auth } = NextAuth(authConfig);
 
-const PUBLIC_PATHS = ["/login", "/api/auth"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/api/auth",
+  "/api/quiz/live-snapshot",
+];
 
 function isPublicPath(pathname: string) {
   if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) return true;

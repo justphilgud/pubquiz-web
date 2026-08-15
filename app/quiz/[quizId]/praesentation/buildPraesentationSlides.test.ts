@@ -65,6 +65,16 @@ test("leitet Standardphasen für mehrere Runden und den Abschluss ab", () => {
     .map((slide) => slide.element.type);
   assert.deepEqual(flowTypes.slice(0, 3), ["WELCOME", "QR_CODE", "RULES"]);
   assert.equal(flowTypes.filter((type) => type === "ROUND_INTRO").length, 2);
+  const firstRoundIntro = slides.find(
+    (slide) =>
+      slide.typ === "ablauf" &&
+      slide.element.type === "ROUND_INTRO" &&
+      slide.abschnitt?.quiz_abschnitt_id === 10,
+  );
+  assert.equal(
+    firstRoundIntro ? getPresentationSlideKey(firstRoundIntro) : null,
+    "section:10:intro",
+  );
   assert.ok(flowTypes.includes("INTERMEDIATE_STANDINGS"));
   assert.deepEqual(flowTypes.slice(-3), ["FINAL_STANDINGS", "WINNER", "CLOSING"]);
 });

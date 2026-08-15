@@ -9,8 +9,15 @@ export function selectQuizAnswerAssignments<
 >(
   audienceState: PresentationAudienceState,
   assignments: readonly TAssignment[],
-  legacyVisibleAssignmentIds: readonly number[] = [],
+  releasedAssignmentIds: readonly number[] = [],
 ) {
+  if (releasedAssignmentIds.length > 0) {
+    const visibleIds = new Set(releasedAssignmentIds);
+    return assignments.filter((assignment) =>
+      visibleIds.has(assignment.quiz_fragen_id),
+    );
+  }
+
   if (
     audienceState.kind === "QUESTION" &&
     audienceState.phase === "QUESTION"
@@ -22,10 +29,7 @@ export function selectQuizAnswerAssignments<
   }
 
   if (audienceState.kind === "LEGACY") {
-    const visibleIds = new Set(legacyVisibleAssignmentIds);
-    return assignments.filter((assignment) =>
-      visibleIds.has(assignment.quiz_fragen_id),
-    );
+    return [];
   }
 
   return [];
