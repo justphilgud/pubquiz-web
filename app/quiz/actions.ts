@@ -2314,6 +2314,10 @@ export async function getQuizAntwortStatus(
           submissions: currentRun
             ? {
                 where: { interaction_run_id: currentRun.interaction_run_id },
+                orderBy: [
+                  { submission_version: "desc" as const },
+                  { team_answer_submission_id: "desc" as const },
+                ],
                 take: 1,
               }
             : false,
@@ -2452,6 +2456,14 @@ export async function getQuizAntwortStatus(
                   submissionStatus:
                     ("submissions" in gespeicherteAntwort
                       ? gespeicherteAntwort.submissions[0]?.status
+                      : null) ?? null,
+                  submissionDraftRevision:
+                    ("submissions" in gespeicherteAntwort
+                      ? gespeicherteAntwort.submissions[0]?.draft_revision
+                      : null) ?? null,
+                  submissionVersion:
+                    ("submissions" in gespeicherteAntwort
+                      ? gespeicherteAntwort.submissions[0]?.submission_version
                       : null) ?? null,
                   antwortfelder: (gespeicherteAntwort.antwortfelder ?? []).map(
                     (feld) => ({

@@ -536,6 +536,7 @@ export const Team_answer_submissionsScalarFieldEnum = {
   interaction_run_id: 'interaction_run_id',
   team_antwort_id: 'team_antwort_id',
   quiz_team_session_id: 'quiz_team_session_id',
+  submission_version: 'submission_version',
   status: 'status',
   interaction_type: 'interaction_type',
   payload: 'payload',

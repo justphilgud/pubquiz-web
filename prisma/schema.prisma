@@ -590,6 +590,7 @@ model team_answer_submissions {
   interaction_run_id        Int
   team_antwort_id           Int
   quiz_team_session_id      Int
+  submission_version        Int                        @default(1)
   status                    TeamAnswerSubmissionStatus
   interaction_type          String                     @db.VarChar(32)
   payload                   Json
@@ -600,8 +601,10 @@ model team_answer_submissions {
   team_antwort              team_antworten             @relation(fields: [team_antwort_id], references: [team_antwort_id], onDelete: Cascade)
   quiz_team_session         quiz_team_sessions         @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
 
-  @@unique([interaction_run_id, quiz_team_session_id], map: "uq_team_answer_submission_run_team")
+  @@unique([interaction_run_id, quiz_team_session_id, submission_version], map: "uq_team_answer_submission_run_team_version")
+  @@unique([interaction_run_id, quiz_team_session_id, draft_revision], map: "uq_team_answer_submission_run_team_draft")
   @@index([team_antwort_id], map: "idx_team_answer_submissions_answer")
+  @@index([interaction_run_id, quiz_team_session_id, submitted_at], map: "idx_team_answer_submissions_run_team_time")
   @@index([quiz_team_session_id, submitted_at], map: "idx_team_answer_submissions_team_time")
   @@schema("pubquiz")
 }

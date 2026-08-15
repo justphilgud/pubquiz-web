@@ -31,6 +31,7 @@ export type Team_answer_submissionsAvgAggregateOutputType = {
   interaction_run_id: number | null
   team_antwort_id: number | null
   quiz_team_session_id: number | null
+  submission_version: number | null
   draft_revision: number | null
 }
 
@@ -39,6 +40,7 @@ export type Team_answer_submissionsSumAggregateOutputType = {
   interaction_run_id: number | null
   team_antwort_id: number | null
   quiz_team_session_id: number | null
+  submission_version: number | null
   draft_revision: number | null
 }
 
@@ -47,6 +49,7 @@ export type Team_answer_submissionsMinAggregateOutputType = {
   interaction_run_id: number | null
   team_antwort_id: number | null
   quiz_team_session_id: number | null
+  submission_version: number | null
   status: $Enums.TeamAnswerSubmissionStatus | null
   interaction_type: string | null
   draft_revision: number | null
@@ -59,6 +62,7 @@ export type Team_answer_submissionsMaxAggregateOutputType = {
   interaction_run_id: number | null
   team_antwort_id: number | null
   quiz_team_session_id: number | null
+  submission_version: number | null
   status: $Enums.TeamAnswerSubmissionStatus | null
   interaction_type: string | null
   draft_revision: number | null
@@ -71,6 +75,7 @@ export type Team_answer_submissionsCountAggregateOutputType = {
   interaction_run_id: number
   team_antwort_id: number
   quiz_team_session_id: number
+  submission_version: number
   status: number
   interaction_type: number
   payload: number
@@ -86,6 +91,7 @@ export type Team_answer_submissionsAvgAggregateInputType = {
   interaction_run_id?: true
   team_antwort_id?: true
   quiz_team_session_id?: true
+  submission_version?: true
   draft_revision?: true
 }
 
@@ -94,6 +100,7 @@ export type Team_answer_submissionsSumAggregateInputType = {
   interaction_run_id?: true
   team_antwort_id?: true
   quiz_team_session_id?: true
+  submission_version?: true
   draft_revision?: true
 }
 
@@ -102,6 +109,7 @@ export type Team_answer_submissionsMinAggregateInputType = {
   interaction_run_id?: true
   team_antwort_id?: true
   quiz_team_session_id?: true
+  submission_version?: true
   status?: true
   interaction_type?: true
   draft_revision?: true
@@ -114,6 +122,7 @@ export type Team_answer_submissionsMaxAggregateInputType = {
   interaction_run_id?: true
   team_antwort_id?: true
   quiz_team_session_id?: true
+  submission_version?: true
   status?: true
   interaction_type?: true
   draft_revision?: true
@@ -126,6 +135,7 @@ export type Team_answer_submissionsCountAggregateInputType = {
   interaction_run_id?: true
   team_antwort_id?: true
   quiz_team_session_id?: true
+  submission_version?: true
   status?: true
   interaction_type?: true
   payload?: true
@@ -226,6 +236,7 @@ export type Team_answer_submissionsGroupByOutputType = {
   interaction_run_id: number
   team_antwort_id: number
   quiz_team_session_id: number
+  submission_version: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: runtime.JsonValue
@@ -262,6 +273,7 @@ export type team_answer_submissionsWhereInput = {
   interaction_run_id?: Prisma.IntFilter<"team_answer_submissions"> | number
   team_antwort_id?: Prisma.IntFilter<"team_answer_submissions"> | number
   quiz_team_session_id?: Prisma.IntFilter<"team_answer_submissions"> | number
+  submission_version?: Prisma.IntFilter<"team_answer_submissions"> | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFilter<"team_answer_submissions"> | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFilter<"team_answer_submissions"> | string
   payload?: Prisma.JsonFilter<"team_answer_submissions">
@@ -278,6 +290,7 @@ export type team_answer_submissionsOrderByWithRelationInput = {
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   status?: Prisma.SortOrder
   interaction_type?: Prisma.SortOrder
   payload?: Prisma.SortOrder
@@ -291,13 +304,15 @@ export type team_answer_submissionsOrderByWithRelationInput = {
 
 export type team_answer_submissionsWhereUniqueInput = Prisma.AtLeast<{
   team_answer_submission_id?: number
-  interaction_run_id_quiz_team_session_id?: Prisma.team_answer_submissionsInteraction_run_idQuiz_team_session_idCompoundUniqueInput
+  interaction_run_id_quiz_team_session_id_submission_version?: Prisma.team_answer_submissionsInteraction_run_idQuiz_team_session_idSubmission_versionCompoundUniqueInput
+  interaction_run_id_quiz_team_session_id_draft_revision?: Prisma.team_answer_submissionsInteraction_run_idQuiz_team_session_idDraft_revisionCompoundUniqueInput
   AND?: Prisma.team_answer_submissionsWhereInput | Prisma.team_answer_submissionsWhereInput[]
   OR?: Prisma.team_answer_submissionsWhereInput[]
   NOT?: Prisma.team_answer_submissionsWhereInput | Prisma.team_answer_submissionsWhereInput[]
   interaction_run_id?: Prisma.IntFilter<"team_answer_submissions"> | number
   team_antwort_id?: Prisma.IntFilter<"team_answer_submissions"> | number
   quiz_team_session_id?: Prisma.IntFilter<"team_answer_submissions"> | number
+  submission_version?: Prisma.IntFilter<"team_answer_submissions"> | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFilter<"team_answer_submissions"> | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFilter<"team_answer_submissions"> | string
   payload?: Prisma.JsonFilter<"team_answer_submissions">
@@ -307,13 +322,14 @@ export type team_answer_submissionsWhereUniqueInput = Prisma.AtLeast<{
   interaction_run?: Prisma.XOR<Prisma.Quiz_interaction_runsScalarRelationFilter, Prisma.quiz_interaction_runsWhereInput>
   team_antwort?: Prisma.XOR<Prisma.Team_antwortenScalarRelationFilter, Prisma.team_antwortenWhereInput>
   quiz_team_session?: Prisma.XOR<Prisma.Quiz_team_sessionsScalarRelationFilter, Prisma.quiz_team_sessionsWhereInput>
-}, "team_answer_submission_id" | "interaction_run_id_quiz_team_session_id">
+}, "team_answer_submission_id" | "interaction_run_id_quiz_team_session_id_submission_version" | "interaction_run_id_quiz_team_session_id_draft_revision">
 
 export type team_answer_submissionsOrderByWithAggregationInput = {
   team_answer_submission_id?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   status?: Prisma.SortOrder
   interaction_type?: Prisma.SortOrder
   payload?: Prisma.SortOrder
@@ -335,6 +351,7 @@ export type team_answer_submissionsScalarWhereWithAggregatesInput = {
   interaction_run_id?: Prisma.IntWithAggregatesFilter<"team_answer_submissions"> | number
   team_antwort_id?: Prisma.IntWithAggregatesFilter<"team_answer_submissions"> | number
   quiz_team_session_id?: Prisma.IntWithAggregatesFilter<"team_answer_submissions"> | number
+  submission_version?: Prisma.IntWithAggregatesFilter<"team_answer_submissions"> | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusWithAggregatesFilter<"team_answer_submissions"> | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringWithAggregatesFilter<"team_answer_submissions"> | string
   payload?: Prisma.JsonWithAggregatesFilter<"team_answer_submissions">
@@ -344,6 +361,7 @@ export type team_answer_submissionsScalarWhereWithAggregatesInput = {
 }
 
 export type team_answer_submissionsCreateInput = {
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -360,6 +378,7 @@ export type team_answer_submissionsUncheckedCreateInput = {
   interaction_run_id: number
   team_antwort_id: number
   quiz_team_session_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -369,6 +388,7 @@ export type team_answer_submissionsUncheckedCreateInput = {
 }
 
 export type team_answer_submissionsUpdateInput = {
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -385,6 +405,7 @@ export type team_answer_submissionsUncheckedUpdateInput = {
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -398,6 +419,7 @@ export type team_answer_submissionsCreateManyInput = {
   interaction_run_id: number
   team_antwort_id: number
   quiz_team_session_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -407,6 +429,7 @@ export type team_answer_submissionsCreateManyInput = {
 }
 
 export type team_answer_submissionsUpdateManyMutationInput = {
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -420,6 +443,7 @@ export type team_answer_submissionsUncheckedUpdateManyInput = {
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -438,9 +462,16 @@ export type team_answer_submissionsOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type team_answer_submissionsInteraction_run_idQuiz_team_session_idCompoundUniqueInput = {
+export type team_answer_submissionsInteraction_run_idQuiz_team_session_idSubmission_versionCompoundUniqueInput = {
   interaction_run_id: number
   quiz_team_session_id: number
+  submission_version: number
+}
+
+export type team_answer_submissionsInteraction_run_idQuiz_team_session_idDraft_revisionCompoundUniqueInput = {
+  interaction_run_id: number
+  quiz_team_session_id: number
+  draft_revision: number
 }
 
 export type team_answer_submissionsCountOrderByAggregateInput = {
@@ -448,6 +479,7 @@ export type team_answer_submissionsCountOrderByAggregateInput = {
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   status?: Prisma.SortOrder
   interaction_type?: Prisma.SortOrder
   payload?: Prisma.SortOrder
@@ -461,6 +493,7 @@ export type team_answer_submissionsAvgOrderByAggregateInput = {
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   draft_revision?: Prisma.SortOrder
 }
 
@@ -469,6 +502,7 @@ export type team_answer_submissionsMaxOrderByAggregateInput = {
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   status?: Prisma.SortOrder
   interaction_type?: Prisma.SortOrder
   draft_revision?: Prisma.SortOrder
@@ -481,6 +515,7 @@ export type team_answer_submissionsMinOrderByAggregateInput = {
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   status?: Prisma.SortOrder
   interaction_type?: Prisma.SortOrder
   draft_revision?: Prisma.SortOrder
@@ -493,6 +528,7 @@ export type team_answer_submissionsSumOrderByAggregateInput = {
   interaction_run_id?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
+  submission_version?: Prisma.SortOrder
   draft_revision?: Prisma.SortOrder
 }
 
@@ -627,6 +663,7 @@ export type EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput = {
 }
 
 export type team_answer_submissionsCreateWithoutQuiz_team_sessionInput = {
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -641,6 +678,7 @@ export type team_answer_submissionsUncheckedCreateWithoutQuiz_team_sessionInput 
   team_answer_submission_id?: number
   interaction_run_id: number
   team_antwort_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -683,6 +721,7 @@ export type team_answer_submissionsScalarWhereInput = {
   interaction_run_id?: Prisma.IntFilter<"team_answer_submissions"> | number
   team_antwort_id?: Prisma.IntFilter<"team_answer_submissions"> | number
   quiz_team_session_id?: Prisma.IntFilter<"team_answer_submissions"> | number
+  submission_version?: Prisma.IntFilter<"team_answer_submissions"> | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFilter<"team_answer_submissions"> | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFilter<"team_answer_submissions"> | string
   payload?: Prisma.JsonFilter<"team_answer_submissions">
@@ -692,6 +731,7 @@ export type team_answer_submissionsScalarWhereInput = {
 }
 
 export type team_answer_submissionsCreateWithoutTeam_antwortInput = {
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -706,6 +746,7 @@ export type team_answer_submissionsUncheckedCreateWithoutTeam_antwortInput = {
   team_answer_submission_id?: number
   interaction_run_id: number
   quiz_team_session_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -741,6 +782,7 @@ export type team_answer_submissionsUpdateManyWithWhereWithoutTeam_antwortInput =
 }
 
 export type team_answer_submissionsCreateWithoutInteraction_runInput = {
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -755,6 +797,7 @@ export type team_answer_submissionsUncheckedCreateWithoutInteraction_runInput = 
   team_answer_submission_id?: number
   team_antwort_id: number
   quiz_team_session_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -793,6 +836,7 @@ export type team_answer_submissionsCreateManyQuiz_team_sessionInput = {
   team_answer_submission_id?: number
   interaction_run_id: number
   team_antwort_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -802,6 +846,7 @@ export type team_answer_submissionsCreateManyQuiz_team_sessionInput = {
 }
 
 export type team_answer_submissionsUpdateWithoutQuiz_team_sessionInput = {
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -816,6 +861,7 @@ export type team_answer_submissionsUncheckedUpdateWithoutQuiz_team_sessionInput 
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -828,6 +874,7 @@ export type team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionIn
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -840,6 +887,7 @@ export type team_answer_submissionsCreateManyTeam_antwortInput = {
   team_answer_submission_id?: number
   interaction_run_id: number
   quiz_team_session_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -849,6 +897,7 @@ export type team_answer_submissionsCreateManyTeam_antwortInput = {
 }
 
 export type team_answer_submissionsUpdateWithoutTeam_antwortInput = {
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -863,6 +912,7 @@ export type team_answer_submissionsUncheckedUpdateWithoutTeam_antwortInput = {
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -875,6 +925,7 @@ export type team_answer_submissionsUncheckedUpdateManyWithoutTeam_antwortInput =
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -887,6 +938,7 @@ export type team_answer_submissionsCreateManyInteraction_runInput = {
   team_answer_submission_id?: number
   team_antwort_id: number
   quiz_team_session_id: number
+  submission_version?: number
   status: $Enums.TeamAnswerSubmissionStatus
   interaction_type: string
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -896,6 +948,7 @@ export type team_answer_submissionsCreateManyInteraction_runInput = {
 }
 
 export type team_answer_submissionsUpdateWithoutInteraction_runInput = {
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -910,6 +963,7 @@ export type team_answer_submissionsUncheckedUpdateWithoutInteraction_runInput = 
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -922,6 +976,7 @@ export type team_answer_submissionsUncheckedUpdateManyWithoutInteraction_runInpu
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  submission_version?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTeamAnswerSubmissionStatusFieldUpdateOperationsInput | $Enums.TeamAnswerSubmissionStatus
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -937,6 +992,7 @@ export type team_answer_submissionsSelect<ExtArgs extends runtime.Types.Extensio
   interaction_run_id?: boolean
   team_antwort_id?: boolean
   quiz_team_session_id?: boolean
+  submission_version?: boolean
   status?: boolean
   interaction_type?: boolean
   payload?: boolean
@@ -953,6 +1009,7 @@ export type team_answer_submissionsSelectCreateManyAndReturn<ExtArgs extends run
   interaction_run_id?: boolean
   team_antwort_id?: boolean
   quiz_team_session_id?: boolean
+  submission_version?: boolean
   status?: boolean
   interaction_type?: boolean
   payload?: boolean
@@ -969,6 +1026,7 @@ export type team_answer_submissionsSelectUpdateManyAndReturn<ExtArgs extends run
   interaction_run_id?: boolean
   team_antwort_id?: boolean
   quiz_team_session_id?: boolean
+  submission_version?: boolean
   status?: boolean
   interaction_type?: boolean
   payload?: boolean
@@ -985,6 +1043,7 @@ export type team_answer_submissionsSelectScalar = {
   interaction_run_id?: boolean
   team_antwort_id?: boolean
   quiz_team_session_id?: boolean
+  submission_version?: boolean
   status?: boolean
   interaction_type?: boolean
   payload?: boolean
@@ -993,7 +1052,7 @@ export type team_answer_submissionsSelectScalar = {
   finalization_reason?: boolean
 }
 
-export type team_answer_submissionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_answer_submission_id" | "interaction_run_id" | "team_antwort_id" | "quiz_team_session_id" | "status" | "interaction_type" | "payload" | "draft_revision" | "submitted_at" | "finalization_reason", ExtArgs["result"]["team_answer_submissions"]>
+export type team_answer_submissionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_answer_submission_id" | "interaction_run_id" | "team_antwort_id" | "quiz_team_session_id" | "submission_version" | "status" | "interaction_type" | "payload" | "draft_revision" | "submitted_at" | "finalization_reason", ExtArgs["result"]["team_answer_submissions"]>
 export type team_answer_submissionsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   interaction_run?: boolean | Prisma.quiz_interaction_runsDefaultArgs<ExtArgs>
   team_antwort?: boolean | Prisma.team_antwortenDefaultArgs<ExtArgs>
@@ -1022,6 +1081,7 @@ export type $team_answer_submissionsPayload<ExtArgs extends runtime.Types.Extens
     interaction_run_id: number
     team_antwort_id: number
     quiz_team_session_id: number
+    submission_version: number
     status: $Enums.TeamAnswerSubmissionStatus
     interaction_type: string
     payload: runtime.JsonValue
@@ -1458,6 +1518,7 @@ export interface team_answer_submissionsFieldRefs {
   readonly interaction_run_id: Prisma.FieldRef<"team_answer_submissions", 'Int'>
   readonly team_antwort_id: Prisma.FieldRef<"team_answer_submissions", 'Int'>
   readonly quiz_team_session_id: Prisma.FieldRef<"team_answer_submissions", 'Int'>
+  readonly submission_version: Prisma.FieldRef<"team_answer_submissions", 'Int'>
   readonly status: Prisma.FieldRef<"team_answer_submissions", 'TeamAnswerSubmissionStatus'>
   readonly interaction_type: Prisma.FieldRef<"team_answer_submissions", 'String'>
   readonly payload: Prisma.FieldRef<"team_answer_submissions", 'Json'>

@@ -3,6 +3,7 @@ import test from "node:test";
 
 import "./interaction/interactionArchitecture.test";
 import "./interaction/interactionPayload.test";
+import "./interaction/interactionSubmissionPolicy.test";
 import "./interaction/interactionStateMachine.test";
 
 import {

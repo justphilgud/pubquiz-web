@@ -165,9 +165,11 @@ export async function getAntwortStatus(
   let antwortenEingegangen: number;
   let letzteAntwortAt: Date | null;
   if (currentRun) {
-    const [count, last] = await Promise.all([
-        prisma.team_answer_submissions.count({
+    const [submittedTeams, last] = await Promise.all([
+        prisma.team_answer_submissions.findMany({
           where: { interaction_run_id: currentRun.interaction_run_id },
+          distinct: ["quiz_team_session_id"],
+          select: { quiz_team_session_id: true },
         }),
         prisma.team_answer_submissions.findFirst({
           where: { interaction_run_id: currentRun.interaction_run_id },
@@ -175,7 +177,7 @@ export async function getAntwortStatus(
           select: { submitted_at: true },
         }),
       ]);
-    antwortenEingegangen = count;
+    antwortenEingegangen = submittedTeams.length;
     letzteAntwortAt = last?.submitted_at ?? null;
   } else {
     const [count, last] = await Promise.all([

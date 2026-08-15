@@ -19,6 +19,10 @@ import {
   interactionPayloadToDraft,
   type QuizInteractionPayload,
 } from "@/app/quiz/interaction/interactionPayload";
+import {
+  isDraftChangedSinceSubmission,
+  resolveInteractionSubmissionPolicy,
+} from "@/app/quiz/interaction/interactionSubmissionPolicy";
 
 type TeamAntwortState = TeamAnswerDraft;
 
@@ -90,6 +94,8 @@ type AntwortStatus = {
       draftRevision: number;
       draftUpdatedAt: string;
       submissionStatus: "SUBMITTED" | "AUTO_FINALIZED" | null;
+      submissionDraftRevision: number | null;
+      submissionVersion: number | null;
       antwortfelder?: {
         antwortfeldId: number;
         antwortText: string | null;
@@ -133,6 +139,11 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
   const [submissionStatuses, setSubmissionStatuses] = useState<
     Record<number, "SUBMITTED" | "AUTO_FINALIZED" | undefined>
   >({});
+  const [submissionDraftRevisions, setSubmissionDraftRevisions] = useState<
+    Record<number, number | undefined>
+  >({});
+  const [locallyEditedSinceSubmission, setLocallyEditedSinceSubmission] =
+    useState<Record<number, boolean | undefined>>({});
   const [currentSubmissionStatus, setCurrentSubmissionStatus] = useState<
     "SUBMITTED" | "AUTO_FINALIZED" | null
   >(null);
@@ -234,6 +245,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
             setAntworten({});
             setDraftRevisions({});
             setSubmissionStatuses({});
+            setSubmissionDraftRevisions({});
+            setLocallyEditedSinceSubmission({});
           }
           setLiveDaten(nextLiveData);
         }
@@ -269,6 +282,19 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
           ...current,
           [question.quiz_fragen_id]: teamState.submission!.status,
         }));
+        setSubmissionDraftRevisions((current) => ({
+          ...current,
+          [question.quiz_fragen_id]: teamState.submission!.draftRevision,
+        }));
+        if (
+          teamState.draft &&
+          teamState.draft.revision > teamState.submission.draftRevision
+        ) {
+          setLocallyEditedSinceSubmission((current) => ({
+            ...current,
+            [question.quiz_fragen_id]: true,
+          }));
+        }
       }
     }
     void refresh();
@@ -306,9 +332,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
           Object.entries(antworten)
             .filter(([quizFragenId]) => {
               const id = Number(quizFragenId);
-              return (
-                visibleQuestionIds.has(id) && !submissionStatuses[id]
-              );
+              return visibleQuestionIds.has(id);
             })
             .map(async ([quizFragenId, antwort]) => {
               const questionId = Number(quizFragenId);
@@ -411,7 +435,6 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     liveDaten.interactionRun,
     blockIstGesperrt,
     draftRevisions,
-    submissionStatuses,
     isSubmitting,
   ]);
 
@@ -422,6 +445,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       number,
       "SUBMITTED" | "AUTO_FINALIZED"
     > = {};
+    const geladeneSubmissionRevisionen: Record<number, number> = {};
+    const geaenderteEntwuerfe: Record<number, boolean> = {};
 
     liveDaten.fragen.forEach((frage) => {
       if (!frage.gespeicherteAntwort) {
@@ -452,6 +477,15 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
         geladeneStatus[frage.quiz_fragen_id] =
           frage.gespeicherteAntwort.submissionStatus;
       }
+      if (frage.gespeicherteAntwort.submissionDraftRevision !== null) {
+        geladeneSubmissionRevisionen[frage.quiz_fragen_id] =
+          frage.gespeicherteAntwort.submissionDraftRevision;
+        geaenderteEntwuerfe[frage.quiz_fragen_id] =
+          isDraftChangedSinceSubmission(
+            frage.gespeicherteAntwort.draftRevision,
+            frage.gespeicherteAntwort.submissionDraftRevision,
+          );
+      }
 
       frage.gespeicherteAntwort.antwortfelder?.forEach((feld) => {
         feldAntworten[feld.antwortfeldId] = feld.antwortText ?? "";
@@ -473,6 +507,14 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     }));
     setDraftRevisions((current) => ({ ...current, ...geladeneRevisionen }));
     setSubmissionStatuses((current) => ({ ...current, ...geladeneStatus }));
+    setSubmissionDraftRevisions((current) => ({
+      ...current,
+      ...geladeneSubmissionRevisionen,
+    }));
+    setLocallyEditedSinceSubmission((current) => ({
+      ...geaenderteEntwuerfe,
+      ...current,
+    }));
   }, [liveDaten.fragen]);
 
   async function handleStartSession() {
@@ -507,6 +549,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     setAntworten({});
     setDraftRevisions({});
     setSubmissionStatuses({});
+    setSubmissionDraftRevisions({});
+    setLocallyEditedSinceSubmission({});
     setCurrentSubmissionStatus(null);
 
     localStorage.setItem(
@@ -536,6 +580,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
     setAntworten({});
     setDraftRevisions({});
     setSubmissionStatuses({});
+    setSubmissionDraftRevisions({});
+    setLocallyEditedSinceSubmission({});
     setCurrentSubmissionStatus(null);
   }
 
@@ -618,8 +664,16 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
         ...current,
         [quizFragenId]: "SUBMITTED",
       }));
+      setSubmissionDraftRevisions((current) => ({
+        ...current,
+        [quizFragenId]: submitted.draftRevision,
+      }));
+      setLocallyEditedSinceSubmission((current) => ({
+        ...current,
+        [quizFragenId]: false,
+      }));
       setCurrentSubmissionStatus("SUBMITTED");
-      setMeldung("Antwort verbindlich abgegeben.");
+      setMeldung("Antwort abgegeben.");
     } catch {
       setMeldung("Die Antwort konnte nicht verbindlich abgegeben werden.");
     } finally {
@@ -786,7 +840,23 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                   const hatBild = bildMedien.length > 0;
                   const submissionStatus =
                     submissionStatuses[frage.quiz_fragen_id];
-                  const isFinalized = Boolean(submissionStatus);
+                  const submissionPolicy = resolveInteractionSubmissionPolicy(
+                    frage.interaction.type,
+                  );
+                  const submissionLocksEditing = Boolean(
+                    submissionStatus &&
+                      !submissionPolicy.resubmissionAllowedWhileOpen,
+                  );
+                  const changedSinceSubmission = Boolean(
+                    submissionStatus === "SUBMITTED" &&
+                      (locallyEditedSinceSubmission[frage.quiz_fragen_id] ||
+                        isDraftChangedSinceSubmission(
+                          draftRevisions[frage.quiz_fragen_id] ?? 0,
+                          submissionDraftRevisions[
+                            frage.quiz_fragen_id
+                          ] ?? null,
+                        )),
+                  );
 
                   return (
                     <div
@@ -827,20 +897,30 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                         questionAssignmentId={frage.quiz_fragen_id}
                         interaction={frage.interaction}
                         value={antworten[frage.quiz_fragen_id]}
-                        disabled={blockIstGesperrt || isFinalized || !session}
-                        onChange={(value) =>
+                        disabled={
+                          blockIstGesperrt || submissionLocksEditing || !session
+                        }
+                        onChange={(value) => {
                           setAntworten((current) => ({
                             ...current,
                             [frage.quiz_fragen_id]: value,
-                          }))
-                        }
+                          }));
+                          if (submissionStatus === "SUBMITTED") {
+                            setLocallyEditedSinceSubmission((current) => ({
+                              ...current,
+                              [frage.quiz_fragen_id]: true,
+                            }));
+                          }
+                        }}
                       />
 
                       <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
                         {submissionStatus ? (
                           <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
                             {submissionStatus === "SUBMITTED"
-                              ? "Verbindlich abgegeben"
+                              ? changedSinceSubmission
+                                ? "Ge\u00e4ndert seit letzter Abgabe"
+                                : "Antwort abgegeben"
                               : "Beim Schlie\u00dfen automatisch \u00fcbernommen"}
                           </p>
                         ) : (draftRevisions[frage.quiz_fragen_id] ?? 0) > 0 ? (
@@ -848,16 +928,24 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                             Entwurf automatisch gespeichert
                           </p>
                         ) : null}
-                        {session && !blockIstGesperrt && !isFinalized && (
+                        {session &&
+                          !blockIstGesperrt &&
+                          !submissionLocksEditing && (
                           <button
                             type="button"
                             onClick={() => void handleSubmit(frage.quiz_fragen_id)}
-                            disabled={isSubmitting}
+                            disabled={
+                              isSubmitting ||
+                              (submissionStatus === "SUBMITTED" &&
+                                !changedSinceSubmission)
+                            }
                             className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
                           >
                             {isSubmitting
                               ? "Wird verbindlich abgegeben..."
-                              : "Verbindlich absenden"}
+                              : submissionStatus === "SUBMITTED"
+                                ? "Erneut absenden"
+                                : "Verbindlich absenden"}
                           </button>
                         )}
                       </div>
@@ -879,7 +967,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
               {currentSubmissionStatus && (
                 <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
                   {currentSubmissionStatus === "SUBMITTED"
-                    ? "Verbindlich abgegeben"
+                    ? "Antwort abgegeben"
                     : "Beim Schließen automatisch übernommen"}
                 </p>
               )}

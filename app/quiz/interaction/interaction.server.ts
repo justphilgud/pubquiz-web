@@ -16,6 +16,11 @@ import {
   isQuizInteractionWritable,
   type QuizInteractionState,
 } from "./interactionStateMachine";
+import {
+  planSubmissionVersion,
+  resolveInteractionSubmissionPolicy,
+  shouldAutoFinalizeDraft,
+} from "./interactionSubmissionPolicy";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -152,16 +157,21 @@ async function autoFinalizeDrafts(
   const finalizedTeams = new Set(existing.map((item) => item.quiz_team_session_id));
   const submissions: Prisma.team_answer_submissionsCreateManyInput[] = [];
   for (const draft of drafts) {
-    if (finalizedTeams.has(draft.quiz_team_session_id)) continue;
     const validated = validateInteractionPayload(
       interaction,
       draftInputFromStored(draft),
     );
-    if (!validated.hasContent) continue;
+    if (!shouldAutoFinalizeDraft({
+      hasExplicitSubmission: finalizedTeams.has(draft.quiz_team_session_id),
+      hasContent: validated.hasContent,
+    })) {
+      continue;
+    }
     submissions.push({
       interaction_run_id: run.interaction_run_id,
       team_antwort_id: draft.team_antwort_id,
       quiz_team_session_id: draft.quiz_team_session_id,
+      submission_version: 1,
       status: "AUTO_FINALIZED",
       interaction_type: run.interaction_type,
       payload: toJson(validated.payload),
@@ -420,18 +430,25 @@ export async function saveTeamAnswerDraft(input: {
       input.quizId,
       input.quizFragenId,
     );
-    const existingSubmission = await tx.team_answer_submissions.findUnique({
-        where: {
-          interaction_run_id_quiz_team_session_id: {
-            interaction_run_id: run.interaction_run_id,
-            quiz_team_session_id: input.quizTeamSessionId,
-          },
-        },
-      });
+    const existingSubmission = await tx.team_answer_submissions.findFirst({
+      where: {
+        interaction_run_id: run.interaction_run_id,
+        quiz_team_session_id: input.quizTeamSessionId,
+      },
+      orderBy: { submission_version: "desc" },
+    });
     if (!teamSession || resolved.assignment.quiz_abschnitt_id !== input.quizAbschnittId) {
       throw new Error("Teamantwort ist f\u00fcr diese Quizfrage nicht autorisiert.");
     }
-    if (existingSubmission) return { success: false, reason: "FINALIZED" };
+    const submissionPolicy = resolveInteractionSubmissionPolicy(
+      run.interaction_type,
+    );
+    if (
+      existingSubmission &&
+      !submissionPolicy.resubmissionAllowedWhileOpen
+    ) {
+      return { success: false, reason: "FINALIZED" };
+    }
     const validated = validateInteractionPayload(resolved.interaction, input.draft);
 
     await tx.$queryRaw`
@@ -584,17 +601,6 @@ export async function submitTeamAnswer(input: {
     ) {
       return { success: false, reason: "LIVE_STATE_CHANGED" as const };
     }
-    const existing = await tx.team_answer_submissions.findUnique({
-      where: {
-        interaction_run_id_quiz_team_session_id: {
-          interaction_run_id: run.interaction_run_id,
-          quiz_team_session_id: input.quizTeamSessionId,
-        },
-      },
-    });
-    if (existing) {
-      return { success: true, status: existing.status, idempotent: true };
-    }
     const draft = await tx.team_antworten.findUnique({
       where: {
         quiz_fragen_id_quiz_team_session_id: {
@@ -612,11 +618,45 @@ export async function submitTeamAnswer(input: {
     if (!validated.hasContent) {
       return { success: false, reason: "EMPTY_DRAFT" as const };
     }
+    const existingSubmissions = await tx.team_answer_submissions.findMany({
+      where: {
+        interaction_run_id: run.interaction_run_id,
+        quiz_team_session_id: input.quizTeamSessionId,
+      },
+      orderBy: { submission_version: "asc" },
+      select: {
+        team_answer_submission_id: true,
+        submission_version: true,
+        draft_revision: true,
+        status: true,
+      },
+    });
+    const versionPlan = planSubmissionVersion(
+      existingSubmissions.map((submission) => ({
+        submissionVersion: submission.submission_version,
+        draftRevision: submission.draft_revision,
+      })),
+      draft.draft_revision,
+    );
+    if (versionPlan.kind === "IDEMPOTENT") {
+      const existing = existingSubmissions.find(
+        (submission) =>
+          submission.draft_revision === draft.draft_revision,
+      )!;
+      return {
+        success: true,
+        status: existing.status,
+        idempotent: true,
+        submissionVersion: existing.submission_version,
+        draftRevision: existing.draft_revision,
+      };
+    }
     const submission = await tx.team_answer_submissions.create({
       data: {
         interaction_run_id: run.interaction_run_id,
         team_antwort_id: draft.team_antwort_id,
         quiz_team_session_id: input.quizTeamSessionId,
+        submission_version: versionPlan.submissionVersion,
         status: "SUBMITTED",
         interaction_type: run.interaction_type,
         payload: toJson(validated.payload),
@@ -624,7 +664,13 @@ export async function submitTeamAnswer(input: {
         finalization_reason: "TEAM_SUBMITTED",
       },
     });
-    return { success: true, status: submission.status, idempotent: false };
+    return {
+      success: true,
+      status: submission.status,
+      idempotent: false,
+      submissionVersion: submission.submission_version,
+      draftRevision: submission.draft_revision,
+    };
   });
 }
 
@@ -661,6 +707,10 @@ export async function getQuizLiveSnapshotData(
           antwortfelder: true,
           submissions: {
             where: { interaction_run_id: run.interaction_run_id },
+            orderBy: [
+              { submission_version: "desc" },
+              { team_answer_submission_id: "desc" },
+            ],
             take: 1,
           },
         },
@@ -709,6 +759,7 @@ export async function getQuizLiveSnapshotData(
                 status: submission.status,
                 submittedAt: submission.submitted_at.toISOString(),
                 draftRevision: submission.draft_revision,
+                submissionVersion: submission.submission_version,
               }
             : null,
         }
