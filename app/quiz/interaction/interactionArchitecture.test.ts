@@ -15,6 +15,21 @@ test("live actions share the canonical Prisma client with access and interaction
   assert.doesNotMatch(actions, /from "@\/lib\/prisma"/);
 });
 
+test("quiz access resolves the authenticated actor once per live request", () => {
+  const quizAccess = read("app/quiz/quizAccess.server.ts");
+  const eventSeriesAccess = read(
+    "app/eventreihen/eventSeriesAccess.server.ts",
+  );
+
+  assert.match(quizAccess, /Promise\.all\(\[[\s\S]*requireActor\(\)/);
+  assert.match(quizAccess, /\{ session, actor \}/);
+  assert.doesNotMatch(quizAccess, /requireSession\(\)/);
+  assert.match(
+    eventSeriesAccess,
+    /authenticatedActor \?\? await requireActor\(\)/,
+  );
+});
+
 test("stores current runs, CAS drafts and immutable versioned snapshots additively", () => {
   const schema = read("prisma/schema.prisma");
   const migration = read(
