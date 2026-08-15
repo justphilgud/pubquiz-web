@@ -147,6 +147,16 @@ export async function requireQuizTeamAnswer(quizId: number, teamAnswerId: number
       quiz_id: quizId,
       team_antwort_id: teamAnswerId,
     },
+    include: {
+      antwortauswahlen: true,
+      antwortfelder: true,
+      submissions: {
+        orderBy: [
+          { submission_version: "desc" },
+          { team_answer_submission_id: "desc" },
+        ],
+      },
+    },
   });
 
   if (!teamAnswer) {

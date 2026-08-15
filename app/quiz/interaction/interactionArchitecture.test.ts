@@ -59,3 +59,24 @@ test("draft writes serialize on the run and use compare-and-swap revisions", () 
   assert.match(service, /skipDuplicates: true/);
   assert.match(service, /DEADLINE_EXPIRED/);
 });
+
+test("only final submission lifecycle events trigger productive evaluation", () => {
+  const service = read("app/quiz/interaction/interaction.server.ts");
+  const saveDraft = service.slice(
+    service.indexOf("export async function saveTeamAnswerDraft"),
+    service.indexOf("export async function submitTeamAnswer"),
+  );
+  const submit = service.slice(
+    service.indexOf("export async function submitTeamAnswer"),
+    service.indexOf("export async function getQuizLiveSnapshotData"),
+  );
+  const close = service.slice(
+    service.indexOf("async function closeRun"),
+    service.indexOf("export async function syncInteractionForPresentation"),
+  );
+
+  assert.doesNotMatch(saveDraft, /recalculateQuizAnswerEvaluation/);
+  assert.doesNotMatch(saveDraft, /bewertung_final: false/);
+  assert.match(submit, /recalculateQuizAnswerEvaluation\(draft\.team_antwort_id, tx\)/);
+  assert.match(close, /recalculateQuizQuestionEvaluation\(run\.quiz_fragen_id, db\)/);
+});

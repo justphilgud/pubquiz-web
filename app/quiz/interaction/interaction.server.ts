@@ -2,6 +2,10 @@ import { Prisma } from "@/app/generated/prisma/client";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { resolveQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { hasAnswerContentChanged } from "@/app/quiz/evaluation/answerContent";
+import {
+  recalculateQuizAnswerEvaluation,
+  recalculateQuizQuestionEvaluation,
+} from "@/app/quiz/evaluation/evaluation.server";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
@@ -140,6 +144,7 @@ async function autoFinalizeDrafts(
   db: DbClient,
   run: {
     interaction_run_id: number;
+    quiz_fragen_id: number | null;
     interaction_type: string;
     config_snapshot: Prisma.JsonValue;
   },
@@ -200,6 +205,9 @@ async function closeRun(
   if (!run) return null;
   if (run.state === "OPEN" || run.state === "COUNTDOWN") {
     await autoFinalizeDrafts(db, run, options.reason);
+    if (run.quiz_fragen_id !== null) {
+      await recalculateQuizQuestionEvaluation(run.quiz_fragen_id, db);
+    }
     assertQuizInteractionTransition(run.state, "CLOSED");
     return db.quiz_interaction_runs.update({
       where: { interaction_run_id: runId },
@@ -398,7 +406,7 @@ export async function saveTeamAnswerDraft(input: {
   quizTeamSessionId: number;
   expectedDraftRevision: number;
   draft: TeamAnswerDraftInput;
-}, afterSave?: (teamAnswerId: number, tx: DbClient) => Promise<unknown>): Promise<SaveTeamAnswerDraftResult> {
+}): Promise<SaveTeamAnswerDraftResult> {
   return prisma.$transaction(async (tx) => {
     await lockRun(tx, input.interactionRunId);
     let run = await tx.quiz_interaction_runs.findUnique({
@@ -519,13 +527,6 @@ export async function saveTeamAnswerDraft(input: {
         aktualisiert_am: now,
         draft_updated_at: now,
         draft_revision: nextRevision,
-        manuelle_punkte: null,
-        bewertet_am: null,
-        bewertet_von_user_id: null,
-        bewertungsquelle: "AUTO",
-        ist_manuell_falsch: false,
-        ist_manuell_richtig: false,
-        bewertung_final: false,
       },
       create: {
         quiz_id: input.quizId,
@@ -566,9 +567,6 @@ export async function saveTeamAnswerDraft(input: {
           antwort_text: field.answerText?.trim() ?? null,
         })),
       });
-    }
-    if (afterSave) {
-      await afterSave(answer.team_antwort_id, tx);
     }
     void validated;
     return {
@@ -643,6 +641,7 @@ export async function submitTeamAnswer(input: {
         (submission) =>
           submission.draft_revision === draft.draft_revision,
       )!;
+      await recalculateQuizAnswerEvaluation(draft.team_antwort_id, tx);
       return {
         success: true,
         status: existing.status,
@@ -664,6 +663,7 @@ export async function submitTeamAnswer(input: {
         finalization_reason: "TEAM_SUBMITTED",
       },
     });
+    await recalculateQuizAnswerEvaluation(draft.team_antwort_id, tx);
     return {
       success: true,
       status: submission.status,

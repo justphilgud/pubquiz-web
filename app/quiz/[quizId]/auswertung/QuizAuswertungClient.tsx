@@ -26,6 +26,9 @@ type AuswertungsAntwort = {
   teamname: string;
   antwortText: string | null;
   antwortId: number | null;
+  antwortQuelle: "SUBMISSION" | "LEGACY" | null;
+  submissionVersion: number | null;
+  submissionStatus: "SUBMITTED" | "AUTO_FINALIZED" | null;
   ausgewaehlteAntwort: string | null;
 
   istOffeneFrage: boolean;
@@ -514,6 +517,15 @@ export default function QuizAuswertungClient({
                           : antwort.antwortText ??
                             antwort.ausgewaehlteAntwort ??
                             "-"}
+                        {!antwort.istUnbeantwortet && (
+                          <div className="mt-1 text-xs font-normal text-slate-500">
+                            {antwort.antwortQuelle === "LEGACY"
+                              ? "Historische Legacy-Antwort"
+                              : antwort.submissionStatus === "AUTO_FINALIZED"
+                                ? "Automatisch finalisierte Abgabe"
+                                : `Abgabe v${antwort.submissionVersion ?? 1}`}
+                          </div>
+                        )}
                       </td>
 
                       <td className="px-4 py-3">

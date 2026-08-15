@@ -125,6 +125,12 @@ test("quiz backfill keeps each question in a bounded transaction", () => {
   assert.match(implementation, /for \(const question of incomplete\)/);
   assert.match(implementation, /recalculateQuizQuestionEvaluation\(/);
   assert.doesNotMatch(implementation, /prisma\.\$transaction/);
+
+  const fullRecalculation = evaluationService.slice(
+    evaluationService.indexOf("export async function recalculateQuizEvaluation"),
+  );
+  assert.match(fullRecalculation, /recalculateQuizQuestionEvaluation\(/);
+  assert.doesNotMatch(fullRecalculation, /prisma\.\$transaction/);
 });
 
 test("evaluation page uses one authorized parallel page-data loader", () => {
@@ -148,7 +154,7 @@ test("evaluation page uses one authorized parallel page-data loader", () => {
   assert.match(evaluationPage, /backfillStatus=\{backfillStatus\}/);
 });
 
-test("evaluation answer loading safely represents missing and structured answers", () => {
+test("evaluation answer loading uses effective submissions and safely represents missing answers", () => {
   const start = actions.indexOf(
     "async function loadQuizAuswertungAlleAntworten",
   );
@@ -162,9 +168,10 @@ test("evaluation answer loading safely represents missing and structured answers
   assert.match(implementation, /return sessions\.map/);
   assert.match(implementation, /antwortfelder/);
   assert.match(implementation, /vorlage: \{ select: \{ code: true \} \}/);
-  assert.match(implementation, /!antwort \|\| antwort\.bewertungsstatus === "UNANSWERED"/);
-  assert.match(implementation, /bewertungsstatus: antwort\?\.bewertungsstatus \?\? "UNANSWERED"/);
-  assert.match(implementation, /vergebenePunkte: Number\(antwort\?\.vergebene_punkte \?\? 0\)/);
+  assert.match(implementation, /resolveEffectiveSubmission\(/);
+  assert.match(implementation, /!effectiveSubmission \|\| antwort\?\.bewertungsstatus === "UNANSWERED"/);
+  assert.match(implementation, /bewertungsstatus: evaluatedAnswer\?\.bewertungsstatus \?\? "UNANSWERED"/);
+  assert.match(implementation, /vergebenePunkte: Number\(evaluatedAnswer\?\.vergebene_punkte \?\? 0\)/);
 });
 
 test("manual recalculation is authorized and preserves overrides", () => {

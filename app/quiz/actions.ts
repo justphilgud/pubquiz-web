@@ -61,6 +61,7 @@ import {
   recalculateQuizQuestionEvaluation,
 } from "./evaluation/evaluation.server";
 import { hasAnswerContentChanged } from "./evaluation/answerContent";
+import { resolveEffectiveSubmission } from "./evaluation/effectiveSubmission";
 import {
   isPartialPointsCapable,
   validateQuestionPointsMode,
@@ -2848,7 +2849,7 @@ export async function saveTeamAntwortDraft(data: {
         answerText: field.antwortText,
       })),
     },
-  }, (teamAnswerId, tx) => recalculateQuizAnswerEvaluation(teamAnswerId, tx));
+  });
 }
 
 export async function saveTeamAntwort(data: {
@@ -3200,7 +3201,14 @@ export async function getQuizFrageAuswertung(
         include: {
           quiz_team_sessions: true,
           antworten: true,
+          antwortfelder: true,
           antwortauswahlen: { include: { antwort: true } },
+          submissions: {
+            orderBy: [
+              { submission_version: "desc" },
+              { team_answer_submission_id: "desc" },
+            ],
+          },
         },
         orderBy: {
           quiz_team_sessions: {
@@ -3244,12 +3252,30 @@ export async function getQuizFrageAuswertung(
       })),
 
     teamAntworten: quizFrage.team_antworten.map((antwort) => {
+      const effectiveSubmission = resolveEffectiveSubmission({
+        interactionRunId: antwort.interaction_run_id,
+        draft: antwort,
+        submissions: antwort.submissions,
+      });
+      const selectedAnswerIds = effectiveSubmission?.selectedAnswerIds ?? [];
       return {
         team_antwort_id: antwort.team_antwort_id,
         teamname: antwort.quiz_team_sessions.teamname,
-        antwortText: antwort.antwort_text,
-        antwortId: antwort.antwort_id,
-        ausgewaehlteAntwort: antwort.antworten?.antwort ?? null,
+        antwortText: effectiveSubmission?.answerText ?? null,
+        antwortId: selectedAnswerIds[0] ?? null,
+        antwortQuelle: effectiveSubmission?.source ?? null,
+        submissionVersion: effectiveSubmission?.submissionVersion ?? null,
+        submissionStatus: effectiveSubmission?.submissionStatus ?? null,
+        ausgewaehlteAntwort:
+          selectedAnswerIds
+            .map(
+              (answerId) =>
+                quizFrage.fragen.antworten.find(
+                  (option) => option.antwort_id === answerId,
+                )?.antwort,
+            )
+            .filter((answer): answer is string => Boolean(answer))
+            .join(", ") || null,
         istAutomatischRichtig:
           antwort.bewertungsquelle !== "MANUAL" &&
           antwort.bewertungsstatus === "CORRECT",
@@ -3284,6 +3310,14 @@ export async function updateTeamAntwortBewertung(data: {
 }) {
   const access = await requireQuizAdmin(data.quizId);
   const existing = await requireQuizTeamAnswer(data.quizId, data.teamAntwortId);
+  const effectiveSubmission = resolveEffectiveSubmission({
+    interactionRunId: existing.interaction_run_id,
+    draft: existing,
+    submissions: existing.submissions,
+  });
+  if (data.aktion !== "zuruecksetzen" && !effectiveSubmission) {
+    throw new Error("Diese Teamantwort wurde noch nicht final abgegeben.");
+  }
 
   await prisma.$transaction(async (tx) => {
     if (data.aktion === "skurril") {
@@ -3444,6 +3478,14 @@ export async function updateQuizFragenStatistiken() {
     include: {
       team_antworten: {
         include: {
+          antwortauswahlen: true,
+          antwortfelder: true,
+          submissions: {
+            orderBy: [
+              { submission_version: "desc" },
+              { team_answer_submission_id: "desc" },
+            ],
+          },
           quiz_team_sessions: {
             select: { erstellt_am: true },
           },
@@ -3453,15 +3495,23 @@ export async function updateQuizFragenStatistiken() {
   });
 
   for (const quizFrage of quizFragen) {
+    const effectiveAnswers = quizFrage.team_antworten.filter(
+      (antwort) =>
+        resolveEffectiveSubmission({
+          interactionRunId: antwort.interaction_run_id,
+          draft: antwort,
+          submissions: antwort.submissions,
+        }) !== null,
+    );
     const beantworteteAntworten =
       quizFrage.punkte_modus === "risikofrage" &&
       quizFrage.risiko_pool_fixiert_am !== null
-        ? quizFrage.team_antworten.filter(
+        ? effectiveAnswers.filter(
             (antwort) =>
               antwort.quiz_team_sessions.erstellt_am <=
               quizFrage.risiko_pool_fixiert_am!,
           )
-        : quizFrage.team_antworten;
+        : effectiveAnswers;
     const richtigeantworten = beantworteteAntworten.filter(
       (antwort) => antwort.bewertungsstatus === "CORRECT",
     ).length;
@@ -3554,7 +3604,18 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
           vorlage: { select: { code: true } },
         },
       },
-      team_antworten: true,
+      team_antworten: {
+        include: {
+          antwortauswahlen: true,
+          antwortfelder: true,
+          submissions: {
+            orderBy: [
+              { submission_version: "desc" },
+              { team_answer_submission_id: "desc" },
+            ],
+          },
+        },
+      },
     },
   });
 
@@ -3571,13 +3632,21 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
       (answerMode.effectiveMode === "UNCLASSIFIED" &&
         quizFrage.fragen.antworten.length <= 1);
 
-    const offenePruefungen = quizFrage.team_antworten.filter(
+    const effectiveAnswers = quizFrage.team_antworten.filter(
+      (antwort) =>
+        resolveEffectiveSubmission({
+          interactionRunId: antwort.interaction_run_id,
+          draft: antwort,
+          submissions: antwort.submissions,
+        }) !== null,
+    );
+    const offenePruefungen = effectiveAnswers.filter(
       (antwort) =>
         antwort.bewertungsstatus === "REVIEW_REQUIRED" &&
         antwort.bewertungsquelle !== "MANUAL",
     ).length;
 
-    const skurrileAntworten = quizFrage.team_antworten.filter(
+    const skurrileAntworten = effectiveAnswers.filter(
       (antwort) => antwort.ist_skurril,
     ).length;
 
@@ -3630,6 +3699,12 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
             antworten: true,
             antwortfelder: true,
             antwortauswahlen: { include: { antwort: true } },
+            submissions: {
+              orderBy: [
+                { submission_version: "desc" },
+                { team_answer_submission_id: "desc" },
+              ],
+            },
           },
         },
       },
@@ -3644,9 +3719,6 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
     }),
   ]);
 
-  const offeneAntworten = quizFragen.flatMap((quizFrage) =>
-    quizFrage.team_antworten.flatMap((antwort) => antwort.antwortfelder),
-  );
   const antwortfelder = quizFragen.flatMap(
     (quizFrage) => quizFrage.fragen.antwortfelder,
   );
@@ -3661,6 +3733,11 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
       quizFrage.risiko_pool_fixiert_am !== null
         ? quizFrage.team_antworten.filter(
             (answer) =>
+              resolveEffectiveSubmission({
+                interactionRunId: answer.interaction_run_id,
+                draft: answer,
+                submissions: answer.submissions,
+              }) !== null &&
               answer.quiz_team_sessions.erstellt_am <=
               quizFrage.risiko_pool_fixiert_am!,
           )
@@ -3718,14 +3795,21 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         (eintrag) =>
           eintrag.quiz_team_session_id === session.quiz_team_session_id,
       );
+      const effectiveSubmission = antwort
+        ? resolveEffectiveSubmission({
+            interactionRunId: antwort.interaction_run_id,
+            draft: antwort,
+            submissions: antwort.submissions,
+          })
+        : null;
+      const evaluatedAnswer = effectiveSubmission ? antwort : null;
 
-      const offeneAntwortfelderText = antwort
-        ? offeneAntworten
-            .filter((feld) => feld.team_antwort_id === antwort.team_antwort_id)
-            .map((feld) => {
+      const offeneAntwortfelderText = effectiveSubmission
+        ? [...effectiveSubmission.structuredAnswers.entries()]
+            .map(([fieldId, answerText]) => {
               const label =
-                antwortfeldLabelMap.get(feld.antwortfeld_id) ?? "Antwort";
-              const text = feld.antwort_text?.trim();
+                antwortfeldLabelMap.get(fieldId) ?? "Antwort";
+              const text = answerText?.trim();
 
               if (!text) {
                 return null;
@@ -3738,15 +3822,15 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         : null;
 
       const istUnbeantwortet =
-        !antwort || antwort.bewertungsstatus === "UNANSWERED";
+        !effectiveSubmission || antwort?.bewertungsstatus === "UNANSWERED";
 
       const istAutomatischRichtig =
-        antwort?.bewertungsquelle !== "MANUAL" &&
-        antwort?.bewertungsstatus === "CORRECT";
+        evaluatedAnswer?.bewertungsquelle !== "MANUAL" &&
+        evaluatedAnswer?.bewertungsstatus === "CORRECT";
       const istPruefpflichtig =
         istUnbeantwortet ||
-        (antwort?.bewertungsstatus === "REVIEW_REQUIRED" &&
-          antwort.bewertungsquelle !== "MANUAL");
+        (evaluatedAnswer?.bewertungsstatus === "REVIEW_REQUIRED" &&
+          evaluatedAnswer.bewertungsquelle !== "MANUAL");
 
       return {
         quiz_fragen_id: quizFrage.quiz_fragen_id,
@@ -3757,14 +3841,22 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         teamname: session.teamname,
-        antwortText: offeneAntwortfelderText || antwort?.antwort_text || null,
-        antwortId: antwort?.antwort_id ?? null,
+        antwortText:
+          offeneAntwortfelderText || effectiveSubmission?.answerText || null,
+        antwortId: effectiveSubmission?.selectedAnswerIds[0] ?? null,
+        antwortQuelle: effectiveSubmission?.source ?? null,
+        submissionVersion: effectiveSubmission?.submissionVersion ?? null,
+        submissionStatus: effectiveSubmission?.submissionStatus ?? null,
         ausgewaehlteAntwort:
-          antwort?.antwortauswahlen
-            .map((selection) => selection.antwort.antwort)
-            .join(", ") ||
-          antwort?.antworten?.antwort ||
-          null,
+          effectiveSubmission?.selectedAnswerIds
+            .map(
+              (answerId) =>
+                quizFrage.fragen.antworten.find(
+                  (option) => option.antwort_id === answerId,
+                )?.antwort,
+            )
+            .filter((answer): answer is string => Boolean(answer))
+            .join(", ") || null,
         punkte_modus: quizFrage.punkte_modus ?? "standard",
         risikoPoolTeamanzahl: quizFrage.risiko_pool_teamanzahl,
         risikoRichtigeTeams: riskCorrectTeams,
@@ -3775,16 +3867,16 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         istUnbeantwortet,
         istAutomatischRichtig,
         istPruefpflichtig,
-        istManuellRichtig: antwort?.ist_manuell_richtig ?? false,
-        istManuellFalsch: antwort?.ist_manuell_falsch ?? false,
-        bewerteteAntwort: antwort?.bewertete_antwort ?? null,
-        istSkurril: antwort?.ist_skurril ?? false,
-        bewertungFinal: antwort?.bewertung_final ?? false,
-        autoBasisPunkte: Number(antwort?.auto_basis_punkte ?? 0),
-        autoEndpunkte: Number(antwort?.auto_endpunkte ?? 0),
-        vergebenePunkte: Number(antwort?.vergebene_punkte ?? 0),
-        bewertungsstatus: antwort?.bewertungsstatus ?? "UNANSWERED",
-        bewertungsquelle: antwort?.bewertungsquelle ?? "AUTO",
+        istManuellRichtig: evaluatedAnswer?.ist_manuell_richtig ?? false,
+        istManuellFalsch: evaluatedAnswer?.ist_manuell_falsch ?? false,
+        bewerteteAntwort: evaluatedAnswer?.bewertete_antwort ?? null,
+        istSkurril: evaluatedAnswer?.ist_skurril ?? false,
+        bewertungFinal: evaluatedAnswer?.bewertung_final ?? false,
+        autoBasisPunkte: Number(evaluatedAnswer?.auto_basis_punkte ?? 0),
+        autoEndpunkte: Number(evaluatedAnswer?.auto_endpunkte ?? 0),
+        vergebenePunkte: Number(evaluatedAnswer?.vergebene_punkte ?? 0),
+        bewertungsstatus: evaluatedAnswer?.bewertungsstatus ?? "UNANSWERED",
+        bewertungsquelle: evaluatedAnswer?.bewertungsquelle ?? "AUTO",
       };
     });
   });
