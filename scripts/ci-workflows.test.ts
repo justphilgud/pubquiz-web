@@ -19,6 +19,7 @@ const repositoryLintJob = ci.slice(
 );
 const vercelConfiguration = JSON.parse(readRepositoryFile("vercel.json")) as {
   git?: { deploymentEnabled?: boolean };
+  regions?: string[];
 };
 
 const forbiddenPrismaCommands = [
@@ -182,4 +183,8 @@ test("Deployment workflows contain no destructive Prisma commands", () => {
 
 test("Vercel Git deployments are disabled for every branch", () => {
   assert.equal(vercelConfiguration.git?.deploymentEnabled, false);
+});
+
+test("Vercel functions run next to the eu-central database", () => {
+  assert.deepEqual(vercelConfiguration.regions, ["fra1"]);
 });

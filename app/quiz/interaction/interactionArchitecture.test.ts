@@ -169,6 +169,7 @@ test("read-only participant polling uses an uncached route instead of serialized
 
 test("full participant refresh does not hydrate the complete run history", () => {
   const actions = read("app/quiz/actions.ts");
+  const client = read("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx");
   const participantStatus = actions.slice(
     actions.indexOf("export async function getQuizAntwortStatus"),
     actions.indexOf("export async function searchTeamsForAntworten"),
@@ -186,6 +187,9 @@ test("full participant refresh does not hydrate the complete run history", () =>
     participantRoute.indexOf("includeAnswerStatus === true") <
       participantRoute.indexOf("resolveParticipantSession(quizId, token)"),
   );
+  assert.match(participantRoute, /knownLiveRevision/);
+  assert.match(participantRoute, /payload = \{ \.\.\.snapshot, answerStatus \}/);
+  assert.match(client, /snapshot\.answerStatus \?\?/);
 });
 
 test("a stale presentation slide cannot reopen a manually locked block", () => {

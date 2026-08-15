@@ -455,8 +455,6 @@ export default function ModerationClient({
 
     if (safeIndex === slideIndex) return;
 
-    await speichereDauerVomAktuellenSlide();
-
     const newStartedAt = new Date().toISOString();
 
     setSlideIndex(safeIndex);
@@ -484,10 +482,15 @@ export default function ModerationClient({
       safeIndex,
       nextSlideKey,
     );
+    void speichereDauerVomAktuellenSlide().catch(() => {
+      // Presentation timing is diagnostic and must not delay live-state publication.
+    });
     if (parseQuizBlockPreviewSectionId(nextSlideKey) !== null) {
       setBlockFreigegeben(true);
     }
-    await aktualisiereAntwortStatus();
+    void aktualisiereAntwortStatus().catch(() => {
+      // The regular status poll retries transient failures.
+    });
   }
 
   async function handleBlockToggle() {

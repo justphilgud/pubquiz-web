@@ -10,6 +10,8 @@ type TeamLiveSnapshotRequest = {
   quizId?: unknown;
   quizTeamSessionToken?: unknown;
   includeAnswerStatus?: unknown;
+  knownLiveRevision?: unknown;
+  knownActiveQuizFragenId?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -47,11 +49,38 @@ export async function POST(request: Request) {
         return Response.json({ error: "INVALID_SESSION" }, { status: 401 });
       }
       phaseStartedAt = performance.now();
-      payload = await getQuizLiveSnapshotData(
+      const snapshot = await getQuizLiveSnapshotData(
         quizId,
         participantSession.quiz_team_session_id,
       );
       phases.snapshot = performance.now() - phaseStartedAt;
+      const knownLiveRevision = typeof body.knownLiveRevision === "string"
+        ? body.knownLiveRevision
+        : null;
+      const knownActiveQuizFragenId = body.knownActiveQuizFragenId === null
+        ? null
+        : Number(body.knownActiveQuizFragenId);
+      const hasKnownActiveQuestion =
+        body.knownActiveQuizFragenId === null ||
+        Number.isSafeInteger(knownActiveQuizFragenId);
+      const activeQuizFragenId =
+        snapshot.activeQuestionReference?.quizFragenId ?? null;
+      const needsAnswerStatus =
+        knownLiveRevision !== null &&
+        (knownLiveRevision !== snapshot.liveRevision ||
+          (hasKnownActiveQuestion &&
+            knownActiveQuizFragenId !== activeQuizFragenId));
+      if (needsAnswerStatus) {
+        phaseStartedAt = performance.now();
+        const answerStatus = await getQuizAntwortStatus(
+          quizId,
+          token ?? undefined,
+        );
+        phases.answerStatus = performance.now() - phaseStartedAt;
+        payload = { ...snapshot, answerStatus };
+      } else {
+        payload = snapshot;
+      }
     }
 
     phaseStartedAt = performance.now();

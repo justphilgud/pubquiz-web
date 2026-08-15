@@ -39,16 +39,25 @@ class InvalidTeamSessionError extends Error {}
 async function fetchQuizLiveSnapshot(
   quizId: number,
   quizTeamSessionToken?: string,
+  knownLiveRevision?: string,
+  knownActiveQuizFragenId?: number | null,
 ) {
   const response = await fetch("/api/quiz/team-live-snapshot", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ quizId, quizTeamSessionToken }),
+    body: JSON.stringify({
+      quizId,
+      quizTeamSessionToken,
+      knownLiveRevision,
+      knownActiveQuizFragenId,
+    }),
   });
   if (response.status === 401) throw new InvalidTeamSessionError();
   if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
-  return await response.json() as QuizLiveSnapshot;
+  return await response.json() as QuizLiveSnapshot & {
+    answerStatus?: AntwortStatus | null;
+  };
 }
 
 async function fetchQuizAnswerStatus(
@@ -311,6 +320,8 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
         const snapshot = await fetchQuizLiveSnapshot(
           liveDaten.quiz_id,
           session?.sessionToken,
+          liveDaten.liveRevision,
+          liveDaten.activeQuizFragenId,
         );
         if (!active) return;
         setPixelState(snapshot.pixelState);
@@ -333,10 +344,11 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
           (session?.sessionToken !== undefined &&
             hydratedSessionTokenRef.current !== session.sessionToken);
         if (needsFullRefresh) {
-          const aktuelleDaten = await fetchQuizAnswerStatus(
-            liveDaten.quiz_id,
-            session?.sessionToken,
-          );
+          const aktuelleDaten = snapshot.answerStatus ??
+            await fetchQuizAnswerStatus(
+              liveDaten.quiz_id,
+              session?.sessionToken,
+            );
           if (active && aktuelleDaten) {
             const nextLiveData = aktuelleDaten as AntwortStatus;
             hydratedSessionTokenRef.current = session?.sessionToken ?? null;
