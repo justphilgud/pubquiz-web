@@ -185,6 +185,7 @@ async function autoFinalizeDrafts(
       where: { interaction_run_id: run.interaction_run_id },
       include: { antwortauswahlen: true, antwortfelder: true },
     });
+  if (drafts.length === 0) return 0;
   const existing = await db.team_answer_submissions.findMany({
       where: { interaction_run_id: run.interaction_run_id },
       select: {
@@ -274,8 +275,8 @@ async function closeRun(
   });
   if (!run) return null;
   if (run.state === "OPEN" || run.state === "COUNTDOWN") {
-    await autoFinalizeDrafts(db, run, options.reason);
-    if (run.quiz_fragen_id !== null) {
+    const finalizedDrafts = await autoFinalizeDrafts(db, run, options.reason);
+    if (run.quiz_fragen_id !== null && finalizedDrafts > 0) {
       await recalculateQuizQuestionEvaluation(run.quiz_fragen_id, db);
     }
     assertQuizInteractionTransition(run.state, "CLOSED");
@@ -301,7 +302,11 @@ async function closeRun(
 
 export async function syncInteractionForPresentation(
   db: DbClient,
-  input: { quizId: number; slideKey: string },
+  input: {
+    quizId: number;
+    slideKey: string;
+    knownOpenQuizSectionId?: number;
+  },
 ) {
   const currentRunId = await lockCurrentRun(db, input.quizId);
   const identity = parsePresentationSlideKey(input.slideKey);
@@ -325,23 +330,34 @@ export async function syncInteractionForPresentation(
     return null;
   }
 
-  const assignment = await db.quiz_fragen.findFirst({
-    where: {
-      quiz_id: input.quizId,
-      quiz_fragen_id: identity.questionAssignmentId,
-    },
-    select: { quiz_abschnitt_id: true },
-  });
-  const blockRelease = assignment?.quiz_abschnitt_id
-    ? await db.quiz_block_freigaben.findUnique({
+  let resolvedAssignment:
+    | Awaited<ReturnType<typeof resolveInteractionAssignment>>
+    | null = null;
+  const assignment = input.knownOpenQuizSectionId === undefined
+    ? await db.quiz_fragen.findFirst({
         where: {
-          quiz_id_quiz_abschnitt_id: {
-            quiz_id: input.quizId,
-            quiz_abschnitt_id: assignment.quiz_abschnitt_id,
-          },
+          quiz_id: input.quizId,
+          quiz_fragen_id: identity.questionAssignmentId,
         },
-        select: { ist_freigegeben: true, ist_geschlossen: true },
+        select: { quiz_abschnitt_id: true },
       })
+    : (resolvedAssignment = await resolveInteractionAssignment(
+        db,
+        input.quizId,
+        identity.questionAssignmentId,
+      )).assignment;
+  const blockRelease = assignment?.quiz_abschnitt_id
+    ? assignment.quiz_abschnitt_id === input.knownOpenQuizSectionId
+      ? { ist_freigegeben: true, ist_geschlossen: false }
+      : await db.quiz_block_freigaben.findUnique({
+          where: {
+            quiz_id_quiz_abschnitt_id: {
+              quiz_id: input.quizId,
+              quiz_abschnitt_id: assignment.quiz_abschnitt_id,
+            },
+          },
+          select: { ist_freigegeben: true, ist_geschlossen: true },
+        })
     : null;
   if (!isQuizQuestionBlockOpen(blockRelease)) {
     if (currentRunId !== null) {
@@ -395,11 +411,13 @@ export async function syncInteractionForPresentation(
         data: { is_current: true, revision: { increment: 1 } },
       });
     }
-    const resolved = await resolveInteractionAssignment(
-      db,
-      input.quizId,
-      identity.questionAssignmentId,
-    );
+    const resolved =
+      resolvedAssignment ??
+      (await resolveInteractionAssignment(
+        db,
+        input.quizId,
+        identity.questionAssignmentId,
+      ));
     return db.quiz_interaction_runs.create({
       data: {
         quiz_id: input.quizId,
@@ -434,11 +452,13 @@ export async function syncInteractionForPresentation(
     }
   }
   if (!revealRun) {
-    const resolved = await resolveInteractionAssignment(
-      db,
-      input.quizId,
-      identity.questionAssignmentId,
-    );
+    const resolved =
+      resolvedAssignment ??
+      (await resolveInteractionAssignment(
+        db,
+        input.quizId,
+        identity.questionAssignmentId,
+      ));
     return db.quiz_interaction_runs.create({
       data: {
         quiz_id: input.quizId,

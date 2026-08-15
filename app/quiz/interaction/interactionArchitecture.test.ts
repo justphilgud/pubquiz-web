@@ -4,6 +4,17 @@ import test from "node:test";
 
 const read = (path: string) => readFileSync(path, "utf8");
 
+test("live actions share the canonical Prisma client with access and interaction services", () => {
+  const actions = read("app/quiz/actions.ts");
+  const access = read("app/quiz/quizAccess.server.ts");
+  const interaction = read("app/quiz/interaction/interaction.server.ts");
+
+  assert.match(actions, /from "@\/app\/lib\/prisma"/);
+  assert.match(access, /from "@\/app\/lib\/prisma"/);
+  assert.match(interaction, /from "@\/app\/lib\/prisma"/);
+  assert.doesNotMatch(actions, /from "@\/lib\/prisma"/);
+});
+
 test("stores current runs, CAS drafts and immutable versioned snapshots additively", () => {
   const schema = read("prisma/schema.prisma");
   const migration = read(
@@ -190,8 +201,30 @@ test("a conscious block reopen resynchronizes the current question", () => {
   assert.match(reopen, /prisma\.\$transaction/);
   assert.match(reopen, /quiz_praesentation_status\.findUnique/);
   assert.match(reopen, /syncInteractionForPresentation/);
+  assert.match(reopen, /knownOpenQuizSectionId: data\.quizAbschnittId/);
   assert.match(
     reopen,
     /aktuelle_quiz_fragen_id: interactionRun\.quiz_fragen_id/,
   );
+});
+
+test("live block mutations avoid redundant work without changing finalization rules", () => {
+  const actions = read("app/quiz/actions.ts");
+  const service = read("app/quiz/interaction/interaction.server.ts");
+  const closeRun = service.slice(
+    service.indexOf("async function closeRun"),
+    service.indexOf("export async function syncInteractionForPresentation"),
+  );
+
+  assert.match(
+    actions.slice(
+      actions.indexOf("export async function freigabeQuizBlock"),
+      actions.indexOf("export async function setAktuelleQuizFrage"),
+    ),
+    /Promise\.all\(\[[\s\S]*requireQuizLiveController[\s\S]*requireQuizQuestionSection/,
+  );
+  assert.match(service, /knownOpenQuizSectionId\?: number/);
+  assert.match(service, /if \(drafts\.length === 0\) return 0/);
+  assert.match(closeRun, /finalizedDrafts > 0/);
+  assert.match(closeRun, /recalculateQuizQuestionEvaluation/);
 });

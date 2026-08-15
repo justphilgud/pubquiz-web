@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { isAdmin, requireActor, requireAdmin, requireSession } from "@/app/lib/permissions";
@@ -2722,8 +2722,10 @@ export async function freigabeQuizBlock(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
-  await requireQuizLiveController(data.quizId);
-  await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
+  await Promise.all([
+    requireQuizLiveController(data.quizId),
+    requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
+  ]);
 
   await prisma.$transaction(async (tx) => {
     await tx.quiz_block_freigaben.updateMany({
@@ -2766,6 +2768,7 @@ export async function freigabeQuizBlock(data: {
       const interactionRun = await syncInteractionForPresentation(tx, {
         quizId: data.quizId,
         slideKey: presentationStatus.slide_key,
+        knownOpenQuizSectionId: data.quizAbschnittId,
       });
       if (interactionRun?.quiz_fragen_id) {
         await tx.quiz_block_freigaben.update({
@@ -2793,8 +2796,10 @@ export async function schliesseQuizBlock(data: {
   quizId: number;
   quizAbschnittId: number;
 }) {
-  await requireQuizLiveController(data.quizId);
-  await requireQuizQuestionSection(data.quizId, data.quizAbschnittId);
+  await Promise.all([
+    requireQuizLiveController(data.quizId),
+    requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
+  ]);
 
   await prisma.$transaction(async (tx) => {
     await tx.quiz_block_freigaben.upsert({
