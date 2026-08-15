@@ -2801,27 +2801,28 @@ export async function schliesseQuizBlock(data: {
     requireQuizQuestionSection(data.quizId, data.quizAbschnittId),
   ]);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.quiz_block_freigaben.upsert({
-      where: {
-        quiz_id_quiz_abschnitt_id: {
-          quiz_id: data.quizId,
-          quiz_abschnitt_id: data.quizAbschnittId,
-        },
-      },
-      update: {
-        ist_freigegeben: false,
-        ist_geschlossen: true,
-        geschlossen_ab: new Date(),
-      },
-      create: {
+  await prisma.quiz_block_freigaben.upsert({
+    where: {
+      quiz_id_quiz_abschnitt_id: {
         quiz_id: data.quizId,
         quiz_abschnitt_id: data.quizAbschnittId,
-        ist_freigegeben: false,
-        ist_geschlossen: true,
-        geschlossen_ab: new Date(),
       },
-    });
+    },
+    update: {
+      ist_freigegeben: false,
+      ist_geschlossen: true,
+      geschlossen_ab: new Date(),
+    },
+    create: {
+      quiz_id: data.quizId,
+      quiz_abschnitt_id: data.quizAbschnittId,
+      ist_freigegeben: false,
+      ist_geschlossen: true,
+      geschlossen_ab: new Date(),
+    },
+  });
+
+  await prisma.$transaction(async (tx) => {
     await closeBlockInteractions(tx, data.quizId, data.quizAbschnittId);
   }, { timeout: 30_000 });
 

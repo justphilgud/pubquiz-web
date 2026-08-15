@@ -397,37 +397,43 @@ export async function syncInteractionForPresentation(
         await deactivateRunWithoutFinalizing(db, currentRun.interaction_run_id);
       }
     }
-    const existingOpenRun = await db.quiz_interaction_runs.findFirst({
+    const previousRun = await db.quiz_interaction_runs.findFirst({
       where: {
         quiz_id: input.quizId,
         quiz_fragen_id: identity.questionAssignmentId,
-        state: { in: ["OPEN", "COUNTDOWN"] },
       },
       orderBy: { interaction_run_id: "desc" },
     });
-    if (existingOpenRun) {
+    if (
+      previousRun &&
+      (previousRun.state === "OPEN" || previousRun.state === "COUNTDOWN")
+    ) {
       return db.quiz_interaction_runs.update({
-        where: { interaction_run_id: existingOpenRun.interaction_run_id },
+        where: { interaction_run_id: previousRun.interaction_run_id },
         data: { is_current: true, revision: { increment: 1 } },
       });
     }
-    const resolved =
-      resolvedAssignment ??
-      (await resolveInteractionAssignment(
-        db,
-        input.quizId,
-        identity.questionAssignmentId,
-      ));
+    const resolved = previousRun
+      ? null
+      : resolvedAssignment ??
+        (await resolveInteractionAssignment(
+          db,
+          input.quizId,
+          identity.questionAssignmentId,
+        ));
     return db.quiz_interaction_runs.create({
       data: {
         quiz_id: input.quizId,
         quiz_fragen_id: identity.questionAssignmentId,
-        interaction_type: resolved.interaction.type,
+        interaction_type:
+          previousRun?.interaction_type ?? resolved!.interaction.type,
         state: "OPEN",
         is_current: true,
         opened_at: new Date(),
         revision: 1,
-        config_snapshot: toJson(buildInteractionConfigSnapshot(resolved)),
+        config_snapshot:
+          previousRun?.config_snapshot ??
+          toJson(buildInteractionConfigSnapshot(resolved!)),
       },
     });
   }

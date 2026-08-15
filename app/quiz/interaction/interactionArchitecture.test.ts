@@ -227,4 +227,17 @@ test("live block mutations avoid redundant work without changing finalization ru
   assert.match(service, /if \(drafts\.length === 0\) return 0/);
   assert.match(closeRun, /finalizedDrafts > 0/);
   assert.match(closeRun, /recalculateQuizQuestionEvaluation/);
+  assert.match(
+    service,
+    /previousRun\?\.config_snapshot \?\?[\s\S]*buildInteractionConfigSnapshot/,
+  );
+
+  const closeBlock = actions.slice(
+    actions.indexOf("export async function schliesseQuizBlock"),
+    actions.indexOf("export async function setAktuelleQuizFrage"),
+  );
+  assert.ok(
+    closeBlock.indexOf("prisma.quiz_block_freigaben.upsert") <
+      closeBlock.indexOf("closeBlockInteractions"),
+  );
 });
