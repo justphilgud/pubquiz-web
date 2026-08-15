@@ -79,6 +79,23 @@ test("structured answers cover all and no matching components", () => {
   assert.equal(wrong.status, "WRONG");
 });
 
+test("pixel text ignores legacy structured fields and remains manually reviewable", () => {
+  const result = evaluateBaseAnswer({
+    ...defaults,
+    templateId: "pixelbild",
+    effectiveAnswerMode: "OPEN",
+    answerText: "Eiffelturm",
+    structuredFields: [{ id: 1, acceptedSolutions: ["Hans Meier"] }],
+  });
+
+  assert.equal(result.status, "REVIEW_REQUIRED");
+  assert.equal(result.maxPoints.toString(), "1");
+  assert.deepEqual(result.details, {
+    strategy: "MANUAL",
+    reason: "MANUAL_EVALUATION",
+  });
+});
+
 test("multiple choice penalizes wrong selections and selecting all is not full", () => {
   const result = evaluateBaseAnswer({
     ...defaults,
@@ -204,6 +221,15 @@ test("punkte_basis is the derived maximum base score", () => {
       templateId: "face_morph",
       correctAnswerCount: 0,
       structuredFieldCount: 2,
+      orderingItemCount: 0,
+    }).toString(),
+    "1",
+  );
+  assert.equal(
+    getQuestionBaseMaximum({
+      templateId: "pixelbild",
+      correctAnswerCount: 0,
+      structuredFieldCount: 3,
       orderingItemCount: 0,
     }).toString(),
     "1",

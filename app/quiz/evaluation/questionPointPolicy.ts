@@ -14,6 +14,9 @@ export function getQuestionBaseMaximum(input: {
   if (templateId === questionTemplateIds.ordering) {
     return new Prisma.Decimal(input.orderingItemCount).mul("0.25");
   }
+  if (templateId === questionTemplateIds.pixelImage) {
+    return new Prisma.Decimal(1);
+  }
   if (input.structuredFieldCount > 0) {
     return new Prisma.Decimal(input.structuredFieldCount).mul("0.5");
   }
