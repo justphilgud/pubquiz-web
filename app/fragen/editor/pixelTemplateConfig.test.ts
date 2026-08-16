@@ -12,7 +12,7 @@ import {
 } from "./pixelTemplateConfig";
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
 
-test("pixel stage durations default to 20 seconds and validate integer bounds", () => {
+test("pixel stage durations default to 15 seconds and validate integer bounds", () => {
   assert.deepEqual(normalizeQuestionTemplateConfig(null), DEFAULT_PIXEL_TEMPLATE_CONFIG);
   assert.deepEqual(normalizeQuestionTemplateConfig({ stageDurationsSeconds: { stage3: 25, stage2: 15, stage1: 10 } }), {
     stageDurationsSeconds: { stage3: 25, stage2: 15, stage1: 10 },

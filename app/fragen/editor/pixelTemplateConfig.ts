@@ -9,7 +9,7 @@ import { parseQuestionTemplateData } from "./templates/questionTemplateData";
 export const PIXEL_STAGE_DURATION_MIN_SECONDS = 1;
 export const PIXEL_STAGE_DURATION_MAX_SECONDS = 120;
 export const DEFAULT_PIXEL_TEMPLATE_CONFIG: QuestionTemplateConfig = {
-  stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 },
+  stageDurationsSeconds: { stage3: 15, stage2: 15, stage1: 15 },
   createPixelQuestionByAnswer: { answer1: false, answer2: false },
 };
 

@@ -14,6 +14,7 @@ type AuswertungsAntwort = {
   fragen_id: number;
   frageIndex: number;
   frage: string;
+  templateId: string | null;
   richtigeAntwort: string;
   punkte_modus?: string;
   risikoPoolTeamanzahl: number | null;
@@ -26,6 +27,9 @@ type AuswertungsAntwort = {
   teamname: string;
   antwortText: string | null;
   antwortId: number | null;
+  antwortQuelle: "SUBMISSION" | "LEGACY" | null;
+  submissionVersion: number | null;
+  submissionStatus: "SUBMITTED" | "AUTO_FINALIZED" | null;
   ausgewaehlteAntwort: string | null;
 
   istOffeneFrage: boolean;
@@ -41,6 +45,9 @@ type AuswertungsAntwort = {
   vergebenePunkte: number;
   bewertungsstatus: "UNANSWERED" | "WRONG" | "PARTIAL" | "CORRECT" | "REVIEW_REQUIRED";
   bewertungsquelle: "AUTO" | "MANUAL" | "LEGACY";
+  pixelStage: 1 | 2 | 3 | null;
+  pixelIsStopper: boolean;
+  pixelOutcome: string | null;
 };
 
 type PunktestandEintrag = {
@@ -474,6 +481,21 @@ export default function QuizAuswertungClient({
                         </div>
 
                         {antwort.frage}
+                        {antwort.templateId === "pixelbild" && antwort.pixelStage && (
+                          <div className="mt-2 rounded-lg bg-fuchsia-50 p-2 text-xs text-fuchsia-950">
+                            <strong>Pixelbild · Stufe {antwort.pixelStage}</strong>
+                            <div>
+                              {antwort.pixelIsStopper ? "Stopper-Team" : "Normale Abgabe"}
+                              {antwort.pixelOutcome === "EXCLUSIVE_BONUS"
+                                ? " · Exklusivbonus"
+                                : antwort.pixelOutcome === "WRONG_STOP"
+                                  ? " · Stop-Risiko"
+                                  : antwort.pixelOutcome === "PENDING"
+                                    ? " · Bewertung offen"
+                                    : ""}
+                            </div>
+                          </div>
+                        )}
                         {antwort.punkte_modus === "risikofrage" && (
                           <div className="mt-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-900">
                             <strong>Risikofrage</strong>
@@ -514,6 +536,15 @@ export default function QuizAuswertungClient({
                           : antwort.antwortText ??
                             antwort.ausgewaehlteAntwort ??
                             "-"}
+                        {!antwort.istUnbeantwortet && (
+                          <div className="mt-1 text-xs font-normal text-slate-500">
+                            {antwort.antwortQuelle === "LEGACY"
+                              ? "Historische Legacy-Antwort"
+                              : antwort.submissionStatus === "AUTO_FINALIZED"
+                                ? "Automatisch finalisierte Abgabe"
+                                : `Abgabe v${antwort.submissionVersion ?? 1}`}
+                          </div>
+                        )}
                       </td>
 
                       <td className="px-4 py-3">

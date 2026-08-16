@@ -10,6 +10,7 @@ import {
   isEvaluationComplete,
 } from "./evaluationCompleteness";
 import { evaluateQuestionPoints } from "./evaluateQuestionPoints";
+import { resolveEffectiveSubmission } from "./effectiveSubmission";
 import {
   processEvaluationBackfillCandidates,
   QUIZ_EVALUATION_BACKFILL_BATCH_QUESTION_LIMIT,
@@ -22,6 +23,11 @@ import {
   isRiskPoolEligible,
   shouldFreezeRiskPool,
 } from "./riskQuestionSnapshot";
+import {
+  allocatePixelQuestionPoints,
+  readPixelLiveConfigSnapshot,
+  resolveEffectivePixelStage,
+} from "@/app/quiz/interaction/pixelLiveInteraction";
 
 type EvaluationDb = Prisma.TransactionClient | typeof prisma;
 
@@ -137,10 +143,20 @@ async function recalculateQuizQuestionEvaluationInTransaction(
         include: {
           antwortauswahlen: true,
           antwortfelder: true,
+          submissions: {
+            orderBy: [
+              { submission_version: "desc" },
+              { team_answer_submission_id: "desc" },
+            ],
+          },
           quiz_team_sessions: {
             select: { erstellt_am: true },
           },
         },
+      },
+      interaction_runs: {
+        orderBy: { interaction_run_id: "desc" },
+        take: 1,
       },
     },
   });
@@ -165,18 +181,11 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   });
 
   const automatic = assignment.team_antworten.map((answer) => {
-    const selectedAnswerIds =
-      answer.antwortauswahlen.length > 0
-        ? answer.antwortauswahlen.map((selection) => selection.antwort_id)
-        : answer.antwort_id === null
-          ? []
-          : [answer.antwort_id];
-    const structuredAnswers = new Map(
-      answer.antwortfelder.map((field) => [
-        field.antwortfeld_id,
-        field.antwort_text,
-      ]),
-    );
+    const effectiveSubmission = resolveEffectiveSubmission({
+      interactionRunId: answer.interaction_run_id,
+      draft: answer,
+      submissions: answer.submissions,
+    });
     const base = evaluateBaseAnswer({
       templateId,
       effectiveAnswerMode: answerMode.effectiveMode,
@@ -184,19 +193,20 @@ async function recalculateQuizQuestionEvaluationInTransaction(
         id: option.antwort_id,
         isCorrect: option.ist_richtig,
       })),
-      selectedAnswerIds,
-      answerText: answer.antwort_text,
+      selectedAnswerIds: effectiveSubmission?.selectedAnswerIds ?? [],
+      answerText: effectiveSubmission?.answerText ?? null,
       structuredFields: assignment.fragen.antwortfelder.map((field) => ({
         id: field.antwortfeld_id,
         acceptedSolutions: field.loesungen.map(
           (solution) => solution.loesung_text,
         ),
       })),
-      structuredAnswers,
+      structuredAnswers: effectiveSubmission?.structuredAnswers ?? new Map(),
       orderingItems: orderedItemIds,
     });
     return {
       answer,
+      hasEffectiveSubmission: effectiveSubmission !== null,
       result: evaluateQuestionPoints(base, assignment.punkte_modus),
     };
   });
@@ -208,7 +218,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
     shouldFreezeRiskPool({
       existingTeamCount: riskPoolSize,
       existingFixedAt: riskPoolFixedAt,
-      hasEvaluations: automatic.length > 0,
+      hasEvaluations: automatic.some((entry) => entry.hasEffectiveSubmission),
       refreeze: options.refreezeRiskPool === true,
     })
   ) {
@@ -259,7 +269,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       }
     }
   }
-  const prepared = automatic.map(({ answer, result }) => {
+  const prepared = automatic.map(({ answer, hasEffectiveSubmission, result }) => {
     const legacyManual =
       answer.bewertungsquelle === "LEGACY" &&
       (answer.ist_manuell_richtig ||
@@ -267,11 +277,13 @@ async function recalculateQuizQuestionEvaluationInTransaction(
         answer.bewertung_final ||
         answer.manuelle_punkte !== null);
     const preserveManual =
+      hasEffectiveSubmission &&
       options.preserveManualOverrides !== false &&
       (answer.bewertungsquelle === "MANUAL" || legacyManual);
     return {
       answer,
       result,
+      hasEffectiveSubmission,
       preserveManual,
       finalStatus: preserveManual ? answer.bewertungsstatus : result.status,
       finalSource: preserveManual ? "MANUAL" as const : "AUTO" as const,
@@ -307,9 +319,41 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       allocation,
     ]) ?? [],
   );
+  const pixelRun = templateId === "pixelbild"
+    ? assignment.interaction_runs[0] ?? null
+    : null;
+  const pixelConfig = pixelRun
+    ? readPixelLiveConfigSnapshot(pixelRun.config_snapshot)
+    : null;
+  const pixelStage = pixelRun && pixelConfig
+    ? resolveEffectivePixelStage({
+        openedAt: pixelRun.opened_at,
+        serverNow: pixelRun.stopped_at ?? pixelRun.closed_at ?? new Date(),
+        config: pixelConfig,
+        stoppedAtStage: pixelRun.stopped_at_stage,
+      })
+    : null;
+  const pixelAllocation = pixelRun && pixelStage
+    ? allocatePixelQuestionPoints({
+        stage: pixelStage,
+        evaluations: prepared.map((entry) => ({
+          teamAnswerId: entry.answer.team_antwort_id,
+          status: entry.finalStatus,
+          isStopper:
+            pixelRun.stopped_by_team_session_id ===
+            entry.answer.quiz_team_session_id,
+          isFinalSubmission: entry.hasEffectiveSubmission,
+        })),
+      })
+    : null;
+  const pixelAllocationByAnswerId = new Map(
+    pixelAllocation?.map((allocation) => [allocation.teamAnswerId, allocation]) ?? [],
+  );
   const requestedIds = new Set(options.answerIds);
   const evaluationsToPersist =
-    assignment.punkte_modus === "risikofrage" || requestedIds.size === 0
+    assignment.punkte_modus === "risikofrage" ||
+    templateId === "pixelbild" ||
+    requestedIds.size === 0
       ? prepared
       : prepared.filter(({ answer }) =>
           requestedIds.has(answer.team_antwort_id),
@@ -331,10 +375,27 @@ async function recalculateQuizQuestionEvaluationInTransaction(
     const allocatedRiskPoints = riskAllocationByAnswerId.get(
       answer.team_antwort_id,
     );
+    const allocatedPixelPoints = pixelAllocationByAnswerId.get(
+      answer.team_antwort_id,
+    );
     const autoFinal =
       assignment.punkte_modus === "risikofrage"
         ? (allocatedRiskPoints?.autoFinalPoints ?? new Prisma.Decimal(0))
+        : allocatedPixelPoints
+          ? new Prisma.Decimal(allocatedPixelPoints.points)
         : result.finalPoints;
+    const evaluationDetails = allocatedPixelPoints
+      ? {
+          ...result.details,
+          pixel: {
+            stage: allocatedPixelPoints.stage,
+            isStopper: allocatedPixelPoints.isStopper,
+            correctTeamCount: allocatedPixelPoints.correctCount,
+            outcome: allocatedPixelPoints.outcome,
+            points: new Prisma.Decimal(allocatedPixelPoints.points).toString(),
+          },
+        }
+      : result.details;
 
     const resultOfUpdate = await db.team_antworten.updateMany({
       where: {
@@ -350,7 +411,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
             auto_endpunkte: autoFinal,
             vergebene_punkte: effectiveManualPoints ?? autoFinal,
             bewertungsstatus: finalStatus,
-            bewertungsdetails: result.details,
+            bewertungsdetails: evaluationDetails,
             bewertungs_version: CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,
             bewertungsquelle: "MANUAL",
             manuelle_punkte: effectiveManualPoints,
@@ -361,7 +422,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
             vergebene_punkte: autoFinal,
             bewertungsstatus: result.status,
             bewertungsquelle: "AUTO",
-            bewertungsdetails: result.details,
+            bewertungsdetails: evaluationDetails,
             bewertungs_version: CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,
             manuelle_punkte: null,
             bewertet_am: null,
@@ -631,23 +692,21 @@ export async function recalculateQuizEvaluation(
   quizId: number,
   options: Omit<RecalculationOptions, "answerIds"> = {},
 ): Promise<RecalculationResult> {
-  return prisma.$transaction(async (tx) => {
-    const questions = await tx.quiz_fragen.findMany({
-      where: { quiz_id: quizId },
-      select: { quiz_fragen_id: true },
-    });
-    let recalculatedAnswers = 0;
-    for (const question of questions) {
-      const result = await recalculateQuizQuestionEvaluationInTransaction(
-        question.quiz_fragen_id,
-        options,
-        tx,
-      );
-      recalculatedAnswers += result.recalculatedAnswers;
-    }
-    return {
-      recalculatedAnswers,
-      recalculatedQuestions: questions.length,
-    };
+  const questions = await prisma.quiz_fragen.findMany({
+    where: { quiz_id: quizId },
+    select: { quiz_fragen_id: true },
   });
+  let recalculatedAnswers = 0;
+  for (const question of questions) {
+    const result = await recalculateQuizQuestionEvaluation(
+      question.quiz_fragen_id,
+      undefined,
+      options,
+    );
+    recalculatedAnswers += result.recalculatedAnswers;
+  }
+  return {
+    recalculatedAnswers,
+    recalculatedQuestions: questions.length,
+  };
 }

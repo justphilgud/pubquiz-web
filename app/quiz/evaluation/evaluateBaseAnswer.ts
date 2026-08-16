@@ -142,7 +142,10 @@ export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation
   if (templateId === questionTemplateIds.ordering) {
     return evaluateOrdering(input);
   }
-  if (input.structuredFields.length > 0) {
+  if (
+    input.structuredFields.length > 0 &&
+    templateId !== questionTemplateIds.pixelImage
+  ) {
     return evaluateStructuredFields(input);
   }
   if (templateId === questionTemplateIds.multipleChoice) {

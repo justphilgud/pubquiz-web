@@ -9,8 +9,15 @@ export function selectQuizAnswerAssignments<
 >(
   audienceState: PresentationAudienceState,
   assignments: readonly TAssignment[],
-  legacyVisibleAssignmentIds: readonly number[] = [],
+  releasedAssignmentIds: readonly number[] = [],
 ) {
+  if (releasedAssignmentIds.length > 0) {
+    const visibleIds = new Set(releasedAssignmentIds);
+    return assignments.filter((assignment) =>
+      visibleIds.has(assignment.quiz_fragen_id),
+    );
+  }
+
   if (
     audienceState.kind === "QUESTION" &&
     audienceState.phase === "QUESTION"
@@ -22,13 +29,31 @@ export function selectQuizAnswerAssignments<
   }
 
   if (audienceState.kind === "LEGACY") {
-    const visibleIds = new Set(legacyVisibleAssignmentIds);
-    return assignments.filter((assignment) =>
-      visibleIds.has(assignment.quiz_fragen_id),
-    );
+    return [];
   }
 
   return [];
+}
+
+export function selectReleasedQuizAnswerAssignmentIds(
+  blockAssignmentIds: readonly number[],
+  runs: readonly {
+    quiz_fragen_id: number | null;
+    opened_at: Date | null;
+    is_current: boolean;
+  }[],
+  releasedAt: Date | null,
+) {
+  if (!releasedAt) return [];
+  const openedIds = new Set(
+    runs.flatMap((run) =>
+      run.quiz_fragen_id !== null &&
+      (run.is_current || (run.opened_at !== null && run.opened_at >= releasedAt))
+        ? [run.quiz_fragen_id]
+        : [],
+    ),
+  );
+  return blockAssignmentIds.filter((assignmentId) => openedIds.has(assignmentId));
 }
 
 export function canSaveQuizAnswerForPresentation(
@@ -40,4 +65,17 @@ export function canSaveQuizAnswerForPresentation(
     audienceState.phase === "QUESTION" &&
     audienceState.questionAssignmentId === questionAssignmentId
   );
+}
+
+export function selectParticipantQuestionMedia<
+  TMedium extends { slot_key: string | null },
+>(
+  templateId: string | null,
+  interactionState: string | null | undefined,
+  media: readonly TMedium[],
+) {
+  if (templateId !== "pixelbild" || interactionState === "REVEALED") {
+    return media;
+  }
+  return media.filter((medium) => medium.slot_key !== "pixel_original_image");
 }

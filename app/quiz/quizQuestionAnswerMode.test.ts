@@ -119,21 +119,27 @@ test("quiz copy preserves true and false free-answer overrides", () => {
   );
 });
 
-test("answer form uses the effective mode before template and option rendering", () => {
-  const answerForm = readFileSync(
+test("answer form resolves the effective mode before generic contract rendering", () => {
+  const answerClient = readFileSync(
     "app/quiz/[quizId]/antworten/QuizAntwortClient.tsx",
     "utf8",
   );
-  const overrideBranch = answerForm.indexOf("freieAntwortErzwungen ? (");
-  const answerFieldBranch = answerForm.indexOf(") : hatAntwortfelder ? (");
-  const optionBranch = answerForm.indexOf(
-    ") : frage.antworten.length > 1 ? (",
+  const interactionResolver = readFileSync(
+    "app/quiz/answerInteraction.ts",
+    "utf8",
+  );
+  const overrideBranch = interactionResolver.indexOf(
+    "freeAnswerOverrideActive && allowedTypes.includes(\"TEXT\")",
+  );
+  const answerFieldBranch = interactionResolver.indexOf(
+    "input.answerFields.length > 0",
   );
 
   assert.ok(overrideBranch >= 0);
   assert.ok(overrideBranch < answerFieldBranch);
-  assert.ok(answerFieldBranch < optionBranch);
-  assert.match(answerForm, /antwortId: null/);
+  assert.match(answerClient, /interaction=\{frage\.interaction\}/);
+  assert.match(answerClient, /<GenericAnswerRenderer/);
+  assert.doesNotMatch(answerClient, /templateId === "multiple_choice"/);
 });
 
 test("server rejects selection answers for an effectively open question", () => {

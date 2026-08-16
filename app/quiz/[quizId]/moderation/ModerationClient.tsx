@@ -47,6 +47,23 @@ import {
   getQuizFlowTypeLabel,
   getQuizSolutionStrategyLabel,
 } from "@/app/quiz/flow/quizFlow";
+import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
+import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
+
+type QuizLiveSnapshot = Awaited<
+  ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
+>;
+
+async function fetchQuizLiveSnapshot(quizId: number) {
+  const response = await fetch("/api/quiz/live-snapshot", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ quizId }),
+  });
+  if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
+  return await response.json() as QuizLiveSnapshot;
+}
 
 type EstimationQuestion = {
   fragen_id: number;
@@ -88,6 +105,7 @@ export default function ModerationClient({
 }: Props) {
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
+  const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
 
   const [slideIndex, setSlideIndex] = useState(() => {
     return resolvePresentationSequenceIndex(
@@ -236,6 +254,32 @@ export default function ModerationClient({
 
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    let refreshing = false;
+    async function refreshPixelState() {
+      if (refreshing) return;
+      refreshing = true;
+      try {
+      const snapshot = await fetchQuizLiveSnapshot(quizId);
+      if (active) {
+        setPixelState(snapshot.pixelState);
+        setBlockFreigegeben(Boolean(
+          snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
+        ));
+      }
+      } finally {
+        refreshing = false;
+      }
+    }
+    void refreshPixelState();
+    const interval = window.setInterval(() => void refreshPixelState(), 750);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [quizId]);
 
   async function speichereDauerVomAktuellenSlide() {
     if (aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
@@ -411,8 +455,6 @@ export default function ModerationClient({
 
     if (safeIndex === slideIndex) return;
 
-    await speichereDauerVomAktuellenSlide();
-
     const newStartedAt = new Date().toISOString();
 
     setSlideIndex(safeIndex);
@@ -429,6 +471,7 @@ export default function ModerationClient({
 
     const nextSlide = slides[safeIndex];
     if (!nextSlide) return;
+    const nextSlideKey = getPresentationSlideKey(nextSlide);
     if (isPauseSlide(nextSlide)) {
       setCountdownDauerMinuten(
         Math.max(1, Math.round(getPauseDurationSeconds(nextSlide) / 60)),
@@ -437,9 +480,17 @@ export default function ModerationClient({
     await setPraesentationSlideIndex(
       quizId,
       safeIndex,
-      getPresentationSlideKey(nextSlide),
+      nextSlideKey,
     );
-    await aktualisiereAntwortStatus();
+    void speichereDauerVomAktuellenSlide().catch(() => {
+      // Presentation timing is diagnostic and must not delay live-state publication.
+    });
+    if (parseQuizBlockPreviewSectionId(nextSlideKey) !== null) {
+      setBlockFreigegeben(true);
+    }
+    void aktualisiereAntwortStatus().catch(() => {
+      // The regular status poll retries transient failures.
+    });
   }
 
   async function handleBlockToggle() {
@@ -551,6 +602,26 @@ export default function ModerationClient({
     void ladePunktestand();
   }, [aktuellerSlide, quizId]);
 
+  useEffect(() => {
+    let active = true;
+    let refreshing = false;
+    async function refresh() {
+      if (!active || refreshing) return;
+      refreshing = true;
+      try {
+        await aktualisiereAntwortStatus();
+      } finally {
+        refreshing = false;
+      }
+    }
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 1_500);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [aktualisiereAntwortStatus]);
+
   useModerationHotkeys({
     hatMedien,
     hatAudio,
@@ -623,10 +694,20 @@ export default function ModerationClient({
               playbackCommandId={playbackCommandId}
               estimationPhase={estimationPhase}
               estimationQuestion={estimationQuestion}
+              now={now}
+              pixelState={pixelState}
             />
 
             <SlideNotes>
               <div className="space-y-2">
+                {pixelState && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && (
+                  <div className="rounded-xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-3">
+                    <p><strong>Pixel-Stufe:</strong> {pixelState.effectivePixelStage} von 3</p>
+                    <p><strong>Stop:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} in Stufe ${pixelState.stoppedAtStage}` : pixelState.effectivePixelStage < 3 ? "möglich" : "in Stufe 3 deaktiviert"}</p>
+                    <p><strong>Finale Antworten:</strong> {antwortStatus.antwortenEingegangen} / {antwortStatus.teamsAngemeldet}</p>
+                    <p><strong>Zustand:</strong> {pixelState.submissionDeadlineAt && new Date(pixelState.submissionDeadlineAt).getTime() > now ? `${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden Restzeit` : pixelState.stopped ? "Countdown beendet" : "offen"}</p>
+                  </div>
+                )}
                 {aktuellerSlide?.typ === "ablauf" && (
                   <p><strong>Typ:</strong> {getQuizFlowTypeLabel(aktuellerSlide.element.type)}</p>
                 )}

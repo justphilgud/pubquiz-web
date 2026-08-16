@@ -36,9 +36,38 @@ const standardQuestionOverlay: TemplateContractOverlay = {
     },
     interaction: {
       defaultType: "TEXT",
-      allowedTypes: ["TEXT", "CHOICE"],
+      allowedTypes: [
+        "TEXT",
+        "STRUCTURED_TEXT",
+        "SINGLE_CHOICE",
+        "MULTI_CHOICE",
+      ],
       required: true,
       quizOverrideAllowed: true,
+      answerForms: [
+        {
+          type: "TEXT",
+          source: "ANSWER_TEXT",
+          multiline: true,
+          inputMode: "text",
+        },
+        {
+          type: "STRUCTURED_TEXT",
+          source: "QUESTION_ANSWER_FIELDS",
+          multiline: false,
+          inputMode: "text",
+        },
+        {
+          type: "SINGLE_CHOICE",
+          source: "QUESTION_ANSWERS",
+          selectionMode: "SINGLE",
+        },
+        {
+          type: "MULTI_CHOICE",
+          source: "QUESTION_ANSWERS",
+          selectionMode: "MULTIPLE",
+        },
+      ],
     },
     evaluation: {
       defaultType: "MANUAL",
@@ -67,7 +96,7 @@ const standardQuestionOverlay: TemplateContractOverlay = {
       ...contract.renderer,
       teamForm: Object.fromEntries(
         sources.map((source) => [
-          source.answerMode === "OPEN_TEXT" ? "TEXT" : "CHOICE",
+          source.answerMode === "OPEN_TEXT" ? "TEXT" : "MULTI_CHOICE",
           source.answerFormKind,
         ]),
       ),
@@ -242,10 +271,11 @@ export const podiumTemplateContract = {
     ],
   },
   interaction: {
-    defaultType: "NONE",
-    allowedTypes: ["NONE"],
+    defaultType: "NO_ANSWER",
+    allowedTypes: ["NO_ANSWER"],
     required: false,
     quizOverrideAllowed: false,
+    answerForms: [{ type: "NO_ANSWER", source: "NONE" }],
   },
   evaluation: { defaultType: "NONE", allowedTypes: ["NONE"] },
   reveal: {

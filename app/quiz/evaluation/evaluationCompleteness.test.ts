@@ -21,6 +21,10 @@ test("current automatic evaluation with details is complete", () => {
 
 test("old, partial and detail-less automatic evaluations need backfill", () => {
   assert.equal(
+    isEvaluationComplete({ ...complete, bewertungs_version: 1 }),
+    false,
+  );
+  assert.equal(
     isEvaluationComplete({ ...complete, bewertungs_version: 0 }),
     false,
   );

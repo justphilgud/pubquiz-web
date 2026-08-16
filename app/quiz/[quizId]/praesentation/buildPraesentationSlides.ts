@@ -17,6 +17,7 @@ export type Medium = {
   medientyp: string;
   sortierung: number;
   bemerkung: string | null;
+  slotKey?: string | null;
 };
 
 
@@ -227,6 +228,12 @@ export function buildPraesentationSlides(
 
 export function getPresentationSlideKey(slide: Slide) {
   if (slide.typ === "ablauf") {
+    if (
+      slide.element.type === "ROUND_INTRO" &&
+      slide.abschnitt?.quiz_abschnitt_id
+    ) {
+      return `section:${slide.abschnitt.quiz_abschnitt_id}:intro`;
+    }
     if (
       slide.element.anchorType === "BLOCK" &&
       slide.element.persistentId !== null

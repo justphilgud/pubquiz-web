@@ -2,7 +2,7 @@ import "server-only";
 
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
-import { requireSession } from "@/app/lib/permissions";
+import { requireActor } from "@/app/lib/permissions";
 import { requireEventSeriesAccess } from "@/app/eventreihen/eventSeriesAccess.server";
 import { buildQuizOwnershipContext } from "./quizOwnershipPolicy";
 import { isQuestionSection } from "./quizSectionPolicy";
@@ -30,11 +30,13 @@ export async function requireQuizAccess(
   quizId: number,
   capability: QuizCapability,
 ): Promise<QuizAuthorizationContext> {
-  await requireSession();
-  const quiz = await prisma.quiz.findUnique({
-    where: { quiz_id: quizId },
-    select: { quiz_id: true, ist_archiviert: true, eventreihe_id: true },
-  });
+  const [{ session, actor }, quiz] = await Promise.all([
+    requireActor(),
+    prisma.quiz.findUnique({
+      where: { quiz_id: quizId },
+      select: { quiz_id: true, ist_archiviert: true, eventreihe_id: true },
+    }),
+  ]);
 
   if (!quiz) {
     throw new Error("Quiz nicht gefunden.");
@@ -43,6 +45,7 @@ export async function requireQuizAccess(
   const eventSeriesAccess = await requireEventSeriesAccess(
     quiz.eventreihe_id,
     capability === "CONTROL_LIVE" ? "CONTROL_LIVE" : "MANAGE_QUIZZES",
+    { session, actor },
   );
 
   if (quiz.ist_archiviert && !capabilityAllowsArchivedQuiz(capability)) {
@@ -146,6 +149,16 @@ export async function requireQuizTeamAnswer(quizId: number, teamAnswerId: number
     where: {
       quiz_id: quizId,
       team_antwort_id: teamAnswerId,
+    },
+    include: {
+      antwortauswahlen: true,
+      antwortfelder: true,
+      submissions: {
+        orderBy: [
+          { submission_version: "desc" },
+          { team_answer_submission_id: "desc" },
+        ],
+      },
     },
   });
 

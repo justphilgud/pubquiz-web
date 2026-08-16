@@ -12,6 +12,7 @@ import {
   MODERATION_PREVIEW_LOGICAL_WIDTH,
   resolveModerationPreviewLayout,
 } from "../moderationPreviewLayout";
+import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 
 type PunktestandEintrag = {
   teamname: string;
@@ -36,6 +37,8 @@ type Props = {
     frage: string;
     richtigeAntwort: string | null;
   } | null;
+  now: number;
+  pixelState: PixelLiveState | null;
 };
 
 export default function CurrentSlidePanel({
@@ -52,6 +55,8 @@ export default function CurrentSlidePanel({
   playbackCommandId,
   estimationPhase,
   estimationQuestion,
+  now,
+  pixelState,
 }: Props) {
   const titel =
     aktuellerSlide?.typ === "frage"
@@ -130,7 +135,7 @@ export default function CurrentSlidePanel({
                 templateRevealCount: endstandRevealCount,
                 punktestand,
                 endstandRevealCount,
-                now: 0,
+                now,
                 estimationPhase,
                 schaetzfrage: estimationQuestion,
                 isSchaetzfrageLoading: false,
@@ -140,6 +145,7 @@ export default function CurrentSlidePanel({
                 mediaOverlayActive,
                 playbackCommand,
                 playbackCommandId,
+                pixelState,
               }}
             />
           </div>

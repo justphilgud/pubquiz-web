@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { QuizPraesentationResult } from "../../actions";
-import { getSchaetzfrageById } from "../../actions";
+import { getQuizLiveSnapshot, getSchaetzfrageById } from "../../actions";
+import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import {
   getPraesentationPunktestand,
   getPraesentationStatus,
@@ -51,6 +52,7 @@ export default function QuizPraesentationPlayer({
     useState<EstimationQuestion | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [syncError, setSyncError] = useState(false);
+  const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
 
   const slideIndex = resolvePresentationSequenceIndex(
     liveState,
@@ -60,10 +62,16 @@ export default function QuizPraesentationPlayer({
 
   useEffect(() => {
     let active = true;
+    let refreshing = false;
 
     async function refresh() {
+      if (refreshing) return;
+      refreshing = true;
       try {
-        const storedStatus = await getPraesentationStatus(quizId);
+        const [storedStatus, interactionSnapshot] = await Promise.all([
+          getPraesentationStatus(quizId),
+          getQuizLiveSnapshot(quizId),
+        ]);
         if (!active) return;
 
         const nextState = resolvePresentationLiveState(storedStatus);
@@ -78,8 +86,11 @@ export default function QuizPraesentationPlayer({
           return nextState;
         });
         setSyncError(false);
+        setPixelState(interactionSnapshot.pixelState);
       } catch {
         if (active) setSyncError(true);
+      } finally {
+        refreshing = false;
       }
     }
 
@@ -182,6 +193,7 @@ export default function QuizPraesentationPlayer({
             mediaOverlayActive: liveState.mediaOverlayActive,
             playbackCommand: liveState.playbackCommand,
             playbackCommandId: liveState.playbackCommandId,
+            pixelState,
           }}
         />
         {syncError && (

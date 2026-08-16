@@ -38,6 +38,10 @@ import {
   type StorybookCompositionVariant,
 } from "@/app/rendering/presentationTemplates/storybookComposition";
 import type { StorybookMemoryAsset } from "@/app/rendering/templateRegistry";
+import {
+  pixelRuntimeStageToMediaSlot,
+  type PixelLiveState,
+} from "@/app/quiz/interaction/pixelLiveInteraction";
 
 type ScoreEntry = {
   teamname: string;
@@ -65,6 +69,7 @@ export type PresentationSlideDisplayState = {
   mediaOverlayActive: boolean;
   playbackCommand: PresentationPlaybackCommand;
   playbackCommandId: number;
+  pixelState?: PixelLiveState | null;
 };
 
 type Props = {
@@ -209,6 +214,7 @@ export default function PresentationSlideRenderer({
     mediaOverlayActive,
     playbackCommand,
     playbackCommandId,
+    pixelState = null,
   } = displayState;
   const currentSlideMedia =
     slide?.typ === "frage"
@@ -400,15 +406,28 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const antworten = sortiereAntworten(frage);
   const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
   const layoutVariant = frage.presentationLayouts.question.variant;
-  const pixelRevealMedia = frage.templateId === "pixelbild" && layoutVariant === "REVEAL_SEQUENCE"
+  const allPixelImageMedia = frage.templateId === "pixelbild" && layoutVariant === "REVEAL_SEQUENCE"
     ? frage.medien.filter((medium) => isBild(medium.datei)).sort((left, right) => left.sortierung - right.sortierung)
     : [];
+  const keyedPixelStageMedia = allPixelImageMedia.filter((medium) =>
+    medium.slotKey?.startsWith("pixel_stage_"),
+  );
+  const pixelRevealMedia = keyedPixelStageMedia.length > 0
+    ? keyedPixelStageMedia
+    : allPixelImageMedia.slice(-3);
   const pixelRevealStep = pixelRevealMedia.length > 0
-    ? Math.min(pixelRevealMedia.length, Math.max(1, templateRevealCount))
+    ? pixelState?.effectivePixelStage ?? Math.min(pixelRevealMedia.length, Math.max(1, templateRevealCount))
     : null;
+  const livePixelMedium = pixelRevealStep === null
+    ? null
+    : pixelRevealMedia.find(
+        (medium) => medium.slotKey === pixelRuntimeStageToMediaSlot(pixelRevealStep as 1 | 2 | 3),
+      ) ?? pixelRevealMedia[pixelRevealStep - 1];
   const questionMedia = pixelRevealStep === null
     ? frage.medien
-    : [pixelRevealMedia[pixelRevealStep - 1]];
+    : livePixelMedium
+      ? [livePixelMedium]
+      : [];
   const storybookKind = resolveStorybookQuestionKind(frage);
 
   if (theme.design.stylePreset === "BIRTHDAY" && storybookKind) {
@@ -1998,6 +2017,32 @@ function renderAktuellenSlide() {
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}
       </PresentationDesignStage>
+      {slide?.typ === "frage" && pixelState?.stopped && (
+        <div className="absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-yellow-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
+          <p className="text-2xl font-black text-yellow-200">
+            {pixelState.stoppedByTeamName ?? "Ein Team"} hat in Stufe {pixelState.stoppedAtStage} gestoppt
+          </p>
+          {pixelState.submissionDeadlineAt && (
+            <p className="mt-1 text-lg font-bold text-white">
+              {pixelState.state === "COUNTDOWN"
+                ? `Noch ${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden f\u00fcr alle anderen Teams`
+                : "Antwortzeit beendet"}
+            </p>
+          )}
+        </div>
+      )}
+      {slide?.typ === "aufloesung" && pixelState?.stopped && pixelState.resolution && (
+        <div className="absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-cyan-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
+          <p className="text-xl font-black text-cyan-200">
+            {pixelState.stoppedByTeamName} stoppte in Stufe {pixelState.stoppedAtStage}: {pixelState.resolution.answer ?? "Keine Antwort"}
+          </p>
+          <p className="mt-1 text-2xl font-black text-white">
+            {pixelState.resolution.status === "CORRECT" ? "Richtig" : pixelState.resolution.status === "WRONG" ? "Falsch" : "Bewertung offen"}
+            {` \u00b7 ${pixelState.resolution.points.replace(".", ",")} Punkte`}
+            {pixelState.resolution.outcome === "EXCLUSIVE_BONUS" ? " \u00b7 Einziger Treffer" : pixelState.resolution.outcome === "WRONG_STOP" ? " \u00b7 Stop-Risiko" : ""}
+          </p>
+        </div>
+      )}
       <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
       {mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">

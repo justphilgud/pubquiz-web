@@ -5,12 +5,12 @@ import {
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type {
   GeneratorId,
-  QuestionAnswerMode,
   QuestionContentGeneratorId,
   QuestionEvaluationMode,
   QuestionTemplateDefinition,
 } from "@/app/fragen/editor/types";
 import type {
+  TemplateAnswerFormDefinition,
   TemplateAuthoringCapability,
   TemplateComponentSlot,
   TemplateContentFieldDefinition,
@@ -30,13 +30,19 @@ export type TemplateContractOverlay = {
 };
 
 function interactionFromAnswerMode(
-  answerMode: QuestionAnswerMode,
+  definition: QuestionTemplateDefinition,
 ): TemplateInteractionType {
+  if (
+    definition.initialAnswers.filter((answer) => answer.fieldLabelKey).length > 1
+  ) {
+    return "STRUCTURED_TEXT";
+  }
+  const answerMode = definition.answerMode;
   if (answerMode === "OPEN_TEXT") return "TEXT";
-  if (answerMode === "BOOLEAN") return "BOOLEAN";
-  if (answerMode === "NUMBER") return "NUMERIC";
-  if (answerMode === "ORDERING") return "ORDERING";
-  return "CHOICE";
+  if (answerMode === "NUMBER") return "NUMBER";
+  if (answerMode === "ORDERING") return "ORDER";
+  if (answerMode === "MULTIPLE_CHOICE") return "MULTI_CHOICE";
+  return "SINGLE_CHOICE";
 }
 
 function evaluationFromQuestionDefinition(
@@ -49,9 +55,82 @@ function evaluationFromQuestionDefinition(
   if (evaluationMode === "NUMERIC_TOLERANCE") return "NUMERIC_TOLERANCE";
   if (evaluationMode === "ORDER_EXACT") return "ORDER_EXACT";
   if (evaluationMode === "ORDER_POSITION") return "ORDER_POSITION";
-  return interaction === "CHOICE"
+  return interaction === "SINGLE_CHOICE" || interaction === "MULTI_CHOICE"
     ? "CHOICE_MATCH"
     : "NORMALIZED_TEXT_MATCH";
+}
+
+function answerFormDefinition(
+  interaction: TemplateInteractionType,
+): TemplateAnswerFormDefinition | null {
+  if (interaction === "NO_ANSWER") {
+    return { type: "NO_ANSWER", source: "NONE" };
+  }
+  if (interaction === "TEXT") {
+    return {
+      type: "TEXT",
+      source: "ANSWER_TEXT",
+      multiline: true,
+      inputMode: "text",
+    };
+  }
+  if (interaction === "STRUCTURED_TEXT") {
+    return {
+      type: "STRUCTURED_TEXT",
+      source: "QUESTION_ANSWER_FIELDS",
+      multiline: false,
+      inputMode: "text",
+    };
+  }
+  if (interaction === "NUMBER") {
+    return { type: "NUMBER", source: "ANSWER_TEXT", inputMode: "decimal" };
+  }
+  if (interaction === "SINGLE_CHOICE") {
+    return {
+      type: "SINGLE_CHOICE",
+      source: "QUESTION_ANSWERS",
+      selectionMode: "SINGLE",
+    };
+  }
+  if (interaction === "MULTI_CHOICE") {
+    return {
+      type: "MULTI_CHOICE",
+      source: "QUESTION_ANSWERS",
+      selectionMode: "MULTIPLE",
+    };
+  }
+  if (interaction === "ORDER") {
+    return {
+      type: "ORDER",
+      source: "TEMPLATE_ORDER_ITEMS",
+      scoringPolicy: "POSITION",
+    };
+  }
+  if (interaction === "MATCHING") {
+    return { type: "MATCHING", source: "QUESTION_MATCHING_ITEMS" };
+  }
+  if (interaction === "POLL_SINGLE") {
+    return {
+      type: "POLL_SINGLE",
+      source: "QUESTION_ANSWERS",
+      selectionMode: "SINGLE",
+    };
+  }
+  if (interaction === "POLL_MULTI") {
+    return {
+      type: "POLL_MULTI",
+      source: "QUESTION_ANSWERS",
+      selectionMode: "MULTIPLE",
+    };
+  }
+  if (interaction === "POLL_SCALE") {
+    return {
+      type: "POLL_SCALE",
+      source: "TEMPLATE_SCALE",
+      inputMode: "decimal",
+    };
+  }
+  return { type: "BUZZER", source: "RUNTIME_ACTION" };
 }
 
 function generatorCapability(
@@ -319,7 +398,12 @@ function unique<T>(values: readonly T[]): T[] {
 export function resolveLegacyQuestionTemplateContract(
   definition: QuestionTemplateDefinition,
 ): TemplateDefinition {
-  const interaction = interactionFromAnswerMode(definition.answerMode);
+  const interaction = interactionFromAnswerMode(definition);
+  const supportsTextOverride =
+    interaction === "SINGLE_CHOICE" ||
+    interaction === "MULTI_CHOICE" ||
+    interaction === "ORDER";
+  const supportsTextFallback = interaction === "STRUCTURED_TEXT";
   const evaluation = evaluationFromQuestionDefinition(
     definition.evaluationMode,
     interaction,
@@ -411,13 +495,25 @@ export function resolveLegacyQuestionTemplateContract(
     },
     interaction: {
       defaultType: interaction,
-      allowedTypes: [interaction],
+      allowedTypes: supportsTextOverride || supportsTextFallback
+        ? [interaction, "TEXT"]
+        : [interaction],
       required: true,
-      quizOverrideAllowed: false,
+      quizOverrideAllowed: supportsTextOverride,
+      answerForms: [
+        answerFormDefinition(interaction),
+        ...(supportsTextOverride || supportsTextFallback
+          ? [answerFormDefinition("TEXT")]
+          : []),
+      ].filter(
+        (form): form is TemplateAnswerFormDefinition => form !== null,
+      ),
     },
     evaluation: {
       defaultType: evaluation,
-      allowedTypes: [evaluation],
+      allowedTypes: supportsTextOverride || supportsTextFallback
+        ? unique([evaluation, "MANUAL", "NORMALIZED_TEXT_MATCH"])
+        : [evaluation],
     },
     reveal: {
       supported: false,

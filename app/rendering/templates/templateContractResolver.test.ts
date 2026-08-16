@@ -82,14 +82,15 @@ test("every productive question definition resolves to a valid contract", () => 
 
 test("template semantics are derived from definitions and focused overlays", () => {
   const cases = [
-    [questionTemplateIds.trueFalse, "BOOLEAN", "CHOICE_MATCH"],
-    [questionTemplateIds.estimate, "NUMERIC", "CLOSEST_VALUE"],
-    [questionTemplateIds.ordering, "ORDERING", "ORDER_EXACT"],
+    [questionTemplateIds.trueFalse, "SINGLE_CHOICE", "CHOICE_MATCH"],
+    [questionTemplateIds.estimate, "NUMBER", "CLOSEST_VALUE"],
+    [questionTemplateIds.ordering, "ORDER", "ORDER_POSITION"],
     [questionTemplateIds.translationReadAloud, "TEXT", "MANUAL"],
     [questionTemplateIds.anagram, "TEXT", "NORMALIZED_TEXT_MATCH"],
     [questionTemplateIds.googleReviews, "TEXT", "MANUAL"],
-    [questionTemplateIds.faceMorph, "TEXT", "MANUAL"],
-    [questionTemplateIds.musicReverse, "TEXT", "MANUAL"],
+    [questionTemplateIds.faceMorph, "STRUCTURED_TEXT", "MANUAL"],
+    [questionTemplateIds.musicReverse, "STRUCTURED_TEXT", "MANUAL"],
+    [questionTemplateIds.musicEightBit, "TEXT", "MANUAL"],
     [questionTemplateIds.pixelImage, "TEXT", "MANUAL"],
   ] as const;
 
@@ -147,7 +148,7 @@ test("legacy IDs and aliases resolve to the reference contracts", () => {
       questionTemplateContractRegistry,
       "multiple_choice",
     )?.interactionType,
-    "CHOICE",
+    "MULTI_CHOICE",
   );
   assert.equal(
     resolveTemplateContract(

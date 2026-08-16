@@ -47,8 +47,9 @@ export async function getEventSeriesIdsForCapability(
 export async function requireEventSeriesAccess(
   eventSeriesId: number,
   capability: EventSeriesCapability,
+  authenticatedActor?: { session: Session; actor: AuthorizationActor },
 ) {
-  const { session, actor } = await requireActor();
+  const { session, actor } = authenticatedActor ?? await requireActor();
   if (!Number.isInteger(eventSeriesId) || eventSeriesId <= 0) {
     throw new Error("Eventreihe nicht gefunden oder Zugriff nicht erlaubt.");
   }
