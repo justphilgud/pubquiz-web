@@ -24,9 +24,7 @@ import {
   shouldFreezeRiskPool,
 } from "./riskQuestionSnapshot";
 import {
-  allocatePixelQuestionPoints,
-  readPixelLiveConfigSnapshot,
-  resolveEffectivePixelStage,
+  allocatePixelQuestionPointsByRun,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 
 type EvaluationDb = Prisma.TransactionClient | typeof prisma;
@@ -149,6 +147,17 @@ async function recalculateQuizQuestionEvaluationInTransaction(
               { team_answer_submission_id: "desc" },
             ],
           },
+          interaction_run: {
+            select: {
+              interaction_run_id: true,
+              opened_at: true,
+              stopped_at: true,
+              stopped_at_stage: true,
+              stopped_by_team_session_id: true,
+              closed_at: true,
+              config_snapshot: true,
+            },
+          },
           quiz_team_sessions: {
             select: { erstellt_am: true },
           },
@@ -206,6 +215,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
     });
     return {
       answer,
+      effectiveSubmission,
       hasEffectiveSubmission: effectiveSubmission !== null,
       result: evaluateQuestionPoints(base, assignment.punkte_modus),
     };
@@ -269,7 +279,13 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       }
     }
   }
-  const prepared = automatic.map(({ answer, hasEffectiveSubmission, result }) => {
+  const legacyPixelRun = assignment.interaction_runs[0] ?? null;
+  const prepared = automatic.map(({
+    answer,
+    effectiveSubmission,
+    hasEffectiveSubmission,
+    result,
+  }) => {
     const legacyManual =
       answer.bewertungsquelle === "LEGACY" &&
       (answer.ist_manuell_richtig ||
@@ -284,6 +300,15 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       answer,
       result,
       hasEffectiveSubmission,
+      pixelRun:
+        effectiveSubmission?.source === "SUBMISSION"
+          ? answer.interaction_run?.interaction_run_id ===
+              effectiveSubmission.interactionRunId
+            ? answer.interaction_run
+            : null
+          : effectiveSubmission?.source === "LEGACY"
+            ? legacyPixelRun
+            : null,
       preserveManual,
       finalStatus: preserveManual ? answer.bewertungsstatus : result.status,
       finalSource: preserveManual ? "MANUAL" as const : "AUTO" as const,
@@ -319,35 +344,35 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       allocation,
     ]) ?? [],
   );
-  const pixelRun = templateId === "pixelbild"
-    ? assignment.interaction_runs[0] ?? null
-    : null;
-  const pixelConfig = pixelRun
-    ? readPixelLiveConfigSnapshot(pixelRun.config_snapshot)
-    : null;
-  const pixelStage = pixelRun && pixelConfig
-    ? resolveEffectivePixelStage({
-        openedAt: pixelRun.opened_at,
-        serverNow: pixelRun.stopped_at ?? pixelRun.closed_at ?? new Date(),
-        config: pixelConfig,
-        stoppedAtStage: pixelRun.stopped_at_stage,
-      })
-    : null;
-  const pixelAllocation = pixelRun && pixelStage
-    ? allocatePixelQuestionPoints({
-        stage: pixelStage,
+  const pixelRuns = new Map(
+    prepared.flatMap((entry) =>
+      entry.pixelRun
+        ? [[entry.pixelRun.interaction_run_id, entry.pixelRun] as const]
+        : [],
+    ),
+  );
+  const pixelAllocation = templateId === "pixelbild"
+    ? allocatePixelQuestionPointsByRun({
+        runs: [...pixelRuns.values()].map((run) => ({
+          interactionRunId: run.interaction_run_id,
+          openedAt: run.opened_at,
+          stoppedAt: run.stopped_at,
+          stoppedAtStage: run.stopped_at_stage,
+          stoppedByTeamSessionId: run.stopped_by_team_session_id,
+          closedAt: run.closed_at,
+          configSnapshot: run.config_snapshot,
+        })),
         evaluations: prepared.map((entry) => ({
           teamAnswerId: entry.answer.team_antwort_id,
+          quizTeamSessionId: entry.answer.quiz_team_session_id,
+          interactionRunId: entry.pixelRun?.interaction_run_id ?? null,
           status: entry.finalStatus,
-          isStopper:
-            pixelRun.stopped_by_team_session_id ===
-            entry.answer.quiz_team_session_id,
           isFinalSubmission: entry.hasEffectiveSubmission,
         })),
       })
-    : null;
+    : [];
   const pixelAllocationByAnswerId = new Map(
-    pixelAllocation?.map((allocation) => [allocation.teamAnswerId, allocation]) ?? [],
+    pixelAllocation.map((allocation) => [allocation.teamAnswerId, allocation]),
   );
   const requestedIds = new Set(options.answerIds);
   const evaluationsToPersist =
