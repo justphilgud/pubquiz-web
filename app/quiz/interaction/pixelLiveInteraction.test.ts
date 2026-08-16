@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   allocatePixelQuestionPoints,
+  allocatePixelQuestionPointsByRun,
   canStopPixelQuestion,
   createPixelLiveConfigSnapshot,
   pixelRuntimeStageToMediaSlot,
@@ -120,4 +121,99 @@ test("pixel scoring defers every final allocation until all final submissions ar
     { id: 1, points: "0", outcome: "PENDING" },
     { id: 2, points: "0", outcome: "PENDING" },
   ]);
+});
+
+function pixelRun(
+  interactionRunId: number,
+  stage: 1 | 2 | 3,
+  stoppedByTeamSessionId: number | null,
+) {
+  const openedAt = new Date("2026-08-15T18:00:00.000Z");
+  return {
+    interactionRunId,
+    openedAt,
+    stoppedAt: stage < 3 ? new Date(openedAt.getTime() + 1_000) : null,
+    closedAt: new Date(openedAt.getTime() + (stage === 3 ? 31_000 : 2_000)),
+    stoppedAtStage: stage < 3 ? stage : null,
+    stoppedByTeamSessionId,
+    configSnapshot: {
+      liveInteraction: createPixelLiveConfigSnapshot(null),
+    },
+  };
+}
+
+function runBoundPoints(input: {
+  stage: 1 | 2 | 3;
+  statuses: readonly ["CORRECT" | "WRONG", "CORRECT" | "WRONG"];
+}) {
+  const run = pixelRun(3, input.stage, input.stage < 3 ? 101 : null);
+  return allocatePixelQuestionPointsByRun({
+    runs: [run],
+    evaluations: input.statuses.map((status, index) => ({
+      teamAnswerId: index + 1,
+      quizTeamSessionId: 101 + index,
+      interactionRunId: run.interactionRunId,
+      status,
+      isFinalSubmission: true,
+    })),
+  }).map((entry) => entry.points);
+}
+
+test("run-bound scoring ignores a newer empty reopen run", () => {
+  const allocations = allocatePixelQuestionPointsByRun({
+    runs: [pixelRun(3, 1, 101), pixelRun(4, 3, null)],
+    evaluations: [
+      {
+        teamAnswerId: 1,
+        quizTeamSessionId: 101,
+        interactionRunId: 3,
+        status: "CORRECT",
+        isFinalSubmission: true,
+      },
+      {
+        teamAnswerId: 2,
+        quizTeamSessionId: 102,
+        interactionRunId: 3,
+        status: "WRONG",
+        isFinalSubmission: true,
+      },
+    ],
+  });
+
+  assert.deepEqual(allocations.map((entry) => entry.points), [6, 0]);
+  assert.deepEqual(allocations.map((entry) => entry.stage), [1, 1]);
+  assert.equal(allocations[0]?.isStopper, true);
+  assert.equal(allocations[0]?.outcome, "EXCLUSIVE_BONUS");
+});
+
+test("submission-based scoring never falls back to an unrelated latest run", () => {
+  assert.deepEqual(allocatePixelQuestionPointsByRun({
+    runs: [pixelRun(4, 3, null)],
+    evaluations: [{
+      teamAnswerId: 1,
+      quizTeamSessionId: 101,
+      interactionRunId: 3,
+      status: "CORRECT",
+      isFinalSubmission: true,
+    }],
+  }), []);
+});
+
+test("run-bound scoring preserves the complete pixel points matrix", () => {
+  const matrix = [
+    { stage: 1, statuses: ["CORRECT", "WRONG"], points: [6, 0] },
+    { stage: 2, statuses: ["CORRECT", "WRONG"], points: [4, 0] },
+    { stage: 1, statuses: ["WRONG", "CORRECT"], points: [-1, 3] },
+    { stage: 2, statuses: ["WRONG", "CORRECT"], points: [-1, 2] },
+    { stage: 1, statuses: ["CORRECT", "CORRECT"], points: [3, 3] },
+    { stage: 2, statuses: ["CORRECT", "CORRECT"], points: [2, 2] },
+    { stage: 3, statuses: ["CORRECT", "WRONG"], points: [1, 0] },
+  ] as const;
+
+  for (const entry of matrix) {
+    assert.deepEqual(
+      runBoundPoints({ stage: entry.stage, statuses: entry.statuses }),
+      entry.points,
+    );
+  }
 });

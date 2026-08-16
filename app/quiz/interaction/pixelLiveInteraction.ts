@@ -156,6 +156,24 @@ export type PixelEvaluationInput = {
   isFinalSubmission: boolean;
 };
 
+export type PixelEvaluationRunInput = {
+  interactionRunId: number;
+  openedAt: Date | string | null;
+  stoppedAt: Date | string | null;
+  closedAt: Date | string | null;
+  stoppedAtStage: number | null;
+  stoppedByTeamSessionId: number | null;
+  configSnapshot: unknown;
+};
+
+export type PixelRunBoundEvaluationInput = Omit<
+  PixelEvaluationInput,
+  "isStopper"
+> & {
+  quizTeamSessionId: number;
+  interactionRunId: number | null;
+};
+
 export function allocatePixelQuestionPoints(input: {
   stage: PixelRuntimeStage;
   evaluations: readonly PixelEvaluationInput[];
@@ -198,5 +216,44 @@ export function allocatePixelQuestionPoints(input: {
       correctCount,
       isStopper: entry.isStopper,
     };
+  });
+}
+
+export function allocatePixelQuestionPointsByRun(input: {
+  runs: readonly PixelEvaluationRunInput[];
+  evaluations: readonly PixelRunBoundEvaluationInput[];
+}) {
+  const evaluationsByRunId = new Map<number, PixelRunBoundEvaluationInput[]>();
+  for (const evaluation of input.evaluations) {
+    if (evaluation.interactionRunId === null) continue;
+    const runEvaluations = evaluationsByRunId.get(evaluation.interactionRunId);
+    if (runEvaluations) {
+      runEvaluations.push(evaluation);
+    } else {
+      evaluationsByRunId.set(evaluation.interactionRunId, [evaluation]);
+    }
+  }
+
+  return input.runs.flatMap((run) => {
+    const evaluations = evaluationsByRunId.get(run.interactionRunId);
+    if (!evaluations) return [];
+    const config = readPixelLiveConfigSnapshot(run.configSnapshot);
+    if (!config) return [];
+    const stage = resolveEffectivePixelStage({
+      openedAt: run.openedAt,
+      serverNow: run.stoppedAt ?? run.closedAt ?? new Date(),
+      config,
+      stoppedAtStage: run.stoppedAtStage,
+    });
+    return allocatePixelQuestionPoints({
+      stage,
+      evaluations: evaluations.map((evaluation) => ({
+        teamAnswerId: evaluation.teamAnswerId,
+        status: evaluation.status,
+        isFinalSubmission: evaluation.isFinalSubmission,
+        isStopper:
+          run.stoppedByTeamSessionId === evaluation.quizTeamSessionId,
+      })),
+    });
   });
 }

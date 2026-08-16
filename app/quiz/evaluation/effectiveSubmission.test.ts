@@ -17,10 +17,11 @@ function submission(input: {
   payload: Prisma.JsonValue;
   status?: "SUBMITTED" | "AUTO_FINALIZED";
   type?: string;
+  runId?: number;
 }) {
   return {
     team_answer_submission_id: input.id,
-    interaction_run_id: 10,
+    interaction_run_id: input.runId ?? 10,
     submission_version: input.version,
     status: input.status ?? "SUBMITTED",
     interaction_type: input.type ?? "TEXT",
@@ -36,6 +37,7 @@ test("uses v1 instead of a newer unsubmitted draft", () => {
   });
 
   assert.equal(result?.source, "SUBMISSION");
+  assert.equal(result?.interactionRunId, 10);
   assert.equal(result?.submissionVersion, 1);
   assert.equal(result?.answerText, "v1");
   assert.deepEqual(result?.selectedAnswerIds, []);
@@ -54,6 +56,21 @@ test("uses the latest explicit submission version without accumulating versions"
   assert.equal(result?.submissionId, 2);
   assert.equal(result?.submissionVersion, 2);
   assert.deepEqual(result?.selectedAnswerIds, [2]);
+});
+
+test("keeps the effective submission bound to run 3 when a newer run 4 exists", () => {
+  const result = resolveEffectiveSubmission({
+    interactionRunId: 3,
+    draft,
+    submissions: [
+      submission({ id: 31, version: 1, runId: 3, payload: { text: "run 3" } }),
+      submission({ id: 41, version: 2, runId: 4, payload: { text: "run 4" } }),
+    ],
+  });
+
+  assert.equal(result?.submissionId, 31);
+  assert.equal(result?.interactionRunId, 3);
+  assert.equal(result?.answerText, "run 3");
 });
 
 test("uses an auto-finalized snapshot when it is the only submission", () => {
@@ -94,6 +111,7 @@ test("uses the explicitly isolated legacy adapter only without an interaction ru
   });
 
   assert.equal(result?.source, "LEGACY");
+  assert.equal(result?.interactionRunId, null);
   assert.equal(result?.answerText, draft.antwort_text);
   assert.deepEqual(result?.selectedAnswerIds, [99]);
   assert.equal(result?.structuredAnswers.get(7), "Draft-Feld");

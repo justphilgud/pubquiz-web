@@ -174,6 +174,16 @@ test("evaluation answer loading uses effective submissions and safely represents
   assert.match(implementation, /vergebenePunkte: Number\(evaluatedAnswer\?\.vergebene_punkte \?\? 0\)/);
 });
 
+test("pixel evaluation binds effective submissions to their own interaction run", () => {
+  assert.match(evaluationService, /interaction_run: \{/);
+  assert.match(evaluationService, /effectiveSubmission\.interactionRunId/);
+  assert.match(evaluationService, /allocatePixelQuestionPointsByRun/);
+  assert.doesNotMatch(
+    evaluationService,
+    /const pixelRun = templateId === "pixelbild"[\s\S]*assignment\.interaction_runs\[0\]/,
+  );
+});
+
 test("manual recalculation is authorized and preserves overrides", () => {
   const start = actions.indexOf(
     "export async function recalculateQuizEvaluationsAction",

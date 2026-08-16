@@ -8,6 +8,7 @@ export type EffectiveAnswerContent = {
 
 export type EffectiveAnswerSnapshot = EffectiveAnswerContent & {
   source: "SUBMISSION" | "LEGACY";
+  interactionRunId: number | null;
   submissionId: number | null;
   submissionVersion: number | null;
   submissionStatus: "SUBMITTED" | "AUTO_FINALIZED" | null;
@@ -139,6 +140,7 @@ function contentFromSubmission(
 function legacyAnswerSnapshot(draft: StoredDraft): EffectiveAnswerSnapshot {
   return {
     source: "LEGACY",
+    interactionRunId: null,
     submissionId: null,
     submissionVersion: null,
     submissionStatus: null,
@@ -184,6 +186,7 @@ export function resolveEffectiveSubmission(
 
   return {
     source: "SUBMISSION",
+    interactionRunId: submission.interaction_run_id,
     submissionId: submission.team_answer_submission_id,
     submissionVersion: submission.submission_version,
     submissionStatus: submission.status,
