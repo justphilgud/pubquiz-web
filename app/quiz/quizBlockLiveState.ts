@@ -15,6 +15,28 @@ export function parseQuizBlockPreviewSectionId(slideKey: string) {
   return Number.isSafeInteger(sectionId) && sectionId > 0 ? sectionId : null;
 }
 
+export function resolveQuizBlockPreviewTransition(input: {
+  previousSlideKey: string | null;
+  nextSlideKey: string;
+  navigationRequestedAt: Date;
+  release: {
+    ist_freigegeben: boolean;
+    ist_geschlossen: boolean;
+    geschlossen_ab: Date | null;
+  } | null;
+}) {
+  if (isQuizQuestionBlockOpen(input.release)) return "KEEP_OPEN" as const;
+
+  const isNewNavigation = input.previousSlideKey !== input.nextSlideKey;
+  const wasLockedAfterNavigationStarted = Boolean(
+    input.release?.geschlossen_ab &&
+      input.release.geschlossen_ab >= input.navigationRequestedAt,
+  );
+  return isNewNavigation && !wasLockedAfterNavigationStarted
+    ? ("OPEN" as const)
+    : ("KEEP_LOCKED" as const);
+}
+
 export function serializeQuizBlockReleaseRevision(
   release: QuizBlockReleaseRevisionInput | null | undefined,
 ) {

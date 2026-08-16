@@ -56,6 +56,31 @@ export function selectReleasedQuizAnswerAssignmentIds(
   return blockAssignmentIds.filter((assignmentId) => openedIds.has(assignmentId));
 }
 
+export function isQuizAnswerRunReleasedForWrite(input: {
+  run: {
+    isCurrent: boolean;
+    isPixel: boolean;
+    openedAt: Date | null;
+  };
+  assignmentSectionId: number | null;
+  requestedSectionId: number;
+  release: {
+    isReleased: boolean;
+    isClosed: boolean;
+    releasedAt: Date | null;
+  } | null;
+}) {
+  if (input.assignmentSectionId === null) return input.run.isCurrent;
+  if (input.assignmentSectionId !== input.requestedSectionId) return false;
+  if (input.run.isPixel && !input.run.isCurrent) return false;
+  if (!input.release?.isReleased || input.release.isClosed) return false;
+  return input.run.isCurrent || Boolean(
+    input.run.openedAt &&
+      input.release.releasedAt &&
+      input.run.openedAt >= input.release.releasedAt,
+  );
+}
+
 export function canSaveQuizAnswerForPresentation(
   audienceState: PresentationAudienceState,
   questionAssignmentId: number,

@@ -7,6 +7,7 @@ import {
   recalculateQuizQuestionEvaluation,
 } from "@/app/quiz/evaluation/evaluation.server";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
+import { isQuizAnswerRunReleasedForWrite } from "@/app/quiz/quizAnswerLiveState";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -593,12 +594,6 @@ async function isRunReleasedForAnswerWrite(
   requestedSectionId: number,
 ) {
   if (assignment.quiz_abschnitt_id === null) return run.is_current;
-  if (
-    assignment.quiz_abschnitt_id !== requestedSectionId
-  ) {
-    return false;
-  }
-  if (isPixelInteractionRun(run) && !run.is_current) return false;
   const release = await db.quiz_block_freigaben.findUnique({
     where: {
       quiz_id_quiz_abschnitt_id: {
@@ -607,18 +602,22 @@ async function isRunReleasedForAnswerWrite(
       },
     },
   });
-  if (
-    !release?.ist_freigegeben ||
-    release.ist_geschlossen ||
-    release.aktuelle_quiz_fragen_id === null
-  ) {
-    return false;
-  }
-  return run.is_current || Boolean(
-    run.opened_at &&
-    release.freigegeben_ab &&
-    run.opened_at >= release.freigegeben_ab
-  );
+  return isQuizAnswerRunReleasedForWrite({
+    run: {
+      isCurrent: run.is_current,
+      isPixel: isPixelInteractionRun(run),
+      openedAt: run.opened_at,
+    },
+    assignmentSectionId: assignment.quiz_abschnitt_id,
+    requestedSectionId,
+    release: release
+      ? {
+          isReleased: release.ist_freigegeben,
+          isClosed: release.ist_geschlossen,
+          releasedAt: release.freigegeben_ab,
+        }
+      : null,
+  });
 }
 
 export type SaveTeamAnswerDraftResult =
