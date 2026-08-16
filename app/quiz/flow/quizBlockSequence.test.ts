@@ -112,6 +112,52 @@ test("automatic strategies preserve story positions and derive solutions", () =>
   ]);
 });
 
+test("editorial question order wins over divergent persisted flow order", () => {
+  const result = resolveQuizBlockSequence({
+    sectionId: 7,
+    quizStrategy: "END_OF_BLOCK",
+    sectionStrategy: null,
+    questions,
+    blockItems: [
+      item({ id: 1, type: "QUESTION", order: 1_000, questionAssignmentId: 12 }),
+      item({ id: 2, type: "TEXT", order: 1_500 }),
+      item({ id: 3, type: "QUESTION", order: 2_000, questionAssignmentId: 11 }),
+    ],
+  });
+
+  assert.deepEqual(compact(result.entries), [
+    "QUESTION:11",
+    "TEXT",
+    "QUESTION:12",
+    "QUESTION_SOLUTION:11",
+    "QUESTION_SOLUTION:12",
+  ]);
+});
+
+test("manual flow keeps content positions while canonicalizing question identities", () => {
+  const result = resolveQuizBlockSequence({
+    sectionId: 7,
+    quizStrategy: "MANUAL",
+    sectionStrategy: null,
+    questions,
+    blockItems: [
+      item({ id: 1, type: "QUESTION", order: 1_000, questionAssignmentId: 12 }),
+      item({ id: 2, type: "QUESTION_SOLUTION", order: 1_500, questionAssignmentId: 12 }),
+      item({ id: 3, type: "TEXT", order: 2_000 }),
+      item({ id: 4, type: "QUESTION", order: 3_000, questionAssignmentId: 11 }),
+      item({ id: 5, type: "QUESTION_SOLUTION", order: 3_500, questionAssignmentId: 11 }),
+    ],
+  });
+
+  assert.deepEqual(compact(result.entries), [
+    "QUESTION:11",
+    "QUESTION_SOLUTION:11",
+    "TEXT",
+    "QUESTION:12",
+    "QUESTION_SOLUTION:12",
+  ]);
+});
+
 test("manual sequences allow story elements between question and solution", () => {
   const result = resolveQuizBlockSequence({
     sectionId: 7,

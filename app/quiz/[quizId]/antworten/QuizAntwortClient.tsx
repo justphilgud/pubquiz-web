@@ -26,6 +26,7 @@ import {
 } from "@/app/quiz/interaction/interactionSubmissionPolicy";
 import {
   pixelRuntimeStageToMediaSlot,
+  resolvePixelAnswerActionPolicy,
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 
@@ -1162,6 +1163,15 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                           ] ?? null,
                         )),
                   );
+                  const pixelActionPolicy = questionPixelState
+                    ? resolvePixelAnswerActionPolicy({
+                        state: questionPixelState.state,
+                        stage: questionPixelState.effectivePixelStage,
+                        stopped: questionPixelState.stopped,
+                        isStopper: questionPixelTeamState?.isStopper ?? false,
+                        canSubmit: questionPixelTeamState?.canSubmit ?? false,
+                      })
+                    : null;
 
                   return (
                     <div
@@ -1199,7 +1209,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                                 {pixelCountdownRemaining !== null && ` Noch ${pixelCountdownRemaining} Sekunden.`}
                               </p>
                             )
-                          ) : questionPixelState.effectivePixelStage < 3 ? (
+                          ) : pixelActionPolicy?.showStopAndSubmit ? (
                             <div className="space-y-2">
                               <button
                                 type="button"
@@ -1207,7 +1217,9 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                                 disabled={isSubmitting || !session}
                                 className="min-h-11 w-full rounded-xl bg-fuchsia-700 px-5 py-3 font-black text-white hover:bg-fuchsia-800 disabled:cursor-not-allowed disabled:bg-slate-400"
                               >
-                                {isSubmitting ? "Stop wird geprüft..." : "Stop – Antwort jetzt verbindlich abgeben"}
+                                {isSubmitting
+                                  ? "Stop wird geprüft..."
+                                  : "Verpixelung für alle stoppen & Antwort abgeben"}
                               </button>
                               <p className="text-sm font-semibold text-fuchsia-900">
                                 Falscher Stop: -1 Punkt. Als einziges richtiges Team sind bis zu {questionPixelState.effectivePixelStage === 1 ? 6 : 4} Punkte möglich.
@@ -1307,7 +1319,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                           !blockIstGesperrt &&
                           questionIsWritable &&
                           !submissionLocksEditing &&
-                          (!questionPixelState || questionPixelTeamState?.canSubmit !== false) && (
+                          pixelActionPolicy?.showNormalSubmit === true && (
                           <button
                             type="button"
                             onClick={() => void handleSubmit(frage.quiz_fragen_id)}

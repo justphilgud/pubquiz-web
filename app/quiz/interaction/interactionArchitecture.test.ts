@@ -227,6 +227,24 @@ test("a conscious block reopen resynchronizes the current question", () => {
   );
 });
 
+test("stopped pixel navigation reuses the authoritative run", () => {
+  const service = read("app/quiz/interaction/interaction.server.ts");
+  const sync = service.slice(
+    service.indexOf("export async function syncInteractionForPresentation"),
+    service.indexOf("export async function closeCurrentInteraction"),
+  );
+
+  assert.match(sync, /shouldReuseStoppedPixelRunOnQuestionReentry/);
+  assert.match(
+    sync,
+    /where: \{ interaction_run_id: previousRun\.interaction_run_id \}[\s\S]*is_current: true/,
+  );
+  assert.ok(
+    sync.indexOf("shouldReuseStoppedPixelRunOnQuestionReentry") <
+      sync.indexOf("quiz_interaction_runs.create"),
+  );
+});
+
 test("live block mutations avoid redundant work without changing finalization rules", () => {
   const actions = read("app/quiz/actions.ts");
   const service = read("app/quiz/interaction/interaction.server.ts");

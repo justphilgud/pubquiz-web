@@ -36,6 +36,16 @@ type OrderedQuestion<TQuestion extends QuizBlockQuestionIdentity> = {
   item: QuizFlowItem | null;
 };
 
+function sortQuestionsEditorially<
+  TQuestion extends QuizBlockQuestionIdentity,
+>(questions: readonly TQuestion[]) {
+  return [...questions].sort(
+    (left, right) =>
+      (left.sortierung ?? 0) - (right.sortierung ?? 0) ||
+      left.quiz_fragen_id - right.quiz_fragen_id,
+  );
+}
+
 function compareOrdered(
   left: { order: number; stable: string },
   right: { order: number; stable: string },
@@ -47,46 +57,73 @@ function resolveOrderedQuestions<TQuestion extends QuizBlockQuestionIdentity>(
   questions: readonly TQuestion[],
   blockItems: readonly QuizFlowItem[],
 ) {
-  const questionById = new Map(
-    questions.map((question) => [question.quiz_fragen_id, question]),
+  const editorialQuestions = sortQuestionsEditorially(questions);
+  const questionIds = new Set(
+    editorialQuestions.map((question) => question.quiz_fragen_id),
   );
-  const persisted = blockItems
+  const persistedQuestionItems = blockItems
     .filter(
       (item) =>
         item.type === "QUESTION" &&
         item.questionAssignmentId !== null &&
-        questionById.has(item.questionAssignmentId),
+        questionIds.has(item.questionAssignmentId),
     )
-    .map((item) => ({
-      order: item.order,
-      question: questionById.get(item.questionAssignmentId!)!,
-      item,
-    }));
-  const represented = new Set(
-    persisted.map((entry) => entry.question.quiz_fragen_id),
+    .sort((left, right) =>
+      compareOrdered(
+        { order: left.order, stable: left.id },
+        { order: right.order, stable: right.id },
+      ),
+    );
+  const itemByQuestionId = new Map(
+    persistedQuestionItems.map((item) => [item.questionAssignmentId!, item]),
   );
   const maximumOrder = Math.max(
     0,
     ...blockItems.map((item) => item.order),
-    ...persisted.map((entry) => entry.order),
+    ...persistedQuestionItems.map((item) => item.order),
   );
-  const missing = [...questions]
-    .filter((question) => !represented.has(question.quiz_fragen_id))
-    .sort(
-      (left, right) =>
-        (left.sortierung ?? 0) - (right.sortierung ?? 0) ||
-        left.quiz_fragen_id - right.quiz_fragen_id,
-    )
-    .map((question, index) => ({
-      order:
-        persisted.length === 0 && blockItems.length === 0
-          ? (index + 1) * 1_000
-          : maximumOrder + (index + 1) * 1_000,
-      question,
-      item: null,
-    }));
 
-  return [...persisted, ...missing] satisfies OrderedQuestion<TQuestion>[];
+  return editorialQuestions.map((question, index) => ({
+    order:
+      persistedQuestionItems[index]?.order ??
+      (persistedQuestionItems.length === 0 && blockItems.length === 0
+          ? (index + 1) * 1_000
+          : maximumOrder +
+            (index - persistedQuestionItems.length + 1) * 1_000),
+    question,
+    item: itemByQuestionId.get(question.quiz_fragen_id) ?? null,
+  })) satisfies OrderedQuestion<TQuestion>[];
+}
+
+function resolveCanonicalQuestionByFlowAssignment<
+  TQuestion extends QuizBlockQuestionIdentity,
+>(questions: readonly TQuestion[], blockItems: readonly QuizFlowItem[]) {
+  const editorialQuestions = sortQuestionsEditorially(questions);
+  const questionIds = new Set(
+    editorialQuestions.map((question) => question.quiz_fragen_id),
+  );
+  const questionSlots = blockItems
+    .filter(
+      (item) =>
+        item.type === "QUESTION" &&
+        item.questionAssignmentId !== null &&
+        questionIds.has(item.questionAssignmentId),
+    )
+    .sort((left, right) =>
+      compareOrdered(
+        { order: left.order, stable: left.id },
+        { order: right.order, stable: right.id },
+      ),
+    );
+
+  return new Map(
+    questionSlots.flatMap((item, index) => {
+      const question = editorialQuestions[index];
+      return question && item.questionAssignmentId !== null
+        ? [[item.questionAssignmentId, question] as const]
+        : [];
+    }),
+  );
 }
 
 function getLinkedStoryPlacement(item: QuizFlowItem): StoryPlacement | null {
@@ -199,6 +236,23 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
   const questionById = new Map(
     questions.map((question) => [question.quiz_fragen_id, question]),
   );
+  const canonicalQuestionByFlowAssignment =
+    resolveCanonicalQuestionByFlowAssignment(questions, blockItems);
+  const questionItemById = new Map(
+    blockItems.flatMap((item) =>
+      item.type === "QUESTION" && item.questionAssignmentId !== null
+        ? [[item.questionAssignmentId, item] as const]
+        : [],
+    ),
+  );
+  const solutionItemById = new Map(
+    blockItems.flatMap((item) =>
+      item.type === "QUESTION_SOLUTION" &&
+          item.questionAssignmentId !== null
+        ? [[item.questionAssignmentId, item] as const]
+        : [],
+    ),
+  );
   const result: QuizBlockSequenceEntry<TQuestion>[] = [];
   const seenQuestions = new Set<number>();
   const seenSolutions = new Set<number>();
@@ -214,18 +268,24 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
     if (item.type === "QUESTION") {
       const question = item.questionAssignmentId === null
         ? null
-        : questionById.get(item.questionAssignmentId) ?? null;
+        : canonicalQuestionByFlowAssignment.get(item.questionAssignmentId) ??
+          questionById.get(item.questionAssignmentId) ?? null;
       if (!question || seenQuestions.has(question.quiz_fragen_id)) continue;
       seenQuestions.add(question.quiz_fragen_id);
       result.push(...(linkedStories.before.get(question.quiz_fragen_id) ?? [])
         .map((story) => ({ kind: "CONTENT" as const, item: story })));
-      result.push({ kind: "QUESTION", question, item });
+      result.push({
+        kind: "QUESTION",
+        question,
+        item: questionItemById.get(question.quiz_fragen_id) ?? item,
+      });
       continue;
     }
     if (item.type === "QUESTION_SOLUTION") {
       const question = item.questionAssignmentId === null
         ? null
-        : questionById.get(item.questionAssignmentId) ?? null;
+        : canonicalQuestionByFlowAssignment.get(item.questionAssignmentId) ??
+          questionById.get(item.questionAssignmentId) ?? null;
       if (
         !question ||
         !seenQuestions.has(question.quiz_fragen_id) ||
@@ -234,7 +294,11 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
         continue;
       }
       seenSolutions.add(question.quiz_fragen_id);
-      result.push({ kind: "QUESTION_SOLUTION", question, item });
+      result.push({
+        kind: "QUESTION_SOLUTION",
+        question,
+        item: solutionItemById.get(question.quiz_fragen_id) ?? item,
+      });
       result.push(...(linkedStories.after.get(question.quiz_fragen_id) ?? [])
         .map((story) => ({ kind: "CONTENT" as const, item: story })));
       continue;
@@ -242,11 +306,7 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
     result.push({ kind: "CONTENT", item });
   }
 
-  for (const question of [...questions].sort(
-    (left, right) =>
-      (left.sortierung ?? 0) - (right.sortierung ?? 0) ||
-      left.quiz_fragen_id - right.quiz_fragen_id,
-  )) {
+  for (const question of sortQuestionsEditorially(questions)) {
     if (!seenQuestions.has(question.quiz_fragen_id)) {
       result.push(...(linkedStories.before.get(question.quiz_fragen_id) ?? [])
         .map((story) => ({ kind: "CONTENT" as const, item: story })));

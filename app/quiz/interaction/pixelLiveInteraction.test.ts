@@ -7,8 +7,10 @@ import {
   canStopPixelQuestion,
   createPixelLiveConfigSnapshot,
   pixelRuntimeStageToMediaSlot,
+  resolvePixelAnswerActionPolicy,
   resolveEffectivePixelStage,
   resolvePixelTeamWriteAccess,
+  shouldReuseStoppedPixelRunOnQuestionReentry,
 } from "./pixelLiveInteraction";
 
 test("pixel live config defaults to 15 seconds and maps historic slots chronologically", () => {
@@ -72,6 +74,67 @@ test("pixel editing stays available on mobile policy until stop deadline", () =>
     serverNow: now,
     isStopper: false,
   }), { canEdit: false, canSubmit: false });
+});
+
+test("pixel answer actions expose exactly one primary path per lifecycle phase", () => {
+  assert.deepEqual(resolvePixelAnswerActionPolicy({
+    state: "OPEN",
+    stage: 1,
+    stopped: false,
+    isStopper: false,
+    canSubmit: true,
+  }), { showStopAndSubmit: true, showNormalSubmit: false });
+  assert.deepEqual(resolvePixelAnswerActionPolicy({
+    state: "OPEN",
+    stage: 3,
+    stopped: false,
+    isStopper: false,
+    canSubmit: true,
+  }), { showStopAndSubmit: false, showNormalSubmit: true });
+  assert.deepEqual(resolvePixelAnswerActionPolicy({
+    state: "COUNTDOWN",
+    stage: 2,
+    stopped: true,
+    isStopper: false,
+    canSubmit: true,
+  }), { showStopAndSubmit: false, showNormalSubmit: true });
+  assert.deepEqual(resolvePixelAnswerActionPolicy({
+    state: "COUNTDOWN",
+    stage: 2,
+    stopped: true,
+    isStopper: true,
+    canSubmit: false,
+  }), { showStopAndSubmit: false, showNormalSubmit: false });
+});
+
+test("stopped terminal pixel runs remain authoritative on question re-entry", () => {
+  const configSnapshot = {
+    liveInteraction: createPixelLiveConfigSnapshot(null),
+  };
+  assert.equal(shouldReuseStoppedPixelRunOnQuestionReentry({
+    state: "CLOSED",
+    configSnapshot,
+    stoppedAt: new Date("2026-08-15T18:00:05.000Z"),
+    stoppedAtStage: 1,
+  }), true);
+  assert.equal(shouldReuseStoppedPixelRunOnQuestionReentry({
+    state: "REVEALED",
+    configSnapshot,
+    stoppedAt: new Date("2026-08-15T18:00:20.000Z"),
+    stoppedAtStage: 2,
+  }), true);
+  assert.equal(shouldReuseStoppedPixelRunOnQuestionReentry({
+    state: "CLOSED",
+    configSnapshot,
+    stoppedAt: null,
+    stoppedAtStage: null,
+  }), false);
+  assert.equal(shouldReuseStoppedPixelRunOnQuestionReentry({
+    state: "CLOSED",
+    configSnapshot: { interaction: { type: "TEXT" } },
+    stoppedAt: new Date("2026-08-15T18:00:05.000Z"),
+    stoppedAtStage: 1,
+  }), false);
 });
 
 function points(stage: 1 | 2 | 3, evaluations: Parameters<typeof allocatePixelQuestionPoints>[0]["evaluations"]) {

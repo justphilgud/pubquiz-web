@@ -37,6 +37,7 @@ import {
   readPixelLiveConfigSnapshot,
   resolveEffectivePixelStage,
   resolvePixelTeamWriteAccess,
+  shouldReuseStoppedPixelRunOnQuestionReentry,
 } from "./pixelLiveInteraction";
 
 type DbClient = Prisma.TransactionClient;
@@ -384,7 +385,13 @@ export async function syncInteractionForPresentation(
   if (identity.phase === "QUESTION") {
     if (
       currentRun?.quiz_fragen_id === identity.questionAssignmentId &&
-      (currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN")
+      ((currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN") ||
+        shouldReuseStoppedPixelRunOnQuestionReentry({
+          state: currentRun.state,
+          configSnapshot: currentRun.config_snapshot,
+          stoppedAt: currentRun.stopped_at,
+          stoppedAtStage: currentRun.stopped_at_stage,
+        }))
     ) {
       return currentRun;
     }
@@ -407,7 +414,13 @@ export async function syncInteractionForPresentation(
     });
     if (
       previousRun &&
-      (previousRun.state === "OPEN" || previousRun.state === "COUNTDOWN")
+      ((previousRun.state === "OPEN" || previousRun.state === "COUNTDOWN") ||
+        shouldReuseStoppedPixelRunOnQuestionReentry({
+          state: previousRun.state,
+          configSnapshot: previousRun.config_snapshot,
+          stoppedAt: previousRun.stopped_at,
+          stoppedAtStage: previousRun.stopped_at_stage,
+        }))
     ) {
       return db.quiz_interaction_runs.update({
         where: { interaction_run_id: previousRun.interaction_run_id },

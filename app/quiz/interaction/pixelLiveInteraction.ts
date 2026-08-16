@@ -127,6 +127,39 @@ export function canStopPixelQuestion(input: {
     !input.isStopper;
 }
 
+export function resolvePixelAnswerActionPolicy(input: {
+  state: PixelLiveState["state"];
+  stage: PixelRuntimeStage;
+  stopped: boolean;
+  isStopper: boolean;
+  canSubmit: boolean;
+}) {
+  const showStopAndSubmit =
+    input.state === "OPEN" &&
+    input.stage < 3 &&
+    !input.stopped &&
+    !input.isStopper;
+
+  return {
+    showStopAndSubmit,
+    showNormalSubmit: input.canSubmit && !showStopAndSubmit,
+  };
+}
+
+export function shouldReuseStoppedPixelRunOnQuestionReentry(input: {
+  state: string;
+  configSnapshot: unknown;
+  stoppedAt: Date | string | null;
+  stoppedAtStage: number | null;
+}) {
+  return (
+    (input.state === "CLOSED" || input.state === "REVEALED") &&
+    readPixelLiveConfigSnapshot(input.configSnapshot) !== null &&
+    input.stoppedAt !== null &&
+    (input.stoppedAtStage === 1 || input.stoppedAtStage === 2)
+  );
+}
+
 export function resolvePixelTeamWriteAccess(input: {
   state: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
   deadlineAt: Date | null;
