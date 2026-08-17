@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   addFrageToQuiz,
   searchFragenForQuiz,
@@ -15,6 +16,7 @@ import QuizElementSearchResult, {
   quizElementActionClass,
 } from "./QuizElementSearchResult";
 import { getStoryElementTypeLabel } from "@/app/story-elemente/storyElement";
+import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
 type Props = {
   quizId: number;
@@ -35,7 +37,14 @@ export default function QuizFragenHinzufuegen({
   const [meldung, setMeldung] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [includeLinkedStoryElements, setIncludeLinkedStoryElements] = useState(true);
-  const [activeTab, setActiveTab] = useState<"QUESTION" | "STORY_ELEMENT">("QUESTION");
+  const [activeTab, setActiveTab] = useState<"QUESTION" | "STORY_ELEMENT" | "POLL">("QUESTION");
+  const visibleResults = ergebnisse.filter((question) =>
+    activeTab === "POLL"
+      ? isPollQuestionTemplateId(question.templateId)
+      : activeTab === "QUESTION"
+        ? !isPollQuestionTemplateId(question.templateId)
+        : false,
+  );
 
   async function handleSearch() {
     setMeldung("");
@@ -123,9 +132,24 @@ export default function QuizFragenHinzufuegen({
         >
           Story-Elemente
         </button>
+        <button
+          type="button"
+          aria-pressed={activeTab === "POLL"}
+          onClick={() => setActiveTab("POLL")}
+          className={activeTab === "POLL"
+            ? "inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+            : buttonSecondaryClass}
+        >
+          Umfragen
+        </button>
       </div>
 
-      {activeTab === "QUESTION" ? <>
+      {activeTab === "QUESTION" || activeTab === "POLL" ? <>
+
+      {activeTab === "POLL" && <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-cyan-200 bg-cyan-50 p-3 text-sm text-cyan-950">
+        <span>Umfragen haben keine richtige Antwort und verändern den Punktestand nicht.</span>
+        <Link href="/fragen/editor" className="font-semibold underline">Neue Umfrage erstellen</Link>
+      </div>}
 
       <ContentSearchControls
         query={suchtext}
@@ -147,7 +171,7 @@ export default function QuizFragenHinzufuegen({
       )}
 
       <div className="mt-4 space-y-3">
-        {ergebnisse.map((frage) => (
+        {visibleResults.map((frage) => (
           <QuizElementSearchResult
             key={frage.fragen_id}
             title={frage.frage}
@@ -190,7 +214,7 @@ export default function QuizFragenHinzufuegen({
           />
         ))}
 
-        {ergebnisse.length === 0 && !isLoading && (
+        {visibleResults.length === 0 && !isLoading && (
           <p className="text-sm text-slate-500">
             Noch keine Suchergebnisse. Starte eine Suche, um Fragen auszuwählen.
           </p>

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import "./interaction/interactionArchitecture.test";
+import "./interaction/pixelAnswerUiArchitecture.test";
 import "./interaction/interactionPayload.test";
 import "./interaction/interactionSubmissionPolicy.test";
 import "./interaction/interactionStateMachine.test";
@@ -12,6 +13,7 @@ import {
 } from "@/app/rendering/presentation/presentationLiveState";
 import {
   canSaveQuizAnswerForPresentation,
+  isQuizAnswerRunReleasedForWrite,
   selectQuizAnswerAssignments,
   selectParticipantQuestionMedia,
   selectReleasedQuizAnswerAssignmentIds,
@@ -19,6 +21,7 @@ import {
 import {
   isQuizQuestionBlockOpen,
   parseQuizBlockPreviewSectionId,
+  resolveQuizBlockPreviewTransition,
   serializeQuizParticipantLiveRevision,
   serializeQuizBlockReleaseRevision,
 } from "./quizBlockLiveState";
@@ -150,6 +153,41 @@ test("an open keyed block accumulates every released question", () => {
   );
 });
 
+test("an open block accumulates F1 through F5 in stable block order", () => {
+  const releasedAt = new Date("2026-08-15T12:00:00.000Z");
+  const blockQuestionIds = [1, 2, 3, 4, 5];
+  const runs = blockQuestionIds.map((quizFragenId, index) => ({
+    quiz_fragen_id: quizFragenId,
+    opened_at: new Date(releasedAt.getTime() + (index + 1) * 1_000),
+    is_current: quizFragenId === 5,
+  }));
+
+  assert.deepEqual(
+    selectReleasedQuizAnswerAssignmentIds(blockQuestionIds, [], releasedAt),
+    [],
+  );
+  assert.deepEqual(
+    selectReleasedQuizAnswerAssignmentIds(
+      blockQuestionIds,
+      runs.slice(0, 1),
+      releasedAt,
+    ),
+    [1],
+  );
+  assert.deepEqual(
+    selectReleasedQuizAnswerAssignmentIds(
+      blockQuestionIds,
+      runs.slice(0, 2),
+      releasedAt,
+    ),
+    [1, 2],
+  );
+  assert.deepEqual(
+    selectReleasedQuizAnswerAssignmentIds(blockQuestionIds, runs, releasedAt),
+    [1, 2, 3, 4, 5],
+  );
+});
+
 test("released questions follow opened runs instead of editorial sort order", () => {
   const releasedAt = new Date("2026-08-15T12:00:00.000Z");
   assert.deepEqual(
@@ -194,6 +232,50 @@ test("released question ids accumulate in stable block order", () => {
     ),
     [1, 3],
   );
+});
+
+test("normal released runs stay editable without an active question until block close", () => {
+  const base = {
+    run: {
+      isCurrent: false,
+      isPixel: false,
+      openedAt: new Date("2026-08-15T12:01:00.000Z"),
+    },
+    assignmentSectionId: 4,
+    requestedSectionId: 4,
+    release: {
+      isReleased: true,
+      isClosed: false,
+      releasedAt: new Date("2026-08-15T12:00:00.000Z"),
+    },
+  };
+  assert.equal(isQuizAnswerRunReleasedForWrite(base), true);
+  assert.equal(isQuizAnswerRunReleasedForWrite({
+    ...base,
+    release: { ...base.release, isReleased: false, isClosed: true },
+  }), false);
+});
+
+test("pixel write access remains bound to its current run", () => {
+  const base = {
+    run: {
+      isCurrent: false,
+      isPixel: true,
+      openedAt: new Date("2026-08-15T12:01:00.000Z"),
+    },
+    assignmentSectionId: 4,
+    requestedSectionId: 4,
+    release: {
+      isReleased: true,
+      isClosed: false,
+      releasedAt: new Date("2026-08-15T12:00:00.000Z"),
+    },
+  };
+  assert.equal(isQuizAnswerRunReleasedForWrite(base), false);
+  assert.equal(isQuizAnswerRunReleasedForWrite({
+    ...base,
+    run: { ...base.run, isCurrent: true },
+  }), true);
 });
 
 test("a released block remains visible during solution and editorial slides", () => {
@@ -273,6 +355,45 @@ test("a manual question-block lock stays authoritative", () => {
     ist_freigegeben: true,
     ist_geschlossen: false,
   }), true);
+});
+
+test("an open intro keeps its release boundary instead of starting a new session", () => {
+  assert.equal(resolveQuizBlockPreviewTransition({
+    previousSlideKey: "question:21:question",
+    nextSlideKey: "section:4:intro",
+    navigationRequestedAt: new Date("2026-08-15T12:05:00.000Z"),
+    release: {
+      ist_freigegeben: true,
+      ist_geschlossen: false,
+      geschlossen_ab: null,
+    },
+  }), "KEEP_OPEN");
+});
+
+test("a stale intro cannot reopen a manually locked block", () => {
+  assert.equal(resolveQuizBlockPreviewTransition({
+    previousSlideKey: "section:4:intro",
+    nextSlideKey: "section:4:intro",
+    navigationRequestedAt: new Date("2026-08-15T12:05:00.000Z"),
+    release: {
+      ist_freigegeben: false,
+      ist_geschlossen: true,
+      geschlossen_ab: new Date("2026-08-15T12:05:01.000Z"),
+    },
+  }), "KEEP_LOCKED");
+});
+
+test("a deliberate intro navigation can open a previously locked block", () => {
+  assert.equal(resolveQuizBlockPreviewTransition({
+    previousSlideKey: "question:21:solution",
+    nextSlideKey: "section:4:intro",
+    navigationRequestedAt: new Date("2026-08-15T12:05:00.000Z"),
+    release: {
+      ist_freigegeben: false,
+      ist_geschlossen: true,
+      geschlossen_ab: new Date("2026-08-15T12:00:00.000Z"),
+    },
+  }), "OPEN");
 });
 
 test("pixel solution media is withheld until the run is revealed", () => {

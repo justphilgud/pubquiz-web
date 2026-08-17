@@ -164,7 +164,8 @@ test("evaluation answer loading uses effective submissions and safely represents
   );
   const implementation = actions.slice(start, end);
 
-  assert.match(implementation, /return quizFragen\.flatMap/);
+  assert.match(implementation, /return quizFragen[\s\S]*\.flatMap/);
+  assert.match(implementation, /!isPollQuestionTemplateId/);
   assert.match(implementation, /return sessions\.map/);
   assert.match(implementation, /antwortfelder/);
   assert.match(implementation, /vorlage: \{ select: \{ code: true \} \}/);

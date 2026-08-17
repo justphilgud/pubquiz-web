@@ -8,6 +8,17 @@ export const PIXEL_NORMAL_POINTS = [3, 2, 1] as const;
 export const PIXEL_EXCLUSIVE_BONUS_POINTS = [6, 4, null] as const;
 export const PIXEL_WRONG_STOP_POINTS = -1 as const;
 
+export function resolvePixelCountdownSeconds(
+  submissionDeadlineAt: string | null,
+  serverNow: number,
+) {
+  if (!submissionDeadlineAt) return null;
+  return Math.max(
+    0,
+    Math.ceil((new Date(submissionDeadlineAt).getTime() - serverNow) / 1_000),
+  );
+}
+
 export type PixelRuntimeStage = 1 | 2 | 3;
 
 export type PixelLiveConfigSnapshot = {
@@ -125,6 +136,39 @@ export function canStopPixelQuestion(input: {
     !input.stopped &&
     input.hasDraftContent &&
     !input.isStopper;
+}
+
+export function resolvePixelAnswerActionPolicy(input: {
+  state: PixelLiveState["state"];
+  stage: PixelRuntimeStage;
+  stopped: boolean;
+  isStopper: boolean;
+  canSubmit: boolean;
+}) {
+  const showStopAndSubmit =
+    input.state === "OPEN" &&
+    input.stage < 3 &&
+    !input.stopped &&
+    !input.isStopper;
+
+  return {
+    showStopAndSubmit,
+    showNormalSubmit: input.canSubmit && !showStopAndSubmit,
+  };
+}
+
+export function shouldReuseStoppedPixelRunOnQuestionReentry(input: {
+  state: string;
+  configSnapshot: unknown;
+  stoppedAt: Date | string | null;
+  stoppedAtStage: number | null;
+}) {
+  return (
+    (input.state === "CLOSED" || input.state === "REVEALED") &&
+    readPixelLiveConfigSnapshot(input.configSnapshot) !== null &&
+    input.stoppedAt !== null &&
+    (input.stoppedAtStage === 1 || input.stoppedAtStage === 2)
+  );
 }
 
 export function resolvePixelTeamWriteAccess(input: {

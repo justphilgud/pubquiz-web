@@ -172,3 +172,22 @@ test("NO_ANSWER and future text templates require no new renderer branch", () =>
   assert.equal(resolve({ templateId: "podium" }).type, "NO_ANSWER");
   assert.equal(resolve({ templateId: "future-country-flags" }).type, "TEXT");
 });
+
+test("resolves all poll contracts without falling back to question interactions", () => {
+  const options = [{ id: 1, label: "A" }, { id: 2, label: "B" }];
+  assert.equal(resolve({ templateId: questionTemplateIds.pollSingle, answerOptions: options }).type, "POLL_SINGLE");
+  assert.equal(resolve({ templateId: questionTemplateIds.pollMulti, answerOptions: options }).type, "POLL_MULTI");
+  assert.deepEqual(resolve({
+    templateId: questionTemplateIds.pollScale,
+    templateData: { kind: "POLL_SCALE", min: 1, max: 5, step: 1, minLabel: "Nein", maxLabel: "Ja" },
+  }), {
+    type: "POLL_SCALE",
+    inputMode: "decimal",
+    min: 1,
+    max: 5,
+    step: 1,
+    minLabel: "Nein",
+    maxLabel: "Ja",
+    values: [1, 2, 3, 4, 5],
+  });
+});

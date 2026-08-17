@@ -38,6 +38,9 @@ function interactionFromAnswerMode(
     return "STRUCTURED_TEXT";
   }
   const answerMode = definition.answerMode;
+  if (answerMode === "POLL_SINGLE") return "POLL_SINGLE";
+  if (answerMode === "POLL_MULTI") return "POLL_MULTI";
+  if (answerMode === "POLL_SCALE") return "POLL_SCALE";
   if (answerMode === "OPEN_TEXT") return "TEXT";
   if (answerMode === "NUMBER") return "NUMBER";
   if (answerMode === "ORDERING") return "ORDER";
@@ -49,6 +52,7 @@ function evaluationFromQuestionDefinition(
   evaluationMode: QuestionEvaluationMode,
   interaction: TemplateInteractionType,
 ): TemplateEvaluationType {
+  if (evaluationMode === "NONE") return "NONE";
   if (evaluationMode === "MANUAL") return "MANUAL";
   if (evaluationMode === "BOOLEAN_MATCH") return "CHOICE_MATCH";
   if (evaluationMode === "NUMERIC_CLOSEST") return "CLOSEST_VALUE";
@@ -169,6 +173,21 @@ function layoutContractForDefinition(
       allowedVariants: withSolution("CHOICE_GRID"),
     };
   }
+  if (
+    definition.id === questionTemplateIds.pollSingle ||
+    definition.id === questionTemplateIds.pollMulti
+  ) {
+    return {
+      defaultVariant: "CHOICE_GRID",
+      allowedVariants: ["CHOICE_GRID", "SOLUTION_FOCUS"],
+    };
+  }
+  if (definition.id === questionTemplateIds.pollScale) {
+    return {
+      defaultVariant: "CONTENT_CENTERED",
+      allowedVariants: ["CONTENT_CENTERED", "SOLUTION_FOCUS"],
+    };
+  }
   if (definition.id === questionTemplateIds.trueFalse) {
     return {
       defaultVariant: "TRUE_FALSE",
@@ -260,6 +279,25 @@ function contentFieldsForDefinition(
       ? { validationRules: [{ type: "MIN_ITEMS" as const, value: 2 }] }
       : {}),
   };
+
+  if (definition.evaluationMode === "NONE") {
+    return definition.answerMode === "POLL_SCALE"
+      ? [prompt, {
+          key: "scale",
+          type: "NUMBER",
+          cardinality: "ONE",
+          requiredAt: "ON_APPROVE",
+          ownership: "CONTENT_ITEM",
+        }]
+      : [prompt, {
+          key: "options",
+          type: "OPTION_LIST",
+          cardinality: "MANY",
+          requiredAt: "ON_APPROVE",
+          ownership: "CONTENT_ITEM",
+          validationRules: [{ type: "MIN_ITEMS", value: 2 }],
+        }];
+  }
 
   if (definition.editorKind === "ESTIMATE") {
     return [
@@ -529,7 +567,7 @@ export function resolveLegacyQuestionTemplateContract(
       nextReveal: false,
       previousReveal: false,
       showSolution: true,
-      manuallyAdjustScores: true,
+      manuallyAdjustScores: evaluation !== "NONE",
     },
     layout: layoutContractForDefinition(definition),
     display: {

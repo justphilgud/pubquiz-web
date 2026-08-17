@@ -79,6 +79,19 @@ test("structured answers cover all and no matching components", () => {
   assert.equal(wrong.status, "WRONG");
 });
 
+test("poll submissions have no evaluation, maximum or points mode", () => {
+  const result = evaluateBaseAnswer({
+    ...defaults,
+    templateId: "umfrage_einfach",
+    selectedAnswerIds: [1],
+  });
+  assert.equal(result.details.strategy, "NONE");
+  assert.equal(result.basePoints.toString(), "0");
+  assert.equal(result.maxPoints.toString(), "0");
+  assert.equal(getQuestionBaseMaximum({ templateId: "umfrage_skala", correctAnswerCount: 0, structuredFieldCount: 0, orderingItemCount: 0 }).toString(), "0");
+  assert.throws(() => validateQuestionPointsMode({ templateId: "umfrage_mehrfach", pointsMode: "expertenbonus", correctAnswerCount: 0, structuredFieldCount: 0, orderingItemCount: 0 }), /keinen Punkte/);
+});
+
 test("pixel text ignores legacy structured fields and remains manually reviewable", () => {
   const result = evaluateBaseAnswer({
     ...defaults,

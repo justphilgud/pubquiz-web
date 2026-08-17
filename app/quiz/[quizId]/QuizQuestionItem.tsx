@@ -10,6 +10,7 @@ import QuizQuestionSettings, {
   type QuizQuestionSettingsActions,
 } from "./QuizQuestionSettings";
 import { getQuizQuestionPointsDisplay } from "@/app/quiz/evaluation/quizQuestionPointsDisplay";
+import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type { ResolvedPresentationLayout } from "@/app/rendering/presentation/presentationLayoutResolver";
 import type { StoryElementType } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
@@ -50,6 +51,10 @@ type Props = {
 };
 
 function getAnswerModeLabel(frage: QuizQuestion) {
+  if (isPollQuestionTemplateId(frage.templateId)) {
+    return "Abstimmung";
+  }
+
   if (frage.freie_antwort_erlaubt) {
     return "Als offene Frage gestellt";
   }
@@ -224,6 +229,7 @@ export default function QuizQuestionItem({
           freieAntwortErlaubt={frage.freie_antwort_erlaubt}
           kannFreieAntwortAktivieren={frage.kann_freie_antwort_aktivieren}
           istPixelbild={frage.templateId === "pixelbild" || frage.templateId === "image_pixel"}
+          istUmfrage={isPollQuestionTemplateId(frage.templateId)}
           teilpunkteFaehig={frage.teilpunkte_faehig}
           storyElements={frage.storyElements}
           actions={settingsActions}

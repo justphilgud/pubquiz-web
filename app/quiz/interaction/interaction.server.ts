@@ -7,6 +7,7 @@ import {
   recalculateQuizQuestionEvaluation,
 } from "@/app/quiz/evaluation/evaluation.server";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
+import { isQuizAnswerRunReleasedForWrite } from "@/app/quiz/quizAnswerLiveState";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -36,7 +37,13 @@ import {
   readPixelLiveConfigSnapshot,
   resolveEffectivePixelStage,
   resolvePixelTeamWriteAccess,
+  shouldReuseStoppedPixelRunOnQuestionReentry,
 } from "./pixelLiveInteraction";
+import {
+  aggregatePollSubmissions,
+  isPollInteractionType,
+  type PollInteraction,
+} from "./pollInteraction";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -276,7 +283,11 @@ async function closeRun(
   if (!run) return null;
   if (run.state === "OPEN" || run.state === "COUNTDOWN") {
     const finalizedDrafts = await autoFinalizeDrafts(db, run, options.reason);
-    if (run.quiz_fragen_id !== null && finalizedDrafts > 0) {
+    if (
+      run.quiz_fragen_id !== null &&
+      finalizedDrafts > 0 &&
+      !isPollInteractionType(run.interaction_type)
+    ) {
       await recalculateQuizQuestionEvaluation(run.quiz_fragen_id, db);
     }
     assertQuizInteractionTransition(run.state, "CLOSED");
@@ -383,7 +394,13 @@ export async function syncInteractionForPresentation(
   if (identity.phase === "QUESTION") {
     if (
       currentRun?.quiz_fragen_id === identity.questionAssignmentId &&
-      (currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN")
+      ((currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN") ||
+        shouldReuseStoppedPixelRunOnQuestionReentry({
+          state: currentRun.state,
+          configSnapshot: currentRun.config_snapshot,
+          stoppedAt: currentRun.stopped_at,
+          stoppedAtStage: currentRun.stopped_at_stage,
+        }))
     ) {
       return currentRun;
     }
@@ -406,7 +423,13 @@ export async function syncInteractionForPresentation(
     });
     if (
       previousRun &&
-      (previousRun.state === "OPEN" || previousRun.state === "COUNTDOWN")
+      ((previousRun.state === "OPEN" || previousRun.state === "COUNTDOWN") ||
+        shouldReuseStoppedPixelRunOnQuestionReentry({
+          state: previousRun.state,
+          configSnapshot: previousRun.config_snapshot,
+          stoppedAt: previousRun.stopped_at,
+          stoppedAtStage: previousRun.stopped_at_stage,
+        }))
     ) {
       return db.quiz_interaction_runs.update({
         where: { interaction_run_id: previousRun.interaction_run_id },
@@ -593,12 +616,6 @@ async function isRunReleasedForAnswerWrite(
   requestedSectionId: number,
 ) {
   if (assignment.quiz_abschnitt_id === null) return run.is_current;
-  if (
-    assignment.quiz_abschnitt_id !== requestedSectionId
-  ) {
-    return false;
-  }
-  if (isPixelInteractionRun(run) && !run.is_current) return false;
   const release = await db.quiz_block_freigaben.findUnique({
     where: {
       quiz_id_quiz_abschnitt_id: {
@@ -607,18 +624,22 @@ async function isRunReleasedForAnswerWrite(
       },
     },
   });
-  if (
-    !release?.ist_freigegeben ||
-    release.ist_geschlossen ||
-    release.aktuelle_quiz_fragen_id === null
-  ) {
-    return false;
-  }
-  return run.is_current || Boolean(
-    run.opened_at &&
-    release.freigegeben_ab &&
-    run.opened_at >= release.freigegeben_ab
-  );
+  return isQuizAnswerRunReleasedForWrite({
+    run: {
+      isCurrent: run.is_current,
+      isPixel: isPixelInteractionRun(run),
+      openedAt: run.opened_at,
+    },
+    assignmentSectionId: assignment.quiz_abschnitt_id,
+    requestedSectionId,
+    release: release
+      ? {
+          isReleased: release.ist_freigegeben,
+          isClosed: release.ist_geschlossen,
+          releasedAt: release.freigegeben_ab,
+        }
+      : null,
+  });
 }
 
 export type SaveTeamAnswerDraftResult =
@@ -892,7 +913,9 @@ export async function submitTeamAnswer(input: {
         (submission) =>
           submission.draft_revision === draft.draft_revision,
       )!;
-      await recalculateQuizAnswerEvaluation(draft.team_antwort_id, tx);
+      if (!isPollInteractionType(run.interaction_type)) {
+        await recalculateQuizAnswerEvaluation(draft.team_antwort_id, tx);
+      }
       return {
         success: true,
         status: existing.status,
@@ -914,7 +937,9 @@ export async function submitTeamAnswer(input: {
         finalization_reason: "TEAM_SUBMITTED",
       },
     });
-    await recalculateQuizAnswerEvaluation(draft.team_antwort_id, tx);
+    if (!isPollInteractionType(run.interaction_type)) {
+      await recalculateQuizAnswerEvaluation(draft.team_antwort_id, tx);
+    }
     return {
       success: true,
       status: submission.status,
@@ -1067,10 +1092,21 @@ export async function stopPixelQuestion(input: {
 export async function getQuizLiveSnapshotData(
   quizId: number,
   quizTeamSessionId: number | null,
+  options: {
+    includePresentationState?: boolean;
+    includeTeamJoinState?: boolean;
+    presentationQuestionAssignmentId?: number;
+  } = {},
 ) {
   const serverNow = new Date();
   const runQuery = () => prisma.quiz_interaction_runs.findFirst({
-      where: { quiz_id: quizId, is_current: true },
+      where: {
+        quiz_id: quizId,
+        ...(options.presentationQuestionAssignmentId === undefined
+          ? { is_current: true }
+          : { quiz_fragen_id: options.presentationQuestionAssignmentId }),
+      },
+      orderBy: { interaction_run_id: "desc" },
       include: {
         stopped_by_team_session: { select: { teamname: true } },
         quiz_fragen: {
@@ -1103,6 +1139,49 @@ export async function getQuizLiveSnapshotData(
     );
     run = await runQuery();
   }
+  const pollInteraction = run && isPollInteractionType(run.interaction_type)
+    ? readInteractionSnapshot(run.config_snapshot) as PollInteraction
+    : null;
+  const needsTeamCount = Boolean(
+    options.includeTeamJoinState ||
+    (options.includePresentationState && pollInteraction),
+  );
+  const [teamCount, visibleTeams, pollSubmissions] = options.includePresentationState
+    ? await Promise.all([
+        needsTeamCount
+          ? prisma.quiz_team_sessions.count({ where: { quiz_id: quizId } })
+          : Promise.resolve(0),
+        options.includeTeamJoinState
+          ? prisma.quiz_team_sessions.findMany({
+              where: { quiz_id: quizId },
+              orderBy: [
+                { erstellt_am: "asc" },
+                { quiz_team_session_id: "asc" },
+              ],
+              take: 12,
+              select: { teamname: true },
+            })
+          : Promise.resolve([]),
+        pollInteraction
+          ? prisma.team_answer_submissions.findMany({
+              where: { interaction_run_id: run!.interaction_run_id },
+              orderBy: [
+                { quiz_team_session_id: "asc" },
+                { submission_version: "desc" },
+                { team_answer_submission_id: "desc" },
+              ],
+              select: { quiz_team_session_id: true, payload: true },
+            })
+          : Promise.resolve([]),
+      ])
+    : [0, [], []];
+  const latestPollPayloads = pollSubmissions.filter(
+    (submission, index, submissions) =>
+      submissions.findIndex(
+        (candidate) =>
+          candidate.quiz_team_session_id === submission.quiz_team_session_id,
+      ) === index,
+  ).map((submission) => submission.payload as QuizInteractionPayload);
   const answer = run && quizTeamSessionId
     ? await prisma.team_antworten.findFirst({
         where: {
@@ -1232,6 +1311,22 @@ export async function getQuizLiveSnapshotData(
         }
       : null,
     publicState: run?.state ?? "LOCKED",
+    teamJoinState: options.includeTeamJoinState
+      ? {
+          teamNames: visibleTeams.map((team) => team.teamname),
+          totalTeams: teamCount,
+          remainingTeams: Math.max(0, teamCount - visibleTeams.length),
+        }
+      : null,
+    pollState:
+      pollInteraction && isPollInteractionType(pollInteraction.type)
+        ? aggregatePollSubmissions({
+            interaction: pollInteraction,
+            state: run!.state,
+            totalTeams: teamCount,
+            payloads: latestPollPayloads,
+          })
+        : null,
     pixelState: run && pixelConfig && pixelStage
       ? {
           interactionType: pixelConfig.type,

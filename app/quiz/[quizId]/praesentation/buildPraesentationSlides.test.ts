@@ -187,3 +187,43 @@ test("mischt Blockelemente und Fragen über denselben produktiven Slide-Builder"
     "block-item:82",
   );
 });
+
+test("verwendet die redaktionelle Fragenreihenfolge trotz abweichender Flow-Slots", () => {
+  const quiz = quizFixture();
+  const first = quiz.fragen[0];
+  const second = quiz.fragen[1];
+  quiz.abschnitte = quiz.abschnitte.slice(0, 1);
+  quiz.fragen = [
+    { ...first, quiz_fragen_id: 101, fragen_id: 1, sortierung: 1 },
+    { ...second, quiz_fragen_id: 102, fragen_id: 2, sortierung: 2 },
+    { ...first, quiz_fragen_id: 103, fragen_id: 3, sortierung: 3 },
+    { ...second, quiz_fragen_id: 104, fragen_id: 4, sortierung: 4 },
+  ];
+  quiz.aufloesungsstrategie = "END_OF_BLOCK";
+  quiz.ablaufElemente = [
+    [103, 1_000],
+    [101, 2_100],
+    [102, 3_200],
+    [104, 4_200],
+  ].map(([questionAssignmentId, order], index) => ({
+    quiz_ablauf_element_id: 90 + index,
+    typ: "QUESTION",
+    anker_typ: "BLOCK",
+    anker_schluessel: "10",
+    quiz_abschnitt_id: 10,
+    quiz_fragen_id: questionAssignmentId,
+    sortierung: order,
+    ist_sichtbar: true,
+    bezeichnung: null,
+    konfiguration: { version: 1 },
+    konfigurations_version: 1,
+    ist_standard: true,
+  }));
+
+  assert.deepEqual(
+    buildPraesentationSlides(quiz)
+      .filter((slide) => slide.typ === "frage")
+      .map((slide) => slide.frage.quiz_fragen_id),
+    [101, 102, 103, 104],
+  );
+});

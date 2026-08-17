@@ -69,6 +69,14 @@ const defaults: Record<string, QuestionTemplateData> = {
     hideAuthorUntilSolution: false,
     hideRatingUntilSolution: false,
   },
+  [questionTemplateIds.pollScale]: {
+    kind: "POLL_SCALE",
+    min: 1,
+    max: 5,
+    step: 1,
+    minLabel: "Trifft gar nicht zu",
+    maxLabel: "Trifft vollkommen zu",
+  },
 };
 
 export function getDefaultQuestionTemplateData(
@@ -101,11 +109,13 @@ export type QuestionTemplateValidationIssue = {
   code:
     | "ESTIMATE_UNIT_REQUIRED"
     | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
-    | "GOOGLE_PLACE_REVIEW_COUNT_INVALID";
+    | "GOOGLE_PLACE_REVIEW_COUNT_INVALID"
+    | "POLL_SCALE_INVALID";
   field:
     | "templateUnit"
     | "templatePlaceAverageRating"
-    | "templatePlaceReviewCount";
+    | "templatePlaceReviewCount"
+    | "answers";
   message: string;
 };
 
@@ -154,6 +164,16 @@ export function getQuestionTemplateValidationIssue(
   value: unknown,
   templateId: string | null,
 ): QuestionTemplateValidationIssue | null {
+  if (
+    templateId === questionTemplateIds.pollScale &&
+    parseQuestionTemplateData(value, templateId, true) === null
+  ) {
+    return {
+      code: "POLL_SCALE_INVALID",
+      field: "answers",
+      message: "Skala, Schrittweite und beide Beschriftungen müssen vollständig und gültig sein.",
+    };
+  }
   if (
     templateId === questionTemplateIds.googleReviews &&
     isRecord(value) &&
@@ -344,6 +364,23 @@ export function parseQuestionTemplateData(
           reviews: reviews as Extract<QuestionTemplateData, { kind: "GOOGLE_REVIEWS" }>["reviews"],
         }
       : null;
+  } else if (value.kind === "POLL_SCALE") {
+    parsed = typeof value.min === "number" && Number.isFinite(value.min) &&
+      typeof value.max === "number" && Number.isFinite(value.max) &&
+      typeof value.step === "number" && Number.isFinite(value.step) &&
+      value.step > 0 && value.max > value.min &&
+      (value.max - value.min) / value.step <= 10 &&
+      Number.isInteger((value.max - value.min) / value.step) &&
+      text(value.minLabel) !== null && text(value.maxLabel) !== null
+      ? {
+          kind: value.kind,
+          min: value.min,
+          max: value.max,
+          step: value.step,
+          minLabel: text(value.minLabel)!,
+          maxLabel: text(value.maxLabel)!,
+        }
+      : null;
   }
 
   if (!parsed) return null;
@@ -375,6 +412,7 @@ export function parseQuestionTemplateData(
   )) return null;
   if (parsed.kind === "ANAGRAM" && (!parsed.name.trim() || !isExactAnagram(parsed.name, parsed.selectedSolution))) return null;
   if (parsed.kind === "GOOGLE_REVIEWS" && (!parsed.placeName.trim() || parsed.reviews.length === 0 || parsed.reviews.some((review) => !review.text.trim()))) return null;
+  if (parsed.kind === "POLL_SCALE" && (!parsed.minLabel.trim() || !parsed.maxLabel.trim())) return null;
   return parsed;
 }
 
@@ -722,6 +760,9 @@ export function getAnswersForTemplateData(
   }
   if (data.kind === "ANAGRAM") {
     return [base(0, data.name)];
+  }
+  if (data.kind === "POLL_SCALE") {
+    return [];
   }
   return [base(0, data.placeName)];
 }

@@ -62,6 +62,26 @@ export type ResolvedQuizAnswerInteraction =
       items: OrderingItem[];
     }
   | {
+      type: "POLL_SINGLE";
+      selectionMode: "SINGLE";
+      options: AnswerOption[];
+    }
+  | {
+      type: "POLL_MULTI";
+      selectionMode: "MULTIPLE";
+      options: AnswerOption[];
+    }
+  | {
+      type: "POLL_SCALE";
+      inputMode: "decimal";
+      min: number;
+      max: number;
+      step: number;
+      minLabel: string;
+      maxLabel: string;
+      values: number[];
+    }
+  | {
       type: Exclude<
         TemplateInteractionType,
         | "NO_ANSWER"
@@ -71,6 +91,9 @@ export type ResolvedQuizAnswerInteraction =
         | "SINGLE_CHOICE"
         | "MULTI_CHOICE"
         | "ORDER"
+        | "POLL_SINGLE"
+        | "POLL_MULTI"
+        | "POLL_SCALE"
       >;
       supported: false;
     };
@@ -219,6 +242,36 @@ export function resolveQuizAnswerInteraction(
               text: item.text,
             }))
           : [],
+    };
+  }
+  if (answerForm.type === "POLL_SINGLE") {
+    return {
+      type: "POLL_SINGLE",
+      selectionMode: answerForm.selectionMode,
+      options: [...input.answerOptions],
+    };
+  }
+  if (answerForm.type === "POLL_MULTI") {
+    return {
+      type: "POLL_MULTI",
+      selectionMode: answerForm.selectionMode,
+      options: [...input.answerOptions],
+    };
+  }
+  if (answerForm.type === "POLL_SCALE") {
+    const scale = input.templateData?.kind === "POLL_SCALE"
+      ? input.templateData
+      : { min: 1, max: 5, step: 1, minLabel: "", maxLabel: "" };
+    const length = Math.floor((scale.max - scale.min) / scale.step) + 1;
+    return {
+      type: "POLL_SCALE",
+      inputMode: answerForm.inputMode,
+      min: scale.min,
+      max: scale.max,
+      step: scale.step,
+      minLabel: scale.minLabel,
+      maxLabel: scale.maxLabel,
+      values: Array.from({ length }, (_, index) => scale.min + index * scale.step),
     };
   }
 

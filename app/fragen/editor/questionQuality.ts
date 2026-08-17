@@ -2,6 +2,7 @@ import type { QuestionEditorDraft } from "./types";
 import { questionTemplateDefinitions } from "./templates/questionTemplates";
 import {
   findQuestionTemplate,
+  isPollQuestionTemplateId,
   questionTemplateIds,
 } from "./templates/questionTemplateRegistry";
 import { getMediaSlotDefinition } from "./mediaSlots";
@@ -37,6 +38,8 @@ export type QuestionQualityIssueCode =
   | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
   | "GOOGLE_PLACE_REVIEW_COUNT_INVALID"
   | "CORRECT_ANSWER_REQUIRED"
+  | "POLL_OPTIONS_REQUIRED"
+  | "POLL_SCALE_INVALID"
   | "ANSWER_MEDIA_REQUIRED"
   | "REQUIRED_LABELED_ANSWER_EMPTY"
   | "VALID_UNTIL_INVALID"
@@ -220,8 +223,18 @@ export function evaluateQuestionQuality(
     }
   }
 
-  if (!filledAnswers.some((answer) => answer.isCorrect)) {
+  if (
+    !isPollQuestionTemplateId(draft.templateId) &&
+    !filledAnswers.some((answer) => answer.isCorrect)
+  ) {
     blockers.push({ code: "CORRECT_ANSWER_REQUIRED", field: "answers" });
+  }
+  if (
+    (template?.id === questionTemplateIds.pollSingle ||
+      template?.id === questionTemplateIds.pollMulti) &&
+    filledAnswers.length < 2
+  ) {
+    blockers.push({ code: "POLL_OPTIONS_REQUIRED", field: "answers" });
   }
 
   if (
@@ -281,6 +294,7 @@ export function evaluateQuestionQuality(
   }
 
   if (
+    !isPollQuestionTemplateId(draft.templateId) &&
     filledAnswers.length > 1 &&
     !filledAnswers.some((answer) => answer.additionalInfo.trim())
   ) {

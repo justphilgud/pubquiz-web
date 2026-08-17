@@ -7,6 +7,8 @@ import {
 
 type LiveSnapshotRequest = {
   quizId?: unknown;
+  includeTeamJoinState?: unknown;
+  presentationQuestionAssignmentId?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -28,8 +30,23 @@ export async function POST(request: Request) {
     if (!Number.isSafeInteger(quizId) || quizId <= 0) {
       return Response.json({ error: "INVALID_QUIZ" }, { status: 400 });
     }
+    const presentationQuestionAssignmentId =
+      body.presentationQuestionAssignmentId === undefined
+        ? undefined
+        : Number(body.presentationQuestionAssignmentId);
+    if (
+      presentationQuestionAssignmentId !== undefined &&
+      (!Number.isSafeInteger(presentationQuestionAssignmentId) ||
+        presentationQuestionAssignmentId <= 0)
+    ) {
+      return Response.json({ error: "INVALID_QUESTION" }, { status: 400 });
+    }
     phaseStartedAt = performance.now();
-    const snapshot = await getQuizLiveSnapshotData(quizId, null);
+    const snapshot = await getQuizLiveSnapshotData(quizId, null, {
+      includePresentationState: true,
+      includeTeamJoinState: body.includeTeamJoinState === true,
+      presentationQuestionAssignmentId,
+    });
     phases.snapshot = performance.now() - phaseStartedAt;
     phaseStartedAt = performance.now();
     const payload = JSON.stringify(snapshot);

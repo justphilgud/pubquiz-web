@@ -10,7 +10,10 @@ import {
 } from "../../quizAccess.server";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 import { syncInteractionForPresentation } from "@/app/quiz/interaction/interaction.server";
-import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
+import {
+  parseQuizBlockPreviewSectionId,
+  resolveQuizBlockPreviewTransition,
+} from "@/app/quiz/quizBlockLiveState";
 import {
   logLivePerformance,
   withPrismaQueryDiagnostics,
@@ -84,6 +87,7 @@ export async function setPraesentationSlideIndex(
   slideIndex: number,
   slideKey: string,
 ) {
+  const navigationRequestedAt = new Date();
   const requestStartedAt = performance.now();
   const phases: Record<string, number> = {};
   const { result, diagnostics } = await withPrismaQueryDiagnostics(async () => {
@@ -103,6 +107,10 @@ export async function setPraesentationSlideIndex(
 
     return prisma.$transaction(async (tx) => {
     phaseStartedAt = performance.now();
+    const previousStatus = await tx.quiz_praesentation_status.findUnique({
+      where: { quiz_id: quizId },
+      select: { slide_key: true },
+    });
     const status = await tx.quiz_praesentation_status.upsert({
       where: { quiz_id: quizId },
       update: {
@@ -134,29 +142,51 @@ export async function setPraesentationSlideIndex(
 
     phaseStartedAt = performance.now();
     if (previewSectionId !== null) {
-      await tx.quiz_block_freigaben.upsert({
-        where: {
-          quiz_id_quiz_abschnitt_id: {
-            quiz_id: quizId,
-            quiz_abschnitt_id: previewSectionId,
-          },
-        },
-        update: {
-          ist_freigegeben: true,
-          ist_geschlossen: false,
-          freigegeben_ab: new Date(),
-          geschlossen_ab: null,
-          aktuelle_quiz_fragen_id: null,
-        },
-        create: {
+      const releaseWhere = {
+        quiz_id_quiz_abschnitt_id: {
           quiz_id: quizId,
           quiz_abschnitt_id: previewSectionId,
+        },
+      };
+      const release = await tx.quiz_block_freigaben.findUnique({
+        where: releaseWhere,
+        select: {
           ist_freigegeben: true,
-          ist_geschlossen: false,
-          freigegeben_ab: new Date(),
-          aktuelle_quiz_fragen_id: null,
+          ist_geschlossen: true,
+          geschlossen_ab: true,
         },
       });
+      const transition = resolveQuizBlockPreviewTransition({
+        previousSlideKey: previousStatus?.slide_key ?? null,
+        nextSlideKey: slideKey,
+        navigationRequestedAt,
+        release,
+      });
+      if (transition === "OPEN") {
+        await tx.quiz_block_freigaben.upsert({
+          where: releaseWhere,
+          update: {
+            ist_freigegeben: true,
+            ist_geschlossen: false,
+            freigegeben_ab: navigationRequestedAt,
+            geschlossen_ab: null,
+            aktuelle_quiz_fragen_id: null,
+          },
+          create: {
+            quiz_id: quizId,
+            quiz_abschnitt_id: previewSectionId,
+            ist_freigegeben: true,
+            ist_geschlossen: false,
+            freigegeben_ab: navigationRequestedAt,
+            aktuelle_quiz_fragen_id: null,
+          },
+        });
+      } else if (transition === "KEEP_OPEN") {
+        await tx.quiz_block_freigaben.update({
+          where: releaseWhere,
+          data: { aktuelle_quiz_fragen_id: null },
+        });
+      }
     } else if (
       identity?.kind === "QUESTION" &&
       identity.phase === "QUESTION" &&

@@ -48,18 +48,27 @@ import {
   getQuizSolutionStrategyLabel,
 } from "@/app/quiz/flow/quizFlow";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
+import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
 >;
 
-async function fetchQuizLiveSnapshot(quizId: number) {
+async function fetchQuizLiveSnapshot(
+  quizId: number,
+  includeTeamJoinState: boolean,
+  presentationQuestionAssignmentId?: number,
+) {
   const response = await fetch("/api/quiz/live-snapshot", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ quizId }),
+    body: JSON.stringify({
+      quizId,
+      includeTeamJoinState,
+      presentationQuestionAssignmentId,
+    }),
   });
   if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
   return await response.json() as QuizLiveSnapshot;
@@ -106,6 +115,8 @@ export default function ModerationClient({
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
+  const [pollState, setPollState] = useState<PollLiveState | null>(null);
+  const [teamJoinState, setTeamJoinState] = useState<QuizLiveSnapshot["teamJoinState"]>(null);
 
   const [slideIndex, setSlideIndex] = useState(() => {
     return resolvePresentationSequenceIndex(
@@ -127,6 +138,13 @@ export default function ModerationClient({
   const [quizBeendet, setQuizBeendet] = useState(false);
 
   const aktuellerSlide = slides[slideIndex];
+  const showTeamJoinState =
+    (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "QR_CODE") ||
+    (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode");
+  const presentationQuestionAssignmentId =
+    aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
+      ? aktuellerSlide.frage.quiz_fragen_id
+      : undefined;
   const pauseVerstrichen =
     isPauseSlide(aktuellerSlide)
       ? (secondsSince(slideStartedAt, now) ?? 0)
@@ -262,9 +280,15 @@ export default function ModerationClient({
       if (refreshing) return;
       refreshing = true;
       try {
-      const snapshot = await fetchQuizLiveSnapshot(quizId);
+      const snapshot = await fetchQuizLiveSnapshot(
+        quizId,
+        showTeamJoinState,
+        presentationQuestionAssignmentId,
+      );
       if (active) {
         setPixelState(snapshot.pixelState);
+        setPollState(snapshot.pollState);
+        setTeamJoinState(snapshot.teamJoinState);
         setBlockFreigegeben(Boolean(
           snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
         ));
@@ -279,7 +303,7 @@ export default function ModerationClient({
       active = false;
       window.clearInterval(interval);
     };
-  }, [quizId]);
+  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId]);
 
   async function speichereDauerVomAktuellenSlide() {
     if (aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
@@ -696,6 +720,8 @@ export default function ModerationClient({
               estimationQuestion={estimationQuestion}
               now={now}
               pixelState={pixelState}
+              pollState={pollState}
+              teamJoinState={teamJoinState}
             />
 
             <SlideNotes>
@@ -706,6 +732,12 @@ export default function ModerationClient({
                     <p><strong>Stop:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} in Stufe ${pixelState.stoppedAtStage}` : pixelState.effectivePixelStage < 3 ? "möglich" : "in Stufe 3 deaktiviert"}</p>
                     <p><strong>Finale Antworten:</strong> {antwortStatus.antwortenEingegangen} / {antwortStatus.teamsAngemeldet}</p>
                     <p><strong>Zustand:</strong> {pixelState.submissionDeadlineAt && new Date(pixelState.submissionDeadlineAt).getTime() > now ? `${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden Restzeit` : pixelState.stopped ? "Countdown beendet" : "offen"}</p>
+                  </div>
+                )}
+                {pollState && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && (
+                  <div className="rounded-xl border border-cyan-500/50 bg-cyan-950/30 p-3">
+                    <p><strong>Umfrage:</strong> {pollState.state === "OPEN" ? "offen" : "geschlossen"}</p>
+                    <p><strong>Finale Antworten:</strong> {pollState.finalAnswers} / {pollState.totalTeams}</p>
                   </div>
                 )}
                 {aktuellerSlide?.typ === "ablauf" && (

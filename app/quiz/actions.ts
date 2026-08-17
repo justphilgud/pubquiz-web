@@ -70,7 +70,11 @@ import {
   isPartialPointsCapable,
   validateQuestionPointsMode,
 } from "./evaluation/questionPointPolicy";
-import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import {
+  isPollQuestionTemplateId,
+  questionTemplateIds,
+  resolveCanonicalQuestionTemplateId,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import {
   resolvePresentationLayout,
@@ -1121,6 +1125,7 @@ export type QuizFrageSuchResult = {
   review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
   ist_verwendbar: boolean;
   status_hinweis: string;
+  templateId: string | null;
   storyElements: Array<{
     id: number;
     title: string;
@@ -1164,6 +1169,7 @@ export async function searchFragenForQuiz(data: {
     },
     take: 25,
     include: {
+      vorlage: { select: { code: true } },
       fragen_kategorien: {
         include: {
           fragenkategorie: true,
@@ -1225,6 +1231,7 @@ export async function searchFragenForQuiz(data: {
             : frage.review_status === "CHANGES_REQUESTED"
               ? "Änderungen angefordert – noch nicht freigegeben"
               : "Für diese Eventreihe nicht verwendbar",
+      templateId: frage.vorlage?.code ?? null,
       storyElements: frage.story_element_verknuepfungen.flatMap((link) => {
         const revision = link.story_element.revisionen[0];
         return revision
@@ -2905,6 +2912,9 @@ export async function getQuizAntwortStatusLive(
 export async function getQuizLiveSnapshot(
   quizId: number,
   quizTeamSessionToken?: string,
+  includePresentationState = false,
+  includeTeamJoinState = false,
+  presentationQuestionAssignmentId?: number,
 ) {
   const participantSession = await resolveParticipantSession(
     quizId,
@@ -2913,6 +2923,11 @@ export async function getQuizLiveSnapshot(
   return getQuizLiveSnapshotData(
     quizId,
     participantSession?.quiz_team_session_id ?? null,
+    {
+      includePresentationState,
+      includeTeamJoinState,
+      presentationQuestionAssignmentId,
+    },
   );
 }
 
@@ -3770,7 +3785,9 @@ export async function getQuizAuswertungUebersicht(quizId: number) {
     },
   });
 
-  return quizFragen.map((quizFrage) => {
+  return quizFragen
+    .filter((quizFrage) => !isPollQuestionTemplateId(quizFrage.fragen.vorlage?.code ?? null))
+    .map((quizFrage) => {
     const answerMode = resolveQuizQuestionAnswerMode({
       templateId: quizFrage.fragen.vorlage?.code ?? null,
       answers: quizFrage.fragen.antworten.map((antwort) => ({
@@ -3878,7 +3895,9 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
     antwortfelder.map((feld) => [feld.antwortfeld_id, feld.label]),
   );
 
-  return quizFragen.flatMap((quizFrage, frageIndex) => {
+  return quizFragen
+    .filter((quizFrage) => !isPollQuestionTemplateId(quizFrage.fragen.vorlage?.code ?? null))
+    .flatMap((quizFrage, frageIndex) => {
     const riskEligibleAnswers =
       quizFrage.punkte_modus === "risikofrage" &&
       quizFrage.risiko_pool_fixiert_am !== null

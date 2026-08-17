@@ -40,8 +40,11 @@ import {
 import type { StorybookMemoryAsset } from "@/app/rendering/templateRegistry";
 import {
   pixelRuntimeStageToMediaSlot,
+  resolvePixelCountdownSeconds,
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
+import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
+import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
 type ScoreEntry = {
   teamname: string;
@@ -70,6 +73,12 @@ export type PresentationSlideDisplayState = {
   playbackCommand: PresentationPlaybackCommand;
   playbackCommandId: number;
   pixelState?: PixelLiveState | null;
+  pollState?: PollLiveState | null;
+  teamJoinState?: {
+    teamNames: string[];
+    totalTeams: number;
+    remainingTeams: number;
+  } | null;
 };
 
 type Props = {
@@ -215,7 +224,14 @@ export default function PresentationSlideRenderer({
     playbackCommand,
     playbackCommandId,
     pixelState = null,
+    pollState = null,
+    teamJoinState = null,
   } = displayState;
+  const relativeAnswerUrl = `/quiz/${quiz.quiz_id}/antworten`;
+  const [answerUrl, setAnswerUrl] = useState(relativeAnswerUrl);
+  useEffect(() => {
+    setAnswerUrl(`${window.location.origin}${relativeAnswerUrl}`);
+  }, [relativeAnswerUrl]);
   const currentSlideMedia =
     slide?.typ === "frage"
       ? slide.frage.medien
@@ -532,6 +548,23 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
         {templateData.unit && <p className="mt-8 rounded-2xl border-2 border-yellow-300 px-6 py-3 text-3xl font-black text-yellow-200">Antwort in {templateData.unit}</p>}
+      </div>
+    );
+  }
+
+  if (templateData?.kind === "POLL_SCALE") {
+    const values = Array.from(
+      { length: Math.floor((templateData.max - templateData.min) / templateData.step) + 1 },
+      (_, index) => templateData.min + index * templateData.step,
+    );
+    return (
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+        <div className="text-sm font-black uppercase tracking-[0.3em] text-cyan-200">Umfrage</div>
+        <h2 className="mt-4 text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          {values.map((value) => <span key={value} className="grid size-20 place-items-center rounded-2xl border-4 border-yellow-300 text-3xl font-black text-yellow-200">{value.toLocaleString("de-DE")}</span>)}
+        </div>
+        <div className="mt-4 flex w-full max-w-4xl justify-between gap-6 text-lg font-bold text-white/70"><span>{templateData.minLabel}</span><span className="text-right">{templateData.maxLabel}</span></div>
       </div>
     );
   }
@@ -1034,6 +1067,33 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const hatAntwortfelderLoesungen = richtigeAntwortfeldLoesungen.some(
     (feld) => feld.loesungen.length > 0
   );
+
+  if (isPollQuestionTemplateId(frage.templateId)) {
+    return (
+      <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.7fr_1.3fr]">
+        <div className="flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-7 shadow-[8px_8px_0_#00e5ff]">
+          <div className="text-sm font-black uppercase tracking-[0.3em] text-pink-300">Umfrageergebnis</div>
+          <h2 className="mt-4 text-4xl font-black leading-tight text-white xl:text-6xl">{frage.frage}</h2>
+          <p className="mt-8 text-xl font-bold text-white/65">{pollState?.finalAnswers ?? 0} von {pollState?.totalTeams ?? 0} Teams abgestimmt</p>
+        </div>
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-slate-950/85 p-6 shadow-[8px_8px_0_#ff00aa]">
+          {!pollState ? <div className="flex h-full items-center justify-center text-2xl font-black text-white/55">Ergebnisse werden geladen …</div> : pollState.scale ? (
+            <div className="flex h-full min-h-0 flex-col">
+              <div className="text-center text-xl font-bold text-cyan-200">Durchschnitt</div>
+              <div className="text-center text-7xl font-black text-yellow-200">{pollState.scale.average?.toLocaleString("de-DE", { maximumFractionDigits: 2 }) ?? "–"}</div>
+              <div className="mt-6 grid min-h-0 flex-1 grid-cols-5 items-end gap-3">
+                {pollState.scale.values.map((entry) => <div key={entry.value} className="flex h-full min-h-0 flex-col justify-end text-center"><strong className="mb-2 text-white">{entry.count}</strong><div className="min-h-2 rounded-t-xl bg-cyan-300" style={{ height: `${Math.max(6, entry.share)}%` }} /><span className="mt-2 font-black text-white">{entry.value.toLocaleString("de-DE")}</span></div>)}
+              </div>
+            </div>
+          ) : (
+            <div className="grid h-full content-center gap-4 overflow-hidden">
+              {pollState.options.map((entry) => <div key={entry.id}><div className="mb-1 flex items-end justify-between gap-4 text-white"><strong className="text-xl">{entry.label}</strong><span className="font-black">{entry.count} · {entry.share.toLocaleString("de-DE")} %</span></div><div className="h-8 overflow-hidden rounded-full border-2 border-white/20 bg-black/40"><div className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-pink-400" style={{ width: `${entry.share}%` }} /></div></div>)}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const storybookKind = resolveStorybookQuestionKind(frage);
   if (theme.design.stylePreset === "BIRTHDAY" && storybookKind) {
@@ -1541,11 +1601,6 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 }
 
 function renderQrCodeSlide() {
-  const antwortUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten`
-      : "";
-
   return (
     <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-10 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-8 py-4 text-2xl font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[5px_5px_0_#00e5ff]">
@@ -1555,7 +1610,7 @@ function renderQrCodeSlide() {
       <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
         <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
           <QRCode
-            value={antwortUrl}
+            value={answerUrl}
             size={500}
           />
         </div>
@@ -1709,10 +1764,6 @@ function renderFlowPauseSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
 function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
   const { config, type } = slide.element;
   const activeRules = config.rules?.filter((rule) => rule.enabled) ?? [];
-  const answerUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/quiz/${quiz.quiz_id}/antworten`
-      : `/quiz/${quiz.quiz_id}/antworten`;
 
   if (type === "WAITING") return renderAnkommenSlide();
   if (type === "START_SEQUENCE") return renderStartsequenzSlide();
@@ -1867,6 +1918,13 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
           <div>
             <strong>{answerUrl}</strong>
             {config.teamHint && <p>{config.teamHint}</p>}
+            {teamJoinState && <div className="mt-6" aria-live="polite">
+              <p className="text-lg font-black uppercase tracking-[0.16em]">Angemeldete Teams · {teamJoinState.totalTeams}</p>
+              {teamJoinState.teamNames.length === 0 ? <p className="mt-3 opacity-70">Noch kein Team angemeldet.</p> : <div className="mt-3 grid grid-cols-2 gap-2 xl:grid-cols-3">
+                {teamJoinState.teamNames.map((teamName) => <span key={teamName} className="truncate rounded-xl border border-white/25 bg-black/25 px-3 py-2 text-sm font-bold" title={teamName}>{teamName}</span>)}
+              </div>}
+              {teamJoinState.remainingTeams > 0 && <p className="mt-3 font-black">+ {teamJoinState.remainingTeams} weitere</p>}
+            </div>}
           </div>
         </div>
       )}
@@ -2025,7 +2083,7 @@ function renderAktuellenSlide() {
           {pixelState.submissionDeadlineAt && (
             <p className="mt-1 text-lg font-bold text-white">
               {pixelState.state === "COUNTDOWN"
-                ? `Noch ${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden f\u00fcr alle anderen Teams`
+                ? `Noch ${resolvePixelCountdownSeconds(pixelState.submissionDeadlineAt, now)} Sekunden f\u00fcr alle anderen Teams`
                 : "Antwortzeit beendet"}
             </p>
           )}

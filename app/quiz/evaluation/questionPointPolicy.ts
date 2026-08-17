@@ -1,5 +1,6 @@
 import { Prisma } from "@/app/generated/prisma/client";
 import {
+  isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
@@ -11,6 +12,9 @@ export function getQuestionBaseMaximum(input: {
   orderingItemCount: number;
 }) {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
+  if (isPollQuestionTemplateId(templateId)) {
+    return new Prisma.Decimal(0);
+  }
   if (templateId === questionTemplateIds.ordering) {
     return new Prisma.Decimal(input.orderingItemCount).mul("0.25");
   }
@@ -52,6 +56,9 @@ export function validateQuestionPointsMode(input: {
   orderingItemCount: number;
 }) {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
+  if (isPollQuestionTemplateId(templateId) && input.pointsMode !== "standard") {
+    throw new Error("Umfragen dürfen keinen Punkte- oder Risikomodus verwenden.");
+  }
   if (
     templateId === questionTemplateIds.pixelImage &&
     (input.pointsMode === "expertenbonus" || input.pointsMode === "risikofrage")

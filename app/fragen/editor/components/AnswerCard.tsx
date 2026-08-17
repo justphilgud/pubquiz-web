@@ -21,6 +21,7 @@ type AnswerCardProps = {
   disabled: boolean;
   showMedia: boolean;
   requireImage: boolean;
+  showCorrectControl?: boolean;
   pixelQuestionOption?: {
     key: FaceMorphPixelQuestionOptionKey;
     checked: boolean;
@@ -40,6 +41,7 @@ export function AnswerCard({
   disabled,
   showMedia,
   requireImage,
+  showCorrectControl = true,
   pixelQuestionOption,
   onChange,
   onMediaChange,
@@ -69,6 +71,7 @@ export function AnswerCard({
           id={answerInputId}
           data-editor-answer-input
           value={answer.text}
+          disabled={disabled}
           maxLength={200}
           onChange={(event) => onChange({ text: event.target.value })}
           placeholder={messages.answers.inputPlaceholder}
@@ -79,10 +82,11 @@ export function AnswerCard({
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <label className="flex min-h-11 items-center gap-2 py-2">
+        {showCorrectControl && <label className="flex min-h-11 items-center gap-2 py-2">
           <input
             type="checkbox"
             checked={answer.isCorrect}
+            disabled={disabled}
             onChange={(event) => onChange({ isCorrect: event.target.checked })}
             className="h-5 w-5"
           />
@@ -90,12 +94,13 @@ export function AnswerCard({
           <span className="text-sm font-medium text-slate-800">
             {messages.answers.correct}
           </span>
-        </label>
+        </label>}
 
         {canRemove && (
           <button
             type="button"
             onClick={onRemove}
+            disabled={disabled}
             aria-label={`${messages.common.remove}: ${answer.fieldLabel ?? (answer.text.trim() || messages.answers.answer)}`}
             className="ml-auto min-h-11 rounded-lg px-3 py-2 text-sm text-red-700 hover:bg-red-50"
           >
@@ -154,6 +159,7 @@ export function AnswerCard({
           <textarea
             id={additionalInfoInputId}
             value={answer.additionalInfo}
+            disabled={disabled}
             maxLength={500}
             onChange={(event) =>
               onChange({ additionalInfo: event.target.value })

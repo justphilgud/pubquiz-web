@@ -41,6 +41,9 @@ export const enQuestionEditorMessages = {
     translationReadAloud: { name: "Translated and read aloud", description: "Keep original text, translation and audio separately editable.", defaultQuestion: "Which song lyrics were translated here?" },
     anagram: { name: "Anagram", description: "Rearrange a name using exactly the same letters.", defaultQuestion: "Which name is hidden in this anagram?" },
     googleReviews: { name: "Google reviews", description: "Manually curated reviews reveal a place step by step.", defaultQuestion: "Which place is described by these reviews?" },
+    pollSingle: { name: "Poll: single choice", description: "Teams select exactly one option; there is no correct answer and no score.", defaultQuestion: "" },
+    pollMulti: { name: "Poll: multiple choice", description: "Teams may select multiple options; there is no correct answer and no score.", defaultQuestion: "" },
+    pollScale: { name: "Poll: scale", description: "Teams vote on a labelled scale; no points are awarded.", defaultQuestion: "" },
   },
   management: {
     title: "Manage question", clone: "Clone question", cloning: "Cloning …", archive: "Archive", restore: "Restore", delete: "Delete permanently", deleting: "Deleting …",
@@ -122,7 +125,7 @@ export const enQuestionEditorMessages = {
   save: { saving: "Saving …", saveQuestion: "Save question", saveDraft: "Save draft", saveDraftAndNew: "Save draft & new question", submit: "Submit for review", approve: "Approve question", saveAndApprove: "Save and approve" },
   review: { statuses: { DRAFT: "Draft", IN_REVIEW: "In review", CHANGES_REQUESTED: "Changes requested", APPROVED: "Approved" }, quality: "Quality review", blockers: "Blocking criteria", warnings: "Warnings" },
   quality: {
-    QUESTION_TEXT_REQUIRED: "Question text is missing", TEMPLATE_MEDIA_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_TYPE_MISMATCH: "{label} has the wrong media type", MEDIA_SLOT_CONFLICT: "{label} has a conflicting assignment", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} contains too many media items", MEDIA_UPLOAD_IN_PROGRESS: "The upload for {label} is still running", MEDIA_UPLOAD_FAILED: "The upload for {label} failed", MEDIA_OWNER_INVALID: "{label} has no unique owner", CORRECT_ANSWER_REQUIRED: "No completed correct answer is available", ANSWER_MEDIA_REQUIRED: "Both FaceMorph answer images are required",
+    QUESTION_TEXT_REQUIRED: "Question text is missing", TEMPLATE_MEDIA_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_TYPE_MISMATCH: "{label} has the wrong media type", MEDIA_SLOT_CONFLICT: "{label} has a conflicting assignment", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} contains too many media items", MEDIA_UPLOAD_IN_PROGRESS: "The upload for {label} is still running", MEDIA_UPLOAD_FAILED: "The upload for {label} failed", MEDIA_OWNER_INVALID: "{label} has no unique owner", CORRECT_ANSWER_REQUIRED: "No completed correct answer is available", POLL_OPTIONS_REQUIRED: "At least two completed poll options are required", POLL_SCALE_INVALID: "Scale, step and labels must be complete and valid", ANSWER_MEDIA_REQUIRED: "Both FaceMorph answer images are required",
     REQUIRED_LABELED_ANSWER_EMPTY: "A required labelled answer field is empty", VALID_UNTIL_INVALID: "The expiry date is incomplete or invalid",
     LABELED_ANSWERS_INCONSISTENT: "Labelled answer data is technically inconsistent", SOURCE_MISSING: "Source is missing", CATEGORY_MISSING: "Category is missing",
     GENERATOR_INPUT_REQUIRED: "The required generator input is missing", GENERATOR_OUTPUT_REQUIRED: "The generated output is missing", GENERATOR_IN_PROGRESS: "Generation is still running",

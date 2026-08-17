@@ -73,6 +73,9 @@ export const deQuestionEditorMessages = {
     translationReadAloud: { name: "Übersetzt vorgelesen", description: "Original, Übersetzung und Audio bleiben getrennt bearbeitbar.", defaultQuestion: "Welcher Songtext wurde hier übersetzt?" },
     anagram: { name: "Anagramm", description: "Ein Name wird aus denselben Buchstaben neu angeordnet.", defaultQuestion: "Welcher Name verbirgt sich hinter diesem Anagramm?" },
     googleReviews: { name: "Google-Rezensionen", description: "Manuell gepflegte Rezensionen führen schrittweise zu einem gesuchten Ort.", defaultQuestion: "Welcher Ort wird in diesen Rezensionen beschrieben?" },
+    pollSingle: { name: "Umfrage: eine Auswahl", description: "Teams wählen genau eine Option; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
+    pollMulti: { name: "Umfrage: mehrere Auswahlen", description: "Teams können mehrere Optionen wählen; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
+    pollScale: { name: "Umfrage: Skala", description: "Teams stimmen auf einer frei beschriftbaren Skala ab; es gibt keine Punkte.", defaultQuestion: "" },
   },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Interpret", title: "Titel", solution: "Lösung" },
   templateMedia: {
@@ -246,7 +249,7 @@ export const deQuestionEditorMessages = {
     openDraftActions: "Entwurf-Aktionen öffnen", requestChanges: "Zur Überarbeitung zurückgeben",
   },
   quality: {
-    QUESTION_TEXT_REQUIRED: "Fragetext fehlt", TEMPLATE_MEDIA_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_TYPE_MISMATCH: "{label} besitzt den falschen Medientyp", MEDIA_SLOT_CONFLICT: "{label} ist widersprüchlich zugeordnet", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} enthält zu viele Medien", MEDIA_UPLOAD_IN_PROGRESS: "Der Upload für {label} läuft noch", MEDIA_UPLOAD_FAILED: "Der Upload für {label} ist fehlgeschlagen", MEDIA_OWNER_INVALID: "{label} besitzt keine eindeutige Zuordnung", CORRECT_ANSWER_REQUIRED: "Keine ausgefüllte richtige Antwort vorhanden", ANSWER_MEDIA_REQUIRED: "Für FaceMorph sind beide Antwortbilder erforderlich",
+    QUESTION_TEXT_REQUIRED: "Fragetext fehlt", TEMPLATE_MEDIA_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_TYPE_MISMATCH: "{label} besitzt den falschen Medientyp", MEDIA_SLOT_CONFLICT: "{label} ist widersprüchlich zugeordnet", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} enthält zu viele Medien", MEDIA_UPLOAD_IN_PROGRESS: "Der Upload für {label} läuft noch", MEDIA_UPLOAD_FAILED: "Der Upload für {label} ist fehlgeschlagen", MEDIA_OWNER_INVALID: "{label} besitzt keine eindeutige Zuordnung", CORRECT_ANSWER_REQUIRED: "Keine ausgefüllte richtige Antwort vorhanden", POLL_OPTIONS_REQUIRED: "Mindestens zwei ausgefüllte Umfrageoptionen sind erforderlich", POLL_SCALE_INVALID: "Skala, Schrittweite und Beschriftungen müssen vollständig und gültig sein", ANSWER_MEDIA_REQUIRED: "Für FaceMorph sind beide Antwortbilder erforderlich",
     REQUIRED_LABELED_ANSWER_EMPTY: "Ein erforderliches beschriftetes Antwortfeld ist leer", VALID_UNTIL_INVALID: "Ablaufdatum ist unvollständig oder ungültig",
     LABELED_ANSWERS_INCONSISTENT: "Beschriftete Antwortdaten sind technisch inkonsistent", SOURCE_MISSING: "Quelle fehlt", CATEGORY_MISSING: "Kategorie fehlt",
     GENERATOR_INPUT_REQUIRED: "Das erforderliche Generator-Original fehlt", GENERATOR_OUTPUT_REQUIRED: "Die erzeugte Ausgabe fehlt", GENERATOR_IN_PROGRESS: "Die Generierung läuft noch",

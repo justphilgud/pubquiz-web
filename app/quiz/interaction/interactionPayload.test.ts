@@ -115,3 +115,19 @@ test("keeps empty drafts distinguishable from finalizable answers", () => {
   };
   assert.equal(validate(text, { answerText: "   " }).hasContent, false);
 });
+
+test("validates poll payloads with the productive payload shapes", () => {
+  const options = [{ id: 1, label: "A" }, { id: 2, label: "B" }];
+  assert.deepEqual(validate({ type: "POLL_SINGLE", selectionMode: "SINGLE", options }, { selectedAnswerIds: [2] }), {
+    payload: { optionId: 2 }, hasContent: true,
+  });
+  assert.deepEqual(validate({ type: "POLL_MULTI", selectionMode: "MULTIPLE", options }, { selectedAnswerIds: [1, 2] }), {
+    payload: { optionIds: [1, 2] }, hasContent: true,
+  });
+  const scale = { type: "POLL_SCALE" as const, inputMode: "decimal" as const, min: 1, max: 5, step: 1, minLabel: "", maxLabel: "", values: [1, 2, 3, 4, 5] };
+  assert.deepEqual(validate(scale, { answerText: "4" }), { payload: { value: 4 }, hasContent: true });
+  assert.throws(() => validate(scale, { answerText: "4.5" }), /Skalenwert/);
+  assert.deepEqual(interactionPayloadToDraft(scale, { value: 3 }), {
+    antwortText: "3", antwortId: null, antwortfelder: {},
+  });
+});
