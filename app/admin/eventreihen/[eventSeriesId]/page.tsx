@@ -47,6 +47,24 @@ export default async function EventSeriesDetailPage({
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>
+        {series.isPublic && !series.isArchived && (
+          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold">Veranstaltungskalender</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Kommende Termine dieser öffentlichen Eventreihe als Kalender abonnieren.
+                </p>
+              </div>
+              <a
+                href={`/calendar/event-series/${series.id}.ics`}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-center font-semibold"
+              >
+                Kalender abonnieren
+              </a>
+            </div>
+          </section>
+        )}
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
