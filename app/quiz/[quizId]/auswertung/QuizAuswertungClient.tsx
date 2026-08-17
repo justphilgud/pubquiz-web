@@ -8,12 +8,16 @@ import {
   updateTeamAntwortBewertung,
 } from "../../actions";
 import { formatQuizPoints } from "../../formatQuizPoints";
+import TeamQuestionEvaluationMatrix from "../../evaluation/TeamQuestionEvaluationMatrix";
+import type { EvaluationMatrix as EvaluationMatrixData } from "../../evaluation/evaluationMatrix";
 
 type AuswertungsAntwort = {
   quiz_fragen_id: number;
   fragen_id: number;
   frageIndex: number;
   frage: string;
+  abschnittTitel: string;
+  maximumPointsLabel: string;
   templateId: string | null;
   richtigeAntwort: string;
   punkte_modus?: string;
@@ -74,13 +78,15 @@ export default function QuizAuswertungClient({
   antworten,
   punktestand,
   backfillStatus,
+  matrix,
 }: {
   quizId: number;
   antworten: AuswertungsAntwort[];
   punktestand: PunktestandEintrag[];
   backfillStatus: EvaluationBackfillStatus;
+  matrix: EvaluationMatrixData;
 }) {
-  const [aktiverTab, setAktiverTab] = useState<"antworten" | "punktestand">(
+  const [aktiverTab, setAktiverTab] = useState<"antworten" | "matrix" | "punktestand">(
     "antworten"
   );
 
@@ -260,6 +266,18 @@ export default function QuizAuswertungClient({
 
           <button
             type="button"
+            onClick={() => setAktiverTab("matrix")}
+            className={`rounded-xl px-5 py-2 text-sm font-bold transition ${
+              aktiverTab === "matrix"
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            Team × Frage
+          </button>
+
+          <button
+            type="button"
             onClick={() => setAktiverTab("punktestand")}
             className={`rounded-xl px-5 py-2 text-sm font-bold transition ${
               aktiverTab === "punktestand"
@@ -295,6 +313,8 @@ export default function QuizAuswertungClient({
           </p>
         )}
       </div>
+
+      {aktiverTab === "matrix" && <TeamQuestionEvaluationMatrix matrix={matrix} />}
 
       {aktiverTab === "punktestand" && (
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm">

@@ -70,6 +70,7 @@ import {
   isPartialPointsCapable,
   validateQuestionPointsMode,
 } from "./evaluation/questionPointPolicy";
+import { getQuizQuestionPointsDisplay } from "./evaluation/quizQuestionPointsDisplay";
 import {
   isPollQuestionTemplateId,
   questionTemplateIds,
@@ -3836,6 +3837,9 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         sortierung: "asc",
       },
       include: {
+        quiz_abschnitte: {
+          select: { titel: true },
+        },
         fragen: {
           include: {
             antwortfelder: {
@@ -3959,6 +3963,11 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
       (answerMode.effectiveMode === "UNCLASSIFIED" &&
         (auswertbareAntwortoptionen.length === 0 ||
           quizFrage.fragen.antwortfelder.length > 0));
+    const maximumPointsLabel = getQuizQuestionPointsDisplay({
+      templateId: quizFrage.fragen.vorlage?.code ?? null,
+      pointsMode: quizFrage.punkte_modus,
+      basePoints: quizFrage.punkte_basis,
+    }).pointsLabel ?? "Keine Punkte";
 
     return sessions.map((session) => {
       const antwort = quizFrage.team_antworten.find(
@@ -4019,8 +4028,10 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
       return {
         quiz_fragen_id: quizFrage.quiz_fragen_id,
         fragen_id: quizFrage.fragen.fragen_id,
-        frageIndex: frageIndex + 1,
+        frageIndex: quizFrage.sortierung ?? frageIndex + 1,
         frage: quizFrage.fragen.frage,
+        abschnittTitel: quizFrage.quiz_abschnitte?.titel ?? "Ohne Runde",
+        maximumPointsLabel,
         templateId: quizFrage.fragen.vorlage?.code ?? null,
         richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
 
