@@ -11,7 +11,17 @@ export const questionTemplateIds = {
   translationReadAloud: "uebersetzt_vorgelesen",
   anagram: "anagramm",
   googleReviews: "google_rezensionen",
+  pollSingle: "umfrage_einfach",
+  pollMulti: "umfrage_mehrfach",
+  pollScale: "umfrage_skala",
 } as const;
+
+export function isPollQuestionTemplateId(templateId: string | null): boolean {
+  const canonicalId = resolveCanonicalQuestionTemplateId(templateId);
+  return canonicalId === questionTemplateIds.pollSingle ||
+    canonicalId === questionTemplateIds.pollMulti ||
+    canonicalId === questionTemplateIds.pollScale;
+}
 
 const questionTemplateAliases: Readonly<Record<string, string>> = {
   "multiple-choice": questionTemplateIds.multipleChoice,

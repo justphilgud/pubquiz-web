@@ -154,7 +154,10 @@ test("read-only participant polling uses an uncached route instead of serialized
   assert.doesNotMatch(moderation, /await getQuizLiveSnapshot\(/);
   assert.match(client, /fetch\("\/api\/quiz\/team-live-snapshot"/);
   assert.match(controllerRoute, /await auth\(\)/);
-  assert.match(controllerRoute, /getQuizLiveSnapshotData\(quizId, null\)/);
+  assert.match(
+    controllerRoute,
+    /getQuizLiveSnapshotData\(quizId, null, \{\s*includePresentationState: true,\s*includeTeamJoinState:/,
+  );
   assert.match(participantRoute, /resolveParticipantSession/);
   assert.match(participantRoute, /INVALID_SESSION/);
   assert.match(participantRoute, /includeAnswerStatus/);

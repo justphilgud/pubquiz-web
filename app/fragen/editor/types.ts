@@ -6,7 +6,10 @@ export type QuestionAnswerMode =
   | "NUMBER"
   | "ORDERING"
   | "SINGLE_CHOICE"
-  | "MULTIPLE_CHOICE";
+  | "MULTIPLE_CHOICE"
+  | "POLL_SINGLE"
+  | "POLL_MULTI"
+  | "POLL_SCALE";
 
 export type QuestionEvaluationMode =
   | "MANUAL"
@@ -15,7 +18,8 @@ export type QuestionEvaluationMode =
   | "NUMERIC_CLOSEST"
   | "NUMERIC_TOLERANCE"
   | "ORDER_EXACT"
-  | "ORDER_POSITION";
+  | "ORDER_POSITION"
+  | "NONE";
 
 export type QuestionTemplateSurfaceKind =
   | "STANDARD"
@@ -24,7 +28,9 @@ export type QuestionTemplateSurfaceKind =
   | "ORDERING"
   | "TRANSLATION_READ_ALOUD"
   | "ANAGRAM"
-  | "GOOGLE_REVIEWS";
+  | "GOOGLE_REVIEWS"
+  | "POLL_OPTIONS"
+  | "POLL_SCALE";
 
 export type AnagramWordCountPreference =
   | "AUTO"
@@ -95,6 +101,14 @@ export type QuestionTemplateData =
       sequentialReveal: boolean;
       hideAuthorUntilSolution: boolean;
       hideRatingUntilSolution: boolean;
+    }
+  | {
+      kind: "POLL_SCALE";
+      min: number;
+      max: number;
+      step: number;
+      minLabel: string;
+      maxLabel: string;
     };
 
 export type QuestionStatus = "DRAFT" | "READY" | "NOT_APPROVED" | "APPROVED";
@@ -320,7 +334,10 @@ export type QuestionTemplateDefinition = {
     | "ordering"
     | "translationReadAloud"
     | "anagram"
-    | "googleReviews";
+    | "googleReviews"
+    | "pollSingle"
+    | "pollMulti"
+    | "pollScale";
   questionLabelKey: "question" | "statement" | "task" | "searchTarget";
   allowsOptionalQuestionImage: boolean;
   initialAnswers: Array<{

@@ -8,6 +8,17 @@ export const PIXEL_NORMAL_POINTS = [3, 2, 1] as const;
 export const PIXEL_EXCLUSIVE_BONUS_POINTS = [6, 4, null] as const;
 export const PIXEL_WRONG_STOP_POINTS = -1 as const;
 
+export function resolvePixelCountdownSeconds(
+  submissionDeadlineAt: string | null,
+  serverNow: number,
+) {
+  if (!submissionDeadlineAt) return null;
+  return Math.max(
+    0,
+    Math.ceil((new Date(submissionDeadlineAt).getTime() - serverNow) / 1_000),
+  );
+}
+
 export type PixelRuntimeStage = 1 | 2 | 3;
 
 export type PixelLiveConfigSnapshot = {

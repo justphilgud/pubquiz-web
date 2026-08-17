@@ -21,6 +21,8 @@ import { questionTemplateDefinitions } from "./templates/questionTemplates";
 import {
   findQuestionTemplate,
   getQuestionTemplatePersistenceIds,
+  isPollQuestionTemplateId,
+  questionTemplateIds,
   representsSameQuestionTemplate,
   resolveCanonicalQuestionTemplateId,
 } from "./templates/questionTemplateRegistry";
@@ -456,6 +458,8 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     );
   }
 
+  const canonicalTemplateId = resolveCanonicalQuestionTemplateId(payload.templateId);
+  const isPoll = isPollQuestionTemplateId(canonicalTemplateId);
   const answers = payload.answers.map((answer) => {
     if (
       !answer ||
@@ -527,7 +531,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
       fieldLabel,
       isRequired: answer.isRequired,
       text: answer.text.trim(),
-      isCorrect: answer.isCorrect,
+      isCorrect: isPoll ? false : answer.isCorrect,
       additionalInfo: answer.additionalInfo.trim(),
       media,
     };
@@ -597,10 +601,23 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
 
   if (
     requiresCompleteQuestion &&
+    !isPoll &&
     !answers.some((answer) => answer.text && answer.isCorrect)
   ) {
     throw new DraftValidationError(
       "Markiere mindestens eine ausgefüllte Antwort als richtig.",
+      "answers",
+    );
+  }
+
+  if (
+    requiresCompleteQuestion &&
+    (canonicalTemplateId === questionTemplateIds.pollSingle ||
+      canonicalTemplateId === questionTemplateIds.pollMulti) &&
+    answers.filter((answer) => answer.text).length < 2
+  ) {
+    throw new DraftValidationError(
+      "Gib mindestens zwei Umfrageoptionen ein.",
       "answers",
     );
   }
@@ -642,7 +659,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     );
   }
 
-  const templateId = resolveCanonicalQuestionTemplateId(payload.templateId);
+  const templateId = canonicalTemplateId;
   const template = findQuestionTemplate(questionTemplateDefinitions, templateId ?? "standard");
   const generatorParameters: GeneratorParametersDraft = {};
   for (const generatorId of template?.generators ?? []) {
@@ -660,7 +677,9 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     specificTemplateIssue &&
     (
       requiresCompleteQuestion ||
-      specificTemplateIssue.code !== "ESTIMATE_UNIT_REQUIRED"
+      !["ESTIMATE_UNIT_REQUIRED", "POLL_SCALE_INVALID"].includes(
+        specificTemplateIssue.code,
+      )
     )
   ) {
     throw new DraftValidationError(
@@ -815,7 +834,6 @@ export async function saveQuestion(
       fallbackMessage: serverMessages.errors.PERMISSION_DENIED,
     };
   }
-
   const requestedStoryLinks = payload.questionId === undefined
     ? (payload.storyElementLinks ?? [])
     : [];

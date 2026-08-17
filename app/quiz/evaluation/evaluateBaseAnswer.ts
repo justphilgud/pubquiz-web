@@ -1,5 +1,6 @@
 import { Prisma } from "@/app/generated/prisma/client";
 import {
+  isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
@@ -138,6 +139,15 @@ function evaluateMultipleChoice(input: BaseAnswerInput): BaseAnswerEvaluation {
 
 export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
+
+  if (isPollQuestionTemplateId(templateId)) {
+    return {
+      basePoints: ZERO,
+      maxPoints: ZERO,
+      status: "UNANSWERED",
+      details: { strategy: "NONE", reason: "POLL_HAS_NO_EVALUATION" },
+    };
+  }
 
   if (templateId === questionTemplateIds.ordering) {
     return evaluateOrdering(input);

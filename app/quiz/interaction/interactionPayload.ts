@@ -12,7 +12,7 @@ export type TeamAnswerDraftInput = {
 export type QuizInteractionPayload =
   | { text: string }
   | { fields: Record<string, string> }
-  | { value: string }
+  | { value: string | number | null }
   | { optionId: number | null }
   | { optionIds: number[] }
   | { itemIds: string[] };
@@ -59,6 +59,21 @@ export function validateInteractionPayload(
     }
     return { payload: { value }, hasContent: value.length > 0 };
   }
+  if (interaction.type === "POLL_SCALE") {
+    const rawValue = draft.answerText?.trim() ?? "";
+    if (!rawValue) return { payload: { value: null }, hasContent: false };
+    const value = Number(rawValue);
+    const stepPosition = (value - interaction.min) / interaction.step;
+    if (
+      !Number.isFinite(value) ||
+      value < interaction.min ||
+      value > interaction.max ||
+      !Number.isInteger(Math.round(stepPosition * 1_000_000) / 1_000_000)
+    ) {
+      throw new Error("Der Skalenwert ist ungültig.");
+    }
+    return { payload: { value }, hasContent: true };
+  }
 
   if (interaction.type === "STRUCTURED_TEXT") {
     const allowedFields = new Set(interaction.fields.map((field) => field.id));
@@ -75,7 +90,10 @@ export function validateInteractionPayload(
     };
   }
 
-  if (interaction.type === "SINGLE_CHOICE") {
+  if (
+    interaction.type === "SINGLE_CHOICE" ||
+    interaction.type === "POLL_SINGLE"
+  ) {
     assertAllowedAnswerIds(
       draft.selectedAnswerIds,
       interaction.options.map((option) => option.id),
@@ -87,7 +105,10 @@ export function validateInteractionPayload(
     return { payload: { optionId }, hasContent: optionId !== null };
   }
 
-  if (interaction.type === "MULTI_CHOICE") {
+  if (
+    interaction.type === "MULTI_CHOICE" ||
+    interaction.type === "POLL_MULTI"
+  ) {
     assertAllowedAnswerIds(
       draft.selectedAnswerIds,
       interaction.options.map((option) => option.id),
@@ -132,7 +153,10 @@ export function interactionPayloadToDraft(
     return { antwortText: payload.text, antwortId: null, antwortfelder: {} };
   }
   if (interaction.type === "NUMBER" && "value" in payload) {
-    return { antwortText: payload.value, antwortId: null, antwortfelder: {} };
+    return { antwortText: String(payload.value ?? ""), antwortId: null, antwortfelder: {} };
+  }
+  if (interaction.type === "POLL_SCALE" && "value" in payload) {
+    return { antwortText: payload.value === null ? "" : String(payload.value), antwortId: null, antwortfelder: {} };
   }
   if (interaction.type === "STRUCTURED_TEXT" && "fields" in payload) {
     return {
@@ -143,7 +167,7 @@ export function interactionPayloadToDraft(
       ),
     };
   }
-  if (interaction.type === "SINGLE_CHOICE" && "optionId" in payload) {
+  if ((interaction.type === "SINGLE_CHOICE" || interaction.type === "POLL_SINGLE") && "optionId" in payload) {
     return {
       antwortText: null,
       antwortId: payload.optionId,
@@ -151,7 +175,7 @@ export function interactionPayloadToDraft(
       antwortfelder: {},
     };
   }
-  if (interaction.type === "MULTI_CHOICE" && "optionIds" in payload) {
+  if ((interaction.type === "MULTI_CHOICE" || interaction.type === "POLL_MULTI") && "optionIds" in payload) {
     return {
       antwortText: null,
       antwortId: null,

@@ -150,5 +150,19 @@ test("ORDER renders the sortable list in the stored identifier order", () => {
 
 test("NO_ANSWER and not-yet-implemented future interactions render no form", () => {
   assert.equal(render({ type: "NO_ANSWER" }), "");
-  assert.equal(render({ type: "POLL_SCALE", supported: false }), "");
+  assert.equal(render({ type: "BUZZER", supported: false }), "");
+});
+
+test("poll choices and mobile scale render as first-class interactions", () => {
+  const options = [{ id: 1, label: "Option A" }, { id: 2, label: "Option B" }];
+  const single = render({ type: "POLL_SINGLE", selectionMode: "SINGLE", options });
+  const multi = render({ type: "POLL_MULTI", selectionMode: "MULTIPLE", options });
+  const scale = render({ type: "POLL_SCALE", inputMode: "decimal", min: 1, max: 5, step: 1, minLabel: "Nein", maxLabel: "Ja", values: [1, 2, 3, 4, 5] });
+  assert.match(single, /data-answer-interaction="POLL_SINGLE"/);
+  assert.match(single, /type="radio"/);
+  assert.match(multi, /data-answer-interaction="POLL_MULTI"/);
+  assert.match(multi, /type="checkbox"/);
+  assert.match(scale, /data-answer-interaction="POLL_SCALE"/);
+  assert.match(scale, /Nein/);
+  assert.match(scale, /Ja/);
 });

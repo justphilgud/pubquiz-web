@@ -17,6 +17,7 @@ type AnswersSectionProps = {
   disabled: boolean;
   validationError?: string | null;
   requireAnswerImages?: boolean;
+  evaluationDisabled?: boolean;
   faceMorphPixelQuestionOptions?: FaceMorphPixelQuestionOptions;
   onFaceMorphPixelQuestionOptionChange?: (
     option: FaceMorphPixelQuestionOptionKey,
@@ -45,6 +46,7 @@ export function AnswersSection({
   disabled,
   validationError = null,
   requireAnswerImages = false,
+  evaluationDisabled = false,
   faceMorphPixelQuestionOptions,
   onFaceMorphPixelQuestionOptionChange,
   onAnswerChange,
@@ -73,14 +75,14 @@ export function AnswersSection({
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="font-semibold text-slate-950">{messages.answers.title}</h2>
+          <h2 className="font-semibold text-slate-950">{evaluationDisabled ? "Umfrageoptionen" : messages.answers.title}</h2>
           <p className="mt-1 text-sm text-slate-600">
-            {messages.answers.description}
+            {evaluationDisabled ? "Die Teams stimmen ab; es gibt keine richtige Antwort und keine Punkte." : messages.answers.description}
           </p>
         </div>
         <p className="shrink-0 text-sm font-medium text-slate-700">
-          {formatEditorNumber(locale, answers.length)} {answers.length === 1 ? messages.answers.answer : messages.answers.answers} ·{" "}
-          {formatEditorNumber(locale, correctAnswerCount)} {messages.answers.correctShort}
+          {formatEditorNumber(locale, answers.length)} {answers.length === 1 ? messages.answers.answer : messages.answers.answers}
+          {!evaluationDisabled && <> · {formatEditorNumber(locale, correctAnswerCount)} {messages.answers.correctShort}</>}
         </p>
       </div>
 
@@ -117,6 +119,7 @@ export function AnswersSection({
               disabled={disabled}
               showMedia={showMedia}
               requireImage={requireAnswerImages}
+              showCorrectControl={!evaluationDisabled}
               pixelQuestionOption={
                 pixelOptionKey && onFaceMorphPixelQuestionOptionChange
                   ? {

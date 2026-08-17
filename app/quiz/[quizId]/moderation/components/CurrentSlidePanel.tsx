@@ -13,6 +13,7 @@ import {
   resolveModerationPreviewLayout,
 } from "../moderationPreviewLayout";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
+import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 
 type PunktestandEintrag = {
   teamname: string;
@@ -39,6 +40,12 @@ type Props = {
   } | null;
   now: number;
   pixelState: PixelLiveState | null;
+  pollState: PollLiveState | null;
+  teamJoinState: {
+    teamNames: string[];
+    totalTeams: number;
+    remainingTeams: number;
+  } | null;
 };
 
 export default function CurrentSlidePanel({
@@ -57,6 +64,8 @@ export default function CurrentSlidePanel({
   estimationQuestion,
   now,
   pixelState,
+  pollState,
+  teamJoinState,
 }: Props) {
   const titel =
     aktuellerSlide?.typ === "frage"
@@ -146,6 +155,8 @@ export default function CurrentSlidePanel({
                 playbackCommand,
                 playbackCommandId,
                 pixelState,
+                pollState,
+                teamJoinState,
               }}
             />
           </div>

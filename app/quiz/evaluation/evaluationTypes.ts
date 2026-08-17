@@ -17,7 +17,8 @@ export type EvaluationDetails = {
     | "MULTIPLE_CHOICE"
     | "STRUCTURED_FIELDS"
     | "ORDERING"
-    | "MANUAL";
+    | "MANUAL"
+    | "NONE";
   correctComponents?: number;
   totalComponents?: number;
   correctSelections?: number;

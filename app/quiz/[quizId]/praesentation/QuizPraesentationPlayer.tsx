@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { QuizPraesentationResult } from "../../actions";
 import { getQuizLiveSnapshot, getSchaetzfrageById } from "../../actions";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
+import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import {
   getPraesentationPunktestand,
   getPraesentationStatus,
@@ -51,14 +52,28 @@ export default function QuizPraesentationPlayer({
   const [estimationQuestion, setEstimationQuestion] =
     useState<EstimationQuestion | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const serverClockOffsetRef = useRef(0);
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
+  const [pollState, setPollState] = useState<PollLiveState | null>(null);
+  const [teamJoinState, setTeamJoinState] = useState<{
+    teamNames: string[];
+    totalTeams: number;
+    remainingTeams: number;
+  } | null>(null);
 
   const slideIndex = resolvePresentationSequenceIndex(
     liveState,
     slides.map(getPresentationSlideKey),
   ).index;
   const slide = slides[slideIndex];
+  const showTeamJoinState =
+    (slide?.typ === "ablauf" && slide.element.type === "QR_CODE") ||
+    (slide?.typ === "fixer-slide" && slide.slideTyp === "qrcode");
+  const presentationQuestionAssignmentId =
+    slide?.typ === "frage" || slide?.typ === "aufloesung"
+      ? slide.frage.quiz_fragen_id
+      : undefined;
 
   useEffect(() => {
     let active = true;
@@ -70,7 +85,13 @@ export default function QuizPraesentationPlayer({
       try {
         const [storedStatus, interactionSnapshot] = await Promise.all([
           getPraesentationStatus(quizId),
-          getQuizLiveSnapshot(quizId),
+          getQuizLiveSnapshot(
+            quizId,
+            undefined,
+            true,
+            showTeamJoinState,
+            presentationQuestionAssignmentId,
+          ),
         ]);
         if (!active) return;
 
@@ -87,6 +108,11 @@ export default function QuizPraesentationPlayer({
         });
         setSyncError(false);
         setPixelState(interactionSnapshot.pixelState);
+        setPollState(interactionSnapshot.pollState);
+        setTeamJoinState(interactionSnapshot.teamJoinState);
+        serverClockOffsetRef.current =
+          new Date(interactionSnapshot.serverNow).getTime() - Date.now();
+        setNow(Date.now() + serverClockOffsetRef.current);
       } catch {
         if (active) setSyncError(true);
       } finally {
@@ -99,7 +125,7 @@ export default function QuizPraesentationPlayer({
       active = false;
       window.clearInterval(interval);
     };
-  }, [quizId]);
+  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId]);
 
   useEffect(() => {
     if (!isStandingsSlide(slide)) return;
@@ -131,7 +157,10 @@ export default function QuizPraesentationPlayer({
   }, [liveState.estimation.questionId, quizId]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    const interval = window.setInterval(
+      () => setNow(Date.now() + serverClockOffsetRef.current),
+      1000,
+    );
     return () => window.clearInterval(interval);
   }, []);
 
@@ -194,6 +223,8 @@ export default function QuizPraesentationPlayer({
             playbackCommand: liveState.playbackCommand,
             playbackCommandId: liveState.playbackCommandId,
             pixelState,
+            pollState,
+            teamJoinState,
           }}
         />
         {syncError && (

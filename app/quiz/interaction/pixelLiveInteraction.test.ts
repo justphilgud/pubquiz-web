@@ -7,11 +7,19 @@ import {
   canStopPixelQuestion,
   createPixelLiveConfigSnapshot,
   pixelRuntimeStageToMediaSlot,
+  resolvePixelCountdownSeconds,
   resolvePixelAnswerActionPolicy,
   resolveEffectivePixelStage,
   resolvePixelTeamWriteAccess,
   shouldReuseStoppedPixelRunOnQuestionReentry,
 } from "./pixelLiveInteraction";
+
+test("presentation countdown derives from the server deadline and never becomes negative", () => {
+  const now = new Date("2026-08-17T18:00:00.000Z").getTime();
+  assert.equal(resolvePixelCountdownSeconds("2026-08-17T18:00:20.000Z", now), 20);
+  assert.equal(resolvePixelCountdownSeconds("2026-08-17T17:59:59.000Z", now), 0);
+  assert.equal(resolvePixelCountdownSeconds(null, now), null);
+});
 
 test("pixel live config defaults to 15 seconds and maps historic slots chronologically", () => {
   const config = createPixelLiveConfigSnapshot(null);

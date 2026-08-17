@@ -5,6 +5,9 @@ const resubmittableInteractionTypes = new Set([
   "SINGLE_CHOICE",
   "MULTI_CHOICE",
   "ORDER",
+  "POLL_SINGLE",
+  "POLL_MULTI",
+  "POLL_SCALE",
 ]);
 
 export type InteractionSubmissionPolicy = {

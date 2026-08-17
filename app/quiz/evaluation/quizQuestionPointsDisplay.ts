@@ -1,4 +1,5 @@
 import {
+  isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
@@ -25,6 +26,10 @@ export function getQuizQuestionPointsDisplay(input: {
   basePoints: Decimal.Value;
 }): QuizQuestionPointsDisplay {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
+
+  if (isPollQuestionTemplateId(templateId)) {
+    return { pointsLabel: null, modeLabel: "Umfrage", isDynamic: false };
+  }
 
   if (templateId === questionTemplateIds.pixelImage) {
     return {

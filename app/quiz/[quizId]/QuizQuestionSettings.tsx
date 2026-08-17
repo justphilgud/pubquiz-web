@@ -43,6 +43,7 @@ type Props = {
   freieAntwortErlaubt: boolean;
   kannFreieAntwortAktivieren: boolean;
   istPixelbild: boolean;
+  istUmfrage: boolean;
   teilpunkteFaehig: boolean;
   storyElements: StoryElementSetting[];
   actions: QuizQuestionSettingsActions;
@@ -150,6 +151,7 @@ export default function QuizQuestionSettings({
   freieAntwortErlaubt,
   kannFreieAntwortAktivieren,
   istPixelbild,
+  istUmfrage,
   teilpunkteFaehig,
   storyElements,
   actions,
@@ -179,6 +181,7 @@ export default function QuizQuestionSettings({
         </span>
         <Select
           value={punkteModus ?? "standard"}
+          disabled={istUmfrage}
           onChange={(event) =>
             void actions.onPunkteModusChange(quizFragenId, event.target.value)
           }
@@ -196,7 +199,9 @@ export default function QuizQuestionSettings({
           </option>
         </Select>
         <span className="block text-xs text-slate-500">
-          Risikofragen sind nur bei Fragen ohne Teilpunkte möglich.
+          {istUmfrage
+            ? "Umfragen vergeben keine Punkte."
+            : "Risikofragen sind nur bei Fragen ohne Teilpunkte möglich."}
         </span>
       </label>
 

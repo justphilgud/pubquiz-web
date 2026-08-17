@@ -133,7 +133,9 @@ export default function GenericAnswerRenderer({
 
   if (
     interaction.type === "SINGLE_CHOICE" ||
-    interaction.type === "MULTI_CHOICE"
+    interaction.type === "MULTI_CHOICE" ||
+    interaction.type === "POLL_SINGLE" ||
+    interaction.type === "POLL_MULTI"
   ) {
     const multiple = interaction.selectionMode === "MULTIPLE";
     return (
@@ -175,14 +177,48 @@ export default function GenericAnswerRenderer({
               className="mt-1"
             />
             <span>
-              <span className="mr-2 font-bold">
+              {!interaction.type.startsWith("POLL_") && <span className="mr-2 font-bold">
                 {String.fromCharCode(65 + optionIndex)}.
-              </span>
+              </span>}
               {option.label}
             </span>
           </label>
         ))}
       </div>
+    );
+  }
+
+  if (interaction.type === "POLL_SCALE") {
+    return (
+      <fieldset data-answer-interaction="POLL_SCALE" className="mt-4">
+        <legend className="sr-only">Skalenwert auswählen</legend>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {interaction.values.map((scaleValue) => {
+            const checked = value?.antwortText === String(scaleValue);
+            return (
+              <label
+                key={scaleValue}
+                className={`flex min-h-12 cursor-pointer items-center justify-center rounded-xl border-2 px-3 py-2 font-bold ${checked ? "border-slate-950 bg-slate-950 text-white" : "border-slate-200 bg-white text-slate-900"}`}
+              >
+                <input
+                  className="sr-only"
+                  type="radio"
+                  name={`frage-${questionAssignmentId}`}
+                  value={scaleValue}
+                  checked={checked}
+                  disabled={disabled}
+                  onChange={() => onChange(textDraft(String(scaleValue)))}
+                />
+                {scaleValue.toLocaleString("de-DE")}
+              </label>
+            );
+          })}
+        </div>
+        <div className="mt-2 flex justify-between gap-4 text-xs font-medium text-slate-600">
+          <span>{interaction.minLabel}</span>
+          <span className="text-right">{interaction.maxLabel}</span>
+        </div>
+      </fieldset>
     );
   }
 

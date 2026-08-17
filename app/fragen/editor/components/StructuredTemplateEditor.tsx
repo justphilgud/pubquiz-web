@@ -565,6 +565,44 @@ function ReviewsEditor(props: EditorProps) {
   </section>;
 }
 
+function PollScaleEditor(props: EditorProps) {
+  if (props.data?.kind !== "POLL_SCALE") return null;
+  const data = props.data;
+  const updateNumber = (key: "min" | "max" | "step", value: string) => {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) commit(props, { ...data, [key]: parsed });
+  };
+  return <section className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-3">
+    <div className="sm:col-span-3">
+      <h2 className="font-semibold">Umfrage-Skala</h2>
+      <p className="mt-1 text-sm text-slate-600">Die Abstimmung hat keine richtige Antwort und vergibt keine Punkte.</p>
+    </div>
+    <label className="text-sm font-medium">Von
+      <input type="number" className={`${inputClass} mt-1`} value={data.min} disabled={props.disabled}
+        onChange={(event) => updateNumber("min", event.target.value)} />
+    </label>
+    <label className="text-sm font-medium">Bis
+      <input type="number" className={`${inputClass} mt-1`} value={data.max} disabled={props.disabled}
+        onChange={(event) => updateNumber("max", event.target.value)} />
+    </label>
+    <label className="text-sm font-medium">Schrittweite
+      <input type="number" min="0.1" step="0.1" className={`${inputClass} mt-1`} value={data.step} disabled={props.disabled}
+        onChange={(event) => updateNumber("step", event.target.value)} />
+    </label>
+    <label className="text-sm font-medium sm:col-span-3 sm:grid sm:grid-cols-2 sm:gap-4">
+      <span>Beschriftung links
+        <input className={`${inputClass} mt-1`} value={data.minLabel} disabled={props.disabled}
+          onChange={(event) => commit(props, { ...data, minLabel: event.target.value })} />
+      </span>
+      <span>Beschriftung rechts
+        <input className={`${inputClass} mt-1`} value={data.maxLabel} disabled={props.disabled}
+          onChange={(event) => commit(props, { ...data, maxLabel: event.target.value })} />
+      </span>
+    </label>
+    {props.validationError && <p role="alert" className="text-sm font-medium text-red-700 sm:col-span-3">{props.validationError}</p>}
+  </section>;
+}
+
 const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorProps>>> = {
   TRUE_FALSE: TrueFalseEditor,
   ESTIMATE: EstimateEditor,
@@ -572,6 +610,7 @@ const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorP
   TRANSLATION_READ_ALOUD: TranslationEditor,
   ANAGRAM: AnagramEditor,
   GOOGLE_REVIEWS: ReviewsEditor,
+  POLL_SCALE: PollScaleEditor,
 };
 
 export function StructuredTemplateEditor({ kind, ...props }: Props) {

@@ -975,7 +975,9 @@ export function QuestionEditor({
           }
         />
 
-        {selectedTemplate && selectedTemplate.editorKind !== "STANDARD" && (
+        {selectedTemplate &&
+          selectedTemplate.editorKind !== "STANDARD" &&
+          selectedTemplate.editorKind !== "POLL_OPTIONS" && (
           <StructuredTemplateEditor
             kind={selectedTemplate.editorKind}
             data={draft.templateConfig.templateData}
@@ -1017,13 +1019,16 @@ export function QuestionEditor({
           </aside>
         )}
 
-        {(!selectedTemplate || selectedTemplate.editorKind === "STANDARD") && <AnswersSection
+        {(!selectedTemplate ||
+          selectedTemplate.editorKind === "STANDARD" ||
+          selectedTemplate.editorKind === "POLL_OPTIONS") && <AnswersSection
           answers={draft.answers}
           questionId={savedQuestionId}
           pathnamePrefix={mediaUploadPathnamePrefix}
           disabled={isEditorDisabled}
           validationError={fieldError?.target === "answers" ? fieldError.text : null}
           requireAnswerImages={selectedTemplate?.requiresAnswerImages ?? false}
+          evaluationDisabled={selectedTemplate?.evaluationMode === "NONE"}
           faceMorphPixelQuestionOptions={
             getFaceMorphPixelQuestionOptionsForTemplate(
               draft.templateConfig,

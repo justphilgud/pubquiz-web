@@ -2,6 +2,10 @@ import "server-only";
 
 import { Prisma } from "@/app/generated/prisma/client";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
+import {
+  isPollQuestionTemplateId,
+  questionTemplateIds,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { prisma } from "@/app/lib/prisma";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
 import { evaluateBaseAnswer } from "./evaluateBaseAnswer";
@@ -30,6 +34,11 @@ import {
 type EvaluationDb = Prisma.TransactionClient | typeof prisma;
 
 const QUESTION_RECALCULATION_TRANSACTION_TIMEOUT_MS = 30_000;
+const POLL_TEMPLATE_IDS = [
+  questionTemplateIds.pollSingle,
+  questionTemplateIds.pollMulti,
+  questionTemplateIds.pollScale,
+];
 export { QUIZ_EVALUATION_BACKFILL_BATCH_QUESTION_LIMIT };
 
 export type RecalculationOptions = {
@@ -61,6 +70,13 @@ function incompleteQuizEvaluationWhere(
 ): Prisma.team_antwortenWhereInput {
   return {
     quiz_id: quizId,
+    NOT: {
+      quiz_fragen: {
+        fragen: {
+          vorlage: { code: { in: POLL_TEMPLATE_IDS } },
+        },
+      },
+    },
     OR: [
       {
         bewertungs_version: {
@@ -172,6 +188,9 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   if (!assignment) throw new Error("Quizfrage nicht gefunden.");
 
   const templateId = assignment.fragen.vorlage?.code ?? null;
+  if (isPollQuestionTemplateId(templateId)) {
+    return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
+  }
   const orderedItemIds = orderingItems(assignment.fragen.template_config_json);
   const maximum = getQuestionBaseMaximum({
     templateId,
@@ -597,6 +616,13 @@ export async function ensureQuizQuestionEvaluation(
   const incomplete = await prisma.team_antworten.findFirst({
     where: {
       quiz_fragen_id: quizQuestionId,
+      NOT: {
+        quiz_fragen: {
+          fragen: {
+            vorlage: { code: { in: POLL_TEMPLATE_IDS } },
+          },
+        },
+      },
       OR: [
         {
           bewertungs_version: {
@@ -630,26 +656,7 @@ export async function ensureQuizEvaluation(
   quizId: number,
 ): Promise<RecalculationResult> {
   const incomplete = await prisma.team_antworten.findMany({
-    where: {
-      quiz_id: quizId,
-      OR: [
-        {
-          bewertungs_version: {
-            not: CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,
-          },
-        },
-        { bewertungsquelle: "AUTO", bewertungsdetails: { equals: Prisma.DbNull } },
-        {
-          quiz_fragen: {
-            punkte_modus: "risikofrage",
-            OR: [
-              { risiko_pool_teamanzahl: null },
-              { risiko_pool_fixiert_am: null },
-            ],
-          },
-        },
-      ],
-    },
+    where: incompleteQuizEvaluationWhere(quizId),
     select: { quiz_fragen_id: true },
     distinct: ["quiz_fragen_id"],
   });
@@ -718,7 +725,14 @@ export async function recalculateQuizEvaluation(
   options: Omit<RecalculationOptions, "answerIds"> = {},
 ): Promise<RecalculationResult> {
   const questions = await prisma.quiz_fragen.findMany({
-    where: { quiz_id: quizId },
+    where: {
+      quiz_id: quizId,
+      NOT: {
+        fragen: {
+          vorlage: { code: { in: POLL_TEMPLATE_IDS } },
+        },
+      },
+    },
     select: { quiz_fragen_id: true },
   });
   let recalculatedAnswers = 0;
