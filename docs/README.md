@@ -33,6 +33,7 @@
 - [Architektur](./architecture/README.md)
 - [Datenmodell](./architecture/datenmodell.md)
 - [Authentifizierung](./architecture/authentifizierung.md)
+- [Antwortformulare und Live-Interaction-Architektur](./architecture/answer-interaction.md)
 - [Medienarchitektur](./architecture/medien.md)
 - [Deployment](./operations/umgebungen-und-deployment.md)
 - [Datenbank und Migrationen](./operations/datenbank-und-migrationen.md)
