@@ -144,8 +144,32 @@ test("ORDER renders the sortable list in the stored identifier order", () => {
 
   assert.match(html, /data-answer-interaction="ORDER"/);
   assert.ok(html.indexOf("Danach") < html.indexOf("Zuerst"));
+  assert.match(html, /aria-label="Position 1 verschieben"/);
+  assert.match(html, /touch-none/);
   assert.match(html, /Danach nach oben/);
   assert.match(html, /Zuerst nach unten/);
+  assert.equal((html.match(/disabled=""/g) ?? []).length, 2);
+});
+
+test("ORDER rejects incomplete stored identifiers and restores the configured order", () => {
+  const html = render(
+    {
+      type: "ORDER",
+      scoringPolicy: "POSITION",
+      items: [
+        { id: "first", text: "Zuerst" },
+        { id: "second", text: "Danach" },
+        { id: "third", text: "Zuletzt" },
+      ],
+    },
+    {
+      ...emptyDraft,
+      antwortText: JSON.stringify(["third", "first"]),
+    },
+  );
+
+  assert.ok(html.indexOf("Zuerst") < html.indexOf("Danach"));
+  assert.ok(html.indexOf("Danach") < html.indexOf("Zuletzt"));
 });
 
 test("NO_ANSWER and not-yet-implemented future interactions render no form", () => {

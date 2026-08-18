@@ -189,6 +189,18 @@ Beim Schließen eines Runs beziehungsweise Blocks werden inhaltlich gefüllte Dr
 
 Audio-, Bild-, Wahr/Falsch-, Anagramm- und weitere Fragetemplates sind keine eigenen Persistenz-Engines. Sie lösen auf einen der obigen Interaction-Typen auf. Wahr/Falsch ist beispielsweise `SINGLE_CHOICE`; Audiofragen können `TEXT` oder `STRUCTURED_TEXT` verwenden.
 
+### Reihenfolge-Interaktion
+
+`ORDER` verwendet dieselbe lokale Antwort und dieselbe Autosave-Pipeline wie alle anderen produktiven Interaktionen. Die sortierbare Liste reicht bei jeder Verschiebung ausschließlich die neue Folge stabiler Item-IDs an `GenericAnswerRenderer` zurück; dort wird sie als JSON in `antwort_text` serialisiert. Es gibt keinen zusätzlichen Drag-and-drop-State und keinen eigenen Speicherweg.
+
+Die gemeinsame `SortableTemplateList` stellt drei gleichwertige Bedienwege bereit:
+
+- Pointer-Drag für Maus und Touch; `touch-action: none` ist auf den Griff begrenzt, damit die Seite außerhalb des Griffs mobil scrollbar bleibt;
+- Tastatursortierung über den `KeyboardSensor` von dnd-kit;
+- explizite, beschriftete Schaltflächen zum Verschieben nach oben oder unten als sichtbarer und screenreadertauglicher Fallback.
+
+Die sichtbare Positionsnummer wird nach jeder Verschiebung aktualisiert. Autosave, Reload, Submission-Snapshot und Bewertung verarbeiten danach unverändert die zentrale `ORDER`-Payload `{ itemIds: string[] }`.
+
 Es gibt derzeit keinen eigenständigen produktiven allgemeinen `SCALE`-Antworttyp. Produktiv ist ausschließlich `POLL_SCALE`. `MATCHING` und `BUZZER` sind im Templatevertrag reserviert, werden vom generischen Antwortformular aber noch nicht produktiv unterstützt. Neue Dokumentation darf diese Typen nicht als implementiert ausgeben.
 
 ## Pixelbild als spezialisierter Run, nicht als zweite Engine

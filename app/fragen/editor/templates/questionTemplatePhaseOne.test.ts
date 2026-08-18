@@ -87,6 +87,8 @@ test("shared controls cover segmented boolean, sortable order and browser voices
   assert.match(answerRenderer, /SortableTemplateList/);
   assert.match(sortable, /PointerSensor/);
   assert.match(sortable, /KeyboardSensor/);
+  assert.match(sortable, /sortableKeyboardCoordinates/);
+  assert.match(sortable, /activationConstraint: \{ distance: 6 \}/);
   assert.match(sortable, /touch-none/);
   assert.match(voices, /speechSynthesis\.getVoices\(\)/);
   assert.match(voices, /voiceschanged/);
