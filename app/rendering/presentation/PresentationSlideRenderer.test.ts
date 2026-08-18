@@ -50,6 +50,8 @@ test("renderer covers the central slide types without player orchestration", () 
   }
   assert.match(rendererSource, /SynchronizedMedia kind="audio"/);
   assert.match(rendererSource, /SynchronizedMedia kind="video"/);
+  assert.match(rendererSource, /type === "CALENDAR_SUBSCRIPTION"/);
+  assert.match(rendererSource, /QRCode value=\{calendarUrl\}/);
   assert.doesNotMatch(rendererSource, /statusActions/);
   assert.doesNotMatch(
     rendererSource,
@@ -62,4 +64,11 @@ test("player and moderation preview share the presentation renderer", () => {
   assert.match(playerSource, /<PresentationSlideRenderer/);
   assert.match(moderationPreviewSource, /<PresentationSlideRenderer/);
   assert.doesNotMatch(moderationPreviewSource, /<SlidePreview/);
+});
+
+test("calendar CTA leaves the team join QR payload and overflow UI intact", () => {
+  assert.match(rendererSource, /QRCode value=\{answerUrl\}/);
+  assert.match(rendererSource, /teamJoinState\.teamNames\.map/);
+  assert.match(rendererSource, /teamJoinState\.remainingTeams > 0/);
+  assert.match(rendererSource, /\+ \{teamJoinState\.remainingTeams\} weitere/);
 });

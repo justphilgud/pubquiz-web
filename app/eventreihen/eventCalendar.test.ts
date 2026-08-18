@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   buildEventSeriesCalendar,
+  buildPublicQuizCalendar,
   type EventCalendarSeries,
 } from "./eventCalendar";
 
@@ -122,4 +124,53 @@ test("folds every physical content line at 75 UTF-8 bytes", () => {
     assert.ok(Buffer.byteLength(line, "utf8") <= 75, `${Buffer.byteLength(line, "utf8")}: ${line}`);
   }
   assert.match(unfold(calendar), /SUMMARY:(Überraschung ){20}/);
+});
+
+test("general calendar aggregates only public active series and eligible quizzes", () => {
+  const publicSeries = createSeries({
+    publicName: "Öffentliche Reihe",
+    quizzes: [
+      { ...createSeries().quizzes[0], id: 51, title: "Öffentlicher Termin" },
+      { ...createSeries().quizzes[0], id: 52, title: "Archiviert", isArchived: true },
+      { ...createSeries().quizzes[0], id: 53, title: "Vergangen", date: "2026-08-16" },
+    ],
+  });
+  const calendar = buildPublicQuizCalendar(
+    [
+      publicSeries,
+      createSeries({
+        publicName: "Private Firmenreihe",
+        isPublic: false,
+        quizzes: [{ ...createSeries().quizzes[0], id: 54, title: "Firmenquiz" }],
+      }),
+      createSeries({
+        publicName: "Archivierte Reihe",
+        isArchived: true,
+        quizzes: [{ ...createSeries().quizzes[0], id: 55, title: "Altbestand" }],
+      }),
+    ],
+    "2026-08-17",
+    generatedAt,
+  );
+
+  const unfolded = unfold(calendar);
+  assert.match(unfolded, /X-WR-CALNAME:ungegoogelt PubQuiz-Termine/);
+  assert.match(unfolded, /SUMMARY:Öffentlicher Termin/);
+  assert.match(unfolded, /DESCRIPTION:Öffentliche Reihe/);
+  assert.doesNotMatch(unfolded, /Archiviert|Vergangen|Firmenquiz|Altbestand|Private Firmenreihe/);
+});
+
+test("participant calendar routes and CTAs share one public landing target", () => {
+  const constants = readFileSync("app/calendar/publicCalendar.ts", "utf8");
+  const landing = readFileSync("app/kalender/page.tsx", "utf8");
+  const renderer = readFileSync("app/rendering/presentation/PresentationSlideRenderer.tsx", "utf8");
+  const answerForm = readFileSync("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx", "utf8");
+  const proxy = readFileSync("proxy.ts", "utf8");
+
+  assert.match(constants, /PUBLIC_CALENDAR_LANDING_PATH = "\/kalender"/);
+  assert.match(constants, /PUBLIC_CALENDAR_FEED_PATH = "\/calendar\/public\.ics"/);
+  assert.match(landing, /PUBLIC_CALENDAR_FEED_PATH/);
+  assert.match(renderer, /PUBLIC_CALENDAR_LANDING_PATH/);
+  assert.match(answerForm, /PUBLIC_CALENDAR_LANDING_PATH/);
+  assert.match(proxy, /"\/kalender"/);
 });

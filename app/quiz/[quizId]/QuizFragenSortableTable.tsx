@@ -94,6 +94,11 @@ const outroSlides = [
     "Bekanntmachungen",
     "Hinweise, nächste Termine und Abschlussinfos",
   ],
+  [
+    "calendar",
+    "PubQuiz-Kalender",
+    "Allgemeinen öffentlichen Kalender abonnieren",
+  ],
 ] as const;
 
 const numberFormatter = new Intl.NumberFormat("de-DE", {
@@ -451,7 +456,7 @@ function DroppableBlock({
                 quizId={quizId}
                 typ="Outro"
                 count={outroSlides.length}
-                description="Bekanntmachungen und vorhandene Konfiguration"
+                description="Bekanntmachungen und PubQuiz-Kalender"
               />
             ) : gruppe.fragen.length === 0 && gruppe.stories.length === 0 ? (
               gruppe.blockTyp === "fragenblock" ? (

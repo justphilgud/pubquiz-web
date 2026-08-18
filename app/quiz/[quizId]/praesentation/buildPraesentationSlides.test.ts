@@ -76,7 +76,7 @@ test("leitet Standardphasen für mehrere Runden und den Abschluss ab", () => {
     "section:10:intro",
   );
   assert.ok(flowTypes.includes("INTERMEDIATE_STANDINGS"));
-  assert.deepEqual(flowTypes.slice(-3), ["FINAL_STANDINGS", "WINNER", "CLOSING"]);
+  assert.deepEqual(flowTypes.slice(-4), ["FINAL_STANDINGS", "WINNER", "CLOSING", "CALENDAR_SUBSCRIPTION"]);
 });
 
 test("ausgeblendete Elemente verschwinden und stabile Schlüssel bleiben erhalten", () => {
@@ -113,6 +113,39 @@ test("ausgeblendete Elemente verschwinden und stabile Schlüssel bleiben erhalte
   );
   assert.ok(visible);
   assert.equal(visible ? getPresentationSlideKey(visible) : null, "flow:77:CUSTOM_MESSAGE");
+});
+
+test("calendar outro uses the existing visibility contract", () => {
+  const quiz = quizFixture();
+  quiz.ablaufElemente = [{
+    quiz_ablauf_element_id: 78,
+    typ: "CALENDAR_SUBSCRIPTION",
+    anker_typ: "AFTER_QUIZ",
+    anker_schluessel: "QUIZ",
+    quiz_abschnitt_id: null,
+    sortierung: 40,
+    ist_sichtbar: false,
+    bezeichnung: null,
+    konfiguration: { version: 1, title: "Kein PubQuiz mehr verpassen" },
+    ist_standard: true,
+  }];
+
+  assert.equal(
+    buildPraesentationSlides(quiz).some(
+      (slide) =>
+        slide.typ === "ablauf" &&
+        slide.element.type === "CALENDAR_SUBSCRIPTION",
+    ),
+    false,
+  );
+  assert.equal(
+    buildPraesentationSlides(quiz, { includeDisabledFlowItems: true }).some(
+      (slide) =>
+        slide.typ === "ablauf" &&
+        slide.element.type === "CALENDAR_SUBSCRIPTION",
+    ),
+    true,
+  );
 });
 
 test("mischt Blockelemente und Fragen über denselben produktiven Slide-Builder", () => {

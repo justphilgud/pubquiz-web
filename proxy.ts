@@ -6,6 +6,7 @@ const { auth } = NextAuth(authConfig);
 
 const PUBLIC_PATHS = [
   "/login",
+  "/kalender",
   "/api/auth",
   "/api/quiz/team-live-snapshot",
 ];

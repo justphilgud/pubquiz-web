@@ -21,10 +21,10 @@ test("the common intro editor contains exactly the five fixed slides", () => {
   );
 });
 
-test("the outro contains only announcements", () => {
+test("the outro contains announcements and the public calendar CTA", () => {
   assert.deepEqual(
     OUTRO_SLIDES.map((slide) => slide.title),
-    ["Bekanntmachungen"],
+    ["Bekanntmachungen", "PubQuiz-Kalender"],
   );
 });
 
@@ -36,8 +36,9 @@ test("every editable fixed slide maps to one productive flow item", () => {
     "rules",
     "prizes",
     "announcements",
+    "calendar",
   ]);
-  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 6);
+  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 7);
 });
 
 test("multi-word prizes remain one prize per line", () => {

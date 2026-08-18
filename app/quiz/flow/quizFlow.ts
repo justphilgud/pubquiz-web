@@ -14,6 +14,7 @@ export const QUIZ_FLOW_ITEM_TYPES = [
   "FINAL_STANDINGS",
   "WINNER",
   "CUSTOM_MESSAGE",
+  "CALENDAR_SUBSCRIPTION",
   "CLOSING",
   "QUESTION",
   "QUESTION_SOLUTION",
@@ -78,6 +79,7 @@ export const QUIZ_GLOBAL_FLOW_ITEM_TYPES = [
   "FINAL_STANDINGS",
   "WINNER",
   "CUSTOM_MESSAGE",
+  "CALENDAR_SUBSCRIPTION",
   "CLOSING",
 ] as const satisfies readonly QuizFlowItemType[];
 
@@ -698,6 +700,11 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
         quiz.outro_bekanntmachungen ??
         "Wir freuen uns auf den nächsten gemeinsamen Quizabend.",
     }),
+    defaultItem("CALENDAR_SUBSCRIPTION", "AFTER_QUIZ", "QUIZ", null, 40, {
+      version: 1,
+      title: "Kein PubQuiz mehr verpassen",
+      body: "Scanne den QR-Code und abonniere unsere nächsten öffentlichen PubQuiz-Termine direkt in deinem Kalender.",
+    }),
   );
 
   return result;
@@ -805,6 +812,7 @@ export function getQuizFlowTypeLabel(type: QuizFlowItemType) {
     FINAL_STANDINGS: "Endstand",
     WINNER: "Gewinner",
     CUSTOM_MESSAGE: "Freie Mitteilung",
+    CALENDAR_SUBSCRIPTION: "PubQuiz-Kalender",
     CLOSING: "Abschluss",
     QUESTION: "Frage",
     QUESTION_SOLUTION: "Auflösung",
@@ -885,7 +893,12 @@ export function getQuizFlowAnswerStatus(type: QuizFlowItemType) {
   if (type === "BREAK" || type === "COUNTDOWN") return "Pause";
   if (type === "INTERMEDIATE_STANDINGS") return "Der Zwischenstand wird gezeigt";
   if (type === "ROUND_INTRO") return "Die nächste Runde beginnt gleich";
-  if (type === "FINAL_STANDINGS" || type === "WINNER" || type === "CLOSING") {
+  if (
+    type === "FINAL_STANDINGS" ||
+    type === "WINNER" ||
+    type === "CALENDAR_SUBSCRIPTION" ||
+    type === "CLOSING"
+  ) {
     return "Das Quiz ist beendet";
   }
   if (type === "QUESTION_SOLUTION") return "Die Auflösung wird gezeigt";

@@ -131,14 +131,16 @@ export async function saveOutroSlide(
     }
 
     await requireQuizEditor(quizId);
-    await prisma.quiz.update({
-      where: { quiz_id: quizId },
-      data: {
-        outro_bekanntmachungen:
-          text(formData, "bekanntmachungen") || null,
-        outro_musik_url: text(formData, "outroMusikUrl") || null,
-      },
-    });
+    if (slideIdValue === "announcements") {
+      await prisma.quiz.update({
+        where: { quiz_id: quizId },
+        data: {
+          outro_bekanntmachungen:
+            text(formData, "bekanntmachungen") || null,
+          outro_musik_url: text(formData, "outroMusikUrl") || null,
+        },
+      });
+    }
     await saveSlideVisibility(
       quizId,
       slideIdValue,

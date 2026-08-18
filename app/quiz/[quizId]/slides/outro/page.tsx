@@ -11,14 +11,19 @@ import {
 } from "../FixedSlideEditor";
 import { saveOutroSlide } from "../fixedSlideActions";
 import BlobUploadField from "../BlobUploadField";
-import { OUTRO_SLIDES } from "@/app/quiz/fixedSlidesPolicy";
+import {
+  isOutroSlideId,
+  OUTRO_SLIDES,
+} from "@/app/quiz/fixedSlidesPolicy";
+import { PUBLIC_CALENDAR_LANDING_PATH } from "@/app/calendar/publicCalendar";
 
 type Props = {
   params: Promise<{ quizId: string }>;
+  searchParams: Promise<{ slide?: string }>;
 };
 
-export default async function OutroEditorPage({ params }: Props) {
-  const { quizId } = await params;
+export default async function OutroEditorPage({ params, searchParams }: Props) {
+  const [{ quizId }, query] = await Promise.all([params, searchParams]);
   const [quiz, slideVisibility] = await Promise.all([
     getQuizDetails(Number(quizId)),
     getQuizFixedSlideVisibility(Number(quizId)),
@@ -29,13 +34,16 @@ export default async function OutroEditorPage({ params }: Props) {
   }
 
   const quizIdValue = quiz.quiz_id;
+  const initialItemId = isOutroSlideId(query.slide)
+    ? query.slide
+    : OUTRO_SLIDES[0].id;
 
   return (
     <FixedSlideEditor
-      eyebrow="Outro · 1 feste Slide"
+      eyebrow="Outro · 2 feste Slides"
       title="Outro konfigurieren"
-      description="Das Outro besteht ausschließlich aus den Bekanntmachungen."
-      initialItemId="announcements"
+      description="Bekanntmachungen und der allgemeine PubQuiz-Kalender bilden gemeinsam den Abschluss."
+      initialItemId={initialItemId}
       backHref={`/quiz/${quizIdValue}`}
       items={[
         {
@@ -77,6 +85,30 @@ export default async function OutroEditorPage({ params }: Props) {
                   className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
                 />
               </FixedSlideField>
+            </FixedSlideForm>
+          ),
+        },
+        {
+          id: OUTRO_SLIDES[1].id,
+          title: OUTRO_SLIDES[1].title,
+          description: OUTRO_SLIDES[1].description,
+          status: "configured",
+          panel: (
+            <FixedSlideForm
+              action={saveOutroSlide}
+              previewHref={PUBLIC_CALENDAR_LANDING_PATH}
+            >
+              <input type="hidden" name="quizId" value={quizIdValue} />
+              <input type="hidden" name="slideId" value="calendar" />
+              <FixedSlideEnabledField defaultEnabled={slideVisibility.calendar} />
+              <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-sm text-cyan-950">
+                <p className="font-black">Kein PubQuiz mehr verpassen</p>
+                <p className="mt-2 leading-6">
+                  Der Slide zeigt einen großen QR-Code zum allgemeinen öffentlichen
+                  PubQuiz-Kalender. Das Ziel ist bei jedem Quiz identisch und enthält
+                  niemals private Termine.
+                </p>
+              </div>
             </FixedSlideForm>
           ),
         },

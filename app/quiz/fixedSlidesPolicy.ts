@@ -39,6 +39,11 @@ export const OUTRO_SLIDES = [
     title: "Bekanntmachungen",
     description: "Hinweise, Termine, Abschlussinformationen und Musik",
   },
+  {
+    id: "calendar",
+    title: "PubQuiz-Kalender",
+    description: "Allgemeinen öffentlichen Kalender per QR-Code abonnieren",
+  },
 ] as const;
 
 export type OutroSlideId = (typeof OUTRO_SLIDES)[number]["id"];
@@ -50,6 +55,7 @@ export const FIXED_SLIDE_FLOW_TYPES = {
   rules: "RULES",
   prizes: "PRIZES",
   announcements: "CLOSING",
+  calendar: "CALENDAR_SUBSCRIPTION",
 } as const;
 
 export type FixedSlideId = keyof typeof FIXED_SLIDE_FLOW_TYPES;

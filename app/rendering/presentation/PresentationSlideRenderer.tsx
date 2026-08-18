@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 
+import { PUBLIC_CALENDAR_LANDING_PATH } from "@/app/calendar/publicCalendar";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 import { parsePrizeSlots } from "@/app/quiz/fixedSlidesPolicy";
 import type { QuizPraesentationResult } from "../../quiz/actions";
@@ -228,10 +229,13 @@ export default function PresentationSlideRenderer({
     teamJoinState = null,
   } = displayState;
   const relativeAnswerUrl = `/quiz/${quiz.quiz_id}/antworten`;
+  const relativeCalendarUrl = PUBLIC_CALENDAR_LANDING_PATH;
   const [answerUrl, setAnswerUrl] = useState(relativeAnswerUrl);
+  const [calendarUrl, setCalendarUrl] = useState(relativeCalendarUrl);
   useEffect(() => {
     setAnswerUrl(`${window.location.origin}${relativeAnswerUrl}`);
-  }, [relativeAnswerUrl]);
+    setCalendarUrl(`${window.location.origin}${relativeCalendarUrl}`);
+  }, [relativeAnswerUrl, relativeCalendarUrl]);
   const currentSlideMedia =
     slide?.typ === "frage"
       ? slide.frage.medien
@@ -1889,6 +1893,32 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
     );
   }
 
+  if (type === "CALENDAR_SUBSCRIPTION") {
+    return (
+      <section
+        className="presentation-flow-slide"
+        data-flow-type={type}
+      >
+        <p className="presentation-flow-kicker">Nächste Termine</p>
+        <h2>{config.title ?? "Kein PubQuiz mehr verpassen"}</h2>
+        <p className="presentation-flow-lead">
+          {config.body ??
+            "Scanne den QR-Code und abonniere unsere nächsten öffentlichen PubQuiz-Termine direkt in deinem Kalender."}
+        </p>
+        <div className="presentation-flow-qr-layout">
+          <div className="presentation-flow-qr">
+            <QRCode value={calendarUrl} size={400} />
+          </div>
+          <div>
+            <strong>PubQuiz-Termine</strong>
+            <p>Ein Kalender für alle öffentlichen ungegoogelt Quizabende.</p>
+            <p className="mt-5 break-all text-base opacity-80">{calendarUrl}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="presentation-flow-slide" data-flow-type={type}>
       <p className="presentation-flow-kicker">
@@ -2028,7 +2058,7 @@ function renderAktuellenSlide() {
       ? slide.abschnitt.quiz_abschnitt_id
       : slideIndex;
   const inferredStorybookContentKind: ResolveStorybookCompositionInput["contentKind"] =
-    slide?.typ === "ablauf" && ["WAITING", "START_SEQUENCE", "WELCOME", "WINNER", "CLOSING"].includes(slide.element.type) ? "COVER"
+    slide?.typ === "ablauf" && ["WAITING", "START_SEQUENCE", "WELCOME", "WINNER", "CLOSING", "CALENDAR_SUBSCRIPTION"].includes(slide.element.type) ? "COVER"
       : slide?.typ === "ablauf" && ["ROUND_INTRO", "CHAPTER_INTRO"].includes(slide.element.type) ? "CHAPTER"
       : slide?.typ === "ablauf" && slide.element.type === "AUDIO" ? "AUDIO"
       : slide?.typ === "ablauf" && ["IMAGE", "IMAGE_GALLERY", "MEDIA_SEQUENCE", "PORTRAIT", "VIDEO"].includes(slide.element.type) ? "IMAGE"
