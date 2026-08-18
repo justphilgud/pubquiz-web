@@ -26,6 +26,9 @@ export async function loadQuestionForEditor(questionId: number) {
       moderationsnotizen: true,
       kategorienwunsch: true,
       gueltig_bis: true,
+      pruefen_ab: true,
+      aktualitaet_geprueft_am: true,
+      aktualitaet_geprueft_von_user_id: true,
       ist_unfertig: true,
       ist_archiviert: true,
       freigegeben: true,
@@ -132,6 +135,7 @@ export async function loadQuestionForEditor(questionId: number) {
     question.submitted_by_user_id,
     question.reviewed_by_user_id,
     question.approved_by_user_id,
+    question.aktualitaet_geprueft_von_user_id,
   ].filter((id): id is number => id !== null);
   const users = userIds.length
     ? await prisma.users.findMany({
@@ -244,6 +248,7 @@ export async function loadQuestionForEditor(questionId: number) {
     approvalRemark: "",
     isIncomplete: question.ist_unfertig,
     validUntil: question.gueltig_bis?.toISOString().slice(0, 10) ?? null,
+    reviewFrom: question.pruefen_ab?.toISOString().slice(0, 10) ?? null,
     status: question.freigegeben
       ? "APPROVED"
       : question.ist_unfertig
@@ -264,6 +269,10 @@ export async function loadQuestionForEditor(questionId: number) {
     createdAt: question.created_at.toISOString(),
     updatedAt: question.updated_at.toISOString(),
     approvedAt: question.approved_at?.toISOString() ?? null,
+    freshnessReviewedAt: question.aktualitaet_geprueft_am?.toISOString() ?? null,
+    freshnessReviewedByName: getUserName(
+      question.aktualitaet_geprueft_von_user_id,
+    ),
     templateName: question.vorlage?.name ?? null,
     isArchived: question.ist_archiviert,
     scope: question.geltungsbereich,

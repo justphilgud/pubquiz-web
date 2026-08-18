@@ -197,11 +197,13 @@ export const deQuestionEditorMessages = {
   },
   details: {
     title: "Weitere Angaben", emptySummary: "Kategorien, interne Angaben und Ablaufdatum", category: "{count} Kategorie", categories: "{count} Kategorien",
-    sourcePresent: "Quelle vorhanden", moderationPresent: "Moderationsnotiz vorhanden", expiryEnabled: "Ablaufdatum aktiviert", validUntil: "Gültig bis {date}",
+    sourcePresent: "Quelle vorhanden", moderationPresent: "Moderationsnotiz vorhanden", expiryEnabled: "Ablaufdatum aktiviert", validUntil: "Gültig bis {date}", outdatedFrom: "Veraltet ab {date}", reviewFrom: "Prüfen ab {date}",
     categoryRequestPresent: "Älterer Kategorienwunsch vorhanden", categoryRequest: "Bestehender Kategorienwunsch", categoryRequestHelp: "Dieser Wunsch stammt aus dem bisherigen Verfahren. Neue Vorschläge legst du direkt über die Kategoriensuche an.", categoryRequestPlaceholder: "Zum Beispiel: Wissenschaft · Raumfahrt",
     expiryTitle: "Zeitlich begrenzte Frage", expiryDescription: "Nutze diese Einstellung für Fragen, deren Antwort nur bis zu einem bestimmten Zeitpunkt aktuell ist, zum Beispiel „Vogel des Jahres 2026“.",
     hasExpiry: "Frage hat ein Ablaufdatum", hasExpiryHelp: "Nach dem Ablauf bleibt die Frage erhalten, wird aber nicht mehr automatisch für neue Quizze vorgeschlagen.",
     usableUntil: "Aktuell nutzbar bis einschließlich", expiryAfterHelp: "Ab dem folgenden Tag gilt die Frage als veraltet. Sie wird nicht gelöscht und kann weiterhin gefunden, bearbeitet oder bewusst verwendet werden.",
+    lifecycleTitle: "Aktualität", lifecycleDescription: "Lege fest, ob die Frage zeitlos ist, ab einem Datum veraltet oder redaktionell geprüft werden soll.",
+    lifecycleTimeless: "Zeitlos", lifecycleOutdated: "Veraltet ab", lifecycleReview: "Prüfen ab", lifecycleDate: "Datum", reviewHelp: "Die Frage bleibt nutzbar. Ab diesem Datum erscheint ein redaktioneller Prüfhinweis.",
   },
   categories: {
     title: "Kategorien", remove: "{name} entfernen", clearAll: "Alle Kategorien entfernen", searchLabel: "Kategorie suchen oder eingeben",
@@ -250,7 +252,7 @@ export const deQuestionEditorMessages = {
   },
   quality: {
     QUESTION_TEXT_REQUIRED: "Fragetext fehlt", TEMPLATE_MEDIA_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_TYPE_MISMATCH: "{label} besitzt den falschen Medientyp", MEDIA_SLOT_CONFLICT: "{label} ist widersprüchlich zugeordnet", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} enthält zu viele Medien", MEDIA_UPLOAD_IN_PROGRESS: "Der Upload für {label} läuft noch", MEDIA_UPLOAD_FAILED: "Der Upload für {label} ist fehlgeschlagen", MEDIA_OWNER_INVALID: "{label} besitzt keine eindeutige Zuordnung", CORRECT_ANSWER_REQUIRED: "Keine ausgefüllte richtige Antwort vorhanden", POLL_OPTIONS_REQUIRED: "Mindestens zwei ausgefüllte Umfrageoptionen sind erforderlich", POLL_SCALE_INVALID: "Skala, Schrittweite und Beschriftungen müssen vollständig und gültig sein", ANSWER_MEDIA_REQUIRED: "Für FaceMorph sind beide Antwortbilder erforderlich",
-    REQUIRED_LABELED_ANSWER_EMPTY: "Ein erforderliches beschriftetes Antwortfeld ist leer", VALID_UNTIL_INVALID: "Ablaufdatum ist unvollständig oder ungültig",
+    REQUIRED_LABELED_ANSWER_EMPTY: "Ein erforderliches beschriftetes Antwortfeld ist leer", VALID_UNTIL_INVALID: "Ablaufdatum ist unvollständig oder ungültig", REVIEW_FROM_INVALID: "Prüfdatum ist unvollständig oder ungültig", LIFECYCLE_DATE_CONFLICT: "Es kann nur ein Aktualitätsmodus aktiv sein",
     LABELED_ANSWERS_INCONSISTENT: "Beschriftete Antwortdaten sind technisch inkonsistent", SOURCE_MISSING: "Quelle fehlt", CATEGORY_MISSING: "Kategorie fehlt",
     GENERATOR_INPUT_REQUIRED: "Das erforderliche Generator-Original fehlt", GENERATOR_OUTPUT_REQUIRED: "Die erzeugte Ausgabe fehlt", GENERATOR_IN_PROGRESS: "Die Generierung läuft noch",
     GENERATOR_FAILED: "Die Generierung ist fehlgeschlagen", GENERATOR_OUTPUT_STALE: "Die Generatorausgabe ist veraltet", GENERATOR_OUTPUT_MISMATCH: "Die Ausgabe gehört nicht zum aktuellen Original",

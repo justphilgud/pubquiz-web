@@ -52,6 +52,7 @@ export async function cloneQuestion(questionId: number): Promise<ManagementResul
         moderationsnotizen: true,
         kategorienwunsch: true,
         gueltig_bis: true,
+        pruefen_ab: true,
         template_config_json: true,
         fragen_kategorien: { select: { fragenkategorie_id: true } },
         medien: {
@@ -131,6 +132,7 @@ export async function cloneQuestion(questionId: number): Promise<ManagementResul
         moderationsnotizen: source.moderationsnotizen,
         kategorienwunsch: source.kategorienwunsch,
         gueltig_bis: source.gueltig_bis,
+        pruefen_ab: source.pruefen_ab,
         template_config_json: source.template_config_json ?? undefined,
         ist_archiviert: false,
         archivierungsgrund: null,

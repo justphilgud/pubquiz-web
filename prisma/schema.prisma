@@ -67,6 +67,10 @@ model fragen {
   moderationsnotizen           String?
   kategorienwunsch             String?
   gueltig_bis                  DateTime?                @db.Date
+  pruefen_ab                   DateTime?                @db.Date
+  aktualitaet_geprueft_am      DateTime?
+  aktualitaet_geprueft_von_user_id Int?
+  aktualitaet_geprueft_von     users?                   @relation("QuestionFreshnessReviewer", fields: [aktualitaet_geprueft_von_user_id], references: [id], onDelete: SetNull)
   review_status                QuestionReviewStatus     @default(DRAFT)
   submitted_at                 DateTime?
   submitted_by_user_id         Int?
@@ -81,6 +85,8 @@ model fragen {
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
   @@index([source_vorlage_id], map: "idx_fragen_source_vorlage")
+  @@index([gueltig_bis, ist_archiviert], map: "idx_fragen_gueltig_bis")
+  @@index([pruefen_ab, ist_archiviert], map: "idx_fragen_pruefen_ab")
   @@schema("pubquiz")
 }
 
@@ -893,6 +899,7 @@ model users {
   erstellte_story_verknuepfungen    frage_story_elemente[]       @relation("StoryQuestionLinkCreator")
   erstellte_fragevorlagen           frage_vorlagen[]             @relation("QuestionTemplateCreator")
   bewertete_fragevorlagen           frage_vorlagen[]             @relation("QuestionTemplateReviewer")
+  aktualitaet_gepruefte_fragen      fragen[]                      @relation("QuestionFreshnessReviewer")
 
   @@schema("pubquiz")
 }

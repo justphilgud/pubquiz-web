@@ -143,6 +143,7 @@ type NormalizedDraft = {
   moderationNotes: string;
   categoryRequest: string;
   validUntil: Date | null;
+  reviewFrom: Date | null;
   reviewFeedback: string | null;
   generatorParameters: GeneratorParametersDraft;
   templateConfig: QuestionTemplateConfig;
@@ -435,6 +436,9 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     !Array.isArray(payload.answers) ||
     !Array.isArray(payload.categoryIds) ||
     (payload.validUntil !== null && typeof payload.validUntil !== "string") ||
+    (payload.reviewFrom !== undefined &&
+      payload.reviewFrom !== null &&
+      typeof payload.reviewFrom !== "string") ||
     (payload.templateId !== null && typeof payload.templateId !== "string") ||
     (payload.sourceTemplateId !== null &&
       (!Number.isInteger(payload.sourceTemplateId) || payload.sourceTemplateId <= 0))
@@ -704,6 +708,21 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     throw new DraftValidationError("Die Anzeigedauern der Pixelstufen sind ungültig.", "questionMedia");
   }
 
+  const validUntil = parseValidUntil(
+    payload.validUntil,
+    requiresCompleteQuestion,
+  );
+  const reviewFrom = parseReviewFrom(
+    payload.reviewFrom,
+    requiresCompleteQuestion,
+  );
+  if (validUntil !== null && reviewFrom !== null) {
+    throw new DraftValidationError(
+      "Wähle entweder ‚Veraltet ab‘ oder ‚Prüfen ab‘, nicht beides.",
+      "reviewFrom",
+    );
+  }
+
   return {
     templateId,
     sourceTemplateId: payload.sourceTemplateId,
@@ -727,14 +746,41 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     sourceOrRemark: payload.sourceOrRemark.trim(),
     moderationNotes: payload.moderationNotes.trim(),
     categoryRequest: payload.categoryRequest.trim(),
-    validUntil: parseValidUntil(
-      payload.validUntil,
-      requiresCompleteQuestion,
-    ),
+    validUntil,
+    reviewFrom,
     reviewFeedback: normalizeReviewFeedback(payload),
     generatorParameters,
     templateConfig,
   };
+}
+
+function parseReviewFrom(
+  value: string | null | undefined,
+  requireCompleteDate: boolean,
+): Date | null {
+  const normalizedValue = value?.trim() ?? "";
+
+  if (!normalizedValue) {
+    if (requireCompleteDate && value !== null && value !== undefined) {
+      throw new DraftValidationError(
+        "Wähle ein vollständiges Prüfdatum aus.",
+        "reviewFrom",
+      );
+    }
+    return null;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+    throw new DraftValidationError(
+      "Das Prüfdatum ist nicht vollständig oder ungültig.",
+      "reviewFrom",
+    );
+  }
+  const date = new Date(`${normalizedValue}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== normalizedValue) {
+    throw new DraftValidationError("Das Prüfdatum ist ungültig.", "reviewFrom");
+  }
+  return date;
 }
 
 async function resolveDynamicTemplateSnapshot(
@@ -1553,6 +1599,7 @@ export async function saveQuestion(
             moderationsnotizen: draft.moderationNotes || null,
             kategorienwunsch: draft.categoryRequest || null,
             gueltig_bis: draft.validUntil,
+            pruefen_ab: draft.reviewFrom,
             freigegeben: approval.freigegeben,
             approved_by_user_id: approval.approved_by_user_id,
             approved_at: approval.approved_at,
@@ -2220,6 +2267,7 @@ export async function saveQuestion(
           moderationsnotizen: draft.moderationNotes || null,
           kategorienwunsch: draft.categoryRequest || null,
           gueltig_bis: draft.validUntil,
+          pruefen_ab: draft.reviewFrom,
           freigegeben: approval.freigegeben,
           approved_by_user_id: approval.approved_by_user_id,
           approved_at: approval.approved_at,

@@ -44,8 +44,25 @@ test("content entry routes declare the expected initial filters", () => {
 
 test("shared content filters parse and serialize mixed search state", () => {
   const filters = parseContentFilters(new URLSearchParams("q=musik&contentType=ALL&storyType=AUDIO&status=ACTIVE&media=WITH&usage=USED"), "QUESTION");
-  assert.deepEqual(filters, { query: "musik", contentType: "ALL", categoryIds: [], storyType: "AUDIO", status: "ACTIVE", media: "WITH", usage: "USED", eventSeriesId: null });
+  assert.deepEqual(filters, { query: "musik", contentType: "ALL", categoryIds: [], storyType: "AUDIO", status: "ACTIVE", questionLifecycle: "ALL", media: "WITH", usage: "USED", eventSeriesId: null });
   assert.equal(serializeContentFilters(filters).toString(), "q=musik&storyType=AUDIO&status=ACTIVE&media=WITH&usage=USED");
+});
+
+test("question lifecycle filters round-trip and are removed for story-only views", () => {
+  const questionFilters = parseContentFilters(
+    new URLSearchParams("contentType=QUESTION&questionLifecycle=REVIEW_DUE"),
+  );
+  assert.equal(questionFilters.questionLifecycle, "REVIEW_DUE");
+  assert.equal(
+    serializeContentFilters(questionFilters).toString(),
+    "contentType=QUESTION&questionLifecycle=REVIEW_DUE",
+  );
+  assert.equal(
+    parseContentFilters(
+      new URLSearchParams("contentType=STORY_ELEMENT&questionLifecycle=OUTDATED"),
+    ).questionLifecycle,
+    "ALL",
+  );
 });
 
 test("category filters preserve multiple independently removable selections", () => {
@@ -138,10 +155,10 @@ test("content workspace links directly to canonical creation routes", () => {
 
 test("type changes discard irrelevant filters and preserve relevant ones", () => {
   assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=QUESTION&storyType=AUDIO&categoryId=4")), {
-    query: "", contentType: "QUESTION", categoryIds: [4], storyType: "ALL", status: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
+    query: "", contentType: "QUESTION", categoryIds: [4], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
   });
   assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=STORY_ELEMENT&storyType=AUDIO&categoryId=4")), {
-    query: "", contentType: "STORY_ELEMENT", categoryIds: [], storyType: "AUDIO", status: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
+    query: "", contentType: "STORY_ELEMENT", categoryIds: [], storyType: "AUDIO", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
   });
 });
 

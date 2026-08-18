@@ -36,6 +36,11 @@ import {
 } from "./questionOverviewFilters";
 import { Prisma } from "@/app/generated/prisma/client";
 import { getBerlinDate } from "@/app/lib/berlinDate";
+import {
+  QUESTION_LIFECYCLE_FILTERS,
+  QUESTION_LIFECYCLE_SOON_DAYS,
+  type QuestionLifecycleFilter,
+} from "./editor/questionLifecycle";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { questionTemplateDefinitions } from "./editor/templates/questionTemplates";
 import { normalizeQuestionTemplateConfig } from "./editor/pixelTemplateConfig";
@@ -111,6 +116,8 @@ export type FrageSuchResult = {
   review_status: "DRAFT" | "IN_REVIEW" | "CHANGES_REQUESTED" | "APPROVED";
   freigegeben: boolean;
   gueltig_bis: string | null;
+  pruefen_ab: string | null;
+  aktualitaet_geprueft_am: string | null;
   can_clone: boolean;
   geltungsbereich: "GLOBAL" | "EVENT_SERIES";
   eventreihen: string[];
@@ -173,6 +180,7 @@ export async function searchFragen(data: {
   templateIds: string[];
   eventSeriesId?: number | null;
   usageState?: "USED" | "UNUSED" | null;
+  lifecycleFilter?: QuestionLifecycleFilter;
   limit?: number;
   offset?: number;
 }) {
@@ -337,6 +345,31 @@ export async function searchFragen(data: {
       : answerMode === "open"
         ? getQuestionAnswerModeWhereInput("OPEN")
         : null;
+  const today = getBerlinDate();
+  const soonUntil = new Date(today);
+  soonUntil.setUTCDate(soonUntil.getUTCDate() + QUESTION_LIFECYCLE_SOON_DAYS);
+  const lifecycleFilter = QUESTION_LIFECYCLE_FILTERS.includes(
+    data.lifecycleFilter as QuestionLifecycleFilter,
+  )
+    ? data.lifecycleFilter
+    : "ALL";
+  const lifecycleCondition: Prisma.fragenWhereInput | null =
+    lifecycleFilter === "CURRENT"
+      ? {
+          AND: [
+            { OR: [{ gueltig_bis: null }, { gueltig_bis: { gte: today } }] },
+            { OR: [{ pruefen_ab: null }, { pruefen_ab: { gt: today } }] },
+          ],
+        }
+      : lifecycleFilter === "OUTDATED_SOON"
+        ? { gueltig_bis: { gte: today, lt: soonUntil } }
+        : lifecycleFilter === "OUTDATED"
+          ? { gueltig_bis: { lt: today } }
+          : lifecycleFilter === "REVIEW_SOON"
+            ? { pruefen_ab: { gt: today, lte: soonUntil } }
+            : lifecycleFilter === "REVIEW_DUE"
+              ? { pruefen_ab: { lte: today } }
+              : null;
 
   const baseWhere: Prisma.fragenWhereInput = {
     fragen_id: sourceQuestionIds
@@ -354,6 +387,7 @@ export async function searchFragen(data: {
       ...(templateConditions.length > 0 ? [{ OR: templateConditions }] : []),
       ...(mediaCondition ? [mediaCondition] : []),
       ...(answerModeCondition ? [answerModeCondition] : []),
+      ...(lifecycleCondition ? [lifecycleCondition] : []),
     ],
 
     fragen_kategorien: (data.kategorieIds?.length ?? 0) > 0 || data.kategorieId
@@ -453,6 +487,8 @@ export async function searchFragen(data: {
       review_status: frage.review_status,
       freigegeben: frage.freigegeben,
       gueltig_bis: frage.gueltig_bis?.toISOString().slice(0, 10) ?? null,
+      pruefen_ab: frage.pruefen_ab?.toISOString().slice(0, 10) ?? null,
+      aktualitaet_geprueft_am: frage.aktualitaet_geprueft_am?.toISOString() ?? null,
       can_clone: canCloneScopedQuestion(actor, mapQuestionAccessContext(frage)),
       geltungsbereich: frage.geltungsbereich,
       eventreihen: frage.eventreihen.map((entry) => entry.eventreihe.name),

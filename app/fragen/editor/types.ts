@@ -268,6 +268,7 @@ export type QuestionEditorDraft = {
 
   isIncomplete: boolean;
   validUntil: string | null;
+  reviewFrom?: string | null;
   status: QuestionStatus;
   storyElementLinks?: Array<{
     storyElementId: number;
@@ -418,6 +419,8 @@ export type QuestionEditorRecord = {
   createdAt: string;
   updatedAt: string;
   approvedAt: string | null;
+  freshnessReviewedAt: string | null;
+  freshnessReviewedByName: string | null;
   templateName: string | null;
   isArchived: boolean;
   scope: "GLOBAL" | "EVENT_SERIES";
@@ -432,7 +435,8 @@ export type QuestionValidationTarget =
   | "templatePlaceReviewCount"
   | "answers"
   | "categories"
-  | "validUntil";
+  | "validUntil"
+  | "reviewFrom";
 
 export type SaveQuestionPayload = {
   questionId?: number;
@@ -451,6 +455,7 @@ export type SaveQuestionPayload = {
   moderationNotes: string;
   categoryRequest: string;
   validUntil: string | null;
+  reviewFrom?: string | null;
   templateId: string | null;
   sourceTemplateId: number | null;
   generatorParameters?: GeneratorParametersDraft;

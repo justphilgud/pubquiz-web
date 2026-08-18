@@ -18,7 +18,7 @@ export default function ContentFilters({ filters, categories, eventSeries, loadi
   onApply: () => void;
   onReset: () => void;
 }) {
-  const filterCount = [filters.contentType !== "ALL", filters.categoryIds.length > 0, filters.storyType !== "ALL", filters.status !== "ALL", filters.media !== "ALL", filters.usage !== "ALL", filters.eventSeriesId !== null].filter(Boolean).length;
+  const filterCount = [filters.contentType !== "ALL", filters.categoryIds.length > 0, filters.storyType !== "ALL", filters.status !== "ALL", filters.questionLifecycle !== "ALL", filters.media !== "ALL", filters.usage !== "ALL", filters.eventSeriesId !== null].filter(Boolean).length;
   const [open, setOpen] = useState(filterCount > 0);
   const [categoryQuery, setCategoryQuery] = useState("");
   const visibleCategories = useMemo(() => {
@@ -38,6 +38,7 @@ export default function ContentFilters({ filters, categories, eventSeries, loadi
         <div className="mt-3 grid gap-3 rounded-2xl bg-slate-50 p-3 sm:grid-cols-2 xl:grid-cols-5">
           <label><span className="mb-1 block text-xs font-bold text-slate-600">Inhaltstyp</span><select value={filters.contentType} onChange={(event) => onChange(normalizeContentFiltersForType({ ...filters, contentType: event.target.value as ContentFiltersState["contentType"] }))} className={inputClass}><option value="ALL">Alle Inhalte</option><option value="QUESTION">Fragen</option><option value="STORY_ELEMENT">Story-Elemente</option></select></label>
           <label><span className="mb-1 block text-xs font-bold text-slate-600">Status</span><select value={filters.status} onChange={(event) => onChange({ ...filters, status: event.target.value as ContentFiltersState["status"] })} className={inputClass}><option value="ALL">Alle Status</option><option value="DRAFT">Entwurf</option><option value="ACTIVE">Aktiv / freigegeben</option><option value="ARCHIVED">Archiviert</option></select></label>
+          {filters.contentType !== "STORY_ELEMENT" && <label><span className="mb-1 block text-xs font-bold text-slate-600">Aktualität</span><select value={filters.questionLifecycle} onChange={(event) => onChange({ ...filters, questionLifecycle: event.target.value as ContentFiltersState["questionLifecycle"] })} className={inputClass}><option value="ALL">Alle</option><option value="CURRENT">Aktuell</option><option value="OUTDATED_SOON">Bald veraltet</option><option value="OUTDATED">Veraltet</option><option value="REVIEW_SOON">Prüfung demnächst</option><option value="REVIEW_DUE">Prüfung fällig</option></select></label>}
           {filters.contentType !== "STORY_ELEMENT" && <details className="relative self-end rounded-xl border border-slate-300 bg-white">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm font-semibold text-slate-800">
               <span>{filters.categoryIds.length === 0 ? "Alle Kategorien" : `${filters.categoryIds.length} Kategorien`}</span>
