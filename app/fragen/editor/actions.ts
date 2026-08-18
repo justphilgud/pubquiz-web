@@ -1,11 +1,13 @@
 "use server";
 
-import { head } from "@vercel/blob";
+import { randomUUID } from "node:crypto";
+import { copy, head } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { requireQuestionEditor } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import {
   getMediaVerificationServerConfig,
+  buildMediaUploadPathname,
   logMediaUploadFailure,
 } from "./mediaUploadEnvironment";
 import { getCurrentUserId } from "@/app/services/questionService";
@@ -85,6 +87,11 @@ import {
   type StoryQuestionRelationshipValue,
 } from "@/app/story-elemente/storyElement";
 import { loadStoryElement } from "@/app/story-elemente/storyElementRepository.server";
+import {
+  getDynamicTemplateRequirementIssue,
+  parseDynamicQuestionTemplateSnapshot,
+  type DynamicQuestionTemplateSnapshot,
+} from "./templates/dynamicQuestionTemplate";
 
 const serverMessages = loadQuestionEditorMessages("de");
 
@@ -127,6 +134,7 @@ type NormalizedAnswer = {
 
 type NormalizedDraft = {
   templateId: string | null;
+  sourceTemplateId: number | null;
   questionText: string;
   questionMedia: Exclude<NormalizedMediaDraft, null>[];
   answers: NormalizedAnswer[];
@@ -427,7 +435,9 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     !Array.isArray(payload.answers) ||
     !Array.isArray(payload.categoryIds) ||
     (payload.validUntil !== null && typeof payload.validUntil !== "string") ||
-    (payload.templateId !== null && typeof payload.templateId !== "string")
+    (payload.templateId !== null && typeof payload.templateId !== "string") ||
+    (payload.sourceTemplateId !== null &&
+      (!Number.isInteger(payload.sourceTemplateId) || payload.sourceTemplateId <= 0))
   ) {
     throw new DraftValidationError("Die Entwurfsdaten sind unvollständig.");
   }
@@ -696,6 +706,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
 
   return {
     templateId,
+    sourceTemplateId: payload.sourceTemplateId,
     questionText,
     questionMedia: (() => {
       if (!Array.isArray(payload.questionMedia)) {
@@ -724,6 +735,85 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     generatorParameters,
     templateConfig,
   };
+}
+
+async function resolveDynamicTemplateSnapshot(
+  sourceTemplateId: number | null,
+  structuralTemplateId: string | null,
+  questionId?: number,
+) {
+  if (sourceTemplateId === null) return null;
+  const row = await prisma.frage_vorlagen.findFirst({
+    where: {
+      vorlage_id: sourceTemplateId,
+      art: "DYNAMIC",
+      OR: [
+        { status: "ACTIVE", ist_aktiv: true },
+        ...(questionId
+          ? [{ angewendete_fragen: { some: { fragen_id: questionId } } }]
+          : []),
+      ],
+    },
+    select: { basis_code: true, konfiguration_json: true },
+  });
+  const snapshot = parseDynamicQuestionTemplateSnapshot(
+    row?.konfiguration_json,
+  );
+  const expectedBase = structuralTemplateId ?? "standard";
+  if (!row || !snapshot || row.basis_code !== expectedBase) {
+    throw new DraftValidationError(
+      "Die angewendete Spezialfragenvorlage ist nicht mehr aktiv oder passt nicht zum Fragentyp.",
+      undefined,
+      "UNKNOWN_TEMPLATE",
+    );
+  }
+  return snapshot;
+}
+
+async function materializeFixedTemplateMedia(
+  media: Exclude<NormalizedMediaDraft, null>[],
+  snapshot: DynamicQuestionTemplateSnapshot,
+) {
+  const fixedUrls = new Set(
+    snapshot.media.flatMap((rule) =>
+      rule.role === "FIXED" && rule.fixedUrl ? [rule.fixedUrl] : []),
+  );
+  if (fixedUrls.size === 0) return media;
+  const config = getMediaVerificationServerConfig();
+
+  return Promise.all(media.map(async (medium) => {
+    if (medium.operation !== "NEW" || !medium.url || !medium.mediaType ||
+      !fixedUrls.has(medium.url)) {
+      return medium;
+    }
+    const metadata = await head(medium.url, config.blobAuthentication);
+    if (!metadata.pathname.startsWith(
+      `${config.environmentPrefix}/template-media/`,
+    )) {
+      throw new DraftValidationError(
+        "Das feste Vorlagenmedium stammt nicht aus dem vorgesehenen Speicher.",
+        "questionMedia",
+      );
+    }
+    const sourceName = getQuestionMediaFileName(metadata.pathname);
+    const extension = sourceName.includes(".")
+      ? `.${sourceName.split(".").pop()!.toLowerCase()}`
+      : "";
+    const copied = await copy(
+      medium.url,
+      buildMediaUploadPathname("question-media", [
+        medium.slotKey,
+        medium.mediaType.toLowerCase(),
+        `${randomUUID()}${extension}`,
+      ]),
+      {
+        access: "public",
+        addRandomSuffix: false,
+        token: config.blobAuthentication.token,
+      },
+    );
+    return { ...medium, url: copied.url };
+  }));
 }
 
 export async function saveQuestion(
@@ -885,9 +975,40 @@ export async function saveQuestion(
   }
 
   let draft: NormalizedDraft;
+  let dynamicTemplateSnapshot: DynamicQuestionTemplateSnapshot | null = null;
+  const requiresCompleteQuestion =
+    payload.intent === "SUBMIT_FOR_REVIEW" || payload.intent === "APPROVE";
 
   try {
     draft = validateQuestion(payload);
+    dynamicTemplateSnapshot = await resolveDynamicTemplateSnapshot(
+      draft.sourceTemplateId,
+      draft.templateId,
+      payload.questionId,
+    );
+    if (requiresCompleteQuestion && dynamicTemplateSnapshot) {
+      const issue = getDynamicTemplateRequirementIssue(
+        dynamicTemplateSnapshot,
+        draft,
+      );
+      if (issue) {
+        const issueDetails = issue === "QUESTION_TEXT"
+          ? { message: "Der Fragentext muss für diese Vorlage neu ausgefüllt werden.", target: "questionText" as const }
+          : issue === "MEDIA"
+            ? { message: "Das erforderliche Medium dieser Vorlage fehlt.", target: "questionMedia" as const }
+            : { message: "Eine erforderliche Antwort dieser Vorlage fehlt.", target: "answers" as const };
+        throw new DraftValidationError(
+          issueDetails.message,
+          issueDetails.target,
+        );
+      }
+    }
+    if (dynamicTemplateSnapshot) {
+      draft.questionMedia = await materializeFixedTemplateMedia(
+        draft.questionMedia,
+        dynamicTemplateSnapshot,
+      );
+    }
     draft.questionMedia = await Promise.all(
       draft.questionMedia.map((media) => verifyUploadedQuestionMedia(media)),
     );
@@ -914,8 +1035,6 @@ export async function saveQuestion(
     };
   }
 
-  const requiresCompleteQuestion =
-    payload.intent === "SUBMIT_FOR_REVIEW" || payload.intent === "APPROVE";
   const selectedTemplate = findQuestionTemplate(
     questionTemplateDefinitions,
     draft.templateId ?? "standard",
@@ -1427,6 +1546,7 @@ export async function saveQuestion(
             geltungsbereich: payload.scope,
             quelle: draft.sourceOrRemark || null,
             vorlage_id: persistedTemplate?.vorlage_id ?? null,
+            source_vorlage_id: draft.sourceTemplateId,
             template_config_json: draft.templateConfig,
             ist_archiviert: false,
             ist_unfertig: payload.intent === "DRAFT",
@@ -2094,6 +2214,7 @@ export async function saveQuestion(
           geltungsbereich: payload.scope,
           quelle: draft.sourceOrRemark || null,
           vorlage_id: persistedTemplateForUpdate?.vorlage_id ?? null,
+          source_vorlage_id: draft.sourceTemplateId,
           template_config_json: draft.templateConfig,
           ist_unfertig: payload.intent === "DRAFT",
           moderationsnotizen: draft.moderationNotes || null,

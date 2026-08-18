@@ -50,6 +50,7 @@ export async function loadQuestionForEditor(questionId: number) {
       vorlage: {
         select: { code: true, name: true },
       },
+      source_vorlage_id: true,
       fragen_kategorien: {
         orderBy: { fragenkategorie_id: "asc" },
         select: { fragenkategorie_id: true },
@@ -216,6 +217,7 @@ export async function loadQuestionForEditor(questionId: number) {
     scope: question.geltungsbereich,
     eventSeriesIds: question.eventreihen.map((entry) => entry.eventreihe_id),
     templateId,
+    sourceTemplateId: question.source_vorlage_id,
     questionText,
     questionMedia,
     generatorRuns,

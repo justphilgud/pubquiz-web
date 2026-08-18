@@ -266,6 +266,8 @@ export type usersWhereInput = {
   erstellte_story_elemente?: Prisma.Story_elementeListRelationFilter
   erstellte_story_revisionen?: Prisma.Story_element_revisionenListRelationFilter
   erstellte_story_verknuepfungen?: Prisma.Frage_story_elementeListRelationFilter
+  erstellte_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
+  bewertete_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -289,6 +291,8 @@ export type usersOrderByWithRelationInput = {
   erstellte_story_elemente?: Prisma.story_elementeOrderByRelationAggregateInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenOrderByRelationAggregateInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeOrderByRelationAggregateInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenOrderByRelationAggregateInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -315,6 +319,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   erstellte_story_elemente?: Prisma.Story_elementeListRelationFilter
   erstellte_story_revisionen?: Prisma.Story_element_revisionenListRelationFilter
   erstellte_story_verknuepfungen?: Prisma.Frage_story_elementeListRelationFilter
+  erstellte_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
+  bewertete_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
 }, "id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -371,6 +377,8 @@ export type usersCreateInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -394,6 +402,8 @@ export type usersUncheckedCreateInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUpdateInput = {
@@ -416,6 +426,8 @@ export type usersUpdateInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -439,6 +451,8 @@ export type usersUncheckedUpdateInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -632,6 +646,38 @@ export type usersUpdateOneWithoutBewertete_team_antwortenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutBewertete_team_antwortenInput, Prisma.usersUpdateWithoutBewertete_team_antwortenInput>, Prisma.usersUncheckedUpdateWithoutBewertete_team_antwortenInput>
 }
 
+export type usersCreateNestedOneWithoutErstellte_fragevorlagenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutErstellte_fragevorlagenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_fragevorlagenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedOneWithoutBewertete_fragevorlagenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutBewertete_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutBewertete_fragevorlagenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutBewertete_fragevorlagenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneWithoutErstellte_fragevorlagenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutErstellte_fragevorlagenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_fragevorlagenInput
+  upsert?: Prisma.usersUpsertWithoutErstellte_fragevorlagenInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutErstellte_fragevorlagenInput, Prisma.usersUpdateWithoutErstellte_fragevorlagenInput>, Prisma.usersUncheckedUpdateWithoutErstellte_fragevorlagenInput>
+}
+
+export type usersUpdateOneWithoutBewertete_fragevorlagenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutBewertete_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutBewertete_fragevorlagenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutBewertete_fragevorlagenInput
+  upsert?: Prisma.usersUpsertWithoutBewertete_fragevorlagenInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutBewertete_fragevorlagenInput, Prisma.usersUpdateWithoutBewertete_fragevorlagenInput>, Prisma.usersUncheckedUpdateWithoutBewertete_fragevorlagenInput>
+}
+
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
@@ -715,6 +761,8 @@ export type usersCreateWithoutErstellte_kategorienInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
@@ -737,6 +785,8 @@ export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_kategorienInput = {
@@ -774,6 +824,8 @@ export type usersUpdateWithoutErstellte_kategorienInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
@@ -796,6 +848,8 @@ export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
@@ -817,6 +871,8 @@ export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = {
@@ -839,6 +895,8 @@ export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = 
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_praesentationstemplatesInput = {
@@ -876,6 +934,8 @@ export type usersUpdateWithoutErstellte_praesentationstemplatesInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = {
@@ -898,6 +958,8 @@ export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = 
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_elementeInput = {
@@ -919,6 +981,8 @@ export type usersCreateWithoutErstellte_story_elementeInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
@@ -941,6 +1005,8 @@ export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_elementeInput = {
@@ -978,6 +1044,8 @@ export type usersUpdateWithoutErstellte_story_elementeInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
@@ -1000,6 +1068,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_revisionenInput = {
@@ -1021,6 +1091,8 @@ export type usersCreateWithoutErstellte_story_revisionenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
@@ -1043,6 +1115,8 @@ export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_revisionenInput = {
@@ -1080,6 +1154,8 @@ export type usersUpdateWithoutErstellte_story_revisionenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
@@ -1102,6 +1178,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
@@ -1123,6 +1201,8 @@ export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
@@ -1145,6 +1225,8 @@ export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_verknuepfungenInput = {
@@ -1182,6 +1264,8 @@ export type usersUpdateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
@@ -1204,6 +1288,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutBewertete_team_antwortenInput = {
@@ -1225,6 +1311,8 @@ export type usersCreateWithoutBewertete_team_antwortenInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
@@ -1247,6 +1335,8 @@ export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutBewertete_team_antwortenInput = {
@@ -1284,6 +1374,8 @@ export type usersUpdateWithoutBewertete_team_antwortenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
@@ -1306,6 +1398,228 @@ export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersCreateWithoutErstellte_fragevorlagenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersUncheckedCreateWithoutErstellte_fragevorlagenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersCreateOrConnectWithoutErstellte_fragevorlagenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutErstellte_fragevorlagenInput>
+}
+
+export type usersCreateWithoutBewertete_fragevorlagenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+}
+
+export type usersUncheckedCreateWithoutBewertete_fragevorlagenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type usersCreateOrConnectWithoutBewertete_fragevorlagenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutBewertete_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutBewertete_fragevorlagenInput>
+}
+
+export type usersUpsertWithoutErstellte_fragevorlagenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_fragevorlagenInput, Prisma.usersUncheckedUpdateWithoutErstellte_fragevorlagenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutErstellte_fragevorlagenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutErstellte_fragevorlagenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_fragevorlagenInput, Prisma.usersUncheckedUpdateWithoutErstellte_fragevorlagenInput>
+}
+
+export type usersUpdateWithoutErstellte_fragevorlagenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutErstellte_fragevorlagenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersUpsertWithoutBewertete_fragevorlagenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutBewertete_fragevorlagenInput, Prisma.usersUncheckedUpdateWithoutBewertete_fragevorlagenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutBewertete_fragevorlagenInput, Prisma.usersUncheckedCreateWithoutBewertete_fragevorlagenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutBewertete_fragevorlagenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutBewertete_fragevorlagenInput, Prisma.usersUncheckedUpdateWithoutBewertete_fragevorlagenInput>
+}
+
+export type usersUpdateWithoutBewertete_fragevorlagenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutBewertete_fragevorlagenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersCreateWithoutRollenzuweisungenInput = {
@@ -1327,6 +1641,8 @@ export type usersCreateWithoutRollenzuweisungenInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
@@ -1349,6 +1665,8 @@ export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutRollenzuweisungenInput = {
@@ -1375,6 +1693,8 @@ export type usersCreateWithoutZugewiesene_rollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
@@ -1397,6 +1717,8 @@ export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_rollenInput = {
@@ -1434,6 +1756,8 @@ export type usersUpdateWithoutRollenzuweisungenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
@@ -1456,6 +1780,8 @@ export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_rollenInput = {
@@ -1488,6 +1814,8 @@ export type usersUpdateWithoutZugewiesene_rollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
@@ -1510,6 +1838,8 @@ export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutEventreihenrollenInput = {
@@ -1531,6 +1861,8 @@ export type usersCreateWithoutEventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutEventreihenrollenInput = {
@@ -1553,6 +1885,8 @@ export type usersUncheckedCreateWithoutEventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutEventreihenrollenInput = {
@@ -1579,6 +1913,8 @@ export type usersCreateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
@@ -1601,6 +1937,8 @@ export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput = {
@@ -1638,6 +1976,8 @@ export type usersUpdateWithoutEventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
@@ -1660,6 +2000,8 @@ export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_eventreihenrollenInput = {
@@ -1692,6 +2034,8 @@ export type usersUpdateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
@@ -1714,6 +2058,8 @@ export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 
@@ -1732,6 +2078,8 @@ export type UsersCountOutputType = {
   erstellte_story_elemente: number
   erstellte_story_revisionen: number
   erstellte_story_verknuepfungen: number
+  erstellte_fragevorlagen: number
+  bewertete_fragevorlagen: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1745,6 +2093,8 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   erstellte_story_elemente?: boolean | UsersCountOutputTypeCountErstellte_story_elementeArgs
   erstellte_story_revisionen?: boolean | UsersCountOutputTypeCountErstellte_story_revisionenArgs
   erstellte_story_verknuepfungen?: boolean | UsersCountOutputTypeCountErstellte_story_verknuepfungenArgs
+  erstellte_fragevorlagen?: boolean | UsersCountOutputTypeCountErstellte_fragevorlagenArgs
+  bewertete_fragevorlagen?: boolean | UsersCountOutputTypeCountBewertete_fragevorlagenArgs
 }
 
 /**
@@ -1827,6 +2177,20 @@ export type UsersCountOutputTypeCountErstellte_story_verknuepfungenArgs<ExtArgs 
   where?: Prisma.frage_story_elementeWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountErstellte_fragevorlagenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.frage_vorlagenWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountBewertete_fragevorlagenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.frage_vorlagenWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1849,6 +2213,8 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   erstellte_story_elemente?: boolean | Prisma.users$erstellte_story_elementeArgs<ExtArgs>
   erstellte_story_revisionen?: boolean | Prisma.users$erstellte_story_revisionenArgs<ExtArgs>
   erstellte_story_verknuepfungen?: boolean | Prisma.users$erstellte_story_verknuepfungenArgs<ExtArgs>
+  erstellte_fragevorlagen?: boolean | Prisma.users$erstellte_fragevorlagenArgs<ExtArgs>
+  bewertete_fragevorlagen?: boolean | Prisma.users$bewertete_fragevorlagenArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -1903,6 +2269,8 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   erstellte_story_elemente?: boolean | Prisma.users$erstellte_story_elementeArgs<ExtArgs>
   erstellte_story_revisionen?: boolean | Prisma.users$erstellte_story_revisionenArgs<ExtArgs>
   erstellte_story_verknuepfungen?: boolean | Prisma.users$erstellte_story_verknuepfungenArgs<ExtArgs>
+  erstellte_fragevorlagen?: boolean | Prisma.users$erstellte_fragevorlagenArgs<ExtArgs>
+  bewertete_fragevorlagen?: boolean | Prisma.users$bewertete_fragevorlagenArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1921,6 +2289,8 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     erstellte_story_elemente: Prisma.$story_elementePayload<ExtArgs>[]
     erstellte_story_revisionen: Prisma.$story_element_revisionenPayload<ExtArgs>[]
     erstellte_story_verknuepfungen: Prisma.$frage_story_elementePayload<ExtArgs>[]
+    erstellte_fragevorlagen: Prisma.$frage_vorlagenPayload<ExtArgs>[]
+    bewertete_fragevorlagen: Prisma.$frage_vorlagenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2337,6 +2707,8 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   erstellte_story_elemente<T extends Prisma.users$erstellte_story_elementeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_story_elementeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$story_elementePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   erstellte_story_revisionen<T extends Prisma.users$erstellte_story_revisionenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_story_revisionenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$story_element_revisionenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   erstellte_story_verknuepfungen<T extends Prisma.users$erstellte_story_verknuepfungenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_story_verknuepfungenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_story_elementePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  erstellte_fragevorlagen<T extends Prisma.users$erstellte_fragevorlagenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_fragevorlagenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_vorlagenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bewertete_fragevorlagen<T extends Prisma.users$bewertete_fragevorlagenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$bewertete_fragevorlagenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_vorlagenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3006,6 +3378,54 @@ export type users$erstellte_story_verknuepfungenArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.Frage_story_elementeScalarFieldEnum | Prisma.Frage_story_elementeScalarFieldEnum[]
+}
+
+/**
+ * users.erstellte_fragevorlagen
+ */
+export type users$erstellte_fragevorlagenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the frage_vorlagen
+   */
+  select?: Prisma.frage_vorlagenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the frage_vorlagen
+   */
+  omit?: Prisma.frage_vorlagenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.frage_vorlagenInclude<ExtArgs> | null
+  where?: Prisma.frage_vorlagenWhereInput
+  orderBy?: Prisma.frage_vorlagenOrderByWithRelationInput | Prisma.frage_vorlagenOrderByWithRelationInput[]
+  cursor?: Prisma.frage_vorlagenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Frage_vorlagenScalarFieldEnum | Prisma.Frage_vorlagenScalarFieldEnum[]
+}
+
+/**
+ * users.bewertete_fragevorlagen
+ */
+export type users$bewertete_fragevorlagenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the frage_vorlagen
+   */
+  select?: Prisma.frage_vorlagenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the frage_vorlagen
+   */
+  omit?: Prisma.frage_vorlagenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.frage_vorlagenInclude<ExtArgs> | null
+  where?: Prisma.frage_vorlagenWhereInput
+  orderBy?: Prisma.frage_vorlagenOrderByWithRelationInput | Prisma.frage_vorlagenOrderByWithRelationInput[]
+  cursor?: Prisma.frage_vorlagenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Frage_vorlagenScalarFieldEnum | Prisma.Frage_vorlagenScalarFieldEnum[]
 }
 
 /**

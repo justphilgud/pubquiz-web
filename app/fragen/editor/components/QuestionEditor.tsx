@@ -30,6 +30,7 @@ import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
 import { TemplateSelector } from "./TemplateSelector";
+import { CreateDynamicQuestionTemplate } from "./CreateDynamicQuestionTemplate";
 import { StructuredTemplateEditor } from "./StructuredTemplateEditor";
 import ContentScopeSection, {
   type ContentScopeEventSeriesOption,
@@ -114,6 +115,7 @@ function createInitialDraft(scopeOptions: { canSelectGlobal: boolean; eventSerie
         ? [scopeOptions.eventSeries[0].id]
         : [],
     templateId: null,
+    sourceTemplateId: null,
     questionText: "",
     questionMedia: [],
     generatorRuns: [],
@@ -217,10 +219,14 @@ export function QuestionEditor({
   const questionTextRef = useRef<HTMLTextAreaElement>(null);
 
   const selectedTemplate = useMemo(
-    () => draft.templateId === null
-      ? null
-      : findQuestionTemplate(templates, draft.templateId),
-    [draft.templateId, templates],
+    () => draft.sourceTemplateId
+      ? templates.find(
+          (template) => template.sourceTemplateId === draft.sourceTemplateId,
+        ) ?? null
+      : draft.templateId === null
+        ? null
+        : findQuestionTemplate(templates, draft.templateId),
+    [draft.sourceTemplateId, draft.templateId, templates],
   );
   const quality = useMemo(() => evaluateQuestionQuality(draft), [draft]);
   const duplicateInput = useMemo(() => ({
@@ -311,7 +317,10 @@ export function QuestionEditor({
 
   function applyTemplate(template: QuestionTemplate): boolean {
     if (
-      template.id === resolveCanonicalQuestionTemplateId(draft.templateId)
+      template.sourceTemplateId
+        ? template.sourceTemplateId === draft.sourceTemplateId
+        : !draft.sourceTemplateId &&
+          template.id === resolveCanonicalQuestionTemplateId(draft.templateId)
     ) {
       return true;
     }
@@ -606,6 +615,7 @@ export function QuestionEditor({
         categoryRequest: draft.categoryRequest,
         validUntil: draft.validUntil,
         templateId: draft.templateId,
+        sourceTemplateId: draft.sourceTemplateId ?? null,
         generatorParameters: draft.generatorParameters,
         templateConfig: draft.templateConfig,
         reviewReasonCodes: options?.reviewReasonCodes,
@@ -891,11 +901,20 @@ export function QuestionEditor({
 
         <TemplateSelector
           templates={specialQuestionTemplates}
-          selectedTemplateId={draft.templateId}
+          selectedTemplateId={selectedTemplate?.id ?? null}
           selectedTemplate={selectedTemplate}
           onSelectTemplate={applyTemplate}
           onClearSelection={clearTemplateSelection}
         />
+
+        {!isReadOnly && (
+          <CreateDynamicQuestionTemplate
+            questionId={savedQuestionId}
+            draft={draft}
+            isAdmin={capabilities.canManageCategories}
+            disabled={isEditorDisabled || hasUnsavedChanges}
+          />
+        )}
 
         <QuestionSection
           questionText={draft.questionText}

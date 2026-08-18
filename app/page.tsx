@@ -411,6 +411,7 @@ export default async function HomePage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <QuickActionCard href="/admin/users" title="Benutzerverwaltung" description="Konten, Rollen und Zugänge verwalten." icon={UserGroupIcon} />
                   <QuickActionCard href="/admin/kategorien" title="Kategorien" description="Kategorien und Vorschläge verwalten." icon={TagIcon} />
+                  <QuickActionCard href="/admin/fragenvorlagen" title="Spezialfragenvorlagen" description="Dynamische Vorlagen und Vorschläge freigeben." icon={TagIcon} />
                   <QuickActionCard href="/admin/styleguide" title="Styleguide" description="UI-Bausteine und Zustände prüfen." icon={PaintBrushIcon} />
                 </div>
               </div>

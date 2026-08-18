@@ -8,6 +8,7 @@ import { getMediaUploadEnvironmentPrefix } from "./mediaUploadEnvironment";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { getQuestionEditorMessages } from "@/app/i18n/getMessages";
 import { localizeQuestionTemplates } from "./templates/questionTemplates";
+import { loadDynamicQuestionTemplates } from "./templates/dynamicQuestionTemplates.server";
 import { getAssignableQuestionEventSeries, getQuestionActor } from "./questionAccess.server";
 import { canEditGlobalQuestions, getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { resolveGooglePlacesFeature } from "./googlePlacesFeature";
@@ -35,6 +36,8 @@ export default async function QuestionEditorPage() {
     getStoryElementEditorOptions(actor),
   ]);
   const canApproveInAnySeries = isAdministrator(actor) || getActorEventSeriesIds(actor, "EVENT_MANAGER").length > 0;
+  const baseTemplates = localizeQuestionTemplates(messages);
+  const dynamicTemplates = await loadDynamicQuestionTemplates(baseTemplates);
 
   return (
     <QuestionEditor
@@ -48,7 +51,7 @@ export default async function QuestionEditorPage() {
       mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
       locale={locale}
       messages={messages}
-      templates={localizeQuestionTemplates(messages)}
+      templates={[...baseTemplates, ...dynamicTemplates]}
       categories={categories.map((category) => ({
         id: category.fragenkategorie_id,
         name: category.kategorie,

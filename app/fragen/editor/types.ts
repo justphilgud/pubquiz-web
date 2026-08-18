@@ -251,6 +251,7 @@ export type QuestionEditorDraft = {
   scope: "GLOBAL" | "EVENT_SERIES";
   eventSeriesIds: number[];
   templateId: string | null;
+  sourceTemplateId?: number | null;
   questionText: string;
   questionMedia: QuestionMediaDraft[];
   generatorRuns?: GeneratorRunDraft[];
@@ -276,6 +277,8 @@ export type QuestionEditorDraft = {
 
 export type QuestionTemplate = {
   id: string;
+  baseTemplateId?: string | null;
+  sourceTemplateId?: number;
   icon: string;
   enabled: boolean;
   answerMode: QuestionAnswerMode;
@@ -302,7 +305,11 @@ export type QuestionTemplate = {
     fieldLabel?: string;
     text?: string;
     isCorrect?: boolean;
+    additionalInfo?: string;
   }>;
+
+  initialQuestionMedia?: QuestionMediaDraft[];
+  initialTemplateConfig?: QuestionTemplateConfig;
 
   mediaSlots: QuestionMediaSlotConfig[];
   generators: GeneratorId[];
@@ -445,6 +452,7 @@ export type SaveQuestionPayload = {
   categoryRequest: string;
   validUntil: string | null;
   templateId: string | null;
+  sourceTemplateId: number | null;
   generatorParameters?: GeneratorParametersDraft;
   templateConfig: QuestionTemplateConfig;
   reviewReasonCodes?: ReviewReasonCode[];
