@@ -1,80 +1,83 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/Button";
 import { formatQuizPoints } from "../formatQuizPoints";
+import EvaluationMatrixDetailModal, {
+  type EvaluationMatrixSelection,
+} from "./EvaluationMatrixDetailModal";
 import type {
   EvaluationMatrix as EvaluationMatrixData,
   EvaluationMatrixCell,
-  EvaluationMatrixStatus,
+  EvaluationMatrixQuestion,
+  EvaluationMatrixTeam,
 } from "./evaluationMatrix";
+import {
+  evaluationMatrixStatusPresentation,
+  type EvaluationMatrixFilter,
+  questionMatchesEvaluationMatrixFilter,
+} from "./evaluationMatrixDisplay";
 
-const statusPresentation: Record<EvaluationMatrixStatus, {
+const filterOptions: ReadonlyArray<{
+  id: EvaluationMatrixFilter;
   label: string;
-  symbol: string;
-  className: string;
-}> = {
-  CORRECT: {
-    label: "Richtig",
-    symbol: "✓",
-    className: "border-emerald-300 bg-emerald-50 text-emerald-800",
-  },
-  WRONG: {
-    label: "Falsch",
-    symbol: "×",
-    className: "border-red-300 bg-red-50 text-red-800",
-  },
-  PARTIAL: {
-    label: "Teilweise",
-    symbol: "½",
-    className: "border-amber-300 bg-amber-50 text-amber-900",
-  },
-  REVIEW_REQUIRED: {
-    label: "Prüfen",
-    symbol: "?",
-    className: "border-blue-300 bg-blue-50 text-blue-900",
-  },
-  UNANSWERED: {
-    label: "Nicht beantwortet",
-    symbol: "–",
-    className: "border-slate-200 bg-slate-50 text-slate-500",
-  },
-};
+}> = [
+  { id: "ALL", label: "Alle" },
+  { id: "REVIEW", label: "Nur prüfen" },
+  { id: "PROBLEMATIC", label: "Problematisch" },
+];
 
-function MatrixCell({ cell }: { cell: EvaluationMatrixCell }) {
-  const presentation = statusPresentation[cell.status];
+function MatrixCell({
+  cell,
+  question,
+  team,
+  selected,
+  onSelect,
+}: {
+  cell: EvaluationMatrixCell;
+  question: EvaluationMatrixQuestion;
+  team: EvaluationMatrixTeam;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const presentation = evaluationMatrixStatusPresentation[cell.status];
+  const accessibleLabel = `${team.name}, Frage ${question.number}: ${presentation.label}. Details anzeigen`;
+
   return (
-    <details className="group min-w-32">
-      <summary
-        className={`flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-xl border px-2 py-2 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 ${presentation.className}`}
-        aria-label={`${presentation.label}; Details anzeigen`}
-      >
-        <span aria-hidden="true" className="text-base">{presentation.symbol}</span>
-        <span>{presentation.label}</span>
-      </summary>
-      <dl className="mt-2 space-y-2 rounded-xl border border-slate-200 bg-white p-3 text-left text-xs text-slate-700 shadow-sm">
-        <div>
-          <dt className="font-bold text-slate-500">Teamantwort</dt>
-          <dd className="mt-0.5 break-words">{cell.answerText || "–"}</dd>
-        </div>
-        <div>
-          <dt className="font-bold text-slate-500">Lösung</dt>
-          <dd className="mt-0.5 break-words">{cell.correctAnswer}</dd>
-        </div>
-        <div>
-          <dt className="font-bold text-slate-500">Punkte</dt>
-          <dd className="mt-0.5 font-bold text-slate-900">
-            Vergeben: {formatQuizPoints(cell.awardedPoints)} · {cell.maximumPointsLabel}
-          </dd>
-        </div>
-      </dl>
-    </details>
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`mx-auto flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-black transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-900 sm:h-8 sm:w-8 ${presentation.className} ${selected ? "ring-2 ring-indigo-600 ring-offset-1" : ""}`}
+      aria-label={accessibleLabel}
+      title={`${presentation.label} · ${team.name} · Frage ${question.number}`}
+    >
+      <span aria-hidden="true">{presentation.symbol}</span>
+    </button>
   );
 }
 
 export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: EvaluationMatrixData }) {
+  const [filter, setFilter] = useState<EvaluationMatrixFilter>("ALL");
+  const [selection, setSelection] = useState<EvaluationMatrixSelection | null>(null);
+  const visibleQuestions = useMemo(
+    () => matrix.questions.filter((question) =>
+      questionMatchesEvaluationMatrixFilter(question, filter)),
+    [filter, matrix.questions],
+  );
+  const selectedQuestionId = selection?.question.id ?? null;
+  const selectedTeamName = selection?.kind === "cell" ? selection.team.name : null;
+
   if (matrix.questions.length === 0 || matrix.teams.length === 0) {
     return (
       <div className="rounded-2xl bg-white p-6 text-sm text-slate-600 shadow-sm">
         Für die Matrix sind noch keine bewerteten Quizfragen und Teams vorhanden.
       </div>
     );
+  }
+
+  function selectFilter(nextFilter: EvaluationMatrixFilter) {
+    setFilter(nextFilter);
+    setSelection(null);
   }
 
   return (
@@ -84,106 +87,158 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
           <div>
             <h2 className="text-xl font-black text-slate-900">Team × Frage</h2>
             <p className="mt-1 max-w-3xl text-sm text-slate-600">
-              Status auswählen, um Antwort, Lösung und Punkte zu sehen. Umfragen sind nicht Teil der bewerteten Matrix.
+              Zelle oder Fragenummer auswählen, um Details zu sehen. Umfragen sind nicht Teil der Bewertung.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 text-xs font-bold">
-            {Object.entries(statusPresentation).map(([status, value]) => (
-              <span key={status} className={`rounded-full border px-3 py-1 ${value.className}`}>
-                {value.symbol} {value.label}
+          <div className="flex flex-wrap gap-1.5 text-xs font-bold" aria-label="Statuslegende">
+            {Object.entries(evaluationMatrixStatusPresentation).map(([status, value]) => (
+              <span key={status} className={`rounded-full border px-2 py-1 ${value.className}`}>
+                <span aria-hidden="true">{value.symbol}</span> {value.label}
               </span>
             ))}
           </div>
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2" aria-label="Matrixfilter">
+          <span className="text-xs font-bold text-slate-500">Ansicht:</span>
+          {filterOptions.map((option) => (
+            <Button
+              key={option.id}
+              type="button"
+              variant={filter === option.id ? "primary" : "secondary"}
+              aria-pressed={filter === option.id}
+              onClick={() => selectFilter(option.id)}
+              className={`px-3 py-1.5 text-xs ${filter === option.id ? "bg-slate-900 hover:bg-slate-800" : ""}`}
+            >
+              {option.label}
+            </Button>
+          ))}
+          <span className="ml-auto text-xs font-semibold text-slate-500">
+            {visibleQuestions.length} von {matrix.questions.length} Fragen
+          </span>
+        </div>
       </section>
 
       <section className="overflow-hidden rounded-2xl bg-white shadow-sm" aria-label="Bewertungsmatrix">
-        <div className="max-w-full overflow-x-auto overscroll-x-contain">
-          <table className="w-max min-w-full border-separate border-spacing-0 text-sm">
+        <div className="max-h-[min(68vh,48rem)] max-w-full overflow-auto overscroll-contain">
+          <table className="w-max min-w-full border-separate border-spacing-0 text-xs">
             <thead className="text-left">
               <tr>
-                <th className="sticky left-0 z-20 min-w-48 border-b border-r border-slate-200 bg-slate-100 px-4 py-3 align-bottom text-xs font-bold uppercase tracking-wide text-slate-500">
-                  Team
+                <th className="sticky left-0 top-0 z-40 w-36 min-w-36 max-w-36 border-b border-r border-slate-200 bg-slate-100 px-3 py-2 align-middle text-[0.6875rem] font-bold uppercase tracking-wide text-slate-500 shadow-[4px_0_8px_-8px_rgba(15,23,42,0.5)] sm:w-44 sm:min-w-44 sm:max-w-44">
+                  Team · Punkte
                 </th>
-                {matrix.questions.map((question) => (
-                  <th key={question.id} className="min-w-40 max-w-48 border-b border-r border-slate-200 bg-slate-100 px-3 py-3 align-top">
-                    <div className="text-xs font-black uppercase tracking-wide text-slate-500">
-                      Frage {question.number}
-                    </div>
-                    <div className="mt-1 line-clamp-3 text-sm font-bold text-slate-900" title={question.text}>
-                      {question.text}
-                    </div>
-                    <div className="mt-2 text-xs font-medium text-slate-500">
-                      {question.sectionTitle} · {question.maximumPointsLabel}
-                    </div>
+                {visibleQuestions.map((question) => (
+                  <th
+                    key={question.id}
+                    className={`sticky top-0 z-30 w-10 min-w-10 max-w-10 border-b border-r border-slate-200 p-1 text-center ${selectedQuestionId === question.id ? "bg-indigo-100" : "bg-slate-100"}`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setSelection({ kind: "question", question })}
+                      className="mx-auto flex h-8 w-8 items-center justify-center rounded-md font-black text-slate-800 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-900"
+                      aria-label={`Frage ${question.number}: ${question.text}. Details anzeigen`}
+                      title={`${question.text} · ${question.sectionTitle} · ${question.maximumPointsLabel}`}
+                    >
+                      {question.number}
+                    </button>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {matrix.teams.map((team) => (
-                <tr key={team.name}>
-                  <th className="sticky left-0 z-10 border-b border-r border-slate-200 bg-white px-4 py-3 text-left align-top shadow-[4px_0_8px_-8px_rgba(15,23,42,0.5)]">
-                    <div className="font-black text-slate-900">{team.name}</div>
-                    <div className="mt-1 text-xs font-semibold text-slate-500">
-                      {team.rank ? `Platz ${team.rank} · ` : ""}{formatQuizPoints(team.totalPoints)} Pkt.
-                    </div>
-                  </th>
-                  {matrix.questions.map((question) => (
-                    <td key={question.id} className="border-b border-r border-slate-200 p-2 align-top">
-                      <MatrixCell cell={team.cells[question.id]} />
-                    </td>
-                  ))}
+              {matrix.teams.map((team) => {
+                const rowSelected = selectedTeamName === team.name;
+                return (
+                  <tr key={team.name} className={rowSelected ? "bg-indigo-50/60" : ""}>
+                    <th
+                      className={`sticky left-0 z-20 w-36 min-w-36 max-w-36 border-b border-r border-slate-200 px-3 py-2 text-left shadow-[4px_0_8px_-8px_rgba(15,23,42,0.5)] sm:w-44 sm:min-w-44 sm:max-w-44 ${rowSelected ? "bg-indigo-50" : "bg-white"}`}
+                      title={team.name}
+                    >
+                      <div className="truncate font-black text-slate-900">{team.name}</div>
+                      <div className="mt-0.5 truncate text-[0.6875rem] font-semibold text-slate-500">
+                        {team.rank ? `#${team.rank} · ` : ""}{formatQuizPoints(team.totalPoints)} Pkt.
+                      </div>
+                    </th>
+                    {visibleQuestions.map((question) => {
+                      const cell = team.cells[question.id];
+                      const cellSelected = selection?.kind === "cell" &&
+                        selection.team.name === team.name &&
+                        selection.question.id === question.id;
+                      const columnSelected = selectedQuestionId === question.id;
+                      return (
+                        <td
+                          key={question.id}
+                          className={`h-10 w-10 min-w-10 max-w-10 border-b border-r border-slate-200 p-0.5 text-center ${columnSelected ? "bg-indigo-50/50" : ""}`}
+                        >
+                          <MatrixCell
+                            cell={cell}
+                            question={question}
+                            team={team}
+                            selected={cellSelected}
+                            onSelect={() => setSelection({ kind: "cell", cell, question, team })}
+                          />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+              {visibleQuestions.length === 0 && (
+                <tr>
+                  <td className="px-4 py-6 text-sm text-slate-500">
+                    Für diesen Filter gibt es keine Fragen.
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </section>
 
       <section className="overflow-hidden rounded-2xl bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-4 py-4">
-          <h2 className="text-xl font-black text-slate-900">Fragenkennzahlen</h2>
-          <p className="mt-1 text-sm text-slate-600">
+        <div className="border-b border-slate-200 px-4 py-3">
+          <h2 className="text-lg font-black text-slate-900">Fragenkennzahlen</h2>
+          <p className="mt-0.5 text-xs text-slate-600">
             Erfolgsquote = vollständig richtige Antworten geteilt durch alle beantworteten Antworten.
           </p>
         </div>
         <div className="max-w-full overflow-x-auto">
-          <table className="min-w-[64rem] w-full border-collapse text-sm">
-            <thead className="bg-slate-100 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
+          <table className="w-full min-w-[50rem] border-collapse text-xs">
+            <thead className="bg-slate-100 text-left text-[0.6875rem] font-bold uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-4 py-3">Frage</th>
-                <th className="px-4 py-3">Runde</th>
-                <th className="px-4 py-3">Punkte</th>
-                <th className="px-4 py-3">Beantwortet</th>
-                <th className="px-4 py-3">Richtig</th>
-                <th className="px-4 py-3">Falsch</th>
-                <th className="px-4 py-3">Teilweise</th>
-                <th className="px-4 py-3">Zu prüfen</th>
-                <th className="px-4 py-3">Nicht beantwortet</th>
-                <th className="px-4 py-3">Erfolg</th>
-                <th className="px-4 py-3">Ø Punkte</th>
+                <th className="px-3 py-2">Frage</th>
+                <th className="px-3 py-2">Runde</th>
+                <th className="px-3 py-2">Punkte</th>
+                <th className="px-3 py-2">Beantw.</th>
+                <th className="px-3 py-2">Richtig</th>
+                <th className="px-3 py-2">Falsch</th>
+                <th className="px-3 py-2">Teilw.</th>
+                <th className="px-3 py-2">Prüfen</th>
+                <th className="px-3 py-2">Offen</th>
+                <th className="px-3 py-2">Erfolg</th>
+                <th className="px-3 py-2">Ø Punkte</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
               {matrix.questions.map((question) => (
                 <tr key={question.id}>
-                  <td className="max-w-sm px-4 py-3">
-                    <div className="font-black text-slate-900">Frage {question.number}</div>
-                    <div className="mt-0.5 line-clamp-2 text-xs text-slate-600" title={question.text}>{question.text}</div>
+                  <td className="max-w-52 px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-slate-900">{question.number}</span>
+                      <span className="truncate text-slate-600" title={question.text}>{question.text}</span>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-slate-700">{question.sectionTitle}</td>
-                  <td className="whitespace-nowrap px-4 py-3 font-semibold">{question.maximumPointsLabel}</td>
-                  <td className="px-4 py-3">{question.answered}</td>
-                  <td className="px-4 py-3 font-bold text-emerald-700">{question.correct}</td>
-                  <td className="px-4 py-3 font-bold text-red-700">{question.wrong}</td>
-                  <td className="px-4 py-3 font-bold text-amber-800">{question.partial}</td>
-                  <td className="px-4 py-3 font-bold text-blue-800">{question.reviewRequired}</td>
-                  <td className="px-4 py-3 text-slate-600">{question.unanswered}</td>
-                  <td className="px-4 py-3 font-black text-slate-900">
+                  <td className="max-w-32 truncate px-3 py-2 text-slate-700" title={question.sectionTitle}>{question.sectionTitle}</td>
+                  <td className="whitespace-nowrap px-3 py-2 font-semibold">{question.maximumPointsLabel}</td>
+                  <td className="px-3 py-2">{question.answered}</td>
+                  <td className="px-3 py-2 font-bold text-emerald-700">{question.correct}</td>
+                  <td className="px-3 py-2 font-bold text-red-700">{question.wrong}</td>
+                  <td className="px-3 py-2 font-bold text-amber-800">{question.partial}</td>
+                  <td className="px-3 py-2 font-bold text-blue-800">{question.reviewRequired}</td>
+                  <td className="px-3 py-2 text-slate-600">{question.unanswered}</td>
+                  <td className="px-3 py-2 font-black text-slate-900">
                     {question.successRate === null ? "–" : `${question.successRate.toLocaleString("de-DE")} %`}
                   </td>
-                  <td className="px-4 py-3 font-semibold">
+                  <td className="px-3 py-2 font-semibold">
                     {question.averagePoints === null ? "–" : formatQuizPoints(question.averagePoints)}
                   </td>
                 </tr>
@@ -192,6 +247,11 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
           </table>
         </div>
       </section>
+
+      <EvaluationMatrixDetailModal
+        selection={selection}
+        onClose={() => setSelection(null)}
+      />
     </div>
   );
 }
