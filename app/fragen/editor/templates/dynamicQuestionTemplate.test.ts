@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { DEFAULT_PIXEL_TEMPLATE_CONFIG } from "../pixelTemplateConfig";
 import { applyQuestionTemplateToDraft } from "../questionTemplateDraft";
@@ -136,6 +137,16 @@ test("rejects malformed stored snapshots", () => {
 test("editors suggest templates while admins activate them directly", () => {
   assert.equal(getDynamicQuestionTemplateInitialStatus(false), "PENDING");
   assert.equal(getDynamicQuestionTemplateInitialStatus(true), "ACTIVE");
+});
+
+test("admin review uses an inline feedback field instead of a native prompt", () => {
+  const manager = readFileSync(
+    "app/admin/fragenvorlagen/DynamicQuestionTemplateManager.tsx",
+    "utf8",
+  );
+  assert.doesNotMatch(manager, /window\.prompt/);
+  assert.match(manager, /Rückmeldung \(optional\)/);
+  assert.match(manager, /maxLength=\{500\}/);
 });
 
 test("applies a dynamic template as a normal structural editor draft", () => {

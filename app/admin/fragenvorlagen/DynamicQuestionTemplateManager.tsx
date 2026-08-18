@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { reviewDynamicQuestionTemplate } from "@/app/fragen/editor/templates/dynamicQuestionTemplateActions";
 
 export type DynamicQuestionTemplateAdminRow = {
@@ -35,6 +36,7 @@ export function DynamicQuestionTemplateManager({
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<"ALL" | DynamicQuestionTemplateAdminRow["status"]>("ALL");
+  const [feedbackByTemplate, setFeedbackByTemplate] = useState<Record<number, string>>({});
   const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const filtered = useMemo(
@@ -43,13 +45,7 @@ export function DynamicQuestionTemplateManager({
   );
 
   function review(id: number, decision: "APPROVE" | "REJECT") {
-    const feedback = window.prompt(
-      decision === "APPROVE"
-        ? "Optionale Freigabenotiz:"
-        : "Begründung der Ablehnung (optional):",
-      "",
-    );
-    if (feedback === null) return;
+    const feedback = feedbackByTemplate[id] ?? "";
     setMessage(null);
     startTransition(async () => {
       const result = await reviewDynamicQuestionTemplate({
@@ -58,7 +54,10 @@ export function DynamicQuestionTemplateManager({
         feedback,
       });
       setMessage({ tone: result.ok ? "success" : "error", text: result.message });
-      if (result.ok) router.refresh();
+      if (result.ok) {
+        setFeedbackByTemplate((current) => ({ ...current, [id]: "" }));
+        router.refresh();
+      }
     });
   }
 
@@ -110,9 +109,25 @@ export function DynamicQuestionTemplateManager({
                 {template.feedback && <p className="text-sm text-slate-700"><strong>Rückmeldung:</strong> {template.feedback}</p>}
               </div>
               {template.status === "PENDING" && (
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  <Button type="button" disabled={pending} onClick={() => review(template.id, "APPROVE")} className="min-h-11 bg-emerald-700 hover:bg-emerald-800">Freigeben</Button>
-                  <Button type="button" variant="secondary" disabled={pending} onClick={() => review(template.id, "REJECT")} className="min-h-11 border-red-300 text-red-700 hover:bg-red-50">Ablehnen</Button>
+                <div className="w-full shrink-0 space-y-2 lg:max-w-sm">
+                  <label className="block text-sm font-medium text-slate-800">
+                    Rückmeldung (optional)
+                    <Textarea
+                      value={feedbackByTemplate[template.id] ?? ""}
+                      onChange={(event) => setFeedbackByTemplate((current) => ({
+                        ...current,
+                        [template.id]: event.target.value,
+                      }))}
+                      maxLength={500}
+                      rows={3}
+                      disabled={pending}
+                      className="mt-1 resize-y"
+                    />
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" disabled={pending} onClick={() => review(template.id, "APPROVE")} className="min-h-11 bg-emerald-700 hover:bg-emerald-800">Freigeben</Button>
+                    <Button type="button" variant="secondary" disabled={pending} onClick={() => review(template.id, "REJECT")} className="min-h-11 border-red-300 text-red-700 hover:bg-red-50">Ablehnen</Button>
+                  </div>
                 </div>
               )}
             </div>
