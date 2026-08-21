@@ -5,6 +5,9 @@ import test from "node:test";
 import {
   applyQuizSpecificOrderingItemOrder,
   createQuizSpecificOrderingItemOrder,
+  formatOrderingAnswerForEvaluation,
+  isPersistedQuizSpecificOrderingItemOrder,
+  resolveQuizSpecificOrderingItemOrder,
 } from "./orderingQuestionOrder";
 
 const items = [
@@ -36,6 +39,26 @@ test("invalid legacy assignments fall back to the canonical solution order", () 
   assert.deepEqual(
     applyQuizSpecificOrderingItemOrder(items, [0, 0, 2, 3]),
     items,
+  );
+});
+
+test("canonical and corrupted legacy assignments are repaired persistently", () => {
+  for (const storedOrder of [[0, 1, 2, 3], [0, 0, 2, 3], []]) {
+    const resolved = resolveQuizSpecificOrderingItemOrder(4, storedOrder, () => 0);
+    assert.equal(resolved.needsRepair, true);
+    assert.equal(isPersistedQuizSpecificOrderingItemOrder(4, resolved.order), true);
+    assert.notDeepEqual(resolved.order, [0, 1, 2, 3]);
+  }
+});
+
+test("evaluation formats ordering labels instead of persisted item ids", () => {
+  assert.equal(
+    formatOrderingAnswerForEvaluation(items, '["human","cat","dog","mouse"]'),
+    "Mensch → Katze → Hund → Maus",
+  );
+  assert.equal(
+    formatOrderingAnswerForEvaluation(items, '["human","unknown"]'),
+    "Ungültige Reihenfolge",
   );
 });
 

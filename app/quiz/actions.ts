@@ -95,6 +95,8 @@ import {
 } from "./quizAnswerLiveState";
 import { serializeQuizParticipantLiveRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
+import { repairQuizSpecificOrderingAssignments } from "./orderingQuestionOrder.server";
+import { formatOrderingAnswerForEvaluation } from "./orderingQuestionOrder";
 import {
   closeBlockInteractions,
   getQuizLiveSnapshotData,
@@ -831,6 +833,7 @@ export async function getQuizDetails(
   quizId: number,
 ): Promise<QuizDetailsResult | null> {
   await requireQuizViewer(quizId);
+  await repairQuizSpecificOrderingAssignments(quizId);
   const quiz = await prisma.quiz.findUnique({
     where: {
       quiz_id: quizId,
@@ -1685,6 +1688,7 @@ export async function getQuizPraesentation(
   quizId: number,
 ): Promise<QuizPraesentationResult | null> {
   await requireQuizViewer(quizId);
+  await repairQuizSpecificOrderingAssignments(quizId);
   const quiz = await prisma.quiz.findUnique({
     where: {
       quiz_id: quizId,
@@ -2186,6 +2190,8 @@ export async function getQuizAntwortStatus(
       fragen: [],
     };
   }
+
+  await repairQuizSpecificOrderingAssignments(quizId);
 
   const quiz = await prisma.quiz.findUnique({
     where: {
@@ -3403,6 +3409,12 @@ export async function getQuizFrageAuswertung(
     answerMode.effectiveMode === "OPEN" ||
     (answerMode.effectiveMode === "UNCLASSIFIED" &&
       auswertbareAntwortoptionen.length === 0);
+  const templateConfig = quizFrage.fragen.template_config_json as
+    | QuestionTemplateConfig
+    | null;
+  const orderingItems = templateConfig?.templateData?.kind === "ORDERING"
+    ? templateConfig.templateData.items
+    : null;
 
   return {
     quiz_fragen_id: quizFrage.quiz_fragen_id,
@@ -3427,7 +3439,12 @@ export async function getQuizFrageAuswertung(
       return {
         team_antwort_id: antwort.team_antwort_id,
         teamname: antwort.quiz_team_sessions.teamname,
-        antwortText: effectiveSubmission?.answerText ?? null,
+        antwortText: orderingItems
+          ? formatOrderingAnswerForEvaluation(
+              orderingItems,
+              effectiveSubmission?.answerText ?? null,
+            )
+          : effectiveSubmission?.answerText ?? null,
         antwortId: selectedAnswerIds[0] ?? null,
         antwortQuelle: effectiveSubmission?.source ?? null,
         submissionVersion: effectiveSubmission?.submissionVersion ?? null,
@@ -3931,6 +3948,15 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => antwort.antwort)
       .join(", ");
+    const templateConfig = quizFrage.fragen.template_config_json as
+      | QuestionTemplateConfig
+      | null;
+    const orderingItems = templateConfig?.templateData?.kind === "ORDERING"
+      ? templateConfig.templateData.items
+      : null;
+    const semantischeRichtigeAntwort = orderingItems
+      ? orderingItems.map((item) => item.text).join(" → ")
+      : richtigeAntworten;
 
     const offeneMusterloesung = quizFrage.fragen.antwortfelder
       .map((feld) => {
@@ -4034,12 +4060,18 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         abschnittTitel: quizFrage.quiz_abschnitte?.titel ?? "Ohne Runde",
         maximumPointsLabel,
         templateId: quizFrage.fragen.vorlage?.code ?? null,
-        richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
+        richtigeAntwort: semantischeRichtigeAntwort || offeneMusterloesung || "-",
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         teamname: session.teamname,
-        antwortText:
-          offeneAntwortfelderText || effectiveSubmission?.answerText || null,
+        antwortText: offeneAntwortfelderText || (
+          orderingItems
+            ? formatOrderingAnswerForEvaluation(
+                orderingItems,
+                effectiveSubmission?.answerText ?? null,
+              )
+            : effectiveSubmission?.answerText ?? null
+        ),
         antwortId: effectiveSubmission?.selectedAnswerIds[0] ?? null,
         antwortQuelle: effectiveSubmission?.source ?? null,
         submissionVersion: effectiveSubmission?.submissionVersion ?? null,

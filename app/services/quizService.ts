@@ -5,7 +5,7 @@ import { getBerlinDate } from "@/app/lib/berlinDate";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { getQuestionBaseMaximum } from "@/app/quiz/evaluation/questionPointPolicy";
-import { createQuizSpecificOrderingItemOrder } from "@/app/quiz/orderingQuestionOrder";
+import { resolveQuizSpecificOrderingItemOrder } from "@/app/quiz/orderingQuestionOrder";
 
 type QuizQuestionCreateData = Parameters<
   typeof prisma.quiz_fragen.create
@@ -76,10 +76,12 @@ export async function addQuestionToQuiz(
   const suppliedAnswerOrder = Array.isArray(data.antwort_reihenfolge)
     ? data.antwort_reihenfolge
     : null;
-  const answerOrder =
-    orderingItemCount > 0 && (!suppliedAnswerOrder || suppliedAnswerOrder.length === 0)
-      ? createQuizSpecificOrderingItemOrder(orderingItemCount)
-      : data.antwort_reihenfolge;
+  const answerOrder = orderingItemCount > 0
+    ? resolveQuizSpecificOrderingItemOrder(
+        orderingItemCount,
+        suppliedAnswerOrder ?? [],
+      ).order
+    : data.antwort_reihenfolge;
   const assignment = await db.quiz_fragen.create({
     data: {
       ...data,
