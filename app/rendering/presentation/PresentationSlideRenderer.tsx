@@ -542,7 +542,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
-        {hatAntwortmoeglichkeiten && (
+        {orderingItems.length > 0 && (
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {orderingItems.map((item) => <div key={item.id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{item.text}</div>)}
           </div>

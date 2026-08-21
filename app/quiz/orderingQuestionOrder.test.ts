@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -36,4 +37,19 @@ test("invalid legacy assignments fall back to the canonical solution order", () 
     applyQuizSpecificOrderingItemOrder(items, [0, 0, 2, 3]),
     items,
   );
+});
+
+test("presentation renders ordering items instead of classic answer options", () => {
+  const renderer = readFileSync(
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
+    "utf8",
+  );
+  const orderingBranch = renderer.slice(
+    renderer.indexOf('templateData?.kind === "ORDERING"'),
+    renderer.indexOf('templateData?.kind === "ESTIMATE"'),
+  );
+
+  assert.match(orderingBranch, /orderingItems\.length > 0/);
+  assert.match(orderingBranch, /orderingItems\.map/);
+  assert.doesNotMatch(orderingBranch, /antworten\.map/);
 });
