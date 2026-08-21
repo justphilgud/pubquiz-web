@@ -46,7 +46,7 @@ import {
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
-import { applyQuizSpecificOrderingItemOrder } from "@/app/quiz/orderingQuestionOrder";
+import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 
 type ScoreEntry = {
   teamname: string;
@@ -535,10 +535,10 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   if (templateData?.kind === "ORDERING") {
-    const orderingItems = applyQuizSpecificOrderingItemOrder(
-      templateData.items,
+    const orderingItems = resolveQuizSpecificOrderingParticipantItems(
+      frage.antworten,
       frage.antwort_reihenfolge,
-    );
+    ) ?? [];
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-4xl font-black text-white">{frage.frage}</h2>

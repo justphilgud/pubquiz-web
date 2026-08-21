@@ -8,6 +8,7 @@ import {
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { prisma } from "@/app/lib/prisma";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
+import { normalizeOrderingAnswerTextToAnswerIds } from "@/app/quiz/orderingQuestionOrder";
 import { evaluateBaseAnswer } from "./evaluateBaseAnswer";
 import {
   CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,
@@ -123,10 +124,10 @@ export async function getQuizEvaluationBackfillStatus(
   );
 }
 
-function orderingItems(config: Prisma.JsonValue | null) {
+function orderingTemplateItems(config: Prisma.JsonValue | null) {
   const typed = config as QuestionTemplateConfig | null;
   return typed?.templateData?.kind === "ORDERING"
-    ? typed.templateData.items.map((item) => item.id)
+    ? typed.templateData.items
     : [];
 }
 
@@ -141,7 +142,10 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       fragen: {
         include: {
           vorlage: { select: { code: true } },
-          antworten: { select: { antwort_id: true, ist_richtig: true } },
+          antworten: {
+            orderBy: { antwort_id: "asc" },
+            select: { antwort_id: true, ist_richtig: true },
+          },
           antwortfelder: {
             orderBy: { sortierung: "asc" },
             include: {
@@ -191,7 +195,12 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   if (isPollQuestionTemplateId(templateId)) {
     return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
   }
-  const orderedItemIds = orderingItems(assignment.fragen.template_config_json);
+  const templateOrderingItems = orderingTemplateItems(
+    assignment.fragen.template_config_json,
+  );
+  const orderedItemIds = templateOrderingItems.length > 0
+    ? assignment.fragen.antworten.map((answer) => String(answer.antwort_id))
+    : [];
   const maximum = getQuestionBaseMaximum({
     templateId,
     correctAnswerCount: assignment.fragen.antworten.filter(
@@ -222,7 +231,13 @@ async function recalculateQuizQuestionEvaluationInTransaction(
         isCorrect: option.ist_richtig,
       })),
       selectedAnswerIds: effectiveSubmission?.selectedAnswerIds ?? [],
-      answerText: effectiveSubmission?.answerText ?? null,
+      answerText: templateOrderingItems.length > 0
+        ? normalizeOrderingAnswerTextToAnswerIds(
+            assignment.fragen.antworten,
+            templateOrderingItems,
+            effectiveSubmission?.answerText ?? null,
+          )
+        : effectiveSubmission?.answerText ?? null,
       structuredFields: assignment.fragen.antwortfelder.map((field) => ({
         id: field.antwortfeld_id,
         acceptedSolutions: field.loesungen.map(

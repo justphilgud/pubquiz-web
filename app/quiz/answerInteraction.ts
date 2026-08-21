@@ -5,7 +5,6 @@ import type {
   TemplateAnswerFormDefinition,
   TemplateInteractionType,
 } from "@/app/rendering/templates/templateContract";
-import { applyQuizSpecificOrderingItemOrder } from "./orderingQuestionOrder";
 
 type AnswerOption = {
   id: number;
@@ -110,7 +109,7 @@ export type QuizAnswerInteractionInput = {
     required: boolean;
   }[];
   answerOptions: readonly AnswerOption[];
-  orderingItemOrder?: readonly number[];
+  orderingItems?: readonly OrderingItem[];
 };
 
 function getAnswerForm(
@@ -239,13 +238,7 @@ export function resolveQuizAnswerInteraction(
       scoringPolicy: answerForm.scoringPolicy,
       items:
         input.templateData?.kind === "ORDERING"
-          ? applyQuizSpecificOrderingItemOrder(
-              input.templateData.items,
-              input.orderingItemOrder ?? [],
-            ).map((item) => ({
-              id: item.id,
-              text: item.text,
-            }))
+          ? [...(input.orderingItems ?? [])]
           : [],
     };
   }
