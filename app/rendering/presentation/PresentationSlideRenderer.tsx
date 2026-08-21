@@ -5,7 +5,10 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 
-import { PUBLIC_CALENDAR_LANDING_PATH } from "@/app/calendar/publicCalendar";
+import {
+  PUBLIC_CALENDAR_FEED_PATH,
+  buildPublicCalendarSubscriptionUrl,
+} from "@/app/calendar/publicCalendar";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 import { parsePrizeSlots } from "@/app/quiz/fixedSlidesPolicy";
 import type { QuizPraesentationResult } from "../../quiz/actions";
@@ -230,12 +233,12 @@ export default function PresentationSlideRenderer({
     teamJoinState = null,
   } = displayState;
   const relativeAnswerUrl = `/quiz/${quiz.quiz_id}/antworten`;
-  const relativeCalendarUrl = PUBLIC_CALENDAR_LANDING_PATH;
+  const relativeCalendarUrl = PUBLIC_CALENDAR_FEED_PATH;
   const [answerUrl, setAnswerUrl] = useState(relativeAnswerUrl);
   const [calendarUrl, setCalendarUrl] = useState(relativeCalendarUrl);
   useEffect(() => {
     setAnswerUrl(`${window.location.origin}${relativeAnswerUrl}`);
-    setCalendarUrl(`${window.location.origin}${relativeCalendarUrl}`);
+    setCalendarUrl(buildPublicCalendarSubscriptionUrl(window.location.origin));
   }, [relativeAnswerUrl, relativeCalendarUrl]);
   const currentSlideMedia =
     slide?.typ === "frage"

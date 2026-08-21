@@ -12,7 +12,6 @@ import {
 } from "../../actions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
-import { PUBLIC_CALENDAR_SUBSCRIBE_PATH } from "@/app/calendar/publicCalendar";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import GenericAnswerRenderer, {
   type TeamAnswerDraft,
@@ -181,7 +180,15 @@ type TeamSession = {
   sessionToken: string;
 };
 
-export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStatus; theme: ResolvedQuizTheme }) {
+export default function QuizAntwortClient({
+  daten,
+  theme,
+  calendarSubscriptionUrl,
+}: {
+  daten: AntwortStatus;
+  theme: ResolvedQuizTheme;
+  calendarSubscriptionUrl: string;
+}) {
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
@@ -1352,9 +1359,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
 
         <footer className="pb-2 text-center text-sm">
           <a
-            href={PUBLIC_CALENDAR_SUBSCRIBE_PATH}
-            target="_blank"
-            rel="noreferrer"
+            href={calendarSubscriptionUrl}
             className="inline-flex min-h-11 items-center rounded-xl px-4 py-2 font-semibold text-slate-600 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-900"
           >
             PubQuiz-Kalender abonnieren

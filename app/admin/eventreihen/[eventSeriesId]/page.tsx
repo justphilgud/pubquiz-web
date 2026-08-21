@@ -8,6 +8,8 @@ import { getPresentationTemplate } from "@/app/rendering/templateRegistry";
 import { getManagedPresentationTemplate } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import { getCalendarRequestOrigin } from "@/app/calendar/calendarOrigin.server";
+import { buildEventSeriesCalendarSubscriptionUrl } from "@/app/calendar/publicCalendar";
 
 const statusLabels = {
   UPCOMING: "Bevorstehend",
@@ -26,9 +28,16 @@ export default async function EventSeriesDetailPage({
   const { eventSeriesId } = await params;
   const series = await getEventSeriesDetails(Number(eventSeriesId));
   if (!series) notFound();
-  const managedPresentation = await getManagedPresentationTemplate(series.defaultPresentationTemplateId);
+  const [managedPresentation, calendarOrigin] = await Promise.all([
+    getManagedPresentationTemplate(series.defaultPresentationTemplateId),
+    getCalendarRequestOrigin(),
+  ]);
   const messages = loadRenderingMessages(getDefaultLocale());
   const roleMessages = loadRoleMessages(getDefaultLocale());
+  const calendarSubscriptionUrl = buildEventSeriesCalendarSubscriptionUrl(
+    calendarOrigin,
+    series.id,
+  );
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8">
@@ -57,7 +66,7 @@ export default async function EventSeriesDetailPage({
                 </p>
               </div>
               <a
-                href={`/calendar/event-series/${series.id}.ics`}
+                href={calendarSubscriptionUrl}
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-center font-semibold"
               >
                 Kalender abonnieren

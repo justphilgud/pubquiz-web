@@ -6,7 +6,12 @@ import {
   buildPublicQuizCalendar,
   type EventCalendarSeries,
 } from "./eventCalendar";
-import { buildPublicCalendarSubscriptionUrl } from "@/app/calendar/publicCalendar";
+import {
+  buildEventSeriesCalendarFeedPath,
+  buildEventSeriesCalendarSubscriptionUrl,
+  buildPublicCalendarSubscriptionUrl,
+} from "@/app/calendar/publicCalendar";
+import { resolveCalendarRequestOrigin } from "@/app/calendar/calendarOrigin";
 
 const generatedAt = new Date("2026-08-17T10:11:12.000Z");
 
@@ -38,6 +43,87 @@ function build(series = createSeries(), today = "2026-08-17") {
 function unfold(calendar: string) {
   return calendar.replaceAll(/\r\n[ \t]/g, "");
 }
+
+function requestHeaders(values: Record<string, string>) {
+  return {
+    get(name: string) {
+      return values[name.toLowerCase()] ?? null;
+    },
+  };
+}
+
+test("public and event-series subscriptions use persistent webcal feeds", () => {
+  assert.equal(
+    buildPublicCalendarSubscriptionUrl("https://preview.quiz.example"),
+    "webcal://preview.quiz.example/calendar/public.ics",
+  );
+  assert.equal(
+    buildEventSeriesCalendarSubscriptionUrl("https://quiz.example", 42),
+    "webcal://quiz.example/calendar/event-series/42.ics",
+  );
+  assert.equal(
+    buildEventSeriesCalendarFeedPath(42),
+    "/calendar/event-series/42.ics",
+  );
+  assert.throws(() => buildEventSeriesCalendarFeedPath(0));
+});
+
+test("request origin follows Preview, Production and local forwarded headers", () => {
+  assert.equal(
+    resolveCalendarRequestOrigin(requestHeaders({
+      "x-forwarded-host": "preview-branch.vercel.app",
+      "x-forwarded-proto": "https",
+    })),
+    "https://preview-branch.vercel.app",
+  );
+  assert.equal(
+    resolveCalendarRequestOrigin(requestHeaders({ host: "quiz.example" })),
+    "https://quiz.example",
+  );
+  assert.equal(
+    resolveCalendarRequestOrigin(requestHeaders({ host: "localhost:3000" })),
+    "http://localhost:3000",
+  );
+});
+
+test("all calendar entry points expose direct subscription links", () => {
+  const landing = readFileSync("app/kalender/page.tsx", "utf8");
+  const renderer = readFileSync(
+    "app/rendering/presentation/PresentationSlideRenderer.tsx",
+    "utf8",
+  );
+  const answerPage = readFileSync(
+    "app/quiz/[quizId]/antworten/page.tsx",
+    "utf8",
+  );
+  const answerForm = readFileSync(
+    "app/quiz/[quizId]/antworten/QuizAntwortClient.tsx",
+    "utf8",
+  );
+  const eventSeries = readFileSync(
+    "app/admin/eventreihen/[eventSeriesId]/page.tsx",
+    "utf8",
+  );
+  const legacySubscribe = readFileSync(
+    "app/calendar/subscribe/route.ts",
+    "utf8",
+  );
+
+  assert.match(landing, /href=\{subscriptionUrl\}/);
+  assert.match(
+    renderer,
+    /buildPublicCalendarSubscriptionUrl\(window\.location\.origin\)/,
+  );
+  assert.match(
+    answerPage,
+    /calendarSubscriptionUrl=\{buildPublicCalendarSubscriptionUrl/,
+  );
+  assert.match(answerForm, /href=\{calendarSubscriptionUrl\}/);
+  assert.doesNotMatch(answerForm, /target="_blank"/);
+  assert.match(eventSeries, /href=\{calendarSubscriptionUrl\}/);
+  assert.match(legacySubscribe, /PUBLIC_CALENDAR_LANDING_PATH/);
+  assert.doesNotMatch(legacySubscribe, /buildPublicCalendarSubscriptionUrl/);
+});
 
 test("creates a valid subscribable calendar with stable event identifiers", () => {
   const calendar = build();
@@ -161,11 +247,51 @@ test("general calendar aggregates only public active series and eligible quizzes
   assert.doesNotMatch(unfolded, /Archiviert|Vergangen|Firmenquiz|Altbestand|Private Firmenreihe/);
 });
 
-test("participant calendar routes and CTAs share one persistent subscription flow", () => {
+test("the same public feed includes later additions and changed appointments", () => {
+  const quiz = createSeries().quizzes[0];
+  const firstFetch = buildPublicQuizCalendar(
+    [createSeries({ quizzes: [{ ...quiz, id: 71, title: "Termin A" }] })],
+    "2026-08-17",
+    generatedAt,
+  );
+  const secondFetch = buildPublicQuizCalendar(
+    [createSeries({
+      quizzes: [
+        { ...quiz, id: 71, title: "Termin A aktualisiert", time: "20:00" },
+        { ...quiz, id: 72, title: "Termin B", date: "2026-11-01" },
+      ],
+    })],
+    "2026-08-17",
+    generatedAt,
+  );
+
+  assert.match(firstFetch, /UID:quiz-71@pubquiz/);
+  assert.doesNotMatch(firstFetch, /Termin B/);
+  assert.match(secondFetch, /UID:quiz-71@pubquiz/);
+  assert.match(secondFetch, /SUMMARY:Termin A aktualisiert/);
+  assert.match(secondFetch, /DTSTART;TZID=Europe\/Berlin:20261025T200000/);
+  assert.match(secondFetch, /UID:quiz-72@pubquiz/);
+  assert.match(secondFetch, /SUMMARY:Termin B/);
+});
+
+test("changing a series from public to private removes it from the same feed", () => {
+  const publicFetch = buildPublicQuizCalendar(
+    [createSeries({ isPublic: true })],
+    "2026-08-17",
+    generatedAt,
+  );
+  const privateFetch = buildPublicQuizCalendar(
+    [createSeries({ isPublic: false })],
+    "2026-08-17",
+    generatedAt,
+  );
+
+  assert.match(publicFetch, /UID:quiz-41@pubquiz/);
+  assert.doesNotMatch(privateFetch, /UID:quiz-41@pubquiz/);
+});
+
+test("calendar routes keep persistent public feed endpoints", () => {
   const constants = readFileSync("app/calendar/publicCalendar.ts", "utf8");
-  const landing = readFileSync("app/kalender/page.tsx", "utf8");
-  const renderer = readFileSync("app/rendering/presentation/PresentationSlideRenderer.tsx", "utf8");
-  const answerForm = readFileSync("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx", "utf8");
   const proxy = readFileSync("proxy.ts", "utf8");
 
   assert.match(constants, /PUBLIC_CALENDAR_LANDING_PATH = "\/kalender"/);
@@ -175,10 +301,6 @@ test("participant calendar routes and CTAs share one persistent subscription flo
     buildPublicCalendarSubscriptionUrl("https://quiz.example"),
     "webcal://quiz.example/calendar/public.ics",
   );
-  assert.match(landing, /PUBLIC_CALENDAR_SUBSCRIBE_PATH/);
-  assert.match(renderer, /PUBLIC_CALENDAR_LANDING_PATH/);
-  assert.match(answerForm, /PUBLIC_CALENDAR_SUBSCRIBE_PATH/);
-  assert.match(answerForm, /target="_blank"/);
   assert.match(proxy, /"\/kalender"/);
   assert.match(proxy, /"\/calendar\/subscribe"/);
 });

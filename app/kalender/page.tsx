@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import {
   PUBLIC_CALENDAR_NAME,
-  PUBLIC_CALENDAR_SUBSCRIBE_PATH,
+  buildPublicCalendarSubscriptionUrl,
 } from "@/app/calendar/publicCalendar";
+import { getCalendarRequestOrigin } from "@/app/calendar/calendarOrigin.server";
 
 export const metadata: Metadata = {
   title: "PubQuiz-Termine abonnieren | ungegoogelt",
   description: "Öffentliche ungegoogelt PubQuiz-Termine als Kalender abonnieren.",
 };
 
-export default function PublicCalendarPage() {
+export default async function PublicCalendarPage() {
+  const subscriptionUrl = buildPublicCalendarSubscriptionUrl(
+    await getCalendarRequestOrigin(),
+  );
+
   return (
     <main className="min-h-dvh bg-slate-950 px-5 py-10 text-white sm:px-8 sm:py-16">
       <div className="mx-auto max-w-3xl">
@@ -31,7 +36,7 @@ export default function PublicCalendarPage() {
             oder einer anderen Kalender-App, die ICS-Abonnements unterstützt.
           </p>
           <a
-            href={PUBLIC_CALENDAR_SUBSCRIBE_PATH}
+            href={subscriptionUrl}
             className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-cyan-300 px-6 py-3 text-base font-black text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200"
           >
             PubQuiz-Kalender abonnieren
