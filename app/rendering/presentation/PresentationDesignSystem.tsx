@@ -52,11 +52,11 @@ export function PresentationDesignHeader({
     return (
       <header className="presentation-chrome presentation-editorial-header relative z-20 flex h-28 shrink-0 items-start justify-between px-3 pt-2">
         {theme.identity.logoUrl ? (
-          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="LOVD STELP" className="presentation-editorial-logo h-24 w-32 object-contain object-left-top" />
+          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="LOVD STELP" className="presentation-editorial-logo" />
         ) : (
           <span className="presentation-editorial-wordmark">LOVD</span>
         )}
-        <div className="presentation-editorial-progress pt-4 text-sm font-semibold uppercase tracking-[0.22em]">
+        <div className="presentation-editorial-progress" aria-label={`${slideLabel}, Folie ${slideNumber} von ${slideCount}`}>
           {slideLabel.toLocaleUpperCase("de-DE")} {progress}
         </div>
       </header>
@@ -311,8 +311,8 @@ export function PresentationDesignFooter({
 }) {
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
-      <footer className="presentation-editorial-footer relative z-20 flex h-9 shrink-0 items-center justify-end px-3 text-xs font-medium tracking-[0.08em]">
-        {theme.design.occasion.extraText || "LOVD × ungegoogelt"}
+      <footer className="presentation-editorial-footer relative z-20 flex shrink-0 items-center justify-end">
+        <span>{theme.design.occasion.extraText || "LOVD × ungegoogelt"}</span>
       </footer>
     );
   }

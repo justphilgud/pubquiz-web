@@ -85,6 +85,24 @@ test("renderer covers the central slide types without player orchestration", () 
   assert.doesNotMatch(rendererSource, /Zurück|Weiter →|setPraesentationSlideIndex/);
 });
 
+test("renderer exposes semantic hooks for LOVD badges, media and legacy flow slides", () => {
+  for (const semanticHook of [
+    "presentation-question-label",
+    "presentation-solution-label",
+    "presentation-solution-answer",
+    "presentation-audio-control",
+    "presentation-media-play-mark",
+    "presentation-estimation-slide",
+    "presentation-legacy-slide",
+    "presentation-countdown-slide",
+    "presentation-qr-slide",
+    "presentation-runtime-status",
+    "presentation-media-overlay",
+  ]) {
+    assert.match(rendererSource, new RegExp(semanticHook));
+  }
+});
+
 test("player and moderation preview share the presentation renderer", () => {
   assert.match(playerSource, /<PresentationSlideRenderer/);
   assert.match(moderationPreviewSource, /<PresentationSlideRenderer/);

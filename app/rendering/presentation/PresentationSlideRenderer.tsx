@@ -337,7 +337,7 @@ function renderMedienKarte(
         />
       ) : isAudio(medium.datei) ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-6">
-          <div className="text-7xl font-black text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
+          <div className="presentation-media-play-mark text-7xl font-black text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
             ▶
           </div>
           {renderMode === "PRESENTATION" ? <SynchronizedMedia kind="audio" src={src} command={effectivePlaybackCommand} commandId={playbackCommandId} renderMode={renderMode} /> : <PreviewAudioPlayer />}
@@ -374,7 +374,7 @@ function renderAntwortOptionen(
 
   if (!hatAntwortmoeglichkeiten) {
     return (
-      <div className="flex h-full items-center justify-center rounded-[1.5rem] border-4 border-dashed border-yellow-300 bg-black/40 p-8 text-center text-2xl font-black uppercase text-white/40">
+      <div className="presentation-open-question flex h-full items-center justify-center rounded-[1.5rem] border-4 border-dashed border-yellow-300 bg-black/40 p-8 text-center text-2xl font-black uppercase text-white/40">
         Offene Frage
       </div>
     );
@@ -630,7 +630,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
       >
         <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
           <div className="mb-4 flex flex-wrap items-center gap-3">
-            <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
+            <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
               Frage {slide.frageIndexImBlock}
             </div>
 
@@ -664,7 +664,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
+          <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
             Frage {slide.frageIndexImBlock}
           </div>
 
@@ -682,9 +682,9 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     const audioMedium = frage.medien[0];
 
     return (
-      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
+      <div data-presentation-layout={layoutVariant} className="presentation-question-card presentation-audio-stage flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
         <div className="mb-10 text-center">
-          <div className="mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
+          <div className="presentation-question-label mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
             Audiofrage
           </div>
 
@@ -694,7 +694,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         </div>
 
         <div className="flex min-h-0 flex-1 items-center justify-center">
-          <div className="flex h-full max-h-[520px] w-full max-w-5xl flex-col items-center justify-center rounded-[2rem] border-4 border-[#FF3BD4] bg-[radial-gradient(circle_at_center,rgba(255,59,212,0.18),transparent_55%),linear-gradient(135deg,rgba(59,130,255,0.16),rgba(0,0,0,0.95))] p-10 text-center shadow-[0_0_20px_#FF3BD4,0_0_40px_rgba(255,59,212,0.35)]">
+          <div className="presentation-audio-control flex h-full max-h-[520px] w-full max-w-5xl flex-col items-center justify-center rounded-[2rem] border-4 border-[#FF3BD4] bg-[radial-gradient(circle_at_center,rgba(255,59,212,0.18),transparent_55%),linear-gradient(135deg,rgba(59,130,255,0.16),rgba(0,0,0,0.95))] p-10 text-center shadow-[0_0_20px_#FF3BD4,0_0_40px_rgba(255,59,212,0.35)]">
             {!audioMedium ? (
               <div className="text-4xl font-black uppercase text-white/40">
                 Keine Audiodatei
@@ -703,13 +703,13 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
               <>
                 {renderMode === "PRESENTATION" ? <SynchronizedMedia kind="audio" src={getMediumUrl(audioMedium.datei)} command={mediaOverlayActive ? null : playbackCommand} commandId={playbackCommandId} renderMode={renderMode} /> : <PreviewAudioPlayer />}
 
-                <div className="mb-10 text-sm font-black uppercase tracking-[0.45em] text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+                <div className="presentation-audio-control-label mb-10 text-sm font-black uppercase tracking-[0.45em] text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
                   Wiedergabe durch die Moderation
                 </div>
 
                 <div
                   aria-hidden="true"
-                  className="flex h-40 w-40 items-center justify-center rounded-full border-4 border-[#FFD83B] bg-black text-7xl font-black text-[#FFD83B] shadow-[0_0_18px_#FFD83B,0_0_42px_rgba(255,216,59,0.55)]"
+                  className="presentation-audio-play-mark flex h-40 w-40 items-center justify-center rounded-full border-4 border-[#FFD83B] bg-black text-7xl font-black text-[#FFD83B] shadow-[0_0_18px_#FFD83B,0_0_42px_rgba(255,216,59,0.55)]"
                 >
                   ▶
                 </div>
@@ -725,7 +725,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
       <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
+          <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
             Frage {slide.frageIndexImBlock}
           </div>
 
@@ -1192,7 +1192,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
 
       <div className="presentation-solution-result flex min-h-0 flex-col rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
+          <div className="presentation-solution-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-slate-950 shadow-[4px_4px_0_#ff00aa]">
             {theme.design.stylePreset === "BIRTHDAY" ? "Erinnerung" : "Richtige Antwort"}
           </div>
 
@@ -1203,7 +1203,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
             antworten.map((antwort, index) => (
               <div
                 key={antwort.antwort_id}
-                className={`rounded-3xl border-4 px-6 py-4 text-2xl font-black shadow-[6px_6px_0_#00e5ff] ${antwort.ist_richtig
+                className={`presentation-solution-option rounded-3xl border-4 px-6 py-4 text-2xl font-black shadow-[6px_6px_0_#00e5ff] ${antwort.ist_richtig
                   ? "border-emerald-300 bg-emerald-500/25 text-yellow-200"
                   : "border-white/15 bg-black/35 text-white/45"
                   }`}
@@ -1221,7 +1221,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
               return (
                 <div
                   key={`${index}-${line}`}
-                  className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
+                  className="presentation-solution-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
                 >
                   <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
                     {linkedUrl ? (
@@ -1241,7 +1241,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
 
           {!frage.templateConfig?.templateData && !hatAntwortmoeglichkeiten &&
             richtigeAntworten.map((antwort) => (
-              <div key={antwort.antwort_id} className="flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
+              <div key={antwort.antwort_id} className="presentation-solution-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
                 <div className="text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">{antwort.antwort}</div>
               </div>
             ))}
@@ -1250,7 +1250,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
             richtigeAntwortfeldLoesungen.map((feld) => (
               <div
                 key={feld.label}
-                className="rounded-3xl border-4 border-emerald-300 bg-black/45 p-6 shadow-[6px_6px_0_#00e5ff]"
+                className="presentation-solution-answer rounded-3xl border-4 border-emerald-300 bg-black/45 p-6 shadow-[6px_6px_0_#00e5ff]"
               >
                 <div className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-emerald-300">
                   {feld.label}
@@ -1275,8 +1275,8 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
 
 function renderSchaetzfrageOverlay() {
   return (
-    <div className="flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-      <div className="mx-auto mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+    <div className="presentation-estimation-slide flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-estimation-kicker mx-auto mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
         Tie-Breaker
       </div>
 
@@ -1284,14 +1284,14 @@ function renderSchaetzfrageOverlay() {
         Schätzfrage
       </h2>
 
-      <div className="mx-auto mt-10 max-w-5xl rounded-3xl border-4 border-cyan-300 bg-slate-950/80 px-8 py-8 text-4xl font-black leading-tight text-white shadow-[6px_6px_0_#ff00aa]">
+      <div className="presentation-estimation-question mx-auto mt-10 max-w-5xl rounded-3xl border-4 border-cyan-300 bg-slate-950/80 px-8 py-8 text-4xl font-black leading-tight text-white shadow-[6px_6px_0_#ff00aa]">
         {isSchaetzfrageLoading
           ? "Schätzfrage wird geladen..."
           : schaetzfrage?.frage ?? "Keine Schätzfrage gefunden."}
       </div>
 
       {estimationPhase === "SOLUTION" && (
-        <div className="mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
+        <div className="presentation-estimation-solution mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
           {schaetzfrage?.richtigeAntwort ?? "Keine Lösung hinterlegt."}
         </div>
       )}
@@ -1325,7 +1325,7 @@ function renderBekanntmachungenSlide() {
     .filter(Boolean);
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
+    <div className="presentation-legacy-slide presentation-announcements-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-8">
         <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Outro
@@ -1368,7 +1368,7 @@ function renderBekanntmachungenSlide() {
 
 function renderAnkommenSlide() {
   return (
-    <div className="vor-dem-start-player relative h-full min-h-0 w-full overflow-hidden rounded-[1.5rem] bg-black">
+    <div className="vor-dem-start-player presentation-arrival-slide relative h-full min-h-0 w-full overflow-hidden rounded-[1.5rem] bg-black">
       {praesentationQuiz.intro_video_url && (
         <video
           autoPlay
@@ -1384,7 +1384,7 @@ function renderAnkommenSlide() {
         </video>
       )}
 
-      <div className="absolute bottom-8 right-8 z-20 rounded-2xl border-4 border-yellow-300 bg-black/70 px-7 py-4 text-3xl font-black text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
+      <div className="presentation-arrival-time absolute bottom-8 right-8 z-20 rounded-2xl border-4 border-yellow-300 bg-black/70 px-7 py-4 text-3xl font-black text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
         Beginn: {praesentationQuiz.intro_startzeit ?? "19:30"} Uhr
       </div>
     </div>
@@ -1393,16 +1393,16 @@ function renderAnkommenSlide() {
 
 function renderStartsequenzSlide() {
   return (
-    <section className="relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[#050510] text-white">
+    <section className="presentation-start-sequence relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[#050510] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,140,0.2),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(0,245,255,0.18),transparent_40%)]" />
-      <div className="relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-400/80 bg-black/50 p-12 text-center shadow-[0_0_45px_rgba(0,240,255,0.9)]">
+      <div className="presentation-start-sequence-content relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-400/80 bg-black/50 p-12 text-center shadow-[0_0_45px_rgba(0,240,255,0.9)]">
         <p className="mb-10 max-w-5xl text-5xl font-black leading-tight text-white drop-shadow-[0_0_14px_rgba(255,255,255,0.8)]">
           {praesentationQuiz.intro_startsequenz_text?.trim() ||
             "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen."}
         </p>
         <div
           aria-hidden="true"
-          className="rounded-3xl border-4 border-pink-500 px-20 py-10 text-[7rem] font-black leading-none text-pink-300 shadow-[0_0_45px_rgba(255,0,150,0.9)]"
+          className="presentation-start-play-mark rounded-3xl border-4 border-pink-500 px-20 py-10 text-[7rem] font-black leading-none text-pink-300 shadow-[0_0_45px_rgba(255,0,150,0.9)]"
         >
           ▶
         </div>
@@ -1491,7 +1491,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
   if (abschnitt.abschnitt_typ === "intro_begruessung") {
     return (
-      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-legacy-slide presentation-welcome-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
         <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Willkommen im
         </div>
@@ -1510,7 +1510,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
   if (abschnitt.abschnitt_typ === "intro_regeln") {
     return (
-      <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-legacy-slide presentation-rules-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
         <div className="mb-8">
           <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
             Rules are good!
@@ -1553,7 +1553,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
   if (abschnitt.abschnitt_typ === "intro_preise") {
     return (
-      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-legacy-slide presentation-prizes-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
         <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Preise
         </div>
@@ -1584,7 +1584,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
   if (abschnitt.abschnitt_typ === "intro_vor_dem_start") {
     return (
-      <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-legacy-slide presentation-waiting-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
         {praesentationQuiz.intro_logo_url ? (
           <img
             src={praesentationQuiz.intro_logo_url}
@@ -1636,7 +1636,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
     : abschnitt.titel;
 
   return (
-    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+    <div className="presentation-legacy-slide presentation-block-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
 
       <h2 className="text-7xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[6px_6px_0_#ff00aa]">
         {blockTitel}
@@ -1660,13 +1660,13 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
 function renderQrCodeSlide() {
   return (
-    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+    <div className="presentation-legacy-slide presentation-qr-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-10 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-8 py-4 text-2xl font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[5px_5px_0_#00e5ff]">
         Jetzt scannen
       </div>
 
-      <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
-        <div className="rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
+      <div className="presentation-qr-frame rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
+        <div className="presentation-qr-code rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
           <QRCode
             value={answerUrl}
             size={500}
@@ -1702,7 +1702,7 @@ function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
 
 
   return (
-    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
+    <div className="presentation-legacy-slide presentation-countdown-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
         Abgabezeit
       </div>
@@ -1711,7 +1711,7 @@ function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
         Verbleibende Zeit zum Grübeln:
       </h2>
 
-      <div className="mt-10 rounded-3xl border-4 border-cyan-300 bg-slate-950/70 px-10 py-6 shadow-[5px_5px_0_#ff00aa]">
+      <div className="presentation-countdown-value mt-10 rounded-3xl border-4 border-cyan-300 bg-slate-950/70 px-10 py-6 shadow-[5px_5px_0_#ff00aa]">
         <div className="text-7xl font-black text-white">
           {String(minuten).padStart(2, "0")}:
           {String(sekunden).padStart(2, "0")}
@@ -2160,7 +2160,7 @@ function renderAktuellenSlide() {
           : renderAktuellenSlide()}
       </PresentationDesignStage>
       {slide?.typ === "frage" && pixelState?.stopped && (
-        <div className="absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-yellow-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
+        <div className="presentation-runtime-status absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-yellow-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
           <p className="text-2xl font-black text-yellow-200">
             {pixelState.stoppedByTeamName ?? "Ein Team"} hat in Stufe {pixelState.stoppedAtStage} gestoppt
           </p>
@@ -2174,7 +2174,7 @@ function renderAktuellenSlide() {
         </div>
       )}
       {slide?.typ === "aufloesung" && pixelState?.stopped && pixelState.resolution && (
-        <div className="absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-cyan-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
+        <div className="presentation-runtime-status absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-cyan-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
           <p className="text-xl font-black text-cyan-200">
             {pixelState.stoppedByTeamName} stoppte in Stufe {pixelState.stoppedAtStage}: {pixelState.resolution.answer ?? "Keine Antwort"}
           </p>
@@ -2187,8 +2187,8 @@ function renderAktuellenSlide() {
       )}
       <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
       {mediaOverlayActive && overlayMedia.length > 0 && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
-          <div className="grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">
+        <div className="presentation-media-overlay absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
+          <div className="presentation-media-overlay-content grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">
             {overlayMedia.slice(0, 2).map((medium) =>
               renderMedienKarte(medium, "overlay"),
             )}

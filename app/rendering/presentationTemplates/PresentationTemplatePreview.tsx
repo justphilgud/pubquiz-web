@@ -345,7 +345,7 @@ function AnswerFormDesignPreview({ theme }: { theme: ResolvedQuizTheme }) {
     return (
       <QuizThemeScope theme={theme} data-preview-surface="ANSWER_FORM" className="answer-template flex h-full w-full flex-col overflow-hidden bg-[var(--quiz-background)] px-20 py-14">
         <header className="flex items-start justify-between">
-          {theme.identity.logoUrl && <img src={theme.identity.logoUrl} alt="LOVD STELP" className="h-24 w-32 object-contain object-left-top" />}
+          {theme.identity.logoUrl && <img src={theme.identity.logoUrl} alt="LOVD STELP" className="answer-editorial-logo" />}
           <span className="pt-4 text-sm font-semibold uppercase tracking-[.22em] text-[var(--quiz-text-muted)]">Frage 01 / 10</span>
         </header>
         <div className="mt-12 max-w-5xl text-sm font-semibold uppercase tracking-[.22em] text-[var(--quiz-accent)]">Frage 01</div>

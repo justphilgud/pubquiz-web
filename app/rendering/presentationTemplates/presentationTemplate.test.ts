@@ -659,6 +659,45 @@ test("semantic renderer variants keep corporate treatment and expose the editori
   assert.doesNotMatch(designSystem, /presentation-album-tape|presentation-album-ring|StorybookPeopleMarks/);
 });
 
+test("LOVD uses one token-driven editorial treatment without visible neon color values", () => {
+  const css = readFileSync("app/globals.css", "utf8");
+  const designSystem = readFileSync("app/rendering/presentation/PresentationDesignSystem.tsx", "utf8");
+  const answerForm = readFileSync("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx", "utf8");
+  const lovdCss = css.slice(css.indexOf("/* LOVD × ungegoogelt:"));
+
+  assert.ok(lovdCss.length > 0);
+  assert.doesNotMatch(lovdCss, /#(?:38e8ff|ff3bd4|ffd83b|00e5ff|ff00aa)/i);
+  for (const semanticHook of [
+    "presentation-question-label",
+    "presentation-solution-label",
+    "presentation-audio-control",
+    "presentation-flow-countdown",
+    "presentation-flow-ranking-list",
+    "presentation-qr-slide",
+    "presentation-runtime-status",
+    "answer-submission-status",
+    "answer-calendar-link",
+  ]) {
+    assert.match(lovdCss, new RegExp(semanticHook));
+  }
+  for (const token of [
+    "--brand-background",
+    "--brand-surface",
+    "--brand-text",
+    "--brand-text-muted",
+    "--brand-border",
+    "--brand-success",
+    "--brand-warning",
+    "--brand-danger",
+  ]) {
+    assert.match(lovdCss, new RegExp(token));
+  }
+  assert.match(designSystem, /className="presentation-editorial-logo"/);
+  assert.match(designSystem, /presentation-editorial-footer[\s\S]+<span>/);
+  assert.match(answerForm, /answer-editorial-logo/);
+  assert.match(answerForm, /answer-brand-header/);
+});
+
 test("template upload is integrated into the shared signed route but requires explicit store confirmation", () => {
   const route = readFileSync("app/api/question-media-upload/route.ts", "utf8");
   const uploadContext = readFileSync("app/rendering/presentationTemplates/presentationTemplateUpload.server.ts", "utf8");
