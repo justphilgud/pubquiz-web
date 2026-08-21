@@ -10,6 +10,7 @@ import {
   getQuestionBaseMaximum,
   validateQuestionPointsMode,
 } from "./questionPointPolicy";
+import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
 const defaults = {
   effectiveAnswerMode: "CLOSED" as const,
@@ -111,6 +112,27 @@ test("pixel text ignores legacy structured fields and remains manually reviewabl
     strategy: "MANUAL",
     reason: "MANUAL_EVALUATION",
   });
+});
+
+test("translated reading evaluates the stored song title instead of its context", () => {
+  const input = {
+    ...defaults,
+    templateId: questionTemplateIds.translationReadAloud,
+    effectiveAnswerMode: "OPEN" as const,
+    answerOptions: [{ id: 1, isCorrect: true, text: "Baby Got Back" }],
+  };
+  const correct = evaluateBaseAnswer({
+    ...input,
+    answerText: " baby got back ",
+  });
+  const context = evaluateBaseAnswer({
+    ...input,
+    answerText: "Ein sehr langer übersetzter Songtext",
+  });
+
+  assert.equal(correct.status, "CORRECT");
+  assert.equal(correct.details.strategy, "EXACT_OPEN_ANSWER");
+  assert.equal(context.status, "REVIEW_REQUIRED");
 });
 
 test("normalizes exact open answers using only trim and case folding", () => {

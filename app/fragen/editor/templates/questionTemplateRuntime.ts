@@ -69,10 +69,7 @@ export function buildQuestionTemplateRuntimeModel(input: {
   if (data?.kind === "TRANSLATION_READ_ALOUD") {
     return {
       ...base,
-      solutionLines: [
-        ...fallbackLines,
-        data.translation,
-      ].filter(Boolean),
+      solutionLines: fallbackLines,
     };
   }
   if (data?.kind === "ANAGRAM") {
