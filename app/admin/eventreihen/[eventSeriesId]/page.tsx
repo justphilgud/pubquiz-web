@@ -8,6 +8,7 @@ import { getPresentationTemplate } from "@/app/rendering/templateRegistry";
 import { getManagedPresentationTemplate } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import { CalendarSubscriptionLink } from "@/app/calendar/CalendarSubscriptionLink";
 
 const statusLabels = {
   UPCOMING: "Bevorstehend",
@@ -56,12 +57,12 @@ export default async function EventSeriesDetailPage({
                   Kommende Termine dieser öffentlichen Eventreihe als Kalender abonnieren.
                 </p>
               </div>
-              <a
-                href={`/calendar/event-series/${series.id}.ics`}
+              <CalendarSubscriptionLink
+                feedPath={`/calendar/event-series/${series.id}.ics`}
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-center font-semibold"
               >
                 Kalender abonnieren
-              </a>
+              </CalendarSubscriptionLink>
             </div>
           </section>
         )}

@@ -166,6 +166,8 @@ test("participant calendar routes and CTAs share one persistent subscription flo
   const landing = readFileSync("app/kalender/page.tsx", "utf8");
   const renderer = readFileSync("app/rendering/presentation/PresentationSlideRenderer.tsx", "utf8");
   const answerForm = readFileSync("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx", "utf8");
+  const subscriptionLink = readFileSync("app/calendar/CalendarSubscriptionLink.tsx", "utf8");
+  const eventSeries = readFileSync("app/admin/eventreihen/[eventSeriesId]/page.tsx", "utf8");
   const proxy = readFileSync("proxy.ts", "utf8");
 
   assert.match(constants, /PUBLIC_CALENDAR_LANDING_PATH = "\/kalender"/);
@@ -175,10 +177,21 @@ test("participant calendar routes and CTAs share one persistent subscription flo
     buildPublicCalendarSubscriptionUrl("https://quiz.example"),
     "webcal://quiz.example/calendar/public.ics",
   );
-  assert.match(landing, /PUBLIC_CALENDAR_SUBSCRIBE_PATH/);
+  assert.equal(
+    buildPublicCalendarSubscriptionUrl(
+      "https://quiz.example",
+      "/calendar/event-series/12.ics",
+    ),
+    "webcal://quiz.example/calendar/event-series/12.ics",
+  );
+  assert.match(subscriptionLink, /window\.location\.origin/);
+  assert.match(subscriptionLink, /href=\{subscriptionUrl\}/);
+  assert.doesNotMatch(subscriptionLink, /onClick/);
+  assert.match(landing, /CalendarSubscriptionLink/);
   assert.match(renderer, /PUBLIC_CALENDAR_LANDING_PATH/);
-  assert.match(answerForm, /PUBLIC_CALENDAR_SUBSCRIBE_PATH/);
-  assert.match(answerForm, /target="_blank"/);
+  assert.match(answerForm, /CalendarSubscriptionLink/);
+  assert.match(eventSeries, /CalendarSubscriptionLink/);
+  assert.match(eventSeries, /feedPath=\{`\/calendar\/event-series\/\$\{series\.id\}\.ics`\}/);
   assert.match(proxy, /"\/kalender"/);
   assert.match(proxy, /"\/calendar\/subscribe"/);
 });

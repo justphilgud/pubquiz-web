@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import {
   PUBLIC_CALENDAR_NAME,
-  PUBLIC_CALENDAR_SUBSCRIBE_PATH,
 } from "@/app/calendar/publicCalendar";
+import { CalendarSubscriptionLink } from "@/app/calendar/CalendarSubscriptionLink";
 
 export const metadata: Metadata = {
   title: "PubQuiz-Termine abonnieren | ungegoogelt",
@@ -30,12 +30,11 @@ export default function PublicCalendarPage() {
             Öffne den Kalender-Link mit Apple Kalender, Outlook, Google Kalender
             oder einer anderen Kalender-App, die ICS-Abonnements unterstützt.
           </p>
-          <a
-            href={PUBLIC_CALENDAR_SUBSCRIBE_PATH}
+          <CalendarSubscriptionLink
             className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-cyan-300 px-6 py-3 text-base font-black text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200"
           >
             PubQuiz-Kalender abonnieren
-          </a>
+          </CalendarSubscriptionLink>
           <p className="mt-4 text-sm leading-6 text-slate-400">
             Der Kalender enthält ausschließlich öffentliche, aktive und nicht
             archivierte Termine. Private Quizze und interne Veranstaltungen
