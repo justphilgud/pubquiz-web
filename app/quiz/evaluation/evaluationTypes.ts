@@ -17,6 +17,7 @@ export type EvaluationDetails = {
     | "MULTIPLE_CHOICE"
     | "STRUCTURED_FIELDS"
     | "ORDERING"
+    | "EXACT_OPEN_ANSWER"
     | "MANUAL"
     | "NONE";
   correctComponents?: number;
@@ -36,6 +37,7 @@ export type BaseAnswerEvaluation = {
 export type AnswerOption = {
   id: number;
   isCorrect: boolean;
+  text?: string;
 };
 
 export type StructuredAnswerField = {

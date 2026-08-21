@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { evaluateBaseAnswer } from "./evaluateBaseAnswer";
+import {
+  evaluateBaseAnswer,
+  isNormalizedExactOpenAnswer,
+  normalizeExactOpenAnswer,
+} from "./evaluateBaseAnswer";
 import { evaluateQuestionPoints } from "./evaluateQuestionPoints";
 import {
   getQuestionBaseMaximum,
@@ -9,7 +13,7 @@ import {
 
 const defaults = {
   effectiveAnswerMode: "CLOSED" as const,
-  answerOptions: [] as { id: number; isCorrect: boolean }[],
+  answerOptions: [] as { id: number; isCorrect: boolean; text?: string }[],
   selectedAnswerIds: [] as number[],
   answerText: null,
   structuredFields: [],
@@ -107,6 +111,75 @@ test("pixel text ignores legacy structured fields and remains manually reviewabl
     strategy: "MANUAL",
     reason: "MANUAL_EVALUATION",
   });
+});
+
+test("normalizes exact open answers using only trim and case folding", () => {
+  assert.equal(normalizeExactOpenAnswer("  LÖSUNG A  "), "lösung a");
+  assert.equal(isNormalizedExactOpenAnswer("7", "7"), true);
+  assert.equal(isNormalizedExactOpenAnswer("7.0", "7"), false);
+  assert.equal(isNormalizedExactOpenAnswer("Baby  Got Back", "Baby Got Back"), false);
+  assert.equal(isNormalizedExactOpenAnswer("", ""), false);
+  assert.equal(isNormalizedExactOpenAnswer("   ", "   "), false);
+});
+
+test("auto-grades only normalized exact matches for open answers", () => {
+  const input = {
+    ...defaults,
+    templateId: "standard",
+    effectiveAnswerMode: "OPEN" as const,
+    answerOptions: [{ id: 1, isCorrect: true, text: "Baby Got Back" }],
+  };
+  const cases = [
+    ["Baby Got Back", "CORRECT"],
+    ["   Baby Got Back   ", "CORRECT"],
+    ["baby got back", "CORRECT"],
+    ["Got Back", "REVIEW_REQUIRED"],
+    ["Baby  Got Back", "REVIEW_REQUIRED"],
+  ] as const;
+  for (const [answerText, expectedStatus] of cases) {
+    const result = evaluateBaseAnswer({ ...input, answerText });
+    assert.equal(result.status, expectedStatus);
+    if (expectedStatus === "CORRECT") {
+      assert.equal(result.basePoints.toString(), "1");
+      assert.equal(result.details.strategy, "EXACT_OPEN_ANSWER");
+    }
+  }
+});
+
+test("handles numeric text conservatively and never matches empty answers", () => {
+  const input = {
+    ...defaults,
+    templateId: "standard",
+    effectiveAnswerMode: "OPEN" as const,
+    answerOptions: [{ id: 1, isCorrect: true, text: "7" }],
+  };
+  assert.equal(evaluateBaseAnswer({ ...input, answerText: "7" }).status, "CORRECT");
+  assert.equal(evaluateBaseAnswer({ ...input, answerText: "6" }).status, "REVIEW_REQUIRED");
+  assert.equal(evaluateBaseAnswer({ ...input, answerText: "7.0" }).status, "REVIEW_REQUIRED");
+  assert.equal(evaluateBaseAnswer({ ...input, answerText: "" }).status, "UNANSWERED");
+  assert.equal(
+    evaluateBaseAnswer({
+      ...input,
+      answerOptions: [{ id: 1, isCorrect: true, text: "" }],
+      answerText: "",
+    }).status,
+    "UNANSWERED",
+  );
+});
+
+test("matches any existing accepted correct answer without a parallel solution model", () => {
+  const result = evaluateBaseAnswer({
+    ...defaults,
+    templateId: "standard",
+    effectiveAnswerMode: "OPEN",
+    answerOptions: [
+      { id: 1, isCorrect: true, text: "Antwort A" },
+      { id: 2, isCorrect: true, text: "Alternative" },
+      { id: 3, isCorrect: false, text: "Ablenkung" },
+    ],
+    answerText: "  ALTERNATIVE ",
+  });
+  assert.equal(result.status, "CORRECT");
 });
 
 test("multiple choice penalizes wrong selections and selecting all is not full", () => {

@@ -137,6 +137,21 @@ function evaluateMultipleChoice(input: BaseAnswerInput): BaseAnswerEvaluation {
   };
 }
 
+export function normalizeExactOpenAnswer(value: string) {
+  return value.trim().toLocaleLowerCase("de-DE");
+}
+
+export function isNormalizedExactOpenAnswer(
+  submitted: string,
+  accepted: string,
+) {
+  const normalizedSubmitted = normalizeExactOpenAnswer(submitted);
+  const normalizedAccepted = normalizeExactOpenAnswer(accepted);
+  return normalizedSubmitted.length > 0 &&
+    normalizedAccepted.length > 0 &&
+    normalizedSubmitted === normalizedAccepted;
+}
+
 export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
 
@@ -171,6 +186,25 @@ export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation
     templateId === questionTemplateIds.pixelImage ||
     templateId === questionTemplateIds.estimate
   ) {
+    const hasExactAcceptedAnswer =
+      input.effectiveAnswerMode === "OPEN" &&
+      templateId !== questionTemplateIds.pixelImage &&
+      templateId !== questionTemplateIds.estimate &&
+      hasText(input.answerText) &&
+      input.answerOptions.some(
+        (answer) =>
+          answer.isCorrect &&
+          hasText(answer.text) &&
+          isNormalizedExactOpenAnswer(input.answerText!, answer.text!),
+      );
+    if (hasExactAcceptedAnswer) {
+      return {
+        basePoints: new Prisma.Decimal(1),
+        maxPoints: new Prisma.Decimal(1),
+        status: "CORRECT",
+        details: { strategy: "EXACT_OPEN_ANSWER" },
+      };
+    }
     return {
       basePoints: ZERO,
       maxPoints: new Prisma.Decimal(1),

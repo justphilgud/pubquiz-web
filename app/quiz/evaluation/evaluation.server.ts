@@ -187,7 +187,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
           vorlage: { select: { code: true } },
           antworten: {
             orderBy: { antwort_id: "asc" },
-            select: { antwort_id: true, ist_richtig: true },
+            select: { antwort_id: true, antwort: true, ist_richtig: true },
           },
           antwortfelder: {
             orderBy: { sortierung: "asc" },
@@ -272,6 +272,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       answerOptions: assignment.fragen.antworten.map((option) => ({
         id: option.antwort_id,
         isCorrect: option.ist_richtig,
+        text: option.antwort,
       })),
       selectedAnswerIds: effectiveSubmission?.selectedAnswerIds ?? [],
       answerText: templateOrderingItems.length > 0
