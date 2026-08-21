@@ -189,7 +189,7 @@ function isSafeAssetReference(value: unknown, nullable = false) {
 
 function normalizeDesign(value: unknown, presentationVariant: unknown) {
   const storedStyle = isRecord(value) ? value.stylePreset : null;
-  const fallback = storedStyle === "NEON" || storedStyle === "CORPORATE" || storedStyle === "BIRTHDAY"
+  const fallback = storedStyle === "NEON" || storedStyle === "CORPORATE" || storedStyle === "BIRTHDAY" || storedStyle === "EDITORIAL"
     ? presentationDesigns[storedStyle]
     : presentationVariant === "DARK"
       ? presentationDesigns.CORPORATE
@@ -223,7 +223,7 @@ function validateDesign(value: unknown) {
     return [{ field: "config.design", message: "Semantische Designbausteine fehlen." }];
   }
   const style = value.stylePreset;
-  if (!["NEON", "CORPORATE", "BIRTHDAY"].includes(String(style))) {
+  if (!["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL"].includes(String(style))) {
     errors.push({ field: "config.design.stylePreset", message: "Unbekannter Designstil." });
     return errors;
   }
@@ -239,9 +239,9 @@ function validateDesign(value: unknown) {
   }
   for (const key of Object.keys(expected) as (keyof typeof expected)[]) {
     const allowed = {
-      layoutPreset: ["CLASSIC", "IMAGE_FOCUS", "SPLIT", "MAGAZINE", "COLLAGE"], headerStyle: ["BRAND_BAR", "CORPORATE_BAND", "BIRTHDAY_HERO"], footerStyle: ["NONE", "STATUS_LINE", "PERSONAL_NOTE"],
-      contentFrame: ["NEON_FRAME", "CORPORATE_PANEL", "BIRTHDAY_ALBUM"], mediaTreatment: ["GLOW_FRAME", "RECTANGULAR", "POLAROID"],
-      answerTreatment: ["NEON_CARDS", "CORPORATE_ROWS", "BIRTHDAY_CARDS"], solutionTreatment: ["SPOTLIGHT", "RESULT_BAND", "MEMORY"],
+      layoutPreset: ["CLASSIC", "IMAGE_FOCUS", "SPLIT", "MAGAZINE", "COLLAGE"], headerStyle: ["BRAND_BAR", "CORPORATE_BAND", "BIRTHDAY_HERO", "EDITORIAL_MARK"], footerStyle: ["NONE", "STATUS_LINE", "PERSONAL_NOTE", "COLLABORATION"],
+      contentFrame: ["NEON_FRAME", "CORPORATE_PANEL", "BIRTHDAY_ALBUM", "OPEN_CANVAS"], mediaTreatment: ["GLOW_FRAME", "RECTANGULAR", "POLAROID"],
+      answerTreatment: ["NEON_CARDS", "CORPORATE_ROWS", "BIRTHDAY_CARDS", "EDITORIAL_ROWS"], solutionTreatment: ["SPOTLIGHT", "RESULT_BAND", "MEMORY", "ANSWER_BAND"],
       decoration: ["NONE", "NEON_ORBITS", "GEOMETRIC_LINES", "CONFETTI"],
     }[key] as readonly string[];
     if (!allowed.includes(String(value.composition[key]))) errors.push({ field: `config.design.composition.${key}`, message: "Unbekannter Kompositionsbaustein." });
@@ -250,7 +250,8 @@ function validateDesign(value: unknown) {
     NEON: ["CLASSIC", "IMAGE_FOCUS", "SPLIT"],
     CORPORATE: ["CLASSIC", "SPLIT", "MAGAZINE"],
     BIRTHDAY: ["IMAGE_FOCUS", "MAGAZINE", "COLLAGE"],
-  }[style as "NEON" | "CORPORATE" | "BIRTHDAY"];
+    EDITORIAL: ["CLASSIC", "SPLIT", "MAGAZINE"],
+  }[style as "NEON" | "CORPORATE" | "BIRTHDAY" | "EDITORIAL"];
   if (!compatibleLayouts.includes(String(value.composition.layoutPreset))) errors.push({ field: "config.design.composition.layoutPreset", message: "Der Aufbau passt nicht zum gewählten Designstil." });
   for (const key of ["headerStyle", "contentFrame", "mediaTreatment", "answerTreatment", "solutionTreatment"] as const) {
     if (value.composition[key] !== expected[key]) errors.push({ field: `config.design.composition.${key}`, message: "Der Baustein passt nicht zum gewählten Designstil." });

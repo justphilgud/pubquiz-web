@@ -45,7 +45,9 @@ export function presentationTemplateStyle(
   return {
     ...variables,
     backgroundImage:
-      template.variant === "NEON"
+      template.design.stylePreset === "EDITORIAL"
+        ? "none"
+        : template.variant === "NEON"
         ? `radial-gradient(circle at 20% 20%, ${secondary} 0, ${secondary}22 24%, transparent 42%), radial-gradient(circle at 80% 10%, ${primary}66 0, ${primary}22 22%, transparent 38%), linear-gradient(135deg, #1a0033, ${background} 45%, #001a3a)`
         : `radial-gradient(circle at 50% 0%, ${primary}22, transparent 42%), linear-gradient(145deg, ${background}, #000000)`,
     backgroundColor: background,

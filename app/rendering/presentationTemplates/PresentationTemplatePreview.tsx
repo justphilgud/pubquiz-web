@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- Generator previews render dynamic repository or managed Blob template assets. */
+
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { QuizPraesentationResult } from "@/app/quiz/actions";
@@ -339,6 +341,22 @@ const displayState: PresentationSlideDisplayState = {
 
 function AnswerFormDesignPreview({ theme }: { theme: ResolvedQuizTheme }) {
   const answers = ["Berlin", "Hamburg", "München", "Köln"];
+  if (theme.design.stylePreset === "EDITORIAL") {
+    return (
+      <QuizThemeScope theme={theme} data-preview-surface="ANSWER_FORM" className="answer-template flex h-full w-full flex-col overflow-hidden bg-[var(--quiz-background)] px-20 py-14">
+        <header className="flex items-start justify-between">
+          {theme.identity.logoUrl && <img src={theme.identity.logoUrl} alt="LOVD STELP" className="h-24 w-32 object-contain object-left-top" />}
+          <span className="pt-4 text-sm font-semibold uppercase tracking-[.22em] text-[var(--quiz-text-muted)]">Frage 01 / 10</span>
+        </header>
+        <div className="mt-12 max-w-5xl text-sm font-semibold uppercase tracking-[.22em] text-[var(--quiz-accent)]">Frage 01</div>
+        <h2 className="mt-5 max-w-5xl text-5xl font-medium leading-tight">Welche Hauptstadt gehört zu Deutschland?</h2>
+        <div className="mt-10 grid flex-1 content-center gap-0">
+          {answers.map((answer, index) => <div key={answer} className="answer-surface grid grid-cols-[4rem_1fr] items-center border-t border-[var(--quiz-border)] py-5 text-xl"><span className="text-[var(--quiz-accent)]">{String.fromCharCode(65 + index)}</span><span>{answer}</span></div>)}
+        </div>
+        <button type="button" className="mt-7 min-h-14 self-end bg-[var(--quiz-accent)] px-12 text-base font-semibold uppercase tracking-[.16em] text-[var(--quiz-text)]">Antwort senden</button>
+      </QuizThemeScope>
+    );
+  }
   if (theme.design.stylePreset === "CORPORATE") {
     return <QuizThemeScope theme={theme} data-preview-surface="ANSWER_FORM" className="answer-template flex h-full w-full flex-col overflow-hidden bg-[var(--quiz-background)] p-14"><header className="flex items-center justify-between border-b-4 border-[var(--quiz-primary)] bg-white px-7 py-5"><div><div className="text-xs font-bold uppercase tracking-[.16em] text-[var(--quiz-primary)]">Corporate Quiz · Antwort</div><h2 className="mt-1 text-3xl font-extrabold">Welche Hauptstadt gehört zu Deutschland?</h2></div><span className="text-xl font-semibold tabular-nums">01 / 10</span></header><div className="mt-7 grid flex-1 content-center gap-3">{answers.map((answer, index) => <div key={answer} className="answer-surface grid grid-cols-[4rem_1fr] items-center border bg-white text-xl font-semibold"><span className="grid h-full place-items-center bg-[var(--quiz-surface-strong)] py-5 text-[var(--quiz-primary)]">{String.fromCharCode(65 + index)}</span><span className="px-5">{answer}</span></div>)}</div><button type="button" className="mt-6 min-h-14 self-end bg-[var(--quiz-primary)] px-12 text-lg font-bold text-white">Antwort übermitteln</button></QuizThemeScope>;
   }

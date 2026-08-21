@@ -816,6 +816,28 @@ function renderZwischenstandSlide() {
     .sort((a, b) => b.punkte - a.punkte)
     .slice(0, 5);
 
+  if (theme.design.stylePreset === "EDITORIAL") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type="SCOREBOARD">
+        <p className="presentation-flow-kicker">Zwischenstand</p>
+        <h2>Aktueller Punktestand</h2>
+        {sortiertePunkte.length === 0 ? (
+          <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
+        ) : (
+          <ol className="presentation-flow-ranking-list">
+            {sortiertePunkte.map((team, index) => (
+              <li key={`${team.teamname}-${index}`}>
+                <span className="presentation-flow-rank">{index + 1}</span>
+                <strong>{team.teamname}</strong>
+                <span>{formatQuizPoints(team.punkte)} Punkte</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+    );
+  }
+
   const maxPunkte = Math.max(
     ...sortiertePunkte.map((team) => team.punkte),
     1
@@ -953,6 +975,31 @@ function renderEndstandSlide() {
     Math.min(endstandRevealCount, platzGruppen.length)
   );
 
+  if (theme.design.stylePreset === "EDITORIAL") {
+    return (
+      <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type="WINNER">
+        <p className="presentation-flow-kicker">Ergebnisse</p>
+        <h2>Finale Tabelle</h2>
+        {teamsMitPlatz.length === 0 ? (
+          <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
+        ) : (
+          <ol className="presentation-flow-ranking-list">
+            {teamsMitPlatz.map((team) => {
+              const istSichtbar = sichtbarePlaetze.includes(team.platz);
+              return (
+                <li key={team.teamname} className={istSichtbar ? "opacity-100" : "opacity-30"}>
+                  <span className="presentation-flow-rank">{team.platz}</span>
+                  <strong>{istSichtbar ? team.teamname : "Noch geheim"}</strong>
+                  <span>{istSichtbar ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </section>
+    );
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-4 inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
@@ -1075,23 +1122,23 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   if (isPollQuestionTemplateId(frage.templateId)) {
     return (
       <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.7fr_1.3fr]">
-        <div className="flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-7 shadow-[8px_8px_0_#00e5ff]">
+        <div className="presentation-poll-question flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-7 shadow-[8px_8px_0_#00e5ff]">
           <div className="text-sm font-black uppercase tracking-[0.3em] text-pink-300">Umfrageergebnis</div>
           <h2 className="mt-4 text-4xl font-black leading-tight text-white xl:text-6xl">{frage.frage}</h2>
           <p className="mt-8 text-xl font-bold text-white/65">{pollState?.finalAnswers ?? 0} von {pollState?.totalTeams ?? 0} Teams abgestimmt</p>
         </div>
-        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-slate-950/85 p-6 shadow-[8px_8px_0_#ff00aa]">
+        <div className="presentation-poll-results min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-slate-950/85 p-6 shadow-[8px_8px_0_#ff00aa]">
           {!pollState ? <div className="flex h-full items-center justify-center text-2xl font-black text-white/55">Ergebnisse werden geladen …</div> : pollState.scale ? (
             <div className="flex h-full min-h-0 flex-col">
               <div className="text-center text-xl font-bold text-cyan-200">Durchschnitt</div>
               <div className="text-center text-7xl font-black text-yellow-200">{pollState.scale.average?.toLocaleString("de-DE", { maximumFractionDigits: 2 }) ?? "–"}</div>
               <div className="mt-6 grid min-h-0 flex-1 grid-cols-5 items-end gap-3">
-                {pollState.scale.values.map((entry) => <div key={entry.value} className="flex h-full min-h-0 flex-col justify-end text-center"><strong className="mb-2 text-white">{entry.count}</strong><div className="min-h-2 rounded-t-xl bg-cyan-300" style={{ height: `${Math.max(6, entry.share)}%` }} /><span className="mt-2 font-black text-white">{entry.value.toLocaleString("de-DE")}</span></div>)}
+                {pollState.scale.values.map((entry) => <div key={entry.value} className="flex h-full min-h-0 flex-col justify-end text-center"><strong className="mb-2 text-white">{entry.count}</strong><div className="presentation-poll-bar min-h-2 rounded-t-xl bg-cyan-300" style={{ height: `${Math.max(6, entry.share)}%` }} /><span className="mt-2 font-black text-white">{entry.value.toLocaleString("de-DE")}</span></div>)}
               </div>
             </div>
           ) : (
             <div className="grid h-full content-center gap-4 overflow-hidden">
-              {pollState.options.map((entry) => <div key={entry.id}><div className="mb-1 flex items-end justify-between gap-4 text-white"><strong className="text-xl">{entry.label}</strong><span className="font-black">{entry.count} · {entry.share.toLocaleString("de-DE")} %</span></div><div className="h-8 overflow-hidden rounded-full border-2 border-white/20 bg-black/40"><div className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-pink-400" style={{ width: `${entry.share}%` }} /></div></div>)}
+              {pollState.options.map((entry) => <div key={entry.id}><div className="mb-1 flex items-end justify-between gap-4 text-white"><strong className="text-xl">{entry.label}</strong><span className="font-black">{entry.count} · {entry.share.toLocaleString("de-DE")} %</span></div><div className="presentation-poll-track h-8 overflow-hidden rounded-full border-2 border-white/20 bg-black/40"><div className="presentation-poll-bar h-full rounded-full bg-gradient-to-r from-cyan-300 to-pink-400" style={{ width: `${entry.share}%` }} /></div></div>)}
             </div>
           )}
         </div>

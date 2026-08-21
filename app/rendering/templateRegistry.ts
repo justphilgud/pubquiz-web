@@ -116,18 +116,18 @@ export type BrandTokens = {
   assets: BrandAssetTokens;
 };
 
-export type PresentationDesignStyle = "NEON" | "CORPORATE" | "BIRTHDAY";
+export type PresentationDesignStyle = "NEON" | "CORPORATE" | "BIRTHDAY" | "EDITORIAL";
 
 export type PresentationTemplateDesign = {
   stylePreset: PresentationDesignStyle;
   composition: {
     layoutPreset: "CLASSIC" | "IMAGE_FOCUS" | "SPLIT" | "MAGAZINE" | "COLLAGE";
-    headerStyle: "BRAND_BAR" | "CORPORATE_BAND" | "BIRTHDAY_HERO";
-    footerStyle: "NONE" | "STATUS_LINE" | "PERSONAL_NOTE";
-    contentFrame: "NEON_FRAME" | "CORPORATE_PANEL" | "BIRTHDAY_ALBUM";
+    headerStyle: "BRAND_BAR" | "CORPORATE_BAND" | "BIRTHDAY_HERO" | "EDITORIAL_MARK";
+    footerStyle: "NONE" | "STATUS_LINE" | "PERSONAL_NOTE" | "COLLABORATION";
+    contentFrame: "NEON_FRAME" | "CORPORATE_PANEL" | "BIRTHDAY_ALBUM" | "OPEN_CANVAS";
     mediaTreatment: "GLOW_FRAME" | "RECTANGULAR" | "POLAROID";
-    answerTreatment: "NEON_CARDS" | "CORPORATE_ROWS" | "BIRTHDAY_CARDS";
-    solutionTreatment: "SPOTLIGHT" | "RESULT_BAND" | "MEMORY";
+    answerTreatment: "NEON_CARDS" | "CORPORATE_ROWS" | "BIRTHDAY_CARDS" | "EDITORIAL_ROWS";
+    solutionTreatment: "SPOTLIGHT" | "RESULT_BAND" | "MEMORY" | "ANSWER_BAND";
     decoration: "NONE" | "NEON_ORBITS" | "GEOMETRIC_LINES" | "CONFETTI";
   };
   imagery: {
@@ -154,10 +154,12 @@ export type TemplateMessageKey =
   | "presentationDark"
   | "presentationCorporate"
   | "presentationBirthday"
+  | "presentationEditorial"
   | "answerDefault"
   | "answerMinimal"
   | "answerCorporate"
-  | "answerBirthday";
+  | "answerBirthday"
+  | "answerEditorial";
 
 type TemplateMetadata = {
   labelKey: TemplateMessageKey;
@@ -230,6 +232,13 @@ export const presentationDesigns = {
       chapters: [],
       material: "CREAM_PAPER",
     },
+  },
+  EDITORIAL: {
+    stylePreset: "EDITORIAL",
+    composition: { layoutPreset: "MAGAZINE", headerStyle: "EDITORIAL_MARK", footerStyle: "COLLABORATION", contentFrame: "OPEN_CANVAS", mediaTreatment: "RECTANGULAR", answerTreatment: "EDITORIAL_ROWS", solutionTreatment: "ANSWER_BAND", decoration: "NONE" },
+    imagery: { heroImage: null, solutionImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "SIDE" },
+    occasion: { personName: "", age: "", subtitle: "", eventTitle: "LOVD PubQuiz", extraText: "LOVD × ungegoogelt", identityPlacement: "HEADER" },
+    storybook: null,
   },
 } as const satisfies Record<PresentationDesignStyle, PresentationTemplateDesign>;
 
@@ -320,6 +329,25 @@ const presentation = [
       colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" },
     },
   },
+  {
+    id: "lovd-ungegoogelt",
+    kind: "PRESENTATION",
+    variant: "DARK",
+    labelKey: "presentationEditorial",
+    category: "BRANDED",
+    selectable: true,
+    preview: { exampleButtonKey: "previewButton" },
+    displayName: "LOVD × ungegoogelt",
+    design: presentationDesigns.EDITORIAL,
+    tokens: {
+      ...sharedSizing,
+      typography: { family: "var(--font-source-sans-3), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
+      radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
+      spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
+      assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
+      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
+    },
+  },
 ] as const satisfies readonly PresentationTemplate[];
 
 const answerForm = [
@@ -396,6 +424,19 @@ const answerForm = [
     labelKey: "answerBirthday", category: "BRANDED", selectable: true,
     preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.BIRTHDAY,
     tokens: { ...sharedSizing, colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" } },
+  },
+  {
+    id: "lovd-ungegoogelt", kind: "ANSWER_FORM", variant: "MINIMAL",
+    labelKey: "answerEditorial", category: "MINIMAL", selectable: true,
+    preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.EDITORIAL,
+    tokens: {
+      ...sharedSizing,
+      typography: { family: "var(--font-source-sans-3), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
+      radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
+      spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
+      assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
+      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
+    },
   },
 ] as const satisfies readonly AnswerFormTemplate[];
 

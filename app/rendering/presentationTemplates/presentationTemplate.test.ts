@@ -104,7 +104,7 @@ test("normalizes legacy configurations and validates all semantic design styles"
   const legacy = structuredClone(defaultPresentationTemplateConfig) as Partial<typeof defaultPresentationTemplateConfig>;
   delete legacy.design;
   assert.equal(parsePresentationTemplateConfig(legacy)?.design.stylePreset, "NEON");
-  for (const style of ["NEON", "CORPORATE", "BIRTHDAY"] as const) {
+  for (const style of ["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL"] as const) {
     assert.equal(validatePresentationTemplateDraft({ ...draft(), config: createPresentationStylePreset(style) }).ok, true);
   }
   const legacyBirthday = createPresentationStylePreset("BIRTHDAY") as unknown as { design: { imagery: { solutionImage?: string | null } } };
@@ -137,6 +137,22 @@ test("presets are structurally distinct and preserve personal imagery when switc
   assert.deepEqual(applyPresentationStylePreset(birthday, "CORPORATE").design.imagery.personalImagePool, birthday.design.imagery.personalImagePool);
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "corporate-reference"));
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "birthday-reference"));
+});
+
+test("LOVD editorial preset is a regular editable generator template with the original logo asset", () => {
+  const editorial = createPresentationStylePreset("EDITORIAL");
+  assert.equal(editorial.design.stylePreset, "EDITORIAL");
+  assert.equal(editorial.design.composition.contentFrame, "OPEN_CANVAS");
+  assert.equal(editorial.design.composition.answerTreatment, "EDITORIAL_ROWS");
+  assert.equal(editorial.tokens.assets.logo, "/branding/lovd/lovd-stelp.png");
+  assert.ok(presentationTemplateAssetRolesByStyle.EDITORIAL.some(({ role }) => role === "LOGO"));
+
+  editorial.tokens.colors.primary = "#b94b35";
+  editorial.tokens.typography.family = "var(--font-geist-sans), Arial, sans-serif";
+  const result = validatePresentationTemplateDraft({ ...draft(), config: editorial });
+  assert.equal(result.ok, true);
+  assert.ok(templateRegistry.presentation.some(({ id }) => id === "lovd-ungegoogelt"));
+  assert.ok(templateRegistry.answerForm.some(({ id }) => id === "lovd-ungegoogelt"));
 });
 
 test("style changes own composition and surfaces without creating event personalization", () => {
@@ -630,6 +646,9 @@ test("semantic renderer variants keep corporate treatment and expose the editori
   assert.match(designSystem, /presentation-corporate-header/);
   assert.match(designSystem, /presentation-birthday-header/);
   assert.match(designSystem, /presentation-neon-header/);
+  assert.match(designSystem, /presentation-editorial-header/);
+  assert.match(css, /data-design-style="EDITORIAL"/);
+  assert.match(css, /presentation-editorial-intro-logo/);
   assert.match(designSystem, /Knowledge · People · Progress/);
   assert.match(designSystem, /storybookPageKind/);
   assert.match(designSystem, /data-storybook-people-mode/);

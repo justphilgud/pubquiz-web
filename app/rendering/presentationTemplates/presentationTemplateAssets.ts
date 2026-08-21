@@ -60,6 +60,11 @@ export const presentationTemplateAssetRolesByStyle: Record<
     { role: "SOLUTION_IMAGE", label: "Auflösungsbild", helpText: "Besonderes Erinnerungsfoto für Lösungen.", multiple: false },
     { role: "DECORATION", label: "Album-Dekoration", helpText: "Optionale Papier-, Karten- oder Erinnerungsmotive.", multiple: true },
   ],
+  EDITORIAL: [
+    { role: "LOGO", label: "LOVD-Logo", helpText: "Originales Markenzeichen im Kopfbereich und auf der Titelfolie.", multiple: false },
+    { role: "HERO_IMAGE", label: "Hauptbild", helpText: "Optionales ruhiges Motiv für bildgestützte Fragen.", multiple: false },
+    { role: "BACKGROUND", label: "Hintergrund", helpText: "Optionales vollflächiges Hintergrundmotiv.", multiple: false },
+  ],
 };
 
 const localAssetPattern = /^\/(?!\/)[a-zA-Z0-9%() _./-]+\.(?:png|jpe?g|webp|svg)$/i;
