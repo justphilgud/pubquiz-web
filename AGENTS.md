@@ -22,6 +22,16 @@ For work on the new Question Editor, Presentation, Moderation and future feature
 
 docs/architecture/editor-principles.md
 
+Before changing answer forms, live interactions, drafts, submissions, polls, Pixel question behavior, or answer evaluation, also read:
+
+docs/architecture/answer-interaction.md
+
+Before changing Quiz Runtime, Ordering, Presentation Flow, Evaluation, Special Question Runtime or Calendar Subscription, read and preserve:
+
+docs/architecture/quiz-runtime-contracts.md
+
+Run the regression tests referenced there for the affected contract.
+
 Before any work on presentation templates, Storybook, Corporate, ungegoogelt design worlds, renderers, design systems, generators, UX, animation, typography, or imagery, read and follow:
 
 docs/design/ungegoogelt-design-manifest.md

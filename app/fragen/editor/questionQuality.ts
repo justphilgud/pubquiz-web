@@ -43,6 +43,8 @@ export type QuestionQualityIssueCode =
   | "ANSWER_MEDIA_REQUIRED"
   | "REQUIRED_LABELED_ANSWER_EMPTY"
   | "VALID_UNTIL_INVALID"
+  | "REVIEW_FROM_INVALID"
+  | "LIFECYCLE_DATE_CONFLICT"
   | "LABELED_ANSWERS_INCONSISTENT"
   | "SOURCE_MISSING"
   | "CATEGORY_MISSING"
@@ -59,7 +61,8 @@ export type QuestionQualityIssue = {
     | "templatePlaceReviewCount"
     | "answers"
     | "categories"
-    | "validUntil";
+    | "validUntil"
+    | "reviewFrom";
 };
 
 export type QuestionQualityResult = {
@@ -255,6 +258,12 @@ export function evaluateQuestionQuality(
 
   if (draft.validUntil !== null && !isValidDateInput(draft.validUntil)) {
     blockers.push({ code: "VALID_UNTIL_INVALID", field: "validUntil" });
+  }
+  if (draft.reviewFrom != null && !isValidDateInput(draft.reviewFrom)) {
+    blockers.push({ code: "REVIEW_FROM_INVALID", field: "reviewFrom" });
+  }
+  if (draft.validUntil !== null && draft.reviewFrom != null) {
+    blockers.push({ code: "LIFECYCLE_DATE_CONFLICT", field: "reviewFrom" });
   }
 
   const groupedFields = new Map<

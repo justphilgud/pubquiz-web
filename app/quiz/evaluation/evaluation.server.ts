@@ -8,6 +8,7 @@ import {
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { prisma } from "@/app/lib/prisma";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
+import { normalizeOrderingAnswerTextToAnswerIds } from "@/app/quiz/orderingQuestionOrder";
 import { evaluateBaseAnswer } from "./evaluateBaseAnswer";
 import {
   CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,
@@ -77,6 +78,14 @@ function incompleteQuizEvaluationWhere(
         },
       },
     },
+    AND: [
+      {
+        OR: [
+          { interaction_run_id: null },
+          { submissions: { some: {} } },
+        ],
+      },
+    ],
     OR: [
       {
         bewertungs_version: {
@@ -103,12 +112,47 @@ function incompleteQuizEvaluationWhere(
 async function getIncompleteQuizEvaluationGroups(
   quizId: number,
 ) {
-  return prisma.team_antworten.groupBy({
-    by: ["quiz_fragen_id"],
+  const answers = await prisma.team_antworten.findMany({
     where: incompleteQuizEvaluationWhere(quizId),
-    _count: { _all: true },
     orderBy: { quiz_fragen_id: "asc" },
+    select: {
+      quiz_fragen_id: true,
+      interaction_run_id: true,
+      antwort_text: true,
+      antwort_id: true,
+      antwortauswahlen: { select: { antwort_id: true } },
+      antwortfelder: {
+        select: { antwortfeld_id: true, antwort_text: true },
+      },
+      submissions: {
+        select: {
+          team_answer_submission_id: true,
+          interaction_run_id: true,
+          submission_version: true,
+          status: true,
+          interaction_type: true,
+          payload: true,
+        },
+      },
+    },
   });
+  const counts = new Map<number, number>();
+  for (const answer of answers) {
+    const effectiveSubmission = resolveEffectiveSubmission({
+      interactionRunId: answer.interaction_run_id,
+      draft: answer,
+      submissions: answer.submissions,
+    });
+    if (!effectiveSubmission) continue;
+    counts.set(
+      answer.quiz_fragen_id,
+      (counts.get(answer.quiz_fragen_id) ?? 0) + 1,
+    );
+  }
+  return [...counts].map(([quizQuestionId, incompleteAnswers]) => ({
+    quiz_fragen_id: quizQuestionId,
+    _count: { _all: incompleteAnswers },
+  }));
 }
 
 export async function getQuizEvaluationBackfillStatus(
@@ -123,10 +167,10 @@ export async function getQuizEvaluationBackfillStatus(
   );
 }
 
-function orderingItems(config: Prisma.JsonValue | null) {
+function orderingTemplateItems(config: Prisma.JsonValue | null) {
   const typed = config as QuestionTemplateConfig | null;
   return typed?.templateData?.kind === "ORDERING"
-    ? typed.templateData.items.map((item) => item.id)
+    ? typed.templateData.items
     : [];
 }
 
@@ -141,7 +185,10 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       fragen: {
         include: {
           vorlage: { select: { code: true } },
-          antworten: { select: { antwort_id: true, ist_richtig: true } },
+          antworten: {
+            orderBy: { antwort_id: "asc" },
+            select: { antwort_id: true, antwort: true, ist_richtig: true },
+          },
           antwortfelder: {
             orderBy: { sortierung: "asc" },
             include: {
@@ -191,7 +238,12 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   if (isPollQuestionTemplateId(templateId)) {
     return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
   }
-  const orderedItemIds = orderingItems(assignment.fragen.template_config_json);
+  const templateOrderingItems = orderingTemplateItems(
+    assignment.fragen.template_config_json,
+  );
+  const orderedItemIds = templateOrderingItems.length > 0
+    ? assignment.fragen.antworten.map((answer) => String(answer.antwort_id))
+    : [];
   const maximum = getQuestionBaseMaximum({
     templateId,
     correctAnswerCount: assignment.fragen.antworten.filter(
@@ -220,9 +272,16 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       answerOptions: assignment.fragen.antworten.map((option) => ({
         id: option.antwort_id,
         isCorrect: option.ist_richtig,
+        text: option.antwort,
       })),
       selectedAnswerIds: effectiveSubmission?.selectedAnswerIds ?? [],
-      answerText: effectiveSubmission?.answerText ?? null,
+      answerText: templateOrderingItems.length > 0
+        ? normalizeOrderingAnswerTextToAnswerIds(
+            assignment.fragen.antworten,
+            templateOrderingItems,
+            effectiveSubmission?.answerText ?? null,
+          )
+        : effectiveSubmission?.answerText ?? null,
       structuredFields: assignment.fragen.antwortfelder.map((field) => ({
         id: field.antwortfeld_id,
         acceptedSolutions: field.loesungen.map(

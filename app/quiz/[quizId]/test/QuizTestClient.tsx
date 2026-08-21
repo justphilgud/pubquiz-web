@@ -63,6 +63,7 @@ const quickTargets = [
   ["FINAL_STANDINGS", "Endstand"],
   ["WINNER", "Gewinner"],
   ["CLOSING", "Abschluss"],
+  ["CALENDAR_SUBSCRIPTION", "PubQuiz-Kalender"],
 ] as const;
 
 export default function QuizTestClient({

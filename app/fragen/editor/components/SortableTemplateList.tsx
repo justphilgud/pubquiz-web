@@ -59,7 +59,7 @@ function SortableItem({
           type="button"
           disabled={disabled}
           aria-label={`Position ${index + 1} verschieben`}
-          className="min-h-11 min-w-11 cursor-grab touch-none rounded-lg border border-slate-300 bg-white px-2 text-xl active:cursor-grabbing disabled:cursor-default"
+          className="sortable-template-drag-handle min-h-11 min-w-11 cursor-grab touch-none rounded-lg border border-slate-300 bg-white px-2 text-xl active:cursor-grabbing disabled:cursor-default"
           {...attributes}
           {...listeners}
         >

@@ -60,7 +60,9 @@ test("theme style exposes quiz variables and compatibility aliases", () => {
   const style = quizThemeStyle(theme);
 
   assert.equal(style["--quiz-primary"], theme.colors.primary);
+  assert.equal(style["--quiz-correct"], theme.semantic.correct);
   assert.equal(style["--quiz-danger"], theme.semantic.danger);
   assert.equal(style["--brand-primary"], theme.colors.primary);
+  assert.equal(style["--brand-correct"], theme.semantic.correct);
   assert.equal(style.fontFamily, theme.appearance.fontFamily);
 });

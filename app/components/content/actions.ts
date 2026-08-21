@@ -18,6 +18,7 @@ import {
 } from "@/app/story-elemente/storyElement";
 import { canArchiveStoryElement } from "@/app/story-elemente/storyElementPolicy";
 import { getBerlinDate } from "@/app/lib/berlinDate";
+import { getQuestionLifecycleState } from "@/app/fragen/editor/questionLifecycle";
 import {
   getAssignableQuestionQuizIds,
   getAssignableStoryQuizIds,
@@ -54,6 +55,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
           templateIds: [],
           eventSeriesId: filters.eventSeriesId,
           usageState: filters.usage === "ALL" ? null : filters.usage,
+          lifecycleFilter: filters.questionLifecycle,
           limit: 50,
           offset: 0,
         })
@@ -74,13 +76,31 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
   const now = getBerlinDate();
 
   const questions: ContentSearchItem[] = questionResult.results
-    .map((question) => ({
+    .map((question) => {
+      const lifecycle = getQuestionLifecycleState({
+        validUntil: question.gueltig_bis,
+        reviewFrom: question.pruefen_ab,
+        today: now.toISOString().slice(0, 10),
+      });
+      const lifecycleStatus = lifecycle.isOutdated
+        ? "Veraltet"
+        : lifecycle.isReviewDue
+          ? "Prüfung fällig"
+          : lifecycle.isOutdatedSoon
+            ? "Bald veraltet"
+            : lifecycle.isReviewSoon
+              ? "Prüfung demnächst"
+              : lifecycle.mode === "TIMELESS"
+                ? "Zeitlos"
+                : "Aktuell";
+      return ({
       key: `QUESTION:${question.fragen_id}`,
       id: question.fragen_id,
       contentType: "QUESTION",
       subtype: "Frage",
       title: question.frage,
       status: question.ist_archiviert ? "Archiviert" : ({ DRAFT: "Entwurf", IN_REVIEW: "Eingereicht", CHANGES_REQUESTED: "Feedback", APPROVED: "Freigegeben" } as const)[question.review_status],
+      lifecycleStatus,
       archived: question.ist_archiviert,
       scope: question.geltungsbereich === "GLOBAL" ? "Global" : question.eventreihen.join(", ") || "Eventreihe",
       mediaCount: question.medien_anzahl,
@@ -108,7 +128,8 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
         answerMediaCount: question.medien_antworten_anzahl,
         storyElementCount: question.story_elemente_anzahl,
       },
-    }));
+    });
+    });
 
   const storyItems: ContentSearchItem[] = stories.map((story) => ({
     key: `STORY_ELEMENT:${story.id}`,

@@ -251,16 +251,15 @@ export default function GenericAnswerRenderer({
           const item = itemMap.get(id);
           if (!item) return null;
           return (
-            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3">
+            <div className="answer-option answer-order-row flex items-center gap-2 rounded-xl border p-3">
               {dragHandle}
-              <span className="w-7 font-bold">{index + 1}.</span>
               <span className="flex-1">{item.text}</span>
               <button
                 type="button"
                 aria-label={`${item.text} nach oben`}
                 disabled={disabled || index === 0}
                 onClick={() => move(index, -1)}
-                className="min-h-11 min-w-11 rounded-lg border disabled:opacity-40"
+                className="answer-order-control min-h-11 min-w-11 rounded-lg border disabled:opacity-40"
               >
                 ↑
               </button>
@@ -269,7 +268,7 @@ export default function GenericAnswerRenderer({
                 aria-label={`${item.text} nach unten`}
                 disabled={disabled || index === order.length - 1}
                 onClick={() => move(index, 1)}
-                className="min-h-11 min-w-11 rounded-lg border disabled:opacity-40"
+                className="answer-order-control min-h-11 min-w-11 rounded-lg border disabled:opacity-40"
               >
                 ↓
               </button>

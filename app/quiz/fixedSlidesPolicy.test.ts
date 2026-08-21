@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 import {
   INTRO_SLIDES,
   OUTRO_SLIDES,
@@ -21,11 +22,23 @@ test("the common intro editor contains exactly the five fixed slides", () => {
   );
 });
 
-test("the outro contains only announcements", () => {
+test("the outro contains announcements and the public calendar CTA", () => {
   assert.deepEqual(
     OUTRO_SLIDES.map((slide) => slide.title),
-    ["Bekanntmachungen"],
+    ["Bekanntmachungen", "PubQuiz-Kalender"],
   );
+});
+
+test("the calendar outro edits and renders its existing flow configuration", () => {
+  const editor = readFileSync("app/quiz/[quizId]/slides/outro/page.tsx", "utf8");
+  const action = readFileSync("app/quiz/[quizId]/slides/fixedSlideActions.ts", "utf8");
+  const renderer = readFileSync("app/rendering/presentation/PresentationSlideRenderer.tsx", "utf8");
+
+  assert.match(editor, /name="title"/);
+  assert.match(editor, /name="body"/);
+  assert.match(editor, /name="ctaText"/);
+  assert.match(action, /teamHint: text\(formData, "ctaText"\)/);
+  assert.match(renderer, /config\.teamHint/);
 });
 
 test("every editable fixed slide maps to one productive flow item", () => {
@@ -36,8 +49,9 @@ test("every editable fixed slide maps to one productive flow item", () => {
     "rules",
     "prizes",
     "announcements",
+    "calendar",
   ]);
-  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 6);
+  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 7);
 });
 
 test("multi-word prizes remain one prize per line", () => {

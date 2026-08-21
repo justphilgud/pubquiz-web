@@ -46,7 +46,8 @@ export function applyQuestionTemplateToDraft(
   template: QuestionTemplate,
   createId: () => string,
 ): QuestionEditorDraft {
-  const templateData = getDefaultQuestionTemplateData(template.id);
+  const structuralTemplateId = template.baseTemplateId ?? template.id;
+  const templateData = getDefaultQuestionTemplateData(structuralTemplateId);
   const answers = template.initialAnswers.map((answer) => {
     const id = createId();
     return {
@@ -56,20 +57,32 @@ export function applyQuestionTemplateToDraft(
       isRequired: answer.fieldLabel ? true : undefined,
       text: answer.text ?? "",
       isCorrect: answer.isCorrect ?? false,
-      additionalInfo: "",
+      additionalInfo: answer.additionalInfo ?? "",
       media: null,
     } satisfies QuestionAnswerDraft;
   });
   return {
     ...draft,
-    templateId: template.id,
-    questionText: draft.questionText.trim()
-      ? draft.questionText
-      : template.defaultQuestionText,
-    templateConfig: {
-      ...draft.templateConfig,
-      ...(templateData ? { templateData } : {}),
-    },
+    templateId: template.sourceTemplateId
+      ? template.baseTemplateId ?? null
+      : template.id === "standard"
+        ? null
+        : template.id,
+    sourceTemplateId: template.sourceTemplateId ?? null,
+    questionText: template.sourceTemplateId
+      ? template.defaultQuestionText
+      : draft.questionText.trim()
+        ? draft.questionText
+        : template.defaultQuestionText,
+    questionMedia: template.sourceTemplateId
+      ? structuredClone(template.initialQuestionMedia ?? [])
+      : draft.questionMedia,
+    templateConfig: template.initialTemplateConfig
+      ? structuredClone(template.initialTemplateConfig)
+      : {
+          ...draft.templateConfig,
+          ...(templateData ? { templateData } : {}),
+        },
     answers: templateData
       ? getAnswersForTemplateData(templateData, answers)
       : answers,
@@ -82,6 +95,7 @@ export function clearQuestionTemplateFromDraft(draft: QuestionEditorDraft): Ques
   return {
     ...draft,
     templateId: null,
+    sourceTemplateId: null,
     questionText: switchesFromSpecialTemplate ? "" : draft.questionText,
     templateConfig: {
       stageDurationsSeconds: draft.templateConfig.stageDurationsSeconds,

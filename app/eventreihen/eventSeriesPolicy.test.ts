@@ -7,6 +7,7 @@ import {
   eventSeriesArchiveState,
   isEventSeriesSelectable,
   validateEventSeriesInput,
+  buildEventSeriesPersistenceData,
 } from "./eventSeriesPolicy";
 
 test("event series slugs normalize umlauts, eszett, whitespace and symbols", () => {
@@ -69,6 +70,19 @@ test("event series answer form follows the selected presentation", () => {
   assert.equal(result.ok, true);
   if (result.ok) {
     assert.equal(result.value.defaultAnswerFormTemplateId, "ungegoogelt-dark");
+  }
+});
+
+test("event series visibility persists in both edit directions", () => {
+  for (const isPublic of [true, false]) {
+    const result = validateEventSeriesInput({ name: "Sommerquiz", isPublic });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(
+        buildEventSeriesPersistenceData(result.value).ist_oeffentlich,
+        isPublic,
+      );
+    }
   }
 });
 

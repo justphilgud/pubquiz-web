@@ -32,6 +32,20 @@ export type NormalizedEventSeriesInput = {
   defaultAnswerFormTemplateId: PresentationTemplate["id"];
 };
 
+export function buildEventSeriesPersistenceData(
+  value: NormalizedEventSeriesInput,
+) {
+  return {
+    name: value.name,
+    oeffentlicher_name: value.publicName,
+    beschreibung: value.description,
+    interne_bemerkung: value.internalNote,
+    ist_oeffentlich: value.isPublic,
+    default_presentation_template_id: value.defaultPresentationTemplateId,
+    default_answer_form_template_id: value.defaultAnswerFormTemplateId,
+  };
+}
+
 export type EventSeriesValidationResult =
   | { ok: true; value: NormalizedEventSeriesInput }
   | { ok: false; errors: Record<string, string> };

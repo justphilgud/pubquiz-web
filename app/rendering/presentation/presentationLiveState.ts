@@ -110,6 +110,7 @@ const NON_QUESTION_STATUS_BY_TYPE: Readonly<Record<string, string>> = {
   FINAL_STANDINGS: "Das Quiz ist beendet",
   WINNER: "Das Quiz ist beendet",
   CUSTOM_MESSAGE: "Das Quiz startet gleich",
+  CALENDAR_SUBSCRIPTION: "Das Quiz ist beendet",
   CLOSING: "Das Quiz ist beendet",
   "vor-dem-start": "Das Quiz startet gleich",
   startsequenz: "Das Quiz startet gleich",

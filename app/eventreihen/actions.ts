@@ -10,6 +10,7 @@ import {
 } from "./eventSeriesAccess.server";
 import {
   generateUniqueEventSeriesSlug,
+  buildEventSeriesPersistenceData,
   eventSeriesArchiveState,
   validateEventSeriesInput,
   type EventSeriesInput,
@@ -18,6 +19,7 @@ import { getQuizTemporalStatus } from "@/app/quiz/quizMasterData";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import { persistEventSeriesUpdate } from "./eventSeriesRepository";
 
 async function getTemplateValidationOptions(additionallyAllowed: readonly string[] = []) {
   const { actor } = await requireActor();
@@ -184,14 +186,8 @@ export async function createEventSeries(
   );
   const created = await prisma.eventreihen.create({
     data: {
-      name: validated.value.name,
       slug,
-      oeffentlicher_name: validated.value.publicName,
-      beschreibung: validated.value.description,
-      interne_bemerkung: validated.value.internalNote,
-      ist_oeffentlich: validated.value.isPublic,
-      default_presentation_template_id: validated.value.defaultPresentationTemplateId,
-      default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
+      ...buildEventSeriesPersistenceData(validated.value),
     },
     select: { eventreihe_id: true },
   });
@@ -236,28 +232,15 @@ export async function updateEventSeries(
       errors: { name: "Name ist bereits vergeben." },
     };
   }
-  const saved = await prisma.eventreihen.update({
-    where: { eventreihe_id: eventSeriesId },
-    data: {
-      name: validated.value.name,
-      oeffentlicher_name: validated.value.publicName,
-      beschreibung: validated.value.description,
-      interne_bemerkung: validated.value.internalNote,
-      ist_oeffentlich: validated.value.isPublic,
-      default_presentation_template_id: validated.value.defaultPresentationTemplateId,
-      default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
-    },
-    select: {
-      name: true,
-      oeffentlicher_name: true,
-      beschreibung: true,
-      interne_bemerkung: true,
-      ist_oeffentlich: true,
-      default_presentation_template_id: true,
-    },
-  });
+  const saved = await persistEventSeriesUpdate(
+    prisma.eventreihen,
+    eventSeriesId,
+    validated.value,
+  );
   revalidatePath("/admin/eventreihen");
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`);
+  revalidatePath("/calendar/public.ics");
+  revalidatePath(`/calendar/event-series/${eventSeriesId}.ics`);
   revalidatePath("/quiz");
   return {
     success: true,

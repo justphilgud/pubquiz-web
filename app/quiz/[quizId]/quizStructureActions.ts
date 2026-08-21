@@ -696,14 +696,21 @@ export async function updateQuizDefaultSolutionStrategy(data: {
   if (!isQuizSolutionStrategy(data.strategy)) {
     return { success: false, message: "Die Auflösungsstrategie ist ungültig." };
   }
-  if (data.strategy === "MANUAL") {
-    const sections = await prisma.quiz_abschnitte.findMany({
-      where: {
-        quiz_id: data.quizId,
-        aufloesungsstrategie: null,
-      },
+  const sections = await prisma.$transaction(async (tx) => {
+    await tx.quiz.update({
+      where: { quiz_id: data.quizId },
+      data: { aufloesungsstrategie: data.strategy },
+    });
+    await tx.quiz_abschnitte.updateMany({
+      where: { quiz_id: data.quizId },
+      data: { aufloesungsstrategie: null },
+    });
+    return tx.quiz_abschnitte.findMany({
+      where: { quiz_id: data.quizId },
       select: { quiz_abschnitt_id: true },
     });
+  });
+  if (data.strategy === "MANUAL") {
     for (const section of sections) {
       await materializeManualQuizBlockSequence(
         data.quizId,
@@ -711,10 +718,6 @@ export async function updateQuizDefaultSolutionStrategy(data: {
       );
     }
   }
-  await prisma.quiz.update({
-    where: { quiz_id: data.quizId },
-    data: { aufloesungsstrategie: data.strategy },
-  });
   revalidateQuizFlow(data.quizId);
   return { success: true };
 }

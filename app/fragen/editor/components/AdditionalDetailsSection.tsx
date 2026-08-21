@@ -5,6 +5,8 @@ import { NotesSection } from "./NotesSection";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 import { formatEditorDate, formatEditorNumber } from "@/app/i18n/formatting";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import { QuestionLifecycleSection } from "./QuestionLifecycleSection";
+import { validUntilToOutdatedFrom } from "../questionLifecycle";
 
 type AdditionalDetailsSectionProps = {
   categories: QuestionCategory[];
@@ -13,12 +15,14 @@ type AdditionalDetailsSectionProps = {
   moderationNotes: string;
   categoryRequest: string;
   validUntil: string | null;
+  reviewFrom: string | null;
   initiallyOpen?: boolean;
   onChangeCategories: (categoryIds: number[]) => void;
   onSourceOrRemarkChange: (sourceOrRemark: string) => void;
   onModerationNotesChange: (moderationNotes: string) => void;
   onCategoryRequestChange: (categoryRequest: string) => void;
   onValidUntilChange: (validUntil: string | null) => void;
+  onReviewFromChange: (reviewFrom: string | null) => void;
   canManageCategories: boolean;
 };
 
@@ -29,18 +33,19 @@ export function AdditionalDetailsSection({
   moderationNotes,
   categoryRequest,
   validUntil,
+  reviewFrom,
   initiallyOpen = false,
   onChangeCategories,
   onSourceOrRemarkChange,
   onModerationNotesChange,
   onCategoryRequestChange,
   onValidUntilChange,
+  onReviewFromChange,
   canManageCategories,
 }: AdditionalDetailsSectionProps) {
   const { locale, messages } = useQuestionEditorMessages();
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const contentId = useId();
-  const validUntilId = useId();
   const summaries = [
     selectedCategoryIds.length > 0
       ? formatMessage(
@@ -56,8 +61,15 @@ export function AdditionalDetailsSection({
     validUntil === ""
       ? messages.details.expiryEnabled
       : validUntil
-        ? formatMessage(messages.details.validUntil, {
-            date: formatEditorDate(locale, validUntil),
+        ? formatMessage(messages.details.outdatedFrom, {
+            date: formatEditorDate(locale, validUntilToOutdatedFrom(validUntil) ?? validUntil),
+          })
+        : null,
+    reviewFrom === ""
+      ? messages.details.lifecycleReview
+      : reviewFrom
+        ? formatMessage(messages.details.reviewFrom, {
+            date: formatEditorDate(locale, reviewFrom),
           })
         : null,
   ].filter((summary): summary is string => summary !== null);
@@ -124,57 +136,14 @@ export function AdditionalDetailsSection({
             />
           </section>
 
-          <section className="rounded-2xl border border-slate-200 p-4">
-            <div>
-              <h3 className="font-medium text-slate-950">
-                {messages.details.expiryTitle}
-              </h3>
-              <p className="mt-1 text-sm text-slate-600">
-                {messages.details.expiryDescription}
-              </p>
-            </div>
-
-            <label className="mt-4 flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={validUntil !== null}
-                onChange={(event) =>
-                  onValidUntilChange(event.target.checked ? "" : null)
-                }
-                className="mt-0.5 h-5 w-5"
-              />
-              <span>
-                <span className="block font-medium text-slate-900">
-                  {messages.details.hasExpiry}
-                </span>
-                <span className="mt-1 block text-sm text-slate-600">
-                  {messages.details.hasExpiryHelp}
-                </span>
-              </span>
-            </label>
-
-            {validUntil !== null && (
-              <div className="mt-4">
-                <label
-                  htmlFor={validUntilId}
-                  className="text-sm font-medium text-slate-900"
-                >
-                  {messages.details.usableUntil}
-                </label>
-                <input
-                  id={validUntilId}
-                  data-editor-valid-until
-                  type="date"
-                  value={validUntil}
-                  onChange={(event) => onValidUntilChange(event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3"
-                />
-                <p className="mt-2 text-sm text-slate-600">
-                  {messages.details.expiryAfterHelp}
-                </p>
-              </div>
-            )}
-          </section>
+          <QuestionLifecycleSection
+            validUntil={validUntil}
+            reviewFrom={reviewFrom}
+            onChange={(value) => {
+              onValidUntilChange(value.validUntil);
+              onReviewFromChange(value.reviewFrom);
+            }}
+          />
         </div>
       )}
     </section>

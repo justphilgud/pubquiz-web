@@ -8,6 +8,7 @@ import { getMediaUploadEnvironmentPrefix } from "../mediaUploadEnvironment";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { getQuestionEditorMessages } from "@/app/i18n/getMessages";
 import { localizeQuestionTemplates } from "../templates/questionTemplates";
+import { loadDynamicQuestionTemplates } from "../templates/dynamicQuestionTemplates.server";
 import { getAssignableQuestionEventSeries, getQuestionActor } from "../questionAccess.server";
 import {
   canApproveScopedQuestion,
@@ -84,6 +85,11 @@ export default async function ExistingQuestionEditorPage({
     getStoryElementEditorOptions(actor),
   ]);
   const canEditQuestion = canEditScopedQuestion(actor, loadedQuestion.access);
+  const baseTemplates = localizeQuestionTemplates(messages);
+  const dynamicTemplates = await loadDynamicQuestionTemplates(
+    baseTemplates,
+    loadedQuestion.draft.sourceTemplateId,
+  );
 
   return (
     <>
@@ -102,7 +108,7 @@ export default async function ExistingQuestionEditorPage({
       mediaUploadPathnamePrefix={getMediaUploadEnvironmentPrefix()}
       locale={locale}
       messages={messages}
-      templates={localizeQuestionTemplates(messages)}
+      templates={[...baseTemplates, ...dynamicTemplates]}
       initialDraft={loadedQuestion.draft}
       questionRecord={loadedQuestion.record}
       categories={categories.map((category) => ({

@@ -66,10 +66,12 @@ import {
 } from "./evaluation/evaluation.server";
 import { hasAnswerContentChanged } from "./evaluation/answerContent";
 import { resolveEffectiveSubmission } from "./evaluation/effectiveSubmission";
+import { resolveEvaluationReadState } from "./evaluation/evaluationReadModel";
 import {
   isPartialPointsCapable,
   validateQuestionPointsMode,
 } from "./evaluation/questionPointPolicy";
+import { getQuizQuestionPointsDisplay } from "./evaluation/quizQuestionPointsDisplay";
 import {
   isPollQuestionTemplateId,
   questionTemplateIds,
@@ -94,6 +96,12 @@ import {
 } from "./quizAnswerLiveState";
 import { serializeQuizParticipantLiveRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
+import { repairQuizSpecificOrderingAssignments } from "./orderingQuestionOrder.server";
+import {
+  formatOrderingAnswerForEvaluation,
+  normalizeOrderingAnswerTextToAnswerIds,
+  resolveQuizSpecificOrderingParticipantItems,
+} from "./orderingQuestionOrder";
 import {
   closeBlockInteractions,
   getQuizLiveSnapshotData,
@@ -830,6 +838,7 @@ export async function getQuizDetails(
   quizId: number,
 ): Promise<QuizDetailsResult | null> {
   await requireQuizViewer(quizId);
+  await repairQuizSpecificOrderingAssignments(quizId);
   const quiz = await prisma.quiz.findUnique({
     where: {
       quiz_id: quizId,
@@ -1292,8 +1301,13 @@ export async function addFrageToQuiz(data: {
   }
 
   const antwortIds = frage.antworten.map((antwort) => antwort.antwort_id);
-
-  const gemischteAntwortIds = [...antwortIds].sort(() => Math.random() - 0.5);
+  const templateConfig = frage.template_config_json as
+    | QuestionTemplateConfig
+    | null;
+  const gemischteAntwortIds =
+    templateConfig?.templateData?.kind === "ORDERING"
+      ? []
+      : [...antwortIds].sort(() => Math.random() - 0.5);
 
   const naechsteSortierung = (letzterEintrag?.sortierung ?? 0) + 1;
 
@@ -1684,6 +1698,7 @@ export async function getQuizPraesentation(
   quizId: number,
 ): Promise<QuizPraesentationResult | null> {
   await requireQuizViewer(quizId);
+  await repairQuizSpecificOrderingAssignments(quizId);
   const quiz = await prisma.quiz.findUnique({
     where: {
       quiz_id: quizId,
@@ -2186,6 +2201,8 @@ export async function getQuizAntwortStatus(
     };
   }
 
+  await repairQuizSpecificOrderingAssignments(quizId);
+
   const quiz = await prisma.quiz.findUnique({
     where: {
       quiz_id: quizId,
@@ -2444,11 +2461,19 @@ export async function getQuizAntwortStatus(
           const templateConfig = eintrag.fragen.template_config_json as
             | QuestionTemplateConfig
             | null;
+          const orderingItems =
+            templateConfig?.templateData?.kind === "ORDERING"
+              ? resolveQuizSpecificOrderingParticipantItems(
+                  eintrag.fragen.antworten,
+                  eintrag.antwort_reihenfolge,
+                ) ?? []
+              : undefined;
           const interaction = resolveQuizAnswerInteraction({
             templateId: eintrag.fragen.vorlage?.code ?? null,
             originalAnswerMode: answerMode.originalMode,
             effectiveAnswerMode: answerMode.effectiveMode,
             templateData: templateConfig?.templateData,
+            orderingItems,
             answerFields: eintrag.fragen.antwortfelder.map((field) => ({
               id: field.antwortfeld_id,
               label: field.label,
@@ -2518,7 +2543,15 @@ export async function getQuizAntwortStatus(
                       : gespeicherteAntwort.antwort_id === null
                         ? []
                         : [gespeicherteAntwort.antwort_id],
-                  antwortText: gespeicherteAntwort.antwort_text,
+                  antwortText:
+                    orderingItems &&
+                    templateConfig?.templateData?.kind === "ORDERING"
+                      ? normalizeOrderingAnswerTextToAnswerIds(
+                          eintrag.fragen.antworten,
+                          templateConfig.templateData.items,
+                          gespeicherteAntwort.antwort_text,
+                        )
+                      : gespeicherteAntwort.antwort_text,
                   draftRevision: gespeicherteAntwort.draft_revision,
                   draftUpdatedAt:
                     gespeicherteAntwort.draft_updated_at?.toISOString() ??
@@ -3194,14 +3227,23 @@ export async function saveTeamAntwort(data: {
   const templateConfig = quizFrage.fragen.template_config_json as
     | QuestionTemplateConfig
     | null;
-  if (templateId === questionTemplateIds.ordering && data.antwortText !== null) {
+  const normalizedAnswerText =
+    templateId === questionTemplateIds.ordering &&
+    templateConfig?.templateData?.kind === "ORDERING"
+      ? normalizeOrderingAnswerTextToAnswerIds(
+          quizFrage.fragen.antworten,
+          templateConfig.templateData.items,
+          data.antwortText,
+        )
+      : data.antwortText;
+  if (templateId === questionTemplateIds.ordering && normalizedAnswerText !== null) {
     const expected =
       templateConfig?.templateData?.kind === "ORDERING"
-        ? templateConfig.templateData.items.map((item) => item.id)
+        ? quizFrage.fragen.antworten.map((answer) => String(answer.antwort_id))
         : [];
     let submitted: unknown;
     try {
-      submitted = JSON.parse(data.antwortText);
+      submitted = JSON.parse(normalizedAnswerText);
     } catch {
       throw new Error("Die Reihenfolge ist kein gültiges JSON.");
     }
@@ -3255,7 +3297,7 @@ export async function saveTeamAntwort(data: {
           })),
         },
         {
-          answerText: data.antwortText,
+          answerText: normalizedAnswerText,
           selectedAnswerIds: requestedAnswerIds,
           structuredAnswers: nextStructuredAnswers.map((field) => ({
             fieldId: field.antwortfeldId,
@@ -3273,7 +3315,7 @@ export async function saveTeamAntwort(data: {
       update: {
         quiz_id: data.quizId,
         quiz_abschnitt_id: data.quizAbschnittId,
-        antwort_text: data.antwortText,
+        antwort_text: normalizedAnswerText,
         antwort_id: requestedAnswerIds[0] ?? null,
         aktualisiert_am: new Date(),
         ...(contentChanged
@@ -3293,7 +3335,7 @@ export async function saveTeamAntwort(data: {
         quiz_abschnitt_id: data.quizAbschnittId,
         quiz_fragen_id: data.quizFragenId,
         quiz_team_session_id: participantSession.quiz_team_session_id,
-        antwort_text: data.antwortText,
+        antwort_text: normalizedAnswerText,
         antwort_id: requestedAnswerIds[0] ?? null,
         aktualisiert_am: new Date(),
         bewertungsquelle: "AUTO",
@@ -3401,6 +3443,12 @@ export async function getQuizFrageAuswertung(
     answerMode.effectiveMode === "OPEN" ||
     (answerMode.effectiveMode === "UNCLASSIFIED" &&
       auswertbareAntwortoptionen.length === 0);
+  const templateConfig = quizFrage.fragen.template_config_json as
+    | QuestionTemplateConfig
+    | null;
+  const orderingItems = templateConfig?.templateData?.kind === "ORDERING"
+    ? templateConfig.templateData.items
+    : null;
 
   return {
     quiz_fragen_id: quizFrage.quiz_fragen_id,
@@ -3425,7 +3473,13 @@ export async function getQuizFrageAuswertung(
       return {
         team_antwort_id: antwort.team_antwort_id,
         teamname: antwort.quiz_team_sessions.teamname,
-        antwortText: effectiveSubmission?.answerText ?? null,
+        antwortText: orderingItems
+          ? formatOrderingAnswerForEvaluation(
+              quizFrage.fragen.antworten,
+              orderingItems,
+              effectiveSubmission?.answerText ?? null,
+            )
+          : effectiveSubmission?.answerText ?? null,
         antwortId: selectedAnswerIds[0] ?? null,
         antwortQuelle: effectiveSubmission?.source ?? null,
         submissionVersion: effectiveSubmission?.submissionVersion ?? null,
@@ -3836,6 +3890,9 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         sortierung: "asc",
       },
       include: {
+        quiz_abschnitte: {
+          select: { titel: true },
+        },
         fragen: {
           include: {
             antwortfelder: {
@@ -3922,10 +3979,19 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
       riskEligibleAnswers.find(
         (answer) => answer.bewertungsstatus === "CORRECT",
       )?.auto_endpunkte ?? new Prisma.Decimal(0);
-    const richtigeAntworten = quizFrage.fragen.antworten
+    const richtigeAntwortenAusOptionen = quizFrage.fragen.antworten
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => antwort.antwort)
       .join(", ");
+    const templateConfig = quizFrage.fragen.template_config_json as
+      | QuestionTemplateConfig
+      | null;
+    const orderingItems = templateConfig?.templateData?.kind === "ORDERING"
+      ? templateConfig.templateData.items
+      : null;
+    const richtigeAntworten = orderingItems
+      ? orderingItems.map((item) => item.text).join(" → ")
+      : richtigeAntwortenAusOptionen;
 
     const offeneMusterloesung = quizFrage.fragen.antwortfelder
       .map((feld) => {
@@ -3959,6 +4025,11 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
       (answerMode.effectiveMode === "UNCLASSIFIED" &&
         (auswertbareAntwortoptionen.length === 0 ||
           quizFrage.fragen.antwortfelder.length > 0));
+    const maximumPointsLabel = getQuizQuestionPointsDisplay({
+      templateId: quizFrage.fragen.vorlage?.code ?? null,
+      pointsMode: quizFrage.punkte_modus,
+      basePoints: quizFrage.punkte_basis,
+    }).pointsLabel ?? "Keine Punkte";
 
     return sessions.map((session) => {
       const antwort = quizFrage.team_antworten.find(
@@ -4005,29 +4076,43 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
             .join(" | ")
         : null;
 
-      const istUnbeantwortet =
-        !effectiveSubmission || antwort?.bewertungsstatus === "UNANSWERED";
+      const evaluationReadState = resolveEvaluationReadState({
+        hasEffectiveSubmission: effectiveSubmission !== null,
+        evaluation: antwort ?? null,
+      });
+      const istUnbeantwortet = evaluationReadState.isUnanswered;
 
       const istAutomatischRichtig =
+        !evaluationReadState.isPending &&
         evaluatedAnswer?.bewertungsquelle !== "MANUAL" &&
         evaluatedAnswer?.bewertungsstatus === "CORRECT";
       const istPruefpflichtig =
         istUnbeantwortet ||
-        (evaluatedAnswer?.bewertungsstatus === "REVIEW_REQUIRED" &&
+        (!evaluationReadState.isPending &&
+          evaluatedAnswer?.bewertungsstatus === "REVIEW_REQUIRED" &&
           evaluatedAnswer.bewertungsquelle !== "MANUAL");
 
       return {
         quiz_fragen_id: quizFrage.quiz_fragen_id,
         fragen_id: quizFrage.fragen.fragen_id,
-        frageIndex: frageIndex + 1,
+        frageIndex: quizFrage.sortierung ?? frageIndex + 1,
         frage: quizFrage.fragen.frage,
+        abschnittTitel: quizFrage.quiz_abschnitte?.titel ?? "Ohne Runde",
+        maximumPointsLabel,
         templateId: quizFrage.fragen.vorlage?.code ?? null,
         richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         teamname: session.teamname,
-        antwortText:
-          offeneAntwortfelderText || effectiveSubmission?.answerText || null,
+        antwortText: offeneAntwortfelderText || (
+          orderingItems
+            ? formatOrderingAnswerForEvaluation(
+                quizFrage.fragen.antworten,
+                orderingItems,
+                effectiveSubmission?.answerText ?? null,
+              )
+            : effectiveSubmission?.answerText ?? null
+        ),
         antwortId: effectiveSubmission?.selectedAnswerIds[0] ?? null,
         antwortQuelle: effectiveSubmission?.source ?? null,
         submissionVersion: effectiveSubmission?.submissionVersion ?? null,
@@ -4050,6 +4135,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
 
         istOffeneFrage,
         istUnbeantwortet,
+        bewertungAusstehend: evaluationReadState.isPending,
         istAutomatischRichtig,
         istPruefpflichtig,
         istManuellRichtig: evaluatedAnswer?.ist_manuell_richtig ?? false,
@@ -4060,7 +4146,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         autoBasisPunkte: Number(evaluatedAnswer?.auto_basis_punkte ?? 0),
         autoEndpunkte: Number(evaluatedAnswer?.auto_endpunkte ?? 0),
         vergebenePunkte: Number(evaluatedAnswer?.vergebene_punkte ?? 0),
-        bewertungsstatus: evaluatedAnswer?.bewertungsstatus ?? "UNANSWERED",
+        bewertungsstatus: evaluationReadState.status,
         bewertungsquelle: evaluatedAnswer?.bewertungsquelle ?? "AUTO",
         pixelStage:
           pixelDetails?.stage === 1 || pixelDetails?.stage === 2 || pixelDetails?.stage === 3

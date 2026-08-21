@@ -7,6 +7,8 @@ import {
   recalculateQuizQuestionEvaluation,
 } from "@/app/quiz/evaluation/evaluation.server";
 import { resolveQuizQuestionAnswerMode } from "@/app/quiz/quizQuestionAnswerMode";
+import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
+import { repairQuizSpecificOrderingAssignments } from "@/app/quiz/orderingQuestionOrder.server";
 import { isQuizAnswerRunReleasedForWrite } from "@/app/quiz/quizAnswerLiveState";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
@@ -80,6 +82,7 @@ export async function resolveInteractionAssignment(
   quizId: number,
   quizFragenId: number,
 ) {
+  await repairQuizSpecificOrderingAssignments(quizId, db);
   const assignment = await db.quiz_fragen.findFirst({
     where: { quiz_id: quizId, quiz_fragen_id: quizFragenId },
     include: {
@@ -115,11 +118,19 @@ export async function resolveInteractionAssignment(
     if (rightIndex < 0) return -1;
     return leftIndex - rightIndex;
   });
+  const orderingItems =
+    templateConfig?.templateData?.kind === "ORDERING"
+      ? resolveQuizSpecificOrderingParticipantItems(
+          assignment.fragen.antworten,
+          assignment.antwort_reihenfolge,
+        ) ?? []
+      : undefined;
   const interaction = resolveQuizAnswerInteraction({
     templateId: assignment.fragen.vorlage?.code ?? null,
     originalAnswerMode: answerMode.originalMode,
     effectiveAnswerMode: answerMode.effectiveMode,
     templateData: templateConfig?.templateData,
+    orderingItems,
     answerFields: assignment.fragen.antwortfelder.map((field) => ({
       id: field.antwortfeld_id,
       label: field.label,
@@ -500,10 +511,6 @@ export async function syncInteractionForPresentation(
         config_snapshot: toJson(buildInteractionConfigSnapshot(resolved)),
       },
     });
-  }
-  if (shouldKeepRunOpenUntilBlockClose(revealRun)) {
-    await deactivateRunWithoutFinalizing(db, revealRun.interaction_run_id);
-    return revealRun;
   }
   if (revealRun.state === "OPEN" || revealRun.state === "COUNTDOWN") {
     revealRun = await closeRun(db, revealRun.interaction_run_id, {

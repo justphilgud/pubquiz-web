@@ -2,10 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
+import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import {
   resolveQuizAnswerInteraction,
   type QuizAnswerInteractionInput,
 } from "./answerInteraction";
+import { resolveQuizSpecificOrderingParticipantItems } from "./orderingQuestionOrder";
 
 function resolve(
   input: Partial<QuizAnswerInteractionInput> &
@@ -125,28 +128,52 @@ test("copies structured fields and falls back to text when legacy fields are abs
 });
 
 test("describes ordering as positional and keeps the stored item identifiers", () => {
-  const interaction = resolve({
-    templateId: questionTemplateIds.ordering,
-    originalAnswerMode: "CLOSED",
-    effectiveAnswerMode: "CLOSED",
+  const templateConfig = {
     templateData: {
-      kind: "ORDERING",
-      scoring: "EXACT",
+      kind: "ORDERING" as const,
+      scoring: "EXACT" as const,
       items: [
         { id: "first", text: "Zuerst", explanation: "" },
         { id: "second", text: "Danach", explanation: "" },
       ],
     },
+  } as QuestionTemplateConfig;
+  const presentationItems = resolveQuizSpecificOrderingParticipantItems(
+    [
+      { antwort_id: 201, antwort: "Zuerst" },
+      { antwort_id: 202, antwort: "Danach" },
+    ],
+    [202, 201],
+  );
+  const interaction = resolve({
+    templateId: questionTemplateIds.ordering,
+    originalAnswerMode: "CLOSED",
+    effectiveAnswerMode: "CLOSED",
+    templateData: templateConfig.templateData,
+    orderingItems: presentationItems ?? [],
   });
 
   assert.deepEqual(interaction, {
     type: "ORDER",
     scoringPolicy: "POSITION",
     items: [
-      { id: "first", text: "Zuerst" },
-      { id: "second", text: "Danach" },
+      { id: "202", text: "Danach" },
+      { id: "201", text: "Zuerst" },
     ],
   });
+  assert.deepEqual(
+    interaction.type === "ORDER" ? interaction.items : [],
+    presentationItems,
+  );
+  assert.deepEqual(
+    buildQuestionTemplateRuntimeModel({
+      templateId: questionTemplateIds.ordering,
+      questionText: "Sortieren",
+      templateConfig,
+      correctAnswers: [],
+    }).solutionLines,
+    ["1. Zuerst", "2. Danach"],
+  );
 });
 
 test("free-answer overrides and text-oriented reveal templates resolve to TEXT", () => {

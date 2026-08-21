@@ -10,6 +10,7 @@ export const deRenderingMessages = {
     },
     presentationCorporate: { label: "Corporate", description: "Ruhiges, professionelles Design mit klarer Hierarchie." },
     presentationBirthday: { label: "Storybook", description: "Persönliches Fotobuch-Design mit redaktioneller Bildsprache." },
+    presentationEditorial: { label: "LOVD × ungegoogelt", description: "Warm-reduziertes Venue-Design mit großzügiger editorialer Hierarchie." },
     answerDefault: {
       label: "ungegoogelt Standard",
       description: "Das vertraute, mobil optimierte Antwortformular.",
@@ -20,6 +21,7 @@ export const deRenderingMessages = {
     },
     answerCorporate: { label: "Corporate", description: "Sachliches Antwortformular für Firmenveranstaltungen." },
     answerBirthday: { label: "Storybook", description: "Ruhiges Antwortformular im persönlichen Fotobuch-Stil." },
+    answerEditorial: { label: "LOVD × ungegoogelt", description: "Reduziertes Antwortformular in warmer LOVD-Eventoptik." },
   },
   fields: {
     presentationTemplate: "Präsentationstemplate",

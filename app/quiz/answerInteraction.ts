@@ -109,6 +109,7 @@ export type QuizAnswerInteractionInput = {
     required: boolean;
   }[];
   answerOptions: readonly AnswerOption[];
+  orderingItems?: readonly OrderingItem[];
 };
 
 function getAnswerForm(
@@ -237,10 +238,7 @@ export function resolveQuizAnswerInteraction(
       scoringPolicy: answerForm.scoringPolicy,
       items:
         input.templateData?.kind === "ORDERING"
-          ? input.templateData.items.map((item) => ({
-              id: item.id,
-              text: item.text,
-            }))
+          ? [...(input.orderingItems ?? [])]
           : [],
     };
   }

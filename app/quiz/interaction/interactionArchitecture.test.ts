@@ -281,3 +281,19 @@ test("live block mutations avoid redundant work without changing finalization ru
       closeBlock.indexOf("closeBlockInteractions"),
   );
 });
+
+test("the first collected solution finalizes its block before evaluation sync", () => {
+  const statusActions = read(
+    "app/quiz/[quizId]/praesentation/statusActions.ts",
+  );
+  const solutionLifecycle = statusActions.slice(
+    statusActions.indexOf('identity.phase === "SOLUTION"'),
+    statusActions.indexOf("phases.interactionMutation"),
+  );
+
+  assert.match(solutionLifecycle, /getEffectiveQuizSolutionStrategy/);
+  assert.ok(
+    solutionLifecycle.indexOf("closeBlockInteractions") <
+      solutionLifecycle.indexOf("syncInteractionForPresentation"),
+  );
+});

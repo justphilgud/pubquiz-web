@@ -136,6 +136,7 @@ export const FragenScalarFieldEnum = {
   ist_archiviert: 'ist_archiviert',
   archivierungsgrund: 'archivierungsgrund',
   vorlage_id: 'vorlage_id',
+  source_vorlage_id: 'source_vorlage_id',
   created_by_user_id: 'created_by_user_id',
   created_at: 'created_at',
   last_modified_by_user_id: 'last_modified_by_user_id',
@@ -147,6 +148,9 @@ export const FragenScalarFieldEnum = {
   moderationsnotizen: 'moderationsnotizen',
   kategorienwunsch: 'kategorienwunsch',
   gueltig_bis: 'gueltig_bis',
+  pruefen_ab: 'pruefen_ab',
+  aktualitaet_geprueft_am: 'aktualitaet_geprueft_am',
+  aktualitaet_geprueft_von_user_id: 'aktualitaet_geprueft_von_user_id',
   review_status: 'review_status',
   submitted_at: 'submitted_at',
   submitted_by_user_id: 'submitted_by_user_id',
@@ -588,8 +592,20 @@ export const Frage_vorlagenScalarFieldEnum = {
   vorlage_id: 'vorlage_id',
   code: 'code',
   name: 'name',
+  beschreibung: 'beschreibung',
   slide_typ: 'slide_typ',
-  ist_aktiv: 'ist_aktiv'
+  ist_aktiv: 'ist_aktiv',
+  art: 'art',
+  status: 'status',
+  basis_code: 'basis_code',
+  konfiguration_json: 'konfiguration_json',
+  source_fragen_id: 'source_fragen_id',
+  created_by_user_id: 'created_by_user_id',
+  reviewed_by_user_id: 'reviewed_by_user_id',
+  review_feedback: 'review_feedback',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  reviewed_at: 'reviewed_at'
 } as const
 
 export type Frage_vorlagenScalarFieldEnum = (typeof Frage_vorlagenScalarFieldEnum)[keyof typeof Frage_vorlagenScalarFieldEnum]

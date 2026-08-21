@@ -47,6 +47,22 @@ export function PresentationDesignHeader({
   slideCount,
   storybookComposition = null,
 }: HeaderProps & { storybookComposition?: StorybookComposition | null }) {
+  if (theme.design.stylePreset === "EDITORIAL") {
+    const progress = `${String(slideNumber).padStart(2, "0")} / ${String(slideCount).padStart(2, "0")}`;
+    return (
+      <header className="presentation-chrome presentation-editorial-header relative z-20 flex h-28 shrink-0 items-start justify-between px-3 pt-2">
+        {theme.identity.logoUrl ? (
+          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="LOVD STELP" className="presentation-editorial-logo" />
+        ) : (
+          <span className="presentation-editorial-wordmark">LOVD</span>
+        )}
+        <div className="presentation-editorial-progress" aria-label={`${slideLabel}, Folie ${slideNumber} von ${slideCount}`}>
+          {slideLabel.toLocaleUpperCase("de-DE")} {progress}
+        </div>
+      </header>
+    );
+  }
+
   if (theme.design.stylePreset === "CORPORATE") {
     return (
       <header className="presentation-chrome presentation-corporate-header mb-4 grid h-24 shrink-0 grid-cols-[auto_1fr_auto] items-stretch bg-white">
@@ -163,6 +179,18 @@ export function PresentationDesignBackdrop({
     />
   ));
 
+  if (theme.design.stylePreset === "EDITORIAL") {
+    return (
+      <div className="presentation-decoration presentation-editorial-decoration pointer-events-none absolute inset-0" aria-hidden="true">
+        {theme.identity.logoUrl && (
+          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="presentation-editorial-intro-logo" />
+        )}
+        <span className="presentation-editorial-intro-title">PUBQUIZ</span>
+        <span className="presentation-editorial-intro-collaboration">{theme.design.occasion.extraText || "LOVD × ungegoogelt"}</span>
+      </div>
+    );
+  }
+
   if (theme.design.stylePreset === "CORPORATE") {
     return (
       <div className="presentation-decoration presentation-corporate-decoration pointer-events-none absolute inset-0" aria-hidden="true">
@@ -254,6 +282,7 @@ export function PresentationDesignStage({
     NEON: "presentation-neon-stage rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]",
     CORPORATE: "presentation-corporate-stage p-6",
     BIRTHDAY: "presentation-birthday-stage p-5",
+    EDITORIAL: "presentation-editorial-stage px-3 pb-10 pt-3",
   }[theme.design.stylePreset];
 
   return (
@@ -280,6 +309,13 @@ export function PresentationDesignFooter({
   theme: ResolvedQuizTheme;
   storybookComposition?: StorybookComposition | null;
 }) {
+  if (theme.design.stylePreset === "EDITORIAL") {
+    return (
+      <footer className="presentation-editorial-footer relative z-20 flex shrink-0 items-center justify-end">
+        <span>{theme.design.occasion.extraText || "LOVD × ungegoogelt"}</span>
+      </footer>
+    );
+  }
   if (theme.design.stylePreset === "CORPORATE") {
     return (
       <footer className="presentation-corporate-footer relative z-20 mt-3 flex h-9 shrink-0 items-center justify-between border-t px-2 text-xs font-semibold uppercase tracking-[0.12em]">

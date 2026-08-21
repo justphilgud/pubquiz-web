@@ -38,6 +38,7 @@ export type ResolvedQuizTheme = {
     border: string;
   };
   semantic: {
+    correct: string;
     success: string;
     warning: string;
     danger: string;
@@ -118,6 +119,7 @@ export function resolveQuizTheme({
       border: identityTokens.colors.border,
     },
     semantic: {
+      correct: identityTokens.colors.correct,
       success: identityTokens.colors.success,
       warning: identityTokens.colors.warning,
       danger: identityTokens.colors.danger,
@@ -170,6 +172,7 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--quiz-text": theme.colors.text,
     "--quiz-text-muted": theme.colors.textMuted,
     "--quiz-border": theme.colors.border,
+    "--quiz-correct": theme.semantic.correct,
     "--quiz-success": theme.semantic.success,
     "--quiz-warning": theme.semantic.warning,
     "--quiz-danger": theme.semantic.danger,
@@ -193,6 +196,7 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--brand-text": theme.colors.text,
     "--brand-text-muted": theme.colors.textMuted,
     "--brand-border": theme.colors.border,
+    "--brand-correct": theme.semantic.correct,
     "--brand-success": theme.semantic.success,
     "--brand-warning": theme.semantic.warning,
     "--brand-danger": theme.semantic.danger,
@@ -216,6 +220,8 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     style.backgroundImage = `radial-gradient(circle at 20% 20%, ${theme.colors.secondary} 0, ${theme.colors.secondary}22 24%, transparent 42%), radial-gradient(circle at 80% 10%, ${theme.colors.primary}66 0, ${theme.colors.primary}22 22%, transparent 38%), linear-gradient(135deg, #1a0033, ${theme.colors.background} 45%, #001a3a)`;
   } else if (theme.design.stylePreset === "CORPORATE") {
     style.backgroundImage = `linear-gradient(120deg, ${theme.colors.background}, ${theme.colors.surfaceStrong})`;
+  } else if (theme.design.stylePreset === "EDITORIAL") {
+    style.backgroundImage = "none";
   } else {
     style.backgroundImage = `radial-gradient(circle at 12% 15%, ${theme.colors.accent}33 0 7%, transparent 8%), radial-gradient(circle at 88% 10%, ${theme.colors.secondary}22 0 10%, transparent 11%), linear-gradient(145deg, ${theme.colors.background}, ${theme.colors.surfaceStrong})`;
   }

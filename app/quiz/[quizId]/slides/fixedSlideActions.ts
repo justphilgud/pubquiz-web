@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireQuizEditor } from "@/app/quiz/quizAccess.server";
+import {
+  requireQuizEditor,
+  requireQuizViewer,
+} from "@/app/quiz/quizAccess.server";
 import {
   FIXED_SLIDE_FLOW_TYPES,
   isIntroSlideId,
@@ -10,6 +13,10 @@ import {
   serializePrizeSlots,
 } from "@/app/quiz/fixedSlidesPolicy";
 import { materializeDefaultQuizFlow } from "@/app/quiz/flow/quizFlowRepository.server";
+import {
+  validateQuizFlowConfig,
+  type QuizFlowConfig,
+} from "@/app/quiz/flow/quizFlow";
 
 export type FixedSlideActionState = {
   status: "idle" | "success" | "error";
@@ -20,10 +27,31 @@ function text(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
 }
 
+export async function getFixedSlideConfig(
+  quizId: number,
+  slideId: keyof typeof FIXED_SLIDE_FLOW_TYPES,
+) {
+  await requireQuizViewer(quizId);
+  const item = await prisma.quiz_ablauf_elemente.findFirst({
+    where: {
+      quiz_id: quizId,
+      ist_standard: true,
+      typ: FIXED_SLIDE_FLOW_TYPES[slideId],
+    },
+    select: { konfiguration: true },
+  });
+  const parsed = validateQuizFlowConfig(
+    FIXED_SLIDE_FLOW_TYPES[slideId],
+    item?.konfiguration ?? { version: 1 },
+  );
+  return parsed.ok ? parsed.value : { version: 1 as const };
+}
+
 async function saveSlideVisibility(
   quizId: number,
   slideId: keyof typeof FIXED_SLIDE_FLOW_TYPES,
   enabled: boolean,
+  configPatch?: Partial<QuizFlowConfig>,
 ) {
   const flow = await materializeDefaultQuizFlow(quizId);
   const item = flow.find(
@@ -34,7 +62,12 @@ async function saveSlideVisibility(
   if (!item?.persistentId) return;
   await prisma.quiz_ablauf_elemente.update({
     where: { quiz_ablauf_element_id: item.persistentId },
-    data: { ist_sichtbar: enabled },
+    data: {
+      ist_sichtbar: enabled,
+      ...(configPatch
+        ? { konfiguration: { ...item.config, ...configPatch } }
+        : {}),
+    },
   });
 }
 
@@ -131,18 +164,27 @@ export async function saveOutroSlide(
     }
 
     await requireQuizEditor(quizId);
-    await prisma.quiz.update({
-      where: { quiz_id: quizId },
-      data: {
-        outro_bekanntmachungen:
-          text(formData, "bekanntmachungen") || null,
-        outro_musik_url: text(formData, "outroMusikUrl") || null,
-      },
-    });
+    if (slideIdValue === "announcements") {
+      await prisma.quiz.update({
+        where: { quiz_id: quizId },
+        data: {
+          outro_bekanntmachungen:
+            text(formData, "bekanntmachungen") || null,
+          outro_musik_url: text(formData, "outroMusikUrl") || null,
+        },
+      });
+    }
     await saveSlideVisibility(
       quizId,
       slideIdValue,
       formData.get("enabled") === "on",
+      slideIdValue === "calendar"
+        ? {
+            title: text(formData, "title"),
+            body: text(formData, "body"),
+            teamHint: text(formData, "ctaText"),
+          }
+        : undefined,
     );
 
     revalidatePath(`/quiz/${quizId}`);

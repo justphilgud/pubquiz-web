@@ -7,6 +7,7 @@ import {
   Nunito,
   Oswald,
   Playfair_Display,
+  Plus_Jakarta_Sans,
   Roboto_Slab,
   Source_Sans_3,
   Space_Grotesk,
@@ -31,6 +32,7 @@ const oswald = Oswald({ variable: "--font-oswald", subsets: ["latin"] });
 const robotoSlab = Roboto_Slab({ variable: "--font-roboto-slab", subsets: ["latin"] });
 const lora = Lora({ variable: "--font-lora", subsets: ["latin"] });
 const playfairDisplay = Playfair_Display({ variable: "--font-playfair-display", subsets: ["latin"] });
+const plusJakartaSans = Plus_Jakarta_Sans({ variable: "--font-plus-jakarta-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -45,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${nunito.variable} ${oswald.variable} ${robotoSlab.variable} ${lora.variable} ${playfairDisplay.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${nunito.variable} ${oswald.variable} ${robotoSlab.variable} ${lora.variable} ${playfairDisplay.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

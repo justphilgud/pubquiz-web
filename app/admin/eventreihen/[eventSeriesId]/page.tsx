@@ -8,6 +8,8 @@ import { getPresentationTemplate } from "@/app/rendering/templateRegistry";
 import { getManagedPresentationTemplate } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
 import { loadRoleMessages } from "@/app/i18n/roleMessages";
 import { formatMessage } from "@/app/i18n/formatMessage";
+import { getCalendarRequestOrigin } from "@/app/calendar/calendarOrigin.server";
+import { buildEventSeriesCalendarSubscriptionUrl } from "@/app/calendar/publicCalendar";
 
 const statusLabels = {
   UPCOMING: "Bevorstehend",
@@ -26,9 +28,16 @@ export default async function EventSeriesDetailPage({
   const { eventSeriesId } = await params;
   const series = await getEventSeriesDetails(Number(eventSeriesId));
   if (!series) notFound();
-  const managedPresentation = await getManagedPresentationTemplate(series.defaultPresentationTemplateId);
+  const [managedPresentation, calendarOrigin] = await Promise.all([
+    getManagedPresentationTemplate(series.defaultPresentationTemplateId),
+    getCalendarRequestOrigin(),
+  ]);
   const messages = loadRenderingMessages(getDefaultLocale());
   const roleMessages = loadRoleMessages(getDefaultLocale());
+  const calendarSubscriptionUrl = buildEventSeriesCalendarSubscriptionUrl(
+    calendarOrigin,
+    series.id,
+  );
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 md:px-8">
@@ -47,6 +56,24 @@ export default async function EventSeriesDetailPage({
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>
+        {series.isPublic && !series.isArchived && (
+          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold">Veranstaltungskalender</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Kommende Termine dieser öffentlichen Eventreihe als Kalender abonnieren.
+                </p>
+              </div>
+              <a
+                href={calendarSubscriptionUrl}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-center font-semibold"
+              >
+                Kalender abonnieren
+              </a>
+            </div>
+          </section>
+        )}
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>

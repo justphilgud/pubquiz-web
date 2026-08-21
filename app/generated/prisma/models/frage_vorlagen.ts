@@ -28,68 +28,148 @@ export type AggregateFrage_vorlagen = {
 
 export type Frage_vorlagenAvgAggregateOutputType = {
   vorlage_id: number | null
+  source_fragen_id: number | null
+  created_by_user_id: number | null
+  reviewed_by_user_id: number | null
 }
 
 export type Frage_vorlagenSumAggregateOutputType = {
   vorlage_id: number | null
+  source_fragen_id: number | null
+  created_by_user_id: number | null
+  reviewed_by_user_id: number | null
 }
 
 export type Frage_vorlagenMinAggregateOutputType = {
   vorlage_id: number | null
   code: string | null
   name: string | null
+  beschreibung: string | null
   slide_typ: string | null
   ist_aktiv: boolean | null
+  art: $Enums.QuestionTemplateKind | null
+  status: $Enums.QuestionTemplateStatus | null
+  basis_code: string | null
+  source_fragen_id: number | null
+  created_by_user_id: number | null
+  reviewed_by_user_id: number | null
+  review_feedback: string | null
+  created_at: Date | null
+  updated_at: Date | null
+  reviewed_at: Date | null
 }
 
 export type Frage_vorlagenMaxAggregateOutputType = {
   vorlage_id: number | null
   code: string | null
   name: string | null
+  beschreibung: string | null
   slide_typ: string | null
   ist_aktiv: boolean | null
+  art: $Enums.QuestionTemplateKind | null
+  status: $Enums.QuestionTemplateStatus | null
+  basis_code: string | null
+  source_fragen_id: number | null
+  created_by_user_id: number | null
+  reviewed_by_user_id: number | null
+  review_feedback: string | null
+  created_at: Date | null
+  updated_at: Date | null
+  reviewed_at: Date | null
 }
 
 export type Frage_vorlagenCountAggregateOutputType = {
   vorlage_id: number
   code: number
   name: number
+  beschreibung: number
   slide_typ: number
   ist_aktiv: number
+  art: number
+  status: number
+  basis_code: number
+  konfiguration_json: number
+  source_fragen_id: number
+  created_by_user_id: number
+  reviewed_by_user_id: number
+  review_feedback: number
+  created_at: number
+  updated_at: number
+  reviewed_at: number
   _all: number
 }
 
 
 export type Frage_vorlagenAvgAggregateInputType = {
   vorlage_id?: true
+  source_fragen_id?: true
+  created_by_user_id?: true
+  reviewed_by_user_id?: true
 }
 
 export type Frage_vorlagenSumAggregateInputType = {
   vorlage_id?: true
+  source_fragen_id?: true
+  created_by_user_id?: true
+  reviewed_by_user_id?: true
 }
 
 export type Frage_vorlagenMinAggregateInputType = {
   vorlage_id?: true
   code?: true
   name?: true
+  beschreibung?: true
   slide_typ?: true
   ist_aktiv?: true
+  art?: true
+  status?: true
+  basis_code?: true
+  source_fragen_id?: true
+  created_by_user_id?: true
+  reviewed_by_user_id?: true
+  review_feedback?: true
+  created_at?: true
+  updated_at?: true
+  reviewed_at?: true
 }
 
 export type Frage_vorlagenMaxAggregateInputType = {
   vorlage_id?: true
   code?: true
   name?: true
+  beschreibung?: true
   slide_typ?: true
   ist_aktiv?: true
+  art?: true
+  status?: true
+  basis_code?: true
+  source_fragen_id?: true
+  created_by_user_id?: true
+  reviewed_by_user_id?: true
+  review_feedback?: true
+  created_at?: true
+  updated_at?: true
+  reviewed_at?: true
 }
 
 export type Frage_vorlagenCountAggregateInputType = {
   vorlage_id?: true
   code?: true
   name?: true
+  beschreibung?: true
   slide_typ?: true
   ist_aktiv?: true
+  art?: true
+  status?: true
+  basis_code?: true
+  konfiguration_json?: true
+  source_fragen_id?: true
+  created_by_user_id?: true
+  reviewed_by_user_id?: true
+  review_feedback?: true
+  created_at?: true
+  updated_at?: true
+  reviewed_at?: true
   _all?: true
 }
 
@@ -183,8 +263,20 @@ export type Frage_vorlagenGroupByOutputType = {
   vorlage_id: number
   code: string
   name: string
+  beschreibung: string | null
   slide_typ: string
   ist_aktiv: boolean
+  art: $Enums.QuestionTemplateKind
+  status: $Enums.QuestionTemplateStatus
+  basis_code: string | null
+  konfiguration_json: runtime.JsonValue | null
+  source_fragen_id: number | null
+  created_by_user_id: number | null
+  reviewed_by_user_id: number | null
+  review_feedback: string | null
+  created_at: Date
+  updated_at: Date
+  reviewed_at: Date | null
   _count: Frage_vorlagenCountAggregateOutputType | null
   _avg: Frage_vorlagenAvgAggregateOutputType | null
   _sum: Frage_vorlagenSumAggregateOutputType | null
@@ -214,20 +306,52 @@ export type frage_vorlagenWhereInput = {
   vorlage_id?: Prisma.IntFilter<"frage_vorlagen"> | number
   code?: Prisma.StringFilter<"frage_vorlagen"> | string
   name?: Prisma.StringFilter<"frage_vorlagen"> | string
+  beschreibung?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
   slide_typ?: Prisma.StringFilter<"frage_vorlagen"> | string
   ist_aktiv?: Prisma.BoolFilter<"frage_vorlagen"> | boolean
+  art?: Prisma.EnumQuestionTemplateKindFilter<"frage_vorlagen"> | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFilter<"frage_vorlagen"> | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  konfiguration_json?: Prisma.JsonNullableFilter<"frage_vorlagen">
+  source_fragen_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  created_by_user_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  reviewed_by_user_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  review_feedback?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  created_at?: Prisma.DateTimeFilter<"frage_vorlagen"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"frage_vorlagen"> | Date | string
+  reviewed_at?: Prisma.DateTimeNullableFilter<"frage_vorlagen"> | Date | string | null
   antwortfelder?: Prisma.Frage_vorlage_antwortfelderListRelationFilter
   fragen?: Prisma.FragenListRelationFilter
+  angewendete_fragen?: Prisma.FragenListRelationFilter
+  source_frage?: Prisma.XOR<Prisma.FragenNullableScalarRelationFilter, Prisma.fragenWhereInput> | null
+  created_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  reviewed_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
 }
 
 export type frage_vorlagenOrderByWithRelationInput = {
   vorlage_id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  beschreibung?: Prisma.SortOrderInput | Prisma.SortOrder
   slide_typ?: Prisma.SortOrder
   ist_aktiv?: Prisma.SortOrder
+  art?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  basis_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  konfiguration_json?: Prisma.SortOrderInput | Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  review_feedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   antwortfelder?: Prisma.frage_vorlage_antwortfelderOrderByRelationAggregateInput
   fragen?: Prisma.fragenOrderByRelationAggregateInput
+  angewendete_fragen?: Prisma.fragenOrderByRelationAggregateInput
+  source_frage?: Prisma.fragenOrderByWithRelationInput
+  created_by?: Prisma.usersOrderByWithRelationInput
+  reviewed_by?: Prisma.usersOrderByWithRelationInput
 }
 
 export type frage_vorlagenWhereUniqueInput = Prisma.AtLeast<{
@@ -237,18 +361,46 @@ export type frage_vorlagenWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.frage_vorlagenWhereInput[]
   NOT?: Prisma.frage_vorlagenWhereInput | Prisma.frage_vorlagenWhereInput[]
   name?: Prisma.StringFilter<"frage_vorlagen"> | string
+  beschreibung?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
   slide_typ?: Prisma.StringFilter<"frage_vorlagen"> | string
   ist_aktiv?: Prisma.BoolFilter<"frage_vorlagen"> | boolean
+  art?: Prisma.EnumQuestionTemplateKindFilter<"frage_vorlagen"> | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFilter<"frage_vorlagen"> | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  konfiguration_json?: Prisma.JsonNullableFilter<"frage_vorlagen">
+  source_fragen_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  created_by_user_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  reviewed_by_user_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  review_feedback?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  created_at?: Prisma.DateTimeFilter<"frage_vorlagen"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"frage_vorlagen"> | Date | string
+  reviewed_at?: Prisma.DateTimeNullableFilter<"frage_vorlagen"> | Date | string | null
   antwortfelder?: Prisma.Frage_vorlage_antwortfelderListRelationFilter
   fragen?: Prisma.FragenListRelationFilter
+  angewendete_fragen?: Prisma.FragenListRelationFilter
+  source_frage?: Prisma.XOR<Prisma.FragenNullableScalarRelationFilter, Prisma.fragenWhereInput> | null
+  created_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  reviewed_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
 }, "vorlage_id" | "code">
 
 export type frage_vorlagenOrderByWithAggregationInput = {
   vorlage_id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  beschreibung?: Prisma.SortOrderInput | Prisma.SortOrder
   slide_typ?: Prisma.SortOrder
   ist_aktiv?: Prisma.SortOrder
+  art?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  basis_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  konfiguration_json?: Prisma.SortOrderInput | Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  review_feedback?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.frage_vorlagenCountOrderByAggregateInput
   _avg?: Prisma.frage_vorlagenAvgOrderByAggregateInput
   _max?: Prisma.frage_vorlagenMaxOrderByAggregateInput
@@ -263,69 +415,166 @@ export type frage_vorlagenScalarWhereWithAggregatesInput = {
   vorlage_id?: Prisma.IntWithAggregatesFilter<"frage_vorlagen"> | number
   code?: Prisma.StringWithAggregatesFilter<"frage_vorlagen"> | string
   name?: Prisma.StringWithAggregatesFilter<"frage_vorlagen"> | string
+  beschreibung?: Prisma.StringNullableWithAggregatesFilter<"frage_vorlagen"> | string | null
   slide_typ?: Prisma.StringWithAggregatesFilter<"frage_vorlagen"> | string
   ist_aktiv?: Prisma.BoolWithAggregatesFilter<"frage_vorlagen"> | boolean
+  art?: Prisma.EnumQuestionTemplateKindWithAggregatesFilter<"frage_vorlagen"> | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusWithAggregatesFilter<"frage_vorlagen"> | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.StringNullableWithAggregatesFilter<"frage_vorlagen"> | string | null
+  konfiguration_json?: Prisma.JsonNullableWithAggregatesFilter<"frage_vorlagen">
+  source_fragen_id?: Prisma.IntNullableWithAggregatesFilter<"frage_vorlagen"> | number | null
+  created_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"frage_vorlagen"> | number | null
+  reviewed_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"frage_vorlagen"> | number | null
+  review_feedback?: Prisma.StringNullableWithAggregatesFilter<"frage_vorlagen"> | string | null
+  created_at?: Prisma.DateTimeWithAggregatesFilter<"frage_vorlagen"> | Date | string
+  updated_at?: Prisma.DateTimeWithAggregatesFilter<"frage_vorlagen"> | Date | string
+  reviewed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"frage_vorlagen"> | Date | string | null
 }
 
 export type frage_vorlagenCreateInput = {
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderCreateNestedManyWithoutVorlageInput
   fragen?: Prisma.fragenCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenCreateNestedManyWithoutSource_vorlageInput
+  source_frage?: Prisma.fragenCreateNestedOneWithoutErzeugte_vorlagenInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_fragevorlagenInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutBewertete_fragevorlagenInput
 }
 
 export type frage_vorlagenUncheckedCreateInput = {
   vorlage_id?: number
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedCreateNestedManyWithoutVorlageInput
   fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutSource_vorlageInput
 }
 
 export type frage_vorlagenUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderUpdateManyWithoutVorlageNestedInput
   fragen?: Prisma.fragenUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUpdateManyWithoutSource_vorlageNestedInput
+  source_frage?: Prisma.fragenUpdateOneWithoutErzeugte_vorlagenNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_fragevorlagenNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutBewertete_fragevorlagenNestedInput
 }
 
 export type frage_vorlagenUncheckedUpdateInput = {
   vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedUpdateManyWithoutVorlageNestedInput
   fragen?: Prisma.fragenUncheckedUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUncheckedUpdateManyWithoutSource_vorlageNestedInput
 }
 
 export type frage_vorlagenCreateManyInput = {
   vorlage_id?: number
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
 }
 
 export type frage_vorlagenUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type frage_vorlagenUncheckedUpdateManyInput = {
   vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type Frage_vorlagenNullableScalarRelationFilter = {
@@ -333,36 +582,86 @@ export type Frage_vorlagenNullableScalarRelationFilter = {
   isNot?: Prisma.frage_vorlagenWhereInput | null
 }
 
+export type Frage_vorlagenListRelationFilter = {
+  every?: Prisma.frage_vorlagenWhereInput
+  some?: Prisma.frage_vorlagenWhereInput
+  none?: Prisma.frage_vorlagenWhereInput
+}
+
+export type frage_vorlagenOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type frage_vorlagenCountOrderByAggregateInput = {
   vorlage_id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  beschreibung?: Prisma.SortOrder
   slide_typ?: Prisma.SortOrder
   ist_aktiv?: Prisma.SortOrder
+  art?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  basis_code?: Prisma.SortOrder
+  konfiguration_json?: Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
+  review_feedback?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrder
 }
 
 export type frage_vorlagenAvgOrderByAggregateInput = {
   vorlage_id?: Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type frage_vorlagenMaxOrderByAggregateInput = {
   vorlage_id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  beschreibung?: Prisma.SortOrder
   slide_typ?: Prisma.SortOrder
   ist_aktiv?: Prisma.SortOrder
+  art?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  basis_code?: Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
+  review_feedback?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrder
 }
 
 export type frage_vorlagenMinOrderByAggregateInput = {
   vorlage_id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  beschreibung?: Prisma.SortOrder
   slide_typ?: Prisma.SortOrder
   ist_aktiv?: Prisma.SortOrder
+  art?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  basis_code?: Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
+  review_feedback?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  reviewed_at?: Prisma.SortOrder
 }
 
 export type frage_vorlagenSumOrderByAggregateInput = {
   vorlage_id?: Prisma.SortOrder
+  source_fragen_id?: Prisma.SortOrder
+  created_by_user_id?: Prisma.SortOrder
+  reviewed_by_user_id?: Prisma.SortOrder
 }
 
 export type Frage_vorlagenScalarRelationFilter = {
@@ -376,6 +675,26 @@ export type frage_vorlagenCreateNestedOneWithoutFragenInput = {
   connect?: Prisma.frage_vorlagenWhereUniqueInput
 }
 
+export type frage_vorlagenCreateNestedOneWithoutAngewendete_fragenInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUncheckedCreateWithoutAngewendete_fragenInput>
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutAngewendete_fragenInput
+  connect?: Prisma.frage_vorlagenWhereUniqueInput
+}
+
+export type frage_vorlagenCreateNestedManyWithoutSource_frageInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput> | Prisma.frage_vorlagenCreateWithoutSource_frageInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput | Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput[]
+  createMany?: Prisma.frage_vorlagenCreateManySource_frageInputEnvelope
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+}
+
+export type frage_vorlagenUncheckedCreateNestedManyWithoutSource_frageInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput> | Prisma.frage_vorlagenCreateWithoutSource_frageInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput | Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput[]
+  createMany?: Prisma.frage_vorlagenCreateManySource_frageInputEnvelope
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+}
+
 export type frage_vorlagenUpdateOneWithoutFragenNestedInput = {
   create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutFragenInput, Prisma.frage_vorlagenUncheckedCreateWithoutFragenInput>
   connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutFragenInput
@@ -384,6 +703,52 @@ export type frage_vorlagenUpdateOneWithoutFragenNestedInput = {
   delete?: Prisma.frage_vorlagenWhereInput | boolean
   connect?: Prisma.frage_vorlagenWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.frage_vorlagenUpdateToOneWithWhereWithoutFragenInput, Prisma.frage_vorlagenUpdateWithoutFragenInput>, Prisma.frage_vorlagenUncheckedUpdateWithoutFragenInput>
+}
+
+export type frage_vorlagenUpdateOneWithoutAngewendete_fragenNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUncheckedCreateWithoutAngewendete_fragenInput>
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutAngewendete_fragenInput
+  upsert?: Prisma.frage_vorlagenUpsertWithoutAngewendete_fragenInput
+  disconnect?: Prisma.frage_vorlagenWhereInput | boolean
+  delete?: Prisma.frage_vorlagenWhereInput | boolean
+  connect?: Prisma.frage_vorlagenWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.frage_vorlagenUpdateToOneWithWhereWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUpdateWithoutAngewendete_fragenInput>, Prisma.frage_vorlagenUncheckedUpdateWithoutAngewendete_fragenInput>
+}
+
+export type frage_vorlagenUpdateManyWithoutSource_frageNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput> | Prisma.frage_vorlagenCreateWithoutSource_frageInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput | Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput[]
+  upsert?: Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutSource_frageInput | Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutSource_frageInput[]
+  createMany?: Prisma.frage_vorlagenCreateManySource_frageInputEnvelope
+  set?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  disconnect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  delete?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  update?: Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutSource_frageInput | Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutSource_frageInput[]
+  updateMany?: Prisma.frage_vorlagenUpdateManyWithWhereWithoutSource_frageInput | Prisma.frage_vorlagenUpdateManyWithWhereWithoutSource_frageInput[]
+  deleteMany?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+}
+
+export type frage_vorlagenUncheckedUpdateManyWithoutSource_frageNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput> | Prisma.frage_vorlagenCreateWithoutSource_frageInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput | Prisma.frage_vorlagenCreateOrConnectWithoutSource_frageInput[]
+  upsert?: Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutSource_frageInput | Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutSource_frageInput[]
+  createMany?: Prisma.frage_vorlagenCreateManySource_frageInputEnvelope
+  set?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  disconnect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  delete?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  update?: Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutSource_frageInput | Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutSource_frageInput[]
+  updateMany?: Prisma.frage_vorlagenUpdateManyWithWhereWithoutSource_frageInput | Prisma.frage_vorlagenUpdateManyWithWhereWithoutSource_frageInput[]
+  deleteMany?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+}
+
+export type EnumQuestionTemplateKindFieldUpdateOperationsInput = {
+  set?: $Enums.QuestionTemplateKind
+}
+
+export type EnumQuestionTemplateStatusFieldUpdateOperationsInput = {
+  set?: $Enums.QuestionTemplateStatus
 }
 
 export type frage_vorlagenCreateNestedOneWithoutAntwortfelderInput = {
@@ -400,26 +765,237 @@ export type frage_vorlagenUpdateOneRequiredWithoutAntwortfelderNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.frage_vorlagenUpdateToOneWithWhereWithoutAntwortfelderInput, Prisma.frage_vorlagenUpdateWithoutAntwortfelderInput>, Prisma.frage_vorlagenUncheckedUpdateWithoutAntwortfelderInput>
 }
 
+export type frage_vorlagenCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput> | Prisma.frage_vorlagenCreateWithoutCreated_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyCreated_byInputEnvelope
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+}
+
+export type frage_vorlagenCreateNestedManyWithoutReviewed_byInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput> | Prisma.frage_vorlagenCreateWithoutReviewed_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyReviewed_byInputEnvelope
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+}
+
+export type frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput> | Prisma.frage_vorlagenCreateWithoutCreated_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyCreated_byInputEnvelope
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+}
+
+export type frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput> | Prisma.frage_vorlagenCreateWithoutReviewed_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyReviewed_byInputEnvelope
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+}
+
+export type frage_vorlagenUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput> | Prisma.frage_vorlagenCreateWithoutCreated_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyCreated_byInputEnvelope
+  set?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  disconnect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  delete?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  update?: Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.frage_vorlagenUpdateManyWithWhereWithoutCreated_byInput | Prisma.frage_vorlagenUpdateManyWithWhereWithoutCreated_byInput[]
+  deleteMany?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+}
+
+export type frage_vorlagenUpdateManyWithoutReviewed_byNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput> | Prisma.frage_vorlagenCreateWithoutReviewed_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput[]
+  upsert?: Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutReviewed_byInput | Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutReviewed_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyReviewed_byInputEnvelope
+  set?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  disconnect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  delete?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  update?: Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutReviewed_byInput | Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutReviewed_byInput[]
+  updateMany?: Prisma.frage_vorlagenUpdateManyWithWhereWithoutReviewed_byInput | Prisma.frage_vorlagenUpdateManyWithWhereWithoutReviewed_byInput[]
+  deleteMany?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+}
+
+export type frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput> | Prisma.frage_vorlagenCreateWithoutCreated_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyCreated_byInputEnvelope
+  set?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  disconnect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  delete?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  update?: Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.frage_vorlagenUpdateManyWithWhereWithoutCreated_byInput | Prisma.frage_vorlagenUpdateManyWithWhereWithoutCreated_byInput[]
+  deleteMany?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+}
+
+export type frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput = {
+  create?: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput> | Prisma.frage_vorlagenCreateWithoutReviewed_byInput[] | Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput[]
+  connectOrCreate?: Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput | Prisma.frage_vorlagenCreateOrConnectWithoutReviewed_byInput[]
+  upsert?: Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutReviewed_byInput | Prisma.frage_vorlagenUpsertWithWhereUniqueWithoutReviewed_byInput[]
+  createMany?: Prisma.frage_vorlagenCreateManyReviewed_byInputEnvelope
+  set?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  disconnect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  delete?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  connect?: Prisma.frage_vorlagenWhereUniqueInput | Prisma.frage_vorlagenWhereUniqueInput[]
+  update?: Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutReviewed_byInput | Prisma.frage_vorlagenUpdateWithWhereUniqueWithoutReviewed_byInput[]
+  updateMany?: Prisma.frage_vorlagenUpdateManyWithWhereWithoutReviewed_byInput | Prisma.frage_vorlagenUpdateManyWithWhereWithoutReviewed_byInput[]
+  deleteMany?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+}
+
 export type frage_vorlagenCreateWithoutFragenInput = {
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenCreateNestedManyWithoutSource_vorlageInput
+  source_frage?: Prisma.fragenCreateNestedOneWithoutErzeugte_vorlagenInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_fragevorlagenInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutBewertete_fragevorlagenInput
 }
 
 export type frage_vorlagenUncheckedCreateWithoutFragenInput = {
   vorlage_id?: number
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutSource_vorlageInput
 }
 
 export type frage_vorlagenCreateOrConnectWithoutFragenInput = {
   where: Prisma.frage_vorlagenWhereUniqueInput
   create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutFragenInput, Prisma.frage_vorlagenUncheckedCreateWithoutFragenInput>
+}
+
+export type frage_vorlagenCreateWithoutAngewendete_fragenInput = {
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenCreateNestedManyWithoutVorlageInput
+  source_frage?: Prisma.fragenCreateNestedOneWithoutErzeugte_vorlagenInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_fragevorlagenInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutBewertete_fragevorlagenInput
+}
+
+export type frage_vorlagenUncheckedCreateWithoutAngewendete_fragenInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutVorlageInput
+}
+
+export type frage_vorlagenCreateOrConnectWithoutAngewendete_fragenInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUncheckedCreateWithoutAngewendete_fragenInput>
+}
+
+export type frage_vorlagenCreateWithoutSource_frageInput = {
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenCreateNestedManyWithoutSource_vorlageInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_fragevorlagenInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutBewertete_fragevorlagenInput
+}
+
+export type frage_vorlagenUncheckedCreateWithoutSource_frageInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutSource_vorlageInput
+}
+
+export type frage_vorlagenCreateOrConnectWithoutSource_frageInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput>
+}
+
+export type frage_vorlagenCreateManySource_frageInputEnvelope = {
+  data: Prisma.frage_vorlagenCreateManySource_frageInput | Prisma.frage_vorlagenCreateManySource_frageInput[]
+  skipDuplicates?: boolean
 }
 
 export type frage_vorlagenUpsertWithoutFragenInput = {
@@ -436,35 +1012,180 @@ export type frage_vorlagenUpdateToOneWithWhereWithoutFragenInput = {
 export type frage_vorlagenUpdateWithoutFragenInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUpdateManyWithoutSource_vorlageNestedInput
+  source_frage?: Prisma.fragenUpdateOneWithoutErzeugte_vorlagenNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_fragevorlagenNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutBewertete_fragevorlagenNestedInput
 }
 
 export type frage_vorlagenUncheckedUpdateWithoutFragenInput = {
   vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUncheckedUpdateManyWithoutSource_vorlageNestedInput
+}
+
+export type frage_vorlagenUpsertWithoutAngewendete_fragenInput = {
+  update: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUncheckedUpdateWithoutAngewendete_fragenInput>
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUncheckedCreateWithoutAngewendete_fragenInput>
+  where?: Prisma.frage_vorlagenWhereInput
+}
+
+export type frage_vorlagenUpdateToOneWithWhereWithoutAngewendete_fragenInput = {
+  where?: Prisma.frage_vorlagenWhereInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutAngewendete_fragenInput, Prisma.frage_vorlagenUncheckedUpdateWithoutAngewendete_fragenInput>
+}
+
+export type frage_vorlagenUpdateWithoutAngewendete_fragenInput = {
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUpdateManyWithoutVorlageNestedInput
+  source_frage?: Prisma.fragenUpdateOneWithoutErzeugte_vorlagenNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_fragevorlagenNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutBewertete_fragevorlagenNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateWithoutAngewendete_fragenInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUncheckedUpdateManyWithoutVorlageNestedInput
+}
+
+export type frage_vorlagenUpsertWithWhereUniqueWithoutSource_frageInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  update: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedUpdateWithoutSource_frageInput>
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedCreateWithoutSource_frageInput>
+}
+
+export type frage_vorlagenUpdateWithWhereUniqueWithoutSource_frageInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutSource_frageInput, Prisma.frage_vorlagenUncheckedUpdateWithoutSource_frageInput>
+}
+
+export type frage_vorlagenUpdateManyWithWhereWithoutSource_frageInput = {
+  where: Prisma.frage_vorlagenScalarWhereInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateManyMutationInput, Prisma.frage_vorlagenUncheckedUpdateManyWithoutSource_frageInput>
+}
+
+export type frage_vorlagenScalarWhereInput = {
+  AND?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+  OR?: Prisma.frage_vorlagenScalarWhereInput[]
+  NOT?: Prisma.frage_vorlagenScalarWhereInput | Prisma.frage_vorlagenScalarWhereInput[]
+  vorlage_id?: Prisma.IntFilter<"frage_vorlagen"> | number
+  code?: Prisma.StringFilter<"frage_vorlagen"> | string
+  name?: Prisma.StringFilter<"frage_vorlagen"> | string
+  beschreibung?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  slide_typ?: Prisma.StringFilter<"frage_vorlagen"> | string
+  ist_aktiv?: Prisma.BoolFilter<"frage_vorlagen"> | boolean
+  art?: Prisma.EnumQuestionTemplateKindFilter<"frage_vorlagen"> | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFilter<"frage_vorlagen"> | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  konfiguration_json?: Prisma.JsonNullableFilter<"frage_vorlagen">
+  source_fragen_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  created_by_user_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  reviewed_by_user_id?: Prisma.IntNullableFilter<"frage_vorlagen"> | number | null
+  review_feedback?: Prisma.StringNullableFilter<"frage_vorlagen"> | string | null
+  created_at?: Prisma.DateTimeFilter<"frage_vorlagen"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"frage_vorlagen"> | Date | string
+  reviewed_at?: Prisma.DateTimeNullableFilter<"frage_vorlagen"> | Date | string | null
 }
 
 export type frage_vorlagenCreateWithoutAntwortfelderInput = {
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
   fragen?: Prisma.fragenCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenCreateNestedManyWithoutSource_vorlageInput
+  source_frage?: Prisma.fragenCreateNestedOneWithoutErzeugte_vorlagenInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_fragevorlagenInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutBewertete_fragevorlagenInput
 }
 
 export type frage_vorlagenUncheckedCreateWithoutAntwortfelderInput = {
   vorlage_id?: number
   code: string
   name: string
+  beschreibung?: string | null
   slide_typ: string
   ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
   fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutSource_vorlageInput
 }
 
 export type frage_vorlagenCreateOrConnectWithoutAntwortfelderInput = {
@@ -486,18 +1207,425 @@ export type frage_vorlagenUpdateToOneWithWhereWithoutAntwortfelderInput = {
 export type frage_vorlagenUpdateWithoutAntwortfelderInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fragen?: Prisma.fragenUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUpdateManyWithoutSource_vorlageNestedInput
+  source_frage?: Prisma.fragenUpdateOneWithoutErzeugte_vorlagenNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_fragevorlagenNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutBewertete_fragevorlagenNestedInput
 }
 
 export type frage_vorlagenUncheckedUpdateWithoutAntwortfelderInput = {
   vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
   ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fragen?: Prisma.fragenUncheckedUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUncheckedUpdateManyWithoutSource_vorlageNestedInput
+}
+
+export type frage_vorlagenCreateWithoutCreated_byInput = {
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenCreateNestedManyWithoutSource_vorlageInput
+  source_frage?: Prisma.fragenCreateNestedOneWithoutErzeugte_vorlagenInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutBewertete_fragevorlagenInput
+}
+
+export type frage_vorlagenUncheckedCreateWithoutCreated_byInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutSource_vorlageInput
+}
+
+export type frage_vorlagenCreateOrConnectWithoutCreated_byInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput>
+}
+
+export type frage_vorlagenCreateManyCreated_byInputEnvelope = {
+  data: Prisma.frage_vorlagenCreateManyCreated_byInput | Prisma.frage_vorlagenCreateManyCreated_byInput[]
+  skipDuplicates?: boolean
+}
+
+export type frage_vorlagenCreateWithoutReviewed_byInput = {
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenCreateNestedManyWithoutSource_vorlageInput
+  source_frage?: Prisma.fragenCreateNestedOneWithoutErzeugte_vorlagenInput
+  created_by?: Prisma.usersCreateNestedOneWithoutErstellte_fragevorlagenInput
+}
+
+export type frage_vorlagenUncheckedCreateWithoutReviewed_byInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedCreateNestedManyWithoutVorlageInput
+  fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutVorlageInput
+  angewendete_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutSource_vorlageInput
+}
+
+export type frage_vorlagenCreateOrConnectWithoutReviewed_byInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput>
+}
+
+export type frage_vorlagenCreateManyReviewed_byInputEnvelope = {
+  data: Prisma.frage_vorlagenCreateManyReviewed_byInput | Prisma.frage_vorlagenCreateManyReviewed_byInput[]
+  skipDuplicates?: boolean
+}
+
+export type frage_vorlagenUpsertWithWhereUniqueWithoutCreated_byInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  update: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedUpdateWithoutCreated_byInput>
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutCreated_byInput>
+}
+
+export type frage_vorlagenUpdateWithWhereUniqueWithoutCreated_byInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutCreated_byInput, Prisma.frage_vorlagenUncheckedUpdateWithoutCreated_byInput>
+}
+
+export type frage_vorlagenUpdateManyWithWhereWithoutCreated_byInput = {
+  where: Prisma.frage_vorlagenScalarWhereInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateManyMutationInput, Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byInput>
+}
+
+export type frage_vorlagenUpsertWithWhereUniqueWithoutReviewed_byInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  update: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedUpdateWithoutReviewed_byInput>
+  create: Prisma.XOR<Prisma.frage_vorlagenCreateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedCreateWithoutReviewed_byInput>
+}
+
+export type frage_vorlagenUpdateWithWhereUniqueWithoutReviewed_byInput = {
+  where: Prisma.frage_vorlagenWhereUniqueInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateWithoutReviewed_byInput, Prisma.frage_vorlagenUncheckedUpdateWithoutReviewed_byInput>
+}
+
+export type frage_vorlagenUpdateManyWithWhereWithoutReviewed_byInput = {
+  where: Prisma.frage_vorlagenScalarWhereInput
+  data: Prisma.XOR<Prisma.frage_vorlagenUpdateManyMutationInput, Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byInput>
+}
+
+export type frage_vorlagenCreateManySource_frageInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_by_user_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+}
+
+export type frage_vorlagenUpdateWithoutSource_frageInput = {
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUpdateManyWithoutSource_vorlageNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_fragevorlagenNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutBewertete_fragevorlagenNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateWithoutSource_frageInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUncheckedUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUncheckedUpdateManyWithoutSource_vorlageNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateManyWithoutSource_frageInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type frage_vorlagenCreateManyCreated_byInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  reviewed_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+}
+
+export type frage_vorlagenCreateManyReviewed_byInput = {
+  vorlage_id?: number
+  code: string
+  name: string
+  beschreibung?: string | null
+  slide_typ: string
+  ist_aktiv?: boolean
+  art?: $Enums.QuestionTemplateKind
+  status?: $Enums.QuestionTemplateStatus
+  basis_code?: string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: number | null
+  created_by_user_id?: number | null
+  review_feedback?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  reviewed_at?: Date | string | null
+}
+
+export type frage_vorlagenUpdateWithoutCreated_byInput = {
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUpdateManyWithoutSource_vorlageNestedInput
+  source_frage?: Prisma.fragenUpdateOneWithoutErzeugte_vorlagenNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutBewertete_fragevorlagenNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateWithoutCreated_byInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUncheckedUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUncheckedUpdateManyWithoutSource_vorlageNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateManyWithoutCreated_byInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type frage_vorlagenUpdateWithoutReviewed_byInput = {
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUpdateManyWithoutSource_vorlageNestedInput
+  source_frage?: Prisma.fragenUpdateOneWithoutErzeugte_vorlagenNestedInput
+  created_by?: Prisma.usersUpdateOneWithoutErstellte_fragevorlagenNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateWithoutReviewed_byInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  antwortfelder?: Prisma.frage_vorlage_antwortfelderUncheckedUpdateManyWithoutVorlageNestedInput
+  fragen?: Prisma.fragenUncheckedUpdateManyWithoutVorlageNestedInput
+  angewendete_fragen?: Prisma.fragenUncheckedUpdateManyWithoutSource_vorlageNestedInput
+}
+
+export type frage_vorlagenUncheckedUpdateManyWithoutReviewed_byInput = {
+  vorlage_id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slide_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  ist_aktiv?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  art?: Prisma.EnumQuestionTemplateKindFieldUpdateOperationsInput | $Enums.QuestionTemplateKind
+  status?: Prisma.EnumQuestionTemplateStatusFieldUpdateOperationsInput | $Enums.QuestionTemplateStatus
+  basis_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  source_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  review_feedback?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -508,11 +1636,13 @@ export type frage_vorlagenUncheckedUpdateWithoutAntwortfelderInput = {
 export type Frage_vorlagenCountOutputType = {
   antwortfelder: number
   fragen: number
+  angewendete_fragen: number
 }
 
 export type Frage_vorlagenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antwortfelder?: boolean | Frage_vorlagenCountOutputTypeCountAntwortfelderArgs
   fragen?: boolean | Frage_vorlagenCountOutputTypeCountFragenArgs
+  angewendete_fragen?: boolean | Frage_vorlagenCountOutputTypeCountAngewendete_fragenArgs
 }
 
 /**
@@ -539,15 +1669,38 @@ export type Frage_vorlagenCountOutputTypeCountFragenArgs<ExtArgs extends runtime
   where?: Prisma.fragenWhereInput
 }
 
+/**
+ * Frage_vorlagenCountOutputType without action
+ */
+export type Frage_vorlagenCountOutputTypeCountAngewendete_fragenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.fragenWhereInput
+}
+
 
 export type frage_vorlagenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   vorlage_id?: boolean
   code?: boolean
   name?: boolean
+  beschreibung?: boolean
   slide_typ?: boolean
   ist_aktiv?: boolean
+  art?: boolean
+  status?: boolean
+  basis_code?: boolean
+  konfiguration_json?: boolean
+  source_fragen_id?: boolean
+  created_by_user_id?: boolean
+  reviewed_by_user_id?: boolean
+  review_feedback?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  reviewed_at?: boolean
   antwortfelder?: boolean | Prisma.frage_vorlagen$antwortfelderArgs<ExtArgs>
   fragen?: boolean | Prisma.frage_vorlagen$fragenArgs<ExtArgs>
+  angewendete_fragen?: boolean | Prisma.frage_vorlagen$angewendete_fragenArgs<ExtArgs>
+  source_frage?: boolean | Prisma.frage_vorlagen$source_frageArgs<ExtArgs>
+  created_by?: boolean | Prisma.frage_vorlagen$created_byArgs<ExtArgs>
+  reviewed_by?: boolean | Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>
   _count?: boolean | Prisma.Frage_vorlagenCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["frage_vorlagen"]>
 
@@ -555,47 +1708,117 @@ export type frage_vorlagenSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   vorlage_id?: boolean
   code?: boolean
   name?: boolean
+  beschreibung?: boolean
   slide_typ?: boolean
   ist_aktiv?: boolean
+  art?: boolean
+  status?: boolean
+  basis_code?: boolean
+  konfiguration_json?: boolean
+  source_fragen_id?: boolean
+  created_by_user_id?: boolean
+  reviewed_by_user_id?: boolean
+  review_feedback?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  reviewed_at?: boolean
+  source_frage?: boolean | Prisma.frage_vorlagen$source_frageArgs<ExtArgs>
+  created_by?: boolean | Prisma.frage_vorlagen$created_byArgs<ExtArgs>
+  reviewed_by?: boolean | Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>
 }, ExtArgs["result"]["frage_vorlagen"]>
 
 export type frage_vorlagenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   vorlage_id?: boolean
   code?: boolean
   name?: boolean
+  beschreibung?: boolean
   slide_typ?: boolean
   ist_aktiv?: boolean
+  art?: boolean
+  status?: boolean
+  basis_code?: boolean
+  konfiguration_json?: boolean
+  source_fragen_id?: boolean
+  created_by_user_id?: boolean
+  reviewed_by_user_id?: boolean
+  review_feedback?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  reviewed_at?: boolean
+  source_frage?: boolean | Prisma.frage_vorlagen$source_frageArgs<ExtArgs>
+  created_by?: boolean | Prisma.frage_vorlagen$created_byArgs<ExtArgs>
+  reviewed_by?: boolean | Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>
 }, ExtArgs["result"]["frage_vorlagen"]>
 
 export type frage_vorlagenSelectScalar = {
   vorlage_id?: boolean
   code?: boolean
   name?: boolean
+  beschreibung?: boolean
   slide_typ?: boolean
   ist_aktiv?: boolean
+  art?: boolean
+  status?: boolean
+  basis_code?: boolean
+  konfiguration_json?: boolean
+  source_fragen_id?: boolean
+  created_by_user_id?: boolean
+  reviewed_by_user_id?: boolean
+  review_feedback?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  reviewed_at?: boolean
 }
 
-export type frage_vorlagenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"vorlage_id" | "code" | "name" | "slide_typ" | "ist_aktiv", ExtArgs["result"]["frage_vorlagen"]>
+export type frage_vorlagenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"vorlage_id" | "code" | "name" | "beschreibung" | "slide_typ" | "ist_aktiv" | "art" | "status" | "basis_code" | "konfiguration_json" | "source_fragen_id" | "created_by_user_id" | "reviewed_by_user_id" | "review_feedback" | "created_at" | "updated_at" | "reviewed_at", ExtArgs["result"]["frage_vorlagen"]>
 export type frage_vorlagenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antwortfelder?: boolean | Prisma.frage_vorlagen$antwortfelderArgs<ExtArgs>
   fragen?: boolean | Prisma.frage_vorlagen$fragenArgs<ExtArgs>
+  angewendete_fragen?: boolean | Prisma.frage_vorlagen$angewendete_fragenArgs<ExtArgs>
+  source_frage?: boolean | Prisma.frage_vorlagen$source_frageArgs<ExtArgs>
+  created_by?: boolean | Prisma.frage_vorlagen$created_byArgs<ExtArgs>
+  reviewed_by?: boolean | Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>
   _count?: boolean | Prisma.Frage_vorlagenCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type frage_vorlagenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type frage_vorlagenIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type frage_vorlagenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  source_frage?: boolean | Prisma.frage_vorlagen$source_frageArgs<ExtArgs>
+  created_by?: boolean | Prisma.frage_vorlagen$created_byArgs<ExtArgs>
+  reviewed_by?: boolean | Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>
+}
+export type frage_vorlagenIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  source_frage?: boolean | Prisma.frage_vorlagen$source_frageArgs<ExtArgs>
+  created_by?: boolean | Prisma.frage_vorlagen$created_byArgs<ExtArgs>
+  reviewed_by?: boolean | Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>
+}
 
 export type $frage_vorlagenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "frage_vorlagen"
   objects: {
     antwortfelder: Prisma.$frage_vorlage_antwortfelderPayload<ExtArgs>[]
     fragen: Prisma.$fragenPayload<ExtArgs>[]
+    angewendete_fragen: Prisma.$fragenPayload<ExtArgs>[]
+    source_frage: Prisma.$fragenPayload<ExtArgs> | null
+    created_by: Prisma.$usersPayload<ExtArgs> | null
+    reviewed_by: Prisma.$usersPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     vorlage_id: number
     code: string
     name: string
+    beschreibung: string | null
     slide_typ: string
     ist_aktiv: boolean
+    art: $Enums.QuestionTemplateKind
+    status: $Enums.QuestionTemplateStatus
+    basis_code: string | null
+    konfiguration_json: runtime.JsonValue | null
+    source_fragen_id: number | null
+    created_by_user_id: number | null
+    reviewed_by_user_id: number | null
+    review_feedback: string | null
+    created_at: Date
+    updated_at: Date
+    reviewed_at: Date | null
   }, ExtArgs["result"]["frage_vorlagen"]>
   composites: {}
 }
@@ -992,6 +2215,10 @@ export interface Prisma__frage_vorlagenClient<T, Null = never, ExtArgs extends r
   readonly [Symbol.toStringTag]: "PrismaPromise"
   antwortfelder<T extends Prisma.frage_vorlagen$antwortfelderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_vorlagen$antwortfelderArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_vorlage_antwortfelderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   fragen<T extends Prisma.frage_vorlagen$fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_vorlagen$fragenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  angewendete_fragen<T extends Prisma.frage_vorlagen$angewendete_fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_vorlagen$angewendete_fragenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  source_frage<T extends Prisma.frage_vorlagen$source_frageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_vorlagen$source_frageArgs<ExtArgs>>): Prisma.Prisma__fragenClient<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  created_by<T extends Prisma.frage_vorlagen$created_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_vorlagen$created_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  reviewed_by<T extends Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.frage_vorlagen$reviewed_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1024,8 +2251,20 @@ export interface frage_vorlagenFieldRefs {
   readonly vorlage_id: Prisma.FieldRef<"frage_vorlagen", 'Int'>
   readonly code: Prisma.FieldRef<"frage_vorlagen", 'String'>
   readonly name: Prisma.FieldRef<"frage_vorlagen", 'String'>
+  readonly beschreibung: Prisma.FieldRef<"frage_vorlagen", 'String'>
   readonly slide_typ: Prisma.FieldRef<"frage_vorlagen", 'String'>
   readonly ist_aktiv: Prisma.FieldRef<"frage_vorlagen", 'Boolean'>
+  readonly art: Prisma.FieldRef<"frage_vorlagen", 'QuestionTemplateKind'>
+  readonly status: Prisma.FieldRef<"frage_vorlagen", 'QuestionTemplateStatus'>
+  readonly basis_code: Prisma.FieldRef<"frage_vorlagen", 'String'>
+  readonly konfiguration_json: Prisma.FieldRef<"frage_vorlagen", 'Json'>
+  readonly source_fragen_id: Prisma.FieldRef<"frage_vorlagen", 'Int'>
+  readonly created_by_user_id: Prisma.FieldRef<"frage_vorlagen", 'Int'>
+  readonly reviewed_by_user_id: Prisma.FieldRef<"frage_vorlagen", 'Int'>
+  readonly review_feedback: Prisma.FieldRef<"frage_vorlagen", 'String'>
+  readonly created_at: Prisma.FieldRef<"frage_vorlagen", 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<"frage_vorlagen", 'DateTime'>
+  readonly reviewed_at: Prisma.FieldRef<"frage_vorlagen", 'DateTime'>
 }
     
 
@@ -1280,6 +2519,10 @@ export type frage_vorlagenCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    */
   data: Prisma.frage_vorlagenCreateManyInput | Prisma.frage_vorlagenCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.frage_vorlagenIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1350,6 +2593,10 @@ export type frage_vorlagenUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * Limit how many frage_vorlagens to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.frage_vorlagenIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1464,6 +2711,87 @@ export type frage_vorlagen$fragenArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.FragenScalarFieldEnum | Prisma.FragenScalarFieldEnum[]
+}
+
+/**
+ * frage_vorlagen.angewendete_fragen
+ */
+export type frage_vorlagen$angewendete_fragenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the fragen
+   */
+  select?: Prisma.fragenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the fragen
+   */
+  omit?: Prisma.fragenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.fragenInclude<ExtArgs> | null
+  where?: Prisma.fragenWhereInput
+  orderBy?: Prisma.fragenOrderByWithRelationInput | Prisma.fragenOrderByWithRelationInput[]
+  cursor?: Prisma.fragenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FragenScalarFieldEnum | Prisma.FragenScalarFieldEnum[]
+}
+
+/**
+ * frage_vorlagen.source_frage
+ */
+export type frage_vorlagen$source_frageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the fragen
+   */
+  select?: Prisma.fragenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the fragen
+   */
+  omit?: Prisma.fragenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.fragenInclude<ExtArgs> | null
+  where?: Prisma.fragenWhereInput
+}
+
+/**
+ * frage_vorlagen.created_by
+ */
+export type frage_vorlagen$created_byArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
+}
+
+/**
+ * frage_vorlagen.reviewed_by
+ */
+export type frage_vorlagen$reviewed_byArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
 }
 
 /**

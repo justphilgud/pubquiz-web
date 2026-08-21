@@ -180,7 +180,15 @@ type TeamSession = {
   sessionToken: string;
 };
 
-export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStatus; theme: ResolvedQuizTheme }) {
+export default function QuizAntwortClient({
+  daten,
+  theme,
+  calendarSubscriptionUrl,
+}: {
+  daten: AntwortStatus;
+  theme: ResolvedQuizTheme;
+  calendarSubscriptionUrl: string;
+}) {
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
@@ -598,23 +606,6 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       }
       questionRunIdsRef.current[frage.quiz_fragen_id] = nextRunId;
       if (!frage.gespeicherteAntwort) {
-        if (frage.interaction.type === "ORDER") {
-          const original = frage.interaction.items.map(
-            (item) => item.id,
-          );
-          const randomized = [...original].sort(() => Math.random() - 0.5);
-          if (
-            randomized.length > 1 &&
-            randomized.every((id, index) => id === original[index])
-          ) {
-            randomized.push(randomized.shift()!);
-          }
-          geladeneAntworten[frage.quiz_fragen_id] = {
-            antwortText: JSON.stringify(randomized),
-            antwortId: null,
-            antwortfelder: {},
-          };
-        }
         return;
       }
 
@@ -954,12 +945,17 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       className="answer-template min-h-dvh px-4 py-6 text-slate-900 sm:py-8"
     >
       <div className="mx-auto max-w-2xl space-y-6">
-        <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h1 className="break-words text-3xl font-bold">
-            {liveDaten.titel ?? `Quiz ${liveDaten.quiz_id}`}
-          </h1>
+        <section className="answer-surface answer-brand-header rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          {theme.design.stylePreset === "EDITORIAL" && theme.identity.logoUrl && (
+            <img src={theme.identity.logoUrl} alt="LOVD STELP" className="answer-editorial-logo" />
+          )}
+          <div className="answer-brand-copy">
+            <h1 className="break-words text-3xl font-bold">
+              {liveDaten.titel ?? `Quiz ${liveDaten.quiz_id}`}
+            </h1>
 
-          <p className="mt-2 text-slate-600">Antwortformular für Teams</p>
+            <p className="mt-2 text-slate-600">Antwortformular für Teams</p>
+          </div>
         </section>
 
         {meldung && (
@@ -1074,7 +1070,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
               aktuellerBlock &&
               !liveDaten.presentationStatusText)) ? (
             <>
-              <div className="text-sm font-semibold uppercase tracking-wide text-green-600">
+              <div className="answer-kicker text-sm font-semibold uppercase tracking-wide text-green-600">
                 {liveDaten.answerPhase === "QUESTION"
                   ? "Aktuelle Frage"
                   : "Aktuell freigegeben"}
@@ -1086,7 +1082,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
 
               <p
                 role="status"
-                className="mt-3 inline-flex rounded-full border border-slate-300 bg-white px-3 py-1 text-sm font-semibold text-slate-700"
+                className="answer-status mt-3 inline-flex rounded-full border border-slate-300 bg-white px-3 py-1 text-sm font-semibold text-slate-700"
               >
                 {liveDaten.interactionState === "OPEN"
                   ? "Antwort offen"
@@ -1099,7 +1095,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
 
               <div className="mt-6 space-y-5">
                 {liveDaten.fragen.length === 0 && (
-                  <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 font-semibold text-slate-700">
+                  <p className="answer-empty-state rounded-2xl border border-slate-200 bg-slate-50 p-5 font-semibold text-slate-700">
                     Der Fragenblock ist geöffnet. Die erste Frage folgt gleich.
                   </p>
                 )}
@@ -1178,7 +1174,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                       key={frage.quiz_fragen_id}
                       className="answer-question rounded-2xl border border-slate-200 bg-slate-50 p-4"
                     >
-                      <div className="mb-3 text-sm font-semibold text-slate-500">
+                      <div className="answer-question-meta mb-3 text-sm font-semibold text-slate-500">
                         Frage {frageIndex + 1}
                       </div>
 
@@ -1187,7 +1183,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                       </h3>
 
                       {frage.templateId === "pixelbild" && questionPixelState && (
-                        <div className="mt-4 space-y-3 rounded-2xl border-2 border-fuchsia-300 bg-fuchsia-50 p-4 text-slate-900">
+                        <div className="answer-special-panel mt-4 space-y-3 rounded-2xl border-2 border-fuchsia-300 bg-fuchsia-50 p-4 text-slate-900">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <strong>
                               {questionPixelState.state === "REVEALED"
@@ -1252,7 +1248,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
                               getBildUrl(sichtbaresBild!.datei)
                             )
                           }
-                          className="mt-4 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm"
+                          className="answer-media-button mt-4 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm"
                         >
                           Bild anzeigen
                         </button>
@@ -1289,7 +1285,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
 
                       <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
                         {submissionStatus ? (
-                          <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
+                          <p className="answer-submission-status rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
                             {submissionStatus === "SUBMITTED"
                               ? changedSinceSubmission
                                 ? "Ge\u00e4ndert seit letzter Abgabe"
@@ -1355,7 +1351,7 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
               </p>
 
               {currentSubmissionStatus && (
-                <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
+                <p className="answer-submission-status mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
                   {currentSubmissionStatus === "SUBMITTED"
                     ? "Antwort abgegeben"
                     : "Beim Schließen automatisch übernommen"}
@@ -1365,6 +1361,15 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
           )}
         </section>
         )}
+
+        <footer className="pb-2 text-center text-sm">
+          <a
+            href={calendarSubscriptionUrl}
+            className="answer-calendar-link inline-flex min-h-11 items-center rounded-xl px-4 py-2 font-semibold text-slate-600 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-900"
+          >
+            PubQuiz-Kalender abonnieren
+          </a>
+        </footer>
       </div>
 
       {bildModalUrl && (

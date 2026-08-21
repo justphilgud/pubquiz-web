@@ -9,7 +9,11 @@ import {
   requireQuizViewer,
 } from "../../quizAccess.server";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
-import { syncInteractionForPresentation } from "@/app/quiz/interaction/interaction.server";
+import {
+  closeBlockInteractions,
+  syncInteractionForPresentation,
+} from "@/app/quiz/interaction/interaction.server";
+import { getEffectiveQuizSolutionStrategy } from "@/app/quiz/flow/quizFlow";
 import {
   parseQuizBlockPreviewSectionId,
   resolveQuizBlockPreviewTransition,
@@ -210,6 +214,35 @@ export async function setPraesentationSlideIndex(
     phases.blockMutation = performance.now() - phaseStartedAt;
 
     phaseStartedAt = performance.now();
+    if (
+      identity?.kind === "QUESTION" &&
+      identity.phase === "SOLUTION" &&
+      question?.quiz_abschnitt_id
+    ) {
+      const strategySource = await tx.quiz.findUniqueOrThrow({
+        where: { quiz_id: quizId },
+        select: {
+          aufloesungsstrategie: true,
+          quiz_abschnitte: {
+            where: { quiz_abschnitt_id: question.quiz_abschnitt_id },
+            select: { aufloesungsstrategie: true },
+          },
+        },
+      });
+      if (
+        getEffectiveQuizSolutionStrategy(
+          strategySource.aufloesungsstrategie,
+          strategySource.quiz_abschnitte[0]?.aufloesungsstrategie,
+        ) === "END_OF_BLOCK"
+      ) {
+        await closeBlockInteractions(
+          tx,
+          quizId,
+          question.quiz_abschnitt_id,
+          "BLOCK_SOLUTION_REVEALED",
+        );
+      }
+    }
     await syncInteractionForPresentation(tx, { quizId, slideKey });
     phases.interactionMutation = performance.now() - phaseStartedAt;
 

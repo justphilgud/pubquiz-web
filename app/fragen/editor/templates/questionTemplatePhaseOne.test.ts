@@ -87,12 +87,18 @@ test("shared controls cover segmented boolean, sortable order and browser voices
   assert.match(answerRenderer, /SortableTemplateList/);
   assert.match(sortable, /PointerSensor/);
   assert.match(sortable, /KeyboardSensor/);
+  assert.match(sortable, /sortableKeyboardCoordinates/);
+  assert.match(sortable, /activationConstraint: \{ distance: 6 \}/);
   assert.match(sortable, /touch-none/);
   assert.match(voices, /speechSynthesis\.getVoices\(\)/);
   assert.match(voices, /voiceschanged/);
   assert.match(editor, /Passend zur Zielsprache/);
   assert.match(editor, /Weitere Stimmen/);
   assert.match(editor, /voiceId/);
+  assert.match(
+    editor,
+    /previewSpeech\(data\.translation, data\.speed, selectedVoice\)/,
+  );
   assert.match(answerRenderer, /interaction\.unit/);
   assert.match(presentation, /Google-Nutzer/);
   assert.match(presentation, /review\.attributionText/);
@@ -259,12 +265,13 @@ test("estimate keeps closest mode while tolerance evaluation is prepared", () =>
 });
 
 test("translation languages and length use the central validator", () => {
+  const translatedContext = "Ein sehr langer übersetzter Songtext. ".repeat(40);
   const valid = {
     kind: "TRANSLATION_READ_ALOUD" as const,
     originalText: "Hello",
     sourceLanguage: "en",
     targetLanguage: "de",
-    translation: "Hallo",
+    translation: translatedContext,
     voiceProvider: "BROWSER" as const,
     voiceId: "default",
     voiceStyle: "",
@@ -294,10 +301,40 @@ test("translation languages and length use the central validator", () => {
       createPixelQuestionByAnswer: { answer1: false, answer2: false },
       templateData: valid,
     },
-    correctAnswers: [{ text: "Gesuchte Lösung" }],
+    correctAnswers: [{ text: "Baby Got Back" }],
   });
+  assert.equal(runtime.templateData?.kind, "TRANSLATION_READ_ALOUD");
+  assert.equal(runtime.prompt, "Welcher Songtext wurde hier übersetzt?");
+  assert.equal(
+    runtime.templateData?.kind === "TRANSLATION_READ_ALOUD"
+      ? runtime.templateData.translation
+      : null,
+    translatedContext,
+  );
   assert.doesNotMatch(runtime.solutionLines.join(" "), /Hello/);
-  assert.match(runtime.solutionLines.join(" "), /Gesuchte Lösung/);
+  assert.doesNotMatch(runtime.solutionLines.join(" "), /übersetzter Songtext/);
+  assert.deepEqual(runtime.solutionLines, ["Baby Got Back"]);
+});
+
+test("translated reading does not change another special template solution", () => {
+  const runtime = buildQuestionTemplateRuntimeModel({
+    templateId: questionTemplateIds.anagram,
+    questionText: "Welcher Begriff wird gesucht?",
+    templateConfig: {
+      stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 },
+      createPixelQuestionByAnswer: { answer1: false, answer2: false },
+      templateData: {
+        kind: "ANAGRAM",
+        name: "Astronomie",
+        suggestions: [],
+        selectedSolution: "Astronomie",
+        wordCountPreference: "AUTO",
+      },
+    },
+    correctAnswers: [{ text: "Andere gespeicherte Antwort" }],
+  });
+
+  assert.deepEqual(runtime.solutionLines, ["Astronomie"]);
 });
 
 test("Google review links are allow-listed without accepting arbitrary hosts", () => {

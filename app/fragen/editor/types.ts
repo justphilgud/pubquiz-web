@@ -251,6 +251,7 @@ export type QuestionEditorDraft = {
   scope: "GLOBAL" | "EVENT_SERIES";
   eventSeriesIds: number[];
   templateId: string | null;
+  sourceTemplateId?: number | null;
   questionText: string;
   questionMedia: QuestionMediaDraft[];
   generatorRuns?: GeneratorRunDraft[];
@@ -267,6 +268,7 @@ export type QuestionEditorDraft = {
 
   isIncomplete: boolean;
   validUntil: string | null;
+  reviewFrom?: string | null;
   status: QuestionStatus;
   storyElementLinks?: Array<{
     storyElementId: number;
@@ -276,6 +278,8 @@ export type QuestionEditorDraft = {
 
 export type QuestionTemplate = {
   id: string;
+  baseTemplateId?: string | null;
+  sourceTemplateId?: number;
   icon: string;
   enabled: boolean;
   answerMode: QuestionAnswerMode;
@@ -302,7 +306,11 @@ export type QuestionTemplate = {
     fieldLabel?: string;
     text?: string;
     isCorrect?: boolean;
+    additionalInfo?: string;
   }>;
+
+  initialQuestionMedia?: QuestionMediaDraft[];
+  initialTemplateConfig?: QuestionTemplateConfig;
 
   mediaSlots: QuestionMediaSlotConfig[];
   generators: GeneratorId[];
@@ -411,6 +419,8 @@ export type QuestionEditorRecord = {
   createdAt: string;
   updatedAt: string;
   approvedAt: string | null;
+  freshnessReviewedAt: string | null;
+  freshnessReviewedByName: string | null;
   templateName: string | null;
   isArchived: boolean;
   scope: "GLOBAL" | "EVENT_SERIES";
@@ -425,7 +435,8 @@ export type QuestionValidationTarget =
   | "templatePlaceReviewCount"
   | "answers"
   | "categories"
-  | "validUntil";
+  | "validUntil"
+  | "reviewFrom";
 
 export type SaveQuestionPayload = {
   questionId?: number;
@@ -444,7 +455,9 @@ export type SaveQuestionPayload = {
   moderationNotes: string;
   categoryRequest: string;
   validUntil: string | null;
+  reviewFrom?: string | null;
   templateId: string | null;
+  sourceTemplateId: number | null;
   generatorParameters?: GeneratorParametersDraft;
   templateConfig: QuestionTemplateConfig;
   reviewReasonCodes?: ReviewReasonCode[];

@@ -61,6 +61,24 @@ export const QuestionReviewStatus = {
 export type QuestionReviewStatus = (typeof QuestionReviewStatus)[keyof typeof QuestionReviewStatus]
 
 
+export const QuestionTemplateKind = {
+  SYSTEM: 'SYSTEM',
+  DYNAMIC: 'DYNAMIC'
+} as const
+
+export type QuestionTemplateKind = (typeof QuestionTemplateKind)[keyof typeof QuestionTemplateKind]
+
+
+export const QuestionTemplateStatus = {
+  ACTIVE: 'ACTIVE',
+  PENDING: 'PENDING',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type QuestionTemplateStatus = (typeof QuestionTemplateStatus)[keyof typeof QuestionTemplateStatus]
+
+
 export const StoryElementStatus = {
   DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',

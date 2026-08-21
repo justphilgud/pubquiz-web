@@ -104,7 +104,7 @@ test("normalizes legacy configurations and validates all semantic design styles"
   const legacy = structuredClone(defaultPresentationTemplateConfig) as Partial<typeof defaultPresentationTemplateConfig>;
   delete legacy.design;
   assert.equal(parsePresentationTemplateConfig(legacy)?.design.stylePreset, "NEON");
-  for (const style of ["NEON", "CORPORATE", "BIRTHDAY"] as const) {
+  for (const style of ["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL"] as const) {
     assert.equal(validatePresentationTemplateDraft({ ...draft(), config: createPresentationStylePreset(style) }).ok, true);
   }
   const legacyBirthday = createPresentationStylePreset("BIRTHDAY") as unknown as { design: { imagery: { solutionImage?: string | null } } };
@@ -137,6 +137,34 @@ test("presets are structurally distinct and preserve personal imagery when switc
   assert.deepEqual(applyPresentationStylePreset(birthday, "CORPORATE").design.imagery.personalImagePool, birthday.design.imagery.personalImagePool);
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "corporate-reference"));
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "birthday-reference"));
+});
+
+test("LOVD editorial preset is a regular editable generator template with the original logo asset", () => {
+  const editorial = createPresentationStylePreset("EDITORIAL");
+  assert.equal(editorial.design.stylePreset, "EDITORIAL");
+  assert.equal(editorial.design.composition.contentFrame, "OPEN_CANVAS");
+  assert.equal(editorial.design.composition.answerTreatment, "EDITORIAL_ROWS");
+  assert.equal(editorial.tokens.assets.logo, "/branding/lovd/lovd-stelp.png");
+  assert.equal(editorial.tokens.typography.family, "var(--font-plus-jakarta-sans), Arial, sans-serif");
+  assert.equal(editorial.tokens.colors.correct, "#e3b65b");
+  assert.ok(presentationTemplateAssetRolesByStyle.EDITORIAL.some(({ role }) => role === "LOGO"));
+
+  editorial.tokens.colors.primary = "#b94b35";
+  editorial.tokens.typography.family = "var(--font-geist-sans), Arial, sans-serif";
+  const result = validatePresentationTemplateDraft({ ...draft(), config: editorial });
+  assert.equal(result.ok, true);
+  assert.ok(templateRegistry.presentation.some(({ id }) => id === "lovd-ungegoogelt"));
+  assert.ok(templateRegistry.answerForm.some(({ id }) => id === "lovd-ungegoogelt"));
+});
+
+test("legacy template colors derive the missing correct-answer token from warning", () => {
+  const legacy = createPresentationStylePreset("EDITORIAL") as unknown as {
+    tokens: { colors: Record<string, unknown> };
+  };
+  delete legacy.tokens.colors.correct;
+
+  const parsed = parsePresentationTemplateConfig(legacy);
+  assert.equal(parsed?.tokens.colors.correct, parsed?.tokens.colors.warning);
 });
 
 test("style changes own composition and surfaces without creating event personalization", () => {
@@ -630,6 +658,9 @@ test("semantic renderer variants keep corporate treatment and expose the editori
   assert.match(designSystem, /presentation-corporate-header/);
   assert.match(designSystem, /presentation-birthday-header/);
   assert.match(designSystem, /presentation-neon-header/);
+  assert.match(designSystem, /presentation-editorial-header/);
+  assert.match(css, /data-design-style="EDITORIAL"/);
+  assert.match(css, /presentation-editorial-intro-logo/);
   assert.match(designSystem, /Knowledge · People · Progress/);
   assert.match(designSystem, /storybookPageKind/);
   assert.match(designSystem, /data-storybook-people-mode/);
@@ -638,6 +669,47 @@ test("semantic renderer variants keep corporate treatment and expose the editori
   }
   assert.match(css, /data-storybook-variant="SEQUENCE"/);
   assert.doesNotMatch(designSystem, /presentation-album-tape|presentation-album-ring|StorybookPeopleMarks/);
+});
+
+test("LOVD uses one token-driven editorial treatment without visible neon color values", () => {
+  const css = readFileSync("app/globals.css", "utf8");
+  const designSystem = readFileSync("app/rendering/presentation/PresentationDesignSystem.tsx", "utf8");
+  const answerForm = readFileSync("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx", "utf8");
+  const lovdCss = css.slice(css.indexOf("/* LOVD × ungegoogelt:"));
+
+  assert.ok(lovdCss.length > 0);
+  assert.doesNotMatch(lovdCss, /#(?:38e8ff|ff3bd4|ffd83b|00e5ff|ff00aa)/i);
+  for (const semanticHook of [
+    "presentation-question-label",
+    "presentation-solution-label",
+    "presentation-correct-answer-value",
+    "presentation-audio-control",
+    "presentation-flow-countdown",
+    "presentation-flow-ranking-list",
+    "presentation-qr-slide",
+    "presentation-runtime-status",
+    "answer-submission-status",
+    "answer-calendar-link",
+  ]) {
+    assert.match(lovdCss, new RegExp(semanticHook));
+  }
+  for (const token of [
+    "--brand-background",
+    "--brand-surface",
+    "--brand-text",
+    "--brand-text-muted",
+    "--brand-border",
+    "--brand-correct",
+    "--brand-success",
+    "--brand-warning",
+    "--brand-danger",
+  ]) {
+    assert.match(lovdCss, new RegExp(token));
+  }
+  assert.match(designSystem, /className="presentation-editorial-logo"/);
+  assert.match(designSystem, /presentation-editorial-footer[\s\S]+<span>/);
+  assert.match(answerForm, /answer-editorial-logo/);
+  assert.match(answerForm, /answer-brand-header/);
 });
 
 test("template upload is integrated into the shared signed route but requires explicit store confirmation", () => {
@@ -749,7 +821,8 @@ test("AP2 branding has two reset semantics and curated self-hosted font choices"
   assert.match(generator, /Änderungen zurücksetzen/);
   assert.match(generator, /Auf Stil-Standard zurücksetzen/);
   assert.match(generator, /window\.confirm\("Branding wirklich/);
-  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 12);
+  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 13);
+  assert.ok(presentationTemplateOptions.fonts.some(({ label }) => label === "Plus Jakarta Sans"));
   assert.match(layout, /Source_Sans_3/);
   assert.match(layout, /Playfair_Display/);
 });

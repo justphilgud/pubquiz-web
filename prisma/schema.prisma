@@ -44,9 +44,12 @@ model fragen {
   ist_archiviert               Boolean                  @default(false)
   archivierungsgrund           String?
   vorlage_id                   Int?
+  source_vorlage_id            Int?
   antworten                    antworten[]
   antwortfelder                frage_antwortfelder[]
   vorlage                      frage_vorlagen?          @relation(fields: [vorlage_id], references: [vorlage_id])
+  source_vorlage               frage_vorlagen?          @relation("QuestionDynamicTemplate", fields: [source_vorlage_id], references: [vorlage_id], onDelete: SetNull)
+  erzeugte_vorlagen            frage_vorlagen[]         @relation("QuestionTemplateSource")
   fragen_kategorien            fragen_kategorien[]
   medien                       medien[]
   generator_laefe              medien_generator_laefe[]
@@ -64,6 +67,10 @@ model fragen {
   moderationsnotizen           String?
   kategorienwunsch             String?
   gueltig_bis                  DateTime?                @db.Date
+  pruefen_ab                   DateTime?                @db.Date
+  aktualitaet_geprueft_am      DateTime?
+  aktualitaet_geprueft_von_user_id Int?
+  aktualitaet_geprueft_von     users?                   @relation("QuestionFreshnessReviewer", fields: [aktualitaet_geprueft_von_user_id], references: [id], onDelete: SetNull)
   review_status                QuestionReviewStatus     @default(DRAFT)
   submitted_at                 DateTime?
   submitted_by_user_id         Int?
@@ -77,6 +84,9 @@ model fragen {
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
+  @@index([source_vorlage_id], map: "idx_fragen_source_vorlage")
+  @@index([gueltig_bis, ist_archiviert], map: "idx_fragen_gueltig_bis")
+  @@index([pruefen_ab, ist_archiviert], map: "idx_fragen_pruefen_ab")
   @@schema("pubquiz")
 }
 
@@ -654,14 +664,32 @@ model frage_antwortfeld_loesungen {
 }
 
 model frage_vorlagen {
-  vorlage_id    Int                           @id @default(autoincrement())
-  code          String                        @unique
-  name          String
-  slide_typ     String
-  ist_aktiv     Boolean                       @default(true)
-  antwortfelder frage_vorlage_antwortfelder[]
-  fragen        fragen[]
+  vorlage_id          Int                           @id @default(autoincrement())
+  code                String                        @unique
+  name                String
+  beschreibung        String?
+  slide_typ           String
+  ist_aktiv           Boolean                       @default(true)
+  art                 QuestionTemplateKind          @default(SYSTEM)
+  status              QuestionTemplateStatus        @default(ACTIVE)
+  basis_code          String?
+  konfiguration_json  Json?
+  source_fragen_id    Int?
+  created_by_user_id  Int?
+  reviewed_by_user_id Int?
+  review_feedback     String?
+  created_at          DateTime                      @default(now())
+  updated_at          DateTime                      @default(now()) @updatedAt
+  reviewed_at         DateTime?
+  antwortfelder       frage_vorlage_antwortfelder[]
+  fragen              fragen[]
+  angewendete_fragen  fragen[]                      @relation("QuestionDynamicTemplate")
+  source_frage        fragen?                       @relation("QuestionTemplateSource", fields: [source_fragen_id], references: [fragen_id], onDelete: SetNull)
+  created_by          users?                        @relation("QuestionTemplateCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  reviewed_by         users?                        @relation("QuestionTemplateReviewer", fields: [reviewed_by_user_id], references: [id], onDelete: SetNull)
 
+  @@index([art, status, name], map: "idx_frage_vorlagen_art_status_name")
+  @@index([source_fragen_id], map: "idx_frage_vorlagen_source_frage")
   @@schema("pubquiz")
 }
 
@@ -741,6 +769,22 @@ enum QuestionReviewStatus {
   IN_REVIEW
   CHANGES_REQUESTED
   APPROVED
+
+  @@schema("pubquiz")
+}
+
+enum QuestionTemplateKind {
+  SYSTEM
+  DYNAMIC
+
+  @@schema("pubquiz")
+}
+
+enum QuestionTemplateStatus {
+  ACTIVE
+  PENDING
+  REJECTED
+  ARCHIVED
 
   @@schema("pubquiz")
 }
@@ -853,6 +897,9 @@ model users {
   erstellte_story_elemente          story_elemente[]             @relation("StoryElementCreator")
   erstellte_story_revisionen        story_element_revisionen[]   @relation("StoryElementRevisionCreator")
   erstellte_story_verknuepfungen    frage_story_elemente[]       @relation("StoryQuestionLinkCreator")
+  erstellte_fragevorlagen           frage_vorlagen[]             @relation("QuestionTemplateCreator")
+  bewertete_fragevorlagen           frage_vorlagen[]             @relation("QuestionTemplateReviewer")
+  aktualitaet_gepruefte_fragen      fragen[]                      @relation("QuestionFreshnessReviewer")
 
   @@schema("pubquiz")
 }

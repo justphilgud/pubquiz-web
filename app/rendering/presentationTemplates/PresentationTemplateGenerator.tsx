@@ -57,6 +57,7 @@ const colorLabels = {
   text: "Text",
   textMuted: "Sekundärtext",
   border: "Rahmen",
+  correct: "Richtige Antwort",
   success: "Erfolg",
   warning: "Warnung",
   danger: "Fehler",
@@ -91,7 +92,8 @@ function EditorSection({ id, title, summary, children }: {
   );
 }
 
-function StyleSilhouette({ style }: { style: PresentationDesignStyle }) {
+function StyleSilhouette({ style, swatches }: { style: PresentationDesignStyle; swatches: readonly string[] }) {
+  if (style === "EDITORIAL") return <div data-style-silhouette="EDITORIAL" className="flex h-16 flex-col justify-between border p-2" style={{ borderColor: swatches[2], backgroundColor: swatches[0] }}><span className="h-3 w-10" style={{ backgroundColor: swatches[1] }} /><span className="grid gap-1"><i className="h-1.5 w-4/5" style={{ backgroundColor: swatches[1] }} /><i className="h-1 w-2/5" style={{ backgroundColor: swatches[2] }} /></span></div>;
   if (style === "CORPORATE") return <div data-style-silhouette="CORPORATE" className="grid h-16 grid-cols-[1fr_2fr] gap-2 border border-slate-300 bg-slate-100 p-2"><span className="bg-slate-400" /><span className="grid content-center gap-1.5"><i className="h-1.5 w-4/5 bg-slate-800" /><i className="h-1.5 w-full bg-slate-300" /><i className="h-1.5 w-3/5 bg-slate-300" /></span></div>;
   if (style === "BIRTHDAY") return <div data-style-silhouette="BIRTHDAY" className="grid h-16 grid-cols-[.9fr_1.1fr] overflow-hidden border border-stone-300 bg-stone-50 p-2"><span className="flex flex-col justify-between border-r border-stone-300 pr-2"><i className="h-1.5 w-4/5 bg-stone-800" /><i className="h-1 w-2/5 bg-rose-700" /></span><span className="ml-2 bg-stone-300" /></div>;
   return <div data-style-silhouette="NEON" className="relative h-16 overflow-hidden rounded-xl border-4 border-slate-400 bg-slate-950"><span className="absolute -right-4 -top-8 size-20 rounded-full border-4 border-slate-500" /><span className="absolute bottom-2 left-3 h-2 w-3/5 skew-x-[-18deg] bg-white" /><span className="absolute bottom-6 left-3 h-1.5 w-2/5 bg-slate-500" /></div>;
@@ -305,7 +307,7 @@ export function PresentationTemplateGenerator({
                   const selected = draft.config.design.stylePreset === preset.id;
                   return (
                     <button key={preset.id} type="button" data-style-card={preset.id} aria-pressed={selected} onClick={() => applyStyle(preset.id)} className={`rounded-2xl border-2 p-3 text-left transition ${selected ? "border-slate-900 bg-slate-50 ring-2 ring-slate-900/10" : "border-slate-200 hover:border-slate-400"}`}>
-                      <StyleSilhouette style={preset.id} />
+                      <StyleSilhouette style={preset.id} swatches={preset.swatches} />
                       <div className="my-2 flex h-1.5 overflow-hidden rounded-full">{preset.swatches.map((color) => <span key={color} className="flex-1" style={{ background: color }} />)}</div>
                       <strong className="text-sm">{preset.name}</strong>
                       <span className="mt-1 block text-xs text-slate-600">{preset.description}</span>
