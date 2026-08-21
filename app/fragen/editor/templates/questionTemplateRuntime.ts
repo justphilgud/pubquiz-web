@@ -39,6 +39,8 @@ export function formatGooglePlaceRatingSummary(
   return parts.join(" · ");
 }
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// Prompt/context, media/TTS data and canonical solutions have distinct roles.
 export function buildQuestionTemplateRuntimeModel(input: {
   templateId: string | null;
   questionText: string;

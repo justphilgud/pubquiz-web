@@ -137,6 +137,8 @@ function evaluateMultipleChoice(input: BaseAnswerInput): BaseAnswerEvaluation {
   };
 }
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// Exact open-answer grading intentionally performs only trim and de-DE case folding.
 export function normalizeExactOpenAnswer(value: string) {
   return value.trim().toLocaleLowerCase("de-DE");
 }

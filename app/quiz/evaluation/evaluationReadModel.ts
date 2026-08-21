@@ -19,6 +19,8 @@ const persistedStatuses = new Set<EvaluationReadStatus>([
   "REVIEW_REQUIRED",
 ]);
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// An effective submission with pending evaluation is never unanswered.
 export function resolveEvaluationReadState(input: {
   hasEffectiveSubmission: boolean;
   evaluation: EvaluationCompletenessInput | null;

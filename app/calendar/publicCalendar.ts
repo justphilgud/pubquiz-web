@@ -4,6 +4,8 @@ export const PUBLIC_CALENDAR_SUBSCRIBE_PATH = "/calendar/subscribe";
 
 export const PUBLIC_CALENDAR_NAME = "ungegoogelt PubQuiz-Termine";
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// Subscription CTAs use stable webcal feeds, not one-time calendar downloads.
 export function buildCalendarSubscriptionUrl(
   origin: string,
   feedPath: string,

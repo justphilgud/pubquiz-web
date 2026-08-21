@@ -69,6 +69,8 @@ export function createQuizSpecificOrderingAnswerIdOrder(
   return order;
 }
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// Persisted participant IDs must stay separate from the canonical solution order.
 export function resolveQuizSpecificOrderingAnswerIdOrder(
   canonicalAnswerIds: readonly number[],
   storedOrder: readonly number[],

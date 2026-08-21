@@ -9,3 +9,4 @@ Zentrale Module: Authentifizierung, Fragen, Quiz, Teams, Moderation, Präsentati
 ## Vertiefende Dokumente
 
 - [Antwortformulare und Live-Interaction-Architektur](./answer-interaction.md)
+- [Verbindliche Quiz Runtime Contracts](./quiz-runtime-contracts.md)

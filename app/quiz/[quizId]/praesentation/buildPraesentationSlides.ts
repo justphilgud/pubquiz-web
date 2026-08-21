@@ -89,6 +89,8 @@ export type Slide =
     abschnitt: Abschnitt;
   };
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// Slide ordering and block/interaction finalization are separate responsibilities.
 export function buildPraesentationSlides(
   quiz: QuizPraesentationResult,
   options: { includeDisabledFlowItems?: boolean } = {},

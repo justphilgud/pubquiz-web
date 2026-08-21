@@ -5,6 +5,8 @@ function stringField(formData: FormData, name: string) {
   return typeof value === "string" ? value : "";
 }
 
+// Runtime contract: docs/architecture/quiz-runtime-contracts.md
+// Submitted FormData, including an absent checkbox, is the persisted source.
 export function eventSeriesInputFromFormData(
   formData: FormData,
 ): EventSeriesInput {
