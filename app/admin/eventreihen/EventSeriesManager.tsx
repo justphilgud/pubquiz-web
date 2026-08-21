@@ -21,6 +21,7 @@ import type { AssignablePresentationTemplate } from "@/app/rendering/presentatio
 import {
   toRuntimePresentationTemplate,
 } from "@/app/rendering/presentationTemplates/presentationTemplate";
+import { eventSeriesInputFromFormData } from "@/app/eventreihen/eventSeriesForm";
 
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3";
 
@@ -83,15 +84,8 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function submit() {
-    const input = {
-      name: form.name,
-      publicName: form.publicName,
-      description: form.description,
-      internalNote: form.internalNote,
-      isPublic: form.isPublic,
-      defaultPresentationTemplateId: form.defaultPresentationTemplateId,
-    };
+  async function submit(formData: FormData) {
+    const input = eventSeriesInputFromFormData(formData);
     const result = editingId === null
       ? await createEventSeries(input)
       : await updateEventSeries(editingId, input);
@@ -120,18 +114,18 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
         <h2 className="text-xl font-bold">{editingId === null ? "Eventreihe anlegen" : "Eventreihe bearbeiten"}</h2>
         <p className="mt-1 text-sm text-slate-600">Der Slug wird bei der Anlage automatisch erzeugt und bleibt danach stabil.</p>
         <form action={submit} className="mt-5 grid gap-4">
-          <label><span className="mb-1 block text-sm font-semibold">Interner Name *</span><input required maxLength={150} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "event-series-name-error" : undefined} className={inputClass} />{errors.name && <span id="event-series-name-error" className="mt-1 block text-sm text-red-700">{errors.name}</span>}</label>
-          <label><span className="mb-1 block text-sm font-semibold">Öffentlicher Name</span><input maxLength={150} value={form.publicName} onChange={(event) => setForm((current) => ({ ...current, publicName: event.target.value }))} className={inputClass} />{errors.publicName && <span className="mt-1 block text-sm text-red-700">{errors.publicName}</span>}</label>
-          <label><span className="mb-1 block text-sm font-semibold">Beschreibung</span><textarea maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>
+          <label><span className="mb-1 block text-sm font-semibold">Interner Name *</span><input name="name" required maxLength={150} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "event-series-name-error" : undefined} className={inputClass} />{errors.name && <span id="event-series-name-error" className="mt-1 block text-sm text-red-700">{errors.name}</span>}</label>
+          <label><span className="mb-1 block text-sm font-semibold">Öffentlicher Name</span><input name="publicName" maxLength={150} value={form.publicName} onChange={(event) => setForm((current) => ({ ...current, publicName: event.target.value }))} className={inputClass} />{errors.publicName && <span className="mt-1 block text-sm text-red-700">{errors.publicName}</span>}</label>
+          <label><span className="mb-1 block text-sm font-semibold">Beschreibung</span><textarea name="description" maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>
           <details className="rounded-xl border border-slate-200 p-3">
             <summary className="cursor-pointer font-semibold">Weitere Angaben</summary>
-            <label className="mt-3 block"><span className="mb-1 block text-sm font-semibold">Interne Bemerkung</span><textarea maxLength={2000} value={form.internalNote} onChange={(event) => setForm((current) => ({ ...current, internalNote: event.target.value }))} className={`${inputClass} min-h-24`} />{errors.internalNote && <span className="mt-1 block text-sm text-red-700">{errors.internalNote}</span>}</label>
+            <label className="mt-3 block"><span className="mb-1 block text-sm font-semibold">Interne Bemerkung</span><textarea name="internalNote" maxLength={2000} value={form.internalNote} onChange={(event) => setForm((current) => ({ ...current, internalNote: event.target.value }))} className={`${inputClass} min-h-24`} />{errors.internalNote && <span className="mt-1 block text-sm text-red-700">{errors.internalNote}</span>}</label>
           </details>
-          <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 p-3"><input type="checkbox" checked={form.isPublic} onChange={(event) => setForm((current) => ({ ...current, isPublic: event.target.checked }))} /><span><span className="block font-semibold">Öffentlich sichtbar</span><span className="block text-sm text-slate-500">Nur für spätere öffentliche Funktionen vorbereitet.</span></span></label>
+          <label className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 p-3"><input name="isPublic" value="true" type="checkbox" checked={form.isPublic} onChange={(event) => setForm((current) => ({ ...current, isPublic: event.target.checked }))} /><span><span className="block font-semibold">Öffentlich sichtbar</span><span className="block text-sm text-slate-500">Nur für spätere öffentliche Funktionen vorbereitet.</span></span></label>
           <div>
             <label className="block min-w-0">
               <span className="mb-1 block text-sm font-semibold">{messages.fields.defaultPresentation}</span>
-              <select value={form.defaultPresentationTemplateId} onChange={(event) => setForm((current) => ({ ...current, defaultPresentationTemplateId: event.target.value }))} className={inputClass}>
+              <select name="defaultPresentationTemplateId" value={form.defaultPresentationTemplateId} onChange={(event) => setForm((current) => ({ ...current, defaultPresentationTemplateId: event.target.value }))} className={inputClass}>
                 {templateRegistry.presentation.filter(({ selectable }) => selectable).map((template) => <option key={template.id} value={template.id}>{messages.templates[template.labelKey].label}</option>)}
                 {customPresentationTemplates.map((template) => <option key={template.id} value={template.id} disabled={!canAssignPresentationTemplates}>{template.displayName}</option>)}
               </select>

@@ -19,6 +19,7 @@ import { getQuizTemporalStatus } from "@/app/quiz/quizMasterData";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import { persistEventSeriesUpdate } from "./eventSeriesRepository";
 
 async function getTemplateValidationOptions(additionallyAllowed: readonly string[] = []) {
   const { actor } = await requireActor();
@@ -231,20 +232,15 @@ export async function updateEventSeries(
       errors: { name: "Name ist bereits vergeben." },
     };
   }
-  const saved = await prisma.eventreihen.update({
-    where: { eventreihe_id: eventSeriesId },
-    data: buildEventSeriesPersistenceData(validated.value),
-    select: {
-      name: true,
-      oeffentlicher_name: true,
-      beschreibung: true,
-      interne_bemerkung: true,
-      ist_oeffentlich: true,
-      default_presentation_template_id: true,
-    },
-  });
+  const saved = await persistEventSeriesUpdate(
+    prisma.eventreihen,
+    eventSeriesId,
+    validated.value,
+  );
   revalidatePath("/admin/eventreihen");
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`);
+  revalidatePath("/calendar/public.ics");
+  revalidatePath(`/calendar/event-series/${eventSeriesId}.ics`);
   revalidatePath("/quiz");
   return {
     success: true,
