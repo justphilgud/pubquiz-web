@@ -109,6 +109,47 @@ test("pixel text ignores legacy structured fields and remains manually reviewabl
   });
 });
 
+test("an exact normalized open answer is graded correct automatically", () => {
+  const input = {
+    ...defaults,
+    templateId: "standard",
+    effectiveAnswerMode: "OPEN" as const,
+    answerOptions: [{ id: 1, isCorrect: true, text: "7" }],
+  };
+  for (const answerText of ["7", " 7 ", "7.0", "7,0"]) {
+    const result = evaluateBaseAnswer({ ...input, answerText });
+    assert.equal(result.status, "CORRECT");
+    assert.equal(result.basePoints.toString(), "1");
+    assert.equal(result.details.strategy, "EXACT_OPEN_ANSWER");
+  }
+});
+
+test("open answers without an exact match stay review-required", () => {
+  const input = {
+    ...defaults,
+    templateId: "standard",
+    effectiveAnswerMode: "OPEN" as const,
+    answerOptions: [{ id: 1, isCorrect: true, text: "Baby Got Back" }],
+  };
+  for (const answerText of ["Baby Got", "Got Back", "Baby Got Backs", "7"]) {
+    assert.equal(
+      evaluateBaseAnswer({ ...input, answerText }).status,
+      "REVIEW_REQUIRED",
+    );
+  }
+});
+
+test("exact open text comparison ignores only safe trivial text differences", () => {
+  const result = evaluateBaseAnswer({
+    ...defaults,
+    templateId: "standard",
+    effectiveAnswerMode: "OPEN",
+    answerOptions: [{ id: 1, isCorrect: true, text: "Baby Got Back" }],
+    answerText: "  baby   got back  ",
+  });
+  assert.equal(result.status, "CORRECT");
+});
+
 test("multiple choice penalizes wrong selections and selecting all is not full", () => {
   const result = evaluateBaseAnswer({
     ...defaults,

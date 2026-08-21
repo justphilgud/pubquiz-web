@@ -1,4 +1,4 @@
-export const CURRENT_QUIZ_ANSWER_EVALUATION_VERSION = 2;
+export const CURRENT_QUIZ_ANSWER_EVALUATION_VERSION = 3;
 
 export type EvaluationCompletenessInput = {
   auto_basis_punkte: unknown | null;

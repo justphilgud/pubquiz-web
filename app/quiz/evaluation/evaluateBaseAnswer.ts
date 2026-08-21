@@ -137,6 +137,28 @@ function evaluateMultipleChoice(input: BaseAnswerInput): BaseAnswerEvaluation {
   };
 }
 
+function parseExactNumericValue(value: string) {
+  const normalized = value.normalize("NFKC").trim();
+  if (!/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(normalized)) return null;
+  const parsed = Number(normalized.replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function isExactNormalizedOpenAnswer(
+  submitted: string,
+  accepted: string,
+) {
+  const normalizedSubmitted = normalizeEvaluationText(submitted);
+  const normalizedAccepted = normalizeEvaluationText(accepted);
+  if (!normalizedSubmitted || !normalizedAccepted) return false;
+  if (normalizedSubmitted === normalizedAccepted) return true;
+  const submittedNumber = parseExactNumericValue(submitted);
+  const acceptedNumber = parseExactNumericValue(accepted);
+  return submittedNumber !== null &&
+    acceptedNumber !== null &&
+    submittedNumber === acceptedNumber;
+}
+
 export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
 
@@ -171,6 +193,25 @@ export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation
     templateId === questionTemplateIds.pixelImage ||
     templateId === questionTemplateIds.estimate
   ) {
+    const acceptedOpenAnswers = input.answerOptions
+      .filter((answer) => answer.isCorrect && hasText(answer.text))
+      .map((answer) => answer.text!);
+    if (
+      input.effectiveAnswerMode === "OPEN" &&
+      templateId !== questionTemplateIds.pixelImage &&
+      templateId !== questionTemplateIds.estimate &&
+      hasText(input.answerText) &&
+      acceptedOpenAnswers.some((accepted) =>
+        isExactNormalizedOpenAnswer(input.answerText!, accepted)
+      )
+    ) {
+      return {
+        basePoints: new Prisma.Decimal(1),
+        maxPoints: new Prisma.Decimal(1),
+        status: "CORRECT",
+        details: { strategy: "EXACT_OPEN_ANSWER" },
+      };
+    }
     return {
       basePoints: ZERO,
       maxPoints: new Prisma.Decimal(1),
