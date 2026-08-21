@@ -90,6 +90,7 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
     "presentation-question-label",
     "presentation-solution-label",
     "presentation-solution-answer",
+    "presentation-correct-answer-value",
     "presentation-audio-control",
     "presentation-media-play-mark",
     "presentation-estimation-slide",
@@ -101,6 +102,8 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
   ]) {
     assert.match(rendererSource, new RegExp(semanticHook));
   }
+  assert.match(rendererSource, /data-correct=\{antwort\.ist_richtig\}/);
+  assert.match(rendererSource, /data-correct="true"/);
 });
 
 test("player and moderation preview share the presentation renderer", () => {

@@ -57,6 +57,7 @@ const colorLabels = {
   text: "Text",
   textMuted: "Sekundärtext",
   border: "Rahmen",
+  correct: "Richtige Antwort",
   success: "Erfolg",
   warning: "Warnung",
   danger: "Fehler",

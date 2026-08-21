@@ -146,6 +146,7 @@ export const defaultPresentationTemplateConfig: PresentationTemplateConfig = {
       text: "#ffffff",
       textMuted: "#cbd5e1",
       border: "#38e8ff",
+      correct: "#42ff5e",
       success: "#42ff5e",
       warning: "#ffd83b",
       danger: "#ff4a4a",
@@ -211,8 +212,14 @@ function normalizeDesign(value: unknown, presentationVariant: unknown) {
 
 export function normalizePresentationTemplateConfig(value: unknown): PresentationTemplateConfig | null {
   if (!isRecord(value) || !isRecord(value.surfaces)) return null;
+  const tokens = isRecord(value.tokens) ? value.tokens : null;
+  const colors = tokens && isRecord(tokens.colors) ? tokens.colors : null;
+  const normalizedTokens = colors && colors.correct === undefined && isHexColor(colors.warning)
+    ? { ...tokens, colors: { ...colors, correct: colors.warning } }
+    : value.tokens;
   return {
     ...(value as unknown as Omit<PresentationTemplateConfig, "design">),
+    tokens: normalizedTokens as BrandTokens,
     design: normalizeDesign(value.design, value.surfaces.presentation),
   };
 }
@@ -320,6 +327,7 @@ function validateConfig(value: unknown) {
     "text",
     "textMuted",
     "border",
+    "correct",
     "success",
     "warning",
     "danger",
@@ -428,6 +436,7 @@ export function validatePresentationTemplateDraft(
       ["Haupttext auf Oberfläche", colors.text, colors.surface],
       ["Text auf Primärfarbe", colors.background, colors.primary],
       ["Sekundärtext auf Oberfläche", colors.textMuted, colors.surface],
+      ["Richtige Antwort auf Hintergrund", colors.correct, colors.background],
       ["Erfolg auf Hintergrund", colors.success, colors.background],
       ["Warnung auf Hintergrund", colors.warning, colors.background],
       ["Fehler auf Hintergrund", colors.danger, colors.background],

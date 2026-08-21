@@ -12,6 +12,7 @@ export type BrandColorTokens = {
   text: `#${string}`;
   textMuted: `#${string}`;
   border: `#${string}`;
+  correct: `#${string}`;
   success: `#${string}`;
   warning: `#${string}`;
   danger: `#${string}`;
@@ -20,6 +21,7 @@ export type BrandColorTokens = {
 export const brandFontOptions = [
   { value: "var(--font-geist-sans), Arial, sans-serif", label: "Geist", character: "Neutral und modern" },
   { value: "var(--font-source-sans-3), Arial, sans-serif", label: "Source Sans 3", character: "Offen und funktional" },
+  { value: "var(--font-plus-jakarta-sans), Arial, sans-serif", label: "Plus Jakarta Sans", character: "Modern und menschlich" },
   { value: "var(--font-space-grotesk), Arial, sans-serif", label: "Space Grotesk", character: "Geometrisch" },
   { value: "var(--font-montserrat), Arial, sans-serif", label: "Montserrat", character: "Markant und klar" },
   { value: "var(--font-nunito), Arial, sans-serif", label: "Nunito", character: "Freundlich und rund" },
@@ -264,6 +266,7 @@ const presentation = [
         text: "#ffffff",
         textMuted: "#cbd5e1",
         border: "#38e8ff",
+        correct: "#42ff5e",
         success: "#42ff5e",
         warning: "#ffd83b",
         danger: "#ff4a4a",
@@ -292,6 +295,7 @@ const presentation = [
         text: "#f8fafc",
         textMuted: "#94a3b8",
         border: "#475569",
+        correct: "#34d399",
         success: "#34d399",
         warning: "#fbbf24",
         danger: "#fb7185",
@@ -312,7 +316,7 @@ const presentation = [
       typography: { family: "system-ui, sans-serif", displayWeight: 800, bodyWeight: 400 },
       radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
-      colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", success: "#047857", warning: "#a16207", danger: "#b91c1c" },
+      colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", correct: "#047857", success: "#047857", warning: "#a16207", danger: "#b91c1c" },
     },
   },
   {
@@ -326,7 +330,7 @@ const presentation = [
     design: presentationDesigns.BIRTHDAY,
     tokens: {
       ...sharedSizing,
-      colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" },
+      colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", correct: "#3f6b52", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" },
     },
   },
   {
@@ -341,11 +345,11 @@ const presentation = [
     design: presentationDesigns.EDITORIAL,
     tokens: {
       ...sharedSizing,
-      typography: { family: "var(--font-source-sans-3), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
+      typography: { family: "var(--font-plus-jakarta-sans), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
       radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
       assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
-      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
+      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", correct: "#e3b65b", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
     },
   },
 ] as const satisfies readonly PresentationTemplate[];
@@ -372,6 +376,7 @@ const answerForm = [
         text: "#0f172a",
         textMuted: "#475569",
         border: "#cbd5e1",
+        correct: "#047857",
         success: "#047857",
         warning: "#a16207",
         danger: "#b91c1c",
@@ -407,6 +412,7 @@ const answerForm = [
         text: "#111827",
         textMuted: "#475569",
         border: "#94a3b8",
+        correct: "#047857",
         success: "#047857",
         warning: "#92400e",
         danger: "#b91c1c",
@@ -417,13 +423,13 @@ const answerForm = [
     id: "corporate-reference", kind: "ANSWER_FORM", variant: "MINIMAL",
     labelKey: "answerCorporate", category: "MINIMAL", selectable: true,
     preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.CORPORATE,
-    tokens: { ...sharedSizing, typography: { family: "system-ui, sans-serif", displayWeight: 800, bodyWeight: 400 }, radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" }, colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", success: "#047857", warning: "#a16207", danger: "#b91c1c" } },
+    tokens: { ...sharedSizing, typography: { family: "system-ui, sans-serif", displayWeight: 800, bodyWeight: 400 }, radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" }, colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", correct: "#047857", success: "#047857", warning: "#a16207", danger: "#b91c1c" } },
   },
   {
     id: "birthday-reference", kind: "ANSWER_FORM", variant: "BRANDED",
     labelKey: "answerBirthday", category: "BRANDED", selectable: true,
     preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.BIRTHDAY,
-    tokens: { ...sharedSizing, colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" } },
+    tokens: { ...sharedSizing, colors: { primary: "#7b2f45", secondary: "#6b6259", accent: "#b49a6c", background: "#f4f0e8", surface: "#faf8f4", surfaceStrong: "#ece6dc", text: "#282522", textMuted: "#6c655d", border: "#cfc6b9", correct: "#3f6b52", success: "#3f6b52", warning: "#8a652c", danger: "#9b3c43" } },
   },
   {
     id: "lovd-ungegoogelt", kind: "ANSWER_FORM", variant: "MINIMAL",
@@ -431,11 +437,11 @@ const answerForm = [
     preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.EDITORIAL,
     tokens: {
       ...sharedSizing,
-      typography: { family: "var(--font-source-sans-3), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
+      typography: { family: "var(--font-plus-jakarta-sans), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
       radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
       assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
-      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
+      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", correct: "#e3b65b", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
     },
   },
 ] as const satisfies readonly AnswerFormTemplate[];

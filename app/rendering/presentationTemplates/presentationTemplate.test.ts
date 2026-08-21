@@ -145,6 +145,8 @@ test("LOVD editorial preset is a regular editable generator template with the or
   assert.equal(editorial.design.composition.contentFrame, "OPEN_CANVAS");
   assert.equal(editorial.design.composition.answerTreatment, "EDITORIAL_ROWS");
   assert.equal(editorial.tokens.assets.logo, "/branding/lovd/lovd-stelp.png");
+  assert.equal(editorial.tokens.typography.family, "var(--font-plus-jakarta-sans), Arial, sans-serif");
+  assert.equal(editorial.tokens.colors.correct, "#e3b65b");
   assert.ok(presentationTemplateAssetRolesByStyle.EDITORIAL.some(({ role }) => role === "LOGO"));
 
   editorial.tokens.colors.primary = "#b94b35";
@@ -153,6 +155,16 @@ test("LOVD editorial preset is a regular editable generator template with the or
   assert.equal(result.ok, true);
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "lovd-ungegoogelt"));
   assert.ok(templateRegistry.answerForm.some(({ id }) => id === "lovd-ungegoogelt"));
+});
+
+test("legacy template colors derive the missing correct-answer token from warning", () => {
+  const legacy = createPresentationStylePreset("EDITORIAL") as unknown as {
+    tokens: { colors: Record<string, unknown> };
+  };
+  delete legacy.tokens.colors.correct;
+
+  const parsed = parsePresentationTemplateConfig(legacy);
+  assert.equal(parsed?.tokens.colors.correct, parsed?.tokens.colors.warning);
 });
 
 test("style changes own composition and surfaces without creating event personalization", () => {
@@ -670,6 +682,7 @@ test("LOVD uses one token-driven editorial treatment without visible neon color 
   for (const semanticHook of [
     "presentation-question-label",
     "presentation-solution-label",
+    "presentation-correct-answer-value",
     "presentation-audio-control",
     "presentation-flow-countdown",
     "presentation-flow-ranking-list",
@@ -686,6 +699,7 @@ test("LOVD uses one token-driven editorial treatment without visible neon color 
     "--brand-text",
     "--brand-text-muted",
     "--brand-border",
+    "--brand-correct",
     "--brand-success",
     "--brand-warning",
     "--brand-danger",
@@ -807,7 +821,8 @@ test("AP2 branding has two reset semantics and curated self-hosted font choices"
   assert.match(generator, /Änderungen zurücksetzen/);
   assert.match(generator, /Auf Stil-Standard zurücksetzen/);
   assert.match(generator, /window\.confirm\("Branding wirklich/);
-  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 12);
+  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 13);
+  assert.ok(presentationTemplateOptions.fonts.some(({ label }) => label === "Plus Jakarta Sans"));
   assert.match(layout, /Source_Sans_3/);
   assert.match(layout, /Playfair_Display/);
 });

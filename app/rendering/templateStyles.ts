@@ -22,6 +22,7 @@ function tokenVariables(
     "--brand-text": colors.text,
     "--brand-text-muted": colors.textMuted,
     "--brand-border": colors.border,
+    "--brand-correct": colors.correct,
     "--brand-success": colors.success,
     "--brand-warning": colors.warning,
     "--brand-danger": colors.danger,

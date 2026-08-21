@@ -1524,6 +1524,7 @@ button {
   background-color: var(--brand-background);
   background-image: none !important;
   color: var(--brand-text);
+  line-height: 1.5;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-chrome,
@@ -1559,7 +1560,7 @@ button {
   font-size: 0.95rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -1570,7 +1571,7 @@ button {
   font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-editorial-footer span {
@@ -1625,8 +1626,8 @@ button {
 .presentation-template[data-design-style="EDITORIAL"] .presentation-editorial-intro-title {
   color: var(--brand-accent);
   font-size: clamp(2.2rem, 3.5vw, 3.75rem);
-  font-weight: 500;
-  letter-spacing: 0.28em;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   line-height: 1;
 }
 
@@ -1634,7 +1635,7 @@ button {
   color: var(--brand-text);
   font-size: clamp(1rem, 1.4vw, 1.35rem);
   font-weight: 500;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.09em;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-question-card,
@@ -1683,8 +1684,9 @@ button {
   max-width: 21ch;
   font-size: clamp(2.8rem, 4.8vw, 5.75rem) !important;
   font-weight: var(--brand-display-weight) !important;
-  line-height: 1.08 !important;
-  letter-spacing: -0.025em;
+  line-height: 1.1 !important;
+  letter-spacing: -0.018em;
+  overflow-wrap: break-word;
   text-wrap: balance;
 }
 
@@ -1752,18 +1754,18 @@ button {
   color: var(--brand-accent) !important;
   font-size: 0.9rem;
   font-weight: 600 !important;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-solution-label {
-  border: 0 !important;
+  border: 1px solid color-mix(in srgb, var(--brand-correct) 78%, var(--brand-text)) !important;
   border-radius: 0 !important;
-  background: transparent !important;
-  padding: 0 !important;
-  color: var(--brand-text) !important;
-  font-size: 1rem;
-  font-weight: 500 !important;
-  letter-spacing: 0.08em;
+  background: var(--brand-correct) !important;
+  padding: 0.55rem 0.9rem !important;
+  color: var(--brand-surface-strong) !important;
+  font-size: 0.9rem;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-answer-option,
@@ -1780,6 +1782,37 @@ button {
 .presentation-template[data-design-style="EDITORIAL"] .presentation-solution-answer {
   border-inline-start: 2px solid var(--brand-text) !important;
   padding-inline: clamp(1.5rem, 2.5vw, 2.75rem) !important;
+}
+
+.presentation-template[data-design-style="EDITORIAL"] .presentation-solution-option[data-correct="true"] {
+  border-color: var(--brand-correct) !important;
+  border-inline-start: 4px solid var(--brand-correct) !important;
+  background: color-mix(in srgb, var(--brand-correct) 14%, transparent) !important;
+  color: var(--brand-correct) !important;
+}
+
+.presentation-template[data-design-style="EDITORIAL"] .presentation-solution-option[data-correct="true"] span {
+  color: var(--brand-correct) !important;
+}
+
+.presentation-template[data-design-style="EDITORIAL"] .presentation-solution-option[data-correct="false"] {
+  color: var(--brand-text-muted) !important;
+  opacity: 0.72;
+}
+
+.presentation-template[data-design-style="EDITORIAL"] .presentation-solution-answer[data-correct="true"] {
+  border-inline-start: 4px solid var(--brand-correct) !important;
+  background: color-mix(in srgb, var(--brand-correct) 9%, transparent) !important;
+}
+
+.presentation-template[data-design-style="EDITORIAL"] .presentation-correct-answer-value {
+  color: var(--brand-correct) !important;
+  font-weight: var(--brand-display-weight) !important;
+  line-height: 1.12 !important;
+}
+
+.presentation-template[data-design-style="EDITORIAL"] .presentation-correct-answer > div:first-child:not(.presentation-correct-answer-value) {
+  color: var(--brand-text-muted) !important;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-open-question {
@@ -1835,7 +1868,7 @@ button {
 .presentation-template[data-design-style="EDITORIAL"] .presentation-audio-control-label {
   color: var(--brand-text-muted) !important;
   font-weight: 500 !important;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-runtime-status,
@@ -1902,16 +1935,16 @@ button {
 .presentation-template[data-design-style="EDITORIAL"] .presentation-flow-kicker {
   color: var(--brand-accent);
   font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
 }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-flow-slide h2 {
   max-width: 18ch;
   font-size: clamp(3rem, 5.4vw, 6.5rem);
   font-weight: var(--brand-display-weight);
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  line-height: 1.08;
+  letter-spacing: -0.018em;
   text-transform: none;
 }
 
@@ -1995,8 +2028,8 @@ button {
   color: var(--brand-text) !important;
   font-size: clamp(3rem, 5.4vw, 6.5rem) !important;
   font-weight: var(--brand-display-weight) !important;
-  letter-spacing: -0.025em !important;
-  line-height: 1.05 !important;
+  letter-spacing: -0.018em !important;
+  line-height: 1.08 !important;
   text-align: start;
   text-transform: none !important;
 }
@@ -2160,8 +2193,17 @@ button {
 .answer-template[data-design-style="EDITORIAL"] .answer-kicker,
 .answer-template[data-design-style="EDITORIAL"] .answer-question-meta {
   color: var(--brand-accent) !important;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
+}
+
+.answer-template[data-design-style="EDITORIAL"] h1,
+.answer-template[data-design-style="EDITORIAL"] h2,
+.answer-template[data-design-style="EDITORIAL"] h3 {
+  font-weight: var(--brand-display-weight) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.015em;
+  overflow-wrap: break-word;
 }
 
 .answer-template[data-design-style="EDITORIAL"] input:not([type="radio"]),

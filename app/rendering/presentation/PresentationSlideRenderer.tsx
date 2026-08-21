@@ -1203,6 +1203,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
             antworten.map((antwort, index) => (
               <div
                 key={antwort.antwort_id}
+                data-correct={antwort.ist_richtig}
                 className={`presentation-solution-option rounded-3xl border-4 px-6 py-4 text-2xl font-black shadow-[6px_6px_0_#00e5ff] ${antwort.ist_richtig
                   ? "border-emerald-300 bg-emerald-500/25 text-yellow-200"
                   : "border-white/15 bg-black/35 text-white/45"
@@ -1221,9 +1222,10 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
               return (
                 <div
                   key={`${index}-${line}`}
-                  className="presentation-solution-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
+                  data-correct="true"
+                  className="presentation-solution-answer presentation-correct-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]"
                 >
-                  <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
+                  <div className="presentation-correct-answer-value text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
                     {linkedUrl ? (
                       <a
                         href={linkedUrl}
@@ -1241,8 +1243,8 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
 
           {!frage.templateConfig?.templateData && !hatAntwortmoeglichkeiten &&
             richtigeAntworten.map((antwort) => (
-              <div key={antwort.antwort_id} className="presentation-solution-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
-                <div className="text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">{antwort.antwort}</div>
+              <div key={antwort.antwort_id} data-correct="true" className="presentation-solution-answer presentation-correct-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
+                <div className="presentation-correct-answer-value text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">{antwort.antwort}</div>
               </div>
             ))}
 
@@ -1250,13 +1252,14 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
             richtigeAntwortfeldLoesungen.map((feld) => (
               <div
                 key={feld.label}
-                className="presentation-solution-answer rounded-3xl border-4 border-emerald-300 bg-black/45 p-6 shadow-[6px_6px_0_#00e5ff]"
+                data-correct="true"
+                className="presentation-solution-answer presentation-correct-answer rounded-3xl border-4 border-emerald-300 bg-black/45 p-6 shadow-[6px_6px_0_#00e5ff]"
               >
                 <div className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-emerald-300">
                   {feld.label}
                 </div>
 
-                <div className="text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
+                <div className="presentation-correct-answer-value text-4xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-6xl">
                   {feld.loesungen.map((loesung) => loesung.loesung_text).join(" / ")}
                 </div>
               </div>
@@ -1291,7 +1294,7 @@ function renderSchaetzfrageOverlay() {
       </div>
 
       {estimationPhase === "SOLUTION" && (
-        <div className="presentation-estimation-solution mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
+        <div data-correct="true" className="presentation-estimation-solution presentation-correct-answer-value mx-auto mt-6 max-w-4xl rounded-3xl border-4 border-yellow-300 bg-yellow-300 px-8 py-6 text-4xl font-black text-slate-950 shadow-[6px_6px_0_#ff00aa]">
           {schaetzfrage?.richtigeAntwort ?? "Keine Lösung hinterlegt."}
         </div>
       )}

@@ -38,6 +38,7 @@ export type ResolvedQuizTheme = {
     border: string;
   };
   semantic: {
+    correct: string;
     success: string;
     warning: string;
     danger: string;
@@ -118,6 +119,7 @@ export function resolveQuizTheme({
       border: identityTokens.colors.border,
     },
     semantic: {
+      correct: identityTokens.colors.correct,
       success: identityTokens.colors.success,
       warning: identityTokens.colors.warning,
       danger: identityTokens.colors.danger,
@@ -170,6 +172,7 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--quiz-text": theme.colors.text,
     "--quiz-text-muted": theme.colors.textMuted,
     "--quiz-border": theme.colors.border,
+    "--quiz-correct": theme.semantic.correct,
     "--quiz-success": theme.semantic.success,
     "--quiz-warning": theme.semantic.warning,
     "--quiz-danger": theme.semantic.danger,
@@ -193,6 +196,7 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--brand-text": theme.colors.text,
     "--brand-text-muted": theme.colors.textMuted,
     "--brand-border": theme.colors.border,
+    "--brand-correct": theme.semantic.correct,
     "--brand-success": theme.semantic.success,
     "--brand-warning": theme.semantic.warning,
     "--brand-danger": theme.semantic.danger,
