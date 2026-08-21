@@ -185,7 +185,7 @@ test("moderation preview follows the effective mode for question choices", () =>
   assert.match(preview, /frage\.antwort_reihenfolge/);
 });
 
-test("evaluation routes effective open answers to manual review", () => {
+test("evaluation auto-grades only exact effective open answers", () => {
   const actions = readFileSync("app/quiz/actions.ts", "utf8");
   const evaluation = readFileSync(
     "app/quiz/evaluation/evaluateBaseAnswer.ts",
@@ -194,8 +194,9 @@ test("evaluation routes effective open answers to manual review", () => {
 
   assert.match(actions, /recalculateQuizQuestionEvaluation/);
   assert.match(evaluation, /input\.effectiveAnswerMode !== "CLOSED"/);
+  assert.match(evaluation, /strategy: "EXACT_OPEN_ANSWER"/);
   assert.match(evaluation, /status: "REVIEW_REQUIRED"/);
-  assert.match(actions, /richtigeAntwort: richtigeAntworten \|\| offeneMusterloesung/);
+  assert.match(actions, /richtigeAntwort: semantischeRichtigeAntwort \|\| offeneMusterloesung/);
 });
 
 test("migration keeps existing quiz assignments disabled by default", () => {
