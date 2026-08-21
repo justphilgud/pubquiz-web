@@ -103,18 +103,25 @@ export function buildPraesentationSlides(
     (item) => options.includeDisabledFlowItems || item.enabled,
   );
 
-  const appendFlowItems = (
+  const getFlowItems = (
     anchorType: QuizFlowItem["anchorType"],
     anchorKey: string,
-    abschnitt: Abschnitt | null,
-  ) => {
+  ) =>
     flow
       .filter(
         (item) =>
           item.anchorType === anchorType && item.anchorKey === anchorKey,
       )
-      .sort((left, right) => left.order - right.order)
-      .forEach((element) => result.push({ typ: "ablauf", element, abschnitt }));
+      .sort((left, right) => left.order - right.order);
+
+  const appendFlowItems = (
+    anchorType: QuizFlowItem["anchorType"],
+    anchorKey: string,
+    abschnitt: Abschnitt | null,
+  ) => {
+    getFlowItems(anchorType, anchorKey).forEach((element) =>
+      result.push({ typ: "ablauf", element, abschnitt }),
+    );
   };
 
   appendFlowItems("BEFORE_QUIZ", "QUIZ", null);
@@ -151,7 +158,28 @@ export function buildPraesentationSlides(
       const questionIndexById = new Map(
         fragenImBlock.map((frage, index) => [frage.quiz_fragen_id, index + 1]),
       );
+      const roundEndItems = getFlowItems(
+        "ROUND_END",
+        String(abschnitt.quiz_abschnitt_id),
+      );
+      const blockClosingCountdownItems =
+        blockSequence.strategy === "END_OF_BLOCK"
+          ? roundEndItems.filter(
+              (item) => item.type === "BREAK" || item.type === "COUNTDOWN",
+            )
+          : [];
+      let countdownItemsAppended = false;
+      const appendBlockClosingCountdownItems = () => {
+        if (countdownItemsAppended) return;
+        blockClosingCountdownItems.forEach((element) =>
+          result.push({ typ: "ablauf", element, abschnitt }),
+        );
+        countdownItemsAppended = true;
+      };
       for (const entry of blockSequence.entries) {
+        if (entry.kind === "QUESTION_SOLUTION") {
+          appendBlockClosingCountdownItems();
+        }
         if (entry.kind === "CONTENT") {
           result.push({ typ: "ablauf", element: entry.item, abschnitt });
           continue;
@@ -171,12 +199,13 @@ export function buildPraesentationSlides(
             : { typ: "aufloesung", ...shared },
         );
       }
+      appendBlockClosingCountdownItems();
 
-      appendFlowItems(
-        "ROUND_END",
-        String(abschnitt.quiz_abschnitt_id),
-        abschnitt,
-      );
+      roundEndItems
+        .filter((item) => !blockClosingCountdownItems.includes(item))
+        .forEach((element) =>
+          result.push({ typ: "ablauf", element, abschnitt }),
+        );
       continue;
     }
 

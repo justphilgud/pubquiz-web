@@ -39,6 +39,51 @@ function quizFixture(): QuizPraesentationResult {
   };
 }
 
+function setBlockQuestions(
+  quiz: QuizPraesentationResult,
+  blocks: ReadonlyArray<{
+    sectionId: number;
+    questionAssignmentIds: readonly number[];
+  }>,
+) {
+  const sourceQuestion = quiz.fragen[0];
+  quiz.abschnitte = quiz.abschnitte.filter((section) =>
+    blocks.some((block) => block.sectionId === section.quiz_abschnitt_id),
+  );
+  quiz.fragen = blocks.flatMap((block) =>
+    block.questionAssignmentIds.map((questionAssignmentId, index) => ({
+      ...sourceQuestion,
+      quiz_fragen_id: questionAssignmentId,
+      fragen_id: questionAssignmentId,
+      quiz_abschnitt_id: block.sectionId,
+      sortierung: index + 1,
+      frage: `Frage ${questionAssignmentId}`,
+    })),
+  );
+}
+
+function compactBlockSequence(
+  slides: ReturnType<typeof buildPraesentationSlides>,
+) {
+  return slides.flatMap((slide) => {
+    if (!("abschnitt" in slide) || !slide.abschnitt) return [];
+    const sectionId = slide.abschnitt.quiz_abschnitt_id;
+    if (slide.typ === "frage") {
+      return [`${sectionId}:QUESTION:${slide.frage.quiz_fragen_id}`];
+    }
+    if (slide.typ === "aufloesung") {
+      return [`${sectionId}:SOLUTION:${slide.frage.quiz_fragen_id}`];
+    }
+    if (
+      slide.typ === "ablauf" &&
+      (slide.element.type === "BREAK" || slide.element.type === "COUNTDOWN")
+    ) {
+      return [`${sectionId}:COUNTDOWN`];
+    }
+    return [];
+  });
+}
+
 test("paart jede Frage unmittelbar mit ihrer richtigen Auflösung", () => {
   const slides = buildPraesentationSlides(quizFixture());
   const questionSlides = slides.filter((slide) => slide.typ === "frage");
@@ -259,4 +304,104 @@ test("verwendet die redaktionelle Fragenreihenfolge trotz abweichender Flow-Slot
       .map((slide) => slide.frage.quiz_fragen_id),
     [101, 102, 103, 104],
   );
+});
+
+test("places an explicit countdown between collected questions and solutions", () => {
+  const quiz = quizFixture();
+  quiz.aufloesungsstrategie = "END_OF_BLOCK";
+  setBlockQuestions(quiz, [
+    { sectionId: 10, questionAssignmentIds: [101, 102, 103] },
+  ]);
+  quiz.ablaufElemente = [
+    {
+      quiz_ablauf_element_id: 301,
+      typ: "BREAK",
+      anker_typ: "ROUND_END",
+      anker_schluessel: "10",
+      quiz_abschnitt_id: 10,
+      quiz_fragen_id: null,
+      sortierung: 10,
+      ist_sichtbar: false,
+      bezeichnung: null,
+      konfiguration: { version: 1, durationSeconds: 60, showCountdown: true },
+      konfigurations_version: 1,
+      ist_standard: true,
+    },
+    {
+      quiz_ablauf_element_id: 302,
+      typ: "COUNTDOWN",
+      anker_typ: "ROUND_END",
+      anker_schluessel: "10",
+      quiz_abschnitt_id: 10,
+      quiz_fragen_id: null,
+      sortierung: 20,
+      ist_sichtbar: true,
+      bezeichnung: "Antworten abgeben",
+      konfiguration: { version: 1, durationSeconds: 60, showCountdown: true },
+      konfigurations_version: 1,
+      ist_standard: false,
+    },
+  ];
+
+  assert.deepEqual(compactBlockSequence(buildPraesentationSlides(quiz)), [
+    "10:QUESTION:101",
+    "10:QUESTION:102",
+    "10:QUESTION:103",
+    "10:COUNTDOWN",
+    "10:SOLUTION:101",
+    "10:SOLUTION:102",
+    "10:SOLUTION:103",
+  ]);
+});
+
+test("places the standard countdown before the solution in a one-question block", () => {
+  const quiz = quizFixture();
+  quiz.aufloesungsstrategie = "END_OF_BLOCK";
+  setBlockQuestions(quiz, [
+    { sectionId: 10, questionAssignmentIds: [101] },
+  ]);
+
+  assert.deepEqual(compactBlockSequence(buildPraesentationSlides(quiz)), [
+    "10:QUESTION:101",
+    "10:COUNTDOWN",
+    "10:SOLUTION:101",
+  ]);
+});
+
+test("keeps countdown and collected solutions inside their respective blocks", () => {
+  const quiz = quizFixture();
+  quiz.aufloesungsstrategie = "END_OF_BLOCK";
+  setBlockQuestions(quiz, [
+    { sectionId: 10, questionAssignmentIds: [101, 102] },
+    { sectionId: 20, questionAssignmentIds: [201, 202] },
+  ]);
+
+  assert.deepEqual(compactBlockSequence(buildPraesentationSlides(quiz)), [
+    "10:QUESTION:101",
+    "10:QUESTION:102",
+    "10:COUNTDOWN",
+    "10:SOLUTION:101",
+    "10:SOLUTION:102",
+    "20:QUESTION:201",
+    "20:QUESTION:202",
+    "20:COUNTDOWN",
+    "20:SOLUTION:201",
+    "20:SOLUTION:202",
+  ]);
+});
+
+test("keeps the immediate reveal sequence unchanged", () => {
+  const quiz = quizFixture();
+  quiz.aufloesungsstrategie = "AFTER_EACH_QUESTION";
+  setBlockQuestions(quiz, [
+    { sectionId: 10, questionAssignmentIds: [101, 102] },
+  ]);
+
+  assert.deepEqual(compactBlockSequence(buildPraesentationSlides(quiz)), [
+    "10:QUESTION:101",
+    "10:SOLUTION:101",
+    "10:QUESTION:102",
+    "10:SOLUTION:102",
+    "10:COUNTDOWN",
+  ]);
 });
