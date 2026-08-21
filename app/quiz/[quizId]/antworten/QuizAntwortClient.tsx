@@ -599,23 +599,6 @@ export default function QuizAntwortClient({ daten, theme }: { daten: AntwortStat
       }
       questionRunIdsRef.current[frage.quiz_fragen_id] = nextRunId;
       if (!frage.gespeicherteAntwort) {
-        if (frage.interaction.type === "ORDER") {
-          const original = frage.interaction.items.map(
-            (item) => item.id,
-          );
-          const randomized = [...original].sort(() => Math.random() - 0.5);
-          if (
-            randomized.length > 1 &&
-            randomized.every((id, index) => id === original[index])
-          ) {
-            randomized.push(randomized.shift()!);
-          }
-          geladeneAntworten[frage.quiz_fragen_id] = {
-            antwortText: JSON.stringify(randomized),
-            antwortId: null,
-            antwortfelder: {},
-          };
-        }
         return;
       }
 

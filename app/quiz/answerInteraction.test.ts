@@ -137,14 +137,15 @@ test("describes ordering as positional and keeps the stored item identifiers", (
         { id: "second", text: "Danach", explanation: "" },
       ],
     },
+    orderingItemOrder: [1, 0],
   });
 
   assert.deepEqual(interaction, {
     type: "ORDER",
     scoringPolicy: "POSITION",
     items: [
-      { id: "first", text: "Zuerst" },
       { id: "second", text: "Danach" },
+      { id: "first", text: "Zuerst" },
     ],
   });
 });

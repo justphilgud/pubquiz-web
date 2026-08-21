@@ -5,6 +5,7 @@ import { getBerlinDate } from "@/app/lib/berlinDate";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { getQuestionBaseMaximum } from "@/app/quiz/evaluation/questionPointPolicy";
+import { createQuizSpecificOrderingItemOrder } from "@/app/quiz/orderingQuestionOrder";
 
 type QuizQuestionCreateData = Parameters<
   typeof prisma.quiz_fragen.create
@@ -68,17 +69,26 @@ export async function addQuestionToQuiz(
     : false;
 
   const config = frage.template_config_json as QuestionTemplateConfig | null;
+  const orderingItemCount =
+    config?.templateData?.kind === "ORDERING"
+      ? config.templateData.items.length
+      : 0;
+  const suppliedAnswerOrder = Array.isArray(data.antwort_reihenfolge)
+    ? data.antwort_reihenfolge
+    : null;
+  const answerOrder =
+    orderingItemCount > 0 && (!suppliedAnswerOrder || suppliedAnswerOrder.length === 0)
+      ? createQuizSpecificOrderingItemOrder(orderingItemCount)
+      : data.antwort_reihenfolge;
   const assignment = await db.quiz_fragen.create({
     data: {
       ...data,
+      antwort_reihenfolge: answerOrder,
       punkte_basis: getQuestionBaseMaximum({
         templateId: frage.vorlage?.code ?? null,
         correctAnswerCount: frage.antworten.filter((answer) => answer.ist_richtig).length,
         structuredFieldCount: frage.antwortfelder.length,
-        orderingItemCount:
-          config?.templateData?.kind === "ORDERING"
-            ? config.templateData.items.length
-            : 0,
+        orderingItemCount,
       }),
     },
   });

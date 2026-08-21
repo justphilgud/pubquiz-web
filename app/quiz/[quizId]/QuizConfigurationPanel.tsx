@@ -44,7 +44,7 @@ export default function QuizConfigurationPanel({ quizId, initialStrategy }: {
           </Select>
         </label>
         <div className="text-sm text-slate-600">
-          Gilt für alle Fragenblöcke ohne historischen Block-Override.
+          Gilt einheitlich für alle Fragenblöcke dieses Quiz.
         </div>
       </div>
       {message && <p role="status" className="mt-3 text-sm font-semibold text-slate-700">{message}</p>}

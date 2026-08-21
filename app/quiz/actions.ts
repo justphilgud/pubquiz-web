@@ -2450,6 +2450,7 @@ export async function getQuizAntwortStatus(
             originalAnswerMode: answerMode.originalMode,
             effectiveAnswerMode: answerMode.effectiveMode,
             templateData: templateConfig?.templateData,
+            orderingItemOrder: eintrag.antwort_reihenfolge,
             answerFields: eintrag.fragen.antwortfelder.map((field) => ({
               id: field.antwortfeld_id,
               label: field.label,

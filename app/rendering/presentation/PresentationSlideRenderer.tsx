@@ -46,6 +46,7 @@ import {
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { applyQuizSpecificOrderingItemOrder } from "@/app/quiz/orderingQuestionOrder";
 
 type ScoreEntry = {
   teamname: string;
@@ -423,7 +424,6 @@ function renderPunkteBadge(punkteModus?: string | null) {
 function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const frage = slide.frage;
   const templateData = frage.templateConfig?.templateData;
-  const antworten = sortiereAntworten(frage);
   const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
   const layoutVariant = frage.presentationLayouts.question.variant;
   const allPixelImageMedia = frage.templateId === "pixelbild" && layoutVariant === "REVEAL_SEQUENCE"
@@ -535,12 +535,16 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   if (templateData?.kind === "ORDERING") {
+    const orderingItems = applyQuizSpecificOrderingItemOrder(
+      templateData.items,
+      frage.antwort_reihenfolge,
+    );
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
         {hatAntwortmoeglichkeiten && (
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {antworten.map((answer) => <div key={answer.antwort_id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{answer.antwort}</div>)}
+            {orderingItems.map((item) => <div key={item.id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{item.text}</div>)}
           </div>
         )}
       </div>

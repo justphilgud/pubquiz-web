@@ -1492,6 +1492,17 @@ button {
   border-radius: var(--brand-radius-medium) !important;
 }
 
+.answer-order-row {
+  color: var(--brand-text);
+}
+
+.answer-template .sortable-template-drag-handle,
+.answer-template .answer-order-control {
+  border-color: var(--brand-border) !important;
+  background: var(--brand-surface) !important;
+  color: var(--brand-text) !important;
+}
+
 .answer-success { border-color: var(--brand-success) !important; }
 .answer-warning { border-inline-start: 5px solid var(--brand-warning); }
 .answer-message { color: var(--brand-danger); }

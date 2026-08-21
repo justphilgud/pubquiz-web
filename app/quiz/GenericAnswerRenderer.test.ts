@@ -146,9 +146,12 @@ test("ORDER renders the sortable list in the stored identifier order", () => {
   assert.ok(html.indexOf("Danach") < html.indexOf("Zuerst"));
   assert.match(html, /aria-label="Position 1 verschieben"/);
   assert.match(html, /touch-none/);
+  assert.match(html, /sortable-template-drag-handle/);
+  assert.match(html, /answer-order-row/);
   assert.match(html, /Danach nach oben/);
   assert.match(html, /Zuerst nach unten/);
   assert.equal((html.match(/disabled=""/g) ?? []).length, 2);
+  assert.doesNotMatch(html, />1\.<|>2\.</);
 });
 
 test("ORDER rejects incomplete stored identifiers and restores the configured order", () => {

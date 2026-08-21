@@ -120,6 +120,7 @@ export async function resolveInteractionAssignment(
     originalAnswerMode: answerMode.originalMode,
     effectiveAnswerMode: answerMode.effectiveMode,
     templateData: templateConfig?.templateData,
+    orderingItemOrder: assignment.antwort_reihenfolge,
     answerFields: assignment.fragen.antwortfelder.map((field) => ({
       id: field.antwortfeld_id,
       label: field.label,
@@ -500,10 +501,6 @@ export async function syncInteractionForPresentation(
         config_snapshot: toJson(buildInteractionConfigSnapshot(resolved)),
       },
     });
-  }
-  if (shouldKeepRunOpenUntilBlockClose(revealRun)) {
-    await deactivateRunWithoutFinalizing(db, revealRun.interaction_run_id);
-    return revealRun;
   }
   if (revealRun.state === "OPEN" || revealRun.state === "COUNTDOWN") {
     revealRun = await closeRun(db, revealRun.interaction_run_id, {
