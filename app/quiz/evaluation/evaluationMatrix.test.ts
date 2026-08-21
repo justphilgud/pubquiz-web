@@ -79,10 +79,32 @@ test("calculates transparent per-question metrics", () => {
     wrong: 1,
     partial: 1,
     reviewRequired: 1,
+    pending: 0,
     unanswered: 1,
     successRate: 25,
     averagePoints: 0.375,
   });
+});
+
+test("keeps submitted answers visible while their evaluation is pending", () => {
+  const matrix = buildEvaluationMatrix({
+    answers: [
+      answer({
+        evaluationStatus: "PENDING",
+        answerText: "7",
+        awardedPoints: 0,
+      }),
+    ],
+    ranking: [{ teamname: "Team A", punkte: 0 }],
+  });
+
+  assert.equal(matrix.teams[0].cells[11].status, "PENDING");
+  assert.equal(matrix.teams[0].cells[11].answerText, "7");
+  assert.equal(matrix.questions[0].answered, 1);
+  assert.equal(matrix.questions[0].pending, 1);
+  assert.equal(matrix.questions[0].unanswered, 0);
+  assert.equal(matrix.questions[0].successRate, null);
+  assert.equal(matrix.questions[0].averagePoints, null);
 });
 
 test("excludes polls from the evaluated matrix", () => {

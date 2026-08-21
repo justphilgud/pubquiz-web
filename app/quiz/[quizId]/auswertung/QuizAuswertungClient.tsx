@@ -10,6 +10,10 @@ import {
 import { formatQuizPoints } from "../../formatQuizPoints";
 import TeamQuestionEvaluationMatrix from "../../evaluation/TeamQuestionEvaluationMatrix";
 import type { EvaluationMatrix as EvaluationMatrixData } from "../../evaluation/evaluationMatrix";
+import {
+  DEFAULT_EVALUATION_ANSWER_FILTERS,
+  filterEvaluationAnswers,
+} from "../../evaluation/evaluationAnswerFilter";
 
 type AuswertungsAntwort = {
   quiz_fragen_id: number;
@@ -28,6 +32,7 @@ type AuswertungsAntwort = {
 
   team_antwort_id: number | null;
   istUnbeantwortet: boolean;
+  bewertungAusstehend: boolean;
   teamname: string;
   antwortText: string | null;
   antwortId: number | null;
@@ -47,7 +52,7 @@ type AuswertungsAntwort = {
   autoBasisPunkte: number;
   autoEndpunkte: number;
   vergebenePunkte: number;
-  bewertungsstatus: "UNANSWERED" | "WRONG" | "PARTIAL" | "CORRECT" | "REVIEW_REQUIRED";
+  bewertungsstatus: "PENDING" | "UNANSWERED" | "WRONG" | "PARTIAL" | "CORRECT" | "REVIEW_REQUIRED";
   bewertungsquelle: "AUTO" | "MANUAL" | "LEGACY";
   pixelStage: 1 | 2 | 3 | null;
   pixelIsStopper: boolean;
@@ -90,9 +95,15 @@ export default function QuizAuswertungClient({
     "antworten"
   );
 
-  const [nurOffeneFragen, setNurOffeneFragen] = useState(true);
-  const [nurFalscheAntworten, setNurFalscheAntworten] = useState(true);
-  const [zeigeUnbeantwortete, setZeigeUnbeantwortete] = useState(false);
+  const [nurOffeneFragen, setNurOffeneFragen] = useState<boolean>(
+    DEFAULT_EVALUATION_ANSWER_FILTERS.openQuestionsOnly,
+  );
+  const [nurFalscheAntworten, setNurFalscheAntworten] = useState<boolean>(
+    DEFAULT_EVALUATION_ANSWER_FILTERS.incorrectAnswersOnly,
+  );
+  const [zeigeUnbeantwortete, setZeigeUnbeantwortete] = useState<boolean>(
+    DEFAULT_EVALUATION_ANSWER_FILTERS.includeUnanswered,
+  );
   const [teamIndex, setTeamIndex] = useState<number | null>(null);
   const [punkteOverrides, setPunkteOverrides] = useState<Record<number, string>>({});
   const [rekalkulationLaeuft, setRekalkulationLaeuft] = useState(false);
@@ -115,16 +126,11 @@ export default function QuizAuswertungClient({
   const ausgewaehltesTeam =
     teamIndex === null ? null : teamnamen[teamIndex] ?? null;
 
-  const sichtbareAntworten = antworten.filter((antwort) => {
-    if (ausgewaehltesTeam && antwort.teamname !== ausgewaehltesTeam) {
-      return false;
-    }
-
-    if (nurOffeneFragen && !antwort.istOffeneFrage) return false;
-    if (nurFalscheAntworten && antwort.istAutomatischRichtig) return false;
-    if (!zeigeUnbeantwortete && antwort.istUnbeantwortet) return false;
-
-    return true;
+  const sichtbareAntworten = filterEvaluationAnswers(antworten, {
+    selectedTeam: ausgewaehltesTeam,
+    openQuestionsOnly: nurOffeneFragen,
+    incorrectAnswersOnly: nurFalscheAntworten,
+    includeUnanswered: zeigeUnbeantwortete,
   });
 
   async function handleBewertung(
@@ -482,6 +488,8 @@ export default function QuizAuswertungClient({
                       className={`align-top ${
                         antwort.istUnbeantwortet
                           ? "bg-slate-50"
+                          : antwort.bewertungAusstehend
+                            ? "bg-amber-50"
                           : antwort.istManuellRichtig
                             ? "bg-green-50"
                             : antwort.istManuellFalsch
@@ -571,6 +579,15 @@ export default function QuizAuswertungClient({
                         {antwort.istUnbeantwortet ? (
                           <div className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-500">
                             unbeantwortet
+                          </div>
+                        ) : antwort.bewertungAusstehend ? (
+                          <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">
+                            <div className="font-bold uppercase tracking-wide">
+                              Bewertung wird berechnet
+                            </div>
+                            <div className="mt-1">
+                              Vorläufig vergeben: {formatQuizPoints(antwort.vergebenePunkte)} Punkte
+                            </div>
                           </div>
                         ) : (
                           <div className="flex flex-wrap gap-2">

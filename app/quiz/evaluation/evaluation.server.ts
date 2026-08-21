@@ -78,6 +78,14 @@ function incompleteQuizEvaluationWhere(
         },
       },
     },
+    AND: [
+      {
+        OR: [
+          { interaction_run_id: null },
+          { submissions: { some: {} } },
+        ],
+      },
+    ],
     OR: [
       {
         bewertungs_version: {
@@ -104,12 +112,47 @@ function incompleteQuizEvaluationWhere(
 async function getIncompleteQuizEvaluationGroups(
   quizId: number,
 ) {
-  return prisma.team_antworten.groupBy({
-    by: ["quiz_fragen_id"],
+  const answers = await prisma.team_antworten.findMany({
     where: incompleteQuizEvaluationWhere(quizId),
-    _count: { _all: true },
     orderBy: { quiz_fragen_id: "asc" },
+    select: {
+      quiz_fragen_id: true,
+      interaction_run_id: true,
+      antwort_text: true,
+      antwort_id: true,
+      antwortauswahlen: { select: { antwort_id: true } },
+      antwortfelder: {
+        select: { antwortfeld_id: true, antwort_text: true },
+      },
+      submissions: {
+        select: {
+          team_answer_submission_id: true,
+          interaction_run_id: true,
+          submission_version: true,
+          status: true,
+          interaction_type: true,
+          payload: true,
+        },
+      },
+    },
   });
+  const counts = new Map<number, number>();
+  for (const answer of answers) {
+    const effectiveSubmission = resolveEffectiveSubmission({
+      interactionRunId: answer.interaction_run_id,
+      draft: answer,
+      submissions: answer.submissions,
+    });
+    if (!effectiveSubmission) continue;
+    counts.set(
+      answer.quiz_fragen_id,
+      (counts.get(answer.quiz_fragen_id) ?? 0) + 1,
+    );
+  }
+  return [...counts].map(([quizQuestionId, incompleteAnswers]) => ({
+    quiz_fragen_id: quizQuestionId,
+    _count: { _all: incompleteAnswers },
+  }));
 }
 
 export async function getQuizEvaluationBackfillStatus(

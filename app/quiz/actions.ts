@@ -66,6 +66,7 @@ import {
 } from "./evaluation/evaluation.server";
 import { hasAnswerContentChanged } from "./evaluation/answerContent";
 import { resolveEffectiveSubmission } from "./evaluation/effectiveSubmission";
+import { resolveEvaluationReadState } from "./evaluation/evaluationReadModel";
 import {
   isPartialPointsCapable,
   validateQuestionPointsMode,
@@ -4075,15 +4076,20 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
             .join(" | ")
         : null;
 
-      const istUnbeantwortet =
-        !effectiveSubmission || antwort?.bewertungsstatus === "UNANSWERED";
+      const evaluationReadState = resolveEvaluationReadState({
+        hasEffectiveSubmission: effectiveSubmission !== null,
+        evaluation: antwort ?? null,
+      });
+      const istUnbeantwortet = evaluationReadState.isUnanswered;
 
       const istAutomatischRichtig =
+        !evaluationReadState.isPending &&
         evaluatedAnswer?.bewertungsquelle !== "MANUAL" &&
         evaluatedAnswer?.bewertungsstatus === "CORRECT";
       const istPruefpflichtig =
         istUnbeantwortet ||
-        (evaluatedAnswer?.bewertungsstatus === "REVIEW_REQUIRED" &&
+        (!evaluationReadState.isPending &&
+          evaluatedAnswer?.bewertungsstatus === "REVIEW_REQUIRED" &&
           evaluatedAnswer.bewertungsquelle !== "MANUAL");
 
       return {
@@ -4129,6 +4135,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
 
         istOffeneFrage,
         istUnbeantwortet,
+        bewertungAusstehend: evaluationReadState.isPending,
         istAutomatischRichtig,
         istPruefpflichtig,
         istManuellRichtig: evaluatedAnswer?.ist_manuell_richtig ?? false,
@@ -4139,7 +4146,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         autoBasisPunkte: Number(evaluatedAnswer?.auto_basis_punkte ?? 0),
         autoEndpunkte: Number(evaluatedAnswer?.auto_endpunkte ?? 0),
         vergebenePunkte: Number(evaluatedAnswer?.vergebene_punkte ?? 0),
-        bewertungsstatus: evaluatedAnswer?.bewertungsstatus ?? "UNANSWERED",
+        bewertungsstatus: evaluationReadState.status,
         bewertungsquelle: evaluatedAnswer?.bewertungsquelle ?? "AUTO",
         pixelStage:
           pixelDetails?.stage === 1 || pixelDetails?.stage === 2 || pixelDetails?.stage === 3

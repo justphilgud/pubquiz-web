@@ -198,7 +198,7 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
         <div className="border-b border-slate-200 px-4 py-3">
           <h2 className="text-lg font-black text-slate-900">Fragenkennzahlen</h2>
           <p className="mt-0.5 text-xs text-slate-600">
-            Erfolgsquote = vollständig richtige Antworten geteilt durch alle beantworteten Antworten.
+            Erfolgsquote = vollständig richtige Antworten geteilt durch alle abgeschlossenen Bewertungen.
           </p>
         </div>
         <div className="max-w-full overflow-x-auto">
@@ -213,6 +213,7 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
                 <th className="px-3 py-2">Falsch</th>
                 <th className="px-3 py-2">Teilw.</th>
                 <th className="px-3 py-2">Prüfen</th>
+                <th className="px-3 py-2">Berechn.</th>
                 <th className="px-3 py-2">Offen</th>
                 <th className="px-3 py-2">Erfolg</th>
                 <th className="px-3 py-2">Ø Punkte</th>
@@ -234,6 +235,7 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
                   <td className="px-3 py-2 font-bold text-red-700">{question.wrong}</td>
                   <td className="px-3 py-2 font-bold text-amber-800">{question.partial}</td>
                   <td className="px-3 py-2 font-bold text-blue-800">{question.reviewRequired}</td>
+                  <td className="px-3 py-2 font-bold text-amber-800">{question.pending}</td>
                   <td className="px-3 py-2 text-slate-600">{question.unanswered}</td>
                   <td className="px-3 py-2 font-black text-slate-900">
                     {question.successRate === null ? "–" : `${question.successRate.toLocaleString("de-DE")} %`}

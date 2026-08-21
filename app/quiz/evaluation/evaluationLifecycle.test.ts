@@ -170,8 +170,9 @@ test("evaluation answer loading uses effective submissions and safely represents
   assert.match(implementation, /antwortfelder/);
   assert.match(implementation, /vorlage: \{ select: \{ code: true \} \}/);
   assert.match(implementation, /resolveEffectiveSubmission\(/);
-  assert.match(implementation, /!effectiveSubmission \|\| antwort\?\.bewertungsstatus === "UNANSWERED"/);
-  assert.match(implementation, /bewertungsstatus: evaluatedAnswer\?\.bewertungsstatus \?\? "UNANSWERED"/);
+  assert.match(implementation, /resolveEvaluationReadState\(/);
+  assert.match(implementation, /bewertungAusstehend: evaluationReadState\.isPending/);
+  assert.match(implementation, /bewertungsstatus: evaluationReadState\.status/);
   assert.match(implementation, /vergebenePunkte: Number\(evaluatedAnswer\?\.vergebene_punkte \?\? 0\)/);
 });
 
@@ -221,6 +222,10 @@ test("backfill action authorizes before processing a bounded batch", () => {
     /QUIZ_EVALUATION_BACKFILL_BATCH_QUESTION_LIMIT/,
   );
   assert.match(evaluationService, /preserveManualOverrides: true/);
+  assert.match(
+    evaluationService,
+    /getIncompleteQuizEvaluationGroups[\s\S]*resolveEffectiveSubmission\(/,
+  );
 });
 
 test("parallel backfill starts update existing unique answers instead of inserting", () => {

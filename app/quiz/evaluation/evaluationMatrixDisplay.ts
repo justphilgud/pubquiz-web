@@ -13,6 +13,11 @@ export const evaluationMatrixStatusPresentation: Record<
     className: string;
   }
 > = {
+  PENDING: {
+    label: "Wird berechnet",
+    symbol: "…",
+    className: "border-amber-300 bg-amber-50 text-amber-900",
+  },
   CORRECT: {
     label: "Richtig",
     symbol: "✓",
@@ -46,7 +51,8 @@ export function questionMatchesEvaluationMatrixFilter(
 ) {
   if (filter === "REVIEW") return question.reviewRequired > 0;
   if (filter === "PROBLEMATIC") {
-    return question.wrong + question.partial + question.reviewRequired > 0;
+    return question.wrong + question.partial + question.reviewRequired +
+      question.pending > 0;
   }
   return true;
 }

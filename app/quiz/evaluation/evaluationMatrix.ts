@@ -1,4 +1,5 @@
 export type EvaluationMatrixStatus =
+  | "PENDING"
   | "UNANSWERED"
   | "WRONG"
   | "PARTIAL"
@@ -44,6 +45,7 @@ export type EvaluationMatrixQuestion = {
   wrong: number;
   partial: number;
   reviewRequired: number;
+  pending: number;
   unanswered: number;
   successRate: number | null;
   averagePoints: number | null;
@@ -76,6 +78,7 @@ export function buildEvaluationMatrix(input: {
     | "wrong"
     | "partial"
     | "reviewRequired"
+    | "pending"
     | "unanswered"
     | "successRate"
     | "averagePoints"
@@ -152,6 +155,9 @@ export function buildEvaluationMatrix(input: {
       const answeredCells = cells.filter(
         (cell) => cell.status !== "UNANSWERED",
       );
+      const completedCells = answeredCells.filter(
+        (cell) => cell.status !== "PENDING",
+      );
       const count = (status: EvaluationMatrixStatus) =>
         cells.filter((cell) => cell.status === status).length;
       return {
@@ -161,18 +167,19 @@ export function buildEvaluationMatrix(input: {
         wrong: count("WRONG"),
         partial: count("PARTIAL"),
         reviewRequired: count("REVIEW_REQUIRED"),
+        pending: count("PENDING"),
         unanswered: count("UNANSWERED"),
-        successRate: answeredCells.length === 0
+        successRate: completedCells.length === 0
           ? null
           : roundOneDecimal(
-              (count("CORRECT") / answeredCells.length) * 100,
+              (count("CORRECT") / completedCells.length) * 100,
             ),
-        averagePoints: answeredCells.length === 0
+        averagePoints: completedCells.length === 0
           ? null
-          : answeredCells.reduce(
+          : completedCells.reduce(
               (sum, cell) => sum + cell.awardedPoints,
               0,
-            ) / answeredCells.length,
+            ) / completedCells.length,
       };
     }),
   };
