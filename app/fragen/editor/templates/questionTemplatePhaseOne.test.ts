@@ -299,7 +299,8 @@ test("translation languages and length use the central validator", () => {
     correctAnswers: [{ text: "Gesuchte Lösung" }],
   });
   assert.doesNotMatch(runtime.solutionLines.join(" "), /Hello/);
-  assert.match(runtime.solutionLines.join(" "), /Gesuchte Lösung/);
+  assert.doesNotMatch(runtime.solutionLines.join(" "), /Hallo/);
+  assert.deepEqual(runtime.solutionLines, ["Gesuchte Lösung"]);
 });
 
 test("Google review links are allow-listed without accepting arbitrary hosts", () => {
