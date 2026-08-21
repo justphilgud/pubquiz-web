@@ -1962,7 +1962,7 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
           </div>
           <div>
             <strong>PubQuiz-Termine</strong>
-            <p>Ein Kalender für alle öffentlichen ungegoogelt Quizabende.</p>
+            <p>{config.teamHint ?? "Ein Kalender für alle öffentlichen ungegoogelt Quizabende."}</p>
             <p className="mt-5 break-all text-base opacity-80">{calendarUrl}</p>
           </div>
         </div>

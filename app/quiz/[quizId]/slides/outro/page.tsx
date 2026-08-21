@@ -9,7 +9,7 @@ import {
   FixedSlideField,
   FixedSlideForm,
 } from "../FixedSlideEditor";
-import { saveOutroSlide } from "../fixedSlideActions";
+import { getFixedSlideConfig, saveOutroSlide } from "../fixedSlideActions";
 import BlobUploadField from "../BlobUploadField";
 import {
   isOutroSlideId,
@@ -24,9 +24,10 @@ type Props = {
 
 export default async function OutroEditorPage({ params, searchParams }: Props) {
   const [{ quizId }, query] = await Promise.all([params, searchParams]);
-  const [quiz, slideVisibility] = await Promise.all([
+  const [quiz, slideVisibility, calendarSlide] = await Promise.all([
     getQuizDetails(Number(quizId)),
     getQuizFixedSlideVisibility(Number(quizId)),
+    getFixedSlideConfig(Number(quizId), "calendar"),
   ]);
 
   if (!quiz) {
@@ -101,6 +102,28 @@ export default async function OutroEditorPage({ params, searchParams }: Props) {
               <input type="hidden" name="quizId" value={quizIdValue} />
               <input type="hidden" name="slideId" value="calendar" />
               <FixedSlideEnabledField defaultEnabled={slideVisibility.calendar} />
+              <FixedSlideField label="Überschrift">
+                <input
+                  name="title"
+                  defaultValue={calendarSlide.title ?? "Kein PubQuiz mehr verpassen"}
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                />
+              </FixedSlideField>
+              <FixedSlideField label="Beschreibung / Subline">
+                <textarea
+                  name="body"
+                  rows={5}
+                  defaultValue={calendarSlide.body ?? "Scanne den QR-Code und abonniere unsere nächsten öffentlichen PubQuiz-Termine direkt in deinem Kalender."}
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                />
+              </FixedSlideField>
+              <FixedSlideField label="CTA- / Hinweistext">
+                <input
+                  name="ctaText"
+                  defaultValue={calendarSlide.teamHint ?? "Ein Kalender für alle öffentlichen ungegoogelt Quizabende."}
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                />
+              </FixedSlideField>
               <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-sm text-cyan-950">
                 <p className="font-black">Kein PubQuiz mehr verpassen</p>
                 <p className="mt-2 leading-6">

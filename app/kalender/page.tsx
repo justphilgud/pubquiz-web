@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import {
-  PUBLIC_CALENDAR_FEED_PATH,
   PUBLIC_CALENDAR_NAME,
+  PUBLIC_CALENDAR_SUBSCRIBE_PATH,
 } from "@/app/calendar/publicCalendar";
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export default function PublicCalendarPage() {
             oder einer anderen Kalender-App, die ICS-Abonnements unterstützt.
           </p>
           <a
-            href={PUBLIC_CALENDAR_FEED_PATH}
+            href={PUBLIC_CALENDAR_SUBSCRIBE_PATH}
             className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-cyan-300 px-6 py-3 text-base font-black text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200"
           >
             PubQuiz-Kalender abonnieren
@@ -44,8 +44,9 @@ export default function PublicCalendarPage() {
         </section>
 
         <p className="mt-8 text-sm leading-6 text-slate-400">
-          Tipp: Manche Kalenderprogramme laden die ICS-Datei zunächst herunter.
-          Öffne sie anschließend mit deiner Kalender-App und wähle „Abonnieren“.
+          Dein Kalenderprogramm öffnet den dauerhaft erreichbaren Terminfeed als
+          Abonnement. Änderungen und neue öffentliche Termine werden anschließend
+          automatisch synchronisiert.
         </p>
       </div>
     </main>

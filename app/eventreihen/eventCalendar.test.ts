@@ -6,6 +6,7 @@ import {
   buildPublicQuizCalendar,
   type EventCalendarSeries,
 } from "./eventCalendar";
+import { buildPublicCalendarSubscriptionUrl } from "@/app/calendar/publicCalendar";
 
 const generatedAt = new Date("2026-08-17T10:11:12.000Z");
 
@@ -160,7 +161,7 @@ test("general calendar aggregates only public active series and eligible quizzes
   assert.doesNotMatch(unfolded, /Archiviert|Vergangen|Firmenquiz|Altbestand|Private Firmenreihe/);
 });
 
-test("participant calendar routes and CTAs share one public landing target", () => {
+test("participant calendar routes and CTAs share one persistent subscription flow", () => {
   const constants = readFileSync("app/calendar/publicCalendar.ts", "utf8");
   const landing = readFileSync("app/kalender/page.tsx", "utf8");
   const renderer = readFileSync("app/rendering/presentation/PresentationSlideRenderer.tsx", "utf8");
@@ -169,8 +170,15 @@ test("participant calendar routes and CTAs share one public landing target", () 
 
   assert.match(constants, /PUBLIC_CALENDAR_LANDING_PATH = "\/kalender"/);
   assert.match(constants, /PUBLIC_CALENDAR_FEED_PATH = "\/calendar\/public\.ics"/);
-  assert.match(landing, /PUBLIC_CALENDAR_FEED_PATH/);
+  assert.match(constants, /PUBLIC_CALENDAR_SUBSCRIBE_PATH = "\/calendar\/subscribe"/);
+  assert.equal(
+    buildPublicCalendarSubscriptionUrl("https://quiz.example"),
+    "webcal://quiz.example/calendar/public.ics",
+  );
+  assert.match(landing, /PUBLIC_CALENDAR_SUBSCRIBE_PATH/);
   assert.match(renderer, /PUBLIC_CALENDAR_LANDING_PATH/);
-  assert.match(answerForm, /PUBLIC_CALENDAR_LANDING_PATH/);
+  assert.match(answerForm, /PUBLIC_CALENDAR_SUBSCRIBE_PATH/);
+  assert.match(answerForm, /target="_blank"/);
   assert.match(proxy, /"\/kalender"/);
+  assert.match(proxy, /"\/calendar\/subscribe"/);
 });

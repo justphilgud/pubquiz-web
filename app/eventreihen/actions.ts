@@ -10,6 +10,7 @@ import {
 } from "./eventSeriesAccess.server";
 import {
   generateUniqueEventSeriesSlug,
+  buildEventSeriesPersistenceData,
   eventSeriesArchiveState,
   validateEventSeriesInput,
   type EventSeriesInput,
@@ -184,14 +185,8 @@ export async function createEventSeries(
   );
   const created = await prisma.eventreihen.create({
     data: {
-      name: validated.value.name,
       slug,
-      oeffentlicher_name: validated.value.publicName,
-      beschreibung: validated.value.description,
-      interne_bemerkung: validated.value.internalNote,
-      ist_oeffentlich: validated.value.isPublic,
-      default_presentation_template_id: validated.value.defaultPresentationTemplateId,
-      default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
+      ...buildEventSeriesPersistenceData(validated.value),
     },
     select: { eventreihe_id: true },
   });
@@ -238,15 +233,7 @@ export async function updateEventSeries(
   }
   const saved = await prisma.eventreihen.update({
     where: { eventreihe_id: eventSeriesId },
-    data: {
-      name: validated.value.name,
-      oeffentlicher_name: validated.value.publicName,
-      beschreibung: validated.value.description,
-      interne_bemerkung: validated.value.internalNote,
-      ist_oeffentlich: validated.value.isPublic,
-      default_presentation_template_id: validated.value.defaultPresentationTemplateId,
-      default_answer_form_template_id: validated.value.defaultAnswerFormTemplateId,
-    },
+    data: buildEventSeriesPersistenceData(validated.value),
     select: {
       name: true,
       oeffentlicher_name: true,
