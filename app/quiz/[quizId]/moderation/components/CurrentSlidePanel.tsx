@@ -47,7 +47,12 @@ type Props = {
   pixelState: PixelLiveState | null;
   pollState: PollLiveState | null;
   teamJoinState: {
-    teamNames: string[];
+    teams: {
+      teamId: number;
+      teamName: string;
+      avatarCode: TeamAvatarCode;
+      photoUrl: string | null;
+    }[];
     totalTeams: number;
     remainingTeams: number;
   } | null;

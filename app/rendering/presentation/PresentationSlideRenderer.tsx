@@ -96,7 +96,12 @@ export type PresentationSlideDisplayState = {
   pollState?: PollLiveState | null;
   funnyAnswers?: FunnyAnswerEntry[];
   teamJoinState?: {
-    teamNames: string[];
+    teams: {
+      teamId: number;
+      teamName: string;
+      avatarCode: TeamAvatarCode;
+      photoUrl: string | null;
+    }[];
     totalTeams: number;
     remainingTeams: number;
   } | null;
@@ -1865,14 +1870,48 @@ function renderQrCodeSlide() {
         Jetzt scannen
       </div>
 
-      <div className="presentation-qr-frame rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
-        <div className="presentation-qr-code rounded-[2rem] border-4 border-cyan-300 bg-white p-8 shadow-[8px_8px_0_#ff00aa]">
-          <QRCode
-            value={answerUrl}
-            size={500}
-          />
+      <div className="presentation-legacy-team-join-layout">
+        <div className="presentation-qr-frame rounded-[2rem] border-4 border-cyan-300 bg-white p-5 shadow-[8px_8px_0_#ff00aa]">
+          <div className="presentation-qr-code rounded-[2rem] border-4 border-cyan-300 bg-white p-5 shadow-[8px_8px_0_#ff00aa]">
+            <QRCode
+              value={answerUrl}
+              size={420}
+            />
+          </div>
         </div>
+        {renderTeamJoinRoster()}
       </div>
+    </div>
+  );
+}
+
+function renderTeamJoinRoster() {
+  if (!teamJoinState) return null;
+  return (
+    <div className="presentation-team-join-roster" aria-live="polite">
+      <p className="presentation-team-join-heading">
+        Angemeldete Teams · {teamJoinState.totalTeams}
+      </p>
+      {teamJoinState.teams.length === 0 ? (
+        <p className="presentation-team-join-empty">Noch kein Team angemeldet.</p>
+      ) : (
+        <div className="presentation-team-join-grid" data-team-count={teamJoinState.teams.length}>
+          {teamJoinState.teams.map((team) => (
+            <span key={team.teamId} className="presentation-team-join-chip" title={team.teamName}>
+              <TeamIdentityVisual
+                name={team.teamName}
+                photoUrl={team.photoUrl}
+                avatarCode={team.avatarCode}
+                className="h-9 w-9"
+              />
+              <strong>{team.teamName}</strong>
+            </span>
+          ))}
+        </div>
+      )}
+      {teamJoinState.remainingTeams > 0 && (
+        <p className="presentation-team-join-more">+ {teamJoinState.remainingTeams} weitere</p>
+      )}
     </div>
   );
 }
@@ -2268,13 +2307,7 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
           <div>
             <strong>{answerUrl}</strong>
             {config.teamHint && <p>{config.teamHint}</p>}
-            {teamJoinState && <div className="mt-6" aria-live="polite">
-              <p className="text-lg font-black uppercase tracking-[0.16em]">Angemeldete Teams · {teamJoinState.totalTeams}</p>
-              {teamJoinState.teamNames.length === 0 ? <p className="mt-3 opacity-70">Noch kein Team angemeldet.</p> : <div className="mt-3 grid grid-cols-2 gap-2 xl:grid-cols-3">
-                {teamJoinState.teamNames.map((teamName) => <span key={teamName} className="truncate rounded-xl border border-white/25 bg-black/25 px-3 py-2 text-sm font-bold" title={teamName}>{teamName}</span>)}
-              </div>}
-              {teamJoinState.remainingTeams > 0 && <p className="mt-3 font-black">+ {teamJoinState.remainingTeams} weitere</p>}
-            </div>}
+            {renderTeamJoinRoster()}
           </div>
         </div>
       )}

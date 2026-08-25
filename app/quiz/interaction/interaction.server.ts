@@ -12,6 +12,7 @@ import { repairQuizSpecificOrderingAssignments } from "@/app/quiz/orderingQuesti
 import { isQuizAnswerRunReleasedForWrite } from "@/app/quiz/quizAnswerLiveState";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { prisma } from "@/app/lib/prisma";
+import { mapTeamProfile } from "@/app/teams/teamProfile";
 import {
   isQuizQuestionBlockOpen,
   serializeQuizParticipantLiveRevision,
@@ -1183,7 +1184,17 @@ export async function getQuizLiveSnapshotData(
                 { quiz_team_session_id: "asc" },
               ],
               take: 12,
-              select: { teamname: true },
+              select: {
+                teamname: true,
+                team: {
+                  select: {
+                    team_id: true,
+                    avatar_code: true,
+                    foto_url: true,
+                    foto_upload_gesperrt: true,
+                  },
+                },
+              },
             })
           : Promise.resolve([]),
         pollInteraction
@@ -1337,7 +1348,12 @@ export async function getQuizLiveSnapshotData(
     publicState: run?.state ?? "LOCKED",
     teamJoinState: options.includeTeamJoinState
       ? {
-          teamNames: visibleTeams.map((team) => team.teamname),
+          teams: visibleTeams.map((team) => ({
+            teamId: team.team.team_id,
+            teamName: team.teamname,
+            avatarCode: mapTeamProfile(team.team).avatarCode,
+            photoUrl: team.team.foto_url,
+          })),
           totalTeams: teamCount,
           remainingTeams: Math.max(0, teamCount - visibleTeams.length),
         }

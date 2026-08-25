@@ -70,7 +70,12 @@ export default function QuizPraesentationPlayer({
     [funnyQuestionIds, quiz],
   );
   const [teamJoinState, setTeamJoinState] = useState<{
-    teamNames: string[];
+    teams: {
+      teamId: number;
+      teamName: string;
+      avatarCode: TeamAvatarCode;
+      photoUrl: string | null;
+    }[];
     totalTeams: number;
     remainingTeams: number;
   } | null>(null);

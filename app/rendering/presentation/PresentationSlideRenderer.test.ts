@@ -423,9 +423,61 @@ test("player and moderation preview share the presentation renderer", () => {
 
 test("calendar CTA leaves the team join QR payload and overflow UI intact", () => {
   assert.match(rendererSource, /QRCode value=\{answerUrl\}/);
-  assert.match(rendererSource, /teamJoinState\.teamNames\.map/);
+  assert.match(rendererSource, /teamJoinState\.teams\.map/);
   assert.match(rendererSource, /teamJoinState\.remainingTeams > 0/);
   assert.match(rendererSource, /\+ \{teamJoinState\.remainingTeams\} weitere/);
+});
+
+test("join slide keeps the QR dominant and renders compact identity chips for up to twelve teams", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const slide: Slide = {
+    typ: "ablauf",
+    abschnitt: null,
+    element: {
+      id: "join-test",
+      persistentId: null,
+      type: "QR_CODE",
+      anchorType: "BEFORE_QUIZ",
+      anchorKey: "QUIZ",
+      sectionId: null,
+      order: 1,
+      enabled: true,
+      label: "Mitspielen",
+      config: { version: 1, title: "Jetzt mitspielen", teamHint: "QR-Code scannen" },
+      configVersion: 1,
+      questionAssignmentId: null,
+      isStandard: true,
+    },
+  };
+
+  for (const count of [3, 6, 9, 12]) {
+    const teams = Array.from({ length: count }, (_, index) => ({
+      teamId: index + 1,
+      teamName: `Join Team ${index + 1}`,
+      avatarCode: "teekanne" as const,
+      photoUrl: index === 0 ? "/join-team-photo.jpg" : null,
+    }));
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz: runtime.quiz,
+      slide,
+      slides: [slide],
+      slideIndex: 0,
+      slideLabel: "MITMACHEN",
+      theme: runtime.theme,
+      displayState: {
+        ...displayState,
+        teamJoinState: { teams, totalTeams: count, remainingTeams: 0 },
+      },
+    }));
+
+    assert.match(html, new RegExp(`data-team-count="${count}"`));
+    assert.match(html, /presentation-flow-qr/);
+    assert.match(html, /join-team-photo\.jpg/);
+    for (let index = 1; index <= count; index += 1) {
+      assert.match(html, new RegExp(`Join Team ${index}(?!\\d)`));
+    }
+    assert.equal((html.match(/presentation-team-join-chip/g) ?? []).length, count);
+  }
 });
 
 test("translated reading keeps its TTS payload invisible and renders only the stored solution title", () => {
