@@ -1845,8 +1845,98 @@ button {
   box-shadow: none;
 }
 
+.presentation-media-fallback {
+  border: 1px solid var(--brand-border);
+  border-radius: var(--brand-radius);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--brand-primary) 8%, transparent), transparent 58%),
+    var(--brand-surface-strong);
+  color: var(--brand-text);
+}
+
+.presentation-media-fallback-icon {
+  width: min(22rem, 58%);
+  color: var(--brand-primary);
+  opacity: 0.82;
+  stroke: currentColor;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.presentation-media-fallback-grid {
+  display: grid;
+  width: min(25rem, 68%);
+  aspect-ratio: 4 / 3;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.35rem;
+}
+
+.presentation-media-fallback-grid > span {
+  border: 1px solid color-mix(in srgb, var(--brand-border) 78%, transparent);
+  background: color-mix(in srgb, var(--brand-primary) 24%, var(--brand-surface));
+}
+
+.presentation-media-fallback-grid > span:nth-child(3n),
+.presentation-media-fallback-grid > span:nth-child(7n) {
+  background: color-mix(in srgb, var(--brand-accent) 48%, var(--brand-surface));
+}
+
+.presentation-media-fallback-grid > span:nth-child(5n) {
+  opacity: 0.35;
+}
+
+.presentation-media-fallback-copy,
+.presentation-audio-status-label {
+  color: var(--brand-text-muted);
+}
+
+.presentation-audio-question {
+  text-wrap: balance;
+}
+
+.presentation-audio-status {
+  color: var(--brand-text);
+}
+
+.presentation-audio-waveform > span {
+  width: clamp(0.28rem, 0.62vw, 0.7rem);
+  height: 30%;
+  border-radius: 999px;
+  background: var(--brand-primary);
+  opacity: 0.72;
+}
+
+.presentation-audio-waveform > span:nth-child(3n) {
+  height: 72%;
+}
+
+.presentation-audio-waveform > span:nth-child(4n) {
+  height: 96%;
+  background: var(--brand-accent);
+}
+
+.presentation-audio-waveform > span:nth-child(5n) {
+  height: 52%;
+}
+
+.presentation-audio-status[data-playback-status="play"] .presentation-audio-waveform > span {
+  animation: presentation-audio-wave 900ms ease-in-out infinite alternate;
+  animation-delay: calc(var(--wave-index) * -34ms);
+}
+
+@keyframes presentation-audio-wave {
+  from { transform: scaleY(0.58); }
+  to { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presentation-audio-status[data-playback-status="play"] .presentation-audio-waveform > span {
+    animation: none;
+  }
+}
+
 .presentation-template[data-design-style="EDITORIAL"] .presentation-media-play-mark,
-.presentation-template[data-design-style="EDITORIAL"] .presentation-audio-play-mark,
 .presentation-template[data-design-style="EDITORIAL"] .presentation-start-play-mark {
   display: grid;
   width: 7.5rem;
@@ -1859,8 +1949,7 @@ button {
   font-size: 3rem !important;
 }
 
-.presentation-template[data-design-style="EDITORIAL"] .presentation-audio-control,
-.presentation-template[data-design-style="EDITORIAL"] .presentation-preview-audio {
+.presentation-template[data-design-style="EDITORIAL"] .presentation-audio-control {
   border: 1px solid var(--lovd-rule) !important;
   border-radius: 0 !important;
   background: var(--lovd-panel) !important;

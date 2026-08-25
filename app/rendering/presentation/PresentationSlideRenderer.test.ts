@@ -101,7 +101,9 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
     "presentation-solution-answer",
     "presentation-correct-answer-value",
     "presentation-audio-control",
-    "presentation-media-play-mark",
+    "presentation-media-fallback",
+    "presentation-audio-status",
+    "presentation-audio-waveform",
     "presentation-estimation-slide",
     "presentation-legacy-slide",
     "presentation-countdown-slide",
@@ -113,6 +115,7 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
   }
   assert.match(rendererSource, /data-correct=\{antwort\.ist_richtig\}/);
   assert.match(rendererSource, /data-correct="true"/);
+  assert.doesNotMatch(rendererSource, /PreviewAudioPlayer|presentation-preview-audio|presentation-audio-play-mark/);
 });
 
 test("LOVD rules keep every configured entry in the bounded slide layout", () => {
