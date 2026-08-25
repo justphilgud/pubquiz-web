@@ -196,6 +196,7 @@ export default function QuizAntwortClient({
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
   const [teamProfile, setTeamProfile] = useState<TeamProfile | null>(daten.teamProfile);
+  const [teamProfileInitiallyOpen, setTeamProfileInitiallyOpen] = useState(false);
   const [teamVorschlaege, setTeamVorschlaege] = useState<
     { team_id: number; teamname: string }[]
   >([]);
@@ -731,6 +732,7 @@ export default function QuizAntwortClient({
 
     setSession(result.session);
     setTeamProfile(result.profile);
+    setTeamProfileInitiallyOpen(result.profileOnboarding);
     setTeamname(result.session.teamname);
     setGeneriertesPasswort(result.generiertesPasswort ?? null);
     setTeamVorschlaege([]);
@@ -761,6 +763,7 @@ export default function QuizAntwortClient({
     localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
     setSession(null);
     setTeamProfile(null);
+    setTeamProfileInitiallyOpen(false);
     setTeamname("");
     setTeamPasswort("");
     setGeneriertesPasswort(null);
@@ -1077,11 +1080,13 @@ export default function QuizAntwortClient({
 
         {session && teamProfile && (
           <TeamProfileEditor
-            key={`${session.quiz_team_session_id}-${teamProfile.photoUrl ?? "avatar"}-${teamProfile.avatarCode}-${teamProfile.photoUploadLocked}`}
+            key={session.quiz_team_session_id}
             quizId={liveDaten.quiz_id}
             sessionToken={session.sessionToken}
             teamName={session.teamname}
             initialProfile={teamProfile}
+            initiallyOpen={teamProfileInitiallyOpen}
+            calendarSubscriptionUrl={calendarSubscriptionUrl}
           />
         )}
 
@@ -1384,14 +1389,6 @@ export default function QuizAntwortClient({
         </section>
         )}
 
-        <footer className="pb-2 text-center text-sm">
-          <a
-            href={calendarSubscriptionUrl}
-            className="answer-calendar-link inline-flex min-h-11 items-center rounded-xl px-4 py-2 font-semibold text-slate-600 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-900"
-          >
-            PubQuiz-Kalender abonnieren
-          </a>
-        </footer>
       </div>
 
       {bildModalUrl && (

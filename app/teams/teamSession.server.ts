@@ -9,6 +9,7 @@ import {
 } from "./teamIdentity";
 import { generateTeamPassword } from "./teamPassword";
 import { mapTeamProfile } from "./teamProfile";
+import { shouldOpenTeamProfileOnboarding } from "./teamProfileOnboarding";
 
 type StartTeamSessionInput = {
   quizId: number;
@@ -27,6 +28,7 @@ export type StartTeamSessionResult =
         teamname: string;
       };
       profile: ReturnType<typeof mapTeamProfile>;
+      profileOnboarding: boolean;
     }
   | { success: false; message: string };
 
@@ -55,6 +57,7 @@ export async function startGlobalTeamQuizSession(
     let team = await transaction.teams.findUnique({
       where: { teamname_normalisiert: normalizedName },
     });
+    const teamWasCreated = team === null;
 
     if (!team) {
       generatedPassword = generateTeamPassword();
@@ -86,6 +89,16 @@ export async function startGlobalTeamQuizSession(
         });
       }
     }
+
+    const existingSession = await transaction.quiz_team_sessions.findUnique({
+      where: {
+        quiz_id_team_id: {
+          quiz_id: input.quizId,
+          team_id: team.team_id,
+        },
+      },
+      select: { quiz_team_session_id: true },
+    });
 
     const session = await transaction.quiz_team_sessions.upsert({
       where: {
@@ -134,6 +147,10 @@ export async function startGlobalTeamQuizSession(
         teamname: team.teamname,
       },
       profile: mapTeamProfile(team),
+      profileOnboarding: shouldOpenTeamProfileOnboarding({
+        teamWasCreated,
+        teamAlreadyJoinedQuiz: existingSession !== null,
+      }),
     } as const;
   });
 

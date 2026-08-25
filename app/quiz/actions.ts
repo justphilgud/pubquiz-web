@@ -2715,6 +2715,7 @@ export async function startQuizTeamSession(data: {
     success: true as const,
     generiertesPasswort: result.generatedPassword,
     profile: result.profile,
+    profileOnboarding: result.profileOnboarding,
     session: {
       quiz_team_session_id: result.session.quiz_team_session_id,
       teamname: result.session.teamname,

@@ -100,6 +100,10 @@ test("all calendar entry points expose direct subscription links", () => {
     "app/quiz/[quizId]/antworten/QuizAntwortClient.tsx",
     "utf8",
   );
+  const teamProfileEditor = readFileSync(
+    "app/teams/TeamProfileEditor.tsx",
+    "utf8",
+  );
   const eventSeries = readFileSync(
     "app/admin/eventreihen/[eventSeriesId]/page.tsx",
     "utf8",
@@ -118,8 +122,9 @@ test("all calendar entry points expose direct subscription links", () => {
     answerPage,
     /calendarSubscriptionUrl=\{buildPublicCalendarSubscriptionUrl/,
   );
-  assert.match(answerForm, /href=\{calendarSubscriptionUrl\}/);
-  assert.doesNotMatch(answerForm, /target="_blank"/);
+  assert.match(answerForm, /calendarSubscriptionUrl=\{calendarSubscriptionUrl\}/);
+  assert.match(teamProfileEditor, /href=\{calendarSubscriptionUrl\}/);
+  assert.doesNotMatch(teamProfileEditor, /target="_blank"/);
   assert.match(eventSeries, /href=\{calendarSubscriptionUrl\}/);
   assert.match(legacySubscribe, /PUBLIC_CALENDAR_LANDING_PATH/);
   assert.doesNotMatch(legacySubscribe, /buildPublicCalendarSubscriptionUrl/);
