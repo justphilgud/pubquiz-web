@@ -14,6 +14,40 @@ export function rankScores<T extends { punkte: number }>(scores: readonly T[]) {
     }));
 }
 
+export function resolveIntermediateStandingsAudience<
+  T extends {
+    punkte: number;
+    teamname: string;
+    teamId?: number | null;
+    photoUrl?: string | null;
+    avatarCode?: unknown;
+  },
+>(
+  scores: readonly T[],
+  renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW",
+) {
+  const showIdentity = shouldShowTeamIdentity({
+    standingsType: "INTERMEDIATE",
+    renderMode,
+  });
+
+  return rankScores(scores).map((entry, index) => ({
+    key: showIdentity
+      ? `team-${entry.teamId ?? entry.teamname}-${index}`
+      : `anonymous-rank-${entry.place}-${index}`,
+    place: entry.place,
+    punkte: entry.punkte,
+    identity: showIdentity
+      ? {
+          teamId: entry.teamId ?? null,
+          teamname: entry.teamname,
+          photoUrl: entry.photoUrl ?? null,
+          avatarCode: entry.avatarCode ?? null,
+        }
+      : null,
+  }));
+}
+
 export function resolveFinalStandingsReveal<T extends { punkte: number }>(
   scores: readonly T[],
   revealCount: number,

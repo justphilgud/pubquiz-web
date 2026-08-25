@@ -59,6 +59,7 @@ import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProf
 import {
   rankScores,
   resolveFinalStandingsReveal,
+  resolveIntermediateStandingsAudience,
   shouldShowTeamIdentity,
 } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
@@ -946,8 +947,7 @@ function renderRennPferd({
   );
 }
 function renderZwischenstandSlide() {
-  const sortiertePunkte = rankScores(punktestand).slice(0, 5);
-  const showIdentity = shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode });
+  const sortiertePunkte = resolveIntermediateStandingsAudience(punktestand, renderMode).slice(0, 5);
 
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
@@ -958,10 +958,10 @@ function renderZwischenstandSlide() {
           <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
         ) : (
           <ol className="presentation-flow-ranking-list">
-            {sortiertePunkte.map((team, index) => (
-              <li key={`${team.teamname}-${index}`}>
+            {sortiertePunkte.map((team) => (
+              <li key={team.key}>
                 <span className="presentation-flow-rank">{team.place}</span>
-                <strong>{showIdentity ? team.teamname : `${team.place}. Platz`}</strong>
+                <strong>{team.identity?.teamname ?? `${team.place}. Platz`}</strong>
                 <span>{formatQuizPoints(team.punkte)} Punkte</span>
               </li>
             ))}
@@ -1017,7 +1017,7 @@ function renderZwischenstandSlide() {
 
             return (
               <div
-                key={`${team.teamname}-${index}`}
+                key={team.key}
                 className="grid grid-cols-[90px_1fr_130px] items-center gap-4"
               >
                 <div className="flex h-full items-center justify-center rounded-2xl border-4 border-yellow-300 bg-slate-950/80 text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
@@ -1037,7 +1037,7 @@ function renderZwischenstandSlide() {
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
 
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
-                    {showIdentity ? team.teamname : `Rang ${team.place}`}
+                    {team.identity?.teamname ?? `Rang ${team.place}`}
                   </div>
 
                   <div
@@ -1968,18 +1968,56 @@ function renderFlowStandingsSlide(
   slide: Extract<Slide, { typ: "ablauf" }>,
 ) {
   const { config, type } = slide.element;
+  if (type === "INTERMEDIATE_STANDINGS") {
+    const hidden = config.standingsSize === "HIDDEN";
+    const showPoints = config.showPoints !== false;
+    const allEntries = resolveIntermediateStandingsAudience(punktestand, renderMode);
+    const limit =
+      config.standingsSize === "TOP_3"
+        ? 3
+        : config.standingsSize === "TOP_5"
+          ? 5
+          : allEntries.length;
+    const entries = allEntries.slice(0, limit);
+
+    return (
+      <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
+        <p className="presentation-flow-kicker">Zwischenstand</p>
+        <h2>{config.title ?? "Aktueller Punktestand"}</h2>
+        {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+        {hidden ? (
+          <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
+        ) : entries.length === 0 ? (
+          <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
+        ) : (
+          <ol className="presentation-flow-ranking-list" data-many={entries.length > 6}>
+            {entries.map((entry) => (
+              <li key={entry.key}>
+                <span className="presentation-flow-rank">{entry.place}</span>
+                <strong className="flex items-center gap-3">
+                  {entry.identity && (
+                    <TeamIdentityVisual
+                      name={entry.identity.teamname}
+                      photoUrl={entry.identity.photoUrl}
+                      avatarCode={(entry.identity.avatarCode as TeamAvatarCode | null) ?? resolveTeamAvatarCode(entry.identity.teamId ?? 0, null)}
+                      className="h-12 w-12"
+                    />
+                  )}
+                  {entry.identity?.teamname ?? `${entry.place}. Platz`}
+                </strong>
+                {showPoints && <span>{formatQuizPoints(entry.punkte)} Punkte</span>}
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+    );
+  }
+
   const sorted = rankScores(punktestand);
-  const limit =
-    config.standingsSize === "TOP_3"
-      ? 3
-      : config.standingsSize === "TOP_5"
-        ? 5
-        : sorted.length;
   const teams = type === "FINAL_STANDINGS"
     ? sorted
-    : type === "WINNER"
-    ? sorted.filter((team) => team.punkte === sorted[0]?.punkte)
-    : sorted.slice(0, limit);
+    : sorted.filter((team) => team.punkte === sorted[0]?.punkte);
   const finalReveal = resolveFinalStandingsReveal(sorted, endstandRevealCount);
   const placeGroups = Array.from(
     new Set(
@@ -1993,9 +2031,9 @@ function renderFlowStandingsSlide(
     : placeGroups;
   const hidden = config.standingsSize === "HIDDEN";
   const showPoints = config.showPoints !== false;
-  const standingsType = type === "INTERMEDIATE_STANDINGS" ? "INTERMEDIATE" : type === "WINNER" ? "WINNER" : "FINAL";
+  const standingsType = type === "WINNER" ? "WINNER" : "FINAL";
   const showIdentity = shouldShowTeamIdentity({ standingsType, renderMode });
-  const finalPodium = type === "INTERMEDIATE_STANDINGS" ? null : type === "FINAL_STANDINGS" ? (
+  const finalPodium = type === "FINAL_STANDINGS" ? (
     <div
       className="presentation-ranking-podium"
       data-group-count={finalReveal.podiumGroups.length}
@@ -2035,9 +2073,7 @@ function renderFlowStandingsSlide(
       })}
     </div>
   );
-  const listTeams = type === "INTERMEDIATE_STANDINGS"
-    ? teams
-    : type === "FINAL_STANDINGS"
+  const listTeams = type === "FINAL_STANDINGS"
       ? finalReveal.showFullTable
         ? finalReveal.remainingEntries
         : []
@@ -2046,9 +2082,7 @@ function renderFlowStandingsSlide(
   return (
     <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
       <p className="presentation-flow-kicker">
-        {type === "INTERMEDIATE_STANDINGS"
-          ? "Zwischenstand"
-          : type === "WINNER"
+        {type === "WINNER"
             ? "Gewinner"
             : "Endstand"}
       </p>
