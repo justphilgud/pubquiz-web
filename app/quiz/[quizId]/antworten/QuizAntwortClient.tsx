@@ -714,7 +714,7 @@ export default function QuizAntwortClient({
 
     setIsStartingSession(false);
 
-    if (!result.success || !result.session) {
+    if (!result.success) {
       setMeldung(result.message ?? "Team konnte nicht gestartet werden.");
       return;
     }

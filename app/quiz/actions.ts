@@ -15,7 +15,7 @@ import {
 import { addQuestionToQuiz } from "@/app/services/quizService";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 
-import { TEAM_PASSWORT_WOERTER } from "@/app/lib/teamPasswortWoerter";
+import { startGlobalTeamQuizSession } from "@/app/teams/teamSession.server";
 import {
   requireQuizAdmin,
   requireQuizEditor,
@@ -2633,6 +2633,7 @@ export async function searchTeamsForAntworten(query: string) {
 
   const teams = await prisma.teams.findMany({
     where: {
+      ist_archiviert: false,
       teamname: {
         contains: suchtext,
         mode: "insensitive",
@@ -2655,108 +2656,31 @@ export async function startQuizTeamSession(data: {
   spielerAnzahl?: number | null;
   passwort?: string;
 }) {
-  const quiz = await prisma.quiz.findFirst({
-    where: { quiz_id: data.quizId, ist_archiviert: false },
-    select: { quiz_id: true },
-  });
-  if (!quiz) {
-    return { success: false, message: "Quiz nicht gefunden." };
-  }
-
-  const teamname = data.teamname.trim();
-
-  if (!teamname) {
-    return {
-      success: false,
-      message: "Bitte einen Teamnamen eingeben.",
-    };
-  }
-
   const spielerAnzahl =
     typeof data.spielerAnzahl === "number" && data.spielerAnzahl > 0
       ? data.spielerAnzahl
       : 1;
 
-  let team = await prisma.teams.findUnique({
-    where: {
-      teamname,
-    },
+  const result = await startGlobalTeamQuizSession({
+    quizId: data.quizId,
+    teamName: data.teamname,
+    playerCount: spielerAnzahl,
+    password: data.passwort,
   });
-
-  let generiertesPasswort: string | null = null;
-
-  if (!team) {
-    generiertesPasswort =
-      TEAM_PASSWORT_WOERTER[
-        Math.floor(Math.random() * TEAM_PASSWORT_WOERTER.length)
-      ];
-
-    team = await prisma.teams.create({
-      data: {
-        teamname,
-        team_passwort: generiertesPasswort,
-      },
-    });
-  } else {
-    if (team.team_passwort && team.team_passwort !== data.passwort) {
-      return {
-        success: false,
-        message: "Falsches Team-Passwort.",
-      };
-    }
-  }
-
-  const session = await prisma.quiz_team_sessions.upsert({
-    where: {
-      quiz_id_teamname: {
-        quiz_id: data.quizId,
-        teamname,
-      },
-    },
-    update: {
-      spieler_anzahl: spielerAnzahl,
-    },
-    create: {
-      quiz_id: data.quizId,
-      teamname,
-      spieler_anzahl: spielerAnzahl,
-    },
-  });
-
-  const statistik = await prisma.quiz_team_sessions.aggregate({
-    where: {
-      quiz_id: data.quizId,
-    },
-    _count: {
-      quiz_team_session_id: true,
-    },
-    _sum: {
-      spieler_anzahl: true,
-    },
-  });
-
-  await prisma.quiz.update({
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      team_anzahl: statistik._count.quiz_team_session_id,
-      teilnehmer_anzahl: statistik._sum.spieler_anzahl ?? 0,
-    },
-  });
+  if (!result.success) return result;
 
   revalidatePath(`/quiz/${data.quizId}`);
   revalidatePath("/quiz");
 
   return {
-    success: true,
-    generiertesPasswort,
+    success: true as const,
+    generiertesPasswort: result.generatedPassword,
     session: {
-      quiz_team_session_id: session.quiz_team_session_id,
-      teamname: session.teamname,
-      teamPasswort: generiertesPasswort,
+      quiz_team_session_id: result.session.quiz_team_session_id,
+      teamname: result.session.teamname,
+      teamPasswort: result.generatedPassword,
       sessionToken: issueTeamSessionToken(
-        { quizId: data.quizId, sessionId: session.quiz_team_session_id },
+        { quizId: data.quizId, sessionId: result.session.quiz_team_session_id },
         getTeamSessionSigningSecret(),
       ),
     },

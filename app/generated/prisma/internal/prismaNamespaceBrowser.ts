@@ -411,7 +411,12 @@ export type Quiz_teamsScalarFieldEnum = (typeof Quiz_teamsScalarFieldEnum)[keyof
 export const TeamsScalarFieldEnum = {
   team_id: 'team_id',
   teamname: 'teamname',
-  team_passwort: 'team_passwort'
+  teamname_normalisiert: 'teamname_normalisiert',
+  team_passwort: 'team_passwort',
+  ist_archiviert: 'ist_archiviert',
+  archiviert_am: 'archiviert_am',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type TeamsScalarFieldEnum = (typeof TeamsScalarFieldEnum)[keyof typeof TeamsScalarFieldEnum]
@@ -460,6 +465,7 @@ export type Quiz_ablauf_elementeScalarFieldEnum = (typeof Quiz_ablauf_elementeSc
 export const Quiz_team_sessionsScalarFieldEnum = {
   quiz_team_session_id: 'quiz_team_session_id',
   quiz_id: 'quiz_id',
+  team_id: 'team_id',
   teamname: 'teamname',
   erstellt_am: 'erstellt_am',
   spieler_anzahl: 'spieler_anzahl'

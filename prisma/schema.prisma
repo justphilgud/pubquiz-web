@@ -428,11 +428,18 @@ model quiz_teams {
 }
 
 model teams {
-  team_id       Int          @id @default(autoincrement())
-  teamname      String       @unique
-  team_passwort String?
-  quiz_teams    quiz_teams[]
+  team_id               Int                  @id @default(autoincrement())
+  teamname              String               @unique
+  teamname_normalisiert String               @unique
+  team_passwort         String?
+  ist_archiviert        Boolean              @default(false)
+  archiviert_am         DateTime?
+  created_at            DateTime             @default(now())
+  updated_at            DateTime             @default(now()) @updatedAt
+  quiz_teams            quiz_teams[]
+  quiz_team_sessions    quiz_team_sessions[]
 
+  @@index([ist_archiviert, teamname], map: "idx_teams_status_name")
   @@schema("pubquiz")
 }
 
@@ -497,15 +504,19 @@ model quiz_ablauf_elemente {
 model quiz_team_sessions {
   quiz_team_session_id Int                       @id @default(autoincrement())
   quiz_id              Int
+  team_id              Int
   teamname             String
   erstellt_am          DateTime                  @default(now())
   spieler_anzahl       Int                       @default(1)
   quiz                 quiz                      @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  team                 teams                     @relation(fields: [team_id], references: [team_id], onDelete: Restrict)
   team_antworten       team_antworten[]
   answer_submissions   team_answer_submissions[]
   stopped_pixel_runs   quiz_interaction_runs[]   @relation("PixelStopper")
 
   @@unique([quiz_id, teamname], map: "uq_quiz_team_session_teamname")
+  @@unique([quiz_id, team_id], map: "uq_quiz_team_session_team")
+  @@index([team_id, erstellt_am], map: "idx_quiz_team_sessions_team_activity")
   @@schema("pubquiz")
 }
 
