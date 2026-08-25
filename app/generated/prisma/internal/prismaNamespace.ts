@@ -3539,6 +3539,9 @@ export const TeamsScalarFieldEnum = {
   team_passwort: 'team_passwort',
   ist_archiviert: 'ist_archiviert',
   archiviert_am: 'archiviert_am',
+  avatar_code: 'avatar_code',
+  foto_url: 'foto_url',
+  foto_upload_gesperrt: 'foto_upload_gesperrt',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -4454,4 +4457,3 @@ export type PrismaAction =
  * `PrismaClient` proxy available in interactive transactions.
  */
 export type TransactionClient = Omit<DefaultPrismaClient, runtime.ITXClientDenyList>
-

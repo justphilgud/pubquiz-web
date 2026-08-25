@@ -41,6 +41,9 @@ export type TeamsMinAggregateOutputType = {
   team_passwort: string | null
   ist_archiviert: boolean | null
   archiviert_am: Date | null
+  avatar_code: string | null
+  foto_url: string | null
+  foto_upload_gesperrt: boolean | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -52,6 +55,9 @@ export type TeamsMaxAggregateOutputType = {
   team_passwort: string | null
   ist_archiviert: boolean | null
   archiviert_am: Date | null
+  avatar_code: string | null
+  foto_url: string | null
+  foto_upload_gesperrt: boolean | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -63,6 +69,9 @@ export type TeamsCountAggregateOutputType = {
   team_passwort: number
   ist_archiviert: number
   archiviert_am: number
+  avatar_code: number
+  foto_url: number
+  foto_upload_gesperrt: number
   created_at: number
   updated_at: number
   _all: number
@@ -84,6 +93,9 @@ export type TeamsMinAggregateInputType = {
   team_passwort?: true
   ist_archiviert?: true
   archiviert_am?: true
+  avatar_code?: true
+  foto_url?: true
+  foto_upload_gesperrt?: true
   created_at?: true
   updated_at?: true
 }
@@ -95,6 +107,9 @@ export type TeamsMaxAggregateInputType = {
   team_passwort?: true
   ist_archiviert?: true
   archiviert_am?: true
+  avatar_code?: true
+  foto_url?: true
+  foto_upload_gesperrt?: true
   created_at?: true
   updated_at?: true
 }
@@ -106,6 +121,9 @@ export type TeamsCountAggregateInputType = {
   team_passwort?: true
   ist_archiviert?: true
   archiviert_am?: true
+  avatar_code?: true
+  foto_url?: true
+  foto_upload_gesperrt?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -204,6 +222,9 @@ export type TeamsGroupByOutputType = {
   team_passwort: string | null
   ist_archiviert: boolean
   archiviert_am: Date | null
+  avatar_code: string | null
+  foto_url: string | null
+  foto_upload_gesperrt: boolean
   created_at: Date
   updated_at: Date
   _count: TeamsCountAggregateOutputType | null
@@ -238,6 +259,9 @@ export type teamsWhereInput = {
   team_passwort?: Prisma.StringNullableFilter<"teams"> | string | null
   ist_archiviert?: Prisma.BoolFilter<"teams"> | boolean
   archiviert_am?: Prisma.DateTimeNullableFilter<"teams"> | Date | string | null
+  avatar_code?: Prisma.StringNullableFilter<"teams"> | string | null
+  foto_url?: Prisma.StringNullableFilter<"teams"> | string | null
+  foto_upload_gesperrt?: Prisma.BoolFilter<"teams"> | boolean
   created_at?: Prisma.DateTimeFilter<"teams"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"teams"> | Date | string
   quiz_teams?: Prisma.Quiz_teamsListRelationFilter
@@ -251,6 +275,9 @@ export type teamsOrderByWithRelationInput = {
   team_passwort?: Prisma.SortOrderInput | Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archiviert_am?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  foto_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  foto_upload_gesperrt?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   quiz_teams?: Prisma.quiz_teamsOrderByRelationAggregateInput
@@ -267,6 +294,9 @@ export type teamsWhereUniqueInput = Prisma.AtLeast<{
   team_passwort?: Prisma.StringNullableFilter<"teams"> | string | null
   ist_archiviert?: Prisma.BoolFilter<"teams"> | boolean
   archiviert_am?: Prisma.DateTimeNullableFilter<"teams"> | Date | string | null
+  avatar_code?: Prisma.StringNullableFilter<"teams"> | string | null
+  foto_url?: Prisma.StringNullableFilter<"teams"> | string | null
+  foto_upload_gesperrt?: Prisma.BoolFilter<"teams"> | boolean
   created_at?: Prisma.DateTimeFilter<"teams"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"teams"> | Date | string
   quiz_teams?: Prisma.Quiz_teamsListRelationFilter
@@ -280,6 +310,9 @@ export type teamsOrderByWithAggregationInput = {
   team_passwort?: Prisma.SortOrderInput | Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archiviert_am?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  foto_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  foto_upload_gesperrt?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.teamsCountOrderByAggregateInput
@@ -299,6 +332,9 @@ export type teamsScalarWhereWithAggregatesInput = {
   team_passwort?: Prisma.StringNullableWithAggregatesFilter<"teams"> | string | null
   ist_archiviert?: Prisma.BoolWithAggregatesFilter<"teams"> | boolean
   archiviert_am?: Prisma.DateTimeNullableWithAggregatesFilter<"teams"> | Date | string | null
+  avatar_code?: Prisma.StringNullableWithAggregatesFilter<"teams"> | string | null
+  foto_url?: Prisma.StringNullableWithAggregatesFilter<"teams"> | string | null
+  foto_upload_gesperrt?: Prisma.BoolWithAggregatesFilter<"teams"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"teams"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"teams"> | Date | string
 }
@@ -309,6 +345,9 @@ export type teamsCreateInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutTeamsInput
@@ -322,6 +361,9 @@ export type teamsUncheckedCreateInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   quiz_teams?: Prisma.quiz_teamsUncheckedCreateNestedManyWithoutTeamsInput
@@ -334,6 +376,9 @@ export type teamsUpdateInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutTeamsNestedInput
@@ -347,6 +392,9 @@ export type teamsUncheckedUpdateInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutTeamsNestedInput
@@ -360,6 +408,9 @@ export type teamsCreateManyInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -370,6 +421,9 @@ export type teamsUpdateManyMutationInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -381,6 +435,9 @@ export type teamsUncheckedUpdateManyInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -397,6 +454,9 @@ export type teamsCountOrderByAggregateInput = {
   team_passwort?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archiviert_am?: Prisma.SortOrder
+  avatar_code?: Prisma.SortOrder
+  foto_url?: Prisma.SortOrder
+  foto_upload_gesperrt?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -412,6 +472,9 @@ export type teamsMaxOrderByAggregateInput = {
   team_passwort?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archiviert_am?: Prisma.SortOrder
+  avatar_code?: Prisma.SortOrder
+  foto_url?: Prisma.SortOrder
+  foto_upload_gesperrt?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -423,6 +486,9 @@ export type teamsMinOrderByAggregateInput = {
   team_passwort?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archiviert_am?: Prisma.SortOrder
+  avatar_code?: Prisma.SortOrder
+  foto_url?: Prisma.SortOrder
+  foto_upload_gesperrt?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -465,6 +531,9 @@ export type teamsCreateWithoutQuiz_teamsInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutTeamInput
@@ -477,6 +546,9 @@ export type teamsUncheckedCreateWithoutQuiz_teamsInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedCreateNestedManyWithoutTeamInput
@@ -504,6 +576,9 @@ export type teamsUpdateWithoutQuiz_teamsInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutTeamNestedInput
@@ -516,6 +591,9 @@ export type teamsUncheckedUpdateWithoutQuiz_teamsInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedUpdateManyWithoutTeamNestedInput
@@ -527,6 +605,9 @@ export type teamsCreateWithoutQuiz_team_sessionsInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutTeamsInput
@@ -539,6 +620,9 @@ export type teamsUncheckedCreateWithoutQuiz_team_sessionsInput = {
   team_passwort?: string | null
   ist_archiviert?: boolean
   archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   quiz_teams?: Prisma.quiz_teamsUncheckedCreateNestedManyWithoutTeamsInput
@@ -566,6 +650,9 @@ export type teamsUpdateWithoutQuiz_team_sessionsInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutTeamsNestedInput
@@ -578,6 +665,9 @@ export type teamsUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutTeamsNestedInput
@@ -630,6 +720,9 @@ export type teamsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   team_passwort?: boolean
   ist_archiviert?: boolean
   archiviert_am?: boolean
+  avatar_code?: boolean
+  foto_url?: boolean
+  foto_upload_gesperrt?: boolean
   created_at?: boolean
   updated_at?: boolean
   quiz_teams?: boolean | Prisma.teams$quiz_teamsArgs<ExtArgs>
@@ -644,6 +737,9 @@ export type teamsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   team_passwort?: boolean
   ist_archiviert?: boolean
   archiviert_am?: boolean
+  avatar_code?: boolean
+  foto_url?: boolean
+  foto_upload_gesperrt?: boolean
   created_at?: boolean
   updated_at?: boolean
 }, ExtArgs["result"]["teams"]>
@@ -655,6 +751,9 @@ export type teamsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   team_passwort?: boolean
   ist_archiviert?: boolean
   archiviert_am?: boolean
+  avatar_code?: boolean
+  foto_url?: boolean
+  foto_upload_gesperrt?: boolean
   created_at?: boolean
   updated_at?: boolean
 }, ExtArgs["result"]["teams"]>
@@ -666,11 +765,14 @@ export type teamsSelectScalar = {
   team_passwort?: boolean
   ist_archiviert?: boolean
   archiviert_am?: boolean
+  avatar_code?: boolean
+  foto_url?: boolean
+  foto_upload_gesperrt?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type teamsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_id" | "teamname" | "teamname_normalisiert" | "team_passwort" | "ist_archiviert" | "archiviert_am" | "created_at" | "updated_at", ExtArgs["result"]["teams"]>
+export type teamsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_id" | "teamname" | "teamname_normalisiert" | "team_passwort" | "ist_archiviert" | "archiviert_am" | "avatar_code" | "foto_url" | "foto_upload_gesperrt" | "created_at" | "updated_at", ExtArgs["result"]["teams"]>
 export type teamsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz_teams?: boolean | Prisma.teams$quiz_teamsArgs<ExtArgs>
   quiz_team_sessions?: boolean | Prisma.teams$quiz_team_sessionsArgs<ExtArgs>
@@ -692,6 +794,9 @@ export type $teamsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     team_passwort: string | null
     ist_archiviert: boolean
     archiviert_am: Date | null
+    avatar_code: string | null
+    foto_url: string | null
+    foto_upload_gesperrt: boolean
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["teams"]>
@@ -1125,6 +1230,9 @@ export interface teamsFieldRefs {
   readonly team_passwort: Prisma.FieldRef<"teams", 'String'>
   readonly ist_archiviert: Prisma.FieldRef<"teams", 'Boolean'>
   readonly archiviert_am: Prisma.FieldRef<"teams", 'DateTime'>
+  readonly avatar_code: Prisma.FieldRef<"teams", 'String'>
+  readonly foto_url: Prisma.FieldRef<"teams", 'String'>
+  readonly foto_upload_gesperrt: Prisma.FieldRef<"teams", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"teams", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"teams", 'DateTime'>
 }

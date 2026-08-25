@@ -8,6 +8,7 @@ import {
   validateTeamName,
 } from "./teamIdentity";
 import { generateTeamPassword } from "./teamPassword";
+import { mapTeamProfile } from "./teamProfile";
 
 type StartTeamSessionInput = {
   quizId: number;
@@ -25,6 +26,7 @@ export type StartTeamSessionResult =
         team_id: number;
         teamname: string;
       };
+      profile: ReturnType<typeof mapTeamProfile>;
     }
   | { success: false; message: string };
 
@@ -131,6 +133,7 @@ export async function startGlobalTeamQuizSession(
         team_id: team.team_id,
         teamname: team.teamname,
       },
+      profile: mapTeamProfile(team),
     } as const;
   });
 

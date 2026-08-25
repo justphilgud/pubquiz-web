@@ -22,7 +22,17 @@ export async function resolveParticipantSession(
     select: {
       quiz_team_session_id: true,
       quiz_id: true,
+      team_id: true,
       teamname: true,
+      team: {
+        select: {
+          team_id: true,
+          avatar_code: true,
+          foto_url: true,
+          foto_upload_gesperrt: true,
+          ist_archiviert: true,
+        },
+      },
     },
   });
 }

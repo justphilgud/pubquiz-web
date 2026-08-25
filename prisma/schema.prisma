@@ -434,6 +434,9 @@ model teams {
   team_passwort         String?
   ist_archiviert        Boolean              @default(false)
   archiviert_am         DateTime?
+  avatar_code           String?              @db.VarChar(32)
+  foto_url              String?
+  foto_upload_gesperrt  Boolean              @default(false)
   created_at            DateTime             @default(now())
   updated_at            DateTime             @default(now()) @updatedAt
   quiz_teams            quiz_teams[]

@@ -29,6 +29,8 @@ import {
   resolvePixelAnswerActionPolicy,
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
+import { TeamProfileEditor } from "@/app/teams/TeamProfileEditor";
+import type { TeamProfile } from "@/app/teams/teamProfile";
 
 type TeamAntwortState = TeamAnswerDraft;
 type QuizLiveSnapshot = Awaited<
@@ -117,6 +119,7 @@ type AntwortStatus = {
   interactionState: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
   answerPhase: "QUESTION" | "SOLUTION" | "NON_QUESTION" | "LEGACY" | "UNKNOWN";
   presentationStatusText: string | null;
+  teamProfile: TeamProfile | null;
 
   fragen: {
     quiz_fragen_id: number;
@@ -192,6 +195,7 @@ export default function QuizAntwortClient({
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
   const [session, setSession] = useState<TeamSession | null>(null);
+  const [teamProfile, setTeamProfile] = useState<TeamProfile | null>(daten.teamProfile);
   const [teamVorschlaege, setTeamVorschlaege] = useState<
     { team_id: number; teamname: string }[]
   >([]);
@@ -259,6 +263,10 @@ export default function QuizAntwortClient({
   useEffect(() => {
     draftEditVersionsRef.current = draftEditVersions;
   }, [draftEditVersions]);
+
+  useEffect(() => {
+    if (liveDaten.teamProfile) setTeamProfile(liveDaten.teamProfile);
+  }, [liveDaten.teamProfile]);
 
   function getBildUrl(datei: string) {
     if (/^https?:\/\//.test(datei)) {
@@ -720,6 +728,7 @@ export default function QuizAntwortClient({
     }
 
     setSession(result.session);
+    setTeamProfile(result.profile);
     setTeamname(result.session.teamname);
     setGeneriertesPasswort(result.generiertesPasswort ?? null);
     setTeamVorschlaege([]);
@@ -749,6 +758,7 @@ export default function QuizAntwortClient({
   function handleTeamWechseln() {
     localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
     setSession(null);
+    setTeamProfile(null);
     setTeamname("");
     setTeamPasswort("");
     setGeneriertesPasswort(null);
@@ -1062,6 +1072,16 @@ export default function QuizAntwortClient({
             </div>
           )}
         </section>
+
+        {session && teamProfile && (
+          <TeamProfileEditor
+            key={`${session.quiz_team_session_id}-${teamProfile.photoUrl ?? "avatar"}-${teamProfile.avatarCode}-${teamProfile.photoUploadLocked}`}
+            quizId={liveDaten.quiz_id}
+            sessionToken={session.sessionToken}
+            teamName={session.teamname}
+            initialProfile={teamProfile}
+          />
+        )}
 
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">

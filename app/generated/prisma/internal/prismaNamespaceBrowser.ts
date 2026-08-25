@@ -415,6 +415,9 @@ export const TeamsScalarFieldEnum = {
   team_passwort: 'team_passwort',
   ist_archiviert: 'ist_archiviert',
   archiviert_am: 'archiviert_am',
+  avatar_code: 'avatar_code',
+  foto_url: 'foto_url',
+  foto_upload_gesperrt: 'foto_upload_gesperrt',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -758,4 +761,3 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-

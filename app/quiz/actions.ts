@@ -16,6 +16,7 @@ import { addQuestionToQuiz } from "@/app/services/quizService";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 
 import { startGlobalTeamQuizSession } from "@/app/teams/teamSession.server";
+import { mapTeamProfile } from "@/app/teams/teamProfile";
 import {
   requireQuizAdmin,
   requireQuizEditor,
@@ -2197,6 +2198,7 @@ export async function getQuizAntwortStatus(
       interactionState: "LOCKED" as const,
       answerPhase: "NON_QUESTION" as const,
       presentationStatusText: null,
+      teamProfile: null,
       fragen: [],
     };
   }
@@ -2621,6 +2623,7 @@ export async function getQuizAntwortStatus(
         : ("QUESTION" as const)
       : audienceState.phase,
     presentationStatusText,
+    teamProfile: mapTeamProfile(participantSession.team),
     fragen,
   };
 }
@@ -2675,6 +2678,7 @@ export async function startQuizTeamSession(data: {
   return {
     success: true as const,
     generiertesPasswort: result.generatedPassword,
+    profile: result.profile,
     session: {
       quiz_team_session_id: result.session.quiz_team_session_id,
       teamname: result.session.teamname,

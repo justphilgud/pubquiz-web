@@ -4,6 +4,7 @@ export type BlobPathArea =
   | "question-media"
   | "answer-media"
   | "template-media"
+  | "team-profile"
   | "media";
 
 export function isSafeBlobPathSegment(segment: string) {
