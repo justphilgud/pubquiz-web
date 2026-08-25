@@ -50,14 +50,15 @@ type PresentationPreviewDefinitionBase = {
 };
 
 export const presentationPreviewRegistry = [
-  { id: "TEXT", label: "Standardfrage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Textfrage ohne Medium", uniqueVisualState: true },
+  { id: "OPEN_QUESTION", label: "Offene Frage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Offene Textfrage ohne sichtbare Antwortoptionen", uniqueVisualState: true },
   { id: "MULTIPLE_CHOICE", label: "Multiple Choice", group: "QUESTIONS", renderer: "QUESTION", purpose: "Geschlossene Frage mit Antwortoptionen", uniqueVisualState: true },
   { id: "TRUE_FALSE", label: "Wahr/Falsch", group: "QUESTIONS", renderer: "QUESTION", purpose: "Binäre Wahr/Falsch-Frage", uniqueVisualState: true },
   { id: "IMAGE", label: "Bildfrage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Medienfrage mit themebarem Bildzustand", uniqueVisualState: true },
   { id: "AUDIO", label: "Audiofrage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Moderationsgesteuerte Audiofrage", uniqueVisualState: true },
   { id: "ORDERING", label: "Reihenfolge", group: "QUESTIONS", renderer: "QUESTION", purpose: "Frage mit sortierbaren Antwortwerten", uniqueVisualState: true },
   { id: "PIXEL", label: "Pixelbild / Reveal", group: "QUESTIONS", renderer: "QUESTION", purpose: "Schrittweiser visueller Reveal", uniqueVisualState: true },
-  { id: "SOLUTION", label: "Richtige Antwort", group: "SOLUTION", renderer: "SOLUTION", purpose: "Kanonische Fragenauflösung", uniqueVisualState: true },
+  { id: "SOLUTION", label: "Multiple Choice · Auflösung", group: "SOLUTION", renderer: "SOLUTION", purpose: "Kanonische Auflösung einer geschlossenen Frage", uniqueVisualState: true },
+  { id: "OPEN_SOLUTION", label: "Offene Frage · Auflösung", group: "SOLUTION", renderer: "SOLUTION", purpose: "Kanonische Auflösung einer offenen Textfrage", uniqueVisualState: true },
   { id: "WELCOME", label: "Begrüßung", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Begrüßungs-Slide", uniqueVisualState: true, flowType: "WELCOME" },
   { id: "RULES", label: "Regeln", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Regeln-Slide", uniqueVisualState: true, flowType: "RULES" },
   { id: "CHAPTER", label: "Kapitel", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Kapitel-Intro-Slide", uniqueVisualState: true, flowType: "CHAPTER_INTRO" },
@@ -196,6 +197,7 @@ function ScaledPreviewStage({
 }
 
 function questionForScenario(scenario: PresentationPreviewScenario) {
+  const isOpenQuestion = scenario === "OPEN_QUESTION" || scenario === "OPEN_SOLUTION";
   const templateId =
     scenario === "MULTIPLE_CHOICE"
       ? "multiple_choice"
@@ -209,7 +211,9 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
               ? "pixelbild"
               : null;
   const answers =
-    scenario.startsWith("STORYBOOK_")
+    isOpenQuestion
+      ? ["7"]
+      : scenario.startsWith("STORYBOOK_")
       ? [scenario === "STORYBOOK_MEMORY" ? "Die Reise nach Berlin" : "Berlin"]
       : scenario === "TRUE_FALSE"
       ? ["Wahr", "Falsch"]
@@ -222,11 +226,14 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
   const layoutMedia = scenario === "IMAGE"
     ? [{ fileName: "bildvorschau.jpg", mediaType: "Bild", scope: "QUESTION" as const }]
     : runtimeMedia;
+  const questionText = isOpenQuestion
+    ? "Wie oft wurde Michael Schumacher Formel-1-Weltmeister?"
+    : scenario.startsWith("STORYBOOK_")
+      ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
+      : "Welche Hauptstadt gehört zu Deutschland?";
   const layoutInput = {
     templateId,
-    questionText: scenario.startsWith("STORYBOOK_")
-      ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
-      : "Welche Hauptstadt gehört zu Deutschland?",
+    questionText,
     answerOptionCount: answers.length,
     structuredFieldCount: 0,
     media: layoutMedia,
@@ -252,6 +259,8 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
                   ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
                   : scenario === "STORYBOOK_EDITORIAL"
                     ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
+                  : isOpenQuestion
+                    ? questionText
                     : scenario === "AUDIO"
         ? "Welcher Song ist in diesem rückwärts abgespielten Ausschnitt zu hören?"
         : scenario === "ORDERING"
@@ -260,9 +269,9 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
     templateId,
     templateConfig: null,
     punkte_modus: "standard",
-    freie_antwort_erlaubt: false,
-    urspruenglicher_antwortmodus: "CLOSED" as const,
-    effektiver_antwortmodus: "CLOSED" as const,
+    freie_antwort_erlaubt: isOpenQuestion,
+    urspruenglicher_antwortmodus: isOpenQuestion ? "OPEN" as const : "CLOSED" as const,
+    effektiver_antwortmodus: isOpenQuestion ? "OPEN" as const : "CLOSED" as const,
     quelle: "Vorschauinhalt",
     kategorien: ["Beispiel"],
     praesentationslayout: "standard",

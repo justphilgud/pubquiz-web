@@ -542,7 +542,7 @@ test("preview and productive design renderer consume the same normalized asset c
     config,
     templateId: managed.id,
     templateName: managed.name,
-    scenario: "TEXT",
+    scenario: "OPEN_QUESTION",
   }));
   for (const reference of [logo, background, hero, decoration]) {
     assert.ok(previewHtml.includes(reference));
@@ -642,6 +642,9 @@ test("preview registry documents and renders every visible entry through its dec
   assert.ok(presentationPreviewRegistry.every(({ uniqueVisualState }) => typeof uniqueVisualState === "boolean"));
   assert.equal(presentationPreviewRegistry.find(({ id }) => id === "MODERATION")?.uniqueVisualState, false);
   assert.equal(presentationPreviewRegistry.some(({ id }) => id.startsWith("CORPORATE_")), false);
+  assert.equal(presentationPreviewRegistry.some(({ id }) => String(id) === "TEXT"), false);
+  assert.equal(presentationPreviewRegistry.find(({ id }) => id === "OPEN_QUESTION")?.label, "Offene Frage");
+  assert.equal(presentationPreviewRegistry.find(({ id }) => id === "OPEN_SOLUTION")?.label, "Offene Frage · Auflösung");
   assert.match(generatorSource, /<optgroup/);
   for (const label of ["Fragen", "Auflösung", "Quiz-Slides", "Weitere Ansichten"]) {
     assert.ok(generatorSource.includes("group.label") || source.includes(label));
@@ -677,6 +680,32 @@ test("preview registry documents and renders every visible entry through its dec
   assert.match(source, /data-preview-scale-container/);
   assert.match(source, /data-preview-fixed-stage/);
   assert.match(source, /transformOrigin: "top left"/);
+});
+
+test("open-question previews use the productive OPEN contract without closed-answer fallback", () => {
+  const config = createPresentationStylePreset("EDITORIAL");
+  const renderScenario = (scenario: "OPEN_QUESTION" | "OPEN_SOLUTION") => renderToStaticMarkup(
+    createElement(PresentationTemplatePreview, {
+      config,
+      templateId: "lovd-open-question-preview",
+      templateName: "LOVD Open Question Preview",
+      scenario,
+    }),
+  );
+
+  const question = renderScenario("OPEN_QUESTION");
+  assert.match(question, /data-preview-renderer="QUESTION"/);
+  assert.match(question, /data-presentation-layout="CONTENT_CENTERED"/);
+  assert.match(question, /Wie oft wurde Michael Schumacher Formel-1-Weltmeister\?/);
+  assert.doesNotMatch(question, /presentation-answer-option|<input|<textarea|<button/);
+  assert.doesNotMatch(question, />Berlin<|>Hamburg<|>München<|>Köln</);
+
+  const solution = renderScenario("OPEN_SOLUTION");
+  assert.match(solution, /data-preview-renderer="SOLUTION"/);
+  assert.match(solution, /data-presentation-layout="SOLUTION_FOCUS"/);
+  assert.match(solution, /data-correct="true"/);
+  assert.match(solution, /presentation-correct-answer-value[^>]*>7</);
+  assert.doesNotMatch(solution, /presentation-solution-option|>Berlin<|>Hamburg<|>München<|>Köln</);
 });
 
 test("media previews use distinct themeable product states without simulated audience controls", () => {

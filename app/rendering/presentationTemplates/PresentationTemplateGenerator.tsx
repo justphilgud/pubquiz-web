@@ -124,7 +124,7 @@ export function PresentationTemplateGenerator({
   const [draft, setDraft] = useState(initialDraft);
   const [savedDraft, setSavedDraft] = useState(initialDraft);
   const [activeSection, setActiveSection] = useState<GeneratorSectionId>("style");
-  const [scenario, setScenario] = useState<PresentationPreviewScenario>("TEXT");
+  const [scenario, setScenario] = useState<PresentationPreviewScenario>("OPEN_QUESTION");
   const [highlightedAssetRole, setHighlightedAssetRole] = useState<PresentationTemplateAssetRole | null>(null);
   const [focusPreview, setFocusPreview] = useState(false);
   const [result, setResult] = useState<PresentationTemplateActionState | null>(null);
@@ -136,7 +136,7 @@ export function PresentationTemplateGenerator({
   const previewGroups = getPresentationPreviewGroups(draft.config.design.stylePreset);
   const effectiveScenario: PresentationPreviewScenario = previewGroups.some((group) =>
     group.scenarios.some((definition) => definition.id === scenario),
-  ) ? scenario : "TEXT";
+  ) ? scenario : "OPEN_QUESTION";
 
   useEffect(() => {
     const dirty = () => !skipLeaveWarning.current && JSON.stringify(draft) !== JSON.stringify(savedDraft);
@@ -207,7 +207,7 @@ export function PresentationTemplateGenerator({
   function applyStyle(style: PresentationDesignStyle) {
     if (style === draft.config.design.stylePreset) return;
     updateConfig((config) => Object.assign(config, applyPresentationStylePreset(config, style)));
-    setScenario(style === "BIRTHDAY" ? "STORYBOOK_COVER" : "TEXT");
+    setScenario(style === "BIRTHDAY" ? "STORYBOOK_COVER" : "OPEN_QUESTION");
     setResult(null);
   }
 

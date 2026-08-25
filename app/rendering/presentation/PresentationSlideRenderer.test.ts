@@ -9,6 +9,7 @@ import { buildStorybookExperienceRuntime } from "@/app/rendering/presentationTem
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "./PresentationSlideRenderer";
+import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { Slide } from "../../quiz/[quizId]/praesentation/buildPraesentationSlides";
 
 const rendererSource = readFileSync(
@@ -116,6 +117,72 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
   assert.match(rendererSource, /data-correct=\{antwort\.ist_richtig\}/);
   assert.match(rendererSource, /data-correct="true"/);
   assert.doesNotMatch(rendererSource, /PreviewAudioPlayer|presentation-preview-audio|presentation-audio-play-mark/);
+});
+
+test("open solutions render short and long canonical answers without fake alternatives", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const theme = structuredClone(runtime.theme);
+  theme.design.stylePreset = "EDITORIAL";
+
+  for (const solutionText of ["7", "Never Gonna Give You Up"]) {
+    const baseQuestion = runtime.quiz.fragen[0];
+    assert.ok(baseQuestion);
+    const answerId = 70;
+    const layoutInput = {
+      templateId: null,
+      questionText: "Wie lautet die gesuchte Lösung?",
+      answerOptionCount: 1,
+      structuredFieldCount: 0,
+      media: [],
+    };
+    const question = {
+      ...baseQuestion,
+      frage: "Wie lautet die gesuchte Lösung?",
+      templateId: null,
+      templateConfig: null,
+      freie_antwort_erlaubt: true,
+      urspruenglicher_antwortmodus: "OPEN" as const,
+      effektiver_antwortmodus: "OPEN" as const,
+      presentationLayouts: {
+        question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }),
+        solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }),
+      },
+      antwort_reihenfolge: [answerId],
+      medien: [],
+      bildMedien: [],
+      antwortfelder: [],
+      antworten: [{
+        antwort_id: answerId,
+        antwort: solutionText,
+        ist_richtig: true,
+        antworttyp: "Text",
+        medien: [],
+      }],
+    };
+    const quiz = { ...runtime.quiz, fragen: [question] };
+    const slide: Slide = {
+      typ: "aufloesung",
+      abschnitt: quiz.abschnitte[0],
+      frage: question,
+      frageIndexImBlock: 1,
+      fragenAnzahlImBlock: 1,
+    };
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz,
+      slide,
+      slides: [slide],
+      slideIndex: 0,
+      slideLabel: "Offene Frage · Auflösung",
+      theme,
+      displayState,
+    }));
+
+    assert.match(html, /data-presentation-layout="SOLUTION_FOCUS"/);
+    assert.match(html, /data-correct="true"/);
+    assert.ok(html.includes(solutionText));
+    assert.doesNotMatch(html, /presentation-solution-option/);
+    assert.equal((html.match(/presentation-correct-answer-value/g) ?? []).length, 1);
+  }
 });
 
 test("LOVD rules keep every configured entry in the bounded slide layout", () => {
