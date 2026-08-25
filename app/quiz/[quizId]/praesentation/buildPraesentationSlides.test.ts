@@ -141,7 +141,7 @@ test("leitet Standardphasen für mehrere Runden und den Abschluss ab", () => {
     "section:10:intro",
   );
   assert.ok(flowTypes.includes("INTERMEDIATE_STANDINGS"));
-  assert.deepEqual(flowTypes.slice(-4), ["WINNER", "FINAL_STANDINGS", "CLOSING", "CALENDAR_SUBSCRIPTION"]);
+  assert.deepEqual(flowTypes.slice(-5), ["WINNER", "FINAL_STANDINGS", "YEARLY_STANDINGS", "CLOSING", "CALENDAR_SUBSCRIPTION"]);
 });
 
 test("ausgeblendete Elemente verschwinden und stabile Schlüssel bleiben erhalten", () => {

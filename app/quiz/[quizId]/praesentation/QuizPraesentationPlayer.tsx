@@ -8,6 +8,7 @@ import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import {
   getPraesentationPunktestand,
+  getPraesentationJahreswertung,
   getPraesentationStatus,
 } from "./statusActions";
 import {
@@ -26,6 +27,7 @@ import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
+import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -50,6 +52,7 @@ export default function QuizPraesentationPlayer({
   const [scores, setScores] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
   >([]);
+  const [yearlyStandings, setYearlyStandings] = useState<YearlyRankingEntry[]>([]);
   const [estimationQuestion, setEstimationQuestion] =
     useState<EstimationQuestion | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -171,8 +174,13 @@ export default function QuizPraesentationPlayer({
     if (!isStandingsSlide(slide)) return;
     let active = true;
 
-    void getPraesentationPunktestand(quizId).then((result) => {
-      if (active) setScores(result);
+    void Promise.all([
+      getPraesentationPunktestand(quizId),
+      getPraesentationJahreswertung(quizId),
+    ]).then(([currentScores, yearlyScores]) => {
+      if (!active) return;
+      setScores(currentScores);
+      setYearlyStandings(yearlyScores);
     });
 
     return () => {
@@ -247,6 +255,7 @@ export default function QuizPraesentationPlayer({
             renderMode: "PRESENTATION",
             templateRevealCount: liveState.revealCount,
             punktestand: scores,
+            yearlyStandings,
             endstandRevealCount: liveState.revealCount,
             now,
             estimationPhase: liveState.estimation.phase,

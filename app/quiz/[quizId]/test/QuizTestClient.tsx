@@ -62,6 +62,7 @@ const quickTargets = [
   ["INTERMEDIATE_STANDINGS", "Zwischenstand"],
   ["FINAL_STANDINGS", "Endstand"],
   ["WINNER", "Gewinner"],
+  ["YEARLY_STANDINGS", "Jahreswertung"],
   ["CLOSING", "Abschluss"],
   ["CALENDAR_SUBSCRIPTION", "PubQuiz-Kalender"],
 ] as const;

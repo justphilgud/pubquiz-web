@@ -109,6 +109,7 @@ const NON_QUESTION_STATUS_BY_TYPE: Readonly<Record<string, string>> = {
   INTERMEDIATE_STANDINGS: "Der Zwischenstand wird gezeigt",
   FINAL_STANDINGS: "Das Quiz ist beendet",
   WINNER: "Das Quiz ist beendet",
+  YEARLY_STANDINGS: "Das Quiz ist beendet",
   CUSTOM_MESSAGE: "Das Quiz startet gleich",
   CALENDAR_SUBSCRIPTION: "Das Quiz ist beendet",
   CLOSING: "Das Quiz ist beendet",

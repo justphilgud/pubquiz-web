@@ -32,6 +32,7 @@ import {
   setEndstandRevealCount,
   setSchaetzfrageStatus,
   getAntwortStatus,
+  getPraesentationJahreswertung,
   starteQuiz,
 } from "../praesentation/statusActions";
 
@@ -54,6 +55,7 @@ import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import { resolvePodiumReveal } from "@/app/rendering/presentation/presentationRankingPolicy";
+import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -191,6 +193,7 @@ export default function ModerationClient({
   const [punktestand, setPunktestand] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
   >([]);
+  const [yearlyStandings, setYearlyStandings] = useState<YearlyRankingEntry[]>([]);
 
   const hatMedien = aktuelleMedien.length > 0;
 
@@ -664,8 +667,12 @@ export default function ModerationClient({
     }
 
     async function ladePunktestand() {
-      const daten = await getQuizPunktestand(quizId);
+      const [daten, jahreswertung] = await Promise.all([
+        getQuizPunktestand(quizId),
+        getPraesentationJahreswertung(quizId),
+      ]);
       setPunktestand(daten);
+      setYearlyStandings(jahreswertung);
     }
 
     void ladePunktestand();
@@ -755,6 +762,7 @@ export default function ModerationClient({
               aktuellerSlide={aktuellerSlide}
               countdownRestSekunden={countdownRestSekunden}
               punktestand={punktestand}
+              yearlyStandings={yearlyStandings}
               endstandRevealCount={endstandRevealCount}
               quiz={quiz}
               theme={theme}

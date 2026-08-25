@@ -94,6 +94,7 @@ test("non-question keys resolve to neutral answer-form states", () => {
     ["flow:13:INTERMEDIATE_STANDINGS", "Der Zwischenstand wird gezeigt"],
     ["default:AFTER_QUIZ:QUIZ:FINAL_STANDINGS", "Das Quiz ist beendet"],
     ["default:AFTER_QUIZ:QUIZ:WINNER", "Das Quiz ist beendet"],
+    ["default:AFTER_QUIZ:QUIZ:YEARLY_STANDINGS", "Das Quiz ist beendet"],
     ["default:AFTER_QUIZ:QUIZ:CLOSING", "Das Quiz ist beendet"],
     ["default:AFTER_QUIZ:QUIZ:CALENDAR_SUBSCRIPTION", "Das Quiz ist beendet"],
   ] as const;

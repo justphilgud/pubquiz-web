@@ -13,6 +13,7 @@ export const QUIZ_FLOW_ITEM_TYPES = [
   "INTERMEDIATE_STANDINGS",
   "FINAL_STANDINGS",
   "WINNER",
+  "YEARLY_STANDINGS",
   "CUSTOM_MESSAGE",
   "CALENDAR_SUBSCRIPTION",
   "CLOSING",
@@ -78,6 +79,7 @@ export const QUIZ_GLOBAL_FLOW_ITEM_TYPES = [
   "INTERMEDIATE_STANDINGS",
   "FINAL_STANDINGS",
   "WINNER",
+  "YEARLY_STANDINGS",
   "CUSTOM_MESSAGE",
   "CALENDAR_SUBSCRIPTION",
   "CLOSING",
@@ -693,14 +695,20 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
       standingsSize: "ALL",
       showPoints: true,
     }),
-    defaultItem("CLOSING", "AFTER_QUIZ", "QUIZ", null, 30, {
+    defaultItem("YEARLY_STANDINGS", "AFTER_QUIZ", "QUIZ", null, 30, {
+      version: 1,
+      title: "Jahreswertung",
+      standingsSize: "ALL",
+      showPoints: true,
+    }),
+    defaultItem("CLOSING", "AFTER_QUIZ", "QUIZ", null, 40, {
       version: 1,
       title: "Danke fürs Mitspielen!",
       body:
         quiz.outro_bekanntmachungen ??
         "Wir freuen uns auf den nächsten gemeinsamen Quizabend.",
     }),
-    defaultItem("CALENDAR_SUBSCRIPTION", "AFTER_QUIZ", "QUIZ", null, 40, {
+    defaultItem("CALENDAR_SUBSCRIPTION", "AFTER_QUIZ", "QUIZ", null, 50, {
       version: 1,
       title: "Kein PubQuiz mehr verpassen",
       body: "Scanne den QR-Code und abonniere unsere nächsten öffentlichen PubQuiz-Termine direkt in deinem Kalender.",
@@ -797,6 +805,7 @@ export function compareQuizFlowItems(left: QuizFlowItem, right: QuizFlowItem) {
   const standardAfterQuizOrder: Partial<Record<QuizFlowItemType, number>> = {
     WINNER: 10,
     FINAL_STANDINGS: 20,
+    YEARLY_STANDINGS: 30,
   };
   const leftOrder = left.isStandard && left.anchorType === "AFTER_QUIZ"
     ? (standardAfterQuizOrder[left.type] ?? left.order)
@@ -822,6 +831,7 @@ export function getQuizFlowTypeLabel(type: QuizFlowItemType) {
     INTERMEDIATE_STANDINGS: "Zwischenstand",
     FINAL_STANDINGS: "Endstand",
     WINNER: "Gewinner",
+    YEARLY_STANDINGS: "Jahreswertung",
     CUSTOM_MESSAGE: "Freie Mitteilung",
     CALENDAR_SUBSCRIPTION: "PubQuiz-Kalender",
     CLOSING: "Abschluss",
@@ -862,6 +872,9 @@ export function getInitialQuizFlowConfig(
   }
   if (type === "WINNER") {
     return { version: 1, title: "Herzlichen Glückwunsch", standingsSize: "TOP_3", showPoints: true };
+  }
+  if (type === "YEARLY_STANDINGS") {
+    return { version: 1, title: "Jahreswertung", standingsSize: "ALL", showPoints: true };
   }
   if (type === "QUESTION" || type === "QUESTION_SOLUTION") {
     return { version: 1 };
@@ -907,6 +920,7 @@ export function getQuizFlowAnswerStatus(type: QuizFlowItemType) {
   if (
     type === "FINAL_STANDINGS" ||
     type === "WINNER" ||
+    type === "YEARLY_STANDINGS" ||
     type === "CALENDAR_SUBSCRIPTION" ||
     type === "CLOSING"
   ) {

@@ -45,7 +45,7 @@ test("leitet einen vollständigen Standardablauf ohne Fragenkopien ab", () => {
     ["Runde 1", "Runde 2"],
   );
   assert.equal(flow.filter((item) => item.type === "INTERMEDIATE_STANDINGS").length, 1);
-  assert.deepEqual(flow.slice(-4).map((item) => item.type), ["WINNER", "FINAL_STANDINGS", "CLOSING", "CALENDAR_SUBSCRIPTION"]);
+  assert.deepEqual(flow.slice(-5).map((item) => item.type), ["WINNER", "FINAL_STANDINGS", "YEARLY_STANDINGS", "CLOSING", "CALENDAR_SUBSCRIPTION"]);
   assert.equal(flow.at(-1)?.enabled, true);
   assert.equal(flow.some((item) => item.type === ("QUESTION" as never)), false);
 });

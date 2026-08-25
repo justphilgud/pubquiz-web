@@ -290,18 +290,24 @@ Rankingdaten dürfen die globale Teamidentität transportieren; der Renderer ent
 | --- | --- | --- |
 | Zwischenstand | Rang und Punkte; kein Name, Foto oder Avatar | vollständige Teamidentität |
 | Endstand / Siegerehrung | Teamname, Punkte und Foto oder Avatar | vollständige Teamidentität |
+| Jahreswertung | Teamname, Jahrespunkte, Foto oder Avatar und semantische Rangbewegung | identische Jahreswertung |
 | bewusst gezeigte skurrile Antwort | Teamname, Antwort und Foto oder Avatar | Teamname, Antwort, Foto oder Avatar sowie Markierung |
 | Join-/QR-Slide | kompakte Identität aus Foto oder stabilem Avatar und Teamname | identische öffentliche Join-Identität |
 
 Der Fallback auf einen Systemavatar ist stabil und template-neutral. Templates dürfen die Anordnung gestalten, aber nicht die Audience-Regel umgehen.
 
 Der öffentliche Zwischenstand verwendet Competition-Ranking (`1, 2, 2, 4`)
-und zeigt die echten Punkte. Beim Endstand werden ausschließlich vorhandene
-Podiums-Ranggruppen bis Platz 3 in absteigender Reihenfolge aufgedeckt. Nach den
-Podiumsgruppen folgt genau eine vollständige Gesamtansicht; fehlende Ränge
-werden weder erfunden noch als leerer Reveal-Schritt dargestellt. Die
-Gesamtansicht enthält alle Teams, mit prominenten Podiumsgruppen und kompakter
-Restliste.
+und zeigt die echten Punkte. Die Siegerehrung deckt ausschließlich vorhandene
+Podiums-Ranggruppen in der Reihenfolge `3 → 2 → 1` auf. Danach folgt ein eigener
+Endstand-Slide mit allen Teams, prominenten Podiumsgruppen und kompakter
+Restliste; fehlende Ränge werden nicht erfunden.
+
+Die anschließende Jahreswertung summiert ausschließlich bereits vergebene
+Punkte aus nicht archivierten Quizzen derselben Eventreihe im Kalenderjahr bis
+einschließlich des aktuellen Quiz. Rangbewegungen vergleichen Competition-Ränge
+vor und nach dem aktuellen Quiz: aufwärts = grünes Dreieck, abwärts = rotes
+Dreieck, unverändert oder ohne belastbaren Vorher-Rang = weißer Punkt. Diese
+Read-Model-Berechnung verändert weder Bewertung noch Scoring oder Persistenz.
 
 ### FaceMorph in Präsentation und Antwortformular
 
@@ -327,7 +333,8 @@ Admin und Eventmanager im serverseitig geprüften Quiz-/Eventreihen-Scope dürfe
 | `app/quiz/funnyAnswerReveal.test.ts` | Nur freie Text-Interactions sind zulässig; ein bis drei Antworten passen auf eine Seite und fünf bleiben ohne Kürzung über zwei Seiten erreichbar. |
 | `app/quiz/[quizId]/praesentation/buildPraesentationSlides.test.ts` | Nur tatsächlich verfügbare Funny-Zustände liegen vor der zugehörigen Auflösung; abwesende Zustände erhöhen das Deck nicht. |
 | `app/rendering/presentation/presentationLiveState.test.ts` | Funny-Schlüssel erhalten die Fragenidentität, werden aber nicht zur Lösungsphase. |
-| `app/rendering/presentation/presentationRankingPolicy.test.ts` | Öffentliche Zwischenstände bleiben anonym; Competition-Ränge, Podiumsgruppen und Volltabellen-Reveal bleiben korrekt. |
+| `app/rendering/presentation/presentationRankingPolicy.test.ts` | Öffentliche Zwischenstände bleiben anonym; Competition-Ränge und vorhandene Podiumsgruppen bleiben korrekt. |
+| `app/quiz/yearlyRanking.test.ts` | Jahrespunkte, Competition-Ränge und neutrale/aufwärts/abwärts gerichtete Bewegungen bleiben reine Read-Model-Logik. |
 | `app/rendering/presentation/PresentationSlideRenderer.test.ts` | FaceMorph trennt Bildpräsentation und Antwortfelder; Rankings und Join-Identitäten erfüllen ihre Audience- und Layout-Verträge. |
 
 Corporate-/Venue-Templates wie LOVD sind Designkonfigurationen innerhalb der

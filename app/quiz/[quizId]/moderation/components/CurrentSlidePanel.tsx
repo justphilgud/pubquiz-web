@@ -16,6 +16,7 @@ import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
+import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 
 type PunktestandEintrag = {
   teamId: number;
@@ -31,6 +32,7 @@ type Props = {
   aktuellerSlide: Slide | undefined;
   countdownRestSekunden: number;
   punktestand: PunktestandEintrag[];
+  yearlyStandings: YearlyRankingEntry[];
   endstandRevealCount: number;
   quiz: QuizPraesentationResult;
   theme: ResolvedQuizTheme;
@@ -65,6 +67,7 @@ export default function CurrentSlidePanel({
   aktuellerSlide,
   countdownRestSekunden,
   punktestand,
+  yearlyStandings,
   endstandRevealCount,
   quiz,
   theme,
@@ -155,6 +158,7 @@ export default function CurrentSlidePanel({
                 renderMode: "MODERATION_PREVIEW",
                 templateRevealCount: endstandRevealCount,
                 punktestand,
+                yearlyStandings,
                 endstandRevealCount,
                 now,
                 estimationPhase,

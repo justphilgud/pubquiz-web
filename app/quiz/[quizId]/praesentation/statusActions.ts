@@ -23,6 +23,7 @@ import {
   withPrismaQueryDiagnostics,
 } from "@/app/lib/prismaQueryDiagnostics.server";
 import { mapTeamProfile } from "@/app/teams/teamProfile";
+import { loadYearlyRanking } from "@/app/quiz/yearlyRanking.server";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
@@ -95,6 +96,11 @@ export async function getPraesentationPunktestand(quizId: number) {
       photoUrl: entry.photoUrl,
       punkte: Number(entry.punkte),
     }));
+}
+
+export async function getPraesentationJahreswertung(quizId: number) {
+  await requireQuizViewer(quizId);
+  return loadYearlyRanking(quizId);
 }
 
 export async function setPraesentationSlideIndex(

@@ -341,7 +341,7 @@ export function isStandingsSlide(slide: Slide | undefined) {
     slide?.typ === "zwischenstand" ||
     slide?.typ === "endstand" ||
     (slide?.typ === "ablauf" &&
-      ["INTERMEDIATE_STANDINGS", "FINAL_STANDINGS", "WINNER"].includes(
+      ["INTERMEDIATE_STANDINGS", "FINAL_STANDINGS", "WINNER", "YEARLY_STANDINGS"].includes(
         slide.element.type,
       ))
   );

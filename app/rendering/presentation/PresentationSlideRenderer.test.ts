@@ -366,6 +366,55 @@ test("podium ceremony reveals 3-2-1 before the full final table", () => {
   }
 });
 
+test("yearly standings render every team with accessible movement markers", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const slide: Slide = {
+    typ: "ablauf",
+    abschnitt: null,
+    element: {
+      id: "yearly-test",
+      persistentId: null,
+      type: "YEARLY_STANDINGS",
+      anchorType: "AFTER_QUIZ",
+      anchorKey: "QUIZ",
+      sectionId: null,
+      order: 30,
+      enabled: true,
+      label: "Jahreswertung",
+      config: { version: 1, title: "Jahreswertung", standingsSize: "ALL", showPoints: true },
+      configVersion: 1,
+      questionAssignmentId: null,
+      isStandard: true,
+    },
+  };
+  const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz: runtime.quiz,
+    slide,
+    slides: [slide],
+    slideIndex: 0,
+    slideLabel: "JAHRESWERTUNG",
+    theme: runtime.theme,
+    displayState: {
+      ...displayState,
+      yearlyStandings: [
+        { teamId: 1, teamname: "Aufsteiger", punkte: 88, place: 1, previousPlace: 2, trend: "UP", avatarCode: "teekanne", photoUrl: null },
+        { teamId: 2, teamname: "Absteiger", punkte: 80, place: 2, previousPlace: 1, trend: "DOWN", avatarCode: "wecker", photoUrl: null },
+        { teamId: 3, teamname: "Konstant", punkte: 70, place: 3, previousPlace: 3, trend: "SAME", avatarCode: "tischlampe", photoUrl: null },
+        { teamId: 4, teamname: "Neu dabei", punkte: 60, place: 4, previousPlace: null, trend: "SAME", avatarCode: "gummistiefel", photoUrl: null },
+      ],
+    },
+  }));
+
+  assert.match(html, /Aufsteiger/);
+  assert.match(html, /Absteiger/);
+  assert.match(html, /Konstant/);
+  assert.match(html, /Neu dabei/);
+  assert.match(html, /Verbessert von Platz 2 auf Platz 1/);
+  assert.match(html, /Gefallen von Platz 1 auf Platz 2/);
+  assert.match(html, /Unverändert auf Platz 3/);
+  assert.match(html, /Noch kein Vorher-Rang/);
+});
+
 test("LOVD rules keep every configured entry in the bounded slide layout", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const theme = structuredClone(runtime.theme);
