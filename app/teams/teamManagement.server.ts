@@ -165,6 +165,7 @@ export async function loadTeamDetail(actor: AuthorizationActor, teamId: number) 
       ist_archiviert: true,
       created_at: true,
       updated_at: true,
+      _count: { select: { quiz_teams: true } },
       quiz_team_sessions: {
         where: scopedSessionWhere(actor),
         orderBy: [{ quiz: { quiz_datum: "desc" } }, { erstellt_am: "desc" }],
@@ -187,5 +188,6 @@ export async function loadTeamDetail(actor: AuthorizationActor, teamId: number) 
   return {
     ...mapTeam(team),
     password: authorizedTeam.team_passwort ?? "",
+    hasHistory: team.quiz_team_sessions.length > 0 || team._count.quiz_teams > 0,
   };
 }

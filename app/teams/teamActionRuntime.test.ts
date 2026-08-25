@@ -11,6 +11,8 @@ const lifecyclePanel = readFileSync(
   "app/admin/teams/TeamLifecyclePanel.tsx",
   "utf8",
 );
+const teamListPage = readFileSync("app/admin/teams/page.tsx", "utf8");
+const deletionService = readFileSync("app/teams/teamDeletion.ts", "utf8");
 
 test("team server-action module exports runtime functions only", () => {
   assert.match(actions, /^"use server";/);
@@ -37,8 +39,11 @@ test("team forms keep initial action state outside the server-action module", ()
 test("expected lifecycle conflicts return inline action messages", () => {
   assert.match(actions, /Dieses Team ist bereits archiviert/);
   assert.match(actions, /Dieses Team ist bereits aktiv/);
-  assert.match(actions, /Quiz-Historie und kann nur archiviert werden/);
-  assert.match(actions, /Teamnamen exakt zur Bestätigung/);
+  assert.match(actions, /deleteTeamInTransaction/);
+  assert.match(actions, /redirect\(`\/admin\/teams\?deleted=/);
+  assert.doesNotMatch(lifecyclePanel, /deleteState\.deleted/);
+  assert.match(teamListPage, /Unbenutztes Team wurde gelöscht/);
+  assert.match(deletionService, /Teamnamen exakt zur Bestätigung/);
   assert.match(passwordPanel, /aria-live="polite"/);
   assert.match(lifecyclePanel, /aria-live="polite"/);
 });

@@ -10,6 +10,7 @@ const actions = readFileSync("app/teams/actions.ts", "utf8");
 const passwordPanel = readFileSync("app/admin/teams/TeamPasswordPanel.tsx", "utf8");
 const detailPage = readFileSync("app/admin/teams/[teamId]/page.tsx", "utf8");
 const lifecyclePanel = readFileSync("app/admin/teams/TeamLifecyclePanel.tsx", "utf8");
+const deletionService = readFileSync("app/teams/teamDeletion.ts", "utf8");
 const listLoader = managementService.slice(
   managementService.indexOf("export async function loadTeamManagementPage"),
   managementService.indexOf("export async function loadTeamDetail"),
@@ -55,9 +56,13 @@ test("event-manager direct object access is checked server-side", () => {
 
 test("destructive actions are admin-only and history needs explicit name confirmation", () => {
   assert.match(actions, /requireAdminTeamActor/);
-  assert.match(actions, /confirmation !== team\.teamname/);
-  assert.match(actions, /quiz_team_sessions\.deleteMany/);
-  assert.match(actions, /quiz_teams\.deleteMany/);
+  assert.match(deletionService, /confirmation !== team\.teamname/);
+  assert.match(deletionService, /quiz_team_sessions\.deleteMany/);
+  assert.match(deletionService, /quiz_teams\.deleteMany/);
+  assert.match(deletionService, /team_answer_submissions\.deleteMany/);
+  assert.match(deletionService, /team_antwort_auswahlen\.deleteMany/);
+  assert.match(deletionService, /team_antwortfelder\.deleteMany/);
+  assert.match(deletionService, /team_antworten\.deleteMany/);
   assert.match(lifecyclePanel, /Team endgültig löschen/);
   assert.match(lifecyclePanel, /Sessions, Antworten, Bewertungen, Punkte und Quizzuordnungen/);
 });

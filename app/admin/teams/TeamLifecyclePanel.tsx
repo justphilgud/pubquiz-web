@@ -14,11 +14,13 @@ export function TeamLifecyclePanel({
   teamName,
   isArchived,
   participationCount,
+  hasHistory,
 }: {
   teamId: number;
   teamName: string;
   isArchived: boolean;
   participationCount: number;
+  hasHistory: boolean;
 }) {
   const router = useRouter();
   const [archiveState, archiveAction, archivePending] = useActionState(
@@ -29,10 +31,6 @@ export function TeamLifecyclePanel({
     deleteTeamAction,
     INITIAL_TEAM_ACTION_RESULT,
   );
-
-  useEffect(() => {
-    if (deleteState.deleted) router.replace("/admin/teams");
-  }, [deleteState.deleted, router]);
 
   useEffect(() => {
     if (archiveState.success) router.refresh();
@@ -58,12 +56,20 @@ export function TeamLifecyclePanel({
 
       <div className="mt-6 border-t border-red-200 pt-5">
         <h3 className="font-bold text-red-800">Gefahrenbereich</h3>
-        {participationCount === 0 ? (
+        {!hasHistory ? (
           <>
             <p className="mt-2 text-sm text-slate-700">
               Dieses Team hat an keinem Quiz teilgenommen und kann ohne historische Datenverluste gelöscht werden.
             </p>
-            <form action={deleteAction} className="mt-3">
+            <form
+              action={deleteAction}
+              className="mt-3"
+              onSubmit={(event) => {
+                if (!window.confirm(`Team „${teamName}“ wirklich löschen?`)) {
+                  event.preventDefault();
+                }
+              }}
+            >
               <input type="hidden" name="teamId" value={teamId} />
               <input type="hidden" name="force" value="false" />
               <button type="submit" disabled={deletePending} className="min-h-11 rounded-xl bg-red-700 px-4 py-2 font-semibold text-white hover:bg-red-800 disabled:opacity-50">
@@ -74,7 +80,9 @@ export function TeamLifecyclePanel({
         ) : (
           <>
             <p className="mt-2 text-sm font-semibold text-red-800">
-              Team „{teamName}“ hat an {participationCount} {participationCount === 1 ? "Quiz" : "Quizzen"} teilgenommen.
+              Team „{teamName}“ hat {participationCount > 0
+                ? `an ${participationCount} ${participationCount === 1 ? "Quiz" : "Quizzen"} teilgenommen`
+                : "eine historische Quizzuordnung"}.
               Beim endgültigen Löschen werden Sessions, Antworten, Bewertungen, Punkte und Quizzuordnungen entfernt.
             </p>
             <form action={deleteAction} className="mt-4 space-y-3 rounded-xl border border-red-200 bg-red-50 p-4">

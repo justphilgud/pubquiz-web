@@ -14,6 +14,7 @@ export default async function TeamManagementPage({
 }) {
   const { actor } = await requireTeamManagementActor();
   const params = await searchParams;
+  const deleted = first(params.deleted);
   const query = first(params.q)?.trim() ?? "";
   const rawStatus = first(params.status);
   const status: TeamListStatus = rawStatus === "ARCHIVED" || rawStatus === "ALL" ? rawStatus : "ACTIVE";
@@ -30,6 +31,17 @@ export default async function TeamManagementPage({
             Globale Teams schnell finden, Zugangswörter unterstützen und Teilnahmen im erlaubten Eventreihen-Scope einsehen.
           </p>
         </div>
+
+        {(deleted === "unused" || deleted === "force") && (
+          <p
+            className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
+            role="status"
+          >
+            {deleted === "force"
+              ? "Team und seine Quiz-Historie wurden endgültig gelöscht."
+              : "Unbenutztes Team wurde gelöscht."}
+          </p>
+        )}
 
         <form className="mt-6 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
           <label>

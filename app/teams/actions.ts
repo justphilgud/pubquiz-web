@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { logTeamAudit } from "./teamAudit.server";
@@ -10,6 +11,7 @@ import {
   requireTeamManagementActor,
   TeamManagementAccessError,
 } from "./teamManagement.server";
+import { deleteTeamInTransaction } from "./teamDeletion";
 import type { TeamActionResult } from "./teamActionResult";
 
 function parseTeamId(value: FormDataEntryValue | null) {
@@ -123,63 +125,29 @@ export async function deleteTeamAction(
   _previous: TeamActionResult,
   formData: FormData,
 ): Promise<TeamActionResult> {
+  let redirectMode: "force" | "unused";
   try {
     const actor = await requireAdminTeamActor();
     const teamId = parseTeamId(formData.get("teamId"));
     const force = formData.get("force") === "true";
     const confirmation = String(formData.get("confirmation") ?? "").trim();
-    const team = await prisma.teams.findUnique({
-      where: { team_id: teamId },
-      select: {
-        teamname: true,
-        quiz_team_sessions: { select: { quiz_id: true } },
-      },
-    });
-    if (!team) throw new TeamManagementAccessError();
-    const participationCount = team.quiz_team_sessions.length;
-    if (participationCount > 0 && !force) {
-      return { success: false, message: "Dieses Team hat Quiz-Historie und kann nur archiviert werden." };
+    const result = await prisma.$transaction((transaction) =>
+      deleteTeamInTransaction(transaction, { teamId, force, confirmation }),
+    );
+    if (result.status === "not_found") throw new TeamManagementAccessError();
+    if (result.status !== "deleted") {
+      return { success: false, message: result.message };
     }
-    if (force && confirmation !== team.teamname) {
-      return { success: false, message: "Bitte den Teamnamen exakt zur Bestätigung eingeben." };
-    }
-
-    const affectedQuizIds = [...new Set(team.quiz_team_sessions.map(({ quiz_id }) => quiz_id))];
-    await prisma.$transaction(async (transaction) => {
-      if (force) {
-        await transaction.quiz_team_sessions.deleteMany({ where: { team_id: teamId } });
-      }
-      await transaction.quiz_teams.deleteMany({ where: { team_id: teamId } });
-      await transaction.teams.delete({ where: { team_id: teamId } });
-      for (const quizId of affectedQuizIds) {
-        const statistics = await transaction.quiz_team_sessions.aggregate({
-          where: { quiz_id: quizId },
-          _count: { quiz_team_session_id: true },
-          _sum: { spieler_anzahl: true },
-        });
-        await transaction.quiz.update({
-          where: { quiz_id: quizId },
-          data: {
-            team_anzahl: statistics._count.quiz_team_session_id,
-            teilnehmer_anzahl: statistics._sum.spieler_anzahl ?? 0,
-          },
-        });
-      }
-    });
     logTeamAudit(force ? "team_force_deleted" : "team_deleted", {
       actorUserId: actor.userId,
       teamId,
-      participationCount,
+      participationCount: result.participationCount,
     });
     revalidatePath("/admin/teams");
-    return {
-      success: true,
-      message: force
-        ? "Team und seine Quiz-Historie wurden endgültig gelöscht."
-        : "Unbenutztes Team wurde gelöscht.",
-      deleted: true,
-    };
+    redirectMode = force ? "force" : "unused";
   } catch (error) {
     return actionFailure("delete", error);
   }
+
+  redirect(`/admin/teams?deleted=${redirectMode}`);
 }
