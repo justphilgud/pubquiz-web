@@ -18,6 +18,7 @@ import {
   type RoleAssignmentRoleValue,
   type RoleScopeTypeValue,
 } from "@/app/roles/roleAssignmentPolicy";
+import { canAccessTeamManagement } from "@/app/teams/teamManagementPolicy";
 
 export const ROLE_PERMISSION_PROFILE_IDS = [
   "ADMIN_GLOBAL",
@@ -41,6 +42,7 @@ export const ROLE_PERMISSION_IDS = [
   "TEMPLATES",
   "CATEGORIES",
   "USERS",
+  "TEAMS",
 ] as const;
 
 export type RolePermissionId = (typeof ROLE_PERMISSION_IDS)[number];
@@ -103,6 +105,7 @@ const permissionChecks: Record<
   TEMPLATES: (actor) => getPresentationTemplateCapabilities(actor).canView,
   CATEGORIES: isAdministrator,
   USERS: canManageUsers,
+  TEAMS: canAccessTeamManagement,
 };
 
 function resolveAccess(profile: RolePermissionProfile, granted: boolean): RolePermissionAccess {

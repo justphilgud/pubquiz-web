@@ -273,6 +273,14 @@ export default async function HomePage() {
                 />
               </>
             )}
+            {capabilities.canManageTeams && (
+              <QuickActionCard
+                href="/admin/teams"
+                title="Teams"
+                description="Globale Teams und Zugangswörter verwalten."
+                icon={UserGroupIcon}
+              />
+            )}
           </div>
         </section>
 

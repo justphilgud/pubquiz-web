@@ -6,6 +6,7 @@ import {
   canManageCategories,
   canManageQuizzes,
   canManageUsers,
+  canManageTeams,
   canCreateQuestions,
   isAdmin,
 } from "@/app/lib/permissions";
@@ -54,6 +55,7 @@ export default async function AppHeader() {
       getPresentationTemplateCapabilities(actor).canView,
     canManageCategories: canManageCategories(actor),
     canManageUsers: canManageUsers(actor),
+    canManageTeams: canManageTeams(actor),
   });
 
   return (

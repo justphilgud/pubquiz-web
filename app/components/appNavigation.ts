@@ -11,6 +11,7 @@ export type AppNavigationCapabilities = {
   canViewPresentationTemplates: boolean;
   canManageCategories: boolean;
   canManageUsers: boolean;
+  canManageTeams: boolean;
 };
 
 export function getAppNavigationItems(
@@ -25,6 +26,9 @@ export function getAppNavigationItems(
       : []),
     ...(capabilities.canManageQuizzes
       ? [{ href: "/quiz", label: "Quiz" }]
+      : []),
+    ...(capabilities.canManageTeams
+      ? [{ href: "/admin/teams", label: "Teams" }]
       : []),
     ...(capabilities.canViewPresentationTemplates
       ? [{ href: "/templates", label: "Templates" }]

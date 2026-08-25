@@ -11,6 +11,7 @@ import {
   isAdministrator,
   type AuthorizationActor,
 } from "@/app/roles/roleAssignmentPolicy";
+import { canAccessTeamManagement } from "@/app/teams/teamManagementPolicy";
 
 export function isAdmin(actor: AuthorizationActor) {
   return isAdministrator(actor);
@@ -188,6 +189,10 @@ export function canManageUsers(actor: AuthorizationActor) {
   return actorCanManageUsers(actor);
 }
 
+export function canManageTeams(actor: AuthorizationActor) {
+  return canAccessTeamManagement(actor);
+}
+
 export function canManageEventSeries(actor: AuthorizationActor) {
   return canManageQuizzes(actor);
 }
@@ -203,6 +208,7 @@ export type DashboardCapabilities = {
   canViewReviewQueue: boolean;
   canManageQuizzes: boolean;
   canManageUsers: boolean;
+  canManageTeams: boolean;
   canViewAdminTools: boolean;
 };
 
@@ -214,6 +220,7 @@ export function getDashboardCapabilities(actor: AuthorizationActor): DashboardCa
     canViewReviewQueue: canViewReviewQueue(actor),
     canManageQuizzes: canManageQuizzes(actor),
     canManageUsers: canManageUsers(actor),
+    canManageTeams: canManageTeams(actor),
     canViewAdminTools: canViewAdminTools(actor),
   };
 }

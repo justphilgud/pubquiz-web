@@ -27,6 +27,9 @@ test("permission matrix is derived from authorization policies", () => {
   assert.equal(rows.EVENT_REVIEW.EVENT_MANAGER_EVENT_SERIES, "ASSIGNED_EVENT_SERIES");
   assert.equal(rows.QUIZZES.EVENT_MANAGER_EVENT_SERIES, "ASSIGNED_EVENT_SERIES");
   assert.equal(rows.TEMPLATES.EVENT_MANAGER_EVENT_SERIES, "NONE");
+  assert.equal(rows.TEAMS.ADMIN_GLOBAL, "GLOBAL");
+  assert.equal(rows.TEAMS.EVENT_MANAGER_EVENT_SERIES, "ASSIGNED_EVENT_SERIES");
+  assert.equal(rows.TEAMS.EDITOR_GLOBAL, "NONE");
 });
 
 test("every role profile and permission has localized explanatory text", () => {

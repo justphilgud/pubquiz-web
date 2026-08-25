@@ -70,6 +70,7 @@ export const deRoleMessages = {
       TEMPLATES: "Präsentationstemplates verwalten",
       CATEGORIES: "Kategorien verwalten",
       USERS: "Benutzer verwalten",
+      TEAMS: "Teams und Zugangswörter verwalten",
     },
     access: {
       GLOBAL: "Global",

@@ -73,6 +73,7 @@ export const enRoleMessages: WidenMessageCatalog<typeof deRoleMessages> = {
       TEMPLATES: "Manage presentation templates",
       CATEGORIES: "Manage categories",
       USERS: "Manage users",
+      TEAMS: "Manage teams and access words",
     },
     access: {
       GLOBAL: "Global",

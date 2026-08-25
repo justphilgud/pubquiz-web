@@ -10,6 +10,7 @@ import {
   canManageCategories,
   canManageQuizzes,
   canManageUsers,
+  canManageTeams,
 } from "@/app/lib/permissions";
 
 const adminActor: AuthorizationActor = {
@@ -31,6 +32,7 @@ function navigationItemsFor(actor: AuthorizationActor) {
     canViewPresentationTemplates: canManageUsers(actor),
     canManageCategories: canManageCategories(actor),
     canManageUsers: canManageUsers(actor),
+    canManageTeams: canManageTeams(actor),
   });
 }
 
@@ -39,6 +41,7 @@ test("admin navigation orders event series, quiz and templates before users", ()
     { href: "/content", label: "Content" },
     { href: "/admin/eventreihen", label: "Eventreihen" },
     { href: "/quiz", label: "Quiz" },
+    { href: "/admin/teams", label: "Teams" },
     { href: "/templates", label: "Templates" },
     { href: "/admin/users", label: "Benutzer" },
   ]);
@@ -54,6 +57,7 @@ test("category capability never exposes the dashboard-only category route", () =
       canViewPresentationTemplates: false,
       canManageCategories: true,
       canManageUsers: false,
+      canManageTeams: false,
     }).some(({ href }) => href === "/admin/kategorien"),
     false,
   );
@@ -75,6 +79,7 @@ test("USER without global or event-series rights has no functional navigation", 
       canViewPresentationTemplates: false,
       canManageCategories: false,
       canManageUsers: false,
+      canManageTeams: false,
     }),
     [],
   );
@@ -90,11 +95,13 @@ test("membership capabilities expose operational navigation without users", () =
       canViewPresentationTemplates: false,
       canManageCategories: false,
       canManageUsers: false,
+      canManageTeams: true,
     }),
     [
       { href: "/content", label: "Content" },
       { href: "/admin/eventreihen", label: "Eventreihen" },
       { href: "/quiz", label: "Quiz" },
+      { href: "/admin/teams", label: "Teams" },
     ],
   );
 });
@@ -141,6 +148,7 @@ test("either existing content capability exposes one shared navigation item", ()
     canViewPresentationTemplates: false,
     canManageCategories: false,
     canManageUsers: false,
+    canManageTeams: false,
   };
   assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: true, canAccessStoryElements: false }), [{ href: "/content", label: "Content" }]);
   assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: false, canAccessStoryElements: true }), [{ href: "/content", label: "Content" }]);
