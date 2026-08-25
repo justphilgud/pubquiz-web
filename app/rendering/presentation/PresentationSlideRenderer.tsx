@@ -56,7 +56,7 @@ import {
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
-import { shouldShowTeamIdentity } from "./presentationRankingPolicy";
+import { rankScores, shouldShowTeamIdentity } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
 type ScoreEntry = {
@@ -937,9 +937,7 @@ function renderRennPferd({
   );
 }
 function renderZwischenstandSlide() {
-  const sortiertePunkte = [...punktestand]
-    .sort((a, b) => b.punkte - a.punkte)
-    .slice(0, 5);
+  const sortiertePunkte = rankScores(punktestand).slice(0, 5);
   const showIdentity = shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode });
 
   if (theme.design.stylePreset === "EDITORIAL") {
@@ -953,8 +951,8 @@ function renderZwischenstandSlide() {
           <ol className="presentation-flow-ranking-list">
             {sortiertePunkte.map((team, index) => (
               <li key={`${team.teamname}-${index}`}>
-                <span className="presentation-flow-rank">{index + 1}</span>
-                <strong>{showIdentity ? team.teamname : `${index + 1}. Platz`}</strong>
+                <span className="presentation-flow-rank">{team.place}</span>
+                <strong>{showIdentity ? team.teamname : `${team.place}. Platz`}</strong>
                 <span>{formatQuizPoints(team.punkte)} Punkte</span>
               </li>
             ))}
@@ -1014,7 +1012,7 @@ function renderZwischenstandSlide() {
                 className="grid grid-cols-[90px_1fr_130px] items-center gap-4"
               >
                 <div className="flex h-full items-center justify-center rounded-2xl border-4 border-yellow-300 bg-slate-950/80 text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
-                  {index + 1}
+                  {team.place}
                 </div>
 
                 <div className="relative h-full min-h-[72px] overflow-visible rounded-2xl border-4 border-cyan-300 bg-slate-950/70 shadow-[4px_4px_0_#ff00aa]">
@@ -1030,7 +1028,7 @@ function renderZwischenstandSlide() {
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
 
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
-                    {showIdentity ? team.teamname : `#${index + 1}`}
+                    {showIdentity ? team.teamname : `Rang ${team.place}`}
                   </div>
 
                   <div
@@ -1043,7 +1041,7 @@ function renderZwischenstandSlide() {
 
                     {renderRennPferd({
                       farbe: pferdeFarben[index % pferdeFarben.length],
-                      nummer: index + 1,
+                      nummer: team.place,
                     })}
                   </div>
 
@@ -1941,7 +1939,7 @@ function renderFlowStandingsSlide(
   slide: Extract<Slide, { typ: "ablauf" }>,
 ) {
   const { config, type } = slide.element;
-  const sorted = [...punktestand].sort((left, right) => right.punkte - left.punkte);
+  const sorted = rankScores(punktestand);
   const limit =
     config.standingsSize === "TOP_3"
       ? 3
@@ -1954,7 +1952,7 @@ function renderFlowStandingsSlide(
   const placeGroups = Array.from(
     new Set(
       teams.map(
-        (team) => sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1,
+        (team) => team.place,
       ),
     ),
   ).sort((left, right) => right - left);
@@ -1968,7 +1966,7 @@ function renderFlowStandingsSlide(
   const finalPodium = type === "INTERMEDIATE_STANDINGS" ? null : (
     <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
       {teams.slice(0, 3).map((team) => {
-        const place = sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1;
+        const place = team.place;
         const visible = visiblePlaces.includes(place);
         return <article key={`flow-podium-${team.teamname}`} data-place={place} className={visible ? "opacity-100" : "opacity-25 blur-sm"}>
           {visible && <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)} className={place === 1 ? "h-24 w-24" : "h-20 w-20"} />}
@@ -2000,7 +1998,7 @@ function renderFlowStandingsSlide(
       ) : listTeams.length > 0 ? (
         <ol className="presentation-flow-ranking-list" data-many={listTeams.length > 6}>
           {listTeams.map((team) => {
-            const place = sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1;
+            const place = team.place;
             return (
               <li
                 key={team.teamname}
