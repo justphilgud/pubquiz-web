@@ -65,6 +65,7 @@ export const presentationPreviewRegistry = [
   { id: "COUNTDOWN", label: "Countdown", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Countdown-Slide", uniqueVisualState: true, flowType: "COUNTDOWN" },
   { id: "BREAK", label: "Pause", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Pausen-Slide", uniqueVisualState: true, flowType: "BREAK" },
   { id: "INTERMEDIATE_STANDINGS", label: "Zwischenstand", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Zwischenstand", uniqueVisualState: true, flowType: "INTERMEDIATE_STANDINGS" },
+  { id: "WINNER", label: "Siegerehrung", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktive Podium-Enthüllung", uniqueVisualState: true, flowType: "WINNER" },
   { id: "FINAL_STANDINGS", label: "Endstand", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Endstand", uniqueVisualState: true, flowType: "FINAL_STANDINGS" },
   { id: "CALENDAR", label: "Kalender / QR", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Kalender-Abo-Slide", uniqueVisualState: true, flowType: "CALENDAR_SUBSCRIPTION" },
   { id: "CLOSING", label: "Outro", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Abschluss-Slide", uniqueVisualState: true, flowType: "CLOSING" },
@@ -382,6 +383,13 @@ function buildPreviewFlowConfig(type: QuizFlowItemType): QuizFlowConfig {
     ...base,
     title: "Das Ergebnis",
     standingsSize: "TOP_5",
+    showPoints: true,
+  };
+  if (type === "WINNER") return {
+    ...base,
+    title: "Das Podium",
+    body: "Platz für Platz enthüllt",
+    standingsSize: "TOP_3",
     showPoints: true,
   };
   if (type === "CALENDAR_SUBSCRIPTION") return {

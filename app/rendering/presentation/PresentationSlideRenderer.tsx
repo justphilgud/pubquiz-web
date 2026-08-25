@@ -58,9 +58,8 @@ import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
 import {
   rankScores,
-  resolveFinalStandingsReveal,
+  resolvePodiumReveal,
   resolveIntermediateStandingsAudience,
-  shouldShowTeamIdentity,
 } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
@@ -1089,10 +1088,11 @@ function renderEndstandSlide() {
   const pferdeFarben = ["#22d3ee", "#fb7185", "#84cc16", "#60a5fa", "#f59e0b"];
 
   const teamsMitPlatz = topTeams.map((team) => ({ ...team, platz: team.place }));
-  const finalReveal = resolveFinalStandingsReveal(punktestand, endstandRevealCount);
+  const finalReveal = resolvePodiumReveal(punktestand, endstandRevealCount);
+  const showFullTable = endstandRevealCount > finalReveal.revealStageCount;
   const sichtbarePlaetze = finalReveal.visiblePodiumGroups.map((group) => group.place);
   const sichtbareTeams = teamsMitPlatz.filter(
-    (team) => finalReveal.showFullTable || sichtbarePlaetze.includes(team.platz),
+    (team) => showFullTable || sichtbarePlaetze.includes(team.platz),
   );
 
   const renderIdentity = (team: ScoreEntry, className = "h-14 w-14") => (
@@ -1128,7 +1128,7 @@ function renderEndstandSlide() {
         ) : (
           <ol className="presentation-flow-ranking-list" data-many={sichtbareTeams.length > 6}>
             {sichtbareTeams.map((team) => {
-              const istSichtbar = finalReveal.showFullTable || sichtbarePlaetze.includes(team.platz);
+              const istSichtbar = showFullTable || sichtbarePlaetze.includes(team.platz);
               return (
                 <li key={team.teamname} className={istSichtbar ? "opacity-100" : "opacity-30"}>
                   <span className="presentation-flow-rank">{team.platz}</span>
@@ -2015,31 +2015,49 @@ function renderFlowStandingsSlide(
   }
 
   const sorted = rankScores(punktestand);
-  const teams = type === "FINAL_STANDINGS"
-    ? sorted
-    : sorted.filter((team) => team.punkte === sorted[0]?.punkte);
-  const finalReveal = resolveFinalStandingsReveal(sorted, endstandRevealCount);
-  const placeGroups = Array.from(
-    new Set(
-      teams.map(
-        (team) => team.place,
-      ),
-    ),
-  ).sort((left, right) => right - left);
-  const visiblePlaces = type === "FINAL_STANDINGS"
-    ? finalReveal.visiblePodiumGroups.map((group) => group.place)
-    : placeGroups;
+  const podiumReveal = resolvePodiumReveal(sorted, endstandRevealCount);
   const hidden = config.standingsSize === "HIDDEN";
   const showPoints = config.showPoints !== false;
-  const standingsType = type === "WINNER" ? "WINNER" : "FINAL";
-  const showIdentity = shouldShowTeamIdentity({ standingsType, renderMode });
-  const finalPodium = type === "FINAL_STANDINGS" ? (
+
+  if (hidden) {
+    return (
+      <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
+        <p className="presentation-flow-kicker">Ergebnisse</p>
+        <h2>{config.title ?? "Endstand"}</h2>
+        <div className="presentation-flow-message">Der Endstand wird gerade berechnet.</div>
+      </section>
+    );
+  }
+
+  if (sorted.length === 0) {
+    return (
+      <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
+        <p className="presentation-flow-kicker">Ergebnisse</p>
+        <h2>{config.title ?? "Endstand"}</h2>
+        <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
+      </section>
+    );
+  }
+
+  const podiumGroups = type === "WINNER"
+    ? podiumReveal.visiblePodiumGroups
+    : [...podiumReveal.podiumGroups].sort((left, right) => left.place - right.place);
+
+  return (
+    <section
+      className={`presentation-flow-slide presentation-flow-ranking ${type === "WINNER" ? "presentation-ranking-ceremony" : "presentation-ranking-overview"}`}
+      data-flow-type={type}
+    >
+      <p className="presentation-flow-kicker">{type === "WINNER" ? "Siegerehrung" : "Endstand"}</p>
+      <h2>{config.title ?? (type === "WINNER" ? "Das Podium" : "Finale Tabelle")}</h2>
+      {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+
     <div
       className="presentation-ranking-podium"
-      data-group-count={finalReveal.podiumGroups.length}
+      data-group-count={podiumGroups.length}
       aria-label="Podium Platz eins bis drei"
     >
-      {finalReveal.visiblePodiumGroups.map((group) => (
+      {podiumGroups.map((group) => (
         <article key={`flow-podium-group-${group.place}`} data-place={group.place}>
           <div className="presentation-ranking-podium-team-group">
             {group.entries.map((team) => (
@@ -2059,70 +2077,32 @@ function renderFlowStandingsSlide(
         </article>
       ))}
     </div>
-  ) : (
-    <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
-      {teams.slice(0, 3).map((team) => {
-        const place = team.place;
-        const visible = visiblePlaces.includes(place);
-        return <article key={`flow-podium-${team.teamname}`} data-place={place} className={visible ? "opacity-100" : "opacity-25 blur-sm"}>
-          {visible && <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)} className={place === 1 ? "h-24 w-24" : "h-20 w-20"} />}
-          <strong>{visible ? team.teamname : "Noch geheim"}</strong>
-          {showPoints && <span>{visible ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>}
-          <b>#{place}</b>
-        </article>;
-      })}
-    </div>
-  );
-  const listTeams = type === "FINAL_STANDINGS"
-      ? finalReveal.showFullTable
-        ? finalReveal.remainingEntries
-        : []
-      : teams.slice(3);
 
-  return (
-    <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
-      <p className="presentation-flow-kicker">
-        {type === "WINNER"
-            ? "Gewinner"
-            : "Endstand"}
-      </p>
-      <h2>{config.title ?? (type === "WINNER" ? "Herzlichen Glückwunsch" : "Aktueller Punktestand")}</h2>
-      {config.body && <p className="presentation-flow-lead">{config.body}</p>}
-      {finalPodium}
-      {type === "FINAL_STANDINGS" && !finalReveal.showFullTable && finalReveal.podiumGroups.length > 0 && (
+      {type === "WINNER" && podiumReveal.visiblePodiumGroups.length < podiumReveal.podiumGroups.length && (
         <p className="presentation-ranking-reveal-hint">
-          Podium wird Platz für Platz enthüllt.
+          Das Podium wird von Platz 3 bis Platz 1 enthüllt.
         </p>
       )}
-      {hidden ? (
-        <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
-      ) : teams.length === 0 ? (
-        <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
-      ) : listTeams.length > 0 ? (
-        <ol className="presentation-flow-ranking-list" data-many={listTeams.length > 6}>
-          {listTeams.map((team) => {
-            const place = team.place;
-            return (
-              <li
-                key={team.teamname}
-                className={
-                  type === "FINAL_STANDINGS" && finalReveal.showFullTable ||
-                  visiblePlaces.includes(place)
-                    ? "opacity-100"
-                    : "opacity-25 blur-sm"
-                }
-              >
-                <span className="presentation-flow-rank">{type === "WINNER" ? "★" : place}</span>
-                <strong className="flex items-center gap-3">
-                  {showIdentity && <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)} className="h-12 w-12" />}
-                  {showIdentity ? team.teamname : `${place}. Platz`}
-                </strong>
-                {showPoints && <span>{formatQuizPoints(team.punkte)} Punkte</span>}
-              </li>
-            );
-          })}
+
+      {type === "FINAL_STANDINGS" && podiumReveal.remainingEntries.length > 0 && (
+        <ol className="presentation-flow-ranking-list" data-many={podiumReveal.remainingEntries.length > 6}>
+          {podiumReveal.remainingEntries.map((team) => (
+            <li key={`${team.teamId ?? team.teamname}-${team.place}`}>
+              <span className="presentation-flow-rank">{team.place}</span>
+              <strong className="flex items-center gap-3">
+                <TeamIdentityVisual
+                  name={team.teamname}
+                  photoUrl={team.photoUrl}
+                  avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)}
+                  className="h-12 w-12"
+                />
+                {team.teamname}
+              </strong>
+              {showPoints && <span>{formatQuizPoints(team.punkte)} Punkte</span>}
+            </li>
+          ))}
         </ol>
-      ) : null}
+      )}
     </section>
   );
 }

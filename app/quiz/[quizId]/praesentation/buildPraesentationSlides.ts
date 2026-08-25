@@ -347,10 +347,10 @@ export function isStandingsSlide(slide: Slide | undefined) {
   );
 }
 
-export function isFinalStandingsSlide(slide: Slide | undefined) {
+export function isPodiumRevealSlide(slide: Slide | undefined) {
   return (
     slide?.typ === "endstand" ||
-    (slide?.typ === "ablauf" && slide.element.type === "FINAL_STANDINGS")
+    (slide?.typ === "ablauf" && slide.element.type === "WINNER")
   );
 }
 

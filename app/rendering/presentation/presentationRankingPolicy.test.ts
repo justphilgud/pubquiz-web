@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   rankScores,
   resolveIntermediateStandingsAudience,
-  resolveFinalStandingsReveal,
+  resolvePodiumReveal,
   shouldShowTeamIdentity,
 } from "./presentationRankingPolicy";
 
@@ -62,23 +62,18 @@ test("ties use competition ranking without inventing the next place", () => {
   );
 });
 
-test("final reveal uses only existing podium groups before the full table", () => {
+test("podium reveal uses only existing rank groups in ceremony order", () => {
   const scores = [100, 90, 90, 80, 70].map((punkte, index) => ({
     team: `Team ${index + 1}`,
     punkte,
   }));
 
-  const first = resolveFinalStandingsReveal(scores, 1);
+  const first = resolvePodiumReveal(scores, 1);
   assert.deepEqual(first.podiumGroups.map((group) => group.place), [2, 1]);
   assert.deepEqual(first.visiblePodiumGroups.map((group) => group.place), [2]);
-  assert.equal(first.showFullTable, false);
-  assert.equal(first.revealStageCount, 3);
+  assert.equal(first.revealStageCount, 2);
 
-  const second = resolveFinalStandingsReveal(scores, 2);
+  const second = resolvePodiumReveal(scores, 2);
   assert.deepEqual(second.visiblePodiumGroups.map((group) => group.place), [2, 1]);
-  assert.equal(second.showFullTable, false);
-
-  const full = resolveFinalStandingsReveal(scores, 3);
-  assert.equal(full.showFullTable, true);
-  assert.deepEqual(full.ranked.map((entry) => entry.place), [1, 2, 2, 4, 5]);
+  assert.deepEqual(second.ranked.map((entry) => entry.place), [1, 2, 2, 4, 5]);
 });

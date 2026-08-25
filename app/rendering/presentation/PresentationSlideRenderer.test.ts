@@ -292,9 +292,9 @@ test("public interim standings expose competition ranks and points without ident
   assert.match(moderationHtml, /secret-alpha\.jpg/);
 });
 
-test("final standings reveal podium groups 3-2-1 before showing every team", () => {
+test("podium ceremony reveals 3-2-1 before the full final table", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
-  const slide: Slide = {
+  const finalSlide: Slide = {
     typ: "ablauf",
     abschnitt: runtime.quiz.abschnitte[0],
     element: {
@@ -313,6 +313,16 @@ test("final standings reveal podium groups 3-2-1 before showing every team", () 
       isStandard: true,
     },
   };
+  const podiumSlide: Slide = {
+    ...finalSlide,
+    element: {
+      ...finalSlide.element,
+      id: "podium-test",
+      type: "WINNER",
+      label: "Siegerehrung",
+      config: { version: 1, title: "Das Podium", standingsSize: "TOP_3", showPoints: true },
+    },
+  };
   const scores = Array.from({ length: 12 }, (_, index) => ({
     teamId: index + 1,
     teamname: `Finalteam ${index + 1}`,
@@ -320,11 +330,11 @@ test("final standings reveal podium groups 3-2-1 before showing every team", () 
     avatarCode: "teekanne" as const,
     photoUrl: null,
   }));
-  const render = (revealCount: number, count = 5) =>
+  const render = (slide: Slide, revealCount: number, count = 5) =>
     renderToStaticMarkup(createElement(PresentationSlideRenderer, {
       quiz: runtime.quiz,
       slide,
-      slides: [slide],
+      slides: [podiumSlide, finalSlide],
       slideIndex: 0,
       slideLabel: "ENDSTAND",
       theme: runtime.theme,
@@ -336,19 +346,19 @@ test("final standings reveal podium groups 3-2-1 before showing every team", () 
       },
     }));
 
-  const placeThree = render(1);
+  const placeThree = render(podiumSlide, 1);
   assert.match(placeThree, /Finalteam 3/);
   assert.doesNotMatch(placeThree, /Finalteam 1|Finalteam 2|Finalteam 4/);
-  const placeTwo = render(2);
+  const placeTwo = render(podiumSlide, 2);
   assert.match(placeTwo, /Finalteam 2/);
   assert.match(placeTwo, /Finalteam 3/);
   assert.doesNotMatch(placeTwo, /Finalteam 1|Finalteam 4/);
-  const placeOne = render(3);
+  const placeOne = render(podiumSlide, 3);
   assert.match(placeOne, /Finalteam 1/);
   assert.doesNotMatch(placeOne, /Finalteam 4/);
 
   for (const count of [5, 8, 10, 12]) {
-    const full = render(4, count);
+    const full = render(finalSlide, 1, count);
     for (let index = 1; index <= count; index += 1) {
       assert.match(full, new RegExp(`Finalteam ${index}(?!\\d)`));
     }

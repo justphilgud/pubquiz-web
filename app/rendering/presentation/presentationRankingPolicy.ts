@@ -48,7 +48,7 @@ export function resolveIntermediateStandingsAudience<
   }));
 }
 
-export function resolveFinalStandingsReveal<T extends { punkte: number }>(
+export function resolvePodiumReveal<T extends { punkte: number }>(
   scores: readonly T[],
   revealCount: number,
 ) {
@@ -58,17 +58,12 @@ export function resolveFinalStandingsReveal<T extends { punkte: number }>(
     return entries.length > 0 ? [{ place, entries }] : [];
   });
   const normalizedRevealCount = Math.max(0, Math.trunc(revealCount));
-  const showFullTable =
-    ranked.length > 0 && normalizedRevealCount > podiumGroups.length;
 
   return {
     ranked,
     podiumGroups,
-    visiblePodiumGroups: showFullTable
-      ? podiumGroups
-      : podiumGroups.slice(0, normalizedRevealCount),
+    visiblePodiumGroups: podiumGroups.slice(0, normalizedRevealCount),
     remainingEntries: ranked.filter((entry) => entry.place > 3),
-    showFullTable,
-    revealStageCount: ranked.length > 0 ? podiumGroups.length + 1 : 0,
+    revealStageCount: podiumGroups.length,
   };
 }

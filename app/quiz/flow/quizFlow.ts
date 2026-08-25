@@ -680,17 +680,17 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
   });
 
   result.push(
-    defaultItem("FINAL_STANDINGS", "AFTER_QUIZ", "QUIZ", null, 10, {
+    defaultItem("WINNER", "AFTER_QUIZ", "QUIZ", null, 10, {
       version: 1,
-      title: "Endstand",
-      standingsSize: "ALL",
+      title: "Das Podium",
+      body: "Wir enthüllen Platz für Platz.",
+      standingsSize: "TOP_3",
       showPoints: true,
     }),
-    defaultItem("WINNER", "AFTER_QUIZ", "QUIZ", null, 20, {
+    defaultItem("FINAL_STANDINGS", "AFTER_QUIZ", "QUIZ", null, 20, {
       version: 1,
-      title: "Herzlichen Glückwunsch",
-      body: "Danke für einen großartigen Quizabend.",
-      standingsSize: "TOP_3",
+      title: "Finale Tabelle",
+      standingsSize: "ALL",
       showPoints: true,
     }),
     defaultItem("CLOSING", "AFTER_QUIZ", "QUIZ", null, 30, {
@@ -794,6 +794,17 @@ export function compareQuizFlowItems(left: QuizFlowItem, right: QuizFlowItem) {
   if (left.sectionId !== right.sectionId) {
     return (left.sectionId ?? 0) - (right.sectionId ?? 0);
   }
+  const standardAfterQuizOrder: Partial<Record<QuizFlowItemType, number>> = {
+    WINNER: 10,
+    FINAL_STANDINGS: 20,
+  };
+  const leftOrder = left.isStandard && left.anchorType === "AFTER_QUIZ"
+    ? (standardAfterQuizOrder[left.type] ?? left.order)
+    : left.order;
+  const rightOrder = right.isStandard && right.anchorType === "AFTER_QUIZ"
+    ? (standardAfterQuizOrder[right.type] ?? right.order)
+    : right.order;
+  if (leftOrder !== rightOrder) return leftOrder - rightOrder;
   return left.order - right.order;
 }
 

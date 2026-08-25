@@ -18,7 +18,7 @@ import {
   getPresentationSlideKey,
   getSlideModeratorNote,
   isPauseSlide,
-  isFinalStandingsSlide,
+  isPodiumRevealSlide,
   isStandingsSlide,
 } from "../praesentation/buildPraesentationSlides";
 import {
@@ -53,7 +53,7 @@ import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
-import { resolveFinalStandingsReveal } from "@/app/rendering/presentation/presentationRankingPolicy";
+import { resolvePodiumReveal } from "@/app/rendering/presentation/presentationRankingPolicy";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -404,12 +404,15 @@ export default function ModerationClient({
       return;
     }
 
-    if (isFinalStandingsSlide(aktuellerSlide)) {
+    if (isPodiumRevealSlide(aktuellerSlide)) {
       const punktestand = await getQuizPunktestand(quizId);
-      const revealStageCount = resolveFinalStandingsReveal(
+      const reveal = resolvePodiumReveal(
         punktestand,
         endstandRevealCount,
-      ).revealStageCount;
+      );
+      const revealStageCount = aktuellerSlide?.typ === "endstand"
+        ? reveal.revealStageCount + 1
+        : reveal.revealStageCount;
 
       if (endstandRevealCount < revealStageCount) {
         const neuerRevealCount = Math.min(
