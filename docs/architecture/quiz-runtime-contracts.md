@@ -282,6 +282,35 @@ steuert anschließend auch öffentliche Feeds.
 
 ## Presentation Template Contract
 
+### Teamidentität nach Audience und Phase
+
+Rankingdaten dürfen die globale Teamidentität transportieren; der Renderer entscheidet anhand der Audience und der fachlichen Phase, ob sie sichtbar wird:
+
+| Zustand | Öffentliche Präsentation | Moderationsansicht |
+| --- | --- | --- |
+| Zwischenstand | Rang und Punkte; kein Name, Foto oder Avatar | vollständige Teamidentität |
+| Endstand / Siegerehrung | Teamname, Punkte und Foto oder Avatar | vollständige Teamidentität |
+| bewusst gezeigte skurrile Antwort | Teamname, Antwort und Foto oder Avatar | Teamname, Antwort, Foto oder Avatar sowie Markierung |
+
+Der Fallback auf einen Systemavatar ist stabil und template-neutral. Templates dürfen die Anordnung gestalten, aber nicht die Audience-Regel umgehen.
+
+### Funny-Reveal
+
+`team_antworten.ist_skurril` bleibt die einzige Markierung für „Falsch aber lustig“. Es wird kein paralleles Funny-Flag persistiert. Der Reveal ist ein reiner Präsentationszustand und verändert weder Submission noch Bewertung, Punkte oder kanonische Lösung.
+
+```text
+Frage → optional FUNNY → richtige Auflösung
+```
+
+Admin und Eventmanager im serverseitig geprüften Quiz-/Eventreihen-Scope dürfen die bestehende Markierung setzen. Die Moderation kann bei vorhandenen Treffern ausdrücklich den Funny-Schritt wählen oder direkt zur Auflösung springen. Ohne Treffer wird der technische Zwischenschritt übersprungen. Pro Seite erscheinen höchstens drei Antworten; weitere Seiten bleiben über denselben Reveal-Zustand erreichbar. Erst danach folgt unverändert die normale Auflösung.
+
+| Testdatei | Geschützte Invariante |
+| --- | --- |
+| `app/quiz/funnyAnswerReveal.test.ts` | Ein bis drei Antworten passen auf eine Seite; fünf Antworten bleiben ohne Kürzung über zwei Seiten erreichbar. |
+| `app/quiz/[quizId]/praesentation/buildPraesentationSlides.test.ts` | Der stabile Funny-Zustand liegt für jede Frage vor der richtigen Auflösung. |
+| `app/rendering/presentation/presentationLiveState.test.ts` | Funny-Schlüssel erhalten die Fragenidentität, werden aber nicht zur Lösungsphase. |
+| `app/rendering/presentation/presentationRankingPolicy.test.ts` | Öffentliche Zwischenstände bleiben anonym; finale und bewusst identifizierende Phasen dürfen Teamidentität zeigen. |
+
 Corporate-/Venue-Templates wie LOVD sind Designkonfigurationen innerhalb der
 bestehenden Template- und Theme-Infrastruktur. Sie:
 
