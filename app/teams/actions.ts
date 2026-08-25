@@ -11,15 +11,7 @@ import {
   TeamManagementAccessError,
 } from "./teamManagement.server";
 import { generateTeamPassword } from "./teamPassword";
-
-export type TeamActionResult = {
-  success: boolean;
-  message: string;
-  revealedPassword?: string;
-  deleted?: boolean;
-};
-
-export const INITIAL_TEAM_ACTION_RESULT: TeamActionResult = { success: false, message: "" };
+import type { TeamActionResult } from "./teamActionResult";
 
 function parseTeamId(value: FormDataEntryValue | null) {
   const teamId = Number(value);
@@ -109,7 +101,15 @@ export async function archiveTeamAction(
       where: { team_id: teamId, ist_archiviert: false },
       data: { ist_archiviert: true, archiviert_am: new Date() },
     });
-    if (result.count === 0) await assertTeamAccess(actor, teamId);
+    if (result.count === 0) {
+      const team = await assertTeamAccess(actor, teamId);
+      return {
+        success: false,
+        message: team.ist_archiviert
+          ? "Dieses Team ist bereits archiviert."
+          : "Das Team konnte nicht archiviert werden.",
+      };
+    }
     logTeamAudit("team_archived", { actorUserId: actor.userId, teamId });
     revalidateTeam(teamId);
     return { success: true, message: "Team wurde archiviert." };
@@ -129,7 +129,15 @@ export async function reactivateTeamAction(
       where: { team_id: teamId, ist_archiviert: true },
       data: { ist_archiviert: false, archiviert_am: null },
     });
-    if (result.count === 0) await assertTeamAccess(actor, teamId);
+    if (result.count === 0) {
+      const team = await assertTeamAccess(actor, teamId);
+      return {
+        success: false,
+        message: team.ist_archiviert
+          ? "Das Team konnte nicht reaktiviert werden."
+          : "Dieses Team ist bereits aktiv.",
+      };
+    }
     logTeamAudit("team_reactivated", { actorUserId: actor.userId, teamId });
     revalidateTeam(teamId);
     return { success: true, message: "Team wurde reaktiviert." };

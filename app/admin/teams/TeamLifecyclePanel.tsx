@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import {
   archiveTeamAction,
   deleteTeamAction,
-  INITIAL_TEAM_ACTION_RESULT,
   reactivateTeamAction,
 } from "@/app/teams/actions";
+import { INITIAL_TEAM_ACTION_RESULT } from "@/app/teams/teamActionResult";
 
 export function TeamLifecyclePanel({
   teamId,
@@ -33,6 +33,10 @@ export function TeamLifecyclePanel({
   useEffect(() => {
     if (deleteState.deleted) router.replace("/admin/teams");
   }, [deleteState.deleted, router]);
+
+  useEffect(() => {
+    if (archiveState.success) router.refresh();
+  }, [archiveState.success, router]);
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

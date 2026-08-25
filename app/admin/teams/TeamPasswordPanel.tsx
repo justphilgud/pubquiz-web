@@ -2,11 +2,11 @@
 
 import { useActionState, useState, useTransition } from "react";
 import {
-  INITIAL_TEAM_ACTION_RESULT,
   randomizeTeamPasswordAction,
   revealTeamPasswordAction,
   setTeamPasswordAction,
 } from "@/app/teams/actions";
+import { INITIAL_TEAM_ACTION_RESULT } from "@/app/teams/teamActionResult";
 
 export function TeamPasswordPanel({ teamId }: { teamId: number }) {
   const [state, formAction, pending] = useActionState(
