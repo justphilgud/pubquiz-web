@@ -1,12 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { chooseManagedTeamAvatar, removeManagedTeamPhoto, setManagedTeamPhotoUploadLock } from "@/app/teams/teamProfileManagementActions";
 import { TeamAvatarPicker } from "@/app/teams/TeamAvatarPicker";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import type { TeamProfile } from "@/app/teams/teamProfile";
+import { TeamPhotoUploadResponseError, uploadTeamPhoto } from "@/app/teams/teamPhotoUpload.client";
 
-export function TeamProfileManagementPanel({ teamName, initialProfile, isAdmin }: { teamName: string; initialProfile: TeamProfile; isAdmin: boolean }) {
+export function TeamProfileManagementPanel({ teamName, initialProfile, isAdmin, uploadEnvironmentPrefix }: { teamName: string; initialProfile: TeamProfile; isAdmin: boolean; uploadEnvironmentPrefix: BlobEnvironmentPrefix }) {
   const [profile, setProfile] = useState(initialProfile);
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState(false);
@@ -15,18 +17,16 @@ export function TeamProfileManagementPanel({ teamName, initialProfile, isAdmin }
   async function upload(file: File | undefined) {
     if (!file || !isAdmin) return;
     setPending(true);
-    const body = new FormData();
-    body.set("mode", "ADMIN");
-    body.set("teamId", String(profile.teamId));
-    body.set("file", file);
     try {
-      const response = await fetch("/api/team-profile-photo", { method: "POST", body });
-      const result = await response.json() as { success: boolean; profile?: TeamProfile; message?: string };
-      if (!response.ok || !result.success || !result.profile) throw new Error(result.message);
-      setProfile(result.profile);
+      const nextProfile = await uploadTeamPhoto(file, uploadEnvironmentPrefix, { mode: "ADMIN", teamId: profile.teamId });
+      setProfile(nextProfile);
       setMessage("Teamfoto gespeichert.");
     } catch (error) {
-      setMessage(error instanceof Error && error.message ? error.message : "Foto konnte nicht gespeichert werden.");
+      console.error("Teamfoto-Upload im Browser fehlgeschlagen", {
+        errorName: error instanceof Error ? error.name : typeof error,
+        ...(error instanceof TeamPhotoUploadResponseError ? error.details : {}),
+      });
+      setMessage(error instanceof Error && error.message ? error.message : "Foto konnte nicht hochgeladen werden. Bitte versuche es erneut.");
     } finally {
       setPending(false);
     }

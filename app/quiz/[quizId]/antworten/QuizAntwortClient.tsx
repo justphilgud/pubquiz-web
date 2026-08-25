@@ -187,10 +187,12 @@ export default function QuizAntwortClient({
   daten,
   theme,
   calendarSubscriptionUrl,
+  teamPhotoUploadEnvironment,
 }: {
   daten: AntwortStatus;
   theme: ResolvedQuizTheme;
   calendarSubscriptionUrl: string;
+  teamPhotoUploadEnvironment: "dev" | "preview" | "prod";
 }) {
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");
@@ -1087,6 +1089,7 @@ export default function QuizAntwortClient({
             initialProfile={teamProfile}
             initiallyOpen={teamProfileInitiallyOpen}
             calendarSubscriptionUrl={calendarSubscriptionUrl}
+            uploadEnvironmentPrefix={teamPhotoUploadEnvironment}
           />
         )}
 

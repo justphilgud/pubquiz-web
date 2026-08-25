@@ -1,12 +1,8 @@
 import sharp from "sharp";
-
-export const MAX_TEAM_PHOTO_UPLOAD_BYTES = 8 * 1024 * 1024;
-export const ALLOWED_TEAM_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+import { validateTeamPhotoUpload } from "./teamPhotoUpload";
 
 export function validateTeamPhotoFile(file: File) {
-  if (!ALLOWED_TEAM_PHOTO_TYPES.has(file.type) || file.size <= 0 || file.size > MAX_TEAM_PHOTO_UPLOAD_BYTES) {
-    throw new Error("Bitte ein JPG-, PNG- oder WebP-Bild bis 8 MB wählen.");
-  }
+  validateTeamPhotoUpload(file);
 }
 
 export async function normalizeTeamPhoto(input: Buffer) {

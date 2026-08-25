@@ -4,6 +4,7 @@ import QuizAntwortClient from "./QuizAntwortClient";
 import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
 import { getCalendarRequestOrigin } from "@/app/calendar/calendarOrigin.server";
 import { buildPublicCalendarSubscriptionUrl } from "@/app/calendar/publicCalendar";
+import { getMediaUploadEnvironmentPrefix } from "@/app/fragen/editor/mediaUploadEnvironment";
 
 type Props = {
   params: Promise<{
@@ -34,6 +35,7 @@ export default async function QuizAntwortPage({ params }: Props) {
       daten={daten}
       theme={templates.theme}
       calendarSubscriptionUrl={buildPublicCalendarSubscriptionUrl(calendarOrigin)}
+      teamPhotoUploadEnvironment={getMediaUploadEnvironmentPrefix()}
     />
   );
 }

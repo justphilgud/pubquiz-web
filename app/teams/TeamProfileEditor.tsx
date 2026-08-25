@@ -2,10 +2,12 @@
 
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useId, useRef, useState } from "react";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { chooseOwnTeamAvatar, removeOwnTeamPhoto } from "./profileActions";
 import { TeamAvatarPicker } from "./TeamAvatarPicker";
 import { TeamIdentityVisual } from "./TeamIdentityVisual";
 import type { TeamProfile } from "./teamProfile";
+import { TeamPhotoUploadResponseError, uploadTeamPhoto } from "./teamPhotoUpload.client";
 
 export function TeamProfileEditor({
   quizId,
@@ -14,6 +16,7 @@ export function TeamProfileEditor({
   initialProfile,
   initiallyOpen = false,
   calendarSubscriptionUrl,
+  uploadEnvironmentPrefix,
 }: {
   quizId: number;
   sessionToken: string;
@@ -21,6 +24,7 @@ export function TeamProfileEditor({
   initialProfile: TeamProfile;
   initiallyOpen?: boolean;
   calendarSubscriptionUrl: string;
+  uploadEnvironmentPrefix: BlobEnvironmentPrefix;
 }) {
   const [profile, setProfile] = useState(initialProfile);
   const [isOpen, setIsOpen] = useState(initiallyOpen);
@@ -34,19 +38,21 @@ export function TeamProfileEditor({
     if (!file) return;
     setPending(true);
     setMessage("");
-    const body = new FormData();
-    body.set("mode", "TEAM");
-    body.set("quizId", String(quizId));
-    body.set("sessionToken", sessionToken);
-    body.set("file", file);
     try {
-      const response = await fetch("/api/team-profile-photo", { method: "POST", body });
-      const result = await response.json() as { success: boolean; profile?: TeamProfile; message?: string };
-      if (!response.ok || !result.success || !result.profile) throw new Error(result.message);
-      setProfile(result.profile);
+      const nextProfile = await uploadTeamPhoto(file, uploadEnvironmentPrefix, {
+        mode: "TEAM",
+        teamId: profile.teamId,
+        quizId,
+        sessionToken,
+      });
+      setProfile(nextProfile);
       setMessage("Teamfoto gespeichert.");
     } catch (error) {
-      setMessage(error instanceof Error && error.message ? error.message : "Foto konnte nicht gespeichert werden.");
+      console.error("Teamfoto-Upload im Browser fehlgeschlagen", {
+        errorName: error instanceof Error ? error.name : typeof error,
+        ...(error instanceof TeamPhotoUploadResponseError ? error.details : {}),
+      });
+      setMessage(error instanceof Error && error.message ? error.message : "Foto konnte nicht hochgeladen werden. Bitte versuche es erneut.");
     } finally {
       setPending(false);
     }

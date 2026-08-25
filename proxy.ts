@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   "/calendar/subscribe",
   "/api/auth",
   "/api/quiz/team-live-snapshot",
+  "/api/team-profile-photo",
 ];
 
 function isPublicPath(pathname: string) {
