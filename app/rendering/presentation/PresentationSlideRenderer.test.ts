@@ -292,6 +292,70 @@ test("public interim standings expose competition ranks and points without ident
   assert.match(moderationHtml, /secret-alpha\.jpg/);
 });
 
+test("final standings reveal podium groups 3-2-1 before showing every team", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const slide: Slide = {
+    typ: "ablauf",
+    abschnitt: runtime.quiz.abschnitte[0],
+    element: {
+      id: "final-test",
+      persistentId: null,
+      type: "FINAL_STANDINGS",
+      anchorType: "AFTER_QUIZ",
+      anchorKey: "QUIZ",
+      sectionId: null,
+      order: 1,
+      enabled: true,
+      label: "Endstand",
+      config: { version: 1, title: "Finale Tabelle", standingsSize: "TOP_5", showPoints: true },
+      configVersion: 1,
+      questionAssignmentId: null,
+      isStandard: true,
+    },
+  };
+  const scores = Array.from({ length: 12 }, (_, index) => ({
+    teamId: index + 1,
+    teamname: `Finalteam ${index + 1}`,
+    punkte: 120 - index * 5,
+    avatarCode: "teekanne" as const,
+    photoUrl: null,
+  }));
+  const render = (revealCount: number, count = 5) =>
+    renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz: runtime.quiz,
+      slide,
+      slides: [slide],
+      slideIndex: 0,
+      slideLabel: "ENDSTAND",
+      theme: runtime.theme,
+      displayState: {
+        ...displayState,
+        renderMode: "PRESENTATION",
+        endstandRevealCount: revealCount,
+        punktestand: scores.slice(0, count),
+      },
+    }));
+
+  const placeThree = render(1);
+  assert.match(placeThree, /Finalteam 3/);
+  assert.doesNotMatch(placeThree, /Finalteam 1|Finalteam 2|Finalteam 4/);
+  const placeTwo = render(2);
+  assert.match(placeTwo, /Finalteam 2/);
+  assert.match(placeTwo, /Finalteam 3/);
+  assert.doesNotMatch(placeTwo, /Finalteam 1|Finalteam 4/);
+  const placeOne = render(3);
+  assert.match(placeOne, /Finalteam 1/);
+  assert.doesNotMatch(placeOne, /Finalteam 4/);
+
+  for (const count of [5, 8, 10, 12]) {
+    const full = render(4, count);
+    for (let index = 1; index <= count; index += 1) {
+      assert.match(full, new RegExp(`Finalteam ${index}(?!\\d)`));
+    }
+    assert.doesNotMatch(full, /Noch geheim/);
+  }
+});
+
 test("LOVD rules keep every configured entry in the bounded slide layout", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const theme = structuredClone(runtime.theme);

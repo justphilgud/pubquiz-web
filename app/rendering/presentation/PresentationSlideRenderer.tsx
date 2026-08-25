@@ -56,7 +56,11 @@ import {
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
-import { rankScores, shouldShowTeamIdentity } from "./presentationRankingPolicy";
+import {
+  rankScores,
+  resolveFinalStandingsReveal,
+  shouldShowTeamIdentity,
+} from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
 type ScoreEntry = {
@@ -1075,28 +1079,15 @@ function renderZwischenstandSlide() {
 }
 
 function renderEndstandSlide() {
-  const topTeams = punktestand.slice(0, 5);
+  const topTeams = rankScores(punktestand);
   const maxPunkte = Math.max(...topTeams.map((team) => team.punkte), 1);
   const pferdeFarben = ["#22d3ee", "#fb7185", "#84cc16", "#60a5fa", "#f59e0b"];
 
-  const teamsMitPlatz = topTeams.map((team) => {
-    const ersterIndexMitDiesenPunkten = topTeams.findIndex(
-      (vergleichsTeam) => vergleichsTeam.punkte === team.punkte
-    );
-
-    return {
-      ...team,
-      platz: ersterIndexMitDiesenPunkten + 1,
-    };
-  });
-
-  const platzGruppen = Array.from(
-    new Set(teamsMitPlatz.map((team) => team.platz))
-  ).sort((a, b) => b - a);
-
-  const sichtbarePlaetze = platzGruppen.slice(
-    0,
-    Math.min(endstandRevealCount, platzGruppen.length)
+  const teamsMitPlatz = topTeams.map((team) => ({ ...team, platz: team.place }));
+  const finalReveal = resolveFinalStandingsReveal(punktestand, endstandRevealCount);
+  const sichtbarePlaetze = finalReveal.visiblePodiumGroups.map((group) => group.place);
+  const sichtbareTeams = teamsMitPlatz.filter(
+    (team) => finalReveal.showFullTable || sichtbarePlaetze.includes(team.platz),
   );
 
   const renderIdentity = (team: ScoreEntry, className = "h-14 w-14") => (
@@ -1110,12 +1101,11 @@ function renderEndstandSlide() {
 
   const podium = (
     <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
-      {teamsMitPlatz.filter((team) => team.platz <= 3).sort((left, right) => left.platz - right.platz).map((team) => {
-        const visible = sichtbarePlaetze.includes(team.platz);
-        return <article key={`podium-${team.teamname}`} data-place={team.platz} className={visible ? "opacity-100" : "opacity-25 blur-sm"}>
-          {visible ? renderIdentity(team, team.platz === 1 ? "h-24 w-24" : "h-20 w-20") : <div className="h-20 w-20 rounded-full bg-white/10" />}
-          <strong>{visible ? team.teamname : "Noch geheim"}</strong>
-          <span>{visible ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>
+      {teamsMitPlatz.filter((team) => team.platz <= 3 && sichtbarePlaetze.includes(team.platz)).sort((left, right) => left.platz - right.platz).map((team) => {
+        return <article key={`podium-${team.teamname}`} data-place={team.platz}>
+          {renderIdentity(team, team.platz === 1 ? "h-24 w-24" : "h-20 w-20")}
+          <strong>{team.teamname}</strong>
+          <span>{formatQuizPoints(team.punkte)} Punkte</span>
           <b>#{team.platz}</b>
         </article>;
       })}
@@ -1131,9 +1121,9 @@ function renderEndstandSlide() {
         {teamsMitPlatz.length === 0 ? (
           <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
         ) : (
-          <ol className="presentation-flow-ranking-list">
-            {teamsMitPlatz.map((team) => {
-              const istSichtbar = sichtbarePlaetze.includes(team.platz);
+          <ol className="presentation-flow-ranking-list" data-many={sichtbareTeams.length > 6}>
+            {sichtbareTeams.map((team) => {
+              const istSichtbar = finalReveal.showFullTable || sichtbarePlaetze.includes(team.platz);
               return (
                 <li key={team.teamname} className={istSichtbar ? "opacity-100" : "opacity-30"}>
                   <span className="presentation-flow-rank">{team.platz}</span>
@@ -1160,14 +1150,14 @@ function renderEndstandSlide() {
 
       <div className="min-h-0 flex-1 rounded-[1.5rem] border-4 border-cyan-300 bg-black/45 p-4 shadow-[6px_6px_0_#ff00aa]">
         <div className="grid h-full gap-3">
-          {teamsMitPlatz.map((team, index) => {
+          {sichtbareTeams.map((team, index) => {
             const prozent = Math.max(8, (team.punkte / maxPunkte) * 100);
             const pferdLinks = `calc(${prozent}% - 5rem)`;
             const istSichtbar = sichtbarePlaetze.includes(team.platz);
             const platz = team.platz;
 
             const istGewinner =
-              team.punkte === topTeams[0].punkte;
+              team.punkte === topTeams[0]?.punkte;
 
             const istTot = !istGewinner;
 
@@ -1946,9 +1936,12 @@ function renderFlowStandingsSlide(
       : config.standingsSize === "TOP_5"
         ? 5
         : sorted.length;
-  const teams = type === "WINNER"
+  const teams = type === "FINAL_STANDINGS"
+    ? sorted
+    : type === "WINNER"
     ? sorted.filter((team) => team.punkte === sorted[0]?.punkte)
     : sorted.slice(0, limit);
+  const finalReveal = resolveFinalStandingsReveal(sorted, endstandRevealCount);
   const placeGroups = Array.from(
     new Set(
       teams.map(
@@ -1957,13 +1950,39 @@ function renderFlowStandingsSlide(
     ),
   ).sort((left, right) => right - left);
   const visiblePlaces = type === "FINAL_STANDINGS"
-    ? placeGroups.slice(0, Math.min(endstandRevealCount, placeGroups.length))
+    ? finalReveal.visiblePodiumGroups.map((group) => group.place)
     : placeGroups;
   const hidden = config.standingsSize === "HIDDEN";
   const showPoints = config.showPoints !== false;
   const standingsType = type === "INTERMEDIATE_STANDINGS" ? "INTERMEDIATE" : type === "WINNER" ? "WINNER" : "FINAL";
   const showIdentity = shouldShowTeamIdentity({ standingsType, renderMode });
-  const finalPodium = type === "INTERMEDIATE_STANDINGS" ? null : (
+  const finalPodium = type === "INTERMEDIATE_STANDINGS" ? null : type === "FINAL_STANDINGS" ? (
+    <div
+      className="presentation-ranking-podium"
+      data-group-count={finalReveal.podiumGroups.length}
+      aria-label="Podium Platz eins bis drei"
+    >
+      {finalReveal.visiblePodiumGroups.map((group) => (
+        <article key={`flow-podium-group-${group.place}`} data-place={group.place}>
+          <div className="presentation-ranking-podium-team-group">
+            {group.entries.map((team) => (
+              <div key={`flow-podium-${team.teamname}`} className="presentation-ranking-podium-team">
+                <TeamIdentityVisual
+                  name={team.teamname}
+                  photoUrl={team.photoUrl}
+                  avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)}
+                  className={group.place === 1 ? "h-24 w-24" : "h-20 w-20"}
+                />
+                <strong>{team.teamname}</strong>
+              </div>
+            ))}
+          </div>
+          {showPoints && <span>{formatQuizPoints(group.entries[0]?.punkte ?? 0)} Punkte</span>}
+          <b>#{group.place}</b>
+        </article>
+      ))}
+    </div>
+  ) : (
     <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
       {teams.slice(0, 3).map((team) => {
         const place = team.place;
@@ -1977,7 +1996,13 @@ function renderFlowStandingsSlide(
       })}
     </div>
   );
-  const listTeams = type === "INTERMEDIATE_STANDINGS" ? teams : teams.slice(3);
+  const listTeams = type === "INTERMEDIATE_STANDINGS"
+    ? teams
+    : type === "FINAL_STANDINGS"
+      ? finalReveal.showFullTable
+        ? finalReveal.remainingEntries
+        : []
+      : teams.slice(3);
 
   return (
     <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
@@ -1991,6 +2016,11 @@ function renderFlowStandingsSlide(
       <h2>{config.title ?? (type === "WINNER" ? "Herzlichen Glückwunsch" : "Aktueller Punktestand")}</h2>
       {config.body && <p className="presentation-flow-lead">{config.body}</p>}
       {finalPodium}
+      {type === "FINAL_STANDINGS" && !finalReveal.showFullTable && finalReveal.podiumGroups.length > 0 && (
+        <p className="presentation-ranking-reveal-hint">
+          Podium wird Platz für Platz enthüllt.
+        </p>
+      )}
       {hidden ? (
         <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
       ) : teams.length === 0 ? (
@@ -2002,7 +2032,12 @@ function renderFlowStandingsSlide(
             return (
               <li
                 key={team.teamname}
-                className={visiblePlaces.includes(place) ? "opacity-100" : "opacity-25 blur-sm"}
+                className={
+                  type === "FINAL_STANDINGS" && finalReveal.showFullTable ||
+                  visiblePlaces.includes(place)
+                    ? "opacity-100"
+                    : "opacity-25 blur-sm"
+                }
               >
                 <span className="presentation-flow-rank">{type === "WINNER" ? "★" : place}</span>
                 <strong className="flex items-center gap-3">

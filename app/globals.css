@@ -2513,6 +2513,10 @@ button {
 .presentation-ranking-podium article[data-place="3"] { order: 3; min-height: 10rem; }
 .presentation-ranking-podium article > strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .presentation-ranking-podium article > b { font-size: 1.5rem; color: var(--quiz-color-accent); }
+.presentation-ranking-podium-team-group { display: flex; min-width: 0; align-items: flex-start; justify-content: center; gap: clamp(0.4rem, 1vw, 0.8rem); }
+.presentation-ranking-podium-team { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 0.25rem; }
+.presentation-ranking-podium-team > strong { max-width: clamp(7rem, 12vw, 12rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.presentation-ranking-reveal-hint { margin-top: 0.25rem; text-align: center; font-size: clamp(0.75rem, 1.2vw, 1rem); font-weight: 700; opacity: 0.65; }
 
 .presentation-flow-ranking,
 .presentation-funny-slide { justify-content: flex-start; padding: clamp(0.75rem, 2vw, 2rem); }
@@ -2534,6 +2538,17 @@ button {
 .presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list li { grid-template-columns: clamp(1.35rem, 2.6vw, 2.4rem) minmax(0, 1fr) auto; padding: clamp(0.08rem, 0.25vw, 0.25rem) clamp(0.35rem, 0.8vw, 0.75rem); font-size: clamp(0.68rem, 1.25vw, 1.2rem); }
 .presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list img,
 .presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list svg { height: clamp(1.35rem, 2.8vw, 2.5rem); width: clamp(1.35rem, 2.8vw, 2.5rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] { padding: clamp(0.45rem, 1vw, 1rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] h2 { font-size: clamp(1.8rem, 3.3vw, 3.5rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-ranking-podium { margin: clamp(0.2rem, 0.55vw, 0.5rem) auto; gap: clamp(0.35rem, 0.8vw, 0.75rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-ranking-podium article { padding: clamp(0.25rem, 0.65vw, 0.6rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-ranking-podium article[data-place="1"],
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-ranking-podium article[data-place="2"],
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-ranking-podium article[data-place="3"] { min-height: 0; }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-flow-ranking-list { margin-top: clamp(0.15rem, 0.45vw, 0.4rem); gap: clamp(0.1rem, 0.3vw, 0.25rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-flow-ranking-list li { padding: clamp(0.08rem, 0.22vw, 0.2rem) clamp(0.35rem, 0.7vw, 0.65rem); font-size: clamp(0.65rem, 1.1vw, 1.05rem); }
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-flow-ranking-list img,
+.presentation-flow-ranking[data-flow-type="FINAL_STANDINGS"] .presentation-flow-ranking-list svg { height: clamp(1.25rem, 2.5vw, 2.25rem); width: clamp(1.25rem, 2.5vw, 2.25rem); }
 .presentation-funny-grid { display: grid; min-height: 0; flex: 1; gap: clamp(0.35rem, 1vw, 0.8rem); margin-top: clamp(0.45rem, 1vw, 1rem); }
 .presentation-funny-grid article { display: grid; min-height: 0; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(0.6rem, 1.5vw, 1.25rem); border: 1px solid color-mix(in srgb, var(--quiz-color-text) 24%, transparent); border-radius: 1.25rem; background: color-mix(in srgb, var(--quiz-color-surface) 88%, transparent); padding: clamp(0.35rem, 0.9vw, 0.8rem) clamp(0.55rem, 1.2vw, 1rem); }
 .presentation-funny-grid article > img,

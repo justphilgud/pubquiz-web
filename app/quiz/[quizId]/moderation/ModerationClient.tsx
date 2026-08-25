@@ -53,6 +53,7 @@ import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
+import { resolveFinalStandingsReveal } from "@/app/rendering/presentation/presentationRankingPolicy";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -405,29 +406,14 @@ export default function ModerationClient({
 
     if (isFinalStandingsSlide(aktuellerSlide)) {
       const punktestand = await getQuizPunktestand(quizId);
-      const standingsSize = aktuellerSlide?.typ === "ablauf"
-        ? aktuellerSlide.element.config.standingsSize
-        : "TOP_5";
-      const topTeams = standingsSize === "TOP_3"
-        ? punktestand.slice(0, 3)
-        : standingsSize === "ALL"
-          ? punktestand
-          : punktestand.slice(0, 5);
+      const revealStageCount = resolveFinalStandingsReveal(
+        punktestand,
+        endstandRevealCount,
+      ).revealStageCount;
 
-      const platzGruppen = Array.from(
-        new Set(
-          topTeams.map(
-            (team) =>
-              topTeams.findIndex(
-                (vergleichsTeam) => vergleichsTeam.punkte === team.punkte,
-              ) + 1,
-          ),
-        ),
-      ).sort((a, b) => b - a);
-
-      if (endstandRevealCount < platzGruppen.length) {
+      if (endstandRevealCount < revealStageCount) {
         const neuerRevealCount = Math.min(
-          platzGruppen.length,
+          revealStageCount,
           endstandRevealCount + 1,
         );
 
