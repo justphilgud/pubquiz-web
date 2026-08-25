@@ -1898,6 +1898,7 @@ function renderFlowStandingsSlide(
       })}
     </div>
   );
+  const listTeams = type === "INTERMEDIATE_STANDINGS" ? teams : teams.slice(3);
 
   return (
     <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
@@ -1915,9 +1916,9 @@ function renderFlowStandingsSlide(
         <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
       ) : teams.length === 0 ? (
         <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
-      ) : (
-        <ol className="presentation-flow-ranking-list" data-many={teams.length > 6}>
-          {teams.map((team) => {
+      ) : listTeams.length > 0 ? (
+        <ol className="presentation-flow-ranking-list" data-many={listTeams.length > 6}>
+          {listTeams.map((team) => {
             const place = sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1;
             return (
               <li
@@ -1934,7 +1935,7 @@ function renderFlowStandingsSlide(
             );
           })}
         </ol>
-      )}
+      ) : null}
     </section>
   );
 }

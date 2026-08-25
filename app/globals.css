@@ -2514,8 +2514,38 @@ button {
 .presentation-ranking-podium article > strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .presentation-ranking-podium article > b { font-size: 1.5rem; color: var(--quiz-color-accent); }
 
-.presentation-funny-grid { display: grid; gap: 1rem; margin-top: 1.5rem; }
-.presentation-funny-grid article { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.25rem; border: 1px solid color-mix(in srgb, var(--quiz-color-text) 24%, transparent); border-radius: 1.25rem; background: color-mix(in srgb, var(--quiz-color-surface) 88%, transparent); padding: 1rem 1.25rem; }
+.presentation-flow-ranking,
+.presentation-funny-slide { justify-content: flex-start; padding: clamp(0.75rem, 2vw, 2rem); }
+.presentation-flow-ranking .presentation-flow-kicker,
+.presentation-funny-slide .presentation-flow-kicker { margin-bottom: clamp(0.2rem, 0.7vw, 0.6rem); font-size: clamp(0.65rem, 1.2vw, 1rem); }
+.presentation-flow-ranking h2,
+.presentation-funny-slide h2 { font-size: clamp(2rem, 4vw, 4.5rem); line-height: 0.95; }
+.presentation-flow-ranking .presentation-flow-ranking-list { flex: 1; margin-top: clamp(0.4rem, 1vw, 0.9rem); gap: clamp(0.2rem, 0.55vw, 0.55rem); }
+.presentation-flow-ranking .presentation-flow-ranking-list li { grid-template-columns: clamp(1.8rem, 3.4vw, 3rem) minmax(0, 1fr) auto; gap: clamp(0.4rem, 1vw, 1rem); padding: clamp(0.18rem, 0.5vw, 0.5rem) clamp(0.45rem, 1vw, 1rem); font-size: clamp(0.8rem, 1.5vw, 1.45rem); }
+.presentation-flow-ranking .presentation-flow-ranking-list img,
+.presentation-flow-ranking .presentation-flow-ranking-list svg { height: clamp(1.8rem, 4vw, 3rem); width: clamp(1.8rem, 4vw, 3rem); }
+.presentation-flow-ranking .presentation-ranking-podium { margin: clamp(0.35rem, 1vw, 0.8rem) auto; }
+.presentation-flow-ranking .presentation-ranking-podium article { min-height: 0; padding: clamp(0.35rem, 1vw, 0.8rem); }
+.presentation-flow-ranking .presentation-ranking-podium article img,
+.presentation-flow-ranking .presentation-ranking-podium article svg { height: clamp(2.7rem, 7vw, 6rem); width: clamp(2.7rem, 7vw, 6rem); }
+.presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] { padding: clamp(0.45rem, 1vw, 1rem); }
+.presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] h2 { font-size: clamp(1.55rem, 3vw, 3.25rem); }
+.presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list { margin-top: clamp(0.15rem, 0.5vw, 0.45rem); gap: clamp(0.1rem, 0.35vw, 0.3rem); }
+.presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list li { grid-template-columns: clamp(1.35rem, 2.6vw, 2.4rem) minmax(0, 1fr) auto; padding: clamp(0.08rem, 0.25vw, 0.25rem) clamp(0.35rem, 0.8vw, 0.75rem); font-size: clamp(0.68rem, 1.25vw, 1.2rem); }
+.presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list img,
+.presentation-flow-ranking[data-flow-type="INTERMEDIATE_STANDINGS"] .presentation-flow-ranking-list svg { height: clamp(1.35rem, 2.8vw, 2.5rem); width: clamp(1.35rem, 2.8vw, 2.5rem); }
+.presentation-funny-grid { display: grid; min-height: 0; flex: 1; gap: clamp(0.35rem, 1vw, 0.8rem); margin-top: clamp(0.45rem, 1vw, 1rem); }
+.presentation-funny-grid article { display: grid; min-height: 0; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(0.6rem, 1.5vw, 1.25rem); border: 1px solid color-mix(in srgb, var(--quiz-color-text) 24%, transparent); border-radius: 1.25rem; background: color-mix(in srgb, var(--quiz-color-surface) 88%, transparent); padding: clamp(0.35rem, 0.9vw, 0.8rem) clamp(0.55rem, 1.2vw, 1rem); }
+.presentation-funny-grid article > img,
+.presentation-funny-grid article > svg { height: clamp(2.7rem, 7vw, 5rem); width: clamp(2.7rem, 7vw, 5rem); }
 .presentation-funny-grid strong { display: block; color: var(--quiz-color-accent); font-size: clamp(1rem, 1.8vw, 1.5rem); }
-.presentation-funny-grid blockquote { margin-top: 0.25rem; font-size: clamp(1.15rem, 2.4vw, 2rem); font-weight: 700; line-height: 1.2; }
-.presentation-funny-page { margin-top: 1rem; text-align: center; font-weight: 700; opacity: 0.75; }
+.presentation-funny-grid blockquote { margin-top: 0.15rem; font-size: clamp(0.85rem, 2vw, 1.7rem); font-weight: 700; line-height: 1.15; }
+.presentation-funny-page { margin-top: 0.4rem; text-align: center; font-weight: 700; opacity: 0.75; }
+.presentation-funny-slide { padding: clamp(0.45rem, 1.2vw, 1.25rem); }
+.presentation-funny-slide h2 { font-size: clamp(1.65rem, 3.2vw, 3.5rem); }
+.presentation-funny-slide .presentation-funny-grid { gap: clamp(0.15rem, 0.55vw, 0.5rem); margin-top: clamp(0.2rem, 0.6vw, 0.5rem); }
+.presentation-funny-slide .presentation-funny-grid article { gap: clamp(0.4rem, 1vw, 0.9rem); padding: clamp(0.15rem, 0.45vw, 0.4rem) clamp(0.35rem, 0.8vw, 0.7rem); }
+.presentation-funny-slide .presentation-funny-grid article > img,
+.presentation-funny-slide .presentation-funny-grid article > svg { height: clamp(2.1rem, 5vw, 4.5rem); width: clamp(2.1rem, 5vw, 4.5rem); }
+.presentation-funny-slide .presentation-funny-grid strong { font-size: clamp(0.75rem, 1.4vw, 1.25rem); }
+.presentation-funny-slide .presentation-funny-grid blockquote { font-size: clamp(0.72rem, 1.55vw, 1.35rem); }
