@@ -26,6 +26,7 @@ Die zentralen Identitäten sind:
 
 - `quiz_fragen_id`: konkrete Zuweisung einer Frage zu einem Quiz;
 - `quiz_team_session_id`: teilnehmendes Team in diesem Quiz;
+- `team_id`: globale Teamidentität, auf die jede Quiz-Session stabil verweist;
 - `interaction_run_id`: konkrete Öffnung einer Interaktion;
 - `team_antwort_id`: aktuell persistierter Draft eines Teams für eine Quizfrage;
 - `team_answer_submission_id`: unveränderlicher finaler Snapshot einer Draft-Revision.
@@ -136,6 +137,8 @@ Die Statuswerte sind:
 ### 2. Team-Sitzung
 
 Die Teilnehmeransicht speichert die signierte Sitzung unter `quiz-session-[quizId]` im `localStorage`. Nach einem Reload wird sie wiederhergestellt und serverseitig über Quiz und Session-ID validiert. Ein Browser-Token ist nie Ersatz für die serverseitige Zuordnungsprüfung.
+
+Die Session referenziert zusätzlich die globale `teams.team_id`. Der Anzeigename in der Session ist ein historischer Snapshot; Join, eventreihenbezogene Teilnahme und spätere teamübergreifende Statistiken verwenden die globale Identität. Antworten bleiben weiterhin über Session, Quiz und `quiz.eventreihe_id` eindeutig in ihrem Veranstaltungskontext.
 
 ### 3. Live-State und Hydrierung
 

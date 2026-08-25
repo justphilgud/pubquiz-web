@@ -1,3 +1,6 @@
 # Administratorhandbuch
 
-Administratoren verwalten Benutzer, Rollen, Kategorien, Freigaben und künftig das Admin-Dashboard.
+Administratoren verwalten Benutzer, Rollen, Teams, Kategorien und Freigaben.
+
+- [Benutzer und Rollen](./benutzer-und-rollen.md)
+- [Teamverwaltung](./teamverwaltung.md)

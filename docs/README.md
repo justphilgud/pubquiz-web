@@ -25,6 +25,7 @@
 ## Administration
 - [Übersicht](./admin-guide/README.md)
 - [Benutzer und Rollen](./admin-guide/benutzer-und-rollen.md)
+- [Teamverwaltung](./admin-guide/teamverwaltung.md)
 - [Fragenfreigabe](./admin-guide/fragenfreigabe.md)
 - [Kategorien](./admin-guide/kategorien.md)
 - [Admin-Dashboard](./admin-guide/admin-dashboard.md)
@@ -34,6 +35,7 @@
 - [Datenmodell](./architecture/datenmodell.md)
 - [Authentifizierung](./architecture/authentifizierung.md)
 - [Antwortformulare und Live-Interaction-Architektur](./architecture/answer-interaction.md)
+- [Globale Teamidentität](./architecture/team-identity.md)
 - [Medienarchitektur](./architecture/medien.md)
 - [Deployment](./operations/umgebungen-und-deployment.md)
 - [Datenbank und Migrationen](./operations/datenbank-und-migrationen.md)
