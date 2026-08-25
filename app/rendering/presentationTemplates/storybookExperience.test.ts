@@ -30,6 +30,7 @@ const displayState: PresentationSlideDisplayState = {
   renderMode: "DESIGN_PREVIEW",
   templateRevealCount: 2,
   punktestand: [],
+  intermediateStandings: [],
   endstandRevealCount: 0,
   now: Date.UTC(2026, 7, 3, 20),
   estimationPhase: "HIDDEN",

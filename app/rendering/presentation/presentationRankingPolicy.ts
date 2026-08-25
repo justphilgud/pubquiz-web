@@ -14,6 +14,18 @@ export function rankScores<T extends { punkte: number }>(scores: readonly T[]) {
     }));
 }
 
+export type IntermediateStandingsAudienceEntry = {
+  key: string;
+  place: number;
+  punkte: number;
+  identity: {
+    teamId: number | null;
+    teamname: string;
+    photoUrl: string | null;
+    avatarCode: unknown;
+  } | null;
+};
+
 export function resolveIntermediateStandingsAudience<
   T extends {
     punkte: number;
@@ -25,7 +37,7 @@ export function resolveIntermediateStandingsAudience<
 >(
   scores: readonly T[],
   renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW",
-) {
+): IntermediateStandingsAudienceEntry[] {
   const showIdentity = shouldShowTeamIdentity({
     standingsType: "INTERMEDIATE",
     renderMode,

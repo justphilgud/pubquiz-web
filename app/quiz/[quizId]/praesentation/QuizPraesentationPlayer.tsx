@@ -28,6 +28,7 @@ import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
+import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentation/presentationRankingPolicy";
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -255,6 +256,7 @@ export default function QuizPraesentationPlayer({
             renderMode: "PRESENTATION",
             templateRevealCount: liveState.revealCount,
             punktestand: scores,
+            intermediateStandings: resolveIntermediateStandingsAudience(scores, "PRESENTATION"),
             yearlyStandings,
             endstandRevealCount: liveState.revealCount,
             now,

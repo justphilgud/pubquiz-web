@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 
 import {
@@ -59,7 +59,7 @@ import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProf
 import {
   rankScores,
   resolvePodiumReveal,
-  resolveIntermediateStandingsAudience,
+  type IntermediateStandingsAudienceEntry,
 } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
@@ -72,12 +72,20 @@ type ScoreEntry = {
   photoUrl?: string | null;
 };
 
+type RankingTableEntry = {
+  key: string;
+  place: number;
+  teamname: string;
+  punkte: number;
+};
+
 type Abschnitt = QuizPraesentationResult["abschnitte"][number];
 
 export type PresentationSlideDisplayState = {
   renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW";
   templateRevealCount: number;
   punktestand: ScoreEntry[];
+  intermediateStandings: IntermediateStandingsAudienceEntry[];
   yearlyStandings?: YearlyRankingEntry[];
   endstandRevealCount: number;
   now: number;
@@ -240,6 +248,7 @@ export default function PresentationSlideRenderer({
     renderMode,
     templateRevealCount,
     punktestand,
+    intermediateStandings,
     yearlyStandings = [],
     endstandRevealCount,
     now,
@@ -949,7 +958,7 @@ function renderRennPferd({
   );
 }
 function renderZwischenstandSlide() {
-  const sortiertePunkte = resolveIntermediateStandingsAudience(punktestand, renderMode).slice(0, 5);
+  const sortiertePunkte = intermediateStandings.slice(0, 5);
 
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
@@ -1119,6 +1128,24 @@ function renderEndstandSlide() {
       })}
     </div>
   );
+
+  if (showFullTable) {
+    return (
+      <section className="presentation-flow-slide presentation-flow-ranking presentation-ranking-overview" data-flow-type="FINAL_STANDINGS">
+        <p className="presentation-flow-kicker">Endstand</p>
+        <h2>Finale Tabelle</h2>
+        {renderRankingTable(
+          teamsMitPlatz.map((team, index) => ({
+            key: `${team.teamId ?? team.teamname}-${index}`,
+            place: team.platz,
+            teamname: team.teamname,
+            punkte: team.punkte,
+          })),
+          true,
+        )}
+      </section>
+    );
+  }
 
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
@@ -1974,7 +2001,7 @@ function renderFlowStandingsSlide(
   if (type === "INTERMEDIATE_STANDINGS") {
     const hidden = config.standingsSize === "HIDDEN";
     const showPoints = config.showPoints !== false;
-    const allEntries = resolveIntermediateStandingsAudience(punktestand, renderMode);
+    const allEntries = intermediateStandings;
     const limit =
       config.standingsSize === "TOP_3"
         ? 3
@@ -2042,17 +2069,37 @@ function renderFlowStandingsSlide(
     );
   }
 
-  const podiumGroups = type === "WINNER"
-    ? podiumReveal.visiblePodiumGroups
-    : [...podiumReveal.podiumGroups].sort((left, right) => left.place - right.place);
+  if (type === "FINAL_STANDINGS") {
+    return (
+      <section
+        className="presentation-flow-slide presentation-flow-ranking presentation-ranking-overview"
+        data-flow-type={type}
+      >
+        <p className="presentation-flow-kicker">Endstand</p>
+        <h2>{config.title ?? "Finale Tabelle"}</h2>
+        {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+        {renderRankingTable(
+          sorted.map((team, index) => ({
+            key: `${team.teamId ?? team.teamname}-${index}`,
+            place: team.place,
+            teamname: team.teamname,
+            punkte: team.punkte,
+          })),
+          showPoints,
+        )}
+      </section>
+    );
+  }
+
+  const podiumGroups = podiumReveal.visiblePodiumGroups;
 
   return (
     <section
-      className={`presentation-flow-slide presentation-flow-ranking ${type === "WINNER" ? "presentation-ranking-ceremony" : "presentation-ranking-overview"}`}
+      className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony"
       data-flow-type={type}
     >
-      <p className="presentation-flow-kicker">{type === "WINNER" ? "Siegerehrung" : "Endstand"}</p>
-      <h2>{config.title ?? (type === "WINNER" ? "Das Podium" : "Finale Tabelle")}</h2>
+      <p className="presentation-flow-kicker">Siegerehrung</p>
+      <h2>{config.title ?? "Das Podium"}</h2>
       {config.body && <p className="presentation-flow-lead">{config.body}</p>}
 
     <div
@@ -2081,32 +2128,53 @@ function renderFlowStandingsSlide(
       ))}
     </div>
 
-      {type === "WINNER" && podiumReveal.visiblePodiumGroups.length < podiumReveal.podiumGroups.length && (
+      {podiumReveal.visiblePodiumGroups.length < podiumReveal.podiumGroups.length && (
         <p className="presentation-ranking-reveal-hint">
           Das Podium wird von Platz 3 bis Platz 1 enthüllt.
         </p>
       )}
 
-      {type === "FINAL_STANDINGS" && podiumReveal.remainingEntries.length > 0 && (
-        <ol className="presentation-flow-ranking-list" data-many={podiumReveal.remainingEntries.length > 6}>
-          {podiumReveal.remainingEntries.map((team) => (
-            <li key={`${team.teamId ?? team.teamname}-${team.place}`}>
-              <span className="presentation-flow-rank">{team.place}</span>
-              <strong className="flex items-center gap-3">
-                <TeamIdentityVisual
-                  name={team.teamname}
-                  photoUrl={team.photoUrl}
-                  avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)}
-                  className="h-12 w-12"
-                />
-                {team.teamname}
-              </strong>
-              {showPoints && <span>{formatQuizPoints(team.punkte)} Punkte</span>}
-            </li>
-          ))}
-        </ol>
-      )}
     </section>
+  );
+}
+
+function renderRankingTable(
+  entries: readonly RankingTableEntry[],
+  showPoints: boolean,
+  trailingContent?: (entry: RankingTableEntry) => ReactNode,
+) {
+  return (
+    <div className="presentation-ranking-table-wrap">
+      <table
+        className="presentation-ranking-table"
+        data-team-count={entries.length}
+        data-has-trend={trailingContent ? "true" : "false"}
+        style={{ "--presentation-ranking-row-count": entries.length } as CSSProperties}
+      >
+        <thead className="sr-only">
+          <tr>
+            <th scope="col">Rang</th>
+            <th scope="col">Team</th>
+            <th scope="col">Punkte</th>
+            {trailingContent && <th scope="col">Veränderung</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((entry) => (
+            <tr key={entry.key} data-place={entry.place}>
+              <td className="presentation-ranking-table-place">{entry.place}</td>
+              <th scope="row">{entry.teamname}</th>
+              <td className="presentation-ranking-table-points">
+                {showPoints ? `${formatQuizPoints(entry.punkte)} Punkte` : "–"}
+              </td>
+              {trailingContent && (
+                <td className="presentation-ranking-table-trend">{trailingContent(entry)}</td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

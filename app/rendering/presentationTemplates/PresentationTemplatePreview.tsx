@@ -14,6 +14,7 @@ import type {
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "@/app/rendering/presentation/PresentationSlideRenderer";
+import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentation/presentationRankingPolicy";
 import { resolvePresentationLayout } from "@/app/rendering/presentation/presentationLayoutResolver";
 import { resolveQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
@@ -497,23 +498,26 @@ function configureStorybookScenario(config: PresentationTemplateConfig, scenario
     : [];
 }
 
+const templatePreviewScores = [
+  { teamId: 1, teamname: "Die Ratlosen", punkte: 21, avatarCode: "teekanne" as const, photoUrl: null },
+  { teamId: 2, teamname: "Quiztopher Columbus", punkte: 19.5, avatarCode: "wecker" as const, photoUrl: null },
+  { teamId: 3, teamname: "Vier gewinnt", punkte: 18, avatarCode: "tischlampe" as const, photoUrl: null },
+  { teamId: 4, teamname: "Besserwisser", punkte: 17, avatarCode: "gummistiefel" as const, photoUrl: null },
+  { teamId: 5, teamname: "Die Schlauberger", punkte: 16.5, avatarCode: "toaster" as const, photoUrl: null },
+  { teamId: 6, teamname: "Ratefüchse", punkte: 15, avatarCode: "giesskanne" as const, photoUrl: null },
+  { teamId: 7, teamname: "Halbwissen", punkte: 14, avatarCode: "staubsauger" as const, photoUrl: null },
+  { teamId: 8, teamname: "Kopfnüsse", punkte: 13.5, avatarCode: "schneebesen" as const, photoUrl: null },
+  { teamId: 9, teamname: "Die Ahnungslosen", punkte: 12, avatarCode: "thermoskanne" as const, photoUrl: null },
+  { teamId: 10, teamname: "Quizkönige", punkte: 11, avatarCode: "buegeleisen" as const, photoUrl: null },
+  { teamId: 11, teamname: "Tisch 7", punkte: 9.5, avatarCode: "teekanne" as const, photoUrl: null },
+  { teamId: 12, teamname: "Spätzünder", punkte: 8, avatarCode: "wecker" as const, photoUrl: null },
+];
+
 const displayState: PresentationSlideDisplayState = {
   renderMode: "DESIGN_PREVIEW",
   templateRevealCount: 4,
-  punktestand: [
-    { teamId: 1, teamname: "Die Ratlosen", punkte: 21, avatarCode: "teekanne", photoUrl: null },
-    { teamId: 2, teamname: "Quiztopher Columbus", punkte: 19.5, avatarCode: "wecker", photoUrl: null },
-    { teamId: 3, teamname: "Vier gewinnt", punkte: 18, avatarCode: "tischlampe", photoUrl: null },
-    { teamId: 4, teamname: "Besserwisser", punkte: 17, avatarCode: "gummistiefel", photoUrl: null },
-    { teamId: 5, teamname: "Die Schlauberger", punkte: 16.5, avatarCode: "toaster", photoUrl: null },
-    { teamId: 6, teamname: "Ratefüchse", punkte: 15, avatarCode: "giesskanne", photoUrl: null },
-    { teamId: 7, teamname: "Halbwissen", punkte: 14, avatarCode: "staubsauger", photoUrl: null },
-    { teamId: 8, teamname: "Kopfnüsse", punkte: 13.5, avatarCode: "schneebesen", photoUrl: null },
-    { teamId: 9, teamname: "Die Ahnungslosen", punkte: 12, avatarCode: "thermoskanne", photoUrl: null },
-    { teamId: 10, teamname: "Quizkönige", punkte: 11, avatarCode: "buegeleisen", photoUrl: null },
-    { teamId: 11, teamname: "Tisch 7", punkte: 9.5, avatarCode: "teekanne", photoUrl: null },
-    { teamId: 12, teamname: "Spätzünder", punkte: 8, avatarCode: "wecker", photoUrl: null },
-  ],
+  punktestand: templatePreviewScores,
+  intermediateStandings: resolveIntermediateStandingsAudience(templatePreviewScores, "DESIGN_PREVIEW"),
   yearlyStandings: [
     { teamId: 1, teamname: "Die Ratlosen", punkte: 86, place: 1, previousPlace: 2, trend: "UP", avatarCode: "teekanne", photoUrl: null },
     { teamId: 2, teamname: "Quiztopher Columbus", punkte: 82, place: 2, previousPlace: 1, trend: "DOWN", avatarCode: "wecker", photoUrl: null },

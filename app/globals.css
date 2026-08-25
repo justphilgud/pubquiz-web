@@ -2564,6 +2564,24 @@ button {
 .presentation-ranking-trend[data-trend="SAME"] { color: #fff; }
 .presentation-ranking-points-and-trend { display: inline-flex; align-items: center; justify-content: flex-end; gap: 0.65rem; }
 .presentation-yearly-ranking .presentation-ranking-podium-team > .presentation-ranking-trend { margin-top: 0.2rem; font-size: 1.15rem; }
+.presentation-ranking-table-wrap { min-height: 0; width: 100%; flex: 1; margin-top: clamp(0.35rem, 0.9vw, 0.8rem); overflow: hidden; container-type: size; }
+.presentation-ranking-table { display: grid; width: 100%; height: 100%; grid-template-rows: minmax(0, 1fr); table-layout: fixed; }
+.presentation-ranking-table tbody { display: grid; min-height: 0; grid-template-rows: repeat(var(--presentation-ranking-row-count), minmax(0, 1fr)); gap: min(0.28rem, 0.7cqh); }
+.presentation-ranking-table tbody tr { display: grid; min-height: 0; grid-template-columns: minmax(2.5rem, 6cqw) minmax(0, 1fr) minmax(7.5rem, 18cqw); }
+.presentation-ranking-table[data-has-trend="true"] tbody tr { grid-template-columns: minmax(2.5rem, 6cqw) minmax(0, 1fr) minmax(7.5rem, 18cqw) minmax(3rem, 7cqw); }
+.presentation-ranking-table th,
+.presentation-ranking-table td { display: flex; min-width: 0; min-height: 0; align-items: center; border-block: 1px solid color-mix(in srgb, var(--brand-accent) 42%, transparent); background: color-mix(in srgb, var(--brand-surface-strong) 88%, transparent); padding: min(0.25rem, 0.7cqh) clamp(0.4rem, 1.4cqw, 1rem); font-size: clamp(0.72rem, 4cqh, 1.25rem); line-height: 1; }
+.presentation-ranking-table tr > :first-child { border-left: 1px solid color-mix(in srgb, var(--brand-accent) 42%, transparent); border-radius: 0.75rem 0 0 0.75rem; }
+.presentation-ranking-table tr > :last-child { border-right: 1px solid color-mix(in srgb, var(--brand-accent) 42%, transparent); border-radius: 0 0.75rem 0.75rem 0; }
+.presentation-ranking-table th[scope="row"] { overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.presentation-ranking-table-place { color: var(--brand-accent); font-size: 1.1em !important; font-weight: 900; text-align: center; }
+.presentation-ranking-table-place,
+.presentation-ranking-table-trend { justify-content: center; }
+.presentation-ranking-table-points { justify-content: flex-end; color: var(--brand-muted); font-weight: 850; text-align: right; white-space: nowrap; }
+.presentation-ranking-table-trend { text-align: center; }
+.presentation-ranking-table tbody tr[data-place="1"] > * { border-color: color-mix(in srgb, var(--brand-accent) 90%, transparent); font-size: clamp(0.82rem, 4.4cqh, 1.5rem); font-weight: 900; }
+.presentation-ranking-table tbody tr[data-place="2"] > *,
+.presentation-ranking-table tbody tr[data-place="3"] > * { border-color: color-mix(in srgb, var(--brand-accent) 62%, transparent); font-weight: 800; }
 
 .presentation-flow-ranking,
 .presentation-funny-slide { justify-content: flex-start; padding: clamp(0.75rem, 2vw, 2rem); }

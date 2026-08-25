@@ -10,6 +10,7 @@ import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "./PresentationSlideRenderer";
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
+import { resolveIntermediateStandingsAudience } from "./presentationRankingPolicy";
 import type { Slide } from "../../quiz/[quizId]/praesentation/buildPraesentationSlides";
 
 const rendererSource = readFileSync(
@@ -43,6 +44,7 @@ const displayState: PresentationSlideDisplayState = {
   renderMode: "DESIGN_PREVIEW",
   templateRevealCount: 0,
   punktestand: [],
+  intermediateStandings: [],
   endstandRevealCount: 0,
   now: Date.UTC(2026, 7, 21, 20),
   estimationPhase: "HIDDEN",
@@ -277,7 +279,12 @@ test("public interim standings expose competition ranks and points without ident
       slideIndex: 0,
       slideLabel: "ZWISCHENSTAND",
       theme: runtime.theme,
-      displayState: { ...displayState, renderMode, punktestand: scores },
+      displayState: {
+        ...displayState,
+        renderMode,
+        punktestand: scores,
+        intermediateStandings: resolveIntermediateStandingsAudience(scores, renderMode),
+      },
     }));
 
   const publicHtml = render("PRESENTATION");
@@ -363,6 +370,10 @@ test("podium ceremony reveals 3-2-1 before the full final table", () => {
       assert.match(full, new RegExp(`Finalteam ${index}(?!\\d)`));
     }
     assert.doesNotMatch(full, /Noch geheim/);
+    assert.match(full, new RegExp(`data-team-count="${count}"`));
+    assert.match(full, /<table[^>]+presentation-ranking-table/);
+    assert.doesNotMatch(full, /presentation-ranking-podium/);
+    assert.equal((full.match(/<tr data-place=/g) ?? []).length, count);
   }
 });
 
