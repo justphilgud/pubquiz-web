@@ -17,6 +17,14 @@ export function canManageGlobalTeamLifecycle(actor: AuthorizationActor) {
   return isAdministrator(actor);
 }
 
+export type TeamProfileCapability = "UPLOAD_PHOTO" | "CHOOSE_AVATAR" | "REMOVE_PHOTO" | "LOCK_PHOTO_UPLOAD";
+
+export function canManageTeamProfile(actor: AuthorizationActor, capability: TeamProfileCapability) {
+  if (isAdministrator(actor)) return true;
+  if (getActorEventSeriesIds(actor, "EVENT_MANAGER").length === 0) return false;
+  return capability === "REMOVE_PHOTO" || capability === "LOCK_PHOTO_UPLOAD";
+}
+
 export function canAccessTeamFromEventSeries(
   actor: AuthorizationActor,
   teamEventSeriesIds: readonly number[],

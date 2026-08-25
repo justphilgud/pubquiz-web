@@ -5,8 +5,9 @@ import { prisma } from "@/app/lib/prisma";
 import { getBlobAreaPrefix } from "@/app/lib/blobPath";
 import { getMediaUploadEnvironmentPrefix, getBlobUploadAuthentication } from "@/app/fragen/editor/mediaUploadEnvironment";
 import { resolveParticipantSession } from "@/app/quiz/participantSession.server";
-import { isAdministrator, type AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
+import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import { assertTeamAccess, TeamManagementAccessError } from "./teamManagement.server";
+import { canManageTeamProfile } from "./teamManagementPolicy";
 import { isTeamAvatarCode, mapTeamProfile, type TeamAvatarCode } from "./teamProfile";
 
 export class TeamProfileAccessError extends Error {
@@ -34,18 +35,20 @@ export async function removeParticipantPhoto(quizId: number, token: string) {
 }
 
 export async function updateManagedAvatar(actor: AuthorizationActor, teamId: number, avatarCode: unknown) {
-  if (!isAdministrator(actor)) throw new TeamManagementAccessError("Nur Administratoren dürfen den Avatar eines Teams ändern.");
+  if (!canManageTeamProfile(actor, "CHOOSE_AVATAR")) throw new TeamManagementAccessError("Nur Administratoren dürfen den Avatar eines Teams ändern.");
   await assertTeamAccess(actor, teamId);
   if (!isTeamAvatarCode(avatarCode)) throw new TeamManagementAccessError("Bitte einen gültigen Avatar wählen.");
   return updateAvatar(teamId, avatarCode);
 }
 
 export async function removeManagedPhoto(actor: AuthorizationActor, teamId: number) {
+  if (!canManageTeamProfile(actor, "REMOVE_PHOTO")) throw new TeamManagementAccessError();
   await assertTeamAccess(actor, teamId);
   return clearTeamPhoto(teamId);
 }
 
 export async function setManagedPhotoUploadLock(actor: AuthorizationActor, teamId: number, locked: boolean) {
+  if (!canManageTeamProfile(actor, "LOCK_PHOTO_UPLOAD")) throw new TeamManagementAccessError();
   await assertTeamAccess(actor, teamId);
   const team = await prisma.teams.update({
     where: { team_id: teamId },

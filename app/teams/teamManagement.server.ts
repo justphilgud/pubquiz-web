@@ -7,6 +7,7 @@ import {
   canAccessTeamManagement,
   getTeamManagementEventSeriesIds,
 } from "./teamManagementPolicy";
+import { mapTeamProfile } from "./teamProfile";
 
 export class TeamManagementAccessError extends Error {
   constructor(message = "Team nicht gefunden oder Zugriff nicht erlaubt.") {
@@ -165,6 +166,9 @@ export async function loadTeamDetail(actor: AuthorizationActor, teamId: number) 
       ist_archiviert: true,
       created_at: true,
       updated_at: true,
+      avatar_code: true,
+      foto_url: true,
+      foto_upload_gesperrt: true,
       _count: { select: { quiz_teams: true } },
       quiz_team_sessions: {
         where: scopedSessionWhere(actor),
@@ -188,6 +192,7 @@ export async function loadTeamDetail(actor: AuthorizationActor, teamId: number) 
   return {
     ...mapTeam(team),
     password: authorizedTeam.team_passwort ?? "",
+    profile: mapTeamProfile(team),
     hasHistory: team.quiz_team_sessions.length > 0 || team._count.quiz_teams > 0,
   };
 }

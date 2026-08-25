@@ -5,6 +5,7 @@ import {
   canAccessTeamFromEventSeries,
   canAccessTeamManagement,
   canManageGlobalTeamLifecycle,
+  canManageTeamProfile,
   getTeamManagementEventSeriesIds,
 } from "./teamManagementPolicy";
 
@@ -19,6 +20,8 @@ test("administrator manages every global team and its lifecycle", () => {
   assert.equal(canAccessTeamManagement(admin), true);
   assert.equal(canManageGlobalTeamLifecycle(admin), true);
   assert.equal(canAccessTeamFromEventSeries(admin, []), true);
+  assert.equal(canManageTeamProfile(admin, "UPLOAD_PHOTO"), true);
+  assert.equal(canManageTeamProfile(admin, "CHOOSE_AVATAR"), true);
 });
 
 test("event manager is limited to teams from assigned event series", () => {
@@ -27,6 +30,10 @@ test("event manager is limited to teams from assigned event series", () => {
   assert.equal(canAccessTeamFromEventSeries(manager, [10, 20]), true);
   assert.equal(canAccessTeamFromEventSeries(manager, [20]), false);
   assert.equal(canManageGlobalTeamLifecycle(manager), false);
+  assert.equal(canManageTeamProfile(manager, "REMOVE_PHOTO"), true);
+  assert.equal(canManageTeamProfile(manager, "LOCK_PHOTO_UPLOAD"), true);
+  assert.equal(canManageTeamProfile(manager, "UPLOAD_PHOTO"), false);
+  assert.equal(canManageTeamProfile(manager, "CHOOSE_AVATAR"), false);
 });
 
 test("global and scoped editors receive no team-management rights", () => {
@@ -36,5 +43,6 @@ test("global and scoped editors receive no team-management rights", () => {
   ]) {
     assert.equal(canAccessTeamManagement(editor), false);
     assert.equal(canAccessTeamFromEventSeries(editor, [10]), false);
+    assert.equal(canManageTeamProfile(editor, "REMOVE_PHOTO"), false);
   }
 });

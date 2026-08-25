@@ -3,6 +3,7 @@ import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { loadTeamDetail, requireTeamManagementActor } from "@/app/teams/teamManagement.server";
 import { TeamLifecyclePanel } from "../TeamLifecyclePanel";
 import { TeamPasswordPanel } from "../TeamPasswordPanel";
+import { TeamProfileManagementPanel } from "../TeamProfileManagementPanel";
 
 const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "Europe/Berlin" });
 
@@ -37,6 +38,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
           </div>
         </header>
 
+        <TeamProfileManagementPanel teamName={team.name} initialProfile={team.profile} isAdmin={admin} />
         <TeamPasswordPanel teamId={team.id} initialPassword={team.password} />
         {admin && <TeamLifecyclePanel teamId={team.id} teamName={team.name} isArchived={team.isArchived} participationCount={team.participationCount} hasHistory={team.hasHistory} />}
       </div>
