@@ -1513,7 +1513,10 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
   if (abschnitt.abschnitt_typ === "intro_regeln") {
     return (
-      <div className="presentation-legacy-slide presentation-rules-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
+      <div
+        className="presentation-legacy-slide presentation-rules-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]"
+        data-rule-count={regeln.length}
+      >
         <div className="mb-8">
           <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
             Rules are good!
@@ -1526,7 +1529,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
           </h2>
         </div>
 
-        <div className="grid flex-1 gap-5">
+        <div className="grid min-h-0 flex-1 gap-5" data-many={regeln.length > 4}>
           {regeln.map((regel, index) => (
             <div
               key={`${regel}-${index}`}
@@ -2017,7 +2020,11 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
       )}
 
       {type === "RULES" && (
-        <ol className="presentation-flow-rules">
+        <ol
+          className="presentation-flow-rules"
+          data-rule-count={activeRules.length}
+          data-many={activeRules.length > 4}
+        >
           {activeRules.map((rule, index) => (
             <li key={rule.id}>
               <span>{index + 1}</span>
