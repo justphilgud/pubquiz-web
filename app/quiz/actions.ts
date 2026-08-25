@@ -4157,7 +4157,11 @@ async function loadQuizPunktestand(quizId: number) {
   const [sessions, totals, answers] = await Promise.all([
     prisma.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
-      select: { quiz_team_session_id: true, teamname: true },
+      select: {
+        quiz_team_session_id: true,
+        teamname: true,
+        team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+      },
     }),
     prisma.team_antworten.groupBy({
       by: ["quiz_team_session_id"],
@@ -4185,7 +4189,10 @@ async function loadQuizPunktestand(quizId: number) {
       const total =
         totalsBySession.get(session.quiz_team_session_id) ?? new Prisma.Decimal(0);
       return {
+        teamId: session.team.team_id,
         teamname: session.teamname,
+        avatarCode: mapTeamProfile(session.team).avatarCode,
+        photoUrl: session.team.foto_url,
         punkte: Number(total),
         details: answers
           .filter((answer) => answer.quiz_team_session_id === session.quiz_team_session_id)
@@ -4200,7 +4207,10 @@ async function loadQuizPunktestand(quizId: number) {
     })
     .sort((left, right) => right._decimal.cmp(left._decimal))
     .map((entry) => ({
+      teamId: entry.teamId,
       teamname: entry.teamname,
+      avatarCode: entry.avatarCode,
+      photoUrl: entry.photoUrl,
       punkte: entry.punkte,
       details: entry.details,
     }));

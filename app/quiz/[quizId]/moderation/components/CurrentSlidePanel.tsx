@@ -14,10 +14,14 @@ import {
 } from "../moderationPreviewLayout";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
+import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 
 type PunktestandEintrag = {
+  teamId: number;
   teamname: string;
   punkte: number;
+  avatarCode: TeamAvatarCode;
+  photoUrl: string | null;
 };
 
 type Props = {

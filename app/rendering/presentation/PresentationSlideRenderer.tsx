@@ -50,10 +50,16 @@ import {
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
+import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
+import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
+import { shouldShowTeamIdentity } from "./presentationRankingPolicy";
 
 type ScoreEntry = {
+  teamId?: number;
   teamname: string;
   punkte: number;
+  avatarCode?: TeamAvatarCode;
+  photoUrl?: string | null;
 };
 
 type Abschnitt = QuizPraesentationResult["abschnitte"][number];
@@ -894,6 +900,7 @@ function renderZwischenstandSlide() {
   const sortiertePunkte = [...punktestand]
     .sort((a, b) => b.punkte - a.punkte)
     .slice(0, 5);
+  const showIdentity = shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode });
 
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
@@ -907,7 +914,7 @@ function renderZwischenstandSlide() {
             {sortiertePunkte.map((team, index) => (
               <li key={`${team.teamname}-${index}`}>
                 <span className="presentation-flow-rank">{index + 1}</span>
-                <strong>{team.teamname}</strong>
+                <strong>{showIdentity ? team.teamname : `${index + 1}. Platz`}</strong>
                 <span>{formatQuizPoints(team.punkte)} Punkte</span>
               </li>
             ))}
@@ -983,7 +990,7 @@ function renderZwischenstandSlide() {
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
 
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
-                    #{index + 1}
+                    {showIdentity ? team.teamname : `#${index + 1}`}
                   </div>
 
                   <div
@@ -1054,11 +1061,35 @@ function renderEndstandSlide() {
     Math.min(endstandRevealCount, platzGruppen.length)
   );
 
+  const renderIdentity = (team: ScoreEntry, className = "h-14 w-14") => (
+    <TeamIdentityVisual
+      name={team.teamname}
+      photoUrl={team.photoUrl}
+      avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)}
+      className={className}
+    />
+  );
+
+  const podium = (
+    <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
+      {teamsMitPlatz.filter((team) => team.platz <= 3).sort((left, right) => left.platz - right.platz).map((team) => {
+        const visible = sichtbarePlaetze.includes(team.platz);
+        return <article key={`podium-${team.teamname}`} data-place={team.platz} className={visible ? "opacity-100" : "opacity-25 blur-sm"}>
+          {visible ? renderIdentity(team, team.platz === 1 ? "h-24 w-24" : "h-20 w-20") : <div className="h-20 w-20 rounded-full bg-white/10" />}
+          <strong>{visible ? team.teamname : "Noch geheim"}</strong>
+          <span>{visible ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>
+          <b>#{team.platz}</b>
+        </article>;
+      })}
+    </div>
+  );
+
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
       <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type="WINNER">
         <p className="presentation-flow-kicker">Ergebnisse</p>
         <h2>Finale Tabelle</h2>
+        {podium}
         {teamsMitPlatz.length === 0 ? (
           <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
         ) : (
@@ -1068,7 +1099,7 @@ function renderEndstandSlide() {
               return (
                 <li key={team.teamname} className={istSichtbar ? "opacity-100" : "opacity-30"}>
                   <span className="presentation-flow-rank">{team.platz}</span>
-                  <strong>{istSichtbar ? team.teamname : "Noch geheim"}</strong>
+                  <strong className="flex items-center gap-3">{istSichtbar && renderIdentity(team)}{istSichtbar ? team.teamname : "Noch geheim"}</strong>
                   <span>{istSichtbar ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>
                 </li>
               );
@@ -1133,7 +1164,7 @@ function renderEndstandSlide() {
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
 
                   <div className="absolute left-5 top-1/2 z-20 max-w-[45%] -translate-y-1/2 truncate text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
-                    {istSichtbar ? team.teamname : "???"}
+                    <span className="flex items-center gap-3">{istSichtbar && renderIdentity(team, "h-12 w-12")}{istSichtbar ? team.teamname : "???"}</span>
                   </div>
 
                   {istSichtbar && (
@@ -1829,6 +1860,22 @@ function renderFlowStandingsSlide(
     : placeGroups;
   const hidden = config.standingsSize === "HIDDEN";
   const showPoints = config.showPoints !== false;
+  const standingsType = type === "INTERMEDIATE_STANDINGS" ? "INTERMEDIATE" : type === "WINNER" ? "WINNER" : "FINAL";
+  const showIdentity = shouldShowTeamIdentity({ standingsType, renderMode });
+  const finalPodium = type === "INTERMEDIATE_STANDINGS" ? null : (
+    <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
+      {teams.slice(0, 3).map((team) => {
+        const place = sorted.findIndex((candidate) => candidate.punkte === team.punkte) + 1;
+        const visible = visiblePlaces.includes(place);
+        return <article key={`flow-podium-${team.teamname}`} data-place={place} className={visible ? "opacity-100" : "opacity-25 blur-sm"}>
+          {visible && <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)} className={place === 1 ? "h-24 w-24" : "h-20 w-20"} />}
+          <strong>{visible ? team.teamname : "Noch geheim"}</strong>
+          {showPoints && <span>{visible ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>}
+          <b>#{place}</b>
+        </article>;
+      })}
+    </div>
+  );
 
   return (
     <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type={type}>
@@ -1841,6 +1888,7 @@ function renderFlowStandingsSlide(
       </p>
       <h2>{config.title ?? (type === "WINNER" ? "Herzlichen Glückwunsch" : "Aktueller Punktestand")}</h2>
       {config.body && <p className="presentation-flow-lead">{config.body}</p>}
+      {finalPodium}
       {hidden ? (
         <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
       ) : teams.length === 0 ? (
@@ -1855,7 +1903,10 @@ function renderFlowStandingsSlide(
                 className={visiblePlaces.includes(place) ? "opacity-100" : "opacity-25 blur-sm"}
               >
                 <span className="presentation-flow-rank">{type === "WINNER" ? "★" : place}</span>
-                <strong>{team.teamname}</strong>
+                <strong className="flex items-center gap-3">
+                  {showIdentity && <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)} className="h-12 w-12" />}
+                  {showIdentity ? team.teamname : `${place}. Platz`}
+                </strong>
                 {showPoints && <span>{formatQuizPoints(team.punkte)} Punkte</span>}
               </li>
             );

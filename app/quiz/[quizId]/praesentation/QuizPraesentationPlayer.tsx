@@ -24,6 +24,7 @@ import {
 import { getPresentationSlideTitle } from "@/app/rendering/presentation/presentationSlideMetadata";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
+import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -47,7 +48,7 @@ export default function QuizPraesentationPlayer({
   const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [liveState, setLiveState] = useState(initialLiveState);
   const [scores, setScores] = useState<
-    { teamname: string; punkte: number }[]
+    { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
   >([]);
   const [estimationQuestion, setEstimationQuestion] =
     useState<EstimationQuestion | null>(null);

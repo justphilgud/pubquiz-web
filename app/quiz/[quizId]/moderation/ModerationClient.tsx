@@ -50,6 +50,7 @@ import {
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
+import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -174,7 +175,7 @@ export default function ModerationClient({
         : [];
 
   const [punktestand, setPunktestand] = useState<
-    { teamname: string; punkte: number }[]
+    { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
   >([]);
 
   const hatMedien = aktuelleMedien.length > 0;

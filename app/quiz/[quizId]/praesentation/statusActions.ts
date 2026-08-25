@@ -22,6 +22,7 @@ import {
   logLivePerformance,
   withPrismaQueryDiagnostics,
 } from "@/app/lib/prismaQueryDiagnostics.server";
+import { mapTeamProfile } from "@/app/teams/teamProfile";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
@@ -57,7 +58,11 @@ export async function getPraesentationPunktestand(quizId: number) {
   const [sessions, totals] = await Promise.all([
     prisma.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
-      select: { quiz_team_session_id: true, teamname: true },
+      select: {
+        quiz_team_session_id: true,
+        teamname: true,
+        team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+      },
     }),
     prisma.team_antworten.groupBy({
       by: ["quiz_team_session_id"],
@@ -74,14 +79,20 @@ export async function getPraesentationPunktestand(quizId: number) {
 
   return sessions
     .map((session) => ({
+      teamId: session.team.team_id,
       teamname: session.teamname,
+      avatarCode: mapTeamProfile(session.team).avatarCode,
+      photoUrl: session.team.foto_url,
       punkte:
         totalsBySession.get(session.quiz_team_session_id) ??
         new Prisma.Decimal(0),
     }))
     .sort((left, right) => right.punkte.cmp(left.punkte))
     .map((entry) => ({
+      teamId: entry.teamId,
       teamname: entry.teamname,
+      avatarCode: entry.avatarCode,
+      photoUrl: entry.photoUrl,
       punkte: Number(entry.punkte),
     }));
 }
