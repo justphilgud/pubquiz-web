@@ -6,6 +6,11 @@ import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "reac
 
 import type { QuizPraesentationResult } from "@/app/quiz/actions";
 import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
+import type {
+  QuizFlowConfig,
+  QuizFlowItem,
+  QuizFlowItemType,
+} from "@/app/quiz/flow/quizFlow";
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "@/app/rendering/presentation/PresentationSlideRenderer";
@@ -19,45 +24,89 @@ import {
   toRuntimePresentationTemplate,
   type PresentationTemplateConfig,
 } from "./presentationTemplate";
+import type { PresentationDesignStyle } from "@/app/rendering/templateRegistry";
 import type { PresentationTemplateAssetRole } from "./presentationTemplateAssets";
 
-const corePresentationPreviewScenarios = [
-  ["TEXT", "Standardfrage"],
-  ["IMAGE", "Bildfrage"],
-  ["MULTIPLE_CHOICE", "Multiple Choice"],
-  ["TRUE_FALSE", "Wahr/Falsch"],
-  ["AUDIO", "Audiofrage"],
-  ["ORDERING", "Reihenfolge"],
-  ["PIXEL", "Pixelbild / Reveal"],
-  ["SOLUTION", "Auflösung"],
-  ["MODERATION", "Moderation"],
-  ["ANSWER_FORM", "Antwortformular"],
-] as const;
+export const presentationPreviewGroupLabels = {
+  QUESTIONS: "Fragen",
+  SOLUTION: "Auflösung",
+  QUIZ_SLIDES: "Quiz-Slides",
+  STORYBOOK: "Storybook-Layouts",
+  MORE: "Weitere Ansichten",
+} as const;
 
-export const storybookPresentationPreviewScenarios = [
-  ["STORYBOOK_COVER", "Cover"],
-  ["STORYBOOK_CHAPTER", "Kapitel"],
-  ["STORYBOOK_EDITORIAL", "Editorial"],
-  ["STORYBOOK_PORTRAIT", "Porträt"],
-  ["STORYBOOK_SPLIT", "Split"],
-  ["STORYBOOK_SEQUENCE", "Sequenz"],
-  ["STORYBOOK_MEMORY", "Erinnerung"],
-] as const;
+export type PresentationPreviewGroupId = keyof typeof presentationPreviewGroupLabels;
+export type PresentationPreviewRenderer = "QUESTION" | "SOLUTION" | "FLOW" | "ANSWER_FORM";
 
-const corporatePresentationPreviewScenarios = [
-  ["CORPORATE_LOGO", "Corporate · Logo"],
-  ["CORPORATE_MEDIA", "Corporate · Medienfrage"],
-  ["CORPORATE_SOLUTION", "Corporate · Auflösung"],
-] as const;
+type PresentationPreviewDefinitionBase = {
+  id: string;
+  label: string;
+  group: PresentationPreviewGroupId;
+  renderer: PresentationPreviewRenderer;
+  purpose: string;
+  uniqueVisualState: boolean;
+  storybookOnly?: true;
+  flowType?: QuizFlowItemType;
+};
 
-export const presentationPreviewScenarios = [
-  ...corePresentationPreviewScenarios,
-  ...storybookPresentationPreviewScenarios,
-  ...corporatePresentationPreviewScenarios,
-] as const;
+export const presentationPreviewRegistry = [
+  { id: "OPEN_QUESTION", label: "Offene Frage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Offene Textfrage ohne sichtbare Antwortoptionen", uniqueVisualState: true },
+  { id: "MULTIPLE_CHOICE", label: "Multiple Choice", group: "QUESTIONS", renderer: "QUESTION", purpose: "Geschlossene Frage mit Antwortoptionen", uniqueVisualState: true },
+  { id: "TRUE_FALSE", label: "Wahr/Falsch", group: "QUESTIONS", renderer: "QUESTION", purpose: "Binäre Wahr/Falsch-Frage", uniqueVisualState: true },
+  { id: "IMAGE", label: "Bildfrage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Medienfrage mit themebarem Bildzustand", uniqueVisualState: true },
+  { id: "AUDIO", label: "Audiofrage", group: "QUESTIONS", renderer: "QUESTION", purpose: "Moderationsgesteuerte Audiofrage", uniqueVisualState: true },
+  { id: "ORDERING", label: "Reihenfolge", group: "QUESTIONS", renderer: "QUESTION", purpose: "Frage mit sortierbaren Antwortwerten", uniqueVisualState: true },
+  { id: "PIXEL", label: "Pixelbild / Reveal", group: "QUESTIONS", renderer: "QUESTION", purpose: "Schrittweiser visueller Reveal", uniqueVisualState: true },
+  { id: "SOLUTION", label: "Multiple Choice · Auflösung", group: "SOLUTION", renderer: "SOLUTION", purpose: "Kanonische Auflösung einer geschlossenen Frage", uniqueVisualState: true },
+  { id: "OPEN_SOLUTION", label: "Offene Frage · Auflösung", group: "SOLUTION", renderer: "SOLUTION", purpose: "Kanonische Auflösung einer offenen Textfrage", uniqueVisualState: true },
+  { id: "WELCOME", label: "Begrüßung", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Begrüßungs-Slide", uniqueVisualState: true, flowType: "WELCOME" },
+  { id: "RULES", label: "Regeln", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Regeln-Slide", uniqueVisualState: true, flowType: "RULES" },
+  { id: "CHAPTER", label: "Kapitel", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Kapitel-Intro-Slide", uniqueVisualState: true, flowType: "CHAPTER_INTRO" },
+  { id: "COUNTDOWN", label: "Countdown", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Countdown-Slide", uniqueVisualState: true, flowType: "COUNTDOWN" },
+  { id: "BREAK", label: "Pause", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Pausen-Slide", uniqueVisualState: true, flowType: "BREAK" },
+  { id: "INTERMEDIATE_STANDINGS", label: "Zwischenstand", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Zwischenstand", uniqueVisualState: true, flowType: "INTERMEDIATE_STANDINGS" },
+  { id: "FINAL_STANDINGS", label: "Endstand", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Endstand", uniqueVisualState: true, flowType: "FINAL_STANDINGS" },
+  { id: "CALENDAR", label: "Kalender / QR", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Kalender-Abo-Slide", uniqueVisualState: true, flowType: "CALENDAR_SUBSCRIPTION" },
+  { id: "CLOSING", label: "Outro", group: "QUIZ_SLIDES", renderer: "FLOW", purpose: "Produktiver Abschluss-Slide", uniqueVisualState: true, flowType: "CLOSING" },
+  { id: "STORYBOOK_COVER", label: "Cover", group: "STORYBOOK", renderer: "QUESTION", purpose: "Kuratiertes Storybook-Cover", uniqueVisualState: true, storybookOnly: true },
+  { id: "STORYBOOK_CHAPTER", label: "Kapitelbogen", group: "STORYBOOK", renderer: "QUESTION", purpose: "Kuratiertes Storybook-Kapitel", uniqueVisualState: true, storybookOnly: true },
+  { id: "STORYBOOK_EDITORIAL", label: "Editorial", group: "STORYBOOK", renderer: "QUESTION", purpose: "Redaktioneller Storybook-Textmoment", uniqueVisualState: true, storybookOnly: true },
+  { id: "STORYBOOK_PORTRAIT", label: "Porträt", group: "STORYBOOK", renderer: "QUESTION", purpose: "Storybook-Porträtkomposition", uniqueVisualState: true, storybookOnly: true },
+  { id: "STORYBOOK_SPLIT", label: "Split", group: "STORYBOOK", renderer: "QUESTION", purpose: "Storybook-Zweipersonenkomposition", uniqueVisualState: true, storybookOnly: true },
+  { id: "STORYBOOK_SEQUENCE", label: "Sequenz", group: "STORYBOOK", renderer: "QUESTION", purpose: "Storybook-Bildsequenz", uniqueVisualState: true, storybookOnly: true },
+  { id: "STORYBOOK_MEMORY", label: "Erinnerung", group: "STORYBOOK", renderer: "SOLUTION", purpose: "Storybook-Erinnerungsauflösung", uniqueVisualState: true, storybookOnly: true },
+  { id: "ANSWER_FORM", label: "Antwortformular", group: "MORE", renderer: "ANSWER_FORM", purpose: "Begleitende Teamansicht", uniqueVisualState: true },
+  { id: "MODERATION", label: "Moderationsansicht", group: "MORE", renderer: "QUESTION", purpose: "Read-only Kontrolle des produktiven Präsentationsrenderers", uniqueVisualState: false },
+] as const satisfies readonly PresentationPreviewDefinitionBase[];
 
-export type PresentationPreviewScenario =
-  (typeof presentationPreviewScenarios)[number][0];
+export type PresentationPreviewScenario = (typeof presentationPreviewRegistry)[number]["id"];
+export type PresentationPreviewDefinition = (typeof presentationPreviewRegistry)[number];
+
+export const presentationPreviewScenarios = presentationPreviewRegistry.map(
+  ({ id, label }) => [id, label] as const,
+);
+
+export const storybookPresentationPreviewScenarios = presentationPreviewRegistry
+  .filter((definition) => "storybookOnly" in definition)
+  .map(({ id, label }) => [id, label] as const);
+
+export function getPresentationPreviewGroups(style: PresentationDesignStyle) {
+  const visibleDefinitions = presentationPreviewRegistry.filter(
+    (definition) => !("storybookOnly" in definition) || style === "BIRTHDAY",
+  );
+
+  return (Object.keys(presentationPreviewGroupLabels) as PresentationPreviewGroupId[])
+    .map((id) => ({
+      id,
+      label: presentationPreviewGroupLabels[id],
+      scenarios: visibleDefinitions.filter((definition) => definition.group === id),
+    }))
+    .filter((group) => group.scenarios.length > 0);
+}
+
+function getPreviewDefinition(scenario: PresentationPreviewScenario): PresentationPreviewDefinition {
+  return presentationPreviewRegistry.find((definition) => definition.id === scenario) as PresentationPreviewDefinition;
+}
 
 type Props = {
   config: PresentationTemplateConfig;
@@ -79,7 +128,17 @@ const assetRoleLabels: Record<PresentationTemplateAssetRole, string> = {
   DECORATION: "Dekoration unterstützt die Bühnenränder",
 };
 
-function ScaledPreviewStage({ children, highlightedAssetRole }: { children: ReactNode; highlightedAssetRole?: PresentationTemplateAssetRole | null }) {
+function ScaledPreviewStage({
+  children,
+  highlightedAssetRole,
+  scenario,
+  renderer,
+}: {
+  children: ReactNode;
+  highlightedAssetRole?: PresentationTemplateAssetRole | null;
+  scenario: PresentationPreviewScenario;
+  renderer: PresentationPreviewRenderer;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -99,6 +158,8 @@ function ScaledPreviewStage({ children, highlightedAssetRole }: { children: Reac
     <div
       ref={containerRef}
       data-preview-scale-container
+      data-preview-scenario={scenario}
+      data-preview-renderer={renderer}
       className="relative aspect-video min-h-0 w-full overflow-hidden rounded-2xl bg-black"
     >
       <div
@@ -136,6 +197,7 @@ function ScaledPreviewStage({ children, highlightedAssetRole }: { children: Reac
 }
 
 function questionForScenario(scenario: PresentationPreviewScenario) {
+  const isOpenQuestion = scenario === "OPEN_QUESTION" || scenario === "OPEN_SOLUTION";
   const templateId =
     scenario === "MULTIPLE_CHOICE"
       ? "multiple_choice"
@@ -149,27 +211,32 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
               ? "pixelbild"
               : null;
   const answers =
-    scenario.startsWith("STORYBOOK_")
+    isOpenQuestion
+      ? ["7"]
+      : scenario.startsWith("STORYBOOK_")
       ? [scenario === "STORYBOOK_MEMORY" ? "Die Reise nach Berlin" : "Berlin"]
       : scenario === "TRUE_FALSE"
       ? ["Wahr", "Falsch"]
       : scenario === "ORDERING"
         ? ["Frühling", "Sommer", "Herbst", "Winter"]
         : ["Berlin", "Hamburg", "München", "Köln"];
-  const media =
-    scenario === "IMAGE" || scenario === "PIXEL" || scenario === "CORPORATE_MEDIA"
-      ? [{ fileName: "template-preview.svg", mediaType: "Bild", scope: "QUESTION" as const }]
-      : scenario === "AUDIO"
-        ? [{ fileName: "vorschau.mp3", mediaType: "Audio", scope: "QUESTION" as const }]
-        : [];
+  const runtimeMedia = scenario === "AUDIO"
+    ? [{ fileName: "vorschau.mp3", mediaType: "Audio", scope: "QUESTION" as const }]
+    : [];
+  const layoutMedia = scenario === "IMAGE"
+    ? [{ fileName: "bildvorschau.jpg", mediaType: "Bild", scope: "QUESTION" as const }]
+    : runtimeMedia;
+  const questionText = isOpenQuestion
+    ? "Wie oft wurde Michael Schumacher Formel-1-Weltmeister?"
+    : scenario.startsWith("STORYBOOK_")
+      ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
+      : "Welche Hauptstadt gehört zu Deutschland?";
   const layoutInput = {
     templateId,
-    questionText: scenario.startsWith("STORYBOOK_")
-      ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
-      : "Welche Hauptstadt gehört zu Deutschland?",
+    questionText,
     answerOptionCount: answers.length,
     structuredFieldCount: 0,
-    media,
+    media: layoutMedia,
   };
 
   return {
@@ -192,6 +259,8 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
                   ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
                   : scenario === "STORYBOOK_EDITORIAL"
                     ? "In welcher Stadt begann unsere erste gemeinsame Reise?"
+                  : isOpenQuestion
+                    ? questionText
                     : scenario === "AUDIO"
         ? "Welcher Song ist in diesem rückwärts abgespielten Ausschnitt zu hören?"
         : scenario === "ORDERING"
@@ -200,9 +269,9 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
     templateId,
     templateConfig: null,
     punkte_modus: "standard",
-    freie_antwort_erlaubt: false,
-    urspruenglicher_antwortmodus: "CLOSED" as const,
-    effektiver_antwortmodus: "CLOSED" as const,
+    freie_antwort_erlaubt: isOpenQuestion,
+    urspruenglicher_antwortmodus: isOpenQuestion ? "OPEN" as const : "CLOSED" as const,
+    effektiver_antwortmodus: isOpenQuestion ? "OPEN" as const : "CLOSED" as const,
     quelle: "Vorschauinhalt",
     kategorien: ["Beispiel"],
     praesentationslayout: "standard",
@@ -211,7 +280,7 @@ function questionForScenario(scenario: PresentationPreviewScenario) {
       solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }),
     },
     antwort_reihenfolge: answers.map((_, index) => index + 1),
-    medien: media.map((medium, index) => ({
+    medien: runtimeMedia.map((medium, index) => ({
       medien_id: index + 1,
       datei: medium.fileName,
       medientyp: medium.mediaType,
@@ -260,6 +329,101 @@ function buildPreviewQuiz(scenario: PresentationPreviewScenario): QuizPraesentat
     }],
     fragen: [questionForScenario(scenario)],
   };
+}
+
+function buildPreviewFlowConfig(type: QuizFlowItemType): QuizFlowConfig {
+  const base = { version: 1 as const };
+
+  if (type === "WELCOME") return {
+    ...base,
+    title: "Willkommen zum PubQuiz",
+    subtitle: "LOVD × ungegoogelt",
+    body: "Macht es euch gemütlich – gleich beginnt der gemeinsame Quizabend.",
+  };
+  if (type === "RULES") return {
+    ...base,
+    title: "So läuft der Abend",
+    rules: [
+      "Bildet ein Team und wählt einen Namen.",
+      "Ein Gerät pro Team reicht aus.",
+      "Antworten rechtzeitig absenden.",
+      "Fair bleiben und nicht googeln.",
+      "Bei Fragen hilft die Moderation.",
+      "Vor allem: gemeinsam Spaß haben.",
+    ].map((text, index) => ({ id: `preview-rule-${index + 1}`, text, enabled: true })),
+  };
+  if (type === "CHAPTER_INTRO") return {
+    ...base,
+    title: "Runde 2",
+    subtitle: "Musik, Reisen und gute Geschichten",
+    body: "Jetzt wird es ein bisschen kniffliger.",
+  };
+  if (type === "COUNTDOWN") return {
+    ...base,
+    title: "Antworten jetzt abschicken",
+    body: "Die Zeit läuft.",
+    durationSeconds: 30,
+    showCountdown: true,
+  };
+  if (type === "BREAK") return {
+    ...base,
+    title: "Kurze Pause",
+    body: "Gleich geht’s weiter.",
+    durationSeconds: 300,
+    showCountdown: true,
+  };
+  if (type === "INTERMEDIATE_STANDINGS") return {
+    ...base,
+    title: "Aktueller Zwischenstand",
+    standingsSize: "TOP_5",
+    showPoints: true,
+  };
+  if (type === "FINAL_STANDINGS") return {
+    ...base,
+    title: "Das Ergebnis",
+    standingsSize: "TOP_5",
+    showPoints: true,
+  };
+  if (type === "CALENDAR_SUBSCRIPTION") return {
+    ...base,
+    title: "Kein PubQuiz mehr verpassen",
+    body: "Abonniert die nächsten Termine direkt in eurem Kalender.",
+    teamHint: "Ein Kalender für alle öffentlichen ungegoogelt Quizabende.",
+  };
+  if (type === "CLOSING") return {
+    ...base,
+    title: "Danke fürs Mitspielen",
+    subtitle: "Kommt gut nach Hause",
+    body: "Wir sehen uns beim nächsten Quizabend.",
+  };
+
+  throw new Error(`Kein Preview-Fixture für Flow-Typ ${type}.`);
+}
+
+function buildPreviewFlowSlide(
+  definition: PresentationPreviewDefinition,
+): Extract<Slide, { typ: "ablauf" }> {
+  if (!("flowType" in definition) || !definition.flowType) {
+    throw new Error(`Preview ${definition.id} hat keinen Flow-Typ.`);
+  }
+
+  const element: QuizFlowItem = {
+    id: `preview-${definition.id.toLocaleLowerCase("de-DE")}`,
+    persistentId: null,
+    type: definition.flowType,
+    anchorType: "BEFORE_QUIZ",
+    anchorKey: "QUIZ",
+    sectionId: null,
+    order: 10,
+    enabled: true,
+    label: definition.label,
+    config: buildPreviewFlowConfig(definition.flowType),
+    configVersion: 1,
+    questionAssignmentId: null,
+    isStandard: true,
+  };
+
+  return { typ: "ablauf", abschnitt: null, element };
 }
 
 function configureStorybookScenario(config: PresentationTemplateConfig, scenario: PresentationPreviewScenario) {
@@ -398,6 +562,7 @@ export function PresentationTemplatePreview({
   scenario,
   highlightedAssetRole,
 }: Props) {
+  const definition = getPreviewDefinition(scenario);
   const theme = useMemo(() => {
     const effectiveConfig = structuredClone(config);
     configureStorybookScenario(effectiveConfig, scenario);
@@ -421,28 +586,38 @@ export function PresentationTemplatePreview({
 
   if (scenario === "ANSWER_FORM") {
     return (
-      <ScaledPreviewStage highlightedAssetRole={highlightedAssetRole}>
+      <ScaledPreviewStage
+        highlightedAssetRole={highlightedAssetRole}
+        scenario={scenario}
+        renderer={definition.renderer}
+      >
         <AnswerFormDesignPreview theme={theme} />
       </ScaledPreviewStage>
     );
   }
 
   const quiz = buildPreviewQuiz(scenario);
-  const slide: Slide = {
-    typ: scenario === "SOLUTION" || scenario === "STORYBOOK_MEMORY" || scenario === "CORPORATE_SOLUTION" ? "aufloesung" : "frage",
-    abschnitt: quiz.abschnitte[0],
-    frage: quiz.fragen[0],
-    frageIndexImBlock: 1,
-    fragenAnzahlImBlock: 1,
-  };
+  const slide: Slide = definition.renderer === "FLOW"
+    ? buildPreviewFlowSlide(definition)
+    : {
+        typ: definition.renderer === "SOLUTION" ? "aufloesung" : "frage",
+        abschnitt: quiz.abschnitte[0],
+        frage: quiz.fragen[0],
+        frageIndexImBlock: 1,
+        fragenAnzahlImBlock: 1,
+      };
   return (
-    <ScaledPreviewStage highlightedAssetRole={highlightedAssetRole}>
+    <ScaledPreviewStage
+      highlightedAssetRole={highlightedAssetRole}
+      scenario={scenario}
+      renderer={definition.renderer}
+    >
       <PresentationSlideRenderer
         quiz={quiz}
         slide={slide}
         slides={[slide]}
         slideIndex={0}
-        slideLabel="Vorschau"
+        slideLabel={definition.label}
         theme={theme}
         displayState={{
           ...displayState,

@@ -62,7 +62,7 @@ export const enQuestionEditorMessages = {
     categoryRequestPresent: "Legacy category request present",
     categoryRequest: "Existing category request",
     categoryRequestHelp: "This request uses the previous workflow. Create new suggestions directly through category search.",
-    outdatedFrom: "Outdated from {date}", reviewFrom: "Review from {date}", lifecycleTitle: "Freshness", lifecycleDescription: "Choose whether the question is timeless, becomes outdated, or needs editorial review.", lifecycleTimeless: "Timeless", lifecycleOutdated: "Outdated from", lifecycleReview: "Review from", lifecycleDate: "Date", reviewHelp: "The question remains usable. An editorial review notice appears from this date.",
+    outdatedFrom: "Outdated from {date}", reviewFrom: "Review from {date}", lifecycleTitle: "Freshness", lifecycleDescription: "Choose whether the question is timeless, becomes outdated, or needs editorial review.", lifecycleTimeless: "Timeless", lifecycleTimelessHelp: "This question remains current without a date limit.", lifecycleOutdated: "Outdated from", lifecycleReview: "Review from", lifecycleDate: "Date", reviewHelp: "The question remains usable. An editorial review notice appears from this date.",
   },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", title: "Title", solution: "Solution" },
   templateSelector: { selected: "Special question: {name}", change: "Change", clear: "Clear selection", select: "Select special question", searchLabel: "Search special questions", searchPlaceholder: "Search special question", empty: "No special question found." },

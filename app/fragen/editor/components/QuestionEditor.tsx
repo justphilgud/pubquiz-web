@@ -31,7 +31,12 @@ import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
 import { TemplateSelector } from "./TemplateSelector";
-import { CreateDynamicQuestionTemplate } from "./CreateDynamicQuestionTemplate";
+import {
+  CreateDynamicQuestionTemplate,
+  type DynamicQuestionTemplateSaveOption,
+} from "./CreateDynamicQuestionTemplate";
+import { createDynamicQuestionTemplate } from "../templates/dynamicQuestionTemplateActions";
+import { remapDynamicTemplateRuleSelection } from "../templates/dynamicQuestionTemplate";
 import { StructuredTemplateEditor } from "./StructuredTemplateEditor";
 import ContentScopeSection, {
   type ContentScopeEventSeriesOption,
@@ -208,6 +213,8 @@ export function QuestionEditor({
     tone: "success" | "error";
     text: string;
   } | null>(null);
+  const [dynamicTemplateSaveOption, setDynamicTemplateSaveOption] =
+    useState<DynamicQuestionTemplateSaveOption | null>(null);
   const [pixelQuestionSync, setPixelQuestionSync] = useState<
     import("../types").FaceMorphPixelQuestionSyncResult | null
   >(null);
@@ -651,6 +658,44 @@ export function QuestionEditor({
 
       if (result.success) {
         setPixelQuestionSync(result.pixelQuestionSync ?? null);
+        const savedDraft = {
+          ...submittedDraft,
+          questionMedia: result.questionMedia,
+          answers: applySavedAnswerState(submittedDraft.answers, result),
+        };
+        if (dynamicTemplateSaveOption) {
+          const templateResult = await createDynamicQuestionTemplate({
+            questionId: result.questionId,
+            requestId: dynamicTemplateSaveOption.requestId,
+            name: dynamicTemplateSaveOption.name,
+            description: dynamicTemplateSaveOption.description,
+            rules: remapDynamicTemplateRuleSelection(
+              dynamicTemplateSaveOption.rules,
+              submittedDraft,
+              savedDraft,
+            ),
+          });
+          if (!templateResult.ok) {
+            setSavedQuestionId(result.questionId);
+            savedDraftRef.current = structuredClone(savedDraft);
+            setSavedDraftFingerprint(getQuestionDraftFingerprint(savedDraft));
+            setDraft(savedDraft);
+            setQuestionMediaUploadStatuses({});
+            setAnswerMediaUploadStatuses({});
+            setSaveMessage({
+              tone: "error",
+              text: `Die Frage wurde gespeichert, aber die Spezialfragenvorlage nicht: ${templateResult.message}`,
+            });
+            return;
+          }
+          setDynamicTemplateSaveOption(null);
+          setSaveMessage({
+            tone: "success",
+            text: templateResult.status === "ACTIVE"
+              ? `Frage und Spezialfragenvorlage „${templateResult.name}“ wurden gespeichert.`
+              : `Die Frage wurde gespeichert und „${templateResult.name}“ zur Vorlagenfreigabe eingereicht.`,
+          });
+        }
         const pixelSyncFailed = Boolean(
           result.pixelQuestionSync?.errorCode ||
             result.pixelQuestionSync?.children.some(
@@ -674,11 +719,6 @@ export function QuestionEditor({
           requestAnimationFrame(() => questionTextRef.current?.focus());
         } else {
           setSavedQuestionId(result.questionId);
-          const savedDraft = {
-            ...submittedDraft,
-            questionMedia: result.questionMedia,
-            answers: applySavedAnswerState(submittedDraft.answers, result),
-          };
           savedDraftRef.current = structuredClone(savedDraft);
           setSavedDraftFingerprint(getQuestionDraftFingerprint(savedDraft));
           setDraft((current) => ({
@@ -935,15 +975,6 @@ export function QuestionEditor({
           onClearSelection={clearTemplateSelection}
         />
 
-        {!isReadOnly && (
-          <CreateDynamicQuestionTemplate
-            questionId={savedQuestionId}
-            draft={draft}
-            isAdmin={capabilities.canManageCategories}
-            disabled={isEditorDisabled || hasUnsavedChanges}
-          />
-        )}
-
         <QuestionSection
           questionText={draft.questionText}
           label={selectedTemplate?.questionLabel}
@@ -1197,6 +1228,15 @@ export function QuestionEditor({
           showDraftActions={editorContext !== "review"}
           allowStartNewQuestion={editorContext === "create"}
           workflowIdleLabel={workflowIdleLabel}
+          secondaryOption={!isReadOnly ? (
+            <CreateDynamicQuestionTemplate
+              draft={draft}
+              isAdmin={capabilities.canManageCategories}
+              disabled={isEditorDisabled}
+              value={dynamicTemplateSaveOption}
+              onChange={setDynamicTemplateSaveOption}
+            />
+          ) : undefined}
           onCancel={cancelChanges}
           onSaveDraft={(startNewQuestion) =>
             void handleSave(

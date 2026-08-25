@@ -203,7 +203,7 @@ export const deQuestionEditorMessages = {
     hasExpiry: "Frage hat ein Ablaufdatum", hasExpiryHelp: "Nach dem Ablauf bleibt die Frage erhalten, wird aber nicht mehr automatisch für neue Quizze vorgeschlagen.",
     usableUntil: "Aktuell nutzbar bis einschließlich", expiryAfterHelp: "Ab dem folgenden Tag gilt die Frage als veraltet. Sie wird nicht gelöscht und kann weiterhin gefunden, bearbeitet oder bewusst verwendet werden.",
     lifecycleTitle: "Aktualität", lifecycleDescription: "Lege fest, ob die Frage zeitlos ist, ab einem Datum veraltet oder redaktionell geprüft werden soll.",
-    lifecycleTimeless: "Zeitlos", lifecycleOutdated: "Veraltet ab", lifecycleReview: "Prüfen ab", lifecycleDate: "Datum", reviewHelp: "Die Frage bleibt nutzbar. Ab diesem Datum erscheint ein redaktioneller Prüfhinweis.",
+    lifecycleTimeless: "Zeitlos", lifecycleTimelessHelp: "Diese Frage bleibt ohne Datumsgrenze aktuell.", lifecycleOutdated: "Veraltet ab", lifecycleReview: "Prüfen ab", lifecycleDate: "Datum", reviewHelp: "Die Frage bleibt nutzbar. Ab diesem Datum erscheint ein redaktioneller Prüfhinweis.",
   },
   categories: {
     title: "Kategorien", remove: "{name} entfernen", clearAll: "Alle Kategorien entfernen", searchLabel: "Kategorie suchen oder eingeben",

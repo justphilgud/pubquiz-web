@@ -52,7 +52,7 @@ export function PresentationDesignHeader({
     return (
       <header className="presentation-chrome presentation-editorial-header relative z-20 flex h-28 shrink-0 items-start justify-between px-3 pt-2">
         {theme.identity.logoUrl ? (
-          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="LOVD STELP" className="presentation-editorial-logo" />
+          <img data-template-asset-role="LOGO" data-logo-framing="lovd-wordmark" src={theme.identity.logoUrl} alt="LOVD STELP" className="presentation-editorial-logo" />
         ) : (
           <span className="presentation-editorial-wordmark">LOVD</span>
         )}
@@ -183,7 +183,7 @@ export function PresentationDesignBackdrop({
     return (
       <div className="presentation-decoration presentation-editorial-decoration pointer-events-none absolute inset-0" aria-hidden="true">
         {theme.identity.logoUrl && (
-          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="presentation-editorial-intro-logo" />
+          <img data-template-asset-role="LOGO" data-logo-framing="lovd-wordmark" src={theme.identity.logoUrl} alt="" className="presentation-editorial-intro-logo" />
         )}
         <span className="presentation-editorial-intro-title">PUBQUIZ</span>
         <span className="presentation-editorial-intro-collaboration">{theme.design.occasion.extraText || "LOVD × ungegoogelt"}</span>

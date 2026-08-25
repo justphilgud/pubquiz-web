@@ -32,8 +32,9 @@ import {
 } from "./presentationTemplateLifecycle";
 import { filterPresentationTemplates } from "./templateOverviewPolicy";
 import {
+  getPresentationPreviewGroups,
   PresentationTemplatePreview,
-  presentationPreviewScenarios,
+  presentationPreviewRegistry,
 } from "./PresentationTemplatePreview";
 import { selectDeterministicTemplateImage } from "./deterministicTemplateImage";
 import { getStorybookPeopleMode, getStorybookTitle } from "./storybook";
@@ -541,7 +542,7 @@ test("preview and productive design renderer consume the same normalized asset c
     config,
     templateId: managed.id,
     templateName: managed.name,
-    scenario: "TEXT",
+    scenario: "OPEN_QUESTION",
   }));
   for (const reference of [logo, background, hero, decoration]) {
     assert.ok(previewHtml.includes(reference));
@@ -632,18 +633,107 @@ test("used templates cannot be archived", () => {
   assert.equal(canArchivePresentationTemplate({ ...template, isSystem: true }), false);
 });
 
-test("preview matrix is complete and uses productive renderer and layout resolver", () => {
-  for (const scenario of ["TEXT", "IMAGE", "MULTIPLE_CHOICE", "AUDIO", "ORDERING", "SOLUTION", "MODERATION", "ANSWER_FORM", "STORYBOOK_COVER", "STORYBOOK_CHAPTER", "STORYBOOK_EDITORIAL", "STORYBOOK_PORTRAIT", "STORYBOOK_SPLIT", "STORYBOOK_SEQUENCE", "STORYBOOK_MEMORY"]) {
-    assert.ok(presentationPreviewScenarios.some(([id]) => id === scenario));
-  }
+test("preview registry documents and renders every visible entry through its declared renderer", () => {
+  const generatorSource = readFileSync("app/rendering/presentationTemplates/PresentationTemplateGenerator.tsx", "utf8");
   const source = readFileSync("app/rendering/presentationTemplates/PresentationTemplatePreview.tsx", "utf8");
+
+  assert.equal(new Set(presentationPreviewRegistry.map(({ id }) => id)).size, presentationPreviewRegistry.length);
+  assert.ok(presentationPreviewRegistry.every(({ purpose }) => purpose.length > 0));
+  assert.ok(presentationPreviewRegistry.every(({ uniqueVisualState }) => typeof uniqueVisualState === "boolean"));
+  assert.equal(presentationPreviewRegistry.find(({ id }) => id === "MODERATION")?.uniqueVisualState, false);
+  assert.equal(presentationPreviewRegistry.some(({ id }) => id.startsWith("CORPORATE_")), false);
+  assert.equal(presentationPreviewRegistry.some(({ id }) => String(id) === "TEXT"), false);
+  assert.equal(presentationPreviewRegistry.find(({ id }) => id === "OPEN_QUESTION")?.label, "Offene Frage");
+  assert.equal(presentationPreviewRegistry.find(({ id }) => id === "OPEN_SOLUTION")?.label, "Offene Frage · Auflösung");
+  assert.match(generatorSource, /<optgroup/);
+  for (const label of ["Fragen", "Auflösung", "Quiz-Slides", "Weitere Ansichten"]) {
+    assert.ok(generatorSource.includes("group.label") || source.includes(label));
+  }
+
+  for (const style of ["NEON", "CORPORATE", "EDITORIAL"] as const) {
+    const ids = getPresentationPreviewGroups(style).flatMap((group) => group.scenarios.map(({ id }) => id));
+    assert.equal(ids.some((id) => id.startsWith("STORYBOOK_")), false);
+  }
+  const birthdayIds = getPresentationPreviewGroups("BIRTHDAY").flatMap((group) => group.scenarios.map(({ id }) => id));
+  assert.ok(birthdayIds.includes("STORYBOOK_COVER"));
+  assert.ok(birthdayIds.includes("STORYBOOK_MEMORY"));
+
+  for (const definition of presentationPreviewRegistry) {
+    const config = createPresentationStylePreset("storybookOnly" in definition ? "BIRTHDAY" : "EDITORIAL");
+    const markup = renderToStaticMarkup(createElement(PresentationTemplatePreview, {
+      config,
+      templateId: "preview-contract",
+      templateName: "Preview Contract",
+      scenario: definition.id,
+    }));
+    assert.match(markup, new RegExp(`data-preview-scenario="${definition.id}"`));
+    assert.match(markup, new RegExp(`data-preview-renderer="${definition.renderer}"`));
+    if ("flowType" in definition) {
+      assert.match(markup, new RegExp(`data-flow-type="${definition.flowType}"`));
+    }
+  }
+
   assert.match(source, /PresentationSlideRenderer/);
   assert.match(source, /resolvePresentationLayout/);
   assert.doesNotMatch(source, /function resolve.*Layout/);
-  assert.doesNotMatch(source, /src=.["']\/medien\/vorschau\.mp3/);
+  assert.doesNotMatch(source, /template-preview\.svg|CORPORATE_(?:LOGO|MEDIA|SOLUTION)/);
   assert.match(source, /data-preview-scale-container/);
   assert.match(source, /data-preview-fixed-stage/);
   assert.match(source, /transformOrigin: "top left"/);
+});
+
+test("open-question previews use the productive OPEN contract without closed-answer fallback", () => {
+  const config = createPresentationStylePreset("EDITORIAL");
+  const renderScenario = (scenario: "OPEN_QUESTION" | "OPEN_SOLUTION") => renderToStaticMarkup(
+    createElement(PresentationTemplatePreview, {
+      config,
+      templateId: "lovd-open-question-preview",
+      templateName: "LOVD Open Question Preview",
+      scenario,
+    }),
+  );
+
+  const question = renderScenario("OPEN_QUESTION");
+  assert.match(question, /data-preview-renderer="QUESTION"/);
+  assert.match(question, /data-presentation-layout="CONTENT_CENTERED"/);
+  assert.match(question, /Wie oft wurde Michael Schumacher Formel-1-Weltmeister\?/);
+  assert.doesNotMatch(question, /presentation-answer-option|<input|<textarea|<button/);
+  assert.doesNotMatch(question, />Berlin<|>Hamburg<|>München<|>Köln</);
+
+  const solution = renderScenario("OPEN_SOLUTION");
+  assert.match(solution, /data-preview-renderer="SOLUTION"/);
+  assert.match(solution, /data-presentation-layout="SOLUTION_FOCUS"/);
+  assert.match(solution, /data-correct="true"/);
+  assert.match(solution, /presentation-correct-answer-value[^>]*>7</);
+  assert.doesNotMatch(solution, /presentation-solution-option|>Berlin<|>Hamburg<|>München<|>Köln</);
+});
+
+test("media previews use distinct themeable product states without simulated audience controls", () => {
+  const config = createPresentationStylePreset("EDITORIAL");
+  const renderScenario = (scenario: "IMAGE" | "PIXEL" | "AUDIO") => renderToStaticMarkup(
+    createElement(PresentationTemplatePreview, {
+      config,
+      templateId: "lovd-media-preview",
+      templateName: "LOVD Media Preview",
+      scenario,
+    }),
+  );
+
+  const image = renderScenario("IMAGE");
+  assert.match(image, /data-presentation-layout="MEDIA_FOCUS"/);
+  assert.match(image, /data-media-fallback="IMAGE"/);
+  assert.doesNotMatch(image, /template-preview\.svg/);
+
+  const pixel = renderScenario("PIXEL");
+  assert.match(pixel, /data-presentation-layout="REVEAL_SEQUENCE"/);
+  assert.match(pixel, /data-media-fallback="PIXEL_REVEAL"/);
+  assert.doesNotMatch(pixel, /data-media-fallback="IMAGE"/);
+
+  const audio = renderScenario("AUDIO");
+  assert.match(audio, /data-presentation-layout="AUDIO_FOCUS"/);
+  assert.match(audio, /data-audio-visualization/);
+  assert.match(audio, /Wiedergabe durch die Moderation/);
+  assert.doesNotMatch(audio, /data-preview-audio|Beispiel-Audio|presentation-audio-play-mark|▶/);
 });
 
 test("semantic renderer variants keep corporate treatment and expose the editorial storybook system", () => {

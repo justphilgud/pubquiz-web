@@ -9,6 +9,8 @@ import { buildStorybookExperienceRuntime } from "@/app/rendering/presentationTem
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "./PresentationSlideRenderer";
+import { resolvePresentationLayout } from "./presentationLayoutResolver";
+import type { Slide } from "../../quiz/[quizId]/praesentation/buildPraesentationSlides";
 
 const rendererSource = readFileSync(
   new URL("./PresentationSlideRenderer.tsx", import.meta.url),
@@ -26,6 +28,14 @@ const moderationPreviewSource = readFileSync(
     "../../quiz/[quizId]/moderation/components/CurrentSlidePanel.tsx",
     import.meta.url,
   ),
+  "utf8",
+);
+const designSystemSource = readFileSync(
+  new URL("./PresentationDesignSystem.tsx", import.meta.url),
+  "utf8",
+);
+const globalStylesSource = readFileSync(
+  new URL("../../globals.css", import.meta.url),
   "utf8",
 );
 
@@ -92,7 +102,9 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
     "presentation-solution-answer",
     "presentation-correct-answer-value",
     "presentation-audio-control",
-    "presentation-media-play-mark",
+    "presentation-media-fallback",
+    "presentation-audio-status",
+    "presentation-audio-waveform",
     "presentation-estimation-slide",
     "presentation-legacy-slide",
     "presentation-countdown-slide",
@@ -104,6 +116,132 @@ test("renderer exposes semantic hooks for LOVD badges, media and legacy flow sli
   }
   assert.match(rendererSource, /data-correct=\{antwort\.ist_richtig\}/);
   assert.match(rendererSource, /data-correct="true"/);
+  assert.doesNotMatch(rendererSource, /PreviewAudioPlayer|presentation-preview-audio|presentation-audio-play-mark/);
+});
+
+test("open solutions render short and long canonical answers without fake alternatives", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const theme = structuredClone(runtime.theme);
+  theme.design.stylePreset = "EDITORIAL";
+
+  for (const solutionText of ["7", "Never Gonna Give You Up"]) {
+    const baseQuestion = runtime.quiz.fragen[0];
+    assert.ok(baseQuestion);
+    const answerId = 70;
+    const layoutInput = {
+      templateId: null,
+      questionText: "Wie lautet die gesuchte Lösung?",
+      answerOptionCount: 1,
+      structuredFieldCount: 0,
+      media: [],
+    };
+    const question = {
+      ...baseQuestion,
+      frage: "Wie lautet die gesuchte Lösung?",
+      templateId: null,
+      templateConfig: null,
+      freie_antwort_erlaubt: true,
+      urspruenglicher_antwortmodus: "OPEN" as const,
+      effektiver_antwortmodus: "OPEN" as const,
+      presentationLayouts: {
+        question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }),
+        solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }),
+      },
+      antwort_reihenfolge: [answerId],
+      medien: [],
+      bildMedien: [],
+      antwortfelder: [],
+      antworten: [{
+        antwort_id: answerId,
+        antwort: solutionText,
+        ist_richtig: true,
+        antworttyp: "Text",
+        medien: [],
+      }],
+    };
+    const quiz = { ...runtime.quiz, fragen: [question] };
+    const slide: Slide = {
+      typ: "aufloesung",
+      abschnitt: quiz.abschnitte[0],
+      frage: question,
+      frageIndexImBlock: 1,
+      fragenAnzahlImBlock: 1,
+    };
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz,
+      slide,
+      slides: [slide],
+      slideIndex: 0,
+      slideLabel: "Offene Frage · Auflösung",
+      theme,
+      displayState,
+    }));
+
+    assert.match(html, /data-presentation-layout="SOLUTION_FOCUS"/);
+    assert.match(html, /data-correct="true"/);
+    assert.ok(html.includes(solutionText));
+    assert.doesNotMatch(html, /presentation-solution-option/);
+    assert.equal((html.match(/presentation-correct-answer-value/g) ?? []).length, 1);
+  }
+});
+
+test("LOVD rules keep every configured entry in the bounded slide layout", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const theme = structuredClone(runtime.theme);
+  theme.design.stylePreset = "EDITORIAL";
+
+  for (const count of [2, 4, 6]) {
+    const rules = Array.from({ length: count }, (_, index) => ({
+      id: `rule-${index + 1}`,
+      text: `Regel ${index + 1}: gemeinsam fair und aufmerksam spielen`,
+      enabled: true,
+    }));
+    const rulesSlide: Slide = {
+      typ: "ablauf",
+      abschnitt: null,
+      element: {
+        id: `rules-${count}`,
+        persistentId: null,
+        type: "RULES",
+        anchorType: "BEFORE_QUIZ",
+        anchorKey: "QUIZ",
+        sectionId: null,
+        order: 10,
+        enabled: true,
+        label: "Regeln",
+        config: { version: 1, title: "Die Regeln", rules },
+        configVersion: 1,
+        questionAssignmentId: null,
+        isStandard: true,
+      },
+    };
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz: runtime.quiz,
+      slide: rulesSlide,
+      slides: [rulesSlide],
+      slideIndex: 0,
+      slideLabel: "REGELN",
+      theme,
+      displayState,
+    }));
+
+    assert.match(html, new RegExp(`data-rule-count="${count}"`));
+    assert.match(html, new RegExp(`data-many="${count > 4}"`));
+    for (let index = 1; index <= count; index += 1) {
+      assert.match(html, new RegExp(`Regel ${index}:`));
+    }
+  }
+});
+
+test("LOVD logo framing and rules overflow are explicit theme contracts", () => {
+  assert.match(designSystemSource, /data-logo-framing="lovd-wordmark"/);
+  assert.match(globalStylesSource, /aspect-ratio:\s*2\.12 \/ 1/);
+  assert.match(globalStylesSource, /presentation-flow-rules\[data-many="true"\]/);
+  assert.match(globalStylesSource, /presentation-rules-slide > \.grid\[data-many="true"\]/);
+  assert.match(
+    globalStylesSource,
+    /presentation-flow-slide\[data-flow-type="RULES"\][^{]*\{[\s\S]*?overflow:\s*visible/,
+  );
 });
 
 test("player and moderation preview share the presentation renderer", () => {

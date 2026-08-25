@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import QRCode from "react-qr-code";
 
 import {
@@ -337,10 +337,16 @@ function renderMedienKarte(
         />
       ) : isAudio(medium.datei) ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-6">
-          <div className="presentation-media-play-mark text-7xl font-black text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
-            ▶
-          </div>
-          {renderMode === "PRESENTATION" ? <SynchronizedMedia kind="audio" src={src} command={effectivePlaybackCommand} commandId={playbackCommandId} renderMode={renderMode} /> : <PreviewAudioPlayer />}
+          {renderMode === "PRESENTATION" && (
+            <SynchronizedMedia
+              kind="audio"
+              src={src}
+              command={effectivePlaybackCommand}
+              commandId={playbackCommandId}
+              renderMode={renderMode}
+            />
+          )}
+          <PresentationAudioStatus playbackCommand={effectivePlaybackCommand} />
         </div>
       ) : isVideo(medium.datei) ? (
         <SynchronizedMedia
@@ -397,12 +403,78 @@ function renderAntwortOptionen(
   );
 }
 
-function PreviewAudioPlayer() {
+function PresentationMediaFallback({
+  kind,
+}: {
+  kind: "IMAGE" | "PIXEL_REVEAL";
+}) {
+  const isPixelReveal = kind === "PIXEL_REVEAL";
+
   return (
-    <div className="presentation-preview-audio flex w-full max-w-xl items-center gap-4 rounded-2xl border border-white/30 bg-black/35 p-4" data-preview-audio>
-      <span aria-hidden="true" className="grid size-12 place-items-center rounded-full border-2 border-current">▶</span>
-      <div className="min-w-0 flex-1"><div className="font-black">Beispiel-Audio</div><div className="mt-2 h-2 rounded-full bg-white/20"><div className="h-full w-2/5 rounded-full bg-current" /></div></div>
-      <span className="text-sm opacity-70">stumm</span>
+    <div
+      className="presentation-media-fallback flex h-full min-h-[18rem] flex-col items-center justify-center gap-7 p-10 text-center"
+      data-media-fallback={kind}
+    >
+      {isPixelReveal ? (
+        <div className="presentation-media-fallback-grid" aria-hidden="true">
+          {Array.from({ length: 48 }, (_, index) => <span key={index} />)}
+        </div>
+      ) : (
+        <svg
+          aria-hidden="true"
+          className="presentation-media-fallback-icon"
+          viewBox="0 0 160 120"
+          fill="none"
+        >
+          <rect x="8" y="8" width="144" height="104" rx="8" />
+          <circle cx="118" cy="40" r="13" />
+          <path d="M22 94 58 58l25 24 18-17 37 29" />
+        </svg>
+      )}
+      <div>
+        <div className="presentation-media-fallback-title text-3xl font-black">
+          {isPixelReveal ? "Pixelbild" : "Bildfrage"}
+        </div>
+        <div className="presentation-media-fallback-copy mt-3 text-lg font-semibold">
+          {isPixelReveal
+            ? "Das Motiv wird schrittweise sichtbar."
+            : "Das Bildmotiv erscheint hier in der Präsentation."}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PresentationAudioStatus({
+  playbackCommand,
+}: {
+  playbackCommand: PresentationPlaybackCommand;
+}) {
+  const statusLabel = playbackCommand === "play"
+    ? "Wiedergabe läuft"
+    : playbackCommand === "pause"
+      ? "Wiedergabe pausiert"
+      : "Audio bereit";
+
+  return (
+    <div
+      className="presentation-audio-status flex w-full max-w-3xl flex-col items-center gap-7 text-center"
+      data-audio-visualization
+      data-playback-status={playbackCommand ?? "ready"}
+    >
+      <div className="presentation-audio-waveform flex h-24 w-full items-center justify-center gap-2" aria-hidden="true">
+        {Array.from({ length: 24 }, (_, index) => (
+          <span key={index} style={{ "--wave-index": index } as CSSProperties} />
+        ))}
+      </div>
+      <div>
+        <div className="presentation-audio-control-label text-sm font-black uppercase tracking-[0.3em]">
+          Wiedergabe durch die Moderation
+        </div>
+        <div className="presentation-audio-status-label mt-3 text-lg font-bold">
+          {statusLabel}
+        </div>
+      </div>
     </div>
   );
 }
@@ -645,9 +717,9 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
         <div className="min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-5 shadow-[8px_8px_0_#ff00aa]">
           {questionMedia.length === 0 ? (
-            <div className="flex h-full items-center justify-center rounded-3xl border-4 border-dashed border-cyan-300 text-3xl font-black uppercase text-white/40">
-              Kein Medium
-            </div>
+            <PresentationMediaFallback
+              kind={layoutVariant === "REVEAL_SEQUENCE" ? "PIXEL_REVEAL" : "IMAGE"}
+            />
           ) : (
             <div className="grid h-full min-h-0 gap-4">
               {questionMedia.slice(0, 1).map((medium) =>
@@ -683,12 +755,12 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card presentation-audio-stage flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
-        <div className="mb-10 text-center">
+        <div className="mb-6 text-center">
           <div className="presentation-question-label mb-4 text-sm font-black uppercase tracking-[0.45em] text-[#38E8FF] drop-shadow-[0_0_8px_#38E8FF]">
             Audiofrage
           </div>
 
-          <h2 className="mx-auto max-w-6xl text-6xl font-black leading-tight text-white drop-shadow-[0_0_10px_#FF3BD4]">
+          <h2 className="presentation-audio-question mx-auto max-w-6xl text-[clamp(2.75rem,4.6vw,5.5rem)] font-black leading-[1.08] text-white drop-shadow-[0_0_10px_#FF3BD4]">
             {frage.frage}
           </h2>
         </div>
@@ -701,18 +773,18 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
               </div>
             ) : (
               <>
-                {renderMode === "PRESENTATION" ? <SynchronizedMedia kind="audio" src={getMediumUrl(audioMedium.datei)} command={mediaOverlayActive ? null : playbackCommand} commandId={playbackCommandId} renderMode={renderMode} /> : <PreviewAudioPlayer />}
-
-                <div className="presentation-audio-control-label mb-10 text-sm font-black uppercase tracking-[0.45em] text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
-                  Wiedergabe durch die Moderation
-                </div>
-
-                <div
-                  aria-hidden="true"
-                  className="presentation-audio-play-mark flex h-40 w-40 items-center justify-center rounded-full border-4 border-[#FFD83B] bg-black text-7xl font-black text-[#FFD83B] shadow-[0_0_18px_#FFD83B,0_0_42px_rgba(255,216,59,0.55)]"
-                >
-                  ▶
-                </div>
+                {renderMode === "PRESENTATION" && (
+                  <SynchronizedMedia
+                    kind="audio"
+                    src={getMediumUrl(audioMedium.datei)}
+                    command={mediaOverlayActive ? null : playbackCommand}
+                    commandId={playbackCommandId}
+                    renderMode={renderMode}
+                  />
+                )}
+                <PresentationAudioStatus
+                  playbackCommand={mediaOverlayActive ? null : playbackCommand}
+                />
               </>
             )}
           </div>
@@ -1513,7 +1585,10 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 
   if (abschnitt.abschnitt_typ === "intro_regeln") {
     return (
-      <div className="presentation-legacy-slide presentation-rules-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
+      <div
+        className="presentation-legacy-slide presentation-rules-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]"
+        data-rule-count={regeln.length}
+      >
         <div className="mb-8">
           <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
             Rules are good!
@@ -1526,7 +1601,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
           </h2>
         </div>
 
-        <div className="grid flex-1 gap-5">
+        <div className="grid min-h-0 flex-1 gap-5" data-many={regeln.length > 4}>
           {regeln.map((regel, index) => (
             <div
               key={`${regel}-${index}`}
@@ -2017,7 +2092,11 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
       )}
 
       {type === "RULES" && (
-        <ol className="presentation-flow-rules">
+        <ol
+          className="presentation-flow-rules"
+          data-rule-count={activeRules.length}
+          data-many={activeRules.length > 4}
+        >
           {activeRules.map((rule, index) => (
             <li key={rule.id}>
               <span>{index + 1}</span>

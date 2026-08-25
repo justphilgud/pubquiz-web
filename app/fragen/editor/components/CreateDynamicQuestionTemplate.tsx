@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -17,7 +16,13 @@ import {
   type DynamicQuestionTemplateRole,
   type DynamicQuestionTemplateRuleSelection,
 } from "../templates/dynamicQuestionTemplate";
-import { createDynamicQuestionTemplate } from "../templates/dynamicQuestionTemplateActions";
+
+export type DynamicQuestionTemplateSaveOption = {
+  requestId: string;
+  name: string;
+  description: string;
+  rules: DynamicQuestionTemplateRuleSelection;
+};
 
 const roleLabels: Record<DynamicQuestionTemplateRole, string> = {
   FIXED: "Fest übernehmen",
@@ -48,40 +53,39 @@ function RoleSelect({
 }
 
 export function CreateDynamicQuestionTemplate({
-  questionId,
   draft,
   isAdmin,
   disabled,
+  value,
+  onChange,
 }: {
-  questionId: number | null;
   draft: QuestionEditorDraft;
   isAdmin: boolean;
   disabled: boolean;
+  value: DynamicQuestionTemplateSaveOption | null;
+  onChange: (value: DynamicQuestionTemplateSaveOption | null) => void;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [rules, setRules] = useState<DynamicQuestionTemplateRuleSelection>(
     () => createDefaultDynamicTemplateRuleSelection(draft),
   );
-  const [message, setMessage] = useState<{
-    tone: "success" | "error";
-    text: string;
-  } | null>(null);
-  const [pending, startTransition] = useTransition();
 
-  function startCreation() {
-    setRules(createDefaultDynamicTemplateRuleSelection(draft));
-    setMessage(null);
+  function openConfiguration() {
+    setName(value?.name ?? "");
+    setDescription(value?.description ?? "");
+    setRules(
+      value?.rules ?? createDefaultDynamicTemplateRuleSelection(draft),
+    );
     setOpen(true);
   }
 
-  function updateMediaRole(sourceMediaId: number, role: DynamicQuestionTemplateRole) {
+  function updateMediaRole(slotKey: string, role: DynamicQuestionTemplateRole) {
     setRules((current) => ({
       ...current,
       media: current.media.map((rule) =>
-        rule.sourceMediaId === sourceMediaId ? { ...rule, role } : rule),
+        rule.slotKey === slotKey ? { ...rule, role } : rule),
     }));
   }
 
@@ -93,72 +97,68 @@ export function CreateDynamicQuestionTemplate({
     }));
   }
 
-  function submit() {
-    if (!questionId) return;
-    setMessage(null);
-    startTransition(async () => {
-      const result = await createDynamicQuestionTemplate({
-        questionId,
-        name,
-        description,
-        rules,
-      });
-      if (!result.ok) {
-        setMessage({ tone: "error", text: result.message });
-        return;
-      }
-      setMessage({
-        tone: "success",
-        text: result.status === "ACTIVE"
-          ? `„${result.name}“ ist jetzt im Vorlagen-Dropdown verfügbar.`
-          : `„${result.name}“ wurde der Administration zur Freigabe vorgeschlagen.`,
-      });
-      setName("");
-      setDescription("");
-      router.refresh();
+  function applyConfiguration() {
+    if (name.trim().length < 3) return;
+    onChange({
+      requestId: value?.requestId ?? crypto.randomUUID(),
+      name: name.trim(),
+      description: description.trim(),
+      rules,
     });
+    setOpen(false);
   }
 
-  const persistedMedia = draft.questionMedia.filter(
-    (medium) => medium.existingMediaId !== null,
+  const availableMedia = draft.questionMedia.filter(
+    (medium) => medium.operation !== "REMOVE" && Boolean(medium.url),
   );
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-medium text-slate-950">Wiederkehrendes Format?</p>
-          <p className="mt-1 text-sm text-slate-600">
-            Speichere die bestehende Frage als generische Spezialfragenvorlage.
-          </p>
-        </div>
+    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+      <label className="flex min-w-0 cursor-pointer items-start gap-3 text-sm text-slate-800">
+        <input
+          type="checkbox"
+          checked={value !== null}
+          disabled={disabled}
+          onChange={(event) => {
+            if (event.target.checked) openConfiguration();
+            else onChange(null);
+          }}
+          className="mt-0.5 size-4 shrink-0 accent-slate-950"
+        />
+        <span>
+          <span className="font-semibold">Zusätzlich als Spezialfragenvorlage speichern</span>
+          <span className="mt-0.5 block text-xs text-slate-600">
+            {value
+              ? `Konfiguriert als „${value.name}“`
+              : isAdmin
+                ? "Wird nach der Frage erstellt und direkt freigegeben."
+                : "Wird nach der Frage als Freigabevorschlag erstellt."}
+          </span>
+        </span>
+      </label>
+      {value && (
         <Button
           type="button"
-          variant="secondary"
-          disabled={disabled || questionId === null}
-          onClick={startCreation}
-          className="min-h-11 shrink-0"
+          variant="ghost"
+          disabled={disabled}
+          onClick={openConfiguration}
+          className="min-h-9 shrink-0 self-end px-3 text-sm sm:self-auto"
         >
-          Als Spezialfragenvorlage speichern
+          Konfigurieren
         </Button>
-      </div>
-      {questionId === null && (
-        <p className="mt-2 text-xs text-amber-700">
-          Speichere die Frage zuerst als Entwurf.
-        </p>
       )}
 
       <Modal
         open={open}
         title={isAdmin ? "Spezialfragenvorlage erstellen" : "Spezialfragenvorlage vorschlagen"}
-        onClose={() => !pending && setOpen(false)}
+        onClose={() => setOpen(false)}
         footer={(
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="ghost" disabled={pending} onClick={() => setOpen(false)}>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
               Abbrechen
             </Button>
-            <Button type="button" disabled={pending || name.trim().length < 3} onClick={submit}>
-              {pending ? "Wird gespeichert …" : isAdmin ? "Erstellen und freigeben" : "Vorschlag senden"}
+            <Button type="button" disabled={name.trim().length < 3} onClick={applyConfiguration}>
+              Übernehmen
             </Button>
           </div>
         )}
@@ -181,13 +181,13 @@ export function CreateDynamicQuestionTemplate({
               <RoleSelect value={rules.questionText} onChange={(questionText) => setRules((current) => ({ ...current, questionText }))} />
             </label>
 
-            {persistedMedia.map((medium) => {
+            {availableMedia.map((medium) => {
               const rule = resolveDynamicTemplateMediaRule(rules, medium)!;
               return (
-                <label key={medium.existingMediaId} className="block rounded-xl border border-slate-200 p-3 text-sm">
+                <label key={medium.slotKey} className="block rounded-xl border border-slate-200 p-3 text-sm">
                   <span className="font-medium">{medium.mediaType === "IMAGE" ? "Bild" : medium.mediaType === "AUDIO" ? "Audio" : "Video"}</span>
                   <span className="mt-1 block truncate text-slate-600">{medium.fileName ?? medium.url}</span>
-                  <RoleSelect value={rule.role} onChange={(role) => updateMediaRole(rule.sourceMediaId, role)} />
+                  <RoleSelect value={rule.role} onChange={(role) => updateMediaRole(rule.slotKey, role)} />
                 </label>
               );
             })}
@@ -207,13 +207,8 @@ export function CreateDynamicQuestionTemplate({
           <p className="rounded-xl bg-slate-100 p-3 text-xs leading-5 text-slate-700">
             Antworttyp und strukturelle Konfiguration werden übernommen. Punkte bleiben Teil des jeweiligen Quiz und werden nicht in der Vorlage gespeichert.
           </p>
-          {message && (
-            <p role={message.tone === "error" ? "alert" : "status"} className={message.tone === "error" ? "text-sm font-medium text-red-700" : "text-sm font-medium text-emerald-700"}>
-              {message.text}
-            </p>
-          )}
         </div>
       </Modal>
-    </section>
+    </div>
   );
 }

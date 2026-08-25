@@ -49,6 +49,18 @@ export function getQuestionLifecycleMode(input: {
   return "TIMELESS";
 }
 
+export function getQuestionLifecycleModeChange(
+  mode: QuestionLifecycleMode,
+): { validUntil: string | null; reviewFrom: string | null } {
+  if (mode === "OUTDATED_FROM") {
+    return { validUntil: "", reviewFrom: null };
+  }
+  if (mode === "REVIEW_FROM") {
+    return { validUntil: null, reviewFrom: "" };
+  }
+  return { validUntil: null, reviewFrom: null };
+}
+
 export function getQuestionLifecycleState(input: {
   validUntil: string | null;
   reviewFrom: string | null;

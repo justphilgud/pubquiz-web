@@ -22,9 +22,8 @@ import {
   presentationStylePresets,
 } from "./presentationTemplatePresets";
 import {
+  getPresentationPreviewGroups,
   PresentationTemplatePreview,
-  presentationPreviewScenarios,
-  storybookPresentationPreviewScenarios,
   type PresentationPreviewScenario,
 } from "./PresentationTemplatePreview";
 
@@ -125,7 +124,7 @@ export function PresentationTemplateGenerator({
   const [draft, setDraft] = useState(initialDraft);
   const [savedDraft, setSavedDraft] = useState(initialDraft);
   const [activeSection, setActiveSection] = useState<GeneratorSectionId>("style");
-  const [scenario, setScenario] = useState<PresentationPreviewScenario>("TEXT");
+  const [scenario, setScenario] = useState<PresentationPreviewScenario>("OPEN_QUESTION");
   const [highlightedAssetRole, setHighlightedAssetRole] = useState<PresentationTemplateAssetRole | null>(null);
   const [focusPreview, setFocusPreview] = useState(false);
   const [result, setResult] = useState<PresentationTemplateActionState | null>(null);
@@ -134,11 +133,10 @@ export function PresentationTemplateGenerator({
   const skipLeaveWarning = useRef(false);
   const [isPending, startTransition] = useTransition();
   const validation = useMemo(() => validatePresentationTemplateDraft(draft), [draft]);
-  const isStorybook = draft.config.design.stylePreset === "BIRTHDAY";
-  const previewScenarios = isStorybook ? storybookPresentationPreviewScenarios : presentationPreviewScenarios;
-  const effectiveScenario: PresentationPreviewScenario = isStorybook
-    ? scenario.startsWith("STORYBOOK_") ? scenario : "STORYBOOK_COVER"
-    : scenario.startsWith("STORYBOOK_") ? "TEXT" : scenario;
+  const previewGroups = getPresentationPreviewGroups(draft.config.design.stylePreset);
+  const effectiveScenario: PresentationPreviewScenario = previewGroups.some((group) =>
+    group.scenarios.some((definition) => definition.id === scenario),
+  ) ? scenario : "OPEN_QUESTION";
 
   useEffect(() => {
     const dirty = () => !skipLeaveWarning.current && JSON.stringify(draft) !== JSON.stringify(savedDraft);
@@ -209,7 +207,7 @@ export function PresentationTemplateGenerator({
   function applyStyle(style: PresentationDesignStyle) {
     if (style === draft.config.design.stylePreset) return;
     updateConfig((config) => Object.assign(config, applyPresentationStylePreset(config, style)));
-    setScenario(style === "BIRTHDAY" ? "STORYBOOK_COVER" : "TEXT");
+    setScenario(style === "BIRTHDAY" ? "STORYBOOK_COVER" : "OPEN_QUESTION");
     setResult(null);
   }
 
@@ -266,7 +264,7 @@ export function PresentationTemplateGenerator({
           <p className="mt-2 text-sm text-slate-600">Aktive, archivierte und Systemtemplates bleiben unveränderlich. Vorschauvarianten sind weiterhin verfügbar.</p>
         </section>
         <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <PreviewToolbar scenario={effectiveScenario} scenarios={previewScenarios} onScenarioChange={setScenario} onExpand={() => setFocusPreview(true)} />
+          <PreviewToolbar scenario={effectiveScenario} groups={previewGroups} onScenarioChange={setScenario} onExpand={() => setFocusPreview(true)} />
           {preview}
         </section>
       </div>{focusPreview && <FocusPreviewDialog preview={preview} onClose={() => setFocusPreview(false)} />}</>
@@ -387,7 +385,7 @@ export function PresentationTemplateGenerator({
 
         <section className="order-first min-w-0 lg:order-none">
           <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:sticky lg:top-20">
-            <PreviewToolbar scenario={effectiveScenario} scenarios={previewScenarios} onScenarioChange={setScenario} onExpand={() => setFocusPreview(true)} />
+            <PreviewToolbar scenario={effectiveScenario} groups={previewGroups} onScenarioChange={setScenario} onExpand={() => setFocusPreview(true)} />
             {preview}
           </div>
         </section>
@@ -398,9 +396,9 @@ export function PresentationTemplateGenerator({
   );
 }
 
-function PreviewToolbar({ scenario, scenarios, onScenarioChange, onExpand }: {
+function PreviewToolbar({ scenario, groups, onScenarioChange, onExpand }: {
   scenario: PresentationPreviewScenario;
-  scenarios: readonly (readonly [PresentationPreviewScenario, string])[];
+  groups: ReturnType<typeof getPresentationPreviewGroups>;
   onScenarioChange: (scenario: PresentationPreviewScenario) => void;
   onExpand: () => void;
 }) {
@@ -408,7 +406,11 @@ function PreviewToolbar({ scenario, scenarios, onScenarioChange, onExpand }: {
     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
       <label className="text-sm font-bold">Live-Vorschau
         <select value={scenario} onChange={(event) => onScenarioChange(event.target.value as PresentationPreviewScenario)} className="ml-2 min-h-10 rounded-xl border border-slate-300 px-2 font-semibold">
-          {scenarios.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+          {groups.map((group) => (
+            <optgroup key={group.id} label={group.label}>
+              {group.scenarios.map(({ id, label }) => <option key={id} value={id}>{label}</option>)}
+            </optgroup>
+          ))}
         </select>
       </label>
       <button type="button" onClick={onExpand} className="min-h-10 rounded-xl border px-3 text-sm font-semibold">Vorschau vergrößern</button>
