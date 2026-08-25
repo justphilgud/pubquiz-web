@@ -117,7 +117,7 @@ type AntwortStatus = {
     revision: number;
   } | null;
   interactionState: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
-  answerPhase: "QUESTION" | "SOLUTION" | "NON_QUESTION" | "LEGACY" | "UNKNOWN";
+  answerPhase: "QUESTION" | "FUNNY" | "SOLUTION" | "NON_QUESTION" | "LEGACY" | "UNKNOWN";
   presentationStatusText: string | null;
   teamProfile: TeamProfile | null;
 
@@ -265,7 +265,9 @@ export default function QuizAntwortClient({
   }, [draftEditVersions]);
 
   useEffect(() => {
-    if (liveDaten.teamProfile) setTeamProfile(liveDaten.teamProfile);
+    if (!liveDaten.teamProfile) return;
+    const timeout = window.setTimeout(() => setTeamProfile(liveDaten.teamProfile), 0);
+    return () => window.clearTimeout(timeout);
   }, [liveDaten.teamProfile]);
 
   function getBildUrl(datei: string) {

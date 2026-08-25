@@ -6,6 +6,7 @@ function getSlideTitel(slide: Slide | undefined) {
   if (slide.typ === "fixer-slide") return slide.slideTyp;
   if (slide.typ === "block") return slide.abschnitt.titel;
   if (slide.typ === "frage") return slide.frage.frage ?? "Frage";
+  if (slide.typ === "funny") return `Falsch aber lustig: ${slide.frage.frage ?? "Frage"}`;
   if (slide.typ === "aufloesung")
     return `Auflösung: ${slide.frage.frage ?? "Frage"}`;
   if (slide.typ === "pause") return "Countdown";
@@ -19,6 +20,7 @@ function getSlideTypLabel(slide: Slide | undefined) {
   if (!slide) return "—";
 
   if (slide.typ === "frage") return "Frage";
+  if (slide.typ === "funny") return "Funny";
   if (slide.typ === "aufloesung") return "Auflösung";
   if (slide.typ === "pause") return "Pause";
   if (slide.typ === "block") return "Block";

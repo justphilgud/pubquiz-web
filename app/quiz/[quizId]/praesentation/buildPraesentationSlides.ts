@@ -76,6 +76,15 @@ export type Slide =
     solutionStrategy?: import("../../flow/quizFlow").QuizSolutionStrategy;
   }
   | {
+    typ: "funny";
+    abschnitt: Abschnitt | null;
+    frage: QuizPraesentationResult["fragen"][number];
+    frageIndexImBlock: number;
+    fragenAnzahlImBlock: number;
+    blockItem?: QuizFlowItem | null;
+    solutionStrategy?: import("../../flow/quizFlow").QuizSolutionStrategy;
+  }
+  | {
     typ: "pause";
     abschnitt: Abschnitt;
     dauerSekunden: number;
@@ -195,11 +204,8 @@ export function buildPraesentationSlides(
           blockItem: entry.item,
           solutionStrategy: blockSequence.strategy,
         };
-        result.push(
-          entry.kind === "QUESTION"
-            ? { typ: "frage", ...shared }
-            : { typ: "aufloesung", ...shared },
-        );
+        if (entry.kind === "QUESTION") result.push({ typ: "frage", ...shared });
+        else result.push({ typ: "funny", ...shared }, { typ: "aufloesung", ...shared });
       }
       appendBlockClosingCountdownItems();
 
@@ -224,6 +230,7 @@ export function buildPraesentationSlides(
         fragenAnzahlImBlock: fragenImBlock.length,
       };
       result.push({ typ: "frage", ...shared });
+      result.push({ typ: "funny", ...shared });
       result.push({ typ: "aufloesung", ...shared });
     });
   }
@@ -244,6 +251,13 @@ export function buildPraesentationSlides(
 
       result.push({
         typ: "aufloesung",
+        abschnitt: null,
+        frage,
+        frageIndexImBlock: index + 1,
+        fragenAnzahlImBlock: fragenOhneBlock.length,
+      });
+      result.splice(result.length - 1, 0, {
+        typ: "funny",
         abschnitt: null,
         frage,
         frageIndexImBlock: index + 1,
@@ -284,6 +298,9 @@ export function getPresentationSlideKey(slide: Slide) {
   }
   if (slide.typ === "aufloesung") {
     return `question:${slide.frage.quiz_fragen_id}:solution`;
+  }
+  if (slide.typ === "funny") {
+    return `question:${slide.frage.quiz_fragen_id}:funny`;
   }
   if (slide.typ === "pause") {
     return `section:${slide.abschnitt.quiz_abschnitt_id}:break`;

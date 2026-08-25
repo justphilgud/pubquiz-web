@@ -2513,3 +2513,9 @@ button {
 .presentation-ranking-podium article[data-place="3"] { order: 3; min-height: 10rem; }
 .presentation-ranking-podium article > strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .presentation-ranking-podium article > b { font-size: 1.5rem; color: var(--quiz-color-accent); }
+
+.presentation-funny-grid { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.presentation-funny-grid article { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.25rem; border: 1px solid color-mix(in srgb, var(--quiz-color-text) 24%, transparent); border-radius: 1.25rem; background: color-mix(in srgb, var(--quiz-color-surface) 88%, transparent); padding: 1rem 1.25rem; }
+.presentation-funny-grid strong { display: block; color: var(--quiz-color-accent); font-size: clamp(1rem, 1.8vw, 1.5rem); }
+.presentation-funny-grid blockquote { margin-top: 0.25rem; font-size: clamp(1.15rem, 2.4vw, 2rem); font-weight: 700; line-height: 1.2; }
+.presentation-funny-page { margin-top: 1rem; text-align: center; font-weight: 700; opacity: 0.75; }

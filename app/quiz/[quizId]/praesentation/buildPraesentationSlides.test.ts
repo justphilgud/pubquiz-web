@@ -84,13 +84,19 @@ function compactBlockSequence(
   });
 }
 
-test("paart jede Frage unmittelbar mit ihrer richtigen Auflösung", () => {
+test("ordnet den Funny-Reveal jeder Frage unmittelbar vor ihrer Auflösung zu", () => {
   const slides = buildPraesentationSlides(quizFixture());
   const questionSlides = slides.filter((slide) => slide.typ === "frage");
   assert.equal(questionSlides.length, 3);
   for (const questionSlide of questionSlides) {
     const index = slides.indexOf(questionSlide);
-    const solution = slides[index + 1];
+    const funny = slides[index + 1];
+    const solution = slides[index + 2];
+    assert.equal(funny?.typ, "funny");
+    assert.equal(
+      funny?.typ === "funny" ? funny.frage.quiz_fragen_id : null,
+      questionSlide.frage.quiz_fragen_id,
+    );
     assert.equal(solution?.typ, "aufloesung");
     assert.equal(
       solution?.typ === "aufloesung" ? solution.frage.quiz_fragen_id : null,
@@ -98,8 +104,11 @@ test("paart jede Frage unmittelbar mit ihrer richtigen Auflösung", () => {
     );
   }
   assert.equal(
-    slides.filter((slide) => slide.typ === "frage" || slide.typ === "aufloesung").length,
-    6,
+    slides.filter(
+      (slide) =>
+        slide.typ === "frage" || slide.typ === "funny" || slide.typ === "aufloesung",
+    ).length,
+    9,
   );
 });
 

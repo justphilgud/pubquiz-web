@@ -4221,6 +4221,37 @@ export async function getQuizPunktestand(quizId: number) {
   return loadQuizPunktestand(quizId);
 }
 
+export async function getPresentationFunnyAnswers(quizId: number, quizFragenId: number) {
+  await requireQuizViewer(quizId);
+  await requireQuizQuestion(quizId, quizFragenId);
+  const answers = await prisma.team_antworten.findMany({
+    where: { quiz_id: quizId, quiz_fragen_id: quizFragenId, ist_skurril: true },
+    orderBy: { team_antwort_id: "asc" },
+    include: {
+      quiz_team_sessions: {
+        select: {
+          teamname: true,
+          team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+        },
+      },
+      antwortauswahlen: { include: { antwort: { select: { antwort: true } } } },
+      antwortfelder: { orderBy: { team_antwortfeld_id: "asc" }, select: { antwort_text: true } },
+    },
+  });
+  return answers.map((answer) => {
+    const structured = answer.antwortfelder.map((field) => field.antwort_text?.trim()).filter(Boolean).join(" · ");
+    const selected = answer.antwortauswahlen.map((selection) => selection.antwort.antwort).join(", ");
+    return {
+      teamAnswerId: answer.team_antwort_id,
+      teamId: answer.quiz_team_sessions.team.team_id,
+      teamName: answer.quiz_team_sessions.teamname,
+      answerText: answer.antwort_text?.trim() || structured || selected || "Keine Textantwort",
+      avatarCode: mapTeamProfile(answer.quiz_team_sessions.team).avatarCode,
+      photoUrl: answer.quiz_team_sessions.team.foto_url,
+    };
+  });
+}
+
 export async function getQuizAuswertungPageData(quizId: number) {
   await requireQuizAdmin(quizId);
   const [quiz, antworten, punktestand, backfillStatus] = await Promise.all([

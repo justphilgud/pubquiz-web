@@ -51,6 +51,7 @@ export function getPresentationSlideTitle(
     return getSectionDisplayTitle(slide.abschnitt, slides);
   }
   if (slide.typ === "frage") return "Frage";
+  if (slide.typ === "funny") return "Falsch aber lustig";
   if (slide.typ === "aufloesung") return "Auflösung";
   if (slide.typ === "pause") return getSectionDisplayTitle(slide.abschnitt, slides);
   if (slide.typ === "zwischenstand") return "Zwischenstand";

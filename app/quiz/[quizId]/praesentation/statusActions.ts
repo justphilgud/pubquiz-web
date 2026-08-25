@@ -227,7 +227,7 @@ export async function setPraesentationSlideIndex(
     phaseStartedAt = performance.now();
     if (
       identity?.kind === "QUESTION" &&
-      identity.phase === "SOLUTION" &&
+      (identity.phase === "SOLUTION" || identity.phase === "FUNNY") &&
       question?.quiz_abschnitt_id
     ) {
       const strategySource = await tx.quiz.findUniqueOrThrow({

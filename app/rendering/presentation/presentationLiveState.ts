@@ -28,7 +28,7 @@ export type PresentationQuestionIdentity = {
 export type PresentationSlideIdentity =
   | {
       kind: "QUESTION";
-      phase: "QUESTION" | "SOLUTION";
+      phase: "QUESTION" | "FUNNY" | "SOLUTION";
       questionAssignmentId: number;
     }
   | {
@@ -41,7 +41,7 @@ export type PresentationSlideIdentity =
 export type PresentationAudienceState =
   | ({
       kind: "QUESTION";
-      phase: "QUESTION" | "SOLUTION";
+      phase: "QUESTION" | "FUNNY" | "SOLUTION";
       slideKey: string;
     } & PresentationQuestionIdentity)
   | {
@@ -142,9 +142,11 @@ export function parsePresentationSlideKey(
     const questionAssignmentId = parsePositiveInteger(parts[1]);
     const phase = parts[2] === "question"
       ? "QUESTION"
-      : parts[2] === "solution"
-        ? "SOLUTION"
-        : null;
+      : parts[2] === "funny"
+        ? "FUNNY"
+        : parts[2] === "solution"
+          ? "SOLUTION"
+          : null;
     return questionAssignmentId && phase
       ? { kind: "QUESTION", phase, questionAssignmentId }
       : { kind: "UNKNOWN" };

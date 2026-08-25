@@ -472,6 +472,23 @@ export async function syncInteractionForPresentation(
     });
   }
 
+  if (identity.phase === "FUNNY") {
+    const funnyRun = currentRun?.quiz_fragen_id === identity.questionAssignmentId
+      ? currentRun
+      : await db.quiz_interaction_runs.findFirst({
+          where: { quiz_id: input.quizId, quiz_fragen_id: identity.questionAssignmentId },
+          orderBy: { interaction_run_id: "desc" },
+        });
+    if (!funnyRun) return null;
+    if (funnyRun.state === "OPEN" || funnyRun.state === "COUNTDOWN") {
+      return closeRun(db, funnyRun.interaction_run_id, {
+        reason: "PRESENTATION_ADVANCED",
+        keepCurrent: true,
+      });
+    }
+    return funnyRun;
+  }
+
   let revealRun = currentRun?.quiz_fragen_id === identity.questionAssignmentId
     ? currentRun
     : await db.quiz_interaction_runs.findFirst({

@@ -15,6 +15,7 @@ import {
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
+import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
 type PunktestandEintrag = {
   teamId: number;
@@ -50,6 +51,7 @@ type Props = {
     totalTeams: number;
     remainingTeams: number;
   } | null;
+  funnyAnswers: FunnyAnswerEntry[];
 };
 
 export default function CurrentSlidePanel({
@@ -70,6 +72,7 @@ export default function CurrentSlidePanel({
   pixelState,
   pollState,
   teamJoinState,
+  funnyAnswers,
 }: Props) {
   const titel =
     aktuellerSlide?.typ === "frage"
@@ -161,6 +164,7 @@ export default function CurrentSlidePanel({
                 pixelState,
                 pollState,
                 teamJoinState,
+                funnyAnswers,
               }}
             />
           </div>

@@ -78,6 +78,14 @@ test("question keys resolve assignment and question phase without copying questi
   );
 });
 
+test("funny reveal keys retain question identity without becoming the solution phase", () => {
+  assert.deepEqual(parsePresentationSlideKey("question:42:funny"), {
+    kind: "QUESTION",
+    phase: "FUNNY",
+    questionAssignmentId: 42,
+  });
+});
+
 test("non-question keys resolve to neutral answer-form states", () => {
   const examples = [
     ["default:BEFORE_QUIZ:QUIZ:WELCOME", "Das Quiz startet gleich"],

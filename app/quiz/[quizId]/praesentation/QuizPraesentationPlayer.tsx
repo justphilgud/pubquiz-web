@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { QuizPraesentationResult } from "../../actions";
-import { getQuizLiveSnapshot, getSchaetzfrageById } from "../../actions";
+import { getPresentationFunnyAnswers, getQuizLiveSnapshot, getSchaetzfrageById } from "../../actions";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import {
@@ -25,6 +25,7 @@ import { getPresentationSlideTitle } from "@/app/rendering/presentation/presenta
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
+import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -57,6 +58,7 @@ export default function QuizPraesentationPlayer({
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
+  const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [teamJoinState, setTeamJoinState] = useState<{
     teamNames: string[];
     totalTeams: number;
@@ -72,9 +74,21 @@ export default function QuizPraesentationPlayer({
     (slide?.typ === "ablauf" && slide.element.type === "QR_CODE") ||
     (slide?.typ === "fixer-slide" && slide.slideTyp === "qrcode");
   const presentationQuestionAssignmentId =
-    slide?.typ === "frage" || slide?.typ === "aufloesung"
+    slide?.typ === "frage" || slide?.typ === "funny" || slide?.typ === "aufloesung"
       ? slide.frage.quiz_fragen_id
       : undefined;
+
+  useEffect(() => {
+    if (slide?.typ !== "funny") {
+      const timeout = window.setTimeout(() => setFunnyAnswers([]), 0);
+      return () => window.clearTimeout(timeout);
+    }
+    let active = true;
+    void getPresentationFunnyAnswers(quizId, slide.frage.quiz_fragen_id).then((answers) => {
+      if (active) setFunnyAnswers(answers);
+    });
+    return () => { active = false; };
+  }, [quizId, slide]);
 
   useEffect(() => {
     let active = true;
@@ -226,6 +240,7 @@ export default function QuizPraesentationPlayer({
             pixelState,
             pollState,
             teamJoinState,
+            funnyAnswers,
           }}
         />
         {syncError && (

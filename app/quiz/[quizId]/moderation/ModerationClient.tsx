@@ -9,6 +9,7 @@ import {
   schliesseQuizBlock,
   QuizPraesentationResult,
   getQuizPunktestand,
+  getPresentationFunnyAnswers,
   getZufaelligeSchaetzfrage,
 } from "../../actions";
 import {
@@ -51,6 +52,7 @@ import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
+import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -117,6 +119,7 @@ export default function ModerationClient({
   const [now, setNow] = useState(() => Date.now());
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
+  const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [teamJoinState, setTeamJoinState] = useState<QuizLiveSnapshot["teamJoinState"]>(null);
 
   const [slideIndex, setSlideIndex] = useState(() => {
@@ -143,7 +146,7 @@ export default function ModerationClient({
     (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "QR_CODE") ||
     (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode");
   const presentationQuestionAssignmentId =
-    aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
+    aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "funny" || aktuellerSlide?.typ === "aufloesung"
       ? aktuellerSlide.frage.quiz_fragen_id
       : undefined;
   const pauseVerstrichen =
@@ -356,6 +359,19 @@ export default function ModerationClient({
   }
 
   async function naechsterSlideAction() {
+    if (aktuellerSlide?.typ === "funny") {
+      const pageCount = getFunnyAnswerPageCount(funnyAnswers.length);
+      if (endstandRevealCount < pageCount) {
+        const nextPage = endstandRevealCount + 1;
+        setEndstandRevealCountLokal(nextPage);
+        await setEndstandRevealCount({ quizId, revealCount: nextPage });
+        return;
+      }
+    }
+    if (aktuellerSlide?.typ === "frage" && naechsterSlide?.typ === "funny" && funnyAnswers.length === 0) {
+      void goToSlide(slideIndex + 2);
+      return;
+    }
     const templateData =
       aktuellerSlide?.typ === "frage"
         ? aktuellerSlide.frage.templateConfig?.templateData
@@ -417,6 +433,14 @@ export default function ModerationClient({
     }
 
     void goToSlide(slideIndex + 1);
+  }
+
+  function showFunnyAnswers() {
+    void goToSlide(slideIndex + 1);
+  }
+
+  function skipFunnyAnswers() {
+    void goToSlide(slideIndex + 2);
   }
 
   const handleMediumToggle = useCallback(async () => {
@@ -598,6 +622,18 @@ export default function ModerationClient({
     !auswertungDialogBereitsGezeigt;
 
   useEffect(() => {
+    if (!aktuellerSlide || (aktuellerSlide.typ !== "frage" && aktuellerSlide.typ !== "funny" && aktuellerSlide.typ !== "aufloesung")) {
+      const timeout = window.setTimeout(() => setFunnyAnswers([]), 0);
+      return () => window.clearTimeout(timeout);
+    }
+    let active = true;
+    void getPresentationFunnyAnswers(quizId, aktuellerSlide.frage.quiz_fragen_id).then((answers) => {
+      if (active) setFunnyAnswers(answers);
+    });
+    return () => { active = false; };
+  }, [aktuellerSlide, quizId]);
+
+  useEffect(() => {
     if (!countdownIstAbgelaufen) return;
 
     const timeoutId = window.setTimeout(() => {
@@ -723,7 +759,18 @@ export default function ModerationClient({
               pixelState={pixelState}
               pollState={pollState}
               teamJoinState={teamJoinState}
+              funnyAnswers={funnyAnswers}
             />
+
+            {aktuellerSlide?.typ === "frage" && naechsterSlide?.typ === "funny" && funnyAnswers.length > 0 && (
+              <section className="rounded-2xl border border-pink-500/50 bg-pink-950/30 p-4">
+                <h2 className="font-bold">{funnyAnswers.length} skurrile {funnyAnswers.length === 1 ? "Antwort" : "Antworten"}</h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button type="button" onClick={showFunnyAnswers} className="min-h-11 rounded-xl bg-pink-600 px-4 py-2 font-bold text-white">Falsch aber lustig anzeigen</button>
+                  <button type="button" onClick={skipFunnyAnswers} className="min-h-11 rounded-xl border border-zinc-600 px-4 py-2 font-bold">Direkt zur Auflösung</button>
+                </div>
+              </section>
+            )}
 
             <SlideNotes>
               <div className="space-y-2">
@@ -751,6 +798,12 @@ export default function ModerationClient({
                   <p><strong>Geplante Verweildauer:</strong> {aktuellerSlide.element.config.durationSeconds} Sekunden</p>
                 )}
                 {getSlideModeratorNote(aktuellerSlide) && <p>{getSlideModeratorNote(aktuellerSlide)}</p>}
+                {funnyAnswers.length > 0 && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "funny" || aktuellerSlide?.typ === "aufloesung") && (
+                  <div className="rounded-xl border border-pink-500/40 bg-pink-950/25 p-3">
+                    <strong>Skurrile Antworten</strong>
+                    <ul className="mt-2 space-y-1">{funnyAnswers.map((answer) => <li key={answer.teamAnswerId}><strong>{answer.teamName}:</strong> „{answer.answerText}“ · skurril</li>)}</ul>
+                  </div>
+                )}
               </div>
             </SlideNotes>
 

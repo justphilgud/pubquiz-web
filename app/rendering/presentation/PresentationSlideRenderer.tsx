@@ -53,6 +53,7 @@ import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/ordering
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
 import { shouldShowTeamIdentity } from "./presentationRankingPolicy";
+import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 
 type ScoreEntry = {
   teamId?: number;
@@ -85,6 +86,7 @@ export type PresentationSlideDisplayState = {
   playbackCommandId: number;
   pixelState?: PixelLiveState | null;
   pollState?: PollLiveState | null;
+  funnyAnswers?: FunnyAnswerEntry[];
   teamJoinState?: {
     teamNames: string[];
     totalTeams: number;
@@ -236,6 +238,7 @@ export default function PresentationSlideRenderer({
     playbackCommandId,
     pixelState = null,
     pollState = null,
+    funnyAnswers = [],
     teamJoinState = null,
   } = displayState;
   const relativeAnswerUrl = `/quiz/${quiz.quiz_id}/antworten`;
@@ -1205,6 +1208,25 @@ function renderEndstandSlide() {
         </div>
       </div>
     </div>
+  );
+}
+
+function renderFunnySlide(slide: Extract<Slide, { typ: "funny" }>) {
+  const page = getFunnyAnswerPage(funnyAnswers, templateRevealCount);
+  return (
+    <section className="presentation-flow-slide presentation-funny-slide" data-flow-type="FUNNY_REVEAL">
+      <p className="presentation-flow-kicker">Frage {slide.frageIndexImBlock} · {slide.frage.frage}</p>
+      <h2>FALSCH ABER LUSTIG</h2>
+      <div className="presentation-funny-grid" data-count={page.answers.length}>
+        {page.answers.map((answer) => (
+          <article key={answer.teamAnswerId}>
+            <TeamIdentityVisual name={answer.teamName} photoUrl={answer.photoUrl} avatarCode={answer.avatarCode} className="h-20 w-20" />
+            <div><strong>{answer.teamName}</strong><blockquote>„{answer.answerText}“</blockquote></div>
+          </article>
+        ))}
+      </div>
+      {page.pageCount > 1 && <p className="presentation-funny-page">Seite {page.page} von {page.pageCount}</p>}
+    </section>
   );
 }
 
@@ -2209,6 +2231,10 @@ function renderAktuellenSlide() {
 
   if (slide.typ === "endstand") {
     return renderEndstandSlide();
+  }
+
+  if (slide.typ === "funny") {
+    return renderFunnySlide(slide);
   }
 
   return renderAufloesungSlide(slide);
