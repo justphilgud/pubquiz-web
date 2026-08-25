@@ -66,6 +66,27 @@ test("keeps legacy multiple_choice as MULTI_CHOICE", () => {
   );
 });
 
+test("FaceMorph keeps both named answer fields in the team interaction", () => {
+  const interaction = resolve({
+    templateId: questionTemplateIds.faceMorph,
+    answerFields: [
+      { id: 11, label: "Person A", required: true },
+      { id: 12, label: "Person B", required: true },
+    ],
+  });
+
+  assert.equal(interaction.type, "STRUCTURED_TEXT");
+  assert.deepEqual(
+    interaction.type === "STRUCTURED_TEXT"
+      ? interaction.fields.map(({ id, label, required }) => ({ id, label, required }))
+      : [],
+    [
+      { id: 11, label: "Person A", required: true },
+      { id: 12, label: "Person B", required: true },
+    ],
+  );
+});
+
 test("resolves true/false and estimate inputs without template-specific UI logic", () => {
   assert.equal(
     resolve({

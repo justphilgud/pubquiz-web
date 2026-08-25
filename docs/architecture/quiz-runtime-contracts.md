@@ -291,25 +291,44 @@ Rankingdaten dürfen die globale Teamidentität transportieren; der Renderer ent
 | Zwischenstand | Rang und Punkte; kein Name, Foto oder Avatar | vollständige Teamidentität |
 | Endstand / Siegerehrung | Teamname, Punkte und Foto oder Avatar | vollständige Teamidentität |
 | bewusst gezeigte skurrile Antwort | Teamname, Antwort und Foto oder Avatar | Teamname, Antwort, Foto oder Avatar sowie Markierung |
+| Join-/QR-Slide | kompakte Identität aus Foto oder stabilem Avatar und Teamname | identische öffentliche Join-Identität |
 
 Der Fallback auf einen Systemavatar ist stabil und template-neutral. Templates dürfen die Anordnung gestalten, aber nicht die Audience-Regel umgehen.
 
+Der öffentliche Zwischenstand verwendet Competition-Ranking (`1, 2, 2, 4`)
+und zeigt die echten Punkte. Beim Endstand werden ausschließlich vorhandene
+Podiums-Ranggruppen bis Platz 3 in absteigender Reihenfolge aufgedeckt. Nach den
+Podiumsgruppen folgt genau eine vollständige Gesamtansicht; fehlende Ränge
+werden weder erfunden noch als leerer Reveal-Schritt dargestellt. Die
+Gesamtansicht enthält alle Teams, mit prominenten Podiumsgruppen und kompakter
+Restliste.
+
+### FaceMorph in Präsentation und Antwortformular
+
+`face_morph_result` ist der sichtbare, dominante Inhalt der öffentlichen
+Fragephase. Die strukturierten Felder `Person A` und `Person B` gehören zum
+Team-Antwortformular und werden nicht als Eingabekarten in der Präsentation
+gerendert. Die Auflösung kombiniert das Morph-Bild mit den gepflegten Lösungen
+beider Antwortfelder. Presentation-View-Model und Answer-Interaction bleiben
+damit fachlich getrennt.
+
 ### Funny-Reveal
 
-`team_antworten.ist_skurril` bleibt die einzige Markierung für „Falsch aber lustig“. Es wird kein paralleles Funny-Flag persistiert. Der Reveal ist ein reiner Präsentationszustand und verändert weder Submission noch Bewertung, Punkte oder kanonische Lösung.
+`team_antworten.ist_skurril` bleibt die einzige Markierung für „Falsch aber lustig“. Es wird kein paralleles Funny-Flag persistiert. Der Reveal ist ein reiner Präsentationszustand und verändert weder Submission noch Bewertung, Punkte oder kanonische Lösung. Er existiert nur, wenn die effektive Answer-Interaction `TEXT` oder `STRUCTURED_TEXT` ist und mindestens eine so markierte wirksame/finalisierte Antwort vorliegt. Auswahl-, Zahlen-, Ordering-, Poll- und `NO_ANSWER`-Interactions erhalten auch bei einem inkonsistenten Flag keinen Funny-Zustand.
 
 ```text
 Frage → optional FUNNY → richtige Auflösung
 ```
 
-Admin und Eventmanager im serverseitig geprüften Quiz-/Eventreihen-Scope dürfen die bestehende Markierung setzen. Die Moderation kann bei vorhandenen Treffern ausdrücklich den Funny-Schritt wählen oder direkt zur Auflösung springen. Ohne Treffer wird der technische Zwischenschritt übersprungen. Pro Seite erscheinen höchstens drei Antworten; weitere Seiten bleiben über denselben Reveal-Zustand erreichbar. Erst danach folgt unverändert die normale Auflösung.
+Admin und Eventmanager im serverseitig geprüften Quiz-/Eventreihen-Scope dürfen die bestehende Markierung setzen. Die Moderation kann bei vorhandenen Treffern ausdrücklich den Funny-Schritt wählen oder direkt zur Auflösung springen. Ohne Treffer oder ohne Freitextfähigkeit existiert der technische Zwischenschritt nicht im Deck und erhöht weder Slidezahl noch Zähler. Pro Seite erscheinen höchstens drei Antworten; weitere Seiten bleiben über denselben Reveal-Zustand erreichbar. Erst danach folgt unverändert die normale Auflösung.
 
 | Testdatei | Geschützte Invariante |
 | --- | --- |
-| `app/quiz/funnyAnswerReveal.test.ts` | Ein bis drei Antworten passen auf eine Seite; fünf Antworten bleiben ohne Kürzung über zwei Seiten erreichbar. |
-| `app/quiz/[quizId]/praesentation/buildPraesentationSlides.test.ts` | Der stabile Funny-Zustand liegt für jede Frage vor der richtigen Auflösung. |
+| `app/quiz/funnyAnswerReveal.test.ts` | Nur freie Text-Interactions sind zulässig; ein bis drei Antworten passen auf eine Seite und fünf bleiben ohne Kürzung über zwei Seiten erreichbar. |
+| `app/quiz/[quizId]/praesentation/buildPraesentationSlides.test.ts` | Nur tatsächlich verfügbare Funny-Zustände liegen vor der zugehörigen Auflösung; abwesende Zustände erhöhen das Deck nicht. |
 | `app/rendering/presentation/presentationLiveState.test.ts` | Funny-Schlüssel erhalten die Fragenidentität, werden aber nicht zur Lösungsphase. |
-| `app/rendering/presentation/presentationRankingPolicy.test.ts` | Öffentliche Zwischenstände bleiben anonym; finale und bewusst identifizierende Phasen dürfen Teamidentität zeigen. |
+| `app/rendering/presentation/presentationRankingPolicy.test.ts` | Öffentliche Zwischenstände bleiben anonym; Competition-Ränge, Podiumsgruppen und Volltabellen-Reveal bleiben korrekt. |
+| `app/rendering/presentation/PresentationSlideRenderer.test.ts` | FaceMorph trennt Bildpräsentation und Antwortfelder; Rankings und Join-Identitäten erfüllen ihre Audience- und Layout-Verträge. |
 
 Corporate-/Venue-Templates wie LOVD sind Designkonfigurationen innerhalb der
 bestehenden Template- und Theme-Infrastruktur. Sie:
