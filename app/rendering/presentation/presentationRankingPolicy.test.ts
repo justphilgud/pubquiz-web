@@ -8,6 +8,7 @@ import {
 
 test("public interim standings expose rank and points but never team identity", () => {
   assert.equal(shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode: "PRESENTATION" }), false);
+  assert.equal(shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode: "DESIGN_PREVIEW" }), false);
   assert.equal(shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode: "MODERATION_PREVIEW" }), true);
 });
 
