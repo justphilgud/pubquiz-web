@@ -21,12 +21,23 @@ export type DynamicQuestionTemplateRole =
 export type DynamicQuestionTemplateRuleSelection = {
   questionText: DynamicQuestionTemplateRole;
   media: Array<{
-    sourceMediaId: number;
+    sourceMediaId: number | null;
     slotKey: MediaSlotKey;
     role: DynamicQuestionTemplateRole;
   }>;
   answers: Array<{
     sourceKey: string;
+    role: DynamicQuestionTemplateRole;
+  }>;
+};
+
+export type PersistedDynamicQuestionTemplateRuleSelection = Omit<
+  DynamicQuestionTemplateRuleSelection,
+  "media"
+> & {
+  media: Array<{
+    sourceMediaId: number;
+    slotKey: MediaSlotKey;
     role: DynamicQuestionTemplateRole;
   }>;
 };
@@ -148,9 +159,9 @@ export function createDefaultDynamicTemplateRuleSelection(
   return {
     questionText: "FIXED",
     media: draft.questionMedia
-      .filter((medium) => medium.existingMediaId !== null)
+      .filter((medium) => medium.operation !== "REMOVE" && Boolean(medium.url))
       .map((medium) => ({
-        sourceMediaId: medium.existingMediaId!,
+        sourceMediaId: medium.existingMediaId,
         slotKey: medium.slotKey,
         role: "REQUIRED_NEW" as const,
       })),
@@ -166,11 +177,53 @@ export function resolveDynamicTemplateMediaRule(
   medium: Pick<QuestionMediaDraft, "existingMediaId" | "slotKey">,
 ) {
   const sourceMediaId = medium.existingMediaId;
-  if (sourceMediaId === null) return null;
-  return rules.media.find((rule) => rule.sourceMediaId === sourceMediaId) ?? {
+  return rules.media.find((rule) =>
+    sourceMediaId !== null
+      ? rule.sourceMediaId === sourceMediaId
+      : rule.sourceMediaId === null && rule.slotKey === medium.slotKey,
+  ) ?? {
     sourceMediaId,
     slotKey: medium.slotKey,
     role: "REQUIRED_NEW" as const,
+  };
+}
+
+export function remapDynamicTemplateRuleSelection(
+  rules: DynamicQuestionTemplateRuleSelection,
+  beforeSave: QuestionEditorDraft,
+  afterSave: QuestionEditorDraft,
+): PersistedDynamicQuestionTemplateRuleSelection {
+  const beforeMediaBySlot = new Map(
+    beforeSave.questionMedia.map((medium) => [medium.slotKey, medium]),
+  );
+  const beforeAnswersByClientId = new Map(
+    beforeSave.answers.map((answer) => [answer.id, answer]),
+  );
+
+  return {
+    questionText: rules.questionText,
+    media: afterSave.questionMedia.flatMap((medium) => {
+      if (medium.existingMediaId === null || medium.operation === "REMOVE") return [];
+      const beforeMedium = beforeMediaBySlot.get(medium.slotKey);
+      const previousRule = beforeMedium
+        ? resolveDynamicTemplateMediaRule(rules, beforeMedium)
+        : null;
+      return [{
+        sourceMediaId: medium.existingMediaId,
+        slotKey: medium.slotKey,
+        role: previousRule?.role ?? "REQUIRED_NEW",
+      }];
+    }),
+    answers: afterSave.answers.map((answer) => {
+      const beforeAnswer = beforeAnswersByClientId.get(answer.id);
+      const previousRule = beforeAnswer
+        ? resolveDynamicTemplateAnswerRule(rules, beforeAnswer)
+        : null;
+      return {
+        sourceKey: getDynamicTemplateAnswerSourceKey(answer),
+        role: previousRule?.role ?? (answer.isCorrect ? "REQUIRED_NEW" : "EXCLUDED"),
+      };
+    }),
   };
 }
 

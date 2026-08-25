@@ -17,8 +17,8 @@ import {
   getDynamicTemplateAnswerSourceKey,
   getDynamicQuestionTemplateInitialStatus,
   type DynamicQuestionTemplateRole,
-  type DynamicQuestionTemplateRuleSelection,
   type DynamicQuestionTemplateSnapshot,
+  type PersistedDynamicQuestionTemplateRuleSelection,
 } from "./dynamicQuestionTemplate";
 import { getQuestionTemplateDefinition } from "./questionTemplates";
 
@@ -38,7 +38,7 @@ function normalizeMetadata(name: string, description: string) {
   return { name: normalizedName, description: normalizedDescription };
 }
 
-function hasValidRoles(rules: DynamicQuestionTemplateRuleSelection) {
+function hasValidRoles(rules: PersistedDynamicQuestionTemplateRuleSelection) {
   const roles: readonly DynamicQuestionTemplateRole[] = [
     "FIXED",
     "REQUIRED_NEW",
@@ -47,6 +47,28 @@ function hasValidRoles(rules: DynamicQuestionTemplateRuleSelection) {
   return roles.includes(rules.questionText) &&
     rules.media.every((rule) => roles.includes(rule.role)) &&
     rules.answers.every((rule) => roles.includes(rule.role));
+}
+
+const CREATION_REQUEST_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function resultFromExistingTemplate(existing: {
+  source_fragen_id: number | null;
+  created_by_user_id: number | null;
+  status: "ACTIVE" | "PENDING" | "REJECTED" | "ARCHIVED";
+  name: string;
+}, questionId: number, userId: number): DynamicQuestionTemplateActionResult | null {
+  if (existing.source_fragen_id !== questionId || existing.created_by_user_id !== userId) {
+    return null;
+  }
+  if (existing.status !== "ACTIVE" && existing.status !== "PENDING") {
+    return null;
+  }
+  return {
+    ok: true,
+    status: existing.status,
+    name: existing.name,
+  };
 }
 
 async function copyFixedMedium(url: string) {
@@ -77,15 +99,19 @@ async function copyFixedMedium(url: string) {
 
 export async function createDynamicQuestionTemplate(input: {
   questionId: number;
+  requestId: string;
   name: string;
   description: string;
-  rules: DynamicQuestionTemplateRuleSelection;
+  rules: PersistedDynamicQuestionTemplateRuleSelection;
 }): Promise<DynamicQuestionTemplateActionResult> {
   const session = await requireQuestionEditor();
   const copiedUrls: string[] = [];
+  let creationCode: string | null = null;
+  let templateCreated = false;
 
   try {
     if (!Number.isInteger(input.questionId) || input.questionId <= 0 ||
+      !CREATION_REQUEST_ID_PATTERN.test(input.requestId) ||
       !input.rules || !hasValidRoles(input.rules)) {
       return { ok: false, message: "Die Vorlagenkonfiguration ist ungültig." };
     }
@@ -93,6 +119,23 @@ export async function createDynamicQuestionTemplate(input: {
     const loaded = await loadQuestionForEditor(input.questionId);
     if (!loaded || !canEditScopedQuestion(session.actor, loaded.access)) {
       return { ok: false, message: "Diese Frage darf nicht als Vorlage verwendet werden." };
+    }
+    creationCode = `dynamic_${input.requestId}`;
+    const existing = await prisma.frage_vorlagen.findUnique({
+      where: { code: creationCode },
+      select: {
+        source_fragen_id: true,
+        created_by_user_id: true,
+        status: true,
+        name: true,
+      },
+    });
+    if (existing) {
+      return resultFromExistingTemplate(
+        existing,
+        input.questionId,
+        session.actor.userId,
+      ) ?? { ok: false, message: "Der Speicherauftrag ist bereits vergeben." };
     }
 
     const mediaById = new Map(
@@ -167,7 +210,7 @@ export async function createDynamicQuestionTemplate(input: {
     );
     await prisma.frage_vorlagen.create({
       data: {
-        code: `dynamic_${randomUUID()}`,
+        code: creationCode,
         name: metadata.name,
         beschreibung: metadata.description || null,
         slide_typ: "DYNAMIC",
@@ -186,16 +229,40 @@ export async function createDynamicQuestionTemplate(input: {
           : {}),
       },
     });
+    templateCreated = true;
     revalidatePath("/fragen/editor");
     revalidatePath(`/fragen/editor/${input.questionId}`);
     revalidatePath("/admin/fragenvorlagen");
     return { ok: true, status, name: metadata.name };
   } catch (error) {
-    if (copiedUrls.length > 0) {
+    if (!templateCreated && copiedUrls.length > 0) {
       try {
         await del(copiedUrls, getMediaVerificationServerConfig().blobAuthentication);
       } catch (cleanupError) {
         console.error("Verwaiste Vorlagenmedien konnten nicht bereinigt werden", cleanupError);
+      }
+    }
+    if (creationCode) {
+      try {
+        const existing = await prisma.frage_vorlagen.findUnique({
+          where: { code: creationCode },
+          select: {
+            source_fragen_id: true,
+            created_by_user_id: true,
+            status: true,
+            name: true,
+          },
+        });
+        const existingResult = existing
+          ? resultFromExistingTemplate(
+              existing,
+              input.questionId,
+              session.actor.userId,
+            )
+          : null;
+        if (existingResult) return existingResult;
+      } catch (lookupError) {
+        console.error("Vorhandener Vorlagenauftrag konnte nicht geprüft werden", lookupError);
       }
     }
     console.error("Spezialfragenvorlage konnte nicht erstellt werden", error);

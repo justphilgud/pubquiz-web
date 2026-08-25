@@ -10,6 +10,7 @@ import {
   getDynamicTemplateRequirementIssue,
   getDynamicQuestionTemplateInitialStatus,
   parseDynamicQuestionTemplateSnapshot,
+  remapDynamicTemplateRuleSelection,
   resolveDynamicTemplateAnswerRule,
   resolveDynamicTemplateMediaRule,
   type DynamicQuestionTemplateSnapshot,
@@ -119,6 +120,92 @@ test("persisted ids received after saving keep safe default roles", () => {
     slotKey: "question_image",
     role: "REQUIRED_NEW",
   });
+});
+
+test("save orchestration remaps configured draft roles to persisted ids", () => {
+  const beforeSave = {
+    scope: "GLOBAL",
+    eventSeriesIds: [],
+    templateId: null,
+    sourceTemplateId: null,
+    questionText: "Welcher Song ist gesucht?",
+    questionMedia: [{
+      slotKey: "question_audio",
+      existingMediaId: null,
+      url: "https://blob.test/new.mp3",
+      mediaType: "AUDIO",
+      operation: "NEW",
+      existingMediaCount: 0,
+    }],
+    templateConfig: DEFAULT_PIXEL_TEMPLATE_CONFIG,
+    answers: [{
+      id: "client-answer",
+      text: "Titel",
+      isCorrect: true,
+      additionalInfo: "",
+      media: null,
+    }],
+    categoryIds: [],
+    sourceOrRemark: "",
+    moderationNotes: "",
+    categoryRequest: "",
+    approvalRemark: "",
+    isIncomplete: true,
+    validUntil: null,
+    status: "DRAFT",
+  } as QuestionEditorDraft;
+  const afterSave = {
+    ...beforeSave,
+    questionMedia: [{
+      ...beforeSave.questionMedia[0],
+      existingMediaId: 91,
+      operation: "UNCHANGED",
+    }],
+    answers: [{ ...beforeSave.answers[0], answerId: 42 }],
+  } as QuestionEditorDraft;
+  const configured = createDefaultDynamicTemplateRuleSelection(beforeSave);
+  configured.media[0].role = "FIXED";
+  configured.answers[0].role = "FIXED";
+
+  assert.deepEqual(
+    remapDynamicTemplateRuleSelection(configured, beforeSave, afterSave),
+    {
+      questionText: "FIXED",
+      media: [{
+        sourceMediaId: 91,
+        slotKey: "question_audio",
+        role: "FIXED",
+      }],
+      answers: [{ sourceKey: "answer:42", role: "FIXED" }],
+    },
+  );
+});
+
+test("template creation is a secondary idempotent question-save option", () => {
+  const option = readFileSync(
+    "app/fragen/editor/components/CreateDynamicQuestionTemplate.tsx",
+    "utf8",
+  );
+  const editor = readFileSync(
+    "app/fragen/editor/components/QuestionEditor.tsx",
+    "utf8",
+  );
+  const action = readFileSync(
+    "app/fragen/editor/templates/dynamicQuestionTemplateActions.ts",
+    "utf8",
+  );
+  assert.match(option, /type="checkbox"/);
+  assert.match(option, /Zusätzlich als Spezialfragenvorlage speichern/);
+  assert.doesNotMatch(option, /Wiederkehrendes Format\?/);
+  assert.match(editor, /const result = await saveQuestion/);
+  assert.match(editor, /await createDynamicQuestionTemplate/);
+  assert.ok(
+    editor.indexOf("await createDynamicQuestionTemplate") >
+      editor.indexOf("const result = await saveQuestion"),
+  );
+  assert.match(editor, /saveInProgressRef\.current/);
+  assert.match(action, /code: creationCode/);
+  assert.match(action, /findUnique\(\{[\s\S]*where: \{ code: creationCode \}/);
 });
 
 test("rejects malformed stored snapshots", () => {
