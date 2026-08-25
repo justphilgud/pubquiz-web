@@ -21,9 +21,7 @@ test("team server-action module exports runtime functions only", () => {
     ([, name]) => name,
   );
   assert.deepEqual(runtimeExports, [
-    "revealTeamPasswordAction",
     "setTeamPasswordAction",
-    "randomizeTeamPasswordAction",
     "archiveTeamAction",
     "reactivateTeamAction",
     "deleteTeamAction",

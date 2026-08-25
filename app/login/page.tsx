@@ -2,6 +2,7 @@ import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
+import { PasswordInput } from "@/app/components/PasswordInput";
 import { Alert, AuthCard, Button, FormField, Input } from "@/components/ui";
 import { getSafeLoginRedirect } from "./redirectTarget";
 
@@ -81,14 +82,12 @@ export default async function LoginPage({
           <Input name="email" type="email" required autoComplete="email" />
         </FormField>
 
-        <FormField label="Passwort">
-          <Input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-          />
-        </FormField>
+        <PasswordInput
+          label="Passwort"
+          name="password"
+          required
+          autoComplete="current-password"
+        />
 
         <div className="flex justify-center pt-2">
           <Button type="submit">Einloggen</Button>

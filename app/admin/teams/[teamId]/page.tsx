@@ -37,7 +37,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
           </div>
         </header>
 
-        <TeamPasswordPanel teamId={team.id} />
+        <TeamPasswordPanel teamId={team.id} initialPassword={team.password} />
         {admin && <TeamLifecyclePanel teamId={team.id} teamName={team.name} isArchived={team.isArchived} participationCount={team.participationCount} />}
       </div>
     </main>

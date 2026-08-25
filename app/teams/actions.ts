@@ -10,7 +10,6 @@ import {
   requireTeamManagementActor,
   TeamManagementAccessError,
 } from "./teamManagement.server";
-import { generateTeamPassword } from "./teamPassword";
 import type { TeamActionResult } from "./teamActionResult";
 
 function parseTeamId(value: FormDataEntryValue | null) {
@@ -36,18 +35,6 @@ function revalidateTeam(teamId: number) {
   revalidatePath(`/admin/teams/${teamId}`);
 }
 
-export async function revealTeamPasswordAction(teamId: number): Promise<TeamActionResult> {
-  try {
-    const { actor } = await requireTeamManagementActor();
-    const team = await assertTeamAccess(actor, teamId);
-    return team.team_passwort
-      ? { success: true, message: "Passwort angezeigt.", revealedPassword: team.team_passwort }
-      : { success: false, message: "Für dieses Team ist noch kein Passwort gesetzt." };
-  } catch (error) {
-    return actionFailure("reveal_password", error);
-  }
-}
-
 export async function setTeamPasswordAction(
   _previous: TeamActionResult,
   formData: FormData,
@@ -62,23 +49,9 @@ export async function setTeamPasswordAction(
     await prisma.teams.update({ where: { team_id: teamId }, data: { team_passwort: password } });
     logTeamAudit("team_password_changed", { actorUserId: actor.userId, teamId });
     revalidateTeam(teamId);
-    return { success: true, message: "Team-Passwort wurde geändert.", revealedPassword: password };
+    return { success: true, message: "Team-Passwort wurde geändert." };
   } catch (error) {
     return actionFailure("set_password", error);
-  }
-}
-
-export async function randomizeTeamPasswordAction(teamId: number): Promise<TeamActionResult> {
-  try {
-    const { actor } = await requireTeamManagementActor();
-    await assertTeamAccess(actor, teamId);
-    const password = generateTeamPassword();
-    await prisma.teams.update({ where: { team_id: teamId }, data: { team_passwort: password } });
-    logTeamAudit("team_password_randomized", { actorUserId: actor.userId, teamId });
-    revalidateTeam(teamId);
-    return { success: true, message: "Neues zufälliges Team-Passwort gesetzt.", revealedPassword: password };
-  } catch (error) {
-    return actionFailure("randomize_password", error);
   }
 }
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { updateUserAction } from "./actions";
+import { PasswordInput } from "@/app/components/PasswordInput";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
-import { BeakerIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useState, useTransition } from "react";
 import type { RoleAssignmentOptions } from "@/app/eventreihen/membershipActions";
 import type { RoleMessages } from "@/app/i18n/roleMessages";
@@ -182,28 +183,14 @@ export default function EditUserDialog({
                   </button>
                 ) : (
                   <>
-                    <label className="mb-1 block text-sm font-medium text-slate-700">
-                      Neues Startpasswort
-                    </label>
-
-                    <div className="flex gap-2">
-                      <input
-                        name="newPassword"
-                        type="text"
-                        value={newPassword}
-                        onChange={(event) => setNewPassword(event.target.value)}
-                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={generateNewPassword}
-                        title="Passwort generieren"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
-                      >
-                        <BeakerIcon className="h-5 w-5" />
-                      </button>
-                    </div>
+                    <PasswordInput
+                      label="Neues Startpasswort"
+                      name="newPassword"
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(event) => setNewPassword(event.target.value)}
+                      onGenerate={generateNewPassword}
+                    />
 
                     <p className="mt-1 text-xs text-slate-500">
                       Das neue Passwort wird erst nach dem Speichern übernommen.

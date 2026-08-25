@@ -156,7 +156,7 @@ export async function loadTeamManagementPage(input: {
 }
 
 export async function loadTeamDetail(actor: AuthorizationActor, teamId: number) {
-  await assertTeamAccess(actor, teamId);
+  const authorizedTeam = await assertTeamAccess(actor, teamId);
   const team = await prisma.teams.findFirstOrThrow({
     where: { team_id: teamId, ...teamScopeWhere(actor) },
     select: {
@@ -184,5 +184,8 @@ export async function loadTeamDetail(actor: AuthorizationActor, teamId: number) 
       },
     },
   });
-  return mapTeam(team);
+  return {
+    ...mapTeam(team),
+    password: authorizedTeam.team_passwort ?? "",
+  };
 }

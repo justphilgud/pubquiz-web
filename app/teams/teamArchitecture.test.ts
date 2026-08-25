@@ -8,6 +8,7 @@ const sessionService = readFileSync("app/teams/teamSession.server.ts", "utf8");
 const managementService = readFileSync("app/teams/teamManagement.server.ts", "utf8");
 const actions = readFileSync("app/teams/actions.ts", "utf8");
 const passwordPanel = readFileSync("app/admin/teams/TeamPasswordPanel.tsx", "utf8");
+const detailPage = readFileSync("app/admin/teams/[teamId]/page.tsx", "utf8");
 const lifecyclePanel = readFileSync("app/admin/teams/TeamLifecyclePanel.tsx", "utf8");
 const listLoader = managementService.slice(
   managementService.indexOf("export async function loadTeamManagementPage"),
@@ -35,9 +36,12 @@ test("quiz and event-series results stay scoped below the global team", () => {
   assert.match(managementService, /quiz:\s*\{ eventreihe_id: \{ in: eventSeriesIds \} \}/);
 });
 
-test("password data is revealed only through an authorized server action", () => {
-  assert.match(actions, /revealTeamPasswordAction[\s\S]+requireTeamManagementActor[\s\S]+assertTeamAccess/);
-  assert.match(passwordPanel, /Passwort anzeigen/);
+test("password data reaches only the authorized detail view and visibility stays client-side", () => {
+  assert.match(managementService, /const authorizedTeam = await assertTeamAccess\(actor, teamId\)/);
+  assert.match(managementService, /password: authorizedTeam\.team_passwort \?\? ""/);
+  assert.match(detailPage, /initialPassword=\{team\.password\}/);
+  assert.match(passwordPanel, /useState\(initialPassword\)[\s\S]+<PasswordInput/);
+  assert.doesNotMatch(actions, /revealTeamPasswordAction/);
   assert.doesNotMatch(listLoader, /team_passwort:\s*true/);
   assert.doesNotMatch(actions, /console\.(?:info|warn|error)\([^\n]*password/i);
 });
@@ -45,9 +49,8 @@ test("password data is revealed only through an authorized server action", () =>
 test("event-manager direct object access is checked server-side", () => {
   assert.match(managementService, /assertTeamAccess/);
   assert.match(managementService, /where:\s*\{ team_id: teamId, \.\.\.teamScopeWhere\(actor\) \}/);
-  for (const operation of ["setTeamPasswordAction", "randomizeTeamPasswordAction"]) {
-    assert.match(actions, new RegExp(`${operation}[\\s\\S]+assertTeamAccess`));
-  }
+  assert.match(actions, /setTeamPasswordAction[\s\S]+assertTeamAccess/);
+  assert.doesNotMatch(actions, /randomizeTeamPasswordAction/);
 });
 
 test("destructive actions are admin-only and history needs explicit name confirmation", () => {

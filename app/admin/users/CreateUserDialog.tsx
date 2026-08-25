@@ -1,8 +1,8 @@
 "use client";
 
 import { createUserAction } from "./actions";
+import { PasswordInput } from "@/app/components/PasswordInput";
 import { generateMemorablePassword } from "@/app/lib/passwordGenerator";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useState, useTransition } from "react";
 import type { RoleMessages } from "@/app/i18n/roleMessages";
 import type { AppLocale } from "@/app/i18n/locale";
@@ -89,30 +89,17 @@ export default function CreateUserDialog({
               </div>
 
               <div>
-                <label className="text-sm font-medium">
-                  Passwort <span className="text-red-500">*</span>
-                </label>
-
-                <div className="mt-1 flex gap-2">
-                  <input
-                    name="password"
-                    type="text"
-                    required
-                    minLength={8}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setPassword(generateMemorablePassword())}
-                    title="Neues Passwort erzeugen"
-                    className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    <ArrowPathIcon className="h-5 w-5" />
-                  </button>
-                </div>
+                <PasswordInput
+                  label="Passwort *"
+                  name="password"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  onGenerate={() => setPassword(generateMemorablePassword())}
+                  generateLabel="Neues Passwort erzeugen"
+                />
 
                 <p className="mt-1 text-xs text-slate-500">
                   Mindestens 8 Zeichen. Das Startpasswort soll beim ersten Login

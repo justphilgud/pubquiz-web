@@ -1,7 +1,6 @@
 export type TeamActionResult = {
   success: boolean;
   message: string;
-  revealedPassword?: string;
   deleted?: boolean;
 };
 
