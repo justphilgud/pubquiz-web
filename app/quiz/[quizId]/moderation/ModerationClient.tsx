@@ -115,11 +115,21 @@ export default function ModerationClient({
   backToQuizLabel,
   theme,
 }: Props) {
-  const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [now, setNow] = useState(() => Date.now());
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
+  const [funnyQuestionIds, setFunnyQuestionIds] = useState(
+    () => new Set(
+      quiz.fragen
+        .filter((question) => question.funnyRevealAvailable)
+        .map((question) => question.quiz_fragen_id),
+    ),
+  );
+  const slides = useMemo(
+    () => buildPraesentationSlides(quiz, { funnyQuestionAssignmentIds: funnyQuestionIds }),
+    [funnyQuestionIds, quiz],
+  );
   const [teamJoinState, setTeamJoinState] = useState<QuizLiveSnapshot["teamJoinState"]>(null);
 
   const [slideIndex, setSlideIndex] = useState(() => {
@@ -628,7 +638,16 @@ export default function ModerationClient({
     }
     let active = true;
     void getPresentationFunnyAnswers(quizId, aktuellerSlide.frage.quiz_fragen_id).then((answers) => {
-      if (active) setFunnyAnswers(answers);
+      if (!active) return;
+      setFunnyAnswers(answers);
+      if (aktuellerSlide.typ === "frage") {
+        setFunnyQuestionIds((current) => {
+          const next = new Set(current);
+          if (answers.length > 0) next.add(aktuellerSlide.frage.quiz_fragen_id);
+          else next.delete(aktuellerSlide.frage.quiz_fragen_id);
+          return next;
+        });
+      }
     });
     return () => { active = false; };
   }, [aktuellerSlide, quizId]);

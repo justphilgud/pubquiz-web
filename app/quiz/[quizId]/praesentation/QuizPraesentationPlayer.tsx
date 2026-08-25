@@ -46,7 +46,6 @@ export default function QuizPraesentationPlayer({
   initialLiveState,
   theme,
 }: Props) {
-  const slides = useMemo(() => buildPraesentationSlides(quiz), [quiz]);
   const [liveState, setLiveState] = useState(initialLiveState);
   const [scores, setScores] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
@@ -59,6 +58,17 @@ export default function QuizPraesentationPlayer({
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
+  const [funnyQuestionIds, setFunnyQuestionIds] = useState(
+    () => new Set(
+      quiz.fragen
+        .filter((question) => question.funnyRevealAvailable)
+        .map((question) => question.quiz_fragen_id),
+    ),
+  );
+  const slides = useMemo(
+    () => buildPraesentationSlides(quiz, { funnyQuestionAssignmentIds: funnyQuestionIds }),
+    [funnyQuestionIds, quiz],
+  );
   const [teamJoinState, setTeamJoinState] = useState<{
     teamNames: string[];
     totalTeams: number;
@@ -79,13 +89,23 @@ export default function QuizPraesentationPlayer({
       : undefined;
 
   useEffect(() => {
-    if (slide?.typ !== "funny") {
+    if (
+      !slide ||
+      (slide.typ !== "frage" && slide.typ !== "funny" && slide.typ !== "aufloesung")
+    ) {
       const timeout = window.setTimeout(() => setFunnyAnswers([]), 0);
       return () => window.clearTimeout(timeout);
     }
     let active = true;
     void getPresentationFunnyAnswers(quizId, slide.frage.quiz_fragen_id).then((answers) => {
-      if (active) setFunnyAnswers(answers);
+      if (!active) return;
+      setFunnyAnswers(answers);
+      if (answers.length > 0) {
+        setFunnyQuestionIds((current) => {
+          if (current.has(slide.frage.quiz_fragen_id)) return current;
+          return new Set(current).add(slide.frage.quiz_fragen_id);
+        });
+      }
     });
     return () => { active = false; };
   }, [quizId, slide]);

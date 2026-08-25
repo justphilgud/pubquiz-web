@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getFunnyAnswerPage, getFunnyAnswerPageCount, type FunnyAnswerEntry } from "./funnyAnswerReveal";
+import {
+  getFunnyAnswerPage,
+  getFunnyAnswerPageCount,
+  supportsFunnyAnswerReveal,
+  type FunnyAnswerEntry,
+} from "./funnyAnswerReveal";
 
 const answers = Array.from({ length: 5 }, (_, index): FunnyAnswerEntry => ({
   teamAnswerId: index + 1,
@@ -22,4 +27,12 @@ test("five funny answers remain reachable over two pages without truncation", ()
   const second = getFunnyAnswerPage(answers, 2);
   assert.deepEqual([...first.answers, ...second.answers].map((entry) => entry.teamAnswerId), [1, 2, 3, 4, 5]);
   assert.equal(second.pageCount, 2);
+});
+
+test("funny reveals are restricted to free-text interactions", () => {
+  assert.equal(supportsFunnyAnswerReveal("TEXT"), true);
+  assert.equal(supportsFunnyAnswerReveal("STRUCTURED_TEXT"), true);
+  for (const type of ["NUMBER", "SINGLE_CHOICE", "MULTI_CHOICE", "ORDER", "POLL_SINGLE", "POLL_MULTI", "POLL_SCALE", "NO_ANSWER"] as const) {
+    assert.equal(supportsFunnyAnswerReveal(type), false);
+  }
 });

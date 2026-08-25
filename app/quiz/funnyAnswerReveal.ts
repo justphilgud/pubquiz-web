@@ -1,4 +1,5 @@
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
+import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 
 export const FUNNY_ANSWERS_PER_PAGE = 3;
 
@@ -10,6 +11,12 @@ export type FunnyAnswerEntry = {
   avatarCode: TeamAvatarCode;
   photoUrl: string | null;
 };
+
+export function supportsFunnyAnswerReveal(
+  interactionType: ResolvedQuizAnswerInteraction["type"],
+) {
+  return interactionType === "TEXT" || interactionType === "STRUCTURED_TEXT";
+}
 
 export function getFunnyAnswerPageCount(answerCount: number) {
   return Math.max(1, Math.ceil(Math.max(0, answerCount) / FUNNY_ANSWERS_PER_PAGE));

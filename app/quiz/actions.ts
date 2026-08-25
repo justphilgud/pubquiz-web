@@ -97,6 +97,7 @@ import {
 } from "./quizAnswerLiveState";
 import { serializeQuizParticipantLiveRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
+import { supportsFunnyAnswerReveal } from "./funnyAnswerReveal";
 import { repairQuizSpecificOrderingAssignments } from "./orderingQuestionOrder.server";
 import {
   formatOrderingAnswerForEvaluation,
@@ -1627,6 +1628,7 @@ export type QuizPraesentationResult = {
     freie_antwort_erlaubt: boolean;
     urspruenglicher_antwortmodus: import("@/app/fragen/questionAnswerMode").DerivedQuestionAnswerMode;
     effektiver_antwortmodus: import("@/app/fragen/questionAnswerMode").DerivedQuestionAnswerMode;
+    funnyRevealAvailable?: boolean;
 
     quelle: string | null;
     kategorien: string[];
@@ -1746,6 +1748,14 @@ export async function getQuizPraesentation(
           sortierung: "asc",
         },
         include: {
+          team_antworten: {
+            where: { ist_skurril: true },
+            include: {
+              antwortauswahlen: true,
+              antwortfelder: true,
+              submissions: true,
+            },
+          },
           fragen: {
             include: {
               fragen_kategorien: {
@@ -1887,6 +1897,31 @@ export async function getQuizPraesentation(
         media: presentationMedia,
         templateData: templateConfig?.templateData,
       };
+      const answerInteraction = resolveQuizAnswerInteraction({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        originalAnswerMode: answerMode.originalMode,
+        effectiveAnswerMode: answerMode.effectiveMode,
+        templateData: templateConfig?.templateData,
+        answerFields: eintrag.fragen.antwortfelder.map((feld) => ({
+          id: feld.antwortfeld_id,
+          label: feld.label,
+          required: feld.ist_pflicht,
+        })),
+        answerOptions: eintrag.fragen.antworten.map((antwort) => ({
+          id: antwort.antwort_id,
+          label: antwort.antwort,
+        })),
+      });
+      const funnyRevealAvailable =
+        supportsFunnyAnswerReveal(answerInteraction.type) &&
+        eintrag.team_antworten.some(
+          (antwort) =>
+            resolveEffectiveSubmission({
+              interactionRunId: antwort.interaction_run_id,
+              draft: antwort,
+              submissions: antwort.submissions,
+            }) !== null,
+        );
 
       return {
       quiz_fragen_id: eintrag.quiz_fragen_id,
@@ -1902,6 +1937,7 @@ export async function getQuizPraesentation(
       freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
       urspruenglicher_antwortmodus: answerMode.originalMode,
       effektiver_antwortmodus: answerMode.effectiveMode,
+      funnyRevealAvailable,
 
       praesentationslayout: eintrag.praesentationslayout ?? "standard",
       presentationLayouts: {
@@ -4224,31 +4260,71 @@ export async function getQuizPunktestand(quizId: number) {
 export async function getPresentationFunnyAnswers(quizId: number, quizFragenId: number) {
   await requireQuizViewer(quizId);
   await requireQuizQuestion(quizId, quizFragenId);
-  const answers = await prisma.team_antworten.findMany({
-    where: { quiz_id: quizId, quiz_fragen_id: quizFragenId, ist_skurril: true },
-    orderBy: { team_antwort_id: "asc" },
-    include: {
-      quiz_team_sessions: {
-        select: {
-          teamname: true,
-          team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+  const [questionDetails, answers] = await Promise.all([
+    prisma.quiz_fragen.findUniqueOrThrow({
+      where: { quiz_fragen_id: quizFragenId },
+      include: {
+        fragen: {
+          include: {
+            vorlage: { select: { code: true } },
+            antworten: true,
+            antwortfelder: true,
+          },
         },
       },
-      antwortauswahlen: { include: { antwort: { select: { antwort: true } } } },
-      antwortfelder: { orderBy: { team_antwortfeld_id: "asc" }, select: { antwort_text: true } },
-    },
+    }),
+    prisma.team_antworten.findMany({
+      where: { quiz_id: quizId, quiz_fragen_id: quizFragenId, ist_skurril: true },
+      orderBy: { team_antwort_id: "asc" },
+      include: {
+        quiz_team_sessions: {
+          select: {
+            teamname: true,
+            team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+          },
+        },
+        antwortauswahlen: true,
+        antwortfelder: { orderBy: { team_antwortfeld_id: "asc" } },
+        submissions: true,
+      },
+    }),
+  ]);
+  const answerMode = resolveQuizQuestionAnswerMode({
+    templateId: questionDetails.fragen.vorlage?.code ?? null,
+    answers: questionDetails.fragen.antworten.map((answer) => ({ isCorrect: answer.ist_richtig })),
+    allowFreeAnswer: questionDetails.freie_antwort_erlaubt,
   });
-  return answers.map((answer) => {
-    const structured = answer.antwortfelder.map((field) => field.antwort_text?.trim()).filter(Boolean).join(" · ");
-    const selected = answer.antwortauswahlen.map((selection) => selection.antwort.antwort).join(", ");
-    return {
+  const templateConfig = questionDetails.fragen.template_config_json as
+    | QuestionTemplateConfig
+    | null;
+  const interaction = resolveQuizAnswerInteraction({
+    templateId: questionDetails.fragen.vorlage?.code ?? null,
+    originalAnswerMode: answerMode.originalMode,
+    effectiveAnswerMode: answerMode.effectiveMode,
+    templateData: templateConfig?.templateData,
+    answerFields: questionDetails.fragen.antwortfelder.map((field) => ({ id: field.antwortfeld_id, label: field.label, required: field.ist_pflicht })),
+    answerOptions: questionDetails.fragen.antworten.map((answer) => ({ id: answer.antwort_id, label: answer.antwort })),
+  });
+  if (!supportsFunnyAnswerReveal(interaction.type)) return [];
+
+  return answers.flatMap((answer) => {
+    const effective = resolveEffectiveSubmission({
+      interactionRunId: answer.interaction_run_id,
+      draft: answer,
+      submissions: answer.submissions,
+    });
+    if (!effective) return [];
+    const structured = [...effective.structuredAnswers.values()].map((value) => value?.trim()).filter(Boolean).join(" · ");
+    const answerText = effective.answerText?.trim() || structured;
+    if (!answerText) return [];
+    return [{
       teamAnswerId: answer.team_antwort_id,
       teamId: answer.quiz_team_sessions.team.team_id,
       teamName: answer.quiz_team_sessions.teamname,
-      answerText: answer.antwort_text?.trim() || structured || selected || "Keine Textantwort",
+      answerText,
       avatarCode: mapTeamProfile(answer.quiz_team_sessions.team).avatarCode,
       photoUrl: answer.quiz_team_sessions.team.foto_url,
-    };
+    }];
   });
 }
 

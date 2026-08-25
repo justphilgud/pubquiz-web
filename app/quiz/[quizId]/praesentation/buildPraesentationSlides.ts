@@ -102,7 +102,10 @@ export type Slide =
 // Slide ordering and block/interaction finalization are separate responsibilities.
 export function buildPraesentationSlides(
   quiz: QuizPraesentationResult,
-  options: { includeDisabledFlowItems?: boolean } = {},
+  options: {
+    includeDisabledFlowItems?: boolean;
+    funnyQuestionAssignmentIds?: ReadonlySet<number>;
+  } = {},
 ): Slide[] {
   const result: Slide[] = [];
 
@@ -133,6 +136,17 @@ export function buildPraesentationSlides(
     getFlowItems(anchorType, anchorKey).forEach((element) =>
       result.push({ typ: "ablauf", element, abschnitt }),
     );
+  };
+  const hasFunnyReveal = (question: QuizPraesentationResult["fragen"][number]) =>
+    options.funnyQuestionAssignmentIds?.has(question.quiz_fragen_id) ??
+    question.funnyRevealAvailable;
+  const appendSolution = (
+    shared: Omit<Extract<Slide, { typ: "aufloesung" }>, "typ">,
+  ) => {
+    if (hasFunnyReveal(shared.frage)) {
+      result.push({ typ: "funny", ...shared });
+    }
+    result.push({ typ: "aufloesung", ...shared });
   };
 
   appendFlowItems("BEFORE_QUIZ", "QUIZ", null);
@@ -205,7 +219,7 @@ export function buildPraesentationSlides(
           solutionStrategy: blockSequence.strategy,
         };
         if (entry.kind === "QUESTION") result.push({ typ: "frage", ...shared });
-        else result.push({ typ: "funny", ...shared }, { typ: "aufloesung", ...shared });
+        else appendSolution(shared);
       }
       appendBlockClosingCountdownItems();
 
@@ -230,8 +244,7 @@ export function buildPraesentationSlides(
         fragenAnzahlImBlock: fragenImBlock.length,
       };
       result.push({ typ: "frage", ...shared });
-      result.push({ typ: "funny", ...shared });
-      result.push({ typ: "aufloesung", ...shared });
+      appendSolution(shared);
     });
   }
 
@@ -249,15 +262,7 @@ export function buildPraesentationSlides(
         fragenAnzahlImBlock: fragenOhneBlock.length,
       });
 
-      result.push({
-        typ: "aufloesung",
-        abschnitt: null,
-        frage,
-        frageIndexImBlock: index + 1,
-        fragenAnzahlImBlock: fragenOhneBlock.length,
-      });
-      result.splice(result.length - 1, 0, {
-        typ: "funny",
+      appendSolution({
         abschnitt: null,
         frage,
         frageIndexImBlock: index + 1,

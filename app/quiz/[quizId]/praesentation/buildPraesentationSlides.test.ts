@@ -13,6 +13,7 @@ function quizFixture(): QuizPraesentationResult {
     quiz_abschnitt_id: sectionId,
     sortierung: order,
     frage: `Frage ${questionId}`,
+    funnyRevealAvailable: false,
   }) as unknown as QuizPraesentationResult["fragen"][number];
   return {
     quiz_id: 1,
@@ -84,19 +85,25 @@ function compactBlockSequence(
   });
 }
 
-test("ordnet den Funny-Reveal jeder Frage unmittelbar vor ihrer Auflösung zu", () => {
-  const slides = buildPraesentationSlides(quizFixture());
+test("ordnet Funny-Reveals nur Fragen mit final markierten Textantworten zu", () => {
+  const quiz = quizFixture();
+  quiz.fragen[0].funnyRevealAvailable = true;
+  quiz.fragen[2].funnyRevealAvailable = true;
+  const slides = buildPraesentationSlides(quiz);
   const questionSlides = slides.filter((slide) => slide.typ === "frage");
   assert.equal(questionSlides.length, 3);
   for (const questionSlide of questionSlides) {
     const index = slides.indexOf(questionSlide);
-    const funny = slides[index + 1];
-    const solution = slides[index + 2];
-    assert.equal(funny?.typ, "funny");
-    assert.equal(
-      funny?.typ === "funny" ? funny.frage.quiz_fragen_id : null,
-      questionSlide.frage.quiz_fragen_id,
-    );
+    const hasFunnyReveal = questionSlide.frage.funnyRevealAvailable;
+    const funny = hasFunnyReveal ? slides[index + 1] : null;
+    const solution = slides[index + (hasFunnyReveal ? 2 : 1)];
+    if (hasFunnyReveal) {
+      assert.equal(funny?.typ, "funny");
+      assert.equal(
+        funny?.typ === "funny" ? funny.frage.quiz_fragen_id : null,
+        questionSlide.frage.quiz_fragen_id,
+      );
+    }
     assert.equal(solution?.typ, "aufloesung");
     assert.equal(
       solution?.typ === "aufloesung" ? solution.frage.quiz_fragen_id : null,
@@ -108,7 +115,11 @@ test("ordnet den Funny-Reveal jeder Frage unmittelbar vor ihrer Auflösung zu", 
       (slide) =>
         slide.typ === "frage" || slide.typ === "funny" || slide.typ === "aufloesung",
     ).length,
-    9,
+    8,
+  );
+  assert.deepEqual(
+    slides.filter((slide) => slide.typ === "funny").map((slide) => slide.frage.quiz_fragen_id),
+    [101, 201],
   );
 });
 
