@@ -185,6 +185,63 @@ test("open solutions render short and long canonical answers without fake altern
   }
 });
 
+test("FaceMorph keeps structured answer fields out of the question slide and reveals both people", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const baseQuestion = runtime.quiz.fragen[0];
+  assert.ok(baseQuestion);
+  const faceMorphQuestion = {
+    ...baseQuestion,
+    frage: "Welche zwei Personen wurden hier kombiniert?",
+    templateId: null,
+    templateConfig: null,
+    presentationLayouts: {
+      question: { variant: "STRUCTURED_RESPONSE" as const, source: "AUTO" as const, reason: "STRUCTURED_RESPONSE" as const },
+      solution: { variant: "SOLUTION_FOCUS" as const, source: "AUTO" as const, reason: "SOLUTION_PHASE" as const },
+    },
+    medien: [{
+      medien_id: 42,
+      datei: "questions/face-morph.webp",
+      medientyp: "Bild",
+      sortierung: 1,
+      bemerkung: null,
+      slotKey: "face_morph_result",
+    }],
+    bildMedien: [{
+      medien_id: 42,
+      datei: "questions/face-morph.webp",
+      medientyp: "Bild",
+      slotKey: "face_morph_result",
+    }],
+    antworten: [],
+    antwortfelder: [
+      { antwortfeld_id: 1, label: "Person A", sortierung: 1, ist_pflicht: true, medien: [], loesungen: [{ loesung_text: "Taylor Swift", sortierung: 1, ist_akzeptiert: true }] },
+      { antwortfeld_id: 2, label: "Person B", sortierung: 2, ist_pflicht: true, medien: [], loesungen: [{ loesung_text: "Albert Einstein", sortierung: 1, ist_akzeptiert: true }] },
+    ],
+  };
+  const quiz = { ...runtime.quiz, fragen: [faceMorphQuestion] };
+  const questionSlide: Slide = { typ: "frage", abschnitt: quiz.abschnitte[0], frage: faceMorphQuestion, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  const solutionSlide: Slide = { typ: "aufloesung", abschnitt: quiz.abschnitte[0], frage: faceMorphQuestion, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  const theme = structuredClone(runtime.theme);
+
+  const questionHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz, slide: questionSlide, slides: [questionSlide, solutionSlide], slideIndex: 0,
+    slideLabel: "FACEMORPH", theme, displayState,
+  }));
+  const solutionHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz, slide: solutionSlide, slides: [questionSlide, solutionSlide], slideIndex: 1,
+    slideLabel: "FACEMORPH · AUFLÖSUNG", theme, displayState,
+  }));
+
+  assert.match(questionHtml, /data-question-template="face_morph"/);
+  assert.match(questionHtml, /questions\/face-morph\.webp/);
+  assert.doesNotMatch(questionHtml, /Mehrteilige Antwort|Antwortteil|Person A|Person B|Pflichtangabe/);
+  assert.match(solutionHtml, /questions\/face-morph\.webp/);
+  assert.match(solutionHtml, /Person A/);
+  assert.match(solutionHtml, /Taylor Swift/);
+  assert.match(solutionHtml, /Person B/);
+  assert.match(solutionHtml, /Albert Einstein/);
+});
+
 test("LOVD rules keep every configured entry in the bounded slide layout", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const theme = structuredClone(runtime.theme);

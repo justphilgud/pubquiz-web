@@ -48,7 +48,11 @@ import {
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
-import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import {
+  isPollQuestionTemplateId,
+  questionTemplateIds,
+  resolveCanonicalQuestionTemplateId,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
@@ -533,8 +537,15 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
       ? [livePixelMedium]
       : [];
   const storybookKind = resolveStorybookQuestionKind(frage);
+  const isFaceMorph =
+    resolveCanonicalQuestionTemplateId(frage.templateId) ===
+      questionTemplateIds.faceMorph ||
+    frage.medien.some((medium) => medium.slotKey === "face_morph_result");
+  const faceMorphMedium = frage.medien.find(
+    (medium) => medium.slotKey === "face_morph_result",
+  ) ?? frage.medien.find((medium) => isBild(medium.datei));
 
-  if (theme.design.stylePreset === "BIRTHDAY" && storybookKind) {
+  if (theme.design.stylePreset === "BIRTHDAY" && storybookKind && !isFaceMorph) {
     const audioMedium = frage.medien.find((medium) => isAudio(medium.datei));
     const selectedMedium = storybookKind === "AUDIO" ? audioMedium : questionMedia[0];
     const audioElement = renderMode === "PRESENTATION" && audioMedium ? (
@@ -658,6 +669,32 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         </div>
         <div className="mt-4 flex w-full max-w-4xl justify-between gap-6 text-lg font-bold text-white/70"><span>{templateData.minLabel}</span><span className="text-right">{templateData.maxLabel}</span></div>
       </div>
+    );
+  }
+
+  if (isFaceMorph) {
+    return (
+      <section
+        data-presentation-layout="MEDIA_FOCUS"
+        data-question-template="face_morph"
+        className="grid h-full min-h-0 grid-rows-[auto_1fr] gap-4"
+      >
+        <div className="presentation-question-card rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 px-7 py-5 shadow-[8px_8px_0_#00e5ff]">
+          <div className="mb-2 text-sm font-black uppercase tracking-[0.3em] text-pink-300">
+            Frage {slide.frageIndexImBlock}
+          </div>
+          <h2 className="text-4xl font-black leading-tight text-white xl:text-5xl">
+            {frage.frage}
+          </h2>
+        </div>
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-4 shadow-[8px_8px_0_#ff00aa]">
+          {faceMorphMedium ? (
+            renderMedienKarte(faceMorphMedium, "large")
+          ) : (
+            <PresentationMediaFallback kind="IMAGE" />
+          )}
+        </div>
+      </section>
     );
   }
 
@@ -1250,6 +1287,13 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const hatAntwortfelderLoesungen = richtigeAntwortfeldLoesungen.some(
     (feld) => feld.loesungen.length > 0
   );
+  const isFaceMorph =
+    resolveCanonicalQuestionTemplateId(frage.templateId) ===
+      questionTemplateIds.faceMorph ||
+    frage.medien.some((medium) => medium.slotKey === "face_morph_result");
+  const faceMorphMedium = frage.medien.find(
+    (medium) => medium.slotKey === "face_morph_result",
+  ) ?? frage.medien.find((medium) => isBild(medium.datei));
 
   if (isPollQuestionTemplateId(frage.templateId)) {
     return (
@@ -1275,6 +1319,43 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
           )}
         </div>
       </div>
+    );
+  }
+
+  if (isFaceMorph) {
+    return (
+      <section
+        data-presentation-layout="SOLUTION_FOCUS"
+        data-question-template="face_morph"
+        className="grid h-full min-h-0 gap-5 lg:grid-cols-[1.38fr_0.62fr]"
+      >
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-4 shadow-[8px_8px_0_#ff00aa]">
+          {faceMorphMedium ? (
+            renderMedienKarte(faceMorphMedium, "large")
+          ) : (
+            <PresentationMediaFallback kind="IMAGE" />
+          )}
+        </div>
+        <div className="presentation-solution-result flex min-h-0 flex-col justify-center gap-4 rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
+          <div className="presentation-solution-label text-sm font-black uppercase tracking-[0.25em] text-emerald-300">
+            Richtige Antwort
+          </div>
+          {richtigeAntwortfeldLoesungen.map((feld) => (
+            <div
+              key={feld.label}
+              data-correct="true"
+              className="presentation-correct-answer rounded-2xl border-2 border-emerald-300 bg-black/35 p-5"
+            >
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-300">
+                {feld.label}
+              </div>
+              <div className="presentation-correct-answer-value mt-2 text-3xl font-black leading-tight text-yellow-200 xl:text-4xl">
+                {feld.loesungen.map((loesung) => loesung.loesung_text).join(" / ")}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
