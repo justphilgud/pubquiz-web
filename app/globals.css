@@ -2559,9 +2559,9 @@ button {
 .presentation-ranking-overview .presentation-ranking-podium article[data-place="1"] svg { height: 3.5rem; width: 3.5rem; }
 .presentation-ranking-overview .presentation-flow-ranking-list { width: 100%; }
 .presentation-ranking-trend { display: inline-flex; min-width: 1.25em; align-items: center; justify-content: center; font-size: 0.9em; font-weight: 900; line-height: 1; }
-.presentation-ranking-trend[data-trend="UP"] { color: #58d68d; }
-.presentation-ranking-trend[data-trend="DOWN"] { color: #ff7272; }
-.presentation-ranking-trend[data-trend="SAME"] { color: #fff; }
+.presentation-ranking-trend[data-trend="UP"] { color: var(--brand-success); }
+.presentation-ranking-trend[data-trend="DOWN"] { color: var(--brand-danger); }
+.presentation-ranking-trend[data-trend="SAME"] { color: var(--brand-text); }
 .presentation-ranking-points-and-trend { display: inline-flex; align-items: center; justify-content: flex-end; gap: 0.65rem; }
 .presentation-yearly-ranking .presentation-ranking-podium-team > .presentation-ranking-trend { margin-top: 0.2rem; font-size: 1.15rem; }
 .presentation-ranking-table-wrap { min-height: 0; width: 100%; flex: 1; margin-top: clamp(0.35rem, 0.9vw, 0.8rem); overflow: hidden; container-type: size; }

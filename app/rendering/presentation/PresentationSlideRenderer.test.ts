@@ -424,6 +424,11 @@ test("yearly standings render every team with accessible movement markers", () =
   assert.match(html, /Gefallen von Platz 1 auf Platz 2/);
   assert.match(html, /Unverändert auf Platz 3/);
   assert.match(html, /Noch kein Vorher-Rang/);
+  assert.match(html, /<table[^>]+presentation-ranking-table/);
+  assert.match(html, /data-team-count="4"/);
+  assert.doesNotMatch(html, /presentation-ranking-podium/);
+  assert.equal((html.match(/<tr data-place=/g) ?? []).length, 4);
+  assert.equal((html.match(/class="presentation-ranking-table-trend"/g) ?? []).length, 4);
 });
 
 test("LOVD rules keep every configured entry in the bounded slide layout", () => {

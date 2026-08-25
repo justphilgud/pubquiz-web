@@ -2138,10 +2138,10 @@ function renderFlowStandingsSlide(
   );
 }
 
-function renderRankingTable(
-  entries: readonly RankingTableEntry[],
+function renderRankingTable<TEntry extends RankingTableEntry>(
+  entries: readonly TEntry[],
   showPoints: boolean,
-  trailingContent?: (entry: RankingTableEntry) => ReactNode,
+  trailingContent?: (entry: TEntry) => ReactNode,
 ) {
   return (
     <div className="presentation-ranking-table-wrap">
@@ -2182,11 +2182,6 @@ function renderYearlyStandingsSlide(
   slide: Extract<Slide, { typ: "ablauf" }>,
 ) {
   const showPoints = slide.element.config.showPoints !== false;
-  const podiumGroups = [1, 2, 3].flatMap((place) => {
-    const entries = yearlyStandings.filter((entry) => entry.place === place);
-    return entries.length > 0 ? [{ place, entries }] : [];
-  });
-  const remainingEntries = yearlyStandings.filter((entry) => entry.place > 3);
   const trendMarker = (entry: YearlyRankingEntry) => {
     const label = entry.trend === "UP"
       ? `Verbessert von Platz ${entry.previousPlace} auf Platz ${entry.place}`
@@ -2210,42 +2205,15 @@ function renderYearlyStandingsSlide(
       {yearlyStandings.length === 0 ? (
         <div className="presentation-flow-message">Für dieses Jahr liegen noch keine Teamwertungen vor.</div>
       ) : (
-        <>
-          <div className="presentation-ranking-podium" data-group-count={podiumGroups.length} aria-label="Jahrespodium Platz eins bis drei">
-            {podiumGroups.map((group) => (
-              <article key={`yearly-podium-${group.place}`} data-place={group.place}>
-                <div className="presentation-ranking-podium-team-group">
-                  {group.entries.map((team) => (
-                    <div key={`yearly-team-${team.teamId}`} className="presentation-ranking-podium-team">
-                      <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode} className={group.place === 1 ? "h-24 w-24" : "h-20 w-20"} />
-                      <strong>{team.teamname}</strong>
-                      {trendMarker(team)}
-                    </div>
-                  ))}
-                </div>
-                {showPoints && <span>{formatQuizPoints(group.entries[0]?.punkte ?? 0)} Punkte</span>}
-                <b>#{group.place}</b>
-              </article>
-            ))}
-          </div>
-          {remainingEntries.length > 0 && (
-            <ol className="presentation-flow-ranking-list" data-many={remainingEntries.length > 6}>
-              {remainingEntries.map((team) => (
-                <li key={`yearly-list-${team.teamId}`}>
-                  <span className="presentation-flow-rank">{team.place}</span>
-                  <strong className="flex items-center gap-3">
-                    <TeamIdentityVisual name={team.teamname} photoUrl={team.photoUrl} avatarCode={team.avatarCode} className="h-12 w-12" />
-                    {team.teamname}
-                  </strong>
-                  <span className="presentation-ranking-points-and-trend">
-                    {showPoints && `${formatQuizPoints(team.punkte)} Punkte`}
-                    {trendMarker(team)}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-        </>
+        renderRankingTable(
+          yearlyStandings.map((team) => ({
+            ...team,
+            key: `yearly-${team.teamId}`,
+            teamname: team.teamname,
+          })),
+          showPoints,
+          trendMarker,
+        )
       )}
     </section>
   );
