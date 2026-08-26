@@ -3898,6 +3898,10 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
             },
           },
         },
+        interaction_runs: {
+          select: { interaction_run_id: true },
+          take: 1,
+        },
       },
     }),
     prisma.quiz_team_sessions.findMany({
@@ -3998,6 +4002,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
     }).pointsLabel ?? "Keine Punkte";
 
     return sessions.map((session) => {
+      const isPlayed = quizFrage.interaction_runs.length > 0;
       const antwort = quizFrage.team_antworten.find(
         (eintrag) =>
           eintrag.quiz_team_session_id === session.quiz_team_session_id,
@@ -4043,6 +4048,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         : null;
 
       const evaluationReadState = resolveEvaluationReadState({
+        isPlayed,
         hasEffectiveSubmission: effectiveSubmission !== null,
         evaluation: antwort ?? null,
       });
@@ -4060,6 +4066,9 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
 
       return {
         quiz_fragen_id: quizFrage.quiz_fragen_id,
+        abschnittId: quizFrage.quiz_abschnitt_id,
+        istGespielt: isPlayed,
+        istNichtGespielt: evaluationReadState.isNotPlayed,
         fragen_id: quizFrage.fragen.fragen_id,
         frageIndex: quizFrage.sortierung ?? frageIndex + 1,
         frage: quizFrage.fragen.frage,

@@ -13,6 +13,11 @@ export const evaluationMatrixStatusPresentation: Record<
     className: string;
   }
 > = {
+  NOT_PLAYED: {
+    label: "Noch nicht gespielt",
+    symbol: "○",
+    className: "border-slate-300 bg-white text-slate-500",
+  },
   PENDING: {
     label: "Wird berechnet",
     symbol: "…",

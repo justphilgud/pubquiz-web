@@ -215,6 +215,7 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
                 <th className="px-3 py-2">Prüfen</th>
                 <th className="px-3 py-2">Berechn.</th>
                 <th className="px-3 py-2">Offen</th>
+                <th className="px-3 py-2">Nicht gesp.</th>
                 <th className="px-3 py-2">Erfolg</th>
                 <th className="px-3 py-2">Ø Punkte</th>
               </tr>
@@ -237,6 +238,7 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
                   <td className="px-3 py-2 font-bold text-blue-800">{question.reviewRequired}</td>
                   <td className="px-3 py-2 font-bold text-amber-800">{question.pending}</td>
                   <td className="px-3 py-2 text-slate-600">{question.unanswered}</td>
+                  <td className="px-3 py-2 text-slate-500">{question.notPlayed}</td>
                   <td className="px-3 py-2 font-black text-slate-900">
                     {question.successRate === null ? "–" : `${question.successRate.toLocaleString("de-DE")} %`}
                   </td>

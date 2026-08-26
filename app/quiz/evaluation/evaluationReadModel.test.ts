@@ -16,29 +16,48 @@ const completeEvaluation = {
 test("keeps a submitted answer visible while its evaluation is pending", () => {
   assert.deepEqual(
     resolveEvaluationReadState({
+      isPlayed: true,
       hasEffectiveSubmission: true,
       evaluation: { ...completeEvaluation, bewertungs_version: 0 },
     }),
-    { isUnanswered: false, isPending: true, status: "PENDING" },
+    { isNotPlayed: false, isUnanswered: false, isPending: true, status: "PENDING" },
   );
 });
 
 test("uses the persisted status after evaluation completes", () => {
   assert.deepEqual(
     resolveEvaluationReadState({
+      isPlayed: true,
       hasEffectiveSubmission: true,
       evaluation: completeEvaluation,
     }),
-    { isUnanswered: false, isPending: false, status: "CORRECT" },
+    { isNotPlayed: false, isUnanswered: false, isPending: false, status: "CORRECT" },
   );
 });
 
 test("distinguishes an absent submission from a pending evaluation", () => {
   assert.deepEqual(
     resolveEvaluationReadState({
+      isPlayed: true,
       hasEffectiveSubmission: false,
       evaluation: null,
     }),
-    { isUnanswered: true, isPending: false, status: "UNANSWERED" },
+    { isNotPlayed: false, isUnanswered: true, isPending: false, status: "UNANSWERED" },
+  );
+});
+
+test("distinguishes a question without an interaction run from unanswered", () => {
+  assert.deepEqual(
+    resolveEvaluationReadState({
+      isPlayed: false,
+      hasEffectiveSubmission: false,
+      evaluation: null,
+    }),
+    {
+      isNotPlayed: true,
+      isUnanswered: false,
+      isPending: false,
+      status: "NOT_PLAYED",
+    },
   );
 });

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildEvaluationMatrix,
+  filterEvaluationMatrixByScope,
   type EvaluationMatrixAnswerInput,
 } from "./evaluationMatrix";
 
@@ -12,7 +13,9 @@ function answer(
     quizQuestionId: 11,
     questionNumber: 1,
     questionText: "Welche Stadt ist die Hauptstadt?",
+    sectionId: 1,
     sectionTitle: "Runde 1",
+    isPlayed: true,
     maximumPointsLabel: "max. 1 Punkt",
     teamName: "Team A",
     isUnanswered: false,
@@ -72,7 +75,9 @@ test("calculates transparent per-question metrics", () => {
     id: 11,
     number: 1,
     text: "Welche Stadt ist die Hauptstadt?",
+    sectionId: 1,
     sectionTitle: "Runde 1",
+    isPlayed: true,
     maximumPointsLabel: "max. 1 Punkt",
     answered: 4,
     correct: 1,
@@ -81,9 +86,36 @@ test("calculates transparent per-question metrics", () => {
     reviewRequired: 1,
     pending: 0,
     unanswered: 1,
+    notPlayed: 0,
     successRate: 25,
     averagePoints: 0.375,
   });
+});
+
+test("played, all and block scopes keep future questions in NOT_PLAYED", () => {
+  const matrix = buildEvaluationMatrix({
+    answers: [
+      answer({ quizQuestionId: 1, questionNumber: 1 }),
+      answer({ quizQuestionId: 2, questionNumber: 2 }),
+      answer({ quizQuestionId: 3, questionNumber: 3, sectionId: 2, sectionTitle: "Runde 2", isPlayed: false, evaluationStatus: "NOT_PLAYED", isUnanswered: false, answerText: null, awardedPoints: 0 }),
+      answer({ quizQuestionId: 4, questionNumber: 4, sectionId: 2, sectionTitle: "Runde 2", isPlayed: false, evaluationStatus: "NOT_PLAYED", isUnanswered: false, answerText: null, awardedPoints: 0 }),
+    ],
+    ranking: [{ teamname: "Team A", punkte: 2 }],
+  });
+
+  assert.deepEqual(
+    filterEvaluationMatrixByScope(matrix, "PLAYED").questions.map((question) => question.id),
+    [1, 2],
+  );
+  assert.deepEqual(
+    filterEvaluationMatrixByScope(matrix, "ALL").questions.map((question) => question.id),
+    [1, 2, 3, 4],
+  );
+  const secondBlock = filterEvaluationMatrixByScope(matrix, "SECTION:2");
+  assert.deepEqual(secondBlock.questions.map((question) => question.id), [3, 4]);
+  assert.equal(secondBlock.teams[0].cells[3].status, "NOT_PLAYED");
+  assert.equal(secondBlock.questions[0].unanswered, 0);
+  assert.equal(secondBlock.questions[0].notPlayed, 1);
 });
 
 test("keeps submitted answers visible while their evaluation is pending", () => {

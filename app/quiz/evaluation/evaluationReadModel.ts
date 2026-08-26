@@ -4,6 +4,7 @@ import {
 } from "./evaluationCompleteness";
 
 export type EvaluationReadStatus =
+  | "NOT_PLAYED"
   | "PENDING"
   | "UNANSWERED"
   | "WRONG"
@@ -22,11 +23,22 @@ const persistedStatuses = new Set<EvaluationReadStatus>([
 // Runtime contract: docs/architecture/quiz-runtime-contracts.md
 // An effective submission with pending evaluation is never unanswered.
 export function resolveEvaluationReadState(input: {
+  isPlayed: boolean;
   hasEffectiveSubmission: boolean;
   evaluation: EvaluationCompletenessInput | null;
 }) {
+  if (!input.isPlayed) {
+    return {
+      isNotPlayed: true,
+      isUnanswered: false,
+      isPending: false,
+      status: "NOT_PLAYED" as const,
+    };
+  }
+
   if (!input.hasEffectiveSubmission) {
     return {
+      isNotPlayed: false,
       isUnanswered: true,
       isPending: false,
       status: "UNANSWERED" as const,
@@ -35,6 +47,7 @@ export function resolveEvaluationReadState(input: {
 
   if (!input.evaluation || !isEvaluationComplete(input.evaluation)) {
     return {
+      isNotPlayed: false,
       isUnanswered: false,
       isPending: true,
       status: "PENDING" as const,
@@ -43,12 +56,13 @@ export function resolveEvaluationReadState(input: {
 
   const persistedStatus = input.evaluation.bewertungsstatus;
   return {
+    isNotPlayed: false,
     isUnanswered: false,
     isPending: false,
     status:
       typeof persistedStatus === "string" &&
       persistedStatuses.has(persistedStatus as EvaluationReadStatus)
-        ? (persistedStatus as Exclude<EvaluationReadStatus, "PENDING">)
+        ? (persistedStatus as Exclude<EvaluationReadStatus, "NOT_PLAYED" | "PENDING">)
         : "UNANSWERED",
   };
 }

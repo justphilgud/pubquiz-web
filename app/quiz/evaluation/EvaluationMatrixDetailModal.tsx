@@ -56,6 +56,26 @@ export function EvaluationMatrixDetailContent({
 
   const presentation = evaluationMatrixStatusPresentation[selection.cell.status];
 
+  if (selection.cell.status === "NOT_PLAYED") {
+    return (
+      <div className="space-y-4 text-sm text-slate-700">
+        <span
+          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${presentation.className}`}
+        >
+          <span aria-hidden="true">{presentation.symbol}</span>
+          {presentation.label}
+        </span>
+        <p className="font-semibold text-slate-950">
+          Frage {question.number} · {question.text}
+        </p>
+        <p>
+          Für diese Frage wurde im Quizflow noch kein Interaction Run gestartet.
+          Sie ist daher weder unbeantwortet noch bewertet.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 text-sm text-slate-700">
       <div className="flex flex-wrap items-center gap-2">

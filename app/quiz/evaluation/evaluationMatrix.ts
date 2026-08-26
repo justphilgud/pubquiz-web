@@ -1,4 +1,10 @@
+import {
+  matchesEvaluationQuestionScope,
+  type EvaluationQuestionScope,
+} from "./evaluationAnswerFilter";
+
 export type EvaluationMatrixStatus =
+  | "NOT_PLAYED"
   | "PENDING"
   | "UNANSWERED"
   | "WRONG"
@@ -10,7 +16,9 @@ export type EvaluationMatrixAnswerInput = {
   quizQuestionId: number;
   questionNumber: number;
   questionText: string;
+  sectionId: number | null;
   sectionTitle: string;
+  isPlayed: boolean;
   maximumPointsLabel: string;
   teamName: string;
   isPoll?: boolean;
@@ -38,7 +46,9 @@ export type EvaluationMatrixQuestion = {
   id: number;
   number: number;
   text: string;
+  sectionId: number | null;
   sectionTitle: string;
+  isPlayed: boolean;
   maximumPointsLabel: string;
   answered: number;
   correct: number;
@@ -47,6 +57,7 @@ export type EvaluationMatrixQuestion = {
   reviewRequired: number;
   pending: number;
   unanswered: number;
+  notPlayed: number;
   successRate: number | null;
   averagePoints: number | null;
 };
@@ -80,6 +91,7 @@ export function buildEvaluationMatrix(input: {
     | "reviewRequired"
     | "pending"
     | "unanswered"
+    | "notPlayed"
     | "successRate"
     | "averagePoints"
   >>();
@@ -90,7 +102,9 @@ export function buildEvaluationMatrix(input: {
         id: answer.quizQuestionId,
         number: answer.questionNumber,
         text: answer.questionText,
+        sectionId: answer.sectionId,
         sectionTitle: answer.sectionTitle,
+        isPlayed: answer.isPlayed,
         maximumPointsLabel: answer.maximumPointsLabel,
       });
     }
@@ -127,7 +141,9 @@ export function buildEvaluationMatrix(input: {
         const answer = answersByTeamAndQuestion.get(
           `${teamName}\u0000${question.id}`,
         );
-        const status = !answer || answer.isUnanswered
+        const status = !question.isPlayed
+          ? "NOT_PLAYED"
+          : !answer || answer.isUnanswered
           ? "UNANSWERED"
           : answer.evaluationStatus;
         return [question.id, {
@@ -153,7 +169,8 @@ export function buildEvaluationMatrix(input: {
     questions: orderedQuestions.map((question) => {
       const cells = teams.map((team) => team.cells[question.id]);
       const answeredCells = cells.filter(
-        (cell) => cell.status !== "UNANSWERED",
+        (cell) =>
+          cell.status !== "UNANSWERED" && cell.status !== "NOT_PLAYED",
       );
       const completedCells = answeredCells.filter(
         (cell) => cell.status !== "PENDING",
@@ -169,6 +186,7 @@ export function buildEvaluationMatrix(input: {
         reviewRequired: count("REVIEW_REQUIRED"),
         pending: count("PENDING"),
         unanswered: count("UNANSWERED"),
+        notPlayed: count("NOT_PLAYED"),
         successRate: completedCells.length === 0
           ? null
           : roundOneDecimal(
@@ -182,5 +200,33 @@ export function buildEvaluationMatrix(input: {
             ) / completedCells.length,
       };
     }),
+  };
+}
+
+export function filterEvaluationMatrixByScope(
+  matrix: EvaluationMatrix,
+  scope: EvaluationQuestionScope,
+): EvaluationMatrix {
+  const questions = matrix.questions.filter((question) =>
+    matchesEvaluationQuestionScope(
+      {
+        abschnittId: question.sectionId,
+        istGespielt: question.isPlayed,
+      },
+      scope,
+    ),
+  );
+  const questionIds = new Set(questions.map((question) => question.id));
+
+  return {
+    questions,
+    teams: matrix.teams.map((team) => ({
+      ...team,
+      cells: Object.fromEntries(
+        Object.entries(team.cells).filter(([questionId]) =>
+          questionIds.has(Number(questionId)),
+        ),
+      ),
+    })),
   };
 }

@@ -170,10 +170,21 @@ test("evaluation answer loading uses effective submissions and safely represents
   assert.match(implementation, /antwortfelder/);
   assert.match(implementation, /vorlage: \{ select: \{ code: true \} \}/);
   assert.match(implementation, /resolveEffectiveSubmission\(/);
+  assert.match(implementation, /interaction_runs: \{/);
+  assert.match(implementation, /const isPlayed = quizFrage\.interaction_runs\.length > 0/);
   assert.match(implementation, /resolveEvaluationReadState\(/);
+  assert.match(implementation, /isPlayed,/);
   assert.match(implementation, /bewertungAusstehend: evaluationReadState\.isPending/);
   assert.match(implementation, /bewertungsstatus: evaluationReadState\.status/);
   assert.match(implementation, /vergebenePunkte: Number\(evaluatedAnswer\?\.vergebene_punkte \?\? 0\)/);
+});
+
+test("evaluation UI defaults to played questions and offers all and section scopes", () => {
+  assert.match(evaluationClient, /DEFAULT_EVALUATION_ANSWER_FILTERS\.scope/);
+  assert.match(evaluationClient, /Bisher gespielt/);
+  assert.match(evaluationClient, /Alle Fragen/);
+  assert.match(evaluationClient, /`SECTION:\$\{abschnitt\.id\}`/);
+  assert.match(evaluationClient, /Noch nicht gespielt/);
 });
 
 test("pixel evaluation binds effective submissions to their own interaction run", () => {

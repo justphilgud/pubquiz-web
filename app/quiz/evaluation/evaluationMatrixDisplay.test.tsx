@@ -11,9 +11,9 @@ import {
 
 const matrix: EvaluationMatrix = {
   questions: [
-    { id: 11, number: 1, text: "Eine bewusst sehr lange Frage, die den kompakten Tabellenkopf nicht verbreitern darf", sectionTitle: "Runde 1", maximumPointsLabel: "max. 1 Punkt", answered: 1, correct: 1, wrong: 0, partial: 0, reviewRequired: 0, pending: 0, unanswered: 0, successRate: 100, averagePoints: 1 },
-    { id: 12, number: 2, text: "Teilantwort", sectionTitle: "Runde 1", maximumPointsLabel: "max. 2 Punkte", answered: 1, correct: 0, wrong: 0, partial: 1, reviewRequired: 0, pending: 0, unanswered: 0, successRate: 0, averagePoints: 1 },
-    { id: 13, number: 3, text: "Manuell prüfen", sectionTitle: "Runde 2", maximumPointsLabel: "max. 1 Punkt", answered: 1, correct: 0, wrong: 0, partial: 0, reviewRequired: 1, pending: 0, unanswered: 0, successRate: 0, averagePoints: 0 },
+    { id: 11, number: 1, text: "Eine bewusst sehr lange Frage, die den kompakten Tabellenkopf nicht verbreitern darf", sectionId: 1, sectionTitle: "Runde 1", isPlayed: true, maximumPointsLabel: "max. 1 Punkt", answered: 1, correct: 1, wrong: 0, partial: 0, reviewRequired: 0, pending: 0, unanswered: 0, notPlayed: 0, successRate: 100, averagePoints: 1 },
+    { id: 12, number: 2, text: "Teilantwort", sectionId: 1, sectionTitle: "Runde 1", isPlayed: true, maximumPointsLabel: "max. 2 Punkte", answered: 1, correct: 0, wrong: 0, partial: 1, reviewRequired: 0, pending: 0, unanswered: 0, notPlayed: 0, successRate: 0, averagePoints: 1 },
+    { id: 13, number: 3, text: "Manuell prüfen", sectionId: 2, sectionTitle: "Runde 2", isPlayed: true, maximumPointsLabel: "max. 1 Punkt", answered: 1, correct: 0, wrong: 0, partial: 0, reviewRequired: 1, pending: 0, unanswered: 0, notPlayed: 0, successRate: 0, averagePoints: 0 },
   ],
   teams: [{
     name: "Das Team mit einem außergewöhnlich langen Namen", rank: 1, totalPoints: 2,
@@ -28,7 +28,7 @@ const matrix: EvaluationMatrix = {
 test("maps every evaluation status to a compact symbol and accessible label", () => {
   assert.deepEqual(
     Object.fromEntries(Object.entries(evaluationMatrixStatusPresentation).map(([status, value]) => [status, [value.symbol, value.label]])),
-    { PENDING: ["…", "Wird berechnet"], CORRECT: ["✓", "Richtig"], WRONG: ["×", "Falsch"], PARTIAL: ["½", "Teilweise"], REVIEW_REQUIRED: ["?", "Prüfen"], UNANSWERED: ["–", "Nicht beantwortet"] },
+    { NOT_PLAYED: ["○", "Noch nicht gespielt"], PENDING: ["…", "Wird berechnet"], CORRECT: ["✓", "Richtig"], WRONG: ["×", "Falsch"], PARTIAL: ["½", "Teilweise"], REVIEW_REQUIRED: ["?", "Prüfen"], UNANSWERED: ["–", "Nicht beantwortet"] },
   );
 });
 

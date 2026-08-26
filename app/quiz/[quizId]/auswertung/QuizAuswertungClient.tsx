@@ -9,14 +9,21 @@ import {
 } from "../../actions";
 import { formatQuizPoints } from "../../formatQuizPoints";
 import TeamQuestionEvaluationMatrix from "../../evaluation/TeamQuestionEvaluationMatrix";
-import type { EvaluationMatrix as EvaluationMatrixData } from "../../evaluation/evaluationMatrix";
+import {
+  filterEvaluationMatrixByScope,
+  type EvaluationMatrix as EvaluationMatrixData,
+} from "../../evaluation/evaluationMatrix";
 import {
   DEFAULT_EVALUATION_ANSWER_FILTERS,
   filterEvaluationAnswers,
+  type EvaluationQuestionScope,
 } from "../../evaluation/evaluationAnswerFilter";
 
 type AuswertungsAntwort = {
   quiz_fragen_id: number;
+  abschnittId: number | null;
+  istGespielt: boolean;
+  istNichtGespielt: boolean;
   fragen_id: number;
   frageIndex: number;
   frage: string;
@@ -52,7 +59,7 @@ type AuswertungsAntwort = {
   autoBasisPunkte: number;
   autoEndpunkte: number;
   vergebenePunkte: number;
-  bewertungsstatus: "PENDING" | "UNANSWERED" | "WRONG" | "PARTIAL" | "CORRECT" | "REVIEW_REQUIRED";
+  bewertungsstatus: "NOT_PLAYED" | "PENDING" | "UNANSWERED" | "WRONG" | "PARTIAL" | "CORRECT" | "REVIEW_REQUIRED";
   bewertungsquelle: "AUTO" | "MANUAL" | "LEGACY";
   pixelStage: 1 | 2 | 3 | null;
   pixelIsStopper: boolean;
@@ -94,6 +101,9 @@ export default function QuizAuswertungClient({
   const [aktiverTab, setAktiverTab] = useState<"antworten" | "matrix" | "punktestand">(
     "antworten"
   );
+  const [fragenScope, setFragenScope] = useState<EvaluationQuestionScope>(
+    DEFAULT_EVALUATION_ANSWER_FILTERS.scope,
+  );
 
   const [nurOffeneFragen, setNurOffeneFragen] = useState<boolean>(
     DEFAULT_EVALUATION_ANSWER_FILTERS.openQuestionsOnly,
@@ -122,16 +132,30 @@ export default function QuizAuswertungClient({
       Array.from(new Set(antworten.map((antwort) => antwort.teamname))).sort(),
     [antworten]
   );
+  const abschnitte = useMemo(() => {
+    const byId = new Map<number, string>();
+    for (const antwort of antworten) {
+      if (antwort.abschnittId !== null) {
+        byId.set(antwort.abschnittId, antwort.abschnittTitel);
+      }
+    }
+    return [...byId.entries()].map(([id, titel]) => ({ id, titel }));
+  }, [antworten]);
 
   const ausgewaehltesTeam =
     teamIndex === null ? null : teamnamen[teamIndex] ?? null;
 
   const sichtbareAntworten = filterEvaluationAnswers(antworten, {
+    scope: fragenScope,
     selectedTeam: ausgewaehltesTeam,
     openQuestionsOnly: nurOffeneFragen,
     incorrectAnswersOnly: nurFalscheAntworten,
     includeUnanswered: zeigeUnbeantwortete,
   });
+  const sichtbareMatrix = useMemo(
+    () => filterEvaluationMatrixByScope(matrix, fragenScope),
+    [fragenScope, matrix],
+  );
 
   async function handleBewertung(
     teamAntwortId: number,
@@ -320,7 +344,53 @@ export default function QuizAuswertungClient({
         )}
       </div>
 
-      {aktiverTab === "matrix" && <TeamQuestionEvaluationMatrix matrix={matrix} />}
+      {aktiverTab !== "punktestand" && (
+        <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2" aria-label="Fragenumfang">
+            <span className="mr-1 text-xs font-bold uppercase tracking-wide text-slate-500">
+              Umfang
+            </span>
+            {[
+              { id: "PLAYED" as const, label: "Bisher gespielt" },
+              { id: "ALL" as const, label: "Alle Fragen" },
+            ].map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                aria-pressed={fragenScope === option.id}
+                onClick={() => setFragenScope(option.id)}
+                className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
+                  fragenScope === option.id
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+            {abschnitte.map((abschnitt) => {
+              const scope = `SECTION:${abschnitt.id}` as const;
+              return (
+                <button
+                  key={abschnitt.id}
+                  type="button"
+                  aria-pressed={fragenScope === scope}
+                  onClick={() => setFragenScope(scope)}
+                  className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
+                    fragenScope === scope
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  {abschnitt.titel}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {aktiverTab === "matrix" && <TeamQuestionEvaluationMatrix matrix={sichtbareMatrix} />}
 
       {aktiverTab === "punktestand" && (
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
@@ -486,7 +556,9 @@ export default function QuizAuswertungClient({
                         antwort.team_antwort_id ?? "unbeantwortet"
                       }`}
                       className={`align-top ${
-                        antwort.istUnbeantwortet
+                        antwort.istNichtGespielt
+                          ? "bg-white"
+                          : antwort.istUnbeantwortet
                           ? "bg-slate-50"
                           : antwort.bewertungAusstehend
                             ? "bg-amber-50"
@@ -559,12 +631,14 @@ export default function QuizAuswertungClient({
                       </td>
 
                       <td className="max-w-xs px-4 py-3 font-semibold text-slate-900">
-                        {antwort.istUnbeantwortet
+                        {antwort.istNichtGespielt
+                          ? "-"
+                          : antwort.istUnbeantwortet
                           ? "-"
                           : antwort.antwortText ??
                             antwort.ausgewaehlteAntwort ??
                             "-"}
-                        {!antwort.istUnbeantwortet && (
+                        {!antwort.istNichtGespielt && !antwort.istUnbeantwortet && (
                           <div className="mt-1 text-xs font-normal text-slate-500">
                             {antwort.antwortQuelle === "LEGACY"
                               ? "Historische Legacy-Antwort"
@@ -576,7 +650,11 @@ export default function QuizAuswertungClient({
                       </td>
 
                       <td className="px-4 py-3">
-                        {antwort.istUnbeantwortet ? (
+                        {antwort.istNichtGespielt ? (
+                          <div className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                            Noch nicht gespielt
+                          </div>
+                        ) : antwort.istUnbeantwortet ? (
                           <div className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-500">
                             unbeantwortet
                           </div>
