@@ -791,8 +791,12 @@ test("LOVD uses one token-driven editorial treatment without visible neon color 
     "--brand-border",
     "--brand-correct",
     "--brand-success",
-    "--brand-warning",
-    "--brand-danger",
+    "--quiz-ui-background",
+    "--quiz-ui-surface",
+    "--quiz-ui-text",
+    "--quiz-ui-border",
+    "--quiz-ui-warning",
+    "--quiz-ui-danger",
   ]) {
     assert.match(lovdCss, new RegExp(token));
   }

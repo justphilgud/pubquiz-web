@@ -441,7 +441,7 @@ const answerForm = [
       radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
       assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
-      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", correct: "#e3b65b", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
+      colors: { primary: "#7f2f23", secondary: "#6b382e", accent: "#a6422e", background: "#f8f4ee", surface: "#ffffff", surfaceStrong: "#f5eee7", text: "#24120e", textMuted: "#5f473f", border: "#8a6f65", correct: "#166534", success: "#166534", warning: "#92400e", danger: "#b91c1c" },
     },
   },
 ] as const satisfies readonly AnswerFormTemplate[];

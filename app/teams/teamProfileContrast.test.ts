@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const editor = readFileSync("app/teams/TeamProfileEditor.tsx", "utf8");
+const styles = readFileSync("app/globals.css", "utf8");
 
 function luminance(hex: string) {
   const values = hex.match(/[a-f\d]{2}/gi)?.map((value) => Number.parseInt(value, 16) / 255) ?? [];
@@ -18,11 +19,33 @@ function contrast(foreground: string, background: string) {
 }
 
 test("mobile team profile uses explicit light-surface UI colors and interaction states", () => {
+  assert.match(editor, /answer-team-profile/);
+  assert.match(editor, /answer-ui-control/);
+  assert.match(editor, /answer-ui-muted/);
   assert.match(editor, /bg-white[^\n]+text-slate-950/);
   assert.match(editor, /border-slate-500[^\n]+text-slate-950[^\n]+hover:bg-slate-100[^\n]+active:bg-slate-200/);
   assert.match(editor, /focus-visible:ring-2[^\n]+disabled:text-slate-400/);
   assert.match(editor, /role=\{message\.kind === "ERROR" \? "alert" : "status"\}/);
   assert.doesNotMatch(editor, /var\(--(?:quiz|brand)-text\)/);
+});
+
+test("answer form CSS maps LOVD and team profile surfaces to semantic UI tokens", () => {
+  assert.match(
+    styles,
+    /\.answer-template\s*\{[\s\S]*?background:\s*var\(--quiz-ui-background\);[\s\S]*?color:\s*var\(--quiz-ui-text\);/,
+  );
+  assert.match(
+    styles,
+    /\.answer-template\[data-design-style="EDITORIAL"\] \[class\*="text-slate"\][\s\S]*?color:\s*var\(--quiz-ui-text\)\s*!important;/,
+  );
+  assert.doesNotMatch(
+    styles,
+    /\.answer-template\[data-design-style="EDITORIAL"\] \[class\*="text-slate"\][\s\S]{0,160}var\(--brand-text\)/,
+  );
+  assert.match(
+    styles,
+    /\.answer-team-profile \.answer-ui-control\s*\{[\s\S]*?border-color:\s*var\(--quiz-ui-border\)/,
+  );
 });
 
 test("selected team profile colors meet their WCAG contrast targets", () => {

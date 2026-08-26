@@ -44,6 +44,25 @@ export type ResolvedQuizTheme = {
     danger: string;
     focus: string;
   };
+  ui: {
+    background: string;
+    surface: string;
+    surfaceStrong: string;
+    text: string;
+    textMuted: string;
+    border: string;
+    primary: string;
+    primaryText: string;
+    focus: string;
+    success: string;
+    successSurface: string;
+    warning: string;
+    warningSurface: string;
+    danger: string;
+    dangerSurface: string;
+    disabledText: string;
+    disabledSurface: string;
+  };
   appearance: {
     mode: "LIGHT" | "DARK";
     typographyPreset: "BRAND_DISPLAY" | "SYSTEM";
@@ -82,12 +101,81 @@ export type ResolveQuizThemeInput = {
   answerForm: ResolvedTemplate<AnswerFormTemplate>;
 };
 
+function relativeLuminance(color: string) {
+  const match = /^#([0-9a-f]{6})$/i.exec(color);
+  if (!match) return null;
+  const channels = match[1].match(/.{2}/g)?.map((value) => Number.parseInt(value, 16) / 255);
+  if (!channels || channels.length !== 3) return null;
+  return channels
+    .map((channel) =>
+      channel <= 0.04045
+        ? channel / 12.92
+        : ((channel + 0.055) / 1.055) ** 2.4,
+    )
+    .reduce(
+      (sum, channel, index) =>
+        sum + channel * [0.2126, 0.7152, 0.0722][index],
+      0,
+    );
+}
+
+function colorContrast(foreground: string, background: string) {
+  const foregroundLuminance = relativeLuminance(foreground);
+  const backgroundLuminance = relativeLuminance(background);
+  if (foregroundLuminance === null || backgroundLuminance === null) return 0;
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
+  const darker = Math.min(foregroundLuminance, backgroundLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function accessibleColor(
+  candidate: string,
+  background: string,
+  fallbacks: readonly string[],
+  minimumContrast: number,
+) {
+  return [candidate, ...fallbacks].find(
+    (color) => colorContrast(color, background) >= minimumContrast,
+  ) ?? fallbacks.at(-1) ?? candidate;
+}
+
 export function resolveQuizTheme({
   displayName,
   presentation,
   answerForm,
 }: ResolveQuizThemeInput): ResolvedQuizTheme {
   const identityTokens = presentation.template.tokens;
+  const uiTokens = answerForm.template.tokens;
+  const uiText = accessibleColor(
+    uiTokens.colors.text,
+    uiTokens.colors.surface,
+    ["#0f172a", "#ffffff"],
+    4.5,
+  );
+  const uiTextMuted = accessibleColor(
+    uiTokens.colors.textMuted,
+    uiTokens.colors.surface,
+    ["#475569", uiText],
+    4.5,
+  );
+  const uiBorder = accessibleColor(
+    uiTokens.colors.border,
+    uiTokens.colors.surface,
+    ["#64748b", "#334155"],
+    3,
+  );
+  const uiPrimaryText = accessibleColor(
+    "#ffffff",
+    uiTokens.colors.primary,
+    ["#0f172a"],
+    4.5,
+  );
+  const uiFocus = accessibleColor(
+    uiTokens.colors.primary,
+    uiTokens.colors.surface,
+    ["#1d4ed8", "#0f172a"],
+    3,
+  );
   const answerFormIsCompact = answerForm.template.variant === "MINIMAL";
   const assets = resolvePresentationTemplateRuntimeAssets(
     presentation.template,
@@ -124,6 +212,25 @@ export function resolveQuizTheme({
       warning: identityTokens.colors.warning,
       danger: identityTokens.colors.danger,
       focus: identityTokens.colors.primary,
+    },
+    ui: {
+      background: uiTokens.colors.background,
+      surface: uiTokens.colors.surface,
+      surfaceStrong: uiTokens.colors.surfaceStrong,
+      text: uiText,
+      textMuted: uiTextMuted,
+      border: uiBorder,
+      primary: uiTokens.colors.primary,
+      primaryText: uiPrimaryText,
+      focus: uiFocus,
+      success: accessibleColor(uiTokens.colors.success, "#f0fdf4", ["#166534"], 4.5),
+      successSurface: "#f0fdf4",
+      warning: accessibleColor(uiTokens.colors.warning, "#fffbeb", ["#92400e"], 4.5),
+      warningSurface: "#fffbeb",
+      danger: accessibleColor(uiTokens.colors.danger, "#fef2f2", ["#b91c1c"], 4.5),
+      dangerSurface: "#fef2f2",
+      disabledText: "#475569",
+      disabledSurface: "#f1f5f9",
     },
     appearance: {
       mode: presentation.template.variant === "DARK" ? "DARK" : "LIGHT",
@@ -177,6 +284,23 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--quiz-warning": theme.semantic.warning,
     "--quiz-danger": theme.semantic.danger,
     "--quiz-focus": theme.semantic.focus,
+    "--quiz-ui-background": theme.ui.background,
+    "--quiz-ui-surface": theme.ui.surface,
+    "--quiz-ui-surface-strong": theme.ui.surfaceStrong,
+    "--quiz-ui-text": theme.ui.text,
+    "--quiz-ui-text-muted": theme.ui.textMuted,
+    "--quiz-ui-border": theme.ui.border,
+    "--quiz-ui-primary": theme.ui.primary,
+    "--quiz-ui-primary-text": theme.ui.primaryText,
+    "--quiz-ui-focus": theme.ui.focus,
+    "--quiz-ui-success": theme.ui.success,
+    "--quiz-ui-success-surface": theme.ui.successSurface,
+    "--quiz-ui-warning": theme.ui.warning,
+    "--quiz-ui-warning-surface": theme.ui.warningSurface,
+    "--quiz-ui-danger": theme.ui.danger,
+    "--quiz-ui-danger-surface": theme.ui.dangerSurface,
+    "--quiz-ui-disabled-text": theme.ui.disabledText,
+    "--quiz-ui-disabled-surface": theme.ui.disabledSurface,
     "--quiz-radius-small": theme.appearance.radii.small,
     "--quiz-radius-medium": theme.appearance.radii.medium,
     "--quiz-radius-large": theme.appearance.radii.large,
@@ -209,8 +333,6 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--brand-font-family": theme.appearance.fontFamily,
     "--brand-display-weight": theme.appearance.displayWeight,
     "--brand-body-weight": theme.appearance.bodyWeight,
-    backgroundColor: theme.colors.background,
-    color: theme.colors.text,
     fontFamily: theme.appearance.fontFamily,
   };
 

@@ -5,6 +5,7 @@ import {
   resolveAnswerFormTemplate,
   resolvePresentationTemplate,
 } from "../templateResolver";
+import { contrastRatio } from "../presentationTemplates/presentationTemplate";
 import { quizThemeStyle, resolveQuizTheme } from "./quizTheme";
 
 function createTheme(
@@ -64,5 +65,39 @@ test("theme style exposes quiz variables and compatibility aliases", () => {
   assert.equal(style["--quiz-danger"], theme.semantic.danger);
   assert.equal(style["--brand-primary"], theme.colors.primary);
   assert.equal(style["--brand-correct"], theme.semantic.correct);
+  assert.equal(style["--quiz-ui-text"], theme.ui.text);
+  assert.equal(style["--quiz-ui-primary"], theme.ui.primary);
   assert.equal(style.fontFamily, theme.appearance.fontFamily);
+});
+
+test("answer forms resolve an accessible UI palette independently of presentation colors", () => {
+  for (const templateId of ["lovd-ungegoogelt", "ungegoogelt-default"]) {
+    const theme = createTheme(templateId, templateId);
+
+    if (templateId === "lovd-ungegoogelt") {
+      assert.equal(theme.colors.background, "#74291d");
+      assert.equal(theme.colors.text, "#f6efe4");
+      assert.equal(theme.ui.background, "#f8f4ee");
+      assert.equal(theme.ui.text, "#24120e");
+    }
+
+    const checks = [
+      ["main text", theme.ui.text, theme.ui.surface, 4.5],
+      ["muted text", theme.ui.textMuted, theme.ui.surface, 4.5],
+      ["control border", theme.ui.border, theme.ui.surface, 3],
+      ["primary button", theme.ui.primaryText, theme.ui.primary, 4.5],
+      ["focus indicator", theme.ui.focus, theme.ui.surface, 3],
+      ["success", theme.ui.success, theme.ui.successSurface, 4.5],
+      ["warning", theme.ui.warning, theme.ui.warningSurface, 4.5],
+      ["danger", theme.ui.danger, theme.ui.dangerSurface, 4.5],
+      ["disabled", theme.ui.disabledText, theme.ui.disabledSurface, 3],
+    ] as const;
+
+    for (const [label, foreground, background, minimum] of checks) {
+      assert.ok(
+        contrastRatio(foreground, background) >= minimum,
+        `${templateId}: ${label}`,
+      );
+    }
+  }
 });
