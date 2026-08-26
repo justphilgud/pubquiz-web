@@ -48,7 +48,12 @@ import {
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
-import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
+import {
+  isPollQuestionTemplateId,
+  questionTemplateIds,
+  resolveCanonicalQuestionTemplateId,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
@@ -99,6 +104,7 @@ type PresentationSlideSharedDisplayState = {
   playbackCommandId: number;
   pixelState?: PixelLiveState | null;
   pollState?: PollLiveState | null;
+  liveResultState?: LiveChoiceResultState | null;
   funnyAnswers?: FunnyAnswerEntry[];
   teamJoinState?: {
     teams: {
@@ -268,6 +274,7 @@ export default function PresentationSlideRenderer({
     playbackCommandId,
     pixelState = null,
     pollState = null,
+    liveResultState = null,
     funnyAnswers = [],
     teamJoinState = null,
   } = displayState;
@@ -575,6 +582,44 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const faceMorphMedium = frage.medien.find(
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));
+
+  if (liveResultState?.visible) {
+    return (
+      <section
+        data-live-result-kind="choice"
+        className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-8 text-[var(--quiz-text)]"
+      >
+        <div className="flex items-start justify-between gap-8">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--quiz-text-muted)]">Live-Ergebnis</p>
+            <h2 className="mt-3 text-4xl font-bold leading-tight xl:text-5xl">{frage.frage}</h2>
+          </div>
+          <p className="shrink-0 rounded-full border border-[var(--quiz-border)] px-4 py-2 font-semibold">
+            {liveResultState.finalAnswers} / {liveResultState.totalTeams} Teams
+          </p>
+        </div>
+        <div className="mt-8 grid min-h-0 flex-1 content-center gap-5 overflow-hidden">
+          {liveResultState.options.map((entry) => (
+            <div key={entry.id}>
+              <div className="mb-2 flex items-end justify-between gap-6">
+                <strong className="truncate text-2xl">{entry.label}</strong>
+                <span className="shrink-0 text-xl font-bold">{entry.count} · {entry.share.toLocaleString("de-DE", { maximumFractionDigits: 1 })} %</span>
+              </div>
+              <div className="h-8 overflow-hidden rounded-full border border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)]">
+                <div className="h-full rounded-full bg-[var(--quiz-primary)] transition-[width] duration-500" style={{ width: `${entry.share}%` }} />
+              </div>
+            </div>
+          ))}
+          {liveResultState.scale && (
+            <div className="grid grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-[var(--quiz-border)] p-5 text-center"><span className="block text-sm text-[var(--quiz-text-muted)]">Durchschnitt</span><strong className="text-5xl">{liveResultState.scale.average?.toLocaleString("de-DE", { maximumFractionDigits: 2 }) ?? "–"}</strong></div>
+              <div className="rounded-2xl border border-[var(--quiz-border)] p-5 text-center"><span className="block text-sm text-[var(--quiz-text-muted)]">Antworten</span><strong className="text-5xl">{liveResultState.scale.values.reduce((sum, entry) => sum + entry.count, 0)}</strong></div>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   if (theme.design.stylePreset === "BIRTHDAY" && storybookKind && !isFaceMorph) {
     const audioMedium = frage.medien.find((medium) => isAudio(medium.datei));

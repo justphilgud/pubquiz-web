@@ -106,6 +106,7 @@ import {
 } from "./orderingQuestionOrder";
 import {
   closeBlockInteractions,
+  closeCurrentInteraction,
   getQuizLiveSnapshotData,
   saveTeamAnswerDraft,
   syncInteractionForPresentation,
@@ -2973,6 +2974,55 @@ export async function getQuizAntwortStatusLive(
 ) {
   return getQuizAntwortStatus(quizId, quizTeamSessionToken);
 }
+
+export async function setQuizLiveResultVisibility(data: {
+  quizId: number;
+  quizFragenId: number;
+  visible: boolean;
+}) {
+  await requireQuizLiveController(data.quizId);
+  const run = await prisma.quiz_interaction_runs.findFirst({
+    where: {
+      quiz_id: data.quizId,
+      quiz_fragen_id: data.quizFragenId,
+      is_current: true,
+      quiz_fragen: { ergebnisdarstellung: "LIVE" },
+    },
+    select: { interaction_run_id: true },
+  });
+  if (!run) throw new Error("Für diese Frage ist kein Live-Ergebnis aktiv.");
+
+  await prisma.quiz_interaction_runs.update({
+    where: { interaction_run_id: run.interaction_run_id },
+    data: {
+      live_results_visible: data.visible,
+      revision: { increment: 1 },
+    },
+  });
+  revalidatePath(`/quiz/${data.quizId}/moderation`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
+}
+
+export async function closeQuizQuestionAnswerPhase(data: {
+  quizId: number;
+  quizFragenId: number;
+}) {
+  await requireQuizLiveController(data.quizId);
+  const run = await prisma.quiz_interaction_runs.findFirst({
+    where: {
+      quiz_id: data.quizId,
+      quiz_fragen_id: data.quizFragenId,
+      is_current: true,
+      quiz_fragen: { ergebnisdarstellung: "LIVE" },
+    },
+    select: { interaction_run_id: true },
+  });
+  if (!run) throw new Error("Für diese Frage ist keine Antwortphase aktiv.");
+  await prisma.$transaction((tx) => closeCurrentInteraction(tx, data.quizId));
+  revalidatePath(`/quiz/${data.quizId}/moderation`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
+}
+
 export async function getQuizLiveSnapshot(
   quizId: number,
   quizTeamSessionToken?: string,

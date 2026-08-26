@@ -11,6 +11,8 @@ import {
   getQuizPunktestand,
   getPresentationFunnyAnswers,
   getZufaelligeSchaetzfrage,
+  setQuizLiveResultVisibility,
+  closeQuizQuestionAnswerPhase,
 } from "../../actions";
 import {
   buildPraesentationSlides,
@@ -51,6 +53,7 @@ import {
 } from "@/app/quiz/flow/quizFlow";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
+import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
@@ -121,6 +124,8 @@ export default function ModerationClient({
   const [now, setNow] = useState(() => Date.now());
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
+  const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | null>(null);
+  const [liveResultPending, setLiveResultPending] = useState(false);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
     () => new Set(
@@ -306,6 +311,7 @@ export default function ModerationClient({
       if (active) {
         setPixelState(snapshot.pixelState);
         setPollState(snapshot.pollState);
+        setLiveResultState(snapshot.liveResultState);
         setTeamJoinState(snapshot.teamJoinState);
         setBlockFreigegeben(Boolean(
           snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
@@ -698,6 +704,34 @@ export default function ModerationClient({
     };
   }, [aktualisiereAntwortStatus]);
 
+  async function toggleLiveResults() {
+    if (aktuellerSlide?.typ !== "frage" || !liveResultState) return;
+    setLiveResultPending(true);
+    try {
+      await setQuizLiveResultVisibility({
+        quizId,
+        quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
+        visible: !liveResultState.visible,
+      });
+      setLiveResultState({ ...liveResultState, visible: !liveResultState.visible });
+    } finally {
+      setLiveResultPending(false);
+    }
+  }
+
+  async function closeLiveAnswerPhase() {
+    if (aktuellerSlide?.typ !== "frage" || !liveResultState) return;
+    setLiveResultPending(true);
+    try {
+      await closeQuizQuestionAnswerPhase({
+        quizId,
+        quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
+      });
+    } finally {
+      setLiveResultPending(false);
+    }
+  }
+
   useModerationHotkeys({
     hatMedien,
     hatAudio,
@@ -774,6 +808,7 @@ export default function ModerationClient({
               now={now}
               pixelState={pixelState}
               pollState={pollState}
+              liveResultState={liveResultState}
               teamJoinState={teamJoinState}
               funnyAnswers={funnyAnswers}
             />
@@ -784,6 +819,25 @@ export default function ModerationClient({
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button type="button" onClick={showFunnyAnswers} className="min-h-11 rounded-xl bg-pink-600 px-4 py-2 font-bold text-white">Falsch aber lustig anzeigen</button>
                   <button type="button" onClick={skipFunnyAnswers} className="min-h-11 rounded-xl border border-zinc-600 px-4 py-2 font-bold">Direkt zur Auflösung</button>
+                </div>
+              </section>
+            )}
+
+            {aktuellerSlide?.typ === "frage" && liveResultState && (
+              <section className="rounded-2xl border border-cyan-500/50 bg-cyan-950/30 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="font-bold">Live-Ergebnis</h2>
+                    <p className="text-sm text-zinc-300">{liveResultState.finalAnswers} / {liveResultState.totalTeams} finale Antworten · {liveResultState.state === "OPEN" ? "Antwortphase offen" : "Antwortphase geschlossen"}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveResults()} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
+                      {liveResultState.visible ? "Zurück zur Frage" : "Live-Ergebnis zeigen"}
+                    </button>
+                    {(liveResultState.state === "OPEN" || liveResultState.state === "COUNTDOWN") && (
+                      <button type="button" disabled={liveResultPending} onClick={() => void closeLiveAnswerPhase()} className="min-h-11 rounded-xl border border-zinc-600 px-4 py-2 font-bold disabled:opacity-50">Antwortphase schließen</button>
+                    )}
+                  </div>
                 </div>
               </section>
             )}

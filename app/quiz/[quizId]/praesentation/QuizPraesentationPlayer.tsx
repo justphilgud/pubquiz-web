@@ -6,6 +6,7 @@ import type { QuizPraesentationResult } from "../../actions";
 import { getPresentationFunnyAnswers, getQuizLiveSnapshot, getSchaetzfrageById } from "../../actions";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
+import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import {
   getPraesentationAudienceZwischenstand,
   getPraesentationPunktestand,
@@ -66,6 +67,7 @@ export default function QuizPraesentationPlayer({
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
+  const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | null>(null);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
     () => new Set(
@@ -159,6 +161,7 @@ export default function QuizPraesentationPlayer({
         setSyncError(false);
         setPixelState(interactionSnapshot.pixelState);
         setPollState(interactionSnapshot.pollState);
+        setLiveResultState(interactionSnapshot.liveResultState);
         setTeamJoinState(interactionSnapshot.teamJoinState);
         serverClockOffsetRef.current =
           new Date(interactionSnapshot.serverNow).getTime() - Date.now();
@@ -290,6 +293,7 @@ export default function QuizPraesentationPlayer({
             playbackCommandId: liveState.playbackCommandId,
             pixelState,
             pollState,
+            liveResultState,
             teamJoinState,
             funnyAnswers,
           }}

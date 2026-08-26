@@ -14,6 +14,7 @@ import {
 } from "../moderationPreviewLayout";
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
+import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
@@ -49,6 +50,7 @@ type Props = {
   now: number;
   pixelState: PixelLiveState | null;
   pollState: PollLiveState | null;
+  liveResultState: LiveChoiceResultState | null;
   teamJoinState: {
     teams: {
       teamId: number;
@@ -80,6 +82,7 @@ export default function CurrentSlidePanel({
   now,
   pixelState,
   pollState,
+  liveResultState,
   teamJoinState,
   funnyAnswers,
 }: Props) {
@@ -174,6 +177,7 @@ export default function CurrentSlidePanel({
                 playbackCommandId,
                 pixelState,
                 pollState,
+                liveResultState,
                 teamJoinState,
                 funnyAnswers,
               }}

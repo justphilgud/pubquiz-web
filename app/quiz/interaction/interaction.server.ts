@@ -47,6 +47,10 @@ import {
   isPollInteractionType,
   type PollInteraction,
 } from "./pollInteraction";
+import {
+  aggregateLiveChoiceResults,
+  isLiveChoiceInteraction,
+} from "@/app/quiz/liveResults/liveChoiceResults";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -1139,6 +1143,7 @@ export async function getQuizLiveSnapshotData(
             quiz_fragen_id: true,
             fragen_id: true,
             quiz_abschnitt_id: true,
+            ergebnisdarstellung: true,
           },
         },
       },
@@ -1164,14 +1169,20 @@ export async function getQuizLiveSnapshotData(
     );
     run = await runQuery();
   }
-  const pollInteraction = run && isPollInteractionType(run.interaction_type)
-    ? readInteractionSnapshot(run.config_snapshot) as PollInteraction
+  const interaction = run ? readInteractionSnapshot(run.config_snapshot) : null;
+  const pollInteraction = interaction && isPollInteractionType(interaction.type)
+    ? interaction as PollInteraction
+    : null;
+  const liveChoiceInteraction = interaction &&
+      run?.quiz_fragen?.ergebnisdarstellung === "LIVE" &&
+      isLiveChoiceInteraction(interaction)
+    ? interaction
     : null;
   const needsTeamCount = Boolean(
     options.includeTeamJoinState ||
-    (options.includePresentationState && pollInteraction),
+    (options.includePresentationState && (pollInteraction || liveChoiceInteraction)),
   );
-  const [teamCount, visibleTeams, pollSubmissions] = options.includePresentationState
+  const [teamCount, visibleTeams, liveSubmissions] = options.includePresentationState
     ? await Promise.all([
         needsTeamCount
           ? prisma.quiz_team_sessions.count({ where: { quiz_id: quizId } })
@@ -1197,7 +1208,7 @@ export async function getQuizLiveSnapshotData(
               },
             })
           : Promise.resolve([]),
-        pollInteraction
+        pollInteraction || liveChoiceInteraction
           ? prisma.team_answer_submissions.findMany({
               where: { interaction_run_id: run!.interaction_run_id },
               orderBy: [
@@ -1210,7 +1221,7 @@ export async function getQuizLiveSnapshotData(
           : Promise.resolve([]),
       ])
     : [0, [], []];
-  const latestPollPayloads = pollSubmissions.filter(
+  const latestLivePayloads = liveSubmissions.filter(
     (submission, index, submissions) =>
       submissions.findIndex(
         (candidate) =>
@@ -1364,7 +1375,17 @@ export async function getQuizLiveSnapshotData(
             interaction: pollInteraction,
             state: run!.state,
             totalTeams: teamCount,
-            payloads: latestPollPayloads,
+            payloads: latestLivePayloads,
+          })
+        : null,
+    liveResultState:
+      run && liveChoiceInteraction
+        ? aggregateLiveChoiceResults({
+            interaction: liveChoiceInteraction,
+            visible: run.live_results_visible,
+            state: run.state,
+            totalTeams: teamCount,
+            payloads: latestLivePayloads,
           })
         : null,
     pixelState: run && pixelConfig && pixelStage
