@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   "/api/auth",
   "/api/quiz/team-live-snapshot",
   "/api/team-profile-photo",
+  "/frage-einreichen",
 ];
 
 function isPublicPath(pathname: string) {

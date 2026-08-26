@@ -400,6 +400,8 @@ export const ModelName = {
   antworten: 'antworten',
   antworttyp: 'antworttyp',
   fragen: 'fragen',
+  public_question_submissions: 'public_question_submissions',
+  public_question_rate_limits: 'public_question_rate_limits',
   fragen_relationen: 'fragen_relationen',
   fragen_kategorien: 'fragen_kategorien',
   fragenkategorie: 'fragenkategorie',
@@ -449,7 +451,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -672,6 +674,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.fragenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.FragenCountAggregateOutputType> | number
+        }
+      }
+    }
+    public_question_submissions: {
+      payload: Prisma.$public_question_submissionsPayload<ExtArgs>
+      fields: Prisma.public_question_submissionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.public_question_submissionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.public_question_submissionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>
+        }
+        findFirst: {
+          args: Prisma.public_question_submissionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.public_question_submissionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>
+        }
+        findMany: {
+          args: Prisma.public_question_submissionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>[]
+        }
+        create: {
+          args: Prisma.public_question_submissionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>
+        }
+        createMany: {
+          args: Prisma.public_question_submissionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.public_question_submissionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>[]
+        }
+        delete: {
+          args: Prisma.public_question_submissionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>
+        }
+        update: {
+          args: Prisma.public_question_submissionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.public_question_submissionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.public_question_submissionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.public_question_submissionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.public_question_submissionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_submissionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Public_question_submissionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePublic_question_submissions>
+        }
+        groupBy: {
+          args: Prisma.public_question_submissionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Public_question_submissionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.public_question_submissionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Public_question_submissionsCountAggregateOutputType> | number
+        }
+      }
+    }
+    public_question_rate_limits: {
+      payload: Prisma.$public_question_rate_limitsPayload<ExtArgs>
+      fields: Prisma.public_question_rate_limitsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.public_question_rate_limitsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.public_question_rate_limitsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>
+        }
+        findFirst: {
+          args: Prisma.public_question_rate_limitsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.public_question_rate_limitsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>
+        }
+        findMany: {
+          args: Prisma.public_question_rate_limitsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>[]
+        }
+        create: {
+          args: Prisma.public_question_rate_limitsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>
+        }
+        createMany: {
+          args: Prisma.public_question_rate_limitsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.public_question_rate_limitsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>[]
+        }
+        delete: {
+          args: Prisma.public_question_rate_limitsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>
+        }
+        update: {
+          args: Prisma.public_question_rate_limitsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>
+        }
+        deleteMany: {
+          args: Prisma.public_question_rate_limitsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.public_question_rate_limitsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.public_question_rate_limitsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>[]
+        }
+        upsert: {
+          args: Prisma.public_question_rate_limitsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_question_rate_limitsPayload>
+        }
+        aggregate: {
+          args: Prisma.Public_question_rate_limitsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePublic_question_rate_limits>
+        }
+        groupBy: {
+          args: Prisma.public_question_rate_limitsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Public_question_rate_limitsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.public_question_rate_limitsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Public_question_rate_limitsCountAggregateOutputType> | number
         }
       }
     }
@@ -3288,6 +3438,28 @@ export const FragenScalarFieldEnum = {
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
 
 
+export const Public_question_submissionsScalarFieldEnum = {
+  public_submission_id: 'public_submission_id',
+  fragen_id: 'fragen_id',
+  submitter_name: 'submitter_name',
+  submitter_email: 'submitter_email',
+  created_at: 'created_at'
+} as const
+
+export type Public_question_submissionsScalarFieldEnum = (typeof Public_question_submissionsScalarFieldEnum)[keyof typeof Public_question_submissionsScalarFieldEnum]
+
+
+export const Public_question_rate_limitsScalarFieldEnum = {
+  rate_limit_id: 'rate_limit_id',
+  request_fingerprint: 'request_fingerprint',
+  window_start: 'window_start',
+  request_count: 'request_count',
+  updated_at: 'updated_at'
+} as const
+
+export type Public_question_rate_limitsScalarFieldEnum = (typeof Public_question_rate_limitsScalarFieldEnum)[keyof typeof Public_question_rate_limitsScalarFieldEnum]
+
+
 export const Fragen_relationenScalarFieldEnum = {
   fragen_relation_id: 'fragen_relation_id',
   quell_fragen_id: 'quell_fragen_id',
@@ -4361,6 +4533,8 @@ export type GlobalOmitConfig = {
   antworten?: Prisma.antwortenOmit
   antworttyp?: Prisma.antworttypOmit
   fragen?: Prisma.fragenOmit
+  public_question_submissions?: Prisma.public_question_submissionsOmit
+  public_question_rate_limits?: Prisma.public_question_rate_limitsOmit
   fragen_relationen?: Prisma.fragen_relationenOmit
   fragen_kategorien?: Prisma.fragen_kategorienOmit
   fragenkategorie?: Prisma.fragenkategorieOmit

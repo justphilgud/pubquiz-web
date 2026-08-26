@@ -40,6 +40,9 @@ export function ReviewQueue({ entries }: { entries: ReviewQueueEntry[] }) {
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <QuestionStatusBadge status="IN_REVIEW" />
+                    {entry.origin === "PUBLIC" && (
+                      <Badge>Öffentlich eingereicht</Badge>
+                    )}
                     {!entry.source && <QualityWarningBadge>Quelle fehlt</QualityWarningBadge>}
                     {entry.categories.length === 0 && (
                       <QualityWarningBadge>Keine Kategorie</QualityWarningBadge>

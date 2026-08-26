@@ -33,6 +33,16 @@ export type antworttyp = Prisma.antworttypModel
  */
 export type fragen = Prisma.fragenModel
 /**
+ * Model public_question_submissions
+ *
+ */
+export type public_question_submissions = Prisma.public_question_submissionsModel
+/**
+ * Model public_question_rate_limits
+ *
+ */
+export type public_question_rate_limits = Prisma.public_question_rate_limitsModel
+/**
  * Model fragen_relationen
  *
  */

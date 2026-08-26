@@ -425,6 +425,11 @@ export type QuestionEditorRecord = {
   isArchived: boolean;
   scope: "GLOBAL" | "EVENT_SERIES";
   eventSeriesNames: string[];
+  publicSubmission?: {
+    origin: "PUBLIC";
+    submittedAt: string;
+    contact: { name: string | null; email: string | null } | null;
+  } | null;
 };
 
 export type QuestionValidationTarget =

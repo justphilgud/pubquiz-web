@@ -40,6 +40,11 @@ export function QuestionReviewPanel({
             status={record.reviewStatus}
             labels={messages.review.statuses}
           />
+          {record.publicSubmission?.origin === "PUBLIC" && (
+            <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold text-violet-800">
+              Öffentlich eingereicht
+            </span>
+          )}
         </div>
 
           <dl className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
@@ -82,6 +87,20 @@ export function QuestionReviewPanel({
               <div>
                 <dt className="font-medium text-slate-800">{messages.review.template}</dt>
                 <dd>{record.templateName}</dd>
+              </div>
+            )}
+            {record.publicSubmission?.contact && (
+              <div className="sm:col-span-2 rounded-xl border border-violet-200 bg-violet-50 p-3">
+                <dt className="font-medium text-violet-950">Kontakt für Rückfragen</dt>
+                <dd className="mt-1 text-violet-900">
+                  {record.publicSubmission.contact.name || "Kein Name"}
+                  {record.publicSubmission.contact.email
+                    ? ` · ${record.publicSubmission.contact.email}`
+                    : " · Keine E-Mail-Adresse"}
+                </dd>
+                <p className="mt-1 text-xs text-violet-800">
+                  Nur für berechtigte Administratoren sichtbar. Nicht veröffentlichen.
+                </p>
               </div>
             )}
           </dl>

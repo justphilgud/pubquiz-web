@@ -54,6 +54,8 @@ export const ModelName = {
   antworten: 'antworten',
   antworttyp: 'antworttyp',
   fragen: 'fragen',
+  public_question_submissions: 'public_question_submissions',
+  public_question_rate_limits: 'public_question_rate_limits',
   fragen_relationen: 'fragen_relationen',
   fragen_kategorien: 'fragen_kategorien',
   fragenkategorie: 'fragenkategorie',
@@ -162,6 +164,28 @@ export const FragenScalarFieldEnum = {
 } as const
 
 export type FragenScalarFieldEnum = (typeof FragenScalarFieldEnum)[keyof typeof FragenScalarFieldEnum]
+
+
+export const Public_question_submissionsScalarFieldEnum = {
+  public_submission_id: 'public_submission_id',
+  fragen_id: 'fragen_id',
+  submitter_name: 'submitter_name',
+  submitter_email: 'submitter_email',
+  created_at: 'created_at'
+} as const
+
+export type Public_question_submissionsScalarFieldEnum = (typeof Public_question_submissionsScalarFieldEnum)[keyof typeof Public_question_submissionsScalarFieldEnum]
+
+
+export const Public_question_rate_limitsScalarFieldEnum = {
+  rate_limit_id: 'rate_limit_id',
+  request_fingerprint: 'request_fingerprint',
+  window_start: 'window_start',
+  request_count: 'request_count',
+  updated_at: 'updated_at'
+} as const
+
+export type Public_question_rate_limitsScalarFieldEnum = (typeof Public_question_rate_limitsScalarFieldEnum)[keyof typeof Public_question_rate_limitsScalarFieldEnum]
 
 
 export const Fragen_relationenScalarFieldEnum = {

@@ -19,6 +19,7 @@ import {
 } from "../questionScopePolicy";
 import { canEditGlobalQuestions, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { resolveGooglePlacesFeature } from "../googlePlacesFeature";
+import { loadPublicQuestionSubmissionReviewMetadata } from "@/app/frage-einreichen/publicQuestionSubmissionReview.server";
 import QuestionStoryElementPanel from "@/app/story-elemente/QuestionStoryElementPanel";
 import { loadQuestionStoryElementPanel } from "@/app/story-elemente/questionStoryElements.server";
 import { getStoryElementEditorOptions } from "@/app/story-elemente/storyElementRepository.server";
@@ -36,8 +37,9 @@ export default async function ExistingQuestionEditorPage({
   }
 
   const session = await requireQuestionEditor();
+  const actor = await getQuestionActor(session);
   const { locale, messages } = getQuestionEditorMessages(getDefaultLocale());
-  const [loadedQuestion, categories, actor, eventSeries] = await Promise.all([
+  const [loadedQuestion, categories, eventSeries, publicSubmission] = await Promise.all([
     loadQuestionForEditor(questionId),
     prisma.fragenkategorie.findMany({
       where: {
@@ -57,8 +59,8 @@ export default async function ExistingQuestionEditorPage({
         status: true,
       },
     }),
-    getQuestionActor(session),
     getAssignableQuestionEventSeries(session),
+    loadPublicQuestionSubmissionReviewMetadata(questionId, isAdministrator(actor)),
   ]);
 
   if (
@@ -110,7 +112,7 @@ export default async function ExistingQuestionEditorPage({
       messages={messages}
       templates={[...baseTemplates, ...dynamicTemplates]}
       initialDraft={loadedQuestion.draft}
-      questionRecord={loadedQuestion.record}
+      questionRecord={{ ...loadedQuestion.record, publicSubmission }}
       categories={categories.map((category) => ({
         id: category.fragenkategorie_id,
         name: category.kategorie,

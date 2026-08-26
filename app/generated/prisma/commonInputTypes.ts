@@ -1238,5 +1238,3 @@ export type NestedEnumEventSeriesRoleWithAggregatesFilter<$PrismaModel = never> 
   _min?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumEventSeriesRoleFilter<$PrismaModel>
 }
-
-

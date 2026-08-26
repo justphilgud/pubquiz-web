@@ -81,12 +81,37 @@ model fragen {
   geltungsbereich              QuestionScope            @default(GLOBAL)
   eventreihen                  fragen_eventreihen[]
   story_element_verknuepfungen frage_story_elemente[]
+  public_submission             public_question_submissions?
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
   @@index([source_vorlage_id], map: "idx_fragen_source_vorlage")
   @@index([gueltig_bis, ist_archiviert], map: "idx_fragen_gueltig_bis")
   @@index([pruefen_ab, ist_archiviert], map: "idx_fragen_pruefen_ab")
+  @@schema("pubquiz")
+}
+
+model public_question_submissions {
+  public_submission_id Int      @id @default(autoincrement())
+  fragen_id             Int      @unique(map: "uq_public_question_submissions_fragen_id")
+  submitter_name        String?  @db.VarChar(120)
+  submitter_email       String?  @db.VarChar(254)
+  created_at            DateTime @default(now())
+  frage                 fragen   @relation(fields: [fragen_id], references: [fragen_id], onDelete: Cascade)
+
+  @@index([created_at], map: "idx_public_question_submissions_created_at")
+  @@schema("pubquiz")
+}
+
+model public_question_rate_limits {
+  rate_limit_id       Int      @id @default(autoincrement())
+  request_fingerprint String   @db.VarChar(64)
+  window_start        DateTime
+  request_count       Int      @default(0)
+  updated_at          DateTime @default(now()) @updatedAt
+
+  @@unique([request_fingerprint, window_start], map: "uq_public_question_rate_limit_window")
+  @@index([updated_at], map: "idx_public_question_rate_limits_updated_at")
   @@schema("pubquiz")
 }
 

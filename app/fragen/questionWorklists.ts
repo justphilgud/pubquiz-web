@@ -99,6 +99,7 @@ export type ReviewQueueEntry = {
   creatorName: string;
   submittedAt: Date | null;
   categories: string[];
+  origin: "PUBLIC" | "EDITORIAL";
 };
 
 export async function loadReviewQueue(managedEventSeriesIds: number[] | null): Promise<ReviewQueueEntry[]> {
@@ -124,6 +125,7 @@ export async function loadReviewQueue(managedEventSeriesIds: number[] | null): P
       quelle: true,
       created_by_user_id: true,
       submitted_at: true,
+      public_submission: { select: { public_submission_id: true } },
       fragen_kategorien: {
         select: {
           fragenkategorie: { select: { kategorie: true } },
@@ -156,13 +158,16 @@ export async function loadReviewQueue(managedEventSeriesIds: number[] | null): P
     text: question.frage,
     source: question.quelle?.trim() || null,
     creatorName:
-      (question.created_by_user_id !== null
+      question.public_submission
+        ? "Öffentlich eingereicht"
+        : (question.created_by_user_id !== null
         ? creatorNames.get(question.created_by_user_id)
         : null) ?? "Unbekannt",
     submittedAt: question.submitted_at,
     categories: question.fragen_kategorien.map(
       ({ fragenkategorie }) => fragenkategorie.kategorie,
     ),
+    origin: question.public_submission ? "PUBLIC" : "EDITORIAL",
   }));
 }
 

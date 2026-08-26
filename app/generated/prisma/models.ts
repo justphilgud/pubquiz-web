@@ -11,6 +11,8 @@
 export type * from './models/antworten'
 export type * from './models/antworttyp'
 export type * from './models/fragen'
+export type * from './models/public_question_submissions'
+export type * from './models/public_question_rate_limits'
 export type * from './models/fragen_relationen'
 export type * from './models/fragen_kategorien'
 export type * from './models/fragenkategorie'
