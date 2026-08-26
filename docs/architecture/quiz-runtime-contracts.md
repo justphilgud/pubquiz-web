@@ -142,17 +142,20 @@ gleichgesetzt werden.
 
 | Zustand | Darstellung |
 | --- | --- |
+| Für die Quizfrage existiert noch kein Interaction Run | Status `NOT_PLAYED`; weder unbeantwortet noch falsch, keine vorläufige Nullbewertung. |
 | Effektive Submission vorhanden, Evaluation fehlt oder ist unvollständig | Antwort sichtbar, Status `PENDING`, nicht unbeantwortet; Punkte gegebenenfalls vorläufig. |
-| Keine effektive Submission | Status `UNANSWERED`. |
+| Interaction Run vorhanden, aber keine effektive Submission | Status `UNANSWERED`. |
 | Submission und vollständige Evaluation | Persistierter Bewertungsstatus und vergebene Punkte. |
 
 ### Quizweite Sicht und Filter
 
 Die Auswertung ist kumulativ über das ganze Quiz. Ergebnisse aus früheren
-Blöcken bleiben nach späteren Blöcken vorhanden. Die Standardansicht startet
-mit allen Teams, Fragen und Antworten; es ist kein versteckter Filter aktiv.
-Filter wie „nur falsche Antworten“ sind explizite Benutzerentscheidungen und
-verändern nur die Darstellung, niemals den zugrunde liegenden Evaluation-Stand.
+Blöcken bleiben nach späteren Blöcken vorhanden. Der Scope „Bisher gespielt“
+ist die Standardansicht und umfasst jede Quizfrage, für die mindestens ein
+Interaction Run gestartet wurde – unabhängig davon, ob ein Team geantwortet
+hat. „Alle Fragen“ und ein bewusst gewählter Block zeigen auch zukünftige
+Fragen mit `NOT_PLAYED`. Scope- und Statusfilter verändern nur die Darstellung,
+niemals Evaluation, Backfill, Punktestand oder Persistenz.
 
 ### Backfill und Neuberechnung
 
@@ -167,9 +170,9 @@ neu berechnet werden.
 
 | Testdatei | Geschützte Invariante |
 | --- | --- |
-| `app/quiz/evaluation/evaluationReadModel.test.ts` | `PENDING` mit Submission bleibt von `UNANSWERED` ohne Submission unterscheidbar. |
-| `app/quiz/evaluation/evaluationMatrix.test.ts` | Pending-Antworten bleiben sichtbar; Statuszellen und Ranking werden aus demselben quizweiten Datenbestand aufgebaut. |
-| `app/quiz/evaluation/evaluationAnswerFilter.test.ts` | Standardfilter erhält Antworten aller Blöcke und Teams; optionale Filter sind explizit. |
+| `app/quiz/evaluation/evaluationReadModel.test.ts` | `NOT_PLAYED`, `UNANSWERED` und `PENDING` bleiben anhand von Interaction Run, Submission und Evaluation unterscheidbar. |
+| `app/quiz/evaluation/evaluationMatrix.test.ts` | Played-, All- und Block-Scope erhalten den quizweiten Datenbestand; zukünftige Zellen bleiben `NOT_PLAYED`. |
+| `app/quiz/evaluation/evaluationAnswerFilter.test.ts` | Standardfilter umfasst alle bereits gespielten Blöcke; All- und Blockfilter sind explizit. |
 | `app/quiz/evaluation/evaluationMatrixDisplay.test.tsx` | Matrixfilter verändern nur die sichtbare Fragenmenge, nicht die Matrixdaten. |
 | `app/quiz/evaluation/evaluationLifecycle.test.ts` | Persistierte Ergebnisse, vorläufiger Zustand, autorisierte Neuberechnung und Erhalt manueller Overrides. |
 | `app/quiz/evaluation/evaluationBackfillPolicy.test.ts` | Begrenzte, wiederaufnehmbare und idempotente Backfill-Batches verarbeiten offene Bewertungen. |
@@ -284,7 +287,9 @@ steuert anschließend auch öffentliche Feeds.
 
 ### Teamidentität nach Audience und Phase
 
-Rankingdaten dürfen die globale Teamidentität transportieren; der Renderer entscheidet anhand der Audience und der fachlichen Phase, ob sie sichtbar wird:
+Audience und Moderation verwenden getrennte Ranking-Read-Models. Der öffentliche
+Zwischenstand lädt ausschließlich Rang und Punkte; Teamidentität erreicht diese
+Datengrenze nicht. Das Moderationsmodell darf die globale Teamidentität tragen:
 
 | Zustand | Öffentliche Präsentation | Moderationsansicht |
 | --- | --- | --- |
@@ -316,7 +321,9 @@ Fragephase. Die strukturierten Felder `Person A` und `Person B` gehören zum
 Team-Antwortformular und werden nicht als Eingabekarten in der Präsentation
 gerendert. Die Auflösung kombiniert das Morph-Bild mit den gepflegten Lösungen
 beider Antwortfelder. Presentation-View-Model und Answer-Interaction bleiben
-damit fachlich getrennt.
+damit fachlich getrennt. Der zentrale Layout-Resolver trägt dafür die explizite
+Presentation-Rolle `FACE_MORPH`; der Renderer leitet sie nicht erneut aus der
+generischen Feldanzahl ab.
 
 ### Funny-Reveal
 
