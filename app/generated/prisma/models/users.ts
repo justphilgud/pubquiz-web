@@ -269,6 +269,9 @@ export type usersWhereInput = {
   erstellte_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
   bewertete_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
   aktualitaet_gepruefte_fragen?: Prisma.FragenListRelationFilter
+  moderierte_live_text_antworten?: Prisma.Live_text_response_publicationsListRelationFilter
+  erstellte_text_ersatzregeln?: Prisma.Public_text_replacement_rulesListRelationFilter
+  aktualisierte_text_ersatzregeln?: Prisma.Public_text_replacement_rulesListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -295,6 +298,9 @@ export type usersOrderByWithRelationInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenOrderByRelationAggregateInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenOrderByRelationAggregateInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenOrderByRelationAggregateInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsOrderByRelationAggregateInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesOrderByRelationAggregateInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -324,6 +330,9 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   erstellte_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
   bewertete_fragevorlagen?: Prisma.Frage_vorlagenListRelationFilter
   aktualitaet_gepruefte_fragen?: Prisma.FragenListRelationFilter
+  moderierte_live_text_antworten?: Prisma.Live_text_response_publicationsListRelationFilter
+  erstellte_text_ersatzregeln?: Prisma.Public_text_replacement_rulesListRelationFilter
+  aktualisierte_text_ersatzregeln?: Prisma.Public_text_replacement_rulesListRelationFilter
 }, "id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -383,6 +392,9 @@ export type usersCreateInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -409,6 +421,9 @@ export type usersUncheckedCreateInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUpdateInput = {
@@ -434,6 +449,9 @@ export type usersUpdateInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -460,6 +478,9 @@ export type usersUncheckedUpdateInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -701,6 +722,54 @@ export type usersUpdateOneWithoutBewertete_fragevorlagenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutBewertete_fragevorlagenInput, Prisma.usersUpdateWithoutBewertete_fragevorlagenInput>, Prisma.usersUncheckedUpdateWithoutBewertete_fragevorlagenInput>
 }
 
+export type usersCreateNestedOneWithoutModerierte_live_text_antwortenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutModerierte_live_text_antwortenInput, Prisma.usersUncheckedCreateWithoutModerierte_live_text_antwortenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutModerierte_live_text_antwortenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneWithoutModerierte_live_text_antwortenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutModerierte_live_text_antwortenInput, Prisma.usersUncheckedCreateWithoutModerierte_live_text_antwortenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutModerierte_live_text_antwortenInput
+  upsert?: Prisma.usersUpsertWithoutModerierte_live_text_antwortenInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutModerierte_live_text_antwortenInput, Prisma.usersUpdateWithoutModerierte_live_text_antwortenInput>, Prisma.usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput>
+}
+
+export type usersCreateNestedOneWithoutErstellte_text_ersatzregelnInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_text_ersatzregelnInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedOneWithoutAktualisierte_text_ersatzregelnInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutAktualisierte_text_ersatzregelnInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneWithoutErstellte_text_ersatzregelnNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_text_ersatzregelnInput
+  upsert?: Prisma.usersUpsertWithoutErstellte_text_ersatzregelnInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutErstellte_text_ersatzregelnInput, Prisma.usersUpdateWithoutErstellte_text_ersatzregelnInput>, Prisma.usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput>
+}
+
+export type usersUpdateOneWithoutAktualisierte_text_ersatzregelnNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutAktualisierte_text_ersatzregelnInput
+  upsert?: Prisma.usersUpsertWithoutAktualisierte_text_ersatzregelnInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUpdateWithoutAktualisierte_text_ersatzregelnInput>, Prisma.usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput>
+}
+
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
@@ -787,6 +856,9 @@ export type usersCreateWithoutAktualitaet_gepruefte_fragenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutAktualitaet_gepruefte_fragenInput = {
@@ -812,6 +884,9 @@ export type usersUncheckedCreateWithoutAktualitaet_gepruefte_fragenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutAktualitaet_gepruefte_fragenInput = {
@@ -852,6 +927,9 @@ export type usersUpdateWithoutAktualitaet_gepruefte_fragenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAktualitaet_gepruefte_fragenInput = {
@@ -877,6 +955,9 @@ export type usersUncheckedUpdateWithoutAktualitaet_gepruefte_fragenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_kategorienInput = {
@@ -901,6 +982,9 @@ export type usersCreateWithoutErstellte_kategorienInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
@@ -926,6 +1010,9 @@ export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_kategorienInput = {
@@ -966,6 +1053,9 @@ export type usersUpdateWithoutErstellte_kategorienInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
@@ -991,6 +1081,9 @@ export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
@@ -1015,6 +1108,9 @@ export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = {
@@ -1040,6 +1136,9 @@ export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = 
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_praesentationstemplatesInput = {
@@ -1080,6 +1179,9 @@ export type usersUpdateWithoutErstellte_praesentationstemplatesInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = {
@@ -1105,6 +1207,9 @@ export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = 
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_elementeInput = {
@@ -1129,6 +1234,9 @@ export type usersCreateWithoutErstellte_story_elementeInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
@@ -1154,6 +1262,9 @@ export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_elementeInput = {
@@ -1194,6 +1305,9 @@ export type usersUpdateWithoutErstellte_story_elementeInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
@@ -1219,6 +1333,9 @@ export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_revisionenInput = {
@@ -1243,6 +1360,9 @@ export type usersCreateWithoutErstellte_story_revisionenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
@@ -1268,6 +1388,9 @@ export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_revisionenInput = {
@@ -1308,6 +1431,9 @@ export type usersUpdateWithoutErstellte_story_revisionenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
@@ -1333,6 +1459,9 @@ export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
@@ -1357,6 +1486,9 @@ export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
@@ -1382,6 +1514,9 @@ export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_verknuepfungenInput = {
@@ -1422,6 +1557,9 @@ export type usersUpdateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
@@ -1447,6 +1585,9 @@ export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutBewertete_team_antwortenInput = {
@@ -1471,6 +1612,9 @@ export type usersCreateWithoutBewertete_team_antwortenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
@@ -1496,6 +1640,9 @@ export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutBewertete_team_antwortenInput = {
@@ -1536,6 +1683,9 @@ export type usersUpdateWithoutBewertete_team_antwortenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
@@ -1561,6 +1711,9 @@ export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_fragevorlagenInput = {
@@ -1585,6 +1738,9 @@ export type usersCreateWithoutErstellte_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_fragevorlagenInput = {
@@ -1610,6 +1766,9 @@ export type usersUncheckedCreateWithoutErstellte_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_fragevorlagenInput = {
@@ -1639,6 +1798,9 @@ export type usersCreateWithoutBewertete_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutBewertete_fragevorlagenInput = {
@@ -1664,6 +1826,9 @@ export type usersUncheckedCreateWithoutBewertete_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutBewertete_fragevorlagenInput = {
@@ -1704,6 +1869,9 @@ export type usersUpdateWithoutErstellte_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_fragevorlagenInput = {
@@ -1729,6 +1897,9 @@ export type usersUncheckedUpdateWithoutErstellte_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUpsertWithoutBewertete_fragevorlagenInput = {
@@ -1764,6 +1935,9 @@ export type usersUpdateWithoutBewertete_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutBewertete_fragevorlagenInput = {
@@ -1789,6 +1963,387 @@ export type usersUncheckedUpdateWithoutBewertete_fragevorlagenInput = {
   erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type usersCreateWithoutModerierte_live_text_antwortenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
+}
+
+export type usersUncheckedCreateWithoutModerierte_live_text_antwortenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
+}
+
+export type usersCreateOrConnectWithoutModerierte_live_text_antwortenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutModerierte_live_text_antwortenInput, Prisma.usersUncheckedCreateWithoutModerierte_live_text_antwortenInput>
+}
+
+export type usersUpsertWithoutModerierte_live_text_antwortenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutModerierte_live_text_antwortenInput, Prisma.usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutModerierte_live_text_antwortenInput, Prisma.usersUncheckedCreateWithoutModerierte_live_text_antwortenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutModerierte_live_text_antwortenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutModerierte_live_text_antwortenInput, Prisma.usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput>
+}
+
+export type usersUpdateWithoutModerierte_live_text_antwortenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type usersCreateWithoutErstellte_text_ersatzregelnInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
+}
+
+export type usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
+}
+
+export type usersCreateOrConnectWithoutErstellte_text_ersatzregelnInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput>
+}
+
+export type usersCreateWithoutAktualisierte_text_ersatzregelnInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+}
+
+export type usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type usersCreateOrConnectWithoutAktualisierte_text_ersatzregelnInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput>
+}
+
+export type usersUpsertWithoutErstellte_text_ersatzregelnInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_text_ersatzregelnInput, Prisma.usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutErstellte_text_ersatzregelnInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_text_ersatzregelnInput, Prisma.usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput>
+}
+
+export type usersUpdateWithoutErstellte_text_ersatzregelnInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type usersUpsertWithoutAktualisierte_text_ersatzregelnInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutAktualisierte_text_ersatzregelnInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutAktualisierte_text_ersatzregelnInput, Prisma.usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput>
+}
+
+export type usersUpdateWithoutAktualisierte_text_ersatzregelnInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersCreateWithoutRollenzuweisungenInput = {
@@ -1813,6 +2368,9 @@ export type usersCreateWithoutRollenzuweisungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
@@ -1838,6 +2396,9 @@ export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutRollenzuweisungenInput = {
@@ -1867,6 +2428,9 @@ export type usersCreateWithoutZugewiesene_rollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
@@ -1892,6 +2456,9 @@ export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_rollenInput = {
@@ -1932,6 +2499,9 @@ export type usersUpdateWithoutRollenzuweisungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
@@ -1957,6 +2527,9 @@ export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_rollenInput = {
@@ -1992,6 +2565,9 @@ export type usersUpdateWithoutZugewiesene_rollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
@@ -2017,6 +2593,9 @@ export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersCreateWithoutEventreihenrollenInput = {
@@ -2041,6 +2620,9 @@ export type usersCreateWithoutEventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutEventreihenrollenInput = {
@@ -2066,6 +2648,9 @@ export type usersUncheckedCreateWithoutEventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutEventreihenrollenInput = {
@@ -2095,6 +2680,9 @@ export type usersCreateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
@@ -2120,6 +2708,9 @@ export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput = {
@@ -2160,6 +2751,9 @@ export type usersUpdateWithoutEventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
@@ -2185,6 +2779,9 @@ export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_eventreihenrollenInput = {
@@ -2220,6 +2817,9 @@ export type usersUpdateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
@@ -2245,6 +2845,9 @@ export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
   erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
   bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
   aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
 
@@ -2266,6 +2869,9 @@ export type UsersCountOutputType = {
   erstellte_fragevorlagen: number
   bewertete_fragevorlagen: number
   aktualitaet_gepruefte_fragen: number
+  moderierte_live_text_antworten: number
+  erstellte_text_ersatzregeln: number
+  aktualisierte_text_ersatzregeln: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2282,6 +2888,9 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   erstellte_fragevorlagen?: boolean | UsersCountOutputTypeCountErstellte_fragevorlagenArgs
   bewertete_fragevorlagen?: boolean | UsersCountOutputTypeCountBewertete_fragevorlagenArgs
   aktualitaet_gepruefte_fragen?: boolean | UsersCountOutputTypeCountAktualitaet_gepruefte_fragenArgs
+  moderierte_live_text_antworten?: boolean | UsersCountOutputTypeCountModerierte_live_text_antwortenArgs
+  erstellte_text_ersatzregeln?: boolean | UsersCountOutputTypeCountErstellte_text_ersatzregelnArgs
+  aktualisierte_text_ersatzregeln?: boolean | UsersCountOutputTypeCountAktualisierte_text_ersatzregelnArgs
 }
 
 /**
@@ -2385,6 +2994,27 @@ export type UsersCountOutputTypeCountAktualitaet_gepruefte_fragenArgs<ExtArgs ex
   where?: Prisma.fragenWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountModerierte_live_text_antwortenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.live_text_response_publicationsWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountErstellte_text_ersatzregelnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.public_text_replacement_rulesWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountAktualisierte_text_ersatzregelnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.public_text_replacement_rulesWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2410,6 +3040,9 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   erstellte_fragevorlagen?: boolean | Prisma.users$erstellte_fragevorlagenArgs<ExtArgs>
   bewertete_fragevorlagen?: boolean | Prisma.users$bewertete_fragevorlagenArgs<ExtArgs>
   aktualitaet_gepruefte_fragen?: boolean | Prisma.users$aktualitaet_gepruefte_fragenArgs<ExtArgs>
+  moderierte_live_text_antworten?: boolean | Prisma.users$moderierte_live_text_antwortenArgs<ExtArgs>
+  erstellte_text_ersatzregeln?: boolean | Prisma.users$erstellte_text_ersatzregelnArgs<ExtArgs>
+  aktualisierte_text_ersatzregeln?: boolean | Prisma.users$aktualisierte_text_ersatzregelnArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -2467,6 +3100,9 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   erstellte_fragevorlagen?: boolean | Prisma.users$erstellte_fragevorlagenArgs<ExtArgs>
   bewertete_fragevorlagen?: boolean | Prisma.users$bewertete_fragevorlagenArgs<ExtArgs>
   aktualitaet_gepruefte_fragen?: boolean | Prisma.users$aktualitaet_gepruefte_fragenArgs<ExtArgs>
+  moderierte_live_text_antworten?: boolean | Prisma.users$moderierte_live_text_antwortenArgs<ExtArgs>
+  erstellte_text_ersatzregeln?: boolean | Prisma.users$erstellte_text_ersatzregelnArgs<ExtArgs>
+  aktualisierte_text_ersatzregeln?: boolean | Prisma.users$aktualisierte_text_ersatzregelnArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2488,6 +3124,9 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     erstellte_fragevorlagen: Prisma.$frage_vorlagenPayload<ExtArgs>[]
     bewertete_fragevorlagen: Prisma.$frage_vorlagenPayload<ExtArgs>[]
     aktualitaet_gepruefte_fragen: Prisma.$fragenPayload<ExtArgs>[]
+    moderierte_live_text_antworten: Prisma.$live_text_response_publicationsPayload<ExtArgs>[]
+    erstellte_text_ersatzregeln: Prisma.$public_text_replacement_rulesPayload<ExtArgs>[]
+    aktualisierte_text_ersatzregeln: Prisma.$public_text_replacement_rulesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2907,6 +3546,9 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   erstellte_fragevorlagen<T extends Prisma.users$erstellte_fragevorlagenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_fragevorlagenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_vorlagenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bewertete_fragevorlagen<T extends Prisma.users$bewertete_fragevorlagenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$bewertete_fragevorlagenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$frage_vorlagenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   aktualitaet_gepruefte_fragen<T extends Prisma.users$aktualitaet_gepruefte_fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$aktualitaet_gepruefte_fragenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  moderierte_live_text_antworten<T extends Prisma.users$moderierte_live_text_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$moderierte_live_text_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$live_text_response_publicationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  erstellte_text_ersatzregeln<T extends Prisma.users$erstellte_text_ersatzregelnArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_text_ersatzregelnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$public_text_replacement_rulesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  aktualisierte_text_ersatzregeln<T extends Prisma.users$aktualisierte_text_ersatzregelnArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$aktualisierte_text_ersatzregelnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$public_text_replacement_rulesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3648,6 +4290,78 @@ export type users$aktualitaet_gepruefte_fragenArgs<ExtArgs extends runtime.Types
   take?: number
   skip?: number
   distinct?: Prisma.FragenScalarFieldEnum | Prisma.FragenScalarFieldEnum[]
+}
+
+/**
+ * users.moderierte_live_text_antworten
+ */
+export type users$moderierte_live_text_antwortenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the live_text_response_publications
+   */
+  select?: Prisma.live_text_response_publicationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the live_text_response_publications
+   */
+  omit?: Prisma.live_text_response_publicationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.live_text_response_publicationsInclude<ExtArgs> | null
+  where?: Prisma.live_text_response_publicationsWhereInput
+  orderBy?: Prisma.live_text_response_publicationsOrderByWithRelationInput | Prisma.live_text_response_publicationsOrderByWithRelationInput[]
+  cursor?: Prisma.live_text_response_publicationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Live_text_response_publicationsScalarFieldEnum | Prisma.Live_text_response_publicationsScalarFieldEnum[]
+}
+
+/**
+ * users.erstellte_text_ersatzregeln
+ */
+export type users$erstellte_text_ersatzregelnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the public_text_replacement_rules
+   */
+  select?: Prisma.public_text_replacement_rulesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the public_text_replacement_rules
+   */
+  omit?: Prisma.public_text_replacement_rulesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.public_text_replacement_rulesInclude<ExtArgs> | null
+  where?: Prisma.public_text_replacement_rulesWhereInput
+  orderBy?: Prisma.public_text_replacement_rulesOrderByWithRelationInput | Prisma.public_text_replacement_rulesOrderByWithRelationInput[]
+  cursor?: Prisma.public_text_replacement_rulesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Public_text_replacement_rulesScalarFieldEnum | Prisma.Public_text_replacement_rulesScalarFieldEnum[]
+}
+
+/**
+ * users.aktualisierte_text_ersatzregeln
+ */
+export type users$aktualisierte_text_ersatzregelnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the public_text_replacement_rules
+   */
+  select?: Prisma.public_text_replacement_rulesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the public_text_replacement_rules
+   */
+  omit?: Prisma.public_text_replacement_rulesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.public_text_replacement_rulesInclude<ExtArgs> | null
+  where?: Prisma.public_text_replacement_rulesWhereInput
+  orderBy?: Prisma.public_text_replacement_rulesOrderByWithRelationInput | Prisma.public_text_replacement_rulesOrderByWithRelationInput[]
+  cursor?: Prisma.public_text_replacement_rulesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Public_text_replacement_rulesScalarFieldEnum | Prisma.Public_text_replacement_rulesScalarFieldEnum[]
 }
 
 /**

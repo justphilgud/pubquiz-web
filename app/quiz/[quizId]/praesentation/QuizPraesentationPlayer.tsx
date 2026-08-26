@@ -7,6 +7,7 @@ import { getPresentationFunnyAnswers, getQuizLiveSnapshot, getSchaetzfrageById }
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
+import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
 import {
   getPraesentationAudienceZwischenstand,
   getPraesentationPunktestand,
@@ -67,7 +68,7 @@ export default function QuizPraesentationPlayer({
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
-  const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | null>(null);
+  const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
     () => new Set(

@@ -49,6 +49,7 @@ import {
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
+import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
 import {
   isPollQuestionTemplateId,
   questionTemplateIds,
@@ -104,7 +105,7 @@ type PresentationSlideSharedDisplayState = {
   playbackCommandId: number;
   pixelState?: PixelLiveState | null;
   pollState?: PollLiveState | null;
-  liveResultState?: LiveChoiceResultState | null;
+  liveResultState?: LiveChoiceResultState | LiveTextResultState | null;
   funnyAnswers?: FunnyAnswerEntry[];
   teamJoinState?: {
     teams: {
@@ -583,7 +584,24 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));
 
-  if (liveResultState?.visible) {
+  if (liveResultState?.kind === "TEXT" && liveResultState.visible) {
+    return (
+      <section data-live-result-kind="text" className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-8 text-[var(--quiz-text)]">
+        <div className="flex items-start justify-between gap-8">
+          <div><p className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--quiz-text-muted)]">Live-Antworten</p><h2 className="mt-3 text-4xl font-bold leading-tight xl:text-5xl">{frage.frage}</h2></div>
+          <p className="shrink-0 rounded-full border border-[var(--quiz-border)] px-4 py-2 font-semibold">{liveResultState.publicResponses.length} freigegeben</p>
+        </div>
+        <div className="mt-8 grid min-h-0 flex-1 auto-rows-fr grid-cols-2 gap-5 overflow-hidden">
+          {liveResultState.publicResponses.slice(0, 6).map((response) => (
+            <article key={response.submissionId} className="flex items-center justify-center rounded-2xl border border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center text-2xl font-semibold leading-snug">„{response.publicText}“</article>
+          ))}
+          {liveResultState.publicResponses.length === 0 && <p className="col-span-2 self-center text-center text-2xl text-[var(--quiz-text-muted)]">Noch keine Antwort freigegeben.</p>}
+        </div>
+      </section>
+    );
+  }
+
+  if (liveResultState?.kind === "CHOICE" && liveResultState.visible) {
     return (
       <section
         data-live-result-kind="choice"

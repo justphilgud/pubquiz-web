@@ -4,11 +4,13 @@ import {
   logLivePerformance,
   withPrismaQueryDiagnostics,
 } from "@/app/lib/prismaQueryDiagnostics.server";
+import { requireQuizLiveController } from "@/app/quiz/quizAccess.server";
 
 type LiveSnapshotRequest = {
   quizId?: unknown;
   includeTeamJoinState?: unknown;
   presentationQuestionAssignmentId?: unknown;
+  includeLiveModeration?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -42,10 +44,14 @@ export async function POST(request: Request) {
       return Response.json({ error: "INVALID_QUESTION" }, { status: 400 });
     }
     phaseStartedAt = performance.now();
+    if (body.includeLiveModeration === true) {
+      await requireQuizLiveController(quizId);
+    }
     const snapshot = await getQuizLiveSnapshotData(quizId, null, {
       includePresentationState: true,
       includeTeamJoinState: body.includeTeamJoinState === true,
       presentationQuestionAssignmentId,
+      includeLiveModeration: body.includeLiveModeration === true,
     });
     phases.snapshot = performance.now() - phaseStartedAt;
     phaseStartedAt = performance.now();

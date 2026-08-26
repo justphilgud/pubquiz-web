@@ -220,6 +220,16 @@ export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel
  */
 export type team_antwort_auswahlen = Prisma.team_antwort_auswahlenModel
 /**
+ * Model live_text_response_publications
+ *
+ */
+export type live_text_response_publications = Prisma.live_text_response_publicationsModel
+/**
+ * Model public_text_replacement_rules
+ *
+ */
+export type public_text_replacement_rules = Prisma.public_text_replacement_rulesModel
+/**
  * Model users
  *
  */

@@ -657,6 +657,7 @@ model team_answer_submissions {
   interaction_run           quiz_interaction_runs      @relation(fields: [interaction_run_id], references: [interaction_run_id], onDelete: Cascade)
   team_antwort              team_antworten             @relation(fields: [team_antwort_id], references: [team_antwort_id], onDelete: Cascade)
   quiz_team_session         quiz_team_sessions         @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
+  live_text_publication     live_text_response_publications?
 
   @@unique([interaction_run_id, quiz_team_session_id, submission_version], map: "uq_team_answer_submission_run_team_version")
   @@unique([interaction_run_id, quiz_team_session_id, draft_revision], map: "uq_team_answer_submission_run_team_draft")
@@ -909,6 +910,36 @@ enum TeamAnswerSubmissionStatus {
   @@schema("pubquiz")
 }
 
+model live_text_response_publications {
+  live_text_response_publication_id Int                     @id @default(autoincrement())
+  team_answer_submission_id         Int                     @unique
+  is_visible                        Boolean                 @default(false)
+  moderated_by_user_id              Int?
+  created_at                        DateTime                @default(now())
+  updated_at                        DateTime                @default(now()) @updatedAt
+  submission                        team_answer_submissions @relation(fields: [team_answer_submission_id], references: [team_answer_submission_id], onDelete: Cascade)
+  moderated_by                      users?                  @relation("LiveTextModerator", fields: [moderated_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([is_visible, updated_at], map: "idx_live_text_publications_visible")
+  @@schema("pubquiz")
+}
+
+model public_text_replacement_rules {
+  public_text_replacement_rule_id Int      @id @default(autoincrement())
+  search_term                     String   @unique @db.VarChar(120)
+  replacement                     String   @db.VarChar(120)
+  is_active                       Boolean  @default(true)
+  created_by_user_id              Int?
+  updated_by_user_id              Int?
+  created_at                      DateTime @default(now())
+  updated_at                      DateTime @default(now()) @updatedAt
+  created_by                      users?   @relation("PublicTextRuleCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  updated_by                      users?   @relation("PublicTextRuleUpdater", fields: [updated_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([is_active, search_term], map: "idx_public_text_rules_active")
+  @@schema("pubquiz")
+}
+
 enum QuizResultDisplayMode {
   STANDARD
   LIVE
@@ -948,6 +979,9 @@ model users {
   erstellte_fragevorlagen           frage_vorlagen[]             @relation("QuestionTemplateCreator")
   bewertete_fragevorlagen           frage_vorlagen[]             @relation("QuestionTemplateReviewer")
   aktualitaet_gepruefte_fragen      fragen[]                      @relation("QuestionFreshnessReviewer")
+  moderierte_live_text_antworten    live_text_response_publications[] @relation("LiveTextModerator")
+  erstellte_text_ersatzregeln       public_text_replacement_rules[] @relation("PublicTextRuleCreator")
+  aktualisierte_text_ersatzregeln   public_text_replacement_rules[] @relation("PublicTextRuleUpdater")
 
   @@schema("pubquiz")
 }

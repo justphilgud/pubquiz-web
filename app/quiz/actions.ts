@@ -3023,6 +3023,43 @@ export async function closeQuizQuestionAnswerPhase(data: {
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
 }
 
+export async function setLiveTextResponsePublication(data: {
+  quizId: number;
+  quizFragenId: number;
+  submissionId: number;
+  visible: boolean;
+}) {
+  const access = await requireQuizLiveController(data.quizId);
+  const submission = await prisma.team_answer_submissions.findFirst({
+    where: {
+      team_answer_submission_id: data.submissionId,
+      interaction_type: "TEXT",
+      interaction_run: {
+        quiz_id: data.quizId,
+        quiz_fragen_id: data.quizFragenId,
+        is_current: true,
+        quiz_fragen: { ergebnisdarstellung: "LIVE" },
+      },
+    },
+    select: { team_answer_submission_id: true },
+  });
+  if (!submission) throw new Error("Die Live-Antwort gehört nicht zu dieser Frage.");
+  await prisma.live_text_response_publications.upsert({
+    where: { team_answer_submission_id: data.submissionId },
+    create: {
+      team_answer_submission_id: data.submissionId,
+      is_visible: data.visible,
+      moderated_by_user_id: Number(access.session.user.id),
+    },
+    update: {
+      is_visible: data.visible,
+      moderated_by_user_id: Number(access.session.user.id),
+    },
+  });
+  revalidatePath(`/quiz/${data.quizId}/moderation`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
+}
+
 export async function getQuizLiveSnapshot(
   quizId: number,
   quizTeamSessionToken?: string,

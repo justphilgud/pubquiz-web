@@ -86,6 +86,8 @@ export const ModelName = {
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
   team_antwort_auswahlen: 'team_antwort_auswahlen',
+  live_text_response_publications: 'live_text_response_publications',
+  public_text_replacement_rules: 'public_text_replacement_rules',
   users: 'users',
   benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
@@ -686,6 +688,32 @@ export const Team_antwort_auswahlenScalarFieldEnum = {
 } as const
 
 export type Team_antwort_auswahlenScalarFieldEnum = (typeof Team_antwort_auswahlenScalarFieldEnum)[keyof typeof Team_antwort_auswahlenScalarFieldEnum]
+
+
+export const Live_text_response_publicationsScalarFieldEnum = {
+  live_text_response_publication_id: 'live_text_response_publication_id',
+  team_answer_submission_id: 'team_answer_submission_id',
+  is_visible: 'is_visible',
+  moderated_by_user_id: 'moderated_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Live_text_response_publicationsScalarFieldEnum = (typeof Live_text_response_publicationsScalarFieldEnum)[keyof typeof Live_text_response_publicationsScalarFieldEnum]
+
+
+export const Public_text_replacement_rulesScalarFieldEnum = {
+  public_text_replacement_rule_id: 'public_text_replacement_rule_id',
+  search_term: 'search_term',
+  replacement: 'replacement',
+  is_active: 'is_active',
+  created_by_user_id: 'created_by_user_id',
+  updated_by_user_id: 'updated_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Public_text_replacement_rulesScalarFieldEnum = (typeof Public_text_replacement_rulesScalarFieldEnum)[keyof typeof Public_text_replacement_rulesScalarFieldEnum]
 
 
 export const UsersScalarFieldEnum = {

@@ -13,6 +13,7 @@ import {
   getZufaelligeSchaetzfrage,
   setQuizLiveResultVisibility,
   closeQuizQuestionAnswerPhase,
+  setLiveTextResponsePublication,
 } from "../../actions";
 import {
   buildPraesentationSlides,
@@ -54,6 +55,7 @@ import {
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
+import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
@@ -77,6 +79,7 @@ async function fetchQuizLiveSnapshot(
       quizId,
       includeTeamJoinState,
       presentationQuestionAssignmentId,
+      includeLiveModeration: true,
     }),
   });
   if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
@@ -124,7 +127,7 @@ export default function ModerationClient({
   const [now, setNow] = useState(() => Date.now());
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
-  const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | null>(null);
+  const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [liveResultPending, setLiveResultPending] = useState(false);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
@@ -732,6 +735,35 @@ export default function ModerationClient({
     }
   }
 
+  async function toggleLiveTextPublication(submissionId: number, visible: boolean) {
+    if (aktuellerSlide?.typ !== "frage" || liveResultState?.kind !== "TEXT") return;
+    setLiveResultPending(true);
+    try {
+      await setLiveTextResponsePublication({
+        quizId,
+        quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
+        submissionId,
+        visible,
+      });
+      setLiveResultState({
+        ...liveResultState,
+        moderationResponses: liveResultState.moderationResponses?.map((entry) =>
+          entry.submissionId === submissionId ? { ...entry, isVisible: visible } : entry,
+        ),
+        publicResponses: visible
+          ? [
+              ...liveResultState.publicResponses.filter((entry) => entry.submissionId !== submissionId),
+              ...liveResultState.moderationResponses
+                ?.filter((entry) => entry.submissionId === submissionId)
+                .map(({ submissionId: id, publicText }) => ({ submissionId: id, publicText })) ?? [],
+            ]
+          : liveResultState.publicResponses.filter((entry) => entry.submissionId !== submissionId),
+      });
+    } finally {
+      setLiveResultPending(false);
+    }
+  }
+
   useModerationHotkeys({
     hatMedien,
     hatAudio,
@@ -839,6 +871,18 @@ export default function ModerationClient({
                     )}
                   </div>
                 </div>
+                {liveResultState.kind === "TEXT" && (
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    {liveResultState.moderationResponses?.map((response) => (
+                      <article key={response.submissionId} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3">
+                        <div className="flex items-center justify-between gap-3"><strong>{response.teamName}</strong><span className="text-xs text-zinc-400">{response.isVisible ? "öffentlich" : "nicht freigegeben"}</span></div>
+                        <p className="mt-2 text-sm">Original: „{response.originalText}“</p>
+                        {response.changed && <p className="mt-1 text-sm text-amber-200">Öffentlich: „{response.publicText}“</p>}
+                        <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveTextPublication(response.submissionId, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold disabled:opacity-50">{response.isVisible ? "Freigabe zurücknehmen" : "Für Publikum freigeben"}</button>
+                      </article>
+                    ))}
+                  </div>
+                )}
               </section>
             )}
 

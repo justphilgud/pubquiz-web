@@ -51,6 +51,7 @@ import {
   aggregateLiveChoiceResults,
   isLiveChoiceInteraction,
 } from "@/app/quiz/liveResults/liveChoiceResults";
+import { aggregateLiveTextResults } from "@/app/quiz/liveResults/liveTextResults";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -1124,6 +1125,7 @@ export async function getQuizLiveSnapshotData(
   options: {
     includePresentationState?: boolean;
     includeTeamJoinState?: boolean;
+    includeLiveModeration?: boolean;
     presentationQuestionAssignmentId?: number;
   } = {},
 ) {
@@ -1178,11 +1180,13 @@ export async function getQuizLiveSnapshotData(
       isLiveChoiceInteraction(interaction)
     ? interaction
     : null;
+  const liveTextInteraction = interaction?.type === "TEXT" &&
+      run?.quiz_fragen?.ergebnisdarstellung === "LIVE";
   const needsTeamCount = Boolean(
     options.includeTeamJoinState ||
-    (options.includePresentationState && (pollInteraction || liveChoiceInteraction)),
+    (options.includePresentationState && (pollInteraction || liveChoiceInteraction || liveTextInteraction)),
   );
-  const [teamCount, visibleTeams, liveSubmissions] = options.includePresentationState
+  const [teamCount, visibleTeams, liveSubmissions, replacementRules] = options.includePresentationState
     ? await Promise.all([
         needsTeamCount
           ? prisma.quiz_team_sessions.count({ where: { quiz_id: quizId } })
@@ -1208,7 +1212,7 @@ export async function getQuizLiveSnapshotData(
               },
             })
           : Promise.resolve([]),
-        pollInteraction || liveChoiceInteraction
+        pollInteraction || liveChoiceInteraction || liveTextInteraction
           ? prisma.team_answer_submissions.findMany({
               where: { interaction_run_id: run!.interaction_run_id },
               orderBy: [
@@ -1216,18 +1220,39 @@ export async function getQuizLiveSnapshotData(
                 { submission_version: "desc" },
                 { team_answer_submission_id: "desc" },
               ],
-              select: { quiz_team_session_id: true, payload: true },
+              select: {
+                team_answer_submission_id: true,
+                quiz_team_session_id: true,
+                payload: true,
+                live_text_publication: { select: { is_visible: true } },
+                quiz_team_session: {
+                  select: {
+                    team_id: true,
+                    teamname: true,
+                    team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+                  },
+                },
+              },
+            })
+          : Promise.resolve([]),
+        liveTextInteraction
+          ? prisma.public_text_replacement_rules.findMany({
+              where: { is_active: true },
+              orderBy: { public_text_replacement_rule_id: "asc" },
             })
           : Promise.resolve([]),
       ])
-    : [0, [], []];
-  const latestLivePayloads = liveSubmissions.filter(
+    : [0, [], [], []];
+  const latestLiveSubmissions = liveSubmissions.filter(
     (submission, index, submissions) =>
       submissions.findIndex(
         (candidate) =>
           candidate.quiz_team_session_id === submission.quiz_team_session_id,
       ) === index,
-  ).map((submission) => submission.payload as QuizInteractionPayload);
+  );
+  const latestLivePayloads = latestLiveSubmissions.map(
+    (submission) => submission.payload as QuizInteractionPayload,
+  );
   const answer = run && quizTeamSessionId
     ? await prisma.team_antworten.findFirst({
         where: {
@@ -1387,7 +1412,32 @@ export async function getQuizLiveSnapshotData(
             totalTeams: teamCount,
             payloads: latestLivePayloads,
           })
-        : null,
+        : run && liveTextInteraction
+          ? aggregateLiveTextResults({
+              visible: run.live_results_visible,
+              state: run.state,
+              totalTeams: teamCount,
+              rules: replacementRules.map((rule) => ({
+                id: rule.public_text_replacement_rule_id,
+                searchTerm: rule.search_term,
+                replacement: rule.replacement,
+              })),
+              includeModeration: options.includeLiveModeration === true,
+              submissions: latestLiveSubmissions.flatMap((submission) => {
+                const payload = submission.payload as QuizInteractionPayload;
+                if (!("text" in payload) || !payload.text.trim()) return [];
+                return [{
+                  submissionId: submission.team_answer_submission_id,
+                  teamId: submission.quiz_team_session.team_id,
+                  teamName: submission.quiz_team_session.teamname,
+                  avatarCode: mapTeamProfile(submission.quiz_team_session.team).avatarCode,
+                  photoUrl: submission.quiz_team_session.team.foto_url,
+                  originalText: payload.text,
+                  isVisible: submission.live_text_publication?.is_visible === true,
+                }];
+              }),
+            })
+          : null,
     pixelState: run && pixelConfig && pixelStage
       ? {
           interactionType: pixelConfig.type,

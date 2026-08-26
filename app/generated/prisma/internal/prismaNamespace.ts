@@ -432,6 +432,8 @@ export const ModelName = {
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
   team_antwort_auswahlen: 'team_antwort_auswahlen',
+  live_text_response_publications: 'live_text_response_publications',
+  public_text_replacement_rules: 'public_text_replacement_rules',
   users: 'users',
   benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
@@ -451,7 +453,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3045,6 +3047,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    live_text_response_publications: {
+      payload: Prisma.$live_text_response_publicationsPayload<ExtArgs>
+      fields: Prisma.live_text_response_publicationsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.live_text_response_publicationsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.live_text_response_publicationsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>
+        }
+        findFirst: {
+          args: Prisma.live_text_response_publicationsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.live_text_response_publicationsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>
+        }
+        findMany: {
+          args: Prisma.live_text_response_publicationsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>[]
+        }
+        create: {
+          args: Prisma.live_text_response_publicationsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>
+        }
+        createMany: {
+          args: Prisma.live_text_response_publicationsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.live_text_response_publicationsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>[]
+        }
+        delete: {
+          args: Prisma.live_text_response_publicationsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>
+        }
+        update: {
+          args: Prisma.live_text_response_publicationsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>
+        }
+        deleteMany: {
+          args: Prisma.live_text_response_publicationsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.live_text_response_publicationsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.live_text_response_publicationsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>[]
+        }
+        upsert: {
+          args: Prisma.live_text_response_publicationsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_text_response_publicationsPayload>
+        }
+        aggregate: {
+          args: Prisma.Live_text_response_publicationsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLive_text_response_publications>
+        }
+        groupBy: {
+          args: Prisma.live_text_response_publicationsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_text_response_publicationsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.live_text_response_publicationsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_text_response_publicationsCountAggregateOutputType> | number
+        }
+      }
+    }
+    public_text_replacement_rules: {
+      payload: Prisma.$public_text_replacement_rulesPayload<ExtArgs>
+      fields: Prisma.public_text_replacement_rulesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.public_text_replacement_rulesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.public_text_replacement_rulesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>
+        }
+        findFirst: {
+          args: Prisma.public_text_replacement_rulesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.public_text_replacement_rulesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>
+        }
+        findMany: {
+          args: Prisma.public_text_replacement_rulesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>[]
+        }
+        create: {
+          args: Prisma.public_text_replacement_rulesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>
+        }
+        createMany: {
+          args: Prisma.public_text_replacement_rulesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.public_text_replacement_rulesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>[]
+        }
+        delete: {
+          args: Prisma.public_text_replacement_rulesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>
+        }
+        update: {
+          args: Prisma.public_text_replacement_rulesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>
+        }
+        deleteMany: {
+          args: Prisma.public_text_replacement_rulesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.public_text_replacement_rulesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.public_text_replacement_rulesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>[]
+        }
+        upsert: {
+          args: Prisma.public_text_replacement_rulesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$public_text_replacement_rulesPayload>
+        }
+        aggregate: {
+          args: Prisma.Public_text_replacement_rulesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePublic_text_replacement_rules>
+        }
+        groupBy: {
+          args: Prisma.public_text_replacement_rulesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Public_text_replacement_rulesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.public_text_replacement_rulesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Public_text_replacement_rulesCountAggregateOutputType> | number
+        }
+      }
+    }
     users: {
       payload: Prisma.$usersPayload<ExtArgs>
       fields: Prisma.usersFieldRefs
@@ -3960,6 +4110,32 @@ export const Team_antwort_auswahlenScalarFieldEnum = {
 export type Team_antwort_auswahlenScalarFieldEnum = (typeof Team_antwort_auswahlenScalarFieldEnum)[keyof typeof Team_antwort_auswahlenScalarFieldEnum]
 
 
+export const Live_text_response_publicationsScalarFieldEnum = {
+  live_text_response_publication_id: 'live_text_response_publication_id',
+  team_answer_submission_id: 'team_answer_submission_id',
+  is_visible: 'is_visible',
+  moderated_by_user_id: 'moderated_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Live_text_response_publicationsScalarFieldEnum = (typeof Live_text_response_publicationsScalarFieldEnum)[keyof typeof Live_text_response_publicationsScalarFieldEnum]
+
+
+export const Public_text_replacement_rulesScalarFieldEnum = {
+  public_text_replacement_rule_id: 'public_text_replacement_rule_id',
+  search_term: 'search_term',
+  replacement: 'replacement',
+  is_active: 'is_active',
+  created_by_user_id: 'created_by_user_id',
+  updated_by_user_id: 'updated_by_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Public_text_replacement_rulesScalarFieldEnum = (typeof Public_text_replacement_rulesScalarFieldEnum)[keyof typeof Public_text_replacement_rulesScalarFieldEnum]
+
+
 export const UsersScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -4581,6 +4757,8 @@ export type GlobalOmitConfig = {
   frage_vorlage_antwortfelder?: Prisma.frage_vorlage_antwortfelderOmit
   quiz_praesentation_status?: Prisma.quiz_praesentation_statusOmit
   team_antwort_auswahlen?: Prisma.team_antwort_auswahlenOmit
+  live_text_response_publications?: Prisma.live_text_response_publicationsOmit
+  public_text_replacement_rules?: Prisma.public_text_replacement_rulesOmit
   users?: Prisma.usersOmit
   benutzer_rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenOmit
   eventreihe_benutzerrollen?: Prisma.eventreihe_benutzerrollenOmit
