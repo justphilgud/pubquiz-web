@@ -50,11 +50,7 @@ import {
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
-import {
-  isPollQuestionTemplateId,
-  questionTemplateIds,
-  resolveCanonicalQuestionTemplateId,
-} from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
