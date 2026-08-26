@@ -1,10 +1,3 @@
-export function shouldShowTeamIdentity(input: {
-  standingsType: "INTERMEDIATE" | "FINAL" | "WINNER";
-  renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW";
-}) {
-  return input.standingsType !== "INTERMEDIATE" || input.renderMode === "MODERATION_PREVIEW";
-}
-
 export function rankScores<T extends { punkte: number }>(scores: readonly T[]) {
   return [...scores]
     .sort((left, right) => right.punkte - left.punkte)
@@ -18,15 +11,35 @@ export type IntermediateStandingsAudienceEntry = {
   key: string;
   place: number;
   punkte: number;
+};
+
+export type IntermediateStandingsModerationEntry =
+  IntermediateStandingsAudienceEntry & {
   identity: {
     teamId: number | null;
     teamname: string;
     photoUrl: string | null;
     avatarCode: unknown;
-  } | null;
+  };
 };
 
+export type IntermediateStandingsEntry =
+  | IntermediateStandingsAudienceEntry
+  | IntermediateStandingsModerationEntry;
+
 export function resolveIntermediateStandingsAudience<
+  T extends { punkte: number },
+>(
+  scores: readonly T[],
+): IntermediateStandingsAudienceEntry[] {
+  return rankScores(scores).map((entry, index) => ({
+    key: `anonymous-rank-${entry.place}-${index}`,
+    place: entry.place,
+    punkte: entry.punkte,
+  }));
+}
+
+export function resolveIntermediateStandingsModeration<
   T extends {
     punkte: number;
     teamname: string;
@@ -34,29 +47,17 @@ export function resolveIntermediateStandingsAudience<
     photoUrl?: string | null;
     avatarCode?: unknown;
   },
->(
-  scores: readonly T[],
-  renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW",
-): IntermediateStandingsAudienceEntry[] {
-  const showIdentity = shouldShowTeamIdentity({
-    standingsType: "INTERMEDIATE",
-    renderMode,
-  });
-
+>(scores: readonly T[]): IntermediateStandingsModerationEntry[] {
   return rankScores(scores).map((entry, index) => ({
-    key: showIdentity
-      ? `team-${entry.teamId ?? entry.teamname}-${index}`
-      : `anonymous-rank-${entry.place}-${index}`,
+    key: `team-${entry.teamId ?? entry.teamname}-${index}`,
     place: entry.place,
     punkte: entry.punkte,
-    identity: showIdentity
-      ? {
-          teamId: entry.teamId ?? null,
-          teamname: entry.teamname,
-          photoUrl: entry.photoUrl ?? null,
-          avatarCode: entry.avatarCode ?? null,
-        }
-      : null,
+    identity: {
+      teamId: entry.teamId ?? null,
+      teamname: entry.teamname,
+      photoUrl: entry.photoUrl ?? null,
+      avatarCode: entry.avatarCode ?? null,
+    },
   }));
 }
 

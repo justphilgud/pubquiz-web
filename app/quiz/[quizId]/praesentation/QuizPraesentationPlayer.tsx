@@ -256,7 +256,7 @@ export default function QuizPraesentationPlayer({
             renderMode: "PRESENTATION",
             templateRevealCount: liveState.revealCount,
             punktestand: scores,
-            intermediateStandings: resolveIntermediateStandingsAudience(scores, "PRESENTATION"),
+            intermediateStandings: resolveIntermediateStandingsAudience(scores),
             yearlyStandings,
             endstandRevealCount: liveState.revealCount,
             now,

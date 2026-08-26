@@ -3,15 +3,9 @@ import test from "node:test";
 import {
   rankScores,
   resolveIntermediateStandingsAudience,
+  resolveIntermediateStandingsModeration,
   resolvePodiumReveal,
-  shouldShowTeamIdentity,
 } from "./presentationRankingPolicy";
-
-test("public interim standings expose rank and points but never team identity", () => {
-  assert.equal(shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode: "PRESENTATION" }), false);
-  assert.equal(shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode: "DESIGN_PREVIEW" }), false);
-  assert.equal(shouldShowTeamIdentity({ standingsType: "INTERMEDIATE", renderMode: "MODERATION_PREVIEW" }), true);
-});
 
 test("public intermediate view models structurally discard team identity", () => {
   const scores = [
@@ -24,25 +18,19 @@ test("public intermediate view models structurally discard team identity", () =>
     },
   ];
 
-  const publicEntries = resolveIntermediateStandingsAudience(scores, "PRESENTATION");
+  const publicEntries = resolveIntermediateStandingsAudience(scores);
   assert.deepEqual(publicEntries, [
     {
       key: "anonymous-rank-1-0",
       place: 1,
       punkte: 42,
-      identity: null,
     },
   ]);
   assert.doesNotMatch(JSON.stringify(publicEntries), /Geheimes Team|secret\.jpg|teekanne/);
 
-  const moderationEntries = resolveIntermediateStandingsAudience(scores, "MODERATION_PREVIEW");
-  assert.equal(moderationEntries[0]?.identity?.teamname, "Geheimes Team");
-  assert.equal(moderationEntries[0]?.identity?.photoUrl, "/secret.jpg");
-});
-
-test("final and winner slides intentionally reveal identity", () => {
-  assert.equal(shouldShowTeamIdentity({ standingsType: "FINAL", renderMode: "PRESENTATION" }), true);
-  assert.equal(shouldShowTeamIdentity({ standingsType: "WINNER", renderMode: "PRESENTATION" }), true);
+  const moderationEntries = resolveIntermediateStandingsModeration(scores);
+  assert.equal(moderationEntries[0]?.identity.teamname, "Geheimes Team");
+  assert.equal(moderationEntries[0]?.identity.photoUrl, "/secret.jpg");
 });
 
 test("ties use competition ranking without inventing the next place", () => {

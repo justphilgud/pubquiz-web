@@ -60,6 +60,7 @@ import {
   rankScores,
   resolvePodiumReveal,
   type IntermediateStandingsAudienceEntry,
+  type IntermediateStandingsModerationEntry,
 } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
@@ -81,11 +82,9 @@ type RankingTableEntry = {
 
 type Abschnitt = QuizPraesentationResult["abschnitte"][number];
 
-export type PresentationSlideDisplayState = {
-  renderMode: "PRESENTATION" | "MODERATION_PREVIEW" | "DESIGN_PREVIEW";
+type PresentationSlideSharedDisplayState = {
   templateRevealCount: number;
   punktestand: ScoreEntry[];
-  intermediateStandings: IntermediateStandingsAudienceEntry[];
   yearlyStandings?: YearlyRankingEntry[];
   endstandRevealCount: number;
   now: number;
@@ -116,6 +115,16 @@ export type PresentationSlideDisplayState = {
     remainingTeams: number;
   } | null;
 };
+
+export type PresentationSlideDisplayState =
+  | (PresentationSlideSharedDisplayState & {
+      renderMode: "PRESENTATION" | "DESIGN_PREVIEW";
+      intermediateStandings: IntermediateStandingsAudienceEntry[];
+    })
+  | (PresentationSlideSharedDisplayState & {
+      renderMode: "MODERATION_PREVIEW";
+      intermediateStandings: IntermediateStandingsModerationEntry[];
+    });
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -957,6 +966,13 @@ function renderRennPferd({
     </div>
   );
 }
+
+function getIntermediateStandingsIdentity(
+  entry: IntermediateStandingsAudienceEntry | IntermediateStandingsModerationEntry,
+) {
+  return "identity" in entry ? entry.identity : null;
+}
+
 function renderZwischenstandSlide() {
   const sortiertePunkte = intermediateStandings.slice(0, 5);
 
@@ -969,13 +985,16 @@ function renderZwischenstandSlide() {
           <div className="presentation-flow-message">Der Zwischenstand wird gerade berechnet.</div>
         ) : (
           <ol className="presentation-flow-ranking-list">
-            {sortiertePunkte.map((team) => (
-              <li key={team.key}>
-                <span className="presentation-flow-rank">{team.place}</span>
-                <strong>{team.identity?.teamname ?? `${team.place}. Platz`}</strong>
-                <span>{formatQuizPoints(team.punkte)} Punkte</span>
-              </li>
-            ))}
+            {sortiertePunkte.map((team) => {
+              const identity = getIntermediateStandingsIdentity(team);
+              return (
+                <li key={team.key}>
+                  <span className="presentation-flow-rank">{team.place}</span>
+                  <strong>{identity?.teamname ?? `${team.place}. Platz`}</strong>
+                  <span>{formatQuizPoints(team.punkte)} Punkte</span>
+                </li>
+              );
+            })}
           </ol>
         )}
       </section>
@@ -1025,6 +1044,7 @@ function renderZwischenstandSlide() {
           {sortiertePunkte.map((team, index) => {
             const prozent = Math.max(7, (team.punkte / maxPunkte) * 100);
             const pferdLinks = `calc(${prozent}% - 5rem)`;
+            const identity = getIntermediateStandingsIdentity(team);
 
             return (
               <div
@@ -1048,7 +1068,7 @@ function renderZwischenstandSlide() {
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
 
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
-                    {team.identity?.teamname ?? `Rang ${team.place}`}
+                    {identity?.teamname ?? `Rang ${team.place}`}
                   </div>
 
                   <div
@@ -2021,23 +2041,26 @@ function renderFlowStandingsSlide(
           <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
         ) : (
           <ol className="presentation-flow-ranking-list" data-many={entries.length > 6}>
-            {entries.map((entry) => (
-              <li key={entry.key}>
-                <span className="presentation-flow-rank">{entry.place}</span>
-                <strong className="flex items-center gap-3">
-                  {entry.identity && (
-                    <TeamIdentityVisual
-                      name={entry.identity.teamname}
-                      photoUrl={entry.identity.photoUrl}
-                      avatarCode={(entry.identity.avatarCode as TeamAvatarCode | null) ?? resolveTeamAvatarCode(entry.identity.teamId ?? 0, null)}
-                      className="h-12 w-12"
-                    />
-                  )}
-                  {entry.identity?.teamname ?? `${entry.place}. Platz`}
-                </strong>
-                {showPoints && <span>{formatQuizPoints(entry.punkte)} Punkte</span>}
-              </li>
-            ))}
+            {entries.map((entry) => {
+              const identity = getIntermediateStandingsIdentity(entry);
+              return (
+                <li key={entry.key}>
+                  <span className="presentation-flow-rank">{entry.place}</span>
+                  <strong className="flex items-center gap-3">
+                    {identity && (
+                      <TeamIdentityVisual
+                        name={identity.teamname}
+                        photoUrl={identity.photoUrl}
+                        avatarCode={(identity.avatarCode as TeamAvatarCode | null) ?? resolveTeamAvatarCode(identity.teamId ?? 0, null)}
+                        className="h-12 w-12"
+                      />
+                    )}
+                    {identity?.teamname ?? `${entry.place}. Platz`}
+                  </strong>
+                  {showPoints && <span>{formatQuizPoints(entry.punkte)} Punkte</span>}
+                </li>
+              );
+            })}
           </ol>
         )}
       </section>

@@ -14,7 +14,10 @@ import type {
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "@/app/rendering/presentation/PresentationSlideRenderer";
-import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentation/presentationRankingPolicy";
+import {
+  resolveIntermediateStandingsAudience,
+  resolveIntermediateStandingsModeration,
+} from "@/app/rendering/presentation/presentationRankingPolicy";
 import { resolvePresentationLayout } from "@/app/rendering/presentation/presentationLayoutResolver";
 import { resolveQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
@@ -517,7 +520,7 @@ const displayState: PresentationSlideDisplayState = {
   renderMode: "DESIGN_PREVIEW",
   templateRevealCount: 4,
   punktestand: templatePreviewScores,
-  intermediateStandings: resolveIntermediateStandingsAudience(templatePreviewScores, "DESIGN_PREVIEW"),
+  intermediateStandings: resolveIntermediateStandingsAudience(templatePreviewScores),
   yearlyStandings: [
     { teamId: 1, teamname: "Die Ratlosen", punkte: 86, place: 1, previousPlace: 2, trend: "UP", avatarCode: "teekanne", photoUrl: null },
     { teamId: 2, teamname: "Quiztopher Columbus", punkte: 82, place: 2, previousPlace: 1, trend: "DOWN", avatarCode: "wecker", photoUrl: null },
@@ -648,6 +651,15 @@ export function PresentationTemplatePreview({
         frageIndexImBlock: 1,
         fragenAnzahlImBlock: 1,
       };
+  const previewDisplayState: PresentationSlideDisplayState =
+    scenario === "MODERATION"
+      ? {
+          ...displayState,
+          renderMode: "MODERATION_PREVIEW",
+          intermediateStandings:
+            resolveIntermediateStandingsModeration(templatePreviewScores),
+        }
+      : displayState;
   return (
     <ScaledPreviewStage
       highlightedAssetRole={highlightedAssetRole}
@@ -661,13 +673,7 @@ export function PresentationTemplatePreview({
         slideIndex={0}
         slideLabel={definition.label}
         theme={theme}
-        displayState={{
-          ...displayState,
-          renderMode:
-            scenario === "MODERATION"
-              ? "MODERATION_PREVIEW"
-              : "DESIGN_PREVIEW",
-        }}
+        displayState={previewDisplayState}
         storybookContext={scenario === "STORYBOOK_COVER"
           ? { contentKind: "COVER" }
           : scenario === "STORYBOOK_CHAPTER"

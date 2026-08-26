@@ -10,8 +10,14 @@ import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "./PresentationSlideRenderer";
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
-import { resolveIntermediateStandingsAudience } from "./presentationRankingPolicy";
-import type { Slide } from "../../quiz/[quizId]/praesentation/buildPraesentationSlides";
+import {
+  resolveIntermediateStandingsAudience,
+  resolveIntermediateStandingsModeration,
+} from "./presentationRankingPolicy";
+import {
+  buildPraesentationSlides,
+  type Slide,
+} from "../../quiz/[quizId]/praesentation/buildPraesentationSlides";
 
 const rendererSource = readFileSync(
   new URL("./PresentationSlideRenderer.tsx", import.meta.url),
@@ -246,55 +252,57 @@ test("FaceMorph keeps structured answer fields out of the question slide and rev
 
 test("public interim standings expose competition ranks and points without identity", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
-  const slide: Slide = {
-    typ: "ablauf",
-    abschnitt: runtime.quiz.abschnitte[0],
-    element: {
-      id: "interim-test",
-      persistentId: null,
-      type: "INTERMEDIATE_STANDINGS",
-      anchorType: "ROUND_END",
-      anchorKey: "1",
-      sectionId: runtime.quiz.abschnitte[0]?.quiz_abschnitt_id ?? null,
-      order: 1,
-      enabled: true,
-      label: "Zwischenstand",
-      config: { version: 1, title: "Zwischenstand", standingsSize: "ALL", showPoints: true },
-      configVersion: 1,
-      questionAssignmentId: null,
-      isStandard: true,
-    },
+  const quiz = {
+    ...runtime.quiz,
+    abschnitte: runtime.quiz.abschnitte.map((section) => ({
+      ...section,
+      abschnitt_typ: "fragenrunde",
+    })),
   };
+  const slides = buildPraesentationSlides(quiz);
+  const slide = slides.find(
+    (candidate) =>
+      candidate.typ === "ablauf" &&
+      candidate.element.type === "INTERMEDIATE_STANDINGS",
+  );
+  assert.ok(slide, "productive slide builder must emit an interim standings slide");
   const scores = [
     { teamId: 1, teamname: "Geheimes Team Alpha", punkte: 90, avatarCode: "teekanne" as const, photoUrl: "/secret-alpha.jpg" },
     { teamId: 2, teamname: "Geheimes Team Beta", punkte: 70, avatarCode: "wecker" as const, photoUrl: "/secret-beta.jpg" },
     { teamId: 3, teamname: "Geheimes Team Gamma", punkte: 70, avatarCode: "tischlampe" as const, photoUrl: null },
     { teamId: 4, teamname: "Geheimes Team Delta", punkte: 40, avatarCode: "gummistiefel" as const, photoUrl: null },
   ];
-  const render = (renderMode: PresentationSlideDisplayState["renderMode"]) =>
+  const render = (state: PresentationSlideDisplayState) =>
     renderToStaticMarkup(createElement(PresentationSlideRenderer, {
-      quiz: runtime.quiz,
+      quiz,
       slide,
-      slides: [slide],
-      slideIndex: 0,
+      slides,
+      slideIndex: slides.indexOf(slide),
       slideLabel: "ZWISCHENSTAND",
       theme: runtime.theme,
-      displayState: {
-        ...displayState,
-        renderMode,
-        punktestand: scores,
-        intermediateStandings: resolveIntermediateStandingsAudience(scores, renderMode),
-      },
+      displayState: state,
     }));
 
-  const publicHtml = render("PRESENTATION");
+  const audienceModel = resolveIntermediateStandingsAudience(scores);
+  assert.deepEqual(Object.keys(audienceModel[0] ?? {}).sort(), ["key", "place", "punkte"]);
+  const publicHtml = render({
+    ...displayState,
+    renderMode: "PRESENTATION",
+    punktestand: scores,
+    intermediateStandings: audienceModel,
+  });
   assert.match(publicHtml, />1<\/span><strong[^>]*>1\. Platz/);
   assert.equal((publicHtml.match(/>2<\/span><strong[^>]*>2\. Platz/g) ?? []).length, 2);
   assert.match(publicHtml, />4<\/span><strong[^>]*>4\. Platz/);
   assert.match(publicHtml, /90 Punkte/);
   assert.doesNotMatch(publicHtml, /Geheimes Team|secret-alpha|secret-beta/);
 
-  const moderationHtml = render("MODERATION_PREVIEW");
+  const moderationHtml = render({
+    ...displayState,
+    renderMode: "MODERATION_PREVIEW",
+    punktestand: scores,
+    intermediateStandings: resolveIntermediateStandingsModeration(scores),
+  });
   assert.match(moderationHtml, /Geheimes Team Alpha/);
   assert.match(moderationHtml, /secret-alpha\.jpg/);
 });
@@ -494,6 +502,12 @@ test("player and moderation preview share the presentation renderer", () => {
   assert.match(playerSource, /<PresentationSlideRenderer/);
   assert.match(moderationPreviewSource, /<PresentationSlideRenderer/);
   assert.doesNotMatch(moderationPreviewSource, /<SlidePreview/);
+  assert.match(playerSource, /resolveIntermediateStandingsAudience\(scores\)/);
+  assert.doesNotMatch(playerSource, /resolveIntermediateStandingsModeration/);
+  assert.match(
+    moderationPreviewSource,
+    /resolveIntermediateStandingsModeration\(punktestand\)/,
+  );
 });
 
 test("calendar CTA leaves the team join QR payload and overflow UI intact", () => {
