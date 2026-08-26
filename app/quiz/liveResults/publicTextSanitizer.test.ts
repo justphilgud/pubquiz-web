@@ -25,3 +25,10 @@ test("returns a moderation diff without mutating the original", () => {
   assert.equal(result.changed, true);
   assert.deepEqual(result.appliedRuleIds, [1]);
 });
+
+test("an inactive rule leaves the public text unchanged", () => {
+  assert.equal(
+    sanitizePublicLiveText("Penis", [{ ...rules[0], active: false }]).publicText,
+    "Penis",
+  );
+});

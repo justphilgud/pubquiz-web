@@ -2,6 +2,7 @@ export type PublicTextReplacementRule = {
   id: number;
   searchTerm: string;
   replacement: string;
+  active?: boolean;
 };
 
 const LEET_EQUIVALENTS: Record<string, string> = {
@@ -35,6 +36,7 @@ export function sanitizePublicLiveText(
   let publicText = original;
   const appliedRuleIds: number[] = [];
   for (const rule of rules) {
+    if (rule.active === false) continue;
     const pattern = buildRulePattern(rule.searchTerm);
     if (!pattern || !pattern.test(publicText)) continue;
     pattern.lastIndex = 0;
