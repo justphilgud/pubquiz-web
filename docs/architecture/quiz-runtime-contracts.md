@@ -358,6 +358,42 @@ bestehenden Template- und Theme-Infrastruktur. Sie:
 normalisierte Theme-Konfiguration, den gemeinsamen produktiven Renderer, die
 editierbare LOVD-Vorlage sowie die Trennung von Design und Eventdaten.
 
+## Live-Result-Contract
+
+`quiz_fragen.ergebnisdarstellung` ist eine quizspezifische Darstellungsstrategie
+und verändert weder den Interaction Contract noch Submission, Lösung,
+Auswertung oder Punkte. `STANDARD` ist der sichere Default. `LIVE` ist nur für
+Single-/Multiple-Choice, Wahr/Falsch, Polls und echte `TEXT`-Interaktionen
+zulässig; Ordering, strukturierte Texte, Zahlen, Pixel und FaceMorph bleiben
+ausgeschlossen.
+
+Choice-Ergebnisse basieren ausschließlich auf der jeweils neuesten finalen
+Submission pro Team. Drafts und ältere Versionen zählen nicht. Solange die
+Antwortphase offen ist, enthält das öffentliche Ergebnis keine
+Richtig/Falsch-Semantik. Die bestehende Snapshot-Abfrage und das bestehende
+Polling transportieren den Zustand; es entsteht kein paralleler Live-Kanal.
+
+Freitext bleibt zweistufig: Die Original-Submission ist unveränderliche Quelle
+für Moderation und Auswertung. Eine Zeile in
+`live_text_response_publications` gibt genau diese Submission ausdrücklich für
+die öffentliche Darstellung frei. Ohne Freigabe erscheint kein Text. Der
+öffentliche Snapshot enthält nur `publicText`; Teamidentität, Original und Diff
+werden ausschließlich nach serverseitiger `CONTROL_LIVE`-Prüfung geladen.
+
+Aktive `public_text_replacement_rules` werden deterministisch ausschließlich
+auf die öffentliche Projektion angewendet. Die Regeln ändern nie Payload,
+Draft, Submission oder Evaluation und bewirken keine automatische Freigabe.
+Nur Administratoren verwalten Regeln; Admin und Eventmanager im Quiz-Scope
+steuern Sichtbarkeit, Freigaben und das Schließen der Antwortphase.
+
+| Testdatei | Geschützte Invariante |
+| --- | --- |
+| `app/quiz/liveResults/liveResultMode.test.ts` | Nur unterstützte Interaction-Typen können `LIVE` verwenden. |
+| `app/quiz/liveResults/liveChoiceResults.test.ts` | Effektive Abgaben werden neutral und submissionsbasiert aggregiert. |
+| `app/quiz/liveResults/liveTextResults.test.ts` | Öffentlich gelangen nur freigegebene, ersetzte Texte; Moderation behält Original und Identität. |
+| `app/quiz/liveResults/publicTextSanitizer.test.ts` | Groß-/Kleinschreibung, Leetspeak, Wiederholungen und Separatoren werden konservativ erkannt. |
+| `app/quiz/liveResults/liveResultArchitecture.test.ts` | Rechte, Audience-Grenze und unveränderte Submission-Persistenz bleiben erhalten. |
+
 ## Pflichtprüfung bei Änderungen
 
 Vor einer Änderung in einem der beschriebenen Bereiche:
