@@ -53,6 +53,7 @@ import {
 } from "@/app/quiz/liveResults/liveChoiceResults";
 import { aggregateLiveTextResults } from "@/app/quiz/liveResults/liveTextResults";
 import { selectEffectiveLiveSubmissions } from "@/app/quiz/liveResults/effectiveLiveSubmissions";
+import { shouldReuseQuestionInteractionRun } from "./interactionRunReuse";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -368,7 +369,7 @@ export async function syncInteractionForPresentation(
           quiz_id: input.quizId,
           quiz_fragen_id: identity.questionAssignmentId,
         },
-        select: { quiz_abschnitt_id: true },
+        select: { quiz_abschnitt_id: true, ergebnisdarstellung: true },
       })
     : (resolvedAssignment = await resolveInteractionAssignment(
         db,
@@ -412,13 +413,16 @@ export async function syncInteractionForPresentation(
   if (identity.phase === "QUESTION") {
     if (
       currentRun?.quiz_fragen_id === identity.questionAssignmentId &&
-      ((currentRun.state === "OPEN" || currentRun.state === "COUNTDOWN") ||
-        shouldReuseStoppedPixelRunOnQuestionReentry({
+      shouldReuseQuestionInteractionRun({
+        state: currentRun.state,
+        liveResultsEnabled: assignment?.ergebnisdarstellung === "LIVE",
+        stoppedPixelRunReusable: shouldReuseStoppedPixelRunOnQuestionReentry({
           state: currentRun.state,
           configSnapshot: currentRun.config_snapshot,
           stoppedAt: currentRun.stopped_at,
           stoppedAtStage: currentRun.stopped_at_stage,
-        }))
+        }),
+      })
     ) {
       return currentRun;
     }
@@ -441,13 +445,16 @@ export async function syncInteractionForPresentation(
     });
     if (
       previousRun &&
-      ((previousRun.state === "OPEN" || previousRun.state === "COUNTDOWN") ||
-        shouldReuseStoppedPixelRunOnQuestionReentry({
+      shouldReuseQuestionInteractionRun({
+        state: previousRun.state,
+        liveResultsEnabled: assignment?.ergebnisdarstellung === "LIVE",
+        stoppedPixelRunReusable: shouldReuseStoppedPixelRunOnQuestionReentry({
           state: previousRun.state,
           configSnapshot: previousRun.config_snapshot,
           stoppedAt: previousRun.stopped_at,
           stoppedAtStage: previousRun.stopped_at_stage,
-        }))
+        }),
+      })
     ) {
       return db.quiz_interaction_runs.update({
         where: { interaction_run_id: previousRun.interaction_run_id },
@@ -566,6 +573,33 @@ export async function closeCurrentInteraction(
   return runId === null
     ? null
     : closeRun(db, runId, { reason, keepCurrent: true });
+}
+
+export async function closeQuizQuestionInteraction(
+  db: DbClient,
+  input: {
+    quizId: number;
+    quizFragenId: number;
+    interactionRunId: number;
+    reason?: string;
+  },
+) {
+  await lockRun(db, input.interactionRunId);
+  const run = await db.quiz_interaction_runs.findUnique({
+    where: { interaction_run_id: input.interactionRunId },
+  });
+  if (
+    !run ||
+    !run.is_current ||
+    run.quiz_id !== input.quizId ||
+    run.quiz_fragen_id !== input.quizFragenId
+  ) {
+    return null;
+  }
+  return closeRun(db, input.interactionRunId, {
+    reason: input.reason ?? "MODERATOR_CLOSED",
+    keepCurrent: true,
+  });
 }
 
 export async function closeBlockInteractions(

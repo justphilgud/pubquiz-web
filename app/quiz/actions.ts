@@ -106,7 +106,7 @@ import {
 } from "./orderingQuestionOrder";
 import {
   closeBlockInteractions,
-  closeCurrentInteraction,
+  closeQuizQuestionInteraction,
   getQuizLiveSnapshotData,
   saveTeamAnswerDraft,
   syncInteractionForPresentation,
@@ -3018,7 +3018,16 @@ export async function closeQuizQuestionAnswerPhase(data: {
     select: { interaction_run_id: true },
   });
   if (!run) throw new Error("Für diese Frage ist keine Antwortphase aktiv.");
-  await prisma.$transaction((tx) => closeCurrentInteraction(tx, data.quizId));
+  const closedRun = await prisma.$transaction((tx) =>
+    closeQuizQuestionInteraction(tx, {
+      quizId: data.quizId,
+      quizFragenId: data.quizFragenId,
+      interactionRunId: run.interaction_run_id,
+    }),
+  );
+  if (!closedRun) {
+    throw new Error("Die Antwortphase hat sich inzwischen geändert.");
+  }
   revalidatePath(`/quiz/${data.quizId}/moderation`);
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
 }

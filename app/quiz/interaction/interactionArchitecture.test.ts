@@ -197,6 +197,7 @@ test("full participant refresh does not hydrate the complete run history", () =>
 
 test("a stale presentation slide cannot reopen a manually locked block", () => {
   const service = read("app/quiz/interaction/interaction.server.ts");
+  const runReuse = read("app/quiz/interaction/interactionRunReuse.ts");
   const sync = service.slice(
     service.indexOf("export async function syncInteractionForPresentation"),
     service.indexOf("export async function closeCurrentInteraction"),
@@ -207,10 +208,10 @@ test("a stale presentation slide cannot reopen a manually locked block", () => {
     sync.indexOf("isQuizQuestionBlockOpen(blockRelease)") <
       sync.indexOf("quiz_interaction_runs.create"),
   );
-  assert.match(
-    sync,
-    /currentRun\?\.quiz_fragen_id === identity\.questionAssignmentId &&[\s\S]*currentRun\.state === "OPEN"[\s\S]*currentRun\.state === "COUNTDOWN"/,
-  );
+  assert.match(sync, /shouldReuseQuestionInteractionRun/);
+  assert.match(runReuse, /state === "OPEN"/);
+  assert.match(runReuse, /state === "COUNTDOWN"/);
+  assert.match(runReuse, /liveResultsEnabled && input\.state === "CLOSED"/);
 });
 
 test("a conscious block reopen resynchronizes the current question", () => {
