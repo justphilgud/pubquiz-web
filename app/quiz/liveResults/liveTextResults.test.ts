@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { aggregateLiveTextResults } from "./liveTextResults";
+import { aggregateLiveTextResults, type LiveTextSubmission } from "./liveTextResults";
 
 const submissions = [
   { submissionId: 1, teamId: 2, teamName: "Team A", avatarCode: "toaster", photoUrl: null, originalText: "P3nis", isVisible: true },
-  { submissionId: 2, teamId: 3, teamName: "Team B", avatarCode: "lamp", photoUrl: null, originalText: "Harmlos", isVisible: false },
-];
+  { submissionId: 2, teamId: 3, teamName: "Team B", avatarCode: "tischlampe", photoUrl: null, originalText: "Harmlos", isVisible: false },
+] satisfies readonly LiveTextSubmission[];
 
 test("public state contains only explicitly approved sanitized text", () => {
   const state = aggregateLiveTextResults({ visible: true, state: "OPEN", totalTeams: 3, submissions, rules: [{ id: 1, searchTerm: "Penis", replacement: "Sonnenblume" }], includeModeration: false });

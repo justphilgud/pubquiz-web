@@ -61,6 +61,7 @@ import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import { resolvePodiumReveal } from "@/app/rendering/presentation/presentationRankingPolicy";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
+import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -875,7 +876,7 @@ export default function ModerationClient({
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
                     {liveResultState.moderationResponses?.map((response) => (
                       <article key={response.submissionId} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3">
-                        <div className="flex items-center justify-between gap-3"><strong>{response.teamName}</strong><span className="text-xs text-zinc-400">{response.isVisible ? "öffentlich" : "nicht freigegeben"}</span></div>
+                        <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><TeamIdentityVisual name={response.teamName} photoUrl={response.photoUrl} avatarCode={response.avatarCode} className="h-9 w-9" /><strong>{response.teamName}</strong></div><span className="text-xs text-zinc-400">{response.isVisible ? "öffentlich" : "nicht freigegeben"}</span></div>
                         <p className="mt-2 text-sm">Original: „{response.originalText}“</p>
                         {response.changed && <p className="mt-1 text-sm text-amber-200">Öffentlich: „{response.publicText}“</p>}
                         <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveTextPublication(response.submissionId, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold disabled:opacity-50">{response.isVisible ? "Freigabe zurücknehmen" : "Für Publikum freigeben"}</button>

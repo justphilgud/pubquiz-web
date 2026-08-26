@@ -1,11 +1,12 @@
 import type { QuizInteractionState } from "@/app/quiz/interaction/interactionStateMachine";
 import { sanitizePublicLiveText, type PublicTextReplacementRule } from "./publicTextSanitizer";
+import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 
 export type LiveTextSubmission = {
   submissionId: number;
   teamId: number;
   teamName: string;
-  avatarCode: string;
+  avatarCode: TeamAvatarCode;
   photoUrl: string | null;
   originalText: string;
   isVisible: boolean;
@@ -22,7 +23,7 @@ export type LiveTextResultState = {
     submissionId: number;
     teamId: number;
     teamName: string;
-    avatarCode: string;
+    avatarCode: TeamAvatarCode;
     photoUrl: string | null;
     originalText: string;
     publicText: string;
