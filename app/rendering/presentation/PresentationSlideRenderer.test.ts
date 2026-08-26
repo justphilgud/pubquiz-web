@@ -502,7 +502,8 @@ test("player and moderation preview share the presentation renderer", () => {
   assert.match(playerSource, /<PresentationSlideRenderer/);
   assert.match(moderationPreviewSource, /<PresentationSlideRenderer/);
   assert.doesNotMatch(moderationPreviewSource, /<SlidePreview/);
-  assert.match(playerSource, /resolveIntermediateStandingsAudience\(scores\)/);
+  assert.match(playerSource, /getPraesentationAudienceZwischenstand\(quizId\)/);
+  assert.match(playerSource, /punktestand: showIntermediateStandings \? \[\] : scores/);
   assert.doesNotMatch(playerSource, /resolveIntermediateStandingsModeration/);
   assert.match(
     moderationPreviewSource,

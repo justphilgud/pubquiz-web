@@ -347,6 +347,14 @@ export function isStandingsSlide(slide: Slide | undefined) {
   );
 }
 
+export function isIntermediateStandingsSlide(slide: Slide | undefined) {
+  return (
+    slide?.typ === "zwischenstand" ||
+    (slide?.typ === "ablauf" &&
+      slide.element.type === "INTERMEDIATE_STANDINGS")
+  );
+}
+
 export function isPodiumRevealSlide(slide: Slide | undefined) {
   return (
     slide?.typ === "endstand" ||

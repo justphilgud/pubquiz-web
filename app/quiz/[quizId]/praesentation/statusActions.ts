@@ -24,6 +24,7 @@ import {
 } from "@/app/lib/prismaQueryDiagnostics.server";
 import { mapTeamProfile } from "@/app/teams/teamProfile";
 import { loadYearlyRanking } from "@/app/quiz/yearlyRanking.server";
+import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentation/presentationRankingPolicy";
 
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
@@ -96,6 +97,33 @@ export async function getPraesentationPunktestand(quizId: number) {
       photoUrl: entry.photoUrl,
       punkte: Number(entry.punkte),
     }));
+}
+
+export async function getPraesentationAudienceZwischenstand(quizId: number) {
+  await requireQuizViewer(quizId);
+  const [sessions, totals] = await Promise.all([
+    prisma.quiz_team_sessions.findMany({
+      where: { quiz_id: quizId },
+      select: { quiz_team_session_id: true },
+    }),
+    prisma.team_antworten.groupBy({
+      by: ["quiz_team_session_id"],
+      where: { quiz_id: quizId },
+      _sum: { vergebene_punkte: true },
+    }),
+  ]);
+  const totalsBySession = new Map(
+    totals.map((entry) => [
+      entry.quiz_team_session_id,
+      Number(entry._sum.vergebene_punkte ?? new Prisma.Decimal(0)),
+    ]),
+  );
+
+  return resolveIntermediateStandingsAudience(
+    sessions.map((session) => ({
+      punkte: totalsBySession.get(session.quiz_team_session_id) ?? 0,
+    })),
+  );
 }
 
 export async function getPraesentationJahreswertung(quizId: number) {

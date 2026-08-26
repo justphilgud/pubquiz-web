@@ -7,6 +7,7 @@ import { getPresentationFunnyAnswers, getQuizLiveSnapshot, getSchaetzfrageById }
 import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import {
+  getPraesentationAudienceZwischenstand,
   getPraesentationPunktestand,
   getPraesentationJahreswertung,
   getPraesentationStatus,
@@ -14,6 +15,7 @@ import {
 import {
   buildPraesentationSlides,
   getPresentationSlideKey,
+  isIntermediateStandingsSlide,
   isStandingsSlide,
 } from "./buildPraesentationSlides";
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
@@ -28,7 +30,7 @@ import { QuizThemeScope } from "@/app/rendering/theme/QuizThemeScope";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
-import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentation/presentationRankingPolicy";
+import type { IntermediateStandingsAudienceEntry } from "@/app/rendering/presentation/presentationRankingPolicy";
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -52,6 +54,9 @@ export default function QuizPraesentationPlayer({
   const [liveState, setLiveState] = useState(initialLiveState);
   const [scores, setScores] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
+  >([]);
+  const [audienceInterimStandings, setAudienceInterimStandings] = useState<
+    IntermediateStandingsAudienceEntry[]
   >([]);
   const [yearlyStandings, setYearlyStandings] = useState<YearlyRankingEntry[]>([]);
   const [estimationQuestion, setEstimationQuestion] =
@@ -96,6 +101,7 @@ export default function QuizPraesentationPlayer({
     slide?.typ === "frage" || slide?.typ === "funny" || slide?.typ === "aufloesung"
       ? slide.frage.quiz_fragen_id
       : undefined;
+  const showIntermediateStandings = isIntermediateStandingsSlide(slide);
 
   useEffect(() => {
     if (
@@ -175,14 +181,21 @@ export default function QuizPraesentationPlayer({
     if (!isStandingsSlide(slide)) return;
     let active = true;
 
-    void Promise.all([
-      getPraesentationPunktestand(quizId),
-      getPraesentationJahreswertung(quizId),
-    ]).then(([currentScores, yearlyScores]) => {
-      if (!active) return;
-      setScores(currentScores);
-      setYearlyStandings(yearlyScores);
-    });
+    if (isIntermediateStandingsSlide(slide)) {
+      void getPraesentationAudienceZwischenstand(quizId).then((standings) => {
+        if (!active) return;
+        setAudienceInterimStandings(standings);
+      });
+    } else {
+      void Promise.all([
+        getPraesentationPunktestand(quizId),
+        getPraesentationJahreswertung(quizId),
+      ]).then(([currentScores, yearlyScores]) => {
+        if (!active) return;
+        setScores(currentScores);
+        setYearlyStandings(yearlyScores);
+      });
+    }
 
     return () => {
       active = false;
@@ -255,8 +268,10 @@ export default function QuizPraesentationPlayer({
           displayState={{
             renderMode: "PRESENTATION",
             templateRevealCount: liveState.revealCount,
-            punktestand: scores,
-            intermediateStandings: resolveIntermediateStandingsAudience(scores),
+            punktestand: showIntermediateStandings ? [] : scores,
+            intermediateStandings: showIntermediateStandings
+              ? audienceInterimStandings
+              : [],
             yearlyStandings,
             endstandRevealCount: liveState.revealCount,
             now,
