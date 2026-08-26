@@ -48,11 +48,7 @@ import {
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
-import {
-  isPollQuestionTemplateId,
-  questionTemplateIds,
-  resolveCanonicalQuestionTemplateId,
-} from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
@@ -568,9 +564,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
       : [];
   const storybookKind = resolveStorybookQuestionKind(frage);
   const isFaceMorph =
-    resolveCanonicalQuestionTemplateId(frage.templateId) ===
-      questionTemplateIds.faceMorph ||
-    frage.medien.some((medium) => medium.slotKey === "face_morph_result");
+    frage.presentationLayouts.question.contentRole === "FACE_MORPH";
   const faceMorphMedium = frage.medien.find(
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));
@@ -1331,9 +1325,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
     (feld) => feld.loesungen.length > 0
   );
   const isFaceMorph =
-    resolveCanonicalQuestionTemplateId(frage.templateId) ===
-      questionTemplateIds.faceMorph ||
-    frage.medien.some((medium) => medium.slotKey === "face_morph_result");
+    frage.presentationLayouts.solution.contentRole === "FACE_MORPH";
   const faceMorphMedium = frage.medien.find(
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));

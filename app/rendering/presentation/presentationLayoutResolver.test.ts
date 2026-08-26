@@ -105,10 +105,12 @@ test("template semantics select choice, boolean, ordering, audio and reveal layo
     resolve({ templateId: questionTemplateIds.pixelImage }).variant,
     "REVEAL_SEQUENCE",
   );
-  assert.equal(
-    resolve({ templateId: questionTemplateIds.faceMorph }).variant,
-    "MEDIA_FOCUS",
-  );
+  assert.deepEqual(resolve({ templateId: questionTemplateIds.faceMorph }), {
+    variant: "MEDIA_FOCUS",
+    source: "AUTO",
+    reason: "FACE_MORPH_TEMPLATE",
+    contentRole: "FACE_MORPH",
+  });
   assert.equal(
     resolve({ templateId: questionTemplateIds.estimate }).variant,
     "CONTENT_CENTERED",
@@ -116,6 +118,29 @@ test("template semantics select choice, boolean, ordering, audio and reveal layo
   assert.equal(
     resolve({ templateId: questionTemplateIds.anagram }).variant,
     "CONTENT_CENTERED",
+  );
+});
+
+test("the persisted FaceMorph media slot restores the runtime role for legacy assignments", () => {
+  assert.deepEqual(
+    resolve({
+      templateId: null,
+      structuredFieldCount: 2,
+      media: [
+        {
+          fileName: "generated-morph.webp",
+          mediaType: "Bild",
+          scope: "QUESTION",
+          slotKey: "face_morph_result",
+        },
+      ],
+    }),
+    {
+      variant: "MEDIA_FOCUS",
+      source: "AUTO",
+      reason: "FACE_MORPH_TEMPLATE",
+      contentRole: "FACE_MORPH",
+    },
   );
 });
 

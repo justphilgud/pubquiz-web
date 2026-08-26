@@ -23,6 +23,7 @@ test("presentation data resolves question and solution layouts centrally", () =>
   assert.match(actionsSource, /phase: "QUESTION"/);
   assert.match(actionsSource, /phase: "SOLUTION"/);
   assert.match(actionsSource, /presentationLayouts:/);
+  assert.match(actionsSource, /slotKey: medium\.slot_key/);
 });
 
 test("the shared renderer consumes the resolved layouts for both phases", () => {
@@ -33,6 +34,10 @@ test("the shared renderer consumes the resolved layouts for both phases", () => 
   assert.match(
     rendererSource,
     /frage\.presentationLayouts\.solution\.variant/,
+  );
+  assert.match(
+    rendererSource,
+    /frage\.presentationLayouts\.question\.contentRole === "FACE_MORPH"/,
   );
   assert.match(rendererSource, /data-presentation-layout=\{layoutVariant\}/);
   assert.doesNotMatch(

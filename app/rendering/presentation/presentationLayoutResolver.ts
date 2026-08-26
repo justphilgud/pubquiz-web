@@ -15,6 +15,7 @@ export type PresentationLayoutMedium = {
   fileName: string;
   mediaType: string;
   scope: "QUESTION" | "ANSWER" | "STRUCTURED_FIELD";
+  slotKey?: string | null;
 };
 
 export type PresentationLayoutReason =
@@ -38,6 +39,7 @@ export type ResolvedPresentationLayout = {
   variant: TemplateLayoutVariant;
   source: "AUTO" | "LEGACY_OVERRIDE";
   reason: PresentationLayoutReason;
+  contentRole?: "FACE_MORPH";
 };
 
 export type ResolvePresentationLayoutInput = {
@@ -114,6 +116,16 @@ export function resolvePresentationLayout(
   const canonicalTemplateId =
     resolveCanonicalQuestionTemplateId(input.templateId) ??
     questionTemplateIds.standard;
+  const isFaceMorph =
+    canonicalTemplateId === questionTemplateIds.faceMorph ||
+    input.media.some(
+      (medium) =>
+        medium.scope === "QUESTION" &&
+        medium.slotKey === "face_morph_result",
+    );
+  const contentRole = isFaceMorph
+    ? ({ contentRole: "FACE_MORPH" } as const)
+    : {};
 
   if (input.phase === "SOLUTION") {
     const resolved = resolveAllowedVariant(contract, "SOLUTION_FOCUS");
@@ -121,6 +133,7 @@ export function resolvePresentationLayout(
       variant: resolved.variant,
       source: "AUTO",
       reason: resolved.usedFallback ? "CONTRACT_FALLBACK" : "SOLUTION_PHASE",
+      ...contentRole,
     };
   }
 
@@ -133,6 +146,7 @@ export function resolvePresentationLayout(
       variant: legacyVariant,
       source: "LEGACY_OVERRIDE",
       reason: "LEGACY_COMPATIBLE",
+      ...contentRole,
     };
   }
 
@@ -164,7 +178,7 @@ export function resolvePresentationLayout(
   ) {
     preferred = "AUDIO_FOCUS";
     reason = "AUDIO_TEMPLATE";
-  } else if (canonicalTemplateId === questionTemplateIds.faceMorph) {
+  } else if (isFaceMorph) {
     preferred = "MEDIA_FOCUS";
     reason = "FACE_MORPH_TEMPLATE";
   } else if (input.structuredFieldCount > 0) {
@@ -189,5 +203,6 @@ export function resolvePresentationLayout(
     variant: resolved.variant,
     source: "AUTO",
     reason: resolved.usedFallback ? "CONTRACT_FALLBACK" : reason,
+    ...contentRole,
   };
 }

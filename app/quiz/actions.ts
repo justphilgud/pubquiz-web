@@ -1872,6 +1872,7 @@ export async function getQuizPraesentation(
           fileName: medium.datei,
           mediaType: medium.medientyp.medientyp,
           scope: "QUESTION" as const,
+          slotKey: medium.slot_key,
         })),
         ...eintrag.fragen.antworten.flatMap((antwort) =>
           antwort.medien.map((medium) => ({

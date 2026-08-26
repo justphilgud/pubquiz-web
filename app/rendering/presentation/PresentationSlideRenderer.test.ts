@@ -200,11 +200,37 @@ test("FaceMorph keeps structured answer fields out of the question slide and rev
   const faceMorphQuestion = {
     ...baseQuestion,
     frage: "Welche zwei Personen wurden hier kombiniert?",
-    templateId: null,
+    templateId: "face_morph",
     templateConfig: null,
     presentationLayouts: {
-      question: { variant: "STRUCTURED_RESPONSE" as const, source: "AUTO" as const, reason: "STRUCTURED_RESPONSE" as const },
-      solution: { variant: "SOLUTION_FOCUS" as const, source: "AUTO" as const, reason: "SOLUTION_PHASE" as const },
+      question: resolvePresentationLayout({
+        templateId: "face_morph",
+        phase: "QUESTION",
+        legacyLayout: "standard",
+        questionText: "Welche zwei Personen wurden hier kombiniert?",
+        answerOptionCount: 0,
+        structuredFieldCount: 2,
+        media: [{
+          fileName: "questions/face-morph.webp",
+          mediaType: "Bild",
+          scope: "QUESTION",
+          slotKey: "face_morph_result",
+        }],
+      }),
+      solution: resolvePresentationLayout({
+        templateId: "face_morph",
+        phase: "SOLUTION",
+        legacyLayout: "standard",
+        questionText: "Welche zwei Personen wurden hier kombiniert?",
+        answerOptionCount: 0,
+        structuredFieldCount: 2,
+        media: [{
+          fileName: "questions/face-morph.webp",
+          mediaType: "Bild",
+          scope: "QUESTION",
+          slotKey: "face_morph_result",
+        }],
+      }),
     },
     medien: [{
       medien_id: 42,
