@@ -24,9 +24,10 @@ type Props = {
 
 export default async function OutroEditorPage({ params, searchParams }: Props) {
   const [{ quizId }, query] = await Promise.all([params, searchParams]);
-  const [quiz, slideVisibility, calendarSlide] = await Promise.all([
+  const [quiz, slideVisibility, questionSubmissionSlide, calendarSlide] = await Promise.all([
     getQuizDetails(Number(quizId)),
     getQuizFixedSlideVisibility(Number(quizId)),
+    getFixedSlideConfig(Number(quizId), "questionSubmission"),
     getFixedSlideConfig(Number(quizId), "calendar"),
   ]);
 
@@ -41,9 +42,9 @@ export default async function OutroEditorPage({ params, searchParams }: Props) {
 
   return (
     <FixedSlideEditor
-      eyebrow="Outro · 2 feste Slides"
+      eyebrow="Outro · 3 feste Slides"
       title="Outro konfigurieren"
-      description="Bekanntmachungen und der allgemeine PubQuiz-Kalender bilden gemeinsam den Abschluss."
+      description="Bekanntmachungen, optionale Frageneinreichung und der allgemeine PubQuiz-Kalender bilden gemeinsam den Abschluss."
       initialItemId={initialItemId}
       backHref={`/quiz/${quizIdValue}`}
       items={[
@@ -93,6 +94,44 @@ export default async function OutroEditorPage({ params, searchParams }: Props) {
           id: OUTRO_SLIDES[1].id,
           title: OUTRO_SLIDES[1].title,
           description: OUTRO_SLIDES[1].description,
+          status: slideVisibility.questionSubmission ? "configured" : "notice",
+          panel: (
+            <FixedSlideForm
+              action={saveOutroSlide}
+              previewHref="/frage-einreichen"
+            >
+              <input type="hidden" name="quizId" value={quizIdValue} />
+              <input type="hidden" name="slideId" value="questionSubmission" />
+              <FixedSlideEnabledField defaultEnabled={slideVisibility.questionSubmission} />
+              <FixedSlideField label="Überschrift">
+                <input
+                  name="title"
+                  defaultValue={questionSubmissionSlide.title ?? "Eure Frage fürs nächste Quiz"}
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                />
+              </FixedSlideField>
+              <FixedSlideField label="Beschreibung / Subline">
+                <textarea
+                  name="body"
+                  rows={4}
+                  defaultValue={questionSubmissionSlide.body ?? "Scanne den QR-Code und reiche deine eigene Quizfrage ein."}
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                />
+              </FixedSlideField>
+              <FixedSlideField label="CTA- / Hinweistext">
+                <input
+                  name="ctaText"
+                  defaultValue={questionSubmissionSlide.teamHint ?? "Anonym möglich · jede Frage wird redaktionell geprüft."}
+                  className="rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                />
+              </FixedSlideField>
+            </FixedSlideForm>
+          ),
+        },
+        {
+          id: OUTRO_SLIDES[2].id,
+          title: OUTRO_SLIDES[2].title,
+          description: OUTRO_SLIDES[2].description,
           status: "configured",
           panel: (
             <FixedSlideForm

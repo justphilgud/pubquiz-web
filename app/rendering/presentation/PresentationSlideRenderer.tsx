@@ -273,12 +273,19 @@ export default function PresentationSlideRenderer({
   } = displayState;
   const relativeAnswerUrl = `/quiz/${quiz.quiz_id}/antworten`;
   const relativeCalendarUrl = PUBLIC_CALENDAR_FEED_PATH;
+  const relativeQuestionSubmissionUrl = "/frage-einreichen";
   const [answerUrl, setAnswerUrl] = useState(relativeAnswerUrl);
   const [calendarUrl, setCalendarUrl] = useState(relativeCalendarUrl);
+  const [questionSubmissionUrl, setQuestionSubmissionUrl] = useState(
+    relativeQuestionSubmissionUrl,
+  );
   useEffect(() => {
     setAnswerUrl(`${window.location.origin}${relativeAnswerUrl}`);
     setCalendarUrl(buildPublicCalendarSubscriptionUrl(window.location.origin));
-  }, [relativeAnswerUrl, relativeCalendarUrl]);
+    setQuestionSubmissionUrl(
+      `${window.location.origin}${relativeQuestionSubmissionUrl}`,
+    );
+  }, [relativeAnswerUrl, relativeCalendarUrl, relativeQuestionSubmissionUrl]);
   const currentSlideMedia =
     slide?.typ === "frage"
       ? slide.frage.medien
@@ -2422,6 +2429,28 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
     );
   }
 
+  if (type === "QUESTION_SUBMISSION_QR") {
+    return (
+      <section className="presentation-flow-slide" data-flow-type={type}>
+        <p className="presentation-flow-kicker">Mitmachen</p>
+        <h2>{config.title ?? "Eure Frage fürs nächste Quiz"}</h2>
+        <p className="presentation-flow-lead">
+          {config.body ?? "Scanne den QR-Code und reiche deine eigene Quizfrage ein."}
+        </p>
+        <div className="presentation-flow-qr-layout">
+          <div className="presentation-flow-qr">
+            <QRCode value={questionSubmissionUrl} size={400} />
+          </div>
+          <div>
+            <strong>Quizfrage einreichen</strong>
+            <p>{config.teamHint ?? "Anonym möglich · jede Frage wird redaktionell geprüft."}</p>
+            <p className="mt-5 break-all text-base opacity-80">{questionSubmissionUrl}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="presentation-flow-slide" data-flow-type={type}>
       <p className="presentation-flow-kicker">
@@ -2563,7 +2592,7 @@ function renderAktuellenSlide() {
       ? slide.abschnitt.quiz_abschnitt_id
       : slideIndex;
   const inferredStorybookContentKind: ResolveStorybookCompositionInput["contentKind"] =
-    slide?.typ === "ablauf" && ["WAITING", "START_SEQUENCE", "WELCOME", "WINNER", "CLOSING", "CALENDAR_SUBSCRIPTION"].includes(slide.element.type) ? "COVER"
+    slide?.typ === "ablauf" && ["WAITING", "START_SEQUENCE", "WELCOME", "WINNER", "CLOSING", "QUESTION_SUBMISSION_QR", "CALENDAR_SUBSCRIPTION"].includes(slide.element.type) ? "COVER"
       : slide?.typ === "ablauf" && ["ROUND_INTRO", "CHAPTER_INTRO"].includes(slide.element.type) ? "CHAPTER"
       : slide?.typ === "ablauf" && slide.element.type === "AUDIO" ? "AUDIO"
       : slide?.typ === "ablauf" && ["IMAGE", "IMAGE_GALLERY", "MEDIA_SEQUENCE", "PORTRAIT", "VIDEO"].includes(slide.element.type) ? "IMAGE"

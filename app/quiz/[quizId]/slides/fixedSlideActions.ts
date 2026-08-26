@@ -178,7 +178,7 @@ export async function saveOutroSlide(
       quizId,
       slideIdValue,
       formData.get("enabled") === "on",
-      slideIdValue === "calendar"
+      slideIdValue === "calendar" || slideIdValue === "questionSubmission"
         ? {
             title: text(formData, "title"),
             body: text(formData, "body"),

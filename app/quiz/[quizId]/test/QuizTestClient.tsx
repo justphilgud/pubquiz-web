@@ -65,6 +65,7 @@ const quickTargets = [
   ["YEARLY_STANDINGS", "Jahreswertung"],
   ["CLOSING", "Abschluss"],
   ["CALENDAR_SUBSCRIPTION", "PubQuiz-Kalender"],
+  ["QUESTION_SUBMISSION_QR", "Frage einreichen"],
 ] as const;
 
 export default function QuizTestClient({

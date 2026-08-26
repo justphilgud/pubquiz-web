@@ -165,7 +165,8 @@ export async function getQuizFixedSlideVisibility(quizId: number) {
   const visibility = {} as Record<FixedSlideId, boolean>;
   for (const [slideId, flowType] of Object.entries(FIXED_SLIDE_FLOW_TYPES)) {
     visibility[slideId as FixedSlideId] =
-      items.find((item) => item.typ === flowType)?.ist_sichtbar ?? true;
+      items.find((item) => item.typ === flowType)?.ist_sichtbar ??
+      slideId !== "questionSubmission";
   }
   return visibility;
 }

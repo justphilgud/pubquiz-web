@@ -544,6 +544,12 @@ test("calendar CTA leaves the team join QR payload and overflow UI intact", () =
   assert.match(rendererSource, /\+ \{teamJoinState\.remainingTeams\} weitere/);
 });
 
+test("question submission QR uses the public route and remains separate from join", () => {
+  assert.match(rendererSource, /relativeQuestionSubmissionUrl = "\/frage-einreichen"/);
+  assert.match(rendererSource, /QRCode value=\{questionSubmissionUrl\}/);
+  assert.match(rendererSource, /Anonym möglich/);
+});
+
 test("join slide keeps the QR dominant and renders compact identity chips for up to twelve teams", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const slide: Slide = {

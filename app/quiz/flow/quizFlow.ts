@@ -15,6 +15,7 @@ export const QUIZ_FLOW_ITEM_TYPES = [
   "WINNER",
   "YEARLY_STANDINGS",
   "CUSTOM_MESSAGE",
+  "QUESTION_SUBMISSION_QR",
   "CALENDAR_SUBSCRIPTION",
   "CLOSING",
   "QUESTION",
@@ -81,6 +82,7 @@ export const QUIZ_GLOBAL_FLOW_ITEM_TYPES = [
   "WINNER",
   "YEARLY_STANDINGS",
   "CUSTOM_MESSAGE",
+  "QUESTION_SUBMISSION_QR",
   "CALENDAR_SUBSCRIPTION",
   "CLOSING",
 ] as const satisfies readonly QuizFlowItemType[];
@@ -708,6 +710,20 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
         quiz.outro_bekanntmachungen ??
         "Wir freuen uns auf den nächsten gemeinsamen Quizabend.",
     }),
+    defaultItem(
+      "QUESTION_SUBMISSION_QR",
+      "AFTER_QUIZ",
+      "QUIZ",
+      null,
+      45,
+      {
+        version: 1,
+        title: "Eure Frage fürs nächste Quiz",
+        body: "Scanne den QR-Code und reiche deine eigene Quizfrage ein.",
+        teamHint: "Anonym möglich · jede Frage wird redaktionell geprüft.",
+      },
+      false,
+    ),
     defaultItem("CALENDAR_SUBSCRIPTION", "AFTER_QUIZ", "QUIZ", null, 50, {
       version: 1,
       title: "Kein PubQuiz mehr verpassen",
@@ -833,6 +849,7 @@ export function getQuizFlowTypeLabel(type: QuizFlowItemType) {
     WINNER: "Gewinner",
     YEARLY_STANDINGS: "Jahreswertung",
     CUSTOM_MESSAGE: "Freie Mitteilung",
+    QUESTION_SUBMISSION_QR: "Frage einreichen",
     CALENDAR_SUBSCRIPTION: "PubQuiz-Kalender",
     CLOSING: "Abschluss",
     QUESTION: "Frage",
@@ -921,6 +938,7 @@ export function getQuizFlowAnswerStatus(type: QuizFlowItemType) {
     type === "FINAL_STANDINGS" ||
     type === "WINNER" ||
     type === "YEARLY_STANDINGS" ||
+    type === "QUESTION_SUBMISSION_QR" ||
     type === "CALENDAR_SUBSCRIPTION" ||
     type === "CLOSING"
   ) {

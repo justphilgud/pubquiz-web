@@ -40,6 +40,11 @@ export const OUTRO_SLIDES = [
     description: "Hinweise, Termine, Abschlussinformationen und Musik",
   },
   {
+    id: "questionSubmission",
+    title: "Frage einreichen",
+    description: "Öffentliche Frageneinreichung per QR-Code anbieten",
+  },
+  {
     id: "calendar",
     title: "PubQuiz-Kalender",
     description: "Allgemeinen öffentlichen Kalender per QR-Code abonnieren",
@@ -55,6 +60,7 @@ export const FIXED_SLIDE_FLOW_TYPES = {
   rules: "RULES",
   prizes: "PRIZES",
   announcements: "CLOSING",
+  questionSubmission: "QUESTION_SUBMISSION_QR",
   calendar: "CALENDAR_SUBSCRIPTION",
 } as const;
 
