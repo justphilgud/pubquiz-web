@@ -444,6 +444,13 @@ export type DecimalFilter<$PrismaModel = never> = {
   not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type EnumQuizResultDisplayModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuizResultDisplayMode | Prisma.EnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuizResultDisplayModeFilter<$PrismaModel> | $Enums.QuizResultDisplayMode
+}
+
 export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -458,6 +465,16 @@ export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type EnumQuizResultDisplayModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuizResultDisplayMode | Prisma.EnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuizResultDisplayModeWithAggregatesFilter<$PrismaModel> | $Enums.QuizResultDisplayMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumQuizResultDisplayModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumQuizResultDisplayModeFilter<$PrismaModel>
 }
 
 export type EnumStoryQuestionRelationshipNullableFilter<$PrismaModel = never> = {
@@ -1036,6 +1053,13 @@ export type NestedDecimalFilter<$PrismaModel = never> = {
   not?: Prisma.NestedDecimalFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type NestedEnumQuizResultDisplayModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuizResultDisplayMode | Prisma.EnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuizResultDisplayModeFilter<$PrismaModel> | $Enums.QuizResultDisplayMode
+}
+
 export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -1050,6 +1074,16 @@ export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type NestedEnumQuizResultDisplayModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.QuizResultDisplayMode | Prisma.EnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  in?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.QuizResultDisplayMode[] | Prisma.ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumQuizResultDisplayModeWithAggregatesFilter<$PrismaModel> | $Enums.QuizResultDisplayMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumQuizResultDisplayModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumQuizResultDisplayModeFilter<$PrismaModel>
 }
 
 export type NestedEnumStoryQuestionRelationshipNullableFilter<$PrismaModel = never> = {

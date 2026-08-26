@@ -3685,6 +3685,7 @@ export const Quiz_fragenScalarFieldEnum = {
   risiko_pool_teamanzahl: 'risiko_pool_teamanzahl',
   risiko_pool_fixiert_am: 'risiko_pool_fixiert_am',
   freie_antwort_erlaubt: 'freie_antwort_erlaubt',
+  ergebnisdarstellung: 'ergebnisdarstellung',
   verknuepfte_story_elemente_uebernehmen: 'verknuepfte_story_elemente_uebernehmen',
   praesentationsdauer_messungen: 'praesentationsdauer_messungen',
   praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
@@ -3834,6 +3835,7 @@ export const Quiz_interaction_runsScalarFieldEnum = {
   stopped_at_stage: 'stopped_at_stage',
   closed_at: 'closed_at',
   revealed_at: 'revealed_at',
+  live_results_visible: 'live_results_visible',
   revision: 'revision',
   config_snapshot: 'config_snapshot',
   created_at: 'created_at',
@@ -4223,6 +4225,20 @@ export type EnumStoryQuestionRelationshipFieldRefInput<$PrismaModel> = FieldRefI
  * Reference to a field of type 'StoryQuestionRelationship[]'
  */
 export type ListEnumStoryQuestionRelationshipFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StoryQuestionRelationship[]'>
+
+
+
+/**
+ * Reference to a field of type 'QuizResultDisplayMode'
+ */
+export type EnumQuizResultDisplayModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizResultDisplayMode'>
+
+
+
+/**
+ * Reference to a field of type 'QuizResultDisplayMode[]'
+ */
+export type ListEnumQuizResultDisplayModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuizResultDisplayMode[]'>
 
 
 

@@ -61,6 +61,7 @@ export type Quiz_interaction_runsMinAggregateOutputType = {
   stopped_at_stage: number | null
   closed_at: Date | null
   revealed_at: Date | null
+  live_results_visible: boolean | null
   revision: number | null
   created_at: Date | null
   updated_at: Date | null
@@ -81,6 +82,7 @@ export type Quiz_interaction_runsMaxAggregateOutputType = {
   stopped_at_stage: number | null
   closed_at: Date | null
   revealed_at: Date | null
+  live_results_visible: boolean | null
   revision: number | null
   created_at: Date | null
   updated_at: Date | null
@@ -101,6 +103,7 @@ export type Quiz_interaction_runsCountAggregateOutputType = {
   stopped_at_stage: number
   closed_at: number
   revealed_at: number
+  live_results_visible: number
   revision: number
   config_snapshot: number
   created_at: number
@@ -144,6 +147,7 @@ export type Quiz_interaction_runsMinAggregateInputType = {
   stopped_at_stage?: true
   closed_at?: true
   revealed_at?: true
+  live_results_visible?: true
   revision?: true
   created_at?: true
   updated_at?: true
@@ -164,6 +168,7 @@ export type Quiz_interaction_runsMaxAggregateInputType = {
   stopped_at_stage?: true
   closed_at?: true
   revealed_at?: true
+  live_results_visible?: true
   revision?: true
   created_at?: true
   updated_at?: true
@@ -184,6 +189,7 @@ export type Quiz_interaction_runsCountAggregateInputType = {
   stopped_at_stage?: true
   closed_at?: true
   revealed_at?: true
+  live_results_visible?: true
   revision?: true
   config_snapshot?: true
   created_at?: true
@@ -292,6 +298,7 @@ export type Quiz_interaction_runsGroupByOutputType = {
   stopped_at_stage: number | null
   closed_at: Date | null
   revealed_at: Date | null
+  live_results_visible: boolean
   revision: number
   config_snapshot: runtime.JsonValue
   created_at: Date
@@ -336,6 +343,7 @@ export type quiz_interaction_runsWhereInput = {
   stopped_at_stage?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
   closed_at?: Prisma.DateTimeNullableFilter<"quiz_interaction_runs"> | Date | string | null
   revealed_at?: Prisma.DateTimeNullableFilter<"quiz_interaction_runs"> | Date | string | null
+  live_results_visible?: Prisma.BoolFilter<"quiz_interaction_runs"> | boolean
   revision?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   config_snapshot?: Prisma.JsonFilter<"quiz_interaction_runs">
   created_at?: Prisma.DateTimeFilter<"quiz_interaction_runs"> | Date | string
@@ -363,6 +371,7 @@ export type quiz_interaction_runsOrderByWithRelationInput = {
   stopped_at_stage?: Prisma.SortOrderInput | Prisma.SortOrder
   closed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   revealed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  live_results_visible?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   config_snapshot?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -393,6 +402,7 @@ export type quiz_interaction_runsWhereUniqueInput = Prisma.AtLeast<{
   stopped_at_stage?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
   closed_at?: Prisma.DateTimeNullableFilter<"quiz_interaction_runs"> | Date | string | null
   revealed_at?: Prisma.DateTimeNullableFilter<"quiz_interaction_runs"> | Date | string | null
+  live_results_visible?: Prisma.BoolFilter<"quiz_interaction_runs"> | boolean
   revision?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   config_snapshot?: Prisma.JsonFilter<"quiz_interaction_runs">
   created_at?: Prisma.DateTimeFilter<"quiz_interaction_runs"> | Date | string
@@ -420,6 +430,7 @@ export type quiz_interaction_runsOrderByWithAggregationInput = {
   stopped_at_stage?: Prisma.SortOrderInput | Prisma.SortOrder
   closed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   revealed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  live_results_visible?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   config_snapshot?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -449,6 +460,7 @@ export type quiz_interaction_runsScalarWhereWithAggregatesInput = {
   stopped_at_stage?: Prisma.IntNullableWithAggregatesFilter<"quiz_interaction_runs"> | number | null
   closed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_interaction_runs"> | Date | string | null
   revealed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_interaction_runs"> | Date | string | null
+  live_results_visible?: Prisma.BoolWithAggregatesFilter<"quiz_interaction_runs"> | boolean
   revision?: Prisma.IntWithAggregatesFilter<"quiz_interaction_runs"> | number
   config_snapshot?: Prisma.JsonWithAggregatesFilter<"quiz_interaction_runs">
   created_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_interaction_runs"> | Date | string
@@ -465,6 +477,7 @@ export type quiz_interaction_runsCreateInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -492,6 +505,7 @@ export type quiz_interaction_runsUncheckedCreateInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -510,6 +524,7 @@ export type quiz_interaction_runsUpdateInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -537,6 +552,7 @@ export type quiz_interaction_runsUncheckedUpdateInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -560,6 +576,7 @@ export type quiz_interaction_runsCreateManyInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -576,6 +593,7 @@ export type quiz_interaction_runsUpdateManyMutationInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -597,6 +615,7 @@ export type quiz_interaction_runsUncheckedUpdateManyInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -633,6 +652,7 @@ export type quiz_interaction_runsCountOrderByAggregateInput = {
   stopped_at_stage?: Prisma.SortOrder
   closed_at?: Prisma.SortOrder
   revealed_at?: Prisma.SortOrder
+  live_results_visible?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   config_snapshot?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -664,6 +684,7 @@ export type quiz_interaction_runsMaxOrderByAggregateInput = {
   stopped_at_stage?: Prisma.SortOrder
   closed_at?: Prisma.SortOrder
   revealed_at?: Prisma.SortOrder
+  live_results_visible?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -684,6 +705,7 @@ export type quiz_interaction_runsMinOrderByAggregateInput = {
   stopped_at_stage?: Prisma.SortOrder
   closed_at?: Prisma.SortOrder
   revealed_at?: Prisma.SortOrder
+  live_results_visible?: Prisma.SortOrder
   revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -916,6 +938,7 @@ export type quiz_interaction_runsCreateWithoutQuizInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -941,6 +964,7 @@ export type quiz_interaction_runsUncheckedCreateWithoutQuizInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -993,6 +1017,7 @@ export type quiz_interaction_runsScalarWhereInput = {
   stopped_at_stage?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
   closed_at?: Prisma.DateTimeNullableFilter<"quiz_interaction_runs"> | Date | string | null
   revealed_at?: Prisma.DateTimeNullableFilter<"quiz_interaction_runs"> | Date | string | null
+  live_results_visible?: Prisma.BoolFilter<"quiz_interaction_runs"> | boolean
   revision?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   config_snapshot?: Prisma.JsonFilter<"quiz_interaction_runs">
   created_at?: Prisma.DateTimeFilter<"quiz_interaction_runs"> | Date | string
@@ -1009,6 +1034,7 @@ export type quiz_interaction_runsCreateWithoutQuiz_fragenInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1034,6 +1060,7 @@ export type quiz_interaction_runsUncheckedCreateWithoutQuiz_fragenInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1078,6 +1105,7 @@ export type quiz_interaction_runsCreateWithoutQuiz_ablauf_elementeInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1103,6 +1131,7 @@ export type quiz_interaction_runsUncheckedCreateWithoutQuiz_ablauf_elementeInput
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1147,6 +1176,7 @@ export type quiz_interaction_runsCreateWithoutStopped_by_team_sessionInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1172,6 +1202,7 @@ export type quiz_interaction_runsUncheckedCreateWithoutStopped_by_team_sessionIn
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1216,6 +1247,7 @@ export type quiz_interaction_runsCreateWithoutTeam_antwortenInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1242,6 +1274,7 @@ export type quiz_interaction_runsUncheckedCreateWithoutTeam_antwortenInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1275,6 +1308,7 @@ export type quiz_interaction_runsUpdateWithoutTeam_antwortenInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1301,6 +1335,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutTeam_antwortenInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1318,6 +1353,7 @@ export type quiz_interaction_runsCreateWithoutAnswer_submissionsInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1344,6 +1380,7 @@ export type quiz_interaction_runsUncheckedCreateWithoutAnswer_submissionsInput =
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1377,6 +1414,7 @@ export type quiz_interaction_runsUpdateWithoutAnswer_submissionsInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1403,6 +1441,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutAnswer_submissionsInput =
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1424,6 +1463,7 @@ export type quiz_interaction_runsCreateManyQuizInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1440,6 +1480,7 @@ export type quiz_interaction_runsUpdateWithoutQuizInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1465,6 +1506,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutQuizInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1487,6 +1529,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutQuizInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1507,6 +1550,7 @@ export type quiz_interaction_runsCreateManyQuiz_fragenInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1523,6 +1567,7 @@ export type quiz_interaction_runsUpdateWithoutQuiz_fragenInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1548,6 +1593,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutQuiz_fragenInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1570,6 +1616,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1590,6 +1637,7 @@ export type quiz_interaction_runsCreateManyQuiz_ablauf_elementeInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1606,6 +1654,7 @@ export type quiz_interaction_runsUpdateWithoutQuiz_ablauf_elementeInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1631,6 +1680,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutQuiz_ablauf_elementeInput
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1653,6 +1703,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeI
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1673,6 +1724,7 @@ export type quiz_interaction_runsCreateManyStopped_by_team_sessionInput = {
   stopped_at_stage?: number | null
   closed_at?: Date | string | null
   revealed_at?: Date | string | null
+  live_results_visible?: boolean
   revision?: number
   config_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
@@ -1689,6 +1741,7 @@ export type quiz_interaction_runsUpdateWithoutStopped_by_team_sessionInput = {
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1714,6 +1767,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutStopped_by_team_sessionIn
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1736,6 +1790,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessi
   stopped_at_stage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revealed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  live_results_visible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   config_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1797,6 +1852,7 @@ export type quiz_interaction_runsSelect<ExtArgs extends runtime.Types.Extensions
   stopped_at_stage?: boolean
   closed_at?: boolean
   revealed_at?: boolean
+  live_results_visible?: boolean
   revision?: boolean
   config_snapshot?: boolean
   created_at?: boolean
@@ -1825,6 +1881,7 @@ export type quiz_interaction_runsSelectCreateManyAndReturn<ExtArgs extends runti
   stopped_at_stage?: boolean
   closed_at?: boolean
   revealed_at?: boolean
+  live_results_visible?: boolean
   revision?: boolean
   config_snapshot?: boolean
   created_at?: boolean
@@ -1850,6 +1907,7 @@ export type quiz_interaction_runsSelectUpdateManyAndReturn<ExtArgs extends runti
   stopped_at_stage?: boolean
   closed_at?: boolean
   revealed_at?: boolean
+  live_results_visible?: boolean
   revision?: boolean
   config_snapshot?: boolean
   created_at?: boolean
@@ -1875,13 +1933,14 @@ export type quiz_interaction_runsSelectScalar = {
   stopped_at_stage?: boolean
   closed_at?: boolean
   revealed_at?: boolean
+  live_results_visible?: boolean
   revision?: boolean
   config_snapshot?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type quiz_interaction_runsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"interaction_run_id" | "quiz_id" | "quiz_fragen_id" | "quiz_ablauf_element_id" | "interaction_type" | "state" | "is_current" | "opened_at" | "deadline_at" | "stopped_by_team_session_id" | "stopped_at" | "stopped_at_stage" | "closed_at" | "revealed_at" | "revision" | "config_snapshot" | "created_at" | "updated_at", ExtArgs["result"]["quiz_interaction_runs"]>
+export type quiz_interaction_runsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"interaction_run_id" | "quiz_id" | "quiz_fragen_id" | "quiz_ablauf_element_id" | "interaction_type" | "state" | "is_current" | "opened_at" | "deadline_at" | "stopped_by_team_session_id" | "stopped_at" | "stopped_at_stage" | "closed_at" | "revealed_at" | "live_results_visible" | "revision" | "config_snapshot" | "created_at" | "updated_at", ExtArgs["result"]["quiz_interaction_runs"]>
 export type quiz_interaction_runsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_interaction_runs$quiz_fragenArgs<ExtArgs>
@@ -1929,6 +1988,7 @@ export type $quiz_interaction_runsPayload<ExtArgs extends runtime.Types.Extensio
     stopped_at_stage: number | null
     closed_at: Date | null
     revealed_at: Date | null
+    live_results_visible: boolean
     revision: number
     config_snapshot: runtime.JsonValue
     created_at: Date
@@ -2376,6 +2436,7 @@ export interface quiz_interaction_runsFieldRefs {
   readonly stopped_at_stage: Prisma.FieldRef<"quiz_interaction_runs", 'Int'>
   readonly closed_at: Prisma.FieldRef<"quiz_interaction_runs", 'DateTime'>
   readonly revealed_at: Prisma.FieldRef<"quiz_interaction_runs", 'DateTime'>
+  readonly live_results_visible: Prisma.FieldRef<"quiz_interaction_runs", 'Boolean'>
   readonly revision: Prisma.FieldRef<"quiz_interaction_runs", 'Int'>
   readonly config_snapshot: Prisma.FieldRef<"quiz_interaction_runs", 'Json'>
   readonly created_at: Prisma.FieldRef<"quiz_interaction_runs", 'DateTime'>

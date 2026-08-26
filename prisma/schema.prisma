@@ -420,6 +420,7 @@ model quiz_fragen {
   risiko_pool_teamanzahl                 Int?
   risiko_pool_fixiert_am                 DateTime?
   freie_antwort_erlaubt                  Boolean                 @default(false)
+  ergebnisdarstellung                    QuizResultDisplayMode   @default(STANDARD)
   verknuepfte_story_elemente_uebernehmen Boolean                 @default(true)
   praesentationsdauer_messungen          Int?                    @default(0)
   praesentationsdauer_sekunden           Int?
@@ -622,6 +623,7 @@ model quiz_interaction_runs {
   stopped_at_stage           Int?
   closed_at                  DateTime?
   revealed_at                DateTime?
+  live_results_visible       Boolean                   @default(false)
   revision                   Int                       @default(0)
   config_snapshot            Json
   created_at                 DateTime                  @default(now())
@@ -903,6 +905,13 @@ enum QuizInteractionState {
 enum TeamAnswerSubmissionStatus {
   SUBMITTED
   AUTO_FINALIZED
+
+  @@schema("pubquiz")
+}
+
+enum QuizResultDisplayMode {
+  STANDARD
+  LIVE
 
   @@schema("pubquiz")
 }

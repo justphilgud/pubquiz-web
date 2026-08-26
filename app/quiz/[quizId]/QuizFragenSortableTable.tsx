@@ -34,6 +34,7 @@ import {
   updateQuizFragePunkteModus,
   updateQuizAbschnittTitel,
   updateQuizQuestionFreeAnswerMode,
+  updateQuizQuestionResultDisplayMode,
   updateQuizFragenBlockSortierung,
 } from "../actions";
 import { synchronizeAutomaticBlockTitles } from "../quizStructure";
@@ -880,9 +881,22 @@ export default function QuizFragenSortableTable({
     setMeldung("Story-Position wurde gespeichert.");
   }
 
+  async function handleResultDisplayModeChange(
+    quizFragenId: number,
+    mode: "STANDARD" | "LIVE",
+  ) {
+    setItems((current) => current.map((item) =>
+      item.quiz_fragen_id === quizFragenId
+        ? { ...item, ergebnisdarstellung: mode }
+        : item,
+    ));
+    await updateQuizQuestionResultDisplayMode({ quizId, quizFragenId, mode });
+  }
+
   const settingsActions: QuizQuestionSettingsActions = {
     onPunkteModusChange: handlePunkteModusChange,
     onFreeAnswerChange: handleFreeAnswerChange,
+    onResultDisplayModeChange: handleResultDisplayModeChange,
     onStoryPlacementOverrideChange: handleStoryPlacementOverrideChange,
   };
 

@@ -11,6 +11,7 @@ import {
   type StoryElementType,
 } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
+import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
 
 export type QuizQuestionSettingsActions = {
   onPunkteModusChange: (
@@ -20,6 +21,10 @@ export type QuizQuestionSettingsActions = {
   onFreeAnswerChange: (
     quizFragenId: number,
     freieAntwortErlaubt: boolean,
+  ) => void | Promise<void>;
+  onResultDisplayModeChange: (
+    quizFragenId: number,
+    mode: QuizResultDisplayMode,
   ) => void | Promise<void>;
   onStoryPlacementOverrideChange: (
     quizFragenId: number,
@@ -41,6 +46,8 @@ type Props = {
   resolvedPresentationLayout: ResolvedPresentationLayout;
   punkteModus: string | null;
   freieAntwortErlaubt: boolean;
+  ergebnisdarstellung: QuizResultDisplayMode;
+  liveErgebnisUnterstuetzt: boolean;
   kannFreieAntwortAktivieren: boolean;
   istPixelbild: boolean;
   istUmfrage: boolean;
@@ -149,6 +156,8 @@ export default function QuizQuestionSettings({
   resolvedPresentationLayout,
   punkteModus,
   freieAntwortErlaubt,
+  ergebnisdarstellung,
+  liveErgebnisUnterstuetzt,
   kannFreieAntwortAktivieren,
   istPixelbild,
   istUmfrage,
@@ -246,6 +255,30 @@ export default function QuizQuestionSettings({
             label="Als offene Frage stellen"
           />
         </div>
+      )}
+
+      {liveErgebnisUnterstuetzt && (
+        <label className="space-y-2">
+          <span className="block text-xs font-bold uppercase tracking-wide text-slate-500">
+            Ergebnisdarstellung
+          </span>
+          <Select
+            value={ergebnisdarstellung}
+            onChange={(event) =>
+              void actions.onResultDisplayModeChange(
+                quizFragenId,
+                event.target.value as QuizResultDisplayMode,
+              )
+            }
+            className="min-h-11 rounded-xl font-semibold"
+          >
+            <option value="STANDARD">Standard</option>
+            <option value="LIVE">Live</option>
+          </Select>
+          <span className="block text-xs text-slate-500">
+            Live steuert nur die öffentliche Ergebnisanzeige. Lösung und Bewertung bleiben unverändert.
+          </span>
+        </label>
       )}
 
       {storyElements.length > 1 && (

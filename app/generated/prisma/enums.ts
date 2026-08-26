@@ -154,3 +154,11 @@ export const TeamAnswerSubmissionStatus = {
 } as const
 
 export type TeamAnswerSubmissionStatus = (typeof TeamAnswerSubmissionStatus)[keyof typeof TeamAnswerSubmissionStatus]
+
+
+export const QuizResultDisplayMode = {
+  STANDARD: 'STANDARD',
+  LIVE: 'LIVE'
+} as const
+
+export type QuizResultDisplayMode = (typeof QuizResultDisplayMode)[keyof typeof QuizResultDisplayMode]

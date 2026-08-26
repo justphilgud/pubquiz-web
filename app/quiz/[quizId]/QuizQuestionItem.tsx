@@ -14,6 +14,7 @@ import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/question
 import type { ResolvedPresentationLayout } from "@/app/rendering/presentation/presentationLayoutResolver";
 import type { StoryElementType } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
+import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
@@ -26,6 +27,8 @@ export type QuizQuestion = {
   punkte_basis: number;
   punkte_modus: string | null;
   freie_antwort_erlaubt: boolean;
+  ergebnisdarstellung: QuizResultDisplayMode;
+  live_ergebnis_unterstuetzt: boolean;
   kann_freie_antwort_aktivieren: boolean;
   effektiver_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
   vorlagenname: string;
@@ -227,6 +230,8 @@ export default function QuizQuestionItem({
           resolvedPresentationLayout={frage.resolvedPresentationLayout}
           punkteModus={frage.punkte_modus}
           freieAntwortErlaubt={frage.freie_antwort_erlaubt}
+          ergebnisdarstellung={frage.ergebnisdarstellung}
+          liveErgebnisUnterstuetzt={frage.live_ergebnis_unterstuetzt}
           kannFreieAntwortAktivieren={frage.kann_freie_antwort_aktivieren}
           istPixelbild={frage.templateId === "pixelbild" || frage.templateId === "image_pixel"}
           istUmfrage={isPollQuestionTemplateId(frage.templateId)}

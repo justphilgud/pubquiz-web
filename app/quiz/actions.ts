@@ -138,6 +138,11 @@ import {
   FIXED_SLIDE_FLOW_TYPES,
   type FixedSlideId,
 } from "@/app/quiz/fixedSlidesPolicy";
+import {
+  isQuizResultDisplayMode,
+  supportsLiveResultEditorMode,
+  type QuizResultDisplayMode,
+} from "@/app/quiz/liveResults/liveResultMode";
 
 async function getPresentationTemplateValidationOptions(
   additionallyAllowed: readonly string[] = [],
@@ -278,6 +283,8 @@ export type QuizDetailsResult = QuizResult & {
     punkte_basis: number;
     punkte_modus: string;
     freie_antwort_erlaubt: boolean;
+    ergebnisdarstellung: QuizResultDisplayMode;
+    live_ergebnis_unterstuetzt: boolean;
     kann_freie_antwort_aktivieren: boolean;
     effektiver_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
     vorlagenname: string;
@@ -758,6 +765,7 @@ export async function copyQuiz(data: {
           praesentationslayout: quizFrage.praesentationslayout,
           antwort_reihenfolge: quizFrage.antwort_reihenfolge,
           freie_antwort_erlaubt: quizFrage.freie_antwort_erlaubt,
+          ergebnisdarstellung: quizFrage.ergebnisdarstellung,
         },
         session,
         tx,
@@ -1083,6 +1091,14 @@ export async function getQuizDetails(
         punkte_basis: Number(eintrag.punkte_basis),
         punkte_modus: eintrag.punkte_modus ?? "standard",
         freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
+        ergebnisdarstellung: eintrag.ergebnisdarstellung,
+        live_ergebnis_unterstuetzt: supportsLiveResultEditorMode({
+          effectiveAnswerMode: answerMode.effectiveMode,
+          templateId: eintrag.fragen.vorlage?.code ?? null,
+          structuredFieldCount: eintrag.fragen.antwortfelder.length,
+          answerOptionCount: eintrag.fragen.antworten.length,
+          isPoll: isPollQuestionTemplateId(eintrag.fragen.vorlage?.code ?? null),
+        }),
         kann_freie_antwort_aktivieren: answerMode.canEnableFreeAnswer,
         effektiver_antwortmodus: answerMode.effectiveMode,
         vorlagenname: eintrag.fragen.vorlage?.name ?? "Standard",
@@ -2038,6 +2054,54 @@ export async function updateQuizQuestionFreeAnswerMode(data: {
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
   revalidatePath(`/quiz/${data.quizId}/moderation`);
   revalidatePath(`/quiz/${data.quizId}/auswertung`);
+}
+
+export async function updateQuizQuestionResultDisplayMode(data: {
+  quizId: number;
+  quizFragenId: number;
+  mode: QuizResultDisplayMode;
+}) {
+  if (!isQuizResultDisplayMode(data.mode)) {
+    throw new Error("Ungültige Ergebnisdarstellung.");
+  }
+
+  await requireQuizEditor(data.quizId);
+  const assignment = await prisma.quiz_fragen.findFirst({
+    where: { quiz_id: data.quizId, quiz_fragen_id: data.quizFragenId },
+    include: {
+      fragen: {
+        select: {
+          vorlage: { select: { code: true } },
+          antworten: { select: { antwort_id: true } },
+          antwortfelder: { select: { antwortfeld_id: true } },
+        },
+      },
+    },
+  });
+  if (!assignment) throw new Error("Quizfrage gehört nicht zu diesem Quiz.");
+  const answerMode = resolveQuizQuestionAnswerMode({
+    templateId: assignment.fragen.vorlage?.code ?? null,
+    answers: assignment.fragen.antworten.map(() => ({ isCorrect: false })),
+    allowFreeAnswer: assignment.freie_antwort_erlaubt,
+  });
+  const supported = supportsLiveResultEditorMode({
+    effectiveAnswerMode: answerMode.effectiveMode,
+    templateId: assignment.fragen.vorlage?.code ?? null,
+    structuredFieldCount: assignment.fragen.antwortfelder.length,
+    answerOptionCount: assignment.fragen.antworten.length,
+    isPoll: isPollQuestionTemplateId(assignment.fragen.vorlage?.code ?? null),
+  });
+  if (data.mode === "LIVE" && !supported) {
+    throw new Error("Live-Ergebnisse werden für diesen Antworttyp nicht unterstützt.");
+  }
+
+  await prisma.quiz_fragen.update({
+    where: { quiz_fragen_id: data.quizFragenId },
+    data: { ergebnisdarstellung: data.mode },
+  });
+  revalidatePath(`/quiz/${data.quizId}`);
+  revalidatePath(`/quiz/${data.quizId}/moderation`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
 }
 
 export async function updateQuizAbschnitteSortierung(data: {
