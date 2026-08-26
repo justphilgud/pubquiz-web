@@ -5,6 +5,7 @@ import test from "node:test";
 const actions = readFileSync("app/quiz/actions.ts", "utf8");
 const snapshotRoute = readFileSync("app/api/quiz/live-snapshot/route.ts", "utf8");
 const interactionServer = readFileSync("app/quiz/interaction/interaction.server.ts", "utf8");
+const effectiveLiveSubmissions = readFileSync("app/quiz/liveResults/effectiveLiveSubmissions.ts", "utf8");
 const adminActions = readFileSync("app/admin/live-text-replacements/actions.ts", "utf8");
 const renderer = readFileSync("app/rendering/presentation/PresentationSlideRenderer.tsx", "utf8");
 const migration = readFileSync("prisma/migrations/20260826120000_add_live_text_moderation/migration.sql", "utf8");
@@ -25,8 +26,10 @@ test("replacement CRUD is admin-only and public rendering has no team identity",
 });
 
 test("effective submissions are latest-per-team and replacements stay outside stored payloads", () => {
-  assert.match(interactionServer, /latestLiveSubmissions/);
-  assert.match(interactionServer, /findIndex[\s\S]{0,200}quiz_team_session_id/);
+  assert.match(interactionServer, /selectEffectiveLiveSubmissions/);
+  assert.match(interactionServer, /team_antworten\.findMany/);
+  assert.match(effectiveLiveSubmissions, /answer\.interaction_run_id !== input\.interactionRunId/);
+  assert.match(effectiveLiveSubmissions, /submission_version > current\.submission_version/);
   assert.doesNotMatch(actions.slice(actions.indexOf("setLiveTextResponsePublication"), actions.indexOf("getQuizLiveSnapshot")), /team_answer_submissions\.(update|delete)/);
 });
 

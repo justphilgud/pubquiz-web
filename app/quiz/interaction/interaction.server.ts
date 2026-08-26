@@ -52,6 +52,7 @@ import {
   isLiveChoiceInteraction,
 } from "@/app/quiz/liveResults/liveChoiceResults";
 import { aggregateLiveTextResults } from "@/app/quiz/liveResults/liveTextResults";
+import { selectEffectiveLiveSubmissions } from "@/app/quiz/liveResults/effectiveLiveSubmissions";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -1186,7 +1187,7 @@ export async function getQuizLiveSnapshotData(
     options.includeTeamJoinState ||
     (options.includePresentationState && (pollInteraction || liveChoiceInteraction || liveTextInteraction)),
   );
-  const [teamCount, visibleTeams, liveSubmissions, replacementRules] = options.includePresentationState
+  const [teamCount, visibleTeams, liveAnswers, replacementRules] = options.includePresentationState
     ? await Promise.all([
         needsTeamCount
           ? prisma.quiz_team_sessions.count({ where: { quiz_id: quizId } })
@@ -1213,23 +1214,33 @@ export async function getQuizLiveSnapshotData(
             })
           : Promise.resolve([]),
         pollInteraction || liveChoiceInteraction || liveTextInteraction
-          ? prisma.team_answer_submissions.findMany({
-              where: { interaction_run_id: run!.interaction_run_id },
-              orderBy: [
-                { quiz_team_session_id: "asc" },
-                { submission_version: "desc" },
-                { team_answer_submission_id: "desc" },
-              ],
+          ? prisma.team_antworten.findMany({
+              where: {
+                interaction_run_id: run!.interaction_run_id,
+                quiz_fragen_id: run!.quiz_fragen!.quiz_fragen_id,
+              },
+              orderBy: { quiz_team_session_id: "asc" },
               select: {
-                team_answer_submission_id: true,
+                interaction_run_id: true,
                 quiz_team_session_id: true,
-                payload: true,
-                live_text_publication: { select: { is_visible: true } },
-                quiz_team_session: {
+                submissions: {
+                  orderBy: [
+                    { submission_version: "desc" },
+                    { team_answer_submission_id: "desc" },
+                  ],
                   select: {
-                    team_id: true,
-                    teamname: true,
-                    team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+                    team_answer_submission_id: true,
+                    interaction_run_id: true,
+                    submission_version: true,
+                    payload: true,
+                    live_text_publication: { select: { is_visible: true } },
+                    quiz_team_session: {
+                      select: {
+                        team_id: true,
+                        teamname: true,
+                        team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+                      },
+                    },
                   },
                 },
               },
@@ -1243,13 +1254,12 @@ export async function getQuizLiveSnapshotData(
           : Promise.resolve([]),
       ])
     : [0, [], [], []];
-  const latestLiveSubmissions = liveSubmissions.filter(
-    (submission, index, submissions) =>
-      submissions.findIndex(
-        (candidate) =>
-          candidate.quiz_team_session_id === submission.quiz_team_session_id,
-      ) === index,
-  );
+  const latestLiveSubmissions = run
+    ? selectEffectiveLiveSubmissions({
+        interactionRunId: run.interaction_run_id,
+        answers: liveAnswers,
+      })
+    : [];
   const latestLivePayloads = latestLiveSubmissions.map(
     (submission) => submission.payload as QuizInteractionPayload,
   );
