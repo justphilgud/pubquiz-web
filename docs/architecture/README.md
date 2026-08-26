@@ -10,3 +10,4 @@ Zentrale Module: Authentifizierung, Fragen, Quiz, Teams, Moderation, Präsentati
 
 - [Antwortformulare und Live-Interaction-Architektur](./answer-interaction.md)
 - [Verbindliche Quiz Runtime Contracts](./quiz-runtime-contracts.md)
+- [Öffentliche Frageneinreichung](./public-question-submissions.md)
