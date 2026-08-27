@@ -5,7 +5,15 @@ import { sanitizePublicLiveText } from "./publicTextSanitizer";
 const rules = [{ id: 1, searchTerm: "Penis", replacement: "Sonnenblume" }];
 
 test("replaces case, leetspeak, repetitions and conservative separators", () => {
-  for (const input of ["PENIS", "P3nis", "Peeenis", "p.e-n_i s"]) {
+  for (const input of [
+    "Penis",
+    "penis",
+    "PENIS",
+    "P3nis",
+    "p.e.n.i.s",
+    "Peeenis",
+    "p.e-n_i s",
+  ]) {
     assert.equal(sanitizePublicLiveText(input, rules).publicText, "Sonnenblume");
   }
 });

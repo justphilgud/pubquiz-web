@@ -130,6 +130,7 @@ export default function ModerationClient({
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [liveResultPending, setLiveResultPending] = useState(false);
+  const [liveTextPublicationError, setLiveTextPublicationError] = useState<string | null>(null);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
     () => new Set(
@@ -739,6 +740,7 @@ export default function ModerationClient({
   async function toggleLiveTextPublication(submissionId: number, visible: boolean) {
     if (aktuellerSlide?.typ !== "frage" || liveResultState?.kind !== "TEXT") return;
     setLiveResultPending(true);
+    setLiveTextPublicationError(null);
     try {
       await setLiveTextResponsePublication({
         quizId,
@@ -760,6 +762,12 @@ export default function ModerationClient({
             ]
           : liveResultState.publicResponses.filter((entry) => entry.submissionId !== submissionId),
       });
+    } catch (error) {
+      setLiveTextPublicationError(
+        error instanceof Error
+          ? error.message
+          : "Die Freigabe konnte nicht gespeichert werden.",
+      );
     } finally {
       setLiveResultPending(false);
     }
@@ -873,15 +881,54 @@ export default function ModerationClient({
                   </div>
                 </div>
                 {liveResultState.kind === "TEXT" && (
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    {liveResultState.moderationResponses?.map((response) => (
-                      <article key={response.submissionId} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3">
-                        <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><TeamIdentityVisual name={response.teamName} photoUrl={response.photoUrl} avatarCode={response.avatarCode} className="h-9 w-9" /><strong>{response.teamName}</strong></div><span className="text-xs text-zinc-400">{response.isVisible ? "öffentlich" : "nicht freigegeben"}</span></div>
-                        <p className="mt-2 text-sm">Original: „{response.originalText}“</p>
-                        {response.changed && <p className="mt-1 text-sm text-amber-200">Öffentlich: „{response.publicText}“</p>}
-                        <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveTextPublication(response.submissionId, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold disabled:opacity-50">{response.isVisible ? "Freigabe zurücknehmen" : "Für Publikum freigeben"}</button>
-                      </article>
-                    ))}
+                  <div className="mt-4">
+                    {liveTextPublicationError && (
+                      <p role="alert" className="mb-3 rounded-xl border border-red-400/60 bg-red-950/50 p-3 text-sm text-red-100">
+                        {liveTextPublicationError}
+                      </p>
+                    )}
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {liveResultState.moderationResponses?.map((response) => (
+                        <article key={response.submissionId} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <TeamIdentityVisual name={response.teamName} photoUrl={response.photoUrl} avatarCode={response.avatarCode} className="h-9 w-9" />
+                              <strong className="truncate">{response.teamName}</strong>
+                            </div>
+                            <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-semibold ${response.isVisible ? "bg-emerald-950 text-emerald-200" : "bg-zinc-800 text-zinc-300"}`}>
+                              {response.isVisible ? "öffentlich" : "nicht freigegeben"}
+                            </span>
+                          </div>
+                          <dl className="mt-3 grid gap-2 text-sm">
+                            <div>
+                              <dt className="font-semibold text-zinc-400">Original</dt>
+                              <dd className="break-words">„{response.originalText}“</dd>
+                            </div>
+                            <div>
+                              <dt className="flex items-center gap-2 font-semibold text-zinc-400">
+                                Öffentlich
+                                {response.changed && (
+                                  <span className="rounded-full bg-amber-950 px-2 py-0.5 text-[0.7rem] text-amber-200">
+                                    Ersetzung angewendet
+                                  </span>
+                                )}
+                              </dt>
+                              <dd className={`break-words ${response.changed ? "text-amber-100" : "text-zinc-100"}`}>
+                                „{response.publicText}“
+                              </dd>
+                            </div>
+                          </dl>
+                          <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveTextPublication(response.submissionId, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold disabled:opacity-50">
+                            {response.isVisible ? "Freigabe zurücknehmen" : "Für Publikum freigeben"}
+                          </button>
+                        </article>
+                      ))}
+                      {(liveResultState.moderationResponses?.length ?? 0) === 0 && (
+                        <p className="rounded-xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-300 md:col-span-2">
+                          Noch keine finalen Freitextantworten eingegangen.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
               </section>

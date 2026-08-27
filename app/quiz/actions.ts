@@ -141,7 +141,7 @@ import {
 } from "@/app/quiz/fixedSlidesPolicy";
 import {
   isQuizResultDisplayMode,
-  supportsLiveResultEditorMode,
+  supportsLiveResultQuestion,
   type QuizResultDisplayMode,
 } from "@/app/quiz/liveResults/liveResultMode";
 
@@ -895,7 +895,10 @@ export async function getQuizDetails(
               },
               antworten: {
                 select: {
+                  antwort_id: true,
+                  antwort: true,
                   ist_richtig: true,
+                  antworttyp: { select: { antworttyp: true } },
                   medien: {
                     select: {
                       datei: true,
@@ -907,6 +910,8 @@ export async function getQuizDetails(
               antwortfelder: {
                 select: {
                   antwortfeld_id: true,
+                  label: true,
+                  ist_pflicht: true,
                   medien: {
                     select: {
                       datei: true,
@@ -1040,6 +1045,23 @@ export async function getQuizDetails(
       const config = eintrag.fragen.template_config_json as
         | QuestionTemplateConfig
         | null;
+      const liveResultSupported = supportsLiveResultQuestion({
+        templateId: eintrag.fragen.vorlage?.code ?? null,
+        originalAnswerMode: answerMode.originalMode,
+        effectiveAnswerMode: answerMode.effectiveMode,
+        templateData: config?.templateData,
+        answerFields: eintrag.fragen.antwortfelder.map((field) => ({
+          id: field.antwortfeld_id,
+          label: field.label,
+          required: field.ist_pflicht,
+        })),
+        answerOptions: eintrag.fragen.antworten
+          .filter((answer) => answer.antworttyp.antworttyp !== "Freitext")
+          .map((answer) => ({
+            id: answer.antwort_id,
+            label: answer.antwort,
+          })),
+      });
       const partialPointsCapable = isPartialPointsCapable({
         templateId: eintrag.fragen.vorlage?.code ?? null,
         correctAnswerCount: eintrag.fragen.antworten.filter(
@@ -1093,13 +1115,7 @@ export async function getQuizDetails(
         punkte_modus: eintrag.punkte_modus ?? "standard",
         freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
         ergebnisdarstellung: eintrag.ergebnisdarstellung,
-        live_ergebnis_unterstuetzt: supportsLiveResultEditorMode({
-          effectiveAnswerMode: answerMode.effectiveMode,
-          templateId: eintrag.fragen.vorlage?.code ?? null,
-          structuredFieldCount: eintrag.fragen.antwortfelder.length,
-          answerOptionCount: eintrag.fragen.antworten.length,
-          isPoll: isPollQuestionTemplateId(eintrag.fragen.vorlage?.code ?? null),
-        }),
+        live_ergebnis_unterstuetzt: liveResultSupported,
         kann_freie_antwort_aktivieren: answerMode.canEnableFreeAnswer,
         effektiver_antwortmodus: answerMode.effectiveMode,
         vorlagenname: eintrag.fragen.vorlage?.name ?? "Standard",
@@ -2073,8 +2089,22 @@ export async function updateQuizQuestionResultDisplayMode(data: {
       fragen: {
         select: {
           vorlage: { select: { code: true } },
-          antworten: { select: { antwort_id: true } },
-          antwortfelder: { select: { antwortfeld_id: true } },
+          template_config_json: true,
+          antworten: {
+            select: {
+              antwort_id: true,
+              antwort: true,
+              ist_richtig: true,
+              antworttyp: { select: { antworttyp: true } },
+            },
+          },
+          antwortfelder: {
+            select: {
+              antwortfeld_id: true,
+              label: true,
+              ist_pflicht: true,
+            },
+          },
         },
       },
     },
@@ -2082,15 +2112,27 @@ export async function updateQuizQuestionResultDisplayMode(data: {
   if (!assignment) throw new Error("Quizfrage gehört nicht zu diesem Quiz.");
   const answerMode = resolveQuizQuestionAnswerMode({
     templateId: assignment.fragen.vorlage?.code ?? null,
-    answers: assignment.fragen.antworten.map(() => ({ isCorrect: false })),
+    answers: assignment.fragen.antworten.map((answer) => ({
+      isCorrect: answer.ist_richtig,
+    })),
     allowFreeAnswer: assignment.freie_antwort_erlaubt,
   });
-  const supported = supportsLiveResultEditorMode({
-    effectiveAnswerMode: answerMode.effectiveMode,
+  const templateConfig = assignment.fragen.template_config_json as
+    | QuestionTemplateConfig
+    | null;
+  const supported = supportsLiveResultQuestion({
     templateId: assignment.fragen.vorlage?.code ?? null,
-    structuredFieldCount: assignment.fragen.antwortfelder.length,
-    answerOptionCount: assignment.fragen.antworten.length,
-    isPoll: isPollQuestionTemplateId(assignment.fragen.vorlage?.code ?? null),
+    originalAnswerMode: answerMode.originalMode,
+    effectiveAnswerMode: answerMode.effectiveMode,
+    templateData: templateConfig?.templateData,
+    answerFields: assignment.fragen.antwortfelder.map((field) => ({
+      id: field.antwortfeld_id,
+      label: field.label,
+      required: field.ist_pflicht,
+    })),
+    answerOptions: assignment.fragen.antworten
+      .filter((answer) => answer.antworttyp.antworttyp !== "Freitext")
+      .map((answer) => ({ id: answer.antwort_id, label: answer.antwort })),
   });
   if (data.mode === "LIVE" && !supported) {
     throw new Error("Live-Ergebnisse werden für diesen Antworttyp nicht unterstützt.");

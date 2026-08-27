@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const actions = readFileSync("app/quiz/actions.ts", "utf8");
+const quizEditor = readFileSync("app/quiz/[quizId]/QuizFragenSortableTable.tsx", "utf8");
+const moderation = readFileSync("app/quiz/[quizId]/moderation/ModerationClient.tsx", "utf8");
 const snapshotRoute = readFileSync("app/api/quiz/live-snapshot/route.ts", "utf8");
 const interactionServer = readFileSync("app/quiz/interaction/interaction.server.ts", "utf8");
 const effectiveLiveSubmissions = readFileSync("app/quiz/liveResults/effectiveLiveSubmissions.ts", "utf8");
@@ -17,6 +19,27 @@ test("live controls and text publications use scoped live-controller authorizati
     assert.match(actions.slice(start, start + 900), /requireQuizLiveController/);
   }
   assert.match(snapshotRoute, /includeLiveModeration[\s\S]{0,180}requireQuizLiveController/);
+});
+
+test("editor persistence and runtime use the same executable LIVE support contract", () => {
+  const updateAction = actions.slice(
+    actions.indexOf("export async function updateQuizQuestionResultDisplayMode"),
+    actions.indexOf("export async function updateQuizAbschnitteSortierung"),
+  );
+  assert.match(updateAction, /ist_richtig: true/);
+  assert.match(updateAction, /supportsLiveResultQuestion/);
+  assert.doesNotMatch(updateAction, /map\(\(\) => \(\{ isCorrect: false \}\)\)/);
+  assert.match(actions, /live_ergebnis_unterstuetzt: liveResultSupported/);
+  assert.match(quizEditor, /await updateQuizQuestionResultDisplayMode[\s\S]{0,500}setItems/);
+});
+
+test("productive moderation requests private text data and exposes publish and hide controls", () => {
+  assert.match(moderation, /includeLiveModeration: true/);
+  assert.match(moderation, /Original/);
+  assert.match(moderation, /Öffentlich/);
+  assert.match(moderation, /Ersetzung angewendet/);
+  assert.match(moderation, /Für Publikum freigeben/);
+  assert.match(moderation, /Freigabe zurücknehmen/);
 });
 
 test("replacement CRUD is admin-only and public rendering has no team identity", () => {

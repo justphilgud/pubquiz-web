@@ -3,9 +3,25 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   isQuizResultDisplayMode,
-  supportsLiveResultEditorMode,
   supportsLiveResultInteraction,
+  supportsLiveResultQuestion,
 } from "./liveResultMode";
+
+function question(input: {
+  templateId?: string | null;
+  originalAnswerMode?: "OPEN" | "CLOSED" | "UNCLASSIFIED";
+  effectiveAnswerMode?: "OPEN" | "CLOSED" | "UNCLASSIFIED";
+  answerFields?: Array<{ id: number; label: string; required: boolean }>;
+  answerOptions?: Array<{ id: number; label: string }>;
+}) {
+  return {
+    templateId: input.templateId ?? null,
+    originalAnswerMode: input.originalAnswerMode ?? "OPEN",
+    effectiveAnswerMode: input.effectiveAnswerMode ?? "OPEN",
+    answerFields: input.answerFields ?? [],
+    answerOptions: input.answerOptions ?? [{ id: 1, label: "Lösung" }],
+  };
+}
 
 test("live result mode is quiz-assignment configuration with a safe default", () => {
   assert.equal(isQuizResultDisplayMode("STANDARD"), true);
@@ -30,8 +46,44 @@ test("ordering, structured, pixel and FaceMorph stay outside live V1", () => {
   assert.equal(supportsLiveResultInteraction({ interactionType: "TEXT", templateId: "face_morph" }), false);
 });
 
-test("editor eligibility mirrors the supported runtime surface", () => {
-  assert.equal(supportsLiveResultEditorMode({ effectiveAnswerMode: "OPEN", templateId: null, structuredFieldCount: 0, answerOptionCount: 1, isPoll: false }), true);
-  assert.equal(supportsLiveResultEditorMode({ effectiveAnswerMode: "CLOSED", templateId: "wahr_falsch", structuredFieldCount: 0, answerOptionCount: 2, isPoll: false }), true);
-  assert.equal(supportsLiveResultEditorMode({ effectiveAnswerMode: "OPEN", templateId: "facemorph", structuredFieldCount: 2, answerOptionCount: 0, isPoll: false }), false);
+test("editor eligibility resolves the same executable interaction as runtime", () => {
+  assert.equal(supportsLiveResultQuestion(question({})), true);
+  assert.equal(supportsLiveResultQuestion(question({
+    originalAnswerMode: "CLOSED",
+    effectiveAnswerMode: "CLOSED",
+    answerOptions: [{ id: 1, label: "A" }, { id: 2, label: "B" }],
+  })), true);
+  assert.equal(supportsLiveResultQuestion(question({
+    templateId: "wahr_falsch",
+    originalAnswerMode: "CLOSED",
+    effectiveAnswerMode: "CLOSED",
+    answerOptions: [{ id: 1, label: "Wahr" }, { id: 2, label: "Falsch" }],
+  })), true);
+  assert.equal(supportsLiveResultQuestion(question({
+    templateId: "umfrage_skala",
+    originalAnswerMode: "UNCLASSIFIED",
+    effectiveAnswerMode: "UNCLASSIFIED",
+    answerOptions: [],
+  })), true);
+});
+
+test("unsupported special interactions are hidden in editor and rejected by runtime", () => {
+  assert.equal(supportsLiveResultQuestion(question({
+    templateId: "face_morph",
+    answerFields: [
+      { id: 1, label: "Person A", required: true },
+      { id: 2, label: "Person B", required: true },
+    ],
+    answerOptions: [],
+  })), false);
+  assert.equal(supportsLiveResultQuestion(question({
+    templateId: "reihenfolge",
+    originalAnswerMode: "CLOSED",
+    effectiveAnswerMode: "CLOSED",
+    answerOptions: [{ id: 1, label: "A" }, { id: 2, label: "B" }],
+  })), false);
+  assert.equal(supportsLiveResultQuestion(question({
+    templateId: "schaetzfrage",
+    answerOptions: [],
+  })), false);
 });

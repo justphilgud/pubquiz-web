@@ -1,4 +1,8 @@
-import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
+import {
+  resolveQuizAnswerInteraction,
+  type QuizAnswerInteractionInput,
+  type ResolvedQuizAnswerInteraction,
+} from "@/app/quiz/answerInteraction";
 
 export const QUIZ_RESULT_DISPLAY_MODES = ["STANDARD", "LIVE"] as const;
 export type QuizResultDisplayMode = (typeof QUIZ_RESULT_DISPLAY_MODES)[number];
@@ -32,17 +36,12 @@ export function supportsLiveResultInteraction(input: {
     !EXCLUDED_TEXT_TEMPLATES.has(input.templateId?.trim().toLocaleLowerCase("de-DE") ?? "");
 }
 
-export function supportsLiveResultEditorMode(input: {
-  effectiveAnswerMode: "OPEN" | "CLOSED" | "UNCLASSIFIED";
-  templateId: string | null;
-  structuredFieldCount: number;
-  answerOptionCount: number;
-  isPoll: boolean;
-}) {
-  if (input.structuredFieldCount > 0) return false;
-  const templateId = input.templateId?.trim().toLocaleLowerCase("de-DE") ?? "";
-  if (EXCLUDED_TEXT_TEMPLATES.has(templateId) || templateId.includes("ordering")) return false;
-  if (input.isPoll) return true;
-  if (input.effectiveAnswerMode === "OPEN") return true;
-  return input.effectiveAnswerMode === "CLOSED" && input.answerOptionCount >= 2;
+export function supportsLiveResultQuestion(
+  input: QuizAnswerInteractionInput,
+) {
+  const interaction = resolveQuizAnswerInteraction(input);
+  return supportsLiveResultInteraction({
+    interactionType: interaction.type,
+    templateId: input.templateId,
+  });
 }

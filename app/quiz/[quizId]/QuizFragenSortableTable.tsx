@@ -885,12 +885,25 @@ export default function QuizFragenSortableTable({
     quizFragenId: number,
     mode: "STANDARD" | "LIVE",
   ) {
-    setItems((current) => current.map((item) =>
-      item.quiz_fragen_id === quizFragenId
-        ? { ...item, ergebnisdarstellung: mode }
-        : item,
-    ));
-    await updateQuizQuestionResultDisplayMode({ quizId, quizFragenId, mode });
+    try {
+      await updateQuizQuestionResultDisplayMode({ quizId, quizFragenId, mode });
+      setItems((current) => current.map((item) =>
+        item.quiz_fragen_id === quizFragenId
+          ? { ...item, ergebnisdarstellung: mode }
+          : item,
+      ));
+      setMeldung(
+        mode === "LIVE"
+          ? "Live-Ergebnisse wurden aktiviert."
+          : "Standard-Ergebnisse wurden aktiviert.",
+      );
+    } catch (error) {
+      setMeldung(
+        error instanceof Error
+          ? error.message
+          : "Die Ergebnisdarstellung konnte nicht gespeichert werden.",
+      );
+    }
   }
 
   const settingsActions: QuizQuestionSettingsActions = {
