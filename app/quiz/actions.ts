@@ -144,6 +144,7 @@ import {
   supportsLiveResultQuestion,
   type QuizResultDisplayMode,
 } from "@/app/quiz/liveResults/liveResultMode";
+import { canToggleLiveResultVisibility } from "@/app/quiz/liveResults/liveResultControls";
 
 async function getPresentationTemplateValidationOptions(
   additionallyAllowed: readonly string[] = [],
@@ -3030,19 +3031,32 @@ export async function setQuizLiveResultVisibility(data: {
       is_current: true,
       quiz_fragen: { ergebnisdarstellung: "LIVE" },
     },
-    select: { interaction_run_id: true },
+    select: { interaction_run_id: true, state: true },
   });
   if (!run) throw new Error("Für diese Frage ist kein Live-Ergebnis aktiv.");
+  if (!canToggleLiveResultVisibility(run.state)) {
+    throw new Error("Das Live-Ergebnis ist in dieser Phase nicht verfügbar.");
+  }
 
-  await prisma.quiz_interaction_runs.update({
+  const updatedRun = await prisma.quiz_interaction_runs.update({
     where: { interaction_run_id: run.interaction_run_id },
     data: {
       live_results_visible: data.visible,
       revision: { increment: 1 },
     },
+    select: {
+      live_results_visible: true,
+      state: true,
+      revision: true,
+    },
   });
   revalidatePath(`/quiz/${data.quizId}/moderation`);
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
+  return {
+    visible: updatedRun.live_results_visible,
+    state: updatedRun.state,
+    revision: updatedRun.revision,
+  };
 }
 
 export async function closeQuizQuestionAnswerPhase(data: {
@@ -3072,6 +3086,10 @@ export async function closeQuizQuestionAnswerPhase(data: {
   }
   revalidatePath(`/quiz/${data.quizId}/moderation`);
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
+  return {
+    state: closedRun.state,
+    revision: closedRun.revision,
+  };
 }
 
 export async function setLiveTextResponsePublication(data: {

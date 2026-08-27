@@ -42,6 +42,21 @@ test("productive moderation requests private text data and exposes publish and h
   assert.match(moderation, /Freigabe zurücknehmen/);
 });
 
+test("OPEN live-result controls are confirmed by the server and never fail silently", () => {
+  const visibilityAction = actions.slice(
+    actions.indexOf("export async function setQuizLiveResultVisibility"),
+    actions.indexOf("export async function closeQuizQuestionAnswerPhase"),
+  );
+  assert.match(visibilityAction, /canToggleLiveResultVisibility\(run\.state\)/);
+  assert.match(visibilityAction, /return \{\s*visible: updatedRun\.live_results_visible/);
+  assert.match(moderation, /const result = await setQuizLiveResultVisibility/);
+  assert.match(moderation, /visible: result\.visible/);
+  assert.match(moderation, /liveResultMutationRevisionRef/);
+  assert.match(moderation, /setLiveResultControlError/);
+  assert.match(moderation, /role="alert"/);
+  assert.match(moderation, /Die aktuelle Verteilung kann schon jetzt gezeigt werden/);
+});
+
 test("replacement CRUD is admin-only and public rendering has no team identity", () => {
   assert.match(adminActions, /requireAdmin\(\)/);
   const publicTextRenderer = renderer.slice(renderer.indexOf('data-live-result-kind="text"'), renderer.indexOf('data-live-result-kind="choice"'));

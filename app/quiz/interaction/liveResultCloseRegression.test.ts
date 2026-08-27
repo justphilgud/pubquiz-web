@@ -5,6 +5,7 @@ import test from "node:test";
 import { resolveEffectiveSubmission } from "../evaluation/effectiveSubmission";
 import { aggregateLiveChoiceResults } from "../liveResults/liveChoiceResults";
 import { selectEffectiveLiveSubmissions } from "../liveResults/effectiveLiveSubmissions";
+import { canToggleLiveResultVisibility } from "../liveResults/liveResultControls";
 import { shouldReuseQuestionInteractionRun } from "./interactionRunReuse";
 import { isQuizInteractionWritable } from "./interactionStateMachine";
 
@@ -78,6 +79,86 @@ test("closing keeps a single-choice submission effective for live results and ev
   assert.deepEqual(result.options.map(({ count }) => count), [0, 1]);
   assert.deepEqual(after.evaluation?.selectedAnswerIds, [3]);
   assert.equal(after.evaluation?.submissionStatus, "SUBMITTED");
+});
+
+test("OPEN can show the current neutral distribution and return to the writable question", () => {
+  const storedAnswer = answer({ payloads: [{ optionId: 3 }] });
+  const live = selectEffectiveLiveSubmissions({
+    interactionRunId: 40,
+    answers: [storedAnswer],
+  });
+  const result = aggregateLiveChoiceResults({
+    interaction: {
+      type: "SINGLE_CHOICE",
+      selectionMode: "SINGLE",
+      options: [{ id: 1, label: "A" }, { id: 3, label: "C" }],
+    },
+    visible: true,
+    state: "OPEN",
+    totalTeams: 1,
+    payloads: live.map(({ payload }) => payload),
+  });
+
+  assert.equal(canToggleLiveResultVisibility("OPEN"), true);
+  assert.equal(isQuizInteractionWritable("OPEN", null, new Date()), true);
+  assert.equal(result.visible, true);
+  assert.deepEqual(result.options.map(({ count }) => count), [0, 1]);
+  assert.ok(result.options.every((option) => !(
+    "correct" in option || "isCorrect" in option
+  )));
+});
+
+test("poll choice and scale submissions remain effective after close", () => {
+  const pollChoice = answer({ payloads: [{ optionId: 2 }] });
+  const choiceAfterClose = selectEffectiveLiveSubmissions({
+    interactionRunId: 40,
+    answers: [pollChoice],
+  });
+  const choiceResult = aggregateLiveChoiceResults({
+    interaction: {
+      type: "POLL_SINGLE",
+      selectionMode: "SINGLE",
+      options: [{ id: 1, label: "A" }, { id: 2, label: "B" }],
+    },
+    visible: true,
+    state: "CLOSED",
+    totalTeams: 1,
+    payloads: choiceAfterClose.map(({ payload }) => payload),
+  });
+  assert.deepEqual(choiceResult.options.map(({ count }) => count), [0, 1]);
+
+  const scaleAnswer = {
+    interaction_run_id: 40,
+    quiz_team_session_id: 7,
+    submissions: [{
+      team_answer_submission_id: 1,
+      interaction_run_id: 40,
+      submission_version: 1,
+      payload: { value: 4 },
+    }],
+  };
+  const scaleAfterClose = selectEffectiveLiveSubmissions({
+    interactionRunId: 40,
+    answers: [scaleAnswer],
+  });
+  const scaleResult = aggregateLiveChoiceResults({
+    interaction: {
+      type: "POLL_SCALE",
+      inputMode: "decimal",
+      min: 1,
+      max: 5,
+      step: 1,
+      minLabel: "niedrig",
+      maxLabel: "hoch",
+      values: [1, 2, 3, 4, 5],
+    },
+    visible: true,
+    state: "CLOSED",
+    totalTeams: 1,
+    payloads: scaleAfterClose.map(({ payload }) => payload),
+  });
+  assert.equal(scaleResult.scale?.average, 4);
+  assert.deepEqual(scaleResult.scale?.values.map(({ count }) => count), [0, 0, 0, 1, 0]);
 });
 
 test("closing preserves multiple-choice selections exactly", () => {

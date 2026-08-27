@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useModerationHotkeys } from "./hooks/useModerationHotkeys";
 
@@ -56,6 +56,10 @@ import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
+import {
+  canCloseLiveResultAnswerPhase,
+  canToggleLiveResultVisibility,
+} from "@/app/quiz/liveResults/liveResultControls";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
@@ -130,7 +134,9 @@ export default function ModerationClient({
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [liveResultPending, setLiveResultPending] = useState(false);
+  const [liveResultControlError, setLiveResultControlError] = useState<string | null>(null);
   const [liveTextPublicationError, setLiveTextPublicationError] = useState<string | null>(null);
+  const liveResultMutationRevisionRef = useRef(0);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
     () => new Set(
@@ -307,6 +313,7 @@ export default function ModerationClient({
     async function refreshPixelState() {
       if (refreshing) return;
       refreshing = true;
+      const liveResultMutationRevision = liveResultMutationRevisionRef.current;
       try {
       const snapshot = await fetchQuizLiveSnapshot(
         quizId,
@@ -316,7 +323,9 @@ export default function ModerationClient({
       if (active) {
         setPixelState(snapshot.pixelState);
         setPollState(snapshot.pollState);
-        setLiveResultState(snapshot.liveResultState);
+        if (liveResultMutationRevision === liveResultMutationRevisionRef.current) {
+          setLiveResultState(snapshot.liveResultState);
+        }
         setTeamJoinState(snapshot.teamJoinState);
         setBlockFreigegeben(Boolean(
           snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
@@ -711,14 +720,27 @@ export default function ModerationClient({
 
   async function toggleLiveResults() {
     if (aktuellerSlide?.typ !== "frage" || !liveResultState) return;
+    if (!canToggleLiveResultVisibility(liveResultState.state)) return;
+    liveResultMutationRevisionRef.current += 1;
     setLiveResultPending(true);
+    setLiveResultControlError(null);
     try {
-      await setQuizLiveResultVisibility({
+      const result = await setQuizLiveResultVisibility({
         quizId,
         quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
         visible: !liveResultState.visible,
       });
-      setLiveResultState({ ...liveResultState, visible: !liveResultState.visible });
+      setLiveResultState({
+        ...liveResultState,
+        visible: result.visible,
+        state: result.state,
+      });
+    } catch (error) {
+      setLiveResultControlError(
+        error instanceof Error
+          ? error.message
+          : "Die Publikumsansicht konnte nicht geändert werden.",
+      );
     } finally {
       setLiveResultPending(false);
     }
@@ -726,12 +748,25 @@ export default function ModerationClient({
 
   async function closeLiveAnswerPhase() {
     if (aktuellerSlide?.typ !== "frage" || !liveResultState) return;
+    if (!canCloseLiveResultAnswerPhase(liveResultState.state)) return;
+    liveResultMutationRevisionRef.current += 1;
     setLiveResultPending(true);
+    setLiveResultControlError(null);
     try {
-      await closeQuizQuestionAnswerPhase({
+      const result = await closeQuizQuestionAnswerPhase({
         quizId,
         quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
       });
+      setLiveResultState({
+        ...liveResultState,
+        state: result.state,
+      });
+    } catch (error) {
+      setLiveResultControlError(
+        error instanceof Error
+          ? error.message
+          : "Die Antwortphase konnte nicht geschlossen werden.",
+      );
     } finally {
       setLiveResultPending(false);
     }
@@ -739,6 +774,7 @@ export default function ModerationClient({
 
   async function toggleLiveTextPublication(submissionId: number, visible: boolean) {
     if (aktuellerSlide?.typ !== "frage" || liveResultState?.kind !== "TEXT") return;
+    liveResultMutationRevisionRef.current += 1;
     setLiveResultPending(true);
     setLiveTextPublicationError(null);
     try {
@@ -870,16 +906,34 @@ export default function ModerationClient({
                   <div>
                     <h2 className="font-bold">Live-Ergebnis</h2>
                     <p className="text-sm text-zinc-300">{liveResultState.finalAnswers} / {liveResultState.totalTeams} finale Antworten · {liveResultState.state === "OPEN" ? "Antwortphase offen" : "Antwortphase geschlossen"}</p>
+                    <p className="mt-1 text-xs text-cyan-100">
+                      Publikumsansicht: {liveResultState.visible ? "aktuelle Verteilung" : "Frage"}
+                    </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveResults()} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-                      {liveResultState.visible ? "Zurück zur Frage" : "Live-Ergebnis zeigen"}
+                    <button type="button" aria-pressed={liveResultState.visible} disabled={liveResultPending || !canToggleLiveResultVisibility(liveResultState.state)} onClick={() => void toggleLiveResults()} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
+                      {liveResultState.visible ? "Zurück zur Frage" : "Aktuelle Verteilung zeigen"}
                     </button>
-                    {(liveResultState.state === "OPEN" || liveResultState.state === "COUNTDOWN") && (
+                    {canCloseLiveResultAnswerPhase(liveResultState.state) && (
                       <button type="button" disabled={liveResultPending} onClick={() => void closeLiveAnswerPhase()} className="min-h-11 rounded-xl border border-zinc-600 px-4 py-2 font-bold disabled:opacity-50">Antwortphase schließen</button>
                     )}
                   </div>
                 </div>
+                {(liveResultState.state === "OPEN" || liveResultState.state === "COUNTDOWN") && (
+                  <p className="mt-3 text-sm text-zinc-300">
+                    Die aktuelle Verteilung kann schon jetzt gezeigt werden. Die richtige Lösung bleibt bis zur Auflösung verborgen; mit „Zurück zur Frage“ können Teams weiter antworten oder ändern.
+                  </p>
+                )}
+                {liveResultState.finalAnswers === 0 && (
+                  <p className="mt-2 text-sm text-amber-200">
+                    Noch keine finale Antwort – die Ergebnisansicht ist derzeit leer.
+                  </p>
+                )}
+                {liveResultControlError && (
+                  <p role="alert" className="mt-3 rounded-xl border border-red-400/60 bg-red-950/50 p-3 text-sm text-red-100">
+                    {liveResultControlError}
+                  </p>
+                )}
                 {liveResultState.kind === "TEXT" && (
                   <div className="mt-4">
                     {liveTextPublicationError && (
