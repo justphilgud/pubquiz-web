@@ -18,6 +18,8 @@ Das Teamprofil ist global: Foto, Avatar und Upload-Sperre gelten in allen Eventr
 
 Die Sperre verhindert neue Foto-Uploads durch das Team. Die Auswahl eines Systemavatars bleibt möglich. Beim Entfernen eines Fotos fällt die Darstellung sofort auf den gespeicherten oder stabil aus der Team-ID abgeleiteten Avatar zurück.
 
+Die Bibliothek enthält zehn feste Avatar-Slots. Ein Wechsel des Artworks verändert weder gespeicherte Team-IDs noch den Slot eines bestehenden Teams. Teamfotos bleiben gegenüber dem Avatar vorrangig.
+
 ## Archivieren und Löschen
 
 Archivieren erhält sämtliche Historie und ist bei nicht mehr aktiven Teams die bevorzugte Aktion. Archivierte Teams bleiben auffindbar und können durch Administratoren reaktiviert werden.

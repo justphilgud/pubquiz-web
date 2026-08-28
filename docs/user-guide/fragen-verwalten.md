@@ -1,11 +1,13 @@
 # Fragen verwalten
 
-1. Fragenverwaltung öffnen.
-2. neue Frage anlegen.
-3. Fragentext und Antworttyp wählen.
-4. Antworten oder Antwortfelder pflegen.
-5. Kategorie und Medien ergänzen.
-6. Moderationsnotizen hinterlegen.
-7. speichern.
+Fragen werden heute über **Content → Neue Frage** angelegt und anschließend in der gemeinsamen Content-Suche gefunden.
 
-Editor-Fragen werden automatisch nicht freigegeben. Quellen, Bemerkungen, Zusatzinformationen, Veraltet-ab-Datum und mobile Eingabe sind für Version 2.0 vorgesehen.
+1. Vorlage beziehungsweise Fragetyp wählen.
+2. Fragentext und die fachlich richtige Lösung pflegen.
+3. Je nach Typ Antwortoptionen, strukturierte Felder oder Medien ergänzen.
+4. Kategorie, Quelle, Moderationsnotiz und Aktualität pflegen.
+5. Als unfertig speichern oder regulär speichern.
+
+Die Aktualität unterscheidet **Zeitlos**, **Veraltet ab** und **Prüfen ab**. Ein Datum erscheint nur bei den beiden datumsabhängigen Modi. Die kompakte Option **Zusätzlich als Spezialfragenvorlage speichern** ist standardmäßig deaktiviert.
+
+Fragen bleiben redaktioneller Content. Quizspezifische Reihenfolge, Blockposition und Ergebnisdarstellung werden erst im Quiz festgelegt.

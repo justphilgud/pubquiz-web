@@ -9,3 +9,7 @@ Archivierte Teams können nicht neu beitreten. Bei vergessenem Zugangswort könn
 Nach einem Verbindungsabbruch stellt die signierte Quiz-Session die Teilnahme im selben Browser wieder her.
 
 Nach jedem erfolgreichen Join kann das Team sein globales Profil sehen und optional ändern: Foto aufnehmen, ein Bild aus der Mediathek wählen oder einen der zehn Systemavatare auswählen. Ohne eigenes Foto bleibt ein stabiler Avatar sichtbar. Eine durch die Verwaltung gesetzte Upload-Sperre verhindert neue Fotos, nicht aber die Avatar-Auswahl. Archivierte Teams können ihr Profil nicht über den Join verändern.
+
+![Kompakte Auswahl der neuen Teamavatare](screenshots/team-avatar-picker.jpg)
+
+Die Avatarauswahl wird über die Profileinstellungen geöffnet und bleibt kompakt. Ein gewählter Avatar gilt global und bleibt nach einem Reload erhalten. Ein eigenes Teamfoto hat in Teamlisten, Moderation und Präsentation Vorrang. Wird es entfernt, erscheint wieder der gespeicherte Avatar.

@@ -1,5 +1,17 @@
 # Quiz verwalten
 
-Quizze können erstellt, bearbeitet, kopiert und archiviert werden. Ein Quiz besteht aus Intro, Fragenrunden und Outro. Abschnitte und Fragen lassen sich per Drag-and-drop sortieren.
+Quizze können erstellt, kopiert und archiviert werden. Der Editor bildet den Ablauf als **Intro → Blöcke → Outro → Kein Block** ab.
 
-Nach dem Frageneditor-Umbau werden Suche und Filter der Fragenauswahl erneut angepasst.
+![Quiz-Editor mit Fragen und Story-Elementen](screenshots/quiz-mixed-content-eventmanager.jpg)
+
+## Gemischte Inhalte
+
+Ein Quiz kann drei eigenständige Inhaltstypen enthalten:
+
+- Fragen mit Antwort, Lösung und optionaler Bewertung;
+- Story-Elemente ohne Antwort;
+- Umfragen ohne Punkte und Bewertung.
+
+Über **Quiz-Element hinzufügen** werden bestehende Inhalte zugeordnet. Die Karten lassen sich per Drag-and-drop innerhalb der erlaubten Bereiche sortieren. **Kein Block** sammelt bereits zugeordnete, aber noch nicht in einen Fragenblock eingeordnete Inhalte. Polls werden wie andere Quiz-Elemente an ihrer gespeicherten Position abgespielt.
+
+Intro und Outro besitzen feste, separat konfigurierbare Slides. Fragenblöcke steuern zusätzlich, ob Lösungen direkt oder gesammelt am Blockende gezeigt werden.
