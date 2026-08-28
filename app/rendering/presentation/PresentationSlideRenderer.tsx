@@ -58,7 +58,7 @@ import {
   rankScores,
   resolvePodiumReveal,
   type IntermediateStandingsAudienceEntry,
-  type IntermediateStandingsModerationEntry,
+  type IntermediateStandingsEntry,
 } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
@@ -122,7 +122,7 @@ export type PresentationSlideDisplayState =
     })
   | (PresentationSlideSharedDisplayState & {
       renderMode: "MODERATION_PREVIEW";
-      intermediateStandings: IntermediateStandingsModerationEntry[];
+      intermediateStandings: IntermediateStandingsEntry[];
     });
 
 type Props = {
@@ -1028,7 +1028,7 @@ function renderRennPferd({
 }
 
 function getIntermediateStandingsIdentity(
-  entry: IntermediateStandingsAudienceEntry | IntermediateStandingsModerationEntry,
+  entry: IntermediateStandingsEntry,
 ) {
   return "identity" in entry ? entry.identity : null;
 }

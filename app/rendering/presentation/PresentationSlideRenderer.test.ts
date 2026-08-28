@@ -12,7 +12,6 @@ import PresentationSlideRenderer, {
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import {
   resolveIntermediateStandingsAudience,
-  resolveIntermediateStandingsModeration,
 } from "./presentationRankingPolicy";
 import {
   buildPraesentationSlides,
@@ -33,6 +32,13 @@ const playerSource = readFileSync(
 const moderationPreviewSource = readFileSync(
   new URL(
     "../../quiz/[quizId]/moderation/components/CurrentSlidePanel.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
+const moderationClientSource = readFileSync(
+  new URL(
+    "../../quiz/[quizId]/moderation/ModerationClient.tsx",
     import.meta.url,
   ),
   "utf8",
@@ -293,10 +299,10 @@ test("public interim standings expose competition ranks and points without ident
   );
   assert.ok(slide, "productive slide builder must emit an interim standings slide");
   const scores = [
-    { teamId: 1, teamname: "Geheimes Team Alpha", punkte: 90, avatarCode: "teekanne" as const, photoUrl: "/secret-alpha.jpg" },
-    { teamId: 2, teamname: "Geheimes Team Beta", punkte: 70, avatarCode: "wecker" as const, photoUrl: "/secret-beta.jpg" },
-    { teamId: 3, teamname: "Geheimes Team Gamma", punkte: 70, avatarCode: "tischlampe" as const, photoUrl: null },
-    { teamId: 4, teamname: "Geheimes Team Delta", punkte: 40, avatarCode: "gummistiefel" as const, photoUrl: null },
+    { teamId: 1, teamname: "Team Kolibri", punkte: 19, avatarCode: "teekanne" as const, photoUrl: "/kolibri.jpg" },
+    { teamId: 2, teamname: "Team Adler", punkte: 17, avatarCode: "wecker" as const, photoUrl: "/adler.jpg" },
+    { teamId: 3, teamname: "Team Lampe", punkte: 17, avatarCode: "tischlampe" as const, photoUrl: null },
+    { teamId: 4, teamname: "Team Kanne", punkte: 16, avatarCode: "gummistiefel" as const, photoUrl: null },
   ];
   const render = (state: PresentationSlideDisplayState) =>
     renderToStaticMarkup(createElement(PresentationSlideRenderer, {
@@ -320,17 +326,20 @@ test("public interim standings expose competition ranks and points without ident
   assert.match(publicHtml, />1<\/span><strong[^>]*>1\. Platz/);
   assert.equal((publicHtml.match(/>2<\/span><strong[^>]*>2\. Platz/g) ?? []).length, 2);
   assert.match(publicHtml, />4<\/span><strong[^>]*>4\. Platz/);
-  assert.match(publicHtml, /90 Punkte/);
-  assert.doesNotMatch(publicHtml, /Geheimes Team|secret-alpha|secret-beta/);
+  assert.match(publicHtml, /19 Punkte/);
+  assert.doesNotMatch(publicHtml, /Kolibri|Adler|Lampe|Kanne|kolibri\.jpg|adler\.jpg/);
 
   const moderationHtml = render({
     ...displayState,
     renderMode: "MODERATION_PREVIEW",
-    punktestand: scores,
-    intermediateStandings: resolveIntermediateStandingsModeration(scores),
+    punktestand: [],
+    intermediateStandings: audienceModel,
   });
-  assert.match(moderationHtml, /Geheimes Team Alpha/);
-  assert.match(moderationHtml, /secret-alpha\.jpg/);
+  assert.equal(moderationHtml, publicHtml.replace(
+    'data-render-mode="PRESENTATION"',
+    'data-render-mode="MODERATION_PREVIEW"',
+  ));
+  assert.doesNotMatch(moderationHtml, /Kolibri|Adler|Lampe|Kanne|kolibri\.jpg|adler\.jpg|teekanne|wecker/);
 });
 
 test("podium ceremony reveals 3-2-1 before the full final table", () => {
@@ -531,10 +540,10 @@ test("player and moderation preview share the presentation renderer", () => {
   assert.match(playerSource, /getPraesentationAudienceZwischenstand\(quizId\)/);
   assert.match(playerSource, /punktestand: showIntermediateStandings \? \[\] : scores/);
   assert.doesNotMatch(playerSource, /resolveIntermediateStandingsModeration/);
-  assert.match(
-    moderationPreviewSource,
-    /resolveIntermediateStandingsModeration\(punktestand\)/,
-  );
+  assert.match(moderationClientSource, /getPraesentationAudienceZwischenstand\(quizId\)/);
+  assert.match(moderationPreviewSource, /punktestand: showIntermediateStandings \? \[\] : punktestand/);
+  assert.match(moderationPreviewSource, /\? audienceInterimStandings/);
+  assert.doesNotMatch(moderationPreviewSource, /resolveIntermediateStandingsModeration/);
 });
 
 test("calendar CTA leaves the team join QR payload and overflow UI intact", () => {

@@ -287,13 +287,14 @@ steuert anschließend auch öffentliche Feeds.
 
 ### Teamidentität nach Audience und Phase
 
-Audience und Moderation verwenden getrennte Ranking-Read-Models. Der öffentliche
-Zwischenstand lädt ausschließlich Rang und Punkte; Teamidentität erreicht diese
-Datengrenze nicht. Das Moderationsmodell darf die globale Teamidentität tragen:
+Audience und Moderationsvorschau verwenden für den Zwischenstand dasselbe
+anonyme Audience-Read-Model. Es lädt ausschließlich Rang und Punkte;
+Teamidentität erreicht diese Datengrenze nicht. Vollständige Teamidentitäten
+bleiben in der getrennten Auswertungs-/Adminansicht verfügbar:
 
-| Zustand | Öffentliche Präsentation | Moderationsansicht |
+| Zustand | Öffentliche Präsentation | Moderationsvorschau |
 | --- | --- | --- |
-| Zwischenstand | Rang und Punkte; kein Name, Foto oder Avatar | vollständige Teamidentität |
+| Zwischenstand | Rang und Punkte; kein Name, Foto, Avatar oder Team-ID | identische anonyme Folie mit Rang und Punkten |
 | Endstand / Siegerehrung | Teamname, Punkte und Foto oder Avatar | vollständige Teamidentität |
 | Jahreswertung | Teamname, Jahrespunkte, Foto oder Avatar und semantische Rangbewegung | identische Jahreswertung |
 | bewusst gezeigte skurrile Antwort | Teamname, Antwort und Foto oder Avatar | Teamname, Antwort, Foto oder Avatar sowie Markierung |

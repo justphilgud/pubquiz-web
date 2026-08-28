@@ -21,6 +21,7 @@ import {
   getPresentationSlideKey,
   getSlideModeratorNote,
   isPauseSlide,
+  isIntermediateStandingsSlide,
   isPodiumRevealSlide,
   isStandingsSlide,
 } from "../praesentation/buildPraesentationSlides";
@@ -35,6 +36,7 @@ import {
   setEndstandRevealCount,
   setSchaetzfrageStatus,
   getAntwortStatus,
+  getPraesentationAudienceZwischenstand,
   getPraesentationJahreswertung,
   starteQuiz,
 } from "../praesentation/statusActions";
@@ -63,7 +65,10 @@ import {
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import { getFunnyAnswerPageCount, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
-import { resolvePodiumReveal } from "@/app/rendering/presentation/presentationRankingPolicy";
+import {
+  resolvePodiumReveal,
+  type IntermediateStandingsAudienceEntry,
+} from "@/app/rendering/presentation/presentationRankingPolicy";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 
@@ -208,6 +213,9 @@ export default function ModerationClient({
 
   const [punktestand, setPunktestand] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
+  >([]);
+  const [audienceInterimStandings, setAudienceInterimStandings] = useState<
+    IntermediateStandingsAudienceEntry[]
   >([]);
   const [yearlyStandings, setYearlyStandings] = useState<YearlyRankingEntry[]>([]);
 
@@ -680,22 +688,28 @@ export default function ModerationClient({
   }, [countdownIstAbgelaufen, quizId, handleBlockSchliessen]);
 
   useEffect(() => {
-    if (
-      !isStandingsSlide(aktuellerSlide)
-    ) {
-      return;
-    }
+    if (!isStandingsSlide(aktuellerSlide)) return;
+    let active = true;
 
-    async function ladePunktestand() {
-      const [daten, jahreswertung] = await Promise.all([
+    if (isIntermediateStandingsSlide(aktuellerSlide)) {
+      void getPraesentationAudienceZwischenstand(quizId).then((standings) => {
+        if (!active) return;
+        setAudienceInterimStandings(standings);
+      });
+    } else {
+      void Promise.all([
         getQuizPunktestand(quizId),
         getPraesentationJahreswertung(quizId),
-      ]);
-      setPunktestand(daten);
-      setYearlyStandings(jahreswertung);
+      ]).then(([daten, jahreswertung]) => {
+        if (!active) return;
+        setPunktestand(daten);
+        setYearlyStandings(jahreswertung);
+      });
     }
 
-    void ladePunktestand();
+    return () => {
+      active = false;
+    };
   }, [aktuellerSlide, quizId]);
 
   useEffect(() => {
@@ -873,6 +887,7 @@ export default function ModerationClient({
               aktuellerSlide={aktuellerSlide}
               countdownRestSekunden={countdownRestSekunden}
               punktestand={punktestand}
+              audienceInterimStandings={audienceInterimStandings}
               yearlyStandings={yearlyStandings}
               endstandRevealCount={endstandRevealCount}
               quiz={quiz}

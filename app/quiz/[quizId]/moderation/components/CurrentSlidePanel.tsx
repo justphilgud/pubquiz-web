@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { QuizPraesentationResult } from "../../../actions";
-import type { Slide } from "../../praesentation/buildPraesentationSlides";
+import {
+  isIntermediateStandingsSlide,
+  type Slide,
+} from "../../praesentation/buildPraesentationSlides";
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { getPresentationSlideTitle } from "@/app/rendering/presentation/presentationSlideMetadata";
@@ -19,7 +22,7 @@ import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults
 import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
-import { resolveIntermediateStandingsModeration } from "@/app/rendering/presentation/presentationRankingPolicy";
+import type { IntermediateStandingsAudienceEntry } from "@/app/rendering/presentation/presentationRankingPolicy";
 
 type PunktestandEintrag = {
   teamId: number;
@@ -35,6 +38,7 @@ type Props = {
   aktuellerSlide: Slide | undefined;
   countdownRestSekunden: number;
   punktestand: PunktestandEintrag[];
+  audienceInterimStandings: IntermediateStandingsAudienceEntry[];
   yearlyStandings: YearlyRankingEntry[];
   endstandRevealCount: number;
   quiz: QuizPraesentationResult;
@@ -71,6 +75,7 @@ export default function CurrentSlidePanel({
   aktuellerSlide,
   countdownRestSekunden,
   punktestand,
+  audienceInterimStandings,
   yearlyStandings,
   endstandRevealCount,
   quiz,
@@ -87,6 +92,7 @@ export default function CurrentSlidePanel({
   teamJoinState,
   funnyAnswers,
 }: Props) {
+  const showIntermediateStandings = isIntermediateStandingsSlide(aktuellerSlide);
   const titel =
     aktuellerSlide?.typ === "frage"
       ? "Frage"
@@ -162,8 +168,10 @@ export default function CurrentSlidePanel({
               displayState={{
                 renderMode: "MODERATION_PREVIEW",
                 templateRevealCount: endstandRevealCount,
-                punktestand,
-                intermediateStandings: resolveIntermediateStandingsModeration(punktestand),
+                punktestand: showIntermediateStandings ? [] : punktestand,
+                intermediateStandings: showIntermediateStandings
+                  ? audienceInterimStandings
+                  : [],
                 yearlyStandings,
                 endstandRevealCount,
                 now,
