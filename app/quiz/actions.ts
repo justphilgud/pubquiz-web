@@ -1819,6 +1819,16 @@ export async function getQuizPraesentation(
               konfiguration: true,
             },
           },
+          live_poll_revision: {
+            select: {
+              live_poll_revision_id: true,
+              live_poll_id: true,
+              typ: true,
+              prompt: true,
+              publication_mode: true,
+              optionen: true,
+            },
+          },
           story_bezugs_frage: {
             select: {
               fragen: {
