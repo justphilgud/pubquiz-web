@@ -29,6 +29,7 @@ import {
   type QuizInteractionState,
 } from "./interactionStateMachine";
 import {
+  isDraftEligibleForAuthoritativeLiveRun,
   planSubmissionVersion,
   resolveInteractionClosePolicy,
   resolveInteractionSubmissionPolicy,
@@ -214,15 +215,39 @@ async function autoFinalizeDrafts(
     quiz_fragen_id: number | null;
     interaction_type: string;
     config_snapshot: Prisma.JsonValue;
+    opened_at: Date | null;
   },
   reason: string,
+  options: { reconcileAuthoritativeLiveDrafts?: boolean } = {},
 ) {
   const interaction = readInteractionSnapshot(run.config_snapshot);
-  const drafts = await db.team_antworten.findMany({
-      where: { interaction_run_id: run.interaction_run_id },
-      include: { antwortauswahlen: true, antwortfelder: true },
-    });
+  const candidates = await db.team_antworten.findMany({
+    where:
+      options.reconcileAuthoritativeLiveDrafts && run.quiz_fragen_id !== null
+        ? { quiz_fragen_id: run.quiz_fragen_id }
+        : { interaction_run_id: run.interaction_run_id },
+    include: { antwortauswahlen: true, antwortfelder: true },
+  });
+  const drafts = options.reconcileAuthoritativeLiveDrafts
+    ? candidates.filter((draft) =>
+        isDraftEligibleForAuthoritativeLiveRun({
+          draftInteractionRunId: draft.interaction_run_id,
+          draftUpdatedAt: draft.draft_updated_at ?? draft.aktualisiert_am,
+          authoritativeRunId: run.interaction_run_id,
+          authoritativeRunOpenedAt: run.opened_at,
+        }),
+      )
+    : candidates;
   if (drafts.length === 0) return 0;
+  if (options.reconcileAuthoritativeLiveDrafts) {
+    for (const draft of drafts) {
+      if (draft.interaction_run_id === run.interaction_run_id) continue;
+      await db.team_antworten.update({
+        where: { team_antwort_id: draft.team_antwort_id },
+        data: { interaction_run_id: run.interaction_run_id },
+      });
+    }
+  }
   const existing = await db.team_answer_submissions.findMany({
       where: { interaction_run_id: run.interaction_run_id },
       select: {
@@ -308,6 +333,7 @@ async function closeRun(
     reason: string;
     keepCurrent: boolean;
     evaluateFinalizedDrafts?: boolean;
+    reconcileAuthoritativeLiveDrafts?: boolean;
   },
 ) {
   await lockRun(db, runId);
@@ -319,7 +345,11 @@ async function closeRun(
     const contentPoll = readLivePollRunSnapshot(run.config_snapshot);
     const finalizedDrafts = contentPoll
       ? 0
-      : await autoFinalizeDrafts(db, run, options.reason);
+      : await autoFinalizeDrafts(db, run, options.reason, {
+          reconcileAuthoritativeLiveDrafts:
+            options.reconcileAuthoritativeLiveDrafts === true &&
+            !isPixelInteractionRun(run),
+        });
     const closePolicy = resolveInteractionClosePolicy(
       isPixelInteractionRun(run) ? "PIXEL" : "DEFAULT",
     );
@@ -670,6 +700,7 @@ export async function closeQuizQuestionInteraction(
     keepCurrent: true,
     evaluateFinalizedDrafts:
       resolveInteractionClosePolicy("LIVE_RESULT").evaluateAutoFinalizedDrafts,
+    reconcileAuthoritativeLiveDrafts: true,
   });
 }
 
@@ -796,9 +827,25 @@ export async function saveTeamAnswerDraft(input: {
   draft: TeamAnswerDraftInput;
 }): Promise<SaveTeamAnswerDraftResult> {
   return prisma.$transaction(async (tx) => {
-    await lockRun(tx, input.interactionRunId);
+    const resolved = await resolveInteractionAssignment(
+      tx,
+      input.quizId,
+      input.quizFragenId,
+    );
+    const authoritativeLiveRunId =
+      resolved.assignment.ergebnisdarstellung === "LIVE"
+        ? await lockCurrentRun(tx, input.quizId)
+        : null;
+    const interactionRunId =
+      resolved.assignment.ergebnisdarstellung === "LIVE"
+        ? authoritativeLiveRunId
+        : input.interactionRunId;
+    if (interactionRunId === null) {
+      return { success: false, reason: "LIVE_STATE_CHANGED" };
+    }
+    await lockRun(tx, interactionRunId);
     let run = await tx.quiz_interaction_runs.findUnique({
-      where: { interaction_run_id: input.interactionRunId },
+      where: { interaction_run_id: interactionRunId },
     });
     const now = new Date();
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
@@ -820,11 +867,6 @@ export async function saveTeamAnswerDraft(input: {
     ) {
       return { success: false, reason: "FINALIZED" };
     }
-    const resolved = await resolveInteractionAssignment(
-      tx,
-      input.quizId,
-      input.quizFragenId,
-    );
     if (!await isRunReleasedForAnswerWrite(
       tx,
       run,
@@ -877,9 +919,21 @@ export async function saveTeamAnswerDraft(input: {
       },
       include: { antwortauswahlen: true, antwortfelder: true },
     });
+    const previousBelongsToLiveResponsePhase = Boolean(
+      previous &&
+        resolved.assignment.ergebnisdarstellung === "LIVE" &&
+        isDraftEligibleForAuthoritativeLiveRun({
+          draftInteractionRunId: previous.interaction_run_id,
+          draftUpdatedAt:
+            previous.draft_updated_at ?? previous.aktualisiert_am,
+          authoritativeRunId: run.interaction_run_id,
+          authoritativeRunOpenedAt: run.opened_at,
+        }),
+    );
     const currentRevision =
-      previous?.interaction_run_id === run.interaction_run_id
-        ? previous.draft_revision
+      previous?.interaction_run_id === run.interaction_run_id ||
+      previousBelongsToLiveResponsePhase
+        ? previous?.draft_revision ?? 0
         : 0;
     const contentChanged =
       previous?.interaction_run_id !== run.interaction_run_id ||

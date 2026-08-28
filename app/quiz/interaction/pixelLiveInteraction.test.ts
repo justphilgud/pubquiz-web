@@ -156,7 +156,10 @@ test("general close preserves pixel stop authority and never simulates another s
     service.indexOf("export async function syncInteractionForPresentation"),
   );
 
-  assert.match(closeRun, /await autoFinalizeDrafts\(db, run, options\.reason\)/);
+  assert.match(
+    closeRun,
+    /await autoFinalizeDrafts\(db, run, options\.reason, \{[\s\S]*!isPixelInteractionRun\(run\)/,
+  );
   assert.match(closeRun, /isPixelInteractionRun\(run\) \? "PIXEL" : "DEFAULT"/);
   assert.match(closeRun, /deadline_at: run\.stopped_at \? run\.deadline_at : null/);
   assert.doesNotMatch(closeRun, /stopped_by_team_session_id\s*:/);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  isDraftEligibleForAuthoritativeLiveRun,
   isDraftChangedSinceSubmission,
   planSubmissionVersion,
   resolveInteractionClosePolicy,
@@ -9,6 +10,35 @@ import {
   shouldKeepInteractionOpenUntilBlockClose,
   shouldAutoFinalizeDraft,
 } from "./interactionSubmissionPolicy";
+
+test("binds only current or newly updated drafts to an authoritative LIVE run", () => {
+  const openedAt = new Date("2026-08-28T10:00:00.000Z");
+
+  assert.equal(isDraftEligibleForAuthoritativeLiveRun({
+    draftInteractionRunId: 40,
+    draftUpdatedAt: new Date("2026-08-28T09:00:00.000Z"),
+    authoritativeRunId: 40,
+    authoritativeRunOpenedAt: openedAt,
+  }), true);
+  assert.equal(isDraftEligibleForAuthoritativeLiveRun({
+    draftInteractionRunId: 12,
+    draftUpdatedAt: new Date("2026-08-28T10:00:01.000Z"),
+    authoritativeRunId: 40,
+    authoritativeRunOpenedAt: openedAt,
+  }), true);
+  assert.equal(isDraftEligibleForAuthoritativeLiveRun({
+    draftInteractionRunId: 12,
+    draftUpdatedAt: new Date("2026-08-28T09:59:59.000Z"),
+    authoritativeRunId: 40,
+    authoritativeRunOpenedAt: openedAt,
+  }), false);
+  assert.equal(isDraftEligibleForAuthoritativeLiveRun({
+    draftInteractionRunId: 12,
+    draftUpdatedAt: new Date("2026-08-28T10:00:01.000Z"),
+    authoritativeRunId: 40,
+    authoritativeRunOpenedAt: null,
+  }), false);
+});
 
 test("allows normal productive interactions to be resubmitted while open", () => {
   for (const interactionType of [

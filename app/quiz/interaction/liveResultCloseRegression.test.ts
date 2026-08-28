@@ -224,6 +224,7 @@ test("the production close action targets the validated run and never deletes su
   assert.match(closeService, /run\.quiz_fragen_id !== input\.quizFragenId/);
   assert.match(closeService, /resolveInteractionClosePolicy\("LIVE_RESULT"\)/);
   assert.match(closeService, /evaluateFinalizedDrafts:/);
+  assert.match(closeService, /reconcileAuthoritativeLiveDrafts: true/);
   assert.doesNotMatch(closeService, /team_answer_submissions\.(delete|update)/);
 });
 

@@ -45,6 +45,17 @@ export function shouldAutoFinalizeDraft(input: {
   return !input.hasExplicitSubmission && input.hasContent;
 }
 
+export function isDraftEligibleForAuthoritativeLiveRun(input: {
+  draftInteractionRunId: number | null;
+  draftUpdatedAt: Date;
+  authoritativeRunId: number;
+  authoritativeRunOpenedAt: Date | null;
+}) {
+  if (input.draftInteractionRunId === input.authoritativeRunId) return true;
+  return input.authoritativeRunOpenedAt !== null &&
+    input.draftUpdatedAt >= input.authoritativeRunOpenedAt;
+}
+
 export function resolveInteractionClosePolicy(
   mode: "DEFAULT" | "LIVE_RESULT" | "PIXEL",
 ) {

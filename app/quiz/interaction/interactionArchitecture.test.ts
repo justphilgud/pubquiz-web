@@ -99,6 +99,26 @@ test("draft writes serialize on the run and use compare-and-swap revisions", () 
   assert.match(service, /DEADLINE_EXPIRED/);
 });
 
+test("LIVE draft writes and close share the authoritative current run", () => {
+  const source = readFileSync(
+    "app/quiz/interaction/interaction.server.ts",
+    "utf8",
+  );
+  const save = source.slice(
+    source.indexOf("export async function saveTeamAnswerDraft"),
+    source.indexOf("export async function submitTeamAnswer"),
+  );
+  const close = source.slice(
+    source.indexOf("export async function closeQuizQuestionInteraction"),
+    source.indexOf("export async function closeBlockInteractions"),
+  );
+
+  assert.match(save, /ergebnisdarstellung === "LIVE"[\s\S]*lockCurrentRun/);
+  assert.match(save, /where: \{ interaction_run_id: interactionRunId \}/);
+  assert.match(save, /isDraftEligibleForAuthoritativeLiveRun/);
+  assert.match(close, /reconcileAuthoritativeLiveDrafts: true/);
+});
+
 test("only final submission lifecycle events trigger productive evaluation", () => {
   const service = read("app/quiz/interaction/interaction.server.ts");
   const saveDraft = service.slice(
