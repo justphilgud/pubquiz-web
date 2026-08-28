@@ -883,7 +883,7 @@ test("template uploads require an exact environment-classified Blob store bindin
     environment: "preview",
     explicitlyEnabled: true,
     readWriteToken: token,
-    configuredStoreId: "store123",
+    configuredStoreId: "store_store123",
     configuredStoreEnvironment: "nonproduction",
   }), { enabled: true, storeId: "store123" });
   assert.equal(resolvePresentationTemplateUploadPolicy({

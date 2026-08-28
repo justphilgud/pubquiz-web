@@ -28,6 +28,14 @@ export function readBlobStoreIdFromToken(token: string | undefined) {
   return storeId;
 }
 
+function normalizeBlobStoreId(storeId: string | undefined) {
+  const normalizedStoreId = storeId?.trim();
+  if (!normalizedStoreId) return null;
+  return normalizedStoreId.startsWith("store_")
+    ? normalizedStoreId.slice("store_".length)
+    : normalizedStoreId;
+}
+
 export function resolvePresentationTemplateUploadPolicy({
   environment,
   explicitlyEnabled,
@@ -50,7 +58,7 @@ export function resolvePresentationTemplateUploadPolicy({
     };
   }
 
-  const expectedStoreId = configuredStoreId?.trim();
+  const expectedStoreId = normalizeBlobStoreId(configuredStoreId);
   if (!expectedStoreId || expectedStoreId !== tokenStoreId) {
     return {
       enabled: false,
