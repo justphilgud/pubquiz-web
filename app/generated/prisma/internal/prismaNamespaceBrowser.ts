@@ -68,6 +68,8 @@ export const ModelName = {
   presentation_templates: 'presentation_templates',
   story_elemente: 'story_elemente',
   story_element_revisionen: 'story_element_revisionen',
+  live_polls: 'live_polls',
+  live_poll_revisions: 'live_poll_revisions',
   frage_story_elemente: 'frage_story_elemente',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
@@ -79,6 +81,7 @@ export const ModelName = {
   team_antworten: 'team_antworten',
   quiz_interaction_runs: 'quiz_interaction_runs',
   team_answer_submissions: 'team_answer_submissions',
+  live_poll_responses: 'live_poll_responses',
   frage_antwortfelder: 'frage_antwortfelder',
   team_antwortfelder: 'team_antwortfelder',
   frage_antwortfeld_loesungen: 'frage_antwortfeld_loesungen',
@@ -387,6 +390,39 @@ export const Story_element_revisionenScalarFieldEnum = {
 export type Story_element_revisionenScalarFieldEnum = (typeof Story_element_revisionenScalarFieldEnum)[keyof typeof Story_element_revisionenScalarFieldEnum]
 
 
+export const Live_pollsScalarFieldEnum = {
+  live_poll_id: 'live_poll_id',
+  stable_key: 'stable_key',
+  status: 'status',
+  geltungsbereich: 'geltungsbereich',
+  eventreihe_id: 'eventreihe_id',
+  quiz_id: 'quiz_id',
+  created_by_user_id: 'created_by_user_id',
+  source_live_poll_id: 'source_live_poll_id',
+  archived_at: 'archived_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Live_pollsScalarFieldEnum = (typeof Live_pollsScalarFieldEnum)[keyof typeof Live_pollsScalarFieldEnum]
+
+
+export const Live_poll_revisionsScalarFieldEnum = {
+  live_poll_revision_id: 'live_poll_revision_id',
+  live_poll_id: 'live_poll_id',
+  revisionsnummer: 'revisionsnummer',
+  typ: 'typ',
+  prompt: 'prompt',
+  publication_mode: 'publication_mode',
+  optionen: 'optionen',
+  moderationsnotiz: 'moderationsnotiz',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at'
+} as const
+
+export type Live_poll_revisionsScalarFieldEnum = (typeof Live_poll_revisionsScalarFieldEnum)[keyof typeof Live_poll_revisionsScalarFieldEnum]
+
+
 export const Frage_story_elementeScalarFieldEnum = {
   frage_story_element_id: 'frage_story_element_id',
   fragen_id: 'fragen_id',
@@ -485,6 +521,7 @@ export const Quiz_ablauf_elementeScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   story_element_revision_id: 'story_element_revision_id',
+  live_poll_revision_id: 'live_poll_revision_id',
   story_bezugs_quiz_fragen_id: 'story_bezugs_quiz_fragen_id',
   story_beziehung: 'story_beziehung'
 } as const
@@ -590,6 +627,24 @@ export const Team_answer_submissionsScalarFieldEnum = {
 } as const
 
 export type Team_answer_submissionsScalarFieldEnum = (typeof Team_answer_submissionsScalarFieldEnum)[keyof typeof Team_answer_submissionsScalarFieldEnum]
+
+
+export const Live_poll_responsesScalarFieldEnum = {
+  live_poll_response_id: 'live_poll_response_id',
+  interaction_run_id: 'interaction_run_id',
+  live_poll_revision_id: 'live_poll_revision_id',
+  quiz_team_session_id: 'quiz_team_session_id',
+  selected_option_id: 'selected_option_id',
+  original_text: 'original_text',
+  public_text: 'public_text',
+  is_visible: 'is_visible',
+  moderated_by_user_id: 'moderated_by_user_id',
+  revision: 'revision',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Live_poll_responsesScalarFieldEnum = (typeof Live_poll_responsesScalarFieldEnum)[keyof typeof Live_poll_responsesScalarFieldEnum]
 
 
 export const Frage_antwortfelderScalarFieldEnum = {

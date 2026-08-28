@@ -8,6 +8,8 @@ import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
+import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
+import { getLivePollPollingDelay } from "@/app/umfragen/livePollRuntime";
 import {
   getPraesentationAudienceZwischenstand,
   getPraesentationPunktestand,
@@ -69,6 +71,7 @@ export default function QuizPraesentationPlayer({
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
+  const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
   const [funnyAnswers, setFunnyAnswers] = useState<FunnyAnswerEntry[]>([]);
   const [funnyQuestionIds, setFunnyQuestionIds] = useState(
     () => new Set(
@@ -131,9 +134,20 @@ export default function QuizPraesentationPlayer({
   useEffect(() => {
     let active = true;
     let refreshing = false;
+    let timeout: number | null = null;
+    let pollActive = false;
+    let consecutiveFailures = 0;
+
+    function schedule() {
+      if (!active) return;
+      const delay = pollActive
+        ? getLivePollPollingDelay({ hidden: document.hidden, consecutiveFailures })
+        : 750;
+      timeout = window.setTimeout(() => void refresh(), delay);
+    }
 
     async function refresh() {
-      if (refreshing) return;
+      if (refreshing) return schedule();
       refreshing = true;
       try {
         const [storedStatus, interactionSnapshot] = await Promise.all([
@@ -163,21 +177,26 @@ export default function QuizPraesentationPlayer({
         setPixelState(interactionSnapshot.pixelState);
         setPollState(interactionSnapshot.pollState);
         setLiveResultState(interactionSnapshot.liveResultState);
+        setLivePollState(interactionSnapshot.livePollState);
+        pollActive = interactionSnapshot.livePollState !== null;
+        consecutiveFailures = 0;
         setTeamJoinState(interactionSnapshot.teamJoinState);
         serverClockOffsetRef.current =
           new Date(interactionSnapshot.serverNow).getTime() - Date.now();
         setNow(Date.now() + serverClockOffsetRef.current);
       } catch {
+        consecutiveFailures += 1;
         if (active) setSyncError(true);
       } finally {
         refreshing = false;
+        schedule();
       }
     }
 
-    const interval = window.setInterval(() => void refresh(), 750);
+    void refresh();
     return () => {
       active = false;
-      window.clearInterval(interval);
+      if (timeout !== null) window.clearTimeout(timeout);
     };
   }, [quizId, showTeamJoinState, presentationQuestionAssignmentId]);
 
@@ -295,6 +314,7 @@ export default function QuizPraesentationPlayer({
             pixelState,
             pollState,
             liveResultState,
+            livePollState,
             teamJoinState,
             funnyAnswers,
           }}

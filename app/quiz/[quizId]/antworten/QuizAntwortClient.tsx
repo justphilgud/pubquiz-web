@@ -31,6 +31,8 @@ import {
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import { TeamProfileEditor } from "@/app/teams/TeamProfileEditor";
 import type { TeamProfile } from "@/app/teams/teamProfile";
+import { submitLivePollResponse } from "@/app/umfragen/actions";
+import { getLivePollPollingDelay } from "@/app/umfragen/livePollRuntime";
 
 type TeamAntwortState = TeamAnswerDraft;
 type QuizLiveSnapshot = Awaited<
@@ -241,6 +243,10 @@ export default function QuizAntwortClient({
     canEdit: boolean;
     canSubmit: boolean;
   } | null>(null);
+  const [livePollState, setLivePollState] = useState<QuizLiveSnapshot["livePollState"]>(null);
+  const livePollStateRef = useRef<QuizLiveSnapshot["livePollState"]>(null);
+  const [livePollResponse, setLivePollResponse] = useState<{ selectedOptionId: string | null; text: string | null } | null>(null);
+  const [livePollText, setLivePollText] = useState("");
 
   const [isLoadingTeams, setIsLoadingTeams] = useState(false);
   const [isStartingSession, setIsStartingSession] = useState(false);
@@ -335,8 +341,17 @@ export default function QuizAntwortClient({
 
     let active = true;
     let refreshing = false;
+    let pollTimeout: number | null = null;
+    let consecutiveFailures = 0;
+    function schedule() {
+      if (!active) return;
+      const delay = livePollStateRef.current
+        ? getLivePollPollingDelay({ hidden: document.hidden, consecutiveFailures })
+        : 500;
+      pollTimeout = window.setTimeout(() => void refresh(), delay);
+    }
     async function refresh() {
-      if (refreshing) return;
+      if (refreshing) return schedule();
       refreshing = true;
       try {
         const snapshot = await fetchQuizLiveSnapshot(
@@ -346,6 +361,14 @@ export default function QuizAntwortClient({
           liveDaten.activeQuizFragenId,
         );
         if (!active) return;
+        consecutiveFailures = 0;
+        livePollStateRef.current = snapshot.livePollState;
+        setLivePollState(snapshot.livePollState);
+        if (snapshot.teamSpecificState?.livePollResponse) {
+          const response = snapshot.teamSpecificState.livePollResponse;
+          setLivePollResponse({ selectedOptionId: response.selectedOptionId, text: response.text });
+          setLivePollText((current) => current || response.text || "");
+        }
         setPixelState(snapshot.pixelState);
         setPixelTeamState(snapshot.pixelState && snapshot.teamSpecificState
           ? {
@@ -425,6 +448,7 @@ export default function QuizAntwortClient({
           }
         }
       } catch (error) {
+        consecutiveFailures += 1;
         if (error instanceof InvalidTeamSessionError && active) {
           localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
           hydratedSessionTokenRef.current = null;
@@ -438,13 +462,13 @@ export default function QuizAntwortClient({
         // A transient polling failure is retried by the next interval.
       } finally {
         refreshing = false;
+        schedule();
       }
     }
     void refresh();
-    const interval = window.setInterval(() => void refresh(), 500);
     return () => {
       active = false;
-      window.clearInterval(interval);
+      if (pollTimeout !== null) window.clearTimeout(pollTimeout);
     };
   }, [
     liveDaten.activeQuizFragenId,
@@ -455,6 +479,18 @@ export default function QuizAntwortClient({
     session?.sessionToken,
     daten,
   ]);
+
+  function saveLivePoll(input: { selectedOptionId?: string; text?: string }) {
+    if (!session || !livePollState || livePollState.state !== "OPEN") return;
+    setIsSubmitting(true);
+    setMeldung("");
+    void submitLivePollResponse({ quizId: liveDaten.quiz_id, quizTeamSessionToken: session.sessionToken, ...input }).then((result) => {
+      setMeldung(result.message);
+      if (result.success) {
+        setLivePollResponse({ selectedOptionId: input.selectedOptionId ?? null, text: input.text?.trim() ?? null });
+      }
+    }).catch(() => setMeldung("Die Umfrageantwort konnte nicht gespeichert werden.")).finally(() => setIsSubmitting(false));
+  }
 
   useEffect(() => {
     if (
@@ -1095,7 +1131,10 @@ export default function QuizAntwortClient({
 
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {!blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
+          {livePollState ? <div className="space-y-5">
+            <div><div className="answer-kicker text-sm font-semibold uppercase tracking-wide text-cyan-700">Live-Umfrage</div><h2 className="mt-2 text-2xl font-bold">{livePollState.prompt}</h2><p className="mt-2 text-sm text-slate-600">{livePollState.state === "OPEN" ? "Antwort offen – Änderungen sind bis zum Schließen möglich." : "Die Umfrage ist geschlossen."}</p></div>
+            {livePollState.type === "SINGLE_CHOICE" ? <div className="grid gap-3">{livePollState.options.map((option) => <button key={option.id} type="button" disabled={isSubmitting || livePollState.state !== "OPEN"} onClick={() => saveLivePoll({ selectedOptionId: option.id })} className={`min-h-12 rounded-xl border px-4 py-3 text-left font-semibold transition disabled:opacity-60 ${livePollResponse?.selectedOptionId === option.id ? "border-cyan-700 bg-cyan-50 text-cyan-950 ring-2 ring-cyan-100" : "border-slate-300 bg-white text-slate-900 hover:border-cyan-500"}`}><span aria-hidden className="mr-2">{livePollResponse?.selectedOptionId === option.id ? "●" : "○"}</span>{option.label}</button>)}</div> : <div className="space-y-3"><textarea className="min-h-28 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none focus:border-cyan-700 focus:ring-2 focus:ring-cyan-100" maxLength={500} value={livePollText} disabled={isSubmitting || livePollState.state !== "OPEN"} onChange={(event) => setLivePollText(event.target.value)} placeholder="Kurzen Beitrag eingeben …" /><button type="button" className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50" disabled={isSubmitting || livePollState.state !== "OPEN" || !livePollText.trim()} onClick={() => saveLivePoll({ text: livePollText })}>Beitrag senden</button>{livePollResponse?.text ? <p className="text-sm text-slate-600">Gespeichert: {livePollResponse.text}</p> : null}</div>}
+          </div> : !blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
             (liveDaten.answerPhase === "LEGACY" &&
               aktuellerBlock &&
               !liveDaten.presentationStatusText)) ? (

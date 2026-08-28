@@ -35,6 +35,7 @@ export type Quiz_ablauf_elementeAvgAggregateOutputType = {
   sortierung: number | null
   konfigurations_version: number | null
   story_element_revision_id: number | null
+  live_poll_revision_id: number | null
   story_bezugs_quiz_fragen_id: number | null
 }
 
@@ -46,6 +47,7 @@ export type Quiz_ablauf_elementeSumAggregateOutputType = {
   sortierung: number | null
   konfigurations_version: number | null
   story_element_revision_id: number | null
+  live_poll_revision_id: number | null
   story_bezugs_quiz_fragen_id: number | null
 }
 
@@ -65,6 +67,7 @@ export type Quiz_ablauf_elementeMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   story_element_revision_id: number | null
+  live_poll_revision_id: number | null
   story_bezugs_quiz_fragen_id: number | null
   story_beziehung: $Enums.StoryQuestionRelationship | null
 }
@@ -85,6 +88,7 @@ export type Quiz_ablauf_elementeMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   story_element_revision_id: number | null
+  live_poll_revision_id: number | null
   story_bezugs_quiz_fragen_id: number | null
   story_beziehung: $Enums.StoryQuestionRelationship | null
 }
@@ -106,6 +110,7 @@ export type Quiz_ablauf_elementeCountAggregateOutputType = {
   created_at: number
   updated_at: number
   story_element_revision_id: number
+  live_poll_revision_id: number
   story_bezugs_quiz_fragen_id: number
   story_beziehung: number
   _all: number
@@ -120,6 +125,7 @@ export type Quiz_ablauf_elementeAvgAggregateInputType = {
   sortierung?: true
   konfigurations_version?: true
   story_element_revision_id?: true
+  live_poll_revision_id?: true
   story_bezugs_quiz_fragen_id?: true
 }
 
@@ -131,6 +137,7 @@ export type Quiz_ablauf_elementeSumAggregateInputType = {
   sortierung?: true
   konfigurations_version?: true
   story_element_revision_id?: true
+  live_poll_revision_id?: true
   story_bezugs_quiz_fragen_id?: true
 }
 
@@ -150,6 +157,7 @@ export type Quiz_ablauf_elementeMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   story_element_revision_id?: true
+  live_poll_revision_id?: true
   story_bezugs_quiz_fragen_id?: true
   story_beziehung?: true
 }
@@ -170,6 +178,7 @@ export type Quiz_ablauf_elementeMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   story_element_revision_id?: true
+  live_poll_revision_id?: true
   story_bezugs_quiz_fragen_id?: true
   story_beziehung?: true
 }
@@ -191,6 +200,7 @@ export type Quiz_ablauf_elementeCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   story_element_revision_id?: true
+  live_poll_revision_id?: true
   story_bezugs_quiz_fragen_id?: true
   story_beziehung?: true
   _all?: true
@@ -299,6 +309,7 @@ export type Quiz_ablauf_elementeGroupByOutputType = {
   created_at: Date
   updated_at: Date
   story_element_revision_id: number | null
+  live_poll_revision_id: number | null
   story_bezugs_quiz_fragen_id: number | null
   story_beziehung: $Enums.StoryQuestionRelationship | null
   _count: Quiz_ablauf_elementeCountAggregateOutputType | null
@@ -343,12 +354,14 @@ export type quiz_ablauf_elementeWhereInput = {
   created_at?: Prisma.DateTimeFilter<"quiz_ablauf_elemente"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"quiz_ablauf_elemente"> | Date | string
   story_element_revision_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
+  live_poll_revision_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
   story_bezugs_quiz_fragen_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
   story_beziehung?: Prisma.EnumStoryQuestionRelationshipNullableFilter<"quiz_ablauf_elemente"> | $Enums.StoryQuestionRelationship | null
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.quizWhereInput>
   quiz_abschnitte?: Prisma.XOR<Prisma.Quiz_abschnitteNullableScalarRelationFilter, Prisma.quiz_abschnitteWhereInput> | null
   quiz_fragen?: Prisma.XOR<Prisma.Quiz_fragenNullableScalarRelationFilter, Prisma.quiz_fragenWhereInput> | null
   story_element_revision?: Prisma.XOR<Prisma.Story_element_revisionenNullableScalarRelationFilter, Prisma.story_element_revisionenWhereInput> | null
+  live_poll_revision?: Prisma.XOR<Prisma.Live_poll_revisionsNullableScalarRelationFilter, Prisma.live_poll_revisionsWhereInput> | null
   story_bezugs_frage?: Prisma.XOR<Prisma.Quiz_fragenNullableScalarRelationFilter, Prisma.quiz_fragenWhereInput> | null
   interaction_runs?: Prisma.Quiz_interaction_runsListRelationFilter
 }
@@ -370,12 +383,14 @@ export type quiz_ablauf_elementeOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrderInput | Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
   story_beziehung?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz?: Prisma.quizOrderByWithRelationInput
   quiz_abschnitte?: Prisma.quiz_abschnitteOrderByWithRelationInput
   quiz_fragen?: Prisma.quiz_fragenOrderByWithRelationInput
   story_element_revision?: Prisma.story_element_revisionenOrderByWithRelationInput
+  live_poll_revision?: Prisma.live_poll_revisionsOrderByWithRelationInput
   story_bezugs_frage?: Prisma.quiz_fragenOrderByWithRelationInput
   interaction_runs?: Prisma.quiz_interaction_runsOrderByRelationAggregateInput
 }
@@ -402,12 +417,14 @@ export type quiz_ablauf_elementeWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"quiz_ablauf_elemente"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"quiz_ablauf_elemente"> | Date | string
   story_element_revision_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
+  live_poll_revision_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
   story_bezugs_quiz_fragen_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
   story_beziehung?: Prisma.EnumStoryQuestionRelationshipNullableFilter<"quiz_ablauf_elemente"> | $Enums.StoryQuestionRelationship | null
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.quizWhereInput>
   quiz_abschnitte?: Prisma.XOR<Prisma.Quiz_abschnitteNullableScalarRelationFilter, Prisma.quiz_abschnitteWhereInput> | null
   quiz_fragen?: Prisma.XOR<Prisma.Quiz_fragenNullableScalarRelationFilter, Prisma.quiz_fragenWhereInput> | null
   story_element_revision?: Prisma.XOR<Prisma.Story_element_revisionenNullableScalarRelationFilter, Prisma.story_element_revisionenWhereInput> | null
+  live_poll_revision?: Prisma.XOR<Prisma.Live_poll_revisionsNullableScalarRelationFilter, Prisma.live_poll_revisionsWhereInput> | null
   story_bezugs_frage?: Prisma.XOR<Prisma.Quiz_fragenNullableScalarRelationFilter, Prisma.quiz_fragenWhereInput> | null
   interaction_runs?: Prisma.Quiz_interaction_runsListRelationFilter
 }, "quiz_ablauf_element_id" | "quiz_id_anker_typ_anker_schluessel_sortierung" | "quiz_id_typ_quiz_fragen_id">
@@ -429,6 +446,7 @@ export type quiz_ablauf_elementeOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrderInput | Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
   story_beziehung?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.quiz_ablauf_elementeCountOrderByAggregateInput
@@ -458,6 +476,7 @@ export type quiz_ablauf_elementeScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_ablauf_elemente"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"quiz_ablauf_elemente"> | Date | string
   story_element_revision_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_ablauf_elemente"> | number | null
+  live_poll_revision_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_ablauf_elemente"> | number | null
   story_bezugs_quiz_fragen_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_ablauf_elemente"> | number | null
   story_beziehung?: Prisma.EnumStoryQuestionRelationshipNullableWithAggregatesFilter<"quiz_ablauf_elemente"> | $Enums.StoryQuestionRelationship | null
 }
@@ -479,6 +498,7 @@ export type quiz_ablauf_elementeCreateInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
@@ -500,6 +520,7 @@ export type quiz_ablauf_elementeUncheckedCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
@@ -522,6 +543,7 @@ export type quiz_ablauf_elementeUpdateInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
@@ -543,6 +565,7 @@ export type quiz_ablauf_elementeUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
@@ -565,6 +588,7 @@ export type quiz_ablauf_elementeCreateManyInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
@@ -601,6 +625,7 @@ export type quiz_ablauf_elementeUncheckedUpdateManyInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
@@ -645,6 +670,7 @@ export type quiz_ablauf_elementeCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrder
   story_beziehung?: Prisma.SortOrder
 }
@@ -657,6 +683,7 @@ export type quiz_ablauf_elementeAvgOrderByAggregateInput = {
   sortierung?: Prisma.SortOrder
   konfigurations_version?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrder
 }
 
@@ -676,6 +703,7 @@ export type quiz_ablauf_elementeMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrder
   story_beziehung?: Prisma.SortOrder
 }
@@ -696,6 +724,7 @@ export type quiz_ablauf_elementeMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrder
   story_beziehung?: Prisma.SortOrder
 }
@@ -708,6 +737,7 @@ export type quiz_ablauf_elementeSumOrderByAggregateInput = {
   sortierung?: Prisma.SortOrder
   konfigurations_version?: Prisma.SortOrder
   story_element_revision_id?: Prisma.SortOrder
+  live_poll_revision_id?: Prisma.SortOrder
   story_bezugs_quiz_fragen_id?: Prisma.SortOrder
 }
 
@@ -797,6 +827,48 @@ export type quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_element_revision
   connect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
   update?: Prisma.quiz_ablauf_elementeUpdateWithWhereUniqueWithoutStory_element_revisionInput | Prisma.quiz_ablauf_elementeUpdateWithWhereUniqueWithoutStory_element_revisionInput[]
   updateMany?: Prisma.quiz_ablauf_elementeUpdateManyWithWhereWithoutStory_element_revisionInput | Prisma.quiz_ablauf_elementeUpdateManyWithWhereWithoutStory_element_revisionInput[]
+  deleteMany?: Prisma.quiz_ablauf_elementeScalarWhereInput | Prisma.quiz_ablauf_elementeScalarWhereInput[]
+}
+
+export type quiz_ablauf_elementeCreateNestedManyWithoutLive_poll_revisionInput = {
+  create?: Prisma.XOR<Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput> | Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput[] | Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput[]
+  connectOrCreate?: Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput[]
+  createMany?: Prisma.quiz_ablauf_elementeCreateManyLive_poll_revisionInputEnvelope
+  connect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+}
+
+export type quiz_ablauf_elementeUncheckedCreateNestedManyWithoutLive_poll_revisionInput = {
+  create?: Prisma.XOR<Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput> | Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput[] | Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput[]
+  connectOrCreate?: Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput[]
+  createMany?: Prisma.quiz_ablauf_elementeCreateManyLive_poll_revisionInputEnvelope
+  connect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+}
+
+export type quiz_ablauf_elementeUpdateManyWithoutLive_poll_revisionNestedInput = {
+  create?: Prisma.XOR<Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput> | Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput[] | Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput[]
+  connectOrCreate?: Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput[]
+  upsert?: Prisma.quiz_ablauf_elementeUpsertWithWhereUniqueWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeUpsertWithWhereUniqueWithoutLive_poll_revisionInput[]
+  createMany?: Prisma.quiz_ablauf_elementeCreateManyLive_poll_revisionInputEnvelope
+  set?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  disconnect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  delete?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  connect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  update?: Prisma.quiz_ablauf_elementeUpdateWithWhereUniqueWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeUpdateWithWhereUniqueWithoutLive_poll_revisionInput[]
+  updateMany?: Prisma.quiz_ablauf_elementeUpdateManyWithWhereWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeUpdateManyWithWhereWithoutLive_poll_revisionInput[]
+  deleteMany?: Prisma.quiz_ablauf_elementeScalarWhereInput | Prisma.quiz_ablauf_elementeScalarWhereInput[]
+}
+
+export type quiz_ablauf_elementeUncheckedUpdateManyWithoutLive_poll_revisionNestedInput = {
+  create?: Prisma.XOR<Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput> | Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput[] | Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput[]
+  connectOrCreate?: Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput[]
+  upsert?: Prisma.quiz_ablauf_elementeUpsertWithWhereUniqueWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeUpsertWithWhereUniqueWithoutLive_poll_revisionInput[]
+  createMany?: Prisma.quiz_ablauf_elementeCreateManyLive_poll_revisionInputEnvelope
+  set?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  disconnect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  delete?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  connect?: Prisma.quiz_ablauf_elementeWhereUniqueInput | Prisma.quiz_ablauf_elementeWhereUniqueInput[]
+  update?: Prisma.quiz_ablauf_elementeUpdateWithWhereUniqueWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeUpdateWithWhereUniqueWithoutLive_poll_revisionInput[]
+  updateMany?: Prisma.quiz_ablauf_elementeUpdateManyWithWhereWithoutLive_poll_revisionInput | Prisma.quiz_ablauf_elementeUpdateManyWithWhereWithoutLive_poll_revisionInput[]
   deleteMany?: Prisma.quiz_ablauf_elementeScalarWhereInput | Prisma.quiz_ablauf_elementeScalarWhereInput[]
 }
 
@@ -962,6 +1034,7 @@ export type quiz_ablauf_elementeCreateWithoutQuizInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
@@ -982,6 +1055,7 @@ export type quiz_ablauf_elementeUncheckedCreateWithoutQuizInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
@@ -1033,6 +1107,7 @@ export type quiz_ablauf_elementeScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"quiz_ablauf_elemente"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"quiz_ablauf_elemente"> | Date | string
   story_element_revision_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
+  live_poll_revision_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
   story_bezugs_quiz_fragen_id?: Prisma.IntNullableFilter<"quiz_ablauf_elemente"> | number | null
   story_beziehung?: Prisma.EnumStoryQuestionRelationshipNullableFilter<"quiz_ablauf_elemente"> | $Enums.StoryQuestionRelationship | null
 }
@@ -1053,6 +1128,7 @@ export type quiz_ablauf_elementeCreateWithoutStory_element_revisionInput = {
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
@@ -1073,6 +1149,7 @@ export type quiz_ablauf_elementeUncheckedCreateWithoutStory_element_revisionInpu
   ist_standard?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
@@ -1104,6 +1181,75 @@ export type quiz_ablauf_elementeUpdateManyWithWhereWithoutStory_element_revision
   data: Prisma.XOR<Prisma.quiz_ablauf_elementeUpdateManyMutationInput, Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_element_revisionInput>
 }
 
+export type quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput = {
+  typ: string
+  anker_typ: string
+  anker_schluessel: string
+  sortierung: number
+  ist_sichtbar?: boolean
+  bezeichnung?: string | null
+  konfiguration: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  konfigurations_version?: number
+  ist_standard?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  story_beziehung?: $Enums.StoryQuestionRelationship | null
+  quiz: Prisma.quizCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
+  interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
+}
+
+export type quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput = {
+  quiz_ablauf_element_id?: number
+  quiz_id: number
+  typ: string
+  anker_typ: string
+  anker_schluessel: string
+  quiz_abschnitt_id?: number | null
+  quiz_fragen_id?: number | null
+  sortierung: number
+  ist_sichtbar?: boolean
+  bezeichnung?: string | null
+  konfiguration: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  konfigurations_version?: number
+  ist_standard?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  story_element_revision_id?: number | null
+  story_bezugs_quiz_fragen_id?: number | null
+  story_beziehung?: $Enums.StoryQuestionRelationship | null
+  interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
+}
+
+export type quiz_ablauf_elementeCreateOrConnectWithoutLive_poll_revisionInput = {
+  where: Prisma.quiz_ablauf_elementeWhereUniqueInput
+  create: Prisma.XOR<Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput>
+}
+
+export type quiz_ablauf_elementeCreateManyLive_poll_revisionInputEnvelope = {
+  data: Prisma.quiz_ablauf_elementeCreateManyLive_poll_revisionInput | Prisma.quiz_ablauf_elementeCreateManyLive_poll_revisionInput[]
+  skipDuplicates?: boolean
+}
+
+export type quiz_ablauf_elementeUpsertWithWhereUniqueWithoutLive_poll_revisionInput = {
+  where: Prisma.quiz_ablauf_elementeWhereUniqueInput
+  update: Prisma.XOR<Prisma.quiz_ablauf_elementeUpdateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedUpdateWithoutLive_poll_revisionInput>
+  create: Prisma.XOR<Prisma.quiz_ablauf_elementeCreateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedCreateWithoutLive_poll_revisionInput>
+}
+
+export type quiz_ablauf_elementeUpdateWithWhereUniqueWithoutLive_poll_revisionInput = {
+  where: Prisma.quiz_ablauf_elementeWhereUniqueInput
+  data: Prisma.XOR<Prisma.quiz_ablauf_elementeUpdateWithoutLive_poll_revisionInput, Prisma.quiz_ablauf_elementeUncheckedUpdateWithoutLive_poll_revisionInput>
+}
+
+export type quiz_ablauf_elementeUpdateManyWithWhereWithoutLive_poll_revisionInput = {
+  where: Prisma.quiz_ablauf_elementeScalarWhereInput
+  data: Prisma.XOR<Prisma.quiz_ablauf_elementeUpdateManyMutationInput, Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutLive_poll_revisionInput>
+}
+
 export type quiz_ablauf_elementeCreateWithoutQuiz_fragenInput = {
   typ: string
   anker_typ: string
@@ -1120,6 +1266,7 @@ export type quiz_ablauf_elementeCreateWithoutQuiz_fragenInput = {
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
@@ -1140,6 +1287,7 @@ export type quiz_ablauf_elementeUncheckedCreateWithoutQuiz_fragenInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
@@ -1172,6 +1320,7 @@ export type quiz_ablauf_elementeCreateWithoutStory_bezugs_frageInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
 
@@ -1192,6 +1341,7 @@ export type quiz_ablauf_elementeUncheckedCreateWithoutStory_bezugs_frageInput = 
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
@@ -1254,6 +1404,7 @@ export type quiz_ablauf_elementeCreateWithoutQuiz_abschnitteInput = {
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_ablauf_elementeInput
 }
@@ -1274,6 +1425,7 @@ export type quiz_ablauf_elementeUncheckedCreateWithoutQuiz_abschnitteInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_ablauf_elementeInput
@@ -1322,6 +1474,7 @@ export type quiz_ablauf_elementeCreateWithoutInteraction_runsInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_ablauf_elementeInput
   quiz_fragen?: Prisma.quiz_fragenCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_element_revision?: Prisma.story_element_revisionenCreateNestedOneWithoutQuiz_ablauf_elementeInput
+  live_poll_revision?: Prisma.live_poll_revisionsCreateNestedOneWithoutQuiz_ablauf_elementeInput
   story_bezugs_frage?: Prisma.quiz_fragenCreateNestedOneWithoutStory_ablauf_elementeInput
 }
 
@@ -1342,6 +1495,7 @@ export type quiz_ablauf_elementeUncheckedCreateWithoutInteraction_runsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
@@ -1379,6 +1533,7 @@ export type quiz_ablauf_elementeUpdateWithoutInteraction_runsInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
 }
 
@@ -1399,6 +1554,7 @@ export type quiz_ablauf_elementeUncheckedUpdateWithoutInteraction_runsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
@@ -1419,6 +1575,7 @@ export type quiz_ablauf_elementeCreateManyQuizInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
@@ -1439,6 +1596,7 @@ export type quiz_ablauf_elementeUpdateWithoutQuizInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
@@ -1459,6 +1617,7 @@ export type quiz_ablauf_elementeUncheckedUpdateWithoutQuizInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
@@ -1480,6 +1639,7 @@ export type quiz_ablauf_elementeUncheckedUpdateManyWithoutQuizInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
@@ -1500,6 +1660,7 @@ export type quiz_ablauf_elementeCreateManyStory_element_revisionInput = {
   ist_standard?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
@@ -1520,6 +1681,7 @@ export type quiz_ablauf_elementeUpdateWithoutStory_element_revisionInput = {
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_ablauf_elementeNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
@@ -1540,6 +1702,7 @@ export type quiz_ablauf_elementeUncheckedUpdateWithoutStory_element_revisionInpu
   ist_standard?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
@@ -1561,6 +1724,92 @@ export type quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_element_revision
   ist_standard?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
+}
+
+export type quiz_ablauf_elementeCreateManyLive_poll_revisionInput = {
+  quiz_ablauf_element_id?: number
+  quiz_id: number
+  typ: string
+  anker_typ: string
+  anker_schluessel: string
+  quiz_abschnitt_id?: number | null
+  quiz_fragen_id?: number | null
+  sortierung: number
+  ist_sichtbar?: boolean
+  bezeichnung?: string | null
+  konfiguration: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  konfigurations_version?: number
+  ist_standard?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  story_element_revision_id?: number | null
+  story_bezugs_quiz_fragen_id?: number | null
+  story_beziehung?: $Enums.StoryQuestionRelationship | null
+}
+
+export type quiz_ablauf_elementeUpdateWithoutLive_poll_revisionInput = {
+  typ?: Prisma.StringFieldUpdateOperationsInput | string
+  anker_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  anker_schluessel?: Prisma.StringFieldUpdateOperationsInput | string
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_sichtbar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bezeichnung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  konfigurations_version?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_standard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
+  quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_ablauf_elementeNestedInput
+  quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
+  interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
+}
+
+export type quiz_ablauf_elementeUncheckedUpdateWithoutLive_poll_revisionInput = {
+  quiz_ablauf_element_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  typ?: Prisma.StringFieldUpdateOperationsInput | string
+  anker_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  anker_schluessel?: Prisma.StringFieldUpdateOperationsInput | string
+  quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_sichtbar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bezeichnung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  konfigurations_version?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_standard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
+  interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
+}
+
+export type quiz_ablauf_elementeUncheckedUpdateManyWithoutLive_poll_revisionInput = {
+  quiz_ablauf_element_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  typ?: Prisma.StringFieldUpdateOperationsInput | string
+  anker_typ?: Prisma.StringFieldUpdateOperationsInput | string
+  anker_schluessel?: Prisma.StringFieldUpdateOperationsInput | string
+  quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sortierung?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_sichtbar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bezeichnung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  konfiguration?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  konfigurations_version?: Prisma.IntFieldUpdateOperationsInput | number
+  ist_standard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
@@ -1581,6 +1830,7 @@ export type quiz_ablauf_elementeCreateManyQuiz_fragenInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
@@ -1602,6 +1852,7 @@ export type quiz_ablauf_elementeCreateManyStory_bezugs_frageInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
 
@@ -1621,6 +1872,7 @@ export type quiz_ablauf_elementeUpdateWithoutQuiz_fragenInput = {
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_ablauf_elementeNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
@@ -1641,6 +1893,7 @@ export type quiz_ablauf_elementeUncheckedUpdateWithoutQuiz_fragenInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
@@ -1662,6 +1915,7 @@ export type quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
@@ -1683,6 +1937,7 @@ export type quiz_ablauf_elementeUpdateWithoutStory_bezugs_frageInput = {
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
 
@@ -1703,6 +1958,7 @@ export type quiz_ablauf_elementeUncheckedUpdateWithoutStory_bezugs_frageInput = 
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
@@ -1724,6 +1980,7 @@ export type quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageInpu
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
 
@@ -1743,6 +2000,7 @@ export type quiz_ablauf_elementeCreateManyQuiz_abschnitteInput = {
   created_at?: Date | string
   updated_at?: Date | string
   story_element_revision_id?: number | null
+  live_poll_revision_id?: number | null
   story_bezugs_quiz_fragen_id?: number | null
   story_beziehung?: $Enums.StoryQuestionRelationship | null
 }
@@ -1763,6 +2021,7 @@ export type quiz_ablauf_elementeUpdateWithoutQuiz_abschnitteInput = {
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_ablauf_elementeNestedInput
   quiz_fragen?: Prisma.quiz_fragenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_element_revision?: Prisma.story_element_revisionenUpdateOneWithoutQuiz_ablauf_elementeNestedInput
+  live_poll_revision?: Prisma.live_poll_revisionsUpdateOneWithoutQuiz_ablauf_elementeNestedInput
   story_bezugs_frage?: Prisma.quiz_fragenUpdateOneWithoutStory_ablauf_elementeNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_ablauf_elementeNestedInput
 }
@@ -1783,6 +2042,7 @@ export type quiz_ablauf_elementeUncheckedUpdateWithoutQuiz_abschnitteInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeNestedInput
@@ -1804,6 +2064,7 @@ export type quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_abschnitteInput =
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   story_element_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  live_poll_revision_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_bezugs_quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   story_beziehung?: Prisma.NullableEnumStoryQuestionRelationshipFieldUpdateOperationsInput | $Enums.StoryQuestionRelationship | null
 }
@@ -1856,12 +2117,14 @@ export type quiz_ablauf_elementeSelect<ExtArgs extends runtime.Types.Extensions.
   created_at?: boolean
   updated_at?: boolean
   story_element_revision_id?: boolean
+  live_poll_revision_id?: boolean
   story_bezugs_quiz_fragen_id?: boolean
   story_beziehung?: boolean
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>
   story_element_revision?: boolean | Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>
+  live_poll_revision?: boolean | Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>
   story_bezugs_frage?: boolean | Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>
   interaction_runs?: boolean | Prisma.quiz_ablauf_elemente$interaction_runsArgs<ExtArgs>
   _count?: boolean | Prisma.Quiz_ablauf_elementeCountOutputTypeDefaultArgs<ExtArgs>
@@ -1884,12 +2147,14 @@ export type quiz_ablauf_elementeSelectCreateManyAndReturn<ExtArgs extends runtim
   created_at?: boolean
   updated_at?: boolean
   story_element_revision_id?: boolean
+  live_poll_revision_id?: boolean
   story_bezugs_quiz_fragen_id?: boolean
   story_beziehung?: boolean
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>
   story_element_revision?: boolean | Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>
+  live_poll_revision?: boolean | Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>
   story_bezugs_frage?: boolean | Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_ablauf_elemente"]>
 
@@ -1910,12 +2175,14 @@ export type quiz_ablauf_elementeSelectUpdateManyAndReturn<ExtArgs extends runtim
   created_at?: boolean
   updated_at?: boolean
   story_element_revision_id?: boolean
+  live_poll_revision_id?: boolean
   story_bezugs_quiz_fragen_id?: boolean
   story_beziehung?: boolean
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>
   story_element_revision?: boolean | Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>
+  live_poll_revision?: boolean | Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>
   story_bezugs_frage?: boolean | Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_ablauf_elemente"]>
 
@@ -1936,16 +2203,18 @@ export type quiz_ablauf_elementeSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   story_element_revision_id?: boolean
+  live_poll_revision_id?: boolean
   story_bezugs_quiz_fragen_id?: boolean
   story_beziehung?: boolean
 }
 
-export type quiz_ablauf_elementeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_ablauf_element_id" | "quiz_id" | "typ" | "anker_typ" | "anker_schluessel" | "quiz_abschnitt_id" | "quiz_fragen_id" | "sortierung" | "ist_sichtbar" | "bezeichnung" | "konfiguration" | "konfigurations_version" | "ist_standard" | "created_at" | "updated_at" | "story_element_revision_id" | "story_bezugs_quiz_fragen_id" | "story_beziehung", ExtArgs["result"]["quiz_ablauf_elemente"]>
+export type quiz_ablauf_elementeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_ablauf_element_id" | "quiz_id" | "typ" | "anker_typ" | "anker_schluessel" | "quiz_abschnitt_id" | "quiz_fragen_id" | "sortierung" | "ist_sichtbar" | "bezeichnung" | "konfiguration" | "konfigurations_version" | "ist_standard" | "created_at" | "updated_at" | "story_element_revision_id" | "live_poll_revision_id" | "story_bezugs_quiz_fragen_id" | "story_beziehung", ExtArgs["result"]["quiz_ablauf_elemente"]>
 export type quiz_ablauf_elementeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>
   story_element_revision?: boolean | Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>
+  live_poll_revision?: boolean | Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>
   story_bezugs_frage?: boolean | Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>
   interaction_runs?: boolean | Prisma.quiz_ablauf_elemente$interaction_runsArgs<ExtArgs>
   _count?: boolean | Prisma.Quiz_ablauf_elementeCountOutputTypeDefaultArgs<ExtArgs>
@@ -1955,6 +2224,7 @@ export type quiz_ablauf_elementeIncludeCreateManyAndReturn<ExtArgs extends runti
   quiz_abschnitte?: boolean | Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>
   story_element_revision?: boolean | Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>
+  live_poll_revision?: boolean | Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>
   story_bezugs_frage?: boolean | Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>
 }
 export type quiz_ablauf_elementeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1962,6 +2232,7 @@ export type quiz_ablauf_elementeIncludeUpdateManyAndReturn<ExtArgs extends runti
   quiz_abschnitte?: boolean | Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>
   story_element_revision?: boolean | Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>
+  live_poll_revision?: boolean | Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>
   story_bezugs_frage?: boolean | Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>
 }
 
@@ -1972,6 +2243,7 @@ export type $quiz_ablauf_elementePayload<ExtArgs extends runtime.Types.Extension
     quiz_abschnitte: Prisma.$quiz_abschnittePayload<ExtArgs> | null
     quiz_fragen: Prisma.$quiz_fragenPayload<ExtArgs> | null
     story_element_revision: Prisma.$story_element_revisionenPayload<ExtArgs> | null
+    live_poll_revision: Prisma.$live_poll_revisionsPayload<ExtArgs> | null
     story_bezugs_frage: Prisma.$quiz_fragenPayload<ExtArgs> | null
     interaction_runs: Prisma.$quiz_interaction_runsPayload<ExtArgs>[]
   }
@@ -1992,6 +2264,7 @@ export type $quiz_ablauf_elementePayload<ExtArgs extends runtime.Types.Extension
     created_at: Date
     updated_at: Date
     story_element_revision_id: number | null
+    live_poll_revision_id: number | null
     story_bezugs_quiz_fragen_id: number | null
     story_beziehung: $Enums.StoryQuestionRelationship | null
   }, ExtArgs["result"]["quiz_ablauf_elemente"]>
@@ -2392,6 +2665,7 @@ export interface Prisma__quiz_ablauf_elementeClient<T, Null = never, ExtArgs ext
   quiz_abschnitte<T extends Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_ablauf_elemente$quiz_abschnitteArgs<ExtArgs>>): Prisma.Prisma__quiz_abschnitteClient<runtime.Types.Result.GetResult<Prisma.$quiz_abschnittePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   quiz_fragen<T extends Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_ablauf_elemente$quiz_fragenArgs<ExtArgs>>): Prisma.Prisma__quiz_fragenClient<runtime.Types.Result.GetResult<Prisma.$quiz_fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   story_element_revision<T extends Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs>>): Prisma.Prisma__story_element_revisionenClient<runtime.Types.Result.GetResult<Prisma.$story_element_revisionenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  live_poll_revision<T extends Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs>>): Prisma.Prisma__live_poll_revisionsClient<runtime.Types.Result.GetResult<Prisma.$live_poll_revisionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   story_bezugs_frage<T extends Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_ablauf_elemente$story_bezugs_frageArgs<ExtArgs>>): Prisma.Prisma__quiz_fragenClient<runtime.Types.Result.GetResult<Prisma.$quiz_fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   interaction_runs<T extends Prisma.quiz_ablauf_elemente$interaction_runsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_ablauf_elemente$interaction_runsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_interaction_runsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2439,6 +2713,7 @@ export interface quiz_ablauf_elementeFieldRefs {
   readonly created_at: Prisma.FieldRef<"quiz_ablauf_elemente", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"quiz_ablauf_elemente", 'DateTime'>
   readonly story_element_revision_id: Prisma.FieldRef<"quiz_ablauf_elemente", 'Int'>
+  readonly live_poll_revision_id: Prisma.FieldRef<"quiz_ablauf_elemente", 'Int'>
   readonly story_bezugs_quiz_fragen_id: Prisma.FieldRef<"quiz_ablauf_elemente", 'Int'>
   readonly story_beziehung: Prisma.FieldRef<"quiz_ablauf_elemente", 'StoryQuestionRelationship'>
 }
@@ -2896,6 +3171,25 @@ export type quiz_ablauf_elemente$story_element_revisionArgs<ExtArgs extends runt
    */
   include?: Prisma.story_element_revisionenInclude<ExtArgs> | null
   where?: Prisma.story_element_revisionenWhereInput
+}
+
+/**
+ * quiz_ablauf_elemente.live_poll_revision
+ */
+export type quiz_ablauf_elemente$live_poll_revisionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the live_poll_revisions
+   */
+  select?: Prisma.live_poll_revisionsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the live_poll_revisions
+   */
+  omit?: Prisma.live_poll_revisionsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.live_poll_revisionsInclude<ExtArgs> | null
+  where?: Prisma.live_poll_revisionsWhereInput
 }
 
 /**

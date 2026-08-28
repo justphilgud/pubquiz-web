@@ -58,6 +58,9 @@ import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
+import type { LivePollAudienceState, LivePollModerationResponse } from "@/app/umfragen/livePollRuntime";
+import { getLivePollPollingDelay } from "@/app/umfragen/livePollRuntime";
+import { closeLivePoll, moderateLivePollResponse } from "@/app/umfragen/actions";
 import {
   canCloseLiveResultAnswerPhase,
   canToggleLiveResultVisibility,
@@ -138,6 +141,8 @@ export default function ModerationClient({
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
+  const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
+  const [livePollModeration, setLivePollModeration] = useState<LivePollModerationResponse[]>([]);
   const [liveResultPending, setLiveResultPending] = useState(false);
   const [liveResultControlError, setLiveResultControlError] = useState<string | null>(null);
   const [liveTextPublicationError, setLiveTextPublicationError] = useState<string | null>(null);
@@ -318,8 +323,18 @@ export default function ModerationClient({
   useEffect(() => {
     let active = true;
     let refreshing = false;
+    let timeout: number | null = null;
+    let pollActive = false;
+    let consecutiveFailures = 0;
+    function schedule() {
+      if (!active) return;
+      timeout = window.setTimeout(
+        () => void refreshPixelState(),
+        pollActive ? getLivePollPollingDelay({ hidden: document.hidden, consecutiveFailures }) : 750,
+      );
+    }
     async function refreshPixelState() {
-      if (refreshing) return;
+      if (refreshing) return schedule();
       refreshing = true;
       const liveResultMutationRevision = liveResultMutationRevisionRef.current;
       try {
@@ -331,6 +346,10 @@ export default function ModerationClient({
       if (active) {
         setPixelState(snapshot.pixelState);
         setPollState(snapshot.pollState);
+        setLivePollState(snapshot.livePollState);
+        pollActive = snapshot.livePollState !== null;
+        consecutiveFailures = 0;
+        setLivePollModeration(snapshot.livePollModeration ?? []);
         if (liveResultMutationRevision === liveResultMutationRevisionRef.current) {
           setLiveResultState(snapshot.liveResultState);
         }
@@ -339,15 +358,17 @@ export default function ModerationClient({
           snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
         ));
       }
+      } catch {
+        consecutiveFailures += 1;
       } finally {
         refreshing = false;
+        schedule();
       }
     }
     void refreshPixelState();
-    const interval = window.setInterval(() => void refreshPixelState(), 750);
     return () => {
       active = false;
-      window.clearInterval(interval);
+      if (timeout !== null) window.clearTimeout(timeout);
     };
   }, [quizId, showTeamJoinState, presentationQuestionAssignmentId]);
 
@@ -823,6 +844,18 @@ export default function ModerationClient({
     }
   }
 
+  async function setPollResponseVisible(responseId: number, visible: boolean) {
+    const result = await moderateLivePollResponse({ quizId, responseId, visible });
+    if (!result.success) return;
+    setLivePollModeration((current) => current.map((entry) => entry.id === responseId ? { ...entry, isVisible: visible } : entry));
+  }
+
+  async function closeContentPoll() {
+    if (!livePollState || livePollState.state !== "OPEN") return;
+    const result = await closeLivePoll({ quizId, runId: livePollState.runId });
+    if (result.success) setLivePollState({ ...livePollState, state: "CLOSED" });
+  }
+
   useModerationHotkeys({
     hatMedien,
     hatAudio,
@@ -901,6 +934,7 @@ export default function ModerationClient({
               pixelState={pixelState}
               pollState={pollState}
               liveResultState={liveResultState}
+              livePollState={livePollState}
               teamJoinState={teamJoinState}
               funnyAnswers={funnyAnswers}
             />
@@ -912,6 +946,13 @@ export default function ModerationClient({
                   <button type="button" onClick={showFunnyAnswers} className="min-h-11 rounded-xl bg-pink-600 px-4 py-2 font-bold text-white">Falsch aber lustig anzeigen</button>
                   <button type="button" onClick={skipFunnyAnswers} className="min-h-11 rounded-xl border border-zinc-600 px-4 py-2 font-bold">Direkt zur Auflösung</button>
                 </div>
+              </section>
+            )}
+
+            {aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "LIVE_POLL" && livePollState && (
+              <section className="rounded-2xl border border-cyan-500/50 bg-cyan-950/30 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">Content-Umfrage</h2><p className="text-sm text-zinc-300">{livePollState.totalResponses} Antworten · {livePollState.state === "OPEN" ? "offen" : "geschlossen"}</p></div>{livePollState.state === "OPEN" ? <button type="button" onClick={() => void closeContentPoll()} className="min-h-11 rounded-xl border border-zinc-500 px-4 py-2 font-bold">Umfrage schließen</button> : null}</div>
+                {livePollState.type === "SINGLE_CHOICE" ? <div className="mt-4 grid gap-2">{livePollState.options.map((option) => <div key={option.id} className="flex justify-between rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2"><span>{option.label}</span><strong>{option.count} · {option.share.toLocaleString("de-DE")} %</strong></div>)}</div> : <div className="mt-4 grid gap-3 md:grid-cols-2">{livePollModeration.map((response) => <article key={response.id} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3"><div className="flex items-center gap-2"><TeamIdentityVisual name={response.teamName} photoUrl={response.photoUrl} avatarCode={response.avatarCode} className="h-9 w-9" /><strong className="truncate">{response.teamName}</strong></div><p className="mt-2 break-words">„{response.originalText}“</p>{response.changed ? <p className="mt-1 break-words text-sm text-amber-200">Öffentlich: „{response.publicText}“</p> : null}<button type="button" onClick={() => void setPollResponseVisible(response.id, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold">{response.isVisible ? "Ausblenden" : "Freigeben"}</button></article>)}</div>}
               </section>
             )}
 

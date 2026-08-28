@@ -1,4 +1,5 @@
 import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
+import { readLivePollRuntimeConfig, type LivePollRuntimeConfig } from "@/app/umfragen/livePoll";
 
 export const QUIZ_FLOW_ITEM_TYPES = [
   "WAITING",
@@ -30,6 +31,7 @@ export const QUIZ_FLOW_ITEM_TYPES = [
   "MEDIA_SEQUENCE",
   "AUDIO",
   "VIDEO",
+  "LIVE_POLL",
 ] as const;
 
 export type QuizFlowItemType = (typeof QUIZ_FLOW_ITEM_TYPES)[number];
@@ -78,6 +80,7 @@ export const QUIZ_GLOBAL_FLOW_ITEM_TYPES = [
   "BREAK",
   "COUNTDOWN",
   "INTERMEDIATE_STANDINGS",
+  "LIVE_POLL",
   "FINAL_STANDINGS",
   "WINNER",
   "YEARLY_STANDINGS",
@@ -153,6 +156,7 @@ export type QuizFlowItem = {
   storyQuestionAssignmentId?: number | null;
   storyRelationship?: string | null;
   storyDefaultRelationship?: string | null;
+  livePoll?: LivePollRuntimeConfig | null;
   isStandard: boolean;
 };
 
@@ -168,6 +172,7 @@ export type StoredQuizFlowItem = {
   story_bezugs_quiz_fragen_id?: number | null;
   story_beziehung?: string | null;
   story_default_beziehung?: string | null;
+  live_poll?: unknown;
   sortierung: number;
   ist_sichtbar: boolean;
   bezeichnung: string | null;
@@ -535,6 +540,7 @@ function defaultItem(
     storyQuestionAssignmentId: null,
     storyRelationship: null,
     storyDefaultRelationship: null,
+    livePoll: null,
     isStandard: true,
   };
 }
@@ -757,6 +763,8 @@ export function parseStoredQuizFlowItem(
   if (configVersion !== 1) return null;
   const config = validateQuizFlowConfig(item.typ, item.konfiguration);
   if (!config.ok) return null;
+  const livePoll = item.typ === "LIVE_POLL" ? readLivePollRuntimeConfig(item.live_poll) : null;
+  if (item.typ === "LIVE_POLL" && !livePoll) return null;
   return {
     id: `flow:${item.quiz_ablauf_element_id}`,
     persistentId: item.quiz_ablauf_element_id,
@@ -775,6 +783,7 @@ export function parseStoredQuizFlowItem(
     storyQuestionAssignmentId: item.story_bezugs_quiz_fragen_id ?? null,
     storyRelationship: item.story_beziehung ?? null,
     storyDefaultRelationship: item.story_default_beziehung ?? null,
+    livePoll,
     isStandard: item.ist_standard,
   };
 }
@@ -864,6 +873,7 @@ export function getQuizFlowTypeLabel(type: QuizFlowItemType) {
     MEDIA_SEQUENCE: "Bildsequenz",
     AUDIO: "Audio",
     VIDEO: "Video",
+    LIVE_POLL: "Umfrage",
   } as const)[type];
 }
 

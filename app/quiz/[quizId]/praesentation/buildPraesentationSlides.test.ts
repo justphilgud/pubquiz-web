@@ -326,6 +326,40 @@ test("verwendet die redaktionelle Fragenreihenfolge trotz abweichender Flow-Slot
   );
 });
 
+test("renders an independent live poll placement without inventing a solution", () => {
+  const quiz = quizFixture();
+  quiz.abschnitte = quiz.abschnitte.slice(0, 1);
+  quiz.fragen = quiz.fragen.slice(0, 1);
+  quiz.ablaufElemente = [{
+    quiz_ablauf_element_id: 990,
+    typ: "LIVE_POLL",
+    anker_typ: "BLOCK",
+    anker_schluessel: "10",
+    quiz_abschnitt_id: 10,
+    quiz_fragen_id: null,
+    sortierung: 1_500,
+    ist_sichtbar: true,
+    bezeichnung: "Lieblingssnack",
+    konfiguration: { version: 1 },
+    konfigurations_version: 1,
+    ist_standard: false,
+    live_poll: {
+      version: 1,
+      pollId: 7,
+      pollRevisionId: 8,
+      type: "SINGLE_CHOICE",
+      prompt: "Was ist euer Lieblingssnack?",
+      publicationMode: "AUTOMATIC",
+      options: [{ id: "chips", label: "Chips" }, { id: "nuesse", label: "Nüsse" }],
+    },
+  }] as unknown as QuizPraesentationResult["ablaufElemente"];
+  const slides = buildPraesentationSlides(quiz);
+  const pollSlides = slides.filter((slide) => slide.typ === "ablauf" && slide.element.type === "LIVE_POLL");
+  assert.equal(pollSlides.length, 1);
+  assert.equal(getPresentationSlideKey(pollSlides[0]), "poll-placement:990");
+  assert.equal(slides.some((slide) => slide.typ === "aufloesung" && "element" in slide), false);
+});
+
 test("places an explicit countdown between collected questions and solutions", () => {
   const quiz = quizFixture();
   quiz.aufloesungsstrategie = "END_OF_BLOCK";

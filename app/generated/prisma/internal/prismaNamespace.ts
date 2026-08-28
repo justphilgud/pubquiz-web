@@ -414,6 +414,8 @@ export const ModelName = {
   presentation_templates: 'presentation_templates',
   story_elemente: 'story_elemente',
   story_element_revisionen: 'story_element_revisionen',
+  live_polls: 'live_polls',
+  live_poll_revisions: 'live_poll_revisions',
   frage_story_elemente: 'frage_story_elemente',
   quiz_fragen: 'quiz_fragen',
   quiz_teams: 'quiz_teams',
@@ -425,6 +427,7 @@ export const ModelName = {
   team_antworten: 'team_antworten',
   quiz_interaction_runs: 'quiz_interaction_runs',
   team_answer_submissions: 'team_answer_submissions',
+  live_poll_responses: 'live_poll_responses',
   frage_antwortfelder: 'frage_antwortfelder',
   team_antwortfelder: 'team_antwortfelder',
   frage_antwortfeld_loesungen: 'frage_antwortfeld_loesungen',
@@ -453,7 +456,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1715,6 +1718,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    live_polls: {
+      payload: Prisma.$live_pollsPayload<ExtArgs>
+      fields: Prisma.live_pollsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.live_pollsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.live_pollsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>
+        }
+        findFirst: {
+          args: Prisma.live_pollsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.live_pollsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>
+        }
+        findMany: {
+          args: Prisma.live_pollsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>[]
+        }
+        create: {
+          args: Prisma.live_pollsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>
+        }
+        createMany: {
+          args: Prisma.live_pollsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.live_pollsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>[]
+        }
+        delete: {
+          args: Prisma.live_pollsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>
+        }
+        update: {
+          args: Prisma.live_pollsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>
+        }
+        deleteMany: {
+          args: Prisma.live_pollsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.live_pollsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.live_pollsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>[]
+        }
+        upsert: {
+          args: Prisma.live_pollsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_pollsPayload>
+        }
+        aggregate: {
+          args: Prisma.Live_pollsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLive_polls>
+        }
+        groupBy: {
+          args: Prisma.live_pollsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_pollsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.live_pollsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_pollsCountAggregateOutputType> | number
+        }
+      }
+    }
+    live_poll_revisions: {
+      payload: Prisma.$live_poll_revisionsPayload<ExtArgs>
+      fields: Prisma.live_poll_revisionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.live_poll_revisionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.live_poll_revisionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>
+        }
+        findFirst: {
+          args: Prisma.live_poll_revisionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.live_poll_revisionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>
+        }
+        findMany: {
+          args: Prisma.live_poll_revisionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>[]
+        }
+        create: {
+          args: Prisma.live_poll_revisionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>
+        }
+        createMany: {
+          args: Prisma.live_poll_revisionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.live_poll_revisionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>[]
+        }
+        delete: {
+          args: Prisma.live_poll_revisionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>
+        }
+        update: {
+          args: Prisma.live_poll_revisionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.live_poll_revisionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.live_poll_revisionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.live_poll_revisionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.live_poll_revisionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_revisionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Live_poll_revisionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLive_poll_revisions>
+        }
+        groupBy: {
+          args: Prisma.live_poll_revisionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_poll_revisionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.live_poll_revisionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_poll_revisionsCountAggregateOutputType> | number
+        }
+      }
+    }
     frage_story_elemente: {
       payload: Prisma.$frage_story_elementePayload<ExtArgs>
       fields: Prisma.frage_story_elementeFieldRefs
@@ -2526,6 +2677,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.team_answer_submissionsCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.Team_answer_submissionsCountAggregateOutputType> | number
+        }
+      }
+    }
+    live_poll_responses: {
+      payload: Prisma.$live_poll_responsesPayload<ExtArgs>
+      fields: Prisma.live_poll_responsesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.live_poll_responsesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.live_poll_responsesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>
+        }
+        findFirst: {
+          args: Prisma.live_poll_responsesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.live_poll_responsesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>
+        }
+        findMany: {
+          args: Prisma.live_poll_responsesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>[]
+        }
+        create: {
+          args: Prisma.live_poll_responsesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>
+        }
+        createMany: {
+          args: Prisma.live_poll_responsesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.live_poll_responsesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>[]
+        }
+        delete: {
+          args: Prisma.live_poll_responsesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>
+        }
+        update: {
+          args: Prisma.live_poll_responsesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>
+        }
+        deleteMany: {
+          args: Prisma.live_poll_responsesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.live_poll_responsesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.live_poll_responsesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>[]
+        }
+        upsert: {
+          args: Prisma.live_poll_responsesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$live_poll_responsesPayload>
+        }
+        aggregate: {
+          args: Prisma.Live_poll_responsesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLive_poll_responses>
+        }
+        groupBy: {
+          args: Prisma.live_poll_responsesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_poll_responsesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.live_poll_responsesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Live_poll_responsesCountAggregateOutputType> | number
         }
       }
     }
@@ -3807,6 +4032,39 @@ export const Story_element_revisionenScalarFieldEnum = {
 export type Story_element_revisionenScalarFieldEnum = (typeof Story_element_revisionenScalarFieldEnum)[keyof typeof Story_element_revisionenScalarFieldEnum]
 
 
+export const Live_pollsScalarFieldEnum = {
+  live_poll_id: 'live_poll_id',
+  stable_key: 'stable_key',
+  status: 'status',
+  geltungsbereich: 'geltungsbereich',
+  eventreihe_id: 'eventreihe_id',
+  quiz_id: 'quiz_id',
+  created_by_user_id: 'created_by_user_id',
+  source_live_poll_id: 'source_live_poll_id',
+  archived_at: 'archived_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Live_pollsScalarFieldEnum = (typeof Live_pollsScalarFieldEnum)[keyof typeof Live_pollsScalarFieldEnum]
+
+
+export const Live_poll_revisionsScalarFieldEnum = {
+  live_poll_revision_id: 'live_poll_revision_id',
+  live_poll_id: 'live_poll_id',
+  revisionsnummer: 'revisionsnummer',
+  typ: 'typ',
+  prompt: 'prompt',
+  publication_mode: 'publication_mode',
+  optionen: 'optionen',
+  moderationsnotiz: 'moderationsnotiz',
+  created_by_user_id: 'created_by_user_id',
+  created_at: 'created_at'
+} as const
+
+export type Live_poll_revisionsScalarFieldEnum = (typeof Live_poll_revisionsScalarFieldEnum)[keyof typeof Live_poll_revisionsScalarFieldEnum]
+
+
 export const Frage_story_elementeScalarFieldEnum = {
   frage_story_element_id: 'frage_story_element_id',
   fragen_id: 'fragen_id',
@@ -3905,6 +4163,7 @@ export const Quiz_ablauf_elementeScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   story_element_revision_id: 'story_element_revision_id',
+  live_poll_revision_id: 'live_poll_revision_id',
   story_bezugs_quiz_fragen_id: 'story_bezugs_quiz_fragen_id',
   story_beziehung: 'story_beziehung'
 } as const
@@ -4010,6 +4269,24 @@ export const Team_answer_submissionsScalarFieldEnum = {
 } as const
 
 export type Team_answer_submissionsScalarFieldEnum = (typeof Team_answer_submissionsScalarFieldEnum)[keyof typeof Team_answer_submissionsScalarFieldEnum]
+
+
+export const Live_poll_responsesScalarFieldEnum = {
+  live_poll_response_id: 'live_poll_response_id',
+  interaction_run_id: 'interaction_run_id',
+  live_poll_revision_id: 'live_poll_revision_id',
+  quiz_team_session_id: 'quiz_team_session_id',
+  selected_option_id: 'selected_option_id',
+  original_text: 'original_text',
+  public_text: 'public_text',
+  is_visible: 'is_visible',
+  moderated_by_user_id: 'moderated_by_user_id',
+  revision: 'revision',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Live_poll_responsesScalarFieldEnum = (typeof Live_poll_responsesScalarFieldEnum)[keyof typeof Live_poll_responsesScalarFieldEnum]
 
 
 export const Frage_antwortfelderScalarFieldEnum = {
@@ -4391,6 +4668,62 @@ export type ListEnumStoryElementScopeFieldRefInput<$PrismaModel> = FieldRefInput
 
 
 /**
+ * Reference to a field of type 'LivePollStatus'
+ */
+export type EnumLivePollStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollStatus'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollStatus[]'
+ */
+export type ListEnumLivePollStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollStatus[]'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollScope'
+ */
+export type EnumLivePollScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollScope'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollScope[]'
+ */
+export type ListEnumLivePollScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollScope[]'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollType'
+ */
+export type EnumLivePollTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollType'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollType[]'
+ */
+export type ListEnumLivePollTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollType[]'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollPublicationMode'
+ */
+export type EnumLivePollPublicationModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollPublicationMode'>
+
+
+
+/**
+ * Reference to a field of type 'LivePollPublicationMode[]'
+ */
+export type ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LivePollPublicationMode[]'>
+
+
+
+/**
  * Reference to a field of type 'StoryQuestionRelationship'
  */
 export type EnumStoryQuestionRelationshipFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StoryQuestionRelationship'>
@@ -4739,6 +5072,8 @@ export type GlobalOmitConfig = {
   presentation_templates?: Prisma.presentation_templatesOmit
   story_elemente?: Prisma.story_elementeOmit
   story_element_revisionen?: Prisma.story_element_revisionenOmit
+  live_polls?: Prisma.live_pollsOmit
+  live_poll_revisions?: Prisma.live_poll_revisionsOmit
   frage_story_elemente?: Prisma.frage_story_elementeOmit
   quiz_fragen?: Prisma.quiz_fragenOmit
   quiz_teams?: Prisma.quiz_teamsOmit
@@ -4750,6 +5085,7 @@ export type GlobalOmitConfig = {
   team_antworten?: Prisma.team_antwortenOmit
   quiz_interaction_runs?: Prisma.quiz_interaction_runsOmit
   team_answer_submissions?: Prisma.team_answer_submissionsOmit
+  live_poll_responses?: Prisma.live_poll_responsesOmit
   frage_antwortfelder?: Prisma.frage_antwortfelderOmit
   team_antwortfelder?: Prisma.team_antwortfelderOmit
   frage_antwortfeld_loesungen?: Prisma.frage_antwortfeld_loesungenOmit

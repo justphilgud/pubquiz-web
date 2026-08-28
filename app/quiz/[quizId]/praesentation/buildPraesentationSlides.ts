@@ -288,6 +288,9 @@ export function getPresentationSlideKey(slide: Slide) {
       slide.element.anchorType === "BLOCK" &&
       slide.element.persistentId !== null
     ) {
+      if (slide.element.type === "LIVE_POLL") {
+        return `poll-placement:${slide.element.persistentId}`;
+      }
       return slide.element.storyElementRevisionId
         ? `story-placement:${slide.element.persistentId}`
         : `block-item:${slide.element.persistentId}`;

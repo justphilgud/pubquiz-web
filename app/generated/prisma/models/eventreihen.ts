@@ -285,6 +285,7 @@ export type eventreihenWhereInput = {
   rollenzuweisungen?: Prisma.Benutzer_rollenzuweisungenListRelationFilter
   fragen?: Prisma.Fragen_eventreihenListRelationFilter
   story_elemente?: Prisma.Story_elementeListRelationFilter
+  live_polls?: Prisma.Live_pollsListRelationFilter
 }
 
 export type eventreihenOrderByWithRelationInput = {
@@ -306,6 +307,7 @@ export type eventreihenOrderByWithRelationInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenOrderByRelationAggregateInput
   fragen?: Prisma.fragen_eventreihenOrderByRelationAggregateInput
   story_elemente?: Prisma.story_elementeOrderByRelationAggregateInput
+  live_polls?: Prisma.live_pollsOrderByRelationAggregateInput
 }
 
 export type eventreihenWhereUniqueInput = Prisma.AtLeast<{
@@ -330,6 +332,7 @@ export type eventreihenWhereUniqueInput = Prisma.AtLeast<{
   rollenzuweisungen?: Prisma.Benutzer_rollenzuweisungenListRelationFilter
   fragen?: Prisma.Fragen_eventreihenListRelationFilter
   story_elemente?: Prisma.Story_elementeListRelationFilter
+  live_polls?: Prisma.Live_pollsListRelationFilter
 }, "eventreihe_id" | "slug">
 
 export type eventreihenOrderByWithAggregationInput = {
@@ -390,6 +393,7 @@ export type eventreihenCreateInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUncheckedCreateInput = {
@@ -411,6 +415,7 @@ export type eventreihenUncheckedCreateInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUpdateInput = {
@@ -431,6 +436,7 @@ export type eventreihenUpdateInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenUncheckedUpdateInput = {
@@ -452,6 +458,7 @@ export type eventreihenUncheckedUpdateInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenCreateManyInput = {
@@ -597,6 +604,22 @@ export type eventreihenUpdateOneWithoutStory_elementeNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.eventreihenUpdateToOneWithWhereWithoutStory_elementeInput, Prisma.eventreihenUpdateWithoutStory_elementeInput>, Prisma.eventreihenUncheckedUpdateWithoutStory_elementeInput>
 }
 
+export type eventreihenCreateNestedOneWithoutLive_pollsInput = {
+  create?: Prisma.XOR<Prisma.eventreihenCreateWithoutLive_pollsInput, Prisma.eventreihenUncheckedCreateWithoutLive_pollsInput>
+  connectOrCreate?: Prisma.eventreihenCreateOrConnectWithoutLive_pollsInput
+  connect?: Prisma.eventreihenWhereUniqueInput
+}
+
+export type eventreihenUpdateOneWithoutLive_pollsNestedInput = {
+  create?: Prisma.XOR<Prisma.eventreihenCreateWithoutLive_pollsInput, Prisma.eventreihenUncheckedCreateWithoutLive_pollsInput>
+  connectOrCreate?: Prisma.eventreihenCreateOrConnectWithoutLive_pollsInput
+  upsert?: Prisma.eventreihenUpsertWithoutLive_pollsInput
+  disconnect?: Prisma.eventreihenWhereInput | boolean
+  delete?: Prisma.eventreihenWhereInput | boolean
+  connect?: Prisma.eventreihenWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.eventreihenUpdateToOneWithWhereWithoutLive_pollsInput, Prisma.eventreihenUpdateWithoutLive_pollsInput>, Prisma.eventreihenUncheckedUpdateWithoutLive_pollsInput>
+}
+
 export type eventreihenCreateNestedOneWithoutRollenzuweisungenInput = {
   create?: Prisma.XOR<Prisma.eventreihenCreateWithoutRollenzuweisungenInput, Prisma.eventreihenUncheckedCreateWithoutRollenzuweisungenInput>
   connectOrCreate?: Prisma.eventreihenCreateOrConnectWithoutRollenzuweisungenInput
@@ -658,6 +681,7 @@ export type eventreihenCreateWithoutQuizInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUncheckedCreateWithoutQuizInput = {
@@ -678,6 +702,7 @@ export type eventreihenUncheckedCreateWithoutQuizInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenCreateOrConnectWithoutQuizInput = {
@@ -713,6 +738,7 @@ export type eventreihenUpdateWithoutQuizInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenUncheckedUpdateWithoutQuizInput = {
@@ -733,6 +759,7 @@ export type eventreihenUncheckedUpdateWithoutQuizInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenCreateWithoutStory_elementeInput = {
@@ -752,6 +779,7 @@ export type eventreihenCreateWithoutStory_elementeInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutEventreiheInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUncheckedCreateWithoutStory_elementeInput = {
@@ -772,6 +800,7 @@ export type eventreihenUncheckedCreateWithoutStory_elementeInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutEventreiheInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenCreateOrConnectWithoutStory_elementeInput = {
@@ -807,6 +836,7 @@ export type eventreihenUpdateWithoutStory_elementeInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutEventreiheNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenUncheckedUpdateWithoutStory_elementeInput = {
@@ -827,6 +857,105 @@ export type eventreihenUncheckedUpdateWithoutStory_elementeInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutEventreiheNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
+}
+
+export type eventreihenCreateWithoutLive_pollsInput = {
+  name: string
+  slug: string
+  oeffentlicher_name?: string | null
+  beschreibung?: string | null
+  interne_bemerkung?: string | null
+  ist_oeffentlich?: boolean
+  ist_archiviert?: boolean
+  archiviert_am?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  default_presentation_template_id?: string
+  default_answer_form_template_id?: string
+  quiz?: Prisma.quizCreateNestedManyWithoutEventreiheInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutEventreiheInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
+  fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
+  story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+}
+
+export type eventreihenUncheckedCreateWithoutLive_pollsInput = {
+  eventreihe_id?: number
+  name: string
+  slug: string
+  oeffentlicher_name?: string | null
+  beschreibung?: string | null
+  interne_bemerkung?: string | null
+  ist_oeffentlich?: boolean
+  ist_archiviert?: boolean
+  archiviert_am?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  default_presentation_template_id?: string
+  default_answer_form_template_id?: string
+  quiz?: Prisma.quizUncheckedCreateNestedManyWithoutEventreiheInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutEventreiheInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
+  fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
+  story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+}
+
+export type eventreihenCreateOrConnectWithoutLive_pollsInput = {
+  where: Prisma.eventreihenWhereUniqueInput
+  create: Prisma.XOR<Prisma.eventreihenCreateWithoutLive_pollsInput, Prisma.eventreihenUncheckedCreateWithoutLive_pollsInput>
+}
+
+export type eventreihenUpsertWithoutLive_pollsInput = {
+  update: Prisma.XOR<Prisma.eventreihenUpdateWithoutLive_pollsInput, Prisma.eventreihenUncheckedUpdateWithoutLive_pollsInput>
+  create: Prisma.XOR<Prisma.eventreihenCreateWithoutLive_pollsInput, Prisma.eventreihenUncheckedCreateWithoutLive_pollsInput>
+  where?: Prisma.eventreihenWhereInput
+}
+
+export type eventreihenUpdateToOneWithWhereWithoutLive_pollsInput = {
+  where?: Prisma.eventreihenWhereInput
+  data: Prisma.XOR<Prisma.eventreihenUpdateWithoutLive_pollsInput, Prisma.eventreihenUncheckedUpdateWithoutLive_pollsInput>
+}
+
+export type eventreihenUpdateWithoutLive_pollsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interne_bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_oeffentlich?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quiz?: Prisma.quizUpdateManyWithoutEventreiheNestedInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutEventreiheNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
+  fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
+  story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+}
+
+export type eventreihenUncheckedUpdateWithoutLive_pollsInput = {
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interne_bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_oeffentlich?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quiz?: Prisma.quizUncheckedUpdateManyWithoutEventreiheNestedInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutEventreiheNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
+  fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
+  story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenCreateWithoutRollenzuweisungenInput = {
@@ -846,6 +975,7 @@ export type eventreihenCreateWithoutRollenzuweisungenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUncheckedCreateWithoutRollenzuweisungenInput = {
@@ -866,6 +996,7 @@ export type eventreihenUncheckedCreateWithoutRollenzuweisungenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenCreateOrConnectWithoutRollenzuweisungenInput = {
@@ -901,6 +1032,7 @@ export type eventreihenUpdateWithoutRollenzuweisungenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenUncheckedUpdateWithoutRollenzuweisungenInput = {
@@ -921,6 +1053,7 @@ export type eventreihenUncheckedUpdateWithoutRollenzuweisungenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenCreateWithoutBenutzerrollenInput = {
@@ -940,6 +1073,7 @@ export type eventreihenCreateWithoutBenutzerrollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUncheckedCreateWithoutBenutzerrollenInput = {
@@ -960,6 +1094,7 @@ export type eventreihenUncheckedCreateWithoutBenutzerrollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
   fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenCreateOrConnectWithoutBenutzerrollenInput = {
@@ -995,6 +1130,7 @@ export type eventreihenUpdateWithoutBenutzerrollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenUncheckedUpdateWithoutBenutzerrollenInput = {
@@ -1015,6 +1151,7 @@ export type eventreihenUncheckedUpdateWithoutBenutzerrollenInput = {
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
   fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenCreateWithoutFragenInput = {
@@ -1034,6 +1171,7 @@ export type eventreihenCreateWithoutFragenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutEventreiheInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenUncheckedCreateWithoutFragenInput = {
@@ -1054,6 +1192,7 @@ export type eventreihenUncheckedCreateWithoutFragenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutEventreiheInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
   story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
 }
 
 export type eventreihenCreateOrConnectWithoutFragenInput = {
@@ -1089,6 +1228,7 @@ export type eventreihenUpdateWithoutFragenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutEventreiheNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
 }
 
 export type eventreihenUncheckedUpdateWithoutFragenInput = {
@@ -1109,6 +1249,7 @@ export type eventreihenUncheckedUpdateWithoutFragenInput = {
   benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutEventreiheNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
   story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
 }
 
 
@@ -1122,6 +1263,7 @@ export type EventreihenCountOutputType = {
   rollenzuweisungen: number
   fragen: number
   story_elemente: number
+  live_polls: number
 }
 
 export type EventreihenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1130,6 +1272,7 @@ export type EventreihenCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   rollenzuweisungen?: boolean | EventreihenCountOutputTypeCountRollenzuweisungenArgs
   fragen?: boolean | EventreihenCountOutputTypeCountFragenArgs
   story_elemente?: boolean | EventreihenCountOutputTypeCountStory_elementeArgs
+  live_polls?: boolean | EventreihenCountOutputTypeCountLive_pollsArgs
 }
 
 /**
@@ -1177,6 +1320,13 @@ export type EventreihenCountOutputTypeCountStory_elementeArgs<ExtArgs extends ru
   where?: Prisma.story_elementeWhereInput
 }
 
+/**
+ * EventreihenCountOutputType without action
+ */
+export type EventreihenCountOutputTypeCountLive_pollsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.live_pollsWhereInput
+}
+
 
 export type eventreihenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   eventreihe_id?: boolean
@@ -1197,6 +1347,7 @@ export type eventreihenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   rollenzuweisungen?: boolean | Prisma.eventreihen$rollenzuweisungenArgs<ExtArgs>
   fragen?: boolean | Prisma.eventreihen$fragenArgs<ExtArgs>
   story_elemente?: boolean | Prisma.eventreihen$story_elementeArgs<ExtArgs>
+  live_polls?: boolean | Prisma.eventreihen$live_pollsArgs<ExtArgs>
   _count?: boolean | Prisma.EventreihenCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["eventreihen"]>
 
@@ -1255,6 +1406,7 @@ export type eventreihenInclude<ExtArgs extends runtime.Types.Extensions.Internal
   rollenzuweisungen?: boolean | Prisma.eventreihen$rollenzuweisungenArgs<ExtArgs>
   fragen?: boolean | Prisma.eventreihen$fragenArgs<ExtArgs>
   story_elemente?: boolean | Prisma.eventreihen$story_elementeArgs<ExtArgs>
+  live_polls?: boolean | Prisma.eventreihen$live_pollsArgs<ExtArgs>
   _count?: boolean | Prisma.EventreihenCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type eventreihenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1268,6 +1420,7 @@ export type $eventreihenPayload<ExtArgs extends runtime.Types.Extensions.Interna
     rollenzuweisungen: Prisma.$benutzer_rollenzuweisungenPayload<ExtArgs>[]
     fragen: Prisma.$fragen_eventreihenPayload<ExtArgs>[]
     story_elemente: Prisma.$story_elementePayload<ExtArgs>[]
+    live_polls: Prisma.$live_pollsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     eventreihe_id: number
@@ -1682,6 +1835,7 @@ export interface Prisma__eventreihenClient<T, Null = never, ExtArgs extends runt
   rollenzuweisungen<T extends Prisma.eventreihen$rollenzuweisungenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$rollenzuweisungenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$benutzer_rollenzuweisungenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   fragen<T extends Prisma.eventreihen$fragenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$fragenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$fragen_eventreihenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   story_elemente<T extends Prisma.eventreihen$story_elementeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$story_elementeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$story_elementePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  live_polls<T extends Prisma.eventreihen$live_pollsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$live_pollsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$live_pollsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2234,6 +2388,30 @@ export type eventreihen$story_elementeArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.Story_elementeScalarFieldEnum | Prisma.Story_elementeScalarFieldEnum[]
+}
+
+/**
+ * eventreihen.live_polls
+ */
+export type eventreihen$live_pollsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the live_polls
+   */
+  select?: Prisma.live_pollsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the live_polls
+   */
+  omit?: Prisma.live_pollsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.live_pollsInclude<ExtArgs> | null
+  where?: Prisma.live_pollsWhereInput
+  orderBy?: Prisma.live_pollsOrderByWithRelationInput | Prisma.live_pollsOrderByWithRelationInput[]
+  cursor?: Prisma.live_pollsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Live_pollsScalarFieldEnum | Prisma.Live_pollsScalarFieldEnum[]
 }
 
 /**

@@ -162,3 +162,37 @@ export const QuizResultDisplayMode = {
 } as const
 
 export type QuizResultDisplayMode = (typeof QuizResultDisplayMode)[keyof typeof QuizResultDisplayMode]
+
+
+export const LivePollStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type LivePollStatus = (typeof LivePollStatus)[keyof typeof LivePollStatus]
+
+
+export const LivePollScope = {
+  GLOBAL: 'GLOBAL',
+  EVENT_SERIES: 'EVENT_SERIES',
+  QUIZ: 'QUIZ'
+} as const
+
+export type LivePollScope = (typeof LivePollScope)[keyof typeof LivePollScope]
+
+
+export const LivePollType = {
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+  FREE_TEXT: 'FREE_TEXT'
+} as const
+
+export type LivePollType = (typeof LivePollType)[keyof typeof LivePollType]
+
+
+export const LivePollPublicationMode = {
+  AUTOMATIC: 'AUTOMATIC',
+  MODERATED: 'MODERATED'
+} as const
+
+export type LivePollPublicationMode = (typeof LivePollPublicationMode)[keyof typeof LivePollPublicationMode]

@@ -2745,3 +2745,15 @@ button {
 .presentation-funny-slide .presentation-funny-grid article > svg { height: clamp(2.1rem, 5vw, 4.5rem); width: clamp(2.1rem, 5vw, 4.5rem); }
 .presentation-funny-slide .presentation-funny-grid strong { font-size: clamp(0.75rem, 1.4vw, 1.25rem); }
 .presentation-funny-slide .presentation-funny-grid blockquote { font-size: clamp(0.72rem, 1.55vw, 1.35rem); }
+.presentation-live-poll { display: flex; min-height: 100%; flex-direction: column; justify-content: center; }
+.presentation-live-poll-bars { display: grid; gap: clamp(.7rem, 1.8vh, 1.3rem); margin-top: clamp(1rem, 3vh, 2.5rem); }
+.presentation-live-poll-label { display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; font-size: clamp(1.1rem, 2.3vw, 2rem); }
+.presentation-live-poll-label span { color: var(--quiz-text-muted); font-variant-numeric: tabular-nums; }
+.presentation-live-poll-track { height: clamp(.7rem, 1.5vh, 1.2rem); overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--quiz-text) 16%, transparent); }
+.presentation-live-poll-track i { display: block; min-width: .25rem; height: 100%; border-radius: inherit; background: var(--quiz-accent); transition: width 700ms ease; }
+.presentation-live-poll-wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(.45rem, 1vw, .9rem); margin-top: clamp(1rem, 2.5vh, 2rem); }
+.presentation-live-poll-wall article { display: grid; min-height: 5rem; place-items: center; overflow-wrap: anywhere; border: 1px solid var(--quiz-border); border-radius: var(--quiz-radius-medium); background: color-mix(in srgb, var(--quiz-surface) 88%, transparent); padding: clamp(.55rem, 1.2vw, 1rem); text-align: center; font-size: clamp(.85rem, 1.55vw, 1.35rem); }
+.presentation-live-poll-wall[data-count="1"] { grid-template-columns: minmax(0, 1fr); }
+.presentation-live-poll-wall[data-count="1"] article { min-height: 12rem; font-size: clamp(1.8rem, 4vw, 3.5rem); }
+.presentation-live-poll-wall[data-count="2"], .presentation-live-poll-wall[data-count="3"], .presentation-live-poll-wall[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.presentation-live-poll-total { margin-top: clamp(.8rem, 2vh, 1.5rem); color: var(--quiz-text-muted); font-size: clamp(.85rem, 1.3vw, 1.1rem); }

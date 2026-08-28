@@ -275,6 +275,7 @@ model quiz {
   quiz_fragen              quiz_fragen[]
   quiz_ablauf_elemente     quiz_ablauf_elemente[]
   story_elemente           story_elemente[]
+  live_polls               live_polls[]
   praesentation_status     quiz_praesentation_status?
   quiz_team_sessions       quiz_team_sessions[]
   quiz_teams               quiz_teams[]
@@ -305,6 +306,7 @@ model eventreihen {
   rollenzuweisungen                benutzer_rollenzuweisungen[]
   fragen                           fragen_eventreihen[]
   story_elemente                   story_elemente[]
+  live_polls                       live_polls[]
 
   @@index([ist_archiviert, name], map: "idx_eventreihen_status_name")
   @@schema("pubquiz")
@@ -382,6 +384,55 @@ model story_element_revisionen {
 
   @@unique([story_element_id, revisionsnummer], map: "uq_story_element_revision")
   @@index([story_element_id, created_at], map: "idx_story_element_revision_created")
+  @@schema("pubquiz")
+}
+
+/// Stable editorial identity for a live poll. Polls are interactive content,
+/// never quiz questions, and therefore carry no solution or scoring fields.
+model live_polls {
+  live_poll_id        Int                @id @default(autoincrement())
+  stable_key          String             @unique @db.VarChar(64)
+  status              LivePollStatus     @default(DRAFT)
+  geltungsbereich     LivePollScope      @default(EVENT_SERIES)
+  eventreihe_id       Int?
+  quiz_id             Int?
+  created_by_user_id  Int?
+  source_live_poll_id Int?
+  archived_at         DateTime?
+  created_at          DateTime           @default(now())
+  updated_at          DateTime           @default(now()) @updatedAt
+  eventreihe          eventreihen?       @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
+  quiz                quiz?              @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+  created_by          users?             @relation("LivePollCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  source              live_polls?        @relation("LivePollSource", fields: [source_live_poll_id], references: [live_poll_id], onDelete: SetNull)
+  ableitungen         live_polls[]       @relation("LivePollSource")
+  revisionen          live_poll_revisions[]
+
+  @@index([status, updated_at], map: "idx_live_polls_status_updated")
+  @@index([geltungsbereich, eventreihe_id], map: "idx_live_polls_scope_eventreihe")
+  @@index([quiz_id], map: "idx_live_polls_quiz")
+  @@schema("pubquiz")
+}
+
+/// Immutable executable configuration of one live poll revision.
+model live_poll_revisions {
+  live_poll_revision_id Int                     @id @default(autoincrement())
+  live_poll_id          Int
+  revisionsnummer      Int
+  typ                   LivePollType
+  prompt                String                  @db.VarChar(300)
+  publication_mode      LivePollPublicationMode @default(AUTOMATIC)
+  optionen               Json
+  moderationsnotiz      String?                 @db.VarChar(2000)
+  created_by_user_id    Int?
+  created_at            DateTime                @default(now())
+  live_poll             live_polls              @relation(fields: [live_poll_id], references: [live_poll_id], onDelete: Cascade)
+  created_by            users?                  @relation("LivePollRevisionCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  quiz_ablauf_elemente  quiz_ablauf_elemente[]
+  responses             live_poll_responses[]
+
+  @@unique([live_poll_id, revisionsnummer], map: "uq_live_poll_revision")
+  @@index([live_poll_id, created_at], map: "idx_live_poll_revision_created")
   @@schema("pubquiz")
 }
 
@@ -515,6 +566,8 @@ model quiz_ablauf_elemente {
   quiz_fragen                 quiz_fragen?               @relation("QuizFlowQuestionItem", fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
   story_element_revision_id   Int?
   story_element_revision      story_element_revisionen?  @relation(fields: [story_element_revision_id], references: [story_element_revision_id], onDelete: Restrict)
+  live_poll_revision_id       Int?
+  live_poll_revision          live_poll_revisions?        @relation(fields: [live_poll_revision_id], references: [live_poll_revision_id], onDelete: Restrict)
   story_bezugs_quiz_fragen_id Int?
   story_beziehung             StoryQuestionRelationship?
   story_bezugs_frage          quiz_fragen?               @relation("QuizFlowStoryQuestionReference", fields: [story_bezugs_quiz_fragen_id], references: [quiz_fragen_id], onDelete: SetNull)
@@ -526,6 +579,7 @@ model quiz_ablauf_elemente {
   @@index([quiz_abschnitt_id], map: "idx_quiz_ablauf_abschnitt")
   @@index([quiz_fragen_id], map: "idx_quiz_ablauf_frage")
   @@index([story_element_revision_id], map: "idx_quiz_ablauf_story_revision")
+  @@index([live_poll_revision_id], map: "idx_quiz_ablauf_live_poll_revision")
   @@index([story_bezugs_quiz_fragen_id], map: "idx_quiz_ablauf_story_question")
   @@schema("pubquiz")
 }
@@ -541,6 +595,7 @@ model quiz_team_sessions {
   team                 teams                     @relation(fields: [team_id], references: [team_id], onDelete: Restrict)
   team_antworten       team_antworten[]
   answer_submissions   team_answer_submissions[]
+  live_poll_responses  live_poll_responses[]
   stopped_pixel_runs   quiz_interaction_runs[]   @relation("PixelStopper")
 
   @@unique([quiz_id, teamname], map: "uq_quiz_team_session_teamname")
@@ -634,6 +689,7 @@ model quiz_interaction_runs {
   stopped_by_team_session    quiz_team_sessions?       @relation("PixelStopper", fields: [stopped_by_team_session_id], references: [quiz_team_session_id], onDelete: SetNull)
   team_antworten             team_antworten[]
   answer_submissions         team_answer_submissions[]
+  live_poll_responses        live_poll_responses[]
 
   @@unique([quiz_id], map: "uq_quiz_interaction_runs_current", where: raw("(is_current = true)"))
   @@index([quiz_id, created_at], map: "idx_quiz_interaction_runs_quiz_created")
@@ -664,6 +720,33 @@ model team_answer_submissions {
   @@index([team_antwort_id], map: "idx_team_answer_submissions_answer")
   @@index([interaction_run_id, quiz_team_session_id, submitted_at], map: "idx_team_answer_submissions_run_team_time")
   @@index([quiz_team_session_id, submitted_at], map: "idx_team_answer_submissions_team_time")
+  @@schema("pubquiz")
+}
+
+/// Latest effective response of one team in one poll run. Selection and text
+/// share the same row so a change during OPEN replaces, rather than duplicates,
+/// the team's effective response.
+model live_poll_responses {
+  live_poll_response_id Int                       @id @default(autoincrement())
+  interaction_run_id    Int
+  live_poll_revision_id Int
+  quiz_team_session_id  Int
+  selected_option_id    String?                   @db.VarChar(64)
+  original_text         String?                   @db.VarChar(500)
+  public_text           String?                   @db.VarChar(500)
+  is_visible            Boolean                   @default(false)
+  moderated_by_user_id  Int?
+  revision              Int                       @default(1)
+  created_at            DateTime                  @default(now())
+  updated_at            DateTime                  @default(now()) @updatedAt
+  interaction_run       quiz_interaction_runs     @relation(fields: [interaction_run_id], references: [interaction_run_id], onDelete: Cascade)
+  live_poll_revision    live_poll_revisions       @relation(fields: [live_poll_revision_id], references: [live_poll_revision_id], onDelete: Restrict)
+  quiz_team_session     quiz_team_sessions        @relation(fields: [quiz_team_session_id], references: [quiz_team_session_id], onDelete: Cascade)
+  moderated_by          users?                    @relation("LivePollResponseModerator", fields: [moderated_by_user_id], references: [id], onDelete: SetNull)
+
+  @@unique([interaction_run_id, quiz_team_session_id], map: "uq_live_poll_response_run_team")
+  @@index([interaction_run_id, is_visible, updated_at], map: "idx_live_poll_response_public")
+  @@index([quiz_team_session_id, updated_at], map: "idx_live_poll_response_team")
   @@schema("pubquiz")
 }
 
@@ -947,6 +1030,36 @@ enum QuizResultDisplayMode {
   @@schema("pubquiz")
 }
 
+enum LivePollStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+
+  @@schema("pubquiz")
+}
+
+enum LivePollScope {
+  GLOBAL
+  EVENT_SERIES
+  QUIZ
+
+  @@schema("pubquiz")
+}
+
+enum LivePollType {
+  SINGLE_CHOICE
+  FREE_TEXT
+
+  @@schema("pubquiz")
+}
+
+enum LivePollPublicationMode {
+  AUTOMATIC
+  MODERATED
+
+  @@schema("pubquiz")
+}
+
 model users {
   id Int @id @default(autoincrement())
 
@@ -982,6 +1095,9 @@ model users {
   moderierte_live_text_antworten    live_text_response_publications[] @relation("LiveTextModerator")
   erstellte_text_ersatzregeln       public_text_replacement_rules[] @relation("PublicTextRuleCreator")
   aktualisierte_text_ersatzregeln   public_text_replacement_rules[] @relation("PublicTextRuleUpdater")
+  erstellte_live_polls              live_polls[]                 @relation("LivePollCreator")
+  erstellte_live_poll_revisionen    live_poll_revisions[]        @relation("LivePollRevisionCreator")
+  moderierte_live_poll_antworten    live_poll_responses[]        @relation("LivePollResponseModerator")
 
   @@schema("pubquiz")
 }

@@ -31,6 +31,16 @@ const flowQuizInclude = {
           konfiguration: true,
         },
       },
+      live_poll_revision: {
+        select: {
+          live_poll_revision_id: true,
+          live_poll_id: true,
+          typ: true,
+          prompt: true,
+          publication_mode: true,
+          optionen: true,
+        },
+      },
       story_bezugs_frage: {
         select: {
           fragen: {
@@ -54,6 +64,7 @@ type StoredItemSource = {
   quiz_abschnitt_id: number | null;
   quiz_fragen_id: number | null;
   story_element_revision_id?: number | null;
+  live_poll_revision_id?: number | null;
   story_bezugs_quiz_fragen_id?: number | null;
   story_beziehung?: string | null;
   story_bezugs_frage?: {
@@ -77,6 +88,14 @@ type StoredItemSource = {
     titel: string;
     moderationsnotiz: string | null;
     konfiguration: unknown;
+  } | null;
+  live_poll_revision?: {
+    live_poll_revision_id: number;
+    live_poll_id: number;
+    typ: string;
+    prompt: string;
+    publication_mode: string;
+    optionen: unknown;
   } | null;
 };
 
@@ -119,6 +138,15 @@ export function toStoredQuizFlowItem(
     story_bezugs_quiz_fragen_id: item.story_bezugs_quiz_fragen_id ?? null,
     story_beziehung: item.story_beziehung ?? null,
     story_default_beziehung: defaultRelationship,
+    live_poll: item.live_poll_revision ? {
+      version: 1,
+      pollId: item.live_poll_revision.live_poll_id,
+      pollRevisionId: item.live_poll_revision.live_poll_revision_id,
+      type: item.live_poll_revision.typ,
+      prompt: item.live_poll_revision.prompt,
+      publicationMode: item.live_poll_revision.publication_mode,
+      options: item.live_poll_revision.optionen,
+    } : null,
     sortierung: item.sortierung,
     ist_sichtbar: item.ist_sichtbar,
     bezeichnung: item.bezeichnung ?? revision?.titel ?? null,
@@ -145,6 +173,16 @@ export async function loadStoredQuizFlowItems(quizId: number) {
           titel: true,
           moderationsnotiz: true,
           konfiguration: true,
+        },
+      },
+      live_poll_revision: {
+        select: {
+          live_poll_revision_id: true,
+          live_poll_id: true,
+          typ: true,
+          prompt: true,
+          publication_mode: true,
+          optionen: true,
         },
       },
       story_bezugs_frage: {
@@ -241,6 +279,16 @@ export async function materializeDefaultQuizFlow(
             titel: true,
             moderationsnotiz: true,
             konfiguration: true,
+          },
+        },
+        live_poll_revision: {
+          select: {
+            live_poll_revision_id: true,
+            live_poll_id: true,
+            typ: true,
+            prompt: true,
+            publication_mode: true,
+            optionen: true,
           },
         },
       },
@@ -661,6 +709,16 @@ export async function materializeManualQuizBlockSequence(
               titel: true,
               moderationsnotiz: true,
               konfiguration: true,
+            },
+          },
+          live_poll_revision: {
+            select: {
+              live_poll_revision_id: true,
+              live_poll_id: true,
+              typ: true,
+              prompt: true,
+              publication_mode: true,
+              optionen: true,
             },
           },
         },

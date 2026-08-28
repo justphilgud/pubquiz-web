@@ -27,6 +27,10 @@ export type PresentationQuestionIdentity = {
 
 export type PresentationSlideIdentity =
   | {
+      kind: "LIVE_POLL";
+      placementId: number;
+    }
+  | {
       kind: "QUESTION";
       phase: "QUESTION" | "FUNNY" | "SOLUTION";
       questionAssignmentId: number;
@@ -126,6 +130,7 @@ const NON_QUESTION_STATUS_BY_TYPE: Readonly<Record<string, string>> = {
   standings: "Der Zwischenstand wird gezeigt",
   final: "Das Quiz ist beendet",
   BLOCK_ITEM: "Bitte folgt der Präsentation",
+  LIVE_POLL: "Die Umfrage läuft",
 };
 
 function parsePositiveInteger(value: string | undefined) {
@@ -152,6 +157,14 @@ export function parsePresentationSlideKey(
     return questionAssignmentId && phase
       ? { kind: "QUESTION", phase, questionAssignmentId }
       : { kind: "UNKNOWN" };
+  }
+
+  if (
+    parts[0] === "poll-placement" &&
+    parts.length === 2
+  ) {
+    const placementId = parsePositiveInteger(parts[1]);
+    return placementId ? { kind: "LIVE_POLL", placementId } : { kind: "UNKNOWN" };
   }
 
   if (
@@ -221,6 +234,16 @@ export function resolvePresentationAudienceState(
       slideKey: liveState.slideKey,
       slideType: identity.slideType,
       statusText: identity.statusText,
+    };
+  }
+
+  if (identity?.kind === "LIVE_POLL") {
+    return {
+      kind: "NON_QUESTION",
+      phase: "NON_QUESTION",
+      slideKey: liveState.slideKey,
+      slideType: "LIVE_POLL",
+      statusText: NON_QUESTION_STATUS_BY_TYPE.LIVE_POLL,
     };
   }
 

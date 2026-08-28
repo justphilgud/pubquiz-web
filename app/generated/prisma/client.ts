@@ -129,6 +129,17 @@ export type story_elemente = Prisma.story_elementeModel
  */
 export type story_element_revisionen = Prisma.story_element_revisionenModel
 /**
+ * Model live_polls
+ * Stable editorial identity for a live poll. Polls are interactive content,
+ * never quiz questions, and therefore carry no solution or scoring fields.
+ */
+export type live_polls = Prisma.live_pollsModel
+/**
+ * Model live_poll_revisions
+ * Immutable executable configuration of one live poll revision.
+ */
+export type live_poll_revisions = Prisma.live_poll_revisionsModel
+/**
  * Model frage_story_elemente
  * Optional editorial relationship. It suggests placement but never changes scoring.
  */
@@ -184,6 +195,13 @@ export type quiz_interaction_runs = Prisma.quiz_interaction_runsModel
  *
  */
 export type team_answer_submissions = Prisma.team_answer_submissionsModel
+/**
+ * Model live_poll_responses
+ * Latest effective response of one team in one poll run. Selection and text
+ * share the same row so a change during OPEN replaces, rather than duplicates,
+ * the team's effective response.
+ */
+export type live_poll_responses = Prisma.live_poll_responsesModel
 /**
  * Model frage_antwortfelder
  *

@@ -59,6 +59,12 @@ import {
   isLiveResultVisibleToAudience,
 } from "@/app/quiz/liveResults/liveResultControls";
 import { shouldReuseQuestionInteractionRun } from "./interactionRunReuse";
+import {
+  buildLivePollRunSnapshot,
+  getLivePollStateForRun,
+  loadLivePollPlacement,
+  readLivePollRunSnapshot,
+} from "@/app/umfragen/livePollRuntime.server";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -310,7 +316,10 @@ async function closeRun(
   });
   if (!run) return null;
   if (run.state === "OPEN" || run.state === "COUNTDOWN") {
-    const finalizedDrafts = await autoFinalizeDrafts(db, run, options.reason);
+    const contentPoll = readLivePollRunSnapshot(run.config_snapshot);
+    const finalizedDrafts = contentPoll
+      ? 0
+      : await autoFinalizeDrafts(db, run, options.reason);
     const closePolicy = resolveInteractionClosePolicy(
       isPixelInteractionRun(run) ? "PIXEL" : "DEFAULT",
     );
@@ -354,6 +363,13 @@ export async function syncInteractionForPresentation(
 ) {
   const currentRunId = await lockCurrentRun(db, input.quizId);
   const identity = parsePresentationSlideKey(input.slideKey);
+  if (identity?.kind === "LIVE_POLL") {
+    return syncLivePollForPresentation(db, {
+      quizId: input.quizId,
+      placementId: identity.placementId,
+      currentRunId,
+    });
+  }
   if (identity?.kind !== "QUESTION") {
     if (currentRunId !== null) {
       const currentRun = await db.quiz_interaction_runs.findUnique({
@@ -576,6 +592,45 @@ export async function syncInteractionForPresentation(
     });
   }
   return revealRun;
+}
+
+async function syncLivePollForPresentation(
+  db: DbClient,
+  input: { quizId: number; placementId: number; currentRunId: number | null },
+) {
+  const resolved = await loadLivePollPlacement(db, input.quizId, input.placementId);
+  const currentRun = input.currentRunId === null
+    ? null
+    : await db.quiz_interaction_runs.findUnique({ where: { interaction_run_id: input.currentRunId } });
+  if (!resolved?.config) {
+    if (input.currentRunId !== null) {
+      await closeRun(db, input.currentRunId, { reason: "POLL_UNAVAILABLE", keepCurrent: false });
+    }
+    return null;
+  }
+  if (
+    currentRun?.quiz_ablauf_element_id === input.placementId &&
+    currentRun.state === "OPEN" &&
+    readLivePollRunSnapshot(currentRun.config_snapshot)
+  ) {
+    return currentRun;
+  }
+  if (input.currentRunId !== null) {
+    await closeRun(db, input.currentRunId, { reason: "PRESENTATION_ADVANCED", keepCurrent: false });
+  }
+  return db.quiz_interaction_runs.create({
+    data: {
+      quiz_id: input.quizId,
+      quiz_ablauf_element_id: input.placementId,
+      interaction_type: resolved.config.type === "SINGLE_CHOICE"
+        ? "CONTENT_POLL_SINGLE"
+        : "CONTENT_POLL_TEXT",
+      state: "OPEN",
+      is_current: true,
+      opened_at: new Date(),
+      config_snapshot: toJson(buildLivePollRunSnapshot(resolved.config)),
+    },
+  });
 }
 
 export async function closeCurrentInteraction(
@@ -1222,7 +1277,8 @@ export async function getQuizLiveSnapshotData(
     );
     run = await runQuery();
   }
-  const interaction = run ? readInteractionSnapshot(run.config_snapshot) : null;
+  const contentPollConfig = run ? readLivePollRunSnapshot(run.config_snapshot) : null;
+  const interaction = run && !contentPollConfig ? readInteractionSnapshot(run.config_snapshot) : null;
   const pollInteraction = interaction && isPollInteractionType(interaction.type)
     ? interaction as PollInteraction
     : null;
@@ -1349,6 +1405,17 @@ export async function getQuizLiveSnapshotData(
         },
       })
     : null;
+  const [livePollState, teamLivePollResponse] = run && contentPollConfig
+    ? await Promise.all([
+        getLivePollStateForRun(run, options.includeLiveModeration === true),
+        quizTeamSessionId
+          ? prisma.live_poll_responses.findUnique({
+              where: { interaction_run_id_quiz_team_session_id: { interaction_run_id: run.interaction_run_id, quiz_team_session_id: quizTeamSessionId } },
+              select: { selected_option_id: true, original_text: true, updated_at: true },
+            })
+          : Promise.resolve(null),
+      ])
+    : [null, null];
   let draftPayload: QuizInteractionPayload | null = null;
   if (run && answer) {
     draftPayload = validateInteractionPayload(
@@ -1479,6 +1546,8 @@ export async function getQuizLiveSnapshotData(
             payloads: exposedLivePayloads,
           })
         : null,
+    livePollState: livePollState?.audience ?? null,
+    livePollModeration: options.includeLiveModeration ? livePollState?.moderationResponses ?? [] : null,
     liveResultState:
       run && liveChoiceInteraction
         ? aggregateLiveChoiceResults({
@@ -1572,6 +1641,13 @@ export async function getQuizLiveSnapshotData(
                 submittedAt: submission.submitted_at.toISOString(),
                 draftRevision: submission.draft_revision,
                 submissionVersion: submission.submission_version,
+              }
+            : null,
+          livePollResponse: teamLivePollResponse
+            ? {
+                selectedOptionId: teamLivePollResponse.selected_option_id,
+                text: teamLivePollResponse.original_text,
+                updatedAt: teamLivePollResponse.updated_at.toISOString(),
               }
             : null,
         }

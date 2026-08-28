@@ -220,9 +220,9 @@ Besonderheiten:
 
 Diese Sonderregeln erweitern den gemeinsamen Lebenszyklus. Sie rechtfertigen keine zweite Draft- oder Submission-Tabelle.
 
-## Polls: verbindliche Sonderregel
+## Poll-Fragen: verbindliche Sonderregel
 
-Polls verwenden vollständig den bestehenden Interaction-Contract:
+Dieser Abschnitt meint ausschließlich Poll-Fragen (`POLL_SINGLE`, `POLL_MULTI`, `POLL_SCALE`) innerhalb einer Quizfrage. Sie verwenden vollständig den bestehenden Interaction-Contract:
 
 - `quiz_interaction_runs` für den Live-Zustand;
 - `team_antworten` für revisionsgeschützte Drafts;
@@ -238,6 +238,10 @@ Polls besitzen ausdrücklich:
 
 `aggregatePollSubmissions` liest finale Payloads und berechnet ausschließlich Ergebnisverteilungen für die Darstellung.
 
+Die eigenständige Content-Art **Umfrage** ist davon bewusst getrennt. Sie besitzt keine `fragen`-Identität, keine Quizlösung, keine Bewertung und keine Punkte. Ihr stabiler Inhalt liegt in `live_polls` mit unveränderlichen `live_poll_revisions`; die jeweils letzte Antwort eines Teams pro Ausführung liegt in `live_poll_responses`. Die Ausführung verwendet weiterhin `quiz_interaction_runs`, die signierte Teamsitzung und die vorhandenen Live-Snapshot-Transporte. Damit entsteht keine zweite allgemeine Interaction-Engine, aber auch keine künstliche Quizfrage nur zur Persistierung eines nicht bewerteten Content-Elements.
+
+Für Freitext bleiben `original_text` und die nach `public_text_replacement_rules` bereinigte öffentliche Fassung getrennt. Das Audience-View-Model enthält weder Teamname noch Profil; nur die Moderation erhält Identität und Originaltext. Auswahlantworten werden bis zum Schließen per Upsert ersetzt. Ein Content-Poll-Run schreibt niemals `team_antworten`, `team_answer_submissions` oder Evaluationen.
+
 ## Countdown und Zeitautorität
 
 Der Server ist die Zeitautorität. Ein Run speichert `deadline_at`; der Live-Snapshot veröffentlicht diese als `submissionDeadlineAt` sowie den Aufnahmezeitpunkt als `serverNow`.
@@ -248,7 +252,7 @@ Der Server ist die Zeitautorität. Ein Run speichert `deadline_at`; der Live-Sna
 - Ein visueller Sekundentick darf keine Datenbankabfrage auslösen. Der vorhandene Live-Snapshot-Abruf synchronisiert Zustandsrevisionen; er ist nicht die Uhr des Countdowns.
 - Es darf keine zweite Countdown-Route und kein eigener Polling-Lebenszyklus je Fragetyp entstehen.
 
-Warum das Live-Snapshot-Intervall aktuell 500 ms beträgt, ist aus Code und bestehenden Architekturtests nicht belastbar begründet. **Reasoning needs confirmation.** Das Intervall darf nicht beiläufig im Rahmen eines neuen Antworttyps verändert werden.
+Quizfragen behalten ihren bestehenden Live-Takt. Für das neue Content-Element Umfrage gilt ein dokumentierter adaptiver Abruf: 1,2 Sekunden im sichtbaren Tab, 5 Sekunden im Hintergrund und exponentielles Fehler-Backoff bis maximal 15 Sekunden. Übertragen wird nur der vorhandene Live-Snapshot, nicht das vollständige Quiz. Visuelle Animationen laufen rein clientseitig.
 
 ## Teamlisten- und Präsentations-Live-State
 

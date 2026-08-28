@@ -240,6 +240,7 @@ export type quiz_team_sessionsWhereInput = {
   team?: Prisma.XOR<Prisma.TeamsScalarRelationFilter, Prisma.teamsWhereInput>
   team_antworten?: Prisma.Team_antwortenListRelationFilter
   answer_submissions?: Prisma.Team_answer_submissionsListRelationFilter
+  live_poll_responses?: Prisma.Live_poll_responsesListRelationFilter
   stopped_pixel_runs?: Prisma.Quiz_interaction_runsListRelationFilter
 }
 
@@ -254,6 +255,7 @@ export type quiz_team_sessionsOrderByWithRelationInput = {
   team?: Prisma.teamsOrderByWithRelationInput
   team_antworten?: Prisma.team_antwortenOrderByRelationAggregateInput
   answer_submissions?: Prisma.team_answer_submissionsOrderByRelationAggregateInput
+  live_poll_responses?: Prisma.live_poll_responsesOrderByRelationAggregateInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsOrderByRelationAggregateInput
 }
 
@@ -273,6 +275,7 @@ export type quiz_team_sessionsWhereUniqueInput = Prisma.AtLeast<{
   team?: Prisma.XOR<Prisma.TeamsScalarRelationFilter, Prisma.teamsWhereInput>
   team_antworten?: Prisma.Team_antwortenListRelationFilter
   answer_submissions?: Prisma.Team_answer_submissionsListRelationFilter
+  live_poll_responses?: Prisma.Live_poll_responsesListRelationFilter
   stopped_pixel_runs?: Prisma.Quiz_interaction_runsListRelationFilter
 }, "quiz_team_session_id" | "quiz_id_teamname" | "quiz_id_team_id">
 
@@ -310,6 +313,7 @@ export type quiz_team_sessionsCreateInput = {
   team: Prisma.teamsCreateNestedOneWithoutQuiz_team_sessionsInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -322,6 +326,7 @@ export type quiz_team_sessionsUncheckedCreateInput = {
   spieler_anzahl?: number
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -333,6 +338,7 @@ export type quiz_team_sessionsUpdateInput = {
   team?: Prisma.teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -345,6 +351,7 @@ export type quiz_team_sessionsUncheckedUpdateInput = {
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -571,6 +578,20 @@ export type quiz_team_sessionsUpdateOneRequiredWithoutAnswer_submissionsNestedIn
   update?: Prisma.XOR<Prisma.XOR<Prisma.quiz_team_sessionsUpdateToOneWithWhereWithoutAnswer_submissionsInput, Prisma.quiz_team_sessionsUpdateWithoutAnswer_submissionsInput>, Prisma.quiz_team_sessionsUncheckedUpdateWithoutAnswer_submissionsInput>
 }
 
+export type quiz_team_sessionsCreateNestedOneWithoutLive_poll_responsesInput = {
+  create?: Prisma.XOR<Prisma.quiz_team_sessionsCreateWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUncheckedCreateWithoutLive_poll_responsesInput>
+  connectOrCreate?: Prisma.quiz_team_sessionsCreateOrConnectWithoutLive_poll_responsesInput
+  connect?: Prisma.quiz_team_sessionsWhereUniqueInput
+}
+
+export type quiz_team_sessionsUpdateOneRequiredWithoutLive_poll_responsesNestedInput = {
+  create?: Prisma.XOR<Prisma.quiz_team_sessionsCreateWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUncheckedCreateWithoutLive_poll_responsesInput>
+  connectOrCreate?: Prisma.quiz_team_sessionsCreateOrConnectWithoutLive_poll_responsesInput
+  upsert?: Prisma.quiz_team_sessionsUpsertWithoutLive_poll_responsesInput
+  connect?: Prisma.quiz_team_sessionsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.quiz_team_sessionsUpdateToOneWithWhereWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUpdateWithoutLive_poll_responsesInput>, Prisma.quiz_team_sessionsUncheckedUpdateWithoutLive_poll_responsesInput>
+}
+
 export type quiz_team_sessionsCreateWithoutQuizInput = {
   teamname: string
   erstellt_am?: Date | string
@@ -578,6 +599,7 @@ export type quiz_team_sessionsCreateWithoutQuizInput = {
   team: Prisma.teamsCreateNestedOneWithoutQuiz_team_sessionsInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -589,6 +611,7 @@ export type quiz_team_sessionsUncheckedCreateWithoutQuizInput = {
   spieler_anzahl?: number
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -637,6 +660,7 @@ export type quiz_team_sessionsCreateWithoutTeamInput = {
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_team_sessionsInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -648,6 +672,7 @@ export type quiz_team_sessionsUncheckedCreateWithoutTeamInput = {
   spieler_anzahl?: number
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -684,6 +709,7 @@ export type quiz_team_sessionsCreateWithoutTeam_antwortenInput = {
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_team_sessionsInput
   team: Prisma.teamsCreateNestedOneWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -695,6 +721,7 @@ export type quiz_team_sessionsUncheckedCreateWithoutTeam_antwortenInput = {
   erstellt_am?: Date | string
   spieler_anzahl?: number
   answer_submissions?: Prisma.team_answer_submissionsUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -721,6 +748,7 @@ export type quiz_team_sessionsUpdateWithoutTeam_antwortenInput = {
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team?: Prisma.teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -732,6 +760,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutTeam_antwortenInput = {
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
   answer_submissions?: Prisma.team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -743,6 +772,7 @@ export type quiz_team_sessionsCreateWithoutStopped_pixel_runsInput = {
   team: Prisma.teamsCreateNestedOneWithoutQuiz_team_sessionsInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesCreateNestedManyWithoutQuiz_team_sessionInput
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutStopped_pixel_runsInput = {
@@ -754,6 +784,7 @@ export type quiz_team_sessionsUncheckedCreateWithoutStopped_pixel_runsInput = {
   spieler_anzahl?: number
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_team_sessionsInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
 }
 
 export type quiz_team_sessionsCreateOrConnectWithoutStopped_pixel_runsInput = {
@@ -780,6 +811,7 @@ export type quiz_team_sessionsUpdateWithoutStopped_pixel_runsInput = {
   team?: Prisma.teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUpdateManyWithoutQuiz_team_sessionNestedInput
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutStopped_pixel_runsInput = {
@@ -791,6 +823,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutStopped_pixel_runsInput = {
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
 }
 
 export type quiz_team_sessionsCreateWithoutAnswer_submissionsInput = {
@@ -800,6 +833,7 @@ export type quiz_team_sessionsCreateWithoutAnswer_submissionsInput = {
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_team_sessionsInput
   team: Prisma.teamsCreateNestedOneWithoutQuiz_team_sessionsInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_team_sessionsInput
+  live_poll_responses?: Prisma.live_poll_responsesCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -811,6 +845,7 @@ export type quiz_team_sessionsUncheckedCreateWithoutAnswer_submissionsInput = {
   erstellt_am?: Date | string
   spieler_anzahl?: number
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_team_sessionsInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutStopped_by_team_sessionInput
 }
 
@@ -837,6 +872,7 @@ export type quiz_team_sessionsUpdateWithoutAnswer_submissionsInput = {
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team?: Prisma.teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_team_sessionsNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -848,6 +884,69 @@ export type quiz_team_sessionsUncheckedUpdateWithoutAnswer_submissionsInput = {
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
+  stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionNestedInput
+}
+
+export type quiz_team_sessionsCreateWithoutLive_poll_responsesInput = {
+  teamname: string
+  erstellt_am?: Date | string
+  spieler_anzahl?: number
+  quiz: Prisma.quizCreateNestedOneWithoutQuiz_team_sessionsInput
+  team: Prisma.teamsCreateNestedOneWithoutQuiz_team_sessionsInput
+  team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_team_sessionsInput
+  answer_submissions?: Prisma.team_answer_submissionsCreateNestedManyWithoutQuiz_team_sessionInput
+  stopped_pixel_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutStopped_by_team_sessionInput
+}
+
+export type quiz_team_sessionsUncheckedCreateWithoutLive_poll_responsesInput = {
+  quiz_team_session_id?: number
+  quiz_id: number
+  team_id: number
+  teamname: string
+  erstellt_am?: Date | string
+  spieler_anzahl?: number
+  team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_team_sessionsInput
+  answer_submissions?: Prisma.team_answer_submissionsUncheckedCreateNestedManyWithoutQuiz_team_sessionInput
+  stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutStopped_by_team_sessionInput
+}
+
+export type quiz_team_sessionsCreateOrConnectWithoutLive_poll_responsesInput = {
+  where: Prisma.quiz_team_sessionsWhereUniqueInput
+  create: Prisma.XOR<Prisma.quiz_team_sessionsCreateWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUncheckedCreateWithoutLive_poll_responsesInput>
+}
+
+export type quiz_team_sessionsUpsertWithoutLive_poll_responsesInput = {
+  update: Prisma.XOR<Prisma.quiz_team_sessionsUpdateWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUncheckedUpdateWithoutLive_poll_responsesInput>
+  create: Prisma.XOR<Prisma.quiz_team_sessionsCreateWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUncheckedCreateWithoutLive_poll_responsesInput>
+  where?: Prisma.quiz_team_sessionsWhereInput
+}
+
+export type quiz_team_sessionsUpdateToOneWithWhereWithoutLive_poll_responsesInput = {
+  where?: Prisma.quiz_team_sessionsWhereInput
+  data: Prisma.XOR<Prisma.quiz_team_sessionsUpdateWithoutLive_poll_responsesInput, Prisma.quiz_team_sessionsUncheckedUpdateWithoutLive_poll_responsesInput>
+}
+
+export type quiz_team_sessionsUpdateWithoutLive_poll_responsesInput = {
+  teamname?: Prisma.StringFieldUpdateOperationsInput | string
+  erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
+  team?: Prisma.teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
+  team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_team_sessionsNestedInput
+  answer_submissions?: Prisma.team_answer_submissionsUpdateManyWithoutQuiz_team_sessionNestedInput
+  stopped_pixel_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutStopped_by_team_sessionNestedInput
+}
+
+export type quiz_team_sessionsUncheckedUpdateWithoutLive_poll_responsesInput = {
+  quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  team_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teamname?: Prisma.StringFieldUpdateOperationsInput | string
+  erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
+  team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsNestedInput
+  answer_submissions?: Prisma.team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -866,6 +965,7 @@ export type quiz_team_sessionsUpdateWithoutQuizInput = {
   team?: Prisma.teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -877,6 +977,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutQuizInput = {
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -903,6 +1004,7 @@ export type quiz_team_sessionsUpdateWithoutTeamInput = {
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -914,6 +1016,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutTeamInput = {
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsNestedInput
   answer_submissions?: Prisma.team_answer_submissionsUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
+  live_poll_responses?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutQuiz_team_sessionNestedInput
   stopped_pixel_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionNestedInput
 }
 
@@ -933,12 +1036,14 @@ export type quiz_team_sessionsUncheckedUpdateManyWithoutTeamInput = {
 export type Quiz_team_sessionsCountOutputType = {
   team_antworten: number
   answer_submissions: number
+  live_poll_responses: number
   stopped_pixel_runs: number
 }
 
 export type Quiz_team_sessionsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   team_antworten?: boolean | Quiz_team_sessionsCountOutputTypeCountTeam_antwortenArgs
   answer_submissions?: boolean | Quiz_team_sessionsCountOutputTypeCountAnswer_submissionsArgs
+  live_poll_responses?: boolean | Quiz_team_sessionsCountOutputTypeCountLive_poll_responsesArgs
   stopped_pixel_runs?: boolean | Quiz_team_sessionsCountOutputTypeCountStopped_pixel_runsArgs
 }
 
@@ -969,6 +1074,13 @@ export type Quiz_team_sessionsCountOutputTypeCountAnswer_submissionsArgs<ExtArgs
 /**
  * Quiz_team_sessionsCountOutputType without action
  */
+export type Quiz_team_sessionsCountOutputTypeCountLive_poll_responsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.live_poll_responsesWhereInput
+}
+
+/**
+ * Quiz_team_sessionsCountOutputType without action
+ */
 export type Quiz_team_sessionsCountOutputTypeCountStopped_pixel_runsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.quiz_interaction_runsWhereInput
 }
@@ -985,6 +1097,7 @@ export type quiz_team_sessionsSelect<ExtArgs extends runtime.Types.Extensions.In
   team?: boolean | Prisma.teamsDefaultArgs<ExtArgs>
   team_antworten?: boolean | Prisma.quiz_team_sessions$team_antwortenArgs<ExtArgs>
   answer_submissions?: boolean | Prisma.quiz_team_sessions$answer_submissionsArgs<ExtArgs>
+  live_poll_responses?: boolean | Prisma.quiz_team_sessions$live_poll_responsesArgs<ExtArgs>
   stopped_pixel_runs?: boolean | Prisma.quiz_team_sessions$stopped_pixel_runsArgs<ExtArgs>
   _count?: boolean | Prisma.Quiz_team_sessionsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_team_sessions"]>
@@ -1026,6 +1139,7 @@ export type quiz_team_sessionsInclude<ExtArgs extends runtime.Types.Extensions.I
   team?: boolean | Prisma.teamsDefaultArgs<ExtArgs>
   team_antworten?: boolean | Prisma.quiz_team_sessions$team_antwortenArgs<ExtArgs>
   answer_submissions?: boolean | Prisma.quiz_team_sessions$answer_submissionsArgs<ExtArgs>
+  live_poll_responses?: boolean | Prisma.quiz_team_sessions$live_poll_responsesArgs<ExtArgs>
   stopped_pixel_runs?: boolean | Prisma.quiz_team_sessions$stopped_pixel_runsArgs<ExtArgs>
   _count?: boolean | Prisma.Quiz_team_sessionsCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1045,6 +1159,7 @@ export type $quiz_team_sessionsPayload<ExtArgs extends runtime.Types.Extensions.
     team: Prisma.$teamsPayload<ExtArgs>
     team_antworten: Prisma.$team_antwortenPayload<ExtArgs>[]
     answer_submissions: Prisma.$team_answer_submissionsPayload<ExtArgs>[]
+    live_poll_responses: Prisma.$live_poll_responsesPayload<ExtArgs>[]
     stopped_pixel_runs: Prisma.$quiz_interaction_runsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1452,6 +1567,7 @@ export interface Prisma__quiz_team_sessionsClient<T, Null = never, ExtArgs exten
   team<T extends Prisma.teamsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teamsDefaultArgs<ExtArgs>>): Prisma.Prisma__teamsClient<runtime.Types.Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   team_antworten<T extends Prisma.quiz_team_sessions$team_antwortenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_team_sessions$team_antwortenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   answer_submissions<T extends Prisma.quiz_team_sessions$answer_submissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_team_sessions$answer_submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_answer_submissionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  live_poll_responses<T extends Prisma.quiz_team_sessions$live_poll_responsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_team_sessions$live_poll_responsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$live_poll_responsesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stopped_pixel_runs<T extends Prisma.quiz_team_sessions$stopped_pixel_runsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_team_sessions$stopped_pixel_runsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_interaction_runsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1934,6 +2050,30 @@ export type quiz_team_sessions$answer_submissionsArgs<ExtArgs extends runtime.Ty
   take?: number
   skip?: number
   distinct?: Prisma.Team_answer_submissionsScalarFieldEnum | Prisma.Team_answer_submissionsScalarFieldEnum[]
+}
+
+/**
+ * quiz_team_sessions.live_poll_responses
+ */
+export type quiz_team_sessions$live_poll_responsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the live_poll_responses
+   */
+  select?: Prisma.live_poll_responsesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the live_poll_responses
+   */
+  omit?: Prisma.live_poll_responsesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.live_poll_responsesInclude<ExtArgs> | null
+  where?: Prisma.live_poll_responsesWhereInput
+  orderBy?: Prisma.live_poll_responsesOrderByWithRelationInput | Prisma.live_poll_responsesOrderByWithRelationInput[]
+  cursor?: Prisma.live_poll_responsesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Live_poll_responsesScalarFieldEnum | Prisma.Live_poll_responsesScalarFieldEnum[]
 }
 
 /**

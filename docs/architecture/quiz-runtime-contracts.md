@@ -427,6 +427,24 @@ steuern Sichtbarkeit, Freigaben und das Schließen der Antwortphase.
 | Testdatei | Geschützte Invariante |
 | --- | --- |
 | `app/quiz/liveResults/liveResultMode.test.ts` | Nur unterstützte Interaction-Typen können `LIVE` verwenden. |
+
+## Eigenständige Content-Umfragen
+
+`LIVE_POLL` ist ein nicht bewertetes `quiz_ablauf_elemente`-Element und ausdrücklich keine Quizfrage. Die Platzierung referenziert eine konkrete unveränderliche `live_poll_revision`; spätere redaktionelle Änderungen erzeugen eine neue Revision und verändern bestehende Quizabläufe nicht. Ein Präsentationsschlüssel `poll-placement:<id>` öffnet einen eigenen `quiz_interaction_runs`-Run mit einem `contentPoll`-Snapshot.
+
+```text
+Umfrage-Platzierung
+→ OPEN Content-Poll-Run
+→ Teams überschreiben ihre aktuelle Auswahl oder ihren Textbeitrag
+→ Audience erhält nur Aggregate bzw. freigegebene bereinigte Texte
+→ Moderation erhält Original, öffentliche Fassung und Teamidentität
+→ CLOSED
+→ nächstes Ablaufelement (keine Lösung, keine Bewertung, keine Punkte)
+```
+
+Auswahl erlaubt zwei bis sechs Optionen und genau eine wirksame Auswahl pro Team und Run. Freitext erlaubt einen wirksamen Beitrag pro Team und Run; Wiederholungen ersetzen ihn bis zum Schließen. `AUTOMATIC` veröffentlicht die bereinigte Fassung direkt, `MODERATED` erst nach serverseitiger Freigabe. Die öffentliche Wall ist auf die letzten 20 sichtbaren Beiträge begrenzt. Ranking-, Funny-, Evaluation- und Solution-Pfade lesen diese Tabellen nicht.
+
+Der Abruf nutzt die bestehenden autorisierten Live-Snapshot-Routen mit `no-store`. Für laufende Content-Umfragen beträgt der Takt 1,2 Sekunden in sichtbaren Tabs und 5 Sekunden in Hintergrund-Tabs; wiederholte Fehler führen zu exponentiellem Backoff bis 15 Sekunden. Die Darstellung interpoliert Änderungen clientseitig und führt keine Datenbankabfrage pro Animationsframe aus.
 | `app/quiz/liveResults/liveChoiceResults.test.ts` | Effektive Abgaben werden neutral und submissionsbasiert aggregiert. |
 | `app/quiz/liveResults/liveTextResults.test.ts` | Öffentlich gelangen nur freigegebene, ersetzte Texte; Moderation behält Original und Identität. |
 | `app/quiz/liveResults/publicTextSanitizer.test.ts` | Groß-/Kleinschreibung, Leetspeak, Wiederholungen und Separatoren werden konservativ erkannt. |

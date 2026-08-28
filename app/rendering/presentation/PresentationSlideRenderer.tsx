@@ -62,6 +62,7 @@ import {
 } from "./presentationRankingPolicy";
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
+import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
 
 type ScoreEntry = {
   teamId?: number;
@@ -102,6 +103,7 @@ type PresentationSlideSharedDisplayState = {
   pixelState?: PixelLiveState | null;
   pollState?: PollLiveState | null;
   liveResultState?: LiveChoiceResultState | LiveTextResultState | null;
+  livePollState?: LivePollAudienceState | null;
   funnyAnswers?: FunnyAnswerEntry[];
   teamJoinState?: {
     teams: {
@@ -272,6 +274,7 @@ export default function PresentationSlideRenderer({
     pixelState = null,
     pollState = null,
     liveResultState = null,
+    livePollState = null,
     funnyAnswers = [],
     teamJoinState = null,
   } = displayState;
@@ -2334,6 +2337,16 @@ function renderFlowPauseSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
 function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
   const { config, type } = slide.element;
   const activeRules = config.rules?.filter((rule) => rule.enabled) ?? [];
+
+  if (type === "LIVE_POLL") {
+    const poll = livePollState;
+    return <section className="presentation-flow-slide presentation-live-poll" data-flow-type="LIVE_POLL" data-poll-type={poll?.type ?? slide.element.livePoll?.type}>
+      <p className="presentation-flow-kicker">Live-Umfrage</p>
+      <h2>{poll?.prompt ?? slide.element.livePoll?.prompt ?? "Umfrage"}</h2>
+      {!poll ? <div className="presentation-flow-message">Die Umfrage wird vorbereitet …</div> : poll.type === "SINGLE_CHOICE" ? <div className="presentation-live-poll-bars">{poll.options.map((option) => <article key={option.id}><div className="presentation-live-poll-label"><strong>{option.label}</strong><span>{option.count} · {option.share.toLocaleString("de-DE")} %</span></div><div className="presentation-live-poll-track"><i style={{ width: `${option.share}%` }} /></div></article>)}</div> : poll.publicResponses.length ? <div className="presentation-live-poll-wall" data-count={Math.min(poll.publicResponses.length, 20)}>{poll.publicResponses.map((response) => <article key={response.id}>{response.publicText}</article>)}</div> : <div className="presentation-flow-message">Die ersten Beiträge erscheinen gleich.</div>}
+      {poll ? <p className="presentation-live-poll-total">{poll.totalResponses} {poll.totalResponses === 1 ? "Antwort" : "Antworten"}{poll.state === "CLOSED" ? " · geschlossen" : " · live"}</p> : null}
+    </section>;
+  }
 
   if (type === "WAITING") return renderAnkommenSlide();
   if (type === "START_SEQUENCE") return renderStartsequenzSlide();

@@ -416,6 +416,74 @@ export type EnumStoryElementScopeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumStoryElementScopeFilter<$PrismaModel>
 }
 
+export type EnumLivePollStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollStatus | Prisma.EnumLivePollStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollStatusFilter<$PrismaModel> | $Enums.LivePollStatus
+}
+
+export type EnumLivePollScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollScope | Prisma.EnumLivePollScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollScopeFilter<$PrismaModel> | $Enums.LivePollScope
+}
+
+export type EnumLivePollStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollStatus | Prisma.EnumLivePollStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollStatusWithAggregatesFilter<$PrismaModel> | $Enums.LivePollStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollStatusFilter<$PrismaModel>
+}
+
+export type EnumLivePollScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollScope | Prisma.EnumLivePollScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollScopeWithAggregatesFilter<$PrismaModel> | $Enums.LivePollScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollScopeFilter<$PrismaModel>
+}
+
+export type EnumLivePollTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollType | Prisma.EnumLivePollTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollTypeFilter<$PrismaModel> | $Enums.LivePollType
+}
+
+export type EnumLivePollPublicationModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollPublicationMode | Prisma.EnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollPublicationModeFilter<$PrismaModel> | $Enums.LivePollPublicationMode
+}
+
+export type EnumLivePollTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollType | Prisma.EnumLivePollTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollTypeWithAggregatesFilter<$PrismaModel> | $Enums.LivePollType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollTypeFilter<$PrismaModel>
+}
+
+export type EnumLivePollPublicationModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollPublicationMode | Prisma.EnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollPublicationModeWithAggregatesFilter<$PrismaModel> | $Enums.LivePollPublicationMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollPublicationModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollPublicationModeFilter<$PrismaModel>
+}
+
 export type EnumStoryQuestionRelationshipFilter<$PrismaModel = never> = {
   equals?: $Enums.StoryQuestionRelationship | Prisma.EnumStoryQuestionRelationshipFieldRefInput<$PrismaModel>
   in?: $Enums.StoryQuestionRelationship[] | Prisma.ListEnumStoryQuestionRelationshipFieldRefInput<$PrismaModel>
@@ -1023,6 +1091,74 @@ export type NestedEnumStoryElementScopeWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStoryElementScopeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStoryElementScopeFilter<$PrismaModel>
+}
+
+export type NestedEnumLivePollStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollStatus | Prisma.EnumLivePollStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollStatusFilter<$PrismaModel> | $Enums.LivePollStatus
+}
+
+export type NestedEnumLivePollScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollScope | Prisma.EnumLivePollScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollScopeFilter<$PrismaModel> | $Enums.LivePollScope
+}
+
+export type NestedEnumLivePollStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollStatus | Prisma.EnumLivePollStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollStatus[] | Prisma.ListEnumLivePollStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollStatusWithAggregatesFilter<$PrismaModel> | $Enums.LivePollStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumLivePollScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollScope | Prisma.EnumLivePollScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollScope[] | Prisma.ListEnumLivePollScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollScopeWithAggregatesFilter<$PrismaModel> | $Enums.LivePollScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollScopeFilter<$PrismaModel>
+}
+
+export type NestedEnumLivePollTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollType | Prisma.EnumLivePollTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollTypeFilter<$PrismaModel> | $Enums.LivePollType
+}
+
+export type NestedEnumLivePollPublicationModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollPublicationMode | Prisma.EnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollPublicationModeFilter<$PrismaModel> | $Enums.LivePollPublicationMode
+}
+
+export type NestedEnumLivePollTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollType | Prisma.EnumLivePollTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollType[] | Prisma.ListEnumLivePollTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollTypeWithAggregatesFilter<$PrismaModel> | $Enums.LivePollType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumLivePollPublicationModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LivePollPublicationMode | Prisma.EnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  in?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LivePollPublicationMode[] | Prisma.ListEnumLivePollPublicationModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLivePollPublicationModeWithAggregatesFilter<$PrismaModel> | $Enums.LivePollPublicationMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLivePollPublicationModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLivePollPublicationModeFilter<$PrismaModel>
 }
 
 export type NestedEnumStoryQuestionRelationshipFilter<$PrismaModel = never> = {
