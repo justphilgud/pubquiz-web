@@ -24,6 +24,11 @@ test("presentation data resolves question and solution layouts centrally", () =>
   assert.match(actionsSource, /phase: "SOLUTION"/);
   assert.match(actionsSource, /presentationLayouts:/);
   assert.match(actionsSource, /slotKey: medium\.slot_key/);
+  assert.equal(
+    actionsSource.match(/structuredFieldLabels: eintrag\.fragen\.antwortfelder\.map/g)?.length,
+    2,
+    "Moderations- und Präsentations-View-Model müssen die strukturierten Feldnamen weiterreichen.",
+  );
 });
 
 test("the shared renderer consumes the resolved layouts for both phases", () => {

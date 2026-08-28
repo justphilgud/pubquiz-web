@@ -1998,6 +1998,9 @@ export async function getQuizPraesentation(
         questionText: eintrag.fragen.frage,
         answerOptionCount: eintrag.fragen.antworten.length,
         structuredFieldCount: eintrag.fragen.antwortfelder.length,
+        structuredFieldLabels: eintrag.fragen.antwortfelder.map(
+          (feld) => feld.label,
+        ),
         media: presentationMedia,
         templateData: templateConfig?.templateData,
       };
