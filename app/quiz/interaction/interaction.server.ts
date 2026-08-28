@@ -1381,8 +1381,21 @@ export async function getQuizLiveSnapshotData(
               },
               orderBy: { quiz_team_session_id: "asc" },
               select: {
+                team_antwort_id: true,
                 interaction_run_id: true,
                 quiz_team_session_id: true,
+                antwort_text: true,
+                antwort_id: true,
+                draft_revision: true,
+                antwortauswahlen: { select: { antwort_id: true } },
+                antwortfelder: { select: { antwortfeld_id: true, antwort_text: true } },
+                quiz_team_sessions: {
+                  select: {
+                    team_id: true,
+                    teamname: true,
+                    team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
+                  },
+                },
                 submissions: {
                   orderBy: [
                     { submission_version: "desc" },
@@ -1392,6 +1405,7 @@ export async function getQuizLiveSnapshotData(
                     team_answer_submission_id: true,
                     interaction_run_id: true,
                     submission_version: true,
+                    draft_revision: true,
                     payload: true,
                     live_text_publication: { select: { is_visible: true } },
                     quiz_team_session: {
@@ -1438,6 +1452,36 @@ export async function getQuizLiveSnapshotData(
     : [];
   const exposedLivePayloads = includeLiveResultAggregates
     ? latestLivePayloads
+    : [];
+  const liveModerationResponses = run && interaction && options.includeLiveModeration === true
+    ? liveAnswers.flatMap((draft) => {
+        const validated = validateInteractionPayload(
+          interaction,
+          draftInputFromStored(draft),
+        );
+        if (!validated.hasContent) return [];
+        const latestSubmission = latestLiveSubmissions.find(
+          (submission) => submission.quiz_team_session.team_id === draft.quiz_team_sessions.team_id,
+        );
+        const isFinal = latestSubmission?.draft_revision === draft.draft_revision;
+        return [{
+          responseKey: isFinal && latestSubmission
+            ? `submission:${latestSubmission.team_answer_submission_id}`
+            : `draft:${draft.team_antwort_id}:${draft.draft_revision}`,
+          submissionId: isFinal && latestSubmission
+            ? latestSubmission.team_answer_submission_id
+            : null,
+          teamId: draft.quiz_team_sessions.team_id,
+          teamName: draft.quiz_team_sessions.teamname,
+          avatarCode: mapTeamProfile(draft.quiz_team_sessions.team).avatarCode,
+          photoUrl: draft.quiz_team_sessions.team.foto_url,
+          payload: validated.payload,
+          status: isFinal ? "FINAL" as const : "DRAFT" as const,
+          isVisible: isFinal
+            ? latestSubmission?.live_text_publication?.is_visible === true
+            : false,
+        }];
+      })
     : [];
   const answer = run && quizTeamSessionId
     ? await prisma.team_antworten.findFirst({
@@ -1610,6 +1654,24 @@ export async function getQuizLiveSnapshotData(
             state: run.state,
             totalTeams: teamCount,
             payloads: exposedLivePayloads,
+            moderationResponses: options.includeLiveModeration === true
+              ? liveModerationResponses.map((response) => {
+                  const payload = response.payload;
+                  const selectedIds = "optionId" in payload
+                    ? payload.optionId === null ? [] : [payload.optionId]
+                    : "optionIds" in payload
+                      ? payload.optionIds
+                      : [];
+                  const labels = "value" in payload && typeof payload.value === "number"
+                    ? [payload.value.toLocaleString("de-DE")]
+                    : "options" in liveChoiceInteraction
+                      ? liveChoiceInteraction.options
+                          .filter((option) => selectedIds.includes(option.id))
+                          .map((option) => option.label)
+                      : [];
+                  return { ...response, labels };
+                })
+              : undefined,
           })
         : run && liveTextInteraction
           ? aggregateLiveTextResults({
@@ -1622,6 +1684,20 @@ export async function getQuizLiveSnapshotData(
                 replacement: rule.replacement,
               })),
               includeModeration: options.includeLiveModeration === true,
+              moderationResponses: liveModerationResponses.flatMap((response) => {
+                if (!("text" in response.payload) || !response.payload.text.trim()) return [];
+                return [{
+                  responseKey: response.responseKey,
+                  submissionId: response.submissionId,
+                  teamId: response.teamId,
+                  teamName: response.teamName,
+                  avatarCode: response.avatarCode,
+                  photoUrl: response.photoUrl,
+                  originalText: response.payload.text,
+                  isVisible: response.isVisible,
+                  status: response.status,
+                }];
+              }),
               submissions: exposedLiveSubmissions.flatMap((submission) => {
                 const payload = submission.payload as QuizInteractionPayload;
                 if (!("text" in payload) || !payload.text.trim()) return [];

@@ -829,7 +829,7 @@ export default function ModerationClient({
               ...liveResultState.publicResponses.filter((entry) => entry.submissionId !== submissionId),
               ...liveResultState.moderationResponses
                 ?.filter((entry) => entry.submissionId === submissionId)
-                .map(({ submissionId: id, publicText }) => ({ submissionId: id, publicText })) ?? [],
+                .flatMap(({ submissionId: id, publicText }) => id === null ? [] : [{ submissionId: id, publicText }]) ?? [],
             ]
           : liveResultState.publicResponses.filter((entry) => entry.submissionId !== submissionId),
       });
@@ -1003,7 +1003,25 @@ export default function ModerationClient({
                   </summary>
                   <p className="mt-1 text-xs text-zinc-400">Nur in der Moderation sichtbar, nicht auf der Präsentationsfolie.</p>
                   {liveResultState.kind === "CHOICE" && (
-                    <div className="mt-3 grid gap-2">
+                    <div className="mt-3 grid gap-3">
+                      {liveResultState.moderationResponses?.map((response) => (
+                        <article key={response.responseKey} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3 text-sm">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <TeamIdentityVisual name={response.teamName} photoUrl={response.photoUrl} avatarCode={response.avatarCode} className="h-9 w-9" />
+                              <strong className="truncate">{response.teamName}</strong>
+                            </div>
+                            <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-semibold ${response.status === "FINAL" ? "bg-emerald-950 text-emerald-200" : "bg-amber-950 text-amber-200"}`}>
+                              {response.status === "FINAL" ? "Final" : "Entwurf"}
+                            </span>
+                          </div>
+                          <p className="mt-2 break-words">{response.labels.join(", ")}</p>
+                        </article>
+                      ))}
+                      {(liveResultState.moderationResponses?.length ?? 0) === 0 && (
+                        <p className="rounded-xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-300">Noch keine gespeicherten Antworten eingegangen.</p>
+                      )}
+                      <div className="mt-1 grid gap-2 border-t border-zinc-700 pt-3">
                       {liveResultState.options.map((entry) => (
                         <div key={entry.id} className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-sm">
                           <span className="truncate">{entry.label}</span>
@@ -1016,6 +1034,7 @@ export default function ModerationClient({
                           <strong>{entry.count} · {entry.share.toLocaleString("de-DE", { maximumFractionDigits: 1 })} %</strong>
                         </div>
                       ))}
+                      </div>
                     </div>
                   )}
                   {liveResultState.kind === "TEXT" && (
@@ -1027,14 +1046,14 @@ export default function ModerationClient({
                     )}
                     <div className="grid gap-3 md:grid-cols-2">
                       {liveResultState.moderationResponses?.map((response) => (
-                        <article key={response.submissionId} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3">
+                        <article key={response.responseKey} className="rounded-xl border border-zinc-700 bg-zinc-900/80 p-3">
                           <div className="flex items-center justify-between gap-3">
                             <div className="flex min-w-0 items-center gap-2">
                               <TeamIdentityVisual name={response.teamName} photoUrl={response.photoUrl} avatarCode={response.avatarCode} className="h-9 w-9" />
                               <strong className="truncate">{response.teamName}</strong>
                             </div>
-                            <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-semibold ${response.isVisible ? "bg-emerald-950 text-emerald-200" : "bg-zinc-800 text-zinc-300"}`}>
-                              {response.isVisible ? "öffentlich" : "nicht freigegeben"}
+                            <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-semibold ${response.status === "FINAL" ? "bg-emerald-950 text-emerald-200" : "bg-amber-950 text-amber-200"}`}>
+                              {response.status === "FINAL" ? "Final" : "Entwurf"}
                             </span>
                           </div>
                           <dl className="mt-3 grid gap-2 text-sm">
@@ -1056,14 +1075,18 @@ export default function ModerationClient({
                               </dd>
                             </div>
                           </dl>
-                          <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveTextPublication(response.submissionId, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold disabled:opacity-50">
-                            {response.isVisible ? "Freigabe zurücknehmen" : "Für Publikum freigeben"}
-                          </button>
+                          {response.submissionId !== null ? (
+                            <button type="button" disabled={liveResultPending} onClick={() => void toggleLiveTextPublication(response.submissionId!, !response.isVisible)} className="mt-3 min-h-10 rounded-lg border border-zinc-600 px-3 py-1.5 text-sm font-bold disabled:opacity-50">
+                              {response.isVisible ? "Freigabe zurücknehmen" : "Für Publikum freigeben"}
+                            </button>
+                          ) : (
+                            <p className="mt-3 text-xs text-zinc-400">Entwürfe können erst nach der Finalisierung veröffentlicht werden.</p>
+                          )}
                         </article>
                       ))}
                       {(liveResultState.moderationResponses?.length ?? 0) === 0 && (
                         <p className="rounded-xl border border-dashed border-zinc-700 p-4 text-sm text-zinc-300 md:col-span-2">
-                          Noch keine finalen Freitextantworten eingegangen.
+                          Noch keine gespeicherten Freitextantworten eingegangen.
                         </p>
                       )}
                     </div>

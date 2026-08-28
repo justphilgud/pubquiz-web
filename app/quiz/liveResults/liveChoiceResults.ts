@@ -18,6 +18,15 @@ export type LiveChoiceResultState = {
     values: Array<{ value: number; count: number; share: number }>;
     average: number | null;
   } | null;
+  moderationResponses?: Array<{
+    responseKey: string;
+    teamId: number;
+    teamName: string;
+    avatarCode: import("@/app/teams/teamProfile").TeamAvatarCode;
+    photoUrl: string | null;
+    labels: string[];
+    status: "DRAFT" | "FINAL";
+  }>;
 };
 
 export function isLiveChoiceInteraction(
@@ -38,6 +47,7 @@ export function aggregateLiveChoiceResults(input: {
   state: QuizInteractionState;
   totalTeams: number;
   payloads: readonly QuizInteractionPayload[];
+  moderationResponses?: LiveChoiceResultState["moderationResponses"];
 }): LiveChoiceResultState {
   const finalAnswers = input.payloads.length;
   if (input.interaction.type === "POLL_SCALE") {
@@ -60,6 +70,7 @@ export function aggregateLiveChoiceResults(input: {
           ? values.reduce((sum, value) => sum + value, 0) / values.length
           : null,
       },
+      ...(input.moderationResponses ? { moderationResponses: input.moderationResponses } : {}),
     };
   }
 
@@ -79,5 +90,6 @@ export function aggregateLiveChoiceResults(input: {
       return { ...option, count, share: share(count, finalAnswers) };
     }),
     scale: null,
+    ...(input.moderationResponses ? { moderationResponses: input.moderationResponses } : {}),
   };
 }

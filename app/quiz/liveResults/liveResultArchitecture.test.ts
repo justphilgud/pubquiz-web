@@ -40,6 +40,11 @@ test("productive moderation requests private text data and exposes publish and h
   assert.match(moderation, /Ersetzung angewendet/);
   assert.match(moderation, /Für Publikum freigeben/);
   assert.match(moderation, /Freigabe zurücknehmen/);
+  assert.match(moderation, /Entwurf/);
+  assert.match(moderation, /Final/);
+  assert.match(moderation, /Entwürfe können erst nach der Finalisierung veröffentlicht werden/);
+  assert.match(interactionServer, /draftInputFromStored\(draft\)/);
+  assert.match(interactionServer, /latestSubmission\?\.draft_revision === draft\.draft_revision/);
 });
 
 test("live-result reveal is server-confirmed and only offered after close", () => {
@@ -63,6 +68,8 @@ test("live-result reveal is server-confirmed and only offered after close", () =
   assert.doesNotMatch(moderation, /Aktuelle Verteilung zeigen/);
   assert.match(interactionServer, /isLiveResultVisibleToAudience/);
   assert.match(interactionServer, /canIncludeLiveResultAggregates/);
+  assert.match(interactionServer, /options\.includeLiveModeration === true/);
+  assert.match(interactionServer, /moderationResponses: options\.includeLiveModeration === true/);
 });
 
 test("replacement CRUD is admin-only and public rendering has no team identity", () => {

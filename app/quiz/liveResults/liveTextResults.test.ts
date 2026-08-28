@@ -20,3 +20,32 @@ test("moderation state preserves identity, original and sanitized diff", () => {
   assert.equal(state.moderationResponses?.[0]?.publicText, "Sonnenblume");
   assert.equal(state.moderationResponses?.[0]?.changed, true);
 });
+
+test("moderation sees the latest persisted draft without exposing it to the audience", () => {
+  const state = aggregateLiveTextResults({
+    visible: false,
+    state: "OPEN",
+    totalTeams: 1,
+    submissions: [],
+    moderationResponses: [{
+      responseKey: "draft:9:2",
+      submissionId: null,
+      teamId: 2,
+      teamName: "Team A",
+      avatarCode: "toaster",
+      photoUrl: null,
+      originalText: "Bremen",
+      isVisible: false,
+      status: "DRAFT",
+    }],
+    rules: [],
+    includeModeration: true,
+  });
+
+  assert.equal(state.finalAnswers, 0);
+  assert.deepEqual(state.publicResponses, []);
+  assert.deepEqual(state.moderationResponses?.map(({ originalText, status }) => ({ originalText, status })), [
+    { originalText: "Bremen", status: "DRAFT" },
+  ]);
+  assert.equal(state.moderationResponses?.some((response) => response.originalText === "Hamburg"), false);
+});

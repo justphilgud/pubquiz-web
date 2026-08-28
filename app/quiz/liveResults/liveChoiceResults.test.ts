@@ -96,3 +96,28 @@ test("poll multi and poll scale aggregate effective team payloads", () => {
   assert.deepEqual(scale.scale?.values.map(({ count }) => count), [1, 0, 2]);
   assert.equal(scale.scale?.average, 7 / 3);
 });
+
+test("choice drafts are moderator-only and remain distinct from final aggregates", () => {
+  const result = aggregateLiveChoiceResults({
+    interaction: { type: "SINGLE_CHOICE", selectionMode: "SINGLE", options: [{ id: 1, label: "A" }, { id: 2, label: "C" }] },
+    visible: false,
+    state: "OPEN",
+    totalTeams: 2,
+    payloads: [],
+    moderationResponses: [{
+      responseKey: "draft:7:3",
+      teamId: 4,
+      teamName: "Team B",
+      avatarCode: "wecker",
+      photoUrl: null,
+      labels: ["C"],
+      status: "DRAFT",
+    }],
+  });
+
+  assert.equal(result.finalAnswers, 0);
+  assert.deepEqual(result.options.map((option) => option.count), [0, 0]);
+  assert.deepEqual(result.moderationResponses?.map(({ labels, status }) => ({ labels, status })), [
+    { labels: ["C"], status: "DRAFT" },
+  ]);
+});
