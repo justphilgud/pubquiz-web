@@ -56,7 +56,10 @@ test("live-result reveal is server-confirmed and only offered after close", () =
   assert.match(moderation, /role="alert"/);
   assert.match(moderation, /Antwortphase schließen/);
   assert.match(moderation, /Ergebnis anzeigen/);
-  assert.match(moderation, /Antworten ansehen/);
+  assert.match(moderation, /Quiz-Live-Ergebnis/);
+  assert.match(moderation, /Antworten ansehen \(intern\)/);
+  assert.match(moderation, /Antwortphase schließen/);
+  assert.match(moderation, /Ergebnis anzeigen/);
   assert.doesNotMatch(moderation, /Aktuelle Verteilung zeigen/);
   assert.match(interactionServer, /isLiveResultVisibleToAudience/);
   assert.match(interactionServer, /canIncludeLiveResultAggregates/);

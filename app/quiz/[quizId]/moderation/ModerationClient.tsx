@@ -919,7 +919,7 @@ export default function ModerationClient({
               <section className="rounded-2xl border border-cyan-500/50 bg-cyan-950/30 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h2 className="font-bold">Live-Ergebnis</h2>
+                    <h2 className="font-bold">Quiz-Live-Ergebnis</h2>
                     <p className="text-sm text-zinc-300">{liveResultState.finalAnswers} / {liveResultState.totalTeams} Teams haben geantwortet · {liveResultState.state === "OPEN" || liveResultState.state === "COUNTDOWN" ? "Antwortphase offen" : "Antwortphase geschlossen"}</p>
                     <p className="mt-1 text-xs text-cyan-100">
                       Publikumsansicht: {liveResultState.visible ? "Ergebnis" : "Frage"}
@@ -958,7 +958,7 @@ export default function ModerationClient({
                 )}
                 <details className="mt-4 rounded-xl border border-zinc-700 bg-zinc-950/35 p-3">
                   <summary className="min-h-10 cursor-pointer select-none font-bold text-cyan-100">
-                    Antworten ansehen
+                    Antworten ansehen (intern)
                   </summary>
                   <p className="mt-1 text-xs text-zinc-400">Nur in der Moderation sichtbar, nicht auf der Präsentationsfolie.</p>
                   {liveResultState.kind === "CHOICE" && (
