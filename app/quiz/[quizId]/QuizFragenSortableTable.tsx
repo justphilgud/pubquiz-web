@@ -42,6 +42,7 @@ import {
   moveStandaloneLivePollToSection,
   moveStandaloneStoryElementToSection,
   removeStandaloneLivePollFromQuiz,
+  updateQuizEditorElementSequence,
   updateQuizStoryPlacementOverride,
 } from "./quizStructureActions";
 import {
@@ -55,6 +56,10 @@ import {
   type LivePollStatus,
   type LivePollType,
 } from "@/app/umfragen/livePoll";
+import QuizEditorElementCard from "./QuizEditorElementCard";
+import {
+  buildQuizEditorElements,
+} from "./quizEditorElement";
 
 type Abschnitt = {
   quiz_abschnitt_id: number;
@@ -173,82 +178,71 @@ function FixedSlidesCard({
   );
 }
 
-function StandaloneStoryItem({ story, containerId }: {
+function StandaloneStoryItem({ story, containerId, displayIndex }: {
   story: QuizStandaloneStory;
   containerId: string;
+  displayIndex: number;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `story-${story.placementId}`,
     data: { type: "story", containerId },
   });
+  const href = `/story-elemente/${story.storyElementId}`;
   return (
-    <article
-      ref={setNodeRef}
+    <QuizEditorElementCard
+      cardRef={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-start gap-2 rounded-xl border bg-white p-3 shadow-sm ${isDragging ? "border-emerald-300 opacity-80 shadow-lg" : "border-slate-200"}`}
-    >
-      <button
-        type="button"
-        className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-lg text-lg font-semibold text-slate-400 hover:bg-slate-100 hover:text-slate-800 active:cursor-grabbing"
-        title="Story-Element zum Sortieren ziehen"
-        aria-label={`${story.title} zum Sortieren ziehen`}
-        {...attributes}
-        {...listeners}
-      >
-        ⠿
-      </button>
-      <div className="min-w-0 flex-1">
-        <strong className="block break-words text-sm text-slate-900">{story.title}</strong>
-        <div className="mt-1 flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
+      isDragging={isDragging}
+      kind="STORY"
+      title={story.title}
+      displayIndex={displayIndex}
+      dragAttributes={attributes}
+      dragListeners={listeners}
+      dragLabel={`${story.title} zum Sortieren ziehen`}
+      metadata={<>
           <span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-800">Story-Element</span>
           <span>{getStoryElementTypeLabel(story.type)}</span>
           {story.quiz_abschnitt_id === null && <span className="text-amber-700">Nicht zugeordnet</span>}
-        </div>
-      </div>
-    </article>
+        </>}
+      configureAction={<a href={href} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">Konfigurieren</a>}
+      previewAction={<a href={href} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">Vorschau</a>}
+    />
   );
 }
 
-function StandalonePollItem({ poll, containerId, onRemove }: {
+function StandalonePollItem({ poll, containerId, displayIndex, onRemove }: {
   poll: QuizStandalonePoll;
   containerId: string;
+  displayIndex: number;
   onRemove: (placementId: number) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `poll-${poll.placementId}`,
     data: { type: "poll", containerId },
   });
+  const href = `/content/polls/${poll.pollId}`;
   return (
-    <article
-      ref={setNodeRef}
+    <QuizEditorElementCard
+      cardRef={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-start gap-2 rounded-xl border bg-white p-3 shadow-sm ${isDragging ? "border-violet-300 opacity-80 shadow-lg" : "border-slate-200"}`}
-    >
-      <button
-        type="button"
-        className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-lg text-lg font-semibold text-slate-400 hover:bg-slate-100 hover:text-slate-800 active:cursor-grabbing"
-        title="Umfrage zum Sortieren ziehen"
-        aria-label={`${poll.title} zum Sortieren ziehen`}
-        {...attributes}
-        {...listeners}
-      >
-        ⠿
-      </button>
-      <div className="min-w-0 flex-1">
-        <strong className="block break-words text-sm text-slate-900">{poll.title}</strong>
-        <div className="mt-1 flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
+      isDragging={isDragging}
+      kind="POLL"
+      title={poll.title}
+      displayIndex={displayIndex}
+      dragAttributes={attributes}
+      dragListeners={listeners}
+      dragLabel={`${poll.title} zum Sortieren ziehen`}
+      metadata={<>
           <span className="rounded-full bg-violet-50 px-2 py-1 text-violet-800">Umfrage</span>
           <span>{getLivePollTypeLabel(poll.type)}</span>
           <span>{poll.publicationMode === "AUTOMATIC" ? "Automatisch" : "Moderiert"}</span>
           <span>{poll.status === "ACTIVE" ? "Freigegeben" : poll.status === "ARCHIVED" ? "Archiviert" : "Entwurf"}</span>
           {poll.quiz_abschnitt_id === null && <span className="text-amber-700">Nicht zugeordnet</span>}
-        </div>
-      </div>
-      <div className="flex shrink-0 flex-wrap gap-2">
-        <a href={`/content/polls/${poll.pollId}`} className="inline-flex min-h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700">Öffnen</a>
-        <button type="button" onClick={() => onRemove(poll.placementId)} className="min-h-9 rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-700">Aus Quiz entfernen</button>
-      </div>
-    </article>
+        </>}
+      configureAction={<a href={href} className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">Konfigurieren</a>}
+      previewAction={<a href={href} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">Vorschau</a>}
+      overflowAction={<button type="button" onClick={() => onRemove(poll.placementId)} className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 font-medium text-red-700 shadow-sm transition hover:bg-red-100">Aus Quiz entfernen</button>}
+    />
   );
 }
 
@@ -301,6 +295,11 @@ function DroppableBlock({
   const [isRenaming, setIsRenaming] = useState(false);
   const [draftTitle, setDraftTitle] = useState(gruppe.titel);
   const istFragenrunde = gruppe.blockTyp === "fragenblock";
+  const editorElements = buildQuizEditorElements({
+    questions: gruppe.fragen,
+    stories: gruppe.stories,
+    polls: gruppe.polls,
+  });
   const {
     attributes,
     listeners,
@@ -510,11 +509,7 @@ function DroppableBlock({
             </form>
           )}
           <SortableContext
-            items={[
-              ...gruppe.fragen.map((frage) => frage.quiz_fragen_id),
-              ...gruppe.stories.map((story) => `story-${story.placementId}`),
-              ...gruppe.polls.map((poll) => `poll-${poll.placementId}`),
-            ]}
+            items={editorElements.map((element) => element.key)}
             strategy={verticalListSortingStrategy}
           >
             {gruppe.blockTyp === "intro" ? (
@@ -543,34 +538,35 @@ function DroppableBlock({
                   Frage hier ablegen
                 </div>
               ) : null
-            ) : (<>
-              {gruppe.fragen.map((frage, index) => (
-                <QuizQuestionItem
-                  key={frage.quiz_fragen_id}
-                  frage={frage}
-                  index={index}
+            ) : editorElements.map((element, index) => {
+              const displayIndex = index + 1;
+              if (element.kind === "QUESTION") {
+                return <QuizQuestionItem
+                  key={element.key}
+                  frage={element.question}
+                  displayIndex={displayIndex}
                   quizId={quizId}
                   containerId={gruppe.containerId}
                   settingsActions={settingsActions}
                   onRemove={onRemove}
-                />
-              ))}
-              {gruppe.stories.map((story) => (
-                <StandaloneStoryItem
-                  key={story.placementId}
-                  story={story}
+                />;
+              }
+              if (element.kind === "STORY") {
+                return <StandaloneStoryItem
+                  key={element.key}
+                  story={element.story}
                   containerId={gruppe.containerId}
-                />
-              ))}
-              {gruppe.polls.map((poll) => (
-                <StandalonePollItem
-                  key={poll.placementId}
-                  poll={poll}
-                  containerId={gruppe.containerId}
-                  onRemove={onRemovePoll}
-                />
-              ))}
-            </>)}
+                  displayIndex={displayIndex}
+                />;
+              }
+              return <StandalonePollItem
+                key={element.key}
+                poll={element.poll}
+                containerId={gruppe.containerId}
+                displayIndex={displayIndex}
+                onRemove={onRemovePoll}
+              />;
+            })}
           </SortableContext>
         </div>
       )}
@@ -770,14 +766,20 @@ export default function QuizFragenSortableTable({
       return;
     }
 
-    const activeId = Number(active.id);
+    const activeId = String(active.id).startsWith("question-")
+      ? Number(String(active.id).slice("question-".length))
+      : Number.NaN;
     const activeItem = findItem(activeId);
     if (!activeItem) {
       return;
     }
 
-    const overItem =
-      typeof over.id === "number" ? findItem(Number(over.id)) : undefined;
+    const overQuestionId = String(over.id).startsWith("question-")
+      ? Number(String(over.id).slice("question-".length))
+      : null;
+    const overItem = overQuestionId === null
+      ? undefined
+      : findItem(overQuestionId);
     const zielContainerId = overItem
       ? getContainerId(overItem.quiz_abschnitt_id)
       : typeof over.data.current?.containerId === "string"
@@ -815,9 +817,12 @@ export default function QuizFragenSortableTable({
         return;
       }
 
-      const overFrage = items.find(
-        (item) => item.quiz_fragen_id === Number(over.id),
-      );
+      const overQuestionId = String(over.id).startsWith("question-")
+        ? Number(String(over.id).slice("question-".length))
+        : null;
+      const overFrage = overQuestionId === null
+        ? undefined
+        : items.find((item) => item.quiz_fragen_id === overQuestionId);
       const zielBlockId = overFrage
         ? getContainerId(overFrage.quiz_abschnitt_id)
         : typeof over.data.current?.containerId === "string"
@@ -859,94 +864,114 @@ export default function QuizFragenSortableTable({
       return;
     }
 
-    if (active.data.current?.type === "poll") {
-      if (!over) return;
-      const placementId = Number(String(active.id).replace("poll-", ""));
-      const zielContainerId = typeof over.data.current?.containerId === "string"
-        ? over.data.current.containerId
-        : String(over.id);
-      if (!zielContainerId.startsWith("block-")) return;
-      const sectionId = getAbschnittIdFromContainer(zielContainerId);
-      const result = await moveStandaloneLivePollToSection({
-        quizId,
-        placementId,
-        sectionId,
-      });
-      if (!result.success) {
-        setMeldung(result.message);
-        return;
-      }
-      setPollItems((current) => current.map((poll) =>
-        poll.placementId === placementId
-          ? { ...poll, quiz_abschnitt_id: sectionId }
-          : poll,
-      ));
-      setMeldung(sectionId === null
-        ? "Umfrage wurde unter Kein Block abgelegt."
-        : "Umfrage wurde dem Block zugeordnet.");
-      return;
-    }
+    if (!over) return;
 
-    if (active.data.current?.type === "story") {
-      if (!over) return;
-      const placementId = Number(String(active.id).replace("story-", ""));
-      const zielContainerId = typeof over.data.current?.containerId === "string"
-        ? over.data.current.containerId
-        : String(over.id);
-      if (!zielContainerId.startsWith("block-")) return;
-      const sectionId = getAbschnittIdFromContainer(zielContainerId);
+    const activeKey = String(active.id);
+    const zielContainerId = typeof over.data.current?.containerId === "string"
+      ? over.data.current.containerId
+      : String(over.id).startsWith("block-")
+        ? String(over.id)
+        : null;
+    if (!zielContainerId?.startsWith("block-")) return;
+    const sectionId = getAbschnittIdFromContainer(zielContainerId);
+    const activeQuestionId = activeKey.startsWith("question-")
+      ? Number(activeKey.slice("question-".length))
+      : null;
+    const activeStoryId = activeKey.startsWith("story-")
+      ? Number(activeKey.slice("story-".length))
+      : null;
+    const activePollId = activeKey.startsWith("poll-")
+      ? Number(activeKey.slice("poll-".length))
+      : null;
+
+    const nextQuestions = items.map((question) =>
+      question.quiz_fragen_id === activeQuestionId
+        ? { ...question, quiz_abschnitt_id: sectionId }
+        : question,
+    );
+    const nextStories = storyItems.map((story) =>
+      story.placementId === activeStoryId
+        ? { ...story, quiz_abschnitt_id: sectionId }
+        : story,
+    );
+    const nextPolls = pollItems.map((poll) =>
+      poll.placementId === activePollId
+        ? { ...poll, quiz_abschnitt_id: sectionId }
+        : poll,
+    );
+    let targetElements = buildQuizEditorElements({
+      questions: nextQuestions.filter((item) => item.quiz_abschnitt_id === sectionId),
+      stories: nextStories.filter((item) => item.quiz_abschnitt_id === sectionId),
+      polls: nextPolls.filter((item) => item.quiz_abschnitt_id === sectionId),
+    });
+    const oldIndex = targetElements.findIndex((element) => element.key === activeKey);
+    const overIndex = targetElements.findIndex((element) => element.key === String(over.id));
+    if (oldIndex >= 0 && overIndex >= 0 && oldIndex !== overIndex) {
+      targetElements = arrayMove(targetElements, oldIndex, overIndex);
+    } else if (oldIndex >= 0 && overIndex < 0) {
+      targetElements = [
+        ...targetElements.filter((element) => element.key !== activeKey),
+        targetElements[oldIndex],
+      ];
+    }
+    const orderByKey = new Map(
+      targetElements.map((element, index) => [element.key, (index + 1) * 1_000]),
+    );
+    const orderedQuestions = nextQuestions.map((question) => ({
+      ...question,
+      flowOrder: orderByKey.get(`question-${question.quiz_fragen_id}`) ?? question.flowOrder,
+    }));
+    const orderedStories = nextStories.map((story) => ({
+      ...story,
+      sortierung: orderByKey.get(`story-${story.placementId}`) ?? story.sortierung,
+    }));
+    const orderedPolls = nextPolls.map((poll) => ({
+      ...poll,
+      sortierung: orderByKey.get(`poll-${poll.placementId}`) ?? poll.sortierung,
+    }));
+
+    const sectionOrder = new Map(
+      fragenrundeBlocks.map((block, index) => [block.quiz_abschnitt_id, index]),
+    );
+    const questionItems = [...orderedQuestions]
+      .sort((left, right) =>
+        (sectionOrder.get(left.quiz_abschnitt_id ?? -1) ?? Number.MAX_SAFE_INTEGER) -
+          (sectionOrder.get(right.quiz_abschnitt_id ?? -1) ?? Number.MAX_SAFE_INTEGER) ||
+        left.flowOrder - right.flowOrder ||
+        left.quiz_fragen_id - right.quiz_fragen_id,
+      )
+      .map((question, index) => ({ ...question, sortierung: index + 1 }));
+
+    if (activeStoryId !== null) {
       const result = await moveStandaloneStoryElementToSection({
         quizId,
-        placementId,
+        placementId: activeStoryId,
         sectionId,
       });
-      if (!result.success) {
-        setMeldung(result.message);
-        return;
-      }
-      setStoryItems((current) => current.map((story) =>
-        story.placementId === placementId
-          ? { ...story, quiz_abschnitt_id: sectionId }
-          : story,
-      ));
-      setMeldung(sectionId === null
-        ? "Story-Element wurde unter Kein Block abgelegt."
-        : "Story-Element wurde dem Block zugeordnet.");
+      if (!result.success) return setMeldung(result.message);
+    } else if (activePollId !== null) {
+      const result = await moveStandaloneLivePollToSection({
+        quizId,
+        placementId: activePollId,
+        sectionId,
+      });
+      if (!result.success) return setMeldung(result.message);
+    } else if (activeQuestionId !== null) {
+      await saveBlockSortierung(questionItems);
+    } else {
       return;
     }
 
-    if (!over) {
-      return;
-    }
-
-    const activeId = Number(active.id);
-    const activeItem = findItem(activeId);
-    if (!activeItem) {
-      return;
-    }
-
-    const overItem =
-      typeof over.id === "number" ? findItem(Number(over.id)) : undefined;
-    let newItems = [...items];
-
-    if (overItem) {
-      const oldIndex = newItems.findIndex(
-        (item) => item.quiz_fragen_id === activeId,
-      );
-      const newIndex = newItems.findIndex(
-        (item) => item.quiz_fragen_id === overItem.quiz_fragen_id,
-      );
-      if (oldIndex >= 0 && newIndex >= 0) {
-        newItems = arrayMove(newItems, oldIndex, newIndex);
-      }
-    }
-
-    newItems = newItems.map((item, index) => ({
-      ...item,
-      sortierung: index + 1,
-    }));
-    setItems(newItems);
-    await saveBlockSortierung(newItems);
+    const sequenceResult = await updateQuizEditorElementSequence({
+      quizId,
+      sectionId,
+      itemKeys: targetElements.map((element) => element.key),
+    });
+    if (!sequenceResult.success) return setMeldung(sequenceResult.message);
+    setItems(questionItems);
+    setStoryItems(orderedStories);
+    setPollItems(orderedPolls);
+    setMeldung("Elementreihenfolge wurde gespeichert.");
   }
 
   async function handlePunkteModusChange(

@@ -731,6 +731,132 @@ export async function moveStandaloneLivePollToSection(data: {
   return { success: true };
 }
 
+function editorSequenceKey(item: {
+  typ: string;
+  quiz_ablauf_element_id: number;
+  quiz_fragen_id: number | null;
+  story_element_revision_id: number | null;
+  live_poll_revision_id: number | null;
+}) {
+  if (item.typ === "QUESTION" && item.quiz_fragen_id !== null) {
+    return `question-${item.quiz_fragen_id}`;
+  }
+  if (item.live_poll_revision_id !== null) {
+    return `poll-${item.quiz_ablauf_element_id}`;
+  }
+  if (item.story_element_revision_id !== null) {
+    return `story-${item.quiz_ablauf_element_id}`;
+  }
+  return null;
+}
+
+export async function updateQuizEditorElementSequence(data: {
+  quizId: number;
+  sectionId: number | null;
+  itemKeys: string[];
+}): Promise<FlowActionResult> {
+  await requireQuizEditor(data.quizId);
+  if (data.sectionId !== null) {
+    await requireQuizQuestionSection(data.quizId, data.sectionId);
+    await materializeQuizBlockQuestionItems(data.quizId, data.sectionId);
+  }
+
+  const questions = await prisma.quiz_fragen.findMany({
+    where: { quiz_id: data.quizId, quiz_abschnitt_id: data.sectionId },
+    select: { quiz_fragen_id: true },
+  });
+  if (data.sectionId === null) {
+    for (const question of questions) {
+      await prisma.quiz_ablauf_elemente.upsert({
+        where: {
+          quiz_id_typ_quiz_fragen_id: {
+            quiz_id: data.quizId,
+            typ: "QUESTION",
+            quiz_fragen_id: question.quiz_fragen_id,
+          },
+        },
+        create: {
+          quiz_id: data.quizId,
+          typ: "QUESTION",
+          anker_typ: "BEFORE_QUIZ",
+          anker_schluessel: "UNASSIGNED",
+          quiz_fragen_id: question.quiz_fragen_id,
+          sortierung: 0,
+          ist_sichtbar: false,
+          konfiguration: { version: 1 },
+          konfigurations_version: 1,
+          ist_standard: true,
+        },
+        update: {
+          anker_typ: "BEFORE_QUIZ",
+          anker_schluessel: "UNASSIGNED",
+          quiz_abschnitt_id: null,
+          ist_sichtbar: false,
+        },
+      });
+    }
+  }
+
+  const placements = await prisma.quiz_ablauf_elemente.findMany({
+    where: {
+      quiz_id: data.quizId,
+      quiz_abschnitt_id: data.sectionId,
+      OR: [
+        { typ: "QUESTION", quiz_fragen_id: { not: null } },
+        {
+          story_element_revision_id: { not: null },
+          story_bezugs_quiz_fragen_id: null,
+        },
+        { typ: "LIVE_POLL", live_poll_revision_id: { not: null } },
+      ],
+    },
+    select: {
+      quiz_ablauf_element_id: true,
+      typ: true,
+      quiz_fragen_id: true,
+      story_element_revision_id: true,
+      live_poll_revision_id: true,
+    },
+  });
+  const placementByKey = new Map(
+    placements.flatMap((item) => {
+      const key = editorSequenceKey(item);
+      return key ? [[key, item] as const] : [];
+    }),
+  );
+  if (
+    new Set(data.itemKeys).size !== data.itemKeys.length ||
+    data.itemKeys.length !== placementByKey.size ||
+    data.itemKeys.some((key) => !placementByKey.has(key))
+  ) {
+    return {
+      success: false,
+      message: "Die Elementreihenfolge ist unvollständig oder ungültig.",
+    };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    for (const [index, key] of data.itemKeys.entries()) {
+      await tx.quiz_ablauf_elemente.update({
+        where: {
+          quiz_ablauf_element_id: placementByKey.get(key)!.quiz_ablauf_element_id,
+        },
+        data: { sortierung: -1_000_000 - index },
+      });
+    }
+    for (const [index, key] of data.itemKeys.entries()) {
+      await tx.quiz_ablauf_elemente.update({
+        where: {
+          quiz_ablauf_element_id: placementByKey.get(key)!.quiz_ablauf_element_id,
+        },
+        data: { sortierung: (index + 1) * 1_000 },
+      });
+    }
+  });
+  revalidateQuizFlow(data.quizId);
+  return { success: true };
+}
+
 export async function removeStandaloneLivePollFromQuiz(data: {
   quizId: number;
   placementId: number;

@@ -10,6 +10,10 @@ const questionSource = readFileSync(
   "app/quiz/[quizId]/QuizQuestionItem.tsx",
   "utf8",
 );
+const elementCardSource = readFileSync(
+  "app/quiz/[quizId]/QuizEditorElementCard.tsx",
+  "utf8",
+);
 
 test("quiz structure DndContext has one stable quiz-specific id", () => {
   assert.equal(structureSource.match(/<DndContext\b/g)?.length, 1);
@@ -28,15 +32,15 @@ test("block and question drag handles retain sortable accessibility attributes",
     structureSource.indexOf("function BlockDragHandle"),
     structureSource.indexOf("function DroppableBlock"),
   );
-  const questionHandle = questionSource.slice(
-    questionSource.indexOf("function DragHandle"),
-    questionSource.indexOf("export default function QuizQuestionItem"),
+  const questionHandle = elementCardSource.slice(
+    elementCardSource.indexOf("<button"),
+    elementCardSource.indexOf("</button>") + "</button>".length,
   );
 
-  for (const handle of [blockHandle, questionHandle]) {
-    assert.match(handle, /\{\.\.\.attributes\}/);
-    assert.match(handle, /\{\.\.\.listeners\}/);
-  }
+  assert.match(blockHandle, /\{\.\.\.attributes\}/);
+  assert.match(blockHandle, /\{\.\.\.listeners\}/);
+  assert.match(questionHandle, /\{\.\.\.dragAttributes\}/);
+  assert.match(questionHandle, /\{\.\.\.dragListeners\}/);
   assert.match(structureSource, /attributes,[\s\S]*listeners,[\s\S]*useSortable\(/);
   assert.match(questionSource, /attributes,[\s\S]*listeners,[\s\S]*useSortable\(/);
 });

@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -15,10 +14,13 @@ import type { ResolvedPresentationLayout } from "@/app/rendering/presentation/pr
 import type { StoryElementType } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
 import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
+import QuizEditorElementCard from "./QuizEditorElementCard";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
   sortierung: number | null;
+  flowPlacementId: number | null;
+  flowOrder: number;
   quiz_abschnitt_id: number | null;
   fragen_id: number;
   frage: string;
@@ -46,7 +48,7 @@ export type QuizQuestion = {
 
 type Props = {
   frage: QuizQuestion;
-  index: number;
+  displayIndex: number;
   quizId: number;
   containerId: string;
   settingsActions: QuizQuestionSettingsActions;
@@ -73,30 +75,9 @@ function getAnswerModeLabel(frage: QuizQuestion) {
   return "Antwortmodus unklar";
 }
 
-function DragHandle({
-  attributes,
-  listeners,
-}: {
-  attributes: React.HTMLAttributes<HTMLButtonElement>;
-  listeners: React.HTMLAttributes<HTMLButtonElement> | undefined;
-}) {
-  return (
-    <button
-      type="button"
-      className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-lg text-lg font-semibold text-slate-400 transition hover:bg-slate-100 hover:text-slate-800 active:cursor-grabbing active:scale-95"
-      title="Zum Sortieren ziehen"
-      aria-label="Frage zum Sortieren ziehen"
-      {...attributes}
-      {...listeners}
-    >
-      ⠿
-    </button>
-  );
-}
-
 export default function QuizQuestionItem({
   frage,
-  index,
+  displayIndex,
   quizId,
   containerId,
   settingsActions,
@@ -111,14 +92,14 @@ export default function QuizQuestionItem({
     transition,
     isDragging,
   } = useSortable({
-    id: frage.quiz_fragen_id,
+    id: `question-${frage.quiz_fragen_id}`,
     data: {
       type: "frage",
       containerId,
     },
   });
 
-  const style: React.CSSProperties = {
+  const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
@@ -129,27 +110,17 @@ export default function QuizQuestionItem({
   });
 
   return (
-    <article
-      ref={setNodeRef}
+    <QuizEditorElementCard
+      cardRef={setNodeRef}
       style={style}
-      className={`rounded-xl border bg-white shadow-sm transition ${
-        isDragging
-          ? "border-cyan-300 opacity-80 shadow-lg"
-          : "border-slate-200"
-      }`}
-    >
-      <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-start">
-        <div className="flex min-w-0 flex-1 items-start gap-2">
-          <DragHandle attributes={attributes} listeners={listeners} />
-          <span className="flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 px-2 text-sm font-black text-slate-600">
-            {index + 1}
-          </span>
-
-          <div className="min-w-0 pt-1">
-            <h3 className="font-semibold leading-6 text-slate-900">
-              {frage.frage}
-            </h3>
-            <div className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold text-slate-600">
+      isDragging={isDragging}
+      kind="QUESTION"
+      title={frage.frage}
+      displayIndex={displayIndex}
+      dragAttributes={attributes}
+      dragListeners={listeners}
+      dragLabel={`${frage.frage} zum Sortieren ziehen`}
+      metadata={<>
               <span className="rounded-full bg-violet-50 px-2.5 py-1 text-violet-700">
                 {frage.vorlagenname}
               </span>
@@ -188,11 +159,8 @@ export default function QuizQuestionItem({
                     : "Story-Elemente"}
                 </span>
               )}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex shrink-0 flex-wrap items-center gap-2 pl-20 sm:pl-0">
+            </>}
+      configureAction={
           <button
             type="button"
             onClick={() => setIsSettingsOpen((current) => !current)}
@@ -201,30 +169,21 @@ export default function QuizQuestionItem({
           >
             Konfigurieren
           </button>
+      }
+      previewAction={
           <QuizFrageVorschauButton
             fragenId={frage.fragen_id}
             storyElements={frage.storyElements}
           />
-
-          <details className="relative">
-            <summary
-              className="flex h-9 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-300 bg-white text-xl font-bold leading-none text-slate-600 shadow-sm transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
-              aria-label="Weitere Aktionen"
-            >
-              …
-            </summary>
-            <div className="absolute right-0 z-20 mt-2 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+      }
+      overflowAction={
               <QuizFrageEntfernenButton
                 quizId={quizId}
                 quizFragenId={frage.quiz_fragen_id}
                 onRemoved={onRemove}
               />
-            </div>
-          </details>
-        </div>
-      </div>
-
-      {isSettingsOpen && (
+      }
+      details={isSettingsOpen ? (
         <QuizQuestionSettings
           quizFragenId={frage.quiz_fragen_id}
           resolvedPresentationLayout={frage.resolvedPresentationLayout}
@@ -239,7 +198,7 @@ export default function QuizQuestionItem({
           storyElements={frage.storyElements}
           actions={settingsActions}
         />
-      )}
-    </article>
+      ) : null}
+    />
   );
 }

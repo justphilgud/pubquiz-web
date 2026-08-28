@@ -291,6 +291,8 @@ export type QuizDetailsResult = QuizResult & {
   fragen: {
     quiz_fragen_id: number;
     sortierung: number | null;
+    flowPlacementId: number | null;
+    flowOrder: number;
     fragen_id: number;
     frage: string;
     quiz_abschnitt_id: number | null;
@@ -883,6 +885,13 @@ export async function getQuizDetails(
           sortierung: "asc",
         },
         include: {
+          quiz_ablauf_elemente: {
+            where: { typ: "QUESTION" },
+            select: {
+              quiz_ablauf_element_id: true,
+              sortierung: true,
+            },
+          },
           story_ablauf_elemente: {
             include: {
               story_element_revision: {
@@ -1150,6 +1159,11 @@ export async function getQuizDetails(
       return {
         quiz_fragen_id: eintrag.quiz_fragen_id,
         sortierung: eintrag.sortierung,
+        flowPlacementId:
+          eintrag.quiz_ablauf_elemente[0]?.quiz_ablauf_element_id ?? null,
+        flowOrder:
+          eintrag.quiz_ablauf_elemente[0]?.sortierung ??
+          (eintrag.sortierung ?? 0) * 1_000,
         quiz_abschnitt_id: eintrag.quiz_abschnitt_id,
         fragen_id: eintrag.fragen.fragen_id,
         frage: eintrag.fragen.frage,
