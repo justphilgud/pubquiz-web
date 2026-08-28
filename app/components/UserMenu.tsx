@@ -7,6 +7,7 @@ import {
   ChevronDownIcon,
   Cog8ToothIcon,
   KeyIcon,
+  QuestionMarkCircleIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { AppVersion } from "@/app/components/AppVersion";
@@ -124,6 +125,15 @@ export default function UserMenu({
                 Benutzerverwaltung
               </Link>
             )}
+
+            <Link
+              href="/hilfe"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-slate-800 hover:bg-slate-50"
+              onClick={() => setOpen(false)}
+            >
+              <QuestionMarkCircleIcon className={iconClass} />
+              Hilfe & Bedienungsanleitung
+            </Link>
 
             <Link
               href="/settings"

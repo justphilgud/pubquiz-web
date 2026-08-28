@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ["ffmpeg-static", "sharp"],
   outputFileTracingIncludes: {
+    "/hilfe": ["./docs/user-guide/**/*.md", "./docs/admin-guide/**/*.md"],
     "/api/question-generator": [
       "./node_modules/ffmpeg-static/ffmpeg*",
       "./node_modules/sharp/**/*",
