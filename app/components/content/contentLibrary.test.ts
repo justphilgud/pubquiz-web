@@ -155,9 +155,12 @@ test("question, story and poll library assignments persist without a block", () 
 
 test("content workspace links directly to canonical creation routes", () => {
   const workspace = readFileSync(new URL("./ContentWorkspace.tsx", import.meta.url), "utf8");
-  for (const href of ["/content/questions/new", "/content/story-elements/new"]) {
-    assert.match(workspace, new RegExp(`href="${href}"`));
+  const actions = readFileSync(new URL("./ContentCreateActions.tsx", import.meta.url), "utf8");
+  assert.match(workspace, /<ContentCreateActions/);
+  for (const href of ["/content/questions/new", "/content/story-elements/new", "/content/polls/new"]) {
+    assert.match(actions, new RegExp(`href: "${href}"`));
   }
+  assert.doesNotMatch(actions, /<details|<summary/);
 });
 
 test("type changes discard irrelevant filters and preserve relevant ones", () => {

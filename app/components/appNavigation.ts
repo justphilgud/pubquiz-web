@@ -1,6 +1,12 @@
 export type AppNavigationItem = {
   href: string;
   label: string;
+  children?: AppNavigationChild[];
+};
+
+export type AppNavigationChild = {
+  href: string;
+  label: string;
 };
 
 export type AppNavigationCapabilities = {
@@ -19,7 +25,22 @@ export function getAppNavigationItems(
 ): AppNavigationItem[] {
   return [
     ...(capabilities.canAccessQuestions || capabilities.canAccessStoryElements
-      ? [{ href: "/content", label: "Content" }]
+      ? [{
+          href: "/content",
+          label: "Content",
+          children: [
+            { href: "/content", label: "Alle Inhalte" },
+            ...(capabilities.canAccessQuestions
+              ? [{ href: "/fragen", label: "Fragen" }]
+              : []),
+            ...(capabilities.canAccessStoryElements
+              ? [
+                  { href: "/story-elemente", label: "Story-Elemente" },
+                  { href: "/content/polls", label: "Umfragen" },
+                ]
+              : []),
+          ],
+        }]
       : []),
     ...(capabilities.canManageEventSeries
       ? [{ href: "/admin/eventreihen", label: "Eventreihen" }]

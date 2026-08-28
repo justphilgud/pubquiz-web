@@ -5,6 +5,7 @@ import {
   getAppNavigationItems,
   isAppNavigationItemActive,
 } from "./appNavigation";
+import { readFileSync } from "node:fs";
 import {
   canManageEventSeries,
   canManageCategories,
@@ -23,6 +24,17 @@ const editorActor: AuthorizationActor = {
   assignments: [{ role: "EDITOR", scopeType: "GLOBAL", eventSeriesId: null }],
 };
 
+const fullContentNavigation = {
+  href: "/content",
+  label: "Content",
+  children: [
+    { href: "/content", label: "Alle Inhalte" },
+    { href: "/fragen", label: "Fragen" },
+    { href: "/story-elemente", label: "Story-Elemente" },
+    { href: "/content/polls", label: "Umfragen" },
+  ],
+};
+
 function navigationItemsFor(actor: AuthorizationActor) {
   return getAppNavigationItems({
     canAccessQuestions: true,
@@ -38,7 +50,7 @@ function navigationItemsFor(actor: AuthorizationActor) {
 
 test("admin navigation orders event series, quiz and templates before users", () => {
   assert.deepEqual(navigationItemsFor(adminActor), [
-    { href: "/content", label: "Content" },
+    fullContentNavigation,
     { href: "/admin/eventreihen", label: "Eventreihen" },
     { href: "/quiz", label: "Quiz" },
     { href: "/admin/teams", label: "Teams" },
@@ -65,7 +77,7 @@ test("category capability never exposes the dashboard-only category route", () =
 
 test("editor navigation does not expose admin destinations", () => {
   assert.deepEqual(navigationItemsFor(editorActor), [
-    { href: "/content", label: "Content" },
+    fullContentNavigation,
   ]);
 });
 
@@ -98,7 +110,7 @@ test("membership capabilities expose operational navigation without users", () =
       canManageTeams: true,
     }),
     [
-      { href: "/content", label: "Content" },
+      fullContentNavigation,
       { href: "/admin/eventreihen", label: "Eventreihen" },
       { href: "/quiz", label: "Quiz" },
       { href: "/admin/teams", label: "Teams" },
@@ -131,6 +143,8 @@ test("content navigation owns all content library and editor routes", () => {
   for (const pathname of [
     "/content",
     "/content/new",
+    "/content/polls",
+    "/content/polls/12",
     "/fragen",
     "/fragen/editor/12",
     "/story-elemente",
@@ -150,6 +164,32 @@ test("either existing content capability exposes one shared navigation item", ()
     canManageUsers: false,
     canManageTeams: false,
   };
-  assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: true, canAccessStoryElements: false }), [{ href: "/content", label: "Content" }]);
-  assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: false, canAccessStoryElements: true }), [{ href: "/content", label: "Content" }]);
+  assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: true, canAccessStoryElements: false }), [{
+    href: "/content",
+    label: "Content",
+    children: [
+      { href: "/content", label: "Alle Inhalte" },
+      { href: "/fragen", label: "Fragen" },
+    ],
+  }]);
+  assert.deepEqual(getAppNavigationItems({ ...base, canAccessQuestions: false, canAccessStoryElements: true }), [{
+    href: "/content",
+    label: "Content",
+    children: [
+      { href: "/content", label: "Alle Inhalte" },
+      { href: "/story-elemente", label: "Story-Elemente" },
+      { href: "/content/polls", label: "Umfragen" },
+    ],
+  }]);
+});
+
+test("content submenu follows the accessible desktop and mobile interaction contract", () => {
+  const source = readFileSync(new URL("./AppNav.tsx", import.meta.url), "utf8");
+  assert.match(source, /<details/);
+  assert.match(source, /<summary/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /pointerdown/);
+  assert.match(source, /focus-visible:ring/);
+  assert.match(source, /col-span-2[\s\S]*md:col-span-1/);
+  assert.match(source, /md:absolute/);
 });
