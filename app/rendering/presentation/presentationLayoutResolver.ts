@@ -49,6 +49,7 @@ export type ResolvePresentationLayoutInput = {
   questionText: string;
   answerOptionCount: number;
   structuredFieldCount: number;
+  structuredFieldLabels?: readonly string[];
   media: readonly PresentationLayoutMedium[];
   templateData?: QuestionTemplateData;
   templateContract?: TemplateDefinition | null;
@@ -116,13 +117,25 @@ export function resolvePresentationLayout(
   const canonicalTemplateId =
     resolveCanonicalQuestionTemplateId(input.templateId) ??
     questionTemplateIds.standard;
+  const normalizedStructuredFieldLabels = (input.structuredFieldLabels ?? [])
+    .map((label) => label.trim().toLocaleLowerCase("de-DE"))
+    .sort();
+  const hasLegacyFaceMorphFields =
+    normalizedStructuredFieldLabels.length === 2 &&
+    normalizedStructuredFieldLabels[0] === "person a" &&
+    normalizedStructuredFieldLabels[1] === "person b";
+  const hasQuestionImage = input.media.some(
+    (medium) =>
+      medium.scope === "QUESTION" && mediumKind(medium) === "VISUAL",
+  );
   const isFaceMorph =
     canonicalTemplateId === questionTemplateIds.faceMorph ||
     input.media.some(
       (medium) =>
         medium.scope === "QUESTION" &&
         medium.slotKey === "face_morph_result",
-    );
+    ) ||
+    (hasLegacyFaceMorphFields && hasQuestionImage);
   const contentRole = isFaceMorph
     ? ({ contentRole: "FACE_MORPH" } as const)
     : {};
@@ -187,7 +200,12 @@ export function resolvePresentationLayout(
   } else if (input.media.some((medium) => mediumKind(medium) === "AUDIO")) {
     preferred = "AUDIO_FOCUS";
     reason = "AUDIO_MEDIUM";
-  } else if (input.media.some((medium) => mediumKind(medium) === "VISUAL")) {
+  } else if (
+    input.media.some(
+      (medium) =>
+        medium.scope === "QUESTION" && mediumKind(medium) === "VISUAL",
+    )
+  ) {
     preferred = "MEDIA_FOCUS";
     reason = "VISUAL_MEDIUM";
   } else if (input.answerOptionCount > 1) {

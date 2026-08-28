@@ -144,6 +144,53 @@ test("the persisted FaceMorph media slot restores the runtime role for legacy as
   );
 });
 
+test("legacy FaceMorph questions restore the visual role from their two named fields and question image", () => {
+  assert.deepEqual(
+    resolve({
+      templateId: null,
+      structuredFieldCount: 2,
+      structuredFieldLabels: ["Person A", "Person B"],
+      media: [
+        {
+          fileName: "generated-morph.webp",
+          mediaType: "Bild",
+          scope: "QUESTION",
+          slotKey: null,
+        },
+      ],
+    }),
+    {
+      variant: "MEDIA_FOCUS",
+      source: "AUTO",
+      reason: "FACE_MORPH_TEMPLATE",
+      contentRole: "FACE_MORPH",
+    },
+  );
+});
+
+test("answer media does not turn a normal multiple-choice question into an empty image slide", () => {
+  for (const answerOptionCount of [2, 4]) {
+    assert.deepEqual(
+      resolve({
+        templateId: null,
+        answerOptionCount,
+        media: [
+          {
+            fileName: "answer-decoration.webp",
+            mediaType: "Bild",
+            scope: "ANSWER",
+          },
+        ],
+      }),
+      {
+        variant: "CHOICE_GRID",
+        source: "AUTO",
+        reason: "CHOICE_OPTIONS",
+      },
+    );
+  }
+});
+
 test("question and solution phases resolve independently", () => {
   const question = resolve({
     templateId: questionTemplateIds.multipleChoice,
