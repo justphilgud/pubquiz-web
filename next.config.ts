@@ -19,7 +19,8 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ["ffmpeg-static", "sharp"],
   outputFileTracingIncludes: {
-    "/hilfe": ["./docs/user-guide/**/*.md", "./docs/admin-guide/**/*.md"],
+    "/hilfe": ["./docs/user-guide/**/*", "./docs/admin-guide/**/*.md"],
+    "/hilfe/screenshots/[name]": ["./docs/user-guide/screenshots/*.jpg"],
     "/api/question-generator": [
       "./node_modules/ffmpeg-static/ffmpeg*",
       "./node_modules/sharp/**/*",
