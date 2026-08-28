@@ -17,10 +17,21 @@ import QuizElementSearchResult, {
 } from "./QuizElementSearchResult";
 import { getStoryElementTypeLabel } from "@/app/story-elemente/storyElement";
 import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { assignContentToQuiz } from "@/app/components/content/actions";
 
 type Props = {
   quizId: number;
   storyElements: QuizStoryElementOption[];
+  polls: QuizLivePollOption[];
+};
+
+export type QuizLivePollOption = {
+  id: number;
+  prompt: string;
+  subtype: string;
+  publicationMode: string;
+  isUsedInQuiz: boolean;
+  canAssign: boolean;
 };
 
 const buttonSecondaryClass =
@@ -29,6 +40,7 @@ const buttonSecondaryClass =
 export default function QuizFragenHinzufuegen({
   quizId,
   storyElements,
+  polls,
 }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -39,11 +51,13 @@ export default function QuizFragenHinzufuegen({
   const [includeLinkedStoryElements, setIncludeLinkedStoryElements] = useState(true);
   const [activeTab, setActiveTab] = useState<"QUESTION" | "STORY_ELEMENT" | "POLL">("QUESTION");
   const visibleResults = ergebnisse.filter((question) =>
-    activeTab === "POLL"
-      ? isPollQuestionTemplateId(question.templateId)
-      : activeTab === "QUESTION"
-        ? !isPollQuestionTemplateId(question.templateId)
-        : false,
+    activeTab === "QUESTION" && !isPollQuestionTemplateId(question.templateId),
+  );
+  const normalizedPollQuery = suchtext.trim().toLocaleLowerCase("de-DE");
+  const visiblePolls = polls.filter((poll) =>
+    !normalizedPollQuery ||
+    poll.prompt.toLocaleLowerCase("de-DE").includes(normalizedPollQuery) ||
+    poll.subtype.toLocaleLowerCase("de-DE").includes(normalizedPollQuery),
   );
 
   async function handleSearch() {
@@ -80,6 +94,17 @@ export default function QuizFragenHinzufuegen({
     }
   }
 
+  async function handleAddPoll(pollId: number) {
+    setMeldung("");
+    const result = await assignContentToQuiz({
+      contentType: "POLL",
+      contentId: pollId,
+      quizId,
+    });
+    setMeldung(result.message);
+    if (result.success) router.refresh();
+  }
+
   if (!isOpen) {
     return (
       <button
@@ -98,7 +123,7 @@ export default function QuizFragenHinzufuegen({
         <div>
           <h3 className="font-semibold">Quiz-Element hinzufügen</h3>
           <p className="mt-1 text-sm text-slate-500">
-            Fragen und Story-Elemente aus derselben Content-Suche auswählen.
+            Fragen, Story-Elemente und Umfragen aus der Content-Bibliothek auswählen.
           </p>
         </div>
 
@@ -148,21 +173,21 @@ export default function QuizFragenHinzufuegen({
 
       {activeTab === "POLL" && <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-cyan-200 bg-cyan-50 p-3 text-sm text-cyan-950">
         <span>Umfragen haben keine richtige Antwort und verändern den Punktestand nicht.</span>
-        <Link href="/fragen/editor" className="font-semibold underline">Neue Umfrage erstellen</Link>
+        <Link href="/content/polls/new" className="font-semibold underline">Neue Umfrage erstellen</Link>
       </div>}
 
       <ContentSearchControls
         query={suchtext}
         loading={isLoading}
-        placeholder="Fragen durchsuchen …"
+        placeholder={activeTab === "POLL" ? "Umfragen durchsuchen …" : "Fragen durchsuchen …"}
         onQueryChange={setSuchtext}
-        onSubmit={() => void handleSearch()}
+        onSubmit={() => activeTab === "POLL" ? undefined : void handleSearch()}
       />
 
-      <label className="mt-3 flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800">
+      {activeTab === "QUESTION" && <label className="mt-3 flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800">
         <input type="checkbox" checked={includeLinkedStoryElements} onChange={(event) => setIncludeLinkedStoryElements(event.target.checked)} className="h-5 w-5 rounded border-slate-300" />
         Verknüpfte Story-Elemente ebenfalls hinzufügen
-      </label>
+      </label>}
 
       {meldung && (
         <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3 text-sm font-medium text-slate-800">
@@ -171,7 +196,7 @@ export default function QuizFragenHinzufuegen({
       )}
 
       <div className="mt-4 space-y-3">
-        {visibleResults.map((frage) => (
+        {activeTab === "QUESTION" && visibleResults.map((frage) => (
           <QuizElementSearchResult
             key={frage.fragen_id}
             title={frage.frage}
@@ -214,10 +239,28 @@ export default function QuizFragenHinzufuegen({
           />
         ))}
 
-        {visibleResults.length === 0 && !isLoading && (
+        {activeTab === "POLL" && visiblePolls.map((poll) => (
+          <QuizElementSearchResult
+            key={`poll-${poll.id}`}
+            title={poll.prompt}
+            description={`${poll.subtype} · Veröffentlichung: ${poll.publicationMode}`}
+            metadata={<>
+              <span className="rounded-full bg-violet-50 px-2 py-1 font-semibold text-violet-800">Umfrage</span>
+              <span>Keine Punkte · keine Lösung</span>
+            </>}
+            actionLabel={poll.isUsedInQuiz ? "Bereits im Quiz" : poll.canAssign ? "Hinzufügen" : "Nicht verfügbar"}
+            disabled={poll.isUsedInQuiz || !poll.canAssign}
+            onAction={() => void handleAddPoll(poll.id)}
+          />
+        ))}
+
+        {activeTab === "QUESTION" && visibleResults.length === 0 && !isLoading && (
           <p className="text-sm text-slate-500">
             Noch keine Suchergebnisse. Starte eine Suche, um Fragen auszuwählen.
           </p>
+        )}
+        {activeTab === "POLL" && visiblePolls.length === 0 && (
+          <p className="text-sm text-slate-500">Keine passenden Umfragen gefunden.</p>
         )}
       </div>
       </> : (

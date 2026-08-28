@@ -17,6 +17,16 @@ import {
   isStoryElementType,
 } from "@/app/story-elemente/storyElement";
 import { canArchiveStoryElement } from "@/app/story-elemente/storyElementPolicy";
+import { getLivePollTypeLabel } from "@/app/umfragen/livePoll";
+import {
+  attachLivePollToQuiz,
+  duplicateLivePoll,
+  setLivePollArchived,
+} from "@/app/umfragen/actions";
+import {
+  canAttachLivePoll,
+  listLivePolls,
+} from "@/app/umfragen/livePollRepository.server";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { getQuestionLifecycleState } from "@/app/fragen/editor/questionLifecycle";
 import {
@@ -40,9 +50,10 @@ function questionStatuses(status: ContentFiltersState["status"]) {
 
 export async function searchContent(filters: ContentFiltersState): Promise<ContentSearchResult> {
   const { actor } = await requireActor();
-  const includeQuestions = filters.contentType !== "STORY_ELEMENT";
-  const includeStories = filters.contentType !== "QUESTION";
-  const [questionResult, stories, quizzes] = await Promise.all([
+  const includeQuestions = filters.contentType !== "STORY_ELEMENT" && filters.contentType !== "POLL";
+  const includeStories = filters.contentType !== "QUESTION" && filters.contentType !== "POLL";
+  const includePolls = filters.contentType !== "QUESTION" && filters.contentType !== "STORY_ELEMENT";
+  const [questionResult, stories, polls, quizzes] = await Promise.all([
     includeQuestions
       ? searchFragen({
           suchtext: filters.query,
@@ -70,6 +81,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
           eventSeriesId: filters.eventSeriesId === null ? undefined : String(filters.eventSeriesId),
         })
       : Promise.resolve([]),
+    includePolls ? listLivePolls(actor) : Promise.resolve([]),
     getAktiveQuizListe(),
   ]);
 
@@ -153,11 +165,51 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
     storyMetrics: { linkedQuestionCount: story.questionLinkCount, linkedQuestionTitle: story.linkedQuestion?.frage ?? null, revision: story.revisionNumber },
   }));
 
+  const normalizedQuery = filters.query.trim().toLocaleLowerCase("de-DE");
+  const pollItems: ContentSearchItem[] = polls
+    .filter((poll) => {
+      if (normalizedQuery && !poll.prompt.toLocaleLowerCase("de-DE").includes(normalizedQuery)) return false;
+      if (filters.status !== "ALL" && poll.status !== filters.status) return false;
+      if (filters.media === "WITH") return false;
+      if (filters.usage === "USED" && poll.quizUsages.length === 0) return false;
+      if (filters.usage === "UNUSED" && poll.quizUsages.length > 0) return false;
+      if (
+        filters.eventSeriesId !== null &&
+        poll.scope !== "GLOBAL" &&
+        poll.eventSeriesId !== filters.eventSeriesId &&
+        !quizzes.some((quiz) => quiz.quiz_id === poll.quizId && quiz.eventreihe_id === filters.eventSeriesId)
+      ) return false;
+      return true;
+    })
+    .map((poll) => ({
+      key: `POLL:${poll.id}`,
+      id: poll.id,
+      contentType: "POLL",
+      subtype: getLivePollTypeLabel(poll.type),
+      title: poll.prompt,
+      status: poll.status === "ACTIVE" ? "Freigegeben" : poll.status === "ARCHIVED" ? "Archiviert" : "Entwurf",
+      archived: poll.status === "ARCHIVED",
+      scope: poll.eventSeriesName ?? (poll.scope === "GLOBAL" ? "Global" : poll.scope === "QUIZ" ? poll.quizTitle ?? "Quiz" : "Eventreihe"),
+      mediaCount: 0,
+      quizUsages: poll.quizUsages,
+      assignableQuizIds: quizzes
+        .filter((quiz) => canAttachLivePoll(actor, poll, { quizId: quiz.quiz_id, eventSeriesId: quiz.eventreihe_id }))
+        .map((quiz) => quiz.quiz_id),
+      editHref: `/content/polls/${poll.id}`,
+      canClone: true,
+      canArchive: canArchiveStoryElement(actor, poll.access),
+      pollMetrics: {
+        publicationMode: poll.publicationMode === "AUTOMATIC" ? "Automatisch" : "Moderiert",
+        optionCount: poll.options.length,
+        revision: poll.revisionNumber,
+      },
+    }));
+
   return {
-    items: [...questions, ...storyItems]
+    items: [...questions, ...storyItems, ...pollItems]
       .sort((left, right) => right.id - left.id || left.contentType.localeCompare(right.contentType))
       .slice(0, 50),
-    total: questionResult.total + stories.length,
+    total: questionResult.total + stories.length + pollItems.length,
   };
 }
 
@@ -167,6 +219,12 @@ export async function cloneContent(contentType: ContentType, id: number) {
     return result.ok
       ? { success: true, href: `/content/questions/${result.questionId}`, message: "Frage wurde geklont." }
       : { success: false, message: "Frage konnte nicht geklont werden." };
+  }
+  if (contentType === "POLL") {
+    const result = await duplicateLivePoll(id);
+    return result.success
+      ? { success: true, href: `/content/polls/${result.pollId}`, message: result.message }
+      : { success: false, message: result.message };
   }
   const result = await duplicateStoryElement(id);
   return result.success
@@ -179,6 +237,10 @@ export async function setContentArchived(contentType: ContentType, id: number, a
     const result = await setQuestionArchived(id, archived, reason);
     return result.ok ? { success: true, message: archived ? "Frage archiviert." : "Frage reaktiviert." } : { success: false, message: "Aktion nicht erlaubt." };
   }
+  if (contentType === "POLL") {
+    const result = await setLivePollArchived(id, archived);
+    return { success: result.success, message: result.message };
+  }
   const result = await setStoryElementArchived(id, archived);
   return { success: result.success, message: result.message };
 }
@@ -190,6 +252,16 @@ export async function assignContentToQuiz(input: { contentType: ContentType; con
       return result.alreadyAssigned
         ? { success: false, message: "Diese Frage ist diesem Quiz bereits zugeordnet." }
         : { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." };
+    }
+    if (input.contentType === "POLL") {
+      const result = await attachLivePollToQuiz({
+        pollId: input.contentId,
+        quizId: input.quizId,
+        sectionId: null,
+      });
+      return result.success
+        ? { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." }
+        : { success: false, message: result.message };
     }
     return await addStoryElementToQuiz({ quizId: input.quizId, storyElementId: input.contentId });
   } catch (error) {

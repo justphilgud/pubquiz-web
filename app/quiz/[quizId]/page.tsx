@@ -29,6 +29,8 @@ import {
 } from "../quizProductActions";
 import { listSelectableStoryElementsForQuiz } from "@/app/story-elemente/storyElementRepository.server";
 import QuizConfigurationPanel from "./QuizConfigurationPanel";
+import { searchContent } from "@/app/components/content/actions";
+import { parseContentFilters } from "@/app/components/content/contentLibrary";
 
 const productActionAppearance: Record<QuizProductActionId, {
   icon: typeof PlayIcon;
@@ -52,9 +54,10 @@ export default async function QuizDetailPage({
   const { quizId } = await params;
   await requireQuizViewer(Number(quizId));
 
-  const [quiz, actorContext] = await Promise.all([
+  const [quiz, actorContext, pollSearch] = await Promise.all([
     getQuizDetails(Number(quizId)),
     requireActor(),
+    searchContent(parseContentFilters(new URLSearchParams("contentType=POLL"))),
   ]);
 
   if (!quiz) {
@@ -209,6 +212,14 @@ export default async function QuizDetailPage({
         <section id="fragen-hinzufuegen" className="mb-6 flex scroll-mt-24 justify-end">
           <QuizFragenHinzufuegen
             quizId={quiz.quiz_id}
+            polls={pollSearch.items.flatMap((item) => item.pollMetrics ? [{
+              id: item.id,
+              prompt: item.title,
+              subtype: item.subtype,
+              publicationMode: item.pollMetrics.publicationMode,
+              isUsedInQuiz: item.quizUsages.some((usage) => usage.quizId === quiz.quiz_id),
+              canAssign: item.assignableQuizIds.includes(quiz.quiz_id),
+            }] : [])}
             storyElements={selectableStories.map((story) => {
               const linkedAssignment = story.linkedQuestion
                 ? questionAssignmentById.get(story.linkedQuestion.fragen_id) ?? null

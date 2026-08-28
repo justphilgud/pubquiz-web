@@ -20,7 +20,21 @@ const include = {
   created_by: { select: { id: true, name: true, email: true } },
   revisionen: {
     orderBy: { revisionsnummer: "desc" as const },
-    include: { _count: { select: { quiz_ablauf_elemente: true } } },
+    include: {
+      _count: { select: { quiz_ablauf_elemente: true } },
+      quiz_ablauf_elemente: {
+        select: {
+          quiz_id: true,
+          quiz: {
+            select: {
+              titel: true,
+              quiz_datum: true,
+              ist_archiviert: true,
+            },
+          },
+        },
+      },
+    },
   },
 } satisfies Prisma.live_pollsInclude;
 
@@ -41,6 +55,16 @@ function mapPoll(poll: PollWithRelations) {
   const revision = poll.revisionen[0];
   if (!revision || !isLivePollType(revision.typ)) return null;
   const options = parseLivePollOptions(revision.optionen) ?? [];
+  const quizUsages = [...new Map(
+    poll.revisionen
+      .flatMap((item) => item.quiz_ablauf_elemente)
+      .map((placement) => [placement.quiz_id, {
+        quizId: placement.quiz_id,
+        title: placement.quiz.titel ?? `Quiz ${placement.quiz_id}`,
+        date: placement.quiz.quiz_datum?.toISOString().slice(0, 10) ?? null,
+        archived: placement.quiz.ist_archiviert,
+      }] as const),
+  ).values()];
   return {
     id: poll.live_poll_id,
     stableKey: poll.stable_key,
@@ -64,6 +88,7 @@ function mapPoll(poll: PollWithRelations) {
     options,
     moderatorNote: revision.moderationsnotiz,
     usageCount: poll.revisionen.reduce((sum, item) => sum + item._count.quiz_ablauf_elemente, 0),
+    quizUsages,
     access: access(poll),
   };
 }

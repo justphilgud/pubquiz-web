@@ -148,22 +148,29 @@ export async function deleteUnusedLivePoll(pollId: number): Promise<LivePollActi
   return { success: true, pollId, updatedAt: new Date().toISOString(), message: "Unbenutzte Umfrage wurde gelöscht." };
 }
 
-export async function attachLivePollToQuiz(input: { pollId: number; quizId: number; sectionId: number }) {
+export async function attachLivePollToQuiz(input: { pollId: number; quizId: number; sectionId: number | null }) {
   const { actor } = await requireActor();
   await requireQuizEditor(input.quizId);
   const poll = await loadLivePoll(actor, input.pollId);
   const quiz = await prisma.quiz.findUnique({ where: { quiz_id: input.quizId }, select: { quiz_id: true, eventreihe_id: true } });
-  const section = await prisma.quiz_abschnitte.findFirst({ where: { quiz_abschnitt_id: input.sectionId, quiz_id: input.quizId, abschnitt_typ: { in: ["fragenblock", "fragenrunde"] } }, select: { quiz_abschnitt_id: true } });
-  if (!poll || !quiz || !section || !canAttachLivePoll(actor, poll, { quizId: quiz.quiz_id, eventSeriesId: quiz.eventreihe_id })) return { success: false, message: "Umfrage kann diesem Quiz nicht hinzugefügt werden." };
-  const last = await prisma.quiz_ablauf_elemente.findFirst({ where: { quiz_id: input.quizId, quiz_abschnitt_id: input.sectionId, anker_typ: "BLOCK" }, orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }], select: { sortierung: true } });
+  const section = input.sectionId === null ? null : await prisma.quiz_abschnitte.findFirst({ where: { quiz_abschnitt_id: input.sectionId, quiz_id: input.quizId, abschnitt_typ: { in: ["fragenblock", "fragenrunde"] } }, select: { quiz_abschnitt_id: true } });
+  if (!poll || !quiz || (input.sectionId !== null && !section) || !canAttachLivePoll(actor, poll, { quizId: quiz.quiz_id, eventSeriesId: quiz.eventreihe_id })) return { success: false, message: "Umfrage kann diesem Quiz nicht hinzugefügt werden." };
+  const existing = await prisma.quiz_ablauf_elemente.findFirst({
+    where: { quiz_id: input.quizId, live_poll_revision: { live_poll_id: input.pollId } },
+    select: { quiz_ablauf_element_id: true },
+  });
+  if (existing) return { success: false, message: "Diese Umfrage ist bereits im Quiz vorhanden." };
+  const anchorType = section ? "BLOCK" : "BEFORE_QUIZ";
+  const anchorKey = section ? String(section.quiz_abschnitt_id) : "UNASSIGNED";
+  const last = await prisma.quiz_ablauf_elemente.findFirst({ where: { quiz_id: input.quizId, anker_typ: anchorType, anker_schluessel: anchorKey }, orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }], select: { sortierung: true } });
   const placement = await prisma.quiz_ablauf_elemente.create({ data: {
     quiz_id: input.quizId,
     typ: "LIVE_POLL",
-    anker_typ: "BLOCK",
-    anker_schluessel: String(input.sectionId),
-    quiz_abschnitt_id: input.sectionId,
+    anker_typ: anchorType,
+    anker_schluessel: anchorKey,
+    quiz_abschnitt_id: section?.quiz_abschnitt_id ?? null,
     sortierung: (last?.sortierung ?? 0) + 1_000,
-    ist_sichtbar: true,
+    ist_sichtbar: section !== null,
     bezeichnung: poll.prompt,
     konfiguration: { version: 1 },
     konfigurations_version: 1,

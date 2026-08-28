@@ -11,6 +11,7 @@ import {
 test("content routes keep their domain-specific initial filter", () => {
   assert.equal(parseContentFilters(new URLSearchParams(), "QUESTION").contentType, "QUESTION");
   assert.equal(parseContentFilters(new URLSearchParams(), "STORY_ELEMENT").contentType, "STORY_ELEMENT");
+  assert.equal(parseContentFilters(new URLSearchParams(), "POLL").contentType, "POLL");
   assert.equal(parseContentFilters(new URLSearchParams()).contentType, "ALL");
 });
 
@@ -37,9 +38,11 @@ test("content entry routes declare the expected initial filters", () => {
   const questions = readFileSync(new URL("../../fragen/page.tsx", import.meta.url), "utf8");
   const stories = readFileSync(new URL("../../story-elemente/page.tsx", import.meta.url), "utf8");
   const content = readFileSync(new URL("../../content/page.tsx", import.meta.url), "utf8");
+  const polls = readFileSync(new URL("../../content/polls/page.tsx", import.meta.url), "utf8");
   assert.match(questions, /initialType="QUESTION"/);
   assert.match(stories, /initialType="STORY_ELEMENT"/);
   assert.doesNotMatch(content, /initialType=/);
+  assert.match(polls, /initialType="POLL"/);
 });
 
 test("shared content filters parse and serialize mixed search state", () => {
@@ -96,7 +99,7 @@ test("search exposes the current result total and permission-derived event serie
   const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
   const page = readFileSync(new URL("./ContentLibraryPage.tsx", import.meta.url), "utf8");
   assert.match(search, /result\.items\.length.*result\.total/);
-  assert.match(actions, /total: questionResult\.total \+ stories\.length/);
+  assert.match(actions, /total: questionResult\.total \+ stories\.length \+ pollItems\.length/);
   assert.match(page, /getAssignableQuestionEventSeries/);
 });
 
@@ -134,16 +137,20 @@ test("both editors use the shared editor shell", () => {
 test("shared result row contains common and type-specific metrics", () => {
   const row = readFileSync(new URL("./ContentResultRow.tsx", import.meta.url), "utf8");
   for (const component of ["StatusBadge", "ScopeBadge", "MediaBadge", "UsageSummary", "ContentActions"]) assert.match(row, new RegExp(component));
-  for (const metric of ["Antworten", "Schwierigkeit", "Antwortart", "Story-Typ", "Verknüpfte Frage", "Quiz-Verwendungen", "Quelle"]) assert.match(row, new RegExp(metric));
+  for (const metric of ["Antworten", "Schwierigkeit", "Antwortart", "Story-Typ", "Verknüpfte Frage", "Quiz-Verwendungen", "Quelle", "Umfragetyp", "Veröffentlichung"]) assert.match(row, new RegExp(metric));
 });
 
-test("question and story library assignments both persist without a block", () => {
+test("question, story and poll library assignments persist without a block", () => {
   const questionActions = readFileSync(new URL("../../quiz/actions.ts", import.meta.url), "utf8");
   const storyActions = readFileSync(new URL("../../story-elemente/actions.ts", import.meta.url), "utf8");
+  const pollActions = readFileSync(new URL("../../umfragen/actions.ts", import.meta.url), "utf8");
   assert.match(questionActions, /quiz_abschnitt_id: null/);
   assert.match(storyActions, /anker_schluessel: "UNASSIGNED"/);
   assert.match(storyActions, /quiz_abschnitt_id: null/);
   assert.match(storyActions, /ist_sichtbar: false/);
+  assert.match(pollActions, /anker_schluessel: anchorKey/);
+  assert.match(pollActions, /quiz_abschnitt_id: section\?\.quiz_abschnitt_id \?\? null/);
+  assert.match(pollActions, /ist_sichtbar: section !== null/);
 });
 
 test("content workspace links directly to canonical creation routes", () => {
@@ -160,6 +167,24 @@ test("type changes discard irrelevant filters and preserve relevant ones", () =>
   assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=STORY_ELEMENT&storyType=AUDIO&categoryId=4")), {
     query: "", contentType: "STORY_ELEMENT", categoryIds: [], storyType: "AUDIO", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
   });
+  assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=POLL&storyType=AUDIO&categoryId=4&questionLifecycle=OUTDATED")), {
+    query: "", contentType: "POLL", categoryIds: [], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
+  });
+});
+
+test("polls participate in shared discovery and the quiz add dialog", () => {
+  const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
+  const filters = readFileSync(new URL("./ContentFilters.tsx", import.meta.url), "utf8");
+  const quizAdd = readFileSync(new URL("../../quiz/[quizId]/QuizFragenHinzufuegen.tsx", import.meta.url), "utf8");
+  const quizPage = readFileSync(new URL("../../quiz/[quizId]/page.tsx", import.meta.url), "utf8");
+  assert.match(filters, /<option value="POLL">Umfragen<\/option>/);
+  assert.match(actions, /includePolls \? listLivePolls\(actor\)/);
+  assert.match(actions, /poll\.prompt\.toLocaleLowerCase\("de-DE"\)\.includes\(normalizedQuery\)/);
+  assert.match(actions, /contentType: "POLL"/);
+  assert.match(quizPage, /searchContent\(parseContentFilters\(new URLSearchParams\("contentType=POLL"\)\)\)/);
+  assert.match(quizAdd, /visiblePolls\.map/);
+  assert.match(quizAdd, /assignContentToQuiz\(\{/);
+  assert.match(quizAdd, /href="\/content\/polls\/new"/);
 });
 
 test("legacy editor routes permanently redirect to canonical content routes", () => {

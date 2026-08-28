@@ -1,4 +1,4 @@
-export const CONTENT_TYPES = ["ALL", "QUESTION", "STORY_ELEMENT"] as const;
+export const CONTENT_TYPES = ["ALL", "QUESTION", "STORY_ELEMENT", "POLL"] as const;
 export type ContentTypeFilter = (typeof CONTENT_TYPES)[number];
 export type ContentType = Exclude<ContentTypeFilter, "ALL">;
 export type ContentInitialType = ContentType | undefined;
@@ -67,6 +67,11 @@ export type ContentSearchItem = {
     linkedQuestionTitle: string | null;
     revision: number;
   };
+  pollMetrics?: {
+    publicationMode: string;
+    optionCount: number;
+    revision: number;
+  };
 };
 
 export type ContentSearchResult = { items: ContentSearchItem[]; total: number };
@@ -120,6 +125,14 @@ function parsePositiveId(value: string | null) {
 export function normalizeContentFiltersForType(filters: ContentFiltersState) {
   if (filters.contentType === "QUESTION") return { ...filters, storyType: "ALL" };
   if (filters.contentType === "STORY_ELEMENT") return { ...filters, categoryIds: [], questionLifecycle: "ALL" as const };
+  if (filters.contentType === "POLL") {
+    return {
+      ...filters,
+      categoryIds: [],
+      storyType: "ALL",
+      questionLifecycle: "ALL" as const,
+    };
+  }
   return filters;
 }
 
@@ -143,12 +156,12 @@ export function serializeContentFilters(filters: ContentFiltersState) {
   const params = new URLSearchParams();
   if (filters.query.trim()) params.set("q", filters.query.trim());
   if (filters.contentType !== "ALL") params.set("contentType", filters.contentType);
-  if (filters.contentType !== "STORY_ELEMENT") {
+  if (filters.contentType === "QUESTION" || filters.contentType === "ALL") {
     for (const categoryId of filters.categoryIds) params.append("categoryId", String(categoryId));
   }
   if (filters.storyType !== "ALL") params.set("storyType", filters.storyType);
   if (filters.status !== "ALL") params.set("status", filters.status);
-  if (filters.contentType !== "STORY_ELEMENT" && filters.questionLifecycle !== "ALL") params.set("questionLifecycle", filters.questionLifecycle);
+  if ((filters.contentType === "QUESTION" || filters.contentType === "ALL") && filters.questionLifecycle !== "ALL") params.set("questionLifecycle", filters.questionLifecycle);
   if (filters.media !== "ALL") params.set("media", filters.media);
   if (filters.usage !== "ALL") params.set("usage", filters.usage);
   if (filters.eventSeriesId !== null) params.set("eventSeriesId", String(filters.eventSeriesId));
