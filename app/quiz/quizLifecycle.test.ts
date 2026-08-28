@@ -77,6 +77,49 @@ test("question and story additions share one visible entry workflow without full
   assert.match(structureEditor, /moveStandaloneStoryElementToSection/);
 });
 
+test("poll placements round-trip through the quiz editor read model", () => {
+  assert.match(
+    quizActions,
+    /OR:\s*\[[\s\S]*story_element_revision_id:\s*\{ not: null \}[\s\S]*live_poll_revision_id:\s*\{ not: null \}/,
+  );
+  assert.match(quizActions, /live_poll_revision:\s*\{[\s\S]*publication_mode:\s*true/);
+  assert.match(quizActions, /standalonePolls:\s*quiz\.quiz_ablauf_elemente\.flatMap/);
+  assert.match(quizDetail, /standalonePolls=\{quiz\.standalonePolls\}/);
+  assert.match(structureEditor, /useState<QuizStandalonePoll\[]>\(standalonePolls\)/);
+});
+
+test("quiz editor treats polls as movable content without question scoring semantics", () => {
+  assert.match(structureEditor, /function StandalonePollItem/);
+  assert.match(structureEditor, /getLivePollTypeLabel\(poll\.type\)/);
+  assert.match(structureEditor, /poll\.publicationMode === "AUTOMATIC"/);
+  assert.match(structureEditor, /poll\.status === "ACTIVE"/);
+  assert.match(structureEditor, /moveStandaloneLivePollToSection/);
+  assert.match(structureEditor, /removeStandaloneLivePollFromQuiz/);
+  assert.doesNotMatch(
+    structureEditor.slice(
+      structureEditor.indexOf("function StandalonePollItem"),
+      structureEditor.indexOf("function BlockDragHandle"),
+    ),
+    /punkte_basis|Lösung|Auflösung/,
+  );
+});
+
+test("poll move and removal actions only mutate the quiz placement", () => {
+  assert.match(
+    flowActions,
+    /moveStandaloneLivePollToSection[\s\S]*typ:\s*"LIVE_POLL"[\s\S]*quiz_abschnitt_id:\s*data\.sectionId[\s\S]*ist_sichtbar:\s*data\.sectionId !== null/,
+  );
+  assert.match(
+    flowActions,
+    /removeStandaloneLivePollFromQuiz[\s\S]*quiz_ablauf_elemente\.deleteMany/,
+  );
+  const removalAction = flowActions.slice(
+    flowActions.indexOf("export async function removeStandaloneLivePollFromQuiz"),
+    flowActions.indexOf("export async function updateQuizDefaultSolutionStrategy"),
+  );
+  assert.doesNotMatch(removalAction, /live_polls\.delete|live_poll_revisionen\.delete/);
+});
+
 test("draft questions are discoverable but server assignment retains eligibility checks", () => {
   assert.match(quizActions, /ist_archiviert: false,[\s\S]*review_status: frage\.review_status/);
   assert.match(quizActions, /Entwurf – noch nicht freigegeben/);

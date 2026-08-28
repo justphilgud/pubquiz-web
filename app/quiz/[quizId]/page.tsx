@@ -256,11 +256,13 @@ export default async function QuizDetailPage({
           key={[
             ...quiz.fragen.map((frage) => `q${frage.quiz_fragen_id}`),
             ...quiz.standaloneStoryElements.map((story) => `s${story.placementId}-${story.quiz_abschnitt_id ?? "none"}`),
+            ...quiz.standalonePolls.map((poll) => `p${poll.placementId}-${poll.quiz_abschnitt_id ?? "none"}`),
           ].join("-")}
           quizId={quiz.quiz_id}
           fragen={quiz.fragen}
           abschnitte={quiz.abschnitte}
           standaloneStories={quiz.standaloneStoryElements}
+          standalonePolls={quiz.standalonePolls}
         />
       </div>
     </main></>

@@ -39,7 +39,9 @@ import {
 } from "../actions";
 import { synchronizeAutomaticBlockTitles } from "../quizStructure";
 import {
+  moveStandaloneLivePollToSection,
   moveStandaloneStoryElementToSection,
+  removeStandaloneLivePollFromQuiz,
   updateQuizStoryPlacementOverride,
 } from "./quizStructureActions";
 import {
@@ -47,6 +49,12 @@ import {
   type StoryElementType,
 } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
+import {
+  getLivePollTypeLabel,
+  type LivePollPublicationMode,
+  type LivePollStatus,
+  type LivePollType,
+} from "@/app/umfragen/livePoll";
 
 type Abschnitt = {
   quiz_abschnitt_id: number;
@@ -62,6 +70,7 @@ type Gruppe = {
   quizAbschnittId: number | null;
   fragen: QuizQuestion[];
   stories: QuizStandaloneStory[];
+  polls: QuizStandalonePoll[];
   blockTyp: "intro" | "outro" | "fragenblock" | "kein-block";
 };
 
@@ -70,6 +79,7 @@ type Props = {
   fragen: QuizQuestion[];
   abschnitte: Abschnitt[];
   standaloneStories: QuizStandaloneStory[];
+  standalonePolls: QuizStandalonePoll[];
 };
 
 export type QuizStandaloneStory = {
@@ -77,6 +87,17 @@ export type QuizStandaloneStory = {
   storyElementId: number;
   title: string;
   type: StoryElementType;
+  quiz_abschnitt_id: number | null;
+  sortierung: number;
+};
+
+export type QuizStandalonePoll = {
+  placementId: number;
+  pollId: number;
+  title: string;
+  type: LivePollType;
+  publicationMode: LivePollPublicationMode;
+  status: LivePollStatus;
   quiz_abschnitt_id: number | null;
   sortierung: number;
 };
@@ -188,6 +209,49 @@ function StandaloneStoryItem({ story, containerId }: {
   );
 }
 
+function StandalonePollItem({ poll, containerId, onRemove }: {
+  poll: QuizStandalonePoll;
+  containerId: string;
+  onRemove: (placementId: number) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `poll-${poll.placementId}`,
+    data: { type: "poll", containerId },
+  });
+  return (
+    <article
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-start gap-2 rounded-xl border bg-white p-3 shadow-sm ${isDragging ? "border-violet-300 opacity-80 shadow-lg" : "border-slate-200"}`}
+    >
+      <button
+        type="button"
+        className="flex h-9 w-9 shrink-0 cursor-grab items-center justify-center rounded-lg text-lg font-semibold text-slate-400 hover:bg-slate-100 hover:text-slate-800 active:cursor-grabbing"
+        title="Umfrage zum Sortieren ziehen"
+        aria-label={`${poll.title} zum Sortieren ziehen`}
+        {...attributes}
+        {...listeners}
+      >
+        ⠿
+      </button>
+      <div className="min-w-0 flex-1">
+        <strong className="block break-words text-sm text-slate-900">{poll.title}</strong>
+        <div className="mt-1 flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
+          <span className="rounded-full bg-violet-50 px-2 py-1 text-violet-800">Umfrage</span>
+          <span>{getLivePollTypeLabel(poll.type)}</span>
+          <span>{poll.publicationMode === "AUTOMATIC" ? "Automatisch" : "Moderiert"}</span>
+          <span>{poll.status === "ACTIVE" ? "Freigegeben" : poll.status === "ARCHIVED" ? "Archiviert" : "Entwurf"}</span>
+          {poll.quiz_abschnitt_id === null && <span className="text-amber-700">Nicht zugeordnet</span>}
+        </div>
+      </div>
+      <div className="flex shrink-0 flex-wrap gap-2">
+        <a href={`/content/polls/${poll.pollId}`} className="inline-flex min-h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700">Öffnen</a>
+        <button type="button" onClick={() => onRemove(poll.placementId)} className="min-h-9 rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-700">Aus Quiz entfernen</button>
+      </div>
+    </article>
+  );
+}
+
 function BlockDragHandle({
   titel,
   attributes,
@@ -218,6 +282,7 @@ function DroppableBlock({
   onToggleGruppe,
   settingsActions,
   onRemove,
+  onRemovePoll,
   onDeleteBlock,
   onRenameBlock,
   fragenrundenAnzahl,
@@ -228,6 +293,7 @@ function DroppableBlock({
   onToggleGruppe: (containerId: string) => void;
   settingsActions: QuizQuestionSettingsActions;
   onRemove: (quizFragenId: number) => void;
+  onRemovePoll: (placementId: number) => void;
   onDeleteBlock: (quizAbschnittId: number) => void | Promise<void>;
   onRenameBlock: (quizAbschnittId: number, currentTitle: string) => void | Promise<void>;
   fragenrundenAnzahl: number;
@@ -330,6 +396,11 @@ function DroppableBlock({
                   <span>
                     {gruppe.stories.length}{" "}
                     {gruppe.stories.length === 1 ? "Story-Element" : "Story-Elemente"}
+                  </span>
+                )}
+                {gruppe.polls.length > 0 && (
+                  <span>
+                    {gruppe.polls.length} {gruppe.polls.length === 1 ? "Umfrage" : "Umfragen"}
                   </span>
                 )}
                 <span>
@@ -442,6 +513,7 @@ function DroppableBlock({
             items={[
               ...gruppe.fragen.map((frage) => frage.quiz_fragen_id),
               ...gruppe.stories.map((story) => `story-${story.placementId}`),
+              ...gruppe.polls.map((poll) => `poll-${poll.placementId}`),
             ]}
             strategy={verticalListSortingStrategy}
           >
@@ -459,7 +531,7 @@ function DroppableBlock({
                 count={outroSlides.length}
                 description="Bekanntmachungen und PubQuiz-Kalender"
               />
-            ) : gruppe.fragen.length === 0 && gruppe.stories.length === 0 ? (
+            ) : gruppe.fragen.length === 0 && gruppe.stories.length === 0 && gruppe.polls.length === 0 ? (
               gruppe.blockTyp === "fragenblock" ? (
                 <div
                   className={`rounded-xl border border-dashed px-4 py-6 text-center text-sm font-medium transition ${
@@ -490,6 +562,14 @@ function DroppableBlock({
                   containerId={gruppe.containerId}
                 />
               ))}
+              {gruppe.polls.map((poll) => (
+                <StandalonePollItem
+                  key={poll.placementId}
+                  poll={poll}
+                  containerId={gruppe.containerId}
+                  onRemove={onRemovePoll}
+                />
+              ))}
             </>)}
           </SortableContext>
         </div>
@@ -503,9 +583,11 @@ export default function QuizFragenSortableTable({
   fragen,
   abschnitte,
   standaloneStories,
+  standalonePolls,
 }: Props) {
   const [items, setItems] = useState<QuizQuestion[]>(fragen);
   const [storyItems, setStoryItems] = useState<QuizStandaloneStory[]>(standaloneStories);
+  const [pollItems, setPollItems] = useState<QuizStandalonePoll[]>(standalonePolls);
   const [blockItems, setBlockItems] = useState(() =>
     synchronizeAutomaticBlockTitles(abschnitte),
   );
@@ -517,6 +599,17 @@ export default function QuizFragenSortableTable({
     setItems((current) =>
       current.filter((item) => item.quiz_fragen_id !== quizFragenId),
     );
+  }
+
+  async function handleRemovePoll(placementId: number) {
+    if (!window.confirm("Umfrage aus diesem Quiz entfernen? Die Umfrage selbst bleibt in der Content-Bibliothek erhalten.")) return;
+    const result = await removeStandaloneLivePollFromQuiz({ quizId, placementId });
+    if (!result.success) {
+      setMeldung(result.message);
+      return;
+    }
+    setPollItems((current) => current.filter((poll) => poll.placementId !== placementId));
+    setMeldung("Umfrage wurde aus dem Quiz entfernt.");
   }
 
   function toggleGruppe(containerId: string) {
@@ -548,6 +641,7 @@ export default function QuizFragenSortableTable({
             quizAbschnittId: introBlock.quiz_abschnitt_id,
             blockTyp: "intro" as const,
             stories: [],
+            polls: [],
             fragen: items
               .filter(
                 (frage) =>
@@ -567,6 +661,9 @@ export default function QuizFragenSortableTable({
       stories: storyItems
         .filter((story) => story.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id)
         .sort((a, b) => a.sortierung - b.sortierung),
+      polls: pollItems
+        .filter((poll) => poll.quiz_abschnitt_id === abschnitt.quiz_abschnitt_id)
+        .sort((a, b) => a.sortierung - b.sortierung),
       fragen: items
         .filter(
           (frage) =>
@@ -584,6 +681,7 @@ export default function QuizFragenSortableTable({
             quizAbschnittId: outroBlock.quiz_abschnitt_id,
             blockTyp: "outro" as const,
             stories: [],
+            polls: [],
             fragen: items
               .filter(
                 (frage) =>
@@ -602,6 +700,9 @@ export default function QuizFragenSortableTable({
       blockTyp: "kein-block",
       stories: storyItems
         .filter((story) => story.quiz_abschnitt_id === null)
+        .sort((a, b) => a.sortierung - b.sortierung),
+      polls: pollItems
+        .filter((poll) => poll.quiz_abschnitt_id === null)
         .sort((a, b) => a.sortierung - b.sortierung),
       fragen: items
         .filter((frage) => frage.quiz_abschnitt_id == null)
@@ -632,6 +733,21 @@ export default function QuizFragenSortableTable({
     const { active, over } = event;
 
     if (!over || active.id === over.id || active.data.current?.type === "block") {
+      return;
+    }
+
+    if (active.data.current?.type === "poll") {
+      const placementId = Number(String(active.id).replace("poll-", ""));
+      const zielContainerId = typeof over.data.current?.containerId === "string"
+        ? over.data.current.containerId
+        : String(over.id);
+      if (!zielContainerId.startsWith("block-")) return;
+      const zielAbschnittId = getAbschnittIdFromContainer(zielContainerId);
+      const zielAbschnitt = blockItems.find((block) => block.quiz_abschnitt_id === zielAbschnittId);
+      if (zielAbschnittId !== null && (!zielAbschnitt || !isQuestionSection(zielAbschnitt))) return;
+      setPollItems((current) => current.map((poll) =>
+        poll.placementId === placementId ? { ...poll, quiz_abschnitt_id: zielAbschnittId } : poll,
+      ));
       return;
     }
 
@@ -740,6 +856,34 @@ export default function QuizFragenSortableTable({
           sortierung: index + 2,
         })),
       });
+      return;
+    }
+
+    if (active.data.current?.type === "poll") {
+      if (!over) return;
+      const placementId = Number(String(active.id).replace("poll-", ""));
+      const zielContainerId = typeof over.data.current?.containerId === "string"
+        ? over.data.current.containerId
+        : String(over.id);
+      if (!zielContainerId.startsWith("block-")) return;
+      const sectionId = getAbschnittIdFromContainer(zielContainerId);
+      const result = await moveStandaloneLivePollToSection({
+        quizId,
+        placementId,
+        sectionId,
+      });
+      if (!result.success) {
+        setMeldung(result.message);
+        return;
+      }
+      setPollItems((current) => current.map((poll) =>
+        poll.placementId === placementId
+          ? { ...poll, quiz_abschnitt_id: sectionId }
+          : poll,
+      ));
+      setMeldung(sectionId === null
+        ? "Umfrage wurde unter Kein Block abgelegt."
+        : "Umfrage wurde dem Block zugeordnet.");
       return;
     }
 
@@ -993,6 +1137,7 @@ export default function QuizFragenSortableTable({
         onToggleGruppe={toggleGruppe}
         settingsActions={settingsActions}
         onRemove={handleRemoveFrage}
+        onRemovePoll={handleRemovePoll}
         onDeleteBlock={handleDeleteBlock}
         onRenameBlock={handleRenameBlock}
         fragenrundenAnzahl={fragenrundeBlocks.length}

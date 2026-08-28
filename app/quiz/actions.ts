@@ -89,6 +89,11 @@ import {
   resolvePresentationAudienceState,
   resolvePresentationLiveState,
 } from "@/app/rendering/presentation/presentationLiveState";
+import type {
+  LivePollPublicationMode,
+  LivePollStatus,
+  LivePollType,
+} from "@/app/umfragen/livePoll";
 import {
   canSaveQuizAnswerForPresentation,
   selectQuizAnswerAssignments,
@@ -270,6 +275,16 @@ export type QuizDetailsResult = QuizResult & {
     storyElementId: number;
     title: string;
     type: StoryElementType;
+    quiz_abschnitt_id: number | null;
+    sortierung: number;
+  }>;
+  standalonePolls: Array<{
+    placementId: number;
+    pollId: number;
+    title: string;
+    type: LivePollType;
+    publicationMode: LivePollPublicationMode;
+    status: LivePollStatus;
     quiz_abschnitt_id: number | null;
     sortierung: number;
   }>;
@@ -944,8 +959,11 @@ export async function getQuizDetails(
       },
       quiz_ablauf_elemente: {
         where: {
-          story_element_revision_id: { not: null },
           story_bezugs_quiz_fragen_id: null,
+          OR: [
+            { story_element_revision_id: { not: null } },
+            { live_poll_revision_id: { not: null } },
+          ],
         },
         orderBy: [
           { sortierung: "asc" },
@@ -957,6 +975,15 @@ export async function getQuizDetails(
               story_element_id: true,
               titel: true,
               typ: true,
+            },
+          },
+          live_poll_revision: {
+            select: {
+              live_poll_id: true,
+              prompt: true,
+              typ: true,
+              publication_mode: true,
+              live_poll: { select: { status: true } },
             },
           },
         },
@@ -1031,6 +1058,20 @@ export async function getQuizDetails(
         storyElementId: revision.story_element_id,
         title: revision.titel,
         type: revision.typ as StoryElementType,
+        quiz_abschnitt_id: placement.quiz_abschnitt_id,
+        sortierung: placement.sortierung,
+      }];
+    }),
+    standalonePolls: quiz.quiz_ablauf_elemente.flatMap((placement) => {
+      const revision = placement.live_poll_revision;
+      if (!revision) return [];
+      return [{
+        placementId: placement.quiz_ablauf_element_id,
+        pollId: revision.live_poll_id,
+        title: revision.prompt,
+        type: revision.typ as LivePollType,
+        publicationMode: revision.publication_mode as LivePollPublicationMode,
+        status: revision.live_poll.status as LivePollStatus,
         quiz_abschnitt_id: placement.quiz_abschnitt_id,
         sortierung: placement.sortierung,
       }];

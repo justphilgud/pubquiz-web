@@ -688,6 +688,67 @@ export async function moveStandaloneStoryElementToSection(data: {
   return { success: true };
 }
 
+export async function moveStandaloneLivePollToSection(data: {
+  quizId: number;
+  placementId: number;
+  sectionId: number | null;
+}): Promise<FlowActionResult> {
+  await requireQuizEditor(data.quizId);
+  if (data.sectionId !== null) {
+    await requireQuizQuestionSection(data.quizId, data.sectionId);
+  }
+  const placement = await prisma.quiz_ablauf_elemente.findFirst({
+    where: {
+      quiz_ablauf_element_id: data.placementId,
+      quiz_id: data.quizId,
+      typ: "LIVE_POLL",
+      live_poll_revision_id: { not: null },
+    },
+    select: { quiz_ablauf_element_id: true },
+  });
+  if (!placement) return { success: false, message: "Umfrage-Platzierung wurde nicht gefunden." };
+
+  await prisma.$transaction(async (tx) => {
+    const anchorType = data.sectionId === null ? "BEFORE_QUIZ" : "BLOCK";
+    const anchorKey = data.sectionId === null ? "UNASSIGNED" : String(data.sectionId);
+    const last = await tx.quiz_ablauf_elemente.findFirst({
+      where: { quiz_id: data.quizId, anker_typ: anchorType, anker_schluessel: anchorKey },
+      orderBy: [{ sortierung: "desc" }, { quiz_ablauf_element_id: "desc" }],
+      select: { sortierung: true },
+    });
+    await tx.quiz_ablauf_elemente.update({
+      where: { quiz_ablauf_element_id: placement.quiz_ablauf_element_id },
+      data: {
+        anker_typ: anchorType,
+        anker_schluessel: anchorKey,
+        quiz_abschnitt_id: data.sectionId,
+        sortierung: (last?.sortierung ?? 0) + 1_000,
+        ist_sichtbar: data.sectionId !== null,
+      },
+    });
+  });
+  revalidateQuizFlow(data.quizId);
+  return { success: true };
+}
+
+export async function removeStandaloneLivePollFromQuiz(data: {
+  quizId: number;
+  placementId: number;
+}): Promise<FlowActionResult> {
+  await requireQuizEditor(data.quizId);
+  const deleted = await prisma.quiz_ablauf_elemente.deleteMany({
+    where: {
+      quiz_ablauf_element_id: data.placementId,
+      quiz_id: data.quizId,
+      typ: "LIVE_POLL",
+      live_poll_revision_id: { not: null },
+    },
+  });
+  if (deleted.count !== 1) return { success: false, message: "Umfrage-Platzierung wurde nicht gefunden." };
+  revalidateQuizFlow(data.quizId);
+  return { success: true };
+}
+
 export async function updateQuizDefaultSolutionStrategy(data: {
   quizId: number;
   strategy: QuizSolutionStrategy;
