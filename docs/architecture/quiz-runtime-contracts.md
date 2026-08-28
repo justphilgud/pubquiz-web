@@ -367,18 +367,55 @@ Single-/Multiple-Choice, Wahr/Falsch, Polls und echte `TEXT`-Interaktionen
 zulässig; Ordering, strukturierte Texte, Zahlen, Pixel und FaceMorph bleiben
 ausgeschlossen.
 
+Der verbindliche Ablauf ist:
+
+```text
+QUESTION / OPEN
+→ Submissions sammeln und moderator-only prüfen
+→ CLOSE
+→ optionales LIVE RESULT REVEAL
+→ normaler SOLUTION-/Quiz-Flow
+```
+
+Während `OPEN` sieht das Publikum ausschließlich die Frage. Es erhält weder
+Antwortverteilung noch offene Texte oder Lösung. Die Moderation sieht den
+Antwortfortschritt und darf eingegangene Antworten in einem ausdrücklich
+moderator-only Bereich prüfen. Bei Freitext darf sie Veröffentlichungen bereits
+vorbereiten oder zurücknehmen; die Publikumsfolie bleibt trotzdem unverändert.
+
+`CLOSE` sperrt weitere Antworten und Änderungen, erhält vorhandene Submissions,
+Moderationsstatus und Veröffentlichungen und erzeugt keinen neuen Run. Ein
+gefüllter Draft ohne finale Submission wird dabei einmalig als
+`AUTO_FINALIZED` gesichert; ein leerer Draft erzeugt keine Submission. Der
+explizite LIVE-Close stößt für diese Auto-Finalisierung keine fachliche
+Evaluation an. Finalisierung und Evaluation bleiben getrennte Zustände.
+
+Erst im Zustand `CLOSED` ist „Ergebnis anzeigen“ verfügbar. Das Ergebnis bleibt
+anonym und neutral; eine Richtig/Falsch-Markierung gehört ausschließlich zum
+separaten Solution-Reveal.
+
+Pixel-Stop bleibt eine eigenständige, explizite Aktion. Ein allgemeiner Close
+darf einen vorhandenen Stopper, Stop-Zustand und eine bestehende Deadline nicht
+verändern, keinen zweiten Stop oder Countdown erzeugen und keinen neuen Run
+öffnen. Drafts anderer Teams dürfen nach den bestehenden Regeln normal
+auto-finalisiert werden, werden dadurch aber weder zum Pixel-Stop noch allein
+wegen Close bewertet. Terminale Pixel-Runs bleiben bei Navigation und Reload
+die maßgebliche Run-Identität.
+
 Choice-Ergebnisse basieren ausschließlich auf der jeweils neuesten finalen
-Submission pro Team. Drafts und ältere Versionen zählen nicht. Solange die
-Antwortphase offen ist, enthält das öffentliche Ergebnis keine
-Richtig/Falsch-Semantik. Die bestehende Snapshot-Abfrage und das bestehende
-Polling transportieren den Zustand; es entsteht kein paralleler Live-Kanal.
+Submission pro Team. Drafts und ältere Versionen zählen nicht. Der öffentliche
+Snapshot transportiert die Aggregate erst nach `CLOSED` und ausdrücklicher
+Ergebnisfreigabe. Die bestehende Snapshot-Abfrage und das bestehende Polling
+transportieren den Zustand; es entsteht kein paralleler Live-Kanal.
 
 Freitext bleibt zweistufig: Die Original-Submission ist unveränderliche Quelle
 für Moderation und Auswertung. Eine Zeile in
 `live_text_response_publications` gibt genau diese Submission ausdrücklich für
-die öffentliche Darstellung frei. Ohne Freigabe erscheint kein Text. Der
-öffentliche Snapshot enthält nur `publicText`; Teamidentität, Original und Diff
-werden ausschließlich nach serverseitiger `CONTROL_LIVE`-Prüfung geladen.
+eine spätere öffentliche Darstellung frei. Ohne Freigabe erscheint kein Text;
+auch eine Freigabe während `OPEN` wird erst im geschlossenen, ausdrücklich
+gezeigten Ergebnis sichtbar. Der öffentliche Snapshot enthält dann nur
+`publicText`; Teamidentität, Original und Diff werden ausschließlich nach
+serverseitiger `CONTROL_LIVE`-Prüfung geladen.
 
 Aktive `public_text_replacement_rules` werden deterministisch ausschließlich
 auf die öffentliche Projektion angewendet. Die Regeln ändern nie Payload,

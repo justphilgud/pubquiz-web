@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   isDraftChangedSinceSubmission,
   planSubmissionVersion,
+  resolveInteractionClosePolicy,
   resolveInteractionSubmissionPolicy,
   shouldKeepInteractionOpenUntilBlockClose,
   shouldAutoFinalizeDraft,
@@ -93,4 +94,33 @@ test("auto-finalizes only a contentful draft without an explicit submission", ()
     }),
     false,
   );
+});
+
+test("LIVE close finalizes contentful drafts without evaluating them", () => {
+  const policy = resolveInteractionClosePolicy("LIVE_RESULT");
+
+  assert.equal(policy.autoFinalizeDrafts, true);
+  assert.equal(policy.evaluateAutoFinalizedDrafts, false);
+  assert.equal(shouldAutoFinalizeDraft({
+    hasExplicitSubmission: false,
+    hasContent: true,
+  }), true);
+  assert.equal(shouldAutoFinalizeDraft({
+    hasExplicitSubmission: false,
+    hasContent: false,
+  }), false);
+});
+
+test("default block close keeps its existing finalization and evaluation policy", () => {
+  assert.deepEqual(resolveInteractionClosePolicy("DEFAULT"), {
+    autoFinalizeDrafts: true,
+    evaluateAutoFinalizedDrafts: true,
+  });
+});
+
+test("pixel close finalizes other drafts without simulating stop evaluation", () => {
+  assert.deepEqual(resolveInteractionClosePolicy("PIXEL"), {
+    autoFinalizeDrafts: true,
+    evaluateAutoFinalizedDrafts: false,
+  });
 });

@@ -30,6 +30,7 @@ import {
 } from "./interactionStateMachine";
 import {
   planSubmissionVersion,
+  resolveInteractionClosePolicy,
   resolveInteractionSubmissionPolicy,
   shouldKeepInteractionOpenUntilBlockClose,
   shouldAutoFinalizeDraft,
@@ -53,6 +54,10 @@ import {
 } from "@/app/quiz/liveResults/liveChoiceResults";
 import { aggregateLiveTextResults } from "@/app/quiz/liveResults/liveTextResults";
 import { selectEffectiveLiveSubmissions } from "@/app/quiz/liveResults/effectiveLiveSubmissions";
+import {
+  canIncludeLiveResultAggregates,
+  isLiveResultVisibleToAudience,
+} from "@/app/quiz/liveResults/liveResultControls";
 import { shouldReuseQuestionInteractionRun } from "./interactionRunReuse";
 
 type DbClient = Prisma.TransactionClient;
@@ -293,7 +298,11 @@ async function deactivateRunWithoutFinalizing(db: DbClient, runId: number) {
 async function closeRun(
   db: DbClient,
   runId: number,
-  options: { reason: string; keepCurrent: boolean },
+  options: {
+    reason: string;
+    keepCurrent: boolean;
+    evaluateFinalizedDrafts?: boolean;
+  },
 ) {
   await lockRun(db, runId);
   const run = await db.quiz_interaction_runs.findUnique({
@@ -302,10 +311,15 @@ async function closeRun(
   if (!run) return null;
   if (run.state === "OPEN" || run.state === "COUNTDOWN") {
     const finalizedDrafts = await autoFinalizeDrafts(db, run, options.reason);
+    const closePolicy = resolveInteractionClosePolicy(
+      isPixelInteractionRun(run) ? "PIXEL" : "DEFAULT",
+    );
     if (
       run.quiz_fragen_id !== null &&
       finalizedDrafts > 0 &&
-      !isPollInteractionType(run.interaction_type)
+      !isPollInteractionType(run.interaction_type) &&
+      options.evaluateFinalizedDrafts !== false &&
+      closePolicy.evaluateAutoFinalizedDrafts
     ) {
       await recalculateQuizQuestionEvaluation(run.quiz_fragen_id, db);
     }
@@ -599,6 +613,8 @@ export async function closeQuizQuestionInteraction(
   return closeRun(db, input.interactionRunId, {
     reason: input.reason ?? "MODERATOR_CLOSED",
     keepCurrent: true,
+    evaluateFinalizedDrafts:
+      resolveInteractionClosePolicy("LIVE_RESULT").evaluateAutoFinalizedDrafts,
   });
 }
 
@@ -1297,6 +1313,22 @@ export async function getQuizLiveSnapshotData(
   const latestLivePayloads = latestLiveSubmissions.map(
     (submission) => submission.payload as QuizInteractionPayload,
   );
+  const liveResultVisibleToAudience = run
+    ? isLiveResultVisibleToAudience(run.state, run.live_results_visible)
+    : false;
+  const includeLiveResultAggregates = run
+    ? canIncludeLiveResultAggregates({
+        state: run.state,
+        requestedVisibility: run.live_results_visible,
+        includeModeration: options.includeLiveModeration === true,
+      })
+    : false;
+  const exposedLiveSubmissions = includeLiveResultAggregates
+    ? latestLiveSubmissions
+    : [];
+  const exposedLivePayloads = includeLiveResultAggregates
+    ? latestLivePayloads
+    : [];
   const answer = run && quizTeamSessionId
     ? await prisma.team_antworten.findFirst({
         where: {
@@ -1444,21 +1476,21 @@ export async function getQuizLiveSnapshotData(
             interaction: pollInteraction,
             state: run!.state,
             totalTeams: teamCount,
-            payloads: latestLivePayloads,
+            payloads: exposedLivePayloads,
           })
         : null,
     liveResultState:
       run && liveChoiceInteraction
         ? aggregateLiveChoiceResults({
             interaction: liveChoiceInteraction,
-            visible: run.live_results_visible,
+            visible: liveResultVisibleToAudience,
             state: run.state,
             totalTeams: teamCount,
-            payloads: latestLivePayloads,
+            payloads: exposedLivePayloads,
           })
         : run && liveTextInteraction
           ? aggregateLiveTextResults({
-              visible: run.live_results_visible,
+              visible: liveResultVisibleToAudience,
               state: run.state,
               totalTeams: teamCount,
               rules: replacementRules.map((rule) => ({
@@ -1467,7 +1499,7 @@ export async function getQuizLiveSnapshotData(
                 replacement: rule.replacement,
               })),
               includeModeration: options.includeLiveModeration === true,
-              submissions: latestLiveSubmissions.flatMap((submission) => {
+              submissions: exposedLiveSubmissions.flatMap((submission) => {
                 const payload = submission.payload as QuizInteractionPayload;
                 if (!("text" in payload) || !payload.text.trim()) return [];
                 return [{

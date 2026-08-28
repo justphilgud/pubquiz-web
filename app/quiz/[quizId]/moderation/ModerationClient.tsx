@@ -905,23 +905,30 @@ export default function ModerationClient({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="font-bold">Live-Ergebnis</h2>
-                    <p className="text-sm text-zinc-300">{liveResultState.finalAnswers} / {liveResultState.totalTeams} finale Antworten · {liveResultState.state === "OPEN" ? "Antwortphase offen" : "Antwortphase geschlossen"}</p>
+                    <p className="text-sm text-zinc-300">{liveResultState.finalAnswers} / {liveResultState.totalTeams} Teams haben geantwortet · {liveResultState.state === "OPEN" || liveResultState.state === "COUNTDOWN" ? "Antwortphase offen" : "Antwortphase geschlossen"}</p>
                     <p className="mt-1 text-xs text-cyan-100">
-                      Publikumsansicht: {liveResultState.visible ? "aktuelle Verteilung" : "Frage"}
+                      Publikumsansicht: {liveResultState.visible ? "Ergebnis" : "Frage"}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" aria-pressed={liveResultState.visible} disabled={liveResultPending || !canToggleLiveResultVisibility(liveResultState.state)} onClick={() => void toggleLiveResults()} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-                      {liveResultState.visible ? "Zurück zur Frage" : "Aktuelle Verteilung zeigen"}
-                    </button>
                     {canCloseLiveResultAnswerPhase(liveResultState.state) && (
                       <button type="button" disabled={liveResultPending} onClick={() => void closeLiveAnswerPhase()} className="min-h-11 rounded-xl border border-zinc-600 px-4 py-2 font-bold disabled:opacity-50">Antwortphase schließen</button>
+                    )}
+                    {canToggleLiveResultVisibility(liveResultState.state) && (
+                      <button type="button" aria-pressed={liveResultState.visible} disabled={liveResultPending} onClick={() => void toggleLiveResults()} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
+                        {liveResultState.visible ? "Ergebnis ausblenden" : "Ergebnis anzeigen"}
+                      </button>
                     )}
                   </div>
                 </div>
                 {(liveResultState.state === "OPEN" || liveResultState.state === "COUNTDOWN") && (
                   <p className="mt-3 text-sm text-zinc-300">
-                    Die aktuelle Verteilung kann schon jetzt gezeigt werden. Die richtige Lösung bleibt bis zur Auflösung verborgen; mit „Zurück zur Frage“ können Teams weiter antworten oder ändern.
+                    Während der Antwortphase sieht das Publikum ausschließlich die Frage. Antworten können hier intern geprüft und Freitexte für die spätere Veröffentlichung vorbereitet werden.
+                  </p>
+                )}
+                {liveResultState.state === "CLOSED" && !liveResultState.visible && (
+                  <p className="mt-3 text-sm text-zinc-300">
+                    Die Antwortphase ist geschlossen. „Ergebnis anzeigen“ veröffentlicht jetzt die anonyme Verteilung oder die freigegebenen Texte; die Lösung bleibt ein eigener Schritt.
                   </p>
                 )}
                 {liveResultState.finalAnswers === 0 && (
@@ -934,8 +941,29 @@ export default function ModerationClient({
                     {liveResultControlError}
                   </p>
                 )}
-                {liveResultState.kind === "TEXT" && (
-                  <div className="mt-4">
+                <details className="mt-4 rounded-xl border border-zinc-700 bg-zinc-950/35 p-3">
+                  <summary className="min-h-10 cursor-pointer select-none font-bold text-cyan-100">
+                    Antworten ansehen
+                  </summary>
+                  <p className="mt-1 text-xs text-zinc-400">Nur in der Moderation sichtbar, nicht auf der Präsentationsfolie.</p>
+                  {liveResultState.kind === "CHOICE" && (
+                    <div className="mt-3 grid gap-2">
+                      {liveResultState.options.map((entry) => (
+                        <div key={entry.id} className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-sm">
+                          <span className="truncate">{entry.label}</span>
+                          <strong className="shrink-0">{entry.count} · {entry.share.toLocaleString("de-DE", { maximumFractionDigits: 1 })} %</strong>
+                        </div>
+                      ))}
+                      {liveResultState.scale?.values.map((entry) => (
+                        <div key={entry.value} className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-sm">
+                          <span>Wert {entry.value.toLocaleString("de-DE")}</span>
+                          <strong>{entry.count} · {entry.share.toLocaleString("de-DE", { maximumFractionDigits: 1 })} %</strong>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {liveResultState.kind === "TEXT" && (
+                    <div className="mt-4">
                     {liveTextPublicationError && (
                       <p role="alert" className="mb-3 rounded-xl border border-red-400/60 bg-red-950/50 p-3 text-sm text-red-100">
                         {liveTextPublicationError}
@@ -983,8 +1011,9 @@ export default function ModerationClient({
                         </p>
                       )}
                     </div>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </details>
               </section>
             )}
 

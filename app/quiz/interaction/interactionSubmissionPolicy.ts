@@ -45,6 +45,15 @@ export function shouldAutoFinalizeDraft(input: {
   return !input.hasExplicitSubmission && input.hasContent;
 }
 
+export function resolveInteractionClosePolicy(
+  mode: "DEFAULT" | "LIVE_RESULT" | "PIXEL",
+) {
+  return {
+    autoFinalizeDrafts: true,
+    evaluateAutoFinalizedDrafts: mode === "DEFAULT",
+  } as const;
+}
+
 export function planSubmissionVersion(
   submissions: readonly {
     submissionVersion: number;

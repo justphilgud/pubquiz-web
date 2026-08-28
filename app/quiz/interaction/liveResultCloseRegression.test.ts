@@ -5,7 +5,11 @@ import test from "node:test";
 import { resolveEffectiveSubmission } from "../evaluation/effectiveSubmission";
 import { aggregateLiveChoiceResults } from "../liveResults/liveChoiceResults";
 import { selectEffectiveLiveSubmissions } from "../liveResults/effectiveLiveSubmissions";
-import { canToggleLiveResultVisibility } from "../liveResults/liveResultControls";
+import {
+  canIncludeLiveResultAggregates,
+  canToggleLiveResultVisibility,
+  isLiveResultVisibleToAudience,
+} from "../liveResults/liveResultControls";
 import { shouldReuseQuestionInteractionRun } from "./interactionRunReuse";
 import { isQuizInteractionWritable } from "./interactionStateMachine";
 
@@ -81,7 +85,7 @@ test("closing keeps a single-choice submission effective for live results and ev
   assert.equal(after.evaluation?.submissionStatus, "SUBMITTED");
 });
 
-test("OPEN can show the current neutral distribution and return to the writable question", () => {
+test("OPEN keeps the neutral distribution moderator-only while the question stays writable", () => {
   const storedAnswer = answer({ payloads: [{ optionId: 3 }] });
   const live = selectEffectiveLiveSubmissions({
     interactionRunId: 40,
@@ -93,15 +97,25 @@ test("OPEN can show the current neutral distribution and return to the writable 
       selectionMode: "SINGLE",
       options: [{ id: 1, label: "A" }, { id: 3, label: "C" }],
     },
-    visible: true,
+    visible: isLiveResultVisibleToAudience("OPEN", true),
     state: "OPEN",
     totalTeams: 1,
     payloads: live.map(({ payload }) => payload),
   });
 
-  assert.equal(canToggleLiveResultVisibility("OPEN"), true);
+  assert.equal(canToggleLiveResultVisibility("OPEN"), false);
+  assert.equal(canIncludeLiveResultAggregates({
+    state: "OPEN",
+    requestedVisibility: true,
+    includeModeration: false,
+  }), false);
+  assert.equal(canIncludeLiveResultAggregates({
+    state: "OPEN",
+    requestedVisibility: false,
+    includeModeration: true,
+  }), true);
   assert.equal(isQuizInteractionWritable("OPEN", null, new Date()), true);
-  assert.equal(result.visible, true);
+  assert.equal(result.visible, false);
   assert.deepEqual(result.options.map(({ count }) => count), [0, 1]);
   assert.ok(result.options.every((option) => !(
     "correct" in option || "isCorrect" in option
@@ -208,6 +222,8 @@ test("the production close action targets the validated run and never deletes su
   assert.doesNotMatch(closeAction, /closeCurrentInteraction/);
   assert.match(closeService, /run\.quiz_id !== input\.quizId/);
   assert.match(closeService, /run\.quiz_fragen_id !== input\.quizFragenId/);
+  assert.match(closeService, /resolveInteractionClosePolicy\("LIVE_RESULT"\)/);
+  assert.match(closeService, /evaluateFinalizedDrafts:/);
   assert.doesNotMatch(closeService, /team_answer_submissions\.(delete|update)/);
 });
 

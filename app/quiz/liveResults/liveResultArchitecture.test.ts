@@ -42,7 +42,7 @@ test("productive moderation requests private text data and exposes publish and h
   assert.match(moderation, /Freigabe zurücknehmen/);
 });
 
-test("OPEN live-result controls are confirmed by the server and never fail silently", () => {
+test("live-result reveal is server-confirmed and only offered after close", () => {
   const visibilityAction = actions.slice(
     actions.indexOf("export async function setQuizLiveResultVisibility"),
     actions.indexOf("export async function closeQuizQuestionAnswerPhase"),
@@ -54,7 +54,12 @@ test("OPEN live-result controls are confirmed by the server and never fail silen
   assert.match(moderation, /liveResultMutationRevisionRef/);
   assert.match(moderation, /setLiveResultControlError/);
   assert.match(moderation, /role="alert"/);
-  assert.match(moderation, /Die aktuelle Verteilung kann schon jetzt gezeigt werden/);
+  assert.match(moderation, /Antwortphase schließen/);
+  assert.match(moderation, /Ergebnis anzeigen/);
+  assert.match(moderation, /Antworten ansehen/);
+  assert.doesNotMatch(moderation, /Aktuelle Verteilung zeigen/);
+  assert.match(interactionServer, /isLiveResultVisibleToAudience/);
+  assert.match(interactionServer, /canIncludeLiveResultAggregates/);
 });
 
 test("replacement CRUD is admin-only and public rendering has no team identity", () => {

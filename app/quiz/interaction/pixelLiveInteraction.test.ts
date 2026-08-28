@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -143,6 +144,25 @@ test("stopped terminal pixel runs remain authoritative on question re-entry", ()
     stoppedAt: new Date("2026-08-15T18:00:05.000Z"),
     stoppedAtStage: 1,
   }), false);
+});
+
+test("general close preserves pixel stop authority and never simulates another stop", () => {
+  const service = readFileSync(
+    "app/quiz/interaction/interaction.server.ts",
+    "utf8",
+  );
+  const closeRun = service.slice(
+    service.indexOf("async function closeRun"),
+    service.indexOf("export async function syncInteractionForPresentation"),
+  );
+
+  assert.match(closeRun, /await autoFinalizeDrafts\(db, run, options\.reason\)/);
+  assert.match(closeRun, /isPixelInteractionRun\(run\) \? "PIXEL" : "DEFAULT"/);
+  assert.match(closeRun, /deadline_at: run\.stopped_at \? run\.deadline_at : null/);
+  assert.doesNotMatch(closeRun, /stopped_by_team_session_id\s*:/);
+  assert.doesNotMatch(closeRun, /stopped_at_stage\s*:/);
+  assert.doesNotMatch(closeRun, /quiz_interaction_runs\.create/);
+  assert.doesNotMatch(closeRun, /startInteractionCountdown|deadlineAt/);
 });
 
 function points(stage: 1 | 2 | 3, evaluations: Parameters<typeof allocatePixelQuestionPoints>[0]["evaluations"]) {
