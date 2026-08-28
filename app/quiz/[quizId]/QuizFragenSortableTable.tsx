@@ -1184,8 +1184,8 @@ export default function QuizFragenSortableTable({
               {meldung && <p role="status" className="mt-3 text-sm font-medium text-slate-600">{meldung}</p>}
             </section>
 
-            {keinBlockGruppe && renderGroup(keinBlockGruppe)}
             {outroGruppe && renderGroup(outroGruppe)}
+            {keinBlockGruppe && renderGroup(keinBlockGruppe)}
           </div>
         </SortableContext>
       </DndContext>

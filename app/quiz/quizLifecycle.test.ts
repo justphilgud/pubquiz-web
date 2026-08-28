@@ -120,6 +120,24 @@ test("poll move and removal actions only mutate the quiz placement", () => {
   assert.doesNotMatch(removalAction, /live_polls\.delete|live_poll_revisionen\.delete/);
 });
 
+test("unassigned content remains the final quiz editor section", () => {
+  const outroPosition = structureEditor.indexOf(
+    "{outroGruppe && renderGroup(outroGruppe)}",
+  );
+  const unassignedPosition = structureEditor.indexOf(
+    "{keinBlockGruppe && renderGroup(keinBlockGruppe)}",
+  );
+
+  assert.ok(outroPosition >= 0);
+  assert.ok(unassignedPosition > outroPosition);
+  assert.match(structureEditor, /fragenGruppen\.map\(renderGroup\)[\s\S]*outroGruppe[\s\S]*keinBlockGruppe/);
+  assert.match(structureEditor, /quiz_abschnitt_id === null/);
+  assert.match(
+    structureEditor,
+    /polls:\s*pollItems[\s\S]*filter\(\(poll\) => poll\.quiz_abschnitt_id === abschnitt\.quiz_abschnitt_id\)/,
+  );
+});
+
 test("draft questions are discoverable but server assignment retains eligibility checks", () => {
   assert.match(quizActions, /ist_archiviert: false,[\s\S]*review_status: frage\.review_status/);
   assert.match(quizActions, /Entwurf – noch nicht freigegeben/);
