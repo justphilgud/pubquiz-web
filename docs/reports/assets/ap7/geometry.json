@@ -1,0 +1,1623 @@
+[
+  {
+    "label": "before-390x440",
+    "viewport": [
+      390,
+      440
+    ],
+    "buttons": [
+      {
+        "label": "Abbrechen",
+        "y": 268,
+        "height": 48
+      },
+      {
+        "label": "Entwurf speichern",
+        "y": 324,
+        "height": 48
+      },
+      {
+        "label": "Speichern und freigeben",
+        "y": 380,
+        "height": 48
+      }
+    ]
+  },
+  {
+    "label": "before-desktop",
+    "viewport": [
+      1440,
+      900
+    ],
+    "buttons": [
+      {
+        "label": "Abbrechen",
+        "x": 264.5,
+        "y": 840,
+        "width": 293.328125,
+        "height": 48
+      },
+      {
+        "label": "Entwurf speichern",
+        "x": 565.828125,
+        "y": 840,
+        "width": 293.3359375,
+        "height": 48
+      },
+      {
+        "label": "Speichern und freigeben",
+        "x": 867.1640625,
+        "y": 840,
+        "width": 293.3359375,
+        "height": 48
+      }
+    ]
+  },
+  {
+    "label": "question-focused-390x440",
+    "active": {
+      "label": "questionText",
+      "rect": {
+        "bottom": 281,
+        "height": 122,
+        "width": 317,
+        "x": 29,
+        "y": 159
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 638,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "question-validation-answer",
+    "active": {
+      "label": "_R_66d5fiv5uivb_-answer",
+      "rect": {
+        "bottom": 277,
+        "height": 50,
+        "width": 299,
+        "x": 38,
+        "y": 227
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 105,
+      "width": 375,
+      "x": 0,
+      "y": 335
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1098.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "story-text-360x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 336,
+        "height": 128,
+        "width": 253,
+        "x": 46,
+        "y": 208
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 345,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 201,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 221,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 345,
+    "scrollY": 1176.5,
+    "viewport": [
+      360,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "story-media-360x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 253,
+        "x": 46,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 345,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 201,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 221,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 345,
+    "scrollY": 1573,
+    "viewport": [
+      360,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "poll-option6-430x440",
+    "active": {
+      "label": "Option 6",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 245.6171875,
+        "x": 33,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 430,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 286,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 306,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 430,
+    "scrollY": 1019.5,
+    "viewport": [
+      430,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "pixel-solution-390x440",
+    "active": {
+      "label": "_r_4_-answer",
+      "rect": {
+        "bottom": 245,
+        "height": 50,
+        "width": 299,
+        "x": 38,
+        "y": 195
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 2452.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "ordering-explanation-390x440",
+    "active": {
+      "label": "Erklärung 3",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 293,
+        "x": 41,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1698.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "translation-longtext-390x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 251.90625,
+        "height": 63.703125,
+        "width": 317,
+        "x": 29,
+        "y": 188.203125
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1153.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "translation-solution-390x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 241.90625,
+        "height": 44,
+        "width": 317,
+        "x": 29,
+        "y": 197.90625
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1670.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "reviews-longtext-390x440",
+    "active": {
+      "label": "Rezension 2",
+      "rect": {
+        "bottom": 274.8125,
+        "height": 109.40625,
+        "width": 293,
+        "x": 41,
+        "y": 165.40625
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 2050,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "reviews-background-390x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 252.015625,
+        "height": 63.703125,
+        "width": 291,
+        "x": 42,
+        "y": 188.3125
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 2859,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "multi-choice-option-390x440",
+    "active": {
+      "label": "_r_7_-answer",
+      "rect": {
+        "bottom": 245,
+        "height": 50,
+        "width": 299,
+        "x": 38,
+        "y": 195
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1706.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "scale-right-label-390x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 317,
+        "x": 29,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1378.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "story-desktop-request-not-applied-actual360x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 268,
+        "height": 96,
+        "width": 287,
+        "x": 29,
+        "y": 172
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 345,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 201,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 221,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 345,
+    "scrollY": 993,
+    "viewport": [
+      360,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-question-desktop-1440x900",
+    "active": {
+      "label": "questionText",
+      "rect": {
+        "bottom": 1087,
+        "height": 122,
+        "width": 862,
+        "x": 281.5,
+        "y": 965
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 900,
+      "height": 137,
+      "width": 1425,
+      "x": 0,
+      "y": 763
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Abbrechen",
+        "rect": {
+          "bottom": 888,
+          "height": 48,
+          "width": 293.328125,
+          "x": 264.5,
+          "y": 840
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Entwurf speichern",
+        "rect": {
+          "bottom": 888,
+          "height": 48,
+          "width": 293.3359375,
+          "x": 565.828125,
+          "y": 840
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 888,
+          "height": 48,
+          "width": 293.3359375,
+          "x": 867.1640625,
+          "y": 840
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 1425,
+    "scrollY": 0,
+    "viewport": [
+      1440,
+      900
+    ],
+    "visualViewport": {
+      "height": 900,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-question-mobile-390x440",
+    "active": {
+      "label": "_R_18pklfiv5uivb_-answer",
+      "rect": {
+        "bottom": 245,
+        "height": 50,
+        "width": 299,
+        "x": 38,
+        "y": 195
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 2082.5,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-question-tablet-768x1024",
+    "active": {
+      "label": "questionText",
+      "rect": {
+        "bottom": 573,
+        "height": 122,
+        "width": 655,
+        "x": 49,
+        "y": 451
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 1024,
+      "height": 137,
+      "width": 753,
+      "x": 0,
+      "y": 887
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Abbrechen",
+        "rect": {
+          "bottom": 1012,
+          "height": 48,
+          "width": 237.6640625,
+          "x": 12,
+          "y": 964
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Entwurf speichern",
+        "rect": {
+          "bottom": 1012,
+          "height": 48,
+          "width": 237.6640625,
+          "x": 257.6640625,
+          "y": 964
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 1012,
+          "height": 48,
+          "width": 237.671875,
+          "x": 503.328125,
+          "y": 964
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 753,
+    "scrollY": 574,
+    "viewport": [
+      768,
+      1024
+    ],
+    "visualViewport": {
+      "height": 1024,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-question-landscape-844x390",
+    "active": {
+      "label": "_R_18pklfiv5uivb_-answer",
+      "rect": {
+        "bottom": 220,
+        "height": 50,
+        "width": 697,
+        "x": 66,
+        "y": 170
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 390,
+      "height": 137,
+      "width": 829,
+      "x": 0,
+      "y": 253
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Abbrechen",
+        "rect": {
+          "bottom": 378,
+          "height": 48,
+          "width": 263,
+          "x": 12,
+          "y": 330
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Entwurf speichern",
+        "rect": {
+          "bottom": 378,
+          "height": 48,
+          "width": 263,
+          "x": 283,
+          "y": 330
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 378,
+          "height": 48,
+          "width": 263,
+          "x": 554,
+          "y": 330
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 829,
+    "scrollY": 1619.5,
+    "viewport": [
+      844,
+      390
+    ],
+    "visualViewport": {
+      "height": 390,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-story-desktop-1440x900",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 514,
+        "height": 128,
+        "width": 1196,
+        "x": 114.5,
+        "y": 386
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 900,
+      "height": 73,
+      "width": 1425,
+      "x": 0,
+      "y": 827
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Abbrechen",
+        "rect": {
+          "bottom": 888,
+          "height": 48,
+          "width": 293.328125,
+          "x": 264.5,
+          "y": 840
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Entwurf speichern",
+        "rect": {
+          "bottom": 888,
+          "height": 48,
+          "width": 293.3359375,
+          "x": 565.828125,
+          "y": 840
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 888,
+          "height": 48,
+          "width": 293.3359375,
+          "x": 867.1640625,
+          "y": 840
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 1425,
+    "scrollY": 650.5,
+    "viewport": [
+      1440,
+      900
+    ],
+    "visualViewport": {
+      "height": 900,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-story-mobile-360x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 284,
+        "height": 128,
+        "width": 253,
+        "x": 46,
+        "y": 156
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 125,
+      "width": 345,
+      "x": 0,
+      "y": 315
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 201,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 221,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 345,
+    "scrollY": 1324.5,
+    "viewport": [
+      360,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-story-title-with-save-feedback",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 287,
+        "x": 29,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 125,
+      "width": 345,
+      "x": 0,
+      "y": 315
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 201,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 221,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 345,
+    "scrollY": 883,
+    "viewport": [
+      360,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-poll-desktop-1440x900",
+    "active": {
+      "label": "Option 6",
+      "rect": {
+        "bottom": 472,
+        "height": 44,
+        "width": 750.6171875,
+        "x": 285.5,
+        "y": 428
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 880,
+      "height": 73,
+      "width": 1425,
+      "x": 0,
+      "y": 807
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Abbrechen",
+        "rect": {
+          "bottom": 868,
+          "height": 48,
+          "width": 293.328125,
+          "x": 264.5,
+          "y": 820
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Entwurf speichern",
+        "rect": {
+          "bottom": 868,
+          "height": 48,
+          "width": 293.3359375,
+          "x": 565.828125,
+          "y": 820
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 868,
+          "height": 48,
+          "width": 293.3359375,
+          "x": 867.1640625,
+          "y": 820
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 1425,
+    "scrollY": 631.5,
+    "viewport": [
+      1440,
+      900
+    ],
+    "visualViewport": {
+      "height": 900,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-poll-mobile-430x440",
+    "active": {
+      "label": "Option 6",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 245.6171875,
+        "x": 33,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 420,
+      "height": 107,
+      "width": 415,
+      "x": 0,
+      "y": 313
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 412,
+          "height": 44,
+          "width": 271,
+          "x": 12,
+          "y": 368
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 412,
+          "height": 44,
+          "width": 112,
+          "x": 291,
+          "y": 368
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 415,
+    "scrollY": 1331.5,
+    "viewport": [
+      430,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-poll-free-text-430x440",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 260,
+        "height": 80,
+        "width": 349,
+        "x": 33,
+        "y": 180
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 420,
+      "height": 107,
+      "width": 415,
+      "x": 0,
+      "y": 313
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 412,
+          "height": 44,
+          "width": 271,
+          "x": 12,
+          "y": 368
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 412,
+          "height": 44,
+          "width": 112,
+          "x": 291,
+          "y": 368
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 415,
+    "scrollY": 1217.5,
+    "viewport": [
+      430,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-poll-validation-prompt",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 268,
+        "height": 96,
+        "width": 349,
+        "x": 33,
+        "y": 172
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 420,
+      "height": 107,
+      "width": 415,
+      "x": 0,
+      "y": 313
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 412,
+          "height": 44,
+          "width": 271,
+          "x": 12,
+          "y": 368
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 412,
+          "height": 44,
+          "width": 112,
+          "x": 291,
+          "y": 368
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 415,
+    "scrollY": 876,
+    "viewport": [
+      430,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-story-error-title",
+    "active": {
+      "label": "",
+      "rect": {
+        "bottom": 242,
+        "height": 44,
+        "width": 287,
+        "x": 29,
+        "y": 198
+      },
+      "tag": "INPUT"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 105,
+      "width": 345,
+      "x": 0,
+      "y": 335
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 201,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 221,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 345,
+    "scrollY": 883,
+    "viewport": [
+      360,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  },
+  {
+    "label": "final-question-focused-390x440",
+    "active": {
+      "label": "questionText",
+      "rect": {
+        "bottom": 281,
+        "height": 122,
+        "width": 317,
+        "x": 29,
+        "y": 159
+      },
+      "tag": "TEXTAREA"
+    },
+    "bar": {
+      "bottom": 440,
+      "height": 61,
+      "width": 375,
+      "x": 0,
+      "y": 379
+    },
+    "buttons": [
+      {
+        "disabled": false,
+        "label": "Speichern und freigeben",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 231,
+          "x": 12,
+          "y": 388
+        }
+      },
+      {
+        "disabled": false,
+        "label": "Weitere Aktionen",
+        "rect": {
+          "bottom": 432,
+          "height": 44,
+          "width": 112,
+          "x": 251,
+          "y": 388
+        }
+      }
+    ],
+    "expanded": "false",
+    "scrollWidth": 375,
+    "scrollY": 1270,
+    "viewport": [
+      390,
+      440
+    ],
+    "visualViewport": {
+      "height": 440,
+      "offsetTop": 0
+    }
+  }
+]

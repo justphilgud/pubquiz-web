@@ -1,0 +1,41 @@
+{
+  "active": {
+    "bottom": 248,
+    "height": 96,
+    "top": 152
+  },
+  "buttons": [
+    {
+      "bottom": 82,
+      "height": 44,
+      "text": "Schließen",
+      "top": 38
+    },
+    {
+      "bottom": 408,
+      "height": 44,
+      "text": "Abbrechen",
+      "top": 364
+    },
+    {
+      "bottom": 356,
+      "height": 44,
+      "text": "Übernehmen",
+      "top": 312
+    }
+  ],
+  "panel": {
+    "bottom": 424,
+    "height": 408,
+    "top": 16
+  },
+  "scrollBody": {
+    "bottom": 295,
+    "height": 190,
+    "top": 105
+  },
+  "viewport": [
+    390,
+    440
+  ]
+}
