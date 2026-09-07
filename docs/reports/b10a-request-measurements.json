@@ -1,0 +1,84 @@
+{
+  "date": "2026-09-07",
+  "timezone": "UTC",
+  "source": "Vercel Observability Query Builder, visible UI manually transcribed after ingestion delay",
+  "project": "pubquiz-web",
+  "environment": "Preview",
+  "deploymentId": "dpl_4WfNXvTPu2LLcuR8uCC3b994SVRU",
+  "runtimeCommit": "2865ceb022cd9ed447b88750209526df255b39b1",
+  "quizId": 29,
+  "method": "POST",
+  "windows": [
+    {
+      "start": "15:14",
+      "end": "15:17",
+      "state": "RUNNING question 1",
+      "teams": 0,
+      "moderatorSnapshot": 212,
+      "moderation": 120,
+      "presentation": 388,
+      "teamSnapshot": 0
+    },
+    {
+      "start": "15:19",
+      "end": "15:22",
+      "state": "RUNNING question 2",
+      "teams": 0,
+      "moderatorSnapshot": 212,
+      "moderation": 120,
+      "presentation": 388,
+      "teamSnapshot": 0
+    },
+    {
+      "start": "15:27",
+      "end": "15:30",
+      "state": "RUNNING question 2, saved draft",
+      "teams": 1,
+      "moderatorSnapshot": 212,
+      "moderation": 120,
+      "presentation": 393,
+      "teamSnapshot": 300
+    },
+    {
+      "start": "15:32",
+      "end": "15:35",
+      "state": "STOPPED",
+      "teams": 1,
+      "moderatorSnapshot": 212,
+      "moderation": 120,
+      "presentation": 390,
+      "teamSnapshot": 306
+    }
+  ],
+  "logSample": {
+    "snapshotUtc": [
+      "15:20:53.94",
+      "15:20:54.77",
+      "15:20:55.62",
+      "15:20:56.52",
+      "15:20:57.35",
+      "15:20:58.20"
+    ],
+    "snapshotQueryCount": 9,
+    "progressUtc": [
+      "15:20:54.80",
+      "15:20:56.30",
+      "15:20:57.80"
+    ],
+    "progressQueryCount": 12,
+    "httpStatus": 200
+  },
+  "baseline": {
+    "kind": "linear extrapolation of one actual team, not multi-client load test",
+    "requestsPer15Min": {
+      "10": 18625,
+      "20": 33625,
+      "40": 63625
+    }
+  },
+  "limitations": [
+    "Changing foreground tabs may affect browser scheduling.",
+    "DB figures cover sampled moderator readers, not total database load.",
+    "Before-fix short host sample was not an isolated single-client measurement."
+  ]
+}
