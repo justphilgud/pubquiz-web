@@ -1,0 +1,77 @@
+[
+  {
+    "fields": [
+      {
+        "height": 44,
+        "label": "Beschriftung links",
+        "value": "AP8 links mobil geprüft",
+        "width": 287,
+        "x": 29,
+        "y": 280
+      },
+      {
+        "height": 44,
+        "label": "Beschriftung rechts",
+        "value": "AP8 rechts: vollkommen",
+        "width": 287,
+        "x": 29,
+        "y": 348
+      }
+    ],
+    "pageWidth": 345,
+    "viewport": [
+      360,
+      740
+    ]
+  },
+  {
+    "fields": [
+      {
+        "height": 44,
+        "label": "Beschriftung links",
+        "value": "AP8 links mobil geprüft",
+        "width": 357,
+        "x": 29,
+        "y": 379
+      },
+      {
+        "height": 44,
+        "label": "Beschriftung rechts",
+        "value": "AP8 rechts: vollkommen",
+        "width": 357,
+        "x": 29,
+        "y": 447
+      }
+    ],
+    "pageWidth": 415,
+    "viewport": [
+      430,
+      844
+    ]
+  },
+  {
+    "fields": [
+      {
+        "height": 44,
+        "label": "Beschriftung links",
+        "value": "AP8 links mobil geprüft",
+        "width": 317,
+        "x": 29,
+        "y": 130
+      },
+      {
+        "height": 44,
+        "label": "Beschriftung rechts",
+        "value": "AP8 rechts: vollkommen",
+        "width": 317,
+        "x": 29,
+        "y": 198
+      }
+    ],
+    "pageWidth": 375,
+    "viewport": [
+      390,
+      440
+    ]
+  }
+]

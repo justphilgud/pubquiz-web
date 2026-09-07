@@ -1,0 +1,67 @@
+- banner:
+  - link "ungegoogelt":
+    - /url: /
+    - img "ungegoogelt"
+  - navigation "Hauptnavigation":
+    - generic "Content":
+      - text: Content
+      - generic: ▾
+    - link "Eventreihen":
+      - /url: /admin/eventreihen
+    - link "Quiz":
+      - /url: /quiz
+    - link "Teams":
+      - /url: /admin/teams
+  - button "Benutzermenü öffnen":
+    - generic: C
+- main:
+  - paragraph: Fragenverwaltung
+  - heading "Neue Frage" [level=1]
+  - button "← Zurück"
+  - group "Geltungsbereich":
+    - generic: Geltungsbereich
+    - radiogroup "Geltungsbereich":
+      - radio "Eventreihe" [checked]
+    - paragraph: Dieser Inhalt kann nur in den ausgewählten Eventreihen verwendet werden.
+    - button "Bestandsquizze entfernen": Bestandsquizze ×
+    - combobox "Eventreihe suchen": Bestands
+  - paragraph: "Spezialfrage: Umfrage: Skala"
+  - paragraph: Teams stimmen auf einer frei beschriftbaren Skala ab; es gibt keine Punkte.
+  - button "Ändern"
+  - button "Auswahl lösen"
+  - text: Frage
+  - textbox "Frage":
+    - /placeholder: Formuliere deine Frage...
+    - text: "Codex AP8 Skala: Wie gut passt die Testbeschriftung?"
+  - paragraph: 52 / 300
+  - button "Medien · Keine Medien":
+    - generic: ♪
+    - generic: Medien
+    - generic: · Keine Medien
+    - generic: ⌄
+  - heading "Umfrage-Skala" [level=2]
+  - paragraph: Die Abstimmung hat keine richtige Antwort und vergibt keine Punkte.
+  - text: Von
+  - spinbutton "Von": "1"
+  - text: Bis
+  - spinbutton "Bis": "5"
+  - text: Schrittweite
+  - spinbutton "Schrittweite": "1"
+  - text: Beschriftung links
+  - textbox "Beschriftung links": "AP8 links: gar nicht"
+  - text: Beschriftung rechts
+  - textbox "Beschriftung rechts" [active]: "AP8 rechts: vollkommen"
+  - button "Weitere Angaben Kategorien, interne Angaben und Ablaufdatum":
+    - generic: Weitere Angaben
+    - generic: Kategorien, interne Angaben und Ablaufdatum
+    - generic: +
+  - generic "Story-Elemente (0)"
+  - option "Story-Element auswählen" [selected]
+  - option "Codex AP7 Mobile Story – eigener Abnahmetext · Anekdote · eigener Entwurf"
+  - checkbox "Zusätzlich als Spezialfragenvorlage speichern Wird nach der Frage als Freigabevorschlag erstellt."
+  - text: Zusätzlich als Spezialfragenvorlage speichern
+  - generic: Wird nach der Frage als Freigabevorschlag erstellt.
+  - button "Abbrechen"
+  - button "Entwurf speichern"
+  - button "Speichern und freigeben"
+- alert

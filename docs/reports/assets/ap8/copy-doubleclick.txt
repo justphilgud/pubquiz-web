@@ -1,0 +1,99 @@
+- banner:
+  - link "ungegoogelt":
+    - /url: /
+    - img "ungegoogelt"
+  - navigation "Hauptnavigation":
+    - generic "Content":
+      - text: Content
+      - generic: ▾
+    - link "Eventreihen":
+      - /url: /admin/eventreihen
+    - link "Quiz":
+      - /url: /quiz
+    - link "Teams":
+      - /url: /admin/teams
+  - button "Benutzermenü öffnen":
+    - generic: C
+- main:
+  - heading "Codex AP8 Kopie Doppelklick" [level=1]
+  - generic: Bestandsquizze
+  - generic: 2026-09-08
+  - link "Zur Übersicht":
+    - /url: /quiz
+  - link "Quiz-Einstellungen öffnen":
+    - /url: /quiz?editQuizId=33
+  - link "Moderieren":
+    - /url: /quiz/33/moderation
+  - link "Präsentation öffnen":
+    - /url: /quiz/33/praesentation
+  - link "Antwortformular öffnen":
+    - /url: /quiz/33/antworten
+  - link "Auswertung öffnen":
+    - /url: /quiz/33/auswertung
+  - button "Quiz kopieren":
+    - generic: Quiz kopieren
+  - button "Archivieren":
+  - button "Quiz-Element hinzufügen"
+  - generic: Auflösungen
+  - combobox "Auflösungen":
+    - option "Direkt nach jeder Frage"
+    - option "Gesammelt am Ende des Blocks" [selected]
+  - generic: Gilt einheitlich für alle Fragenblöcke dieses Quiz.
+  - generic: IN
+  - button "Intro 5 feste Slides Intro" [expanded]:
+    - generic: Intro
+    - generic: 5 feste Slides
+    - generic: Intro
+  - button "Block einklappen":
+    - generic: ⌄
+  - article:
+    - generic: Intro konfigurieren
+    - generic: Wartebildschirm, Countdown, Begrüßung, Preise und Regeln. Zum Abschluss folgt der QR-Code zum Teambeitritt; die Moderation schaltet weiter.
+    - generic: 5 feste Slides · Fixiert
+    - link "Intro konfigurieren":
+      - /url: /quiz/33/slides/intro
+  - region "Fragenblöcke":
+    - heading "Fragenblöcke" [level=2]
+    - paragraph: Fragen, Auflösungen und Story-Elemente gemeinsam strukturieren.
+    - button "+ Block hinzufügen"
+    - button "Block 1 zum Sortieren ziehen": ⠿
+    - button "Block 1 Block 1 Frage 1 Basispunkte" [expanded]:
+      - generic: Block 1
+      - generic: Block
+      - generic: 1 Frage
+      - generic: 1 Basispunkte
+    - button "Block einklappen":
+      - generic: ⌄
+    - article:
+      - button "Wie oft wurde Michael Schumacher Formel-1-Weltmeister? zum Sortieren ziehen": ⠿
+      - generic: "1"
+      - heading "Wie oft wurde Michael Schumacher Formel-1-Weltmeister?" [level=3]
+      - generic: Standard
+      - generic: max. 1 Punkt
+      - generic: Offene Antwort
+      - button "Konfigurieren"
+      - button "Vorschau"
+      - generic "Weitere Aktionen": …
+  - generic: OUT
+  - button "Outro 2 feste Slides Outro" [expanded]:
+    - generic: Outro
+    - generic: 2 feste Slides
+    - generic: Outro
+  - button "Block einklappen":
+    - generic: ⌄
+  - article:
+    - generic: Outro konfigurieren
+    - generic: Bekanntmachungen und PubQuiz-Kalender
+    - generic: 2 feste Slides · Fixiert
+    - link "Outro konfigurieren":
+      - /url: /quiz/33/slides/outro
+  - generic: "!"
+  - button "Kein Block Ohne Block 0 Fragen 0 Basispunkte" [expanded]:
+    - generic: Kein Block
+    - generic: Ohne Block
+    - generic: 0 Fragen
+    - generic: 0 Basispunkte
+  - button "Block einklappen":
+    - generic: ⌄
+  - status
+- alert

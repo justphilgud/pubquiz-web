@@ -1,0 +1,566 @@
+[
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 250,
+      "height": 250,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 307.4140625,
+        "font": "24px",
+        "text": "1Teamname wählen",
+        "top": 251.0078125
+      },
+      {
+        "bottom": 371.8203125,
+        "font": "24px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 315.4140625
+      },
+      {
+        "bottom": 436.2265625,
+        "font": "24px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 379.8203125
+      },
+      {
+        "bottom": 500.6328125,
+        "font": "24px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 444.2265625
+      }
+    ],
+    "scroll": {
+      "content": 530,
+      "contentWidth": 1193,
+      "height": 530,
+      "width": 1193
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1280,
+      720
+    ],
+    "style": "NEON",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 238,
+      "height": 238,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 329.4140625,
+        "font": "24px",
+        "text": "1Teamname wählen",
+        "top": 276.0078125
+      },
+      {
+        "bottom": 390.8203125,
+        "font": "24px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 337.4140625
+      },
+      {
+        "bottom": 452.2265625,
+        "font": "24px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 398.8203125
+      },
+      {
+        "bottom": 513.6328125,
+        "font": "24px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 460.2265625
+      }
+    ],
+    "scroll": {
+      "content": 449,
+      "contentWidth": 1169,
+      "height": 449,
+      "width": 1169
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1280,
+      720
+    ],
+    "style": "EDITORIAL",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 250,
+      "height": 250,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 320.4140625,
+        "font": "24px",
+        "text": "1Teamname wählen",
+        "top": 264.0078125
+      },
+      {
+        "bottom": 384.8203125,
+        "font": "24px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 328.4140625
+      },
+      {
+        "bottom": 449.2265625,
+        "font": "24px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 392.8203125
+      },
+      {
+        "bottom": 513.6328125,
+        "font": "24px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 457.2265625
+      }
+    ],
+    "scroll": {
+      "content": 462,
+      "contentWidth": 1185,
+      "height": 462,
+      "width": 1185
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1280,
+      720
+    ],
+    "style": "CORPORATE",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 295,
+      "height": 295,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 334.8125,
+        "font": "24px",
+        "text": "1Teamname wählen",
+        "top": 267.0078125
+      },
+      {
+        "bottom": 410.6171875,
+        "font": "24px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 342.8125
+      },
+      {
+        "bottom": 486.421875,
+        "font": "24px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 418.6171875
+      },
+      {
+        "bottom": 562.2265625,
+        "font": "24px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 494.421875
+      }
+    ],
+    "scroll": {
+      "content": 486,
+      "contentWidth": 1033,
+      "height": 486,
+      "width": 1033
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1280,
+      720
+    ],
+    "style": "BIRTHDAY",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 323,
+      "height": 323,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 397.671875,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 323.03125
+      },
+      {
+        "bottom": 480.3125,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 405.671875
+      },
+      {
+        "bottom": 562.953125,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 488.3125
+      },
+      {
+        "bottom": 645.59375,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 570.953125
+      }
+    ],
+    "scroll": {
+      "content": 858,
+      "contentWidth": 1833,
+      "height": 858,
+      "width": 1833
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "style": "NEON",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 311,
+      "height": 311,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 431.4296875,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 359.7890625
+      },
+      {
+        "bottom": 511.0703125,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 439.4296875
+      },
+      {
+        "bottom": 590.7109375,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 519.0703125
+      },
+      {
+        "bottom": 670.3515625,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 598.7109375
+      }
+    ],
+    "scroll": {
+      "content": 750,
+      "contentWidth": 1809,
+      "height": 750,
+      "width": 1809
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "style": "EDITORIAL",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 323,
+      "height": 323,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 386.671875,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 312.03125
+      },
+      {
+        "bottom": 469.3125,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 394.671875
+      },
+      {
+        "bottom": 551.953125,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 477.3125
+      },
+      {
+        "bottom": 634.59375,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 559.953125
+      }
+    ],
+    "scroll": {
+      "content": 814,
+      "contentWidth": 1825,
+      "height": 814,
+      "width": 1825
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "style": "CORPORATE",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 395,
+      "height": 395,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 399.7890625,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 307.03125
+      },
+      {
+        "bottom": 500.546875,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 407.7890625
+      },
+      {
+        "bottom": 601.3046875,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 508.546875
+      },
+      {
+        "bottom": 702.0625,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 609.3046875
+      }
+    ],
+    "scroll": {
+      "content": 846,
+      "contentWidth": 1673,
+      "height": 846,
+      "width": 1673
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "style": "BIRTHDAY",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 328,
+      "height": 328,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 407.46875,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 331.46875
+      },
+      {
+        "bottom": 491.46875,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 415.46875
+      },
+      {
+        "bottom": 575.46875,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 499.46875
+      },
+      {
+        "bottom": 659.46875,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 583.46875
+      }
+    ],
+    "scroll": {
+      "content": 1218,
+      "contentWidth": 2473,
+      "height": 1218,
+      "width": 2473
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      2560,
+      1440
+    ],
+    "style": "NEON",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 316,
+      "height": 316,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 449.1484375,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 376.1484375
+      },
+      {
+        "bottom": 530.1484375,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 457.1484375
+      },
+      {
+        "bottom": 611.1484375,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 538.1484375
+      },
+      {
+        "bottom": 692.1484375,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 619.1484375
+      }
+    ],
+    "scroll": {
+      "content": 1102,
+      "contentWidth": 2449,
+      "height": 1102,
+      "width": 2449
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      2560,
+      1440
+    ],
+    "style": "EDITORIAL",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 328,
+      "height": 328,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 396.46875,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 320.46875
+      },
+      {
+        "bottom": 480.46875,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 404.46875
+      },
+      {
+        "bottom": 564.46875,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 488.46875
+      },
+      {
+        "bottom": 648.46875,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 572.46875
+      }
+    ],
+    "scroll": {
+      "content": 1174,
+      "contentWidth": 2465,
+      "height": 1174,
+      "width": 2465
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      2560,
+      1440
+    ],
+    "style": "CORPORATE",
+    "hintVisible": false
+  },
+  {
+    "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+    "list": {
+      "content": 400,
+      "height": 400,
+      "overflow": "visible"
+    },
+    "rows": [
+      {
+        "bottom": 409.5859375,
+        "font": "32px",
+        "text": "1Teamname wählen",
+        "top": 315.46875
+      },
+      {
+        "bottom": 511.703125,
+        "font": "32px",
+        "text": "2Antworten rechtzeitig absenden",
+        "top": 417.5859375
+      },
+      {
+        "bottom": 613.8203125,
+        "font": "32px",
+        "text": "3Keine Suchmaschinen verwenden",
+        "top": 519.703125
+      },
+      {
+        "bottom": 715.9375,
+        "font": "32px",
+        "text": "4Die Entscheidung der Moderation gilt",
+        "top": 621.8203125
+      }
+    ],
+    "scroll": {
+      "content": 1206,
+      "contentWidth": 2313,
+      "height": 1206,
+      "width": 2313
+    },
+    "title": "Die Spielregeln",
+    "viewport": [
+      2560,
+      1440
+    ],
+    "style": "BIRTHDAY",
+    "hintVisible": false
+  }
+]

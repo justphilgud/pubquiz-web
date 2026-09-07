@@ -1,0 +1,51 @@
+- banner:
+  - link "ungegoogelt":
+    - /url: /
+    - img "ungegoogelt"
+  - navigation "Hauptnavigation":
+    - generic "Content":
+      - text: Content
+      - generic: ▾
+    - link "Eventreihen":
+      - /url: /admin/eventreihen
+    - link "Quiz":
+      - /url: /quiz
+    - link "Teams":
+      - /url: /admin/teams
+  - button "Benutzermenü öffnen":
+    - generic: C
+- main:
+  - generic: Auswertung
+  - heading "Codex AP8 Kopie Klick" [level=1]
+  - button "Antwortprüfung"
+  - button "Team × Frage"
+  - button "Punktestand"
+  - button "Bewertungen neu berechnen"
+  - generic: Automatische Bewertungen neu berechnen; manuelle Punkte bleiben erhalten.
+  - generic "Fragenumfang":
+    - generic: Umfang
+    - button "Bisher gespielt"
+    - button "Alle Fragen" [active] [pressed]
+  - button "Alle Teams"
+  - button "←"
+  - button "→"
+  - generic: Alle Teams
+  - generic: nur offene Fragen
+  - button "nur offene Fragen"
+  - generic: nur falsche Antwort
+  - button "nur falsche Antwort"
+  - generic: unbeantwortete
+  - button "unbeantwortete"
+  - generic: 0 Treffer
+  - table:
+    - rowgroup:
+      - row "Team Frage Lösung Antwort Bewertung":
+        - columnheader "Team"
+        - columnheader "Frage"
+        - columnheader "Lösung"
+        - columnheader "Antwort"
+        - columnheader "Bewertung"
+    - rowgroup:
+      - row "Keine Antworten für diesen Filter.":
+        - cell "Keine Antworten für diesen Filter."
+- alert

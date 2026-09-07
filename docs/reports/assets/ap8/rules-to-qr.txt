@@ -1,0 +1,15 @@
+- main:
+  - generic: QR-Code
+  - generic: Codex AP8 Kopie Klick
+  - generic: "6"
+  - generic: /
+  - generic: "15"
+  - region "Präsentationsinhalt":
+    - paragraph: Mitspielen
+    - heading "Jetzt mitspielen" [level=2]
+    - paragraph: QR-Code scannen und Team anmelden.
+    - strong: https://pubquiz-ojcwrsyif-just-phil-gud.vercel.app/quiz/31/antworten
+    - paragraph: Wählt einen eindeutigen Teamnamen.
+    - paragraph: Angemeldete Teams · 0
+    - paragraph: Noch kein Team angemeldet.
+- alert

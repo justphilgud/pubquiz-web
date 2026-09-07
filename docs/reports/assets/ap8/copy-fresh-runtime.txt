@@ -1,0 +1,65 @@
+- main:
+  - generic "Codex AP8 Kopie Klick"
+  - group "Quiz-Lifecycle":
+    - status: Vorbereitung
+    - button "Quiz starten"
+    - button "Quiz zurücksetzen"
+  - link "Zurück zur Quizverwaltung":
+    - /url: /quiz/31
+  - generic: Aktueller Slide 1 / 15
+  - heading "Wartebildschirm" [level=1]
+  - generic "Präsentationsvorschau":
+    - generic: Wartebildschirm
+    - generic: Codex AP8 Kopie Klick
+    - generic: "1"
+    - generic: /
+    - generic: "15"
+    - region "Präsentationsinhalt":
+      - generic: "Beginn: 19:30 Uhr"
+  - heading "Moderationsnotizen" [level=2]
+  - paragraph:
+    - strong: "Typ:"
+    - text: Wartebildschirm
+  - button "Zur ersten Slide":
+  - button "Zurück":
+  - button "Weiter":
+  - button "Block freigeben":
+  - button "Kein Medium auf diesem Slide" [disabled]:
+  - button "Kein abspielbares Medium auf diesem Slide" [disabled]:
+  - button "Auswertung öffnen":
+  - spinbutton [disabled]: "5"
+  - generic: min
+  - generic: 05:00
+  - button "Countdown starten" [disabled]:
+  - button "Countdown zurücksetzen" [disabled]:
+  - complementary:
+    - heading "Nächste Folie" [level=2]
+    - generic: Slide
+    - paragraph: Slide
+    - heading "Antworten" [level=2]
+    - generic: "0"
+    - generic: Teams
+    - generic: "0"
+    - generic: Antworten
+    - generic: 0%
+    - generic: Quote
+    - generic: Noch keine Antwort eingegangen
+    - heading "Zeit" [level=2]
+    - generic: Aktuelle Folie
+    - generic: 00:13
+    - generic: Quiz gesamt
+    - generic: Nicht gestartet
+    - heading "Fortschritt" [level=2]
+    - generic: 7%
+    - generic: 1 / 15
+    - generic: Slides
+    - generic: "14"
+    - generic: verbleibend
+    - generic: "--:--"
+    - generic: Prognose Rest
+    - generic: "--:--"
+    - generic: Prognose Ende
+    - generic: Prognose startet, sobald das Quiz gestartet wurde.
+    - generic: Hotkeys
+    - text: ←/→ Slide · Leertaste weiter · PageUp/PageDown · F Vollbild
+- alert

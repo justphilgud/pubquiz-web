@@ -1,0 +1,46 @@
+{
+  "hint": "Überlänge: Weitere Inhalte durch Scrollen",
+  "list": {
+    "content": 250,
+    "height": 250,
+    "overflow": "visible"
+  },
+  "rows": [
+    {
+      "bottom": 307.4140625,
+      "font": "24px",
+      "text": "1Teamname wählen",
+      "top": 251.0078125
+    },
+    {
+      "bottom": 371.8203125,
+      "font": "24px",
+      "text": "2Antworten rechtzeitig absenden",
+      "top": 315.4140625
+    },
+    {
+      "bottom": 436.2265625,
+      "font": "24px",
+      "text": "3Keine Suchmaschinen verwenden",
+      "top": 379.8203125
+    },
+    {
+      "bottom": 500.6328125,
+      "font": "24px",
+      "text": "4Die Entscheidung der Moderation gilt",
+      "top": 444.2265625
+    }
+  ],
+  "scroll": {
+    "content": 530,
+    "contentWidth": 1193,
+    "height": 530,
+    "width": 1193
+  },
+  "title": "Die Regeln",
+  "viewport": [
+    1280,
+    720
+  ],
+  "hintVisible": false
+}

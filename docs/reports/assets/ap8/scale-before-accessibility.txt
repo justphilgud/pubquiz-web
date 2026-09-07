@@ -1,0 +1,61 @@
+- banner:
+  - link "ungegoogelt":
+    - /url: /
+    - img "ungegoogelt"
+  - navigation "Hauptnavigation":
+    - generic "Content":
+      - text: Content
+      - generic: ▾
+    - link "Eventreihen":
+      - /url: /admin/eventreihen
+    - link "Quiz":
+      - /url: /quiz
+    - link "Teams":
+      - /url: /admin/teams
+  - button "Benutzermenü öffnen":
+    - generic: C
+- main:
+  - paragraph: Fragenverwaltung
+  - heading "Neue Frage" [level=1]
+  - button "← Zurück"
+  - group "Geltungsbereich":
+    - generic: Geltungsbereich
+    - radiogroup "Geltungsbereich":
+      - radio "Eventreihe" [checked]
+    - paragraph: Dieser Inhalt kann nur in den ausgewählten Eventreihen verwendet werden.
+    - combobox "Eventreihe suchen"
+    - alert: Wähle mindestens eine Eventreihe aus.
+  - paragraph: "Spezialfrage: Umfrage: Skala"
+  - paragraph: Teams stimmen auf einer frei beschriftbaren Skala ab; es gibt keine Punkte.
+  - button "Ändern"
+  - button "Auswahl lösen"
+  - text: Frage
+  - textbox "Frage":
+    - /placeholder: Formuliere deine Frage...
+  - paragraph: 0 / 300
+  - button "Medien · Keine Medien":
+    - generic: ♪
+    - generic: Medien
+    - generic: · Keine Medien
+    - generic: ⌄
+  - heading "Umfrage-Skala" [level=2]
+  - paragraph: Die Abstimmung hat keine richtige Antwort und vergibt keine Punkte.
+  - text: Von
+  - spinbutton "Von": "1"
+  - text: Bis
+  - spinbutton "Bis": "5"
+  - text: Schrittweite
+  - spinbutton "Schrittweite": "1"
+  - text: Beschriftung links
+  - textbox "Beschriftung links Beschriftung rechts Trifft vollkommen zu": Trifft gar nicht zu
+  - text: Beschriftung rechts
+  - textbox: Trifft vollkommen zu
+  - button "Weitere Angaben Kategorien, interne Angaben und Ablaufdatum":
+    - generic: Weitere Angaben
+    - generic: Kategorien, interne Angaben und Ablaufdatum
+    - generic: +
+  - generic "Story-Elemente (0)"
+  - option "Story-Element auswählen" [selected]
+  - button "Speichern und freigeben"
+  - button "Weitere Aktionen"
+- alert
