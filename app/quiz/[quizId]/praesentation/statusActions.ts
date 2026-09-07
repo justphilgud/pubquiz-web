@@ -2,6 +2,10 @@
 
 import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
+import { assertLifecycleRevision, resolveQuizLifecycle } from "../../quizLifecycle";
+import { lockQuizLifecycle, requireQuizNotStopped, RESET_PRESENTATION_DATA } from "../../quizLifecycle.server";
+import { getQuizPraesentation } from "../../actions";
+import { buildPraesentationSlides, getPresentationSlideKey } from "./buildPraesentationSlides";
 import {
   requireQuizLiveController,
   requireQuizQuestion,
@@ -11,6 +15,7 @@ import {
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 import {
   closeBlockInteractions,
+  closeCurrentInteraction,
   syncInteractionForPresentation,
 } from "@/app/quiz/interaction/interaction.server";
 import { getEffectiveQuizSolutionStrategy } from "@/app/quiz/flow/quizFlow";
@@ -29,22 +34,7 @@ import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentati
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
   return prisma.$transaction(async (tx) => {
-    const status = await tx.quiz_praesentation_status.upsert({
-      where: { quiz_id: quizId },
-      update: {},
-      create: {
-        quiz_id: quizId,
-        slide_index: 0,
-        slide_started_at: new Date(),
-      },
-    });
-    if (status.slide_key) {
-      await syncInteractionForPresentation(tx, {
-        quizId,
-        slideKey: status.slide_key,
-      });
-    }
-    return status;
+    return lockQuizLifecycle(tx, quizId);
   });
 }
 
@@ -135,6 +125,7 @@ export async function setPraesentationSlideIndex(
   quizId: number,
   slideIndex: number,
   slideKey: string,
+  expectedLifecycleRevision?: number,
 ) {
   const navigationRequestedAt = new Date();
   const requestStartedAt = performance.now();
@@ -143,6 +134,13 @@ export async function setPraesentationSlideIndex(
     let phaseStartedAt = performance.now();
     await requireQuizLiveController(quizId);
     phases.access = performance.now() - phaseStartedAt;
+    const quiz = await getQuizPraesentation(quizId);
+    if (!quiz) throw new Error("Quiz nicht gefunden.");
+    const slides = buildPraesentationSlides(quiz);
+    if (!Number.isSafeInteger(slideIndex) || !slides[slideIndex] ||
+        getPresentationSlideKey(slides[slideIndex]) !== slideKey) {
+      throw new Error("Ungültige Präsentationsposition.");
+    }
     const identity = parsePresentationSlideKey(slideKey);
     const previewSectionId = parseQuizBlockPreviewSectionId(slideKey);
     phaseStartedAt = performance.now();
@@ -156,10 +154,20 @@ export async function setPraesentationSlideIndex(
 
     return prisma.$transaction(async (tx) => {
     phaseStartedAt = performance.now();
-    const previousStatus = await tx.quiz_praesentation_status.findUnique({
-      where: { quiz_id: quizId },
-      select: { slide_key: true },
-    });
+    const previousStatus = await requireQuizNotStopped(tx, quizId);
+    if (expectedLifecycleRevision !== undefined) {
+      assertLifecycleRevision(previousStatus.lifecycle_revision, expectedLifecycleRevision);
+    }
+    if (previousStatus.slide_key === slideKey) return previousStatus;
+    if (slideIndex < previousStatus.slide_index) {
+      const followingQuestionIds = slides.slice(slideIndex + 1).flatMap((slide) =>
+        slide.typ === "frage" ? [slide.frage.quiz_fragen_id] : [],
+      );
+      await tx.quiz_interaction_runs.updateMany({
+        where: { quiz_id: quizId, quiz_fragen_id: { in: followingQuestionIds } },
+        data: { is_hidden: true, revision: { increment: 1 } },
+      });
+    }
     const status = await tx.quiz_praesentation_status.upsert({
       where: { quiz_id: quizId },
       update: {
@@ -212,6 +220,10 @@ export async function setPraesentationSlideIndex(
         release,
       });
       if (transition === "OPEN") {
+        await tx.quiz_block_freigaben.updateMany({
+          where: { quiz_id: quizId, quiz_abschnitt_id: { not: previewSectionId } },
+          data: { ist_freigegeben: false },
+        });
         await tx.quiz_block_freigaben.upsert({
           where: releaseWhere,
           update: {
@@ -387,19 +399,77 @@ export async function getAntwortStatus(
   });
   return result;
 }
-export async function starteQuiz(quizId: number) {
+export async function starteQuiz(quizId: number, expectedRevision: number) {
   await requireQuizLiveController(quizId);
-  return prisma.quiz_praesentation_status.upsert({
-    where: { quiz_id: quizId },
-    update: {
-      quiz_started_at: new Date(),
-    },
-    create: {
-      quiz_id: quizId,
-      slide_index: 0,
-      slide_started_at: new Date(),
-      quiz_started_at: new Date(),
-    },
+  return prisma.$transaction(async (tx) => {
+    const status = await requireQuizNotStopped(tx, quizId);
+    assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
+    if (resolveQuizLifecycle(status) === "RUNNING") return status;
+    return tx.quiz_praesentation_status.update({
+      where: { quiz_id: quizId },
+      data: { quiz_started_at: new Date() },
+    });
+  });
+}
+
+export async function stoppeQuiz(quizId: number, expectedRevision: number) {
+  await requireQuizLiveController(quizId);
+  return prisma.$transaction(async (tx) => {
+    const status = await lockQuizLifecycle(tx, quizId);
+    assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
+    if (resolveQuizLifecycle(status) === "STOPPED") return status;
+    const sections = await tx.quiz_abschnitte.findMany({ where: { quiz_id: quizId } });
+    for (const section of sections) {
+      await closeBlockInteractions(tx, quizId, section.quiz_abschnitt_id, "QUIZ_STOPPED");
+    }
+    await closeCurrentInteraction(tx, quizId, "QUIZ_STOPPED");
+    await tx.quiz_block_freigaben.updateMany({
+      where: { quiz_id: quizId },
+      data: { ist_freigegeben: false, ist_geschlossen: true, geschlossen_ab: new Date(), aktuelle_quiz_fragen_id: null },
+    });
+    return tx.quiz_praesentation_status.update({
+      where: { quiz_id: quizId },
+      data: { quiz_stopped_at: new Date(), countdown_status: "finished", countdown_ended_at: new Date(), audio_aktion: "stop", audio_aktion_id: { increment: 1 } },
+    });
+  }, { timeout: 30_000 });
+}
+
+export async function resetQuizDurchlauf(quizId: number, expectedRevision: number, confirmed: boolean) {
+  await requireQuizLiveController(quizId);
+  if (confirmed !== true) throw new Error("Bitte das Zurücksetzen bestätigen.");
+  return prisma.$transaction(async (tx) => {
+    const status = await lockQuizLifecycle(tx, quizId);
+    assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
+    // Session cascades remove drafts, field values, choices and submission snapshots.
+    await tx.quiz_team_sessions.deleteMany({ where: { quiz_id: quizId } });
+    await tx.quiz_interaction_runs.deleteMany({ where: { quiz_id: quizId } });
+    await tx.quiz_block_freigaben.deleteMany({ where: { quiz_id: quizId } });
+    await tx.quiz_teams.deleteMany({ where: { quiz_id: quizId } });
+    await tx.quiz.update({ where: { quiz_id: quizId }, data: { team_anzahl: 0, teilnehmer_anzahl: 0, manuelle_bewertungen: 0 } });
+    return tx.quiz_praesentation_status.update({
+      where: { quiz_id: quizId },
+      data: { ...RESET_PRESENTATION_DATA, slide_started_at: new Date(), audio_aktion_id: { increment: 1 }, lifecycle_revision: { increment: 1 } },
+    });
+  }, { timeout: 30_000 });
+}
+
+export async function setQuizQuestionHidden(quizId: number, quizFragenId: number, hidden: boolean, expectedRevision: number) {
+  await requireQuizLiveController(quizId);
+  await requireQuizQuestion(quizId, quizFragenId);
+  return prisma.$transaction(async (tx) => {
+    const status = await requireQuizNotStopped(tx, quizId);
+    assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
+    const run = await tx.quiz_interaction_runs.findFirst({
+      where: { quiz_id: quizId, quiz_fragen_id: quizFragenId },
+      orderBy: { interaction_run_id: "desc" },
+    });
+    if (!run) throw new Error("Diese Frage wurde noch nicht geöffnet.");
+    await tx.quiz_interaction_runs.update({
+      where: { interaction_run_id: run.interaction_run_id },
+      data: { is_hidden: hidden, revision: { increment: 1 } },
+    });
+    // Visibility changes must invalidate participant snapshots even for a noncurrent run.
+    await tx.quiz_praesentation_status.update({ where: { quiz_id: quizId }, data: { updated_at: new Date() } });
   });
 }
 export async function speicherePraesentationsdauer(data: {
@@ -460,12 +530,21 @@ export async function speicherePraesentationsdauer(data: {
   });
   return result;
 }
+async function mutatePresentationStatus(quizId: number, expectedRevision: number | undefined, args: Prisma.quiz_praesentation_statusUpdateArgs) {
+  return prisma.$transaction(async (tx) => {
+    const status = await requireQuizNotStopped(tx, quizId);
+    if (expectedRevision !== undefined) assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
+    return tx.quiz_praesentation_status.update(args);
+  });
+}
+
 export async function setMediumOverlayAktiv(data: {
   quizId: number;
+  lifecycleRevision?: number;
   aktiv: boolean;
 }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: {
       quiz_id: data.quizId,
     },
@@ -479,10 +558,11 @@ export async function setMediumOverlayAktiv(data: {
 
 export async function setAudioAktion(data: {
   quizId: number;
+  lifecycleRevision?: number;
   aktion: "play" | "pause" | "stop";
 }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: {
       quiz_id: data.quizId,
     },
@@ -498,10 +578,11 @@ export async function setAudioAktion(data: {
 }
 export async function starteCountdown(data: {
   quizId: number;
+  lifecycleRevision?: number;
   dauerSekunden: number;
 }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: {
       quiz_id: data.quizId,
     },
@@ -516,9 +597,9 @@ export async function starteCountdown(data: {
   return { success: true };
 }
 
-export async function resetCountdown(data: { quizId: number }) {
+export async function resetCountdown(data: { quizId: number; lifecycleRevision?: number }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: {
       quiz_id: data.quizId,
     },
@@ -532,9 +613,9 @@ export async function resetCountdown(data: { quizId: number }) {
   return { success: true };
 }
 
-export async function beendeCountdown(data: { quizId: number }) {
+export async function beendeCountdown(data: { quizId: number; lifecycleRevision?: number }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: {
       quiz_id: data.quizId,
     },
@@ -548,10 +629,11 @@ export async function beendeCountdown(data: { quizId: number }) {
 }
 export async function setEndstandRevealCount(data: {
   quizId: number;
+  lifecycleRevision?: number;
   revealCount: number;
 }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: {
       quiz_id: data.quizId,
     },
@@ -564,12 +646,13 @@ export async function setEndstandRevealCount(data: {
 }
 export async function setSchaetzfrageStatus(data: {
   quizId: number;
+  lifecycleRevision?: number;
   showSchaetzfrage: boolean;
   zeigeSchaetzantwort?: boolean;
   schaetzfrageId?: number | null;
 }) {
   await requireQuizLiveController(data.quizId);
-  await prisma.quiz_praesentation_status.update({
+  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
     where: { quiz_id: data.quizId },
     data: {
       show_schaetzfrage: data.showSchaetzfrage,

@@ -1,4 +1,6 @@
 "use server";
+import { assertLifecycleRevision } from "./quizLifecycle";
+import { requireQuizNotStopped } from "./quizLifecycle.server";
 
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -2501,6 +2503,7 @@ export async function getQuizAntwortStatus(
   const interactionRuns = await prisma.quiz_interaction_runs.findMany({
     where: {
       quiz_id: quizId,
+      is_hidden: false,
       OR: [
         { is_current: true },
         ...(offeneBlockFragenIds.length > 0 &&
@@ -2812,10 +2815,11 @@ export async function getQuizAntwortStatus(
   return {
     quiz_id: quiz.quiz_id,
     titel: quiz.titel,
-    liveRevision: serializeQuizParticipantLiveRevision(
+    lifecycle: liveState.lifecycle,
+    liveRevision: [serializeQuizParticipantLiveRevision(
       blockFreigabe ?? letzteBlockFreigabe,
       currentRun,
-    ),
+    ), quiz.praesentation_status?.updated_at.toISOString() ?? ""].join(":"),
     activeQuizFragenId: currentRun?.quiz_fragen_id ?? null,
     abschnitte,
     offenerBlock:
@@ -2910,6 +2914,7 @@ export async function startQuizTeamSession(data: {
 }
 export async function freigabeQuizBlock(data: {
   quizId: number;
+  lifecycleRevision?: number;
   quizAbschnittId: number;
 }) {
   const requestStartedAt = performance.now();
@@ -2924,6 +2929,8 @@ export async function freigabeQuizBlock(data: {
 
     phaseStartedAt = performance.now();
     await prisma.$transaction(async (tx) => {
+    const lifecycle = await requireQuizNotStopped(tx, data.quizId);
+    if (data.lifecycleRevision !== undefined) assertLifecycleRevision(lifecycle.lifecycle_revision, data.lifecycleRevision);
     await tx.quiz_block_freigaben.updateMany({
       where: {
         quiz_id: data.quizId,
@@ -2998,6 +3005,7 @@ export async function freigabeQuizBlock(data: {
 
 export async function schliesseQuizBlock(data: {
   quizId: number;
+  lifecycleRevision?: number;
   quizAbschnittId: number;
 }) {
   const requestStartedAt = performance.now();
@@ -3011,7 +3019,10 @@ export async function schliesseQuizBlock(data: {
     phases.access = performance.now() - phaseStartedAt;
 
     phaseStartedAt = performance.now();
-    await prisma.quiz_block_freigaben.upsert({
+    await prisma.$transaction(async (tx) => {
+    const lifecycle = await requireQuizNotStopped(tx, data.quizId);
+    if (data.lifecycleRevision !== undefined) assertLifecycleRevision(lifecycle.lifecycle_revision, data.lifecycleRevision);
+    await tx.quiz_block_freigaben.upsert({
     where: {
       quiz_id_quiz_abschnitt_id: {
         quiz_id: data.quizId,
@@ -3034,7 +3045,6 @@ export async function schliesseQuizBlock(data: {
     phases.blockMutation = performance.now() - phaseStartedAt;
 
     phaseStartedAt = performance.now();
-    await prisma.$transaction(async (tx) => {
       await closeBlockInteractions(tx, data.quizId, data.quizAbschnittId);
     }, { timeout: 30_000 });
     phases.finalization = performance.now() - phaseStartedAt;
@@ -3517,6 +3527,7 @@ export async function saveTeamAntwort(data: {
   }
 
   await prisma.$transaction(async (tx) => {
+    await requireQuizNotStopped(tx, data.quizId);
     const previousAnswer = await tx.team_antworten.findUnique({
       where: {
         quiz_fragen_id_quiz_team_session_id: {

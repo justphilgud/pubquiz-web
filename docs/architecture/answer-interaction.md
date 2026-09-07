@@ -2,6 +2,14 @@
 
 Stand: 17. August 2026
 
+AP1-Ergänzung (7. September 2026): Für Quizstart, Stop, Reset, Rücknavigation und
+reversibles Ausblenden gilt zusätzlich [Quiz-Lifecycle](quiz-lifecycle.md).
+`quiz_interaction_runs.is_hidden` sperrt Sichtbarkeit und Antwortannahme ohne
+Löschen oder Wechsel des Submission-Kontexts. Wiederbesuchte finale Runs bleiben
+final; nur Reset erzeugt einen sauberen neuen Quizdurchlauf. Die folgenden
+Close-/Finalisierungsregeln gelten weiterhin für echtes Run-/Blockschließen,
+nicht für das reversible Ausblenden.
+
 Dieses Dokument beschreibt die produktive Architektur der Team-Antwortformulare. Es ist die verbindliche technische Leitplanke für Änderungen an Antworttypen, Live-Interaktionen, Drafts, Submissions, Polls, Pixelbild und deren Auswertung. Es beschreibt den vorhandenen Stand; es ist kein Zielbild für ein paralleles System.
 
 ## Kurzfassung

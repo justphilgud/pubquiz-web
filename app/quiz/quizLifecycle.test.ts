@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import "./quizLifecycleRegression.test";
 import { DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY } from "./flow/quizFlow";
 
 const read = (path: string) => readFileSync(path, "utf8");

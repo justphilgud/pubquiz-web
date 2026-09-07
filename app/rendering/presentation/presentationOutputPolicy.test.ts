@@ -38,7 +38,9 @@ test("presentation is a read-only live-state consumer", () => {
     assert.doesNotMatch(player, new RegExp(mutation));
   }
 
-  assert.doesNotMatch(player, /<button|ArrowRight|ArrowLeft|PageDown|PageUp/);
+  assert.doesNotMatch(player, /ArrowRight|ArrowLeft|PageDown|PageUp/);
+  assert.match(player, /setActivatedContext\(activationContext\)/);
+  assert.match(player, /playbackCommand: activated \? liveState.playbackCommand : null/);
   assert.match(player, /getPraesentationStatus/);
   assert.match(player, /initialLiveState/);
   assert.match(player, /event\.key\.toLowerCase\(\) !== "f"/);
@@ -56,7 +58,9 @@ test("existing moderation owns navigation, releases and live decisions", () => {
   assert.match(statusActions, /prisma\.\$transaction/);
   assert.match(statusActions, /quiz_block_freigaben\.upsert/);
   assert.match(moderation, /templateData\?\.kind === "GOOGLE_REVIEWS"/);
-  assert.match(moderation, /await starteQuiz\(quizId\)/);
+  assert.doesNotMatch(moderation, /await starteQuiz/);
+  const lifecycleControls = readFileSync("app/quiz/[quizId]/moderation/components/QuizLifecycleControls.tsx", "utf8");
+  assert.match(lifecycleControls, /await starteQuiz\(quizId, state.lifecycleRevision\)/);
 });
 
 test("shared stored reveal state drives Google reviews and final ranking", () => {

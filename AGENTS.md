@@ -16,6 +16,16 @@ Heed deprecation notices.
 
 # PubQuiz Development Rules
 
+## Living Specifications
+
+Für relevante Funktionen, Komponenten und Templates gilt verbindlich:
+Bestehende Spezifikation lesen → gegen die neue Anforderung prüfen → Änderung
+implementieren → Regressionstests durchführen → Spezifikation aktualisieren.
+Widersprüche werden bewusst entschieden und dokumentiert. Spezifikationen enthalten
+Zweck, Verhalten, Zustände, Ein-/Ausgaben, Persistenz, Abhängigkeiten, Invarianten und Tests.
+Vor Änderungen an Quiz-Lifecycle, Moderation, Präsentationsnavigation oder Teilnahme
+zusätzlich `docs/architecture/quiz-lifecycle.md` lesen. AP1 dokumentiert nur diesen Bereich.
+
 ## Project architecture
 
 For work on the new Question Editor, Presentation, Moderation and future features, also read:

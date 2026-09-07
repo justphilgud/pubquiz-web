@@ -25,6 +25,7 @@ import {
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
 import {
   resolvePresentationLiveState,
+  resolvePresentationOpeningState,
   resolvePresentationSequenceIndex,
   type PresentationLiveState,
 } from "@/app/rendering/presentation/presentationLiveState";
@@ -55,7 +56,11 @@ export default function QuizPraesentationPlayer({
   initialLiveState,
   theme,
 }: Props) {
-  const [liveState, setLiveState] = useState(initialLiveState);
+  const [liveState, setLiveState] = useState(() => resolvePresentationOpeningState(initialLiveState));
+  const [activatedContext, setActivatedContext] = useState<string | null>(null);
+  const activationContext = `${liveState.lifecycleRevision}:${liveState.quizStartedAt ?? "preparation"}`;
+  const activated = activatedContext === activationContext && liveState.lifecycle !== "STOPPED";
+  const presentationRoot = useRef<HTMLDivElement>(null);
   const [scores, setScores] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
   >([]);
@@ -162,7 +167,11 @@ export default function QuizPraesentationPlayer({
         ]);
         if (!active) return;
 
-        const nextState = resolvePresentationLiveState(storedStatus);
+        const storedState = resolvePresentationLiveState(storedStatus);
+        const nextState = storedState.lifecycle === "PREPARATION" &&
+          storedState.lifecycleRevision === initialLiveState.lifecycleRevision &&
+          storedState.slideStartedAt === initialLiveState.slideStartedAt
+          ? resolvePresentationOpeningState(storedState) : storedState;
         setLiveState((current) => {
           if (
             current.updatedAt &&
@@ -198,7 +207,7 @@ export default function QuizPraesentationPlayer({
       active = false;
       if (timeout !== null) window.clearTimeout(timeout);
     };
-  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId]);
+  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId, initialLiveState]);
 
   useEffect(() => {
     if (!isStandingsSlide(slide)) return;
@@ -280,7 +289,7 @@ export default function QuizPraesentationPlayer({
       theme={theme}
       className="presentation-template h-dvh overflow-hidden text-white"
     >
-      <div className="h-full p-4">
+      <div ref={presentationRoot} className="h-full p-4">
         <PresentationSlideRenderer
           quiz={quiz}
           slide={slide}
@@ -309,7 +318,7 @@ export default function QuizPraesentationPlayer({
             remoteCountdownStartedAt: liveState.countdownStartedAt,
             remoteCountdownStatus: liveState.countdownStatus,
             mediaOverlayActive: liveState.mediaOverlayActive,
-            playbackCommand: liveState.playbackCommand,
+            playbackCommand: activated ? liveState.playbackCommand : null,
             playbackCommandId: liveState.playbackCommandId,
             pixelState,
             pollState,
@@ -319,6 +328,20 @@ export default function QuizPraesentationPlayer({
             funnyAnswers,
           }}
         />
+        {!activated && <div className="absolute inset-0 z-[70] flex items-center justify-center bg-black/85 p-6">
+          <div className="max-w-lg text-center">
+            <h1 className="text-3xl font-bold">{liveState.lifecycle === "STOPPED" ? "Quiz beendet" : "Präsentation bereit"}</h1>
+            <p className="my-4">{liveState.lifecycle === "PREPARATION" ? "Das Quiz ist in Vorbereitung. Der reguläre Durchlauf wird in der Moderation gestartet." : liveState.lifecycle === "RUNNING" ? "Das Quiz läuft. Aktiviere dieses Fenster, um die Präsentation und Medienwiedergabe fortzusetzen." : "Die Antworten bleiben gespeichert. Ein neuer Durchlauf beginnt nach dem Zurücksetzen."}</p>
+            {liveState.lifecycle !== "STOPPED" && <button className="min-h-11 rounded-lg bg-white px-5 py-3 font-bold text-black" onClick={() => {
+              // Invoke play synchronously in this window's user gesture. Individual
+              // media retain their existing blocked-playback fallback for later slides.
+              if (liveState.playbackCommand === "play") {
+                presentationRoot.current?.querySelectorAll<HTMLMediaElement>("audio, video").forEach((media) => { void media.play().catch(() => {}); });
+              }
+              setActivatedContext(activationContext);
+            }}>{liveState.lifecycle === "RUNNING" ? "Präsentation starten / fortsetzen" : "Vorschau aktivieren"}</button>}
+          </div>
+        </div>}
         {syncError && (
           <div
             role="status"

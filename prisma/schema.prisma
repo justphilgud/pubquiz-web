@@ -671,6 +671,7 @@ model quiz_interaction_runs {
   interaction_type           String                    @db.VarChar(32)
   state                      QuizInteractionState      @default(LOCKED)
   is_current                 Boolean                   @default(false)
+  is_hidden                  Boolean                   @default(false)
   opened_at                  DateTime?
   deadline_at                DateTime?
   stopped_by_team_session_id Int?
@@ -835,6 +836,8 @@ model quiz_praesentation_status {
   slide_key                String?   @db.VarChar(160)
   slide_started_at         DateTime  @default(now())
   quiz_started_at          DateTime?
+  quiz_stopped_at          DateTime?
+  lifecycle_revision      Int       @default(0)
   updated_at               DateTime  @updatedAt
   audio_aktion             String?
   audio_aktion_id          Int       @default(0)

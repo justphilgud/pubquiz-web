@@ -38,9 +38,11 @@ import {
   getAntwortStatus,
   getPraesentationAudienceZwischenstand,
   getPraesentationJahreswertung,
-  starteQuiz,
+  stoppeQuiz,
+  setQuizQuestionHidden,
 } from "../praesentation/statusActions";
 
+import QuizLifecycleControls from "./components/QuizLifecycleControls";
 import ModerationToolbar from "./components/ModerationToolbar";
 import ModerationSidebar from "./components/ModerationSidebar";
 import SlideNotes from "./components/SlideNotes";
@@ -49,7 +51,7 @@ import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
-import { resolvePresentationSequenceIndex } from "@/app/rendering/presentation/presentationLiveState";
+import { resolvePresentationSequenceIndex, resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import {
   getQuizFlowTypeLabel,
   getQuizSolutionStrategyLabel,
@@ -171,14 +173,18 @@ export default function ModerationClient({
   const [slideStartedAt, setSlideStartedAt] = useState(
     initialLiveState.slideStartedAt,
   );
-  const [quizStartedAt] = useState(initialLiveState.quizStartedAt);
+  const [lifecycleState, setLifecycleState] = useState(initialLiveState);
+  const quizStartedAt = lifecycleState.quizStartedAt;
+  const [questionHidden, setQuestionHidden] = useState(false);
+  const navigationPending = useRef(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [antwortStatus, setAntwortStatus] = useState(initialAntwortStatus);
   const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(
     initialLiveState.mediaOverlayActive,
   );
 
   const [confirmEndOpen, setConfirmEndOpen] = useState(false);
-  const [quizBeendet, setQuizBeendet] = useState(false);
+  const quizBeendet = lifecycleState.lifecycle === "STOPPED";
 
   const aktuellerSlide = slides[slideIndex];
   const showTeamJoinState =
@@ -320,6 +326,20 @@ export default function ModerationClient({
     return () => window.clearInterval(interval);
   }, []);
 
+  const applyLiveState = useCallback((state: PresentationLiveState) => {
+    setLifecycleState(state);
+    setSlideIndex(resolvePresentationSequenceIndex(state, slides.map(getPresentationSlideKey)).index);
+    setSlideStartedAt(state.slideStartedAt);
+    setCountdownStartedAt(state.countdownStartedAt);
+    setCountdownStatus(state.countdownStatus);
+    setMediumOverlayAktivLokal(state.mediaOverlayActive);
+    setPlaybackCommand(state.playbackCommand);
+    setPlaybackCommandId(state.playbackCommandId);
+    setAudioLaeuft(state.playbackCommand === "play");
+    setEndstandRevealCountLokal(state.revealCount);
+    setEstimationPhase(state.estimation.phase);
+  }, [slides]);
+
   useEffect(() => {
     let active = true;
     let refreshing = false;
@@ -344,6 +364,8 @@ export default function ModerationClient({
         presentationQuestionAssignmentId,
       );
       if (active) {
+        if (!navigationPending.current) applyLiveState(snapshot.presentationState);
+        setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
         setPollState(snapshot.pollState);
         setLivePollState(snapshot.livePollState);
@@ -370,10 +392,10 @@ export default function ModerationClient({
       active = false;
       if (timeout !== null) window.clearTimeout(timeout);
     };
-  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId]);
+  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId, applyLiveState]);
 
   async function speichereDauerVomAktuellenSlide() {
-    if (aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
+    if (lifecycleState.lifecycle !== "RUNNING" || aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
       return;
     }
 
@@ -399,9 +421,10 @@ export default function ModerationClient({
 
     await freigabeQuizBlock({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
     });
-  }, [aktuellerSlide, quizId]);
+  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
 
   const handleBlockSchliessen = useCallback(async () => {
     const abschnitt =
@@ -413,9 +436,10 @@ export default function ModerationClient({
 
     await schliesseQuizBlock({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       quizAbschnittId: abschnitt.quiz_abschnitt_id,
     });
-  }, [aktuellerSlide, quizId]);
+  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
 
   function vorherigerSlide() {
     void goToSlide(slideIndex - 1);
@@ -501,9 +525,10 @@ export default function ModerationClient({
 
     await setMediumOverlayAktiv({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       aktiv: neuerWert,
     });
-  }, [mediumOverlayAktiv, quizId]);
+  }, [mediumOverlayAktiv, quizId, lifecycleState.lifecycleRevision]);
 
   const handleAudioPlay = useCallback(async () => {
     const naechsteAktion = audioLaeuft ? "pause" : "play";
@@ -511,19 +536,12 @@ export default function ModerationClient({
     setAudioLaeuft(!audioLaeuft);
     setPlaybackCommand(naechsteAktion);
     setPlaybackCommandId((current) => current + 1);
-    if (
-      naechsteAktion === "play" &&
-      aktuellerSlide?.typ === "fixer-slide" &&
-      aktuellerSlide.slideTyp === "startsequenz"
-    ) {
-      await starteQuiz(quizId);
-    }
-
     await setAudioAktion({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       aktion: naechsteAktion,
     });
-  }, [aktuellerSlide, audioLaeuft, quizId]);
+  }, [audioLaeuft, quizId, lifecycleState.lifecycleRevision]);
 
   const handleAuswertungOeffnen = useCallback(() => {
     setShowAuswertungIframe(true);
@@ -553,7 +571,8 @@ export default function ModerationClient({
       Math.max(slides.length - 1, 0),
     );
 
-    if (safeIndex === slideIndex) return;
+    if (safeIndex === slideIndex || navigationPending.current || quizBeendet) return;
+    navigationPending.current = true;
 
     const newStartedAt = new Date().toISOString();
 
@@ -577,11 +596,14 @@ export default function ModerationClient({
         Math.max(1, Math.round(getPauseDurationSeconds(nextSlide) / 60)),
       );
     }
-    await setPraesentationSlideIndex(
-      quizId,
-      safeIndex,
-      nextSlideKey,
-    );
+    try {
+      await setPraesentationSlideIndex(quizId, safeIndex, nextSlideKey, lifecycleState.lifecycleRevision);
+      setActionError(null);
+    } catch (cause) {
+      setActionError(cause instanceof Error ? cause.message : "Navigation fehlgeschlagen.");
+    } finally {
+      navigationPending.current = false;
+    }
     void speichereDauerVomAktuellenSlide().catch(() => {
       // Presentation timing is diagnostic and must not delay live-state publication.
     });
@@ -609,10 +631,13 @@ export default function ModerationClient({
   }
 
   async function handleQuizBeenden() {
-    setQuizBeendet(true);
-    setConfirmEndOpen(false);
-
-    await beendeCountdown({ quizId });
+    try {
+      const status = await stoppeQuiz(quizId, lifecycleState.lifecycleRevision);
+      applyLiveState(resolvePresentationLiveState(status));
+      setConfirmEndOpen(false);
+    } catch (cause) {
+      setActionError(cause instanceof Error ? cause.message : "Beenden fehlgeschlagen.");
+    }
   }
 
   async function handleSchaetzfrageStarten() {
@@ -622,6 +647,7 @@ export default function ModerationClient({
 
     await setSchaetzfrageStatus({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       showSchaetzfrage: true,
       zeigeSchaetzantwort: false,
       schaetzfrageId: frage?.fragen_id ?? null,
@@ -632,6 +658,7 @@ export default function ModerationClient({
     setEstimationPhase("SOLUTION");
     await setSchaetzfrageStatus({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       showSchaetzfrage: true,
       zeigeSchaetzantwort: true,
     });
@@ -642,6 +669,7 @@ export default function ModerationClient({
     setEstimationQuestion(null);
     await setSchaetzfrageStatus({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       showSchaetzfrage: false,
       zeigeSchaetzantwort: false,
       schaetzfrageId: null,
@@ -651,6 +679,7 @@ export default function ModerationClient({
   async function handleCountdownStart() {
     await starteCountdown({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
       dauerSekunden: countdownDauerMinuten * 60,
     });
 
@@ -661,6 +690,7 @@ export default function ModerationClient({
   async function handleCountdownReset() {
     await resetCountdown({
       quizId,
+      lifecycleRevision: lifecycleState.lifecycleRevision,
     });
 
     setCountdownStartedAt(null);
@@ -691,7 +721,7 @@ export default function ModerationClient({
       }
     });
     return () => { active = false; };
-  }, [aktuellerSlide, quizId]);
+  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
 
   useEffect(() => {
     if (!countdownIstAbgelaufen) return;
@@ -702,11 +732,11 @@ export default function ModerationClient({
       setShowAuswertungDialog(true);
 
       void handleBlockSchliessen();
-      void beendeCountdown({ quizId });
+      void beendeCountdown({ quizId, lifecycleRevision: lifecycleState.lifecycleRevision });
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [countdownIstAbgelaufen, quizId, handleBlockSchliessen]);
+  }, [countdownIstAbgelaufen, quizId, handleBlockSchliessen, lifecycleState.lifecycleRevision]);
 
   useEffect(() => {
     if (!isStandingsSlide(aktuellerSlide)) return;
@@ -731,7 +761,7 @@ export default function ModerationClient({
     return () => {
       active = false;
     };
-  }, [aktuellerSlide, quizId]);
+  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
 
   useEffect(() => {
     let active = true;
@@ -908,6 +938,15 @@ export default function ModerationClient({
           <div className="min-w-0">
             <div className="truncate font-bold">{quiz.titel ?? `Quiz ${quizId}`}</div>
           </div>
+          <QuizLifecycleControls quizId={quizId} state={lifecycleState} onChange={applyLiveState} />
+          {presentationQuestionAssignmentId && !quizBeendet && <button className="min-h-11 rounded-lg border border-zinc-700 px-4" onClick={async () => {
+            try {
+              await setQuizQuestionHidden(quizId, presentationQuestionAssignmentId, !questionHidden, lifecycleState.lifecycleRevision);
+              setQuestionHidden(!questionHidden);
+              setActionError(null);
+            } catch (cause) { setActionError(cause instanceof Error ? cause.message : "Aktion fehlgeschlagen."); }
+          }}>{questionHidden ? "Frage wieder einblenden" : "Frage schließen / ausblenden"}</button>}
+          {actionError && <p role="alert">{actionError}</p>}
           <Link href={`/quiz/${quizId}`} className="inline-flex min-h-11 items-center rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
             {backToQuizLabel}
           </Link>

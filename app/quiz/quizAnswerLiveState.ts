@@ -9,9 +9,9 @@ export function selectQuizAnswerAssignments<
 >(
   audienceState: PresentationAudienceState,
   assignments: readonly TAssignment[],
-  releasedAssignmentIds: readonly number[] = [],
+  releasedAssignmentIds: readonly number[] | null = null,
 ) {
-  if (releasedAssignmentIds.length > 0) {
+  if (releasedAssignmentIds !== null) {
     const visibleIds = new Set(releasedAssignmentIds);
     return assignments.filter((assignment) =>
       visibleIds.has(assignment.quiz_fragen_id),
@@ -41,6 +41,7 @@ export function selectReleasedQuizAnswerAssignmentIds(
     quiz_fragen_id: number | null;
     opened_at: Date | null;
     is_current: boolean;
+    is_hidden?: boolean;
   }[],
   releasedAt: Date | null,
 ) {
@@ -48,6 +49,7 @@ export function selectReleasedQuizAnswerAssignmentIds(
   const openedIds = new Set(
     runs.flatMap((run) =>
       run.quiz_fragen_id !== null &&
+      !run.is_hidden &&
       (run.is_current || (run.opened_at !== null && run.opened_at >= releasedAt))
         ? [run.quiz_fragen_id]
         : [],
@@ -61,6 +63,7 @@ export function isQuizAnswerRunReleasedForWrite(input: {
     isCurrent: boolean;
     isPixel: boolean;
     openedAt: Date | null;
+    isHidden?: boolean;
   };
   assignmentSectionId: number | null;
   requestedSectionId: number;
@@ -70,6 +73,7 @@ export function isQuizAnswerRunReleasedForWrite(input: {
     releasedAt: Date | null;
   } | null;
 }) {
+  if (input.run.isHidden) return false;
   if (input.assignmentSectionId === null) return input.run.isCurrent;
   if (input.assignmentSectionId !== input.requestedSectionId) return false;
   if (input.run.isPixel && !input.run.isCurrent) return false;

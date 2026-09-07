@@ -228,15 +228,15 @@ test("the production close action targets the validated run and never deletes su
   assert.doesNotMatch(closeService, /team_answer_submissions\.(delete|update)/);
 });
 
-test("closed standard questions retain their existing lifecycle behavior", () => {
+test("AP1 revisits finalized questions without replacing their submission context", () => {
   assert.equal(shouldReuseQuestionInteractionRun({
     state: "CLOSED",
     liveResultsEnabled: false,
     stoppedPixelRunReusable: false,
-  }), false);
+  }), true);
   assert.equal(shouldReuseQuestionInteractionRun({
     state: "REVEALED",
     liveResultsEnabled: true,
     stoppedPixelRunReusable: false,
-  }), false);
+  }), true);
 });

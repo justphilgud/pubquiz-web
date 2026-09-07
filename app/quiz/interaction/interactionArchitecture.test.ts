@@ -231,7 +231,7 @@ test("a stale presentation slide cannot reopen a manually locked block", () => {
   assert.match(sync, /shouldReuseQuestionInteractionRun/);
   assert.match(runReuse, /state === "OPEN"/);
   assert.match(runReuse, /state === "COUNTDOWN"/);
-  assert.match(runReuse, /liveResultsEnabled && input\.state === "CLOSED"/);
+  assert.match(runReuse, /input\.state === "CLOSED"/);
 });
 
 test("a conscious block reopen resynchronizes the current question", () => {

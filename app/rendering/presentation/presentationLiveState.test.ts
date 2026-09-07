@@ -10,6 +10,8 @@ import {
 
 test("missing presentation state resolves to a safe read-only display state", () => {
   assert.deepEqual(resolvePresentationLiveState(null), {
+    lifecycle: "PREPARATION",
+    lifecycleRevision: 0,
     slideIndex: 0,
     slideKey: null,
     slideStartedAt: null,

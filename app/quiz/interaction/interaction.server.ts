@@ -1,4 +1,6 @@
 import { Prisma } from "@/app/generated/prisma/client";
+import { requireQuizNotStopped } from "../quizLifecycle.server";
+import { resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { resolveQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { hasAnswerContentChanged } from "@/app/quiz/evaluation/answerContent";
@@ -391,6 +393,7 @@ export async function syncInteractionForPresentation(
     knownOpenQuizSectionId?: number;
   },
 ) {
+  await requireQuizNotStopped(db, input.quizId);
   const currentRunId = await lockCurrentRun(db, input.quizId);
   const identity = parsePresentationSlideKey(input.slideKey);
   if (identity?.kind === "LIVE_POLL") {
@@ -484,7 +487,10 @@ export async function syncInteractionForPresentation(
         }),
       })
     ) {
-      return currentRun;
+      return db.quiz_interaction_runs.update({
+        where: { interaction_run_id: currentRun.interaction_run_id },
+        data: { is_hidden: false, revision: { increment: 1 } },
+      });
     }
     if (currentRun) {
       if (!shouldKeepRunOpenUntilBlockClose(currentRun)) {
@@ -518,7 +524,7 @@ export async function syncInteractionForPresentation(
     ) {
       return db.quiz_interaction_runs.update({
         where: { interaction_run_id: previousRun.interaction_run_id },
-        data: { is_current: true, revision: { increment: 1 } },
+        data: { is_current: true, is_hidden: false, revision: { increment: 1 } },
       });
     }
     const resolved = previousRun
@@ -648,6 +654,14 @@ async function syncLivePollForPresentation(
   if (input.currentRunId !== null) {
     await closeRun(db, input.currentRunId, { reason: "PRESENTATION_ADVANCED", keepCurrent: false });
   }
+  const previousRun = await db.quiz_interaction_runs.findFirst({
+    where: { quiz_id: input.quizId, quiz_ablauf_element_id: input.placementId },
+    orderBy: { interaction_run_id: "desc" },
+  });
+  if (previousRun) return db.quiz_interaction_runs.update({
+    where: { interaction_run_id: previousRun.interaction_run_id },
+    data: { is_current: true, is_hidden: false, revision: { increment: 1 } },
+  });
   return db.quiz_interaction_runs.create({
     data: {
       quiz_id: input.quizId,
@@ -683,6 +697,7 @@ export async function closeQuizQuestionInteraction(
     reason?: string;
   },
 ) {
+  await requireQuizNotStopped(db, input.quizId);
   await lockRun(db, input.interactionRunId);
   const run = await db.quiz_interaction_runs.findUnique({
     where: { interaction_run_id: input.interactionRunId },
@@ -773,6 +788,7 @@ async function isRunReleasedForAnswerWrite(
   db: DbClient,
   run: {
     is_current: boolean;
+    is_hidden: boolean;
     config_snapshot: Prisma.JsonValue;
     opened_at: Date | null;
   },
@@ -796,6 +812,7 @@ async function isRunReleasedForAnswerWrite(
       isCurrent: run.is_current,
       isPixel: isPixelInteractionRun(run),
       openedAt: run.opened_at,
+      isHidden: run.is_hidden,
     },
     assignmentSectionId: assignment.quiz_abschnitt_id,
     requestedSectionId,
@@ -827,6 +844,7 @@ export async function saveTeamAnswerDraft(input: {
   draft: TeamAnswerDraftInput;
 }): Promise<SaveTeamAnswerDraftResult> {
   return prisma.$transaction(async (tx) => {
+    await requireQuizNotStopped(tx, input.quizId);
     const resolved = await resolveInteractionAssignment(
       tx,
       input.quizId,
@@ -1040,6 +1058,7 @@ export async function submitTeamAnswer(input: {
   quizTeamSessionId: number;
 }) {
   return prisma.$transaction(async (tx) => {
+    await requireQuizNotStopped(tx, input.quizId);
     await lockRun(tx, input.interactionRunId);
     let run = await tx.quiz_interaction_runs.findUnique({
       where: { interaction_run_id: input.interactionRunId },
@@ -1048,7 +1067,7 @@ export async function submitTeamAnswer(input: {
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (
       !run ||
-      !run.is_current ||
+      run.is_hidden ||
       run.quiz_id !== input.quizId ||
       run.quiz_fragen_id !== input.quizFragenId ||
       !isQuizInteractionWritable(run.state as QuizInteractionState, run.deadline_at, now)
@@ -1072,6 +1091,9 @@ export async function submitTeamAnswer(input: {
     });
     if (!draft || draft.interaction_run_id !== run.interaction_run_id) {
       return { success: false, reason: "NO_DRAFT" as const };
+    }
+    if (!await isRunReleasedForAnswerWrite(tx, run, draft, input.quizId, draft.quiz_abschnitt_id)) {
+      return { success: false, reason: "LIVE_STATE_CHANGED" as const };
     }
     const interaction = readInteractionSnapshot(run.config_snapshot);
     const validated = validateInteractionPayload(interaction, draftInputFromStored(draft));
@@ -1164,6 +1186,7 @@ export async function stopPixelQuestion(input: {
   quizTeamSessionId: number;
 }): Promise<StopPixelQuestionResult> {
   return prisma.$transaction(async (tx) => {
+    await requireQuizNotStopped(tx, input.quizId);
     await lockRun(tx, input.interactionRunId);
     let run = await tx.quiz_interaction_runs.findUnique({
       where: { interaction_run_id: input.interactionRunId },
@@ -1173,6 +1196,7 @@ export async function stopPixelQuestion(input: {
     if (
       !run ||
       !run.is_current ||
+      run.is_hidden ||
       run.quiz_id !== input.quizId ||
       run.quiz_fragen_id !== input.quizFragenId
     ) {
@@ -1293,6 +1317,7 @@ export async function getQuizLiveSnapshotData(
   const runQuery = () => prisma.quiz_interaction_runs.findFirst({
       where: {
         quiz_id: quizId,
+        ...(quizTeamSessionId !== null ? { is_hidden: false } : {}),
         ...(options.presentationQuestionAssignmentId === undefined
           ? { is_current: true }
           : { quiz_fragen_id: options.presentationQuestionAssignmentId }),
@@ -1310,7 +1335,7 @@ export async function getQuizLiveSnapshotData(
         },
       },
     });
-  const [initialRun, blockRelease] = await Promise.all([
+  const [initialRun, blockRelease, presentationStatus] = await Promise.all([
     runQuery(),
     prisma.quiz_block_freigaben.findFirst({
       where: { quiz_id: quizId },
@@ -1319,6 +1344,7 @@ export async function getQuizLiveSnapshotData(
         { quiz_block_freigabe_id: "desc" },
       ],
     }),
+    prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } }),
   ]);
   let run = initialRun;
   if (
@@ -1597,7 +1623,10 @@ export async function getQuizLiveSnapshotData(
     : null;
   return {
     serverNow: serverNow.toISOString(),
-    liveRevision: serializeQuizParticipantLiveRevision(blockRelease, run),
+    presentationState: resolvePresentationLiveState(presentationStatus),
+    lifecycle: resolvePresentationLiveState(presentationStatus).lifecycle,
+    questionHidden: run?.is_hidden ?? false,
+    liveRevision: [serializeQuizParticipantLiveRevision(blockRelease, run), presentationStatus?.updated_at.toISOString() ?? ""].join(":"),
     blockState: blockRelease
       ? {
           quizAbschnittId: blockRelease.quiz_abschnitt_id,

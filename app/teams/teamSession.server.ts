@@ -1,4 +1,5 @@
 import "server-only";
+import { requireQuizNotStopped } from "@/app/quiz/quizLifecycle.server";
 
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -53,6 +54,7 @@ export async function startGlobalTeamQuizSession(
     });
     if (!quiz) return { success: false, message: "Quiz nicht gefunden." } as const;
 
+    await requireQuizNotStopped(transaction, input.quizId);
     let generatedPassword: string | null = null;
     let team = await transaction.teams.findUnique({
       where: { teamname_normalisiert: normalizedName },

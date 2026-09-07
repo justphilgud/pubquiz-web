@@ -1,4 +1,5 @@
 import "server-only";
+import { requireQuizNotStopped } from "@/app/quiz/quizLifecycle.server";
 
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -56,6 +57,7 @@ export async function saveLivePollResponse(input: {
   text?: unknown;
 }) {
   return prisma.$transaction(async (tx) => {
+    await requireQuizNotStopped(tx, input.quizId);
     const rows = await tx.$queryRaw<{ interaction_run_id: number }[]>`
       SELECT "interaction_run_id" FROM "pubquiz"."quiz_interaction_runs"
       WHERE "quiz_id" = ${input.quizId} AND "is_current" = true FOR UPDATE
@@ -67,7 +69,7 @@ export async function saveLivePollResponse(input: {
       tx.quiz_team_sessions.findFirst({ where: { quiz_team_session_id: input.quizTeamSessionId, quiz_id: input.quizId }, select: { quiz_team_session_id: true } }),
     ]);
     const config = run ? readLivePollRunSnapshot(run.config_snapshot) : null;
-    if (!run || !session || !config || run.state !== "OPEN") return { success: false as const, message: "Die Umfrage ist geschlossen." };
+    if (!run || !session || !config || run.is_hidden || run.state !== "OPEN") return { success: false as const, message: "Die Umfrage ist geschlossen." };
 
     let selectedOptionId: string | null = null;
     let originalText: string | null = null;

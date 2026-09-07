@@ -8,5 +8,5 @@ export function shouldReuseQuestionInteractionRun(input: {
   return input.state === "OPEN" ||
     input.state === "COUNTDOWN" ||
     input.stoppedPixelRunReusable ||
-    (input.liveResultsEnabled && input.state === "CLOSED");
+    input.state === "CLOSED" || input.state === "REVEALED";
 }

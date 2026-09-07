@@ -1,6 +1,10 @@
+import { resolveQuizLifecycle, type QuizLifecycle } from "@/app/quiz/quizLifecycle";
+
 export type PresentationPlaybackCommand = "play" | "pause" | "stop" | null;
 
 export type PresentationLiveState = {
+  lifecycle: QuizLifecycle;
+  lifecycleRevision: number;
   slideIndex: number;
   slideKey: string | null;
   slideStartedAt: string | null;
@@ -74,6 +78,8 @@ export type StoredPresentationStatus = {
   slide_key?: string | null;
   slide_started_at?: DateValue;
   quiz_started_at?: DateValue;
+  quiz_stopped_at?: DateValue;
+  lifecycle_revision?: number;
   endstand_reveal_count?: number | null;
   medium_overlay_aktiv?: boolean | null;
   audio_aktion?: string | null;
@@ -282,6 +288,8 @@ export function resolvePresentationLiveState(
 ): PresentationLiveState {
   if (!status) {
     return {
+      lifecycle: "PREPARATION",
+      lifecycleRevision: 0,
       slideIndex: 0,
       slideKey: null,
       slideStartedAt: null,
@@ -299,6 +307,8 @@ export function resolvePresentationLiveState(
   }
 
   return {
+    lifecycle: resolveQuizLifecycle(status),
+    lifecycleRevision: status.lifecycle_revision ?? 0,
     slideIndex: Math.max(0, status.slide_index),
     slideKey: status.slide_key ?? null,
     slideStartedAt: serializeDate(status.slide_started_at),
@@ -320,4 +330,11 @@ export function resolvePresentationLiveState(
     },
     updatedAt: serializeDate(status.updated_at),
   };
+}
+
+/** A newly opened preparation window starts at slide one until the next navigation. */
+export function resolvePresentationOpeningState(state: PresentationLiveState): PresentationLiveState {
+  if (state.lifecycle !== "PREPARATION") return state;
+  return { ...state, slideIndex: 0, slideKey: null, mediaOverlayActive: false,
+    playbackCommand: null, countdownStatus: "idle", estimation: { phase: "HIDDEN", questionId: null } };
 }
