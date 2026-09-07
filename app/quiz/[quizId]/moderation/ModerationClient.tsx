@@ -1139,7 +1139,7 @@ export default function ModerationClient({
                 {aktuellerSlide?.typ === "ablauf" && (
                   <p><strong>Typ:</strong> {getQuizFlowTypeLabel(aktuellerSlide.element.type)}</p>
                 )}
-                {(aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && aktuellerSlide.solutionStrategy && (
+                {(aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && aktuellerSlide.solutionStrategy && aktuellerSlide.solutionStrategy !== "END_OF_BLOCK" && (
                   <p><strong>Auflösungsstrategie:</strong> {getQuizSolutionStrategyLabel(aktuellerSlide.solutionStrategy)}</p>
                 )}
                 {aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.config.durationSeconds !== undefined && (

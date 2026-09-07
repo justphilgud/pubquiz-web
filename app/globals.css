@@ -2777,3 +2777,27 @@ button {
 .presentation-live-poll-wall[data-count="1"] article { min-height: 12rem; font-size: clamp(1.8rem, 4vw, 3.5rem); }
 .presentation-live-poll-wall[data-count="2"], .presentation-live-poll-wall[data-count="3"], .presentation-live-poll-wall[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .presentation-live-poll-total { margin-top: clamp(.8rem, 2vh, 1.5rem); color: var(--quiz-text-muted); font-size: clamp(.85rem, 1.3vw, 1.1rem); }
+
+/* AP6: one local four-second greeting; QR DOM and join URL remain intact. */
+.presentation-team-welcome {
+  position: absolute; z-index: 45; inset: 18% 5% auto 39%;
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  max-height: 74%; overflow: auto; padding: clamp(1.5rem, 3cqw, 3rem);
+  border: 2px solid var(--brand-accent); border-radius: 1.5rem;
+  background: var(--brand-surface-strong); color: var(--brand-text);
+  text-align: center; pointer-events: none;
+  animation: team-join-welcome var(--team-join-duration) ease both;
+}
+.presentation-team-welcome h2 { margin: 0; font-size: var(--pres-title); line-height: 1.18; overflow-wrap: anywhere; }
+.presentation-team-welcome p { margin: 0; font-size: var(--pres-body); line-height: 1.35; }
+.presentation-team-welcome .presentation-team-welcome-names { font-size: var(--pres-info); }
+.presentation-team-welcome-avatars { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem; }
+.presentation-team-welcome-avatar { width: clamp(4rem, 9cqw, 9rem); height: clamp(4rem, 9cqw, 9rem); flex-shrink: 0; }
+@keyframes team-join-welcome {
+  0% { opacity: 0; transform: translateY(1rem); }
+  8%, 90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-0.5rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .presentation-team-welcome { animation: none; }
+}

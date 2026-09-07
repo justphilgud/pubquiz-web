@@ -67,6 +67,7 @@ type Props = {
     }[];
     totalTeams: number;
     remainingTeams: number;
+    joinObservation?: import("@/app/rendering/presentation/teamJoinQueue").TeamJoinObservation;
   } | null;
   funnyAnswers: FunnyAnswerEntry[];
 };

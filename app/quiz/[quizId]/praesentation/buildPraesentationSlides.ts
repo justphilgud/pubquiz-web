@@ -6,6 +6,7 @@ import {
 } from "../../quizSectionPolicy";
 import {
   resolveQuizFlow,
+  compareQuizFlowItems,
   type QuizFlowItem,
   type QuizFlowItemType,
 } from "../../flow/quizFlow";
@@ -131,7 +132,7 @@ export function buildPraesentationSlides(
         (item) =>
           item.anchorType === anchorType && item.anchorKey === anchorKey,
       )
-      .sort((left, right) => left.order - right.order);
+      .sort(compareQuizFlowItems);
 
   const appendFlowItems = (
     anchorType: QuizFlowItem["anchorType"],

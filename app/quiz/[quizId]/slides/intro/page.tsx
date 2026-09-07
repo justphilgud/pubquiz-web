@@ -214,7 +214,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
     <FixedSlideEditor
       eyebrow="Intro · 5 feste Slides"
       title="Intro konfigurieren"
-      description="Alle Intro-Inhalte an einem Ort. Beim Wechsel zwischen den Slides bleiben noch nicht gespeicherte Eingaben erhalten."
+      description="Alle Intro-Inhalte an einem Ort. Der QR-Code zum Teambeitritt folgt immer als letzter Intro-Slide; weiter geht es erst durch die Moderation. Beim Wechsel bleiben noch nicht gespeicherte Eingaben erhalten."
       initialItemId={initialItemId}
       backHref={`/quiz/${quizIdValue}`}
       items={INTRO_SLIDES.map((slide) => ({

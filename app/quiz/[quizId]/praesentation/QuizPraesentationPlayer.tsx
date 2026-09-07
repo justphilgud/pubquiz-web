@@ -100,6 +100,7 @@ export default function QuizPraesentationPlayer({
     }[];
     totalTeams: number;
     remainingTeams: number;
+    joinObservation?: import("@/app/rendering/presentation/teamJoinQueue").TeamJoinObservation;
   } | null>(null);
 
   const slideIndex = resolvePresentationSequenceIndex(

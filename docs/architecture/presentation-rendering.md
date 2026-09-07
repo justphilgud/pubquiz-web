@@ -143,3 +143,8 @@ Inhalte und Audio für vier Designwelten. Bestehende Renderer-/AP1–AP4-Tests g
 weiter. Geometrie und tatsächliche Wiedergabe benötigen zusätzlich die dokumentierte
 Browserabnahme. `/templates/presentation-quality` liefert nach Anmeldung dieselben
 internen, rein lesenden Fixtures über den produktiven Renderer; keine Quizdaten.
+
+## AP6: Intro und Teambegrüßung
+
+[Intro-/QR-Flow und Teambeitritt](intro-team-join.md) definiert den manuellen QR-Abschluss,
+die rein lokale Begrüßungsqueue und die Wiederverwendung vorhandener Snapshots.

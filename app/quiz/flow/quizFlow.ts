@@ -669,7 +669,7 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
     );
   }
   result.push(
-    defaultItem("QR_CODE", "BEFORE_QUIZ", "QUIZ", null, 50, {
+    defaultItem("QR_CODE", "BEFORE_QUIZ", "QUIZ", null, 70, {
       version: 1,
       title: "Jetzt mitspielen",
       body: "QR-Code scannen und Team anmelden.",
@@ -737,7 +737,7 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
     }),
   );
 
-  return result;
+  return result.sort(compareQuizFlowItems);
 }
 
 export function parseStoredQuizFlowItem(
@@ -792,7 +792,7 @@ export function resolveQuizFlow(
   quiz: DefaultFlowQuiz,
   storedItems: readonly StoredQuizFlowItem[],
 ): QuizFlowItem[] {
-  if (storedItems.length === 0) return buildDefaultQuizFlow(quiz);
+  if (storedItems.length === 0) return buildDefaultQuizFlow(quiz).sort(compareQuizFlowItems);
 
   const parsed = storedItems
     .map(parseStoredQuizFlowItem)
@@ -824,6 +824,10 @@ const ANCHOR_ORDER: Record<QuizFlowAnchorType, number> = {
 export function compareQuizFlowItems(left: QuizFlowItem, right: QuizFlowItem) {
   const anchorDifference = ANCHOR_ORDER[left.anchorType] - ANCHOR_ORDER[right.anchorType];
   if (anchorDifference !== 0) return anchorDifference;
+  if (left.anchorType === "BEFORE_QUIZ" && left.anchorKey === right.anchorKey) {
+    const qrDifference = Number(left.type === "QR_CODE") - Number(right.type === "QR_CODE");
+    if (qrDifference !== 0) return qrDifference;
+  }
   if (left.sectionId !== right.sectionId) {
     return (left.sectionId ?? 0) - (right.sectionId ?? 0);
   }

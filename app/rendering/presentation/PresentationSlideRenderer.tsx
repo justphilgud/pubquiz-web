@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
+import { TeamJoinWelcome } from "./TeamJoinWelcome";
 import { pixelRules } from "@/app/fragen/editor/templates/pixelRules";
 
 import {
@@ -118,6 +119,7 @@ type PresentationSlideSharedDisplayState = {
     }[];
     totalTeams: number;
     remainingTeams: number;
+    joinObservation?: import("@/app/rendering/presentation/teamJoinQueue").TeamJoinObservation;
   } | null;
 };
 
@@ -2768,6 +2770,12 @@ function renderAktuellenSlide() {
           </p>
         </div>
       )}
+      {teamJoinState?.joinObservation && estimationPhase === "HIDDEN" && (
+        (slide?.typ === "ablauf" && slide.element.type === "QR_CODE") ||
+        (slide?.typ === "fixer-slide" && slide.slideTyp === "qrcode") ||
+        (slide?.typ === "block" && slide.abschnitt.abschnitt_typ === "intro_qrcode")
+      ) && <TeamJoinWelcome key={`${quiz.quiz_id}:${slideIndex}:${teamJoinState.joinObservation.lifecycleRevision}`}
+        observation={teamJoinState.joinObservation} />}
       <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
       {mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="presentation-media-overlay absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">

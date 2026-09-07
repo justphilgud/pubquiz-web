@@ -18,16 +18,16 @@ export const INTRO_SLIDES = [
     description: "Quizname und Willkommensgruß",
   },
   {
-    id: "rules",
-    legacyRoute: "regeln",
-    title: "Regeln",
-    description: "Quizregeln und Ablauf",
-  },
-  {
     id: "prizes",
     legacyRoute: "preise",
     title: "Preise",
     description: "Preise für Platz 1 bis 3",
+  },
+  {
+    id: "rules",
+    legacyRoute: "regeln",
+    title: "Regeln",
+    description: "Quizregeln und Ablauf",
   },
 ] as const;
 

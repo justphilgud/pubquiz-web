@@ -140,7 +140,7 @@ test("leitet Standardphasen für mehrere Runden und den Abschluss ab", () => {
   const flowTypes = slides
     .filter((slide) => slide.typ === "ablauf")
     .map((slide) => slide.element.type);
-  assert.deepEqual(flowTypes.slice(0, 3), ["WELCOME", "QR_CODE", "RULES"]);
+  assert.deepEqual(flowTypes.slice(0, 3), ["WELCOME", "RULES", "QR_CODE"]);
   assert.equal(flowTypes.filter((type) => type === "ROUND_INTRO").length, 2);
   const firstRoundIntro = slides.find(
     (slide) =>
@@ -470,4 +470,23 @@ test("keeps the immediate reveal sequence unchanged", () => {
     "10:SOLUTION:102",
     "10:COUNTDOWN",
   ]);
+});
+
+
+test("AP6 INTRO-INV-01/02: legacy and dynamic intro retain all contents with QR last", () => {
+  const quiz = quizFixture();
+  quiz.ablaufElemente = [
+    { quiz_ablauf_element_id: 901, typ: "QR_CODE", anker_typ: "BEFORE_QUIZ", anker_schluessel: "QUIZ", quiz_abschnitt_id: null, sortierung: -10, ist_sichtbar: true, bezeichnung: null, konfiguration: { version: 1 }, ist_standard: true },
+    { quiz_ablauf_element_id: 902, typ: "TEXT", anker_typ: "BEFORE_QUIZ", anker_schluessel: "QUIZ", quiz_abschnitt_id: null, sortierung: 999, ist_sichtbar: true, bezeichnung: null, konfiguration: { version: 1, body: "Zusätzliche Geschichte" }, ist_standard: false },
+  ];
+  const slides = buildPraesentationSlides(quiz);
+  const qr = slides.findIndex(s => s.typ === "ablauf" && s.element.type === "QR_CODE");
+  assert.ok(qr > slides.findIndex(s => s.typ === "ablauf" && s.element.type === "RULES"));
+  assert.ok(qr > slides.findIndex(s => s.typ === "ablauf" && s.element.persistentId === 902));
+  assert.equal(slides.filter(s => s.typ === "ablauf" && s.element.type === "QR_CODE").length, 1);
+  const next = slides[qr + 1];
+  assert.equal(next.typ === "ablauf" && next.element.type, "ROUND_INTRO");
+  assert.equal(slides.filter(s => s.typ === "frage").length, 3);
+  assert.equal(slides.filter(s => s.typ === "aufloesung").length, 3);
+  assert.equal(slides[qr].typ === "ablauf" && slides[qr].element.config.durationSeconds, undefined);
 });

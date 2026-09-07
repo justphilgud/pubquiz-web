@@ -36,7 +36,7 @@ function quizFixture() {
 
 test("leitet einen vollständigen Standardablauf ohne Fragenkopien ab", () => {
   const flow = buildDefaultQuizFlow(quizFixture());
-  assert.deepEqual(flow.slice(0, 3).map((item) => item.type), ["WELCOME", "QR_CODE", "RULES"]);
+  assert.deepEqual(flow.slice(0, 3).map((item) => item.type), ["WELCOME", "RULES", "QR_CODE"]);
   assert.equal(flow.filter((item) => item.type === "ROUND_INTRO").length, 2);
   assert.deepEqual(
     flow

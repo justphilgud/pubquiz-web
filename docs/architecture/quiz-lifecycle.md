@@ -232,3 +232,8 @@ Lifecycle-, Submission-, Bewertungs- oder Schreibregeln.
 
 [Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
 und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.
+
+## AP6: Intro und Teambegrüßung
+
+[Intro-/QR-Flow und Teambeitritt](intro-team-join.md) definiert den manuellen QR-Abschluss,
+die rein lokale Begrüßungsqueue und die Wiederverwendung vorhandener Snapshots.

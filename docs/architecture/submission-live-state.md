@@ -136,3 +136,8 @@ neu projizierte Quizobjekte, echte Kontextwechsel, alte Antworten und wiederholt
 Mount/Unmount. Eine Gegenprobe mit der früheren Set-/Dependency-Kombination muss
 die Schleife erkennen. Die reale React-/Request-Abnahme auf Preview ist zusätzlich
 verpflichtend; der Test-Harness ersetzt sie nicht.
+
+## AP6: Intro und Teambegrüßung
+
+[Intro-/QR-Flow und Teambeitritt](intro-team-join.md) definiert den manuellen QR-Abschluss,
+die rein lokale Begrüßungsqueue und die Wiederverwendung vorhandener Snapshots.

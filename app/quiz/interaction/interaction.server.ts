@@ -1413,8 +1413,8 @@ export async function getQuizLiveSnapshotData(
                 { erstellt_am: "asc" },
                 { quiz_team_session_id: "asc" },
               ],
-              take: 12,
               select: {
+                quiz_team_session_id: true,
                 teamname: true,
                 team: {
                   select: {
@@ -1682,14 +1682,25 @@ export async function getQuizLiveSnapshotData(
     publicState: run?.state ?? "LOCKED",
     teamJoinState: options.includeTeamJoinState
       ? {
-          teams: visibleTeams.map((team) => ({
+          teams: visibleTeams.slice(0, 12).map((team) => ({
             teamId: team.team.team_id,
             teamName: team.teamname,
             avatarCode: mapTeamProfile(team.team).avatarCode,
             photoUrl: team.team.foto_url,
           })),
           totalTeams: teamCount,
-          remainingTeams: Math.max(0, teamCount - visibleTeams.length),
+          remainingTeams: Math.max(0, teamCount - 12),
+          joinObservation: {
+            lifecycleRevision: resolvePresentationLiveState(presentationStatus).lifecycleRevision,
+            lifecycle: resolvePresentationLiveState(presentationStatus).lifecycle,
+            teams: visibleTeams.map((team) => ({
+              participationId: team.quiz_team_session_id,
+              teamId: team.team.team_id,
+              teamName: team.teamname,
+              avatarCode: mapTeamProfile(team.team).avatarCode,
+              photoUrl: team.team.foto_url,
+            })),
+          },
         }
       : null,
     pollState:

@@ -517,7 +517,7 @@ function DroppableBlock({
                 quizId={quizId}
                 typ="Intro"
                 count={introSlides.length}
-                description="Wartebildschirm, Countdown, Begrüßung, Regeln und Preise"
+                description="Wartebildschirm, Countdown, Begrüßung, Preise und Regeln. Zum Abschluss folgt der QR-Code zum Teambeitritt; die Moderation schaltet weiter."
               />
             ) : gruppe.blockTyp === "outro" ? (
               <FixedSlidesCard

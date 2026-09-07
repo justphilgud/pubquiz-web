@@ -16,8 +16,8 @@ test("the common intro editor contains exactly the five fixed slides", () => {
       "Wartebildschirm",
       "Countdown bis zum Start",
       "Begrüßung",
-      "Regeln",
       "Preise",
+      "Regeln",
     ],
   );
 });
