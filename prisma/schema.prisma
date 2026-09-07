@@ -621,6 +621,7 @@ model quiz_block_freigaben {
 }
 
 model team_antworten {
+  pixel_stage_history  Json?
   team_antwort_id      Int                        @id @default(autoincrement())
   quiz_id              Int
   quiz_abschnitt_id    Int
@@ -664,6 +665,7 @@ model team_antworten {
 }
 
 model quiz_interaction_runs {
+  pixel_completed_stages     Int                       @default(0)
   interaction_run_id         Int                       @id @default(autoincrement())
   quiz_id                    Int
   quiz_fragen_id             Int?

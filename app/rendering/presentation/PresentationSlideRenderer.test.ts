@@ -22,6 +22,45 @@ const rendererSource = readFileSync(
   new URL("./PresentationSlideRenderer.tsx", import.meta.url),
   "utf8",
 );
+
+test("AP3: both rules slides render distinct modes without revealing the answer", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const pixel = runtime.quiz.fragen.find((question) => question.templateId === "pixelbild");
+  assert.ok(pixel);
+  for (const mode of ["STAGED", "CHALLENGE"] as const) {
+    const slide: Slide = { typ: "pixel-erklaerung", abschnitt: null, frage: { ...pixel,
+      templateConfig: { ...pixel.templateConfig!, pixelMode: mode } } };
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz: runtime.quiz, slide, slides: [slide], slideIndex: 0, slideLabel: "Pixelbild · Spielregeln",
+      theme: runtime.theme, displayState,
+    }));
+    assert.match(html, mode === "STAGED" ? /Stufenwertung/ : /Challenge/);
+    assert.match(html, mode === "STAGED" ? /Stufe 3: 3 Punkte/ : /Falscher Stop: −1/);
+    assert.doesNotMatch(html, /pixel_original_image/);
+  }
+});
+
+test("AP3: live pixel audience displays stage and absolute countdown before and after a Challenge", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const pixel = runtime.quiz.fragen.find((question) => question.templateId === "pixelbild");
+  assert.ok(pixel);
+  const slide: Slide = { typ: "frage", abschnitt: null, frage: pixel, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  for (const stopped of [false, true]) {
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz: runtime.quiz, slide, slides: [slide], slideIndex: 0, slideLabel: "Pixelbild",
+      theme: runtime.theme, displayState: { ...displayState, pixelState: {
+        interactionType: "PIXEL_STOP", mode: "CHALLENGE", state: stopped ? "COUNTDOWN" : "OPEN",
+        effectivePixelStage: 1, stopped, stoppedByTeamName: stopped ? "Testteam" : null,
+        stoppedAt: stopped ? new Date(displayState.now).toISOString() : null,
+        stoppedAtStage: stopped ? 1 : null, submissionDeadlineAt: null,
+        stageDeadlineAt: new Date(displayState.now + 12_000).toISOString(), resolution: null,
+      } },
+    }));
+    assert.match(html, /12 s/);
+    assert.match(html, /Challenge · Stufe 3/);
+    if (stopped) assert.match(html, /Restantwortzeit/);
+  }
+});
 const playerSource = readFileSync(
   new URL(
     "../../quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",

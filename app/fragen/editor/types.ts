@@ -195,6 +195,7 @@ export type FaceMorphPixelQuestionOptions = Record<
 >;
 
 export type QuestionTemplateConfig = {
+  pixelMode?: "CHALLENGE" | "STAGED";
   stageDurationsSeconds: PixelStageDurationsSeconds;
   createPixelQuestionByAnswer: FaceMorphPixelQuestionOptions;
   templateData?: QuestionTemplateData;

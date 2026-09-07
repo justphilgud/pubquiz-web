@@ -213,6 +213,9 @@ Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln
 
 ## UI-Nachtrag: kompakte Moderationsleiste
 
+Für Pixel-Timer, Stufen-Snapshots und deren Einbindung in Stop/Reset gilt ergänzend
+[Pixel-Frage (AP3)](pixel-question.md). Der gemeinsame Lifecycle bleibt maßgeblich.
+
 Status und Lifecycle-Aktionen stehen gemeinsam im oberen Header: PREPARATION
 zeigt Start und Reset, RUNNING Beenden und Reset, STOPPED nur Reset. Beenden
 öffnet unverändert den bestehenden Bestätigungsdialog der Moderation. Start und

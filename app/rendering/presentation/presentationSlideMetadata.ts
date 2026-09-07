@@ -29,6 +29,7 @@ export function getPresentationSlideTitle(
   slides: Slide[],
 ) {
   if (!slide) return "Kein Slide";
+  if (slide.typ === "pixel-erklaerung") return "Pixelbild · Spielregeln";
 
   if (slide.typ === "ablauf") {
     return slide.element.label ?? getQuizFlowTypeLabel(slide.element.type);

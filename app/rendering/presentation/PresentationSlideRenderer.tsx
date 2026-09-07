@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
+import { pixelRules } from "@/app/fragen/editor/templates/pixelRules";
 
 import {
   PUBLIC_CALENDAR_FEED_PATH,
@@ -2602,6 +2603,14 @@ function renderAktuellenSlide() {
   if (slide.typ === "ablauf") {
     return renderFlowContentSlide(slide);
   }
+  if (slide.typ === "pixel-erklaerung") {
+    const rules = pixelRules(slide.frage.templateConfig?.pixelMode ?? "CHALLENGE");
+    return <div className="flex h-full flex-col justify-center gap-8 px-16 py-12" style={{ color: "var(--quiz-text)" }}>
+      <p className="text-2xl font-semibold">Pixelbild · {slide.frage.templateConfig?.pixelMode === "STAGED" ? "Stufenwertung" : "Challenge"}</p>
+      <h1 className="text-5xl font-bold">{rules.title}</h1>
+      <ul className="space-y-5 text-3xl">{rules.lines.map((line) => <li key={line}>{line}</li>)}</ul>
+    </div>;
+  }
 
   if (slide.typ === "fixer-slide") {
     return renderFixenSlide(slide);
@@ -2711,16 +2720,17 @@ function renderAktuellenSlide() {
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}
       </PresentationDesignStage>
-      {slide?.typ === "frage" && pixelState?.stopped && (
-        <div className="presentation-runtime-status absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-yellow-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
-          <p className="text-2xl font-black text-yellow-200">
-            {pixelState.stoppedByTeamName ?? "Ein Team"} hat in Stufe {pixelState.stoppedAtStage} gestoppt
+      {slide?.typ === "frage" && pixelState && (
+        <div className="presentation-runtime-status absolute bottom-6 right-8 z-40 max-w-[60%] rounded-xl border px-6 py-3 text-center" style={{ background: "var(--quiz-surface-strong)", color: "var(--quiz-text)", borderColor: "var(--quiz-border)" }}>
+          <p className="text-2xl font-bold">
+            {pixelState.mode === "STAGED" ? "Stufenwertung" : "Challenge"} · Stufe {4 - pixelState.effectivePixelStage}
+            {pixelState.stopped ? ` · ${pixelState.stoppedByTeamName ?? "Ein Team"} hat gestoppt` : ""}
           </p>
-          {pixelState.submissionDeadlineAt && (
-            <p className="mt-1 text-lg font-bold text-white">
-              {pixelState.state === "COUNTDOWN"
-                ? `Noch ${resolvePixelCountdownSeconds(pixelState.submissionDeadlineAt, now)} Sekunden f\u00fcr alle anderen Teams`
-                : "Antwortzeit beendet"}
+          {(
+            <p className="mt-1 text-4xl font-bold tabular-nums">
+              {pixelState.stageDeadlineAt
+                ? `${resolvePixelCountdownSeconds(pixelState.stageDeadlineAt, now)} s${pixelState.stopped ? " · Restantwortzeit" : ""}`
+                : "Antwortphase beendet"}
             </p>
           )}
         </div>

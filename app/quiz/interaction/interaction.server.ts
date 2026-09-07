@@ -41,12 +41,16 @@ import {
 } from "./interactionSubmissionPolicy";
 import {
   canStopPixelQuestion,
+  completedPixelStages,
+  pixelStageEnd,
+  pixelAnswerDeadline,
   createPixelLiveConfigSnapshot,
   readPixelLiveConfigSnapshot,
   resolveEffectivePixelStage,
   resolvePixelTeamWriteAccess,
   shouldReuseStoppedPixelRunOnQuestionReentry,
 } from "./pixelLiveInteraction";
+import { readPixelStageHistory, snapshotPixelStage } from "./pixelStageHistory";
 import {
   aggregatePollSubmissions,
   isPollInteractionType,
@@ -315,6 +319,7 @@ async function closeRun(
   });
   if (!run) return null;
   if (run.state === "OPEN" || run.state === "COUNTDOWN") {
+    await settlePixelStages(db, run, new Date(), true);
     const contentPoll = readLivePollRunSnapshot(run.config_snapshot);
     const finalizedDrafts = contentPoll
       ? 0
@@ -742,6 +747,12 @@ async function expireDeadlineIfNecessary(db: DbClient, runId: number, now: Date)
   const run = await db.quiz_interaction_runs.findUnique({
     where: { interaction_run_id: runId },
   });
+  if (run && (run.state === "OPEN" || run.state === "COUNTDOWN")) {
+    const completed = await settlePixelStages(db, run, now);
+    const config = readPixelLiveConfigSnapshot(run.config_snapshot);
+    const deadline = config ? pixelAnswerDeadline({ openedAt: run.opened_at, config, stoppedAt: run.stopped_at, deadlineAt: run.deadline_at }) : null;
+    if (completed === 3 || (!run.stopped_at && deadline && deadline <= now)) return closeRun(db, runId, { reason: "PIXEL_STAGES_COMPLETED", keepCurrent: run.is_current });
+  }
   if (
     run?.state === "COUNTDOWN" &&
     run.deadline_at &&
@@ -753,6 +764,32 @@ async function expireDeadlineIfNecessary(db: DbClient, runId: number, now: Date)
     });
   }
   return run;
+}
+
+/** All callers hold the run lock. Catch up before any draft overwrite, never after it. */
+async function settlePixelStages(db: DbClient, run: {
+  interaction_run_id: number; config_snapshot: Prisma.JsonValue;
+  opened_at: Date | null; pixel_completed_stages: number;
+}, now: Date, closing = false) {
+  const config = readPixelLiveConfigSnapshot(run.config_snapshot);
+  if (!config || config.mode !== "STAGED" || !run.opened_at) return 0;
+  const due = completedPixelStages(run.opened_at, config, now);
+  const target = closing ? Math.min(3, due + (due < 3 ? 1 : 0)) : due;
+  if (target <= run.pixel_completed_stages) return target;
+  const drafts = await db.team_antworten.findMany({ where: { interaction_run_id: run.interaction_run_id } });
+  for (const draft of drafts) {
+    let history = readPixelStageHistory(draft.pixel_stage_history);
+    for (let chronological = 1; chronological <= target; chronological++) {
+      const stage = (4 - chronological) as 1 | 2 | 3;
+      const at = chronological <= due ? pixelStageEnd(run.opened_at, config, chronological as 1 | 2 | 3) : now;
+      // A team that first writes later had no answer at earlier boundaries.
+      const text = (draft.draft_updated_at ?? draft.aktualisiert_am) < at ? draft.antwort_text : null;
+      history = snapshotPixelStage(history, stage, text, at.toISOString());
+    }
+    await db.team_antworten.update({ where: { team_antwort_id: draft.team_antwort_id }, data: { pixel_stage_history: toJson(history) } });
+  }
+  await db.quiz_interaction_runs.update({ where: { interaction_run_id: run.interaction_run_id }, data: { pixel_completed_stages: target, revision: { increment: 1 } } });
+  return target;
 }
 
 async function isRunReleasedForAnswerWrite(
@@ -1036,6 +1073,9 @@ export async function submitTeamAnswer(input: {
     });
     const now = new Date();
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
+    if (run && readPixelLiveConfigSnapshot(run.config_snapshot)?.mode === "STAGED") {
+      return { success: false, reason: "STAGED_AUTO_FINALIZED" as const };
+    }
     if (
       !run ||
       run.is_hidden ||
@@ -1174,7 +1214,7 @@ export async function stopPixelQuestion(input: {
       return { success: false, reason: "LIVE_STATE_CHANGED" };
     }
     const config = readPixelLiveConfigSnapshot(run.config_snapshot);
-    if (!config) return { success: false, reason: "STOP_NOT_AVAILABLE" };
+    if (!config || config.mode === "STAGED") return { success: false, reason: "STOP_NOT_AVAILABLE" };
     if (run.stopped_by_team_session_id !== null) {
       return { success: false, reason: "ALREADY_STOPPED" };
     }
@@ -1318,14 +1358,19 @@ export async function getQuizLiveSnapshotData(
     prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } }),
   ]);
   let run = initialRun;
+  const initialPixelConfig = run ? readPixelLiveConfigSnapshot(run.config_snapshot) : null;
+  const pixelDeadline = run && initialPixelConfig ? pixelAnswerDeadline({ openedAt: run.opened_at, config: initialPixelConfig, stoppedAt: run.stopped_at, deadlineAt: run.deadline_at }) : null;
   if (
-    run?.state === "COUNTDOWN" &&
+    run && ((initialPixelConfig && (run.state === "OPEN" || run.state === "COUNTDOWN") &&
+      (completedPixelStages(run.opened_at, initialPixelConfig, serverNow) > run.pixel_completed_stages || (pixelDeadline && pixelDeadline <= serverNow))) ||
+    (run.state === "COUNTDOWN" &&
     run.deadline_at &&
-    run.deadline_at <= serverNow
+    run.deadline_at <= serverNow))
   ) {
-    await prisma.$transaction((tx) =>
-      expireDeadlineIfNecessary(tx, run!.interaction_run_id, serverNow),
-    );
+    await prisma.$transaction(async (tx) => {
+      await requireQuizNotStopped(tx, quizId);
+      return expireDeadlineIfNecessary(tx, run!.interaction_run_id, new Date());
+    });
     run = await runQuery();
   }
   const contentPollConfig = run ? readLivePollRunSnapshot(run.config_snapshot) : null;
@@ -1525,7 +1570,7 @@ export async function getQuizLiveSnapshotData(
   const pixelStage = run && pixelConfig
     ? resolveEffectivePixelStage({
         openedAt: run.opened_at,
-        serverNow,
+        serverNow: run.closed_at ?? serverNow,
         config: pixelConfig,
         stoppedAtStage: run.stopped_at_stage,
       })
@@ -1716,6 +1761,10 @@ export async function getQuizLiveSnapshotData(
     pixelState: run && pixelConfig && pixelStage
       ? {
           interactionType: pixelConfig.type,
+          mode: pixelConfig.mode,
+          stageDeadlineAt: run.opened_at && (run.state === "OPEN" || run.state === "COUNTDOWN")
+            ? (run.stopped_at ? run.deadline_at : pixelStageEnd(run.opened_at, pixelConfig, pixelStage))?.toISOString() ?? null
+            : null,
           state: run.state,
           effectivePixelStage: pixelStage,
           stopped: run.stopped_by_team_session_id !== null,
@@ -1748,6 +1797,7 @@ export async function getQuizLiveSnapshotData(
             pixelStage &&
             pixelConfig &&
             canStopPixelQuestion({
+              mode: pixelConfig.mode,
               state: run.state,
               stage: pixelStage,
               stopped: run.stopped_by_team_session_id !== null,

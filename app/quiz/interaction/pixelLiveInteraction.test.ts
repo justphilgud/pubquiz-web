@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { readPixelStageHistory, snapshotPixelStage } from "./pixelStageHistory";
+import { completedPixelStages, pixelStageEnd, readPixelLiveConfigSnapshot } from "./pixelLiveInteraction";
+import { normalizeQuestionTemplateConfig } from "../../fragen/editor/pixelTemplateConfig";
 
 import {
   allocatePixelQuestionPoints,
@@ -310,4 +313,72 @@ test("run-bound scoring preserves the complete pixel points matrix", () => {
       entry.points,
     );
   }
+});
+
+const stagedConfig = createPixelLiveConfigSnapshot({
+  pixelMode: "STAGED", stageDurationsSeconds: { stage3: 99, stage2: 99, stage1: 99 },
+  createPixelQuestionByAnswer: { answer1: false, answer2: false },
+});
+
+test("AP3 modes persist explicitly, legacy remains Challenge, staged duration is fixed", () => {
+  assert.equal(createPixelLiveConfigSnapshot(null).mode, "CHALLENGE");
+  assert.equal(readPixelLiveConfigSnapshot({ liveInteraction: { ...stagedConfig, mode: undefined } })?.mode, "CHALLENGE");
+  assert.equal(normalizeQuestionTemplateConfig({ pixelMode: "STAGED" }, "pixelbild")?.pixelMode, "STAGED");
+  assert.equal(normalizeQuestionTemplateConfig({ pixelMode: "INVALID" }, "pixelbild"), null);
+  assert.deepEqual(stagedConfig.stageDurationSeconds, { 1: 20, 2: 20, 3: 20 });
+  assert.equal(canStopPixelQuestion({ mode: "STAGED", state: "OPEN", stage: 1, stopped: false, hasDraftContent: true, isStopper: false }), false);
+  assert.deepEqual(resolvePixelAnswerActionPolicy({ mode: "STAGED", state: "OPEN", stage: 1, stopped: false, isStopper: false, canSubmit: true }), { showStopAndSubmit: false, showNormalSubmit: true });
+});
+
+test("AP3 A–K: boundary history and fixed points use only the final answer", () => {
+  const scenarios = [
+    { texts: ["Eiffelturm", "Eiffelturm", "Eiffelturm"], stage: 3, points: 3 },
+    { texts: [null, "Eiffelturm", "Eiffelturm"], stage: 2, points: 2 },
+    { texts: ["Fernsehturm", "Eiffelturm", "Eiffelturm"], stage: 2, points: 2 },
+    { texts: ["Fernsehturm", "Fernsehturm", "Eiffelturm"], stage: 1, points: 1 },
+    { texts: ["Fernsehturm", "Big Ben", "Eiffelturm"], stage: 1, points: 1 },
+    { texts: ["Eiffelturm", "  EIFFELTURM ", "Eiffelturm"], stage: 3, points: 3 },
+    { texts: [null, null, null], stage: null, points: 0 },
+    { texts: ["Big Ben", "Big Ben", "Big Ben"], stage: 3, points: 0 },
+    { texts: ["Eiffelturm", "Eiffelturm", "Big Ben"], stage: 1, points: 0 },
+    { texts: ["Eiffelturm", null, "Eiffelturm"], stage: 1, points: 1 },
+    { texts: ["Eiffelturm", null, null], stage: null, points: 0 },
+  ];
+  for (const scenario of scenarios) {
+    let history = readPixelStageHistory(null);
+    scenario.texts.forEach((text, index) => {
+      history = snapshotPixelStage(history, (3 - index) as 1 | 2 | 3, text, `2026-09-07T18:00:${index}0.000Z`);
+      history = readPixelStageHistory(JSON.parse(JSON.stringify(history))); // reload/reconnect
+    });
+    assert.equal(history.relevantStage, scenario.stage);
+    assert.equal(history.snapshots.length, 3);
+    assert.deepEqual(snapshotPixelStage(history, 1, "late write", "2026-09-07T19:00:00Z"), history);
+    const last = scenario.texts.at(-1);
+    const allocation = allocatePixelQuestionPointsByRun({
+      runs: [{ ...pixelRun(3, 3, null), configSnapshot: { liveInteraction: stagedConfig } }],
+      evaluations: [{ teamAnswerId: 1, quizTeamSessionId: 101, interactionRunId: 3,
+        relevantStage: history.relevantStage, isFinalSubmission: Boolean(last),
+        status: last?.trim().toLowerCase() === "eiffelturm" ? "CORRECT" : last ? "WRONG" : "UNANSWERED" }],
+    });
+    assert.equal(allocation[0].points, scenario.points);
+  }
+});
+
+test("AP3 three independent teams score 3/2/1 without pending peers affecting each other", () => {
+  const allocations = allocatePixelQuestionPointsByRun({
+    runs: [{ ...pixelRun(3, 3, null), configSnapshot: { liveInteraction: stagedConfig } }],
+    evaluations: ([3, 2, 1] as const).map((stage) => ({ teamAnswerId: stage, quizTeamSessionId: stage,
+      interactionRunId: 3, relevantStage: stage, isFinalSubmission: true, status: "CORRECT" })),
+  });
+  assert.deepEqual(allocations.map((entry) => entry.points), [3, 2, 1]);
+});
+
+test("AP3 L: absolute stage boundaries survive reload and catch up without resetting time", () => {
+  const openedAt = new Date("2026-09-07T18:00:00Z");
+  for (const [elapsed, completed, stage] of [[0, 0, 1], [19_999, 0, 1], [20_000, 1, 2], [33_000, 1, 2], [40_000, 2, 3], [60_000, 3, 3]] as const) {
+    const now = new Date(openedAt.getTime() + elapsed);
+    assert.equal(completedPixelStages(openedAt, stagedConfig, now), completed);
+    assert.equal(resolveEffectivePixelStage({ openedAt, config: stagedConfig, serverNow: now }), stage);
+  }
+  assert.equal(resolvePixelCountdownSeconds(pixelStageEnd(openedAt, stagedConfig, 2).toISOString(), openedAt.getTime() + 33_000), 7);
 });

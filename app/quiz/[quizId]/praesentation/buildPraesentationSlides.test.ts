@@ -40,6 +40,18 @@ function quizFixture(): QuizPraesentationResult {
   };
 }
 
+test("AP3: each pixel question has a distinct explanation before opening the question", () => {
+  const quiz = quizFixture();
+  quiz.fragen[0].templateId = "pixelbild";
+  const slides = buildPraesentationSlides(quiz);
+  const questionIndex = slides.findIndex((slide) => slide.typ === "frage" && slide.frage.quiz_fragen_id === 101);
+  assert.equal(slides[questionIndex - 1].typ, "pixel-erklaerung");
+  assert.equal(getPresentationSlideKey(slides[questionIndex - 1]), "pixel-explanation:101");
+  assert.equal(getPresentationSlideKey(slides[questionIndex]), "question:101:question");
+  assert.equal(slides.filter((slide) => slide.typ === "pixel-erklaerung").length, 1);
+  assert.equal(slides.filter((slide) => slide.typ === "frage").length, 3);
+});
+
 function setBlockQuestions(
   quiz: QuizPraesentationResult,
   blocks: ReadonlyArray<{

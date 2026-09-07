@@ -96,6 +96,9 @@ unverändert. `npm test` führt zusätzlich die Payload- und AP1-Regressionstest
 
 ## Grenzen und Abnahme
 
+AP3 ergänzt [Pixel-Stufenmetadaten](pixel-question.md) am vorhandenen Draft.
+Grenz-Snapshots sind keine finalen Submissions und verändern diese Zählregeln nicht.
+
 Keine Migration, neue Dependency, neue Submission-Engine oder neues Realtime-System.
 Content-Umfragen bleiben bei `live_poll_responses`; Pixel-Schreib-/Stopregeln und
 alle Bewertungsverfahren bleiben unverändert. Ungültige persistierte Contracts oder

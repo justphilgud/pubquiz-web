@@ -81,6 +81,9 @@ export function applyQuestionTemplateToDraft(
       ? structuredClone(template.initialTemplateConfig)
       : {
           ...draft.templateConfig,
+          ...(structuralTemplateId === "pixelbild" && draft.templateId !== "pixelbild" ? {
+            pixelMode: "CHALLENGE" as const,
+          } : {}),
           ...(templateData ? { templateData } : {}),
         },
     answers: templateData

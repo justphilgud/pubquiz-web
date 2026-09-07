@@ -556,6 +556,7 @@ export type Quiz_block_freigabenScalarFieldEnum = (typeof Quiz_block_freigabenSc
 
 
 export const Team_antwortenScalarFieldEnum = {
+  pixel_stage_history: 'pixel_stage_history',
   team_antwort_id: 'team_antwort_id',
   quiz_id: 'quiz_id',
   quiz_abschnitt_id: 'quiz_abschnitt_id',
@@ -588,6 +589,7 @@ export type Team_antwortenScalarFieldEnum = (typeof Team_antwortenScalarFieldEnu
 
 
 export const Quiz_interaction_runsScalarFieldEnum = {
+  pixel_completed_stages: 'pixel_completed_stages',
   interaction_run_id: 'interaction_run_id',
   quiz_id: 'quiz_id',
   quiz_fragen_id: 'quiz_fragen_id',

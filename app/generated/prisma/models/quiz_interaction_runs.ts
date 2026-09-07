@@ -27,6 +27,7 @@ export type AggregateQuiz_interaction_runs = {
 }
 
 export type Quiz_interaction_runsAvgAggregateOutputType = {
+  pixel_completed_stages: number | null
   interaction_run_id: number | null
   quiz_id: number | null
   quiz_fragen_id: number | null
@@ -37,6 +38,7 @@ export type Quiz_interaction_runsAvgAggregateOutputType = {
 }
 
 export type Quiz_interaction_runsSumAggregateOutputType = {
+  pixel_completed_stages: number | null
   interaction_run_id: number | null
   quiz_id: number | null
   quiz_fragen_id: number | null
@@ -47,6 +49,7 @@ export type Quiz_interaction_runsSumAggregateOutputType = {
 }
 
 export type Quiz_interaction_runsMinAggregateOutputType = {
+  pixel_completed_stages: number | null
   interaction_run_id: number | null
   quiz_id: number | null
   quiz_fragen_id: number | null
@@ -69,6 +72,7 @@ export type Quiz_interaction_runsMinAggregateOutputType = {
 }
 
 export type Quiz_interaction_runsMaxAggregateOutputType = {
+  pixel_completed_stages: number | null
   interaction_run_id: number | null
   quiz_id: number | null
   quiz_fragen_id: number | null
@@ -91,6 +95,7 @@ export type Quiz_interaction_runsMaxAggregateOutputType = {
 }
 
 export type Quiz_interaction_runsCountAggregateOutputType = {
+  pixel_completed_stages: number
   interaction_run_id: number
   quiz_id: number
   quiz_fragen_id: number
@@ -116,6 +121,7 @@ export type Quiz_interaction_runsCountAggregateOutputType = {
 
 
 export type Quiz_interaction_runsAvgAggregateInputType = {
+  pixel_completed_stages?: true
   interaction_run_id?: true
   quiz_id?: true
   quiz_fragen_id?: true
@@ -126,6 +132,7 @@ export type Quiz_interaction_runsAvgAggregateInputType = {
 }
 
 export type Quiz_interaction_runsSumAggregateInputType = {
+  pixel_completed_stages?: true
   interaction_run_id?: true
   quiz_id?: true
   quiz_fragen_id?: true
@@ -136,6 +143,7 @@ export type Quiz_interaction_runsSumAggregateInputType = {
 }
 
 export type Quiz_interaction_runsMinAggregateInputType = {
+  pixel_completed_stages?: true
   interaction_run_id?: true
   quiz_id?: true
   quiz_fragen_id?: true
@@ -158,6 +166,7 @@ export type Quiz_interaction_runsMinAggregateInputType = {
 }
 
 export type Quiz_interaction_runsMaxAggregateInputType = {
+  pixel_completed_stages?: true
   interaction_run_id?: true
   quiz_id?: true
   quiz_fragen_id?: true
@@ -180,6 +189,7 @@ export type Quiz_interaction_runsMaxAggregateInputType = {
 }
 
 export type Quiz_interaction_runsCountAggregateInputType = {
+  pixel_completed_stages?: true
   interaction_run_id?: true
   quiz_id?: true
   quiz_fragen_id?: true
@@ -290,6 +300,7 @@ export type quiz_interaction_runsGroupByArgs<ExtArgs extends runtime.Types.Exten
 }
 
 export type Quiz_interaction_runsGroupByOutputType = {
+  pixel_completed_stages: number
   interaction_run_id: number
   quiz_id: number
   quiz_fragen_id: number | null
@@ -336,6 +347,7 @@ export type quiz_interaction_runsWhereInput = {
   AND?: Prisma.quiz_interaction_runsWhereInput | Prisma.quiz_interaction_runsWhereInput[]
   OR?: Prisma.quiz_interaction_runsWhereInput[]
   NOT?: Prisma.quiz_interaction_runsWhereInput | Prisma.quiz_interaction_runsWhereInput[]
+  pixel_completed_stages?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   interaction_run_id?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   quiz_id?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   quiz_fragen_id?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
@@ -366,6 +378,7 @@ export type quiz_interaction_runsWhereInput = {
 }
 
 export type quiz_interaction_runsOrderByWithRelationInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -401,6 +414,7 @@ export type quiz_interaction_runsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.quiz_interaction_runsWhereInput | Prisma.quiz_interaction_runsWhereInput[]
   OR?: Prisma.quiz_interaction_runsWhereInput[]
   NOT?: Prisma.quiz_interaction_runsWhereInput | Prisma.quiz_interaction_runsWhereInput[]
+  pixel_completed_stages?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   quiz_fragen_id?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
   quiz_ablauf_element_id?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
   interaction_type?: Prisma.StringFilter<"quiz_interaction_runs"> | string
@@ -429,6 +443,7 @@ export type quiz_interaction_runsWhereUniqueInput = Prisma.AtLeast<{
 }, "interaction_run_id" | "quiz_id">
 
 export type quiz_interaction_runsOrderByWithAggregationInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -460,6 +475,7 @@ export type quiz_interaction_runsScalarWhereWithAggregatesInput = {
   AND?: Prisma.quiz_interaction_runsScalarWhereWithAggregatesInput | Prisma.quiz_interaction_runsScalarWhereWithAggregatesInput[]
   OR?: Prisma.quiz_interaction_runsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.quiz_interaction_runsScalarWhereWithAggregatesInput | Prisma.quiz_interaction_runsScalarWhereWithAggregatesInput[]
+  pixel_completed_stages?: Prisma.IntWithAggregatesFilter<"quiz_interaction_runs"> | number
   interaction_run_id?: Prisma.IntWithAggregatesFilter<"quiz_interaction_runs"> | number
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz_interaction_runs"> | number
   quiz_fragen_id?: Prisma.IntNullableWithAggregatesFilter<"quiz_interaction_runs"> | number | null
@@ -483,6 +499,7 @@ export type quiz_interaction_runsScalarWhereWithAggregatesInput = {
 }
 
 export type quiz_interaction_runsCreateInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -508,6 +525,7 @@ export type quiz_interaction_runsCreateInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -534,6 +552,7 @@ export type quiz_interaction_runsUncheckedCreateInput = {
 }
 
 export type quiz_interaction_runsUpdateInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -559,6 +578,7 @@ export type quiz_interaction_runsUpdateInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -585,6 +605,7 @@ export type quiz_interaction_runsUncheckedUpdateInput = {
 }
 
 export type quiz_interaction_runsCreateManyInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -608,6 +629,7 @@ export type quiz_interaction_runsCreateManyInput = {
 }
 
 export type quiz_interaction_runsUpdateManyMutationInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -626,6 +648,7 @@ export type quiz_interaction_runsUpdateManyMutationInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateManyInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -664,6 +687,7 @@ export type Quiz_interaction_runsNullableScalarRelationFilter = {
 }
 
 export type quiz_interaction_runsCountOrderByAggregateInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrder
@@ -687,6 +711,7 @@ export type quiz_interaction_runsCountOrderByAggregateInput = {
 }
 
 export type quiz_interaction_runsAvgOrderByAggregateInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrder
@@ -697,6 +722,7 @@ export type quiz_interaction_runsAvgOrderByAggregateInput = {
 }
 
 export type quiz_interaction_runsMaxOrderByAggregateInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrder
@@ -719,6 +745,7 @@ export type quiz_interaction_runsMaxOrderByAggregateInput = {
 }
 
 export type quiz_interaction_runsMinOrderByAggregateInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrder
@@ -741,6 +768,7 @@ export type quiz_interaction_runsMinOrderByAggregateInput = {
 }
 
 export type quiz_interaction_runsSumOrderByAggregateInput = {
+  pixel_completed_stages?: Prisma.SortOrder
   interaction_run_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_fragen_id?: Prisma.SortOrder
@@ -972,6 +1000,7 @@ export type quiz_interaction_runsUpdateOneRequiredWithoutLive_poll_responsesNest
 }
 
 export type quiz_interaction_runsCreateWithoutQuizInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -996,6 +1025,7 @@ export type quiz_interaction_runsCreateWithoutQuizInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutQuizInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_fragen_id?: number | null
   quiz_ablauf_element_id?: number | null
@@ -1050,6 +1080,7 @@ export type quiz_interaction_runsScalarWhereInput = {
   AND?: Prisma.quiz_interaction_runsScalarWhereInput | Prisma.quiz_interaction_runsScalarWhereInput[]
   OR?: Prisma.quiz_interaction_runsScalarWhereInput[]
   NOT?: Prisma.quiz_interaction_runsScalarWhereInput | Prisma.quiz_interaction_runsScalarWhereInput[]
+  pixel_completed_stages?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   interaction_run_id?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   quiz_id?: Prisma.IntFilter<"quiz_interaction_runs"> | number
   quiz_fragen_id?: Prisma.IntNullableFilter<"quiz_interaction_runs"> | number | null
@@ -1073,6 +1104,7 @@ export type quiz_interaction_runsScalarWhereInput = {
 }
 
 export type quiz_interaction_runsCreateWithoutQuiz_fragenInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -1097,6 +1129,7 @@ export type quiz_interaction_runsCreateWithoutQuiz_fragenInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutQuiz_fragenInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_ablauf_element_id?: number | null
@@ -1148,6 +1181,7 @@ export type quiz_interaction_runsUpdateManyWithWhereWithoutQuiz_fragenInput = {
 }
 
 export type quiz_interaction_runsCreateWithoutQuiz_ablauf_elementeInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -1172,6 +1206,7 @@ export type quiz_interaction_runsCreateWithoutQuiz_ablauf_elementeInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutQuiz_ablauf_elementeInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1223,6 +1258,7 @@ export type quiz_interaction_runsUpdateManyWithWhereWithoutQuiz_ablauf_elementeI
 }
 
 export type quiz_interaction_runsCreateWithoutStopped_by_team_sessionInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -1247,6 +1283,7 @@ export type quiz_interaction_runsCreateWithoutStopped_by_team_sessionInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutStopped_by_team_sessionInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1298,6 +1335,7 @@ export type quiz_interaction_runsUpdateManyWithWhereWithoutStopped_by_team_sessi
 }
 
 export type quiz_interaction_runsCreateWithoutTeam_antwortenInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -1322,6 +1360,7 @@ export type quiz_interaction_runsCreateWithoutTeam_antwortenInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutTeam_antwortenInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1363,6 +1402,7 @@ export type quiz_interaction_runsUpdateToOneWithWhereWithoutTeam_antwortenInput 
 }
 
 export type quiz_interaction_runsUpdateWithoutTeam_antwortenInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1387,6 +1427,7 @@ export type quiz_interaction_runsUpdateWithoutTeam_antwortenInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutTeam_antwortenInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1412,6 +1453,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutTeam_antwortenInput = {
 }
 
 export type quiz_interaction_runsCreateWithoutAnswer_submissionsInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -1436,6 +1478,7 @@ export type quiz_interaction_runsCreateWithoutAnswer_submissionsInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutAnswer_submissionsInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1477,6 +1520,7 @@ export type quiz_interaction_runsUpdateToOneWithWhereWithoutAnswer_submissionsIn
 }
 
 export type quiz_interaction_runsUpdateWithoutAnswer_submissionsInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1501,6 +1545,7 @@ export type quiz_interaction_runsUpdateWithoutAnswer_submissionsInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutAnswer_submissionsInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1526,6 +1571,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutAnswer_submissionsInput =
 }
 
 export type quiz_interaction_runsCreateWithoutLive_poll_responsesInput = {
+  pixel_completed_stages?: number
   interaction_type: string
   state?: $Enums.QuizInteractionState
   is_current?: boolean
@@ -1550,6 +1596,7 @@ export type quiz_interaction_runsCreateWithoutLive_poll_responsesInput = {
 }
 
 export type quiz_interaction_runsUncheckedCreateWithoutLive_poll_responsesInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1591,6 +1638,7 @@ export type quiz_interaction_runsUpdateToOneWithWhereWithoutLive_poll_responsesI
 }
 
 export type quiz_interaction_runsUpdateWithoutLive_poll_responsesInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1615,6 +1663,7 @@ export type quiz_interaction_runsUpdateWithoutLive_poll_responsesInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutLive_poll_responsesInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1640,6 +1689,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutLive_poll_responsesInput 
 }
 
 export type quiz_interaction_runsCreateManyQuizInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_fragen_id?: number | null
   quiz_ablauf_element_id?: number | null
@@ -1662,6 +1712,7 @@ export type quiz_interaction_runsCreateManyQuizInput = {
 }
 
 export type quiz_interaction_runsUpdateWithoutQuizInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1686,6 +1737,7 @@ export type quiz_interaction_runsUpdateWithoutQuizInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutQuizInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quiz_ablauf_element_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1711,6 +1763,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutQuizInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateManyWithoutQuizInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   quiz_ablauf_element_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1733,6 +1786,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutQuizInput = {
 }
 
 export type quiz_interaction_runsCreateManyQuiz_fragenInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_ablauf_element_id?: number | null
@@ -1755,6 +1809,7 @@ export type quiz_interaction_runsCreateManyQuiz_fragenInput = {
 }
 
 export type quiz_interaction_runsUpdateWithoutQuiz_fragenInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1779,6 +1834,7 @@ export type quiz_interaction_runsUpdateWithoutQuiz_fragenInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutQuiz_fragenInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_ablauf_element_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1804,6 +1860,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutQuiz_fragenInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_ablauf_element_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1826,6 +1883,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenInput = {
 }
 
 export type quiz_interaction_runsCreateManyQuiz_ablauf_elementeInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1848,6 +1906,7 @@ export type quiz_interaction_runsCreateManyQuiz_ablauf_elementeInput = {
 }
 
 export type quiz_interaction_runsUpdateWithoutQuiz_ablauf_elementeInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1872,6 +1931,7 @@ export type quiz_interaction_runsUpdateWithoutQuiz_ablauf_elementeInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutQuiz_ablauf_elementeInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1897,6 +1957,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutQuiz_ablauf_elementeInput
 }
 
 export type quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1919,6 +1980,7 @@ export type quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_ablauf_elementeI
 }
 
 export type quiz_interaction_runsCreateManyStopped_by_team_sessionInput = {
+  pixel_completed_stages?: number
   interaction_run_id?: number
   quiz_id: number
   quiz_fragen_id?: number | null
@@ -1941,6 +2003,7 @@ export type quiz_interaction_runsCreateManyStopped_by_team_sessionInput = {
 }
 
 export type quiz_interaction_runsUpdateWithoutStopped_by_team_sessionInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_type?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumQuizInteractionStateFieldUpdateOperationsInput | $Enums.QuizInteractionState
   is_current?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1965,6 +2028,7 @@ export type quiz_interaction_runsUpdateWithoutStopped_by_team_sessionInput = {
 }
 
 export type quiz_interaction_runsUncheckedUpdateWithoutStopped_by_team_sessionInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1990,6 +2054,7 @@ export type quiz_interaction_runsUncheckedUpdateWithoutStopped_by_team_sessionIn
 }
 
 export type quiz_interaction_runsUncheckedUpdateManyWithoutStopped_by_team_sessionInput = {
+  pixel_completed_stages?: Prisma.IntFieldUpdateOperationsInput | number
   interaction_run_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2061,6 +2126,7 @@ export type Quiz_interaction_runsCountOutputTypeCountLive_poll_responsesArgs<Ext
 
 
 export type quiz_interaction_runsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  pixel_completed_stages?: boolean
   interaction_run_id?: boolean
   quiz_id?: boolean
   quiz_fragen_id?: boolean
@@ -2092,6 +2158,7 @@ export type quiz_interaction_runsSelect<ExtArgs extends runtime.Types.Extensions
 }, ExtArgs["result"]["quiz_interaction_runs"]>
 
 export type quiz_interaction_runsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  pixel_completed_stages?: boolean
   interaction_run_id?: boolean
   quiz_id?: boolean
   quiz_fragen_id?: boolean
@@ -2119,6 +2186,7 @@ export type quiz_interaction_runsSelectCreateManyAndReturn<ExtArgs extends runti
 }, ExtArgs["result"]["quiz_interaction_runs"]>
 
 export type quiz_interaction_runsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  pixel_completed_stages?: boolean
   interaction_run_id?: boolean
   quiz_id?: boolean
   quiz_fragen_id?: boolean
@@ -2146,6 +2214,7 @@ export type quiz_interaction_runsSelectUpdateManyAndReturn<ExtArgs extends runti
 }, ExtArgs["result"]["quiz_interaction_runs"]>
 
 export type quiz_interaction_runsSelectScalar = {
+  pixel_completed_stages?: boolean
   interaction_run_id?: boolean
   quiz_id?: boolean
   quiz_fragen_id?: boolean
@@ -2168,7 +2237,7 @@ export type quiz_interaction_runsSelectScalar = {
   updated_at?: boolean
 }
 
-export type quiz_interaction_runsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"interaction_run_id" | "quiz_id" | "quiz_fragen_id" | "quiz_ablauf_element_id" | "interaction_type" | "state" | "is_current" | "is_hidden" | "opened_at" | "deadline_at" | "stopped_by_team_session_id" | "stopped_at" | "stopped_at_stage" | "closed_at" | "revealed_at" | "live_results_visible" | "revision" | "config_snapshot" | "created_at" | "updated_at", ExtArgs["result"]["quiz_interaction_runs"]>
+export type quiz_interaction_runsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"pixel_completed_stages" | "interaction_run_id" | "quiz_id" | "quiz_fragen_id" | "quiz_ablauf_element_id" | "interaction_type" | "state" | "is_current" | "is_hidden" | "opened_at" | "deadline_at" | "stopped_by_team_session_id" | "stopped_at" | "stopped_at_stage" | "closed_at" | "revealed_at" | "live_results_visible" | "revision" | "config_snapshot" | "created_at" | "updated_at", ExtArgs["result"]["quiz_interaction_runs"]>
 export type quiz_interaction_runsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_fragen?: boolean | Prisma.quiz_interaction_runs$quiz_fragenArgs<ExtArgs>
@@ -2204,6 +2273,7 @@ export type $quiz_interaction_runsPayload<ExtArgs extends runtime.Types.Extensio
     live_poll_responses: Prisma.$live_poll_responsesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    pixel_completed_stages: number
     interaction_run_id: number
     quiz_id: number
     quiz_fragen_id: number | null
@@ -2307,8 +2377,8 @@ export interface quiz_interaction_runsDelegate<ExtArgs extends runtime.Types.Ext
    * // Get first 10 Quiz_interaction_runs
    * const quiz_interaction_runs = await prisma.quiz_interaction_runs.findMany({ take: 10 })
    * 
-   * // Only select the `interaction_run_id`
-   * const quiz_interaction_runsWithInteraction_run_idOnly = await prisma.quiz_interaction_runs.findMany({ select: { interaction_run_id: true } })
+   * // Only select the `pixel_completed_stages`
+   * const quiz_interaction_runsWithPixel_completed_stagesOnly = await prisma.quiz_interaction_runs.findMany({ select: { pixel_completed_stages: true } })
    * 
    */
   findMany<T extends quiz_interaction_runsFindManyArgs>(args?: Prisma.SelectSubset<T, quiz_interaction_runsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_interaction_runsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -2352,9 +2422,9 @@ export interface quiz_interaction_runsDelegate<ExtArgs extends runtime.Types.Ext
    *   ]
    * })
    * 
-   * // Create many Quiz_interaction_runs and only return the `interaction_run_id`
-   * const quiz_interaction_runsWithInteraction_run_idOnly = await prisma.quiz_interaction_runs.createManyAndReturn({
-   *   select: { interaction_run_id: true },
+   * // Create many Quiz_interaction_runs and only return the `pixel_completed_stages`
+   * const quiz_interaction_runsWithPixel_completed_stagesOnly = await prisma.quiz_interaction_runs.createManyAndReturn({
+   *   select: { pixel_completed_stages: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -2443,9 +2513,9 @@ export interface quiz_interaction_runsDelegate<ExtArgs extends runtime.Types.Ext
    *   ]
    * })
    * 
-   * // Update zero or more Quiz_interaction_runs and only return the `interaction_run_id`
-   * const quiz_interaction_runsWithInteraction_run_idOnly = await prisma.quiz_interaction_runs.updateManyAndReturn({
-   *   select: { interaction_run_id: true },
+   * // Update zero or more Quiz_interaction_runs and only return the `pixel_completed_stages`
+   * const quiz_interaction_runsWithPixel_completed_stagesOnly = await prisma.quiz_interaction_runs.updateManyAndReturn({
+   *   select: { pixel_completed_stages: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -2654,6 +2724,7 @@ export interface Prisma__quiz_interaction_runsClient<T, Null = never, ExtArgs ex
  * Fields of the quiz_interaction_runs model
  */
 export interface quiz_interaction_runsFieldRefs {
+  readonly pixel_completed_stages: Prisma.FieldRef<"quiz_interaction_runs", 'Int'>
   readonly interaction_run_id: Prisma.FieldRef<"quiz_interaction_runs", 'Int'>
   readonly quiz_id: Prisma.FieldRef<"quiz_interaction_runs", 'Int'>
   readonly quiz_fragen_id: Prisma.FieldRef<"quiz_interaction_runs", 'Int'>

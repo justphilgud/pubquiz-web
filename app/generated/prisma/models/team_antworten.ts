@@ -117,6 +117,7 @@ export type Team_antwortenMaxAggregateOutputType = {
 }
 
 export type Team_antwortenCountAggregateOutputType = {
+  pixel_stage_history: number
   team_antwort_id: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -238,6 +239,7 @@ export type Team_antwortenMaxAggregateInputType = {
 }
 
 export type Team_antwortenCountAggregateInputType = {
+  pixel_stage_history?: true
   team_antwort_id?: true
   quiz_id?: true
   quiz_abschnitt_id?: true
@@ -354,6 +356,7 @@ export type team_antwortenGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 export type Team_antwortenGroupByOutputType = {
+  pixel_stage_history: runtime.JsonValue | null
   team_antwort_id: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -406,6 +409,7 @@ export type team_antwortenWhereInput = {
   AND?: Prisma.team_antwortenWhereInput | Prisma.team_antwortenWhereInput[]
   OR?: Prisma.team_antwortenWhereInput[]
   NOT?: Prisma.team_antwortenWhereInput | Prisma.team_antwortenWhereInput[]
+  pixel_stage_history?: Prisma.JsonNullableFilter<"team_antworten">
   team_antwort_id?: Prisma.IntFilter<"team_antworten"> | number
   quiz_id?: Prisma.IntFilter<"team_antworten"> | number
   quiz_abschnitt_id?: Prisma.IntFilter<"team_antworten"> | number
@@ -445,6 +449,7 @@ export type team_antwortenWhereInput = {
 }
 
 export type team_antwortenOrderByWithRelationInput = {
+  pixel_stage_history?: Prisma.SortOrderInput | Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -489,6 +494,7 @@ export type team_antwortenWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.team_antwortenWhereInput | Prisma.team_antwortenWhereInput[]
   OR?: Prisma.team_antwortenWhereInput[]
   NOT?: Prisma.team_antwortenWhereInput | Prisma.team_antwortenWhereInput[]
+  pixel_stage_history?: Prisma.JsonNullableFilter<"team_antworten">
   quiz_id?: Prisma.IntFilter<"team_antworten"> | number
   quiz_abschnitt_id?: Prisma.IntFilter<"team_antworten"> | number
   quiz_fragen_id?: Prisma.IntFilter<"team_antworten"> | number
@@ -527,6 +533,7 @@ export type team_antwortenWhereUniqueInput = Prisma.AtLeast<{
 }, "team_antwort_id" | "quiz_fragen_id_quiz_team_session_id">
 
 export type team_antwortenOrderByWithAggregationInput = {
+  pixel_stage_history?: Prisma.SortOrderInput | Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -564,6 +571,7 @@ export type team_antwortenScalarWhereWithAggregatesInput = {
   AND?: Prisma.team_antwortenScalarWhereWithAggregatesInput | Prisma.team_antwortenScalarWhereWithAggregatesInput[]
   OR?: Prisma.team_antwortenScalarWhereWithAggregatesInput[]
   NOT?: Prisma.team_antwortenScalarWhereWithAggregatesInput | Prisma.team_antwortenScalarWhereWithAggregatesInput[]
+  pixel_stage_history?: Prisma.JsonNullableWithAggregatesFilter<"team_antworten">
   team_antwort_id?: Prisma.IntWithAggregatesFilter<"team_antworten"> | number
   quiz_id?: Prisma.IntWithAggregatesFilter<"team_antworten"> | number
   quiz_abschnitt_id?: Prisma.IntWithAggregatesFilter<"team_antworten"> | number
@@ -593,6 +601,7 @@ export type team_antwortenScalarWhereWithAggregatesInput = {
 }
 
 export type team_antwortenCreateInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -624,6 +633,7 @@ export type team_antwortenCreateInput = {
 }
 
 export type team_antwortenUncheckedCreateInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -656,6 +666,7 @@ export type team_antwortenUncheckedCreateInput = {
 }
 
 export type team_antwortenUpdateInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -687,6 +698,7 @@ export type team_antwortenUpdateInput = {
 }
 
 export type team_antwortenUncheckedUpdateInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -719,6 +731,7 @@ export type team_antwortenUncheckedUpdateInput = {
 }
 
 export type team_antwortenCreateManyInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -748,6 +761,7 @@ export type team_antwortenCreateManyInput = {
 }
 
 export type team_antwortenUpdateManyMutationInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -769,6 +783,7 @@ export type team_antwortenUpdateManyMutationInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -813,6 +828,7 @@ export type team_antwortenQuiz_fragen_idQuiz_team_session_idCompoundUniqueInput 
 }
 
 export type team_antwortenCountOrderByAggregateInput = {
+  pixel_stage_history?: Prisma.SortOrder
   team_antwort_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -1281,6 +1297,7 @@ export type team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput = {
 }
 
 export type team_antwortenCreateWithoutAntwortenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1311,6 +1328,7 @@ export type team_antwortenCreateWithoutAntwortenInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutAntwortenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -1371,6 +1389,7 @@ export type team_antwortenScalarWhereInput = {
   AND?: Prisma.team_antwortenScalarWhereInput | Prisma.team_antwortenScalarWhereInput[]
   OR?: Prisma.team_antwortenScalarWhereInput[]
   NOT?: Prisma.team_antwortenScalarWhereInput | Prisma.team_antwortenScalarWhereInput[]
+  pixel_stage_history?: Prisma.JsonNullableFilter<"team_antworten">
   team_antwort_id?: Prisma.IntFilter<"team_antworten"> | number
   quiz_id?: Prisma.IntFilter<"team_antworten"> | number
   quiz_abschnitt_id?: Prisma.IntFilter<"team_antworten"> | number
@@ -1400,6 +1419,7 @@ export type team_antwortenScalarWhereInput = {
 }
 
 export type team_antwortenCreateWithoutQuizInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1430,6 +1450,7 @@ export type team_antwortenCreateWithoutQuizInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutQuizInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_abschnitt_id: number
   quiz_fragen_id: number
@@ -1487,6 +1508,7 @@ export type team_antwortenUpdateManyWithWhereWithoutQuizInput = {
 }
 
 export type team_antwortenCreateWithoutQuiz_fragenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1517,6 +1539,7 @@ export type team_antwortenCreateWithoutQuiz_fragenInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutQuiz_fragenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -1574,6 +1597,7 @@ export type team_antwortenUpdateManyWithWhereWithoutQuiz_fragenInput = {
 }
 
 export type team_antwortenCreateWithoutQuiz_abschnitteInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1604,6 +1628,7 @@ export type team_antwortenCreateWithoutQuiz_abschnitteInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutQuiz_abschnitteInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_fragen_id: number
@@ -1661,6 +1686,7 @@ export type team_antwortenUpdateManyWithWhereWithoutQuiz_abschnitteInput = {
 }
 
 export type team_antwortenCreateWithoutQuiz_team_sessionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1691,6 +1717,7 @@ export type team_antwortenCreateWithoutQuiz_team_sessionsInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutQuiz_team_sessionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -1748,6 +1775,7 @@ export type team_antwortenUpdateManyWithWhereWithoutQuiz_team_sessionsInput = {
 }
 
 export type team_antwortenCreateWithoutInteraction_runInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1778,6 +1806,7 @@ export type team_antwortenCreateWithoutInteraction_runInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutInteraction_runInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -1835,6 +1864,7 @@ export type team_antwortenUpdateManyWithWhereWithoutInteraction_runInput = {
 }
 
 export type team_antwortenCreateWithoutSubmissionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -1865,6 +1895,7 @@ export type team_antwortenCreateWithoutSubmissionsInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutSubmissionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -1912,6 +1943,7 @@ export type team_antwortenUpdateToOneWithWhereWithoutSubmissionsInput = {
 }
 
 export type team_antwortenUpdateWithoutSubmissionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1942,6 +1974,7 @@ export type team_antwortenUpdateWithoutSubmissionsInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutSubmissionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1973,6 +2006,7 @@ export type team_antwortenUncheckedUpdateWithoutSubmissionsInput = {
 }
 
 export type team_antwortenCreateWithoutAntwortfelderInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -2003,6 +2037,7 @@ export type team_antwortenCreateWithoutAntwortfelderInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutAntwortfelderInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2050,6 +2085,7 @@ export type team_antwortenUpdateToOneWithWhereWithoutAntwortfelderInput = {
 }
 
 export type team_antwortenUpdateWithoutAntwortfelderInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2080,6 +2116,7 @@ export type team_antwortenUpdateWithoutAntwortfelderInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutAntwortfelderInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2111,6 +2148,7 @@ export type team_antwortenUncheckedUpdateWithoutAntwortfelderInput = {
 }
 
 export type team_antwortenCreateWithoutAntwortauswahlenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -2141,6 +2179,7 @@ export type team_antwortenCreateWithoutAntwortauswahlenInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutAntwortauswahlenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2188,6 +2227,7 @@ export type team_antwortenUpdateToOneWithWhereWithoutAntwortauswahlenInput = {
 }
 
 export type team_antwortenUpdateWithoutAntwortauswahlenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2218,6 +2258,7 @@ export type team_antwortenUpdateWithoutAntwortauswahlenInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutAntwortauswahlenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2249,6 +2290,7 @@ export type team_antwortenUncheckedUpdateWithoutAntwortauswahlenInput = {
 }
 
 export type team_antwortenCreateWithoutBewertet_vonInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: string | null
   aktualisiert_am?: Date | string
   bewertete_antwort?: string | null
@@ -2279,6 +2321,7 @@ export type team_antwortenCreateWithoutBewertet_vonInput = {
 }
 
 export type team_antwortenUncheckedCreateWithoutBewertet_vonInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2336,6 +2379,7 @@ export type team_antwortenUpdateManyWithWhereWithoutBewertet_vonInput = {
 }
 
 export type team_antwortenCreateManyAntwortenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2364,6 +2408,7 @@ export type team_antwortenCreateManyAntwortenInput = {
 }
 
 export type team_antwortenUpdateWithoutAntwortenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2394,6 +2439,7 @@ export type team_antwortenUpdateWithoutAntwortenInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutAntwortenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2425,6 +2471,7 @@ export type team_antwortenUncheckedUpdateWithoutAntwortenInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutAntwortenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2453,6 +2500,7 @@ export type team_antwortenUncheckedUpdateManyWithoutAntwortenInput = {
 }
 
 export type team_antwortenCreateManyQuizInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_abschnitt_id: number
   quiz_fragen_id: number
@@ -2481,6 +2529,7 @@ export type team_antwortenCreateManyQuizInput = {
 }
 
 export type team_antwortenUpdateWithoutQuizInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2511,6 +2560,7 @@ export type team_antwortenUpdateWithoutQuizInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutQuizInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2542,6 +2592,7 @@ export type team_antwortenUncheckedUpdateWithoutQuizInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutQuizInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2570,6 +2621,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuizInput = {
 }
 
 export type team_antwortenCreateManyQuiz_fragenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2598,6 +2650,7 @@ export type team_antwortenCreateManyQuiz_fragenInput = {
 }
 
 export type team_antwortenUpdateWithoutQuiz_fragenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2628,6 +2681,7 @@ export type team_antwortenUpdateWithoutQuiz_fragenInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutQuiz_fragenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2659,6 +2713,7 @@ export type team_antwortenUncheckedUpdateWithoutQuiz_fragenInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutQuiz_fragenInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2687,6 +2742,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuiz_fragenInput = {
 }
 
 export type team_antwortenCreateManyQuiz_abschnitteInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_fragen_id: number
@@ -2715,6 +2771,7 @@ export type team_antwortenCreateManyQuiz_abschnitteInput = {
 }
 
 export type team_antwortenUpdateWithoutQuiz_abschnitteInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2745,6 +2802,7 @@ export type team_antwortenUpdateWithoutQuiz_abschnitteInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutQuiz_abschnitteInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2776,6 +2834,7 @@ export type team_antwortenUncheckedUpdateWithoutQuiz_abschnitteInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2804,6 +2863,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
 }
 
 export type team_antwortenCreateManyQuiz_team_sessionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2832,6 +2892,7 @@ export type team_antwortenCreateManyQuiz_team_sessionsInput = {
 }
 
 export type team_antwortenUpdateWithoutQuiz_team_sessionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2862,6 +2923,7 @@ export type team_antwortenUpdateWithoutQuiz_team_sessionsInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutQuiz_team_sessionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2893,6 +2955,7 @@ export type team_antwortenUncheckedUpdateWithoutQuiz_team_sessionsInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2921,6 +2984,7 @@ export type team_antwortenUncheckedUpdateManyWithoutQuiz_team_sessionsInput = {
 }
 
 export type team_antwortenCreateManyInteraction_runInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -2949,6 +3013,7 @@ export type team_antwortenCreateManyInteraction_runInput = {
 }
 
 export type team_antwortenUpdateWithoutInteraction_runInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2979,6 +3044,7 @@ export type team_antwortenUpdateWithoutInteraction_runInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutInteraction_runInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3010,6 +3076,7 @@ export type team_antwortenUncheckedUpdateWithoutInteraction_runInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutInteraction_runInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3038,6 +3105,7 @@ export type team_antwortenUncheckedUpdateManyWithoutInteraction_runInput = {
 }
 
 export type team_antwortenCreateManyBewertet_vonInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -3066,6 +3134,7 @@ export type team_antwortenCreateManyBewertet_vonInput = {
 }
 
 export type team_antwortenUpdateWithoutBewertet_vonInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   antwort_text?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aktualisiert_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bewertete_antwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3096,6 +3165,7 @@ export type team_antwortenUpdateWithoutBewertet_vonInput = {
 }
 
 export type team_antwortenUncheckedUpdateWithoutBewertet_vonInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3127,6 +3197,7 @@ export type team_antwortenUncheckedUpdateWithoutBewertet_vonInput = {
 }
 
 export type team_antwortenUncheckedUpdateManyWithoutBewertet_vonInput = {
+  pixel_stage_history?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antwort_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3204,6 +3275,7 @@ export type Team_antwortenCountOutputTypeCountSubmissionsArgs<ExtArgs extends ru
 
 
 export type team_antwortenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  pixel_stage_history?: boolean
   team_antwort_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -3244,6 +3316,7 @@ export type team_antwortenSelect<ExtArgs extends runtime.Types.Extensions.Intern
 }, ExtArgs["result"]["team_antworten"]>
 
 export type team_antwortenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  pixel_stage_history?: boolean
   team_antwort_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -3280,6 +3353,7 @@ export type team_antwortenSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 }, ExtArgs["result"]["team_antworten"]>
 
 export type team_antwortenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  pixel_stage_history?: boolean
   team_antwort_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -3316,6 +3390,7 @@ export type team_antwortenSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 }, ExtArgs["result"]["team_antworten"]>
 
 export type team_antwortenSelectScalar = {
+  pixel_stage_history?: boolean
   team_antwort_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -3344,7 +3419,7 @@ export type team_antwortenSelectScalar = {
   draft_updated_at?: boolean
 }
 
-export type team_antwortenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_antwort_id" | "quiz_id" | "quiz_abschnitt_id" | "quiz_fragen_id" | "quiz_team_session_id" | "antwort_text" | "antwort_id" | "aktualisiert_am" | "bewertete_antwort" | "bewertung_final" | "ist_manuell_falsch" | "ist_manuell_richtig" | "ist_skurril" | "auto_basis_punkte" | "auto_endpunkte" | "vergebene_punkte" | "bewertungsstatus" | "bewertungsquelle" | "bewertungsdetails" | "bewertungs_version" | "manuelle_punkte" | "bewertet_am" | "bewertet_von_user_id" | "interaction_run_id" | "draft_revision" | "draft_updated_at", ExtArgs["result"]["team_antworten"]>
+export type team_antwortenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"pixel_stage_history" | "team_antwort_id" | "quiz_id" | "quiz_abschnitt_id" | "quiz_fragen_id" | "quiz_team_session_id" | "antwort_text" | "antwort_id" | "aktualisiert_am" | "bewertete_antwort" | "bewertung_final" | "ist_manuell_falsch" | "ist_manuell_richtig" | "ist_skurril" | "auto_basis_punkte" | "auto_endpunkte" | "vergebene_punkte" | "bewertungsstatus" | "bewertungsquelle" | "bewertungsdetails" | "bewertungs_version" | "manuelle_punkte" | "bewertet_am" | "bewertet_von_user_id" | "interaction_run_id" | "draft_revision" | "draft_updated_at", ExtArgs["result"]["team_antworten"]>
 export type team_antwortenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.team_antworten$antwortenArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_abschnitteDefaultArgs<ExtArgs>
@@ -3392,6 +3467,7 @@ export type $team_antwortenPayload<ExtArgs extends runtime.Types.Extensions.Inte
     submissions: Prisma.$team_answer_submissionsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    pixel_stage_history: runtime.JsonValue | null
     team_antwort_id: number
     quiz_id: number
     quiz_abschnitt_id: number
@@ -3501,8 +3577,8 @@ export interface team_antwortenDelegate<ExtArgs extends runtime.Types.Extensions
    * // Get first 10 Team_antwortens
    * const team_antwortens = await prisma.team_antworten.findMany({ take: 10 })
    *
-   * // Only select the `team_antwort_id`
-   * const team_antwortenWithTeam_antwort_idOnly = await prisma.team_antworten.findMany({ select: { team_antwort_id: true } })
+   * // Only select the `pixel_stage_history`
+   * const team_antwortenWithPixel_stage_historyOnly = await prisma.team_antworten.findMany({ select: { pixel_stage_history: true } })
    *
    */
   findMany<T extends team_antwortenFindManyArgs>(args?: Prisma.SelectSubset<T, team_antwortenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$team_antwortenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -3546,9 +3622,9 @@ export interface team_antwortenDelegate<ExtArgs extends runtime.Types.Extensions
    *   ]
    * })
    *
-   * // Create many Team_antwortens and only return the `team_antwort_id`
-   * const team_antwortenWithTeam_antwort_idOnly = await prisma.team_antworten.createManyAndReturn({
-   *   select: { team_antwort_id: true },
+   * // Create many Team_antwortens and only return the `pixel_stage_history`
+   * const team_antwortenWithPixel_stage_historyOnly = await prisma.team_antworten.createManyAndReturn({
+   *   select: { pixel_stage_history: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -3637,9 +3713,9 @@ export interface team_antwortenDelegate<ExtArgs extends runtime.Types.Extensions
    *   ]
    * })
    *
-   * // Update zero or more Team_antwortens and only return the `team_antwort_id`
-   * const team_antwortenWithTeam_antwort_idOnly = await prisma.team_antworten.updateManyAndReturn({
-   *   select: { team_antwort_id: true },
+   * // Update zero or more Team_antwortens and only return the `pixel_stage_history`
+   * const team_antwortenWithPixel_stage_historyOnly = await prisma.team_antworten.updateManyAndReturn({
+   *   select: { pixel_stage_history: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -3851,6 +3927,7 @@ export interface Prisma__team_antwortenClient<T, Null = never, ExtArgs extends r
  * Fields of the team_antworten model
  */
 export interface team_antwortenFieldRefs {
+  readonly pixel_stage_history: Prisma.FieldRef<"team_antworten", 'Json'>
   readonly team_antwort_id: Prisma.FieldRef<"team_antworten", 'Int'>
   readonly quiz_id: Prisma.FieldRef<"team_antworten", 'Int'>
   readonly quiz_abschnitt_id: Prisma.FieldRef<"team_antworten", 'Int'>

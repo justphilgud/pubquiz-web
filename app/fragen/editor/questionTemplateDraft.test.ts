@@ -209,6 +209,7 @@ test("applying the pixel template creates a canonical editable draft", () => {
   assert.equal(changed.templateId, questionTemplateIds.pixelImage);
   assert.equal(changed.answers[0]?.fieldLabel, "Lösung");
   assert.deepEqual(changed.templateConfig, {
+    pixelMode: "CHALLENGE",
     stageDurationsSeconds: { stage3: 20, stage2: 20, stage1: 20 },
     createPixelQuestionByAnswer: { answer1: false, answer2: false },
   });

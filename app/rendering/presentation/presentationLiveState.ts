@@ -151,6 +151,9 @@ export function parsePresentationSlideKey(
   if (!slideKey) return null;
 
   const parts = slideKey.split(":");
+  if (parts[0] === "pixel-explanation" && parts.length === 2 && parsePositiveInteger(parts[1])) {
+    return { kind: "NON_QUESTION", slideType: "PIXEL_EXPLANATION", statusText: "Pixelbild: Gleich geht es los. Bitte die Spielregeln auf der Leinwand beachten." };
+  }
   if (parts[0] === "question" && parts.length === 3) {
     const questionAssignmentId = parsePositiveInteger(parts[1]);
     const phase = parts[2] === "question"

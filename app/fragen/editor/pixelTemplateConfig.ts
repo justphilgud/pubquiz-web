@@ -39,6 +39,8 @@ export function parseQuestionTemplateConfigDraft(
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const config = value as Record<string, unknown>;
+  if (config.pixelMode !== undefined && config.pixelMode !== "CHALLENGE" && config.pixelMode !== "STAGED") return null;
+  const pixelMode = config.pixelMode as "CHALLENGE" | "STAGED" | undefined;
   const durations = config.stageDurationsSeconds;
   const pixelQuestionOptions = config.createPixelQuestionByAnswer;
   const templateData = parseQuestionTemplateData(
@@ -84,6 +86,7 @@ export function parseQuestionTemplateConfigDraft(
   if (durations === undefined) {
     return {
       ...DEFAULT_PIXEL_TEMPLATE_CONFIG,
+      ...(pixelMode ? { pixelMode } : {}),
       createPixelQuestionByAnswer: { answer1, answer2 },
       ...(templateData ? { templateData } : {}),
     };
@@ -95,6 +98,7 @@ export function parseQuestionTemplateConfigDraft(
     return null;
   }
   return {
+    ...(pixelMode ? { pixelMode } : {}),
     stageDurationsSeconds: {
       stage3: Number(candidate.stage3),
       stage2: Number(candidate.stage2),

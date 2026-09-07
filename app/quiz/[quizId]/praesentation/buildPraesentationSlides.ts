@@ -45,6 +45,11 @@ export type FixerSlideTyp =
 
 export type Slide =
   | {
+    typ: "pixel-erklaerung";
+    abschnitt: Abschnitt | null;
+    frage: QuizPraesentationResult["fragen"][number];
+  }
+  | {
     typ: "ablauf";
     element: QuizFlowItem;
     abschnitt: Abschnitt | null;
@@ -218,7 +223,10 @@ export function buildPraesentationSlides(
           blockItem: entry.item,
           solutionStrategy: blockSequence.strategy,
         };
-        if (entry.kind === "QUESTION") result.push({ typ: "frage", ...shared });
+        if (entry.kind === "QUESTION") {
+          if (shared.frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt, frage: shared.frage });
+          result.push({ typ: "frage", ...shared });
+        }
         else appendSolution(shared);
       }
       appendBlockClosingCountdownItems();
@@ -243,6 +251,7 @@ export function buildPraesentationSlides(
         frageIndexImBlock: index + 1,
         fragenAnzahlImBlock: fragenImBlock.length,
       };
+      if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt, frage });
       result.push({ typ: "frage", ...shared });
       appendSolution(shared);
     });
@@ -254,6 +263,7 @@ export function buildPraesentationSlides(
 
   if (fragenOhneBlock.length > 0) {
     fragenOhneBlock.forEach((frage, index) => {
+      if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt: null, frage });
       result.push({
         typ: "frage",
         abschnitt: null,
@@ -277,6 +287,7 @@ export function buildPraesentationSlides(
 }
 
 export function getPresentationSlideKey(slide: Slide) {
+  if (slide.typ === "pixel-erklaerung") return `pixel-explanation:${slide.frage.quiz_fragen_id}`;
   if (slide.typ === "ablauf") {
     if (
       slide.element.type === "ROUND_INTRO" &&

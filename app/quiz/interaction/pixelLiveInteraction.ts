@@ -21,7 +21,27 @@ export function resolvePixelCountdownSeconds(
 
 export type PixelRuntimeStage = 1 | 2 | 3;
 
+export function pixelStageEnd(openedAt: Date | string, config: PixelLiveConfigSnapshot, stage: PixelRuntimeStage) {
+  let seconds = 0;
+  for (let index = 1; index <= stage; index++) seconds += config.stageDurationSeconds[index as PixelRuntimeStage];
+  return new Date(new Date(openedAt).getTime() + seconds * 1_000);
+}
+
+export function completedPixelStages(openedAt: Date | null, config: PixelLiveConfigSnapshot, now: Date) {
+  if (!openedAt || config.mode !== "STAGED") return 0;
+  return ([1, 2, 3] as const).filter((stage) => pixelStageEnd(openedAt, config, stage) <= now).length;
+}
+
+export function pixelAnswerDeadline(input: {
+  openedAt: Date | null; config: PixelLiveConfigSnapshot;
+  stoppedAt: Date | null; deadlineAt: Date | null;
+}) {
+  return input.stoppedAt ? input.deadlineAt
+    : input.openedAt ? pixelStageEnd(input.openedAt, input.config, 3) : null;
+}
+
 export type PixelLiveConfigSnapshot = {
+  mode: "CHALLENGE" | "STAGED";
   type: typeof PIXEL_LIVE_INTERACTION_TYPE;
   stageDurationSeconds: Record<PixelRuntimeStage, number>;
   stageCount: typeof PIXEL_STAGE_COUNT;
@@ -32,6 +52,8 @@ export type PixelLiveConfigSnapshot = {
 };
 
 export type PixelLiveState = {
+  mode?: "CHALLENGE" | "STAGED";
+  stageDeadlineAt?: string | null;
   interactionType: typeof PIXEL_LIVE_INTERACTION_TYPE;
   state: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
   effectivePixelStage: PixelRuntimeStage;
@@ -69,11 +91,12 @@ export function createPixelLiveConfigSnapshot(
 ): PixelLiveConfigSnapshot {
   const durations = templateConfig?.stageDurationsSeconds;
   return {
+    mode: templateConfig?.pixelMode ?? "CHALLENGE",
     type: PIXEL_LIVE_INTERACTION_TYPE,
     stageDurationSeconds: {
-      1: validDuration(durations?.stage3),
-      2: validDuration(durations?.stage2),
-      3: validDuration(durations?.stage1),
+      1: templateConfig?.pixelMode === "STAGED" ? 20 : validDuration(durations?.stage3),
+      2: templateConfig?.pixelMode === "STAGED" ? 20 : validDuration(durations?.stage2),
+      3: templateConfig?.pixelMode === "STAGED" ? 20 : validDuration(durations?.stage1),
     },
     stageCount: PIXEL_STAGE_COUNT,
     normalPoints: PIXEL_NORMAL_POINTS,
@@ -94,10 +117,11 @@ export function readPixelLiveConfigSnapshot(value: unknown) {
   if (!durations || typeof durations !== "object") return null;
   return {
     ...createPixelLiveConfigSnapshot(null),
+    mode: typed.mode === "STAGED" ? "STAGED" : "CHALLENGE",
     stageDurationSeconds: {
-      1: validDuration(durations[1]),
-      2: validDuration(durations[2]),
-      3: validDuration(durations[3]),
+      1: typed.mode === "STAGED" ? 20 : validDuration(durations[1]),
+      2: typed.mode === "STAGED" ? 20 : validDuration(durations[2]),
+      3: typed.mode === "STAGED" ? 20 : validDuration(durations[3]),
     },
   } satisfies PixelLiveConfigSnapshot;
 }
@@ -125,13 +149,14 @@ export function resolveEffectivePixelStage(input: {
 }
 
 export function canStopPixelQuestion(input: {
+  mode?: "CHALLENGE" | "STAGED";
   state: string;
   stage: PixelRuntimeStage;
   stopped: boolean;
   hasDraftContent: boolean;
   isStopper: boolean;
 }) {
-  return input.state === "OPEN" &&
+  return input.mode !== "STAGED" && input.state === "OPEN" &&
     input.stage < 3 &&
     !input.stopped &&
     input.hasDraftContent &&
@@ -139,6 +164,7 @@ export function canStopPixelQuestion(input: {
 }
 
 export function resolvePixelAnswerActionPolicy(input: {
+  mode?: "CHALLENGE" | "STAGED";
   state: PixelLiveState["state"];
   stage: PixelRuntimeStage;
   stopped: boolean;
@@ -146,6 +172,7 @@ export function resolvePixelAnswerActionPolicy(input: {
   canSubmit: boolean;
 }) {
   const showStopAndSubmit =
+    input.mode !== "STAGED" &&
     input.state === "OPEN" &&
     input.stage < 3 &&
     !input.stopped &&
@@ -214,6 +241,7 @@ export type PixelRunBoundEvaluationInput = Omit<
   PixelEvaluationInput,
   "isStopper"
 > & {
+  relevantStage?: 1 | 2 | 3 | null;
   quizTeamSessionId: number;
   interactionRunId: number | null;
 };
@@ -283,6 +311,14 @@ export function allocatePixelQuestionPointsByRun(input: {
     if (!evaluations) return [];
     const config = readPixelLiveConfigSnapshot(run.configSnapshot);
     if (!config) return [];
+    if (config.mode === "STAGED") return evaluations.map((entry) => ({
+      teamAnswerId: entry.teamAnswerId,
+      points: entry.status === "CORRECT" ? entry.relevantStage ?? 0 : 0,
+      outcome: entry.status === "REVIEW_REQUIRED" ? "PENDING" as const : "NORMAL" as const,
+      stage: entry.relevantStage ?? 1,
+      correctCount: evaluations.filter((item) => item.status === "CORRECT").length,
+      isStopper: false,
+    }));
     const stage = resolveEffectivePixelStage({
       openedAt: run.openedAt,
       serverNow: run.stoppedAt ?? run.closedAt ?? new Date(),

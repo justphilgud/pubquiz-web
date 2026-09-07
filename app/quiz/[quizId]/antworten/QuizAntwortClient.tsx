@@ -255,6 +255,7 @@ export default function QuizAntwortClient({
   const [meldung, setMeldung] = useState("");
   const [bildModalUrl, setBildModalUrl] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const pixelClockOffset = useRef(0);
 
   const aktuellerBlock = liveDaten.aktuellerBlock;
   const blockIstGesperrt = liveDaten.blockIstGesperrt;
@@ -334,7 +335,7 @@ export default function QuizAntwortClient({
   }, [teamname, session]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => setNow(Date.now()), 1_000);
+    const interval = window.setInterval(() => setNow(Date.now() + pixelClockOffset.current), 1_000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -372,6 +373,7 @@ export default function QuizAntwortClient({
           setLivePollText((current) => current || response.text || "");
         }
         setPixelState(snapshot.pixelState);
+        pixelClockOffset.current = new Date(snapshot.serverNow).getTime() - Date.now();
         setPixelTeamState(snapshot.pixelState && snapshot.teamSpecificState
           ? {
               isStopper: snapshot.teamSpecificState.isStopper,
@@ -880,6 +882,10 @@ export default function QuizAntwortClient({
         ...current,
         [quizFragenId]: saved.draftRevision,
       }));
+      if (pixelState?.mode === "STAGED" && liveDaten.activeQuizFragenId === quizFragenId) {
+        setMeldung("Antwort gespeichert. Der Stand am Stufenende zählt; Änderungen bleiben möglich.");
+        return;
+      }
       const submitted = await submitTeamAntwort({
         quizId: liveDaten.quiz_id,
         quizFragenId,
@@ -1199,11 +1205,11 @@ export default function QuizAntwortClient({
                     : null;
                   const sichtbaresBild = pixelMedium ?? bildMedien[0] ?? null;
                   const hatBild = sichtbaresBild !== null;
-                  const pixelCountdownRemaining = questionPixelState?.submissionDeadlineAt
+                  const pixelCountdownRemaining = questionPixelState?.stageDeadlineAt
                     ? Math.max(
                         0,
                         Math.ceil(
-                          (new Date(questionPixelState.submissionDeadlineAt).getTime() - now) /
+                          (new Date(questionPixelState.stageDeadlineAt).getTime() - now) /
                             1_000,
                         ),
                       )
@@ -1235,6 +1241,7 @@ export default function QuizAntwortClient({
                   );
                   const pixelActionPolicy = questionPixelState
                     ? resolvePixelAnswerActionPolicy({
+                        mode: questionPixelState.mode,
                         state: questionPixelState.state,
                         stage: questionPixelState.effectivePixelStage,
                         stopped: questionPixelState.stopped,
@@ -1262,16 +1269,17 @@ export default function QuizAntwortClient({
                             <strong>
                               {questionPixelState.state === "REVEALED"
                                 ? "Auflösung"
-                                : `Pixel-Stufe ${questionPixelState.effectivePixelStage} von 3`}
+                                : `${questionPixelState.mode === "STAGED" ? "Stufenwertung" : "Challenge"} · Stufe ${4 - questionPixelState.effectivePixelStage}`}
                             </strong>
                             <span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-bold text-white">
                               {4 - questionPixelState.effectivePixelStage} {4 - questionPixelState.effectivePixelStage === 1 ? "Punkt" : "Punkte"}
                             </span>
                           </div>
-                          {questionPixelState.stopped ? (
+                          <p className="text-xl font-bold tabular-nums">{pixelCountdownRemaining === null ? "Antwortphase beendet" : `${pixelCountdownRemaining} Sekunden`}</p>
+                          {questionPixelState.mode === "STAGED" ? <p>Antwort bleibt erhalten. Eine spätere Änderung zählt für die spätere Stufe. Am Ende wird automatisch abgegeben.</p> : questionPixelState.stopped ? (
                             questionPixelTeamState?.isStopper ? (
                               <p className="font-semibold text-fuchsia-900">
-                                Ihr habt in Stufe {questionPixelState.stoppedAtStage} gestoppt. Eure Antwort ist abgegeben und gesperrt.
+                                Ihr habt in Stufe {4 - (questionPixelState.stoppedAtStage ?? 1)} gestoppt. Eure Antwort ist abgegeben und gesperrt.
                               </p>
                             ) : (
                               <p className="font-semibold text-fuchsia-900">
@@ -1377,7 +1385,7 @@ export default function QuizAntwortClient({
                             type="button"
                             onClick={() => void handlePixelStop(frage.quiz_fragen_id)}
                             disabled={isSubmitting || !session}
-                            className="min-h-11 w-full rounded-xl bg-fuchsia-700 px-5 py-3 font-black text-white transition hover:bg-fuchsia-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                            className="answer-primary-button pixel-answer-action min-h-11 w-full rounded-xl px-5 py-3 font-bold transition disabled:cursor-not-allowed"
                           >
                             {isSubmitting
                               ? "Stop wird geprüft..."
@@ -1399,10 +1407,11 @@ export default function QuizAntwortClient({
                               (submissionStatus === "SUBMITTED" &&
                                 !changedSinceSubmission)
                             }
-                            className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                            className="answer-primary-button pixel-answer-action min-h-11 w-full rounded-xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed"
                           >
                             {isSubmitting
-                              ? "Wird verbindlich abgegeben..."
+                              ? "Wird gespeichert..."
+                              : questionPixelState?.mode === "STAGED" ? "Antwort speichern"
                               : submissionStatus === "SUBMITTED"
                                 ? "Erneut absenden"
                                 : "Verbindlich absenden"}

@@ -30,7 +30,9 @@ import {
 } from "./riskQuestionSnapshot";
 import {
   allocatePixelQuestionPointsByRun,
+  readPixelLiveConfigSnapshot,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
+import { readPixelStageHistory } from "@/app/quiz/interaction/pixelStageHistory";
 
 type EvaluationDb = Prisma.TransactionClient | typeof prisma;
 
@@ -441,6 +443,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
           configSnapshot: run.config_snapshot,
         })),
         evaluations: prepared.map((entry) => ({
+          relevantStage: readPixelStageHistory(entry.answer.pixel_stage_history).relevantStage,
           teamAnswerId: entry.answer.team_antwort_id,
           quizTeamSessionId: entry.answer.quiz_team_session_id,
           interactionRunId: entry.pixelRun?.interaction_run_id ?? null,
@@ -512,7 +515,8 @@ async function recalculateQuizQuestionEvaluationInTransaction(
         ? {
             auto_basis_punkte: result.basePoints,
             auto_endpunkte: autoFinal,
-            vergebene_punkte: effectiveManualPoints ?? autoFinal,
+            vergebene_punkte: readPixelLiveConfigSnapshot(answer.interaction_run?.config_snapshot)?.mode === "STAGED"
+              ? autoFinal : effectiveManualPoints ?? autoFinal,
             bewertungsstatus: finalStatus,
             bewertungsdetails: evaluationDetails,
             bewertungs_version: CURRENT_QUIZ_ANSWER_EVALUATION_VERSION,

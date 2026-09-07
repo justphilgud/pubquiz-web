@@ -1512,6 +1512,25 @@ button {
   color: var(--quiz-ui-primary-text) !important;
 }
 
+.answer-template button.pixel-answer-action {
+  background: var(--quiz-ui-primary) !important;
+  color: var(--quiz-ui-primary-text) !important;
+  border: 2px solid var(--quiz-ui-primary) !important;
+}
+.answer-template button.pixel-answer-action:focus-visible {
+  outline: 3px solid var(--quiz-ui-text);
+  outline-offset: 3px;
+}
+.answer-template button.pixel-answer-action:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.answer-template button.pixel-answer-action:disabled {
+  background: var(--quiz-ui-surface-strong) !important;
+  color: var(--quiz-ui-text-muted) !important;
+  border-color: var(--quiz-ui-border) !important;
+  cursor: not-allowed;
+}
+
 .answer-primary-button:hover:not(:disabled) {
   background: color-mix(in srgb, var(--quiz-ui-primary) 88%, black) !important;
 }

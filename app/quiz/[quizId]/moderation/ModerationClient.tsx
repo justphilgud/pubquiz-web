@@ -141,6 +141,7 @@ export default function ModerationClient({
   theme,
 }: Props) {
   const [now, setNow] = useState(() => Date.now());
+  const pixelClockOffset = useRef(0);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
@@ -368,6 +369,7 @@ export default function ModerationClient({
         if (!navigationPending.current) applyLiveState(snapshot.presentationState);
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
+        pixelClockOffset.current = new Date(snapshot.serverNow).getTime() - Date.now();
         setPollState(snapshot.pollState);
         setLivePollState(snapshot.livePollState);
         pollActive = snapshot.livePollState !== null;
@@ -955,7 +957,7 @@ export default function ModerationClient({
               playbackCommandId={playbackCommandId}
               estimationPhase={estimationPhase}
               estimationQuestion={estimationQuestion}
-              now={now}
+              now={now + pixelClockOffset.current}
               pixelState={pixelState}
               pollState={pollState}
               liveResultState={liveResultState}
@@ -1125,10 +1127,10 @@ export default function ModerationClient({
               <div className="space-y-2">
                 {pixelState && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && (
                   <div className="rounded-xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-3">
-                    <p><strong>Pixel-Stufe:</strong> {pixelState.effectivePixelStage} von 3</p>
-                    <p><strong>Stop:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} in Stufe ${pixelState.stoppedAtStage}` : pixelState.effectivePixelStage < 3 ? "möglich" : "in Stufe 3 deaktiviert"}</p>
+                    <p><strong>Pixel:</strong> {pixelState.mode === "STAGED" ? "Stufenwertung" : "Challenge"} · Stufe {4 - pixelState.effectivePixelStage}</p>
+                    {pixelState.mode !== "STAGED" && <p><strong>Challenge:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} hat gestoppt` : pixelState.effectivePixelStage < 3 ? "Stop möglich" : "Stop deaktiviert"}</p>}
                     <p><strong>Finale Antworten:</strong> {antwortStatus.finaleAntworten} / {antwortStatus.teamsAngemeldet}</p>
-                    <p><strong>Zustand:</strong> {pixelState.submissionDeadlineAt && new Date(pixelState.submissionDeadlineAt).getTime() > now ? `${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden Restzeit` : pixelState.stopped ? "Countdown beendet" : "offen"}</p>
+                    <p className="text-lg font-bold tabular-nums"><strong>Restzeit:</strong> {pixelState.stageDeadlineAt ? `${Math.max(0, Math.ceil((new Date(pixelState.stageDeadlineAt).getTime() - now - pixelClockOffset.current) / 1000))} Sekunden` : "Antwortphase beendet"}</p>
                   </div>
                 )}
                 {pollState && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && (

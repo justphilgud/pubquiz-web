@@ -312,10 +312,10 @@ export function PresentationStorybookQuestionSlide({
         {isPixel && pixelRevealStep !== null && (
           <div className="presentation-storybook-reveal-progress">
             <span>Enthüllung</span>
-            <div aria-label={`Stufe ${pixelRevealStep} von ${pixelRevealTotal}`}>
+            <div aria-label={`Pixelstufe ${4 - pixelRevealStep}`}>
               {Array.from({ length: pixelRevealTotal }, (_, index) => <i key={index} data-active={index < pixelRevealStep} />)}
             </div>
-            <strong>{String(pixelRevealStep).padStart(2, "0")} / {String(pixelRevealTotal).padStart(2, "0")}</strong>
+            <strong>Stufe {4 - pixelRevealStep}</strong>
           </div>
         )}
       </div>

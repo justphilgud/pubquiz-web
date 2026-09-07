@@ -5,12 +5,14 @@ import { PIXEL_STAGE_DURATION_MAX_SECONDS, PIXEL_STAGE_DURATION_MIN_SECONDS } fr
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
 type Props = {
+  mode: "CHALLENGE" | "STAGED";
+  onModeChange: (mode: "CHALLENGE" | "STAGED") => void;
   value: PixelStageDurationsSeconds;
   disabled?: boolean;
   onChange: (value: PixelStageDurationsSeconds) => void;
 };
 
-export function PixelStageTimingFields({ value, disabled, onChange }: Props) {
+export function PixelStageTimingFields({ value, disabled, onChange, mode, onModeChange }: Props) {
   const { messages } = useQuestionEditorMessages();
   const stages = [
     { key: "stage3", label: messages.pixelStages.stage3 },
@@ -21,7 +23,13 @@ export function PixelStageTimingFields({ value, disabled, onChange }: Props) {
     <fieldset className="rounded-xl border border-slate-200 p-3">
       <legend className="px-1 text-sm font-semibold text-slate-900">{messages.pixelStages.durationTitle}</legend>
       <div className="space-y-3">
-        {stages.map(({ key, label }) => (
+        <label className="block text-sm text-slate-700">Spielmodus
+          <select className="mt-1 block min-h-11 w-full rounded-xl border border-slate-300 px-3" value={mode} disabled={disabled} onChange={(event) => onModeChange(event.target.value as "CHALLENGE" | "STAGED")}>
+            <option value="CHALLENGE">Challenge</option>
+            <option value="STAGED">Stufenwertung</option>
+          </select>
+        </label>
+        {mode === "STAGED" ? <p className="text-sm text-slate-700">Drei Stufen mit je 20 Sekunden. Richtige Antworten zählen je nach Wertungsstufe 3, 2 oder 1 Punkt.</p> : stages.map(({ key, label }) => (
           <label key={key} className="block text-sm text-slate-700">
             <span className="mb-1 block font-medium">{label}</span>
             <span className="flex items-center gap-2">

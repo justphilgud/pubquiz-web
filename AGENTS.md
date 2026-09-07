@@ -25,6 +25,7 @@ Widersprüche werden bewusst entschieden und dokumentiert. Spezifikationen entha
 Zweck, Verhalten, Zustände, Ein-/Ausgaben, Persistenz, Abhängigkeiten, Invarianten und Tests.
 Vor Änderungen an Quiz-Lifecycle, Moderation, Präsentationsnavigation oder Teilnahme
 zusätzlich `docs/architecture/quiz-lifecycle.md` lesen. AP1 dokumentiert nur diesen Bereich.
+Bei Änderungen an Pixel-Fragen zusätzlich `docs/architecture/pixel-question.md` lesen.
 
 ## Project architecture
 

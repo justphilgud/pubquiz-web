@@ -216,6 +216,10 @@ Es gibt derzeit keinen eigenständigen produktiven allgemeinen `SCALE`-Antwortty
 
 ## Pixelbild als spezialisierter Run, nicht als zweite Engine
 
+AP3: Der verbindliche erweiterte Vertrag steht in [Pixel-Frage](pixel-question.md).
+Er umfasst Challenge und Stufenwertung, Grenz-Snapshots und absolute Countdowns.
+Die folgenden Stop-Sonderregeln betreffen ausschließlich Challenge.
+
 Pixelbild verwendet für die eigentliche Antwort den normalen `TEXT`-Contract, denselben Draft und dieselben Submission-Snapshots. Der Run enthält zusätzlich einen `liveInteraction`-Snapshot mit Stufendauern und Punktregeln.
 
 Besonderheiten:

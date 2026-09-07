@@ -1038,6 +1038,8 @@ export function QuestionEditor({
               )}
               {mediaTemplate?.id === questionTemplateIds.pixelImage && (
                 <PixelStageTimingFields
+                  mode={draft.templateConfig.pixelMode ?? "CHALLENGE"}
+                  onModeChange={(pixelMode) => setDraft((current) => ({ ...current, templateConfig: { ...current.templateConfig, pixelMode } }))}
                   value={draft.templateConfig.stageDurationsSeconds}
                   disabled={isEditorDisabled}
                   onChange={(stageDurationsSeconds) => setDraft((current) => ({
