@@ -1,0 +1,175 @@
+{
+  "quiz": 27,
+  "url": "https://pubquiz-9m1nisjp0-just-phil-gud.vercel.app/quiz/27/auswertung",
+  "runtimeCommit": "2df6283aad3d7bc0a448b110e2436de2248fbff3",
+  "successfulRatingActions": 14,
+  "scoreBeforeReload": [
+    "      - row \"#1 Codex AP3 A 2\":",
+    "      - row \"#2 Codex AP3 B 2\":",
+    "      - row \"#3 Codex AP3 C 1\":"
+  ],
+  "scoreAfterReload": [
+    "      - row \"#1 Codex AP3 A 2\":",
+    "      - row \"#2 Codex AP3 B 2\":",
+    "      - row \"#3 Codex AP3 C 1\":"
+  ],
+  "answersEqual": true,
+  "buttonAudit": [
+    {
+      "insideForm": false,
+      "text": "Skurril",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Teilweise",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Richtig",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Falsch",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Reset",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Skurril",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Teilweise",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Richtig",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Falsch",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Reset",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Skurril",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Teilweise",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Richtig",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Falsch",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Reset",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Skurril",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Teilweise",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Richtig",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Falsch",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Reset",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Skurril",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Teilweise",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Richtig",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Falsch",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Reset",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Skurril",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Teilweise",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Richtig",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Falsch",
+      "type": "button"
+    },
+    {
+      "insideForm": false,
+      "text": "Reset",
+      "type": "button"
+    }
+  ],
+  "scrollBeforeFinal": 632,
+  "scrollAfterFinal": 632,
+  "lifecycle": "RUNNING",
+  "slide": "17/21",
+  "conflict": "Die Bewertung wurde inzwischen geändert. Bitte den aktuellen Stand prüfen und erneut bewerten.",
+  "invalidPoints": "Die Punktzahl passt nicht zum gewählten Bewertungsstatus."
+}
