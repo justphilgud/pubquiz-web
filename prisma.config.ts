@@ -1,5 +1,6 @@
 import { defineConfig } from "prisma/config";
 import { loadLocalEnvironment } from "./scripts/load-local-environment";
+import { resolvePrismaCliConnection } from "./scripts/prisma-cli-connection";
 
 const databaseUrlWasExplicitlySet = Boolean(process.env.DATABASE_URL);
 const environmentSource = loadLocalEnvironment({
@@ -25,6 +26,6 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: resolvePrismaCliConnection(process.env["DATABASE_URL"], process.env.DEPLOYMENT_ENV),
   },
 });

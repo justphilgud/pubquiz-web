@@ -186,3 +186,15 @@ Content-Poll-Polling bleiben erhalten. AP1 erweitert die zentrale Run-Reuse-Poli
 bewusst auf CLOSED/REVEALED auch für Standardfragen; die bisherige Erwartung, dass
 diese einen neuen leeren Kontext erhalten, widerspricht INV-08. Die zugehörigen
 Regressionserwartungen wurden auf Erhalt der finalen Identität aktualisiert.
+
+## Preview-Migrationen
+
+Bei der Abnahme scheiterte das Folge-Deployment wiederholt mit Prisma P1002 am
+Session-Advisory-Lock über den Neon-Pooler. Ausschließlich bei
+`DEPLOYMENT_ENV=preview` verwendet die Prisma-CLI nun den direkten Endpunkt
+desselben Neon-Computes (Entfernen des dokumentierten `-pooler`-Suffixes).
+Datenbank, Schema, Zugangsdaten und TLS-Parameter bleiben identisch; die vorherige
+Deployment-Identitätsprüfung bleibt bestehen. Runtime-Verbindung, lokale Umgebung
+und Production werden nicht geändert. Regressionen prüfen diese Grenzen.
+Siehe [Neon-Verbindungsfehler](https://neon.com/docs/connect/connection-errors)
+und [Prisma-Datenbankverbindungen](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections).

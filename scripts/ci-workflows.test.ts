@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import "./prisma-cli-connection.test";
 
 function readRepositoryFile(path: string) {
   return readFileSync(path, "utf8");
