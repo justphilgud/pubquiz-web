@@ -1,3 +1,5 @@
+> Historischer AP3-Bericht: Die damalige Begrenzung der letzten Stufe auf 20 Sekunden wird durch B09 ersetzt. Aktueller Vertrag: [Living Specification](../architecture/pixel-question.md). Historische Testergebnisse beschreiben den damaligen Stand.
+
 # AP3 – Pixel-Frage und Stufenwertung
 
 Stand: 7. September 2026. Technische Implementierung, finales Preview-Deployment

@@ -774,3 +774,24 @@ test("translated reading keeps its TTS payload invisible and renders only the st
     /Sehr langer übersetzter Kontext/,
   );
 });
+
+
+test("B09: untimed open stage is visibly distinct from a closed answer phase", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const pixel = runtime.quiz.fragen.find((question) => question.templateId === "pixelbild");
+  assert.ok(pixel);
+  const slide: Slide = { typ: "frage", abschnitt: null, frage: pixel, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  for (const state of ["OPEN", "CLOSED"] as const) {
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz: runtime.quiz, slide, slides: [slide], slideIndex: 0, slideLabel: "Pixelbild",
+      theme: runtime.theme, displayState: { ...displayState, pixelState: {
+        interactionType: "PIXEL_STOP", mode: "STAGED", state, effectivePixelStage: 3,
+        stopped: false, stoppedByTeamName: null, stoppedAt: null, stoppedAtStage: null,
+        submissionDeadlineAt: null, stageDeadlineAt: null, resolution: null,
+      } },
+    }));
+    assert.match(html, /Stufenwertung · Stufe 1/);
+    assert.match(html, state === "OPEN" ? /Offen bis zum Abschluss durch Moderation/ : /Antwortphase beendet/);
+    if (state === "OPEN") assert.doesNotMatch(html, /Antwortphase beendet|[0-9]+ s</);
+  }
+});

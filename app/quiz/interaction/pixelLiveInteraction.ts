@@ -22,6 +22,8 @@ export function resolvePixelCountdownSeconds(
 export type PixelRuntimeStage = 1 | 2 | 3;
 
 export function pixelStageEnd(openedAt: Date | string, config: PixelLiveConfigSnapshot, stage: PixelRuntimeStage) {
+  // Runtime stage 3 is visible stage 1; its stored legacy duration is ignored.
+  if (config.mode === "STAGED" && stage === 3) return null;
   let seconds = 0;
   for (let index = 1; index <= stage; index++) seconds += config.stageDurationSeconds[index as PixelRuntimeStage];
   return new Date(new Date(openedAt).getTime() + seconds * 1_000);
@@ -29,13 +31,17 @@ export function pixelStageEnd(openedAt: Date | string, config: PixelLiveConfigSn
 
 export function completedPixelStages(openedAt: Date | null, config: PixelLiveConfigSnapshot, now: Date) {
   if (!openedAt || config.mode !== "STAGED") return 0;
-  return ([1, 2, 3] as const).filter((stage) => pixelStageEnd(openedAt, config, stage) <= now).length;
+  return ([1, 2, 3] as const).filter((stage) => {
+    const end = pixelStageEnd(openedAt, config, stage);
+    return end !== null && end <= now;
+  }).length;
 }
 
 export function pixelAnswerDeadline(input: {
   openedAt: Date | null; config: PixelLiveConfigSnapshot;
   stoppedAt: Date | null; deadlineAt: Date | null;
 }) {
+  if (input.config.mode === "STAGED") return null;
   return input.stoppedAt ? input.deadlineAt
     : input.openedAt ? pixelStageEnd(input.openedAt, input.config, 3) : null;
 }
@@ -69,6 +75,13 @@ export type PixelLiveState = {
     outcome: "NORMAL" | "EXCLUSIVE_BONUS" | "WRONG_STOP" | "PENDING" | null;
   } | null;
 };
+
+export function isPixelStageOpenEnded(state: PixelLiveState | null | undefined) {
+  return state?.mode === "STAGED" && state.state === "OPEN" &&
+    state.effectivePixelStage === 3 && !state.stopped;
+}
+
+export const PIXEL_OPEN_STAGE_LABEL = "Offen bis zum Abschluss durch Moderation";
 
 const MIN_DURATION_SECONDS = 1;
 const MAX_DURATION_SECONDS = 120;

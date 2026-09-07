@@ -29,7 +29,7 @@ export function PixelStageTimingFields({ value, disabled, onChange, mode, onMode
             <option value="STAGED">Stufenwertung</option>
           </select>
         </label>
-        {mode === "STAGED" ? <p className="text-sm text-slate-700">Drei Stufen mit je 20 Sekunden. Richtige Antworten zählen je nach Wertungsstufe 3, 2 oder 1 Punkt.</p> : stages.map(({ key, label }) => (
+        {mode === "STAGED" ? <p className="text-sm text-slate-700">Stufe 3 und 2 dauern je 20 Sekunden. Stufe 1 bleibt bis zum Abschluss durch die Moderation offen. Richtige Antworten zählen je nach Wertungsstufe 3, 2 oder 1 Punkt.</p> : stages.map(({ key, label }) => (
           <label key={key} className="block text-sm text-slate-700">
             <span className="mb-1 block font-medium">{label}</span>
             <span className="flex items-center gap-2">

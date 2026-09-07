@@ -748,10 +748,10 @@ async function expireDeadlineIfNecessary(db: DbClient, runId: number, now: Date)
     where: { interaction_run_id: runId },
   });
   if (run && (run.state === "OPEN" || run.state === "COUNTDOWN")) {
-    const completed = await settlePixelStages(db, run, now);
+    await settlePixelStages(db, run, now);
     const config = readPixelLiveConfigSnapshot(run.config_snapshot);
     const deadline = config ? pixelAnswerDeadline({ openedAt: run.opened_at, config, stoppedAt: run.stopped_at, deadlineAt: run.deadline_at }) : null;
-    if (completed === 3 || (!run.stopped_at && deadline && deadline <= now)) return closeRun(db, runId, { reason: "PIXEL_STAGES_COMPLETED", keepCurrent: run.is_current });
+    if (!run.stopped_at && deadline && deadline <= now) return closeRun(db, runId, { reason: "PIXEL_STAGES_COMPLETED", keepCurrent: run.is_current });
   }
   if (
     run?.state === "COUNTDOWN" &&
@@ -782,7 +782,7 @@ async function settlePixelStages(db: DbClient, run: {
     let history = readPixelStageHistory(draft.pixel_stage_history);
     for (let chronological = 1; chronological <= target; chronological++) {
       const stage = (4 - chronological) as 1 | 2 | 3;
-      const at = chronological <= due ? pixelStageEnd(run.opened_at, config, chronological as 1 | 2 | 3) : now;
+      const at = chronological <= due ? pixelStageEnd(run.opened_at, config, chronological as 1 | 2 | 3) ?? now : now;
       // A team that first writes later had no answer at earlier boundaries.
       const text = (draft.draft_updated_at ?? draft.aktualisiert_am) < at ? draft.antwort_text : null;
       history = snapshotPixelStage(history, stage, text, at.toISOString());

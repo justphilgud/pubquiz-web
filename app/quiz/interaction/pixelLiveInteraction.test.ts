@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { readPixelStageHistory, snapshotPixelStage } from "./pixelStageHistory";
-import { completedPixelStages, pixelStageEnd, readPixelLiveConfigSnapshot } from "./pixelLiveInteraction";
+import { completedPixelStages, pixelStageEnd, pixelAnswerDeadline, readPixelLiveConfigSnapshot } from "./pixelLiveInteraction";
 import { normalizeQuestionTemplateConfig } from "../../fragen/editor/pixelTemplateConfig";
 
 import {
@@ -376,10 +376,47 @@ test("AP3 three independent teams score 3/2/1 without pending peers affecting ea
 
 test("AP3 L: absolute stage boundaries survive reload and catch up without resetting time", () => {
   const openedAt = new Date("2026-09-07T18:00:00Z");
-  for (const [elapsed, completed, stage] of [[0, 0, 1], [19_999, 0, 1], [20_000, 1, 2], [33_000, 1, 2], [40_000, 2, 3], [60_000, 3, 3]] as const) {
+  for (const [elapsed, completed, stage] of [[0, 0, 1], [19_999, 0, 1], [20_000, 1, 2], [33_000, 1, 2], [40_000, 2, 3], [60_000, 2, 3], [90_000, 2, 3], [160_000, 2, 3], [86_400_000, 2, 3]] as const) {
     const now = new Date(openedAt.getTime() + elapsed);
     assert.equal(completedPixelStages(openedAt, stagedConfig, now), completed);
     assert.equal(resolveEffectivePixelStage({ openedAt, config: stagedConfig, serverNow: now }), stage);
   }
-  assert.equal(resolvePixelCountdownSeconds(pixelStageEnd(openedAt, stagedConfig, 2).toISOString(), openedAt.getTime() + 33_000), 7);
+  assert.equal(resolvePixelCountdownSeconds(pixelStageEnd(openedAt, stagedConfig, 2)?.toISOString() ?? null, openedAt.getTime() + 33_000), 7);
+});
+
+
+test("B09 A-D/F: visible stage 1 has no deadline, including persisted configuration after reload", () => {
+  const openedAt = new Date("2026-09-07T18:00:00Z");
+  const config = readPixelLiveConfigSnapshot(JSON.parse(JSON.stringify({ liveInteraction: stagedConfig })))!;
+  assert.equal(pixelStageEnd(openedAt, config, 1)?.getTime(), openedAt.getTime() + 20_000);
+  assert.equal(pixelStageEnd(openedAt, config, 2)?.getTime(), openedAt.getTime() + 40_000);
+  assert.equal(pixelStageEnd(openedAt, config, 3), null);
+  assert.equal(pixelAnswerDeadline({ openedAt, config, stoppedAt: null, deadlineAt: null }), null);
+  assert.equal(resolvePixelCountdownSeconds(null, openedAt.getTime() + 160_000), null);
+  const challenge = createPixelLiveConfigSnapshot(null);
+  assert.equal(pixelAnswerDeadline({ openedAt, config: challenge, stoppedAt: null, deadlineAt: null })?.getTime(), openedAt.getTime() + 45_000);
+  const stoppedAt = new Date(openedAt.getTime() + 10_000);
+  const deadlineAt = new Date(stoppedAt.getTime() + 20_000);
+  assert.equal(pixelAnswerDeadline({ openedAt, config: challenge, stoppedAt, deadlineAt }), deadlineAt);
+});
+
+test("B09 E/G/H: manual closing snapshots late first/changed answers without time reducing points", () => {
+  for (const elapsed of [45_000, 90_000, 160_000]) {
+    for (const [early, last, expected] of [[null, "Frosch", 1], ["Katze", "Frosch", 1], ["Frosch", "Katze", 0], ["Frosch", "Frosch", 3]] as const) {
+      const openedAt = new Date("2026-09-07T18:00:00Z");
+      let history = snapshotPixelStage(readPixelStageHistory(null), 3, early, new Date(openedAt.getTime() + 20_000).toISOString());
+      history = snapshotPixelStage(history, 2, early, new Date(openedAt.getTime() + 40_000).toISOString());
+      history = readPixelStageHistory(JSON.parse(JSON.stringify(history)));
+      assert.equal(history.snapshots.length, 2); // Reload never finalizes the open last stage.
+      assert.equal(completedPixelStages(openedAt, stagedConfig, new Date(openedAt.getTime() + elapsed)), 2);
+      history = snapshotPixelStage(history, 1, last, new Date(openedAt.getTime() + elapsed).toISOString());
+      const [allocation] = allocatePixelQuestionPointsByRun({
+        runs: [{ ...pixelRun(3, 3, null), configSnapshot: { liveInteraction: stagedConfig } }],
+        evaluations: [{ teamAnswerId: 1, quizTeamSessionId: 101, interactionRunId: 3,
+          relevantStage: history.relevantStage, isFinalSubmission: true, status: last === "Frosch" ? "CORRECT" : "WRONG" }],
+      });
+      assert.equal(allocation.points, expected);
+      assert.equal(history.snapshots.length, 3);
+    }
+  }
 });

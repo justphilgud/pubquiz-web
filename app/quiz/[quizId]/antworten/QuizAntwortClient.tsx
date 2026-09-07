@@ -26,6 +26,8 @@ import {
   resolveInteractionSubmissionPolicy,
 } from "@/app/quiz/interaction/interactionSubmissionPolicy";
 import {
+  isPixelStageOpenEnded,
+  PIXEL_OPEN_STAGE_LABEL,
   pixelRuntimeStageToMediaSlot,
   resolvePixelAnswerActionPolicy,
   type PixelLiveState,
@@ -1275,8 +1277,8 @@ export default function QuizAntwortClient({
                               {4 - questionPixelState.effectivePixelStage} {4 - questionPixelState.effectivePixelStage === 1 ? "Punkt" : "Punkte"}
                             </span>
                           </div>
-                          <p className="text-xl font-bold tabular-nums">{pixelCountdownRemaining === null ? "Antwortphase beendet" : `${pixelCountdownRemaining} Sekunden`}</p>
-                          {questionPixelState.mode === "STAGED" ? <p>Antwort bleibt erhalten. Eine spätere Änderung zählt für die spätere Stufe. Am Ende wird automatisch abgegeben.</p> : questionPixelState.stopped ? (
+                          <p className="text-xl font-bold tabular-nums">{pixelCountdownRemaining === null ? (isPixelStageOpenEnded(questionPixelState) ? PIXEL_OPEN_STAGE_LABEL : "Antwortphase beendet") : `${pixelCountdownRemaining} Sekunden`}</p>
+                          {questionPixelState.mode === "STAGED" ? <p>Antwort bleibt erhalten. Eine spätere Änderung zählt für die spätere Stufe. Beim Abschluss durch die Moderation wird automatisch abgegeben.</p> : questionPixelState.stopped ? (
                             questionPixelTeamState?.isStopper ? (
                               <p className="font-semibold text-fuchsia-900">
                                 Ihr habt in Stufe {4 - (questionPixelState.stoppedAtStage ?? 1)} gestoppt. Eure Antwort ist abgegeben und gesperrt.

@@ -56,7 +56,7 @@ import {
   getQuizFlowTypeLabel,
   getQuizSolutionStrategyLabel,
 } from "@/app/quiz/flow/quizFlow";
-import type { PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
+import { isPixelStageOpenEnded, PIXEL_OPEN_STAGE_LABEL, type PixelLiveState } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
@@ -1130,7 +1130,7 @@ export default function ModerationClient({
                     <p><strong>Pixel:</strong> {pixelState.mode === "STAGED" ? "Stufenwertung" : "Challenge"} · Stufe {4 - pixelState.effectivePixelStage}</p>
                     {pixelState.mode !== "STAGED" && <p><strong>Challenge:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} hat gestoppt` : pixelState.effectivePixelStage < 3 ? "Stop möglich" : "Stop deaktiviert"}</p>}
                     <p><strong>Finale Antworten:</strong> {antwortStatus.finaleAntworten} / {antwortStatus.teamsAngemeldet}</p>
-                    <p className="text-lg font-bold tabular-nums"><strong>Restzeit:</strong> {pixelState.stageDeadlineAt ? `${Math.max(0, Math.ceil((new Date(pixelState.stageDeadlineAt).getTime() - now - pixelClockOffset.current) / 1000))} Sekunden` : "Antwortphase beendet"}</p>
+                    <p className="text-lg font-bold tabular-nums"><strong>{isPixelStageOpenEnded(pixelState) ? "Antwortphase:" : "Restzeit:"}</strong> {pixelState.stageDeadlineAt ? `${Math.max(0, Math.ceil((new Date(pixelState.stageDeadlineAt).getTime() - now - pixelClockOffset.current) / 1000))} Sekunden` : (isPixelStageOpenEnded(pixelState) ? PIXEL_OPEN_STAGE_LABEL : "Antwortphase beendet")}</p>
                   </div>
                 )}
                 {pollState && (aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && (

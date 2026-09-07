@@ -38,7 +38,7 @@ ableiten. Anzeigen verwenden außerdem interne statt sichtbarer Stufennummern.
 Diese unmittelbar AP3 betreffenden Fehler werden korrigiert.
 
 Challenge behält bestehende konfigurierte Dauern, Stopdauer und Punkte. Stufenwertung
-verwendet genau 20/20/20 Sekunden und 3/2/1 Punkte. Fehlender Modus bedeutet Challenge.
+verwendet 20 Sekunden für Stufe 3 und 2; Stufe 1 bleibt unbegrenzt offen. Punkte: 3/2/1. Fehlender Modus bedeutet Challenge.
 V1 zeigt vor jeder Pixel-Frage eine Erklärung, die noch keinen Run öffnet.
 
 Stufen-Snapshots werden als Zusatzmetadaten des bestehenden Drafts persistiert;
@@ -60,12 +60,12 @@ Modusauswahl liegt im vorhandenen Pixel-Konfigurationsfeld; neue Auswahl speiche
 Challenge explizit, historische fehlende Werte bleiben Challenge. Die Bildstärken
 und die generierten Slots bleiben unverändert.
 
-Stufenwertung: Erklärung → 3 (20 s) → 2 (20 s) → 1 (20 s) → CLOSED → REVEALED.
+Stufenwertung: Erklärung → 3 (20 s) → 2 (20 s) → 1 (ohne Zeitlimit) → manueller Abschluss → CLOSED → REVEALED.
 Challenge verwendet die gespeicherten Dauern; die bisher unbegrenzt offene letzte
 Stufe endet nun bewusst nach ihrer bereits konfigurierten Dauer. Das behebt den
 Widerspruch zwischen vorhandener Dauer und tatsächlich offen bleibender Antwortphase.
 Bestandsfallback 15/15/15 und individuell konfigurierte Dauern werden nicht migriert.
-Die Forderung nach 20 Sekunden wird im neuen Modus strikt umgesetzt; bestehende
+Die 20 Sekunden gelten im neuen Modus ausschließlich für Stufe 3 und 2; bestehende
 Challenge-Konfiguration hat zur Bestandskompatibilität Vorrang.
 
 Ein Stop friert die Challenge-Stufe ein. Seine eigene bestehende 20-Sekunden-Deadline
@@ -117,14 +117,20 @@ PREPARATION-Tests starten das Quiz nicht implizit.
 
 Startquelle ist `opened_at`, Grenzen sind kumulierte konfigurierte Dauern. Der
 vorhandene Live-Snapshot transportiert `serverNow`, Modus, sichtbare Stufenbasis
-und `stageDeadlineAt`. Terminale Runs haben keine aktive Anzeige-Deadline.
+und `stageDeadlineAt`. Stufe 1 im Stufenmodus hat keine Endzeit (`null`), keinen Countdown
+und keinen automatischen Abschluss. Alle drei Oberflächen zeigen stattdessen
+"Offen bis zum Abschluss durch Moderation". Terminale Runs zeigen "Antwortphase beendet".
 Präsentation, Moderation und Teamformular verwenden einen Serverzeit-Offset und
 lokale Sekundenticks, niemals einen bei Mount gestarteten 20-Sekunden-Timer.
 Reload lädt dieselbe Run-ID, History und Deadline. Polling bleibt unverändert.
 Nur eine tatsächlich fällige Grenze erzeugt die Transaktion und Metadaten-Writes;
 ein visueller Tick erzeugt weder Requests noch Writes. Ohne verbundene Browser
 wird der persistierte Grenzabschluss beim nächsten Lesen/Schreiben nachgezogen;
-die absolute fachliche Frist läuft unabhängig davon ab.
+die absoluten Fristen der ersten beiden Stufen laufen unabhängig davon ab.
+Die letzte Stufe bleibt auch nach Minuten oder einem Reload offen. Ihre History wird
+erst beim bestehenden manuellen Close gesichert; Dauer allein ändert keine Wertungsstufe.
+Das gespeicherte dritte Dauerfeld bleibt aus Kompatibilitätsgründen erhalten, wird
+für STAGED aber ignoriert. B09 benötigt keine Migration.
 
 Alle Team-Histories einer fälligen Grenze werden in einem parametrisierten
 Batch-UPDATE geschrieben. Die Zahl der Datenbank-Roundtrips je Grenze wächst
@@ -132,7 +138,7 @@ dadurch nicht mit der Teamzahl; Datenmenge und reine Berechnung bleiben linear.
 
 Moderation zeigt Modus, Bildstufe 3/2/1, Zeit, Challenge-Status und weiterhin AP2-
 Fortschritt. Die kompakte Lifecycle-Leiste bleibt unverändert. Präsentation zeigt
-eine große Zeitangabe am Bildrand. Teamformular behält die Antwort, zeigt dieselbe
+eine große Zeitangabe am Bildrand für zeitlich begrenzte Phasen, sonst den Offen-Status. Teamformular behält die Antwort, zeigt dieselbe
 Zeit und verwendet semantische Primäraktion-Tokens einschließlich Focus/Active/
 Disabled. Regeltexte liegen in `templates/pixelRules.ts` und nicht im Scoring.
 
@@ -155,3 +161,19 @@ und Countdowns vor/nach Challenge. Vorhandene Pixel-Tests bleiben erhalten; der
 Editor-Test ergänzt lediglich den neu explizit gespeicherten Challenge-Modus.
 Unit-/Renderer-Tests ersetzen keine echte Browser-/DB-Abnahme. Deren Ergebnisse
 werden gesondert im AP3-Abschlussbericht dokumentiert.
+
+### B09 – unbegrenzte letzte Stufe
+
+PIX-INV-19: Stufe 1 in STAGED besitzt keine Endzeit und endet nie automatisch.
+PIX-INV-20: Präsentation, Moderation und Teamformular zeigen dort keinen Countdown.
+PIX-INV-21: Die Antwort bleibt bis zum manuellen Abschluss durch Moderation editierbar;
+AP1-Stop und Reset bleiben maßgeblich. Es gibt keinen neuen Abschlussweg.
+PIX-INV-22: Auch nach 45 Sekunden oder mehreren Minuten ergibt eine erstmals richtige
+Antwort in Stufe 1 einen Punkt. Eine spätere Änderung bleibt Stufe 1; eine falsche Endantwort zählt null.
+PIX-INV-23: Reload/Reconnect erhält Stufe, Draft und Offen-Zustand ohne neue Endzeit,
+Submission oder Wertungsstufe. Automatische Grenz-Snapshots enden bei zwei;
+der dritte Snapshot entsteht ausschließlich beim manuellen Close.
+
+Regressionen: B09 A–H in `pixelLiveInteraction.test.ts` und der Offen-/Geschlossen-
+Rendervergleich in `PresentationSlideRenderer.test.ts`. Die ursprüngliche AP3-Abnahme
+prüfte noch die inzwischen ersetzte 20-Sekunden-Endphase; B09 wird separat abgenommen.

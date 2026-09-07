@@ -44,6 +44,8 @@ import {
 } from "@/app/rendering/presentationTemplates/storybookComposition";
 import type { StorybookMemoryAsset } from "@/app/rendering/templateRegistry";
 import {
+  isPixelStageOpenEnded,
+  PIXEL_OPEN_STAGE_LABEL,
   pixelRuntimeStageToMediaSlot,
   resolvePixelCountdownSeconds,
   type PixelLiveState,
@@ -2730,7 +2732,7 @@ function renderAktuellenSlide() {
             <p className="mt-1 text-4xl font-bold tabular-nums">
               {pixelState.stageDeadlineAt
                 ? `${resolvePixelCountdownSeconds(pixelState.stageDeadlineAt, now)} s${pixelState.stopped ? " · Restantwortzeit" : ""}`
-                : "Antwortphase beendet"}
+                : (isPixelStageOpenEnded(pixelState) ? PIXEL_OPEN_STAGE_LABEL : "Antwortphase beendet")}
             </p>
           )}
         </div>
