@@ -117,7 +117,13 @@ Production-App-Neuveröffentlichung und keine Änderung ihrer Schutzregeln vorge
 - Prisma-Validierung erfolgreich; keine Schemaänderung.
 - Alle sechs Workflowdateien mit vorhandenem `js-yaml` erfolgreich geparst.
 - Neue Guardtests als zusätzlicher Schritt in verbindlicher CI eingebunden.
-- Remote-CI inklusive Production-Build wird am veröffentlichten Branch geprüft.
+- [Remote-CI 34156498277](https://github.com/justphilgud/pubquiz-web/actions/runs/34156498277)
+  für Infrastrukturcommit `181c0bdf857a9ebd482730ef0fd1c562bc67da15` erfolgreich,
+  einschließlich Guardtests, vollständigem Repository-Lint und Production-Build.
+
+Veröffentlicht auf `codex/infra-preview-backup`; der nachfolgende reine
+Dokumentationscommit ergänzt diesen CI-Nachweis. `main` und Preview verbleiben
+beide auf `1d4c703e068c0752a10757620d1f7fe03d47b20a`.
 
 Initiale TypeScript-Probleme in den neuen Helpern wurden behoben; keine bestehenden
 Repositoryfehler festgestellt. Bekannte Node-20-Action-Warnung im Previewworkflow
