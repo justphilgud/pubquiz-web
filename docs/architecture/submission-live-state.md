@@ -114,3 +114,25 @@ Ergebnisse und Qualitätsnachweise: [AP2-Bericht](../reports/ap2-submission-cons
 
 [Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
 und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.
+
+## B10a: stabiler Moderations-Abrufkontext
+
+Gleicher fachlicher Zustand darf keine neue Requestgeneration erzeugen. Der
+Funny-Effect hängt von Quiz-ID, Fragezuweisung, Slide-Typ und Lifecycle-Zustand/
+Durchlaufrevision ab, nicht von der Slide-Objektidentität. Bei unveränderter
+Funny-Mitgliedschaft bleibt dieselbe Set-Referenz erhalten. Der Live-State-Callback
+verwendet die geordnete primitive Slide-Key-Signatur statt der Arrayreferenz.
+Echte Deck-, Frage-, Quiz-, Stop- oder Resetwechsel aktualisieren den Kontext.
+
+Cleanup entfernt vorhandene Timer und bricht den Moderations-Snapshot-Fetch ab;
+active-Guards verwerfen verspätete Antworten auch bei nicht abbrechbaren Server
+Actions. STOPPED beobachtet weiterhin Reset und gespeicherte Antworten. Die
+750-ms-Snapshotpause, der 1.500-ms-Antwortfortschritt und die Content-Poll-Ausnahme
+bleiben unverändert. Es entstehen keine neue Persistenz und kein weiterer Kanal.
+
+`app/quiz/moderationRequestLoop.test.ts` führt den tatsächlichen Komponentenrumpf
+mit deterministischen Hook-/Timergrenzen aus: unveränderte leere/nichtleere Mengen,
+neu projizierte Quizobjekte, echte Kontextwechsel, alte Antworten und wiederholtes
+Mount/Unmount. Eine Gegenprobe mit der früheren Set-/Dependency-Kombination muss
+die Schleife erkennen. Die reale React-/Request-Abnahme auf Preview ist zusätzlich
+verpflichtend; der Test-Harness ersetzt sie nicht.

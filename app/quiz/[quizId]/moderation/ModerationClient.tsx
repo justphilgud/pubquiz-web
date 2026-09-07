@@ -87,10 +87,12 @@ async function fetchQuizLiveSnapshot(
   quizId: number,
   includeTeamJoinState: boolean,
   presentationQuestionAssignmentId?: number,
+  signal?: AbortSignal,
 ) {
   const response = await fetch("/api/quiz/live-snapshot", {
     method: "POST",
     cache: "no-store",
+    signal,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       quizId,
@@ -165,6 +167,8 @@ export default function ModerationClient({
     () => buildPraesentationSlides(quiz, { funnyQuestionAssignmentIds: funnyQuestionIds }),
     [funnyQuestionIds, quiz],
   );
+  // The live context depends on the deck's identities, not freshly projected slides.
+  const slideKeysSignature = JSON.stringify(slides.map(getPresentationSlideKey));
   const [teamJoinState, setTeamJoinState] = useState<QuizLiveSnapshot["teamJoinState"]>(null);
 
   const [slideIndex, setSlideIndex] = useState(() => {
@@ -191,6 +195,7 @@ export default function ModerationClient({
   const quizBeendet = lifecycleState.lifecycle === "STOPPED";
 
   const aktuellerSlide = slides[slideIndex];
+  const currentSlideType = aktuellerSlide?.typ;
   const showTeamJoinState =
     (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "QR_CODE") ||
     (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode");
@@ -332,7 +337,7 @@ export default function ModerationClient({
 
   const applyLiveState = useCallback((state: PresentationLiveState) => {
     setLifecycleState(state);
-    setSlideIndex(resolvePresentationSequenceIndex(state, slides.map(getPresentationSlideKey)).index);
+    setSlideIndex(resolvePresentationSequenceIndex(state, JSON.parse(slideKeysSignature) as string[]).index);
     setSlideStartedAt(state.slideStartedAt);
     setCountdownStartedAt(state.countdownStartedAt);
     setCountdownStatus(state.countdownStatus);
@@ -342,12 +347,13 @@ export default function ModerationClient({
     setAudioLaeuft(state.playbackCommand === "play");
     setEndstandRevealCountLokal(state.revealCount);
     setEstimationPhase(state.estimation.phase);
-  }, [slides]);
+  }, [slideKeysSignature]);
 
   useEffect(() => {
     let active = true;
     let refreshing = false;
     let timeout: number | null = null;
+    const controller = new AbortController();
     let pollActive = false;
     let consecutiveFailures = 0;
     function schedule() {
@@ -366,6 +372,7 @@ export default function ModerationClient({
         quizId,
         showTeamJoinState,
         presentationQuestionAssignmentId,
+        controller.signal,
       );
       if (active) {
         if (!navigationPending.current) applyLiveState(snapshot.presentationState);
@@ -395,9 +402,10 @@ export default function ModerationClient({
     void refreshPixelState();
     return () => {
       active = false;
+      controller.abort();
       if (timeout !== null) window.clearTimeout(timeout);
     };
-  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId, applyLiveState]);
+  }, [quizId, showTeamJoinState, presentationQuestionAssignmentId, applyLiveState, lifecycleState.lifecycleRevision, lifecycleState.lifecycle]);
 
   async function speichereDauerVomAktuellenSlide() {
     if (lifecycleState.lifecycle !== "RUNNING" || aktuellerSlide?.typ !== "frage" || !slideStartedAt) {
@@ -688,25 +696,26 @@ export default function ModerationClient({
     !auswertungDialogBereitsGezeigt;
 
   useEffect(() => {
-    if (!aktuellerSlide || (aktuellerSlide.typ !== "frage" && aktuellerSlide.typ !== "funny" && aktuellerSlide.typ !== "aufloesung")) {
+    if (presentationQuestionAssignmentId === undefined) {
       const timeout = window.setTimeout(() => setFunnyAnswers([]), 0);
       return () => window.clearTimeout(timeout);
     }
     let active = true;
-    void getPresentationFunnyAnswers(quizId, aktuellerSlide.frage.quiz_fragen_id).then((answers) => {
+    void getPresentationFunnyAnswers(quizId, presentationQuestionAssignmentId).then((answers) => {
       if (!active) return;
       setFunnyAnswers(answers);
-      if (aktuellerSlide.typ === "frage") {
+      if (currentSlideType === "frage") {
         setFunnyQuestionIds((current) => {
+          if (current.has(presentationQuestionAssignmentId) === (answers.length > 0)) return current;
           const next = new Set(current);
-          if (answers.length > 0) next.add(aktuellerSlide.frage.quiz_fragen_id);
-          else next.delete(aktuellerSlide.frage.quiz_fragen_id);
+          if (answers.length > 0) next.add(presentationQuestionAssignmentId);
+          else next.delete(presentationQuestionAssignmentId);
           return next;
         });
       }
     });
     return () => { active = false; };
-  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
+  }, [presentationQuestionAssignmentId, currentSlideType, quizId, lifecycleState.lifecycleRevision, lifecycleState.lifecycle]);
 
   useEffect(() => {
     if (!countdownIstAbgelaufen) return;
