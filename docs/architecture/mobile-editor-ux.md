@@ -52,6 +52,14 @@ Button-Labels, Pending/Disabled und vorhandene Rollenverträge bleiben erhalten.
 
 ## Abnahme und Grenzen
 
+AP8/AP7-F02: Im strukturierten Skaleneditor besitzt jedes Randfeld genau ein
+eigenes sichtbares Label: „Beschriftung links“ bzw. „Beschriftung rechts“.
+Ein Label enthält genau sein Input; beide zugänglichen Namen sind unabhängig
+vom jeweils anderen Feld und dessen Wert. Tastaturreihenfolge, Zweispaltenlayout
+ab `sm`, mobile Stapelung, Disabled-Verhalten und Persistenz bleiben unverändert.
+`pollScaleAccessibility.test.ts` prüft Zuordnung und isolierte Wertänderungen;
+Preview prüft Fokus, Speichern/Reload und mobile Erreichbarkeit.
+
 Browserabnahme auf Preview mit eigenem Inhalt: neue/bestehende Fragen, Antworten,
 Lösung und Spezialfelder, Storytext sowie unterste Polloption; Validierung,
 Entwurf und berechtigte Freigabe; 360–390, 430, Zwischenbreite, Desktop und

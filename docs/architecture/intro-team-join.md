@@ -68,6 +68,12 @@ Anzeige; die serverseitige AP1-Löschung bleibt unverändert.
 
 ## Darstellung und Last
 
+AP8/AP6-F01: Für die Standard-Regelfolie gilt die zentrale RULES-Geometrie aus
+[Presentation Rendering](presentation-rendering.md): vier kurze Regeln vollständig
+ohne Scrollen ab 1280 × 720; überlange Bestandsinhalte mit vorhandenem Fallback.
+Regeln → QR bleibt derselbe manuelle Intro-Übergang. Keine Änderung an Lifecycle,
+QR-Geometrie, Teambeitritt oder Begrüßungsqueue.
+
 Vier Sekunden mit Namen und proportionalem Avatar, bestehende Theme-Tokens und
 AP5-Rollen `--pres-title`, `--pres-body`, `--pres-info`. Standard, LOVD, Corporate
 und Storybook benutzen dieselbe Komponente. Reduced Motion zeigt die Begrüßung

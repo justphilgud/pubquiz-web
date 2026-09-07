@@ -12,6 +12,7 @@ export function QuizCopyDialog({
   quizTitle: string;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const inFlight = useRef(false);
   const [title, setTitle] = useState(`${quizTitle} (Kopie)`);
   const [date, setDate] = useState("");
   const [message, setMessage] = useState("");
@@ -25,15 +26,22 @@ export function QuizCopyDialog({
   }, []);
 
   async function handleCopy() {
+    if (inFlight.current || !title.trim() || !date) return;
+    inFlight.current = true;
     setPending(true);
     setMessage("");
-    const result = await copyQuiz({ quizId, neuerTitel: title, quizDatum: date });
-    setPending(false);
-    if (!result.success || !result.quizId) {
+    try {
+      const result = await copyQuiz({ quizId, neuerTitel: title, quizDatum: date });
+      if (result.success && result.quizId) {
+        window.location.href = `/quiz/${result.quizId}`;
+        return;
+      }
       setMessage(result.message);
-      return;
+    } catch {
+      setMessage("Das Quiz konnte nicht kopiert werden. Bitte erneut versuchen.");
     }
-    window.location.href = `/quiz/${result.quizId}`;
+    inFlight.current = false;
+    setPending(false);
   }
 
   return (
@@ -50,11 +58,12 @@ export function QuizCopyDialog({
 
       <dialog
         ref={dialogRef}
+        onCancel={(event) => { if (inFlight.current) event.preventDefault(); }}
         aria-labelledby={`copy-quiz-title-${quizId}`}
         aria-describedby={`copy-quiz-description-${quizId}`}
         className="m-auto w-[calc(100%-2rem)] max-w-md rounded-3xl border border-slate-200 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/40"
       >
-        <form method="dialog" className="space-y-5 p-6" onSubmit={(event) => { event.preventDefault(); void handleCopy(); }}>
+        <form className="space-y-5 p-6" onSubmit={(event) => { event.preventDefault(); void handleCopy(); }}>
           <div>
             <h2 id={`copy-quiz-title-${quizId}`} className="text-xl font-bold">
               Quiz kopieren
@@ -68,6 +77,7 @@ export function QuizCopyDialog({
             <input
               required
               maxLength={200}
+              disabled={pending}
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3"
@@ -78,6 +88,7 @@ export function QuizCopyDialog({
             <input
               required
               type="date"
+              disabled={pending}
               value={date}
               onChange={(event) => setDate(event.target.value)}
               className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3"
@@ -86,14 +97,15 @@ export function QuizCopyDialog({
           {message && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-800">{message}</p>}
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button
-              type="submit"
+              type="button"
+              disabled={pending}
               onClick={() => dialogRef.current?.close()}
               className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 font-semibold"
             >
               Abbrechen
             </button>
             <button
-              type="button"
+              type="submit"
               disabled={pending || !title.trim() || !date}
               className="min-h-11 rounded-xl bg-slate-900 px-4 py-2 font-semibold text-white disabled:bg-slate-400"
             >

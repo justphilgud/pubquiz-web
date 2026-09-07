@@ -591,16 +591,16 @@ function PollScaleEditor(props: EditorProps) {
       <input type="number" min="0.1" step="0.1" className={`${inputClass} mt-1`} value={data.step} disabled={props.disabled}
         onChange={(event) => updateNumber("step", event.target.value)} />
     </label>
-    <label className="text-sm font-medium sm:col-span-3 sm:grid sm:grid-cols-2 sm:gap-4">
-      <span>Beschriftung links
+    <div className="text-sm font-medium sm:col-span-3 sm:grid sm:grid-cols-2 sm:gap-4">
+      <label>Beschriftung links
         <input className={`${inputClass} mt-1`} value={data.minLabel} disabled={props.disabled}
           onChange={(event) => commit(props, { ...data, minLabel: event.target.value })} />
-      </span>
-      <span>Beschriftung rechts
+      </label>
+      <label>Beschriftung rechts
         <input className={`${inputClass} mt-1`} value={data.maxLabel} disabled={props.disabled}
           onChange={(event) => commit(props, { ...data, maxLabel: event.target.value })} />
-      </span>
-    </label>
+      </label>
+    </div>
     {props.validationError && <p role="alert" className="text-sm font-medium text-red-700 sm:col-span-3">{props.validationError}</p>}
   </section>;
 }

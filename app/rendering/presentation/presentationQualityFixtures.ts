@@ -8,7 +8,8 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "image-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr"] as const;
+export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "image-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy"] as const;
+export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
 export const longOptions = [
@@ -65,6 +66,9 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     typ: "ablauf", abschnitt: null, element: { id: "quality-qr", persistentId: null, type: "QR_CODE", anchorType: "BEFORE_QUIZ", anchorKey: "QUIZ", sectionId: null, order: 1, enabled: true, label: "Teambeitritt", config: { version: 1, title: "Jetzt mitspielen", body: "QR-Code scannen und Team anmelden." }, configVersion: 1, questionAssignmentId: null, isStandard: true },
   };
   const theme = resolveQuizTheme({ displayName: "AP5 Präsentationsreferenz", presentation: { template: toRuntimePresentationTemplate(managed), source: "QUIZ", requestedId: managed.id, usedFallback: false }, answerForm: { template: toRuntimeAnswerFormTemplate(managed), source: "QUIZ", requestedId: managed.id, usedFallback: false } });
+  if (scenario.startsWith("rules")) slide = {
+    typ: "ablauf", abschnitt: null, element: { id: "quality-rules", persistentId: null, type: "RULES", anchorType: "BEFORE_QUIZ", anchorKey: "QUIZ", sectionId: null, order: 1, enabled: true, label: "Regeln", config: { version: 1, title: "Die Spielregeln", rules: (scenario === "rules-legacy" ? Array.from({ length: 8 }, (_, index) => `${qualityRules[index % 4]}. ${storyText}`) : qualityRules).map((text, index) => ({ id: String(index), text, enabled: true })) }, configVersion: 1, questionAssignmentId: null, isStandard: true },
+  };
   const displayState: PresentationSlideDisplayState = { renderMode: "DESIGN_PREVIEW", templateRevealCount: 1, punktestand: [], intermediateStandings: [], endstandRevealCount: 0, now: Date.UTC(2026, 8, 7, 20), estimationPhase: "HIDDEN", schaetzfrage: null, isSchaetzfrageLoading: false, remoteCountdownDauerSekunden: null, remoteCountdownStartedAt: null, remoteCountdownStatus: null, mediaOverlayActive: false, playbackCommand: null, playbackCommandId: 0,
     livePollState: scenario === "poll" ? { revision: "fixture", runId: 1, pollRevisionId: 1, state: "OPEN", type: "SINGLE_CHOICE", prompt: "Welches Angebot würdet ihr für unseren nächsten gemeinsamen Quizabend bevorzugen?", publicationMode: "AUTOMATIC", totalResponses: 12, options: ["Eine gemischte Runde mit Fragen zu Musik, Geografie und überraschenden Alltagsgeschichten", "Ein Themenabend mit zusätzlichen Bildern und kurzen Hörbeispielen aus verschiedenen Jahrzehnten", "Ein entspannter Abend mit mehr Zeit für Diskussionen und kleinen Pausen zwischen den Runden"].map((label, index) => ({ id: String(index), label, count: 4, share: 100 / 3 })), publicResponses: [] } : null,
   };

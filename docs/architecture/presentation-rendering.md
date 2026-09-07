@@ -146,5 +146,15 @@ internen, rein lesenden Fixtures über den produktiven Renderer; keine Quizdaten
 
 ## AP6: Intro und Teambegrüßung
 
+AP8/AP6-F01: RULES verwendet ebenfalls `--pres-title` und `--pres-body`.
+Die Regelliste und ihre Zeilen behalten natürliche Mindesthöhen; weder Liste
+noch Folie schneiden Text ab. Vier kurze Regeln passen ohne Scrollbedarf in
+1280 × 720, 1920 × 1080 und 2560 × 1440. Überlange Bestandsregeln bleiben
+vollständig und nutzen ausschließlich den vorhandenen zugänglichen
+`PresentationOverflowRegion`-Scrollbereich samt Hinweis. Themefarben und
+Branding bleiben erhalten, ebenso LOVDs Mehrspaltenlayout für mehr als vier
+Regeln. Die interne Referenz enthält `rules` und `rules-legacy`; Renderer-Tests
+prüfen vier Designwelten, die Browserabnahme ergänzt Geometrie und Scrollbarkeit.
+
 [Intro-/QR-Flow und Teambeitritt](intro-team-join.md) definiert den manuellen QR-Abschluss,
 die rein lokale Begrüßungsqueue und die Wiederverwendung vorhandener Snapshots.

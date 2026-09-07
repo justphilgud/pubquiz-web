@@ -5,7 +5,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import PresentationSlideRenderer from "./PresentationSlideRenderer";
 import { PresentationContentWarning } from "./PresentationContentWarning";
-import { buildPresentationQualityFixture, longOptions, longQuestion, qualityScenarios, storyText } from "./presentationQualityFixtures";
+import { buildPresentationQualityFixture, longOptions, longQuestion, qualityRules, qualityScenarios, storyText } from "./presentationQualityFixtures";
 import { presentationContentWarning, presentationRecommendations, presentationTextDensity, templatePresentationTexts } from "./presentationReadability";
 
 test("PRES-INV-01/02/04: text lengths select only three bounded typography variants", () => {
@@ -48,6 +48,11 @@ for (const style of ["NEON", "EDITORIAL", "BIRTHDAY", "CORPORATE"] as const) {
       if (["long", "legacy", "solution-long"].includes(scenario)) assert.ok(html.includes(longQuestion));
       if (fixture.slide.typ === "frage") assert.ok(html.includes(fixture.slide.frage.frage));
       if (scenario.startsWith("story")) assert.ok(html.includes(storyText));
+      if (scenario.startsWith("rules")) {
+        for (const rule of qualityRules) assert.ok(html.includes(rule));
+        assert.match(html, new RegExp(`data-rule-count="${scenario === "rules" ? 4 : 8}"`));
+        if (scenario === "rules-legacy") assert.equal(html.split(storyText).length - 1, 8);
+      }
       if (scenario === "legacy") assert.equal(html.split(longQuestion).length - 1, 3);
       if (scenario === "choice6") for (const option of ["Berlin", "Wien", "Prag", "Budapest", "Paris", "Rom"]) assert.ok(html.includes(option));
       assert.match(html, /Präsentationsinhalt/);

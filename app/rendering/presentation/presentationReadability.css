@@ -79,6 +79,40 @@
 .presentation-structured-media .presentation-audio-control-label { font-size: var(--pres-status); letter-spacing: .04em; }
 .presentation-structured-media .presentation-audio-status-label { font-size: var(--pres-status); margin-top: .25rem; }
 
+/* Rules use natural rows; legacy overflow belongs to the shared viewport. */
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-slide[data-flow-type="RULES"] {
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  justify-content: flex-start;
+  padding: clamp(1rem, 1.25cqw, 2rem);
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-slide[data-flow-type="RULES"] > * { flex-shrink: 0; }
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-slide[data-flow-type="RULES"] .presentation-flow-kicker { margin-bottom: .5rem; }
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-slide[data-flow-type="RULES"] h2 {
+  font-size: var(--pres-title) !important;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-rules {
+  flex: none;
+  min-height: min-content;
+  grid-auto-rows: auto;
+  align-content: start;
+  margin-top: 1rem;
+  gap: .5rem;
+  overflow: visible;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-rules li {
+  min-height: min-content;
+  grid-template-columns: clamp(2rem, 3cqw, 3rem) minmax(0, 1fr);
+  gap: 1rem;
+  padding: clamp(.4rem, .6cqw, .75rem) clamp(.75rem, 1cqw, 1.25rem);
+  font-size: var(--pres-body) !important;
+  line-height: 1.35;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-rules strong { overflow-wrap: anywhere; }
+
 /* Story text keeps its format but uses the same bounded reading scale. */
 .presentation-template.presentation-readable[data-design-style] .presentation-flow-editorial,
 .presentation-template.presentation-readable[data-design-style] .presentation-live-poll {
