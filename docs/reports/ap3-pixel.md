@@ -1,8 +1,7 @@
 # AP3 – Pixel-Frage und Stufenwertung
 
-Stand: 7. September 2026. Technische Implementierung, Preview-Deployment und reale
-Kernabnahme geprüft. Kleine Alternativtext-Korrektur nach Browserabnahme; finaler
-Deploy-Nachweis wird unten ergänzt. Grenzen und separate Befunde sind ausdrücklich genannt.
+Stand: 7. September 2026. Technische Implementierung, finales Preview-Deployment
+und reale Kernabnahme geprüft. Grenzen und separate Befunde sind ausdrücklich genannt.
 
 ## Fachlicher Vertrag und Architektur
 
@@ -157,6 +156,31 @@ Screenshots beider Erklärungen, Audience, Moderation, Teamaktion und Restzeit v
 - Kein fremdes Quiz verändert. Testquizze 23/24/25 bleiben beendet als Nachweise
   erhalten. Keine Änderungen an main oder Produktion.
 
+### Visuelle Referenzen
+
+| Stufenwertung – Erklärung | Challenge – Erklärung |
+| --- | --- |
+| ![Stufenregeln](ap3-staged-rules.png) | ![Challengeregeln](ap3-challenge-rules.png) |
+
+| Präsentation mit Countdown | Moderation mit Countdown |
+| --- | --- |
+| ![Pixelstufe und Countdown](ap3-staged-stage.png) | ![Moderation](ap3-staged-moderation.png) |
+
+| Teamaktion im LOVD-Template | Challenge-Restzeit |
+| --- | --- |
+| ![Antwort speichern](ap3-lovd-team.png) | ![Restantwortzeit](ap3-challenge-residual.png) |
+
+| Bestätigter Punktestand | Falsche Endantwort |
+| --- | --- |
+| ![3/2/1](ap3-staged-results.png) | ![Nullwertung](ap3-negative-evaluation.png) |
+
+Reproduktion der separaten UI-Befunde: eigenes Quiz öffnen → Quiz kopieren →
+Name/Datum eingeben → Kopie anlegen (keine Aktion), Enter im Namensfeld (Kopie).
+Auswertung eines eigenen Quiz öffnen → offene Pixelantwort Richtig/Falsch bewerten →
+Seitenwechsel zu /fragen wurde mehrfach beobachtet; Rückkehr zur Auswertung zeigt
+gespeicherte Bewertung. Ergebnisfolie vor Bewertungsänderung laden → in zweitem Tab
+bewerten → Ergebnisfolie bleibt veraltet → Reload lädt korrekte Werte.
+
 ## Geänderte Bereiche
 
 Pixel-Konfiguration/Editor, bestehender Interaction-Service mit neuem reinen
@@ -169,6 +193,18 @@ Commits, Preview-Adresse und Abnahmebelege stehen in diesem Bericht.
 Unabhängige Backlog-Befunde wurden dokumentiert, nicht nebenbei behoben.
 
 ## Preview-Nachweise
+
+Finale Korrektur: `bd389a299aa81c25577fee5b9d783b0c8f5e8b82`.
+[Finales Preview](https://pubquiz-3ziqw9555-just-phil-gud.vercel.app/quiz).
+[Deploy Preview #145](https://github.com/justphilgud/pubquiz-web/actions/runs/34116165095):
+erfolgreich, inklusive Migration/Deployment/Smoke-Test; Deployment-ID
+`dpl_31eeabZFuqqAz3T2PhYnMTooSoj8`, Dauer 2m 29s.
+[Preview-CI #139](https://github.com/justphilgud/pubquiz-web/actions/runs/34116013601)
+und [Feature-CI #138](https://github.com/justphilgud/pubquiz-web/actions/runs/34116013539)
+erfolgreich. Repositoryweiter ESLint meldet keinen Rückstand.
+Die reale Abnahme oben erfolgte auf `c101e23`; der einzige spätere Laufzeitunterschied
+ist die korrekte sichtbare Stufennummer im Bildalttext. Kein erneuter kompletter
+Browserlauf für diese einzeilige Beschriftungskorrektur.
 
 - Laufzeit-Commit: `c101e23a1658570f73a248e196def41ac300313d`.
 - [Preview](https://pubquiz-llcm8un8i-just-phil-gud.vercel.app/quiz).
@@ -232,3 +268,7 @@ und Screenshots. Bis dahin wird keine Browserabnahme als bestanden ausgegeben.
 - prisma/schema.prisma
 
 Code-Commits: e004e0b, 61faad2, c101e23. Letzte Ergänzung: ein parametrisiertes Batch-UPDATE für alle Team-Snapshots einer Grenze; keine Datenbank-Roundtrips je Team. Gezielte Regressionen (34 Tests), Typecheck und ESLint danach erfolgreich. Vollständiger letzter Stand wird zusätzlich durch Preview-CI geprüft.
+
+Abschließender Code-/Abnahmecommit: bd389a2 (Bildalttext plus Browserbelege).
+Vollständige finale CI erfolgreich. Spätere Berichts-/Galerieergänzungen liegen nur
+im Feature-Branch und lösen kein weiteres Runtime-Deployment aus.
