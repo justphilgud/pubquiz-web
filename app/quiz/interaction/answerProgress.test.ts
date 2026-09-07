@@ -104,6 +104,7 @@ test("SUB-INV-11/12: counter is an authorized, uncached, read-only projection; p
   assert.match(actions, /return getQuizAnswerProgress\(quizId, quizFragenId\)/);
   const client = read("app/quiz/[quizId]/moderation/ModerationClient.tsx");
   assert.match(client, /await getAntwortStatus\(quizId, questionId\);\s*if \(!active\) return;/);
+  assert.match(client, /\[presentationQuestionAssignmentId, quizId, lifecycleState.lifecycleRevision\]/);
   assert.match(client, /Finale Antworten:<\/strong> \{antwortStatus.finaleAntworten\}/);
   const page = read("app/quiz/[quizId]/moderation/page.tsx");
   assert.doesNotMatch(page, /getAntwortStatus\(quizId, null\)/);

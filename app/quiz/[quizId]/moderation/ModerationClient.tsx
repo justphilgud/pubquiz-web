@@ -751,8 +751,7 @@ export default function ModerationClient({
       if (!active || refreshing) return;
       refreshing = true;
       try {
-        const questionId = aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung" || aktuellerSlide?.typ === "funny"
-          ? aktuellerSlide.frage.quiz_fragen_id : null;
+        const questionId = presentationQuestionAssignmentId ?? null;
         const next = await getAntwortStatus(quizId, questionId);
         if (!active) return;
         setAntwortStatus({ ...next, letzteAntwortAt: next.letzteAntwortAt?.toISOString() ?? null });
@@ -768,7 +767,7 @@ export default function ModerationClient({
       active = false;
       window.clearInterval(interval);
     };
-  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
+  }, [presentationQuestionAssignmentId, quizId, lifecycleState.lifecycleRevision]);
 
   async function toggleLiveResults() {
     if (aktuellerSlide?.typ !== "frage" || !liveResultState) return;

@@ -53,7 +53,9 @@ Inhaltszeitpunkt. Ohne Frage: Teamzahl und 0 Antworten; dies ist kein Quizgesamt
 Die aktuelle Frage folgt derselben Slide-Sequenz wie die Moderation, einschließlich
 Frage-, Funny- und Lösungsphase. Initiales Server-Rendering und Polling verwenden
 denselben Leser. Ein verspäteter Poll aus einem verlassenen Frage-/Durchlaufkontext
-wird verworfen. Bestehender Takt: 1,5 Sekunden, ohne überlappende Requests je Effect;
+wird verworfen. Die Effect-Abhängigkeit ist die primitive Frage-ID, nicht das
+bei Rendern neu erzeugbare Slide-Objekt: sonst können gültige Poll-Ergebnisse
+fortlaufend verworfen werden. Bestehender Takt: 1,5 Sekunden, ohne überlappende Requests je Effect;
 Fehler werden beim nächsten Poll wiederholt. Keine zusätzliche Cache-Schicht.
 
 | Ereignis | Zähler und Persistenz |
