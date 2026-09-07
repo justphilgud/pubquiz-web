@@ -1316,7 +1316,7 @@ export default function QuizAntwortClient({
                         >
                           <img
                             src={getBildUrl(sichtbaresBild!.datei)}
-                            alt={`Pixelbild in Stufe ${questionPixelState?.effectivePixelStage ?? 1}`}
+                            alt={`Pixelbild in Stufe ${4 - (questionPixelState?.effectivePixelStage ?? 1)}`}
                             className="aspect-video w-full object-contain"
                           />
                         </button>

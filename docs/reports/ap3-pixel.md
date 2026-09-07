@@ -1,8 +1,8 @@
 # AP3 – Pixel-Frage und Stufenwertung
 
-Stand: 7. September 2026. Technische Implementierung und Preview-Deployment geprüft;
-reale Browserabnahme wartet auf Anmeldung am neuen Deployment. Noch kein abgeschlossener
-Abnahmebericht.
+Stand: 7. September 2026. Technische Implementierung, Preview-Deployment und reale
+Kernabnahme geprüft. Kleine Alternativtext-Korrektur nach Browserabnahme; finaler
+Deploy-Nachweis wird unten ergänzt. Grenzen und separate Befunde sind ausdrücklich genannt.
 
 ## Fachlicher Vertrag und Architektur
 
@@ -70,15 +70,92 @@ Challenge. Keine destruktive Migration, kein Production- oder main-Update.
   an fehlender lokaler Umgebungsdatei im isolierten Worktree.
 - `git diff --check`: erfolgreich; reine Generator-Whitespace-Änderungen entfernt.
 
-## Offene Preview-Abnahme
+## Preview-Abnahme
 
 CI, Migration, Deployment und Smoke-Test: erfolgreich (Nachweise unten).
-Eigenes Testquiz, bestehende Pixel-Fragen und Editor-Persistenz: ausstehend.
-Challenge inklusive Restzeit, Sperre, Bewertung und Reload: ausstehend.
-Drei Teams mit 3/2/1, Einzel-/Gesamtpunkte und Ergebnisdarstellung: ausstehend.
-Zusätzlicher Lauf richtig → falsch mit 0 Punkten: ausstehend.
-Team-/Moderator-/Präsentationsreload, Stop und Reset: ausstehend.
-Screenshots beider Erklärungen, Audience, Moderation, Teamaktion und Restzeit: ausstehend.
+Eigenes Testquiz, bestehende Pixel-Frage und Editor-Persistenz: geprüft.
+Challenge: Stufen 3/2, Stop in 2, Restzeit, Sperre und Exklusivbonus 4 geprüft.
+Drei Teams mit 3/2/1: Einzelwertung, Gesamtpunkte, Teamauflösung und Podium geprüft.
+Zusätzlicher Lauf richtig → falsch: finale Nullwertung geprüft.
+Team-/Moderator-/Präsentationsreload während des Stufenlaufs, Stop und Reset geprüft.
+Screenshots beider Erklärungen, Audience, Moderation, Teamaktion und Restzeit vorhanden.
+
+### Browserprotokoll – erster Durchlauf
+
+- Eigenes Preview-Quiz **23**, „Codex AP3 Pixel E2E 2026-09-07“, angelegt.
+- Bestehende Pixel-Frage 73 unverändert zugeordnet; eigene Stufenfrage **96** mit
+  Modus Stufenwertung, Lösung Frosch, Originalbild und drei erfolgreich erzeugten
+  Pixelstufen erstellt. Freigabe in Bestandsquizze ausdrücklich vom Nutzer bestätigt.
+- Beide Fragen per Drag-and-drop dem Testblock 83 zugeordnet. Ohne Block entsteht
+  keine Teaminteraktion; das war zunächst ein unvollständiger Testaufbau.
+- Drei getrennte Teamtabs A/B/C angemeldet. Challenge-Erklärung startet keinen Run.
+- Challenge: Stufen 3 und 2 sichtbar, A stoppt in 2; Antwort Hans Meier gesperrt,
+  B/C erhalten Restzeit. Nach Frist Eingabe deaktiviert. Richtig-Moderation ergibt
+  exklusiven Bonus **4**. Screenshot hält Restzeit 7 Sekunden fest.
+- Stufenwertung: automatische Wechsel 3 → 2 → 1, Antworten bleiben stehen.
+  A wurde im ersten Lauf erst in Stufe 2 gespeichert (Testbedienung zu spät),
+  B korrigiert in 2, C antwortet erstmals in 1. Alle werden einmal automatisch
+  finalisiert; Moderation zeigt **3/3**, Quote **100 %**.
+- Zentrale Richtig-Bewertung ergibt **2/2/1**; Gesamtpunktestand **6/2/1** inklusive
+  Challenge. Werte nach erneutem Seitenaufruf bestätigt. Quiz-Lifecycle **Beendet**.
+- Gezielter 3/2/1-Wiederholungslauf, Reload während Stufe 2 und richtig → falsch
+  bleiben offen. Reset-Dialog vorbereitet; endgültiges Löschen wartet auf Bestätigung.
+- Auffälligkeiten: normale Datum-fill-Eingabe erst nach ArrowUp/ArrowDown übernommen;
+  Auswertung wechselte nach manueller Bewertung zweimal unerwartet zu /fragen,
+  obwohl Punkte gespeichert waren. Ursache noch nicht eingegrenzt; keine Änderung
+  außerhalb AP3 vorgenommen. Team-Bildalttext verwendet noch interne Stufennummer.
+- Screenshots: ap3-challenge-rules.png, ap3-challenge-residual.png,
+  ap3-challenge-moderation.png, ap3-staged-rules.png, ap3-staged-stage.png,
+  ap3-staged-moderation.png, ap3-staged-team.png, ap3-first-results.png.
+
+### Zweiter Durchlauf und Negativfall
+
+- Reset von Quiz 23 ausdrücklich bestätigt und durchgeführt: Vorbereitung, Folie 1,
+  alte Teamsitzungen ungültig, anschließend neue Anmeldungen mit bestehenden Teamkonten.
+- Zweiter Lauf: A Frosch in Stufe 3 unverändert; B Katze in Stufe 3, Frosch in 2;
+  C erstmals Frosch in 1. Alle drei Speichern-Aktionen bleiben Drafts. Beim Ende
+  genau drei AUTO_FINALIZED-Abgaben. Persistierte Wertungsstufen **3/2/1**.
+- Manuelle Richtig-Bewertung zentral: A **3**, B **2**, C **1**. Nach erneutem Laden
+  stimmen Einzelprüfung, Punktestand und vollständiges Podium überein.
+- Team C zeigt in der Auflösung **1 Punkt**. Moderation zeigt nach Poll **3/3**.
+- Moderator, Audience und Team C in Stufe 2 neu geladen; die verstrichene Zeit
+  läuft weiter über die Grenze zu Stufe 1, keine neue Frist oder zusätzliche Abgabe.
+- Isolierte Kopie Quiz **24**: Frosch in Stufe 3 gespeichert, Teamreload in 2;
+  danach Frosch unverändert vorhanden. Die geplante spätere Änderung verpasste wegen
+  Browser-/Freigabeprüfungs-Latenz die Frist und zählt ausdrücklich nicht als Negativtest.
+- Isolierte Kopie Quiz **25**, „Codex AP3 Endantwort Stop 2026-09-07“, LOVD-Template:
+  Frosch in 3 gespeichert, Katze in 2 gespeichert. Quiz während Stufe 1 beendet,
+  genau **1/1** finalisiert, Teamansicht gesperrt. Nach Reload und über 60 Sekunden
+  später weiterhin Beendet, Stufe 1, Antwortphase beendet.
+- Zentrale Endwertung für Quiz 25: **Katze**, Wertungsstufe **2**, **WRONG (manuell),
+  0 Punkte**. Die frühe richtige Antwort erzeugt keinen Punkteanspruch.
+- Eigene Frage 96 erneut geöffnet: Stufenwertung und 20-Sekunden-Regel persistiert,
+  vier Medien vorhanden. Legacy-Frage 73 im neuen Preview geöffnet und unverändert
+  spielbar; der bestehende Review-/Berechtigungszustand sperrt ihre Bearbeitung.
+- Ergänzende Belege: ap3-staged-stage3.png, ap3-staged-evaluation.png,
+  ap3-staged-results.png, ap3-staged-podium.png, ap3-lovd-team.png,
+  ap3-lovd-stopped.png, ap3-negative-evaluation.png.
+
+### Grenzen und separate Befunde
+
+- Screenshots prüfen Standard und LOVD bei der vorhandenen Desktopbreite. Kein
+  vollständiger zusätzlicher Matrixlauf aller mobilen Breiten und Fokuszustände.
+- Challenge-Reload während der kurzen Restzeit nicht separat reproduziert; die
+  absolute Deadline ist durch bestehende Regressionen und Stufenreload abgesichert.
+- Keine quantitative Netzwerk-/SQL-Profilierung im Browser. Performanceaussagen
+  beruhen auf Codeprüfung: bestehendes Polling, lokale Ticks, ein Batch pro Grenze.
+- Pixel-Bildalttext verwendete intern 1/2/3. Im Browser gefunden und auf sichtbares
+  3/2/1 korrigiert; Typecheck und dateibezogener ESLint danach erfolgreich.
+- Bestehender Kopierdialogfehler in Basis 6038b8c bestätigt: „Kopie anlegen“ hat
+  type=button ohne Handler, „Abbrechen“ type=submit. Kopie per Enter möglich.
+  Außerhalb AP3, nicht verändert.
+- Bestehende Ergebnisfolien benötigen nach Änderungen einen Reload, um aktuelle
+  Teamwertungen zu übernehmen. Nach Reload korrekte 3/2/1-Darstellung.
+- Unerwartete Navigation nach manueller Bewertung zu /fragen mehrfach beobachtet;
+  Ursprung nicht abschließend geklärt. Bewertungen nach erneutem Laden kontrolliert.
+  Dies sowie initial kurz fehlende Live-Daten nach Reload sind separate UI-Befunde.
+- Kein fremdes Quiz verändert. Testquizze 23/24/25 bleiben beendet als Nachweise
+  erhalten. Keine Änderungen an main oder Produktion.
 
 ## Geänderte Bereiche
 
@@ -88,8 +165,8 @@ Slide-Identität/-Titel, produktiver Präsentationsrenderer, Moderation und Team
 gezielte Pixel-Aktionsstyles, additive Prisma-Migration und generierter Client,
 Regressionstests, Living Specifications und AGENTS-Verweis.
 
-Commits, Preview-Adresse und genaue Abnahmebelege werden nach Deployment ergänzt.
-Keine unabhängigen Backlog-Bugs reproduziert oder nebenbei behoben.
+Commits, Preview-Adresse und Abnahmebelege stehen in diesem Bericht.
+Unabhängige Backlog-Befunde wurden dokumentiert, nicht nebenbei behoben.
 
 ## Preview-Nachweise
 

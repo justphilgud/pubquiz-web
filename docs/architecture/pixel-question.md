@@ -4,6 +4,10 @@ Basis: AP2 und kompakter AP1-Nachtrag, Commit 6038b8c. Verbindlich zusammen mit
 [Lifecycle](quiz-lifecycle.md), [Submission](submission-live-state.md) und
 [Answer-Interaction](answer-interaction.md).
 
+Reale Preview-Abnahme vom 7. September 2026: [Bericht und Belege](../reports/ap3-pixel.md).
+Eigene Quizze bestätigen 3/2/1, falsch nach früher richtig = 0, Challenge-Stop mit
+Exklusivbonus, absolute Zeit über Reload, Stop-Sperre und vollständigen Quizreset.
+
 ## Rekonstruierter IST-Vertrag
 
 Pixel nutzt TEXT, `team_antworten`, versionierte `team_answer_submissions` und
