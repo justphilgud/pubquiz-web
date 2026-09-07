@@ -1,0 +1,2437 @@
+{
+  "commit": "4bce410a822ec249a8b4c71011b5c8668e6823cc",
+  "results": [
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "choice2",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "choice3",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "choice4",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "choice6",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "choice-long",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "choice-mixed",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 443
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "NEON",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 338
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "choice2",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "choice3",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "choice4",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "choice6",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "choice-long",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "choice-mixed",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 326
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "EDITORIAL",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 254
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "choice2",
+      "choiceGap": 181.7265625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "choice3",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "choice4",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "choice6",
+      "choiceGap": 113.0546875,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "choice-long",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "choice-mixed",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 483
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "BIRTHDAY",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 200
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "choice2",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "choice3",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "choice4",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "choice6",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "choice-long",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "choice-mixed",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 508
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1280x720",
+      "style": "CORPORATE",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 402
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "choice2",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "choice3",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "choice4",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "choice6",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "choice-long",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "choice-mixed",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 443
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "NEON",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 338
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "choice2",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "choice3",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "choice4",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "choice6",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "choice-long",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "choice-mixed",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 326
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "EDITORIAL",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 254
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "choice2",
+      "choiceGap": 181.7265625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "choice3",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "choice4",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "choice6",
+      "choiceGap": 113.0546875,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "choice-long",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "choice-mixed",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 483
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "BIRTHDAY",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 200
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "choice2",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "choice3",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "choice4",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "choice6",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "choice-long",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "choice-mixed",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 508
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "1920x1080",
+      "style": "CORPORATE",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 402
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "choice2",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "choice3",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "choice4",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "choice6",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "choice-long",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "choice-mixed",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 443
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "NEON",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 338
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "choice2",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "choice3",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "choice4",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "choice6",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "choice-long",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "choice-mixed",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 326
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "EDITORIAL",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 254
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "choice2",
+      "choiceGap": 181.7265625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "choice3",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "choice4",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "choice6",
+      "choiceGap": 113.0546875,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "choice-long",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "choice-mixed",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 483
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "BIRTHDAY",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 200
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "choice2",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "choice3",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "choice4",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "choice6",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "choice-long",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "choice-mixed",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 508
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "2560x1440",
+      "style": "CORPORATE",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 402
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "choice2",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "choice3",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "choice4",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "choice6",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "choice-long",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "choice-mixed",
+      "choiceGap": 40,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 443
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "NEON",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 338
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "choice2",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "choice3",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "choice4",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "choice6",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "choice-long",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "choice-mixed",
+      "choiceGap": 32,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 326
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "EDITORIAL",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 254
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "choice2",
+      "choiceGap": 181.7265625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "choice3",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "choice4",
+      "choiceGap": 147.390625,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "choice6",
+      "choiceGap": 113.0546875,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "choice-long",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "choice-mixed",
+      "choiceGap": 58.5859375,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 483
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "BIRTHDAY",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 200
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "short",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "normal",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "choice2",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "choice3",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "choice4",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "choice6",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "choice-long",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "choice-mixed",
+      "choiceGap": 37,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "image-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "structured-audio",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "structured-empty",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "ordering",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "story",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "story-legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 508
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "poll",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "solution-long",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "pixel",
+      "choiceGap": null,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "size": "900x900",
+      "style": "CORPORATE",
+      "scenario": "legacy",
+      "choiceGap": null,
+      "x": 0,
+      "y": 402
+    }
+  ]
+}

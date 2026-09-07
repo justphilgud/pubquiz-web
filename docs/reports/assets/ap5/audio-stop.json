@@ -1,0 +1,19 @@
+{
+  "commit": "4bce410a822ec249a8b4c71011b5c8668e6823cc",
+  "quiz": 28,
+  "beforeStop": [
+    {
+      "duration": 20.397732,
+      "paused": false,
+      "ready": 4,
+      "time": 9.938735
+    }
+  ],
+  "afterStop": [
+    {
+      "duration": 20.397732,
+      "paused": true,
+      "time": 11.63616
+    }
+  ]
+}

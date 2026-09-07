@@ -56,10 +56,10 @@ Farben, Fonts, Rahmen, Bildwelten und visuelle Identität stammen aus dem Theme.
 ## Layout und Priorität
 
 Kernfrage und Optionen haben Vorrang vor großen Innenabständen und Dekoration.
-Choice verwendet Frage oben und gleichgewichtete Optionen in zwei Spalten,
-mit einer inhaltsbasierten Mindesthöhe der Frage gegen Überlagerungen. Auf
-Flächen bis 1450 Pixeln nutzt die Auswahlfrage 32 px und reduzierte Kartenabstände.
-unter 1000 logischen Pixeln in einer Spalte. Lange Bildfragen erhalten zwei
+Choice verwendet die Frage oben und gleichgewichtete Optionen in zwei Spalten,
+unter 1000 logischen Pixeln in einer Spalte. Die inhaltsbasierte Mindesthöhe der
+Frage verhindert Überlagerungen. Auf Flächen bis 1450 Pixeln nutzt die Auswahlfrage
+32 px und reduzierte Kartenabstände. Lange Bildfragen erhalten zwei
 gleich breite Spalten; lange Standardlösungen 55 % Frage / 45 % Lösung.
 Unter 1450 Pixeln werden Header und Abstände kompakter. Storybook gibt bei
 dichterem Inhalt den für dekorative Galerien reservierten Platz frei; eigentliche

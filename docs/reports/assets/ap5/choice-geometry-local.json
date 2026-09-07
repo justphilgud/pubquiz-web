@@ -1,0 +1,674 @@
+[
+  {
+    "size": "1280x720",
+    "style": "NEON",
+    "scenario": "choice2",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "NEON",
+    "scenario": "choice3",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "NEON",
+    "scenario": "choice4",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "NEON",
+    "scenario": "choice6",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "NEON",
+    "scenario": "choice-long",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "NEON",
+    "scenario": "choice-mixed",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "EDITORIAL",
+    "scenario": "choice2",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "EDITORIAL",
+    "scenario": "choice3",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "EDITORIAL",
+    "scenario": "choice4",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "EDITORIAL",
+    "scenario": "choice6",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "EDITORIAL",
+    "scenario": "choice-long",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "EDITORIAL",
+    "scenario": "choice-mixed",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "BIRTHDAY",
+    "scenario": "choice2",
+    "gap": 181.7265625,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "BIRTHDAY",
+    "scenario": "choice3",
+    "gap": 147.390625,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "BIRTHDAY",
+    "scenario": "choice4",
+    "gap": 147.390625,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "BIRTHDAY",
+    "scenario": "choice6",
+    "gap": 113.0546875,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "BIRTHDAY",
+    "scenario": "choice-long",
+    "gap": 58.5859375,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "BIRTHDAY",
+    "scenario": "choice-mixed",
+    "gap": 58.5859375,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "CORPORATE",
+    "scenario": "choice2",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "CORPORATE",
+    "scenario": "choice3",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "CORPORATE",
+    "scenario": "choice4",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "CORPORATE",
+    "scenario": "choice6",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "CORPORATE",
+    "scenario": "choice-long",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "1280x720",
+    "style": "CORPORATE",
+    "scenario": "choice-mixed",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "NEON",
+    "scenario": "choice2",
+    "gap": 84.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "NEON",
+    "scenario": "choice3",
+    "gap": 84.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "NEON",
+    "scenario": "choice4",
+    "gap": 84.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "NEON",
+    "scenario": "choice6",
+    "gap": 84.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "NEON",
+    "scenario": "choice-long",
+    "gap": 84.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "NEON",
+    "scenario": "choice-mixed",
+    "gap": 84.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "EDITORIAL",
+    "scenario": "choice2",
+    "gap": 76.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "EDITORIAL",
+    "scenario": "choice3",
+    "gap": 76.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "EDITORIAL",
+    "scenario": "choice4",
+    "gap": 76.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "EDITORIAL",
+    "scenario": "choice6",
+    "gap": 76.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "EDITORIAL",
+    "scenario": "choice-long",
+    "gap": 76.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "EDITORIAL",
+    "scenario": "choice-mixed",
+    "gap": 76.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "BIRTHDAY",
+    "scenario": "choice2",
+    "gap": 324.3515625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "BIRTHDAY",
+    "scenario": "choice3",
+    "gap": 273.7578125,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "BIRTHDAY",
+    "scenario": "choice4",
+    "gap": 273.7578125,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "BIRTHDAY",
+    "scenario": "choice6",
+    "gap": 223.15625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "BIRTHDAY",
+    "scenario": "choice-long",
+    "gap": 198.7578125,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "BIRTHDAY",
+    "scenario": "choice-mixed",
+    "gap": 198.7578125,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "CORPORATE",
+    "scenario": "choice2",
+    "gap": 81.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "CORPORATE",
+    "scenario": "choice3",
+    "gap": 81.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "CORPORATE",
+    "scenario": "choice4",
+    "gap": 81.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "CORPORATE",
+    "scenario": "choice6",
+    "gap": 81.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "CORPORATE",
+    "scenario": "choice-long",
+    "gap": 81.40625,
+    "overflow": 0
+  },
+  {
+    "size": "1920x1080",
+    "style": "CORPORATE",
+    "scenario": "choice-mixed",
+    "gap": 81.40625,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "NEON",
+    "scenario": "choice2",
+    "gap": 88,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "NEON",
+    "scenario": "choice3",
+    "gap": 88,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "NEON",
+    "scenario": "choice4",
+    "gap": 88,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "NEON",
+    "scenario": "choice6",
+    "gap": 88,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "NEON",
+    "scenario": "choice-long",
+    "gap": 88,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "NEON",
+    "scenario": "choice-mixed",
+    "gap": 88,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "EDITORIAL",
+    "scenario": "choice2",
+    "gap": 80,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "EDITORIAL",
+    "scenario": "choice3",
+    "gap": 80,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "EDITORIAL",
+    "scenario": "choice4",
+    "gap": 80,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "EDITORIAL",
+    "scenario": "choice6",
+    "gap": 80,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "EDITORIAL",
+    "scenario": "choice-long",
+    "gap": 80,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "EDITORIAL",
+    "scenario": "choice-mixed",
+    "gap": 80,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "BIRTHDAY",
+    "scenario": "choice2",
+    "gap": 504.1484375,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "BIRTHDAY",
+    "scenario": "choice3",
+    "gap": 453.5546875,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "BIRTHDAY",
+    "scenario": "choice4",
+    "gap": 453.5546875,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "BIRTHDAY",
+    "scenario": "choice6",
+    "gap": 402.953125,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "BIRTHDAY",
+    "scenario": "choice-long",
+    "gap": 418.5546875,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "BIRTHDAY",
+    "scenario": "choice-mixed",
+    "gap": 418.5546875,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "CORPORATE",
+    "scenario": "choice2",
+    "gap": 85,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "CORPORATE",
+    "scenario": "choice3",
+    "gap": 85,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "CORPORATE",
+    "scenario": "choice4",
+    "gap": 85,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "CORPORATE",
+    "scenario": "choice6",
+    "gap": 85,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "CORPORATE",
+    "scenario": "choice-long",
+    "gap": 85,
+    "overflow": 0
+  },
+  {
+    "size": "2560x1440",
+    "style": "CORPORATE",
+    "scenario": "choice-mixed",
+    "gap": 85,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "NEON",
+    "scenario": "choice2",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "NEON",
+    "scenario": "choice3",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "NEON",
+    "scenario": "choice4",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "NEON",
+    "scenario": "choice6",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "NEON",
+    "scenario": "choice-long",
+    "gap": 38.890625,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "NEON",
+    "scenario": "choice-mixed",
+    "gap": 40,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "EDITORIAL",
+    "scenario": "choice2",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "EDITORIAL",
+    "scenario": "choice3",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "EDITORIAL",
+    "scenario": "choice4",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "EDITORIAL",
+    "scenario": "choice6",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "EDITORIAL",
+    "scenario": "choice-long",
+    "gap": 1.8984375,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "EDITORIAL",
+    "scenario": "choice-mixed",
+    "gap": 32,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "BIRTHDAY",
+    "scenario": "choice2",
+    "gap": 219.9453125,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "BIRTHDAY",
+    "scenario": "choice3",
+    "gap": 186.4453125,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "BIRTHDAY",
+    "scenario": "choice4",
+    "gap": 152.9453125,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "BIRTHDAY",
+    "scenario": "choice6",
+    "gap": 85.9453125,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "BIRTHDAY",
+    "scenario": "choice-long",
+    "gap": 32.9453125,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "BIRTHDAY",
+    "scenario": "choice-mixed",
+    "gap": 92.9453125,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "CORPORATE",
+    "scenario": "choice2",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "CORPORATE",
+    "scenario": "choice3",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "CORPORATE",
+    "scenario": "choice4",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "CORPORATE",
+    "scenario": "choice6",
+    "gap": 37,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "CORPORATE",
+    "scenario": "choice-long",
+    "gap": 5.890625,
+    "overflow": 0
+  },
+  {
+    "size": "900x900",
+    "style": "CORPORATE",
+    "scenario": "choice-mixed",
+    "gap": 37,
+    "overflow": 0
+  }
+]
