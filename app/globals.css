@@ -2850,7 +2850,10 @@ button {
   .content-editor-alternative { order: 1; }
   .content-editor-extra { order: 2; }
   .content-editor-template-dialog { top: auto; bottom: var(--editor-viewport-bottom, 0px); height: var(--editor-visible-height, 100dvh); }
-  .content-editor-template-dialog .content-editor-template-body { max-height: max(4rem, calc(var(--editor-visible-height, 100dvh) - 14rem)); }
+  .content-editor-template-dialog > div { display: flex; max-height: 100%; flex-direction: column; }
+  .content-editor-template-dialog > div > div { flex: none; }
+  .content-editor-template-dialog > div > div:nth-child(2) { min-height: 0; flex: 1 1 auto; overflow-y: auto; }
+  .content-editor-template-dialog .content-editor-template-body { max-height: none; overflow: visible; }
   .content-editor-feedback { max-height: min(5rem, calc(var(--editor-visible-height, 100dvh) * .22)); overflow-y: auto; }
   .content-editor-footer-space { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
   .content-editor-shell :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select) { font-size: 16px; }
