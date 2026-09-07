@@ -9,6 +9,7 @@ import type { AnswerMediaUploadStatus } from "./AnswerMediaSlot";
 import { AnswerCard } from "./AnswerCard";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 import { formatEditorNumber } from "@/app/i18n/formatting";
+import { presentationRecommendations } from "@/app/rendering/presentation/presentationReadability";
 
 type AnswersSectionProps = {
   answers: QuestionAnswerDraft[];
@@ -92,6 +93,7 @@ export function AnswersSection({
         </p>
       )}
 
+      {answers.length > presentationRecommendations.optionCount && <p role="status" className="mt-2 text-sm text-amber-800">Mehr als sechs Antworten – bitte die vollständige Darstellung in der Präsentationsvorschau prüfen.</p>}
       <div className="mt-4 space-y-4">
         {answers.map((answer, index) => {
           const showMedia =

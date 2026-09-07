@@ -32,6 +32,7 @@ type StorybookQuestionSlideProps = {
   kind: StorybookQuestionKind;
   medium: StorybookPresentationMedium | null;
   audioElement: ReactNode;
+  structuredMedia?: ReactNode;
   isPreview: boolean;
   pixelRevealStep: number | null;
   pixelRevealTotal: number;
@@ -251,6 +252,7 @@ export function PresentationStorybookQuestionSlide({
   isPreview,
   pixelRevealStep,
   pixelRevealTotal,
+  structuredMedia,
 }: StorybookQuestionSlideProps) {
   const lead = <StorybookQuestionLead question={question} questionNumber={questionNumber} kind={kind} />;
 
@@ -284,7 +286,7 @@ export function PresentationStorybookQuestionSlide({
   if (kind === "STRUCTURED_RESPONSE") {
     return (
       <section data-presentation-layout={layoutVariant} data-storybook-question-kind={kind} className="presentation-storybook-question presentation-storybook-question--split">
-        {lead}
+        <div className="presentation-structured-lead">{lead}{structuredMedia}</div>
         <StorybookStructuredFields question={question} />
       </section>
     );

@@ -25,6 +25,7 @@ import type { StoryQuestionRelationshipValue } from "./storyElement";
 import { getAvailableStoryElementScopes, getDefaultStoryElementScope } from "./storyElementScopePresentation";
 import ContentEditorActionBar from "@/app/components/content/ContentEditorActionBar";
 import ContentScopeSection from "@/app/components/content/ContentScopeSection";
+import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 
 export type StoryElementEditorOptions = {
   eventSeries: { eventreihe_id: number; name: string }[];
@@ -317,6 +318,7 @@ export default function StoryElementEditor({
           <label>
             <span className="mb-1 block text-sm font-semibold">Titel *</span>
             <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} className={inputClass} disabled={!canEdit || pending} />
+            <PresentationContentWarning text={title} role="title" />
           </label>
           <label>
             <span className="mb-1 block text-sm font-semibold">Kurze Beschreibung</span>
@@ -327,6 +329,11 @@ export default function StoryElementEditor({
         <section className="space-y-4 rounded-2xl border border-slate-200 p-4">
           <div>
             <h2 className="font-bold">Inhalt</h2>
+            <PresentationContentWarning text={config.body ?? ""} role="body" />
+            <PresentationContentWarning text={config.subtitle ?? ""} role="information" />
+            <PresentationContentWarning text={config.description ?? ""} role="body" />
+            <PresentationContentWarning text={config.caption ?? ""} role="information" />
+            {config.images?.map((image) => <PresentationContentWarning key={image.id} text={image.caption ?? ""} role="information" />)}
             <p className="text-sm text-slate-500">Es werden nur sichere, typgebundene Felder gespeichert – kein HTML oder Embed-Code.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">

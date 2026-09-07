@@ -2,6 +2,8 @@
 
 import { useState, type ComponentType } from "react";
 import { CharacterCount } from "./CharacterCount";
+import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
+import { templatePresentationTexts } from "@/app/rendering/presentation/presentationReadability";
 import { SortableTemplateList } from "./SortableTemplateList";
 import { resolveSpeechVoice, useSpeechVoices } from "./useSpeechVoices";
 import {
@@ -615,5 +617,5 @@ const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorP
 
 export function StructuredTemplateEditor({ kind, ...props }: Props) {
   const Editor = editors[kind];
-  return Editor ? <Editor {...props} /> : null;
+  return Editor ? <><Editor {...props} />{templatePresentationTexts(props.data).map((entry, index) => <PresentationContentWarning key={index} {...entry} />)}</> : null;
 }

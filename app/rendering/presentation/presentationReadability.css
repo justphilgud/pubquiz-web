@@ -1,0 +1,121 @@
+/* AP5: geometry and type roles only. Branding remains in the resolved theme. */
+.presentation-overflow-region { display: grid; grid-template-rows: minmax(0, 1fr) 1.6rem; height: 100%; min-height: 0; }
+.presentation-content-viewport { min-height: 0; overflow: auto; scrollbar-gutter: stable; }
+.presentation-content-inner { height: 100%; min-height: 0; }
+.presentation-content-viewport:focus-visible { outline: 2px solid var(--brand-accent); outline-offset: -2px; }
+.presentation-overflow-hint { margin: 0; align-self: end; color: var(--brand-text); font-size: .9rem; text-align: center; }
+.presentation-readable {
+  container-type: inline-size;
+  container-name: presentation;
+  --pres-question: clamp(2rem, 3.5cqw, 4rem);
+  --pres-answer: clamp(1.5rem, 2cqw, 2.25rem);
+  --pres-title: clamp(2rem, 3.8cqw, 4.25rem);
+  --pres-body: clamp(1.5rem, 1.9cqw, 2rem);
+  --pres-info: clamp(1.125rem, 1.45cqw, 1.625rem);
+  --pres-status: clamp(1rem, 1.15cqw, 1.375rem);
+  --pres-result: clamp(2rem, 3.4cqw, 4rem);
+}
+.presentation-readable[data-question-density="compact"] { --pres-question: clamp(2rem, 3cqw, 3.5rem); }
+.presentation-readable[data-question-density="extended"] { --pres-question: clamp(2rem, 2.5cqw, 3rem); }
+.presentation-readable[data-answer-density="compact"],
+.presentation-readable[data-answer-density="extended"] { --pres-answer: clamp(1.5rem, 1.7cqw, 2rem); --pres-result: clamp(1.5rem, 2cqw, 2.25rem); }
+
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-question-card h2, .presentation-solution-question h2, .presentation-poll-question h2, .presentation-storybook-question-lead h2, .presentation-storybook-solution-lead p) {
+  font-size: var(--pres-question) !important;
+  max-width: 36ch;
+  line-height: 1.18 !important;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-answer-option, .presentation-solution-option, .presentation-storybook-choices strong, .presentation-storybook-sequence strong, .presentation-storybook-solution-choices strong, .presentation-live-poll-label strong) {
+  font-size: var(--pres-answer) !important;
+  line-height: 1.25 !important;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-correct-answer-value, .presentation-storybook-primary-solution > strong, .presentation-storybook-structured-solution strong) {
+  font-size: var(--pres-result) !important;
+  line-height: 1.2 !important;
+  overflow-wrap: anywhere;
+}
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-question-card, .presentation-solution-question, .presentation-answer-panel, .presentation-solution-result, .presentation-poll-question, .presentation-poll-results) {
+  min-width: 0;
+  padding: clamp(1rem, 1.6cqw, 2rem) !important;
+  justify-content: safe center;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-anagram-stimulus { font-size: clamp(2rem, 4cqw, 4.5rem); letter-spacing: .08em; line-height: 1.2; overflow-wrap: anywhere; }
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-items > div { font-size: var(--pres-answer); overflow-wrap: anywhere; }
+.presentation-readable[data-pixel-status="visible"] .presentation-stage { margin-bottom: 5.5rem; }
+.presentation-readable .presentation-runtime-status p { font-size: var(--pres-status); }
+.presentation-readable .presentation-runtime-status p + p { font-size: var(--pres-answer); }
+.presentation-readable .presentation-media-error { font-size: var(--pres-status); color: var(--brand-text); }
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-storybook-question, .presentation-storybook-solution-content) { gap: clamp(1rem, 2cqw, 2rem); }
+
+/* Choice needs the full width for comparable options, not a narrow side rail. */
+.presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(min-content, 1fr);
+  gap: 1rem;
+}
+.presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] h2 { max-width: 52ch; }
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-answer-options, [data-presentation-layout="CHOICE_GRID"] .presentation-storybook-choices) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: clamp(.75rem, 1cqw, 1rem);
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-answer-option { display: flex; align-items: center; padding: .8em; }
+.presentation-template.presentation-readable[data-design-style] .presentation-answer-option > span { flex-shrink: 0; }
+
+/* Structured fields and all attached media share the existing media renderer. */
+.presentation-structured-lead { min-width: 0; }
+.presentation-structured-media { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; min-height: 0; margin-top: 1rem; }
+.presentation-structured-media .presentation-media-card { max-height: 16rem; }
+.presentation-structured-media :is(img, video) { min-height: 0; max-height: 12rem; }
+.presentation-structured-media .presentation-audio-waveform { height: 2rem; }
+.presentation-structured-media .presentation-audio-status { gap: .5rem; }
+.presentation-structured-media .presentation-audio-control-label { font-size: var(--pres-status); letter-spacing: .04em; }
+.presentation-structured-media .presentation-audio-status-label { font-size: var(--pres-status); margin-top: .25rem; }
+
+/* Story text keeps its format but uses the same bounded reading scale. */
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-editorial,
+.presentation-template.presentation-readable[data-design-style] .presentation-live-poll {
+  padding: clamp(1rem, 2.5cqw, 3rem);
+  overflow: visible;
+  justify-content: safe center;
+}
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-editorial h2, .presentation-live-poll h2) {
+  max-width: 42ch;
+  font-size: var(--pres-title) !important;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-editorial-body, .presentation-flow-quote blockquote, .presentation-flow-lead, .presentation-flow-subtitle) {
+  max-width: 68ch;
+  font-size: var(--pres-body) !important;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-kicker, .presentation-storybook-kicker, .presentation-audio-status-label) { font-size: var(--pres-status); }
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-editorial figcaption, .presentation-storybook-solution-note) { font-size: var(--pres-info); overflow-wrap: anywhere; }
+.presentation-template.presentation-readable[data-design-style] .presentation-live-poll-bars { gap: .8rem; }
+.presentation-template.presentation-readable[data-design-style] .presentation-live-poll-label { align-items: baseline; }
+.presentation-template.presentation-readable[data-design-style] .presentation-live-poll-label > span { flex-shrink: 0; font-size: var(--pres-status); }
+
+/* Existing content has no universal item cap. Keep its natural minimum size;
+   the stage supplies a visible, keyboard-accessible overflow fallback. */
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-solution-result > .grid, .presentation-poll-results, .presentation-poll-results > .grid) { overflow: visible; }
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-solution-answer, .presentation-correct-answer, .presentation-solution-option) { min-height: min-content; }
+.presentation-template.presentation-readable[data-design-style] .presentation-media-card img { flex: 1; min-height: 0; }
+.presentation-template.presentation-readable[data-design-style] .presentation-media-card > div:last-child { flex-shrink: 0; }
+
+@container presentation (max-width: 1000px) {
+  .presentation-readable .presentation-editorial-header { height: 5rem; }
+  .presentation-readable .presentation-editorial-logo { width: 10rem; }
+  .presentation-readable .presentation-editorial-footer { height: 2.5rem; }
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout] { grid-template-columns: minmax(0, 1fr); }
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="REVEAL_SEQUENCE"],
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="MEDIA_FOCUS"] { grid-template-rows: auto minmax(14rem, 1fr); }
+  .presentation-template.presentation-readable[data-design-style] .presentation-question-card { justify-content: safe center; }
+}

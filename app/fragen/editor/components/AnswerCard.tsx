@@ -10,6 +10,7 @@ import {
   type AnswerMediaUploadStatus,
 } from "./AnswerMediaSlot";
 import { CharacterCount } from "./CharacterCount";
+import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 import { FaceMorphPixelQuestionOption } from "./FaceMorphPixelQuestionOption";
 
@@ -79,6 +80,7 @@ export function AnswerCard({
         />
 
         <CharacterCount current={answer.text.length} maximum={200} />
+        <PresentationContentWarning text={answer.text} role="answer" />
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -173,6 +175,7 @@ export function AnswerCard({
             current={answer.additionalInfo.length}
             maximum={500}
           />
+          <PresentationContentWarning text={answer.additionalInfo} role="information" />
           {answer.additionalInfo.length > 0 && (
             <button
               type="button"

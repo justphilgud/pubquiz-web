@@ -1,5 +1,6 @@
 import type { ReactNode, Ref } from "react";
 import { CharacterCount } from "./CharacterCount";
+import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
 
 type QuestionSectionProps = {
@@ -52,6 +53,7 @@ export function QuestionSection({
         warningAt={220}
       />
       {mediaContent}
+      <PresentationContentWarning text={questionText} role="question" />
     </section>
   );
 }

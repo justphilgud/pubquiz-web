@@ -5,6 +5,7 @@ import type { TemplateAssetReference } from "@/app/rendering/templateRegistry";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { StorybookComposition } from "@/app/rendering/presentationTemplates/storybookComposition";
 import { getStorybookTitle } from "@/app/rendering/presentationTemplates/storybook";
+import { PresentationOverflowRegion } from "./PresentationOverflowRegion";
 
 type HeaderProps = {
   theme: ResolvedQuizTheme;
@@ -273,10 +274,12 @@ export function PresentationDesignStage({
   theme,
   children,
   storybookComposition = null,
+  contentKey = "preview",
 }: {
   theme: ResolvedQuizTheme;
   children: ReactNode;
   storybookComposition?: StorybookComposition | null;
+  contentKey?: string;
 }) {
   const styleClass = {
     NEON: "presentation-neon-stage rounded-[2rem] border-4 border-cyan-300 bg-black/55 p-4 shadow-[0_0_35px_rgba(0,229,255,0.35)]",
@@ -295,7 +298,7 @@ export function PresentationDesignStage({
       {theme.design.stylePreset === "BIRTHDAY" && storybookComposition?.chapter && (
         <div className="presentation-storybook-chapter"><span>Kapitel</span><strong>{storybookComposition.chapter.title}</strong>{storybookComposition.chapter.subtitle && <small>{storybookComposition.chapter.subtitle}</small>}</div>
       )}
-      <div className="presentation-storybook-content h-full min-h-0">{children}</div>
+      <div className="presentation-storybook-content h-full min-h-0"><PresentationOverflowRegion contentKey={contentKey}>{children}</PresentationOverflowRegion></div>
       {theme.design.stylePreset === "BIRTHDAY" && storybookComposition?.anecdote && (
         <aside className="presentation-storybook-anecdote"><span>{storybookComposition.anecdote.year || "Erinnert ihr euch?"}</span><q>{storybookComposition.anecdote.text}</q></aside>
       )}

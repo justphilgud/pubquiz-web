@@ -66,6 +66,7 @@ import {
 import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
+import { presentationTextDensity } from "./presentationReadability";
 
 type ScoreEntry = {
   teamId?: number;
@@ -169,7 +170,9 @@ function SynchronizedMedia({
 }) {
   const mediaRef = useRef<HTMLMediaElement | null>(null);
   const handledCommandIdRef = useRef<number | null>(null);
+  const handledSourceRef = useRef<string | null>(null);
   const [playbackBlocked, setPlaybackBlocked] = useState(false);
+  const [failedSource, setFailedSource] = useState<string | null>(null);
 
   async function play() {
     try {
@@ -189,8 +192,9 @@ function SynchronizedMedia({
       handledCommandIdRef.current = null;
       return;
     }
-    if (handledCommandIdRef.current === commandId) return;
+    if (handledCommandIdRef.current === commandId && handledSourceRef.current === src) return;
     handledCommandIdRef.current = commandId;
+    handledSourceRef.current = src;
 
     if (command === "play") {
       void media
@@ -203,7 +207,7 @@ function SynchronizedMedia({
       media.pause();
       media.currentTime = 0;
     }
-  }, [command, commandId, renderMode]);
+  }, [command, commandId, renderMode, src]);
 
   const media =
     kind === "audio" ? (
@@ -214,6 +218,8 @@ function SynchronizedMedia({
         src={src}
         loop={loop}
         preload="metadata"
+        onError={() => setFailedSource(src)}
+        onLoadedMetadata={() => setFailedSource(null)}
       />
     ) : (
       <video
@@ -227,13 +233,16 @@ function SynchronizedMedia({
         playsInline
         className={className}
         preload="metadata"
+        onError={() => setFailedSource(src)}
+        onLoadedMetadata={() => setFailedSource(null)}
       />
     );
 
   return (
     <>
       {media}
-      {playbackBlocked && renderMode === "PRESENTATION" && (
+      {failedSource === src && <p role="status" className="presentation-media-error">Medium konnte nicht geladen werden. Bitte Datei und Verbindung prüfen.</p>}
+      {playbackBlocked && command === "play" && failedSource !== src && renderMode === "PRESENTATION" && (
         <button
           type="button"
           onClick={() => void play()}
@@ -443,7 +452,7 @@ function renderAntwortOptionen(
   }
 
   return (
-    <div className="grid h-full min-h-0 content-center gap-4">
+    <div className="presentation-answer-options grid h-full min-h-0 content-center gap-4">
       {antworten.map((antwort, index) => (
         <div
           key={antwort.antwort_id}
@@ -507,7 +516,7 @@ function PresentationAudioStatus({
   playbackCommand: PresentationPlaybackCommand;
 }) {
   const statusLabel = playbackCommand === "play"
-    ? "Wiedergabe läuft"
+    ? "Wiedergabe angefordert"
     : playbackCommand === "pause"
       ? "Wiedergabe pausiert"
       : "Audio bereit";
@@ -662,6 +671,9 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         kind={storybookKind}
         medium={toStorybookMedium(selectedMedium)}
         audioElement={audioElement}
+        structuredMedia={storybookKind === "STRUCTURED_RESPONSE" && questionMedia.length > 0
+          ? <div className="presentation-structured-media">{questionMedia.map((medium) => renderMedienKarte(medium, "small"))}</div>
+          : null}
         isPreview={renderMode !== "PRESENTATION"}
         pixelRevealStep={pixelRevealStep}
         pixelRevealTotal={pixelRevealMedia.length}
@@ -720,7 +732,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-3xl font-black text-white">{frage.frage}</h2>
-        <p className="mt-10 break-words text-7xl font-black uppercase tracking-[0.2em] text-yellow-200 xl:text-9xl">{templateData.selectedSolution}</p>
+        <p className="presentation-anagram-stimulus mt-10 break-words text-7xl font-black uppercase tracking-[0.2em] text-yellow-200 xl:text-9xl">{templateData.selectedSolution}</p>
       </div>
     );
   }
@@ -734,7 +746,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-4xl font-black text-white">{frage.frage}</h2>
         {orderingItems.length > 0 && (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="presentation-ordering-items mt-8 grid gap-4 sm:grid-cols-2">
             {orderingItems.map((item) => <div key={item.id} className="rounded-2xl border-2 border-cyan-300 bg-white/10 p-5 text-2xl font-bold text-white">{item.text}</div>)}
           </div>
         )}
@@ -800,6 +812,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         <div className="presentation-question-card flex min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8 shadow-[8px_8px_0_#00e5ff]">
           <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-pink-300">Mehrteilige Antwort</div>
           <h2 className="text-4xl font-black leading-tight text-white xl:text-6xl">{frage.frage}</h2>
+          {questionMedia.length > 0 && <div className="presentation-structured-media">{questionMedia.map((medium) => renderMedienKarte(medium, "small"))}</div>}
         </div>
         <div className="grid min-h-0 content-center gap-4 rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-6 shadow-[8px_8px_0_#ff00aa]">
           {frage.antwortfelder.map((field, index) => (
@@ -893,7 +906,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   if (layoutVariant === "AUDIO_FOCUS") {
-    const audioMedium = frage.medien[0];
+    const audioMedium = frage.medien.find((medium) => isAudio(medium.datei));
 
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card presentation-audio-stage flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-[#38E8FF] bg-black/70 p-10 shadow-[0_0_24px_#38E8FF]">
@@ -2705,7 +2718,10 @@ function renderAktuellenSlide() {
   return (
     <QuizThemeScope
       theme={theme}
-      className="presentation-template relative flex h-full min-h-0 flex-col text-white"
+      className="presentation-template presentation-readable relative flex h-full min-h-0 flex-col text-white"
+      data-question-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? slide.frage.frage.length : 0, "question")}
+      data-answer-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? Math.max(0, ...slide.frage.antworten.map((answer) => answer.antwort.length)) : 0, "answer")}
+      data-pixel-status={slide?.typ === "frage" && pixelState ? "visible" : undefined}
     >
       <PresentationDesignBackdrop theme={theme} images={collageImages} storybookComposition={storybookComposition} />
       {slideLabel !== "VOR DEM START" && (
@@ -2717,7 +2733,7 @@ function renderAktuellenSlide() {
           storybookComposition={storybookComposition}
         />
       )}
-      <PresentationDesignStage theme={theme} storybookComposition={storybookComposition}>
+      <PresentationDesignStage theme={theme} storybookComposition={storybookComposition} contentKey={`${slideIndex}:${slide?.typ}:${theme.design.stylePreset}:${templateRevealCount}:${estimationPhase}`}>
         {estimationPhase !== "HIDDEN"
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}

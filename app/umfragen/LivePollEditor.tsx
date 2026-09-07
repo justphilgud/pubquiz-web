@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import ContentEditorActionBar from "@/app/components/content/ContentEditorActionBar";
 import {
   attachLivePollToQuiz,
@@ -110,12 +111,13 @@ export default function LivePollEditor({ options, initialPoll, canEdit, canArchi
         </label>)}
       </fieldset>
       <label className="mt-4 block text-sm font-semibold text-slate-800">Prompt<textarea className={`${inputClass} mt-1 min-h-24`} value={prompt} maxLength={300} disabled={!canEdit || pending} onChange={(event) => setPrompt(event.target.value)} /></label>
+      <PresentationContentWarning text={prompt} role="question" />
       {type === "SINGLE_CHOICE" ? <div className="mt-4 space-y-2">
         <div className="flex items-center justify-between"><strong className="text-sm text-slate-800">Optionen (2–6)</strong><button type="button" className="text-sm font-semibold text-cyan-800 disabled:opacity-40" disabled={!canEdit || pending || pollOptions.length >= 6} onClick={() => setPollOptions((current) => [...current, newOption(current.length)])}>+ Option</button></div>
-        {pollOptions.map((option, index) => <div className="flex gap-2" key={option.id}>
+        {pollOptions.map((option, index) => <div key={option.id}><div className="flex gap-2">
           <input className={inputClass} value={option.label} maxLength={160} disabled={!canEdit || pending} aria-label={`Option ${index + 1}`} onChange={(event) => setPollOptions((current) => current.map((item, optionIndex) => optionIndex === index ? { ...item, label: event.target.value } : item))} />
           <button type="button" className="rounded-xl border border-slate-300 px-3 text-slate-700 disabled:opacity-40" disabled={!canEdit || pending || pollOptions.length <= 2} onClick={() => setPollOptions((current) => current.filter((_, optionIndex) => optionIndex !== index))}>Entfernen</button>
-        </div>)}
+        </div><PresentationContentWarning text={option.label} role="answer" /></div>)}
       </div> : <fieldset className="mt-4" disabled={!canEdit || pending}>
         <legend className="text-sm font-semibold text-slate-800">Veröffentlichung</legend>
         <div className="mt-2 flex flex-wrap gap-3">{(["AUTOMATIC", "MODERATED"] as const).map((mode) => <label key={mode} className={`rounded-xl border px-4 py-3 ${publicationMode === mode ? "border-cyan-600 bg-cyan-50" : "border-slate-200"}`}><input className="mr-2" type="radio" checked={publicationMode === mode} onChange={() => setPublicationMode(mode)} />{mode === "AUTOMATIC" ? "Automatisch bereinigt" : "Nach Moderationsfreigabe"}</label>)}</div>
