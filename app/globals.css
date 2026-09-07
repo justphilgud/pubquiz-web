@@ -2778,9 +2778,29 @@ button {
 .presentation-live-poll-wall[data-count="2"], .presentation-live-poll-wall[data-count="3"], .presentation-live-poll-wall[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .presentation-live-poll-total { margin-top: clamp(.8rem, 2vh, 1.5rem); color: var(--quiz-text-muted); font-size: clamp(.85rem, 1.3vw, 1.1rem); }
 
+/* Keep the QR square inside the remaining slide height, including full rosters. */
+.presentation-template .presentation-flow-slide[data-flow-type="QR_CODE"] {
+  padding: clamp(1rem, 2cqw, 2.5rem);
+  justify-content: flex-start;
+}
+.presentation-flow-slide[data-flow-type="QR_CODE"] > :is(h2, p) { flex-shrink: 0; }
+.presentation-flow-slide[data-flow-type="QR_CODE"] .presentation-flow-kicker { margin-bottom: 0.5rem; }
+.presentation-template .presentation-flow-slide[data-flow-type="QR_CODE"] h2 { font-size: var(--pres-title); }
+.presentation-flow-slide[data-flow-type="QR_CODE"] .presentation-flow-lead { margin-top: 0.5rem; font-size: var(--pres-body); }
+.presentation-flow-slide[data-flow-type="QR_CODE"] .presentation-flow-qr-layout {
+  flex: 1; min-height: 0; width: 100%; container-type: size;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  font-size: var(--pres-info);
+}
+.presentation-flow-slide[data-flow-type="QR_CODE"] .presentation-flow-qr {
+  width: min(100%, 100cqh); aspect-ratio: 1; padding: clamp(0.75rem, 1.5cqw, 1.5rem);
+}
+.presentation-flow-slide[data-flow-type="QR_CODE"] .presentation-flow-qr svg { width: 100%; height: 100%; }
+.presentation-flow-slide[data-flow-type="QR_CODE"] .presentation-flow-qr-layout > :last-child { min-height: 0; max-height: 100%; overflow: auto; }
+
 /* AP6: one local four-second greeting; QR DOM and join URL remain intact. */
 .presentation-team-welcome {
-  position: absolute; z-index: 45; inset: 18% 5% auto 39%;
+  position: absolute; z-index: 45; inset: 18% 5% auto 43%;
   display: flex; flex-direction: column; align-items: center; gap: 1rem;
   max-height: 74%; overflow: auto; padding: clamp(1.5rem, 3cqw, 3rem);
   border: 2px solid var(--brand-accent); border-radius: 1.5rem;
