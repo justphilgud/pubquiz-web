@@ -18,8 +18,8 @@ export default function ContentEditorShell({
   footerSpace?: boolean;
   children: ReactNode;
 }) {
-  return <main className="min-h-screen bg-slate-50 px-3 py-4 text-slate-950 sm:px-4 sm:py-5 md:px-8">
-    <div className={`mx-auto flex w-full ${maxWidth} flex-col gap-5 ${footerSpace ? "pb-64 sm:pb-28" : "pb-8"}`}>
+  return <main className="content-editor-shell min-h-dvh bg-slate-50 px-3 py-4 text-slate-950 sm:px-4 sm:py-5 md:px-8">
+    <div className={`mx-auto flex w-full ${maxWidth} flex-col gap-5 ${footerSpace ? "content-editor-footer-space pb-28" : "pb-8"}`}>
       <ContentEditorHeader eyebrow={eyebrow} title={title} description={description} fallbackHref={fallbackHref} />
       {children}
     </div>

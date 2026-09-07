@@ -150,6 +150,7 @@ export function CreateDynamicQuestionTemplate({
 
       <Modal
         open={open}
+        className="content-editor-template-dialog"
         title={isAdmin ? "Spezialfragenvorlage erstellen" : "Spezialfragenvorlage vorschlagen"}
         onClose={() => setOpen(false)}
         footer={(
@@ -163,7 +164,7 @@ export function CreateDynamicQuestionTemplate({
           </div>
         )}
       >
-        <div className="max-h-[65vh] space-y-5 overflow-y-auto pr-1">
+        <div className="content-editor-template-body max-h-[65vh] space-y-5 overflow-y-auto pr-1">
           <label className="block text-sm font-medium text-slate-900">
             Name
             <Input value={name} maxLength={120} onChange={(event) => setName(event.target.value)} className="mt-1 min-h-11" />

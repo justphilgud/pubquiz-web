@@ -374,7 +374,7 @@ export default function StoryElementEditor({
           </div>
         </details>
 
-        {message && <p role="alert" className={`rounded-xl px-4 py-3 text-sm font-semibold ${message.tone === "error" ? "bg-red-50 text-red-800" : "bg-emerald-50 text-emerald-900"}`}>{message.text}</p>}
+        {message && <p role="alert" className={`rounded-xl px-4 py-3 text-sm font-semibold ${canEdit && initialStory?.status !== "ARCHIVED" ? "hidden sm:block" : ""} ${message.tone === "error" ? "bg-red-50 text-red-800" : "bg-emerald-50 text-emerald-900"}`}>{message.text}</p>}
         <div className="flex flex-wrap gap-3">
           {initialStory && <button type="button" onClick={() => runLifecycle(() => duplicateStoryElement(initialStory.id))} disabled={pending} className={secondaryButtonClass}>Duplizieren</button>}
           {initialStory && canArchive && <button type="button" onClick={() => runLifecycle(() => setStoryElementArchived(initialStory.id, initialStory.status !== "ARCHIVED"))} disabled={pending} className={secondaryButtonClass}>{initialStory.status === "ARCHIVED" ? "Als Entwurf reaktivieren" : "Archivieren"}</button>}
@@ -383,7 +383,7 @@ export default function StoryElementEditor({
       </section>
 
       {initialStory && <dl className="mt-4 grid grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm sm:grid-cols-4"><div><dt className="text-slate-500">Revision</dt><dd className="font-bold">{initialStory.revisionNumber}</dd></div><div><dt className="text-slate-500">Verwendungen</dt><dd className="font-bold">{initialStory.usageCount}</dd></div><div><dt className="text-slate-500">Fragenlinks</dt><dd className="font-bold">{initialStory.questionLinkCount}</dd></div><div><dt className="text-slate-500">Herkunft</dt><dd className="font-bold">{initialStory.sourceStoryElementId ? `Kopie von #${initialStory.sourceStoryElementId}` : "Original"}</dd></div></dl>}
-      {canEdit && initialStory?.status !== "ARCHIVED" && <ContentEditorActionBar pending={pending} onCancel={cancelChanges} onSaveDraft={() => submit("DRAFT")} onPublish={() => submit("ACTIVE")} />}
+      {canEdit && initialStory?.status !== "ARCHIVED" && <ContentEditorActionBar pending={pending} onCancel={cancelChanges} onSaveDraft={() => submit("DRAFT")} onPublish={() => submit("ACTIVE")} message={message ? <p role={message.tone === "error" ? "alert" : "status"} className={`mb-2 rounded-xl px-3 py-2 text-sm font-semibold sm:hidden ${message.tone === "error" ? "bg-red-50 text-red-800" : "bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : undefined} />}
     </div>
   );
 }

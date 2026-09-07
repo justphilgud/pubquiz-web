@@ -8,12 +8,14 @@ export function Modal({
   children,
   footer,
   onClose,
+  className = "",
 }: {
   open: boolean;
   title: string;
   children: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
+  className?: string;
 }) {
   useEffect(() => {
     if (!open) {
@@ -35,7 +37,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 ${className}`}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose();

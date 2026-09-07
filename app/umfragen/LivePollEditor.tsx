@@ -142,10 +142,10 @@ export default function LivePollEditor({ options, initialPoll, canEdit, canArchi
       </div>
     </section> : null}
 
-    {message ? <p role="status" className={`rounded-xl border px-4 py-3 text-sm ${message.tone === "error" ? "border-red-200 bg-red-50 text-red-900" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : null}
-
+    {message ? <p role="status" className={`hidden rounded-xl border px-4 py-3 text-sm sm:block ${message.tone === "error" ? "border-red-200 bg-red-50 text-red-900" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : null}
     <ContentEditorActionBar
       pending={pending}
+      message={message ? <p role={message.tone === "error" ? "alert" : "status"} className={`mb-2 rounded-xl border px-3 py-2 text-sm sm:hidden ${message.tone === "error" ? "border-red-200 bg-red-50 text-red-900" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : undefined}
       onSaveDraft={canEdit ? () => save("DRAFT") : undefined}
       onPublish={canEdit ? () => save("ACTIVE") : undefined}
       onCancel={() => router.push("/content/polls")}

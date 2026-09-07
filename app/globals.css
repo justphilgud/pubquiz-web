@@ -2821,3 +2821,43 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .presentation-team-welcome { animation: none; }
 }
+
+/* AP7: one shared action projection; existing desktop order is retained. */
+.content-editor-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: .5rem; }
+.content-editor-actions:has(.content-editor-extra) { row-gap: .5rem; }
+.content-editor-secondary { display: contents; }
+.content-editor-extra { grid-column: 1 / -1; }
+.content-editor-cancel { grid-column: 1; grid-row: 2; }
+.content-editor-alternative { grid-column: 2; grid-row: 2; }
+.content-editor-primary { grid-column: 3; grid-row: 2; }
+.content-editor-actions[data-primary-draft="true"] .content-editor-alternative { grid-column: 3; grid-row: 2; }
+.content-editor-actions[data-primary-draft="true"] .content-editor-primary { grid-column: 2; grid-row: 2; background: white; color: inherit; border-color: var(--color-slate-300); }
+.content-editor-more, .presentation-content-warning-mobile { display: none; }
+.content-editor-action-bar button:focus-visible,
+.presentation-content-warning summary:focus-visible { outline: 2px solid var(--color-cyan-700); outline-offset: 2px; }
+.content-editor-shell :is(input, textarea, select) { scroll-margin-block: 5.5rem; }
+@media (width < 640px) {
+  .content-editor-action-bar { bottom: var(--editor-viewport-bottom, 0px); padding: .5rem .75rem calc(.5rem + env(safe-area-inset-bottom)); backdrop-filter: none; }
+  .content-editor-action-bar[data-expanded="false"] .content-editor-actions { row-gap: 0; }
+  .content-editor-actions { grid-template-columns: minmax(0, 1fr) 7rem; align-items: stretch; }
+  .content-editor-actions .content-editor-primary { grid-column: 1; grid-row: 2; min-height: 44px; padding-inline: .6rem; font-size: .875rem; }
+  .content-editor-actions[data-primary-draft="true"] .content-editor-primary { grid-column: 1; background: var(--color-slate-950); color: white; border-color: var(--color-slate-950); }
+  .content-editor-more { display: block; grid-column: 2; grid-row: 2; min-height: 44px; }
+  .content-editor-secondary { display: none; grid-column: 1 / -1; grid-row: 1; }
+  .content-editor-action-bar[data-expanded="true"] .content-editor-secondary { display: flex; flex-direction: column; gap: .5rem; max-height: min(18rem, calc(var(--editor-visible-height, 100dvh) * .5)); overflow-y: auto; padding: .25rem; }
+  .content-editor-secondary button { min-height: 44px; }
+  .content-editor-cancel { order: 3; border-color: transparent; text-decoration: underline; }
+  .content-editor-alternative { order: 1; }
+  .content-editor-extra { order: 2; }
+  .content-editor-template-dialog { top: auto; bottom: var(--editor-viewport-bottom, 0px); height: var(--editor-visible-height, 100dvh); }
+  .content-editor-template-dialog .content-editor-template-body { max-height: max(4rem, calc(var(--editor-visible-height, 100dvh) - 14rem)); }
+  .content-editor-feedback { max-height: min(5rem, calc(var(--editor-visible-height, 100dvh) * .22)); overflow-y: auto; }
+  .content-editor-footer-space { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+  .content-editor-shell :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select) { font-size: 16px; }
+  .presentation-content-warning-desktop { display: none; }
+  .presentation-content-warning-mobile { display: block; }
+  .presentation-content-warning summary { display: flex; min-height: 44px; align-items: center; cursor: pointer; font-weight: 600; }
+  .presentation-content-warning summary::before { content: "+"; margin-right: .5rem; }
+  .presentation-content-warning details[open] summary::before { content: "−"; }
+  .presentation-content-warning details p { padding-bottom: .5rem; }
+}
