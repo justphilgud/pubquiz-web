@@ -1,7 +1,8 @@
 # AP3 – Pixel-Frage und Stufenwertung
 
-Stand: 7. September 2026. Technische Implementierung geprüft; Preview- und
-Browserabnahme werden nach Deployment ergänzt. Noch kein abgeschlossener Abnahmebericht.
+Stand: 7. September 2026. Technische Implementierung und Preview-Deployment geprüft;
+reale Browserabnahme wartet auf Anmeldung am neuen Deployment. Noch kein abgeschlossener
+Abnahmebericht.
 
 ## Fachlicher Vertrag und Architektur
 
@@ -71,7 +72,7 @@ Challenge. Keine destruktive Migration, kein Production- oder main-Update.
 
 ## Offene Preview-Abnahme
 
-CI, Migration, Deployment und Smoke-Test: ausstehend.
+CI, Migration, Deployment und Smoke-Test: erfolgreich (Nachweise unten).
 Eigenes Testquiz, bestehende Pixel-Fragen und Editor-Persistenz: ausstehend.
 Challenge inklusive Restzeit, Sperre, Bewertung und Reload: ausstehend.
 Drei Teams mit 3/2/1, Einzel-/Gesamtpunkte und Ergebnisdarstellung: ausstehend.
@@ -89,3 +90,68 @@ Regressionstests, Living Specifications und AGENTS-Verweis.
 
 Commits, Preview-Adresse und genaue Abnahmebelege werden nach Deployment ergänzt.
 Keine unabhängigen Backlog-Bugs reproduziert oder nebenbei behoben.
+
+## Preview-Nachweise
+
+- Laufzeit-Commit: `c101e23a1658570f73a248e196def41ac300313d`.
+- [Preview](https://pubquiz-llcm8un8i-just-phil-gud.vercel.app/quiz).
+- [Preview-CI #135](https://github.com/justphilgud/pubquiz-web/actions/runs/34107583503): erfolgreich.
+- [Feature-CI #136](https://github.com/justphilgud/pubquiz-web/actions/runs/34107583763): erfolgreich,
+  einschließlich repositoryweitem ESLint ohne Restfehler.
+- [Deployment #141](https://github.com/justphilgud/pubquiz-web/actions/runs/34107766916): erfolgreich,
+  3m 6s einschließlich Datenbankidentitätsprüfung, additiver Migration, anschließender
+  Migrationsprüfung, Vercel-Build und Smoke-Test.
+- Deployment-ID: `dpl_6wuFqMu3a6VxEEVPmm2ySgQtsHQ4`.
+- `main` bleibt `e76f57dce19f26488cf9db24b881ab06bf004fd6`; Production unverändert.
+- Bestehende nichtblockierende GitHub-Actions-Warnung: checkout/setup-node v4
+  deklarieren Node 20, werden auf Node 24 ausgeführt. Kein AP3-Laufzeitfehler.
+
+Die Bestandsfrage #73 wurde auf dem vorigen Preview ausschließlich lesend geöffnet:
+Pixel-Template, vier Medien und gespeicherte Lösung vorhanden. Die aktive
+Review-/Berechtigungssperre wurde nicht umgangen. Die echte Bestands-/Modusabnahme
+auf dem neuen Runtime-Commit ist damit noch nicht ersetzt.
+
+Der neue Preview-Tab zeigt die Anmeldung. Nach Login folgen eigenes Testquiz,
+drei Teamverläufe, Verschlimmbesserung, Reload/Stop/Reset, Bewertungsvergleich
+und Screenshots. Bis dahin wird keine Browserabnahme als bestanden ausgegeben.
+
+## Dateiliste des geprüften AP3-Stands
+
+- AGENTS.md
+- app/fragen/editor/components/PixelStageTimingFields.tsx
+- app/fragen/editor/components/QuestionEditor.tsx
+- app/fragen/editor/pixelTemplateConfig.ts
+- app/fragen/editor/questionTemplateDraft.test.ts
+- app/fragen/editor/questionTemplateDraft.ts
+- app/fragen/editor/templates/pixelRules.ts
+- app/fragen/editor/types.ts
+- app/generated/prisma/internal/class.ts
+- app/generated/prisma/internal/prismaNamespace.ts
+- app/generated/prisma/internal/prismaNamespaceBrowser.ts
+- app/generated/prisma/models/quiz_interaction_runs.ts
+- app/generated/prisma/models/team_antworten.ts
+- app/globals.css
+- app/quiz/[quizId]/antworten/QuizAntwortClient.tsx
+- app/quiz/[quizId]/moderation/ModerationClient.tsx
+- app/quiz/[quizId]/praesentation/buildPraesentationSlides.test.ts
+- app/quiz/[quizId]/praesentation/buildPraesentationSlides.ts
+- app/quiz/actions.ts
+- app/quiz/evaluation/evaluation.server.ts
+- app/quiz/interaction/interaction.server.ts
+- app/quiz/interaction/pixelLiveInteraction.test.ts
+- app/quiz/interaction/pixelLiveInteraction.ts
+- app/quiz/interaction/pixelStageHistory.ts
+- app/rendering/presentation/PresentationSlideRenderer.test.ts
+- app/rendering/presentation/PresentationSlideRenderer.tsx
+- app/rendering/presentation/PresentationStorybookQuestionTypes.tsx
+- app/rendering/presentation/presentationLiveState.ts
+- app/rendering/presentation/presentationSlideMetadata.ts
+- docs/architecture/answer-interaction.md
+- docs/architecture/pixel-question.md
+- docs/architecture/quiz-lifecycle.md
+- docs/architecture/submission-live-state.md
+- docs/reports/ap3-pixel.md
+- prisma/migrations/20260907180000_pixel_stage_history/migration.sql
+- prisma/schema.prisma
+
+Code-Commits: e004e0b, 61faad2, c101e23. Letzte Ergänzung: ein parametrisiertes Batch-UPDATE für alle Team-Snapshots einer Grenze; keine Datenbank-Roundtrips je Team. Gezielte Regressionen (34 Tests), Typecheck und ESLint danach erfolgreich. Vollständiger letzter Stand wird zusätzlich durch Preview-CI geprüft.
