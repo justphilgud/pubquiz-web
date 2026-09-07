@@ -144,10 +144,11 @@ test("evaluation page uses one authorized parallel page-data loader", () => {
   const loader = actions.slice(loaderStart, loaderEnd);
 
   assert.match(loader, /await requireQuizAdmin\(quizId\)/);
+  assert.match(loader, /Prisma.TransactionIsolationLevel.RepeatableRead/);
   assert.match(loader, /await Promise\.all\(/);
-  assert.match(loader, /loadQuizAuswertungAlleAntworten\(quizId\)/);
-  assert.match(loader, /loadQuizPunktestand\(quizId\)/);
-  assert.match(loader, /getQuizEvaluationBackfillStatus\(quizId\)/);
+  assert.match(loader, /loadQuizAuswertungAlleAntworten\(quizId, tx\)/);
+  assert.match(loader, /loadQuizPunktestand\(quizId, tx\)/);
+  assert.match(loader, /getQuizEvaluationBackfillStatus\(quizId, tx\)/);
   assert.match(evaluationPage, /getQuizAuswertungPageData/);
   assert.doesNotMatch(evaluationPage, /getQuizPraesentation/);
   assert.match(evaluationPage, /if \(!quiz\)/);

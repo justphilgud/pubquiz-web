@@ -17,7 +17,7 @@ export default async function QuizAuswertungPage({
 }: Props) {
   const { quizId } = await params;
   await searchParams;
-  const { quiz, antworten, punktestand, backfillStatus } =
+  const { quiz, antworten, punktestand, backfillStatus, revision } =
     await getQuizAuswertungPageData(Number(quizId));
 
   if (!quiz) {
@@ -56,6 +56,7 @@ export default async function QuizAuswertungPage({
 
         <QuizAuswertungClient
           quizId={quiz.quiz_id}
+          revision={revision}
           antworten={antworten}
           punktestand={punktestand}
           backfillStatus={backfillStatus}

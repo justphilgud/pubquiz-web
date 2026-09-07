@@ -227,3 +227,8 @@ Die Leiste verwendet reduzierte Abstände, mindestens 36 px hohe Klickziele und
 umbricht bei geringer Breite. Lange Quiznamen werden mit vollständig verfügbarem
 Titel gekürzt. Dies ändert ausschließlich Darstellung und Bedienort, keine
 Lifecycle-, Submission-, Bewertungs- oder Schreibregeln.
+
+## AP4: Bewertung und Ergebnisaktualisierung
+
+[Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
+und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.

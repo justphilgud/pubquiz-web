@@ -1,5 +1,7 @@
 "use client";
 
+import { pollEvaluation } from "../../evaluation/pollEvaluation";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { QuizPraesentationResult } from "../../actions";
@@ -211,27 +213,13 @@ export default function QuizPraesentationPlayer({
 
   useEffect(() => {
     if (!isStandingsSlide(slide)) return;
-    let active = true;
-
     if (isIntermediateStandingsSlide(slide)) {
-      void getPraesentationAudienceZwischenstand(quizId).then((standings) => {
-        if (!active) return;
-        setAudienceInterimStandings(standings);
-      });
-    } else {
-      void Promise.all([
-        getPraesentationPunktestand(quizId),
-        getPraesentationJahreswertung(quizId),
-      ]).then(([currentScores, yearlyScores]) => {
-        if (!active) return;
-        setScores(currentScores);
-        setYearlyStandings(yearlyScores);
-      });
+      return pollEvaluation(() => getPraesentationAudienceZwischenstand(quizId), setAudienceInterimStandings);
     }
-
-    return () => {
-      active = false;
-    };
+    return pollEvaluation(
+      () => Promise.all([getPraesentationPunktestand(quizId), getPraesentationJahreswertung(quizId)]),
+      ([scores, yearly]) => { setScores(scores); setYearlyStandings(yearly); },
+    );
   }, [quizId, slide, liveState.updatedAt]);
 
   useEffect(() => {

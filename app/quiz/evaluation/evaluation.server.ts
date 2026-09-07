@@ -113,8 +113,9 @@ function incompleteQuizEvaluationWhere(
 
 async function getIncompleteQuizEvaluationGroups(
   quizId: number,
+  db: EvaluationDb = prisma,
 ) {
-  const answers = await prisma.team_antworten.findMany({
+  const answers = await db.team_antworten.findMany({
     where: incompleteQuizEvaluationWhere(quizId),
     orderBy: { quiz_fragen_id: "asc" },
     select: {
@@ -159,8 +160,9 @@ async function getIncompleteQuizEvaluationGroups(
 
 export async function getQuizEvaluationBackfillStatus(
   quizId: number,
+  db: EvaluationDb = prisma,
 ): Promise<QuizEvaluationBackfillStatus> {
-  const groups = await getIncompleteQuizEvaluationGroups(quizId);
+  const groups = await getIncompleteQuizEvaluationGroups(quizId, db);
   return summarizeIncompleteEvaluations(
     groups.map((group) => ({
       quizQuestionId: group.quiz_fragen_id,
@@ -181,6 +183,10 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   options: RecalculationOptions,
   db: EvaluationDb,
 ): Promise<RecalculationResult> {
+  // Same lock order as AP1/AP2; no presentation-status write or lifecycle change.
+  await db.$queryRaw`SELECT q."quiz_id" FROM "pubquiz"."quiz" q
+    JOIN "pubquiz"."quiz_fragen" f ON f."quiz_id" = q."quiz_id"
+    WHERE f."quiz_fragen_id" = ${quizQuestionId} FOR UPDATE OF q`;
   const assignment = await db.quiz_fragen.findUnique({
     where: { quiz_fragen_id: quizQuestionId },
     include: {

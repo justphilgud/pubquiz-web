@@ -48,8 +48,9 @@ export async function getPraesentationStatus(quizId: number) {
 
 export async function getPraesentationPunktestand(quizId: number) {
   await requireQuizViewer(quizId);
+  return prisma.$transaction(async (tx) => {
   const [sessions, totals] = await Promise.all([
-    prisma.quiz_team_sessions.findMany({
+    tx.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
       select: {
         quiz_team_session_id: true,
@@ -57,7 +58,7 @@ export async function getPraesentationPunktestand(quizId: number) {
         team: { select: { team_id: true, avatar_code: true, foto_url: true, foto_upload_gesperrt: true } },
       },
     }),
-    prisma.team_antworten.groupBy({
+    tx.team_antworten.groupBy({
       by: ["quiz_team_session_id"],
       where: { quiz_id: quizId },
       _sum: { vergebene_punkte: true },
@@ -88,16 +89,18 @@ export async function getPraesentationPunktestand(quizId: number) {
       photoUrl: entry.photoUrl,
       punkte: Number(entry.punkte),
     }));
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
 }
 
 export async function getPraesentationAudienceZwischenstand(quizId: number) {
   await requireQuizViewer(quizId);
+  return prisma.$transaction(async (tx) => {
   const [sessions, totals] = await Promise.all([
-    prisma.quiz_team_sessions.findMany({
+    tx.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
       select: { quiz_team_session_id: true },
     }),
-    prisma.team_antworten.groupBy({
+    tx.team_antworten.groupBy({
       by: ["quiz_team_session_id"],
       where: { quiz_id: quizId },
       _sum: { vergebene_punkte: true },
@@ -115,6 +118,7 @@ export async function getPraesentationAudienceZwischenstand(quizId: number) {
       punkte: totalsBySession.get(session.quiz_team_session_id) ?? 0,
     })),
   );
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
 }
 
 export async function getPraesentationJahreswertung(quizId: number) {

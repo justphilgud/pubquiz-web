@@ -64,6 +64,13 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
       questionMatchesEvaluationMatrixFilter(question, filter)),
     [filter, matrix.questions],
   );
+  // Selection is UI state; its content always comes from the latest server projection.
+  const currentQuestion = matrix.questions.find((question) => question.id === selection?.question.id);
+  const currentTeam = selection?.kind === "cell" ? matrix.teams.find((team) => team.name === selection.team.name) : undefined;
+  const currentSelection: EvaluationMatrixSelection | null = !currentQuestion ? null
+    : selection?.kind === "question" ? { kind: "question", question: currentQuestion }
+    : currentTeam?.cells[currentQuestion.id] ? { kind: "cell", question: currentQuestion, team: currentTeam, cell: currentTeam.cells[currentQuestion.id] }
+    : null;
   const selectedQuestionId = selection?.question.id ?? null;
   const selectedTeamName = selection?.kind === "cell" ? selection.team.name : null;
 
@@ -253,7 +260,7 @@ export default function TeamQuestionEvaluationMatrix({ matrix }: { matrix: Evalu
       </section>
 
       <EvaluationMatrixDetailModal
-        selection={selection}
+        selection={currentSelection}
         onClose={() => setSelection(null)}
       />
     </div>

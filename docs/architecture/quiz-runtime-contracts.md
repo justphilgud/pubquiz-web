@@ -464,3 +464,8 @@ Vor einer Änderung in einem der beschriebenen Bereiche:
 Die zentralen Ordering- und Interaction-Lifecycle-Tests sind Teil von
 `npm test`; dadurch bleiben Teilnehmerreihenfolge, Blockfinalisierung und
 Submission-Lifecycle auch in CI ausführbare Spezifikation.
+
+## AP4: Bewertung und Ergebnisaktualisierung
+
+[Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
+und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.

@@ -1,5 +1,7 @@
 "use client";
 
+import { pollEvaluation } from "../../evaluation/pollEvaluation";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useModerationHotkeys } from "./hooks/useModerationHotkeys";
@@ -723,27 +725,13 @@ export default function ModerationClient({
 
   useEffect(() => {
     if (!isStandingsSlide(aktuellerSlide)) return;
-    let active = true;
-
     if (isIntermediateStandingsSlide(aktuellerSlide)) {
-      void getPraesentationAudienceZwischenstand(quizId).then((standings) => {
-        if (!active) return;
-        setAudienceInterimStandings(standings);
-      });
-    } else {
-      void Promise.all([
-        getQuizPunktestand(quizId),
-        getPraesentationJahreswertung(quizId),
-      ]).then(([daten, jahreswertung]) => {
-        if (!active) return;
-        setPunktestand(daten);
-        setYearlyStandings(jahreswertung);
-      });
+      return pollEvaluation(() => getPraesentationAudienceZwischenstand(quizId), setAudienceInterimStandings);
     }
-
-    return () => {
-      active = false;
-    };
+    return pollEvaluation(
+      () => Promise.all([getQuizPunktestand(quizId), getPraesentationJahreswertung(quizId)]),
+      ([scores, yearly]) => { setPunktestand(scores); setYearlyStandings(yearly); },
+    );
   }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
 
   useEffect(() => {

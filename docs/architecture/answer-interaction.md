@@ -335,3 +335,8 @@ Weitergehende Produktentscheidungen, etwa ob zukünftig jede Interaktion explizi
 [Submission- und Moderationskonsistenz](submission-live-state.md) definiert den
 rein lesenden Antwortzähler aus gespeichertem Inhalt und wirksamen finalen
 Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln.
+
+## AP4: Bewertung und Ergebnisaktualisierung
+
+[Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
+und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.

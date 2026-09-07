@@ -109,3 +109,8 @@ Preview-Abnahme mit einem eigenen Quiz und mindestens drei Teams:
 0 → 1 → 2 → 3, Änderung bleibt 3, Reload beider Ansichten, zwei Moderationsfenster,
 Aus-/Einblenden, Vor-/Zurücknavigation, Blockclose, Stop und bestätigter Reset.
 Ergebnisse und Qualitätsnachweise: [AP2-Bericht](../reports/ap2-submission-consistency.md).
+
+## AP4: Bewertung und Ergebnisaktualisierung
+
+[Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
+und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.

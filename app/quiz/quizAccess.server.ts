@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Prisma } from "@/app/generated/prisma/client";
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
 import { requireActor } from "@/app/lib/permissions";
@@ -144,8 +145,8 @@ export async function requireQuizQuestionInSection(
   return quizQuestion;
 }
 
-export async function requireQuizTeamAnswer(quizId: number, teamAnswerId: number) {
-  const teamAnswer = await prisma.team_antworten.findFirst({
+export async function requireQuizTeamAnswer(quizId: number, teamAnswerId: number, db: Prisma.TransactionClient = prisma) {
+  const teamAnswer = await db.team_antworten.findFirst({
     where: {
       quiz_id: quizId,
       team_antwort_id: teamAnswerId,

@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
+  getQuizEvaluationRevision,
   continueQuizEvaluationBackfillAction,
   recalculateQuizEvaluationsAction,
   updateTeamAntwortBewertung,
 } from "../../actions";
+import { pollEvaluation } from "../../evaluation/pollEvaluation";
 import { formatQuizPoints } from "../../formatQuizPoints";
 import TeamQuestionEvaluationMatrix from "../../evaluation/TeamQuestionEvaluationMatrix";
 import {
@@ -38,6 +40,7 @@ type AuswertungsAntwort = {
   risikoPunkteJeRichtigemTeam: number;
 
   team_antwort_id: number | null;
+  evaluationRevision: string | null;
   istUnbeantwortet: boolean;
   bewertungAusstehend: boolean;
   teamname: string;
@@ -87,12 +90,14 @@ type BewertungsAktion =
 
 export default function QuizAuswertungClient({
   quizId,
+  revision,
   antworten,
   punktestand,
   backfillStatus,
   matrix,
 }: {
   quizId: number;
+  revision: string;
   antworten: AuswertungsAntwort[];
   punktestand: PunktestandEintrag[];
   backfillStatus: EvaluationBackfillStatus;
@@ -114,7 +119,7 @@ export default function QuizAuswertungClient({
   const [zeigeUnbeantwortete, setZeigeUnbeantwortete] = useState<boolean>(
     DEFAULT_EVALUATION_ANSWER_FILTERS.includeUnanswered,
   );
-  const [teamIndex, setTeamIndex] = useState<number | null>(null);
+  const [ausgewaehltesTeam, setAusgewaehltesTeam] = useState<string | null>(null);
   const [punkteOverrides, setPunkteOverrides] = useState<Record<number, string>>({});
   const [rekalkulationLaeuft, setRekalkulationLaeuft] = useState(false);
   const [rekalkulationsmeldung, setRekalkulationsmeldung] = useState<string | null>(
@@ -126,6 +131,14 @@ export default function QuizAuswertungClient({
   const rekalkulationLock = useRef(false);
   const backfillLock = useRef(false);
   const router = useRouter();
+  const ratingLock = useRef(false);
+  const [ratingPending, startRating] = useTransition();
+  const [ratingError, setRatingError] = useState<string | null>(null);
+
+  useEffect(() => pollEvaluation(
+    () => getQuizEvaluationRevision(quizId),
+    (current) => { if (current !== revision && !ratingLock.current) router.refresh(); },
+  ), [quizId, revision, router]);
 
   const teamnamen = useMemo(
     () =>
@@ -142,8 +155,7 @@ export default function QuizAuswertungClient({
     return [...byId.entries()].map(([id, titel]) => ({ id, titel }));
   }, [antworten]);
 
-  const ausgewaehltesTeam =
-    teamIndex === null ? null : teamnamen[teamIndex] ?? null;
+
 
   const sichtbareAntworten = filterEvaluationAnswers(antworten, {
     scope: fragenScope,
@@ -157,16 +169,30 @@ export default function QuizAuswertungClient({
     [fragenScope, matrix],
   );
 
-  async function handleBewertung(
-    teamAntwortId: number,
-    aktion: BewertungsAktion,
-    punkte?: string,
-  ) {
-    await updateTeamAntwortBewertung({
-      quizId,
-      teamAntwortId,
-      aktion,
-      punkte,
+  function handleBewertung(teamAntwortId: number, aktion: BewertungsAktion, punkte?: string) {
+    if (ratingLock.current || ratingPending) return;
+    const expectedRevision = antworten.find((answer) => answer.team_antwort_id === teamAntwortId)?.evaluationRevision;
+    if (!expectedRevision) return;
+    ratingLock.current = true;
+    setRatingError(null);
+    startRating(async () => {
+      try {
+        const result = await updateTeamAntwortBewertung({ quizId, teamAntwortId, aktion, punkte, expectedRevision });
+        if (!result.success) {
+          setRatingError(result.message);
+          return;
+        }
+        setPunkteOverrides((current) => {
+          const next = { ...current };
+          delete next[teamAntwortId];
+          return next;
+        });
+        router.refresh();
+      } catch {
+        setRatingError("Die Bewertung konnte nicht gespeichert werden. Bitte erneut versuchen.");
+      } finally {
+        ratingLock.current = false;
+      }
     });
   }
 
@@ -228,23 +254,24 @@ export default function QuizAuswertungClient({
   }
 
   function vorherigesTeam() {
-    setTeamIndex((current) => {
-      if (teamnamen.length === 0) return null;
-      if (current === null) return teamnamen.length - 1;
-      return current <= 0 ? teamnamen.length - 1 : current - 1;
+    setAusgewaehltesTeam((current) => {
+      if (!teamnamen.length) return null;
+      const index = current === null ? 0 : teamnamen.indexOf(current);
+      return teamnamen[(index - 1 + teamnamen.length) % teamnamen.length];
     });
   }
 
   function naechstesTeam() {
-    setTeamIndex((current) => {
-      if (teamnamen.length === 0) return null;
-      if (current === null) return 0;
-      return current >= teamnamen.length - 1 ? 0 : current + 1;
+    setAusgewaehltesTeam((current) => {
+      if (!teamnamen.length) return null;
+      return teamnamen[(teamnamen.indexOf(current ?? "") + 1) % teamnamen.length];
     });
   }
 
   return (
     <div className="space-y-4">
+      {ratingError && <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-red-900">{ratingError}</p>}
+      {ratingPending && <p role="status" className="text-sm text-slate-600">Bewertung wird gespeichert ...</p>}
       {!backfillStatus.isComplete && (
         <div
           className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-sm"
@@ -430,9 +457,9 @@ export default function QuizAuswertungClient({
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={() => setTeamIndex(null)}
+                onClick={() => setAusgewaehltesTeam(null)}
                 className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
-                  teamIndex === null
+                  ausgewaehltesTeam === null
                     ? "bg-slate-900 text-white"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
@@ -677,6 +704,7 @@ export default function QuizAuswertungClient({
                             </div>
                             <button
                               type="button"
+                              disabled={ratingPending}
                               onClick={() =>
                                 handleBewertung(
                                   antwort.team_antwort_id!,
@@ -696,6 +724,7 @@ export default function QuizAuswertungClient({
                               <input
                                 type="text"
                                 inputMode="decimal"
+                                disabled={ratingPending}
                                 value={
                                   punkteOverrides[antwort.team_antwort_id!] ??
                                   String(antwort.vergebenePunkte)
@@ -711,6 +740,7 @@ export default function QuizAuswertungClient({
                               />
                               <button
                                 type="button"
+                              disabled={ratingPending}
                                 onClick={() =>
                                   handleBewertung(
                                     antwort.team_antwort_id!,
@@ -737,6 +767,7 @@ export default function QuizAuswertungClient({
 
                             <button
                               type="button"
+                              disabled={ratingPending}
                               onClick={() =>
                                 handleBewertung(
                                   antwort.team_antwort_id!,
@@ -754,6 +785,7 @@ export default function QuizAuswertungClient({
 
                             <button
                               type="button"
+                              disabled={ratingPending}
                               onClick={() =>
                                 handleBewertung(
                                   antwort.team_antwort_id!,
@@ -771,6 +803,7 @@ export default function QuizAuswertungClient({
 
                             <button
                               type="button"
+                              disabled={ratingPending}
                               onClick={() =>
                                 handleBewertung(
                                   antwort.team_antwort_id!,
