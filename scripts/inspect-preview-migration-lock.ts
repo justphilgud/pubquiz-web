@@ -33,12 +33,31 @@ async function main() {
         AND l.database = (SELECT oid FROM pg_database WHERE datname = current_database())
     `);
     console.info("Preview migration lock inspection:", JSON.stringify(locks.rows));
+    const releaseArgument = process.argv.find((value) => value.startsWith("--release-idle-pid="));
+    if (releaseArgument) {
+      const pid = Number(releaseArgument.split("=")[1]);
+      if (!Number.isSafeInteger(pid) || pid <= 0) throw new Error("Invalid PID");
+      const released = await client.query(`
+        SELECT a.pid, pg_terminate_backend(a.pid) AS released
+        FROM pg_stat_activity a
+        WHERE a.pid = $1 AND a.datname = current_database()
+          AND a.application_name = 'pgbouncer' AND a.state = 'idle'
+          AND a.xact_start IS NULL AND a.wait_event = 'ClientRead'
+          AND a.state_change < now() - interval '2 minutes'
+          AND EXISTS (
+            SELECT 1 FROM pg_locks l WHERE l.pid = a.pid
+              AND l.locktype = 'advisory' AND l.classid = 0
+              AND l.objid = 72707369 AND l.granted
+          )
+      `, [pid]);
+      console.info("Targeted idle Preview migration session release:", JSON.stringify(released.rows));
+    }
   } finally {
     await client.end();
   }
 }
 
 void main().catch(() => {
-  console.error("Preview migration lock inspection failed; no sessions were changed.");
+  console.error("Preview migration lock operation failed; inspect the preceding diagnostic result.");
   process.exitCode = 1;
 });

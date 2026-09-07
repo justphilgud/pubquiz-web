@@ -16,7 +16,7 @@
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:status": "prisma migrate status",
-    "predb:deploy": "node --import tsx scripts/inspect-preview-migration-lock.ts",
+    "predb:deploy": "node --import tsx scripts/inspect-preview-migration-lock.ts --release-idle-pid=974",
     "db:deploy": "prisma migrate deploy",
     "deployment:validate": "tsx scripts/validate-deployment-environment.ts",
     "lint:changed": "tsx scripts/lint-changed-files.ts",
