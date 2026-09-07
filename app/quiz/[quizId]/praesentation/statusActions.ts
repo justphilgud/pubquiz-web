@@ -1,5 +1,6 @@
 "use server";
 
+import { getQuizAnswerProgress } from "../../interaction/answerProgress.server";
 import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "../../quizLifecycle";
@@ -322,66 +323,7 @@ async function getAntwortStatusData(
   if (quizFragenId !== null) {
     await requireQuizQuestion(quizId, quizFragenId);
   }
-  const teamsAngemeldet = await prisma.quiz_team_sessions.count({
-    where: {
-      quiz_id: quizId,
-    },
-  });
-
-  if (!quizFragenId) {
-    return {
-      teamsAngemeldet,
-      antwortenEingegangen: 0,
-      prozent: 0,
-      letzteAntwortAt: null,
-    };
-  }
-
-  const currentRun = await prisma.quiz_interaction_runs.findFirst({
-    where: { quiz_id: quizId, quiz_fragen_id: quizFragenId, is_current: true },
-    select: { interaction_run_id: true },
-  });
-  let antwortenEingegangen: number;
-  let letzteAntwortAt: Date | null;
-  if (currentRun) {
-    const [submittedTeams, last] = await Promise.all([
-        prisma.team_answer_submissions.findMany({
-          where: { interaction_run_id: currentRun.interaction_run_id },
-          distinct: ["quiz_team_session_id"],
-          select: { quiz_team_session_id: true },
-        }),
-        prisma.team_answer_submissions.findFirst({
-          where: { interaction_run_id: currentRun.interaction_run_id },
-          orderBy: { submitted_at: "desc" },
-          select: { submitted_at: true },
-        }),
-      ]);
-    antwortenEingegangen = submittedTeams.length;
-    letzteAntwortAt = last?.submitted_at ?? null;
-  } else {
-    const [count, last] = await Promise.all([
-        prisma.team_antworten.count({
-          where: { quiz_id: quizId, quiz_fragen_id: quizFragenId },
-        }),
-        prisma.team_antworten.findFirst({
-          where: { quiz_id: quizId, quiz_fragen_id: quizFragenId },
-          orderBy: { aktualisiert_am: "desc" },
-          select: { aktualisiert_am: true },
-        }),
-      ]);
-    antwortenEingegangen = count;
-    letzteAntwortAt = last?.aktualisiert_am ?? null;
-  }
-
-  return {
-    teamsAngemeldet,
-    antwortenEingegangen,
-    prozent:
-      teamsAngemeldet > 0
-        ? Math.round((antwortenEingegangen / teamsAngemeldet) * 100)
-        : 0,
-    letzteAntwortAt,
-  };
+  return getQuizAnswerProgress(quizId, quizFragenId);
 }
 
 export async function getAntwortStatus(

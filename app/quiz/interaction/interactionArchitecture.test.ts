@@ -87,7 +87,10 @@ test("presentation drives active runs while block close finalizes every released
   );
   assert.match(actions, /saveTeamAntwortDraft/);
   assert.match(actions, /submitTeamAntwort/);
-  assert.match(statusActions, /distinct: \["quiz_team_session_id"\]/);
+  assert.match(statusActions, /getQuizAnswerProgress\(quizId, quizFragenId\)/);
+  const progress = read("app/quiz/interaction/answerProgress.ts");
+  assert.match(progress, /answered = new Set<number>/);
+  assert.match(progress, /selectEffectiveLiveSubmissions/);
 });
 
 test("draft writes serialize on the run and use compare-and-swap revisions", () => {

@@ -204,3 +204,9 @@ Sitzung ohne Transaktion. Beim anschließenden Wiederherstellungslauf war er ber
 freigegeben; die eng begrenzte Freigabeaktion traf keine Sitzung und beendete keine
 Verbindung. Migration und Statusprüfung liefen danach regulär durch. Die einmalige
 Diagnose/Freigabe und ihr npm-Hook wurden anschließend wieder entfernt.
+
+## AP2: Antwortfortschritt
+
+[Submission- und Moderationskonsistenz](submission-live-state.md) definiert den
+rein lesenden Antwortzähler aus gespeichertem Inhalt und wirksamen finalen
+Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln.

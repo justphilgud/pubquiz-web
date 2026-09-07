@@ -325,3 +325,9 @@ Weitergehende Produktentscheidungen, etwa ob zukünftig jede Interaktion explizi
 - `app/quiz/evaluation/effectiveSubmission.test.ts`
 - `app/quiz/evaluation/evaluateBaseAnswer.test.ts`
 - `app/quiz/quizAnswerLiveState.test.ts`
+
+## AP2: Antwortfortschritt
+
+[Submission- und Moderationskonsistenz](submission-live-state.md) definiert den
+rein lesenden Antwortzähler aus gespeichertem Inhalt und wirksamen finalen
+Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln.

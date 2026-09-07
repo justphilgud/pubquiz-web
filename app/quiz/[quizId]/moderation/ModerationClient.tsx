@@ -110,6 +110,7 @@ type EstimationQuestion = {
 type AntwortStatus = {
   teamsAngemeldet: number;
   antwortenEingegangen: number;
+  finaleAntworten: number;
   prozent: number;
   letzteAntwortAt: string | null;
 };
@@ -547,23 +548,6 @@ export default function ModerationClient({
     setShowAuswertungIframe(true);
     setShowAuswertungDialog(false);
   }, []);
-  const aktualisiereAntwortStatus = useCallback(async () => {
-    const aktuelleQuizFragenId =
-      aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung"
-        ? aktuellerSlide.frage.quiz_fragen_id
-        : null;
-
-    const neuerStatus = await getAntwortStatus(quizId, aktuelleQuizFragenId);
-
-    setAntwortStatus({
-      teamsAngemeldet: neuerStatus.teamsAngemeldet,
-      antwortenEingegangen: neuerStatus.antwortenEingegangen,
-      prozent: neuerStatus.prozent,
-      letzteAntwortAt: neuerStatus.letzteAntwortAt
-        ? neuerStatus.letzteAntwortAt.toISOString()
-        : null,
-    });
-  }, [aktuellerSlide, quizId]);
 
   async function goToSlide(nextIndex: number) {
     const safeIndex = Math.min(
@@ -610,9 +594,6 @@ export default function ModerationClient({
     if (parseQuizBlockPreviewSectionId(nextSlideKey) !== null) {
       setBlockFreigegeben(true);
     }
-    void aktualisiereAntwortStatus().catch(() => {
-      // The regular status poll retries transient failures.
-    });
   }
 
   async function handleBlockToggle() {
@@ -770,7 +751,13 @@ export default function ModerationClient({
       if (!active || refreshing) return;
       refreshing = true;
       try {
-        await aktualisiereAntwortStatus();
+        const questionId = aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung" || aktuellerSlide?.typ === "funny"
+          ? aktuellerSlide.frage.quiz_fragen_id : null;
+        const next = await getAntwortStatus(quizId, questionId);
+        if (!active) return;
+        setAntwortStatus({ ...next, letzteAntwortAt: next.letzteAntwortAt?.toISOString() ?? null });
+      } catch {
+        // Keep the last confirmed value; the existing poll retries transient failures.
       } finally {
         refreshing = false;
       }
@@ -781,7 +768,7 @@ export default function ModerationClient({
       active = false;
       window.clearInterval(interval);
     };
-  }, [aktualisiereAntwortStatus]);
+  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
 
   async function toggleLiveResults() {
     if (aktuellerSlide?.typ !== "frage" || !liveResultState) return;
@@ -1141,7 +1128,7 @@ export default function ModerationClient({
                   <div className="rounded-xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-3">
                     <p><strong>Pixel-Stufe:</strong> {pixelState.effectivePixelStage} von 3</p>
                     <p><strong>Stop:</strong> {pixelState.stopped ? `${pixelState.stoppedByTeamName ?? "Team"} in Stufe ${pixelState.stoppedAtStage}` : pixelState.effectivePixelStage < 3 ? "möglich" : "in Stufe 3 deaktiviert"}</p>
-                    <p><strong>Finale Antworten:</strong> {antwortStatus.antwortenEingegangen} / {antwortStatus.teamsAngemeldet}</p>
+                    <p><strong>Finale Antworten:</strong> {antwortStatus.finaleAntworten} / {antwortStatus.teamsAngemeldet}</p>
                     <p><strong>Zustand:</strong> {pixelState.submissionDeadlineAt && new Date(pixelState.submissionDeadlineAt).getTime() > now ? `${Math.max(0, Math.ceil((new Date(pixelState.submissionDeadlineAt).getTime() - now) / 1000))} Sekunden Restzeit` : pixelState.stopped ? "Countdown beendet" : "offen"}</p>
                   </div>
                 )}
