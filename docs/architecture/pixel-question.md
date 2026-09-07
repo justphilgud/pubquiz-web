@@ -122,6 +122,10 @@ ein visueller Tick erzeugt weder Requests noch Writes. Ohne verbundene Browser
 wird der persistierte Grenzabschluss beim nächsten Lesen/Schreiben nachgezogen;
 die absolute fachliche Frist läuft unabhängig davon ab.
 
+Alle Team-Histories einer fälligen Grenze werden in einem parametrisierten
+Batch-UPDATE geschrieben. Die Zahl der Datenbank-Roundtrips je Grenze wächst
+dadurch nicht mit der Teamzahl; Datenmenge und reine Berechnung bleiben linear.
+
 Moderation zeigt Modus, Bildstufe 3/2/1, Zeit, Challenge-Status und weiterhin AP2-
 Fortschritt. Die kompakte Lifecycle-Leiste bleibt unverändert. Präsentation zeigt
 eine große Zeitangabe am Bildrand. Teamformular behält die Antwort, zeigt dieselbe

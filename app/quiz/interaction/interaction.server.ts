@@ -777,6 +777,7 @@ async function settlePixelStages(db: DbClient, run: {
   const target = closing ? Math.min(3, due + (due < 3 ? 1 : 0)) : due;
   if (target <= run.pixel_completed_stages) return target;
   const drafts = await db.team_antworten.findMany({ where: { interaction_run_id: run.interaction_run_id } });
+  const historyUpdates = [];
   for (const draft of drafts) {
     let history = readPixelStageHistory(draft.pixel_stage_history);
     for (let chronological = 1; chronological <= target; chronological++) {
@@ -786,7 +787,18 @@ async function settlePixelStages(db: DbClient, run: {
       const text = (draft.draft_updated_at ?? draft.aktualisiert_am) < at ? draft.antwort_text : null;
       history = snapshotPixelStage(history, stage, text, at.toISOString());
     }
-    await db.team_antworten.update({ where: { team_antwort_id: draft.team_antwort_id }, data: { pixel_stage_history: toJson(history) } });
+    historyUpdates.push({ id: draft.team_antwort_id, history });
+  }
+  if (historyUpdates.length > 0) {
+    // One parameterized write per boundary batch, not one network round trip per team.
+    await db.$executeRaw`
+      UPDATE "pubquiz"."team_antworten" AS answer
+      SET "pixel_stage_history" = item.history
+      FROM jsonb_to_recordset(${JSON.stringify(historyUpdates)}::jsonb)
+        AS item(id integer, history jsonb)
+      WHERE answer."team_antwort_id" = item.id
+        AND answer."interaction_run_id" = ${run.interaction_run_id}
+    `;
   }
   await db.quiz_interaction_runs.update({ where: { interaction_run_id: run.interaction_run_id }, data: { pixel_completed_stages: target, revision: { increment: 1 } } });
   return target;
