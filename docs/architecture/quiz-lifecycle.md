@@ -198,3 +198,9 @@ Deployment-Identitätsprüfung bleibt bestehen. Runtime-Verbindung, lokale Umgeb
 und Production werden nicht geändert. Regressionen prüfen diese Grenzen.
 Siehe [Neon-Verbindungsfehler](https://neon.com/docs/connect/connection-errors)
 und [Prisma-Datenbankverbindungen](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections).
+
+Der zuvor belegte Lock gehörte laut lesender Diagnose einer inaktiven PgBouncer-
+Sitzung ohne Transaktion. Beim anschließenden Wiederherstellungslauf war er bereits
+freigegeben; die eng begrenzte Freigabeaktion traf keine Sitzung und beendete keine
+Verbindung. Migration und Statusprüfung liefen danach regulär durch. Die einmalige
+Diagnose/Freigabe und ihr npm-Hook wurden anschließend wieder entfernt.
