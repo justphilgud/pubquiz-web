@@ -1,0 +1,92 @@
+Run Query
+
+Metric
+Requests
+Count
+N
+Sum
+18:33 - 18:36
+Combobox Menu
+Group By
+Request Path
+Filter
+Project
+is
+pubquiz-web
+Environment
+is
+Preview
+Deployment ID
+is
+dpl_2PXkurJVzhWYDmL…
+Add filter
+Query Assistant
+/
+10 seconds
+0
+20
+40
+Sep 7, 18:33
+Sep 7, 18:33
+Sep 7, 18:34
+Sep 7, 18:35
+Sep 7, 18:35
+Request Path
+	
+Count Sum
+
+
+/api/quiz/team-live-snapshot
+	
+918
+
+
+/quiz/30/praesentation
+	
+390
+
+
+/api/quiz/live-snapshot
+	
+212
+
+
+/quiz/30/moderation
+	
+120
+
+
+/_next/image
+	
+10
+
+
+/templates/presentation-quality
+	
+2
+
+
+/logo_transparent.png
+	
+1
+
+
+/branding/lovd/lovd-stelp.png
+	
+1
+
+
+/_next/static/chunks/0qgy5sy4in474.js
+	
+1
+
+
+/_next/static/chunks/0dew..ru4nlza.js
+	
+1
+
+
+/
+	
+1
+Add to Notebook

@@ -1,0 +1,63 @@
+Run Query
+
+Metric
+Requests
+Count
+N
+Sum
+18:49 - 18:52
+Combobox Menu
+Group By
+Request Path
+Filter
+Project
+is
+pubquiz-web
+Environment
+is
+Preview
+Deployment ID
+is
+dpl_5tyJiieCmMVHxBQ…
+Add filter
+Query Assistant
+/
+10 seconds
+0
+20
+40
+60
+Sep 7, 18:49
+Sep 7, 18:49
+Sep 7, 18:50
+Sep 7, 18:51
+Sep 7, 18:51
+Request Path
+	
+Count Sum
+
+
+/api/quiz/team-live-snapshot
+	
+1.2K
+
+
+/quiz/30/praesentation
+	
+389
+
+
+/api/quiz/live-snapshot
+	
+209
+
+
+/quiz/30/moderation
+	
+117
+
+
+/quiz/30/antworten
+	
+1
+Add to Notebook

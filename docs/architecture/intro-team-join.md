@@ -74,6 +74,12 @@ und Storybook benutzen dieselbe Komponente. Reduced Motion zeigt die Begrüßung
 ohne Bewegung mit gleicher Dauer. QR bleibt im DOM; die Begrüßung belegt primär
 den rechten Informationsbereich und ist keine Interaktionssperre.
 
+Der QR-Bereich verwendet die verbleibende Slidehöhe als Größenbegrenzung. Der
+Code bleibt quadratisch und vollständig sichtbar, auch wenn die Teamübersicht
+ihre zwölf Einträge erreicht. Nur die Informationsspalte darf bei Platzmangel
+scrollen. Die Begrüßung beginnt rechts von der QR-Spalte. Diese Geometrie ist
+für alle vier Themes bei 1280 × 720, 1920 × 1080 und 2560 × 1440 abgenommen.
+
 JOIN-INV-10: Kein neuer Poller, Server-Action oder Request pro Begrüßung/Frame.
 Bestehender Player-/Moderationstakt bleibt unverändert. Primitive Beobachtungssignatur
 und aktiver Batch-Key verhindern Effekt-/Timerneustarts bei identischen Snapshots.
@@ -93,3 +99,5 @@ AP1–AP5-/B10a-Regressionen. Die interne Präsentationsreferenz enthält QR mit
 synthetischen Einzel-/Dreier-/Burstbeitritten für alle Designwelten; keine DB-Schreib-
 oder Pollingfunktion. Reale Animation und Requestzahlen werden zusätzlich auf einem
 eigenen Preview-Testquiz geprüft; ein Screenshot ersetzt diese Abnahme nicht.
+
+Abnahme: [AP6-Bericht mit Messungen und Screenshots](../reports/ap6-intro-team-join.md).
