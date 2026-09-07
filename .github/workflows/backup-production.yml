@@ -1,0 +1,61 @@
+name: Backup Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        type: choice
+        options: [daily, weekly, release]
+        default: release
+      production_commit:
+        description: Full SHA of the verified current Production release
+        type: string
+        required: true
+  # Activate only after private storage, reader role and retention are provisioned.
+  # Daily: 17 3 * * * UTC; weekly: 47 3 * * 0 UTC.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Check prerequisites without printing secrets
+        env:
+          READER: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+          STORAGE: ${{ secrets.BACKUP_BLOB_READ_WRITE_TOKEN }}
+          HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+          RETENTION: ${{ vars.BACKUP_RETENTION_VERIFIED }}
+        run: |
+          test -n "$READER" && test -n "$STORAGE" && test -n "$HOST" && test "$RETENTION" = true || {
+            echo 'BLOCKED: dedicated reader, private backup store and verified retention required' >&2
+            exit 1
+          }
+      - name: Require operator-provisioned compatible PostgreSQL tools
+        run: |
+          command -v pg_dump
+          command -v pg_restore
+          pg_dump --version
+          pg_restore --version
+      - name: Read-only dump, integrity, private upload and checksum readback
+        env:
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+          BACKUP_BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_READ_WRITE_TOKEN }}
+          BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+          BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
+          PRODUCTION_RELEASE_SHA: ${{ inputs.production_commit }}
+          BACKUP_KIND: ${{ inputs.kind }}
+        run: node --import tsx scripts/operations/cli.ts backup

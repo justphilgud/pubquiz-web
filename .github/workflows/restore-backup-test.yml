@@ -1,0 +1,29 @@
+name: Restore Production Backup in Isolated Test Environment
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-backup-restore
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Reject persistent targets; stop until isolated provisioning is available
+        env:
+          RESTORE_TEST_DATABASE_URL: ${{ secrets.RESTORE_TEST_DATABASE_URL }}
+          RESTORE_TEST_EXPECTED_HOST: ${{ vars.RESTORE_TEST_EXPECTED_HOST }}
+        run: node --import tsx scripts/operations/cli.ts restore-test

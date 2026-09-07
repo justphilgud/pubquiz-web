@@ -1,0 +1,30 @@
+name: Refresh Preview from Production
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-deployment
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    # Prepared only: the CLI deliberately stops before mutation until isolation is verified.
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Validate Production source and Preview target; fail closed until ready
+        env:
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+          PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+        run: node --import tsx scripts/operations/cli.ts refresh

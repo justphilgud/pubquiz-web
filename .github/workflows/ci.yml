@@ -48,6 +48,9 @@ jobs:
       - name: Tests
         run: npm test
 
+      - name: Infrastructure safety guards
+        run: node --import tsx --test scripts/operations/guards.test.ts
+
       - name: Strict ESLint for CI/CD package TypeScript
         run: >-
           npx eslint --max-warnings=0 --

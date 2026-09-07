@@ -2,6 +2,9 @@
 
 ## Umgebungen
 
+[Umgebungsvertrag, Preview-Refresh und Backup-/Restore-Prozess](environments-and-backups.md)
+beschreibt den geprüften Stand und noch offene Einrichtungsschritte.
+
 Das Projekt verwendet getrennte Entwicklungs- und Produktivumgebungen.
 
 ## Deployment
