@@ -1,4 +1,5 @@
 "use client";
+import { QUIZ_LIFECYCLE_LABELS, type QuizLifecycle } from "../../quizLifecycle";
 
 /* eslint-disable @next/next/no-img-element -- Pixel stages use dynamic question-media URLs. */
 
@@ -85,6 +86,7 @@ async function fetchQuizAnswerStatus(
 }
 
 type AntwortStatus = {
+  lifecycle: QuizLifecycle;
   quiz_id: number;
   titel: string | null;
   liveRevision: string;
@@ -1008,6 +1010,9 @@ export default function QuizAntwortClient({
             </h1>
 
             <p className="mt-2 text-slate-600">Antwortformular für Teams</p>
+            <p className="mt-1 text-sm font-medium text-slate-600" role="status">
+              {QUIZ_LIFECYCLE_LABELS[liveDaten.lifecycle]}
+            </p>
           </div>
         </section>
 
@@ -1068,7 +1073,7 @@ export default function QuizAntwortClient({
               <button
                 type="button"
                 onClick={handleStartSession}
-                disabled={isLoadingTeams || isStartingSession || !teamname.trim()}
+                disabled={liveDaten.lifecycle === "STOPPED" || isLoadingTeams || isStartingSession || !teamname.trim()}
                 className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-4 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
                 {isLoadingTeams

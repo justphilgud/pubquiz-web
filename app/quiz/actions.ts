@@ -1,5 +1,5 @@
 "use server";
-import { assertLifecycleRevision } from "./quizLifecycle";
+import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { requireQuizNotStopped } from "./quizLifecycle.server";
 
 import { prisma } from "@/app/lib/prisma";
@@ -2401,12 +2401,13 @@ export async function getQuizAntwortStatus(
   if (!participantSession) {
     const joinSafeQuiz = await prisma.quiz.findFirst({
       where: { quiz_id: quizId, ist_archiviert: false },
-      select: { quiz_id: true, titel: true },
+      select: { quiz_id: true, titel: true, praesentation_status: { select: { quiz_started_at: true, quiz_stopped_at: true } } },
     });
     if (!joinSafeQuiz) return null;
     return {
       quiz_id: joinSafeQuiz.quiz_id,
       titel: joinSafeQuiz.titel,
+      lifecycle: resolveQuizLifecycle(joinSafeQuiz.praesentation_status),
       liveRevision: "participant:join",
       activeQuizFragenId: null,
       abschnitte: [],
@@ -2802,7 +2803,9 @@ export async function getQuizAntwortStatus(
           };
         });
 
-  const presentationStatusText = offenerFragenblock
+  const presentationStatusText = liveState.lifecycle === "STOPPED"
+    ? "Das Quiz ist beendet"
+    : offenerFragenblock
     ? null
     : currentRun?.state === "CLOSED"
     ? "Die Antwortzeit ist beendet"
