@@ -176,4 +176,6 @@ der dritte Snapshot entsteht ausschließlich beim manuellen Close.
 
 Regressionen: B09 A–H in `pixelLiveInteraction.test.ts` und der Offen-/Geschlossen-
 Rendervergleich in `PresentationSlideRenderer.test.ts`. Die ursprüngliche AP3-Abnahme
-prüfte noch die inzwischen ersetzte 20-Sekunden-Endphase; B09 wird separat abgenommen.
+prüfte noch die inzwischen ersetzte 20-Sekunden-Endphase. Die separate
+[B09-Browserabnahme](../reports/ap3-b09.md) bestätigt die unbegrenzte letzte Stufe,
+späte Antwort, Reload, manuellen Abschluss und genau einen Punkt auf dem finalen Preview.
