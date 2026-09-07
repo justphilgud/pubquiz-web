@@ -59,6 +59,7 @@
   gap: 1rem;
 }
 .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] h2 { max-width: 52ch; }
+.presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] > :first-child { min-height: min-content; }
 .presentation-template.presentation-readable[data-design-style] :is(.presentation-answer-options, [data-presentation-layout="CHOICE_GRID"] .presentation-storybook-choices) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -121,6 +122,9 @@
 .presentation-template.presentation-readable[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution { padding-block: 1.25rem; }
 /* Compact chrome gives laptop slides more room without reducing reading text. */
 @container presentation (max-width: 1450px) {
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] h2 { font-size: 2rem !important; max-width: none; }
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] :is(.presentation-question-card, .presentation-answer-panel) { padding: .5rem !important; }
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] .presentation-answer-option { padding: .5em; }
   .presentation-template.presentation-readable[data-design-style] .presentation-neon-header { height: 5rem; }
   .presentation-template.presentation-readable[data-design-style] .presentation-neon-header img { height: 4rem; width: 4rem; }
   .presentation-template.presentation-readable[data-design-style] .presentation-editorial-header { height: 5.5rem; padding-top: .5rem; }
