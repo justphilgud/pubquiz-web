@@ -361,6 +361,7 @@ test("AP3 A–K: boundary history and fixed points use only the final answer", (
         status: last?.trim().toLowerCase() === "eiffelturm" ? "CORRECT" : last ? "WRONG" : "UNANSWERED" }],
     });
     assert.equal(allocation[0].points, scenario.points);
+    assert.equal(allocation[0].stage, scenario.stage);
   }
 });
 

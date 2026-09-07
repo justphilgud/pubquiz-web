@@ -2738,7 +2738,7 @@ function renderAktuellenSlide() {
       {slide?.typ === "aufloesung" && pixelState?.stopped && pixelState.resolution && (
         <div className="presentation-runtime-status absolute inset-x-8 bottom-12 z-40 rounded-2xl border-4 border-cyan-300 bg-slate-950/95 px-6 py-4 text-center shadow-[6px_6px_0_#ff00aa]">
           <p className="text-xl font-black text-cyan-200">
-            {pixelState.stoppedByTeamName} stoppte in Stufe {pixelState.stoppedAtStage}: {pixelState.resolution.answer ?? "Keine Antwort"}
+            {pixelState.stoppedByTeamName} stoppte in Stufe {4 - (pixelState.stoppedAtStage ?? 1)}: {pixelState.resolution.answer ?? "Keine Antwort"}
           </p>
           <p className="mt-1 text-2xl font-black text-white">
             {pixelState.resolution.status === "CORRECT" ? "Richtig" : pixelState.resolution.status === "WRONG" ? "Falsch" : "Bewertung offen"}

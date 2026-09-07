@@ -494,6 +494,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       ? {
           ...result.details,
           pixel: {
+            mode: readPixelLiveConfigSnapshot(answer.interaction_run?.config_snapshot)?.mode ?? "CHALLENGE",
             stage: allocatedPixelPoints.stage,
             isStopper: allocatedPixelPoints.isStopper,
             correctTeamCount: allocatedPixelPoints.correctCount,

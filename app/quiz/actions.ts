@@ -4330,6 +4330,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         typeof evaluationDetails.pixel === "object" &&
         !Array.isArray(evaluationDetails.pixel)
         ? evaluationDetails.pixel as {
+            mode?: unknown;
             stage?: unknown;
             isStopper?: unknown;
             outcome?: unknown;
@@ -4431,7 +4432,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number) {
         bewertungsquelle: evaluatedAnswer?.bewertungsquelle ?? "AUTO",
         pixelStage:
           pixelDetails?.stage === 1 || pixelDetails?.stage === 2 || pixelDetails?.stage === 3
-            ? pixelDetails.stage as 1 | 2 | 3
+            ? (pixelDetails.mode === "STAGED" ? pixelDetails.stage : 4 - pixelDetails.stage) as 1 | 2 | 3
             : null,
         pixelIsStopper: pixelDetails?.isStopper === true,
         pixelOutcome:

@@ -306,7 +306,7 @@ export function allocatePixelQuestionPointsByRun(input: {
     }
   }
 
-  return input.runs.flatMap((run) => {
+  return input.runs.flatMap<Omit<ReturnType<typeof allocatePixelQuestionPoints>[number], "stage"> & { stage: PixelRuntimeStage | null }>((run) => {
     const evaluations = evaluationsByRunId.get(run.interactionRunId);
     if (!evaluations) return [];
     const config = readPixelLiveConfigSnapshot(run.configSnapshot);
@@ -315,7 +315,7 @@ export function allocatePixelQuestionPointsByRun(input: {
       teamAnswerId: entry.teamAnswerId,
       points: entry.status === "CORRECT" ? entry.relevantStage ?? 0 : 0,
       outcome: entry.status === "REVIEW_REQUIRED" ? "PENDING" as const : "NORMAL" as const,
-      stage: entry.relevantStage ?? 1,
+      stage: entry.relevantStage ?? null,
       correctCount: evaluations.filter((item) => item.status === "CORRECT").length,
       isStopper: false,
     }));
