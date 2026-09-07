@@ -33,6 +33,7 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.effektiver_antwortmodus = "OPEN";
   }
   question.frage = scenario === "short" ? "Wie heißt die Hauptstadt von Deutschland?" : scenario === "legacy" ? `${longQuestion} ${longQuestion} ${longQuestion}` : ["long", "image-long", "solution-long"].includes(scenario) ? longQuestion : "Welche dieser Städte ist heute die Hauptstadt von Deutschland?";
+  if (scenario === "ordering" || scenario === "pixel") question.frage = original.frage;
   if (scenario.startsWith("choice")) {
     question.templateId = "multiple_choice";
     question.effektiver_antwortmodus = "CLOSED";
@@ -40,7 +41,11 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.antworten = labels.map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
   }
   question.antwort_reihenfolge = question.antworten.map((answer) => answer.antwort_id);
-  if (scenario === "image-long") question.medien = [{ medien_id: 1, datei: "bilder/wahrzeichen/taipei-101_standard.jpg", medientyp: "Bild", sortierung: 1, bemerkung: "Taipei 101 – Bildbeispiel für Text und Medium" }];
+  if (scenario === "image-long") {
+    question.frage = "Welcher Wolkenkratzer ist auf diesem Bild zu sehen? Das Gebäude steht in der Hauptstadt Taiwans und gehörte bei seiner Eröffnung zu den höchsten Bauwerken der Welt. Seine gestuften Abschnitte erinnern an Bambus. Nennt den Namen dieses bekannten Wahrzeichens.";
+    question.antworten[0].antwort = "Taipei 101";
+    question.medien = [{ medien_id: 1, datei: "bilder/wahrzeichen/taipei-101_standard.jpg", medientyp: "Bild", sortierung: 1, bemerkung: "Taipei 101 – Bildbeispiel für Text und Medium" }];
+  }
   if (scenario.startsWith("structured")) {
     question.templateId = null;
     question.templateConfig = null;

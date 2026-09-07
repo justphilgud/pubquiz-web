@@ -12,6 +12,7 @@ export function PresentationOverflowRegion({ children, contentKey }: { children:
     const region = viewport.current;
     const inner = content.current;
     if (!region || !inner) return;
+    let active = true;
     region.scrollTop = 0;
     const measure = () => setOverflow(region.scrollHeight > region.clientHeight + 2 || region.scrollWidth > region.clientWidth + 2);
     measure();
@@ -20,12 +21,13 @@ export function PresentationOverflowRegion({ children, contentKey }: { children:
     observer.observe(inner);
     // Media dimensions may become known without changing the fixed slide box.
     inner.addEventListener("load", measure, true);
-    return () => { observer.disconnect(); inner.removeEventListener("load", measure, true); };
+    void document.fonts.ready.then(() => { if (active) measure(); });
+    return () => { active = false; observer.disconnect(); inner.removeEventListener("load", measure, true); };
   }, [contentKey]);
   return <div className="presentation-overflow-region">
     <div ref={viewport} className="presentation-content-viewport" tabIndex={overflow ? 0 : undefined} role="region" aria-label="Präsentationsinhalt">
       <div ref={content} className="presentation-content-inner">{children}</div>
     </div>
-    <p className="presentation-overflow-hint" style={{ visibility: overflow ? "visible" : "hidden" }} role="status">Weitere Inhalte durch Scrollen · für die Projektion bitte redaktionell kürzen</p>
+    <p className="presentation-overflow-hint" style={{ visibility: overflow ? "visible" : "hidden" }} role="status">Überlänge: Weitere Inhalte durch Scrollen</p>
   </div>;
 }

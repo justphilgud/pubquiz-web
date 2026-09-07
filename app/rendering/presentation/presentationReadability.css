@@ -81,7 +81,7 @@
 /* Story text keeps its format but uses the same bounded reading scale. */
 .presentation-template.presentation-readable[data-design-style] .presentation-flow-editorial,
 .presentation-template.presentation-readable[data-design-style] .presentation-live-poll {
-  padding: clamp(1rem, 2.5cqw, 3rem);
+  padding: clamp(1rem, 1.25cqw, 2rem);
   overflow: visible;
   justify-content: safe center;
 }
@@ -100,6 +100,9 @@
 .presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-kicker, .presentation-storybook-kicker, .presentation-audio-status-label) { font-size: var(--pres-status); }
 .presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-editorial figcaption, .presentation-storybook-solution-note) { font-size: var(--pres-info); overflow-wrap: anywhere; }
 .presentation-template.presentation-readable[data-design-style] .presentation-live-poll-bars { gap: .8rem; }
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-editorial, .presentation-live-poll) { gap: 1rem; }
+.presentation-template.presentation-readable[data-design-style] :is(.presentation-flow-editorial, .presentation-live-poll) > :is(p, h2, div) { margin-block: 0; }
+.presentation-template.presentation-readable[data-design-style] .presentation-live-poll h2 { font-size: var(--pres-question) !important; max-width: 52ch; }
 .presentation-template.presentation-readable[data-design-style] .presentation-live-poll-label { align-items: baseline; }
 .presentation-template.presentation-readable[data-design-style] .presentation-live-poll-label > span { flex-shrink: 0; font-size: var(--pres-status); }
 
@@ -110,7 +113,28 @@
 .presentation-template.presentation-readable[data-design-style] .presentation-media-card img { flex: 1; min-height: 0; }
 .presentation-template.presentation-readable[data-design-style] .presentation-media-card > div:last-child { flex-shrink: 0; }
 
+/* Give long questions a real reading column, including beside an image. */
+.presentation-template.presentation-readable[data-question-density="extended"] :is([data-presentation-layout="MEDIA_FOCUS"], [data-presentation-layout="SOLUTION_FOCUS"]):not(.presentation-storybook-solution) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.presentation-template.presentation-readable[data-question-density="extended"] [data-presentation-layout="SOLUTION_FOCUS"]:not(.presentation-storybook-solution) { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); }
+.presentation-template.presentation-readable[data-design-style="BIRTHDAY"]:is([data-question-density="compact"], [data-question-density="extended"], [data-answer-density="extended"]) .presentation-storybook-content { padding-right: 0 !important; }
+.presentation-template.presentation-readable[data-design-style="BIRTHDAY"]:is([data-question-density="compact"], [data-question-density="extended"], [data-answer-density="extended"]) .presentation-storybook-gallery { display: none; }
+.presentation-template.presentation-readable[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution { padding-block: 1.25rem; }
+/* Compact chrome gives laptop slides more room without reducing reading text. */
+@container presentation (max-width: 1450px) {
+  .presentation-template.presentation-readable[data-design-style] .presentation-neon-header { height: 5rem; }
+  .presentation-template.presentation-readable[data-design-style] .presentation-neon-header img { height: 4rem; width: 4rem; }
+  .presentation-template.presentation-readable[data-design-style] .presentation-editorial-header { height: 5.5rem; padding-top: .5rem; }
+  .presentation-template.presentation-readable[data-design-style] .presentation-editorial-logo { width: 10rem; }
+  .presentation-template.presentation-readable[data-design-style] .presentation-editorial-footer { height: 2.5rem; padding-bottom: .5rem; }
+  .presentation-template.presentation-readable[data-design-style] .presentation-corporate-header { height: 4.5rem; margin-bottom: .5rem; }
+  .presentation-template.presentation-readable[data-design-style="BIRTHDAY"] .presentation-storybook-choices li { padding-block: .75rem; }
+  .presentation-template.presentation-readable[data-design-style] .presentation-live-poll { gap: .6rem; }
+}
+
 @container presentation (max-width: 1000px) {
+  .presentation-template.presentation-readable[data-question-density="extended"] :is([data-presentation-layout="MEDIA_FOCUS"], [data-presentation-layout="SOLUTION_FOCUS"]):not(.presentation-storybook-solution) { grid-template-columns: minmax(0, 1fr); }
+  .presentation-template.presentation-readable[data-design-style] :is(.presentation-answer-options, [data-presentation-layout="CHOICE_GRID"] .presentation-storybook-choices) { grid-template-columns: minmax(0, 1fr); }
+  .presentation-template.presentation-readable[data-design-style] .presentation-answer-option { padding: .65em; }
   .presentation-readable .presentation-editorial-header { height: 5rem; }
   .presentation-readable .presentation-editorial-logo { width: 10rem; }
   .presentation-readable .presentation-editorial-footer { height: 2.5rem; }

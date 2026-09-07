@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { pixelRules } from "@/app/fragen/editor/templates/pixelRules";
 
@@ -291,6 +291,9 @@ export default function PresentationSlideRenderer({
     teamJoinState = null,
   } = displayState;
   const relativeAnswerUrl = `/quiz/${quiz.quiz_id}/antworten`;
+  // Includes editor changes on the same slide; excludes the ticking display clock.
+  const slideContentKey = useMemo(() => JSON.stringify(slide), [slide]);
+  const pollContentKey = livePollState ? JSON.stringify([livePollState.prompt, livePollState.options.map((option) => option.label)]) : "";
   const relativeCalendarUrl = PUBLIC_CALENDAR_FEED_PATH;
   const relativeQuestionSubmissionUrl = "/frage-einreichen";
   const [answerUrl, setAnswerUrl] = useState(relativeAnswerUrl);
@@ -2720,7 +2723,7 @@ function renderAktuellenSlide() {
       theme={theme}
       className="presentation-template presentation-readable relative flex h-full min-h-0 flex-col text-white"
       data-question-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? slide.frage.frage.length : 0, "question")}
-      data-answer-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? Math.max(0, ...slide.frage.antworten.map((answer) => answer.antwort.length)) : 0, "answer")}
+      data-answer-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? Math.max(0, ...slide.frage.antworten.map((answer) => answer.antwort.length), ...slide.frage.antwortfelder.flatMap((field) => field.loesungen.map((solution) => solution.loesung_text.length))) : 0, "answer")}
       data-pixel-status={slide?.typ === "frage" && pixelState ? "visible" : undefined}
     >
       <PresentationDesignBackdrop theme={theme} images={collageImages} storybookComposition={storybookComposition} />
@@ -2733,7 +2736,7 @@ function renderAktuellenSlide() {
           storybookComposition={storybookComposition}
         />
       )}
-      <PresentationDesignStage theme={theme} storybookComposition={storybookComposition} contentKey={`${slideIndex}:${slide?.typ}:${theme.design.stylePreset}:${templateRevealCount}:${estimationPhase}`}>
+      <PresentationDesignStage theme={theme} storybookComposition={storybookComposition} contentKey={`${slideIndex}:${slideContentKey}:${pollContentKey}:${theme.design.stylePreset}:${templateRevealCount}:${estimationPhase}`}>
         {estimationPhase !== "HIDDEN"
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}

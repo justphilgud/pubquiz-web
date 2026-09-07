@@ -1,6 +1,7 @@
 # AP5 – Präsentationsqualität und Renderer
 
-Status: Implementierung und lokale Prüfung; Preview-Abnahme noch ausstehend.
+Status: Implementiert und auf Preview bereitgestellt; visuelle und Audio-Abnahme
+wartet auf Anmeldung an der neuen Deployment-Adresse.
 
 ## 1. Ausgangsvertrag und Inventar
 
@@ -56,11 +57,25 @@ auch in Storybook. Strukturierte Felder behalten ihre Layoutpriorität.
 11 neue Tests mit 19 Inhaltsfällen × vier Designwelten sowie Audio-/Warnprüfungen.
 Erste vollständige Suite: 1059 Tests bestanden (391 + 508 + 11 + 149).
 TypeScript, repositoryweiter ESLint und Prisma-Validierung bestanden.
-Production-Build, CI und finaler Stand werden nach Abschluss ergänzt.
+Production-Build bestanden. Der erste Versuch scheiterte ausschließlich am
+eingeschränkten Google-Fonts-Netzwerkzugriff; Wiederholung mit Netzwerkfreigabe grün.
+Nach den letzten Änderungen: TypeScript, gezielter ESLint und 28 Renderer-Tests grün.
+Preview-CI #147 (`34128157855`) und Feature-CI #148 (`34128157936`) erfolgreich.
+Deployment #154 (`34128383801`, Job `101762331475`) erfolgreich, inklusive Smoke-Test.
+Bestehende CI-Warnung: checkout/setup-node v4 verwenden eine ältere Actions-Runtime;
+kein AP5-Fehler und in diesem Auftrag nicht geändert.
 
 ## 21–23. Browser und Screenshots
 
-Die reale Preview-Abnahme einschließlich B06 steht noch aus.
+Die Anmeldung im ersten Preview ist bestätigt. Die reale Browsermatrix bei
+1280 × 720 deckte schmale Bildspalten, doppelte Story-/Pollabstände und durch
+Storybook-Dekoration eingeschränkte Lösungen auf. Diese wurden korrigiert.
+Die anschließende lokale Geometrieprüfung verwendet den produktiven Renderer
+und die gebauten Styles/Fonts: 19 Fälle × vier Themes × vier Größen = 304
+Kombinationen. Reguläre Fälle passen bei 1280 × 720, 1920 × 1080 und 2560 × 1440;
+die schmale 900 × 900-Ansicht erhielt zusätzliche einspaltige Anordnungen.
+Überlange Legacyfälle bewahren den Volltext mit explizitem Scroll-Fallback.
+Finale Preview-Screenshots und der reale B06-Ablauf stehen noch aus.
 Die Fixtureseite `/templates/presentation-quality` verwendet den produktiven
 Renderer und dieselbe Liveflächenregel; sie speichert keine Inhalte.
 Audio wird zusätzlich im eigenen Quiz 28 mit regulärem Lifecycle geprüft.
@@ -81,7 +96,13 @@ zeigen, wäre unzutreffend. AP5 bewahrt Volltext und macht Grenzfälle sichtbar.
 Geänderte Verantwortlichkeiten: Renderer und Storybook-Medienintegration,
 DesignStage/Overflowregion, zentrale Lesbarkeitsregeln/CSS, bestehende Editorfelder,
 gemeinsame Fixtures/Tests, interne Referenzseite, Testscript und Dokumentation.
-Dateiliste und finale Commit-/Deployment-Referenzen folgen nach Preview-Abnahme.
+Die Dateiliste folgt nach Preview-Abnahme.
+
+Erster AP5-Runtime-Commit: `36bba85c7108d27604035af6c4ae250c7d13746d`.
+Preview: https://pubquiz-cqmu9qsxa-just-phil-gud.vercel.app
+Deployment-ID: `dpl_9EPD93ZZ2tLvgXrM3Z431x3Saz3z`.
+Die Deployment-Zusammenfassung bestätigt ausdrücklich diesen Runtime-Commit;
+die Workflowdefinition selbst stammt wie bisher vom Default-Branch.
 
 `main` am Start: `e76f57dce19f26488cf9db24b881ab06bf004fd6`.
 Nur Preview ist als Deploymentziel autorisiert; Production bleibt unberührt.

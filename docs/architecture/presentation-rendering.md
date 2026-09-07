@@ -40,7 +40,8 @@ einer skalierten Vorschau fälschlich vom umgebenden Editorfenster abhängig.
 | Frage extended | 32 px | 2,5 cqw | 48 px |
 | Antwort regular | 24 px | 2 cqw | 36 px |
 | Antwort compact/extended | 24 px | 1,7 cqw | 32 px |
-| Story-/Umfragetitel | 32 px | 3,8 cqw | 68 px |
+| Storytitel | 32 px | 3,8 cqw | 68 px |
+| Umfrageprompt | 32 px | 3,5 cqw | 64 px |
 | Fließtext | 24 px | 1,9 cqw | 32 px |
 | Zusatzinformation | 18 px | 1,45 cqw | 26 px |
 | Status | 16 px | 1,15 cqw | 22 px |
@@ -55,7 +56,12 @@ Farben, Fonts, Rahmen, Bildwelten und visuelle Identität stammen aus dem Theme.
 ## Layout und Priorität
 
 Kernfrage und Optionen haben Vorrang vor großen Innenabständen und Dekoration.
-Choice verwendet Frage oben und gleichgewichtete Optionen in zwei Spalten.
+Choice verwendet Frage oben und gleichgewichtete Optionen in zwei Spalten,
+unter 1000 logischen Pixeln in einer Spalte. Lange Bildfragen erhalten zwei
+gleich breite Spalten; lange Standardlösungen 55 % Frage / 45 % Lösung.
+Unter 1450 Pixeln werden Header und Abstände kompakter. Storybook gibt bei
+dichterem Inhalt den für dekorative Galerien reservierten Platz frei; eigentliche
+Fragenmedien bleiben erhalten.
 Medien bleiben proportional (`object-contain`) und erhalten begrenzte Flächen.
 Strukturierte Antworten zeigen Feldbeschriftungen sowie vorhandene Medien über
 dieselbe Medienkarte wie andere Fragen. Pixelstatus erhält reservierten Platz;
@@ -75,7 +81,9 @@ Für eine Projektion muss der Inhalt dann redaktionell reduziert werden.
 
 `PresentationOverflowRegion` misst einmal beim Inhalts-/Slidewechsel und bei
 tatsächlichen Größenänderungen über ResizeObserver; Medien-load kann ebenfalls
-eine Messung auslösen. Keine Messung pro Animationsframe, kein zusätzliches
+eine Messung auslösen, ebenso das Laden der Fonts. Ein Inhaltsfingerabdruck
+erfasst auch Änderungen auf derselben Slide, ohne den Anzeige-Timer einzubeziehen.
+Keine Messung pro Animationsframe, kein zusätzliches
 Polling und keine iterative Schriftanpassung. Der Hinweisplatz bleibt reserviert,
 damit sein Einblenden keine sich selbst auslösende Resize-Schleife erzeugt.
 

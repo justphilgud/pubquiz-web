@@ -45,7 +45,8 @@ for (const style of ["NEON", "EDITORIAL", "BIRTHDAY", "CORPORATE"] as const) {
       const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
       assert.match(html, new RegExp(`data-design-style="${style}"`));
       if (scenario === "choice-long") for (const option of longOptions) assert.ok(html.includes(option));
-      if (["long", "legacy", "image-long", "solution-long"].includes(scenario)) assert.ok(html.includes(longQuestion));
+      if (["long", "legacy", "solution-long"].includes(scenario)) assert.ok(html.includes(longQuestion));
+      if (fixture.slide.typ === "frage") assert.ok(html.includes(fixture.slide.frage.frage));
       if (scenario.startsWith("story")) assert.ok(html.includes(storyText));
       if (scenario === "legacy") assert.equal(html.split(longQuestion).length - 1, 3);
       if (scenario === "choice6") for (const option of ["Berlin", "Wien", "Prag", "Budapest", "Paris", "Rom"]) assert.ok(html.includes(option));
