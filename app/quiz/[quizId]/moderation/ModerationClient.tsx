@@ -920,12 +920,12 @@ export default function ModerationClient({
       />
 
       <main className="flex min-h-dvh flex-col bg-zinc-950 p-3 text-zinc-100 lg:h-dvh lg:overflow-hidden lg:p-4">
-        <header className="mb-3 flex min-h-11 flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2">
-          <div className="min-w-0">
-            <div className="truncate font-bold">{quiz.titel ?? `Quiz ${quizId}`}</div>
+        <header className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-1.5">
+          <div className="min-w-0 max-w-full sm:max-w-64 xl:max-w-80">
+            <div className="truncate text-sm font-semibold" title={quiz.titel ?? `Quiz ${quizId}`}>{quiz.titel ?? `Quiz ${quizId}`}</div>
           </div>
-          <QuizLifecycleControls quizId={quizId} state={lifecycleState} onChange={applyLiveState} />
-          {presentationQuestionAssignmentId && !quizBeendet && <button className="min-h-11 rounded-lg border border-zinc-700 px-4" onClick={async () => {
+          <QuizLifecycleControls quizId={quizId} state={lifecycleState} onChange={applyLiveState} onRequestEnd={() => setConfirmEndOpen(true)} />
+          {presentationQuestionAssignmentId && !quizBeendet && <button className="min-h-9 rounded-lg border border-zinc-700 px-3 text-sm" onClick={async () => {
             try {
               await setQuizQuestionHidden(quizId, presentationQuestionAssignmentId, !questionHidden, lifecycleState.lifecycleRevision);
               setQuestionHidden(!questionHidden);
@@ -933,7 +933,7 @@ export default function ModerationClient({
             } catch (cause) { setActionError(cause instanceof Error ? cause.message : "Aktion fehlgeschlagen."); }
           }}>{questionHidden ? "Frage wieder einblenden" : "Frage schließen / ausblenden"}</button>}
           {actionError && <p role="alert">{actionError}</p>}
-          <Link href={`/quiz/${quizId}`} className="inline-flex min-h-11 items-center rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
+          <Link href={`/quiz/${quizId}`} className="ml-auto inline-flex min-h-9 items-center rounded-lg px-2 py-1 text-sm font-medium text-zinc-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
             {backToQuizLabel}
           </Link>
         </header>
@@ -1179,7 +1179,6 @@ export default function ModerationClient({
               onCountdownDauerChange={setCountdownDauerMinuten}
               onCountdownStart={handleCountdownStart}
               onCountdownReset={handleCountdownReset}
-              onQuizBeenden={() => setConfirmEndOpen(true)}
             />
           </section>
 

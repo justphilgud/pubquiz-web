@@ -13,10 +13,9 @@ import {
   PlayIcon,
   ScaleIcon,
   SpeakerWaveIcon,
-  StopIcon,
 } from "@heroicons/react/24/outline";
 
-import { Button, IconButton } from "@/components/ui";
+import { IconButton } from "@/components/ui";
 
 function formatSeconds(seconds: number | null | undefined) {
   if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
@@ -54,7 +53,6 @@ type Props = {
   onCountdownDauerChange: (value: number) => void;
   onCountdownStart: () => void | Promise<void>;
   onCountdownReset: () => void | Promise<void>;
-  onQuizBeenden: () => void;
 };
 
 export default function ModerationToolbar({
@@ -80,7 +78,6 @@ export default function ModerationToolbar({
   onCountdownDauerChange,
   onCountdownStart,
   onCountdownReset,
-  onQuizBeenden,
 }: Props) {
   return (
     <div className="flex flex-wrap items-start gap-3">
@@ -218,17 +215,7 @@ export default function ModerationToolbar({
         />
       </div>
 
-      <div className="ml-auto pt-3">
-        <Button
-          type="button"
-          variant="danger"
-          onClick={onQuizBeenden}
-          className="gap-2"
-        >
-          <StopIcon className="h-5 w-5" />
-          Quiz beenden
-        </Button>
-      </div>
+
     </div>
   );
 }

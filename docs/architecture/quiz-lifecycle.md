@@ -210,3 +210,17 @@ Diagnose/Freigabe und ihr npm-Hook wurden anschließend wieder entfernt.
 [Submission- und Moderationskonsistenz](submission-live-state.md) definiert den
 rein lesenden Antwortzähler aus gespeichertem Inhalt und wirksamen finalen
 Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln.
+
+## UI-Nachtrag: kompakte Moderationsleiste
+
+Status und Lifecycle-Aktionen stehen gemeinsam im oberen Header: PREPARATION
+zeigt Start und Reset, RUNNING Beenden und Reset, STOPPED nur Reset. Beenden
+öffnet unverändert den bestehenden Bestätigungsdialog der Moderation. Start und
+Reset behalten Revisionsprüfung, Pending-/Doppelklickschutz und Resetbestätigung.
+Die untere Foliensteuerung enthält keinen zusätzlichen Beenden-Button und keinen
+zugehörigen Platzhalter. Navigation zur Quizverwaltung ist optisch separat.
+
+Die Leiste verwendet reduzierte Abstände, mindestens 36 px hohe Klickziele und
+umbricht bei geringer Breite. Lange Quiznamen werden mit vollständig verfügbarem
+Titel gekürzt. Dies ändert ausschließlich Darstellung und Bedienort, keine
+Lifecycle-, Submission-, Bewertungs- oder Schreibregeln.
