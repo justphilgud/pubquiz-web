@@ -1,7 +1,8 @@
 # Umgebungen, Preview-Refresh und Backups
 
-Stand: 7. September 2026. **Teilweise vorbereitet, kein aktiver Backupbetrieb.**
-Der [INFRA-AP1-Bericht](../reports/infra-ap1-preview-backup.md) trennt reale Nachweise
+Stand: 10. September 2026. **Teilweise vorbereitet, kein DB-Refresh und kein aktiver Backupbetrieb.**
+Der [aktuelle Verifikationsbericht](../reports/infra-ap1-production-preview-2026-09-10.md)
+ergänzt den [ersten INFRA-AP1-Bericht](../reports/infra-ap1-preview-backup.md) und trennt reale Nachweise
 von noch nicht ausführbaren Schritten. Ein Dump oder erfolgreicher Upload allein
 ist ausdrücklich kein Restore-Nachweis.
 
@@ -18,11 +19,13 @@ Preview-Arbeit beendet und der aktuelle Production-Release abgenommen sein.
 | Preview | `preview/content-and-quiz-flow` | `ep-wispy-bird-al4hfg4e.c-3.eu-central-1.aws.neon.tech` | `neondb` / `pubquiz` |
 | Development | lokaler Arbeitsstand | `ep-dry-dust-aljik09f.c-3.eu-central-1.aws.neon.tech` | `neondb` / `pubquiz` |
 
-GitHub-Variablen belegen die ersten zwei Endpoints; lokale Development-Konfiguration
-belegt den dritten. GitHub bezeichnet `wispy-bird`/`dawn-paper` als erwartete
-Branchkennung, technisch sind dies Endpointbestandteile, **keine verifizierten
-Neon-Projekt- oder Branch-IDs**. Deren Zuordnung und der aktuelle Neon-Tarif bleiben
-bis zum autorisierten Providerzugriff offen. Poolerhost = Endpoint plus `-pooler`.
+Neon-Konsole und GitHub-Variablen bestätigen die Endpoints. Projekt **pubquiz**:
+`sparkling-dust-66487393`, Organisation `org-red-fog-55598232`, Tarif **Launch**.
+Production: `br-noisy-art-al7qjmqd` (Default); Preview: `br-gentle-lab-allcaleq`;
+Development: `br-royal-shadow-al4hjwcu` (in der Branchliste als archiviert angezeigt).
+Preview und Development sind Kinder von Production. GitHub bezeichnet
+`wispy-bird`/`dawn-paper` als erwartete Branchkennung; technisch sind dies
+Endpointbestandteile, keine Neon-Branch-IDs. Poolerhost = Endpoint plus `-pooler`.
 Für Dump/Restore direkte Verbindung und PostgreSQL-Client gleicher oder neuerer
 Hauptversion verwenden. Keine Poolerkennung als eigenständige Isolation behandeln.
 
@@ -40,9 +43,11 @@ innerhalb des konfigurierten Restore-Fensters ohne Supportanfrage. Planlimits la
 [Neon](https://neon.com/faqs/databases-recover-accidental-data-deletion): Free bis
 6 Stunden/1 GB Änderungen, Launch bis 7 Tage, Scale bis 30 Tage. Das konfigurierte
 Fenster gilt projektweit; siehe [Projektverwaltung](https://neon.com/docs/manage/projects).
-Limits sind keine Zusage, dass dieses Projekt sie aktiviert hat. Tatsächlicher
-Tarif, Retention, Branchlimits, Kosten und Restore-Verfügbarkeit: **unverifiziert**,
-Neon-Konsole erfordert Anmeldung. Vor dem nächsten Release projektspezifisch belegen.
+Am 10.09.2026 über die bestehende GitHub-Anmeldung in Neon verifiziert: **Launch,
+History window 6 Stunden**, drei vorhandene Branches. Das Fenster wurde nicht
+verändert. Sieben Tage sind das Tarifmaximum, nicht das konfigurierte Fenster.
+Die UI zeigt 3/5000 Branches als technische Grenze; dies ist keine Aussage über
+kostenlose Branches. Ein echter historischer Restore wurde nicht ausgeführt.
 Provider-Recovery ersetzt keinen unabhängig gelagerten PostgreSQL-Dump.
 
 ## Preview-Refresh: derzeit bis zum Guard vorbereitet
@@ -87,8 +92,12 @@ URLs nicht automatisch um. Vollständiges Produktionsreferenzinventar ist noch o
 
 Vercel zeigt den **öffentlichen** Store `pubquiz-media-public`
 (`store_bIx6H2j23vJzi240`), angebunden an Production und Preview. Zusätzlich bestehen
-branchspezifische Preview-Overrides für Store-ID/Token/Webhook. Deren wirksame
-Store- und Rechtezuordnung ist nicht vollständig verifiziert. Keine Tokenwerte
+branchspezifische Preview-Overrides für Store-ID/Token/Webhook. Die Store-ID des
+Preview-Branches verweist auf den separaten öffentlichen Store **pubquiz-media-nonprod**
+(`store_VzfNwjccgkzhc9bi`) mit `dev/`- und `preview/`-Präfixen. Die tatsächliche
+Tokenzuordnung und die Isolation für andere Preview-Branches sind nicht vollständig
+verifiziert. Die allgemeine Production-und-Preview-Tokenbindung ist weiterhin vorhanden.
+Keine Tokenwerte
 enthüllen, kopieren oder im Bericht veröffentlichen.
 
 Präfixprüfungen im Anwendungscode (z. B. Teamfoto-Löschung) sind vorhanden,
@@ -121,8 +130,12 @@ Größe/Prüfsumme sind technische Metadaten, Datensätze bleiben privat.
 
 ### Speicher, Verschlüsselung und Rechte
 
-Es existiert derzeit **kein eingerichteter privater Backupspeicher**. Der vorhandene
-öffentliche App-Blob-Store wird abgewiesen. GitHub-Artefakte des öffentlichen
+Es existiert ein privater Store **pubquiz-media** (`store_BVRjATGCRBW0fBeF`),
+aber **kein verifiziert eingerichteter dedizierter Backupzugang mit Retention**.
+Sein bestehender Zweck darf nicht stillschweigend umgewidmet werden. GitHub hat
+weiterhin keine Repository-Backupsecrets; Production besitzt in Neon nur die
+angezeigte Rolle `neondb_owner`, keinen `pubquiz_backup_reader`.
+Öffentliche App-Blob-Stores werden abgewiesen. GitHub-Artefakte des öffentlichen
 Repositories sind ungeeignet: Nutzer mit Repository-Lesezugriff können sie laden
 ([GitHub](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts)).
 
