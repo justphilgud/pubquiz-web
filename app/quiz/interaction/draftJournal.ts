@@ -1,4 +1,4 @@
-import type { DraftEntry } from "./answerDraftController";
+import { sameDraft, type DraftEntry } from "./answerDraftController";
 
 const MAX_AGE = 24 * 60 * 60 * 1000;
 function isDraft(value: unknown): boolean {
@@ -25,29 +25,59 @@ export function readDraftJournal(raw: string | null, now = Date.now()): Record<n
   } catch { return {}; }
 }
 
-/** Separate records per mounted client: another tab never overwrites the local recovery copy. */
-export function createDraftJournal(scope: string, storage: Storage, clientId: string) {
+/** Separate records per mounted client; unconfirmed content in another tab stays protected. */
+export function createDraftJournal(scope: string, storage: Storage, clientId: string, tabStorage?: Storage) {
   const prefix = `quiz-unsaved-v1:${scope}:`;
   const key = `${prefix}${clientId}`;
-
+  const ignoredKey = `quiz-dismissed-recovery:${scope}`;
+  let priorIgnored: unknown = [];
+  try { priorIgnored = JSON.parse(tabStorage?.getItem(ignoredKey) ?? "[]"); } catch { /* Ignore corrupt receipts, never answer content. */ }
+  const ignored = new Set<string>(Array.isArray(priorIgnored) ? priorIgnored.filter(value => typeof value === "string").slice(-200) : []);
+  let sources: { key: string; raw: string; at: number; entries: Record<number, DraftEntry> }[] = [];
+  const receipt = (source: { key: string; at: number }, id: string) => `${source.key}:${source.at}:${id}`;
   return {
     load() {
-      const own = readDraftJournal(storage.getItem(key));
-      if (Object.keys(own).length) return own;
-      const records: { key: string; at: number; entries: Record<number, DraftEntry> }[] = [];
+      sources = [];
       for (let i = 0; i < storage.length; i++) {
         const candidate = storage.key(i);
         if (!candidate?.startsWith(prefix)) continue;
         const raw = storage.getItem(candidate);
         const entries = readDraftJournal(raw);
-        if (Object.keys(entries).length) records.push({ key: candidate, at: JSON.parse(raw!).at, entries });
+        if (Object.keys(entries).length) {
+          const source = { key: candidate, raw: raw!, at: JSON.parse(raw!).at, entries };
+          source.entries = Object.fromEntries(Object.entries(entries).filter(([id]) => !ignored.has(receipt(source, id))));
+          sources.push(source);
+        }
       }
-      records.sort((a, b) => a.at - b.at);
-      return Object.assign({}, ...records.map(record => record.entries)) as Record<number, DraftEntry>;
+      sources.sort((a, b) => a.at - b.at);
+      return Object.assign({}, ...sources.map(source => source.entries)) as Record<number, DraftEntry>;
     },
     save(entries: Record<number, DraftEntry>) {
-      if (Object.keys(entries).length) storage.setItem(key, JSON.stringify({ version: 1, at: Date.now(), entries }));
+      const pending = Object.fromEntries(Object.entries(entries).filter(([, entry]) => entry.status !== "saved"));
+      if (Object.keys(pending).length) storage.setItem(key, JSON.stringify({ version: 1, at: Date.now(), entries: pending }));
       else storage.removeItem(key);
+      for (const source of sources) {
+        // Never modify a record another client has changed since recovery.
+        if (storage.getItem(source.key) !== source.raw) continue;
+        const remaining = readDraftJournal(source.raw);
+        for (const [id, recovered] of Object.entries(source.entries)) {
+          const current = entries[Number(id)];
+          if (current?.status !== "saved" || current.runId !== recovered.runId) continue;
+          if (sameDraft(current.serverValue, recovered.value)) {
+            // This exact backup is now confirmed on the server. It is safe to retire.
+            delete remaining[Number(id)];
+          } else {
+            // A deliberate different choice is remembered only by this tab. Another
+            // active tab keeps its own unconfirmed copy and may still resolve it.
+            ignored.add(receipt(source, id));
+          }
+        }
+        const nextRaw = JSON.stringify({ version: 1, at: source.at, entries: remaining });
+        if (Object.keys(remaining).length) storage.setItem(source.key, nextRaw);
+        else storage.removeItem(source.key);
+        source.raw = nextRaw;
+      }
+      tabStorage?.setItem(ignoredKey, JSON.stringify([...ignored].slice(-200)));
     },
   };
 }

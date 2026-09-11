@@ -48,7 +48,7 @@ export class AnswerDraftController {
   private put(id: number, entry: DraftEntry) {
     if (this.disposed) return;
     this.entries = { ...this.entries, [id]: entry };
-    this.dependencies.persist(this.journal());
+    this.dependencies.persist(this.entries);
     this.listeners.forEach(listener => listener());
   }
   private clearTimer(id: number) {
@@ -67,7 +67,7 @@ export class AnswerDraftController {
     for (const [id, entry] of Object.entries(journal)) {
       this.entries = { ...this.entries, [Number(id)]: { ...entry, writable: false, status: "recovered", failures: 0 } };
     }
-    this.dependencies.persist(this.journal());
+    this.dependencies.persist(this.entries);
     this.listeners.forEach(listener => listener());
   }
   hydrate(id: number, runId: number, value: TeamAnswerDraft, revision: number, writable: boolean) {

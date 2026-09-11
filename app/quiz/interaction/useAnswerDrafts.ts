@@ -23,9 +23,10 @@ export function useAnswerDrafts(scope: string | null, save: (id: number, runId: 
   const entries = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
   useEffect(() => {
     controller.activate();
+    journalRef.current = null;
     if (scope) {
       try {
-        journalRef.current = createDraftJournal(scope, localStorage, crypto.randomUUID());
+        journalRef.current = createDraftJournal(scope, localStorage, crypto.randomUUID(), sessionStorage);
         const recovered = journalRef.current.load();
         controller.restore(recovered);
       } catch {

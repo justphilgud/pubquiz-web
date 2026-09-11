@@ -41,6 +41,28 @@ test("reload protects the latest unconfirmed text; one tab never deletes another
   assert.deepEqual(readDraftJournal(JSON.stringify({ version: 1, at: 0, entries: c.journal() })), {});
 });
 
+test("a recovered backup cannot resurrect after confirmation or a deliberate choice and another reload", () => {
+  const memory = (): Storage => {
+    const map = new Map<string,string>();
+    return { get length() { return map.size; }, key: i => [...map.keys()][i] ?? null,
+      getItem: k => map.get(k) ?? null, setItem: (k,v) => { map.set(k,v); }, removeItem: k => { map.delete(k); }, clear: () => map.clear() };
+  };
+  const storage = memory(), tab = memory();
+  const old = createDraftJournal("quiz:team", storage, "old", tab);
+  const c = new AnswerDraftController({ save: async () => ({ success: true, draftRevision: 5 }), persist: e => old.save(e), schedule: () => 0, cancel: () => {} });
+  c.hydrate(1,10,value("Berlin"),4,true); c.edit(1,value("Hamburg"));
+  const reload = createDraftJournal("quiz:team", storage, "reload", tab);
+  const recovered = reload.load();
+  reload.save({ ...recovered, 1: { ...recovered[1], status: "saved", serverValue: value("Hamburg"), value: value("Hamburg"), baseRevision: 5, serverRevision: 5 } });
+  assert.deepEqual(createDraftJournal("quiz:team", storage, "again", tab).load(), {});
+  c.edit(1,value("Bremen"));
+  const choice = createDraftJournal("quiz:team", storage, "choice", tab);
+  const pending = choice.load();
+  choice.save({ 1: { ...pending[1], status: "saved", value: value("Leipzig"), serverValue: value("Leipzig") } });
+  assert.deepEqual(createDraftJournal("quiz:team", storage, "after-choice", tab).load(), {});
+  assert.equal(createDraftJournal("quiz:team", storage, "other-tab", memory()).load()[1].value.antwortText, "Bremen");
+});
+
 // Execute the real write function with an in-memory transaction. The clock is sampled
 // after locks, as in production; request start time never extends the deadline.
 for (const offset of [-10000, -1, 0, 1, 5000]) {

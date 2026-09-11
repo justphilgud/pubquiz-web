@@ -390,3 +390,9 @@ Regression: `answerDraftController.test.ts`, `participantRecovery.test.ts` und
 `teamJoinRecovery.test.ts`; zusätzlich bestehende Interaction-, Lifecycle-,
 Submission-, Evaluation- und Pixel-Suiten. Deadline-Tests führen den echten
 Save-Funktionskörper mit kontrollierter Transaktion und Uhr vor/an/nach Ablauf aus.
+
+Browser-Regressionsnachtrag: Nach Wiederaufnahme werden alte Sicherungskopien
+entfernt, sobald genau ihr Inhalt serverseitig bestätigt ist. Eine bewusst andere
+Wahl wird nur für das entscheidende Browserfenster als erledigt vermerkt; die
+ungespeicherte Kopie eines parallelen Fensters bleibt erhalten. Ein späterer Reload
+darf eine bereits bestätigte Sicherung nicht nochmals als Konflikt hervorholen.
