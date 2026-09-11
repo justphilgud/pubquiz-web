@@ -6,8 +6,6 @@ import { QUIZ_LIFECYCLE_LABELS, type QuizLifecycle } from "../../quizLifecycle";
 import { useEffect, useRef, useState } from "react";
 import {
   searchTeamsForAntworten,
-  saveTeamAntwortDraft,
-  startQuizTeamSession,
   submitTeamAntwort,
   stopPixelbildAntwort,
 } from "../../actions";
@@ -37,7 +35,11 @@ import type { TeamProfile } from "@/app/teams/teamProfile";
 import { submitLivePollResponse } from "@/app/umfragen/actions";
 import { getLivePollPollingDelay } from "@/app/umfragen/livePollRuntime";
 
-type TeamAntwortState = TeamAnswerDraft;
+import { useAnswerDrafts } from "../../interaction/useAnswerDrafts";
+import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
+import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
+import AnswerSaveStatus from "./AnswerSaveStatus";
+import type { saveTeamAntwortDraft, startQuizTeamSession } from "../../actions";
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
 >;
@@ -50,41 +52,28 @@ async function fetchQuizLiveSnapshot(
   knownLiveRevision?: string,
   knownActiveQuizFragenId?: number | null,
 ) {
-  const response = await fetch("/api/quiz/team-live-snapshot", {
-    method: "POST",
-    cache: "no-store",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      quizId,
-      quizTeamSessionToken,
-      knownLiveRevision,
-      knownActiveQuizFragenId,
-    }),
-  });
-  if (response.status === 401) throw new InvalidTeamSessionError();
-  if (!response.ok) throw new Error("Live-Status konnte nicht geladen werden.");
-  return await response.json() as QuizLiveSnapshot & {
-    answerStatus?: AntwortStatus | null;
-  };
+  try {
+    return await participantRequest<QuizLiveSnapshot & { answerStatus?: AntwortStatus | null }>("/api/quiz/team-live-snapshot", {
+      quizId, quizTeamSessionToken, knownLiveRevision, knownActiveQuizFragenId,
+    });
+  } catch (error) {
+    if (error instanceof ParticipantRequestError && error.status === 401) throw new InvalidTeamSessionError();
+    throw error;
+  }
 }
 
 async function fetchQuizAnswerStatus(
   quizId: number,
   quizTeamSessionToken?: string,
 ) {
-  const response = await fetch("/api/quiz/team-live-snapshot", {
-    method: "POST",
-    cache: "no-store",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      quizId,
-      quizTeamSessionToken,
-      includeAnswerStatus: true,
-    }),
-  });
-  if (response.status === 401) throw new InvalidTeamSessionError();
-  if (!response.ok) throw new Error("Antwortstatus konnte nicht geladen werden.");
-  return await response.json() as AntwortStatus | null;
+  try {
+    return await participantRequest<AntwortStatus | null>("/api/quiz/team-live-snapshot", {
+      quizId, quizTeamSessionToken, includeAnswerStatus: true,
+    });
+  } catch (error) {
+    if (error instanceof ParticipantRequestError && error.status === 401) throw new InvalidTeamSessionError();
+    throw error;
+  }
 }
 
 type AntwortStatus = {
@@ -215,13 +204,6 @@ export default function QuizAntwortClient({
     null
   );
 
-  const [antworten, setAntworten] = useState<Record<number, TeamAntwortState>>(
-    {}
-  );
-  const [draftRevisions, setDraftRevisions] = useState<Record<number, number>>(
-    {},
-  );
-  const draftRevisionsRef = useRef(draftRevisions);
   const [submissionStatuses, setSubmissionStatuses] = useState<
     Record<number, "SUBMITTED" | "AUTO_FINALIZED" | undefined>
   >({});
@@ -230,12 +212,7 @@ export default function QuizAntwortClient({
   >({});
   const [locallyEditedSinceSubmission, setLocallyEditedSinceSubmission] =
     useState<Record<number, boolean | undefined>>({});
-  const [draftEditVersions, setDraftEditVersions] = useState<
-    Record<number, number | undefined>
-  >({});
-  const draftEditVersionsRef = useRef(draftEditVersions);
   const hydratedSessionTokenRef = useRef<string | null>(null);
-  const questionRunIdsRef = useRef<Record<number, number | null>>({});
   const [currentSubmissionStatus, setCurrentSubmissionStatus] = useState<
     "SUBMITTED" | "AUTO_FINALIZED" | null
   >(null);
@@ -270,13 +247,28 @@ export default function QuizAntwortClient({
     (team) => team.teamname.toLowerCase() === teamname.trim().toLowerCase()
   );
 
-  useEffect(() => {
-    draftRevisionsRef.current = draftRevisions;
-  }, [draftRevisions]);
-
-  useEffect(() => {
-    draftEditVersionsRef.current = draftEditVersions;
-  }, [draftEditVersions]);
+  const { controller, entries, storageError } = useAnswerDrafts(
+    session ? `${liveDaten.quiz_id}:${session.quiz_team_session_id}` : null,
+    async (questionId, runId, revision, draft) => {
+      const question = liveDaten.fragen.find(q => q.quiz_fragen_id === questionId);
+      if (!session || !question || !speicherBlockId) return { success: false, reason: "LIVE_STATE_CHANGED" };
+      const result = await participantRequest<Awaited<ReturnType<typeof saveTeamAntwortDraft>>>("/api/quiz/team-answer-draft", {
+        quizId: liveDaten.quiz_id, quizAbschnittId: speicherBlockId, quizFragenId: questionId,
+        quizTeamSessionToken: session.sessionToken, interactionRunId: runId, expectedDraftRevision: revision,
+        antwortText: draft.antwortText, antwortId: draft.antwortId, antwortIds: draft.antwortIds,
+        antwortfelder: Object.entries(draft.antwortfelder).map(([id, text]) => ({ antwortfeldId: Number(id), antwortText: text })),
+      });
+      if (!result.success) return result;
+      return { ...result, confirmedValue: {
+        antwortText: result.confirmedDraft.answerText,
+        antwortId: result.confirmedDraft.selectedAnswerIds[0] ?? null,
+        antwortIds: [...result.confirmedDraft.selectedAnswerIds],
+        antwortfelder: Object.fromEntries(result.confirmedDraft.structuredAnswers.map(field => [field.fieldId, field.answerText ?? ""])),
+      } };
+    },
+  );
+  const antworten = Object.fromEntries(Object.entries(entries).map(([id, entry]) => [id, entry.value]));
+  const draftRevisions = Object.fromEntries(Object.entries(entries).map(([id, entry]) => [id, entry.baseRevision]));
 
   useEffect(() => {
     if (!liveDaten.teamProfile) return;
@@ -297,28 +289,33 @@ export default function QuizAntwortClient({
   }
 
   useEffect(() => {
-    const gespeicherteSession = localStorage.getItem(
-      `quiz-session-${liveDaten.quiz_id}`
-    );
-
-    if (!gespeicherteSession) return;
-
     try {
+      const gespeicherteSession = localStorage.getItem(`quiz-session-${liveDaten.quiz_id}`);
+      if (!gespeicherteSession) {
+        const raw = localStorage.getItem(`quiz-join-attempt-${liveDaten.quiz_id}`);
+        if (raw) {
+          const prior = JSON.parse(raw);
+          // Synchronize the persisted join attempt from external browser storage.
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          if (typeof prior.name === "string") setTeamname(prior.name);
+        }
+        return;
+      }
       const parsedSession = JSON.parse(gespeicherteSession) as TeamSession;
       if (!parsedSession.sessionToken) {
         localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
         return;
       }
       // Restore the external localStorage session into the client state.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSession(parsedSession);
       setTeamname(parsedSession.teamname);
     } catch {
-      localStorage.removeItem(`quiz-session-${liveDaten.quiz_id}`);
+      setMeldung("Der Browserspeicher ist nicht verfügbar oder enthält ungültige Daten. Bitte den Teambeitritt erneut versuchen.");
     }
   }, [liveDaten.quiz_id]);
 
   useEffect(() => {
+    let active = true;
     const timeout = window.setTimeout(async () => {
       const suchtext = teamname.trim();
 
@@ -328,12 +325,14 @@ export default function QuizAntwortClient({
       }
 
       setIsLoadingTeams(true);
-      const result = await searchTeamsForAntworten(suchtext);
-      setTeamVorschlaege(result);
-      setIsLoadingTeams(false);
+      try {
+        const result = await boundedParticipantAction(searchTeamsForAntworten(suchtext));
+        if (active) setTeamVorschlaege(result);
+      } catch { if (active) setTeamVorschlaege([]); }
+      finally { if (active) setIsLoadingTeams(false); }
     }, 250);
 
-    return () => window.clearTimeout(timeout);
+    return () => { active = false; window.clearTimeout(timeout); };
   }, [teamname, session]);
 
   useEffect(() => {
@@ -352,7 +351,7 @@ export default function QuizAntwortClient({
       if (!active) return;
       const delay = livePollStateRef.current
         ? getLivePollPollingDelay({ hidden: document.hidden, consecutiveFailures })
-        : 500;
+        : Math.min(8000, 500 * 2 ** Math.min(consecutiveFailures, 4));
       pollTimeout = window.setTimeout(() => void refresh(), delay);
     }
     async function refresh() {
@@ -411,28 +410,10 @@ export default function QuizAntwortClient({
         const question = liveDaten.fragen.find(
           (entry) => entry.quiz_fragen_id === nextQuestionId,
         );
-        if (
-          question &&
-          teamState?.draft &&
-          teamState.draft.revision >
-            (draftRevisionsRef.current[question.quiz_fragen_id] ?? 0)
-        ) {
-          const serverDraft = interactionPayloadToDraft(
-            question.interaction,
-            teamState.draft.payload as QuizInteractionPayload,
-          );
-          if (
-            (draftEditVersionsRef.current[question.quiz_fragen_id] ?? 0) === 0
-          ) {
-            setAntworten((current) => ({
-              ...current,
-              [question.quiz_fragen_id]: serverDraft,
-            }));
-          }
-          setDraftRevisions((current) => ({
-            ...current,
-            [question.quiz_fragen_id]: teamState.draft!.revision,
-          }));
+        if (question?.interactionRun && teamState?.draft) {
+          controller.hydrate(question.quiz_fragen_id, question.interactionRun.id,
+            interactionPayloadToDraft(question.interaction, teamState.draft.payload as QuizInteractionPayload),
+            teamState.draft.revision, teamState.canEdit);
         }
         if (question && teamState?.submission?.status) {
           setSubmissionStatuses((current) => ({
@@ -484,13 +465,14 @@ export default function QuizAntwortClient({
     session,
     session?.sessionToken,
     daten,
+    controller,
   ]);
 
   function saveLivePoll(input: { selectedOptionId?: string; text?: string }) {
     if (!session || !livePollState || livePollState.state !== "OPEN") return;
     setIsSubmitting(true);
     setMeldung("");
-    void submitLivePollResponse({ quizId: liveDaten.quiz_id, quizTeamSessionToken: session.sessionToken, ...input }).then((result) => {
+    void boundedParticipantAction(submitLivePollResponse({ quizId: liveDaten.quiz_id, quizTeamSessionToken: session.sessionToken, ...input })).then((result) => {
       setMeldung(result.message);
       if (result.success) {
         setLivePollResponse({ selectedOptionId: input.selectedOptionId ?? null, text: input.text?.trim() ?? null });
@@ -499,308 +481,62 @@ export default function QuizAntwortClient({
   }
 
   useEffect(() => {
-    if (
-      !session ||
-      !speicherBlockId ||
-      blockIstGesperrt ||
-      isSubmitting
-    ) {
-      return;
+    if (!session || hydratedSessionTokenRef.current !== session.sessionToken) return;
+    const visible = new Set<number>();
+    const statuses: Record<number, "SUBMITTED" | "AUTO_FINALIZED"> = {};
+    const submittedRevisions: Record<number, number> = {};
+    for (const question of liveDaten.fragen) {
+      if (!question.interactionRun) continue;
+      visible.add(question.quiz_fragen_id);
+      const saved = question.gespeicherteAntwort;
+      const value: TeamAnswerDraft = saved ? {
+        antwortText: saved.antwortText, antwortId: saved.antwortId, antwortIds: saved.antwortIds,
+        antwortfelder: Object.fromEntries((saved.antwortfelder ?? []).map(f => [f.antwortfeldId, f.antwortText ?? ""])),
+      } : EMPTY_TEAM_DRAFT;
+      controller.hydrate(question.quiz_fragen_id, question.interactionRun.id, value, saved?.draftRevision ?? 0,
+        !liveDaten.blockIstGesperrt && question.istFreigegeben && ["OPEN", "COUNTDOWN"].includes(question.interactionRun.state));
+      if (saved?.submissionStatus) statuses[question.quiz_fragen_id] = saved.submissionStatus;
+      if (saved?.submissionDraftRevision != null) submittedRevisions[question.quiz_fragen_id] = saved.submissionDraftRevision;
     }
-    const timeout = window.setTimeout(async () => {
-      const visibleQuestionIds = new Set(
-        liveDaten.fragen.map((frage) => frage.quiz_fragen_id),
-      );
-      try {
-        const results = await Promise.all(
-          Object.entries(antworten)
-            .filter(([quizFragenId]) => {
-              const id = Number(quizFragenId);
-              const question = liveDaten.fragen.find(
-                (entry) => entry.quiz_fragen_id === id,
-              );
-              return (
-                visibleQuestionIds.has(id) &&
-                (draftEditVersions[id] ?? 0) > 0 &&
-                Boolean(
-                  question?.interactionRun &&
-                  ["OPEN", "COUNTDOWN"].includes(question.interactionRun.state),
-                )
-              );
-            })
-            .map(async ([quizFragenId, antwort]) => {
-              const questionId = Number(quizFragenId);
-              const question = liveDaten.fragen.find(
-                (entry) => entry.quiz_fragen_id === questionId,
-              )!;
-              const editVersion = draftEditVersions[questionId] ?? 0;
-              const result = await saveTeamAntwortDraft({
-                quizId: liveDaten.quiz_id,
-                quizAbschnittId: speicherBlockId,
-                quizFragenId: questionId,
-                quizTeamSessionToken: session.sessionToken,
-                interactionRunId: question.interactionRun!.id,
-                expectedDraftRevision: draftRevisions[questionId] ?? 0,
-                antwortText: antwort.antwortText,
-                antwortId: antwort.antwortId,
-                antwortIds: antwort.antwortIds,
-                antwortfelder: Object.entries(antwort.antwortfelder).map(
-                  ([antwortfeldId, antwortText]) => ({
-                    antwortfeldId: Number(antwortfeldId),
-                    antwortText,
-                  }),
-                ),
-              });
-              return { questionId, editVersion, result };
-            }),
-        );
-        for (const { questionId, editVersion, result } of results) {
-          if (result.success) {
-            setDraftRevisions((current) => ({
-              ...current,
-              [questionId]: result.draftRevision,
-            }));
-            setDraftEditVersions((current) => ({
-              ...current,
-              [questionId]: current[questionId] === editVersion
-                ? 0
-                : current[questionId],
-            }));
-          } else if (result.reason === "FINALIZED") {
-            setSubmissionStatuses((current) => ({
-              ...current,
-              [questionId]: "SUBMITTED",
-            }));
-          }
-        }
-        const conflict = results.find(
-          ({ result }) => !result.success && result.reason === "REVISION_CONFLICT",
-        );
-        if (conflict) {
-          const snapshot = await fetchQuizLiveSnapshot(
-            liveDaten.quiz_id,
-            session.sessionToken,
-          );
-          const question = liveDaten.fragen.find(
-            (entry) => entry.quiz_fragen_id === conflict.questionId,
-          );
-          if (question && snapshot.teamSpecificState?.draft) {
-            setAntworten((current) => ({
-              ...current,
-              [conflict.questionId]: interactionPayloadToDraft(
-                question.interaction,
-                snapshot.teamSpecificState!.draft!.payload as QuizInteractionPayload,
-              ),
-            }));
-            setDraftRevisions((current) => ({
-              ...current,
-              [conflict.questionId]: snapshot.teamSpecificState!.draft!.revision,
-            }));
-          }
-          setMeldung(
-            "Die Antwort wurde in einem anderen Tab ge\u00e4ndert. Der aktuelle Serverstand wurde geladen.",
-          );
-          return;
-        }
-        if (
-          results.some(
-            ({ result }) => !result.success && result.reason !== "FINALIZED",
-          )
-        ) {
-          const aktuelleDaten = await fetchQuizAnswerStatus(
-            liveDaten.quiz_id,
-            session.sessionToken,
-          );
-          if (aktuelleDaten) setLiveDaten(aktuelleDaten as AntwortStatus);
-          setMeldung(
-            "Die Frage hat inzwischen gewechselt. Der aktuelle Stand wurde neu geladen.",
-          );
-        }
-      } catch {
-        const aktuelleDaten = await fetchQuizAnswerStatus(
-          liveDaten.quiz_id,
-          session.sessionToken,
-        );
-        if (aktuelleDaten) setLiveDaten(aktuelleDaten as AntwortStatus);
-        setMeldung(
-          "Die Frage hat inzwischen gewechselt. Der aktuelle Stand wurde neu geladen.",
-        );
-      }
-    }, 1200);
-
-    return () => window.clearTimeout(timeout);
-  }, [
-    antworten,
-    session,
-    speicherBlockId,
-    liveDaten.offenerBlock,
-    liveDaten.quiz_id,
-    liveDaten.fragen,
-    blockIstGesperrt,
-    draftRevisions,
-    draftEditVersions,
-    isSubmitting,
-  ]);
-
-  useEffect(() => {
-    const geladeneAntworten: Record<number, TeamAntwortState> = {};
-    const geladeneRevisionen: Record<number, number> = {};
-    const geladeneStatus: Record<
-      number,
-      "SUBMITTED" | "AUTO_FINALIZED"
-    > = {};
-    const geladeneSubmissionRevisionen: Record<number, number> = {};
-    const geaenderteEntwuerfe: Record<number, boolean> = {};
-    const changedRunQuestionIds = new Set<number>();
-
-    liveDaten.fragen.forEach((frage) => {
-      const nextRunId = frage.interactionRun?.id ?? null;
-      const previousRunId = questionRunIdsRef.current[frage.quiz_fragen_id];
-      if (previousRunId !== undefined && previousRunId !== nextRunId) {
-        changedRunQuestionIds.add(frage.quiz_fragen_id);
-      }
-      questionRunIdsRef.current[frage.quiz_fragen_id] = nextRunId;
-      if (!frage.gespeicherteAntwort) {
-        return;
-      }
-
-      const feldAntworten: Record<number, string> = {};
-      geladeneRevisionen[frage.quiz_fragen_id] =
-        frage.gespeicherteAntwort.draftRevision;
-      if (frage.gespeicherteAntwort.submissionStatus) {
-        geladeneStatus[frage.quiz_fragen_id] =
-          frage.gespeicherteAntwort.submissionStatus;
-      }
-      if (frage.gespeicherteAntwort.submissionDraftRevision !== null) {
-        geladeneSubmissionRevisionen[frage.quiz_fragen_id] =
-          frage.gespeicherteAntwort.submissionDraftRevision;
-        geaenderteEntwuerfe[frage.quiz_fragen_id] =
-          isDraftChangedSinceSubmission(
-            frage.gespeicherteAntwort.draftRevision,
-            frage.gespeicherteAntwort.submissionDraftRevision,
-          );
-      }
-
-      frage.gespeicherteAntwort.antwortfelder?.forEach((feld) => {
-        feldAntworten[feld.antwortfeldId] = feld.antwortText ?? "";
-      });
-
-      geladeneAntworten[frage.quiz_fragen_id] = {
-        antwortText: frage.gespeicherteAntwort.antwortText,
-        antwortId: frage.gespeicherteAntwort.antwortId,
-        antwortIds: frage.gespeicherteAntwort.antwortIds,
-        antwortfelder: feldAntworten,
-      };
-    });
-
-    // Synchronize newly released server answers without overwriting local edits.
-    setAntworten((current) => {
-      const next = { ...current };
-      for (const questionId of changedRunQuestionIds) {
-        delete next[questionId];
-      }
-      for (const [questionId, answer] of Object.entries(geladeneAntworten)) {
-        if ((draftEditVersionsRef.current[Number(questionId)] ?? 0) === 0) {
-          next[Number(questionId)] = answer;
-        }
-      }
-      return next;
-    });
-    setDraftRevisions((current) => {
-      const next = { ...current };
-      for (const frage of liveDaten.fragen) {
-        if (!(frage.quiz_fragen_id in geladeneRevisionen)) {
-          delete next[frage.quiz_fragen_id];
-        }
-      }
-      return { ...next, ...geladeneRevisionen };
-    });
-    setSubmissionStatuses((current) => {
-      const next = { ...current };
-      for (const frage of liveDaten.fragen) {
-        if (!(frage.quiz_fragen_id in geladeneStatus)) {
-          delete next[frage.quiz_fragen_id];
-        }
-      }
-      return { ...next, ...geladeneStatus };
-    });
-    setSubmissionDraftRevisions((current) => {
-      const next = { ...current };
-      for (const frage of liveDaten.fragen) {
-        if (!(frage.quiz_fragen_id in geladeneSubmissionRevisionen)) {
-          delete next[frage.quiz_fragen_id];
-        }
-      }
-      return { ...next, ...geladeneSubmissionRevisionen };
-    });
-    setLocallyEditedSinceSubmission((current) => {
-      const next = { ...current };
-      for (const frage of liveDaten.fragen) {
-        if (!(frage.quiz_fragen_id in geaenderteEntwuerfe)) {
-          delete next[frage.quiz_fragen_id];
-        }
-      }
-      return { ...next, ...geaenderteEntwuerfe };
-    });
-    setDraftEditVersions((current) => {
-      const next = { ...current };
-      for (const questionId of changedRunQuestionIds) delete next[questionId];
-      return next;
-    });
-  }, [liveDaten.fragen]);
+    controller.pauseMissing(visible);
+    setSubmissionStatuses(statuses);
+    setSubmissionDraftRevisions(submittedRevisions);
+  }, [controller, liveDaten.fragen, liveDaten.blockIstGesperrt, session]);
 
   async function handleStartSession() {
     const name = teamname.trim();
-
-    if (!name) {
-      setMeldung("Bitte einen Teamnamen eingeben.");
-      return;
-    }
-
+    if (!name) { setMeldung("Bitte einen Teamnamen eingeben."); return; }
     setIsStartingSession(true);
     setMeldung("");
-
-    const result = await startQuizTeamSession({
-      quizId: liveDaten.quiz_id,
-      teamname: teamname.trim(),
-      passwort: teamPasswort.trim() || undefined,
-      spielerAnzahl: Math.max(1, Number(spielerAnzahl) || 1),
-    });
-
-    setIsStartingSession(false);
-
-    if (!result.success) {
-      setMeldung(result.message ?? "Team konnte nicht gestartet werden.");
-      return;
-    }
-
-    setSession(result.session);
-    setTeamProfile(result.profile);
-    setTeamProfileInitiallyOpen(result.profileOnboarding);
-    setTeamname(result.session.teamname);
-    setGeneriertesPasswort(result.generiertesPasswort ?? null);
-    setTeamVorschlaege([]);
-    setAntworten({});
-    setDraftRevisions({});
-    setSubmissionStatuses({});
-    setSubmissionDraftRevisions({});
-    setLocallyEditedSinceSubmission({});
-    setDraftEditVersions({});
-    setCurrentSubmissionStatus(null);
-
-    localStorage.setItem(
-      `quiz-session-${liveDaten.quiz_id}`,
-      JSON.stringify(result.session)
-    );
-
-    const aktuelleDaten = await fetchQuizAnswerStatus(
-      liveDaten.quiz_id,
-      result.session.sessionToken
-    );
-
-    if (aktuelleDaten) {
-      setLiveDaten(aktuelleDaten as AntwortStatus);
-    }
+    try {
+      const key = `quiz-join-attempt-${liveDaten.quiz_id}`;
+      const raw = localStorage.getItem(key);
+      const prior = raw ? JSON.parse(raw) : null;
+      const joinRequestId = prior?.name === name && typeof prior.id === "string"
+        ? prior.id : crypto.randomUUID();
+      // Protect the proof BEFORE sending so a reload can retry a lost response.
+      localStorage.setItem(key, JSON.stringify({ name, id: joinRequestId }));
+      const result = await participantRequest<Awaited<ReturnType<typeof startQuizTeamSession>>>("/api/quiz/team-session", {
+        quizId: liveDaten.quiz_id, teamname: name, passwort: teamPasswort.trim() || undefined,
+        spielerAnzahl: Math.max(1, Number(spielerAnzahl) || 1), joinRequestId,
+      });
+      if (!result.success) { setMeldung(result.message ?? "Team konnte nicht gestartet werden."); return; }
+      localStorage.setItem(`quiz-session-${liveDaten.quiz_id}`, JSON.stringify(result.session));
+      localStorage.removeItem(key);
+      setSession(result.session);
+      setTeamProfile(result.profile);
+      setTeamProfileInitiallyOpen(result.profileOnboarding);
+      setTeamname(result.session.teamname);
+      setGeneriertesPasswort(result.generiertesPasswort ?? null);
+      setTeamVorschlaege([]);
+      setSubmissionStatuses({});
+      setSubmissionDraftRevisions({});
+      setLocallyEditedSinceSubmission({});
+      setCurrentSubmissionStatus(null);
+      // The polling loop hydrates the authenticated session, retrying after network loss.
+    } catch {
+      setMeldung("Teambeitritt nicht bestätigt. Bitte Verbindung prüfen und mit demselben Teamnamen erneut versuchen. Auch nach Neuladen ist der Versuch wiederaufnehmbar. Dafür muss der Browserspeicher verfügbar sein.");
+    } finally { setIsStartingSession(false); }
   }
 
   function handleTeamWechseln() {
@@ -814,12 +550,9 @@ export default function QuizAntwortClient({
     setSpielerAnzahl("1");
     setTeamVorschlaege([]);
     setMeldung("");
-    setAntworten({});
-    setDraftRevisions({});
     setSubmissionStatuses({});
     setSubmissionDraftRevisions({});
     setLocallyEditedSinceSubmission({});
-    setDraftEditVersions({});
     setCurrentSubmissionStatus(null);
   }
 
@@ -833,67 +566,20 @@ export default function QuizAntwortClient({
     setIsSubmitting(true);
     setMeldung("");
     try {
-      const saved = await saveTeamAntwortDraft({
-        quizId: liveDaten.quiz_id,
-        quizAbschnittId: speicherBlockId,
-        quizFragenId,
-        quizTeamSessionToken: session.sessionToken,
-        interactionRunId: run.id,
-        expectedDraftRevision: draftRevisions[quizFragenId] ?? 0,
-        antwortText: draft.antwortText,
-        antwortId: draft.antwortId,
-        antwortIds: draft.antwortIds,
-        antwortfelder: Object.entries(draft.antwortfelder).map(
-          ([antwortfeldId, antwortText]) => ({
-            antwortfeldId: Number(antwortfeldId),
-            antwortText,
-          }),
-        ),
-      });
-      if (!saved.success) {
-        if (saved.reason === "REVISION_CONFLICT") {
-          const snapshot = await fetchQuizLiveSnapshot(
-            liveDaten.quiz_id,
-            session.sessionToken,
-          );
-          const question = liveDaten.fragen.find(
-            (entry) => entry.quiz_fragen_id === quizFragenId,
-          );
-          if (question && snapshot.teamSpecificState?.draft) {
-            setAntworten((current) => ({
-              ...current,
-              [quizFragenId]: interactionPayloadToDraft(
-                question.interaction,
-                snapshot.teamSpecificState!.draft!.payload as QuizInteractionPayload,
-              ),
-            }));
-            setDraftRevisions((current) => ({
-              ...current,
-              [quizFragenId]: snapshot.teamSpecificState!.draft!.revision,
-            }));
-          }
-        }
-        setMeldung(
-          saved.reason === "REVISION_CONFLICT"
-            ? "Die Antwort wurde in einem anderen Tab ge\u00e4ndert. Der aktuelle Serverstand wurde geladen; bitte pr\u00fcfen und erneut absenden."
-            : "Die Antwortzeit ist inzwischen beendet.",
-        );
+      if (!await controller.flush(quizFragenId)) {
+        setMeldung("Die aktuelle Antwort ist noch nicht bestätigt. Bitte den Speicherhinweis an der Frage prüfen.");
         return;
       }
-      setDraftRevisions((current) => ({
-        ...current,
-        [quizFragenId]: saved.draftRevision,
-      }));
       if (pixelState?.mode === "STAGED" && liveDaten.activeQuizFragenId === quizFragenId) {
         setMeldung("Antwort gespeichert. Der Stand am Stufenende zählt; Änderungen bleiben möglich.");
         return;
       }
-      const submitted = await submitTeamAntwort({
+      const submitted = await boundedParticipantAction(submitTeamAntwort({
         quizId: liveDaten.quiz_id,
         quizFragenId,
         interactionRunId: run.id,
         quizTeamSessionToken: session.sessionToken,
-      });
+      }));
       if (!submitted.success) {
         setMeldung(
           submitted.reason === "EMPTY_DRAFT"
@@ -917,7 +603,7 @@ export default function QuizAntwortClient({
       setCurrentSubmissionStatus("SUBMITTED");
       setMeldung("Antwort abgegeben.");
     } catch {
-      setMeldung("Die Antwort konnte nicht verbindlich abgegeben werden.");
+      setMeldung("Abgabe nicht bestätigt. Bitte den aktuellen Stand prüfen; die Anfrage kann bereits angekommen sein.");
     } finally {
       setIsSubmitting(false);
     }
@@ -933,37 +619,16 @@ export default function QuizAntwortClient({
     setIsSubmitting(true);
     setMeldung("");
     try {
-      const saved = await saveTeamAntwortDraft({
-        quizId: liveDaten.quiz_id,
-        quizAbschnittId: speicherBlockId,
-        quizFragenId,
-        quizTeamSessionToken: session.sessionToken,
-        interactionRunId: run.id,
-        expectedDraftRevision: draftRevisions[quizFragenId] ?? 0,
-        antwortText: draft.antwortText,
-        antwortId: draft.antwortId,
-        antwortIds: draft.antwortIds,
-        antwortfelder: Object.entries(draft.antwortfelder).map(
-          ([antwortfeldId, antwortText]) => ({
-            antwortfeldId: Number(antwortfeldId),
-            antwortText,
-          }),
-        ),
-      });
-      if (!saved.success) {
-        setMeldung("Die Antwort konnte vor dem Stoppen nicht gespeichert werden.");
+      if (!await controller.flush(quizFragenId)) {
+        setMeldung("Die aktuelle Antwort ist noch nicht bestätigt. Bitte den Speicherhinweis an der Frage prüfen.");
         return;
       }
-      setDraftRevisions((current) => ({
-        ...current,
-        [quizFragenId]: saved.draftRevision,
-      }));
-      const stopped = await stopPixelbildAntwort({
+      const stopped = await boundedParticipantAction(stopPixelbildAntwort({
         quizId: liveDaten.quiz_id,
         quizFragenId,
         interactionRunId: run.id,
         quizTeamSessionToken: session.sessionToken,
-      });
+      }));
       if (!stopped.success) {
         setMeldung(
           stopped.reason === "ALREADY_STOPPED"
@@ -994,7 +659,7 @@ export default function QuizAntwortClient({
       }
       setMeldung(`In Stufe ${stopped.stage} gestoppt. Eure Antwort ist verbindlich abgegeben.`);
     } catch {
-      setMeldung("Die Pixelbild-Frage konnte nicht gestoppt werden.");
+      setMeldung("Stoppen nicht bestätigt. Bitte den aktuellen Stand prüfen; die Anfrage kann bereits angekommen sein.");
     } finally {
       setIsSubmitting(false);
     }
@@ -1233,7 +898,7 @@ export default function QuizAntwortClient({
                   );
                   const changedSinceSubmission = Boolean(
                     submissionStatus === "SUBMITTED" &&
-                      (locallyEditedSinceSubmission[frage.quiz_fragen_id] ||
+                      (entries[frage.quiz_fragen_id]?.status !== "saved" || locallyEditedSinceSubmission[frage.quiz_fragen_id] ||
                         isDraftChangedSinceSubmission(
                           draftRevisions[frage.quiz_fragen_id] ?? 0,
                           submissionDraftRevisions[
@@ -1343,32 +1008,17 @@ export default function QuizAntwortClient({
                         interaction={frage.interaction}
                         value={antworten[frage.quiz_fragen_id]}
                         disabled={
+                          !entries[frage.quiz_fragen_id] || isSubmitting ||
                           blockIstGesperrt ||
                           !questionIsWritable ||
                           submissionLocksEditing ||
                           !session
                         }
-                        onChange={(value) => {
-                          setAntworten((current) => ({
-                            ...current,
-                            [frage.quiz_fragen_id]: value,
-                          }));
-                          setDraftEditVersions((current) => ({
-                            ...current,
-                            [frage.quiz_fragen_id]:
-                              (current[frage.quiz_fragen_id] ?? 0) + 1,
-                          }));
-                          if (submissionStatus === "SUBMITTED") {
-                            setLocallyEditedSinceSubmission((current) => ({
-                              ...current,
-                              [frage.quiz_fragen_id]: true,
-                            }));
-                          }
-                        }}
+                        onChange={(value) => controller.edit(frage.quiz_fragen_id, value)}
                       />
 
                       <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
-                        {submissionStatus ? (
+                        {submissionStatus && entries[frage.quiz_fragen_id]?.status === "saved" ? (
                           <p className="answer-submission-status rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-800">
                             {submissionStatus === "SUBMITTED"
                               ? changedSinceSubmission
@@ -1376,11 +1026,10 @@ export default function QuizAntwortClient({
                                 : "Antwort abgegeben"
                               : "Beim Schlie\u00dfen automatisch \u00fcbernommen"}
                           </p>
-                        ) : (draftRevisions[frage.quiz_fragen_id] ?? 0) > 0 ? (
-                          <p className="text-sm font-semibold text-slate-600">
-                            Entwurf automatisch gespeichert – beim Schließen des Blocks wird der aktuelle Stand übernommen.
-                          </p>
                         ) : null}
+                        {entries[frage.quiz_fragen_id] && <AnswerSaveStatus interaction={frage.interaction} entry={entries[frage.quiz_fragen_id]}
+                          onRetry={() => void controller.retry(frage.quiz_fragen_id)}
+                          onResolve={(choice) => controller.resolve(frage.quiz_fragen_id, choice)} />}
                         {frage.templateId === "pixelbild" &&
                           pixelActionPolicy?.showStopAndSubmit === true && (
                           <button
@@ -1447,6 +1096,13 @@ export default function QuizAntwortClient({
         </section>
         )}
 
+        {storageError && <p role="alert" className="rounded-xl border border-amber-400 bg-amber-50 p-3 text-amber-950">Dieser Browser kann Änderungen nicht auf dem Gerät sichern. Bitte diese Seite bis zur bestätigten Speicherung geöffnet lassen.</p>}
+        {Object.entries(entries).filter(([id, entry]) => entry.status !== "saved" && !liveDaten.fragen.some(q => q.quiz_fragen_id === Number(id) && q.istFreigegeben)).map(([id, entry]) => (
+          <section key={id} className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-slate-950">
+            <p className="font-semibold">Noch nicht bestätigte Antwort</p>
+            <AnswerSaveStatus entry={entry} onRetry={() => void controller.retry(Number(id))} onResolve={choice => controller.resolve(Number(id), choice)} />
+          </section>
+        ))}
       </div>
 
       {bildModalUrl && (

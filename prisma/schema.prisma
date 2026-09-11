@@ -585,6 +585,7 @@ model quiz_ablauf_elemente {
 }
 
 model quiz_team_sessions {
+  join_request_hash    String?
   quiz_team_session_id Int                       @id @default(autoincrement())
   quiz_id              Int
   team_id              Int

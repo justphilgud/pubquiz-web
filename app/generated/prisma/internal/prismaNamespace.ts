@@ -4172,6 +4172,7 @@ export type Quiz_ablauf_elementeScalarFieldEnum = (typeof Quiz_ablauf_elementeSc
 
 
 export const Quiz_team_sessionsScalarFieldEnum = {
+  join_request_hash: 'join_request_hash',
   quiz_team_session_id: 'quiz_team_session_id',
   quiz_id: 'quiz_id',
   team_id: 'team_id',

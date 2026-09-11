@@ -2883,6 +2883,7 @@ export async function startQuizTeamSession(data: {
   teamname: string;
   spielerAnzahl?: number | null;
   passwort?: string;
+  joinRequestId?: string;
 }) {
   const spielerAnzahl =
     typeof data.spielerAnzahl === "number" && data.spielerAnzahl > 0
@@ -2894,6 +2895,7 @@ export async function startQuizTeamSession(data: {
     teamName: data.teamname,
     playerCount: spielerAnzahl,
     password: data.passwort,
+    joinRequestId: data.joinRequestId,
   });
   if (!result.success) return result;
 

@@ -340,3 +340,53 @@ Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln
 
 [Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
 und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.
+
+## AP9.1: Bestätigter Speicherstand und Wiederaufnahme
+
+Die fachliche Interaktions-/Submission-Engine bleibt unverändert maßgeblich.
+`AnswerDraftController` orchestriert ausschließlich den Teilnehmer-Client:
+
+- Jeder lokale Inhalt behält seine Serverbasis, einen lokalen Änderungszähler und
+  den zuletzt bestätigten Serverinhalt. Polling aktualisiert eine schmutzige Basis
+  niemals mit fremdem Inhalt. Ein Konflikt sperrt Autosave bis zur bewussten Wahl.
+- Status: geändert, speichernd, bestätigt, Fehler, Konflikt, wiedergefunden oder
+  geschlossen. Nur die Bestätigung des aktuellen Inhalts darf „gespeichert“ anzeigen.
+  Die Save-Antwort enthält den tatsächlich persistierten Inhalt, auch bei einer
+  unveränderten, normalisierten Antwort ohne neue Revision.
+- Ein Save je Frage gleichzeitig; Änderungen währenddessen bleiben lokal geändert.
+  Autosave bündelt 1.200 ms. Transporttimeout 12 Sekunden. Nach Fehlern höchstens
+  drei automatische Wiederholungen (2/5/10 Sekunden), danach manuell oder bei Online.
+  Ein Timeout ist kein Beweis, dass der Server die Anfrage verworfen hat.
+- Unbestätigte Inhalte werden synchron je Quiz/Teamsitzung/Client im lokalen
+  Browserspeicher geschützt. Andere Fenster überschreiben oder löschen diese Kopie
+  nicht. Wiederherstellung akzeptiert nur strukturell gültige Einträge bis 24 Stunden.
+  Nach Reload wird niemals still replayt: frischer Serverstand und bewusste Wahl
+  sind nötig, außer er bestätigt bereits exakt diesen Inhalt. Gespeicherte Antworten
+  werden beim Gerätewechsel ausschließlich vom Server geladen.
+- Vor Verlassen wird bei unbestätigten Inhalten gewarnt; pagehide/visibilitychange
+  versuchen einen Save. Dies garantiert keine Netzübertragung beim Schließen oder
+  Sperren. Der lokale Schutz und der sichtbare Status bleiben deshalb notwendig.
+  Bei nicht verfügbarem Browserspeicher wird dessen Ausfall sichtbar gemeldet.
+- Konfliktanzeige zeigt lokalen und bestätigten Inhalt. „Gespeicherte Antwort
+  verwenden“ verwirft bewusst die lokale Variante; „Eigene Änderung übernehmen
+  und speichern“ setzt bewusst auf der angezeigten Serverbasis auf. Jeder weitere
+  konkurrierende Save wird weiterhin durch serverseitiges CAS abgewehrt.
+- Bei geschlossenem Run/Block keine lokale Übernahme und kein automatischer Retry.
+  Der Server prüft unverändert unter seinen Locks Lifecycle, Freigabe, Run,
+  Deadline und Finalisierung. Ein spät eintreffender Retry schafft keine Ausnahme.
+  Pixel-Stufen, letzter offener Schritt und Stop-Regeln bleiben unverändert.
+- `team-answer-draft` und `team-session` sind uncached POST-Transporte um vorhandene
+  Actions. Draft-Schreiben benötigt weiterhin das validierte Team-Sitzungstoken.
+  Polling nutzt den getrennten Read-Pfad mit begrenztem Fehler-Backoff.
+
+Beim Erstbeitritt schützt eine vor dem Request lokal gespeicherte UUID den erneuten
+Versuch nach verlorener Response. Ihr SHA-256-Hash wird bei neuem Team atomar in
+`quiz_team_sessions.join_request_hash` hinterlegt. Nur gleiche Quiz-/Team-/Kennung
+innerhalb von 24 Stunden kann die Sitzung samt erzeugtem Passwort wiedererhalten.
+Bestehende Teams bleiben passwortgeschützt; ein normaler Beitritt überschreibt den
+Nachweis nicht. Reset entfernt ihn mit der Sitzung. Keine neue Abhängigkeit.
+
+Regression: `answerDraftController.test.ts`, `participantRecovery.test.ts` und
+`teamJoinRecovery.test.ts`; zusätzlich bestehende Interaction-, Lifecycle-,
+Submission-, Evaluation- und Pixel-Suiten. Deadline-Tests führen den echten
+Save-Funktionskörper mit kontrollierter Transaktion und Uhr vor/an/nach Ablauf aus.

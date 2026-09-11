@@ -41,6 +41,7 @@ export type Quiz_team_sessionsSumAggregateOutputType = {
 }
 
 export type Quiz_team_sessionsMinAggregateOutputType = {
+  join_request_hash: string | null
   quiz_team_session_id: number | null
   quiz_id: number | null
   team_id: number | null
@@ -50,6 +51,7 @@ export type Quiz_team_sessionsMinAggregateOutputType = {
 }
 
 export type Quiz_team_sessionsMaxAggregateOutputType = {
+  join_request_hash: string | null
   quiz_team_session_id: number | null
   quiz_id: number | null
   team_id: number | null
@@ -59,6 +61,7 @@ export type Quiz_team_sessionsMaxAggregateOutputType = {
 }
 
 export type Quiz_team_sessionsCountAggregateOutputType = {
+  join_request_hash: number
   quiz_team_session_id: number
   quiz_id: number
   team_id: number
@@ -84,6 +87,7 @@ export type Quiz_team_sessionsSumAggregateInputType = {
 }
 
 export type Quiz_team_sessionsMinAggregateInputType = {
+  join_request_hash?: true
   quiz_team_session_id?: true
   quiz_id?: true
   team_id?: true
@@ -93,6 +97,7 @@ export type Quiz_team_sessionsMinAggregateInputType = {
 }
 
 export type Quiz_team_sessionsMaxAggregateInputType = {
+  join_request_hash?: true
   quiz_team_session_id?: true
   quiz_id?: true
   team_id?: true
@@ -102,6 +107,7 @@ export type Quiz_team_sessionsMaxAggregateInputType = {
 }
 
 export type Quiz_team_sessionsCountAggregateInputType = {
+  join_request_hash?: true
   quiz_team_session_id?: true
   quiz_id?: true
   team_id?: true
@@ -198,6 +204,7 @@ export type quiz_team_sessionsGroupByArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 export type Quiz_team_sessionsGroupByOutputType = {
+  join_request_hash: string | null
   quiz_team_session_id: number
   quiz_id: number
   team_id: number
@@ -230,6 +237,7 @@ export type quiz_team_sessionsWhereInput = {
   AND?: Prisma.quiz_team_sessionsWhereInput | Prisma.quiz_team_sessionsWhereInput[]
   OR?: Prisma.quiz_team_sessionsWhereInput[]
   NOT?: Prisma.quiz_team_sessionsWhereInput | Prisma.quiz_team_sessionsWhereInput[]
+  join_request_hash?: Prisma.StringNullableFilter<"quiz_team_sessions"> | string | null
   quiz_team_session_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
   quiz_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
   team_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
@@ -245,6 +253,7 @@ export type quiz_team_sessionsWhereInput = {
 }
 
 export type quiz_team_sessionsOrderByWithRelationInput = {
+  join_request_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   team_id?: Prisma.SortOrder
@@ -266,6 +275,7 @@ export type quiz_team_sessionsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.quiz_team_sessionsWhereInput | Prisma.quiz_team_sessionsWhereInput[]
   OR?: Prisma.quiz_team_sessionsWhereInput[]
   NOT?: Prisma.quiz_team_sessionsWhereInput | Prisma.quiz_team_sessionsWhereInput[]
+  join_request_hash?: Prisma.StringNullableFilter<"quiz_team_sessions"> | string | null
   quiz_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
   team_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
   teamname?: Prisma.StringFilter<"quiz_team_sessions"> | string
@@ -280,6 +290,7 @@ export type quiz_team_sessionsWhereUniqueInput = Prisma.AtLeast<{
 }, "quiz_team_session_id" | "quiz_id_teamname" | "quiz_id_team_id">
 
 export type quiz_team_sessionsOrderByWithAggregationInput = {
+  join_request_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   team_id?: Prisma.SortOrder
@@ -297,6 +308,7 @@ export type quiz_team_sessionsScalarWhereWithAggregatesInput = {
   AND?: Prisma.quiz_team_sessionsScalarWhereWithAggregatesInput | Prisma.quiz_team_sessionsScalarWhereWithAggregatesInput[]
   OR?: Prisma.quiz_team_sessionsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.quiz_team_sessionsScalarWhereWithAggregatesInput | Prisma.quiz_team_sessionsScalarWhereWithAggregatesInput[]
+  join_request_hash?: Prisma.StringNullableWithAggregatesFilter<"quiz_team_sessions"> | string | null
   quiz_team_session_id?: Prisma.IntWithAggregatesFilter<"quiz_team_sessions"> | number
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz_team_sessions"> | number
   team_id?: Prisma.IntWithAggregatesFilter<"quiz_team_sessions"> | number
@@ -306,6 +318,7 @@ export type quiz_team_sessionsScalarWhereWithAggregatesInput = {
 }
 
 export type quiz_team_sessionsCreateInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -318,6 +331,7 @@ export type quiz_team_sessionsCreateInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   team_id: number
@@ -331,6 +345,7 @@ export type quiz_team_sessionsUncheckedCreateInput = {
 }
 
 export type quiz_team_sessionsUpdateInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -343,6 +358,7 @@ export type quiz_team_sessionsUpdateInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -356,6 +372,7 @@ export type quiz_team_sessionsUncheckedUpdateInput = {
 }
 
 export type quiz_team_sessionsCreateManyInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   team_id: number
@@ -365,12 +382,14 @@ export type quiz_team_sessionsCreateManyInput = {
 }
 
 export type quiz_team_sessionsUpdateManyMutationInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type quiz_team_sessionsUncheckedUpdateManyInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -400,6 +419,7 @@ export type quiz_team_sessionsQuiz_idTeam_idCompoundUniqueInput = {
 }
 
 export type quiz_team_sessionsCountOrderByAggregateInput = {
+  join_request_hash?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   team_id?: Prisma.SortOrder
@@ -416,6 +436,7 @@ export type quiz_team_sessionsAvgOrderByAggregateInput = {
 }
 
 export type quiz_team_sessionsMaxOrderByAggregateInput = {
+  join_request_hash?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   team_id?: Prisma.SortOrder
@@ -425,6 +446,7 @@ export type quiz_team_sessionsMaxOrderByAggregateInput = {
 }
 
 export type quiz_team_sessionsMinOrderByAggregateInput = {
+  join_request_hash?: Prisma.SortOrder
   quiz_team_session_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   team_id?: Prisma.SortOrder
@@ -593,6 +615,7 @@ export type quiz_team_sessionsUpdateOneRequiredWithoutLive_poll_responsesNestedI
 }
 
 export type quiz_team_sessionsCreateWithoutQuizInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -604,6 +627,7 @@ export type quiz_team_sessionsCreateWithoutQuizInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutQuizInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   team_id: number
   teamname: string
@@ -645,6 +669,7 @@ export type quiz_team_sessionsScalarWhereInput = {
   AND?: Prisma.quiz_team_sessionsScalarWhereInput | Prisma.quiz_team_sessionsScalarWhereInput[]
   OR?: Prisma.quiz_team_sessionsScalarWhereInput[]
   NOT?: Prisma.quiz_team_sessionsScalarWhereInput | Prisma.quiz_team_sessionsScalarWhereInput[]
+  join_request_hash?: Prisma.StringNullableFilter<"quiz_team_sessions"> | string | null
   quiz_team_session_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
   quiz_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
   team_id?: Prisma.IntFilter<"quiz_team_sessions"> | number
@@ -654,6 +679,7 @@ export type quiz_team_sessionsScalarWhereInput = {
 }
 
 export type quiz_team_sessionsCreateWithoutTeamInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -665,6 +691,7 @@ export type quiz_team_sessionsCreateWithoutTeamInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutTeamInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   teamname: string
@@ -703,6 +730,7 @@ export type quiz_team_sessionsUpdateManyWithWhereWithoutTeamInput = {
 }
 
 export type quiz_team_sessionsCreateWithoutTeam_antwortenInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -714,6 +742,7 @@ export type quiz_team_sessionsCreateWithoutTeam_antwortenInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutTeam_antwortenInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   team_id: number
@@ -742,6 +771,7 @@ export type quiz_team_sessionsUpdateToOneWithWhereWithoutTeam_antwortenInput = {
 }
 
 export type quiz_team_sessionsUpdateWithoutTeam_antwortenInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -753,6 +783,7 @@ export type quiz_team_sessionsUpdateWithoutTeam_antwortenInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutTeam_antwortenInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -765,6 +796,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutTeam_antwortenInput = {
 }
 
 export type quiz_team_sessionsCreateWithoutStopped_pixel_runsInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -776,6 +808,7 @@ export type quiz_team_sessionsCreateWithoutStopped_pixel_runsInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutStopped_pixel_runsInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   team_id: number
@@ -804,6 +837,7 @@ export type quiz_team_sessionsUpdateToOneWithWhereWithoutStopped_pixel_runsInput
 }
 
 export type quiz_team_sessionsUpdateWithoutStopped_pixel_runsInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -815,6 +849,7 @@ export type quiz_team_sessionsUpdateWithoutStopped_pixel_runsInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutStopped_pixel_runsInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -827,6 +862,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutStopped_pixel_runsInput = {
 }
 
 export type quiz_team_sessionsCreateWithoutAnswer_submissionsInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -838,6 +874,7 @@ export type quiz_team_sessionsCreateWithoutAnswer_submissionsInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutAnswer_submissionsInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   team_id: number
@@ -866,6 +903,7 @@ export type quiz_team_sessionsUpdateToOneWithWhereWithoutAnswer_submissionsInput
 }
 
 export type quiz_team_sessionsUpdateWithoutAnswer_submissionsInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -877,6 +915,7 @@ export type quiz_team_sessionsUpdateWithoutAnswer_submissionsInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutAnswer_submissionsInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -889,6 +928,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutAnswer_submissionsInput = {
 }
 
 export type quiz_team_sessionsCreateWithoutLive_poll_responsesInput = {
+  join_request_hash?: string | null
   teamname: string
   erstellt_am?: Date | string
   spieler_anzahl?: number
@@ -900,6 +940,7 @@ export type quiz_team_sessionsCreateWithoutLive_poll_responsesInput = {
 }
 
 export type quiz_team_sessionsUncheckedCreateWithoutLive_poll_responsesInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   team_id: number
@@ -928,6 +969,7 @@ export type quiz_team_sessionsUpdateToOneWithWhereWithoutLive_poll_responsesInpu
 }
 
 export type quiz_team_sessionsUpdateWithoutLive_poll_responsesInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -939,6 +981,7 @@ export type quiz_team_sessionsUpdateWithoutLive_poll_responsesInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutLive_poll_responsesInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -951,6 +994,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutLive_poll_responsesInput = {
 }
 
 export type quiz_team_sessionsCreateManyQuizInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   team_id: number
   teamname: string
@@ -959,6 +1003,7 @@ export type quiz_team_sessionsCreateManyQuizInput = {
 }
 
 export type quiz_team_sessionsUpdateWithoutQuizInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -970,6 +1015,7 @@ export type quiz_team_sessionsUpdateWithoutQuizInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutQuizInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
@@ -982,6 +1028,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutQuizInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateManyWithoutQuizInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   team_id?: Prisma.IntFieldUpdateOperationsInput | number
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
@@ -990,6 +1037,7 @@ export type quiz_team_sessionsUncheckedUpdateManyWithoutQuizInput = {
 }
 
 export type quiz_team_sessionsCreateManyTeamInput = {
+  join_request_hash?: string | null
   quiz_team_session_id?: number
   quiz_id: number
   teamname: string
@@ -998,6 +1046,7 @@ export type quiz_team_sessionsCreateManyTeamInput = {
 }
 
 export type quiz_team_sessionsUpdateWithoutTeamInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
   erstellt_am?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   spieler_anzahl?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1009,6 +1058,7 @@ export type quiz_team_sessionsUpdateWithoutTeamInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateWithoutTeamInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1021,6 +1071,7 @@ export type quiz_team_sessionsUncheckedUpdateWithoutTeamInput = {
 }
 
 export type quiz_team_sessionsUncheckedUpdateManyWithoutTeamInput = {
+  join_request_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quiz_team_session_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   teamname?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1087,6 +1138,7 @@ export type Quiz_team_sessionsCountOutputTypeCountStopped_pixel_runsArgs<ExtArgs
 
 
 export type quiz_team_sessionsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  join_request_hash?: boolean
   quiz_team_session_id?: boolean
   quiz_id?: boolean
   team_id?: boolean
@@ -1103,6 +1155,7 @@ export type quiz_team_sessionsSelect<ExtArgs extends runtime.Types.Extensions.In
 }, ExtArgs["result"]["quiz_team_sessions"]>
 
 export type quiz_team_sessionsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  join_request_hash?: boolean
   quiz_team_session_id?: boolean
   quiz_id?: boolean
   team_id?: boolean
@@ -1114,6 +1167,7 @@ export type quiz_team_sessionsSelectCreateManyAndReturn<ExtArgs extends runtime.
 }, ExtArgs["result"]["quiz_team_sessions"]>
 
 export type quiz_team_sessionsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  join_request_hash?: boolean
   quiz_team_session_id?: boolean
   quiz_id?: boolean
   team_id?: boolean
@@ -1125,6 +1179,7 @@ export type quiz_team_sessionsSelectUpdateManyAndReturn<ExtArgs extends runtime.
 }, ExtArgs["result"]["quiz_team_sessions"]>
 
 export type quiz_team_sessionsSelectScalar = {
+  join_request_hash?: boolean
   quiz_team_session_id?: boolean
   quiz_id?: boolean
   team_id?: boolean
@@ -1133,7 +1188,7 @@ export type quiz_team_sessionsSelectScalar = {
   spieler_anzahl?: boolean
 }
 
-export type quiz_team_sessionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_team_session_id" | "quiz_id" | "team_id" | "teamname" | "erstellt_am" | "spieler_anzahl", ExtArgs["result"]["quiz_team_sessions"]>
+export type quiz_team_sessionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"join_request_hash" | "quiz_team_session_id" | "quiz_id" | "team_id" | "teamname" | "erstellt_am" | "spieler_anzahl", ExtArgs["result"]["quiz_team_sessions"]>
 export type quiz_team_sessionsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   team?: boolean | Prisma.teamsDefaultArgs<ExtArgs>
@@ -1163,6 +1218,7 @@ export type $quiz_team_sessionsPayload<ExtArgs extends runtime.Types.Extensions.
     stopped_pixel_runs: Prisma.$quiz_interaction_runsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    join_request_hash: string | null
     quiz_team_session_id: number
     quiz_id: number
     team_id: number
@@ -1252,8 +1308,8 @@ export interface quiz_team_sessionsDelegate<ExtArgs extends runtime.Types.Extens
    * // Get first 10 Quiz_team_sessions
    * const quiz_team_sessions = await prisma.quiz_team_sessions.findMany({ take: 10 })
    *
-   * // Only select the `quiz_team_session_id`
-   * const quiz_team_sessionsWithQuiz_team_session_idOnly = await prisma.quiz_team_sessions.findMany({ select: { quiz_team_session_id: true } })
+   * // Only select the `join_request_hash`
+   * const quiz_team_sessionsWithJoin_request_hashOnly = await prisma.quiz_team_sessions.findMany({ select: { join_request_hash: true } })
    *
    */
   findMany<T extends quiz_team_sessionsFindManyArgs>(args?: Prisma.SelectSubset<T, quiz_team_sessionsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_team_sessionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1297,9 +1353,9 @@ export interface quiz_team_sessionsDelegate<ExtArgs extends runtime.Types.Extens
    *   ]
    * })
    *
-   * // Create many Quiz_team_sessions and only return the `quiz_team_session_id`
-   * const quiz_team_sessionsWithQuiz_team_session_idOnly = await prisma.quiz_team_sessions.createManyAndReturn({
-   *   select: { quiz_team_session_id: true },
+   * // Create many Quiz_team_sessions and only return the `join_request_hash`
+   * const quiz_team_sessionsWithJoin_request_hashOnly = await prisma.quiz_team_sessions.createManyAndReturn({
+   *   select: { join_request_hash: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1388,9 +1444,9 @@ export interface quiz_team_sessionsDelegate<ExtArgs extends runtime.Types.Extens
    *   ]
    * })
    *
-   * // Update zero or more Quiz_team_sessions and only return the `quiz_team_session_id`
-   * const quiz_team_sessionsWithQuiz_team_session_idOnly = await prisma.quiz_team_sessions.updateManyAndReturn({
-   *   select: { quiz_team_session_id: true },
+   * // Update zero or more Quiz_team_sessions and only return the `join_request_hash`
+   * const quiz_team_sessionsWithJoin_request_hashOnly = await prisma.quiz_team_sessions.updateManyAndReturn({
+   *   select: { join_request_hash: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1598,6 +1654,7 @@ export interface Prisma__quiz_team_sessionsClient<T, Null = never, ExtArgs exten
  * Fields of the quiz_team_sessions model
  */
 export interface quiz_team_sessionsFieldRefs {
+  readonly join_request_hash: Prisma.FieldRef<"quiz_team_sessions", 'String'>
   readonly quiz_team_session_id: Prisma.FieldRef<"quiz_team_sessions", 'Int'>
   readonly quiz_id: Prisma.FieldRef<"quiz_team_sessions", 'Int'>
   readonly team_id: Prisma.FieldRef<"quiz_team_sessions", 'Int'>

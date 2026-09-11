@@ -847,7 +847,7 @@ async function isRunReleasedForAnswerWrite(
 }
 
 export type SaveTeamAnswerDraftResult =
-  | { success: true; draftRevision: number; draftUpdatedAt: string }
+  | { success: true; draftRevision: number; draftUpdatedAt: string; confirmedDraft: TeamAnswerDraftInput }
   | {
       success: false;
       reason: "LIVE_STATE_CHANGED" | "REVISION_CONFLICT" | "FINALIZED";
@@ -985,6 +985,7 @@ export async function saveTeamAnswerDraft(input: {
         return {
           success: true,
           draftRevision: previous.draft_revision,
+          confirmedDraft: draftInputFromStored(previous),
           draftUpdatedAt: (
             previous.draft_updated_at ?? previous.aktualisiert_am
           ).toISOString(),
@@ -1001,6 +1002,7 @@ export async function saveTeamAnswerDraft(input: {
       return {
         success: true,
         draftRevision: previous.draft_revision,
+          confirmedDraft: draftInputFromStored(previous),
         draftUpdatedAt: (previous.draft_updated_at ?? previous.aktualisiert_am).toISOString(),
       };
     }
@@ -1066,6 +1068,7 @@ export async function saveTeamAnswerDraft(input: {
     return {
       success: true,
       draftRevision: nextRevision,
+      confirmedDraft: { ...input.draft, structuredAnswers: nonEmptyFields.map(field => ({ ...field, answerText: field.answerText?.trim() ?? null })) },
       draftUpdatedAt: now.toISOString(),
     };
   });

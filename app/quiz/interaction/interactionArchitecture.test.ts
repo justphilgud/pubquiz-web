@@ -175,7 +175,8 @@ test("read-only participant polling uses an uncached route instead of serialized
   assert.doesNotMatch(client, /await getQuizAntwortStatusLive\(/);
   assert.match(moderation, /fetchQuizLiveSnapshot/);
   assert.doesNotMatch(moderation, /await getQuizLiveSnapshot\(/);
-  assert.match(client, /fetch\("\/api\/quiz\/team-live-snapshot"/);
+  assert.match(client, /participantRequest[\s\S]*"\/api\/quiz\/team-live-snapshot"/);
+  assert.match(read("app/quiz/interaction/participantRequest.ts"), /cache: "no-store"/);
   assert.match(controllerRoute, /await auth\(\)/);
   assert.match(
     controllerRoute,
