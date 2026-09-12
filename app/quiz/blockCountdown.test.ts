@@ -23,13 +23,15 @@ function fixture() {
   const drafts = new Map<number, Draft>();
   const finals: Draft[] = [];
   let writes = 0;
+  let transactions = 0;
   let chain = Promise.resolve();
-  const matches = (where: { quiz_id?: number; ist_freigegeben?: boolean; ist_geschlossen?: boolean; answer_deadline_at?: Date | null | { lte: Date } }) =>
+  const matches = (where: { quiz_id?: number; ist_freigegeben?: boolean; ist_geschlossen?: boolean; answer_deadline_at?: Date | null | { lte: Date } | { not: null } }) =>
     (where.quiz_id === undefined || where.quiz_id === block.quiz_id) &&
     (where.ist_freigegeben === undefined || where.ist_freigegeben === block.ist_freigegeben) &&
     (where.ist_geschlossen === undefined || where.ist_geschlossen === block.ist_geschlossen) &&
     (where.answer_deadline_at === undefined || (where.answer_deadline_at === null ? block.answer_deadline_at === null :
-      "lte" in where.answer_deadline_at ? Boolean(block.answer_deadline_at && block.answer_deadline_at <= where.answer_deadline_at.lte) : block.answer_deadline_at?.getTime() === where.answer_deadline_at.getTime()));
+      "lte" in where.answer_deadline_at ? Boolean(block.answer_deadline_at && block.answer_deadline_at <= where.answer_deadline_at.lte) :
+        "not" in where.answer_deadline_at ? block.answer_deadline_at !== null : block.answer_deadline_at?.getTime() === where.answer_deadline_at.getTime()));
   const db = {
     $queryRaw: async () => [],
     quiz_praesentation_status: {
@@ -72,7 +74,8 @@ function fixture() {
   };
   const context = {
     exports, Date: class extends Date { constructor(value?: string | number) { super(value ?? clock); } static now() { return clock; } },
-    prisma: { $transaction: <T>(fn: (tx: typeof db) => Promise<T>) => {
+    prisma: { ...db, $transaction: <T>(fn: (tx: typeof db) => Promise<T>) => {
+      transactions++;
       const result = chain.then(() => fn(db)); chain = result.then(() => {}, () => {}); return result;
     } },
     presentationCountdownDeadline, requireQuizLiveController: async () => {},
@@ -94,7 +97,7 @@ function fixture() {
   };
   runInNewContext(ts.transpileModule(interactionSource + "\n" + countdownSource, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, context);
   return {
-    block, status, run, drafts, finals, writes: () => writes, at: (offset: number) => { clock = origin + offset; },
+    block, status, run, drafts, finals, writes: () => writes, transactions: () => transactions, at: (offset: number) => { clock = origin + offset; },
     start: () => exports.starteCountdown({ quizId: 7, dauerSekunden: 60, lifecycleRevision: 1 }),
     reset: () => exports.resetCountdown({ quizId: 7, lifecycleRevision: 1 }),
     read: () => exports.ensureQuizBlockDeadlines(7),
@@ -110,6 +113,19 @@ for (const offset of [59999, 60000, 60001]) test(`general block lazy read/save a
   assert.equal(f.block.ist_geschlossen, offset >= 60000);
   await f.read(); assert.equal(f.status.countdown_status, offset < 60000 ? "running" : "finished");
   if (offset >= 60000) { assert.equal((await f.save(1, "Retry")).success, false); assert.equal(f.writes(), 0); }
+});
+
+test("parallel polls before deadline do not reserve transactions; overdue reads still close", async () => {
+  const f = fixture(); await f.start();
+  const initial = f.transactions();
+  f.at(59999); await Promise.all(Array.from({ length: 80 }, () => f.read()));
+  assert.equal(f.transactions(), initial);
+  assert.equal(f.block.ist_geschlossen, false);
+  f.at(60000); await f.read();
+  assert.equal(f.transactions(), initial + 1);
+  assert.equal(f.block.ist_geschlossen, true);
+  await Promise.all(Array.from({ length: 80 }, () => f.read()));
+  assert.equal(f.transactions(), initial + 1);
 });
 
 test("no controller: reads after deadline finalize accepted drafts exactly once", async () => {

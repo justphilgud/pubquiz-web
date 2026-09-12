@@ -110,6 +110,21 @@ const requireQuizNotStopped = requireQuizAnswerWindow;
 
 /** No timer process: the first relevant read materializes the elapsed boundary. */
 export async function ensureQuizBlockDeadlines(quizId: number) {
+  // Polls must not reserve a transaction/quiz lock when there is nothing to
+  // close. Read persisted deadlines afresh; writes still recheck under lock.
+  const [status, blocks] = await Promise.all([
+    prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } }),
+    prisma.quiz_block_freigaben.findMany({
+      where: { quiz_id: quizId, ist_geschlossen: false, answer_deadline_at: { not: null } },
+      select: { answer_deadline_at: true },
+    }),
+  ]);
+  const now = new Date();
+  const deadline = status && presentationCountdownDeadline(status);
+  if (status && !blocks.some(block => block.answer_deadline_at && block.answer_deadline_at <= now) &&
+    !(status.countdown_status === "running" && deadline && deadline <= now)) {
+    return status;
+  }
   return prisma.$transaction(async (tx) => {
     await lockQuizLifecycle(tx, quizId);
     await expireQuizBlockDeadlines(tx, quizId);
