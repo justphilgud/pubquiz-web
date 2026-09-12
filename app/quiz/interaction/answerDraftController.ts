@@ -2,6 +2,7 @@ import type { TeamAnswerDraft } from "../[quizId]/antworten/GenericAnswerRendere
 
 export type DraftSaveResult = { success: true; draftRevision: number; confirmedValue?: TeamAnswerDraft } | {
   success: false; reason: "LIVE_STATE_CHANGED" | "REVISION_CONFLICT" | "FINALIZED";
+  currentDraftRevision?: number; currentValue?: TeamAnswerDraft;
 };
 export type DraftEntry = {
   runId: number;
@@ -152,7 +153,10 @@ export class AnswerDraftController {
       }
       // A snapshot can confirm the content while an older retry is still in flight.
       if (current.status === "saved") return true;
-      this.put(id, { ...current, status: result.reason === "REVISION_CONFLICT" ? "conflict" : "closed",
+      const server = result.reason === "REVISION_CONFLICT" && result.currentValue &&
+        result.currentDraftRevision !== undefined && result.currentDraftRevision >= current.serverRevision
+        ? { serverValue: result.currentValue, serverRevision: result.currentDraftRevision } : {};
+      this.put(id, { ...current, ...server, status: result.reason === "REVISION_CONFLICT" ? "conflict" : "closed",
         writable: result.reason === "REVISION_CONFLICT" && current.writable });
     } catch {
       const current = this.entries[id];

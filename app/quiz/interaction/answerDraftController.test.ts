@@ -119,3 +119,30 @@ test("a normalized no-op acknowledgement displays the actual persisted content",
   assert.equal(c.getSnapshot()[1].value.antwortText, "Berlin");
   assert.equal(c.getSnapshot()[1].status, "saved");
 });
+
+test("a conflict response supplies the current comparison before any poll or immediate choice", async () => {
+  const c = fixture(async () => ({ success: false, reason: "REVISION_CONFLICT",
+    currentDraftRevision: 5, currentValue: draft("Bremen") }));
+  c.edit(1, draft("Hamburg"));
+  await c.flush(1);
+  assert.equal(c.getSnapshot()[1].status, "conflict");
+  assert.equal(c.getSnapshot()[1].serverValue.antwortText, "Bremen");
+  assert.equal(c.getSnapshot()[1].baseRevision, 4);
+  c.resolve(1, "server");
+  assert.equal(c.getSnapshot()[1].value.antwortText, "Bremen");
+  assert.equal(c.getSnapshot()[1].status, "saved");
+  assert.equal(c.getSnapshot()[1].baseRevision, 5);
+});
+
+test("an older conflict response cannot replace a newer polled comparison", async () => {
+  let complete!: (value: DraftSaveResult) => void;
+  const c = fixture(() => new Promise(resolve => { complete = resolve; }));
+  c.edit(1, draft("Hamburg"));
+  const pending = c.flush(1);
+  c.hydrate(1, 10, draft("Köln"), 6, true);
+  complete({ success: false, reason: "REVISION_CONFLICT", currentDraftRevision: 5, currentValue: draft("Bremen") });
+  await pending;
+  c.resolve(1, "server");
+  assert.equal(c.getSnapshot()[1].value.antwortText, "Köln");
+  assert.equal(c.getSnapshot()[1].baseRevision, 6);
+});

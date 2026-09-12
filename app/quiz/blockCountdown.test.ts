@@ -61,7 +61,7 @@ function fixture() {
     team_antwort_auswahlen: { deleteMany: async () => {}, createMany: async () => {} },
     team_antwortfelder: { deleteMany: async () => {}, createMany: async () => {} },
   };
-  type SaveResult = { success: boolean; reason?: string; draftRevision?: number };
+  type SaveResult = { success: boolean; reason?: string; draftRevision?: number; currentDraftRevision?: number; currentDraft?: { answerText: string | null } };
   type SaveInput = { quizId: number; quizAbschnittId: number; quizFragenId: number; interactionRunId: number; quizTeamSessionId: number; expectedDraftRevision: number; draft: { answerText: string; selectedAnswerIds: number[]; structuredAnswers: never[] } };
   type StartInput = { quizId: number; dauerSekunden: number; lifecycleRevision: number };
   const exports = {} as {
@@ -104,6 +104,22 @@ function fixture() {
     save: (team: number, text: string, revision = 0) => exports.saveTeamAnswerDraft({ quizId: 7, quizAbschnittId: 3, quizFragenId: 1, interactionRunId: 10, quizTeamSessionId: team, expectedDraftRevision: revision, draft: { answerText: text, selectedAnswerIds: [], structuredAnswers: [] } }),
   };
 }
+
+test("conflicts return only the locked current own run draft without writing", async () => {
+  const f = fixture();
+  await f.save(1, "Own current");
+  await f.save(2, "Other team");
+  const result = await f.save(1, "Stale edit", 0);
+  assert.equal(result.reason, "REVISION_CONFLICT");
+  assert.equal(result.currentDraftRevision, 1);
+  assert.equal(result.currentDraft?.answerText, "Own current");
+  assert.equal(f.writes(), 2);
+  f.drafts.get(1)!.interaction_run_id = 9;
+  const newRun = await f.save(1, "Old base", 1);
+  assert.equal(newRun.currentDraftRevision, 0);
+  assert.equal(newRun.currentDraft?.answerText, null, "old run content is not the current comparison");
+  assert.equal(f.writes(), 2);
+});
 
 for (const offset of [59999, 60000, 60001]) test(`general block lazy read/save at deadline offset ${offset - 60000} ms`, async () => {
   const f = fixture(); await f.start(); f.at(offset);

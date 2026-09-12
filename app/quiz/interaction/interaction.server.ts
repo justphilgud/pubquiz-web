@@ -908,6 +908,7 @@ export type SaveTeamAnswerDraftResult =
       success: false;
       reason: "LIVE_STATE_CHANGED" | "REVISION_CONFLICT" | "FINALIZED";
       currentDraftRevision?: number;
+      currentDraft?: TeamAnswerDraftInput;
     };
 
 export async function saveTeamAnswerDraft(input: {
@@ -1052,6 +1053,9 @@ export async function saveTeamAnswerDraft(input: {
         success: false,
         reason: "REVISION_CONFLICT",
         currentDraftRevision: currentRevision,
+        currentDraft: previous?.interaction_run_id === run.interaction_run_id
+          ? draftInputFromStored(previous)
+          : { answerText: null, selectedAnswerIds: [], structuredAnswers: [] },
       };
     }
     const requestedAnswerIds = [...input.draft.selectedAnswerIds];

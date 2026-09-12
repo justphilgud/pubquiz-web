@@ -259,7 +259,12 @@ export default function QuizAntwortClient({
         antwortText: draft.antwortText, antwortId: draft.antwortId, antwortIds: draft.antwortIds,
         antwortfelder: Object.entries(draft.antwortfelder).map(([id, text]) => ({ antwortfeldId: Number(id), antwortText: text })),
       });
-      if (!result.success) return result;
+      if (!result.success) return { ...result, currentValue: result.currentDraft ? {
+        antwortText: result.currentDraft.answerText,
+        antwortId: result.currentDraft.selectedAnswerIds[0] ?? null,
+        antwortIds: [...result.currentDraft.selectedAnswerIds],
+        antwortfelder: Object.fromEntries(result.currentDraft.structuredAnswers.map(field => [field.fieldId, field.answerText ?? ""])),
+      } : undefined };
       return { ...result, confirmedValue: {
         antwortText: result.confirmedDraft.answerText,
         antwortId: result.confirmedDraft.selectedAnswerIds[0] ?? null,
