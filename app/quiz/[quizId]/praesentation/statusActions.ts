@@ -1,10 +1,11 @@
 "use server";
 
+import { presentationCountdownDeadline } from "../../blockCountdown";
 import { getQuizAnswerProgress } from "../../interaction/answerProgress.server";
 import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "../../quizLifecycle";
-import { lockQuizLifecycle, requireQuizNotStopped, RESET_PRESENTATION_DATA } from "../../quizLifecycle.server";
+import { lockQuizLifecycle, RESET_PRESENTATION_DATA } from "../../quizLifecycle.server";
 import { getQuizPraesentation } from "../../actions";
 import { buildPraesentationSlides, getPresentationSlideKey } from "./buildPraesentationSlides";
 import {
@@ -15,6 +16,9 @@ import {
 } from "../../quizAccess.server";
 import { parsePresentationSlideKey } from "@/app/rendering/presentation/presentationLiveState";
 import {
+  requireQuizAnswerWindow as requireQuizNotStopped,
+  ensureQuizBlockDeadlines,
+  expireQuizBlockDeadlines,
   closeBlockInteractions,
   closeCurrentInteraction,
   syncInteractionForPresentation,
@@ -35,19 +39,22 @@ import { resolveIntermediateStandingsAudience } from "@/app/rendering/presentati
 export async function getOrCreatePraesentationStatus(quizId: number) {
   await requireQuizLiveController(quizId);
   return prisma.$transaction(async (tx) => {
-    return lockQuizLifecycle(tx, quizId);
+    await lockQuizLifecycle(tx, quizId);
+    await expireQuizBlockDeadlines(tx, quizId);
+    const status = await tx.quiz_praesentation_status.findUniqueOrThrow({ where: { quiz_id: quizId } });
+    return { ...status, serverNow: Date.now() };
   });
 }
 
 export async function getPraesentationStatus(quizId: number) {
   await requireQuizViewer(quizId);
-  return prisma.quiz_praesentation_status.findUnique({
-    where: { quiz_id: quizId },
-  });
+  const status = await ensureQuizBlockDeadlines(quizId);
+  return { ...status, serverNow: Date.now() };
 }
 
 export async function getPraesentationPunktestand(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction(async (tx) => {
   const [sessions, totals] = await Promise.all([
     tx.quiz_team_sessions.findMany({
@@ -94,6 +101,7 @@ export async function getPraesentationPunktestand(quizId: number) {
 
 export async function getPraesentationAudienceZwischenstand(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction(async (tx) => {
   const [sessions, totals] = await Promise.all([
     tx.quiz_team_sessions.findMany({
@@ -236,6 +244,7 @@ export async function setPraesentationSlideIndex(
             ist_geschlossen: false,
             freigegeben_ab: navigationRequestedAt,
             geschlossen_ab: null,
+            answer_deadline_at: null,
             aktuelle_quiz_fragen_id: null,
           },
           create: {
@@ -324,6 +333,7 @@ async function getAntwortStatusData(
   quizFragenId: number | null,
 ) {
   await requireQuizLiveController(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   if (quizFragenId !== null) {
     await requireQuizQuestion(quizId, quizFragenId);
   }
@@ -528,50 +538,56 @@ export async function starteCountdown(data: {
   dauerSekunden: number;
 }) {
   await requireQuizLiveController(data.quizId);
-  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      countdown_dauer_sekunden: data.dauerSekunden,
-      countdown_started_at: new Date(),
-      countdown_ended_at: null,
-      countdown_status: "running",
-    },
-  });
-
-  return { success: true };
+  if (!Number.isSafeInteger(data.dauerSekunden) || data.dauerSekunden <= 0 || data.dauerSekunden > 86400) {
+    throw new Error("Ungültige Countdown-Dauer.");
+  }
+  const status = await prisma.$transaction(async (tx) => {
+    const current = await requireQuizNotStopped(tx, data.quizId);
+    if (data.lifecycleRevision !== undefined) assertLifecycleRevision(current.lifecycle_revision, data.lifecycleRevision);
+    // A duplicate click or lost start response must never extend the deadline.
+    if (current.countdown_status === "running" || current.countdown_status === "finished") return current;
+    const blocks = await tx.quiz_block_freigaben.findMany({
+      where: { quiz_id: data.quizId, ist_freigegeben: true, ist_geschlossen: false },
+    });
+    const existingDeadlines = blocks.flatMap(block => block.answer_deadline_at ? [block.answer_deadline_at.getTime()] : []);
+    const deadline = new Date(existingDeadlines.length ? Math.min(...existingDeadlines) : Date.now() + data.dauerSekunden * 1000);
+    const startedAt = new Date(deadline.getTime() - data.dauerSekunden * 1000);
+    await tx.quiz_block_freigaben.updateMany({
+      where: { quiz_id: data.quizId, ist_freigegeben: true, ist_geschlossen: false, answer_deadline_at: null },
+      data: { answer_deadline_at: deadline },
+    });
+    return tx.quiz_praesentation_status.update({
+      where: { quiz_id: data.quizId },
+      data: { countdown_dauer_sekunden: data.dauerSekunden, countdown_started_at: startedAt, countdown_ended_at: null, countdown_status: "running" },
+    });
+  }, { timeout: 30_000 });
+  return { success: true, status };
 }
 
 export async function resetCountdown(data: { quizId: number; lifecycleRevision?: number }) {
   await requireQuizLiveController(data.quizId);
-  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      countdown_started_at: null,
-      countdown_ended_at: null,
-      countdown_status: "idle",
-    },
-  });
-
-  return { success: true };
+  const status = await prisma.$transaction(async (tx) => {
+    const current = await requireQuizNotStopped(tx, data.quizId);
+    if (data.lifecycleRevision !== undefined) assertLifecycleRevision(current.lifecycle_revision, data.lifecycleRevision);
+    const deadline = presentationCountdownDeadline(current);
+    if (deadline && current.countdown_status === "running") {
+      await tx.quiz_block_freigaben.updateMany({
+        where: { quiz_id: data.quizId, ist_geschlossen: false, answer_deadline_at: deadline },
+        data: { answer_deadline_at: null },
+      });
+    }
+    return tx.quiz_praesentation_status.update({
+      where: { quiz_id: data.quizId },
+      data: { countdown_started_at: null, countdown_ended_at: null, countdown_status: "idle" },
+    });
+  }, { timeout: 30_000 });
+  return { success: true, status };
 }
 
+// Compatibility for an older open browser: expiry is decided only by server time.
 export async function beendeCountdown(data: { quizId: number; lifecycleRevision?: number }) {
   await requireQuizLiveController(data.quizId);
-  await mutatePresentationStatus(data.quizId, data.lifecycleRevision, {
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      countdown_ended_at: new Date(),
-      countdown_status: "finished",
-    },
-  });
-
-  return { success: true };
+  return { success: true, status: await ensureQuizBlockDeadlines(data.quizId) };
 }
 export async function setEndstandRevealCount(data: {
   quizId: number;

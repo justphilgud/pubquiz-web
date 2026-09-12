@@ -1,5 +1,6 @@
 "use client";
 
+import { countdownRemainingSeconds } from "../../blockCountdown";
 import { pollEvaluation } from "../../evaluation/pollEvaluation";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -34,7 +35,6 @@ import {
   setAudioAktion,
   starteCountdown,
   resetCountdown,
-  beendeCountdown,
   setEndstandRevealCount,
   setSchaetzfrageStatus,
   getAntwortStatus,
@@ -129,12 +129,6 @@ type Props = {
   theme: ResolvedQuizTheme;
 };
 
-function secondsSince(startAt: string | null, now: number) {
-  if (!startAt) return null;
-
-  return Math.max(0, Math.floor((now - new Date(startAt).getTime()) / 1000));
-}
-
 export default function ModerationClient({
   quizId,
   quiz,
@@ -144,8 +138,10 @@ export default function ModerationClient({
   backToQuizLabel,
   theme,
 }: Props) {
+  const [activeBlockId, setActiveBlockId] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
-  const pixelClockOffset = useRef(0);
+  const [initialClockOffset] = useState(() => (initialLiveState.serverNow ?? Date.now()) - Date.now());
+  const pixelClockOffset = useRef(initialClockOffset);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
@@ -203,15 +199,6 @@ export default function ModerationClient({
     aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "funny" || aktuellerSlide?.typ === "aufloesung"
       ? aktuellerSlide.frage.quiz_fragen_id
       : undefined;
-  const pauseVerstrichen =
-    isPauseSlide(aktuellerSlide)
-      ? (secondsSince(slideStartedAt, now) ?? 0)
-      : 0;
-
-  const istPauseAbgelaufen =
-    isPauseSlide(aktuellerSlide) &&
-    pauseVerstrichen >= getPauseDurationSeconds(aktuellerSlide);
-
   const naechsterSlide = slides[slideIndex + 1];
   const istCountdownSlide = isPauseSlide(aktuellerSlide);
 
@@ -294,13 +281,11 @@ export default function ModerationClient({
 
   const [showAuswertungIframe, setShowAuswertungIframe] = useState(false);
 
-  const countdownVerstrichen = countdownStartedAt
-    ? (secondsSince(countdownStartedAt, now) ?? 0)
-    : 0;
-
-  const countdownRestSekunden = Math.max(
-    0,
-    countdownDauerMinuten * 60 - countdownVerstrichen,
+  const countdownRestSekunden = countdownRemainingSeconds(
+    countdownStartedAt,
+    countdownStatus === "idle" ? countdownDauerMinuten * 60 : lifecycleState.countdownDurationSeconds ?? countdownDauerMinuten * 60,
+    countdownStatus,
+    now + pixelClockOffset.current,
   );
 
   const [auswertungDialogBereitsGezeigt, setAuswertungDialogBereitsGezeigt] =
@@ -314,18 +299,6 @@ export default function ModerationClient({
   );
   const [estimationQuestion, setEstimationQuestion] =
     useState(initialEstimationQuestion);
-
-  useEffect(() => {
-    if (!istPauseAbgelaufen) return;
-    if (auswertungDialogBereitsGezeigt) return;
-
-    const timeoutId = window.setTimeout(() => {
-      setShowAuswertungDialog(true);
-      setAuswertungDialogBereitsGezeigt(true);
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [istPauseAbgelaufen, auswertungDialogBereitsGezeigt]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -388,6 +361,7 @@ export default function ModerationClient({
           setLiveResultState(snapshot.liveResultState);
         }
         setTeamJoinState(snapshot.teamJoinState);
+        setActiveBlockId(snapshot.blockState?.quizAbschnittId ?? null);
         setBlockFreigegeben(Boolean(
           snapshot.blockState?.isReleased && !snapshot.blockState.isClosed,
         ));
@@ -445,14 +419,15 @@ export default function ModerationClient({
         ? aktuellerSlide.abschnitt
         : null;
 
-    if (!abschnitt?.quiz_abschnitt_id) return;
+    const sectionId = abschnitt?.quiz_abschnitt_id ?? activeBlockId;
+    if (sectionId === null) return;
 
     await schliesseQuizBlock({
       quizId,
       lifecycleRevision: lifecycleState.lifecycleRevision,
-      quizAbschnittId: abschnitt.quiz_abschnitt_id,
+      quizAbschnittId: sectionId,
     });
-  }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
+  }, [aktuellerSlide, activeBlockId, quizId, lifecycleState.lifecycleRevision]);
 
   function vorherigerSlide() {
     void goToSlide(slideIndex - 1);
@@ -670,29 +645,26 @@ export default function ModerationClient({
   }
 
   async function handleCountdownStart() {
-    await starteCountdown({
+    const result = await starteCountdown({
       quizId,
       lifecycleRevision: lifecycleState.lifecycleRevision,
       dauerSekunden: countdownDauerMinuten * 60,
     });
 
-    setCountdownStartedAt(new Date().toISOString());
-    setCountdownStatus("running");
+    applyLiveState(resolvePresentationLiveState(result.status));
   }
 
   async function handleCountdownReset() {
-    await resetCountdown({
+    const result = await resetCountdown({
       quizId,
       lifecycleRevision: lifecycleState.lifecycleRevision,
     });
 
-    setCountdownStartedAt(null);
-    setCountdownStatus("idle");
+    applyLiveState(resolvePresentationLiveState(result.status));
   }
 
   const countdownIstAbgelaufen =
-    countdownStatus === "running" &&
-    countdownRestSekunden <= 0 &&
+    countdownStatus === "finished" &&
     !auswertungDialogBereitsGezeigt;
 
   useEffect(() => {
@@ -721,16 +693,13 @@ export default function ModerationClient({
     if (!countdownIstAbgelaufen) return;
 
     const timeoutId = window.setTimeout(() => {
-      setCountdownStatus("finished");
       setAuswertungDialogBereitsGezeigt(true);
       setShowAuswertungDialog(true);
 
-      void handleBlockSchliessen();
-      void beendeCountdown({ quizId, lifecycleRevision: lifecycleState.lifecycleRevision });
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [countdownIstAbgelaufen, quizId, handleBlockSchliessen, lifecycleState.lifecycleRevision]);
+  }, [countdownIstAbgelaufen]);
 
   useEffect(() => {
     if (!isStandingsSlide(aktuellerSlide)) return;

@@ -72,8 +72,9 @@ export default function QuizPraesentationPlayer({
   const [yearlyStandings, setYearlyStandings] = useState<YearlyRankingEntry[]>([]);
   const [estimationQuestion, setEstimationQuestion] =
     useState<EstimationQuestion | null>(null);
-  const [now, setNow] = useState(() => Date.now());
-  const serverClockOffsetRef = useRef(0);
+  const [now, setNow] = useState(() => initialLiveState.serverNow ?? Date.now());
+  const [initialClockOffset] = useState(() => (initialLiveState.serverNow ?? Date.now()) - Date.now());
+  const serverClockOffsetRef = useRef(initialClockOffset);
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);

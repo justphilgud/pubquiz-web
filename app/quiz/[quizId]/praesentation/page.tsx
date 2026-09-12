@@ -37,7 +37,7 @@ export default async function QuizPraesentationPage({ params }: Props) {
     <QuizPraesentationPlayer
       quiz={quiz}
       quizId={quizId}
-      initialLiveState={resolvePresentationLiveState(status)}
+      initialLiveState={{ ...resolvePresentationLiveState(status), serverNow: status.serverNow }}
       theme={templates.theme}
     />
   );

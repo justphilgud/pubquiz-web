@@ -1,6 +1,7 @@
 import { draftInputFromStored, readInteractionSnapshot } from "./interactionStoredAnswer";
 import { Prisma } from "@/app/generated/prisma/client";
-import { requireQuizNotStopped } from "../quizLifecycle.server";
+import { lockQuizLifecycle, requireQuizNotStopped as requireQuizRunning } from "../quizLifecycle.server";
+import { presentationCountdownDeadline } from "../blockCountdown";
 import { resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { resolveQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
@@ -75,6 +76,46 @@ import {
 } from "@/app/umfragen/livePollRuntime.server";
 
 type DbClient = Prisma.TransactionClient;
+
+/** Caller holds the quiz lock; all writes and closes share quiz -> run -> draft. */
+export async function expireQuizBlockDeadlines(db: DbClient, quizId: number, now = new Date()) {
+  const expired = await db.quiz_block_freigaben.findMany({
+    where: { quiz_id: quizId, ist_geschlossen: false, answer_deadline_at: { lte: now } },
+    orderBy: { quiz_abschnitt_id: "asc" },
+  });
+  for (const block of expired) {
+    await closeBlockInteractions(db, quizId, block.quiz_abschnitt_id, "BLOCK_DEADLINE_EXPIRED");
+    await db.quiz_block_freigaben.update({
+      where: { quiz_block_freigabe_id: block.quiz_block_freigabe_id },
+      data: { ist_freigegeben: false, ist_geschlossen: true, geschlossen_ab: block.answer_deadline_at },
+    });
+  }
+  const status = await db.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } });
+  const deadline = status && presentationCountdownDeadline(status);
+  if (status?.countdown_status === "running" && deadline && deadline <= now) {
+    await db.quiz_praesentation_status.update({
+      where: { quiz_id: quizId },
+      data: { countdown_status: "finished", countdown_ended_at: deadline },
+    });
+  }
+}
+
+export async function requireQuizAnswerWindow(db: DbClient, quizId: number) {
+  await requireQuizRunning(db, quizId);
+  await expireQuizBlockDeadlines(db, quizId);
+  return db.quiz_praesentation_status.findUniqueOrThrow({ where: { quiz_id: quizId } });
+}
+
+const requireQuizNotStopped = requireQuizAnswerWindow;
+
+/** No timer process: the first relevant read materializes the elapsed boundary. */
+export async function ensureQuizBlockDeadlines(quizId: number) {
+  return prisma.$transaction(async (tx) => {
+    await lockQuizLifecycle(tx, quizId);
+    await expireQuizBlockDeadlines(tx, quizId);
+    return tx.quiz_praesentation_status.findUniqueOrThrow({ where: { quiz_id: quizId } });
+  }, { timeout: 30_000 });
+}
 
 function toJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -886,6 +927,7 @@ export async function saveTeamAnswerDraft(input: {
       where: { interaction_run_id: interactionRunId },
     });
     const now = new Date();
+    await expireQuizBlockDeadlines(tx, input.quizId, now);
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (
       !run ||
@@ -1087,6 +1129,7 @@ export async function submitTeamAnswer(input: {
       where: { interaction_run_id: input.interactionRunId },
     });
     const now = new Date();
+    await expireQuizBlockDeadlines(tx, input.quizId, now);
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (run && readPixelLiveConfigSnapshot(run.config_snapshot)?.mode === "STAGED") {
       return { success: false, reason: "STAGED_AUTO_FINALIZED" as const };
@@ -1218,6 +1261,7 @@ export async function stopPixelQuestion(input: {
       where: { interaction_run_id: input.interactionRunId },
     });
     const now = new Date();
+    await expireQuizBlockDeadlines(tx, input.quizId, now);
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (
       !run ||
@@ -1339,6 +1383,7 @@ export async function getQuizLiveSnapshotData(
     presentationQuestionAssignmentId?: number;
   } = {},
 ) {
+  await ensureQuizBlockDeadlines(quizId);
   const serverNow = new Date();
   const runQuery = () => prisma.quiz_interaction_runs.findFirst({
       where: {

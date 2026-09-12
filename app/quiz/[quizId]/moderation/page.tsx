@@ -38,7 +38,7 @@ export default async function ModerationPage({ params }: Props) {
     resolveQuizTemplates(quizId),
   ]);
   if (!templates) notFound();
-  const initialLiveState = resolvePresentationLiveState(status);
+  const initialLiveState = { ...resolvePresentationLiveState(status), serverNow: status.serverNow };
   const slides = buildPraesentationSlides(quiz, { funnyQuestionAssignmentIds: new Set(quiz.fragen.filter((question) => question.funnyRevealAvailable).map((question) => question.quiz_fragen_id)) });
   const slide = slides[resolvePresentationSequenceIndex(initialLiveState, slides.map(getPresentationSlideKey)).index];
   const questionId = slide?.typ === "frage" || slide?.typ === "aufloesung" || slide?.typ === "funny" ? slide.frage.quiz_fragen_id : null;

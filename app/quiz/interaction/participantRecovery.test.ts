@@ -24,6 +24,7 @@ test("closed snapshots confirm accepted content without exposing questions or ac
   runInNewContext(ts.transpileModule(body, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, {
     exports,
     resolveParticipantSession: async (_id: number, token?: string) => token === "valid" ? { quiz_team_session_id: 9, team: {} } : null,
+    ensureQuizBlockDeadlines: async () => {},
     repairQuizSpecificOrderingAssignments: async () => {},
     prisma: {
       quiz: { findUnique: async () => ({ quiz_id: 7, titel: "Closed", quiz_abschnitte: [], quiz_fragen: [], praesentation_status: null }), findFirst: async () => ({ quiz_id: 7, titel: "Closed" }) },
@@ -153,6 +154,7 @@ for (const offset of [-10000, -1, 0, 1, 5000]) {
     runInNewContext(ts.transpileModule(body, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, {
       exports, Date: class extends Date { constructor() { super(now); } },
       prisma: { $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) },
+      expireQuizBlockDeadlines: async () => {},
       requireQuizNotStopped: async () => {},
       resolveInteractionAssignment: async () => ({ assignment: { quiz_abschnitt_id: 3, ergebnisdarstellung: "DEFAULT" }, interaction: {} }),
       lockRun: async () => {}, expireDeadlineIfNecessary: async () => run,

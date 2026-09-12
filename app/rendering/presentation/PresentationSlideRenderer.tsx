@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
+import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
@@ -2053,20 +2054,7 @@ function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
   const dauerSekunden =
     remoteCountdownDauerSekunden ?? slide.dauerSekunden;
 
-  const verstrichen =
-    remoteCountdownStartedAt && remoteCountdownStatus === "running"
-      ? Math.max(
-        0,
-        Math.floor(
-          (now - new Date(remoteCountdownStartedAt).getTime()) / 1000
-        )
-      )
-      : 0;
-
-  const aktuelleSekunden =
-    remoteCountdownStatus === "running"
-      ? Math.max(0, dauerSekunden - verstrichen)
-      : dauerSekunden;
+  const aktuelleSekunden = countdownRemainingSeconds(remoteCountdownStartedAt, dauerSekunden, remoteCountdownStatus, now);
 
   const minuten = Math.floor(aktuelleSekunden / 60);
   const sekunden = aktuelleSekunden % 60;
@@ -2327,16 +2315,7 @@ function renderYearlyStandingsSlide(
 function renderFlowPauseSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
   const config = slide.element.config;
   const duration = remoteCountdownDauerSekunden ?? config.durationSeconds ?? 300;
-  const elapsed =
-    remoteCountdownStartedAt && remoteCountdownStatus === "running"
-      ? Math.max(
-          0,
-          Math.floor((now - new Date(remoteCountdownStartedAt).getTime()) / 1000),
-        )
-      : 0;
-  const remaining = remoteCountdownStatus === "running"
-    ? Math.max(0, duration - elapsed)
-    : duration;
+  const remaining = countdownRemainingSeconds(remoteCountdownStartedAt, duration, remoteCountdownStatus, now);
 
   return (
     <section className="presentation-flow-slide presentation-flow-pause" data-flow-type={slide.element.type}>

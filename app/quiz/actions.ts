@@ -1,7 +1,7 @@
 "use server";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluationRevisionSelect } from "./evaluation/evaluationRevision";
-import { requireQuizNotStopped } from "./quizLifecycle.server";
+import { requireQuizAnswerWindow as requireQuizNotStopped, ensureQuizBlockDeadlines } from "./interaction/interaction.server";
 
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -2425,6 +2425,7 @@ export async function getQuizAntwortStatus(
     };
   }
 
+  await ensureQuizBlockDeadlines(quizId);
   await repairQuizSpecificOrderingAssignments(quizId);
 
   const quiz = await prisma.quiz.findUnique({
@@ -2968,6 +2969,7 @@ export async function freigabeQuizBlock(data: {
         ist_geschlossen: false,
         freigegeben_ab: new Date(),
         geschlossen_ab: null,
+        answer_deadline_at: null,
         aktuelle_quiz_fragen_id: null,
       },
       create: {
@@ -3542,8 +3544,13 @@ export async function saveTeamAntwort(data: {
     }
   }
 
-  await prisma.$transaction(async (tx) => {
+  const saved = await prisma.$transaction(async (tx) => {
     await requireQuizNotStopped(tx, data.quizId);
+    const currentBlock = await tx.quiz_block_freigaben.findFirst({
+      where: { quiz_id: data.quizId, quiz_abschnitt_id: data.quizAbschnittId },
+    });
+    if (!currentBlock?.ist_freigegeben || currentBlock.ist_geschlossen ||
+        (currentBlock.answer_deadline_at && currentBlock.answer_deadline_at <= new Date())) return false;
     const previousAnswer = await tx.team_antworten.findUnique({
       where: {
         quiz_fragen_id_quiz_team_session_id: {
@@ -3657,17 +3664,17 @@ export async function saveTeamAntwort(data: {
       }
     }
     await recalculateQuizAnswerEvaluation(teamAntwort.team_antwort_id, tx);
+    return true;
   });
 
-  return {
-    success: true,
-  };
+  return saved ? { success: true } : { success: false, reason: "LIVE_STATE_CHANGED" as const };
 }
 export async function getQuizFrageAuswertung(
   quizId: number,
   quizFragenId: number,
 ) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   await ensureQuizQuestionEvaluation(quizFragenId);
   const quizFrage = await prisma.quiz_fragen.findFirst({
     where: {
@@ -4106,6 +4113,7 @@ export async function updateQuizFragenStatistiken() {
 }
 export async function getQuizAuswertungUebersicht(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -4473,6 +4481,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number, db: Prisma.Transa
 
 export async function getQuizAuswertungAlleAntworten(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return loadQuizAuswertungAlleAntworten(quizId);
 }
 export async function updateQuizFragePunkteModus(data: {
@@ -4597,6 +4606,7 @@ async function loadQuizPunktestand(quizId: number, db: Prisma.TransactionClient 
 
 export async function getQuizPunktestand(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction((tx) => loadQuizPunktestand(quizId, tx), {
     isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
   });
@@ -4684,11 +4694,13 @@ async function loadQuizEvaluationRevision(quizId: number, db: Prisma.Transaction
 
 export async function getQuizEvaluationRevision(quizId: number) {
   await requireQuizAdmin(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return loadQuizEvaluationRevision(quizId);
 }
 
 export async function getQuizAuswertungPageData(quizId: number) {
   await requireQuizAdmin(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction(async (tx) => {
     const [quiz, antworten, punktestand, backfillStatus, revision] = await Promise.all([
       tx.quiz.findUnique({ where: { quiz_id: quizId }, select: { quiz_id: true, titel: true } }),

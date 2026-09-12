@@ -606,6 +606,7 @@ model quiz_team_sessions {
 }
 
 model quiz_block_freigaben {
+  answer_deadline_at      DateTime?
   quiz_block_freigabe_id  Int             @id @default(autoincrement())
   quiz_id                 Int
   quiz_abschnitt_id       Int

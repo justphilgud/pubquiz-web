@@ -41,6 +41,7 @@ export type Quiz_block_freigabenSumAggregateOutputType = {
 }
 
 export type Quiz_block_freigabenMinAggregateOutputType = {
+  answer_deadline_at: Date | null
   quiz_block_freigabe_id: number | null
   quiz_id: number | null
   quiz_abschnitt_id: number | null
@@ -52,6 +53,7 @@ export type Quiz_block_freigabenMinAggregateOutputType = {
 }
 
 export type Quiz_block_freigabenMaxAggregateOutputType = {
+  answer_deadline_at: Date | null
   quiz_block_freigabe_id: number | null
   quiz_id: number | null
   quiz_abschnitt_id: number | null
@@ -63,6 +65,7 @@ export type Quiz_block_freigabenMaxAggregateOutputType = {
 }
 
 export type Quiz_block_freigabenCountAggregateOutputType = {
+  answer_deadline_at: number
   quiz_block_freigabe_id: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -90,6 +93,7 @@ export type Quiz_block_freigabenSumAggregateInputType = {
 }
 
 export type Quiz_block_freigabenMinAggregateInputType = {
+  answer_deadline_at?: true
   quiz_block_freigabe_id?: true
   quiz_id?: true
   quiz_abschnitt_id?: true
@@ -101,6 +105,7 @@ export type Quiz_block_freigabenMinAggregateInputType = {
 }
 
 export type Quiz_block_freigabenMaxAggregateInputType = {
+  answer_deadline_at?: true
   quiz_block_freigabe_id?: true
   quiz_id?: true
   quiz_abschnitt_id?: true
@@ -112,6 +117,7 @@ export type Quiz_block_freigabenMaxAggregateInputType = {
 }
 
 export type Quiz_block_freigabenCountAggregateInputType = {
+  answer_deadline_at?: true
   quiz_block_freigabe_id?: true
   quiz_id?: true
   quiz_abschnitt_id?: true
@@ -210,6 +216,7 @@ export type quiz_block_freigabenGroupByArgs<ExtArgs extends runtime.Types.Extens
 }
 
 export type Quiz_block_freigabenGroupByOutputType = {
+  answer_deadline_at: Date | null
   quiz_block_freigabe_id: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -244,6 +251,7 @@ export type quiz_block_freigabenWhereInput = {
   AND?: Prisma.quiz_block_freigabenWhereInput | Prisma.quiz_block_freigabenWhereInput[]
   OR?: Prisma.quiz_block_freigabenWhereInput[]
   NOT?: Prisma.quiz_block_freigabenWhereInput | Prisma.quiz_block_freigabenWhereInput[]
+  answer_deadline_at?: Prisma.DateTimeNullableFilter<"quiz_block_freigaben"> | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
   quiz_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
   quiz_abschnitt_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
@@ -257,6 +265,7 @@ export type quiz_block_freigabenWhereInput = {
 }
 
 export type quiz_block_freigabenOrderByWithRelationInput = {
+  answer_deadline_at?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_block_freigabe_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -275,6 +284,7 @@ export type quiz_block_freigabenWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.quiz_block_freigabenWhereInput | Prisma.quiz_block_freigabenWhereInput[]
   OR?: Prisma.quiz_block_freigabenWhereInput[]
   NOT?: Prisma.quiz_block_freigabenWhereInput | Prisma.quiz_block_freigabenWhereInput[]
+  answer_deadline_at?: Prisma.DateTimeNullableFilter<"quiz_block_freigaben"> | Date | string | null
   quiz_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
   quiz_abschnitt_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
   ist_freigegeben?: Prisma.BoolFilter<"quiz_block_freigaben"> | boolean
@@ -287,6 +297,7 @@ export type quiz_block_freigabenWhereUniqueInput = Prisma.AtLeast<{
 }, "quiz_block_freigabe_id" | "quiz_id_quiz_abschnitt_id">
 
 export type quiz_block_freigabenOrderByWithAggregationInput = {
+  answer_deadline_at?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_block_freigabe_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -306,6 +317,7 @@ export type quiz_block_freigabenScalarWhereWithAggregatesInput = {
   AND?: Prisma.quiz_block_freigabenScalarWhereWithAggregatesInput | Prisma.quiz_block_freigabenScalarWhereWithAggregatesInput[]
   OR?: Prisma.quiz_block_freigabenScalarWhereWithAggregatesInput[]
   NOT?: Prisma.quiz_block_freigabenScalarWhereWithAggregatesInput | Prisma.quiz_block_freigabenScalarWhereWithAggregatesInput[]
+  answer_deadline_at?: Prisma.DateTimeNullableWithAggregatesFilter<"quiz_block_freigaben"> | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntWithAggregatesFilter<"quiz_block_freigaben"> | number
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz_block_freigaben"> | number
   quiz_abschnitt_id?: Prisma.IntWithAggregatesFilter<"quiz_block_freigaben"> | number
@@ -317,6 +329,7 @@ export type quiz_block_freigabenScalarWhereWithAggregatesInput = {
 }
 
 export type quiz_block_freigabenCreateInput = {
+  answer_deadline_at?: Date | string | null
   ist_freigegeben?: boolean
   ist_geschlossen?: boolean
   freigegeben_ab?: Date | string | null
@@ -327,6 +340,7 @@ export type quiz_block_freigabenCreateInput = {
 }
 
 export type quiz_block_freigabenUncheckedCreateInput = {
+  answer_deadline_at?: Date | string | null
   quiz_block_freigabe_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -338,6 +352,7 @@ export type quiz_block_freigabenUncheckedCreateInput = {
 }
 
 export type quiz_block_freigabenUpdateInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_geschlossen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   freigegeben_ab?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -348,6 +363,7 @@ export type quiz_block_freigabenUpdateInput = {
 }
 
 export type quiz_block_freigabenUncheckedUpdateInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -359,6 +375,7 @@ export type quiz_block_freigabenUncheckedUpdateInput = {
 }
 
 export type quiz_block_freigabenCreateManyInput = {
+  answer_deadline_at?: Date | string | null
   quiz_block_freigabe_id?: number
   quiz_id: number
   quiz_abschnitt_id: number
@@ -370,6 +387,7 @@ export type quiz_block_freigabenCreateManyInput = {
 }
 
 export type quiz_block_freigabenUpdateManyMutationInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_geschlossen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   freigegeben_ab?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -378,6 +396,7 @@ export type quiz_block_freigabenUpdateManyMutationInput = {
 }
 
 export type quiz_block_freigabenUncheckedUpdateManyInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -404,6 +423,7 @@ export type quiz_block_freigabenQuiz_idQuiz_abschnitt_idCompoundUniqueInput = {
 }
 
 export type quiz_block_freigabenCountOrderByAggregateInput = {
+  answer_deadline_at?: Prisma.SortOrder
   quiz_block_freigabe_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -422,6 +442,7 @@ export type quiz_block_freigabenAvgOrderByAggregateInput = {
 }
 
 export type quiz_block_freigabenMaxOrderByAggregateInput = {
+  answer_deadline_at?: Prisma.SortOrder
   quiz_block_freigabe_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -433,6 +454,7 @@ export type quiz_block_freigabenMaxOrderByAggregateInput = {
 }
 
 export type quiz_block_freigabenMinOrderByAggregateInput = {
+  answer_deadline_at?: Prisma.SortOrder
   quiz_block_freigabe_id?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   quiz_abschnitt_id?: Prisma.SortOrder
@@ -535,6 +557,7 @@ export type quiz_block_freigabenUncheckedUpdateManyWithoutQuiz_abschnitteNestedI
 }
 
 export type quiz_block_freigabenCreateWithoutQuizInput = {
+  answer_deadline_at?: Date | string | null
   ist_freigegeben?: boolean
   ist_geschlossen?: boolean
   freigegeben_ab?: Date | string | null
@@ -544,6 +567,7 @@ export type quiz_block_freigabenCreateWithoutQuizInput = {
 }
 
 export type quiz_block_freigabenUncheckedCreateWithoutQuizInput = {
+  answer_deadline_at?: Date | string | null
   quiz_block_freigabe_id?: number
   quiz_abschnitt_id: number
   ist_freigegeben?: boolean
@@ -583,6 +607,7 @@ export type quiz_block_freigabenScalarWhereInput = {
   AND?: Prisma.quiz_block_freigabenScalarWhereInput | Prisma.quiz_block_freigabenScalarWhereInput[]
   OR?: Prisma.quiz_block_freigabenScalarWhereInput[]
   NOT?: Prisma.quiz_block_freigabenScalarWhereInput | Prisma.quiz_block_freigabenScalarWhereInput[]
+  answer_deadline_at?: Prisma.DateTimeNullableFilter<"quiz_block_freigaben"> | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
   quiz_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
   quiz_abschnitt_id?: Prisma.IntFilter<"quiz_block_freigaben"> | number
@@ -594,6 +619,7 @@ export type quiz_block_freigabenScalarWhereInput = {
 }
 
 export type quiz_block_freigabenCreateWithoutQuiz_abschnitteInput = {
+  answer_deadline_at?: Date | string | null
   ist_freigegeben?: boolean
   ist_geschlossen?: boolean
   freigegeben_ab?: Date | string | null
@@ -603,6 +629,7 @@ export type quiz_block_freigabenCreateWithoutQuiz_abschnitteInput = {
 }
 
 export type quiz_block_freigabenUncheckedCreateWithoutQuiz_abschnitteInput = {
+  answer_deadline_at?: Date | string | null
   quiz_block_freigabe_id?: number
   quiz_id: number
   ist_freigegeben?: boolean
@@ -639,6 +666,7 @@ export type quiz_block_freigabenUpdateManyWithWhereWithoutQuiz_abschnitteInput =
 }
 
 export type quiz_block_freigabenCreateManyQuizInput = {
+  answer_deadline_at?: Date | string | null
   quiz_block_freigabe_id?: number
   quiz_abschnitt_id: number
   ist_freigegeben?: boolean
@@ -649,6 +677,7 @@ export type quiz_block_freigabenCreateManyQuizInput = {
 }
 
 export type quiz_block_freigabenUpdateWithoutQuizInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_geschlossen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   freigegeben_ab?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -658,6 +687,7 @@ export type quiz_block_freigabenUpdateWithoutQuizInput = {
 }
 
 export type quiz_block_freigabenUncheckedUpdateWithoutQuizInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -668,6 +698,7 @@ export type quiz_block_freigabenUncheckedUpdateWithoutQuizInput = {
 }
 
 export type quiz_block_freigabenUncheckedUpdateManyWithoutQuizInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_abschnitt_id?: Prisma.IntFieldUpdateOperationsInput | number
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -678,6 +709,7 @@ export type quiz_block_freigabenUncheckedUpdateManyWithoutQuizInput = {
 }
 
 export type quiz_block_freigabenCreateManyQuiz_abschnitteInput = {
+  answer_deadline_at?: Date | string | null
   quiz_block_freigabe_id?: number
   quiz_id: number
   ist_freigegeben?: boolean
@@ -688,6 +720,7 @@ export type quiz_block_freigabenCreateManyQuiz_abschnitteInput = {
 }
 
 export type quiz_block_freigabenUpdateWithoutQuiz_abschnitteInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ist_geschlossen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   freigegeben_ab?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -697,6 +730,7 @@ export type quiz_block_freigabenUpdateWithoutQuiz_abschnitteInput = {
 }
 
 export type quiz_block_freigabenUncheckedUpdateWithoutQuiz_abschnitteInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -707,6 +741,7 @@ export type quiz_block_freigabenUncheckedUpdateWithoutQuiz_abschnitteInput = {
 }
 
 export type quiz_block_freigabenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
+  answer_deadline_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   quiz_block_freigabe_id?: Prisma.IntFieldUpdateOperationsInput | number
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   ist_freigegeben?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -719,6 +754,7 @@ export type quiz_block_freigabenUncheckedUpdateManyWithoutQuiz_abschnitteInput =
 
 
 export type quiz_block_freigabenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  answer_deadline_at?: boolean
   quiz_block_freigabe_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -732,6 +768,7 @@ export type quiz_block_freigabenSelect<ExtArgs extends runtime.Types.Extensions.
 }, ExtArgs["result"]["quiz_block_freigaben"]>
 
 export type quiz_block_freigabenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  answer_deadline_at?: boolean
   quiz_block_freigabe_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -745,6 +782,7 @@ export type quiz_block_freigabenSelectCreateManyAndReturn<ExtArgs extends runtim
 }, ExtArgs["result"]["quiz_block_freigaben"]>
 
 export type quiz_block_freigabenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  answer_deadline_at?: boolean
   quiz_block_freigabe_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -758,6 +796,7 @@ export type quiz_block_freigabenSelectUpdateManyAndReturn<ExtArgs extends runtim
 }, ExtArgs["result"]["quiz_block_freigaben"]>
 
 export type quiz_block_freigabenSelectScalar = {
+  answer_deadline_at?: boolean
   quiz_block_freigabe_id?: boolean
   quiz_id?: boolean
   quiz_abschnitt_id?: boolean
@@ -768,7 +807,7 @@ export type quiz_block_freigabenSelectScalar = {
   aktuelle_quiz_fragen_id?: boolean
 }
 
-export type quiz_block_freigabenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_block_freigabe_id" | "quiz_id" | "quiz_abschnitt_id" | "ist_freigegeben" | "ist_geschlossen" | "freigegeben_ab" | "geschlossen_ab" | "aktuelle_quiz_fragen_id", ExtArgs["result"]["quiz_block_freigaben"]>
+export type quiz_block_freigabenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"answer_deadline_at" | "quiz_block_freigabe_id" | "quiz_id" | "quiz_abschnitt_id" | "ist_freigegeben" | "ist_geschlossen" | "freigegeben_ab" | "geschlossen_ab" | "aktuelle_quiz_fragen_id", ExtArgs["result"]["quiz_block_freigaben"]>
 export type quiz_block_freigabenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz_abschnitte?: boolean | Prisma.quiz_abschnitteDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
@@ -789,6 +828,7 @@ export type $quiz_block_freigabenPayload<ExtArgs extends runtime.Types.Extension
     quiz: Prisma.$quizPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    answer_deadline_at: Date | null
     quiz_block_freigabe_id: number
     quiz_id: number
     quiz_abschnitt_id: number
@@ -880,8 +920,8 @@ export interface quiz_block_freigabenDelegate<ExtArgs extends runtime.Types.Exte
    * // Get first 10 Quiz_block_freigabens
    * const quiz_block_freigabens = await prisma.quiz_block_freigaben.findMany({ take: 10 })
    *
-   * // Only select the `quiz_block_freigabe_id`
-   * const quiz_block_freigabenWithQuiz_block_freigabe_idOnly = await prisma.quiz_block_freigaben.findMany({ select: { quiz_block_freigabe_id: true } })
+   * // Only select the `answer_deadline_at`
+   * const quiz_block_freigabenWithAnswer_deadline_atOnly = await prisma.quiz_block_freigaben.findMany({ select: { answer_deadline_at: true } })
    *
    */
   findMany<T extends quiz_block_freigabenFindManyArgs>(args?: Prisma.SelectSubset<T, quiz_block_freigabenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_block_freigabenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -925,9 +965,9 @@ export interface quiz_block_freigabenDelegate<ExtArgs extends runtime.Types.Exte
    *   ]
    * })
    *
-   * // Create many Quiz_block_freigabens and only return the `quiz_block_freigabe_id`
-   * const quiz_block_freigabenWithQuiz_block_freigabe_idOnly = await prisma.quiz_block_freigaben.createManyAndReturn({
-   *   select: { quiz_block_freigabe_id: true },
+   * // Create many Quiz_block_freigabens and only return the `answer_deadline_at`
+   * const quiz_block_freigabenWithAnswer_deadline_atOnly = await prisma.quiz_block_freigaben.createManyAndReturn({
+   *   select: { answer_deadline_at: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1016,9 +1056,9 @@ export interface quiz_block_freigabenDelegate<ExtArgs extends runtime.Types.Exte
    *   ]
    * })
    *
-   * // Update zero or more Quiz_block_freigabens and only return the `quiz_block_freigabe_id`
-   * const quiz_block_freigabenWithQuiz_block_freigabe_idOnly = await prisma.quiz_block_freigaben.updateManyAndReturn({
-   *   select: { quiz_block_freigabe_id: true },
+   * // Update zero or more Quiz_block_freigabens and only return the `answer_deadline_at`
+   * const quiz_block_freigabenWithAnswer_deadline_atOnly = await prisma.quiz_block_freigaben.updateManyAndReturn({
+   *   select: { answer_deadline_at: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1222,6 +1262,7 @@ export interface Prisma__quiz_block_freigabenClient<T, Null = never, ExtArgs ext
  * Fields of the quiz_block_freigaben model
  */
 export interface quiz_block_freigabenFieldRefs {
+  readonly answer_deadline_at: Prisma.FieldRef<"quiz_block_freigaben", 'DateTime'>
   readonly quiz_block_freigabe_id: Prisma.FieldRef<"quiz_block_freigaben", 'Int'>
   readonly quiz_id: Prisma.FieldRef<"quiz_block_freigaben", 'Int'>
   readonly quiz_abschnitt_id: Prisma.FieldRef<"quiz_block_freigaben", 'Int'>
