@@ -2821,7 +2821,9 @@ export async function getQuizAntwortStatus(
     liveRevision: [serializeQuizParticipantLiveRevision(
       blockFreigabe ?? letzteBlockFreigabe,
       currentRun,
-    ), quiz.praesentation_status?.updated_at.toISOString() ?? ""].join(":"),
+    ), quiz.praesentation_status?.updated_at.toISOString() ?? "",
+      `answers:${gespeicherteAntworten.reduce((total, answer) => total + answer.draft_revision, 0)}`,
+    ].join(":"),
     activeQuizFragenId: currentRun?.quiz_fragen_id ?? null,
     abschnitte,
     offenerBlock:

@@ -1421,7 +1421,7 @@ export async function getQuizLiveSnapshotData(
         },
       },
     });
-  const [initialRun, blockRelease, presentationStatus] = await Promise.all([
+  const [initialRun, blockRelease, presentationStatus, ownAnswers] = await Promise.all([
     runQuery(),
     prisma.quiz_block_freigaben.findFirst({
       where: { quiz_id: quizId },
@@ -1431,6 +1431,12 @@ export async function getQuizLiveSnapshotData(
       ],
     }),
     prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } }),
+    quizTeamSessionId !== null
+      ? prisma.team_antworten.aggregate({
+          where: { quiz_id: quizId, quiz_team_session_id: quizTeamSessionId },
+          _sum: { draft_revision: true },
+        })
+      : Promise.resolve(null),
   ]);
   let run = initialRun;
   const initialPixelConfig = run ? readPixelLiveConfigSnapshot(run.config_snapshot) : null;
@@ -1717,7 +1723,9 @@ export async function getQuizLiveSnapshotData(
     presentationState: resolvePresentationLiveState(presentationStatus),
     lifecycle: resolvePresentationLiveState(presentationStatus).lifecycle,
     questionHidden: run?.is_hidden ?? false,
-    liveRevision: [serializeQuizParticipantLiveRevision(blockRelease, run), presentationStatus?.updated_at.toISOString() ?? ""].join(":"),
+    liveRevision: [serializeQuizParticipantLiveRevision(blockRelease, run), presentationStatus?.updated_at.toISOString() ?? "",
+      ...(ownAnswers ? [`answers:${ownAnswers._sum.draft_revision ?? 0}`] : []),
+    ].join(":"),
     blockState: blockRelease
       ? {
           quizAbschnittId: blockRelease.quiz_abschnitt_id,

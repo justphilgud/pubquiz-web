@@ -19,7 +19,7 @@ test("closed snapshots confirm accepted content without exposing questions or ac
     { quiz_id: 7, quiz_team_session_id: 99, quiz_fragen_id: 4, interaction_run_id: 13, draft_revision: 1, antwort_text: "Other team", antwort_id: null, antwortauswahlen: [], antwortfelder: [] },
   ];
   type Confirmation = { questionId: number; runId: number; revision: number; value: ReturnType<typeof value> };
-  const exports: { getQuizAntwortStatus?: (quizId: number, token?: string) => Promise<{ fragen: unknown[]; answerConfirmations: Confirmation[] }> } = {};
+  const exports: { getQuizAntwortStatus?: (quizId: number, token?: string) => Promise<{ liveRevision: string; fragen: unknown[]; answerConfirmations: Confirmation[] }> } = {};
   let reads = 0;
   runInNewContext(ts.transpileModule(body, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, {
     exports,
@@ -46,6 +46,10 @@ test("closed snapshots confirm accepted content without exposing questions or ac
   assert.deepEqual(Array.from(snapshot.answerConfirmations, c => c.questionId), [1, 2]);
   assert.equal((await exports.getQuizAntwortStatus!(7)).answerConfirmations.length, 0);
   assert.equal(reads, 1, "an unauthenticated caller cannot read any confirmations");
+  assert.ok(snapshot.liveRevision.endsWith(":answers:9"));
+  stored[0].draft_revision++;
+  const updated = await exports.getQuizAntwortStatus!(7, "valid");
+  assert.ok(updated.liveRevision.endsWith(":answers:10"), "full revision covers all own answers, including invisible earlier questions");
 
   let complete!: (result: { success: false; reason: "LIVE_STATE_CHANGED" }) => void;
   let writes = 0;
@@ -75,6 +79,40 @@ test("closed snapshots confirm accepted content without exposing questions or ac
   c.edit(1, value("New edit"));
   c.reconcileMissing(new Set(), snapshot.answerConfirmations);
   assert.equal(c.getSnapshot()[1].serverValue.antwortText, "New run", "an old run cannot confirm a new run");
+});
+
+test("light polls detect earlier-question edits during a pause without reading other teams", async () => {
+  const path = "app/quiz/interaction/interaction.server.ts";
+  const source = ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true);
+  const body = source.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === "getQuizLiveSnapshotData")!.getText(source);
+  const rows = [
+    { quiz: 7, team: 9, revision: 5 }, { quiz: 7, team: 9, revision: 4 },
+    { quiz: 7, team: 99, revision: 100 }, { quiz: 8, team: 9, revision: 200 },
+  ];
+  let reads = 0;
+  const exports = {} as { getQuizLiveSnapshotData: (quiz: number, team: number | null) => Promise<{ liveRevision: string }> };
+  runInNewContext(ts.transpileModule(body, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, {
+    exports, ensureQuizBlockDeadlines: async () => {},
+    resolvePresentationLiveState: () => ({ lifecycle: "RUNNING" }),
+    serializeQuizParticipantLiveRevision: () => "pause",
+    prisma: {
+      quiz_interaction_runs: { findFirst: async () => null },
+      quiz_block_freigaben: { findFirst: async () => null },
+      quiz_praesentation_status: { findUnique: async () => null },
+      team_antworten: { aggregate: async ({ where }: { where: { quiz_id: number; quiz_team_session_id: number } }) => {
+        reads++;
+        return { _sum: { draft_revision: rows.filter(row => row.quiz === where.quiz_id && row.team === where.quiz_team_session_id).reduce((sum, row) => sum + row.revision, 0) } };
+      } },
+    },
+  });
+  const first = await exports.getQuizLiveSnapshotData(7, 9);
+  assert.equal(first.liveRevision, "pause::answers:9");
+  rows[0].revision++;
+  assert.equal((await exports.getQuizLiveSnapshotData(7, 9)).liveRevision, "pause::answers:10");
+  rows[2].revision++;
+  assert.equal((await exports.getQuizLiveSnapshotData(7, 9)).liveRevision, "pause::answers:10");
+  assert.equal((await exports.getQuizLiveSnapshotData(7, null)).liveRevision, "pause:");
+  assert.equal(reads, 3, "presentation without a participant does not aggregate private answers");
 });
 
 test("transport bounds missing requests and lost responses, including a stalled response body", async () => {
