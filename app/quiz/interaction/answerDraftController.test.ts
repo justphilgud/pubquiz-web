@@ -146,3 +146,21 @@ test("an older conflict response cannot replace a newer polled comparison", asyn
   assert.equal(c.getSnapshot()[1].value.antwortText, "Köln");
   assert.equal(c.getSnapshot()[1].baseRevision, 6);
 });
+
+test("reload of a never-accepted edit stays closed when its question is no longer available", async () => {
+  let writes = 0;
+  const c = fixture(async () => { writes++; return { success: true, draftRevision: 1 }; });
+  c.hydrate(2, 20, draft(""), 0, true);
+  c.edit(2, draft("Too late"));
+  const journal = c.journal();
+  c.restore(journal);
+  assert.equal(c.getSnapshot()[2].status, "recovered");
+  c.reconcileMissing(new Set(), []);
+  assert.equal(c.getSnapshot()[2].status, "closed");
+  assert.equal(c.getSnapshot()[2].writable, false);
+  assert.equal(c.getSnapshot()[2].value.antwortText, "Too late");
+  assert.equal(c.getSnapshot()[2].serverRevision, 0);
+  c.resolve(2, "local");
+  assert.equal(await c.retry(2), false);
+  assert.equal(writes, 0);
+});

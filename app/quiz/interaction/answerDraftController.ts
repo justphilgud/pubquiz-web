@@ -173,7 +173,7 @@ export class AnswerDraftController {
   }
   pauseMissing(visible: ReadonlySet<number>) {
     for (const [id, entry] of Object.entries(this.entries)) {
-      if (!visible.has(Number(id)) && entry.writable) {
+      if (!visible.has(Number(id)) && (entry.writable || entry.status === "recovered")) {
         this.clearTimer(Number(id));
         this.put(Number(id), { ...entry, writable: false, status: entry.status === "saved" ? "saved" : "closed" });
       }
