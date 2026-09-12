@@ -1,7 +1,7 @@
 # AP9.2 – Serververbindlicher Blockschluss
 
-Stand: 12. September 2026. Implementierung und Preview geprüft; ein Browserfall
-wartet auf externe Anmeldung. Production unverändert.
+Stand: 12. September 2026. Implementierung und Browserabnahme A–G auf Preview
+vollständig abgeschlossen. Production unverändert.
 
 ## Reproduktion vor der Korrektur
 
@@ -62,14 +62,14 @@ ESLint-Lauf, Prisma-Validierung und lokaler Production-Build grün. CI-Lauf
 Eigene Testquizze 39 (allgemeiner Block) und 36 (Pixel). Reguläre einminütige
 Blockcountdowns und konfigurierte Pixelphasen; keine künstliche Änderung von
 Deadline oder Serveruhr. Netzwerkfehler ausschließlich über autorisiertes
-Playwright-Routing im separaten Chrome-Testbrowser.
+Playwright-Routing bzw. BrowserContext.setOffline im separaten Chrome-Testbrowser.
 
 | Fall | Ergebnis und tatsächliches Verhalten |
 | --- | --- |
 | A – normaler Blockschluss | Bestanden. Deadline 12:50:37.989Z. Rechtzeitige Antwort Revision 2 bleibt erhalten; späterer Save `LIVE_STATE_CHANGED`. Block LOCKED/geschlossen, Moderation und Leinwand 00:00. Auswertung finalisiert ausschließlich den rechtzeitigen Inhalt. |
 | B – Moderation schließen | Bestanden. Vor Deadline 12:53:34.163Z alle Steuerfenster für Quiz 39 geschlossen. Erster späterer Zugriff setzt Schluss serverseitig durch; kein verspäteter Save angenommen. Neu geöffnete Moderation und Präsentation sofort beendet/00:00. |
-| C – Moderation neu initialisieren | Bestanden durch Schließen und Öffnen eines neuen vollständigen Browserdokuments während des Countdowns (kein bloßer Komponentenwechsel). Originaldeadline unverändert, zuletzt um 12:53:26.599Z geprüft. Ein zusätzlicher wörtlicher F5-/Playwright-reload-Lauf ist nicht separat erfolgt. |
-| D – Moderationsclient offline | Offen: gezieltes Playwright-Offline für einen angemeldeten Moderationsclient nicht ausgeführt. Im separaten Chrome ist Vercel angemeldet, aber die Quizverwaltung zeigt weiterhin ihr E-Mail-/Passwort-Login. Die bereits angefragte reguläre Anmeldung ist noch erforderlich. Anmeldung im Codex-Browser überträgt sich nicht automatisch. |
+| C – Moderation neu initialisieren | Bestanden durch vollständige Dokument-Neuinitialisierung während Countdown. Zusätzlich in Fall D echte Playwright-page.reload()-Aufrufe von Moderation und Präsentation vor Ablauf und nach Reconnect ausgeführt. Originalstart und Deadline unverändert. |
+| D – Moderationsclient offline | Bestanden nach regulärer Verwaltungsanmeldung. Normaler 60-Sekunden-Countdown, Deadline 19:00:01.020Z. Einzige Moderation für Quiz 39 gezielt per BrowserContext.setOffline(true) getrennt; navigator.onLine=false und ERR_INTERNET_DISCONNECTED nachgewiesen. Nach Ablauf Teilnehmer-Save mit LIVE_STATE_CHANGED abgewiesen, Block LOCKED/geschlossen, rechtzeitig bestätigte Revision 1 erhalten. Nach Reconnect und echten Reloads beide Anzeigen sofort 00:00, Moderation „Antwortzeit beendet“, Deadline unverändert. |
 | E – rechtzeitig akzeptiert, Response verloren | Bestanden. Save um 12:52:57.141Z serverseitig angenommen (Revision 2), Response zurückgehalten und nach Deadline verworfen. Reconnect bestätigt exakt diesen Inhalt; Reload und Auswertung erhalten ihn. |
 | F – Request erreicht Server zu spät | Bestanden. Lokale Änderung vor Deadline; Request vor Serverkontakt gehalten und erst nach Ablauf zugelassen. Save und Retry `LIVE_STATE_CHANGED`; Revision 1 bleibt maßgeblich. Lokaler Text bleibt sichtbar als unbestätigt/gesperrt, einschließlich Reload. Kein nachträgliches Finalisieren der Änderung. |
 | G – Pixel | Bestanden. Sichtbare Stufen 3 → 2 → 1, Save in jeder Stufe, Reload in Stufe 3 ohne Verlängerung, letzte Stufe nach weiteren 25 Sekunden weiterhin OPEN ohne Deadline. Manueller Blockschluss finalisiert Revision 3. Zuvor zurückgehaltener Request und Retry danach abgewiesen; geschlossener Zustand und korrekte Bestätigung nach Reload. |
@@ -80,6 +80,27 @@ geschlossen und als neues Browserdokument geöffnet: vorher 00:47, danach 00:41,
 identischer Serverstart und identische Dauer. Dieser ergänzende Anzeigetest
 erfolgte bei bereits geschlossenem Antwortblock und prüft keine neue Freigabe.
 Auch hier wurde vollständige Dokument-Neuinitialisierung statt F5 verwendet.
+
+Der abschließende Fall D ergänzt echte `page.reload()`-Aufrufe auf beiden
+Oberflächen: einmal während laufendem Countdown und erneut nach Ablauf und
+Reconnect. Testquiz 39, Lifecycle-Revision 4, Run 485; Serverstart
+18:59:01.020Z, Dauer 60 Sekunden, Deadline 19:00:01.020Z. Der Snapshot unmittelbar
+vor Offline bestätigte um 18:59:02.062Z denselben Start nach beiden Reloads.
+Moderation lief in einem eigenen Browserkontext, Teilnehmer und Präsentation
+in getrennten Kontexten. Browserinventar bestätigte genau eine Moderation für
+Quiz 39; im Codex-Browser waren nur Moderationen anderer Quizze offen.
+
+Während der Unterbrechung schlugen die echten Moderationsrequests mit
+`net::ERR_INTERNET_DISCONNECTED` fehl. Teilnehmer-Snapshots wurden im Test
+zurückgehalten, damit ein noch editierbares Formular nach Ablauf tatsächlich
+einen Save senden konnte. Der Server wies „D NACH Deadline VERBOTEN“ ab.
+Der folgende Snapshot um 19:00:05.240Z zeigte geschlossen/LOCKED und
+countdownStatus=finished, ohne geänderten Countdownstart. Maßgeblich blieb
+„D rechtzeitig bestätigt“, Revision 1. Der Moderator war zu diesem Zeitpunkt
+weiterhin offline. Nach setOffline(false) und beiden Reloads bestätigte der
+Snapshot um 19:00:44.048Z unverändert denselben geschlossenen Zustand.
+Screenshots und DOM-Prüfungen zeigen sofort 00:00 sowie die Abschlussmeldung
+der Moderation. Alle Netzwerksimulationen wurden anschließend entfernt.
 
 Im Pixel-Lauf blieb die erste Stufengrenze vor und nach Reload exakt
 13:07:41.332Z; die zweite lag bei 13:08:01.332Z. Um 13:08:28.537Z war die letzte
@@ -111,6 +132,8 @@ aufgrund dieser Teststeuerungsfehler.
   result-4 (Reproduktion), result-10 bis result-17 (allgemeiner Block),
   BCEF-reconnect.png, result-26/27/29/30 (vollständiger Pixel-Lauf und Schluss),
   result-32/33 (Präsentations-Neuinitialisierung während Countdown),
+  result-42 bis result-45 (Fall D mit echten Reloads),
+  D-moderation-reload.png und D-presentation-reload.png,
   full-tests.log, typecheck.log, lint.log, build.log, block-tests.log.
 
 Geänderte Verantwortlichkeiten: Blockdeadline im bestehenden Prisma-Modell;
@@ -128,10 +151,11 @@ Keine neuen Produktfehler in den ausgeführten Abnahmen gefunden. Keine weiteren
 Produktänderungen nach dem genannten Commit, keine neue Infrastruktur, keine
 Abschwächung des Preview-Schutzes und keine Production-Veröffentlichung.
 
-Die externe Verwaltungsanmeldung für D bleibt offen. Für den abschließenden
-Wiederholungslauf können zusätzlich wörtliche Playwright-reloads von Moderation
-und Präsentation mitgeführt werden; vollständige Dokument-Neuinitialisierungen
-sind bereits geprüft. Alle derzeit unabhängig ausführbaren Arbeiten sind
-abgeschlossen; die Abnahme wird nicht trotz fehlendem D als vollständig gemeldet.
+Die reguläre Verwaltungsanmeldung ist erfolgt; Fall D und die ergänzenden echten
+Reloads sind bestanden. Keine offenen AP9.2-Abnahmepunkte. Die abschließende
+Änderung betrifft ausschließlich diesen Bericht; Produktcommit und Preview
+bleiben unverändert. Die bereits grünen automatisierten Prüfungen gelten
+weiterhin für exakt diesen Produktcommit; wegen der reinen Dokumentation kein
+zusätzlicher Produktbuild oder Deployment.
 
-**AP9.2 vollständig abgenommen: Nein.**
+**AP9.2 vollständig abgenommen: Ja.**
