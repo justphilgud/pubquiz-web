@@ -396,3 +396,15 @@ entfernt, sobald genau ihr Inhalt serverseitig bestätigt ist. Eine bewusst ande
 Wahl wird nur für das entscheidende Browserfenster als erledigt vermerkt; die
 ungespeicherte Kopie eines parallelen Fensters bleibt erhalten. Ein späterer Reload
 darf eine bereits bestätigte Sicherung nicht nochmals als Konflikt hervorholen.
+
+Browser-Netzwerkabnahme (12. September 2026): Der vollständige autorisierte
+Antwortstatus enthält zusätzlich `answerConfirmations` aus den eigenen gespeicherten
+Drafts, unabhängig von der Sichtbarkeit der Fragen. Die Projektion enthält nur
+Frage-/Run-ID, Revision und eigenen Antwortinhalt, keine Lösungen oder fremden
+Teamdaten. So kann eine vor Blockschluss angenommene Antwort auch nach verlorener
+Response und verschwundenem Formular bestätigt werden. Der Controller gleicht
+ausschließlich bereits bekannte, nicht sichtbare Antworten desselben Runs ab;
+er erteilt dabei keine Schreibfreigabe. Abweichende lokale Inhalte bleiben geschlossen
+und unbestätigt. Eine später eintreffende Ablehnung eines alten Retries darf eine
+zwischenzeitliche Snapshot-Bestätigung nicht wieder zurücknehmen. Die bestehende
+Statusanzeige zeigt bei dieser Wiederaufnahme den tatsächlich bestätigten Inhalt.

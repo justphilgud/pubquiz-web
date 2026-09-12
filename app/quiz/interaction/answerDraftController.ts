@@ -150,6 +150,8 @@ export class AnswerDraftController {
           status: unchanged ? "saved" : current.writable ? "dirty" : "closed" });
         return unchanged;
       }
+      // A snapshot can confirm the content while an older retry is still in flight.
+      if (current.status === "saved") return true;
       this.put(id, { ...current, status: result.reason === "REVISION_CONFLICT" ? "conflict" : "closed",
         writable: result.reason === "REVISION_CONFLICT" && current.writable });
     } catch {
@@ -170,6 +172,17 @@ export class AnswerDraftController {
       if (!visible.has(Number(id)) && entry.writable) {
         this.clearTimer(Number(id));
         this.put(Number(id), { ...entry, writable: false, status: entry.status === "saved" ? "saved" : "closed" });
+      }
+    }
+  }
+  reconcileMissing(visible: ReadonlySet<number>, confirmations: readonly {
+    questionId: number; runId: number; revision: number; value: TeamAnswerDraft;
+  }[]) {
+    this.pauseMissing(visible);
+    for (const confirmation of confirmations) {
+      const current = this.entries[confirmation.questionId];
+      if (!visible.has(confirmation.questionId) && current?.runId === confirmation.runId) {
+        this.hydrate(confirmation.questionId, confirmation.runId, confirmation.value, confirmation.revision, false);
       }
     }
   }

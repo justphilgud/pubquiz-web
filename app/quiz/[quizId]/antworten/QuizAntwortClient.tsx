@@ -115,6 +115,7 @@ type AntwortStatus = {
   answerPhase: "QUESTION" | "FUNNY" | "SOLUTION" | "NON_QUESTION" | "LEGACY" | "UNKNOWN";
   presentationStatusText: string | null;
   teamProfile: TeamProfile | null;
+  answerConfirmations?: NonNullable<Awaited<ReturnType<typeof import("../../actions").getQuizAntwortStatus>>>["answerConfirmations"];
 
   fragen: {
     quiz_fragen_id: number;
@@ -498,10 +499,10 @@ export default function QuizAntwortClient({
       if (saved?.submissionStatus) statuses[question.quiz_fragen_id] = saved.submissionStatus;
       if (saved?.submissionDraftRevision != null) submittedRevisions[question.quiz_fragen_id] = saved.submissionDraftRevision;
     }
-    controller.pauseMissing(visible);
+    controller.reconcileMissing(visible, liveDaten.answerConfirmations ?? []);
     setSubmissionStatuses(statuses);
     setSubmissionDraftRevisions(submittedRevisions);
-  }, [controller, liveDaten.fragen, liveDaten.blockIstGesperrt, session]);
+  }, [controller, liveDaten.fragen, liveDaten.answerConfirmations, liveDaten.blockIstGesperrt, session]);
 
   async function handleStartSession() {
     const name = teamname.trim();
@@ -1097,10 +1098,10 @@ export default function QuizAntwortClient({
         )}
 
         {storageError && <p role="alert" className="rounded-xl border border-amber-400 bg-amber-50 p-3 text-amber-950">Dieser Browser kann Änderungen nicht auf dem Gerät sichern. Bitte diese Seite bis zur bestätigten Speicherung geöffnet lassen.</p>}
-        {Object.entries(entries).filter(([id, entry]) => entry.status !== "saved" && !liveDaten.fragen.some(q => q.quiz_fragen_id === Number(id) && q.istFreigegeben)).map(([id, entry]) => (
-          <section key={id} className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-slate-950">
-            <p className="font-semibold">Noch nicht bestätigte Antwort</p>
-            <AnswerSaveStatus entry={entry} onRetry={() => void controller.retry(Number(id))} onResolve={choice => controller.resolve(Number(id), choice)} />
+        {Object.entries(entries).filter(([id, entry]) => (entry.status !== "saved" || entry.version > 0) && !liveDaten.fragen.some(q => q.quiz_fragen_id === Number(id) && q.istFreigegeben)).map(([id, entry]) => (
+          <section key={id} className={`rounded-xl border p-4 text-slate-950 ${entry.status === "saved" ? "border-emerald-200 bg-emerald-50" : "border-amber-300 bg-amber-50"}`}>
+            <p className="font-semibold">{entry.status === "saved" ? "Bestätigte Antwort" : "Noch nicht bestätigte Antwort"}</p>
+            <AnswerSaveStatus entry={entry} showConfirmed onRetry={() => void controller.retry(Number(id))} onResolve={choice => controller.resolve(Number(id), choice)} />
           </section>
         ))}
       </div>

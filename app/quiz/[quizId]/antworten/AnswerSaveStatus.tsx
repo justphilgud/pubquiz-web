@@ -23,15 +23,17 @@ function summary(value: TeamAnswerDraft, interaction?: ResolvedQuizAnswerInterac
   return selected ? `${selected} Auswahl(en)` : "Keine Antwort";
 }
 
-export default function AnswerSaveStatus({ entry, onRetry, onResolve, interaction }: {
+export default function AnswerSaveStatus({ entry, onRetry, onResolve, interaction, showConfirmed = false }: {
   entry: DraftEntry;
   interaction?: ResolvedQuizAnswerInteraction;
+  showConfirmed?: boolean;
   onRetry: () => void;
   onResolve: (choice: "server" | "local") => void;
 }) {
   const needsDecision = ["conflict", "recovered", "closed"].includes(entry.status);
   return <div className="space-y-2 text-sm" aria-live="polite" aria-atomic="true" data-save-status={entry.status}>
     <p className="font-semibold">{draftStatusText(entry)}</p>
+    {showConfirmed && entry.status === "saved" && <p className="whitespace-pre-wrap break-words">{summary(entry.serverValue, interaction)}</p>}
     {needsDecision && <>
       <p className="whitespace-pre-wrap break-words"><strong>Auf diesem Gerät:</strong> {summary(entry.value, interaction)}</p>
       <p className="whitespace-pre-wrap break-words"><strong>Zuletzt bestätigt:</strong> {summary(entry.serverValue, interaction)}</p>

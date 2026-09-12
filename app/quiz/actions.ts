@@ -2420,6 +2420,7 @@ export async function getQuizAntwortStatus(
       answerPhase: "NON_QUESTION" as const,
       presentationStatusText: null,
       teamProfile: null,
+      answerConfirmations: [],
       fragen: [],
     };
   }
@@ -2620,29 +2621,25 @@ export async function getQuizAntwortStatus(
         },
       })
     : Promise.resolve([]);
-  const answerPromise =
-    fragenZurAnzeige.length > 0
-      ? prisma.team_antworten.findMany({
-          where: {
-            quiz_team_session_id: participantSession.quiz_team_session_id,
-            quiz_id: quizId,
-            quiz_fragen_id: {
-              in: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
-            },
-          },
-          include: {
-            antwortauswahlen: true,
-            submissions: {
-              orderBy: [
-                { submitted_at: "desc" as const },
-                { team_answer_submission_id: "desc" as const },
-              ],
-              take: 1,
-            },
-            antwortfelder: { include: { antwortfeld: true } },
-          },
-        })
-      : Promise.resolve([]);
+  // Own persisted content remains readable after its form disappears. Otherwise
+  // a lost save response cannot be reconciled after block close or navigation.
+  const answerPromise = prisma.team_antworten.findMany({
+    where: {
+      quiz_team_session_id: participantSession.quiz_team_session_id,
+      quiz_id: quizId,
+    },
+    include: {
+      antwortauswahlen: true,
+      submissions: {
+        orderBy: [
+          { submitted_at: "desc" as const },
+          { team_answer_submission_id: "desc" as const },
+        ],
+        take: 1,
+      },
+      antwortfelder: { include: { antwortfeld: true } },
+    },
+  });
 
   const [detaillierteFragen, gespeicherteAntworten] = await Promise.all([
     detailPromise,
@@ -2849,6 +2846,19 @@ export async function getQuizAntwortStatus(
       : audienceState.phase,
     presentationStatusText,
     teamProfile: mapTeamProfile(participantSession.team),
+    answerConfirmations: gespeicherteAntworten.flatMap(answer => answer.interaction_run_id === null ? [] : [{
+      questionId: answer.quiz_fragen_id,
+      runId: answer.interaction_run_id,
+      revision: answer.draft_revision,
+      value: {
+        antwortText: answer.antwort_text,
+        antwortId: answer.antwort_id,
+        antwortIds: answer.antwortauswahlen.length > 0
+          ? answer.antwortauswahlen.map(selection => selection.antwort_id)
+          : answer.antwort_id === null ? [] : [answer.antwort_id],
+        antwortfelder: Object.fromEntries(answer.antwortfelder.map(field => [field.antwortfeld_id, field.antwort_text ?? ""])),
+      },
+    }]),
     fragen,
   };
 }

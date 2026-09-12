@@ -9,6 +9,73 @@ import { AnswerDraftController } from "./answerDraftController";
 import { isQuizInteractionWritable } from "./interactionStateMachine";
 
 const value = (text: string) => ({ antwortText: text, antwortId: null, antwortfelder: {} });
+test("closed snapshots confirm accepted content without exposing questions or accepting late edits", async () => {
+  const source = readFileSync("app/quiz/actions.ts", "utf8");
+  const body = source.slice(source.indexOf("export async function getQuizAntwortStatus("), source.indexOf("export async function searchTeamsForAntworten("));
+  const stored = [
+    { quiz_id: 7, quiz_team_session_id: 9, quiz_fragen_id: 1, interaction_run_id: 10, draft_revision: 5, antwort_text: "Hamburg", antwort_id: null, antwortauswahlen: [], antwortfelder: [] },
+    { quiz_id: 7, quiz_team_session_id: 9, quiz_fragen_id: 2, interaction_run_id: 11, draft_revision: 4, antwort_text: "Berlin", antwort_id: null, antwortauswahlen: [], antwortfelder: [] },
+    { quiz_id: 8, quiz_team_session_id: 9, quiz_fragen_id: 3, interaction_run_id: 12, draft_revision: 1, antwort_text: "Other quiz", antwort_id: null, antwortauswahlen: [], antwortfelder: [] },
+    { quiz_id: 7, quiz_team_session_id: 99, quiz_fragen_id: 4, interaction_run_id: 13, draft_revision: 1, antwort_text: "Other team", antwort_id: null, antwortauswahlen: [], antwortfelder: [] },
+  ];
+  type Confirmation = { questionId: number; runId: number; revision: number; value: ReturnType<typeof value> };
+  const exports: { getQuizAntwortStatus?: (quizId: number, token?: string) => Promise<{ fragen: unknown[]; answerConfirmations: Confirmation[] }> } = {};
+  let reads = 0;
+  runInNewContext(ts.transpileModule(body, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, {
+    exports,
+    resolveParticipantSession: async (_id: number, token?: string) => token === "valid" ? { quiz_team_session_id: 9, team: {} } : null,
+    repairQuizSpecificOrderingAssignments: async () => {},
+    prisma: {
+      quiz: { findUnique: async () => ({ quiz_id: 7, titel: "Closed", quiz_abschnitte: [], quiz_fragen: [], praesentation_status: null }), findFirst: async () => ({ quiz_id: 7, titel: "Closed" }) },
+      quiz_interaction_runs: { findMany: async () => [] },
+      team_antworten: { findMany: async ({ where }: { where: { quiz_id: number; quiz_team_session_id: number; quiz_fragen_id?: unknown } }) => {
+        reads++;
+        assert.equal(where.quiz_fragen_id, undefined, "confirmation must not depend on visible questions");
+        return stored.filter(a => a.quiz_id === where.quiz_id && a.quiz_team_session_id === where.quiz_team_session_id);
+      } },
+    },
+    resolveQuizLifecycle: () => "RUNNING",
+    resolvePresentationLiveState: () => ({ lifecycle: "RUNNING" }),
+    resolvePresentationAudienceState: () => ({ kind: "NON_QUESTION", phase: "NON_QUESTION", statusText: "Pause" }),
+    serializeQuizParticipantLiveRevision: () => "closed",
+    mapTeamProfile: () => null,
+  });
+  const snapshot = await exports.getQuizAntwortStatus!(7, "valid");
+  assert.equal(snapshot.fragen.length, 0);
+  assert.deepEqual(Array.from(snapshot.answerConfirmations, c => c.questionId), [1, 2]);
+  assert.equal((await exports.getQuizAntwortStatus!(7)).answerConfirmations.length, 0);
+  assert.equal(reads, 1, "an unauthenticated caller cannot read any confirmations");
+
+  let complete!: (result: { success: false; reason: "LIVE_STATE_CHANGED" }) => void;
+  let writes = 0;
+  const c = new AnswerDraftController({ save: async () => { writes++; return new Promise(resolve => { complete = resolve; }); }, persist: () => {}, schedule: () => 0, cancel: () => {} });
+  c.hydrate(1, 10, value("Berlin"), 4, true);
+  c.hydrate(2, 11, value("Berlin"), 4, true);
+  c.edit(1, value("Hamburg"));
+  c.edit(2, value("Too late"));
+  const retry = c.flush(1);
+  const journal = c.journal();
+  c.reconcileMissing(new Set(), snapshot.answerConfirmations);
+  assert.equal(c.getSnapshot()[1].status, "saved");
+  assert.equal(c.getSnapshot()[1].serverValue.antwortText, "Hamburg");
+  assert.equal(c.getSnapshot()[2].status, "closed");
+  assert.equal(c.getSnapshot()[2].value.antwortText, "Too late");
+  assert.equal(c.getSnapshot()[2].serverValue.antwortText, "Berlin");
+  complete({ success: false, reason: "LIVE_STATE_CHANGED" });
+  await retry;
+  assert.equal(c.getSnapshot()[1].status, "saved", "a rejected stale retry must not undo the snapshot confirmation");
+  await c.retry(2);
+  assert.equal(writes, 1);
+  c.restore(journal);
+  c.reconcileMissing(new Set(), snapshot.answerConfirmations);
+  assert.equal(c.getSnapshot()[1].status, "saved", "reload of the pending journal also reconciles after close");
+  assert.equal(c.getSnapshot()[2].status, "closed");
+  c.hydrate(1, 20, value("New run"), 1, true);
+  c.edit(1, value("New edit"));
+  c.reconcileMissing(new Set(), snapshot.answerConfirmations);
+  assert.equal(c.getSnapshot()[1].serverValue.antwortText, "New run", "an old run cannot confirm a new run");
+});
+
 test("transport bounds missing requests and lost responses, including a stalled response body", async () => {
   const original = globalThis.fetch;
   try {
