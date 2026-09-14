@@ -35,6 +35,15 @@ formats and signed URLs fail closed. This is not a promise to identify arbitrary
 written as unrelated free text. The current Prisma/auth implementation has two stored
 credential columns; team-session signatures and AUTH_SECRET are not stored in these tables.
 
+The third live run authenticated successfully but stopped before pg_dump at
+EMBEDDED_SECRET_REVIEW_REQUIRED. A read-only aggregate audit of all eleven JSONB
+columns found three matching design objects, all at
+presentation_templates.theme_config_json.tokens. The Operations scanner now reviews
+only this exact path as design: version 1, exact groups/keys, hex colors, registered
+fonts, bounded weights/spacing/radii and safe asset references. All contents still
+pass the recursive credential and media scan; arbitrary tokens fields remain blocked.
+The stored rows and hashes are unchanged. No Production data or application code changes.
+
 The target is checked before connection and again at the only write call. A transaction
 advisory lock and database/role/empty-catalog guard precede DDL. The empty default public
 schema is dropped without CASCADE so pg_restore can recreate it; existing data causes

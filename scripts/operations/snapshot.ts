@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { AUTH_COLUMNS, auditColumns, inspectValue, projection, tableName, type Column } from "./acceptance-policy";
+import { AUTH_COLUMNS, auditColumns, inspectRow, inspectValue, projection, tableName, type Column } from "./acceptance-policy";
 import { requireCondition } from "./guards";
 import type { PgSession } from "./pg-session";
 
@@ -40,7 +40,7 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
     // Each row is JSON TEXT inside the outer JSON array: keep bigints/decimals exact.
     const rows = await session.json<string[]>(`SELECT coalesce(json_agg(v ORDER BY v COLLATE "C"),'[]') FROM
       (SELECT row_to_json(r)::text AS v FROM (SELECT ${projection(cols)} FROM ${tableName(schema, table)}) r) s`, "TABLE_ROWS");
-    for (const row of rows) inspectValue(JSON.parse(row), media);
+    for (const row of rows) inspectRow(JSON.parse(row), media, schema, table);
     tables.push({ schema, table, rows: rows.length, sha256: sha256(JSON.stringify(rows)), samples: rows.slice(0, 5).map(sha256) });
     if (cols.some(c => `${key}.${c.column}` in AUTH_COLUMNS)) authRows[key] = `[${rows.join(",")}]`;
   }
