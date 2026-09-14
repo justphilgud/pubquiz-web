@@ -1,4 +1,6 @@
 import { assertRestoreTarget, requireCondition } from "./guards";
+import { brandFontOptions } from "../../app/rendering/templateRegistry";
+import { isSafeTemplateAssetReference } from "../../app/rendering/presentationTemplates/presentationTemplateAssets";
 
 export const RESTORE_TARGET = {
   project: "icy-leaf-46256271", branch: "br-bitter-paper-b20sx4lu",
@@ -47,6 +49,35 @@ export function auditColumns(columns: Column[]) {
 }
 export function projection(columns: Column[]) {
   return columns.map(c => `${AUTH_COLUMNS[`${c.schema}.${c.table}.${c.column}`] ?? identifier(c.column)} AS ${identifier(c.column)}`).join(",");
+}
+function record(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+function exactKeys(value: unknown, keys: string): asserts value is Record<string, unknown> {
+  requireCondition(record(value) && Object.keys(value).sort().join(",") === keys.split(",").sort().join(","), "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
+}
+// Only this persisted presentation field uses "tokens" for design, not authentication.
+// Check exact shape and bounded design values, then retain the ordinary recursive scan.
+export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
+  if (schema !== "pubquiz" || table !== "presentation_templates") return inspectValue(value, media);
+  const { theme_config_json: config, ...rest } = value;
+  requireCondition(record(config) && config.version === 1, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
+  const { tokens, ...configRest } = config;
+  exactKeys(tokens, "colors,typography,radii,spacing,assets");
+  exactKeys(tokens.colors, "primary,secondary,accent,background,surface,surfaceStrong,text,textMuted,border,correct,success,warning,danger");
+  requireCondition(Object.values(tokens.colors).every(v => typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v)), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
+  exactKeys(tokens.typography, "family,displayWeight,bodyWeight");
+  const typography = tokens.typography;
+  requireCondition(brandFontOptions.some(f => f.value === typography.family) &&
+    typeof typography.displayWeight === "number" && [700, 800, 900].includes(typography.displayWeight) &&
+    typeof typography.bodyWeight === "number" && [400, 500, 600].includes(typography.bodyWeight), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
+  for (const group of ["radii", "spacing"] as const) {
+    exactKeys(tokens[group], "small,medium,large");
+    requireCondition(Object.values(tokens[group]).every(v => typeof v === "string" && /^(0\.5|0\.75|1|1\.5|2|2\.5)rem$/.test(v)), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
+  }
+  exactKeys(tokens.assets, "logo,backgroundImage");
+  requireCondition(Object.values(tokens.assets).every(v => v === null || isSafeTemplateAssetReference(v)), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
+  inspectValue(rest, media); inspectValue(configRest, media); inspectValue(tokens, media);
 }
 // Review persisted JSON/string values before any pg_dump. Never print offending content.
 export function inspectValue(value: unknown, media: Set<string>, key = "") {

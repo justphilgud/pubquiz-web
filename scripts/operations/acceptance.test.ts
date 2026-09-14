@@ -5,7 +5,8 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
-import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, auditColumns, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
+import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, auditColumns, inspectRow, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
+import { templateRegistry } from "../../app/rendering/templateRegistry";
 import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
 import { authInsertSql, sha256 } from "./snapshot";
 import { dumpArguments } from "./acceptance-backup";
@@ -73,6 +74,38 @@ test("only fixed redacted auth overlays can enter SQL; original hashes are rejec
   assert.match(authInsertSql(data, columns), /json_populate_recordset/);
   assert.throws(() => authInsertSql({ ...data, "pubquiz.users": '[{"password_hash":"synthetic-original"}]' }, columns));
   assert.throws(() => authInsertSql({ ...data, "public.other": "[]" }, columns));
+});
+test("persisted presentation design tokens survive unchanged only at the reviewed table/column", () => {
+  for (const template of templateRegistry.presentation) {
+    const row = { theme_config_json: { version: 1, tokens: structuredClone(template.tokens) } };
+    const original = JSON.stringify(row);
+    assert.throws(() => inspectValue(row, new Set()), /EMBEDDED_SECRET_REVIEW_REQUIRED/);
+    inspectRow(row, new Set(), "pubquiz", "presentation_templates");
+    assert.equal(JSON.stringify(row), original);
+    assert.throws(() => inspectRow(row, new Set(), "public", "presentation_templates"));
+    assert.throws(() => inspectRow(row, new Set(), "pubquiz", "other"));
+  }
+});
+test("reviewed design structure cannot hide secrets or skip media validation", () => {
+  const base = { theme_config_json: { version: 1, tokens: structuredClone(templateRegistry.presentation[0].tokens) } };
+  const edits: ((row: typeof base) => void)[] = [
+    row => Object.assign(row.theme_config_json.tokens, { access_token: "synthetic" }),
+    row => Object.assign(row.theme_config_json.tokens.colors, { secret: "synthetic" }),
+    row => Object.assign(row.theme_config_json.tokens.typography, { family: "synthetic" }),
+    row => Object.assign(row.theme_config_json, { nested: { tokens: "synthetic" } }),
+    row => Object.assign(row.theme_config_json.tokens.assets, { logo: "https://other.public.blob.vercel-storage.com/a.png" }),
+    row => Object.assign(row.theme_config_json.tokens.assets, { logo: "https://example.com/a.png?token=synthetic" }),
+    row => Object.assign(row.theme_config_json, { text: "postgresql://owner:synthetic@host/db" }),
+  ];
+  for (const edit of edits) {
+    const row = structuredClone(base); edit(row);
+    assert.throws(() => inspectRow(row, new Set(), "pubquiz", "presentation_templates"));
+  }
+  const media = new Set<string>();
+  const logo = "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/prod/test.png";
+  Object.assign(base.theme_config_json.tokens.assets, { logo });
+  inspectRow(base, media, "pubquiz", "presentation_templates");
+  assert.ok(media.has(logo));
 });
 test("artifact corruption, path traversal and stream overflow fail closed", async () => {
   const bytes = Buffer.from("synthetic data"); const evidence = { name: "database.dump", bytes: bytes.length, sha256: sha256(bytes) };
