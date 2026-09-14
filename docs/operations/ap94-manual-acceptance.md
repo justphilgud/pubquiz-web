@@ -87,6 +87,15 @@ operational RPO/RTO guarantee. No automatic cleanup or retention is enabled.
 
 ## Validation of this implementation
 
+Run 34883162344 on main 386d034 failed with OPERATIONS_FAILED_DETAILS_WITHHELD
+(backup job 2m26s, acceptance step 1m34s); restore was skipped. This message does
+not establish which phase failed or whether partial uploads exist. Do not claim
+a completed backup, successful readback or absence of uploaded artifacts from it.
+Unexpected backup exceptions now expose only a fixed phase (source capture,
+archive, media capture, overlay file, upload, manifest, anonymous readback or cleanup).
+Existing safety-gate codes remain unchanged; raw errors and causes are discarded.
+No export, redaction, credential, transport, target or reviewer rule changes.
+
 The first real run (34876340079, 2026-09-14) stopped with LIBPQ_SESSION_FAILED;
 restore was skipped. The native session now reports only a fixed failure category
 and a fixed execution phase. Raw stderr is bounded to 8192 characters in memory,

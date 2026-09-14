@@ -9,11 +9,23 @@ import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, auditColumns, ins
 import { templateRegistry } from "../../app/rendering/templateRegistry";
 import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
 import { authInsertSql, sha256 } from "./snapshot";
-import { dumpArguments } from "./acceptance-backup";
+import { backupPhaseError, dumpArguments } from "./acceptance-backup";
 import { PgSession, sessionFailureCategory } from "./pg-session";
-import { safeError } from "./guards";
+import { OperationsError, safeError } from "./guards";
 const env = { GITHUB_REPOSITORY: "justphilgud/pubquiz-web", GITHUB_REF: "refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", AP94_MANUAL_ACCEPTANCE: "true", BACKUP_AUTOMATION_ENABLED: "false", BACKUP_RETENTION_VERIFIED: "false" };
 const columns = Object.keys(AUTH_COLUMNS).map(key => { const [schema, table, column] = key.split("."); return { schema, table, column, type: "text", generated: "", identity: "", nullable: true, default: null } satisfies Column; });
+test("backup phase diagnostics expose only fixed phases and preserve existing safety gates", () => {
+  const error = new Error("postgresql://owner:SYNTHETIC_SECRET@host/db", { cause: { token: "SYNTHETIC_SECRET" } });
+  for (const phase of ["SOURCE_SESSION", "SOURCE_CAPTURE", "ARCHIVE", "MEDIA_CAPTURE", "AUTH_OVERLAY_FILE", "DATA_UPLOAD", "MANIFEST_UPLOAD", "ANONYMOUS_READBACK", "CLEANUP"] as const) {
+    const classified = backupPhaseError(error, phase);
+    assert.equal(safeError(classified), `BACKUP_${phase}_FAILED_DETAILS_WITHHELD`);
+    assert.doesNotMatch(String(classified), /SYNTHETIC_SECRET|postgresql|owner|host/);
+    assert.equal(classified.cause, undefined);
+  }
+  const gate = new OperationsError("AUTH_TABLE_DATA_IN_DUMP");
+  assert.equal(backupPhaseError(gate, "ARCHIVE"), gate);
+  assert.throws(() => backupPhaseError(error, "SYNTHETIC_SECRET" as never), /BACKUP_DIAGNOSTIC_PHASE_INVALID/);
+});
 test("manual acceptance cannot enable schedules/retention or run from another branch/repository", () => {
   assert.doesNotThrow(() => assertManualAcceptance(env));
   for (const [key, value] of Object.entries({ GITHUB_REPOSITORY: "other/repo", GITHUB_REF: "refs/heads/feature", GITHUB_EVENT_NAME: "schedule", AP94_MANUAL_ACCEPTANCE: "false", BACKUP_AUTOMATION_ENABLED: "true", BACKUP_RETENTION_VERIFIED: "true" })) assert.throws(() => assertManualAcceptance({ ...env, [key]: value }));
