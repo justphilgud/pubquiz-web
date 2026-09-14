@@ -12,8 +12,32 @@ import { authInsertSql, sha256 } from "./snapshot";
 import { backupPhaseError, dumpArguments } from "./acceptance-backup";
 import { PgSession, sessionFailureCategory } from "./pg-session";
 import { OperationsError, safeError } from "./guards";
+import { BlobAccessError, BlobFileTooLargeError, BlobError, BlobServiceRateLimited } from "@vercel/blob";
+import { privateBlobOperation } from "./blob-diagnostics";
 const env = { GITHUB_REPOSITORY: "justphilgud/pubquiz-web", GITHUB_REF: "refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", AP94_MANUAL_ACCEPTANCE: "true", BACKUP_AUTOMATION_ENABLED: "false", BACKUP_RETENTION_VERIFIED: "false" };
 const columns = Object.keys(AUTH_COLUMNS).map(key => { const [schema, table, column] = key.split("."); return { schema, table, column, type: "text", generated: "", identity: "", nullable: true, default: null } satisfies Column; });
+test("private Blob errors identify operation/category without exposing messages or causes", async () => {
+  const secret = "SYNTHETIC_SECRET_NEVER_LOG";
+  const cases: [unknown, string][] = [
+    [new BlobAccessError(), "ACCESS_DENIED"], [new BlobFileTooLargeError(secret), "FILE_TOO_LARGE"],
+    [new BlobServiceRateLimited(30), "RATE_LIMITED"], [new BlobError(secret), "REQUEST_REJECTED"],
+    [new TypeError(secret, { cause: { code: "ECONNRESET", secret } }), "CONNECTION_FAILED"],
+    [{ code: "ENOTFOUND", message: secret }, "DNS_FAILED"],
+    [{ cause: { code: "CERT_HAS_EXPIRED", message: secret } }, "TLS_FAILED"],
+    [{ cause: { code: "UND_ERR_CONNECT_TIMEOUT", message: secret } }, "TIMEOUT"],
+    [new Error(secret), "UNKNOWN"],
+  ];
+  for (const operation of ["UPLOAD", "READBACK"] as const) for (const [error, category] of cases) {
+    await assert.rejects(privateBlobOperation(operation, async () => { throw error; }), actual => {
+      assert.equal(safeError(actual), `PRIVATE_BLOB_${operation}_${category}`);
+      assert.doesNotMatch(String(actual), new RegExp(secret));
+      assert.equal((actual as Error).cause, undefined); return true;
+    });
+  }
+  const guard = new OperationsError("ARTIFACT_SIZE_LIMIT");
+  await assert.rejects(privateBlobOperation("READBACK", async () => { throw guard; }), error => error === guard);
+  assert.equal(await privateBlobOperation("UPLOAD", async () => "success"), "success");
+});
 test("backup phase diagnostics expose only fixed phases and preserve existing safety gates", () => {
   const error = new Error("postgresql://owner:SYNTHETIC_SECRET@host/db", { cause: { token: "SYNTHETIC_SECRET" } });
   for (const phase of ["SOURCE_SESSION", "SOURCE_CAPTURE", "ARCHIVE", "MEDIA_CAPTURE", "AUTH_OVERLAY_FILE", "DATA_UPLOAD", "MANIFEST_UPLOAD", "ANONYMOUS_READBACK", "CLEANUP"] as const) {

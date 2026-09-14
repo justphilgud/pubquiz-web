@@ -87,6 +87,14 @@ operational RPO/RTO guarantee. No automatic cleanup or retention is enabled.
 
 ## Validation of this implementation
 
+Run 34884691642 on main 25d54a3 failed in DATA_UPLOAD (backup 1m52s, acceptance
+1m08s). Source snapshot, redacted capture, archive audit and media capture precede
+that phase and completed; a successful private backup is still not established.
+The SDK cause remains unknown: the phase includes put and immediate get/readback.
+The private adapter now emits fixed UPLOAD/READBACK plus known SDK/network categories,
+never provider messages or causes. Existing identity, size and checksum gates remain
+unchanged. No retry, credentials, access mode, transport or restore protection changes.
+
 Run 34883162344 on main 386d034 failed with OPERATIONS_FAILED_DETAILS_WITHHELD
 (backup job 2m26s, acceptance step 1m34s); restore was skipped. This message does
 not establish which phase failed or whether partial uploads exist. Do not claim

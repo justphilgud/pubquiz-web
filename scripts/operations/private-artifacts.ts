@@ -5,6 +5,7 @@ import { PRIVATE_HOST, type Environment } from "./acceptance-policy";
 import { assertStoreToken } from "./credentials";
 import { requireCondition } from "./guards";
 import { sha256 } from "./snapshot";
+import { privateBlobOperation } from "./blob-diagnostics";
 
 export type Artifact = { name: string; bytes: number; sha256: string };
 export function artifactName(name: string) {
@@ -32,12 +33,12 @@ export class PrivateArtifacts {
   }
   private url(name: string) { return `https://${PRIVATE_HOST}/${this.key}/${artifactName(name)}`; }
   async read(name: string) {
-    const result = await get(this.url(name), { token: this.token, access: "private", useCache: false });
+    const result = await privateBlobOperation("READBACK", () => get(this.url(name), { token: this.token, access: "private", useCache: false }));
     requireCondition(result?.statusCode === 200 && result.stream, "PRIVATE_READBACK_FAILED");
-    return boundedBytes(result.stream);
+    return privateBlobOperation("READBACK", () => boundedBytes(result.stream));
   }
   async upload(name: string, bytes: Buffer): Promise<Artifact> {
-    const result = await put(`${this.key}/${artifactName(name)}`, bytes, { token: this.token, access: "private", addRandomSuffix: false, allowOverwrite: false, contentType: "application/octet-stream" });
+    const result = await privateBlobOperation("UPLOAD", () => put(`${this.key}/${artifactName(name)}`, bytes, { token: this.token, access: "private", addRandomSuffix: false, allowOverwrite: false, contentType: "application/octet-stream" }));
     requireCondition(result.url === this.url(name), "PRIVATE_UPLOAD_IDENTITY_MISMATCH");
     const evidence = { name, bytes: bytes.length, sha256: sha256(bytes) };
     verifyArtifact(await this.read(name), evidence);
