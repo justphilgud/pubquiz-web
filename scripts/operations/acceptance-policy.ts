@@ -64,7 +64,10 @@ export function inspectRow(value: Record<string, unknown>, media: Set<string>, s
   requireCondition(record(config) && config.version === 1, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
   const { tokens, ...configRest } = config;
   exactKeys(tokens, "colors,typography,radii,spacing,assets");
-  exactKeys(tokens.colors, "primary,secondary,accent,background,surface,surfaceStrong,text,textMuted,border,correct,success,warning,danger");
+  // The application supports legacy palettes without `correct` (derived at render time
+  // from warning). Preserve the original backup row; do not normalize or add a color.
+  const paletteKeys = "primary,secondary,accent,background,surface,surfaceStrong,text,textMuted,border,success,warning,danger";
+  exactKeys(tokens.colors, paletteKeys + (record(tokens.colors) && Object.hasOwn(tokens.colors, "correct") ? ",correct" : ""));
   requireCondition(Object.values(tokens.colors).every(v => typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v)), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
   exactKeys(tokens.typography, "family,displayWeight,bodyWeight");
   const typography = tokens.typography;
