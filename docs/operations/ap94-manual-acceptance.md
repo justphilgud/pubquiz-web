@@ -44,6 +44,12 @@ fonts, bounded weights/spacing/radii and safe asset references. All contents sti
 pass the recursive credential and media scan; arbitrary tokens fields remain blocked.
 The stored rows and hashes are unchanged. No Production data or application code changes.
 
+Run 34881900154 on main 6fdb1dc stopped at the narrower structure gate before
+dump/upload. Read-only structure counts found one of three palettes missing only
+colors.correct, the legacy form already supported by the application normalizer.
+The audit permits precisely that missing key; other missing/extra keys and invalid
+values still fail. It does not normalize the backup or populate a fallback value.
+
 The target is checked before connection and again at the only write call. A transaction
 advisory lock and database/role/empty-catalog guard precede DDL. The empty default public
 schema is dropped without CASCADE so pg_restore can recreate it; existing data causes

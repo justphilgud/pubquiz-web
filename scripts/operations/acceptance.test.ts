@@ -86,6 +86,20 @@ test("persisted presentation design tokens survive unchanged only at the reviewe
     assert.throws(() => inspectRow(row, new Set(), "pubquiz", "other"));
   }
 });
+test("legacy palette preserves a missing correct color but rejects any other missing/extra field", () => {
+  const colors: Record<string, unknown> = { ...templateRegistry.presentation[0].tokens.colors };
+  delete colors.correct;
+  const row = { theme_config_json: { version: 1, tokens: { ...structuredClone(templateRegistry.presentation[0].tokens), colors } } };
+  const original = JSON.stringify(row);
+  inspectRow(row, new Set(), "pubquiz", "presentation_templates");
+  assert.equal(JSON.stringify(row), original);
+  assert.equal(Object.hasOwn(colors, "correct"), false);
+  for (const bad of [ { ...colors, correct: null }, { ...colors, correct: "synthetic" }, { ...colors, access_token: "synthetic" } ]) {
+    assert.throws(() => inspectRow({ theme_config_json: { ...row.theme_config_json, tokens: { ...row.theme_config_json.tokens, colors: bad } } }, new Set(), "pubquiz", "presentation_templates"));
+  }
+  delete colors.warning;
+  assert.throws(() => inspectRow(row, new Set(), "pubquiz", "presentation_templates"));
+});
 test("reviewed design structure cannot hide secrets or skip media validation", () => {
   const base = { theme_config_json: { version: 1, tokens: structuredClone(templateRegistry.presentation[0].tokens) } };
   const edits: ((row: typeof base) => void)[] = [
