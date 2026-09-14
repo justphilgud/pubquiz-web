@@ -72,6 +72,14 @@ operational RPO/RTO guarantee. No automatic cleanup or retention is enabled.
 
 ## Validation of this implementation
 
+The first real run (34876340079, 2026-09-14) stopped with LIBPQ_SESSION_FAILED;
+restore was skipped. The native session now reports only a fixed failure category
+and a fixed execution phase. Raw stderr is bounded to 8192 characters in memory,
+classified and discarded; SQL, row data, URLs, hostnames and credentials are never
+included in the diagnostic output. Unknown messages remain SESSION_FAILED. These
+categories are diagnostic hints, not permission to relax any source/target/TLS guard.
+The source, redaction, read-only transaction, private store and reviewer gates are unchanged.
+
 Local disposable PostgreSQL 18.4 with TLS/SCRAM binding: synchronized concurrent-change
 test, original-auth-value exclusion, custom dump/restore, Unicode/quotes/decimal/FK/
 migration/full-row-hash comparison and nonempty-target rejection passed. No Production

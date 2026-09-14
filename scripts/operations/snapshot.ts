@@ -30,16 +30,16 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
     (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','pubquiz') AND c.relkind IN ('f','p','m')) +
     (SELECT count(*) FROM pg_foreign_server) + (SELECT count(*) FROM pg_publication) +
     (SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname IN ('public','pubquiz') AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e'))
-  )::int`);
+  )::int`, "SCHEMA_AUDIT");
   requireCondition(unsafe === 0, "SCHEMA_SECURITY_REVIEW_REQUIRED");
-  const columns = await session.json<Column[]>(COLUMN_SQL); auditColumns(columns);
+  const columns = await session.json<Column[]>(COLUMN_SQL, "COLUMN_AUDIT"); auditColumns(columns);
   const tables: TableEvidence[] = []; const media = new Set<string>(); const authRows: Record<string, string> = {};
   for (const key of [...new Set(columns.map(c => `${c.schema}.${c.table}`))].sort()) {
     const cols = columns.filter(c => `${c.schema}.${c.table}` === key);
     const { schema, table } = cols[0];
     // Each row is JSON TEXT inside the outer JSON array: keep bigints/decimals exact.
     const rows = await session.json<string[]>(`SELECT coalesce(json_agg(v ORDER BY v COLLATE "C"),'[]') FROM
-      (SELECT row_to_json(r)::text AS v FROM (SELECT ${projection(cols)} FROM ${tableName(schema, table)}) r) s`);
+      (SELECT row_to_json(r)::text AS v FROM (SELECT ${projection(cols)} FROM ${tableName(schema, table)}) r) s`, "TABLE_ROWS");
     for (const row of rows) inspectValue(JSON.parse(row), media);
     tables.push({ schema, table, rows: rows.length, sha256: sha256(JSON.stringify(rows)), samples: rows.slice(0, 5).map(sha256) });
     if (cols.some(c => `${key}.${c.column}` in AUTH_COLUMNS)) authRows[key] = `[${rows.join(",")}]`;
@@ -50,8 +50,8 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
      coalesce(sum(a.vergebene_punkte) FILTER (WHERE a.bewertung_final),0)::text AS final_points,
      count(a.team_antwort_id) FILTER (WHERE NOT a.bewertung_final)::text AS pending
      FROM pubquiz.quiz_team_sessions s LEFT JOIN pubquiz.team_antworten a USING(quiz_team_session_id)
-     GROUP BY s.quiz_id,s.team_id) r) x`);
-  return { columns, catalog: await session.json(CATALOG_SQL), tables, media: [...media].sort(), authRows, resultRows };
+     GROUP BY s.quiz_id,s.team_id) r) x`, "RESULT_ROWS");
+  return { columns, catalog: await session.json(CATALOG_SQL, "CATALOG"), tables, media: [...media].sort(), authRows, resultRows };
 }
 export function compareSnapshots(expected: Omit<Snapshot, "authRows">, actual: Snapshot) {
   for (const part of ["columns", "catalog", "tables", "media", "resultRows"] as const) {
