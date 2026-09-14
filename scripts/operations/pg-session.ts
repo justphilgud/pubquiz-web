@@ -4,12 +4,29 @@ import { OperationsError, requireCondition } from "./guards";
 import { libpqEnvironment } from "./libpq";
 import type { Environment } from "./acceptance-policy";
 
+const phases = ["QUERY", "SOURCE_BEGIN", "SOURCE_IDENTITY", "SOURCE_PRIVILEGES", "SOURCE_SNAPSHOT", "SCHEMA_AUDIT", "COLUMN_AUDIT", "TABLE_ROWS", "RESULT_ROWS", "CATALOG"] as const;
+type Phase = typeof phases[number];
+// Return only constant categories, never any part of PostgreSQL's diagnostic text.
+export function sessionFailureCategory(diagnostic: string) {
+  if (/password authentication failed|no password supplied/i.test(diagnostic)) return "AUTHENTICATION_REJECTED";
+  if (/channel binding/i.test(diagnostic)) return "CHANNEL_BINDING_FAILED";
+  if (/SSL error|certificate verify failed|server does not support SSL/i.test(diagnostic)) return "TLS_FAILED";
+  if (/could not translate host name|Name or service not known/i.test(diagnostic)) return "DNS_FAILED";
+  if (/connection refused|Network is unreachable|timeout expired|connection timed out/i.test(diagnostic)) return "NETWORK_FAILED";
+  if (/permission denied|must be (?:a |the )?(?:superuser|owner)|insufficient privilege/i.test(diagnostic)) return "PERMISSION_DENIED";
+  if (/syntax error/i.test(diagnostic)) return "SQL_SYNTAX_FAILED";
+  if (/does not exist/i.test(diagnostic)) return "SQL_OBJECT_MISSING";
+  if (/unrecognized configuration parameter|unsupported startup parameter|invalid value for parameter/i.test(diagnostic)) return "CONFIGURATION_REJECTED";
+  return "SESSION_FAILED";
+}
+
 // Persistent native libpq connection: exported snapshots live until close().
 // No raw SQL errors/stdout are logged. Only one request at a time.
 export class PgSession {
   private child: ChildProcessWithoutNullStreams;
-  private pending?: { marker: string; resolve: (value: string) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> };
+  private pending?: { marker: string; phase: Phase; resolve: (value: string) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> };
   private output = "";
+  private diagnostic = "";
   private dead = false;
   constructor(connection: string, env: Environment, launch: (args: string[], env: NodeJS.ProcessEnv) => ChildProcessWithoutNullStreams =
     (args, childEnv) => spawn("psql", args, { env: childEnv, stdio: "pipe", windowsHide: true })) {
@@ -23,24 +40,28 @@ export class PgSession {
         const result = this.output.slice(0, -p.marker.length - 1).trim(); this.output = ""; p.resolve(result);
       }
     });
-    this.child.stderr.resume(); // psql can include data values in diagnostics; discard them.
-    this.child.on("error", () => this.fail()); this.child.on("exit", () => this.fail());
+    this.child.stderr.setEncoding("utf8");
+    this.child.stderr.on("data", (chunk: string) => { this.diagnostic = (this.diagnostic + chunk).slice(-8192); });
+    // close waits for stderr to drain; raw diagnostics remain bounded and in memory only.
+    this.child.on("error", () => this.fail()); this.child.on("close", () => this.fail());
     this.child.stdin.on("error", () => this.fail());
   }
   private fail() {
     this.dead = true;
-    if (this.pending) { clearTimeout(this.pending.timer); this.pending.reject(new OperationsError("LIBPQ_SESSION_FAILED")); this.pending = undefined; }
+    const category = sessionFailureCategory(this.diagnostic); this.diagnostic = "";
+    if (this.pending) { clearTimeout(this.pending.timer); this.pending.reject(new OperationsError(`LIBPQ_${category}_${this.pending.phase}`)); this.pending = undefined; }
     this.child.kill();
   }
-  async sql(sql: string): Promise<string> {
+  async sql(sql: string, phase: Phase = "QUERY"): Promise<string> {
+    requireCondition(phases.includes(phase), "LIBPQ_PHASE_INVALID");
     requireCondition(!this.pending && !this.dead, "LIBPQ_SESSION_UNAVAILABLE");
     const marker = `ap94_${randomUUID().replaceAll("-", "")}`;
     return new Promise((resolve, reject) => {
-      this.pending = { marker, resolve, reject, timer: setTimeout(() => this.fail(), 900000) };
+      this.pending = { marker, phase, resolve, reject, timer: setTimeout(() => this.fail(), 900000) };
       this.child.stdin.write(`${sql};\n\\echo ${marker}\n`);
     });
   }
-  async json<T>(query: string): Promise<T> { return JSON.parse(await this.sql(query)) as T; }
+  async json<T>(query: string, phase: Phase = "QUERY"): Promise<T> { return JSON.parse(await this.sql(query, phase)) as T; }
   close() { this.fail(); }
 }
 export function pgTool(tool: "pg_dump" | "pg_restore" | "psql", args: string[], env: Environment, input?: string) {

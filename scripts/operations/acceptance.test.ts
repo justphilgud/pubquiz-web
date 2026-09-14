@@ -4,15 +4,51 @@ import { readFileSync } from "node:fs";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { spawn } from "node:child_process";
 import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, auditColumns, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
 import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
 import { authInsertSql, sha256 } from "./snapshot";
 import { dumpArguments } from "./acceptance-backup";
+import { PgSession, sessionFailureCategory } from "./pg-session";
+import { safeError } from "./guards";
 const env = { GITHUB_REPOSITORY: "justphilgud/pubquiz-web", GITHUB_REF: "refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", AP94_MANUAL_ACCEPTANCE: "true", BACKUP_AUTOMATION_ENABLED: "false", BACKUP_RETENTION_VERIFIED: "false" };
 const columns = Object.keys(AUTH_COLUMNS).map(key => { const [schema, table, column] = key.split("."); return { schema, table, column, type: "text", generated: "", identity: "", nullable: true, default: null } satisfies Column; });
 test("manual acceptance cannot enable schedules/retention or run from another branch/repository", () => {
   assert.doesNotThrow(() => assertManualAcceptance(env));
   for (const [key, value] of Object.entries({ GITHUB_REPOSITORY: "other/repo", GITHUB_REF: "refs/heads/feature", GITHUB_EVENT_NAME: "schedule", AP94_MANUAL_ACCEPTANCE: "false", BACKUP_AUTOMATION_ENABLED: "true", BACKUP_RETENTION_VERIFIED: "true" })) assert.throws(() => assertManualAcceptance({ ...env, [key]: value }));
+});
+test("native session diagnostics expose only fixed categories, never SQL, URLs or credentials", async () => {
+  const secret = "SYNTHETIC_SECRET_NEVER_LOG";
+  const cases = [
+    [`FATAL: password authentication failed for user "${secret}"`, "AUTHENTICATION_REJECTED"],
+    [`ERROR: permission denied for table ${secret}`, "PERMISSION_DENIED"],
+    [`ERROR: syntax error at or near "${secret}"`, "SQL_SYNTAX_FAILED"],
+    [`SSL error: certificate verify failed ${secret}`, "TLS_FAILED"],
+    [`channel binding required ${secret}`, "CHANNEL_BINDING_FAILED"],
+    [`could not translate host name ${secret}`, "DNS_FAILED"],
+    [`connection refused ${secret}`, "NETWORK_FAILED"],
+    [`unrecognized configuration parameter ${secret}`, "CONFIGURATION_REJECTED"],
+    [`ERROR: relation "${secret}" does not exist`, "SQL_OBJECT_MISSING"],
+    [`Unknown error postgresql://owner:${secret}@example.test/db`, "SESSION_FAILED"],
+  ];
+  for (const [diagnostic, expected] of cases) assert.equal(sessionFailureCategory(diagnostic), expected);
+  const session = new PgSession("postgresql://owner:synthetic@127.0.0.1/neondb?sslmode=require&channel_binding=require", {}, (args, childEnv) => {
+    assert.ok(args.includes("ON_ERROR_STOP=1")); assert.equal(childEnv.PGCHANNELBINDING, "require");
+    assert.equal(childEnv.PGSSLMODE, "require"); assert.match(childEnv.PGOPTIONS!, /default_transaction_read_only=on/);
+    return spawn(process.execPath, ["-e", `process.stdin.once('data',()=>{process.stderr.write('ERROR: permission ');setImmediate(()=>{process.stderr.write('denied for table ${secret}');process.exit(1);});});`], { stdio: "pipe", windowsHide: true });
+  });
+  try {
+    await assert.rejects(session.sql("SELECT 1", "SOURCE_PRIVILEGES"), error => {
+      assert.equal(safeError(error), "LIBPQ_PERMISSION_DENIED_SOURCE_PRIVILEGES");
+      assert.doesNotMatch(String(error), new RegExp(secret)); return true;
+    });
+  } finally { session.close(); }
+});
+test("diagnostic phases preserve the successful native-session marker protocol", async () => {
+  const session = new PgSession("postgresql://owner:synthetic@127.0.0.1/neondb?sslmode=require&channel_binding=require", {}, () =>
+    spawn(process.execPath, ["-e", "process.stdin.once('data',chunk=>{const m=chunk.toString().match(/ap94_[a-f0-9]+/)[0];process.stdout.write('42\\n'+m+'\\n');});"], { stdio: "pipe", windowsHide: true }));
+  try { assert.equal(await session.json<number>("SELECT 42", "SOURCE_IDENTITY"), 42); }
+  finally { session.close(); }
 });
 test("restore pins exact j-host even when both configurable values name a different Neon", () => {
   const url = `postgresql://neondb_owner:synthetic@${RESTORE_TARGET.host}/neondb?sslmode=require&channel_binding=require`;

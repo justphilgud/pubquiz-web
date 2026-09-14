@@ -33,11 +33,11 @@ export async function acceptanceBackup(env: Environment) {
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-"));
   const session = new PgSession(verified.connectionString, env);
   try {
-    await session.sql("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; SET LOCAL search_path=pg_catalog; SET LOCAL TIME ZONE 'UTC'; SET LOCAL DateStyle='ISO, YMD'");
-    const identity = await session.json<{ role: string; database: string; major: number }>("SELECT json_build_object('role',current_user,'database',current_database(),'major',current_setting('server_version_num')::int/10000)");
+    await session.sql("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; SET LOCAL search_path=pg_catalog; SET LOCAL TIME ZONE 'UTC'; SET LOCAL DateStyle='ISO, YMD'", "SOURCE_BEGIN");
+    const identity = await session.json<{ role: string; database: string; major: number }>("SELECT json_build_object('role',current_user,'database',current_database(),'major',current_setting('server_version_num')::int/10000)", "SOURCE_IDENTITY");
     requireCondition(identity.role === "pubquiz_backup_reader" && identity.database === "neondb" && identity.major === 17, "SOURCE_SESSION_IDENTITY_MISMATCH");
-    assertReaderPrivileges((await session.json<ReaderPrivileges[]>(`SELECT json_agg(x) FROM (${READER_PRIVILEGES_SQL}) x`))[0]);
-    const snapshot = await session.json<{ id: string; time: string }>("SELECT json_build_object('id',pg_export_snapshot(),'time',transaction_timestamp())");
+    assertReaderPrivileges((await session.json<ReaderPrivileges[]>(`SELECT json_agg(x) FROM (${READER_PRIVILEGES_SQL}) x`, "SOURCE_PRIVILEGES"))[0]);
+    const snapshot = await session.json<{ id: string; time: string }>("SELECT json_build_object('id',pg_export_snapshot(),'time',transaction_timestamp())", "SOURCE_SNAPSHOT");
     const state = await collectSnapshot(session); // inspect redacted data before dump
     const path = join(directory, "database.dump");
     const pgEnv = libpqEnvironment(verified.connectionString, env);
