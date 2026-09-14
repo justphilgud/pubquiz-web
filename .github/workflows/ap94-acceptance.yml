@@ -1,0 +1,81 @@
+name: AP9.4 Manual Backup and Isolated Restore
+
+on:
+  workflow_dispatch:
+    inputs:
+      production_commit:
+        description: Verified current Production release SHA (40 characters)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ap94-manual-acceptance
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container: postgres:17
+    environment: operations-backup
+    timeout-minutes: 45
+    outputs:
+      key: ${{ steps.backup.outputs.key }}
+      manifest: ${{ steps.backup.outputs.manifest }}
+      automation: ${{ steps.backup.outputs.automation }}
+      retention: ${{ steps.backup.outputs.retention }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts
+      - name: Explicit manual acceptance with automation and deletion disabled
+        id: backup
+        shell: bash
+        env:
+          AP94_MANUAL_ACCEPTANCE: 'true'
+          PRODUCTION_RELEASE_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+          BACKUP_BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_READ_WRITE_TOKEN }}
+          BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+          BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
+          BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
+        run: |
+          set -euo pipefail
+          node --import tsx scripts/operations/acceptance-cli.ts backup > "$RUNNER_TEMP/ap94-result.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const r=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/ap94-result.json`,'utf8'));
+          appendFileSync(process.env.GITHUB_OUTPUT,`key=${r.key}\nmanifest=${r.manifestSha256}\nautomation=false\nretention=false\n`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Backup readback verified.\n\nKey: ${r.key}\n\nManifest SHA-256: ${r.manifestSha256}\n\nBytes: ${r.bytes}\n\nSnapshot: ${r.snapshotAt}\n\nBackup ms: ${r.backupMs}\n\nRestore requires operations-restore reviewer approval.\n`);
+          NODE
+  restore:
+    needs: backup
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container: postgres:17
+    environment: operations-restore
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Restore only after required reviewer approval
+        env:
+          AP94_MANUAL_ACCEPTANCE: 'true'
+          AP94_BACKUP_KEY: ${{ needs.backup.outputs.key }}
+          AP94_MANIFEST_SHA256: ${{ needs.backup.outputs.manifest }}
+          BACKUP_AUTOMATION_ENABLED: ${{ needs.backup.outputs.automation }}
+          BACKUP_RETENTION_VERIFIED: ${{ needs.backup.outputs.retention }}
+          RESTORE_TEST_DATABASE_URL: ${{ secrets.RESTORE_TEST_DATABASE_URL }}
+          RESTORE_TEST_EXPECTED_HOST: ${{ vars.RESTORE_TEST_EXPECTED_HOST }}
+          BACKUP_BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_READ_WRITE_TOKEN }}
+          BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+        run: node --import tsx scripts/operations/acceptance-cli.ts restore

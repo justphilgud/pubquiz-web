@@ -16,9 +16,43 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  deployment-scope:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      required: ${{ steps.scope.outputs.required }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - id: scope
+        env:
+          MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          node --experimental-strip-types --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          import {appendFileSync} from 'node:fs';
+          import {needsApplicationDeployment} from './scripts/operations/deployment-scope.ts';
+          const paths=execFileSync('git',['diff','--name-only','-z','HEAD^','HEAD'],{encoding:'utf8'}).split('\0').filter(Boolean);
+          const required=process.env.MANUAL==='true'||needsApplicationDeployment(paths);
+          appendFileSync(process.env.GITHUB_OUTPUT,`required=${required}\n`);
+          NODE
   deploy-production:
+    needs: deployment-scope
     name: Approve, migrate and deploy Production
     if: >-
+      needs.deployment-scope.outputs.required == 'true' &&
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
       (
         (
