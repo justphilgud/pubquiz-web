@@ -8,7 +8,9 @@ import { spawn } from "node:child_process";
 import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, auditColumns, inspectRow, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
 import { templateRegistry } from "../../app/rendering/templateRegistry";
 import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
-import { authInsertSql, sha256 } from "./snapshot";
+import { authInsertSql, compareSnapshots, sha256, type Snapshot } from "./snapshot";
+import { canonicalCatalog, canonicalCatalogDefinition } from "./catalog-comparison";
+import catalogCastCases from "./fixtures/run19-catalog-casts.json";
 import { backupPhaseError, dumpArguments } from "./acceptance-backup";
 import { PgSession, sessionFailureCategory } from "./pg-session";
 import { OperationsError, safeError } from "./guards";
@@ -16,6 +18,62 @@ import { BlobAccessError, BlobFileTooLargeError, BlobError, BlobServiceRateLimit
 import { privateBlobOperation } from "./blob-diagnostics";
 const env = { GITHUB_REPOSITORY: "justphilgud/pubquiz-web", GITHUB_REF: "refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", AP94_MANUAL_ACCEPTANCE: "true", BACKUP_AUTOMATION_ENABLED: "false", BACKUP_RETENTION_VERIFIED: "false" };
 const columns = Object.keys(AUTH_COLUMNS).map(key => { const [schema, table, column] = key.split("."); return { schema, table, column, type: "text", generated: "", identity: "", nullable: true, default: null } satisfies Column; });
+test("Run 19 catalog: all seven CHECKs and partial unique index survive PG array-cast deparsing", () => {
+  assert.equal(catalogCastCases.length, 8);
+  const empty: Snapshot = { columns: [], catalog: {}, tables: [], media: [], authRows: {}, resultRows: [] };
+  for (const pair of catalogCastCases) {
+    const expected = { ...empty, catalog: { [pair.section]: [pair.expected] } };
+    const actual = { ...empty, catalog: { [pair.section]: [pair.actual] } };
+    const before = JSON.stringify([expected, actual]);
+    assert.notDeepEqual(expected.catalog, actual.catalog);
+    assert.doesNotThrow(() => compareSnapshots(expected, actual));
+    assert.doesNotThrow(() => compareSnapshots(actual, expected));
+    assert.equal(JSON.stringify([expected, actual]), before, "evidence must not be mutated");
+  }
+});
+test("catalog equivalence preserves real constraint/index differences and every other snapshot gate", () => {
+  const empty: Snapshot = { columns: [], catalog: {}, tables: [], media: [], authRows: {}, resultRows: [] };
+  for (const pair of catalogCastCases) {
+    const field = pair.section === "constraints" ? "definition" : "indexdef";
+    const entry = pair.actual as Record<string, unknown>;
+    const definition = entry[field] as string;
+    const mutations = [
+      { ...entry, [field]: definition.replace(/'[A-Z_]+/, "'DIFFERENT") },
+      { ...entry, [field]: definition.replace("= ANY", "<> ALL") },
+      { ...entry, [field]: definition.replace("::character varying", "::character(1)") },
+      { ...entry, [field]: definition.replace("::text", "::varchar") },
+      { ...entry, schema: "other" }, { ...entry, unexpected: true },
+      ...(pair.section === "constraints" ? [{ ...entry, validated: false }] : [
+        { ...entry, indexdef: definition.replace("UNIQUE ", "") },
+        { ...entry, indexdef: definition.replace("fragen_id, generator_id", "generator_id, fragen_id") },
+      ]),
+    ];
+    for (const changed of mutations) assert.throws(() => compareSnapshots(
+      { ...empty, catalog: { [pair.section]: [pair.expected] } },
+      { ...empty, catalog: { [pair.section]: [changed] } }), /RESTORE_CATALOG_MISMATCH/);
+  }
+  for (const part of ["columns", "catalog", "tables", "media", "resultRows"] as const) {
+    assert.throws(() => compareSnapshots(empty, { ...empty, [part]: ["changed"] }), new RegExp(`RESTORE_${part.toUpperCase()}_MISMATCH`));
+  }
+  assert.notDeepEqual(canonicalCatalog({ schemas: ["public"], constraints: [] }), canonicalCatalog({ schemas: ["public", "other"], constraints: [] }));
+});
+test("catalog cast rewrite is narrow, quote-aware and retains literal order and surrounding logic", () => {
+  const source = "(ARRAY['A'::character varying, 'B'::character varying])::text[]";
+  const target = "ARRAY[('A'::character varying)::text, ('B'::character varying)::text]";
+  assert.equal(canonicalCatalogDefinition(source), target);
+  assert.equal(canonicalCatalogDefinition(`(${source}) OR (${source})`), `(${target}) OR (${target})`);
+  for (const unsupported of [
+    `'${source.replaceAll("'", "''")}'`, `"${source}"`, `$tag$${source}$tag$`,
+    `/* ${source} */`, `-- ${source}`, `E'\\n' || ${source}`,
+    source.replace("'A'", "NULL"), source.replace("'A'", "some_column"),
+    source.replace("'A'", "'a'"), source.replace("'A'", "'A''B'"),
+    source.replaceAll("character varying", "character(1)"),
+    source.replace("::text[]", "::integer[]"), source.replace("::text[]", "::pubquiz.custom[]"),
+  ]) assert.equal(canonicalCatalogDefinition(unsupported), unsupported);
+  assert.notEqual(canonicalCatalogDefinition(source.replace("'A'", "'C'")), target);
+  assert.notEqual(canonicalCatalogDefinition(source.replace("'A'", "'B'").replace(", 'B'", ", 'A'")), target);
+  assert.notEqual(canonicalCatalogDefinition(`x IS NULL OR ${source}`), canonicalCatalogDefinition(`x IS NOT NULL OR ${source}`));
+});
 test("private Blob errors identify operation/category without exposing messages or causes", async () => {
   const secret = "SYNTHETIC_SECRET_NEVER_LOG";
   const cases: [unknown, string][] = [

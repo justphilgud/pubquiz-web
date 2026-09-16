@@ -1,0 +1,150 @@
+[
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "medien_generator_laefe",
+      "name": "chk_generator_lauf_status",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'PROCESSING'::character varying, 'SUCCEEDED'::character varying, 'FAILED'::character varying, 'STALE'::character varying, 'CANCELLED'::character varying])::text[])))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "medien_generator_laefe",
+      "name": "chk_generator_lauf_status",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((status)::text = ANY (ARRAY[('PENDING'::character varying)::text, ('PROCESSING'::character varying)::text, ('SUCCEEDED'::character varying)::text, ('FAILED'::character varying)::text, ('STALE'::character varying)::text, ('CANCELLED'::character varying)::text])))"
+    }
+  },
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "medien_generator_lauf_medien",
+      "name": "chk_generator_medium_rolle",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((rolle)::text = ANY ((ARRAY['INPUT'::character varying, 'OUTPUT'::character varying])::text[])))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "medien_generator_lauf_medien",
+      "name": "chk_generator_medium_rolle",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((rolle)::text = ANY (ARRAY[('INPUT'::character varying)::text, ('OUTPUT'::character varying)::text])))"
+    }
+  },
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "presentation_templates",
+      "name": "presentation_templates_status_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['DRAFT'::character varying, 'ACTIVE'::character varying, 'ARCHIVED'::character varying])::text[])))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "presentation_templates",
+      "name": "presentation_templates_status_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((status)::text = ANY (ARRAY[('DRAFT'::character varying)::text, ('ACTIVE'::character varying)::text, ('ARCHIVED'::character varying)::text])))"
+    }
+  },
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "quiz",
+      "name": "chk_quiz_aufloesungsstrategie",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((aufloesungsstrategie)::text = ANY ((ARRAY['AFTER_EACH_QUESTION'::character varying, 'END_OF_BLOCK'::character varying, 'MANUAL'::character varying])::text[])))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "quiz",
+      "name": "chk_quiz_aufloesungsstrategie",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((aufloesungsstrategie)::text = ANY (ARRAY[('AFTER_EACH_QUESTION'::character varying)::text, ('END_OF_BLOCK'::character varying)::text, ('MANUAL'::character varying)::text])))"
+    }
+  },
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "quiz_ablauf_elemente",
+      "name": "chk_quiz_ablauf_fragebezug",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((((typ)::text = ANY ((ARRAY['QUESTION'::character varying, 'QUESTION_SOLUTION'::character varying])::text[])) AND (quiz_fragen_id IS NOT NULL)) OR (((typ)::text <> ALL ((ARRAY['QUESTION'::character varying, 'QUESTION_SOLUTION'::character varying])::text[])) AND (quiz_fragen_id IS NULL))))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "quiz_ablauf_elemente",
+      "name": "chk_quiz_ablauf_fragebezug",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((((typ)::text = ANY (ARRAY[('QUESTION'::character varying)::text, ('QUESTION_SOLUTION'::character varying)::text])) AND (quiz_fragen_id IS NOT NULL)) OR (((typ)::text <> ALL (ARRAY[('QUESTION'::character varying)::text, ('QUESTION_SOLUTION'::character varying)::text])) AND (quiz_fragen_id IS NULL))))"
+    }
+  },
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "quiz_abschnitte",
+      "name": "chk_quiz_abschnitt_aufloesungsstrategie",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((aufloesungsstrategie IS NULL) OR ((aufloesungsstrategie)::text = ANY ((ARRAY['AFTER_EACH_QUESTION'::character varying, 'END_OF_BLOCK'::character varying, 'MANUAL'::character varying])::text[]))))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "quiz_abschnitte",
+      "name": "chk_quiz_abschnitt_aufloesungsstrategie",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((aufloesungsstrategie IS NULL) OR ((aufloesungsstrategie)::text = ANY (ARRAY[('AFTER_EACH_QUESTION'::character varying)::text, ('END_OF_BLOCK'::character varying)::text, ('MANUAL'::character varying)::text]))))"
+    }
+  },
+  {
+    "section": "constraints",
+    "expected": {
+      "schema": "pubquiz",
+      "table": "story_element_revisionen",
+      "name": "ck_story_element_type",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((typ)::text = ANY ((ARRAY['IMAGE'::character varying, 'IMAGE_GALLERY'::character varying, 'TEXT'::character varying, 'ANECDOTE'::character varying, 'QUOTE'::character varying, 'PORTRAIT'::character varying, 'CHAPTER_INTRO'::character varying, 'MEDIA_SEQUENCE'::character varying, 'AUDIO'::character varying, 'VIDEO'::character varying, 'CUSTOM_MESSAGE'::character varying])::text[])))"
+    },
+    "actual": {
+      "schema": "pubquiz",
+      "table": "story_element_revisionen",
+      "name": "ck_story_element_type",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((typ)::text = ANY (ARRAY[('IMAGE'::character varying)::text, ('IMAGE_GALLERY'::character varying)::text, ('TEXT'::character varying)::text, ('ANECDOTE'::character varying)::text, ('QUOTE'::character varying)::text, ('PORTRAIT'::character varying)::text, ('CHAPTER_INTRO'::character varying)::text, ('MEDIA_SEQUENCE'::character varying)::text, ('AUDIO'::character varying)::text, ('VIDEO'::character varying)::text, ('CUSTOM_MESSAGE'::character varying)::text])))"
+    }
+  },
+  {
+    "section": "indexes",
+    "expected": {
+      "schemaname": "pubquiz",
+      "tablename": "medien_generator_laefe",
+      "indexname": "uq_generator_lauf_active",
+      "indexdef": "CREATE UNIQUE INDEX uq_generator_lauf_active ON pubquiz.medien_generator_laefe USING btree (fragen_id, generator_id) WHERE ((status)::text = ANY ((ARRAY['PENDING'::character varying, 'PROCESSING'::character varying])::text[]))"
+    },
+    "actual": {
+      "schemaname": "pubquiz",
+      "tablename": "medien_generator_laefe",
+      "indexname": "uq_generator_lauf_active",
+      "indexdef": "CREATE UNIQUE INDEX uq_generator_lauf_active ON pubquiz.medien_generator_laefe USING btree (fragen_id, generator_id) WHERE ((status)::text = ANY (ARRAY[('PENDING'::character varying)::text, ('PROCESSING'::character varying)::text]))"
+    }
+  }
+]
