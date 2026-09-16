@@ -5,6 +5,7 @@ import { runKey, STORE_ID } from "./bridge/lib/contract";
 import { OperationsError, requireCondition, safeError } from "./guards";
 import { createHash } from "node:crypto";
 import { expectProbeDenial } from "./transport-probe-diagnostics";
+import { runIdentityProbe } from "./identity-probe";
 const sample = Buffer.from("AP9.4 OIDC bridge synthetic transport proof; no production data.\n");
 const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 async function main() {
@@ -17,6 +18,7 @@ async function main() {
   const key = runKey("synthetic", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
   const client = new BridgeClient(env, role, key);
   const body = { operation: role === "backup" ? "backup-readback" : "restore-read", store: STORE_ID, key, name: "probe.bin", kind: "probe" };
+  const identityBoundary = await runIdentityProbe(env, body);
   const invalid = [
     { ...body, store: "store_other" }, { ...body, key: `${key}-other` }, { ...body, name: "../probe.bin" },
     { ...body, name: "manifest.json", kind: "manifest" }, { ...body, operation: "delete" }, { ...body, allowOverwrite: true },
@@ -51,7 +53,7 @@ async function main() {
   await delay(Math.max(0, grant.expiresAt - Date.now()) + 2000);
   const expired = await fetch(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(30000) });
   requireCondition(expired.status === 401 || expired.status === 403, "SIGNED_EXPIRY_NOT_ENFORCED");
-  return { synthetic: true, role, key, hash: digest(sample), readback: "verified", expiry: "rejected", negatives: invalid.length,
+  return { synthetic: true, role, key, identityBoundary, hash: digest(sample), readback: "verified", expiry: "rejected", negatives: invalid.length,
     signedMethodAndPath: "rejected", ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false };
 }
 main().then(r => console.log(JSON.stringify(r))).catch(e => {

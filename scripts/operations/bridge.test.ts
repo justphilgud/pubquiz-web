@@ -14,6 +14,56 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { presignUrl } from "@vercel/blob";
 import { expectProbeDenial } from "./transport-probe-diagnostics";
+import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
+
+test("identity probe separates signed wrong audience, tampering and both authentication layers", async () => {
+  const token = (aud: string) => `e30.${Buffer.from(JSON.stringify({ aud, repository: REPOSITORY })).toString("base64url")}.signature`;
+  const valid = token(AUDIENCE); const badAudience = token(`${AUDIENCE}:untrusted`);
+  const sent: { edge: string | null; bearer: string | null }[] = [];
+  const audiences: (string | null)[] = [];
+  const request: typeof fetch = async (input, init) => {
+    const url = new URL(String(input));
+    if (url.hostname === "example.actions.githubusercontent.com") {
+      audiences.push(url.searchParams.get("audience"));
+      return Response.json({ value: token(url.searchParams.get("audience")!) });
+    }
+    assert.equal(url.origin, "https://pubquiz-backup-operations.vercel.app");
+    assert.equal(init?.redirect, "manual");
+    const headers = new Headers(init?.headers);
+    const edge = headers.get("x-vercel-trusted-oidc-idp-token");
+    const bearer = headers.get("authorization"); sent.push({ edge, bearer });
+    return edge !== valid ? new Response("Provider denial", { status: 401 })
+      : Response.json({ error: "IDENTITY_REJECTED" }, { status: 403 });
+  };
+  const result = await runIdentityProbe({ AP94_TRANSPORT_MODE: "synthetic",
+    AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app",
+    ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "request-canary" }, {}, request);
+  assert.deepEqual(audiences, [AUDIENCE, `${AUDIENCE}:untrusted`]);
+  assert.equal(sent.length, 4 + identityMutations.length);
+  assert.deepEqual(sent[1], { edge: badAudience, bearer: `Bearer ${valid}` });
+  assert.deepEqual(sent[2], { edge: valid, bearer: `Bearer ${badAudience}` });
+  for (const item of sent.slice(4)) {
+    assert.equal(item.edge, valid); assert.notEqual(item.bearer, `Bearer ${valid}`);
+    assert.ok(item.bearer?.endsWith(".signature")); // invalid original signature retained
+  }
+  assert.equal(result.semanticForeignClaims, "local-signed-regression-only");
+  assert.doesNotMatch(JSON.stringify(result), /signature|request-canary|e30\./);
+  assert.throws(() => mutateIdentity(valid, { aud: AUDIENCE }), /IDENTITY_PROBE_TOKEN_INVALID/);
+});
+
+test("identity denial checks reject outages, redirects, wrong layer and leaked diagnostics", async () => {
+  for (const status of [200, 302, 307, 404, 429, 500, 503]) {
+    for (const layer of ["edge", "bridge"] as const) {
+      await assert.rejects(expectIdentityDenial(new Response("secret-canary", { status }), 1, layer),
+        new RegExp(`^Error: IDENTITY_PROBE_1_${layer.toUpperCase()}_HTTP_${status}_FAILED$`));
+    }
+  }
+  await assert.rejects(expectIdentityDenial(Response.json({ error: "IDENTITY_REJECTED" }, { status: 403 }), 1, "edge"));
+  await assert.rejects(expectIdentityDenial(new Response("login", { status: 401 }), 1, "bridge"));
+  await assert.rejects(expectIdentityDenial(Response.json({ error: "IDENTITY_REJECTED", token: "secret-canary" }, { status: 403 }), 1, "bridge"));
+  await expectIdentityDenial(Response.json({ error: "IDENTITY_REJECTED" }, { status: 403 }), 1, "bridge");
+});
 
 test("compiled bridge entrypoint loads in plain Node ESM without a TypeScript loader", () => {
   const bridge = fileURLToPath(new URL("./bridge/", import.meta.url));
