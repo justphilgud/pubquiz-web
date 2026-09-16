@@ -18,4 +18,4 @@ jobs:
       - run: npm ci --prefix scripts/operations/bridge
       - run: npm run typecheck --prefix scripts/operations/bridge
       - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts
-      - run: npx eslint scripts/operations/bridge scripts/operations/bridge.test.ts scripts/operations/bridge-client.ts scripts/operations/print-claims.ts scripts/operations/transport-probe.ts --max-warnings=0
+      - run: npx eslint scripts/operations/bridge scripts/operations/bridge.test.ts scripts/operations/bridge-client.ts scripts/operations/print-claims.ts scripts/operations/transport-probe.ts scripts/operations/identity-probe.ts --max-warnings=0

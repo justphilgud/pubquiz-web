@@ -8,10 +8,14 @@ Security-Regression sind grün; der Anwendungsdeployjob wurde übersprungen.
 PR #10 ist regulär integriert: Main `e903d4dc1d1f0e7b905a14a3e65270070b79c6d5`.
 Main-CI/Bridge-CI grün, Appdeployjob skipped, Operations auf diesem SHA READY.
 Die Workflow-Bedingung ist durch den Betreiber korrigiert und API-seitig verifiziert.
-Lauf #13 erreicht die Function, scheitert aber vor der Bridge-Prüfung an einem
-Node-ESM-Importfehler (HTTP 500). Minimaler Import-/NodeNext-Fix samt kompiliertem
-Runtime-Smoke vorbereitet. **Aktuelles Gate: reguläre Main-Freigabe dieses Fixes.**
-Keine weitere Provideränderung nötig. Siehe [Diagnose Lauf #13](../reports/ap9-4-provider-run13-20260916.md)
+PR #11 behebt den Node-ESM-Importfehler; Main
+`0a6b95b3ba01edfb88fa86059bdf4e475872d9df`, beide CIs grün, kein Appdeploy.
+Lauf #14: synthetischer Backuptransport und nach Betreiberfreigabe Restore-Lesetest
+erfolgreich, einschließlich Readback/Hash, Rollen-/Pfad-/Methodenprüfungen und echtem
+URL-Ablauf. Noch offen: zusätzliche Live-Identitätsproben. Diese sind als reiner
+Testfix vorbereitet; reguläre Main-Freigabe erforderlich. Transportfreigabe bleibt false.
+Siehe [Nachweis Lauf #14](../reports/ap9-4-provider-run14-20260916.md),
+[Diagnose Lauf #13](../reports/ap9-4-provider-run13-20260916.md)
 und [Diagnose Lauf #12](../reports/ap9-4-provider-run12-20260916.md)
 und [Providerbefund](../reports/ap9-4-provider-preflight-20260916.md),
 [Integrationsnachweis](../reports/ap9-4-variant2-main-integration-20260916.md)
@@ -233,7 +237,7 @@ Production-only Storebindung und Deployment-Protection-Abdeckung. Keine Tokenwer
 Noch keinen acceptance-Lauf starten. Danach technische Verifikation und synthetische
 Abnahme durch Codex; beim Restore-Reviewer wieder stoppen.
 
-## Abnahme nach Einrichtung (noch nicht ausgeführt)
+## Abnahme nach Einrichtung
 
 Mode `synthetic`: keine DB-Secrets an Steps, nur festes Probeobjekt. Backup prüft
 falsche Rollen/Pfade/Store/Größe, Upload, Hash-Readback, direkten Overwrite-Replay,
@@ -243,6 +247,23 @@ Probeobjekte bleiben erhalten; kein Cleanup/Delete. Rate Limits und Providerfehl
 sind keine erfolgreichen Negativnachweise. Echte falsche Claims sind lokal mit
 gültigen synthetischen Signaturen geprüft; Provider-/Trusted-Sources-Abweisung muss
 zusätzlich mit kontrollierten ungültigen Identitäten verifiziert werden, ohne Regeln zu lockern.
+
+Der ergänzte Identitätstest läuft vor jedem synthetischen Transport. Er trennt:
+- Fehlende Zugangsdaten und eine echt von GitHub signierte falsche Audience am
+  Vercel-Eingang (401/403, keine erfolgreiche Bridge-Antwort).
+- Gültiger Trusted-Source-Token, aber falsche Audience oder fehlender Bearer im
+  Authorization-Header: Bridge muss exakt 403/IDENTITY_REJECTED liefern.
+- Elf gezielt manipulierte Payloads (Repository, Owner, beide IDs, Branch, Workflow,
+  Audience, Environment, Subject, Issuer, Event) bei gültigem Edge-Token:
+  erneute JWT-Prüfung in der echten Function muss jede Manipulation ablehnen.
+
+Diese elf Tokens haben absichtlich ungültige Signaturen. Sie beweisen live die
+Unabhängigkeit der Bridge vom Edge-Token, **nicht** die semantische Ablehnung von
+GitHub-signierten fremden Repositories/Branches/Workflows. Letztere Claim-Semantik
+prüfen die vorhandenen lokalen RSA/JOSE-Regressionen. Ohne entsprechende externe
+Workflow-Identitäten keinen vollständigen Live-Fremdidentitätsnachweis behaupten.
+Redirects, Rate Limits und Providerfehler bestehen die Probe nicht. Keine Tokens,
+Antworttexte oder Signed URLs werden in Diagnosen aufgenommen.
 
 Erst wenn alle Nachweise grün sind, separat `AP94_BRIDGE_MODE=acceptance` im
 Operations-Projekt und AP94_OIDC_TRANSPORT_ACCEPTED=true in beiden GitHub-Environments
