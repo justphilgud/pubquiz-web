@@ -4,6 +4,7 @@ import { BridgeClient } from "./bridge-client";
 import { runKey, STORE_ID } from "./bridge/lib/contract";
 import { OperationsError, requireCondition, safeError } from "./guards";
 import { createHash } from "node:crypto";
+import { expectProbeDenial } from "./transport-probe-diagnostics";
 const sample = Buffer.from("AP9.4 OIDC bridge synthetic transport proof; no production data.\n");
 const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 async function main() {
@@ -23,7 +24,10 @@ async function main() {
     ...(role === "restore" ? [{ ...body, operation: "backup-readback" }] : []),
     { ...body, operation: "backup-upload", bytes: 16385 },
   ];
-  for (const value of invalid) requireCondition((await client.access(value)).status === 403, "SYNTHETIC_NEGATIVE_FAILED");
+  for (const [index, value] of invalid.entries()) {
+    await expectProbeDenial(await client.access(value), index + 1,
+      role === "backup" && index === invalid.length - 1 ? "OBJECT_TOO_LARGE" : "REQUEST_REJECTED");
+  }
   const rejected = (status: number) => [400, 401, 403, 404, 405, 409, 412, 413].includes(status);
   if (role === "backup") {
     const bounded = await client.grant("probe.bin", sample.length);
@@ -32,7 +36,7 @@ async function main() {
     await client.upload("probe.bin", sample);
     const replay = await fetch(bounded.url, { method: "PUT", body: new Uint8Array(sample), headers: { "content-type": "application/octet-stream" }, redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition(rejected(replay.status), "SIGNED_OVERWRITE_NOT_ENFORCED");
-    requireCondition((await client.access({ ...body, operation: "backup-upload", bytes: sample.length })).status === 403, "OVERWRITE_NOT_REJECTED");
+    await expectProbeDenial(await client.access({ ...body, operation: "backup-upload", bytes: sample.length }), 10, "OBJECT_EXISTS");
   }
   requireCondition(digest(await client.read("probe.bin")) === digest(sample), "SYNTHETIC_HASH_MISMATCH");
   const grant = await client.grant("probe.bin");
