@@ -51,11 +51,11 @@ Vorher: Original-CSS und Original-LOVD-Tokens aus Main `49ee7b68173ee574ed98c091
 
 ## Bereitstellung
 
-Preview-Bereitstellung und Prüfung der authentifizierten Referenzansicht stehen zum Zeitpunkt dieses Implementierungscommits noch aus. Production wird nicht integriert oder deployt. Die bestehende gemeinsame Preview wird nicht auf einen älteren Branchstand zurückgesetzt.
+Die Bereitstellung erfolgt ausschließlich auf der separaten Branch-Preview. Production und die bisherige gemeinsame Preview bleiben unverändert. Die abschließende authentifizierte Prüfung ist unten dokumentiert.
 
 Bildnachweis: Der 1920×1080-Viewport wurde im DOM geprüft. Der direkte Screenshotexport der Browsersteuerung liefert dazu 1874×1080 Pixel (rechter Rand begrenzt); dies ist eine dokumentierte Werkzeuggrenze, kein skaliertes Ersatzbild. Full-Page-/Kachelexporte waren fehlerhaft und werden nicht als Belege verwendet. 1280×720 und 960×540 wurden mit exakten Bildmaßen gesichert. Die JPEG-Dateiendungen entsprechen dem Ausgabeformat.
 
-Erster Preview-Deploy: https://pubquiz-n07oucgyb-just-phil-gud.vercel.app – READY, Commit 6ca91fad5ed33484431881585942a796123e49e5. GitHub CI #232 erfolgreich: https://github.com/justphilgud/pubquiz-web/actions/runs/35123810084 . Anwendungsauthentifizierung für die interaktive Referenzansicht noch ausstehend. Eine anschließende reine LOVD-CSS-Korrektur für kleine Auflösungsvorschauen wird separat bereitgestellt.
+Erster Preview-Deploy: https://pubquiz-n07oucgyb-just-phil-gud.vercel.app – READY, Commit 6ca91fad5ed33484431881585942a796123e49e5. GitHub CI #232 erfolgreich: https://github.com/justphilgud/pubquiz-web/actions/runs/35123810084 . Dieser historische Zwischenstand wurde anschließend um die Korrektur kleiner Auflösungsvorschauen ergänzt.
 
 ## Geänderte Verantwortlichkeiten / Dateien
 
@@ -82,4 +82,36 @@ Erster Preview-Deploy: https://pubquiz-n07oucgyb-just-phil-gud.vercel.app – RE
 - Die bestehende gemeinsame Preview `pubquiz-qowmwx1ez-just-phil-gud.vercel.app` und Production `pubquiz-duckwlqkj-just-phil-gud.vercel.app` blieben READY und unverändert in der Deploymentliste. Kein Main-Merge, keine Production-Bereitstellung.
 - Lokaler Fixture-Server auf Port 55460 beendet.
 
-**Abnahmegrenze:** Lokale reale Browserdarstellung geprüft, automatisierte Prüfungen grün, Preview bereitgestellt. Die zusätzliche Prüfung der hydratisierten Preview-Referenz-/Editoransicht ist noch am regulären Anwendungslogin offen. Der Browser zeigt dafür das Loginformular; kein Authentifizierungsweg wurde umgangen. Deshalb wird eine vollständige interaktive Preview-Abnahme noch nicht behauptet.
+## Authentifizierte Preview-Nachprüfung
+
+Nach regulärer Betreiberanmeldung wurde die echte hydratisierte Next.js-Ansicht geprüft:
+
+- Elf Kernfolien jeweils bei 1280×720 und 1920×1080, einschließlich Intro, Frage, Choice, Reveal, Countdown, Zwischen-/Endstand, Sponsor-Intro, Sponsorfragen und Outro.
+- Inhaltswechsel über die echten React-Selects; Screenshots `preview-720-*` und `preview-1080-*`.
+- Tatsächliche Schriftfamilie: Montserrat. Keine Inhaltsüberläufe in diesen 22 Prüffällen.
+- Sponsor-Intro-Bild beim ersten DOM-Messpunkt einmal noch ladend; anschließend vollständig geladen und im Screenshot korrekt sichtbar. Kein defektes Asset.
+- Kleine 960×540-Ansicht: lange Auflösung und Sponsor-Choice ohne Überlauf oder Überlagerung.
+- Vorlagenwechsel derselben Sponsorfrage: Kennzeichnung ausschließlich in LOVD; nicht in Standard, Corporate oder Storybook.
+- Editor: optionalen Bereich öffnen, Logo-Adresse setzen, Default „Präsentiert von“ prüfen, zu „Unterstützt von“ ändern, Logo entfernen. Danach Sponsorzeile wieder deaktiviert und Default wiederhergestellt. Keine Frage gespeichert, kein Upload und keine Lifecycleaktion ausgeführt.
+- Keine Browserkonsolenfehler während dieser Prüfung.
+
+Die abschließende Computed-Style-Prüfung erkannte sechs ältere LOVD-Labelregeln mit 500/600/700. Sie verwenden nun ebenfalls das vorhandene Displaygewicht 400. Reiner CSS-Fix, keine neue Komponente oder Verhaltensänderung. Die vollständigen 1.098 Tests, Typecheck und lokale Buildprüfung wurden danach erfolgreich wiederholt; der bestehende ESLint-Befund für die unveränderten TS/TSX-Dateien bleibt gültig.
+
+Die erneute finale Aufnahme zeigt dieselbe Exportbegrenzung wie zuvor: Der DOM-Viewport ist 1920×1080, die 11 direkten JPEG-Exporte sind 1874×1080. Die 11 720p- und 2 540p-Dateien besitzen ihre exakten Zielmaße. Keine Bilder wurden künstlich verbreitert; die 1080p-Layoutprüfung ist zusätzlich in `preview-metrics.json` belegt.
+
+## Abschluss
+
+**LOVD-Refinement und generische Sponsor-Darstellung auf Preview abgenommen: Ja**, im ausdrücklich freigegebenen Umfang mit austauschbarem Platzhalter.
+
+- Finaler Code-Commit: `7e831a7bcb83af4d5de1f36b0346344b47b0b3bf`.
+- Finale Preview: https://pubquiz-qeehuqqts-just-phil-gud.vercel.app
+- Stabile Abnahmeansicht: https://pubquiz-web-git-codex-lovd-brand-refinement-just-phil-gud.vercel.app/templates/presentation-quality
+- Deployment `BziyEZNKujgLc459D8CQRF4m5hN3`: READY, Preview.
+- CI #235 erfolgreich: https://github.com/justphilgud/pubquiz-web/actions/runs/35125769878
+- Alle 22 Kernansichten nach dem letzten CSS-Fix erneut interaktiv ausgewählt und aufgenommen: kein Überlauf, alle Bilder geladen, sämtliche sichtbaren Textknoten mit Schriftgewicht 400. [Messwerte](preview-metrics.json).
+- Kleine Vorschauen nach dem Fix erneut aufgenommen; Vorlagen- und Editorprüfung zuvor erfolgreich, vom Schriftgewichtsfix funktional unberührt.
+- Keine Änderung an Production, Authentifizierung, fachlichem Ablauf oder anderen Templates. Keine Frage gespeichert. Kein weiterer Produktfix offen.
+- Das eigenständige offizielle STELP-Sponsorasset ist weiterhin optional nachzuliefern; gemäß Betreiberentscheidung kein Blocker für die austauschbare Platzhalterlösung.
+- Screenshot-Exportgrenze bei 1080p dokumentiert; kein Layoutüberlauf. Browsergröße nach Prüfung zurückgesetzt, Abnahmeansicht offen gelassen.
+
+STOPP nach Preview-Abnahme. Keine Production-Integration.
