@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { AUTH_COLUMNS, auditColumns, inspectRow, inspectValue, projection, tableName, type Column } from "./acceptance-policy";
 import { requireCondition } from "./guards";
 import type { PgSession } from "./pg-session";
+import { canonicalCatalog } from "./catalog-comparison";
 
 export const sha256 = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
 export const COLUMN_SQL = `SELECT coalesce(json_agg(x ORDER BY schema,"table",ordinal),'[]') FROM (
@@ -55,7 +56,9 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
 }
 export function compareSnapshots(expected: Omit<Snapshot, "authRows">, actual: Snapshot) {
   for (const part of ["columns", "catalog", "tables", "media", "resultRows"] as const) {
-    requireCondition(JSON.stringify(expected[part]) === JSON.stringify(actual[part]), `RESTORE_${part.toUpperCase()}_MISMATCH`);
+    const left = part === "catalog" ? canonicalCatalog(expected[part]) : expected[part];
+    const right = part === "catalog" ? canonicalCatalog(actual[part]) : actual[part];
+    requireCondition(JSON.stringify(left) === JSON.stringify(right), `RESTORE_${part.toUpperCase()}_MISMATCH`);
   }
 }
 export function authInsertSql(data: Record<string, string>, columns: Column[]) {

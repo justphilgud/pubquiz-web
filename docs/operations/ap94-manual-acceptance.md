@@ -140,3 +140,15 @@ Vercel Git automatic deployment remains disabled by the unchanged vercel.json.
 
 Sources: [PostgreSQL snapshot/dump options](https://www.postgresql.org/docs/18/app-pgdump.html),
 [Vercel private storage](https://vercel.com/docs/vercel-blob/private-storage).
+
+## Run #19: post-commit catalog mismatch — do not retry
+
+The approved real restore committed successfully before its separate read-only
+validation failed with RESTORE_CATALOG_MISMATCH. The target is populated; this error
+is not a rollback. Do not rerun the write workflow, clear the target or recreate the
+successful backup. See [the read-only diagnosis](../reports/ap9-4-run19-catalog-diagnosis-20260916.md).
+Seven CHECKs and one partial unique index differ only in PostgreSQL's distribution of
+varchar-array-to-text casts over literal elements. The validator now recognizes only
+that narrowly proven equivalence, retaining every other catalog/snapshot comparison.
+Full read-only validation of the existing target remains pending; the current combined
+restore workflow is not a read-only resume operation. Main integration requires approval.

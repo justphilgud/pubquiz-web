@@ -97,3 +97,12 @@ Browser-Smoke wird vom aktuellen Adapter ausdrücklich nicht ausgeführt.
 R03 Backup/Restore geschlossen: Nein (echter Restore ausstehend).
 R04 Preview-/Production-Isolation geschlossen: Ja.
 AP9.4 vollständig abgenommen: Nein.
+
+## Aktualisierung nach Betreiberfreigabe: Diagnose, kein Retry
+
+Der oben dokumentierte Wartezustand ist historisch. Der Betreiber hat den echten
+Restore freigegeben; Job 104815481004 scheiterte nach erfolgreichem Commit bei
+RESTORE_CATALOG_MISMATCH. Das Ziel enthält die restaurierten Daten. Kein erneuter
+Restore gestartet. Konkreter Vergleich, Transaktionsnachweis und minimaler Validatorfix:
+[Lesende Run-19-Diagnose](ap9-4-run19-catalog-diagnosis-20260916.md).
+R03 und AP9.4 bleiben offen; das bestehende Backup bleibt erhalten.
