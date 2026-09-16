@@ -1,0 +1,21 @@
+name: AP9.4 Bridge Checks
+on:
+  pull_request:
+    paths: ['scripts/operations/**', '.github/workflows/ap94-*.yml']
+  push:
+    paths: ['scripts/operations/**', '.github/workflows/ap94-*.yml']
+permissions:
+  contents: read
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm ci --prefix scripts/operations/bridge
+      - run: npm run typecheck --prefix scripts/operations/bridge
+      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts
+      - run: npx eslint scripts/operations/bridge scripts/operations/bridge.test.ts scripts/operations/bridge-client.ts scripts/operations/print-claims.ts scripts/operations/transport-probe.ts --max-warnings=0

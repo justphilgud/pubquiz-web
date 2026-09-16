@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { randomUUID } from "node:crypto";
+import { runKey } from "./bridge/lib/contract";
 import { assertManualAcceptance, AUTH_COLUMNS, RESTORE_TARGET, type Environment } from "./acceptance-policy";
 import { operationConnection, assertReaderPrivileges, READER_PRIVILEGES_SQL, type ReaderPrivileges } from "./credentials";
 import { OperationsError, requireCondition } from "./guards";
@@ -36,8 +36,9 @@ export async function acceptanceBackup(env: Environment) {
   requireCondition(/^[a-f0-9]{40}$/.test(env.PRODUCTION_RELEASE_SHA ?? "") && /^[a-f0-9]{40}$/.test(env.GITHUB_SHA ?? ""), "RELEASE_SHA_REQUIRED");
   const verified = operationConnection(env.PRODUCTION_BACKUP_DATABASE_URL, "production");
   toolsVersion(env);
-  const started = Date.now(); const key = `production/acceptance/${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID()}`;
-  const store = new PrivateArtifacts(env, key); // check store before opening the DB
+  const started = Date.now(); const key = runKey("acceptance", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
+  const store = new PrivateArtifacts(env, key, "backup"); // check transport before opening the DB
+  await store.clientPreflight();
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-"));
   const session = new PgSession(verified.connectionString, env);
   let phase: BackupPhase = "SOURCE_SESSION";

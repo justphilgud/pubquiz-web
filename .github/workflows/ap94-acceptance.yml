@@ -3,9 +3,15 @@ name: AP9.4 Manual Backup and Isolated Restore
 on:
   workflow_dispatch:
     inputs:
-      production_commit:
-        description: Verified current Production release SHA (40 characters)
+      mode:
+        description: Synthetic transport proof first; real acceptance requires separate transport approval
+        type: choice
+        options: [synthetic, claims-only, acceptance]
+        default: synthetic
         required: true
+      production_commit:
+        description: Verified current Production release SHA (required only for acceptance)
+        required: false
         type: string
 
 permissions:
@@ -18,6 +24,9 @@ concurrency:
 jobs:
   backup:
     if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     container: postgres:17
     environment: operations-backup
@@ -33,15 +42,29 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
-      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts
+      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts
+      - name: Record verified identity claims only
+        run: node --import tsx scripts/operations/print-claims.ts
+      - name: Synthetic backup transport (no database credentials)
+        if: inputs.mode == 'synthetic'
+        env:
+          AP94_TRANSPORT_MODE: synthetic
+          AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
+          BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+          BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
+          BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
+        run: node --import tsx scripts/operations/transport-probe.ts backup
       - name: Explicit manual acceptance with automation and deletion disabled
+        if: inputs.mode == 'acceptance'
         id: backup
         shell: bash
         env:
           AP94_MANUAL_ACCEPTANCE: 'true'
+          AP94_TRANSPORT_MODE: acceptance
+          AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
+          AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
           PRODUCTION_RELEASE_SHA: ${{ inputs.production_commit }}
           PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
-          BACKUP_BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_READ_WRITE_TOKEN }}
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
           BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
           BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
@@ -57,6 +80,9 @@ jobs:
   restore:
     needs: backup
     if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     container: postgres:17
     environment: operations-restore
@@ -67,15 +93,29 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
+      - name: Record verified identity claims only
+        run: node --import tsx scripts/operations/print-claims.ts
+      - name: Synthetic restore transport (no database credentials)
+        if: inputs.mode == 'synthetic'
+        env:
+          AP94_TRANSPORT_MODE: synthetic
+          AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
+          BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+          BACKUP_AUTOMATION_ENABLED: 'false'
+          BACKUP_RETENTION_VERIFIED: 'false'
+        run: node --import tsx scripts/operations/transport-probe.ts restore
       - name: Restore only after required reviewer approval
+        if: inputs.mode == 'acceptance'
         env:
           AP94_MANUAL_ACCEPTANCE: 'true'
+          AP94_TRANSPORT_MODE: acceptance
+          AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
+          AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
           AP94_BACKUP_KEY: ${{ needs.backup.outputs.key }}
           AP94_MANIFEST_SHA256: ${{ needs.backup.outputs.manifest }}
           BACKUP_AUTOMATION_ENABLED: ${{ needs.backup.outputs.automation }}
           BACKUP_RETENTION_VERIFIED: ${{ needs.backup.outputs.retention }}
           RESTORE_TEST_DATABASE_URL: ${{ secrets.RESTORE_TEST_DATABASE_URL }}
           RESTORE_TEST_EXPECTED_HOST: ${{ vars.RESTORE_TEST_EXPECTED_HOST }}
-          BACKUP_BLOB_READ_WRITE_TOKEN: ${{ secrets.BACKUP_BLOB_READ_WRITE_TOKEN }}
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
         run: node --import tsx scripts/operations/acceptance-cli.ts restore

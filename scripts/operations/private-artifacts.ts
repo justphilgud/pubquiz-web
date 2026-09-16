@@ -1,18 +1,16 @@
-import { get, put } from "@vercel/blob";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { PRIVATE_HOST, type Environment } from "./acceptance-policy";
-import { assertStoreToken } from "./credentials";
+import { type Environment } from "./acceptance-policy";
+import { BridgeClient } from "./bridge-client";
 import { requireCondition } from "./guards";
 import { sha256 } from "./snapshot";
-import { privateBlobOperation } from "./blob-diagnostics";
 
 export type Artifact = { name: string; bytes: number; sha256: string };
 export function artifactName(name: string) {
   requireCondition(/^[a-z0-9][a-z0-9.-]{0,100}$/.test(name) && !name.includes(".."), "ARTIFACT_NAME_INVALID"); return name;
 }
 export function backupKey(key: string) {
-  requireCondition(/^production\/acceptance\/[0-9T-Z-]+-[a-f0-9-]{36}$/.test(key), "BACKUP_KEY_INVALID"); return key;
+  requireCondition(/^(production|synthetic)\/acceptance\/run-[1-9][0-9]{0,19}-[1-9][0-9]{0,5}$/.test(key), "BACKUP_KEY_INVALID"); return key;
 }
 export async function boundedBytes(stream: ReadableStream<Uint8Array>, limit = 128 * 1024 * 1024) {
   const reader = stream.getReader(); const parts: Buffer[] = []; let bytes = 0;
@@ -25,21 +23,16 @@ export async function boundedBytes(stream: ReadableStream<Uint8Array>, limit = 1
   return Buffer.concat(parts);
 }
 export class PrivateArtifacts {
-  private token: string;
-  constructor(env: Environment, readonly key: string) {
-    backupKey(key); assertStoreToken(env.BACKUP_BLOB_READ_WRITE_TOKEN, "backup");
-    requireCondition(env.BACKUP_PRIVATE_BLOB_HOST === PRIVATE_HOST, "PRIVATE_STORE_HOST_REQUIRED");
-    this.token = env.BACKUP_BLOB_READ_WRITE_TOKEN!;
+  private client: BridgeClient;
+  constructor(env: Environment, readonly key: string, role: "backup" | "restore") {
+    backupKey(key); this.client = new BridgeClient(env, role, key);
   }
-  private url(name: string) { return `https://${PRIVATE_HOST}/${this.key}/${artifactName(name)}`; }
+  async clientPreflight() { await this.client.grant("database.dump", 1); }
   async read(name: string) {
-    const result = await privateBlobOperation("READBACK", () => get(this.url(name), { token: this.token, access: "private", useCache: false }));
-    requireCondition(result?.statusCode === 200 && result.stream, "PRIVATE_READBACK_FAILED");
-    return privateBlobOperation("READBACK", () => boundedBytes(result.stream));
+    return this.client.read(artifactName(name));
   }
   async upload(name: string, bytes: Buffer): Promise<Artifact> {
-    const result = await privateBlobOperation("UPLOAD", () => put(`${this.key}/${artifactName(name)}`, bytes, { token: this.token, access: "private", addRandomSuffix: false, allowOverwrite: false, contentType: "application/octet-stream" }));
-    requireCondition(result.url === this.url(name), "PRIVATE_UPLOAD_IDENTITY_MISMATCH");
+    await this.client.upload(artifactName(name), bytes);
     const evidence = { name, bytes: bytes.length, sha256: sha256(bytes) };
     verifyArtifact(await this.read(name), evidence);
     return evidence;
