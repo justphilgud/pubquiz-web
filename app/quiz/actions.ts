@@ -1,4 +1,6 @@
 "use server";
+
+import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluationRevisionSelect } from "./evaluation/evaluationRevision";
 import { requireQuizNotStopped } from "./quizLifecycle.server";
@@ -1693,6 +1695,8 @@ export async function removeFrageFromQuizByFrageId(data: {
   revalidatePath("/fragen");
 }
 export type QuizPraesentationResult = {
+  /** Server-resolved presentation capability, identical for navigation and both clients. */
+  sponsorMomentsEnabled?: boolean;
   quiz_id: number;
   intro_begruessungstitel: string | null;
   intro_begruessungstext: string | null;
@@ -1925,7 +1929,9 @@ export async function getQuizPraesentation(
     return null;
   }
 
+  const templates = await resolveQuizTemplates(quizId);
   return {
+    sponsorMomentsEnabled: templates?.theme.design.stylePreset === "EDITORIAL",
     quiz_id: quiz.quiz_id,
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,
@@ -2530,7 +2536,8 @@ export async function getQuizAntwortStatus(
     })),
   );
 
-  const currentRun = interactionRuns.find((run) => run.is_current) ?? null;
+  const sponsorPosition = audienceState.kind === "NON_QUESTION" && audienceState.slideType === "SPONSOR";
+  const currentRun = sponsorPosition ? null : interactionRuns.find((run) => run.is_current) ?? null;
   const currentRunQuestion = currentRun?.quiz_fragen_id
     ? quiz.quiz_fragen.find(
         (entry) => entry.quiz_fragen_id === currentRun.quiz_fragen_id,
@@ -2806,6 +2813,8 @@ export async function getQuizAntwortStatus(
 
   const presentationStatusText = liveState.lifecycle === "STOPPED"
     ? "Das Quiz ist beendet"
+    : sponsorPosition
+    ? "Nächste Frage gleich …"
     : offenerFragenblock
     ? null
     : currentRun?.state === "CLOSED"
@@ -2840,7 +2849,7 @@ export async function getQuizAntwortStatus(
         }
       : null,
     interactionState: currentRun?.state ?? (offenerFragenblock ? "OPEN" : "LOCKED"),
-    answerPhase: offenerFragenblock
+    answerPhase: sponsorPosition ? ("NON_QUESTION" as const) : offenerFragenblock
       ? ("QUESTION" as const)
       : currentRun
       ? currentRun.state === "REVEALED"

@@ -164,6 +164,14 @@ export async function setPraesentationSlideIndex(
       assertLifecycleRevision(previousStatus.lifecycle_revision, expectedLifecycleRevision);
     }
     if (previousStatus.slide_key === slideKey) return previousStatus;
+    // Validated against the server-built deck above. A sponsor changes ONLY
+    // presentation position, never runs, deadlines, countdowns or block releases.
+    if (identity?.kind === "NON_QUESTION" && identity.slideType === "SPONSOR") {
+      return tx.quiz_praesentation_status.update({
+        where: { quiz_id: quizId },
+        data: { slide_index: slideIndex, slide_key: slideKey, slide_started_at: new Date() },
+      });
+    }
     if (slideIndex < previousStatus.slide_index) {
       const followingQuestionIds = slides.slice(slideIndex + 1).flatMap((slide) =>
         slide.typ === "frage" ? [slide.frage.quiz_fragen_id] : [],

@@ -73,6 +73,7 @@ function slot(
 }
 
 export const mediaSlotDefinitions = {
+  sponsor_logo: slot("sponsor_logo", "QUESTION", "IMAGE"),
   question_image: slot("question_image", "QUESTION", "IMAGE", "questionImage"),
   question_audio: slot("question_audio", "QUESTION", "AUDIO", "questionAudio"),
   question_video: slot("question_video", "QUESTION", "VIDEO", "questionVideo"),

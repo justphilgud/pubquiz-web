@@ -72,32 +72,68 @@ Antwortart. Auflösung, übrige Presets, Fragen ohne Sponsor und sämtliche
 Interaktionsdaten bleiben davon unabhängig. `QuestionSponsorMark` rendert nur
 Text und Logo, ohne Aktionen oder Effekte. Die Fragefläche wird nicht verkleinert.
 
-### Optionale Vorfolie ohne Lifecycle-Eingriff
+### Moderierter Sponsor-Moment (Folgeauftrag)
 
-1. Bestehendes Story-Element vom Typ **Bild** erstellen.
-2. Titel „Diese Frage wird präsentiert von“, Logo als Bild, passenden Alt-Text setzen.
-3. Element im vorhandenen Quizablauf unmittelbar vor der betreffenden Frage platzieren.
-4. Bei Bedarf über die bestehenden Ablaufkontrollen ausblenden/entfernen.
+Die frühere manuell platzierte Story-Vorfolie wird für Sponsoren durch eine
+abgeleitete Position ersetzt. Ein gültiges Logo erzeugt unter LOVD automatisch
+`presentationRole.kind = SPONSOR`, stabiler Schlüssel `sponsor:<quiz_fragen_id>`.
+Es gibt keinen Aktivierungsschalter, separaten Storydatensatz oder Sponsorcodepfad.
+Die serverseitig aufgelöste LOVD-Fähigkeit steuert dasselbe Deck in Moderation,
+Präsentation und Navigationsvalidierung. Andere Designwelten erhalten keine Position.
 
-Dies verwendet die vorhandene Story-Platzierung vollständig. Ein automatischer
-Checkbox-Mechanismus mit zusätzlicher Deck-/Navigationslogik wird bewusst nicht
-eingeführt. Es gibt keinen neuen Start, Run, Countdown oder Submission-Kontext.
-LOVD-Bildfolien zeigen das gesamte Bild mit Freiraum statt Logos zu beschneiden.
+Die Sponsorpflege liegt im bestehenden Bereich **Weitere Funktionen** (zuvor
+Weitere Angaben). `MediaUploadSlot` verwendet den bestehenden Uploadendpunkt,
+Frageberechtigungen, Größen-/MIME-Regeln und isolierten Medienstore. `sponsor_logo`
+ist ein semantischer Uploadslot; die resultierende Referenz bleibt ausschließlich
+in `templateConfig.sponsor`, nicht im fachlichen Fragenmedium. Upload, Vorschau,
+Austausch und Entfernen benötigen keine URL-Eingabe. Eine Produkt-Medienbibliothek
+ist nicht vorhanden und wird nicht neu gebaut; Dateiauswahl vom Gerät ist verfügbar.
 
-Der Nutzer hat einen klar erkennbaren austauschbaren **Platzhalter** freigegeben:
-`/branding/sponsors/placeholder.svg`. Der öffentliche Guide enthält kein separates
-STELP-Sponsorlogo. Das konkrete STELP-Asset und dessen abschließende Sichtprüfung
-bleiben deshalb offen; der Platzhalter wird nicht als offizielles Logo bezeichnet.
+Die Sponsorposition ist explizit nicht-interaktiv. Nach Deck-, Rollen- und
+Lifecyclevalidierung schreibt ihr Eintritt nur Index, Schlüssel und Anzeigezeit
+in den vorhandenen Präsentationsstatus. Kein Rücknavigation-Hide, Interaktionssync,
+Blockwechsel, Medienkommando oder Countdownreset. Die Interaktionssynchronisation
+selbst akzeptiert Sponsorpositionen ebenfalls als No-op. Vorhandene Runs und
+Drafts werden nicht verändert. Natürlicher Zeitablauf bestehender Deadlines wird
+**nicht pausiert**; unabhängige Deadlineabläufe bleiben serverseitig wirksam.
+
+Teilnehmer-Read-Models liefern während Sponsor keine Fragen oder Poll-Inhalte,
+auch nicht aus früher freigegebenen Runs bei Rücknavigation. Angezeigt wird
+„Nächste Frage gleich …“. Die Datenbankruns bleiben erhalten. Erst Moderator-Weiter
+auf die Frage verwendet den bestehenden vollständigen Navigations-/Öffnungspfad;
+Doppelklickschutz und serverseitige Idempotenz bleiben bestehen. Reload/Reconnect
+im laufenden Quiz verwenden den persistierten Schlüssel. Die bestehende explizite
+Browseraktivierung und der PREPARATION-Startbildschirm bleiben unverändert.
+
+Das Logo erscheint in einer großen, zentrierten Bounding-Box im unveränderten
+LOVD-Rahmen (400 ms Fade). Beim Weitergehen animiert eine rein visuelle Kopie in
+700 ms zur tatsächlich gemessenen kleinen Sponsorposition. Breite und Höhe der
+Box werden interpoliert, `object-fit: contain` wahrt das Logoformat. Kein Cropping,
+Umfärben, Bounce, Timerwechsel oder fachlicher Animation-Callback. Bei Reduced
+Motion wird direkt der richtige Zustand gezeigt; bei Reload direkt auf der Frage
+wird keine Voranimation erfunden. Beide Darstellungen verwenden dieselbe Referenz.
+
+Kopieren übernimmt das vorhandene `template_config_json`; Wiederverwenden liest
+die Konfiguration der Frage. Keine Medienduplikation und keine Migration.
+
+STELP ist nur Testinhalt. Das vom Betreiber genannte Partnerangebot
+https://www.lindencompany.com/executive-search/ bindet das separate Bild
+https://www.lindencompany.com/wp-content/uploads/stelp-logo.jpg ein. Die Abnahme
+verwendet dieses Bild unverändert über den Upload, ohne es ins Template einzubauen.
 
 ## Invarianten und Regression
 
-Keine Änderungen an Antwortannahme, Draft/Save-Verhalten, Bewertung, Punkten,
-Deadline-/Countdownlogik, Lifecycle, Moderation, Polling, Snapshotlogik, Teams,
+Die eng begrenzte Sponsor-Ausnahme in Navigation und Teilnehmerdarstellung ist
+ausdrücklich freigegeben. Keine Änderungen an Antwortannahme, Draft/Save-Verhalten,
+Bewertung, Punkten, fachlicher Deadline-/Countdownlogik, Teams,
 Authentifizierung, Backup/Restore oder Monitoring. Kein Production-Deployment.
 
 `questionSponsor.test.tsx` schützt Persistenz/Validierung, offene/geschlossene
 Darstellung, Abwesenheit auf anderen Presets/Auflösungen, unveränderte Deckschlüssel
-und die Nicht-Fragen-Identität der normalen Story-Vorfolie.
+und die Nicht-Fragen-Identität der Sponsorposition. `sponsorNavigation.test.ts`
+führt die tatsächliche Serveraktion mit strikt beschränkten DB-/Service-Spies aus
+und schützt Position-only-Mutation, Vorwärts/Rückwärts, Idempotenz, Reload,
+Teilnehmerausblendung und den einmaligen normalen Fragenstart.
 Bestehende Präsentations-, Lifecycle- und Theme-Regressionen bleiben erforderlich.
 
 Die interne, authentifizierte `/templates/presentation-quality`-Ansicht enthält

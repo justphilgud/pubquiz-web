@@ -370,8 +370,10 @@ export async function syncInteractionForPresentation(
   },
 ) {
   await requireQuizNotStopped(db, input.quizId);
-  const currentRunId = await lockCurrentRun(db, input.quizId);
   const identity = parsePresentationSlideKey(input.slideKey);
+  // Sponsor positions never synchronize or settle the previous interaction.
+  if (identity?.kind === "NON_QUESTION" && identity.slideType === "SPONSOR") return null;
+  const currentRunId = await lockCurrentRun(db, input.quizId);
   if (identity?.kind === "LIVE_POLL") {
     return syncLivePollForPresentation(db, {
       quizId: input.quizId,
@@ -1385,6 +1387,10 @@ export async function getQuizLiveSnapshotData(
     });
     run = await runQuery();
   }
+  const presentationIdentity = parsePresentationSlideKey(presentationStatus?.slide_key);
+  // Read-model only: preserve the stored previous run and its natural deadlines,
+  // but do not send its question/poll payload while the sponsor is displayed.
+  if (presentationIdentity?.kind === "NON_QUESTION" && presentationIdentity.slideType === "SPONSOR") run = null;
   const contentPollConfig = run ? readLivePollRunSnapshot(run.config_snapshot) : null;
   const interaction = run && !contentPollConfig ? readInteractionSnapshot(run.config_snapshot) : null;
   const pollInteraction = interaction && isPollInteractionType(interaction.type)

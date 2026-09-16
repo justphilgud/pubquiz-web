@@ -570,23 +570,24 @@ export default function ModerationClient({
     if (safeIndex === slideIndex || navigationPending.current || quizBeendet) return;
     navigationPending.current = true;
 
+    const nextSlide = slides[safeIndex];
+    if (!nextSlide) { navigationPending.current = false; return; }
+    const nextSlideKey = getPresentationSlideKey(nextSlide);
+    const sponsorMoment = nextSlide.typ === "ablauf" && nextSlide.presentationRole?.kind === "SPONSOR";
     const newStartedAt = new Date().toISOString();
-
     setSlideIndex(safeIndex);
     setSlideStartedAt(newStartedAt);
-    setShowAuswertungDialog(false);
-    setAuswertungDialogBereitsGezeigt(false);
-    setEndstandRevealCountLokal(1);
-    setMediumOverlayAktivLokal(false);
-    setAudioLaeuft(false);
-    setPlaybackCommand("stop");
-    setPlaybackCommandId((current) => current + 1);
-    setCountdownStartedAt(null);
-    setCountdownStatus("idle");
-
-    const nextSlide = slides[safeIndex];
-    if (!nextSlide) return;
-    const nextSlideKey = getPresentationSlideKey(nextSlide);
+    if (!sponsorMoment) {
+      setShowAuswertungDialog(false);
+      setAuswertungDialogBereitsGezeigt(false);
+      setEndstandRevealCountLokal(1);
+      setMediumOverlayAktivLokal(false);
+      setAudioLaeuft(false);
+      setPlaybackCommand("stop");
+      setPlaybackCommandId((current) => current + 1);
+      setCountdownStartedAt(null);
+      setCountdownStatus("idle");
+    }
     if (isPauseSlide(nextSlide)) {
       setCountdownDauerMinuten(
         Math.max(1, Math.round(getPauseDurationSeconds(nextSlide) / 60)),

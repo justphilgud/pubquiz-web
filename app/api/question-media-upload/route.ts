@@ -380,7 +380,7 @@ export async function POST(request: Request) {
 
         if (context.target === "QUESTION") {
           const template = findQuestionTemplate(questionTemplateDefinitions, effectiveTemplateId ?? "standard");
-          if (!template?.mediaSlots.some((slot) => slot.slotKey === context.slotKey)) {
+          if (context.slotKey !== "sponsor_logo" && !template?.mediaSlots.some((slot) => slot.slotKey === context.slotKey)) {
             throw new Error("Medienslot ist für diese Vorlage nicht erlaubt.");
           }
         }

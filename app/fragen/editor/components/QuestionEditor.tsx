@@ -1142,10 +1142,12 @@ export function QuestionEditor({
           }
         />}
 
-        <QuestionSponsorSection value={draft.templateConfig.sponsor} disabled={isEditorDisabled}
-          onChange={(sponsor) => setDraft((current) => ({ ...current, templateConfig: { ...current.templateConfig, sponsor } }))} />
-
         <AdditionalDetailsSection
+          sponsor={<QuestionSponsorSection value={draft.templateConfig.sponsor} disabled={isEditorDisabled}
+            questionId={savedQuestionId} templateId={draft.templateId}
+            environmentPrefix={mediaUploadPathnamePrefix}
+            onUploadStatusChange={(status) => setQuestionMediaUploadStatuses((current) => ({ ...current, sponsor_logo: status }))}
+            onChange={(sponsor) => setDraft((current) => ({ ...current, templateConfig: { ...current.templateConfig, sponsor } }))} />}
           categories={categories}
           selectedCategoryIds={draft.categoryIds}
           sourceOrRemark={draft.sourceOrRemark}

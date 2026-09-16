@@ -1,25 +1,33 @@
 "use client";
 
 import type { QuestionSponsor } from "@/app/rendering/presentation/questionSponsor";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
+import { MediaUploadSlot, type MediaUploadStatus } from "./MediaUploadSlot";
 
-export function QuestionSponsorSection({ value, disabled, onChange }: {
+export function QuestionSponsorSection({ value, disabled, onChange, questionId, templateId, environmentPrefix, onUploadStatusChange }: {
   value?: QuestionSponsor;
   disabled: boolean;
   onChange: (value: QuestionSponsor | undefined) => void;
+  questionId: number | null;
+  templateId: string | null;
+  environmentPrefix: BlobEnvironmentPrefix;
+  onUploadStatusChange: (status: MediaUploadStatus) => void;
 }) {
-  return <details className="rounded-xl border border-slate-200 bg-white p-4" open={value ? true : undefined}>
-    <summary className="cursor-pointer font-medium">Präsentation / Sponsor (optional)</summary>
-    <fieldset disabled={disabled} className="mt-4 grid gap-3">
-      <label className="grid gap-1">Sponsorlogo · Bildadresse
-        <input className="rounded border p-2" value={value?.logo ?? ""} placeholder="/branding/sponsors/partner.png" maxLength={2048}
-          onChange={event => onChange(event.target.value ? { logo: event.target.value as QuestionSponsor["logo"], line: value?.line ?? "Präsentiert von" } : undefined)} />
-      </label>
-      <p className="text-sm text-slate-600">Repository-Bild oder vorhandene verwaltete Medienadresse. Anzeige auf LOVD-Fragefolien; Logo unverzerrt mit Freiraum.</p>
-      <label className="grid gap-1">Sponsorzeile
-        <input className="rounded border p-2" value={value?.line ?? "Präsentiert von"} maxLength={80} disabled={!value || disabled}
-          onChange={event => value && onChange({ ...value, line: event.target.value })} />
-      </label>
-      <p className="text-sm text-slate-600">Eine optionale Vorfolie lässt sich als bestehendes Story-Element mit Text und Logo unmittelbar vor der Frage im Quizablauf platzieren. Sie startet keine Frage.</p>
-    </fieldset>
-  </details>;
+  return <section className="rounded-xl border border-slate-200 p-4" aria-label="Sponsor">
+    <h3 className="font-semibold">Sponsor (optional)</h3>
+    <p className="mt-1 text-sm text-slate-600">Mit Logo erscheint in LOVD vor dieser Frage ein Sponsor-Moment. Die Moderation startet die Frage mit Weiter.</p>
+    <MediaUploadSlot
+      media={value ? { slotKey: "sponsor_logo", existingMediaId: null, url: value.logo, mediaType: "IMAGE", operation: "UNCHANGED", existingMediaCount: 1 } : null}
+      mediaType="IMAGE" slotKey="sponsor_logo"
+      uploadTarget={{ target: "QUESTION", questionId, templateId }}
+      environmentPrefix={environmentPrefix} label="Sponsorlogo" previewAlt="Sponsorlogo-Vorschau"
+      compact disabled={disabled}
+      onUploadStatusChange={onUploadStatusChange}
+      onChange={(media) => onChange(media?.url && media.operation !== "REMOVE" ? { logo: media.url as QuestionSponsor["logo"], line: value?.line ?? "Präsentiert von" } : undefined)}
+    />
+    <label className="mt-4 grid gap-1">Sponsorzeile
+      <input className="rounded border p-2" value={value?.line ?? "Präsentiert von"} maxLength={80} disabled={!value || disabled}
+        onChange={event => value && onChange({ ...value, line: event.target.value })} />
+    </label>
+  </section>;
 }

@@ -2987,3 +2987,23 @@ button {
   .presentation-content-warning details[open] summary::before { content: "−"; }
   .presentation-content-warning details p { padding-bottom: .5rem; }
 }
+
+/* Sponsor positions share the LOVD canvas; logo aspect ratio is always preserved. */
+.presentation-template[data-design-style="EDITORIAL"] .presentation-sponsor-layer {
+  position: absolute; inset: 0; z-index: 30; pointer-events: none;
+}
+.presentation-template[data-design-style="EDITORIAL"] .presentation-sponsor-moment {
+  position: absolute; inset: 20% 18% 16%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.5rem;
+  color: var(--brand-text); animation: sponsor-arrive 400ms cubic-bezier(.22,.61,.36,1) both;
+}
+.presentation-template[data-design-style="EDITORIAL"] .presentation-sponsor-moment p {
+  font-size: clamp(1.25rem, 2.2vw, 2.5rem); text-align: center; overflow-wrap: anywhere;
+}
+.presentation-template[data-design-style="EDITORIAL"] .presentation-sponsor-moment img {
+  width: 100%; height: 70%; min-height: 0; object-fit: contain; padding: 24px;
+}
+@keyframes sponsor-arrive { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .presentation-template[data-design-style="EDITORIAL"] .presentation-sponsor-moment { animation: none; }
+}

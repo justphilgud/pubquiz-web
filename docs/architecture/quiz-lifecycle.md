@@ -237,3 +237,13 @@ und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.
 
 [Intro-/QR-Flow und Teambeitritt](intro-team-join.md) definiert den manuellen QR-Abschluss,
 die rein lokale Begrüßungsqueue und die Wiederverwendung vorhandener Snapshots.
+
+## Begrenzte Sponsorposition (LOVD)
+
+Der freigegebene moderierte Sponsor-Moment ist eine explizite, rein darstellende
+Position im vorhandenen Deck, keine neue Lifecyclephase. Eintritt schreibt nur
+Präsentationsposition/-zeit; Interaktionssync, Run-Hide und Countdownreset werden
+für diese Position übersprungen. Teilnehmer sehen den serverseitigen Wartezustand.
+Erst Weiter zur Frage verwendet unverändert die bestehende Fragenlogik. Bereits
+laufende Deadlines laufen unabhängig weiter. Details und Tests:
+[LOVD-Sponsorvertrag](../design/lovd-brand-refinement.md).

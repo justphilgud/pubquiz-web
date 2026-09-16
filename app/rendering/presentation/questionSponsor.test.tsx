@@ -36,14 +36,14 @@ test("optional sponsor renders on open/closed LOVD questions, never on other des
   assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("normal", "EDITORIAL"))), /presentation-question-sponsor/);
 });
 
-test("sponsor has no effect on deck ordering or question identity; intro is an ordinary Story image", () => {
+test("sponsor adds only a noninteractive presentation position and retains all question/reveal identities", () => {
   const fixture = buildPresentationQualityFixture("sponsor-open", "EDITORIAL");
   const withSponsor = buildPraesentationSlides(fixture.quiz).map(getPresentationSlideKey);
   const without = structuredClone(fixture.quiz);
   delete without.fragen[0].templateConfig?.sponsor;
-  assert.deepEqual(withSponsor, buildPraesentationSlides(without).map(getPresentationSlideKey));
+  assert.deepEqual(withSponsor.filter(key => !key.startsWith("sponsor:")), buildPraesentationSlides(without).map(getPresentationSlideKey));
   const intro = buildPresentationQualityFixture("sponsor-intro", "EDITORIAL");
   assert.equal(intro.slide.typ, "ablauf");
   assert.notEqual(parsePresentationSlideKey(getPresentationSlideKey(intro.slide))?.kind, "QUESTION");
-  assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, intro)), /Diese Frage wird präsentiert von/);
+  assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, intro)), /Präsentiert von/);
 });

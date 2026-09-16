@@ -136,6 +136,7 @@ export type QuestionCategory = {
 export type QuestionMediaType = "IMAGE" | "AUDIO" | "VIDEO";
 
 export type MediaSlotKey =
+  | "sponsor_logo"
   | "question_image"
   | "question_audio"
   | "question_video"
