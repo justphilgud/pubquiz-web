@@ -4,6 +4,6 @@ export function needsApplicationDeployment(paths: readonly string[]) {
   return paths.some(path => !(
     path.startsWith("scripts/operations/") || path.startsWith("docs/operations/") ||
     path.startsWith("docs/reports/ap9-4") ||
-    path === ".github/workflows/ap94-acceptance.yml" || path === ".github/workflows/deploy-production.yml"
+    path === ".github/workflows/ap94-acceptance.yml" || path === ".github/workflows/ap94-bridge-ci.yml" || path === ".github/workflows/deploy-production.yml"
   ));
 }

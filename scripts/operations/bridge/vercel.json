@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run typecheck",
+  "outputDirectory": "public",
+  "regions": ["fra1"],
+  "functions": { "api/access.ts": { "maxDuration": 30 } },
+  "git": { "deploymentEnabled": false }
+}

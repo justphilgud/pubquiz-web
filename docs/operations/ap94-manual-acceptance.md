@@ -1,5 +1,16 @@
 # AP9.4 manual acceptance pipeline
 
+## Current preparation gate: OIDC Operations Bridge, 2026-09-16
+
+The static Blob-secret transport is replaced by the isolated bridge described in
+[the setup runbook](ap94-oidc-bridge-setup.md). It is prepared, not externally accepted.
+Do not dispatch a real backup yet. First complete manual project/Store/OIDC/Trusted
+Sources setup, verified claims and synthetic tests, preserving all reviewer gates.
+The workflow defaults to synthetic; claims-only reads verified identity metadata only.
+The acceptance mode additionally requires AP94_OIDC_TRANSPORT_ACCEPTED=true and the
+separately configured bridge acceptance mode after successful transport acceptance.
+Neither original automation/retention flag changes. Old secrets are not deleted.
+
 Prepared 2026-09-14. This is an operations-only addition, not an application release.
 Production and the regular Preview/Development endpoints are never restore targets.
 
@@ -75,12 +86,14 @@ Reverify both environments, private store, empty target, current Production rele
 and provider identity. Do not infer actual GitHub secret values from their names.
 The corrected j-host is confirmed in operations-restore; password unchanged by this work.
 
-Run **AP9.4 Manual Backup and Isolated Restore** on main with the verified 40-character
+Only after the OIDC transport gate, run **AP9.4 Manual Backup and Isolated Restore**
+in acceptance mode on main with the verified 40-character
 Production application SHA. The backup job records its key and manifest SHA in its
 summary and hands these exact values to the protected restore job. Stop when that job
 waits for the reviewer; report the exact run URL. The workflow never deploys the application.
 
-After approval inspect the private validation record and complete application/browser
+After approval inspect the secretsafe validation result in the protected GitHub run
+(Restore no longer uploads a Blob validation record) and complete application/browser
 smoke against the isolated target. Record all failures honestly. Snapshot age at restore,
 measured restore/validation durations and total recovery duration are separate from an
 operational RPO/RTO guarantee. No automatic cleanup or retention is enabled.

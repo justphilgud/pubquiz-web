@@ -46,7 +46,7 @@ export function restoreSql(directory: string, auth: Record<string, string>, mani
 }
 export async function acceptanceRestore(env: Environment) {
   assertManualAcceptance(env); const connection = pinnedRestoreConnection(env); toolsVersion(env);
-  const store = new PrivateArtifacts(env, env.AP94_BACKUP_KEY ?? "");
+  const store = new PrivateArtifacts(env, env.AP94_BACKUP_KEY ?? "", "restore");
   const manifest = parseManifest(await store.read("manifest.json"), env.AP94_MANIFEST_SHA256 ?? "", store.key);
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-restore-"));
   try {
@@ -105,7 +105,7 @@ export async function acceptanceRestore(env: Environment) {
       snapshotAgeAtRestoreMs: started - Date.parse(manifest.snapshotAt),
       measuredRecoveryMs: Date.now() - started, deletionEnabled: false };
     await writeFile(join(directory, "validation.json"), JSON.stringify(evidence), { mode: 0o600 });
-    await store.upload(`validation-${Date.now()}.json`, Buffer.from(JSON.stringify(evidence)));
+    // Restore is read-only in Blob. Evidence is returned to the protected GitHub run.
     return evidence;
   } finally { await rm(directory, { recursive: true, force: true }); }
 }
