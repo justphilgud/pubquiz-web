@@ -1,5 +1,5 @@
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey, type JWTPayload } from "jose";
-import { AUDIENCE, check, ISSUER, REPOSITORY, REPOSITORY_ID, OWNER_ID, WORKFLOW } from "./contract";
+import { AUDIENCE, check, ISSUER, REPOSITORY, REPOSITORY_ID, OWNER_ID, WORKFLOW } from "./contract.js";
 
 const githubKeys = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks`), { timeoutDuration: 5000 });
 export type Identity = { environment: "operations-backup" | "operations-restore"; run: string; attempt: string; expiresAt: number };

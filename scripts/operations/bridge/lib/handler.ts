@@ -1,6 +1,6 @@
-import { BridgeError, check, STORE_ID, REPOSITORY_ID, OWNER_ID, type Mode } from "./contract";
-import { verifyGithub, type Identity, type IdentityPins } from "./identity";
-import { grantAccess, type BlobProvider } from "./service";
+import { BridgeError, check, STORE_ID, REPOSITORY_ID, OWNER_ID, type Mode } from "./contract.js";
+import { verifyGithub, type Identity, type IdentityPins } from "./identity.js";
+import { grantAccess, type BlobProvider } from "./service.js";
 
 type Env = Readonly<Record<string, string | undefined>>;
 export function configuration(env: Env): { mode: Mode; pins: IdentityPins } {
