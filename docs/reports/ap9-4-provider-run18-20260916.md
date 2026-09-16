@@ -62,19 +62,26 @@ keine Behauptung echter fremder GitHub-Identitäten. Acht Operationsnegativfäll
 Beide Dateitypen: Größen-/Overwrite-Abweisung, Method-/Pfad-Abweisung und tatsächlicher
 Ablauf nach fünf Minuten erfolgreich. deletion=false.
 
-## Unverändertes Reviewer-Gate
+## Reguläre Reviewer-Freigabe und vollständiger Abschluss
 
-Run #18 Status Waiting, operations-restore waiting for review.
-Ausstehender Restorejob: 104809963788. Keine Freigabe durch den Agenten.
+Run #18 wartete zunächst regulär auf operations-restore. Der Betreiber hat am
+16.09.2026 um 15:19 Europe/Berlin freigegeben; keine Freigabe durch den Agenten.
+Restorejob 104809963788 erfolgreich in 6m05s, Transportschritt 5m13s.
 Der Job führt im Modus synthetic ausschließlich den OIDC-/Security-Test sowie
 privaten Readback, SHA-256-/Größenvergleich, Methoden-/Pfad- und Ablaufprüfung
 beider Testobjekte aus. Keine DB-Credentials im Testschritt, kein Datenbankzugriff,
 keine Änderungen am isolierten Neon-Ziel oder Production, keine Blob-Writes/Deletes.
 
-Nächste notwendige Betreiberaktion: Run #18 / Review deployments /
-operations-restore regulär freigeben. Erst nach dessen erfolgreichem Abschluss
-gilt die erneute Providerabnahme vollständig als grün. Danach Operations zurück
-auf acceptance deployen und den bereits autorisierten echten Backupversuch starten.
+Restore-Lesetest bestätigt beide oben dokumentierten Größen und SHA-256 identisch,
+readback=verified, expiry=rejected, neun Operationsnegativfälle erfolgreich,
+signedMethodAndPath=rejected, deletion=false. Identitätsgrenzen ebenfalls grün
+(gleiche ausdrücklich begrenzte Aussage zu semantischen fremden Claims wie oben).
+Damit ist die erneute synthetische JSON-/Binärproviderabnahme vollständig grün.
+
+Anschließend Operations auf unverändertem Main-Stand im acceptance-Modus READY:
+dpl_3R2iS7bY5MWUyi8BybGaXEqL3VUg. PubQuiz-Production und Main erneut lesend
+unverändert bestätigt. Autorisierter echter Run #19 gestartet:
+https://github.com/justphilgud/pubquiz-web/actions/runs/35102025962.
 Beim ECHTEN Restorejob erneut stoppen und die geforderten Backup-/Zielnachweise liefern.
 
 R03 Backup/Restore geschlossen: Nein.
