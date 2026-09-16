@@ -15,7 +15,8 @@ erfolgreich, einschließlich Readback/Hash, Rollen-/Pfad-/Methodenprüfungen und
 URL-Ablauf. PR #12 ist integriert: Main `4ac84083c0af78b319fb2f9e944e3c7467f69645`.
 Run #15 inklusive beider Identitäten/Transportpfade erfolgreich. Transportflags true,
 Bridge acceptance; Automatisierung/Retention unverändert false. Run #16 erreicht den
-echten Export, scheitert nach Datenbankupload/Readback beim Auth-Overlay-Upload.
+echten Export; nur database.dump ist gespeichert, Uploadphase fehlgeschlagen.
+Der nächste Auth-Overlay-Upload ist der vermutete Fehlerort, bislang nicht sicher belegt.
 Minimaler secretsicherer Diagnosefix vorbereitet; aktuelles Gate ist dessen reguläre
 Main-Freigabe. Kein Restore und kein gültiges vollständiges Backup vorhanden.
 Siehe [Run #16](../reports/ap9-4-acceptance-run16-20260916.md) und

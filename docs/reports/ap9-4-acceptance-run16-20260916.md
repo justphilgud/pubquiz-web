@@ -26,9 +26,11 @@ database.dump sichtbar (UI gerundet 282 kB). Keine auth-redacted.json, keine Med
 kein Manifest. Nichts gelöscht oder überschrieben. Teilstand ist kein gültiges Backup.
 
 Aus dem Codeablauf folgt: Leserrollen-/Rechteprüfung, konsistenter Snapshot,
-Authausschlussprüfung, Dumpprüfung, lokale Medienerfassung und Upload/Hash-/Größen-
-Readback des Datenbankarchivs sind passiert. Der nächste Upload ist auth-redacted.json;
-dort trat die Providerablehnung auf. Originale password_hash/team_passwort wurden
+Authausschlussprüfung, Dumpprüfung und lokale Medienerfassung sind passiert. Nach dem
+Datenbankarchiv ist auth-redacted.json der nächste Upload und damit der naheliegende
+Fehlerort. Das vorhandene Objekt allein beweist aber keinen erfolgreichen HTTP-Abschluss
+oder Readback des ersten PUT; eine Speicherung mit anschließendem Fehler ist mit der
+bisherigen Diagnose nicht sicher auszuschließen. Originale password_hash/team_passwort wurden
 weder exportiert noch hochgeladen. Vollständiger Auth-Overlay-/Medien-/Manifestnachweis
 und Snapshotzeit/gesamte Backupgröße sind mangels erfolgreichem Ergebnis nicht verfügbar.
 
