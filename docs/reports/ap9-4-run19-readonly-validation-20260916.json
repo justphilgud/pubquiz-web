@@ -1,0 +1,41 @@
+{
+  "main": "49ee7b68173ee574ed98c0912efbd8a187ef13ad",
+  "key": "production/acceptance/run-35102025962-1",
+  "snapshotAt": "2026-09-16T13:28:18.907504+00:00",
+  "readAt": "2026-09-16T14:35:40.385099+00:00",
+  "identity": {
+    "role": "neondb_owner",
+    "database": "neondb",
+    "version": "17.11 (c4ba6b8)",
+    "readOnly": "on",
+    "at": "2026-09-16T14:24:30.29178+00:00"
+  },
+  "validation": "PASS",
+  "parts": [
+    "columns",
+    "catalog",
+    "tables",
+    "media",
+    "resultRows"
+  ],
+  "tables": 45,
+  "rows": 1717,
+  "samples": 171,
+  "sequences": 41,
+  "migrations": 42,
+  "authNonredacted": 0,
+  "resultGroups": 20,
+  "quizzes": 4,
+  "media": 96,
+  "artifactBytes": 209290150,
+  "manifestBytes": 259377,
+  "manifestSha256": "d60a86f750a9c6f80ec7e66f7c37c54f87cd779986b1783b13474f3feb76581b",
+  "backupTimings": {
+    "backupMs": 259497,
+    "mediaMs": 2887
+  },
+  "offlineValidationMs": 24,
+  "completedAt": "2026-09-16T14:36:24.616Z",
+  "metadataSha256": "62c4f5ed6df0666837d56b0cc95b357f521c638415d6f1b2f92c2782d7c28b55",
+  "rowEvidenceSha256": "b913b32af5b523d8f45b023c169e7914cd5afbaad2040492503745b82cb48378"
+}

@@ -106,3 +106,8 @@ RESTORE_CATALOG_MISMATCH. Das Ziel enthält die restaurierten Daten. Kein erneut
 Restore gestartet. Konkreter Vergleich, Transaktionsnachweis und minimaler Validatorfix:
 [Lesende Run-19-Diagnose](ap9-4-run19-catalog-diagnosis-20260916.md).
 R03 und AP9.4 bleiben offen; das bestehende Backup bleibt erhalten.
+
+## Lesende Nachvalidierung nach Main-Integration
+
+Der vollständige Datenvergleich mit dem integrierten Validator ist inzwischen erfolgreich;
+kein Restore wurde wiederholt. [Nachvalidierung und verbleibendes Browser-Gate](ap9-4-run19-readonly-validation-20260916.md).
