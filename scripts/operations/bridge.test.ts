@@ -6,7 +6,7 @@ import { verifyGithub, type Identity } from "./bridge/lib/identity";
 import { grantAccess, type BlobProvider, type Scope } from "./bridge/lib/service";
 import { handleAccess, configuration } from "./bridge/lib/handler";
 import { createBlobProvider } from "./bridge/lib/provider";
-import { BridgeClient, validateGrant } from "./bridge-client";
+import { BridgeClient, validateGrant, privateUploadFailure } from "./bridge-client";
 import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
@@ -15,6 +15,29 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { presignUrl } from "@vercel/blob";
 import { expectProbeDenial } from "./transport-probe-diagnostics";
 import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
+
+test("upload denial preserves only artifact class, HTTP status and bounded provider category", async () => {
+  const secret = "SECRET_CANARY_JWT_SIGNED_URL";
+  const cases: [Response, string][] = [
+    [Response.json({ error: { code: "forbidden", message: secret } }, { status: 403 }), "FORBIDDEN"],
+    [Response.json({ error: { code: "bad_request", message: `contentType ${secret} is not allowed` } }, { status: 400 }), "CONTENT_TYPE_NOT_ALLOWED"],
+    [Response.json({ error: { code: "rate_limited", message: secret } }, { status: 429 }), "RATE_LIMITED"],
+    [Response.json({ error: { code: secret, message: secret } }, { status: 400 }), "UNKNOWN"],
+    [new Response(secret, { status: 502 }), "UNKNOWN"],
+    [new Response(secret.repeat(500), { status: 503 }), "UNKNOWN"],
+    [new Response(new ReadableStream({ start(c) { c.error(new Error(secret)); } }), { status: 502 }), "UNKNOWN"],
+  ];
+  for (const [response, category] of cases) {
+    const result = await privateUploadFailure(response, "auth-overlay");
+    assert.equal(result.message, `PRIVATE_UPLOAD_AUTH_OVERLAY_HTTP_${response.status}_${category}`);
+    assert.doesNotMatch(JSON.stringify(result), /SECRET_CANARY/);
+    assert.equal(result.cause, undefined);
+  }
+  for (const kind of ["database", "manifest", "media", "probe"] as const) {
+    assert.equal((await privateUploadFailure(new Response(null, { status: 403 }), kind)).code,
+      `PRIVATE_UPLOAD_${kind.toUpperCase()}_HTTP_403_UNKNOWN`);
+  }
+});
 
 test("identity probe separates signed wrong audience, tampering and both authentication layers", async () => {
   const token = (aud: string) => `e30.${Buffer.from(JSON.stringify({ aud, repository: REPOSITORY })).toString("base64url")}.signature`;
