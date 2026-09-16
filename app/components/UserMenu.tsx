@@ -116,6 +116,13 @@ export default function UserMenu({
 
           <div className="border-t border-slate-100 py-2">
             {isAdmin && (
+              <Link href="/admin/monitoring" onClick={() => setOpen(false)}
+                className="flex min-h-11 items-center gap-3 px-4 py-2 text-sm text-slate-800 hover:bg-slate-50">
+                <Cog8ToothIcon className={iconClass} />
+                Monitoring
+              </Link>
+            )}
+            {isAdmin && (
               <Link
                 href="/admin/users"
                 className="flex items-center gap-3 px-4 py-2 text-sm text-slate-800 hover:bg-slate-50"
