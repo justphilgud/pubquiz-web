@@ -16,9 +16,18 @@ URL-Ablauf. PR #12 ist integriert: Main `4ac84083c0af78b319fb2f9e944e3c7467f6964
 Run #15 inklusive beider Identitäten/Transportpfade erfolgreich. Transportflags true,
 Bridge acceptance; Automatisierung/Retention unverändert false. Run #16 erreicht den
 echten Export; nur database.dump ist gespeichert, Uploadphase fehlgeschlagen.
-Der nächste Auth-Overlay-Upload ist der vermutete Fehlerort, bislang nicht sicher belegt.
-Minimaler secretsicherer Diagnosefix vorbereitet; aktuelles Gate ist dessen reguläre
-Main-Freigabe. Kein Restore und kein gültiges vollständiges Backup vorhanden.
+PR #13 regulär integriert: Main `f831b54caeee2d1e618a215ec57ce8f357f7a869`.
+Main-CI und Bridge-CI grün; Anwendungsdeployjob skipped, Production unverändert.
+Run #17 belegt PRIVATE_UPLOAD_AUTH_OVERLAY_HTTP_403_CONTENT_TYPE_NOT_ALLOWED.
+Der vorherige Datenbankupload einschließlich Hash-/Größenreadback ist damit passiert.
+Minimaler Fix: exakt application/json für Auth-Overlay/Manifest, exakt
+application/octet-stream für Dump/Medien; beide Signaturstufen und Runner konsistent.
+Keine frei wählbare MIME-Liste oder Wildcards. Die synthetische Probe ergänzt probe.json
+mit Upload, Hash-/Größenreadback, Restore-Lesen, Overwrite-/Größen-/Pfad-/Methoden-
+und Ablaufprüfung. Aktuelles Gate: reguläre Main-Freigabe dieses Fixes, danach zuerst
+synthetische Providerabnahme beider Dateitypen (Reviewer beibehalten), erst dann echter
+Backupversuch. Kein Restore und kein gültiges vollständiges Backup vorhanden.
+Siehe [Run #17 und MIME-Korrektur](../reports/ap9-4-acceptance-run17-20260916.md).
 Siehe [Run #16](../reports/ap9-4-acceptance-run16-20260916.md) und
 [Run #15](../reports/ap9-4-provider-run15-20260916.md).
 Siehe [Nachweis Lauf #14](../reports/ap9-4-provider-run14-20260916.md),
@@ -64,7 +73,7 @@ Ein konkurrierender Upload wird zusätzlich durch signiertes `allowOverwrite:fal
 
 | Modus/Objekt | Pfad/Name | Grenze |
 |---|---|---|
-| synthetisch | `synthetic/acceptance/run-<run_id>-<run_attempt>/probe.bin` | 16 KiB |
+| synthetisch | `synthetic/acceptance/run-<run_id>-<run_attempt>/probe.bin` und `probe.json` | jeweils 16 KiB |
 | Abnahme Datenbank | `production/acceptance/run-<run_id>-<run_attempt>/database.dump` | 128 MiB |
 | Auth-Overlay | gleicher Runpfad, `auth-redacted.json` | 16 MiB |
 | Manifest | gleicher Runpfad, `manifest.json` | 16 MiB |
