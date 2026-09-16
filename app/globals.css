@@ -1762,13 +1762,19 @@ button {
     padding: .86rem;
   }
   .presentation-template.presentation-readable[data-design-style="EDITORIAL"] .presentation-editorial-stage {
-    padding-block: .5rem;
+    padding-block: .5rem !important;
   }
   .presentation-template.presentation-readable[data-design-style="EDITORIAL"] .presentation-storybook-content {
     padding-top: .5rem;
   }
   .presentation-template.presentation-readable[data-design-style="EDITORIAL"] [data-presentation-layout="CHOICE_GRID"] .presentation-answer-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .presentation-template.presentation-readable[data-design-style="EDITORIAL"][data-question-density="extended"] [data-presentation-layout="SOLUTION_FOCUS"]:not(.presentation-storybook-solution) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .presentation-template.presentation-readable[data-design-style="EDITORIAL"] [data-presentation-layout="SOLUTION_FOCUS"] :is(h2, .presentation-correct-answer-value) {
+    font-size: 1.25rem !important;
   }
 }
 
