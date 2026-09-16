@@ -56,3 +56,30 @@ Preview-Bereitstellung und Prüfung der authentifizierten Referenzansicht stehen
 Bildnachweis: Der 1920×1080-Viewport wurde im DOM geprüft. Der direkte Screenshotexport der Browsersteuerung liefert dazu 1874×1080 Pixel (rechter Rand begrenzt); dies ist eine dokumentierte Werkzeuggrenze, kein skaliertes Ersatzbild. Full-Page-/Kachelexporte waren fehlerhaft und werden nicht als Belege verwendet. 1280×720 und 960×540 wurden mit exakten Bildmaßen gesichert. Die JPEG-Dateiendungen entsprechen dem Ausgabeformat.
 
 Erster Preview-Deploy: https://pubquiz-n07oucgyb-just-phil-gud.vercel.app – READY, Commit 6ca91fad5ed33484431881585942a796123e49e5. GitHub CI #232 erfolgreich: https://github.com/justphilgud/pubquiz-web/actions/runs/35123810084 . Anwendungsauthentifizierung für die interaktive Referenzansicht noch ausstehend. Eine anschließende reine LOVD-CSS-Korrektur für kleine Auflösungsvorschauen wird separat bereitgestellt.
+
+## Geänderte Verantwortlichkeiten / Dateien
+
+- `app/rendering/templateRegistry.ts` und `presentationTemplates/`: bestehende LOVD-Markentokens, zulässiges Regular-Schriftgewicht und Presetvorschau; zugehörige Erwartungstests.
+- `app/globals.css`: ausschließlich LOVD-Präsentationsstil und kompakte Vorschaukorrekturen.
+- `app/rendering/presentation/questionSponsor.ts` / `QuestionSponsorMark.tsx`: reine Metadatenvalidierung und passive Anzeige.
+- `PresentationDesignSystem.tsx` / `PresentationSlideRenderer.tsx`: optionale Kennzeichnung im bestehenden LOVD-Frageheader.
+- `app/fragen/editor/`: kleiner optionaler Sponsorbereich, Typ und Metadatenerhalt im vorhandenen Konfigurationsvertrag.
+- `presentationQualityFixtures.ts` / `questionSponsor.test.tsx`: synthetische Referenzen und Sponsorregressionen.
+- `public/branding/`: unverändertes offizielles LOVD-RGB-PNG samt Herkunft und klar markierter Sponsorplatzhalter.
+- `package.json`: neue Sponsorregression in vorhandenes Testkommando aufgenommen; keine Abhängigkeitsänderung.
+- `docs/design/lovd-brand-refinement.md` und dieser Bericht mit Screenshots: Bestandsvergleich, Gestaltungsvertrag und Abnahmebelege.
+
+## Finaler Bereitstellungsnachweis
+
+- Deployment: `2Wo9qMFyEmNKvRJK6Hn4AuVQhTvc`, Status **READY**, Ziel **Preview**.
+- Code-Commit: `99de0c8c4af06b8dfd64d3ff7b3471de410121a8`.
+- Unveränderliche URL: https://pubquiz-p4196w17t-just-phil-gud.vercel.app
+- Branch-Preview: https://pubquiz-web-git-codex-lovd-brand-refinement-just-phil-gud.vercel.app
+- GitHub CI #233: **erfolgreich**, https://github.com/justphilgud/pubquiz-web/actions/runs/35124673967
+- Lokaler Build nach letzter CSS-Korrektur erneut erfolgreich.
+- Referenzansicht: `/templates/presentation-quality`; im aufklappbaren Bereich „Interne Präsentationsreferenz“ Vorlage **LOVD** und Inhalt z.B. `sponsor-choice` oder `sponsor-intro` wählen.
+- Die Branch-Preview verwendet die bestehende Preview-Konfiguration. Lesend verifiziert: separate Preview-DATABASE_URL und Nonprod-Blob-Binding `store_VzfNwjccgkzhc9bi`; Production-Blob separat `store_bIx6H2j23vJzi240`. Keine Environmentvariable geändert oder Secrets ausgelesen.
+- Die bestehende gemeinsame Preview `pubquiz-qowmwx1ez-just-phil-gud.vercel.app` und Production `pubquiz-duckwlqkj-just-phil-gud.vercel.app` blieben READY und unverändert in der Deploymentliste. Kein Main-Merge, keine Production-Bereitstellung.
+- Lokaler Fixture-Server auf Port 55460 beendet.
+
+**Abnahmegrenze:** Lokale reale Browserdarstellung geprüft, automatisierte Prüfungen grün, Preview bereitgestellt. Die zusätzliche Prüfung der hydratisierten Preview-Referenz-/Editoransicht ist noch am regulären Anwendungslogin offen. Der Browser zeigt dafür das Loginformular; kein Authentifizierungsweg wurde umgangen. Deshalb wird eine vollständige interaktive Preview-Abnahme noch nicht behauptet.
