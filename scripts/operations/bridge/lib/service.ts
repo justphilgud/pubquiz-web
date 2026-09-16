@@ -1,5 +1,5 @@
-import { BridgeError, check, objectRule, runKey, STORE_ID, TTL_MS, type Grant, type Mode } from "./contract";
-import type { Identity } from "./identity";
+import { BridgeError, check, objectRule, runKey, STORE_ID, TTL_MS, type Grant, type Mode } from "./contract.js";
+import type { Identity } from "./identity.js";
 
 export type Scope = { pathname: string; method: "PUT" | "GET"; maximumSize: number; expiresAt: number };
 export interface BlobProvider {

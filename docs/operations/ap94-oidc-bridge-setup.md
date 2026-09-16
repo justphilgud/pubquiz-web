@@ -5,10 +5,15 @@ Die frühere Forderung nach GitHub-Environment-Claims bereits in Vercel ist aufg
 **Aktuelles Gate:** Die Bridge-Verschärfung ist regulär über PR #9 in Main-Commit
 `4bb6168ebf49a9ed058d7e45360eb0d42db54de1` integriert. Main-CI, Bridge-CI und
 Security-Regression sind grün; der Anwendungsdeployjob wurde übersprungen.
-Vercel-Konfiguration und isoliertes Deployment sind inzwischen geprüft. Der erste
-synthetische Providerlauf #11 brach in der Negativmatrix ab; Transport bleibt gesperrt.
-Nächstes Gate: reguläre Main-Freigabe der secretsicheren Probe-Diagnostik, anschließend
-erneuter synthetischer Lauf. Siehe [Providerbefund](../reports/ap9-4-provider-preflight-20260916.md),
+PR #10 ist regulär integriert: Main `e903d4dc1d1f0e7b905a14a3e65270070b79c6d5`.
+Main-CI/Bridge-CI grün, Appdeployjob skipped, Operations auf diesem SHA READY.
+Die Workflow-Bedingung ist durch den Betreiber korrigiert und API-seitig verifiziert.
+Lauf #13 erreicht die Function, scheitert aber vor der Bridge-Prüfung an einem
+Node-ESM-Importfehler (HTTP 500). Minimaler Import-/NodeNext-Fix samt kompiliertem
+Runtime-Smoke vorbereitet. **Aktuelles Gate: reguläre Main-Freigabe dieses Fixes.**
+Keine weitere Provideränderung nötig. Siehe [Diagnose Lauf #13](../reports/ap9-4-provider-run13-20260916.md)
+und [Diagnose Lauf #12](../reports/ap9-4-provider-run12-20260916.md)
+und [Providerbefund](../reports/ap9-4-provider-preflight-20260916.md),
 [Integrationsnachweis](../reports/ap9-4-variant2-main-integration-20260916.md)
 und [Security Review](../reports/ap9-4-variant2-security-20260916.md).
 
@@ -179,12 +184,16 @@ Die aktuell tatsächlich vorhandenen Felder exakt so belegen:
 |---|---|
 | Account | justphilgud |
 | Repository | pubquiz-web |
-| Workflow | ap94-acceptance.yml |
+| Workflow | AP9.4 Manual Backup and Isolated Restore |
 | Branch | main |
 | Audience | urn:pubquiz:ap94:blob-bridge |
 | Applies to environments | ausschließlich Production von pubquiz-backup-operations |
 
 Kein GitHub-Environment-, sub- oder Raw-Claims-Feld voraussetzen. Nur eine Regel.
+**Korrektur nach API-Prüfung am 16.09.:** Das sichtbare Workflow-Feld speichert den
+Claim `workflow`, also den YAML-`name`, nicht den Dateinamen. Die frühere Anleitung
+mit `ap94-acceptance.yml` in diesem Feld war falsch. Die Bridge prüft zusätzlich
+unverändert `workflow_ref=justphilgud/pubquiz-web/.github/workflows/ap94-acceptance.yml@refs/heads/main`.
 IDs, event_name, exakter workflow_ref, environment, sub und Operationsrechte prüft
 zwingend die Bridge. Die Berechtigung folgt ausschließlich dem verifizierten JWT.
 Die UI-Angaben und deren gespeicherte Wirkung sind nach manueller Anlage und vor

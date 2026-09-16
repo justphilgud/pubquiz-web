@@ -1,6 +1,6 @@
 import { BlobNotFoundError, head, issueSignedToken, presignUrl } from "@vercel/blob";
-import { STORE_HOST, STORE_ID } from "./contract";
-import type { BlobProvider } from "./service";
+import { STORE_HOST, STORE_ID } from "./contract.js";
+import type { BlobProvider } from "./service.js";
 
 // No static token, no wildcard delegation, no signed-token material leaves this service.
 export function createBlobProvider(api = { head, issueSignedToken, presignUrl }): BlobProvider { return {

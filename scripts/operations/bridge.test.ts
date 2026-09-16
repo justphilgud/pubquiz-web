@@ -7,9 +7,35 @@ import { grantAccess, type BlobProvider, type Scope } from "./bridge/lib/service
 import { handleAccess, configuration } from "./bridge/lib/handler";
 import { createBlobProvider } from "./bridge/lib/provider";
 import { BridgeClient, validateGrant } from "./bridge-client";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { presignUrl } from "@vercel/blob";
 import { expectProbeDenial } from "./transport-probe-diagnostics";
+
+test("compiled bridge entrypoint loads in plain Node ESM without a TypeScript loader", () => {
+  const bridge = fileURLToPath(new URL("./bridge/", import.meta.url));
+  const output = mkdtempSync(join(bridge, ".runtime-smoke-"));
+  try {
+    execFileSync(process.execPath, [createRequire(import.meta.url).resolve("typescript/bin/tsc"),
+      "-p", join(bridge, "tsconfig.json"), "--noEmit", "false", "--outDir", output], { stdio: "pipe" });
+    const entry = pathToFileURL(join(output, "api/access.js")).href;
+    const result = execFileSync(process.execPath, ["--input-type=module", "--eval", `
+      import handler from ${JSON.stringify(entry)};
+      const response = await handler.fetch(new Request('https://bridge.invalid/api/access', {
+        method: 'POST', headers: {'content-type': 'application/json'}, body: '{}'
+      }));
+      console.log(JSON.stringify({status: response.status, body: await response.json()}));
+    `], { encoding: "utf8", stdio: "pipe", env: { NODE_ENV: "test", PATH: process.env.PATH, SystemRoot: process.env.SystemRoot } });
+    assert.deepEqual(JSON.parse(result), { status: 503, body: { error: "CONFIG_REJECTED" } });
+  } finally {
+    // Delete only the generated direct child of this isolated bridge directory.
+    assert.equal(dirname(output), dirname(join(bridge, "placeholder")));
+    rmSync(output, { recursive: true, force: true });
+  }
+});
 
 test("live probe cannot count an edge or identity rejection as operation authorization proof", async () => {
   await expectProbeDenial(Response.json({ error: "REQUEST_REJECTED" }, { status: 403 }), 1);
