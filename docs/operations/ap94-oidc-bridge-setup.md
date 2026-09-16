@@ -1,8 +1,21 @@
 # AP9.4 OIDC Operations Bridge – Einrichtungsgate
 
+Variante 2 ist durch den Betreiber ausdrücklich als Architektur freigegeben.
+Die frühere Forderung nach GitHub-Environment-Claims bereits in Vercel ist aufgehoben.
+**Aktuelles Gate:** minimale Bridge-Verschärfung auf exakte Subjects und feste IDs
+muss vor Provideraktivierung regulär nach main integriert werden. Siehe
+[Security Review](../reports/ap9-4-variant2-security-20260916.md).
+
+> Vercel authentifiziert den erlaubten GitHub-Zugangsweg.
+> Die Bridge autorisiert anhand des verifizierten GitHub-OIDC-JWTs die konkrete
+> Backup- bzw. Restoreoperation.
+
+Die fehlende Environment-Prüfung auf Vercel-Ebene ist eine bewusste Architekturentscheidung.
+Eine gemeinsame Trusted Source, keine zweite identische Regel. Kein statischer Ersatzweg.
+
 Stand: 16.09.2026. Codevorbereitung, **keine externe Transportabnahme**.
-Kein Projekt wurde angelegt, kein Store verbunden, keine Trusted Source aktiviert,
-kein Backup/Restore gestartet. PubQuiz-Production bleibt unverändert.
+Das Operations-Projekt existiert inzwischen. In diesem Review wurden keine Provider-
+einstellungen verändert, keine Trusted Source angelegt und kein Backup/Restore gestartet.
 
 ## Architektur und Grenzen
 
@@ -13,8 +26,9 @@ Es verwendet die bereits im Repository verwendeten Bibliotheken @vercel/blob 2.4
 und jose 6.2.3. Die Root-Pakete, App, Prisma und App-vercel.json bleiben unverändert.
 
 GitHub erhält kurzlebige URLs, niemals Vercel-OIDC oder das Delegations-Signingmaterial.
-Trusted Sources prüft den GitHub-Token am Deployment-Eingang; die Function prüft
-zusätzlich dieselbe Identität mit JOSE, GitHubs festem JWKS-Endpunkt und RS256.
+Trusted Sources prüft GitHub-Zugangsweg, Audience und Vercel-Zielumgebung. Die Function
+prüft alle Vertragsclaims einschließlich IDs, Environment und Subject erneut mit JOSE,
+GitHubs festem JWKS-Endpunkt und RS256 und entscheidet über die konkrete Operation.
 Der Runner sendet den Token sowohl als Trusted-Sources-Header als auch als Bearer
 Authorization. Die Function verlässt sich nicht auf die Weiterleitung des ersten Headers.
 Vercels SDK verwendet die eigene Runtime-OIDC-Identität für den verbundenen Store.
@@ -57,21 +71,23 @@ aus festen Kategorien. Signed URLs nur im Arbeitsspeicher, nicht in Outputs/Arte
 
 ### 0. PR und tatsächliche Claims zuerst
 
-Der vorbereitete PR ist noch nicht gemergt. Erst regulär reviewen und integrieren,
-CI abwarten; keine Schutzregel umgehen. Die geprüften Operations-Pfade unterdrücken
+PR #8 ist regulär gemergt: main `e85b2b2fa179862e6b7884c591d8212447b444ba`.
+Main-CI und Bridge-CI sind erfolgreich; der Production-Deployjob wurde übersprungen.
+Die geprüften Operations-Pfade unterdrücken
 den App-Deployjob auch nach Merge. Gemischte App-/Schema-/Root-Paketänderungen tun das nicht.
 Vercel-Git-Autodeployment bleibt in beiden Projektkonfigurationen deaktiviert.
 
-Danach kann **ohne Blob-/DB-Zugriff** ein separater Lauf gestartet werden:
+Der separate Lauf #10 wurde **ohne Blob-/DB-Zugriff** erfolgreich ausgeführt:
 GitHub → Actions → AP9.4 Manual Backup and Isolated Restore → Run workflow → Branch
 `main` → Mode `claims-only` → Production Commit leer lassen. Die ausschließlich
 signaturgeprüften, erlaubten Identitätsfelder stehen in `Record verified identity claims only`.
 Der Restorejob wartet weiterhin am Required Reviewer. Auch diesen Claims-Lauf nicht
 selbst freigeben; dem Betreiber die konkrete Run-URL nennen.
 
-Die tatsächlichen Claims konnten vor dem Einrichtungsgate noch nicht erhoben werden.
-Lokale RSA-signierte Testclaims sind kein GitHub-Provider-Nachweis. Vor Aktivierung
-der Trusted Sources sind die Ausgaben beider Jobs mit folgenden Anforderungen abzugleichen:
+Beide tatsächlichen Claims wurden signaturgeprüft und sind im
+[Claims-Prüfbericht](../reports/ap9-4-oidc-claims-main-20260916.md) dokumentiert.
+Restore lief erst nach regulärer Betreiberfreigabe. Kein weiterer Claims-Lauf nötig.
+Für Trusted Sources gelten die folgenden abgeglichenen Werte:
 
 | Claim | Exakter Sollwert |
 |---|---|
@@ -79,15 +95,16 @@ der Trusted Sources sind die Ausgaben beider Jobs mit folgenden Anforderungen ab
 | aud | `urn:pubquiz:ap94:blob-bridge` |
 | repository | `justphilgud/pubquiz-web` |
 | repository_owner | `justphilgud` |
-| repository_id / repository_owner_id | tatsächlich verifizierte numerische IDs aus dem Claims-Lauf |
+| repository_id / repository_owner_id | `1253336192` / `288915542` |
 | ref | `refs/heads/main` |
 | workflow_ref | `justphilgud/pubquiz-web/.github/workflows/ap94-acceptance.yml@refs/heads/main` |
 | event_name | `workflow_dispatch` |
 | environment | `operations-backup` bzw. `operations-restore` |
-| sub | tatsächlicher environmentgebundener Subject des jeweiligen Jobs |
+| sub Backup | `repo:justphilgud/pubquiz-web:environment:operations-backup` |
+| sub Restore | `repo:justphilgud/pubquiz-web:environment:operations-restore` |
 
-GitHub kennt alte und neue Subjects mit unveränderlichen IDs. Beide dokumentierten
-Formen werden gegen die festgelegten IDs geprüft; keine beliebigen Subjects. Keine
+Nach der vorbereiteten Verschärfung werden ausschließlich die beiden oben tatsächlich
+gemessenen Subjects akzeptiert; keine automatische Erweiterung auf andere Formate. Keine
 Änderung an GitHubs Subject-Konfiguration erforderlich. `sha`, `run_id`, `run_attempt`
 werden geprüft; exp/iat/nbf werden validiert, Tokens nie ausgegeben.
 
@@ -97,7 +114,7 @@ Im Team `just-phil-gud`: Add New → Project → Import Git Repository →
 `justphilgud/pubquiz-web`. Neuer Projektname **pubquiz-backup-operations**.
 Nicht das vorhandene Projekt bearbeiten und nicht dessen Einstellungen kopieren.
 
-- Root Directory: **scripts/operations/bridge** (erst nach regulärem Merge vorhanden).
+- Root Directory: **scripts/operations/bridge** (auf main vorhanden).
 - Framework Preset: **Other**.
 - Node.js: **24.x**.
 - Install Command: `npm ci`; Build Command: `npm run typecheck`.
@@ -117,8 +134,8 @@ Nur im neuen Projekt, Zielumgebung **Production**:
 | Variable | Wert |
 |---|---|
 | AP94_OPERATIONS_PROJECT_ID | tatsächliche neue `prj_…`-ID |
-| AP94_GITHUB_REPOSITORY_ID | geprüfte numerische repository_id |
-| AP94_GITHUB_OWNER_ID | geprüfte numerische repository_owner_id |
+| AP94_GITHUB_REPOSITORY_ID | `1253336192` |
+| AP94_GITHUB_OWNER_ID | `288915542` |
 | AP94_BRIDGE_MODE | **synthetic** |
 
 Automatische Systemvariablen müssen verfügbar sein (Settings → Environment Variables →
@@ -147,21 +164,32 @@ Wenn der aktuelle Tarif diese Abdeckung nicht bietet: stoppen, keine kostenpflic
 Option ohne Betreiberentscheidung aktivieren. Keine öffentliche Exception/Bypass-Secret.
 Die API bleibt zusätzlich durch ihre eigene JOSE-Prüfung geschützt.
 
-### 5. Zwei Trusted Sources – erst nach Claims-Abgleich
+### 5. EINE Trusted Source – erst nach Main-Fix und Schutzprüfung
 
-Settings → Deployment Protection → Trusted Sources → External Services → Add →
-GitHub Actions. Account `justphilgud`, Repository `pubquiz-web`, Branch `main`.
-Environment **operations-backup**. Applies to environments: nur **Production** des
-Operations-Projekts. Use a custom audience: `urn:pubquiz:ap94:blob-bridge`.
+Settings → Deployment Protection → Add trusted source → External Service → GitHub Actions.
+Die aktuell tatsächlich vorhandenen Felder exakt so belegen:
 
-Unter Edit raw claims zusätzlich exakt `workflow_ref`, `repository_id`,
-`repository_owner_id`, `repository_owner`, `event_name` und tatsächlichen `sub`
-aus obiger Tabelle setzen; vorhandene `repository`, `ref`, `environment`, `aud`
-beibehalten. Keine Wildcards und keine kontoweite Freigabe. Alle Claims müssen passen.
+| Feld | Wert |
+|---|---|
+| Account | justphilgud |
+| Repository | pubquiz-web |
+| Workflow | ap94-acceptance.yml |
+| Branch | main |
+| Audience | urn:pubquiz:ap94:blob-bridge |
+| Applies to environments | ausschließlich Production von pubquiz-backup-operations |
 
-Zweite Regel mit denselben Einschränkungen, aber Environment **operations-restore**
-und dessen tatsächlichem `sub`. Nicht beide Rollen in eine unspezifische Regel zusammenlegen.
-Die Bridge selbst leitet das Recht aus dem erneut verifizierten Environment ab.
+Kein GitHub-Environment-, sub- oder Raw-Claims-Feld voraussetzen. Nur eine Regel.
+IDs, event_name, exakter workflow_ref, environment, sub und Operationsrechte prüft
+zwingend die Bridge. Die Berechtigung folgt ausschließlich dem verifizierten JWT.
+Die UI-Angaben und deren gespeicherte Wirkung sind nach manueller Anlage und vor
+Transportfreigabe lesend sowie mit echten Negativzugriffen zu prüfen.
+
+Am 16.09.2026 direkt beobachtet: Require Log In aktiv, **Standard Protection**.
+Das Auswahlmenü beschreibt dies als Schutz außer Production Custom Domains.
+**All Deployments – Protect all domains** ist verfügbar. Nur im Operations-Projekt
+manuell wählen und speichern, um sämtliche Operations-Production-URLs einzuschließen;
+bei einem unerwarteten kostenpflichtigen Bestätigungsschritt stoppen. Im Review wurde
+keine Auswahl geändert oder gespeichert. PubQuiz-Production bleibt unberührt.
 
 ### 6. Isoliertes Deployment und GitHub-Variablen
 
@@ -185,7 +213,7 @@ BACKUP_BLOB_READ_WRITE_TOKEN nicht mehr. Keine JWTs/Signed URLs als Secrets spei
 ### 7. Rückmeldung an Codex und STOPP
 
 Nur nicht geheime Werte melden: neue Projekt-ID, Team-ID, Deployment-URL/ID und SHA,
-GitHub repository_id/owner_id, Claims-Lauf-URL, Bestätigung der zwei engen Regeln,
+GitHub repository_id/owner_id, Claims-Lauf-URL, Bestätigung der einen engen Regel,
 Production-only Storebindung und Deployment-Protection-Abdeckung. Keine Tokenwerte.
 Noch keinen acceptance-Lauf starten. Danach technische Verifikation und synthetische
 Abnahme durch Codex; beim Restore-Reviewer wieder stoppen.

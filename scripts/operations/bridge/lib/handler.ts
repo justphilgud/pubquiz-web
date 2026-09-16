@@ -1,4 +1,4 @@
-import { BridgeError, check, STORE_ID, type Mode } from "./contract";
+import { BridgeError, check, STORE_ID, REPOSITORY_ID, OWNER_ID, type Mode } from "./contract";
 import { verifyGithub, type Identity, type IdentityPins } from "./identity";
 import { grantAccess, type BlobProvider } from "./service";
 
@@ -9,7 +9,7 @@ export function configuration(env: Env): { mode: Mode; pins: IdentityPins } {
     (env.AP94_BRIDGE_MODE === "synthetic" || env.AP94_BRIDGE_MODE === "acceptance"), "CONFIG_REJECTED");
   check(!Object.entries(env).some(([k, v]) => v && (/DATABASE_URL|BLOB_READ_WRITE_TOKEN|BLOB_API_URL/.test(k) || k === "PGPASSWORD")), "CONFIG_REJECTED");
   const pins = { repositoryId: env.AP94_GITHUB_REPOSITORY_ID ?? "", ownerId: env.AP94_GITHUB_OWNER_ID ?? "" };
-  check(/^[1-9][0-9]+$/.test(pins.repositoryId) && /^[1-9][0-9]+$/.test(pins.ownerId), "CONFIG_REJECTED");
+  check(pins.repositoryId === REPOSITORY_ID && pins.ownerId === OWNER_ID, "CONFIG_REJECTED");
   return { mode: env.AP94_BRIDGE_MODE, pins };
 }
 const headers = { "content-type": "application/json", "cache-control": "no-store, private", "referrer-policy": "no-referrer", "x-content-type-options": "nosniff" };

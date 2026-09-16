@@ -1,20 +1,16 @@
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey, type JWTPayload } from "jose";
-import { AUDIENCE, check, ISSUER, REPOSITORY, WORKFLOW } from "./contract";
+import { AUDIENCE, check, ISSUER, REPOSITORY, REPOSITORY_ID, OWNER_ID, WORKFLOW } from "./contract";
 
 const githubKeys = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks`), { timeoutDuration: 5000 });
 export type Identity = { environment: "operations-backup" | "operations-restore"; run: string; attempt: string; expiresAt: number };
 export type IdentityPins = { repositoryId: string; ownerId: string };
 export function claimsIdentity(p: JWTPayload, pins: IdentityPins, now: number): Identity {
-  check(/^[1-9][0-9]+$/.test(pins.repositoryId) && /^[1-9][0-9]+$/.test(pins.ownerId), "CONFIG_REJECTED");
+  check(pins.repositoryId === REPOSITORY_ID && pins.ownerId === OWNER_ID, "CONFIG_REJECTED");
   check(p.repository === REPOSITORY && p.repository_owner === "justphilgud" &&
     p.repository_id === pins.repositoryId && p.repository_owner_id === pins.ownerId &&
     p.ref === "refs/heads/main" && p.workflow_ref === WORKFLOW && p.event_name === "workflow_dispatch" &&
     (p.environment === "operations-backup" || p.environment === "operations-restore"), "IDENTITY_REJECTED");
-  const subjects = [
-    `repo:${REPOSITORY}:environment:${p.environment}`,
-    `repo:justphilgud@${pins.ownerId}/pubquiz-web@${pins.repositoryId}:environment:${p.environment}`,
-  ];
-  check(typeof p.sub === "string" && subjects.includes(p.sub) && typeof p.sha === "string" && /^[a-f0-9]{40}$/.test(p.sha) &&
+  check(p.sub === `repo:${REPOSITORY}:environment:${p.environment}` && typeof p.sha === "string" && /^[a-f0-9]{40}$/.test(p.sha) &&
     typeof p.run_id === "string" && /^[1-9][0-9]{0,19}$/.test(p.run_id) &&
     typeof p.run_attempt === "string" && /^[1-9][0-9]{0,5}$/.test(p.run_attempt) &&
     typeof p.exp === "number" && p.exp * 1000 > now &&
