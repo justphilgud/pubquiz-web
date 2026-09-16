@@ -112,6 +112,10 @@ Box werden interpoliert, `object-fit: contain` wahrt das Logoformat. Kein Croppi
 Umfärben, Bounce, Timerwechsel oder fachlicher Animation-Callback. Bei Reduced
 Motion wird direkt der richtige Zustand gezeigt; bei Reload direkt auf der Frage
 wird keine Voranimation erfunden. Beide Darstellungen verwenden dieselbe Referenz.
+Die gemessenen Viewport-Koordinaten werden vor der Animation in den lokalen
+Canvasraum zurückgerechnet. Dadurch stimmen Start und Ziel auch in der skalierten
+Moderationsvorschau; ein Regressionstest schützt beide Bounding-Boxes bei mehreren
+Skalierungsfaktoren.
 
 Kopieren übernimmt das vorhandene `template_config_json`; Wiederverwenden liest
 die Konfiguration der Frage. Keine Medienduplikation und keine Migration.

@@ -8,6 +8,24 @@ import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import PresentationSlideRenderer from "./PresentationSlideRenderer";
 import { buildPraesentationSlides, getPresentationSlideKey } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
 import { parsePresentationSlideKey } from "./presentationLiveState";
+import { sponsorAnimationFrame } from "./sponsorAnimationFrame";
+
+test("sponsor transition preserves source and target bounds in scaled moderation canvases", () => {
+  for (const scale of [1, 2 / 3, 0.32]) {
+    const origin = { left: 137, top: 159, width: 1920 * scale, height: 1080 * scale };
+    for (const box of [
+      { left: 400, top: 300, width: 1100, height: 600 },
+      { left: 1450, top: 20, width: 150, height: 90 },
+    ]) {
+      const measured = { left: origin.left + box.left * scale, top: origin.top + box.top * scale, width: box.width * scale, height: box.height * scale };
+      const frame = sponsorAnimationFrame(measured, origin, { width: 1920, height: 1080 }, "24px");
+      for (const key of ["left", "top", "width", "height"] as const) {
+        assert.ok(Math.abs(parseFloat(frame[key]) - box[key]) < 0.0001, `${scale}: ${key}`);
+      }
+      assert.equal(frame.padding, "24px");
+    }
+  }
+});
 
 test("sponsor metadata round-trips without changing existing question configuration", () => {
   const plain = normalizeQuestionTemplateConfig({});

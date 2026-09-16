@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- Same managed logo in both bounding boxes. */
 import { useLayoutEffect, useRef } from "react";
 import type { QuestionSponsor } from "./questionSponsor";
+import { sponsorAnimationFrame } from "./sponsorAnimationFrame";
 
 type Moment = { phase: "SPONSOR" | "QUESTION"; assignmentId: number; sponsor: QuestionSponsor };
 
@@ -35,7 +36,8 @@ export function SponsorMoment({ moment }: { moment: Moment | null }) {
     container.appendChild(ghost);
     const visibility = target.style.visibility;
     target.style.visibility = "hidden";
-    const frame = (rect: DOMRect, padding: string) => ({ left: `${rect.left-origin.left}px`, top: `${rect.top-origin.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, padding });
+    const canvas = { width: container.clientWidth, height: container.clientHeight };
+    const frame = (rect: DOMRect, padding: string) => sponsorAnimationFrame(rect, origin, canvas, padding);
     const animation = ghost.animate([frame(from.rect, "24px"), frame(end, getComputedStyle(target).padding)], { duration: 700, easing: "cubic-bezier(.22,.61,.36,1)", fill: "both" });
     const restore = () => { target.style.visibility = visibility; ghost.remove(); };
     animation.onfinish = restore;
