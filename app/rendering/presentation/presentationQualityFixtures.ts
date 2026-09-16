@@ -1,4 +1,5 @@
 import type { QuizPraesentationResult } from "@/app/quiz/actions";
+import type { QuizFlowItemType } from "@/app/quiz/flow/quizFlow";
 import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
 import type { PresentationDesignStyle } from "@/app/rendering/templateRegistry";
 import { resolveQuizTheme } from "@/app/rendering/theme/quizTheme";
@@ -8,7 +9,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "image-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy"] as const;
+export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "image-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "sponsor-open", "sponsor-choice", "sponsor-intro"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -72,5 +73,22 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   const displayState: PresentationSlideDisplayState = { renderMode: "DESIGN_PREVIEW", templateRevealCount: 1, punktestand: [], intermediateStandings: [], endstandRevealCount: 0, now: Date.UTC(2026, 8, 7, 20), estimationPhase: "HIDDEN", schaetzfrage: null, isSchaetzfrageLoading: false, remoteCountdownDauerSekunden: null, remoteCountdownStartedAt: null, remoteCountdownStatus: null, mediaOverlayActive: false, playbackCommand: null, playbackCommandId: 0,
     livePollState: scenario === "poll" ? { revision: "fixture", runId: 1, pollRevisionId: 1, state: "OPEN", type: "SINGLE_CHOICE", prompt: "Welches Angebot würdet ihr für unseren nächsten gemeinsamen Quizabend bevorzugen?", publicationMode: "AUTOMATIC", totalResponses: 12, options: ["Eine gemischte Runde mit Fragen zu Musik, Geografie und überraschenden Alltagsgeschichten", "Ein Themenabend mit zusätzlichen Bildern und kurzen Hörbeispielen aus verschiedenen Jahrzehnten", "Ein entspannter Abend mit mehr Zeit für Diskussionen und kleinen Pausen zwischen den Runden"].map((label, index) => ({ id: String(index), label, count: 4, share: 100 / 3 })), publicResponses: [] } : null,
   };
-  return { quiz: { ...base.quiz, titel: "AP5 Präsentationsreferenz", fragen: [question] }, slide, slides: [slide], slideIndex: 0, slideLabel: scenario === "qr" ? "Teambeitritt" : scenario === "solution-long" ? "Auflösung" : scenario.startsWith("story") ? "Geschichte" : scenario === "poll" ? "Umfrage" : "Frage", theme, displayState };
+  if (scenario === "sponsor-open" || scenario === "sponsor-choice") {
+    question.templateConfig = { stageDurationsSeconds: { stage3: 15, stage2: 15, stage1: 15 }, createPixelQuestionByAnswer: { answer1: false, answer2: false }, sponsor: { logo: "/branding/sponsors/placeholder.svg", line: "Präsentiert von" } };
+    if (scenario === "sponsor-choice") {
+      question.effektiver_antwortmodus = "CLOSED";
+      question.antworten = ["Berlin", "Wien", "Prag", "Paris"].map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
+      question.antwort_reihenfolge = [1, 2, 3, 4];
+      question.presentationLayouts = { question: resolvePresentationLayout({ ...layoutInput, answerOptionCount: 4, phase: "QUESTION" }), solution: resolvePresentationLayout({ ...layoutInput, answerOptionCount: 4, phase: "SOLUTION" }) };
+    }
+  }
+  const flowTypes: Partial<Record<QualityScenario, QuizFlowItemType>> = { "lovd-intro": "WAITING", "lovd-countdown": "COUNTDOWN", "lovd-ranking": "INTERMEDIATE_STANDINGS", "lovd-final": "FINAL_STANDINGS", "lovd-outro": "CLOSING", "sponsor-intro": "IMAGE" };
+  const flowType = flowTypes[scenario];
+  if (flowType) {
+    slide = { typ: "ablauf", abschnitt: null, element: { id: `flow:${scenario}`, persistentId: null, type: flowType, anchorType: "BEFORE_QUIZ", anchorKey: "QUIZ", sectionId: null, order: 1, enabled: true, label: scenario, config: { version: 1, title: scenario === "sponsor-intro" ? "Diese Frage wird präsentiert von" : scenario === "lovd-outro" ? "Danke fürs Mitspielen" : "LOVD PubQuiz", ...(scenario === "sponsor-intro" ? { imageUrl: "/branding/sponsors/placeholder.svg", altText: "Austauschbares Sponsorlogo – Platzhalter" } : {}), durationSeconds: 60, showCountdown: true }, configVersion: 1, questionAssignmentId: null, isStandard: false } };
+    displayState.punktestand = [{ teamname: "Die Wissbegierigen", punkte: 42 }, { teamname: "Kaffee & Köpfe", punkte: 38 }, { teamname: "Abendrunde", punkte: 36 }];
+    displayState.intermediateStandings = displayState.punktestand.map((team, index) => ({ key: `fixture-${index}`, place: index + 1, punkte: team.punkte }));
+    displayState.endstandRevealCount = 3;
+  }
+  return { quiz: { ...base.quiz, titel: "AP5 Präsentationsreferenz", fragen: [question] }, slide, slides: [slide], slideIndex: 0, slideLabel: scenario === "lovd-intro" ? "VOR DEM START" : scenario === "sponsor-intro" ? "Partner" : scenario === "lovd-countdown" ? "Countdown" : scenario === "lovd-ranking" ? "Zwischenstand" : scenario === "lovd-final" ? "Endstand" : scenario === "lovd-outro" ? "Zum Abschluss" : scenario === "qr" ? "Teambeitritt" : scenario === "solution-long" ? "Auflösung" : scenario.startsWith("story") ? "Geschichte" : scenario === "poll" ? "Umfrage" : "Frage", theme, displayState };
 }

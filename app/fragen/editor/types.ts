@@ -195,6 +195,7 @@ export type FaceMorphPixelQuestionOptions = Record<
 >;
 
 export type QuestionTemplateConfig = {
+  sponsor?: import("@/app/rendering/presentation/questionSponsor").QuestionSponsor;
   pixelMode?: "CHALLENGE" | "STAGED";
   stageDurationsSeconds: PixelStageDurationsSeconds;
   createPixelQuestionByAnswer: FaceMorphPixelQuestionOptions;

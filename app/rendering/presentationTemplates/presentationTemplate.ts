@@ -89,7 +89,7 @@ export function normalizeTemplateTags(tags: readonly string[]) {
 
 const allowedFonts = brandFontOptions.map(({ value }) => value);
 
-const displayWeights = [700, 800, 900] as const;
+const displayWeights = [400, 700, 800, 900] as const;
 const bodyWeights = [400, 500, 600] as const;
 const smallRadii = ["0.5rem", "0.75rem"] as const;
 const mediumRadii = ["0.75rem", "1rem", "1.5rem"] as const;

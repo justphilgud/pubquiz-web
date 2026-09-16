@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
+import { parseQuestionSponsor } from "./questionSponsor";
 import { pixelRules } from "@/app/fragen/editor/templates/pixelRules";
 
 import {
@@ -2735,6 +2736,7 @@ function renderAktuellenSlide() {
           slideLabel={slideLabel}
           slideNumber={slideIndex + 1}
           slideCount={slides.length}
+          sponsor={slide?.typ === "frage" ? parseQuestionSponsor(slide.frage.templateConfig?.sponsor) ?? undefined : undefined}
           storybookComposition={storybookComposition}
         />
       )}

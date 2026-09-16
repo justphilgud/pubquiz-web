@@ -27,6 +27,7 @@ import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { PendingCategoryReviewDialog } from "./PendingCategoryReviewDialog";
 import { QuestionSection } from "./QuestionSection";
+import { QuestionSponsorSection } from "./QuestionSponsorSection";
 import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
@@ -1140,6 +1141,9 @@ export function QuestionEditor({
             }))
           }
         />}
+
+        <QuestionSponsorSection value={draft.templateConfig.sponsor} disabled={isEditorDisabled}
+          onChange={(sponsor) => setDraft((current) => ({ ...current, templateConfig: { ...current.templateConfig, sponsor } }))} />
 
         <AdditionalDetailsSection
           categories={categories}

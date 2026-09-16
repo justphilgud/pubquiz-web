@@ -5,6 +5,7 @@ import type {
 } from "./types";
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
 import { parseQuestionTemplateData } from "./templates/questionTemplateData";
+import { parseQuestionSponsor } from "@/app/rendering/presentation/questionSponsor";
 
 export const PIXEL_STAGE_DURATION_MIN_SECONDS = 1;
 export const PIXEL_STAGE_DURATION_MAX_SECONDS = 120;
@@ -39,6 +40,8 @@ export function parseQuestionTemplateConfigDraft(
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const config = value as Record<string, unknown>;
+  const sponsor = parseQuestionSponsor(config.sponsor);
+  if (sponsor === null) return null;
   if (config.pixelMode !== undefined && config.pixelMode !== "CHALLENGE" && config.pixelMode !== "STAGED") return null;
   const pixelMode = config.pixelMode as "CHALLENGE" | "STAGED" | undefined;
   const durations = config.stageDurationsSeconds;
@@ -86,6 +89,7 @@ export function parseQuestionTemplateConfigDraft(
   if (durations === undefined) {
     return {
       ...DEFAULT_PIXEL_TEMPLATE_CONFIG,
+      ...(sponsor ? { sponsor } : {}),
       ...(pixelMode ? { pixelMode } : {}),
       createPixelQuestionByAnswer: { answer1, answer2 },
       ...(templateData ? { templateData } : {}),
@@ -98,6 +102,7 @@ export function parseQuestionTemplateConfigDraft(
     return null;
   }
   return {
+    ...(sponsor ? { sponsor } : {}),
     ...(pixelMode ? { pixelMode } : {}),
     stageDurationsSeconds: {
       stage3: Number(candidate.stage3),
