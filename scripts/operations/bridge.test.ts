@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { presignUrl } from "@vercel/blob";
 
 const now = Date.now(); const seconds = Math.floor(now / 1000);
-const pins = { repositoryId: "12345", ownerId: "67890" };
+const pins = { repositoryId: "1253336192", ownerId: "288915542" };
 const identity: Identity = { environment: "operations-backup", run: "123456", attempt: "1", expiresAt: now + TTL_MS };
 const key = runKey("synthetic", identity.run, identity.attempt);
 const upload = { operation: "backup-upload", store: STORE_ID, key, name: "probe.bin", kind: "probe", bytes: 12 };
@@ -22,6 +22,69 @@ const claims = { repository: REPOSITORY, repository_owner: "justphilgud", reposi
   ref: "refs/heads/main", workflow_ref: WORKFLOW, event_name: "workflow_dispatch", environment: "operations-backup",
   sub: `repo:${REPOSITORY}:environment:operations-backup`, run_id: identity.run, run_attempt: identity.attempt, sha: "a".repeat(40),
   iss: ISSUER, aud: AUDIENCE, iat: seconds, nbf: seconds, exp: seconds + 300 };
+
+test("Variant 2 adversarial HTTP boundary: verified JWT is the only authority", async t => {
+  const keys = await generateKeyPair("RS256");
+  const jwks = createLocalJWKSet({ keys: [{ ...await exportJWK(keys.publicKey), kid: "adversarial" }] });
+  const sign = (delta: Record<string, unknown>) => new SignJWT({ ...claims, ...delta }).setProtectedHeader({ alg: "RS256", kid: "adversarial" }).sign(keys.privateKey);
+  const restore = { environment: "operations-restore", sub: `repo:${REPOSITORY}:environment:operations-restore` };
+  const cases: [string, Record<string, unknown>, object][] = [
+    ["01 wrong repository", { repository: "justphilgud/other" }, upload],
+    ["02 same repository name different owner", { repository: "attacker/pubquiz-web", repository_owner: "attacker" }, upload],
+    ["03 wrong repository_id", { repository_id: "99999" }, upload],
+    ["04 wrong owner_id", { repository_owner_id: "99999" }, upload],
+    ["05 wrong branch", { ref: "refs/heads/preview" }, upload],
+    ["06 wrong workflow repository", { workflow_ref: WORKFLOW.replace("justphilgud", "attacker") }, upload],
+    ["07 other workflow even with correct requested audience", { workflow_ref: WORKFLOW.replace("ap94-acceptance.yml", "other.yml") }, upload],
+    ["08 wrong audience", { aud: "attacker-audience" }, upload],
+    ["09 wrong issuer", { iss: "https://attacker.invalid" }, upload],
+    ["10 expired JWT", { exp: seconds - 1 }, upload],
+    ["12 missing environment", { environment: undefined }, upload],
+    ["13 arbitrary environment", { environment: "production" }, upload],
+    ["14 backup tries restore", {}, { ...readback, operation: "restore-read" }],
+    ["15 backup delete", {}, { ...readback, operation: "delete" }],
+    ["16 backup requests overwrite", {}, { ...upload, allowOverwrite: true }],
+    ["17 restore upload", restore, upload],
+    ["18 restore delete", restore, { ...readback, operation: "delete" }],
+    ["19 restore creates foreign path", restore, { ...upload, key: `${key}-new` }],
+    ["20 manipulated subject", { sub: `${claims.sub}:other` }, upload],
+    ["21 contradictory environment and subject", { environment: "operations-restore" }, upload],
+    ["22 body claims backup role despite restore JWT", restore, { ...upload, role: "backup", environment: "operations-backup" }],
+    ["23 traversal", {}, { ...upload, name: "../probe.bin" }],
+    ["24 foreign run path", {}, { ...upload, key: key.replace("123456", "999999") }],
+    ["25 wrong store", {}, { ...upload, store: "store_foreign" }],
+    ["26 oversized upload", {}, { ...upload, bytes: 16385 }],
+  ];
+  let providerCalls = 0;
+  const provider: BlobProvider = { async size() { providerCalls++; return null; }, async sign() { providerCalls++; return "unused"; } };
+  const request = (token: string, body: object) => new Request("https://bridge.example/api/access", {
+    method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json", "x-role": "backup" }, body: JSON.stringify(body) });
+  for (const [name, delta, body] of cases) await t.test(name, async () => {
+    const token = await sign(delta);
+    const result = await handleAccess(request(token, body), env, provider, (jwt, p) => verifyGithub(jwt, p, now, jwks));
+    assert.equal(result.status, 403); assert.doesNotMatch(await result.text(), /eyJ|attacker|token=/);
+  });
+  await t.test("11 manipulated signature", async () => {
+    const token = await sign({}); const parts = token.split(".");
+    parts[2] = (parts[2][0] === "A" ? "B" : "A") + parts[2].slice(1);
+    assert.equal((await handleAccess(request(parts.join("."), upload), env, provider, (jwt, p) => verifyGithub(jwt, p, now, jwks))).status, 403);
+  });
+  assert.equal(providerCalls, 0, "all invalid identities/operations rejected before any provider access");
+  await t.test("restore cannot read a missing object as a way to create it", async () => {
+    const result = await handleAccess(request(await sign(restore), { ...readback, operation: "restore-read" }), env, provider, (jwt, p) => verifyGithub(jwt, p, now, jwks));
+    assert.equal(result.status, 403); assert.equal(await result.text(), '{"error":"OBJECT_MISSING"}');
+    assert.equal(providerCalls, 1, "only existence read; no signing or object creation");
+  });
+  await t.test("29 tokens and signed URLs never escape through bridge logs/errors", async () => {
+    const token = await sign({}); const secretUrl = "https://private.invalid/object?signature=SYNTHETIC_SECRET";
+    const logged: unknown[][] = [];
+    for (const method of ["log", "error", "warn", "info", "debug"] as const) t.mock.method(console, method, (...args: unknown[]) => { logged.push(args); });
+    const failing: BlobProvider = { async size() { throw new Error(`${token} ${secretUrl}`); }, async sign() { throw new Error(secretUrl); } };
+    const result = await handleAccess(request(token, upload), env, failing, (jwt, p) => verifyGithub(jwt, p, now, jwks));
+    assert.equal(await result.text(), '{"error":"PROVIDER_REJECTED"}'); assert.deepEqual(logged, []);
+    t.mock.restoreAll();
+  });
+});
 
 test("real JWT signature verification: exact GitHub claims, expiry, issuer, audience, subject and immutable IDs", async () => {
   const keys = await generateKeyPair("RS256");
@@ -35,7 +98,11 @@ test("real JWT signature verification: exact GitHub claims, expiry, issuer, audi
     { sub: "repo:other:environment:operations-backup" }, { event_name: "pull_request" }, { run_id: "../1" },
   ]) await assert.rejects(verifyGithub(await sign(changes), pins, now, jwks), /IDENTITY_REJECTED/);
   const immutable = `repo:justphilgud@${pins.ownerId}/pubquiz-web@${pins.repositoryId}:environment:operations-backup`;
-  assert.equal((await verifyGithub(await sign({ sub: immutable }), pins, now, jwks)).environment, "operations-backup");
+  await assert.rejects(verifyGithub(await sign({ sub: immutable }), pins, now, jwks), /IDENTITY_REJECTED/);
+  const foreignPins = { repositoryId: "99999", ownerId: "88888" };
+  await assert.rejects(verifyGithub(await sign({ repository_id: foreignPins.repositoryId, repository_owner_id: foreignPins.ownerId }), foreignPins, now, jwks));
+  assert.throws(() => configuration({ ...env, AP94_GITHUB_REPOSITORY_ID: foreignPins.repositoryId }));
+  assert.throws(() => configuration({ ...env, AP94_GITHUB_OWNER_ID: foreignPins.ownerId }));
   const restoreClaims = { environment: "operations-restore", sub: `repo:${REPOSITORY}:environment:operations-restore` };
   assert.equal((await verifyGithub(await sign(restoreClaims), pins, now, jwks)).environment, "operations-restore");
   const alienKeys = await generateKeyPair("RS256");
