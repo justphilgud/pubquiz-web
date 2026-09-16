@@ -2,9 +2,15 @@
 
 Variante 2 ist durch den Betreiber ausdrücklich als Architektur freigegeben.
 Die frühere Forderung nach GitHub-Environment-Claims bereits in Vercel ist aufgehoben.
-**Aktuelles Gate:** minimale Bridge-Verschärfung auf exakte Subjects und feste IDs
-muss vor Provideraktivierung regulär nach main integriert werden. Siehe
-[Security Review](../reports/ap9-4-variant2-security-20260916.md).
+**Aktuelles Gate:** Die Bridge-Verschärfung ist regulär über PR #9 in Main-Commit
+`4bb6168ebf49a9ed058d7e45360eb0d42db54de1` integriert. Main-CI, Bridge-CI und
+Security-Regression sind grün; der Anwendungsdeployjob wurde übersprungen.
+Vercel-Konfiguration und isoliertes Deployment sind inzwischen geprüft. Der erste
+synthetische Providerlauf #11 brach in der Negativmatrix ab; Transport bleibt gesperrt.
+Nächstes Gate: reguläre Main-Freigabe der secretsicheren Probe-Diagnostik, anschließend
+erneuter synthetischer Lauf. Siehe [Providerbefund](../reports/ap9-4-provider-preflight-20260916.md),
+[Integrationsnachweis](../reports/ap9-4-variant2-main-integration-20260916.md)
+und [Security Review](../reports/ap9-4-variant2-security-20260916.md).
 
 > Vercel authentifiziert den erlaubten GitHub-Zugangsweg.
 > Die Bridge autorisiert anhand des verifizierten GitHub-OIDC-JWTs die konkrete

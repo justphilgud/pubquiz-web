@@ -9,6 +9,32 @@ import { createBlobProvider } from "./bridge/lib/provider";
 import { BridgeClient, validateGrant } from "./bridge-client";
 import { readFileSync } from "node:fs";
 import { presignUrl } from "@vercel/blob";
+import { expectProbeDenial } from "./transport-probe-diagnostics";
+
+test("live probe cannot count an edge or identity rejection as operation authorization proof", async () => {
+  await expectProbeDenial(Response.json({ error: "REQUEST_REJECTED" }, { status: 403 }), 1);
+  await expectProbeDenial(Response.json({ error: "OBJECT_TOO_LARGE" }, { status: 403 }), 8, "OBJECT_TOO_LARGE");
+  await expectProbeDenial(Response.json({ error: "OBJECT_EXISTS" }, { status: 403 }), 10, "OBJECT_EXISTS");
+  for (const [status, code] of [[401, "REQUEST_REJECTED"], [403, "IDENTITY_REJECTED"],
+    [503, "CONFIG_REJECTED"], [503, "PROVIDER_REJECTED"], [403, "OBJECT_MISSING"], [200, "REQUEST_REJECTED"]] as const) {
+    await assert.rejects(expectProbeDenial(Response.json({ error: code }, { status }), 1),
+      new RegExp(`^Error: SYNTHETIC_CASE_1_HTTP_${status}_BODY_${code}$`));
+  }
+});
+
+test("live probe diagnostics redact arbitrary provider bodies, headers, URLs and stream errors", async () => {
+  const secret = "synthetic-secret-canary";
+  const responses = [new Response(secret, { status: 401, headers: { location: `https://example.com/?token=${secret}` } }),
+    Response.json({ error: secret }, { status: 403 }),
+    Response.json({ error: "REQUEST_REJECTED", token: secret }, { status: 403 }),
+    new Response(secret.repeat(200), { status: 503 }),
+    new Response(new ReadableStream({ start(controller) { controller.error(new Error(secret)); } }), { status: 502 })];
+  for (const response of responses) {
+    await assert.rejects(expectProbeDenial(response, 2),
+      new RegExp(`^Error: SYNTHETIC_CASE_2_HTTP_${response.status}_BODY_UNRECOGNIZED$`));
+  }
+  await assert.rejects(expectProbeDenial(new Response(), Number.NaN), /SYNTHETIC_CASE_INVALID/);
+});
 
 const now = Date.now(); const seconds = Math.floor(now / 1000);
 const pins = { repositoryId: "1253336192", ownerId: "288915542" };
