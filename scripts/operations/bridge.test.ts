@@ -179,6 +179,8 @@ test("Variant 2 adversarial HTTP boundary: verified JWT is the only authority", 
     ["24 foreign run path", {}, { ...upload, key: key.replace("123456", "999999") }],
     ["25 wrong store", {}, { ...upload, store: "store_foreign" }],
     ["26 oversized upload", {}, { ...upload, bytes: 16385 }],
+    ["27 caller cannot choose MIME type", {}, { ...upload, contentType: "text/html" }],
+    ["28 caller cannot broaden MIME allowlist", {}, { ...upload, allowedContentTypes: ["*"] }],
   ];
   let providerCalls = 0;
   const provider: BlobProvider = { async size() { providerCalls++; return null; }, async sign() { providerCalls++; return "unused"; } };
@@ -279,13 +281,14 @@ test("provider adapter delegates one exact object/operation and signs enforced i
     issueSignedToken: async options => { calls.push(options); return { delegationToken: "synthetic", clientSigningToken: "synthetic", validUntil: now + TTL_MS }; },
     presignUrl: async (_token, options) => { calls.push(options); return { presignedUrl: "synthetic" }; },
   });
-  const scope: Scope = { pathname: `${key}/probe.bin`, method: "PUT", maximumSize: 12, expiresAt: now + TTL_MS };
+  const scope: Scope = { pathname: `${key}/probe.bin`, method: "PUT", maximumSize: 12, expiresAt: now + TTL_MS, contentType: "application/octet-stream" };
   await provider.sign(scope);
   const [delegation, url] = calls as [Record<string, unknown>, Record<string, unknown>];
   assert.deepEqual(delegation.operations, ["put"]); assert.equal(delegation.pathname, scope.pathname);
   assert.equal(delegation.storeId, STORE_ID); assert.equal(delegation.maximumSizeInBytes, 12);
   assert.equal(url.allowOverwrite, false); assert.equal(url.addRandomSuffix, false); assert.equal(url.access, "private");
   assert.equal(url.validUntil, scope.expiresAt); assert.deepEqual(url.allowedContentTypes, ["application/octet-stream"]);
+  assert.deepEqual(delegation.allowedContentTypes, ["application/octet-stream"]);
   calls.length = 0; await provider.sign({ ...scope, method: "GET" });
   assert.deepEqual((calls[0] as Record<string, unknown>).operations, ["get"]);
   assert.equal("clientSigningToken" in (calls[1] as object), false);
@@ -327,33 +330,52 @@ test("bridge package and runtime import boundary contain no application or datab
   assert.match(workflow, /default: synthetic/); assert.match(workflow, /AP94_OIDC_TRANSPORT_ACCEPTED/);
 });
 
-test("runner-to-HTTP-to-SDK signed URLs roundtrip using synthetic provider and real JOSE verification", async () => {
+test("runner-to-HTTP-to-SDK fixes exactly one MIME type per artifact, preserving bounds and overwrite denial", async () => {
   const keys = await generateKeyPair("RS256");
   const jwks = createLocalJWKSet({ keys: [{ ...await exportJWK(keys.publicKey), kid: "integration" }] });
   const jwt = await new SignJWT(claims).setProtectedHeader({ alg: "RS256", kid: "integration" }).sign(keys.privateKey);
-  const bytes = Buffer.from("hello world!"); let object: Buffer | null = null;
+  const bytes = Buffer.from("hello world!"); const objects = new Map<string, Buffer>();
   const signingProvider = createBlobProvider({ head: async () => { throw new Error("unused"); }, issueSignedToken: async options => ({
     delegationToken: `${Buffer.from(JSON.stringify({ ...options, storeId: STORE_ID })).toString("base64url")}.synthetic`,
     clientSigningToken: Buffer.alloc(32, 7).toString("base64url"), validUntil: identity.expiresAt }), presignUrl });
-  const provider: BlobProvider = { async size() { return object?.length ?? null; }, sign: signingProvider.sign };
+  const provider: BlobProvider = { async size(path) { return objects.get(path)?.length ?? null; }, sign: signingProvider.sign };
   const e = { AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app", AP94_TRANSPORT_MODE: "synthetic", GITHUB_RUN_ID: identity.run,
     GITHUB_RUN_ATTEMPT: identity.attempt, BACKUP_PRIVATE_BLOB_HOST: STORE_HOST, ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-request-token",
     ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/idtoken" };
-  const fetcher: typeof fetch = async (input, init) => {
-    const url = new URL(String(input)); assert.equal(init?.redirect, "error");
-    if (url.hostname === "example.actions.githubusercontent.com") {
-      assert.equal(url.searchParams.get("audience"), AUDIENCE); return Response.json({ value: jwt });
-    }
-    if (url.origin === e.AP94_BRIDGE_ORIGIN) return handleAccess(new Request(url, init), env, provider, (token, p) => verifyGithub(token, p, Date.now(), jwks));
-    assert.ok(url.searchParams.has("vercel-blob-signature"));
-    if (init?.method === "PUT") {
-      assert.equal(url.origin, "https://vercel.com"); assert.equal(url.searchParams.get("pathname"), `${key}/probe.bin`);
-      object = Buffer.from(init.body as Uint8Array);
-      return Response.json({ url: `https://${STORE_HOST}/${key}/probe.bin` });
-    }
-    assert.equal(url.hostname, STORE_HOST); assert.ok(object); return new Response(new Uint8Array(object));
-  };
-  const client = new BridgeClient(e, "backup", key, fetcher);
-  await client.upload("probe.bin", bytes); assert.deepEqual(await client.read("probe.bin"), bytes);
-  await assert.rejects(client.upload("probe.bin", bytes), /BRIDGE_ACCESS_REJECTED/);
+  for (const [mode, name, contentType] of [
+    ["synthetic", "probe.bin", "application/octet-stream"],
+    ["synthetic", "probe.json", "application/json"],
+    ["acceptance", "database.dump", "application/octet-stream"],
+    ["acceptance", "auth-redacted.json", "application/json"],
+    ["acceptance", "manifest.json", "application/json"],
+    ["acceptance", `media-${"a".repeat(64)}.bin`, "application/octet-stream"],
+  ] as const) {
+    const artifactKey = runKey(mode, identity.run, identity.attempt);
+    const path = `${artifactKey}/${name}`;
+    const fetcher: typeof fetch = async (input, init) => {
+      const url = new URL(String(input)); assert.equal(init?.redirect, "error");
+      if (url.hostname === "example.actions.githubusercontent.com") {
+        assert.equal(url.searchParams.get("audience"), AUDIENCE); return Response.json({ value: jwt });
+      }
+      if (url.origin === e.AP94_BRIDGE_ORIGIN) return handleAccess(new Request(url, init), { ...env, AP94_BRIDGE_MODE: mode }, provider, (token, p) => verifyGithub(token, p, Date.now(), jwks));
+      assert.ok(url.searchParams.has("vercel-blob-signature"));
+      if (init?.method === "PUT") {
+        assert.equal(url.origin, "https://vercel.com"); assert.equal(url.searchParams.get("pathname"), path);
+        assert.equal(new Headers(init.headers).get("content-type"), contentType);
+        const delegation = JSON.parse(Buffer.from(url.searchParams.get("vercel-blob-delegation")!.split(".")[0], "base64url").toString());
+        assert.deepEqual(delegation.allowedContentTypes, [contentType]);
+        assert.deepEqual(delegation.operations, ["put"]); assert.equal(delegation.pathname, path);
+        assert.equal(delegation.maximumSizeInBytes, bytes.length);
+        assert.equal(url.searchParams.get("vercel-blob-allowed-content-types"), contentType);
+        assert.equal(url.searchParams.get("vercel-blob-allow-overwrite"), "false");
+        objects.set(path, Buffer.from(init.body as Uint8Array));
+        return Response.json({ url: `https://${STORE_HOST}/${path}` });
+      }
+      assert.equal(url.hostname, STORE_HOST); assert.equal(url.pathname, `/${path}`);
+      assert.ok(objects.has(path)); return new Response(new Uint8Array(objects.get(path)!));
+    };
+    const client = new BridgeClient({ ...e, AP94_TRANSPORT_MODE: mode, AP94_OIDC_TRANSPORT_ACCEPTED: "true" }, "backup", artifactKey, fetcher);
+    await client.upload(name, bytes); assert.deepEqual(await client.read(name), bytes);
+    await assert.rejects(client.upload(name, bytes), /BRIDGE_ACCESS_REJECTED/);
+  }
 });

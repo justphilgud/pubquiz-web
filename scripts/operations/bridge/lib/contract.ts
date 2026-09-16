@@ -11,6 +11,7 @@ export const TTL_MS = 5 * 60 * 1000;
 export type Mode = "synthetic" | "acceptance";
 export type Operation = "backup-upload" | "backup-readback" | "restore-read";
 export type ObjectKind = "database" | "auth-overlay" | "manifest" | "media" | "probe";
+export type ContentType = "application/json" | "application/octet-stream";
 export type AccessRequest = { operation: Operation; store: string; key: string; name: string; kind: ObjectKind; bytes?: number };
 export type Grant = { url: string; method: "PUT" | "GET"; expiresAt: number; maximumSize: number };
 export class BridgeError extends Error {
@@ -23,11 +24,14 @@ export function runKey(mode: Mode, run: string, attempt: string) {
   check(/^[1-9][0-9]{0,19}$/.test(run) && /^[1-9][0-9]{0,5}$/.test(attempt));
   return `${mode === "synthetic" ? "synthetic" : "production"}/acceptance/run-${run}-${attempt}`;
 }
-export function objectRule(name: string, mode: Mode): { kind: ObjectKind; maximumSize: number } {
-  if (mode === "synthetic") { check(name === "probe.bin"); return { kind: "probe", maximumSize: 16 * 1024 }; }
-  if (name === "database.dump") return { kind: "database", maximumSize: 128 * 1024 * 1024 };
-  if (name === "auth-redacted.json") return { kind: "auth-overlay", maximumSize: 16 * 1024 * 1024 };
-  if (name === "manifest.json") return { kind: "manifest", maximumSize: 16 * 1024 * 1024 };
+export function objectRule(name: string, mode: Mode): { kind: ObjectKind; maximumSize: number; contentType: ContentType } {
+  if (mode === "synthetic") {
+    check(name === "probe.bin" || name === "probe.json");
+    return { kind: "probe", maximumSize: 16 * 1024, contentType: name === "probe.json" ? "application/json" : "application/octet-stream" };
+  }
+  if (name === "database.dump") return { kind: "database", maximumSize: 128 * 1024 * 1024, contentType: "application/octet-stream" };
+  if (name === "auth-redacted.json") return { kind: "auth-overlay", maximumSize: 16 * 1024 * 1024, contentType: "application/json" };
+  if (name === "manifest.json") return { kind: "manifest", maximumSize: 16 * 1024 * 1024, contentType: "application/json" };
   check(/^media-[a-f0-9]{64}\.bin$/.test(name));
-  return { kind: "media", maximumSize: 128 * 1024 * 1024 };
+  return { kind: "media", maximumSize: 128 * 1024 * 1024, contentType: "application/octet-stream" };
 }

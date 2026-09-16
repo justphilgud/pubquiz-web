@@ -115,7 +115,7 @@ export class BridgeClient {
   async upload(name: string, bytes: Buffer) {
     try {
       const grant = await this.grant(name, bytes.length);
-      const response = await this.request(grant.url, { method: "PUT", body: new Uint8Array(bytes), headers: { "content-type": "application/octet-stream" },
+      const response = await this.request(grant.url, { method: "PUT", body: new Uint8Array(bytes), headers: { "content-type": objectRule(name, this.mode).contentType },
         redirect: "error", signal: AbortSignal.timeout(120000) });
       if (!response.ok) throw await privateUploadFailure(response, objectRule(name, this.mode).kind);
       const result = JSON.parse((await limitedResponse(response, 20000)).toString()) as { url?: string };

@@ -11,10 +11,10 @@ export function createBlobProvider(api = { head, issueSignedToken, presignUrl })
   async sign(scope) {
     const operation = scope.method === "PUT" ? "put" : "get";
     const signed = await api.issueSignedToken({ storeId: STORE_ID, pathname: scope.pathname, operations: [operation],
-      validUntil: scope.expiresAt, ...(operation === "put" ? { allowedContentTypes: ["application/octet-stream"], maximumSizeInBytes: scope.maximumSize } : {}),
+      validUntil: scope.expiresAt, ...(operation === "put" ? { allowedContentTypes: [scope.contentType], maximumSizeInBytes: scope.maximumSize } : {}),
       abortSignal: AbortSignal.timeout(10000) });
     return (await api.presignUrl(signed, { operation, pathname: scope.pathname, access: "private", validUntil: scope.expiresAt,
-      ...(operation === "put" ? { allowedContentTypes: ["application/octet-stream"], maximumSizeInBytes: scope.maximumSize,
+      ...(operation === "put" ? { allowedContentTypes: [scope.contentType], maximumSizeInBytes: scope.maximumSize,
         allowOverwrite: false, addRandomSuffix: false, cacheControlMaxAge: 60 } : {}) })).presignedUrl;
   },
 }; }

@@ -1,7 +1,7 @@
-import { BridgeError, check, objectRule, runKey, STORE_ID, TTL_MS, type Grant, type Mode } from "./contract.js";
+import { BridgeError, check, objectRule, runKey, STORE_ID, TTL_MS, type ContentType, type Grant, type Mode } from "./contract.js";
 import type { Identity } from "./identity.js";
 
-export type Scope = { pathname: string; method: "PUT" | "GET"; maximumSize: number; expiresAt: number };
+export type Scope = { pathname: string; method: "PUT" | "GET"; maximumSize: number; expiresAt: number; contentType: ContentType };
 export interface BlobProvider {
   size(pathname: string): Promise<number | null>;
   sign(scope: Scope): Promise<string>;
@@ -18,7 +18,7 @@ export function authorize(body: unknown, identity: Identity, mode: Mode, now: nu
   if (upload) check(typeof b.bytes === "number" && Number.isSafeInteger(b.bytes) && b.bytes > 0 && b.bytes <= rule.maximumSize, "OBJECT_TOO_LARGE");
   const expiresAt = Math.min(now + TTL_MS, identity.expiresAt);
   check(expiresAt > now + 1000, "IDENTITY_REJECTED");
-  return { pathname: `${b.key}/${b.name}`, method: upload ? "PUT" : "GET", maximumSize: upload ? b.bytes as number : rule.maximumSize, expiresAt };
+  return { pathname: `${b.key}/${b.name}`, method: upload ? "PUT" : "GET", maximumSize: upload ? b.bytes as number : rule.maximumSize, expiresAt, contentType: rule.contentType };
 }
 export async function grantAccess(body: unknown, identity: Identity, mode: Mode, provider: BlobProvider, now = Date.now()): Promise<Grant> {
   const scope = authorize(body, identity, mode, now);

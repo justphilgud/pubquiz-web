@@ -1,12 +1,16 @@
 // Explicit workflow-only synthetic test. Never imports DB or backup/restore entrypoints.
 import { setTimeout as delay } from "node:timers/promises";
 import { BridgeClient } from "./bridge-client";
-import { runKey, STORE_ID } from "./bridge/lib/contract";
+import { objectRule, runKey, STORE_ID } from "./bridge/lib/contract";
 import { OperationsError, requireCondition, safeError } from "./guards";
 import { createHash } from "node:crypto";
 import { expectProbeDenial } from "./transport-probe-diagnostics";
 import { runIdentityProbe } from "./identity-probe";
 const sample = Buffer.from("AP9.4 OIDC bridge synthetic transport proof; no production data.\n");
+const samples = [
+  { name: "probe.bin", bytes: sample },
+  { name: "probe.json", bytes: Buffer.from('{"synthetic":true,"productionData":false}\n') },
+];
 const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 async function main() {
   const env = process.env;
@@ -31,30 +35,41 @@ async function main() {
       role === "backup" && index === invalid.length - 1 ? "OBJECT_TOO_LARGE" : "REQUEST_REJECTED");
   }
   const rejected = (status: number) => [400, 401, 403, 404, 405, 409, 412, 413].includes(status);
-  if (role === "backup") {
-    const bounded = await client.grant("probe.bin", sample.length);
-    const tooLarge = await fetch(bounded.url, { method: "PUT", body: new Uint8Array(sample.length + 1), headers: { "content-type": "application/octet-stream" }, redirect: "error", signal: AbortSignal.timeout(30000) });
+  for (const { name, bytes } of samples) if (role === "backup") {
+    const bounded = await client.grant(name, bytes.length);
+    const headers = { "content-type": objectRule(name, "synthetic").contentType };
+    const tooLarge = await fetch(bounded.url, { method: "PUT", body: new Uint8Array(bytes.length + 1), headers, redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition(rejected(tooLarge.status), "SIGNED_SIZE_NOT_ENFORCED");
-    await client.upload("probe.bin", sample);
-    const replay = await fetch(bounded.url, { method: "PUT", body: new Uint8Array(sample), headers: { "content-type": "application/octet-stream" }, redirect: "error", signal: AbortSignal.timeout(30000) });
+    await client.upload(name, bytes);
+    const replay = await fetch(bounded.url, { method: "PUT", body: new Uint8Array(bytes), headers, redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition(rejected(replay.status), "SIGNED_OVERWRITE_NOT_ENFORCED");
-    await expectProbeDenial(await client.access({ ...body, operation: "backup-upload", bytes: sample.length }), 10, "OBJECT_EXISTS");
+    await expectProbeDenial(await client.access({ ...body, name, operation: "backup-upload", bytes: bytes.length }), 10, "OBJECT_EXISTS");
   }
-  requireCondition(digest(await client.read("probe.bin")) === digest(sample), "SYNTHETIC_HASH_MISMATCH");
-  const grant = await client.grant("probe.bin");
-  for (const method of ["PUT", "DELETE"]) {
-    const denied = await fetch(grant.url, { method, redirect: "error", signal: AbortSignal.timeout(30000) });
-    requireCondition(rejected(denied.status), "SIGNED_OPERATION_NOT_ENFORCED");
+  const proofs = [];
+  const grants = [];
+  for (const { name, bytes } of samples) {
+    const restored = await client.read(name);
+    requireCondition(restored.length === bytes.length && digest(restored) === digest(bytes), "SYNTHETIC_HASH_MISMATCH");
+    proofs.push({ name, bytes: bytes.length, sha256: digest(bytes), readback: "verified" });
+    grants.push(await client.grant(name));
   }
-  const changed = new URL(grant.url); changed.pathname = changed.pathname.replace("probe.bin", "other.bin");
-  const deniedPath = await fetch(changed, { redirect: "error", signal: AbortSignal.timeout(30000) });
-  requireCondition(rejected(deniedPath.status), "SIGNED_PATH_NOT_ENFORCED");
+  for (const grant of grants) {
+    for (const method of ["PUT", "DELETE"]) {
+      const denied = await fetch(grant.url, { method, redirect: "error", signal: AbortSignal.timeout(30000) });
+      requireCondition(rejected(denied.status), "SIGNED_OPERATION_NOT_ENFORCED");
+    }
+    const changed = new URL(grant.url); changed.pathname = changed.pathname.replace(/probe\.(bin|json)$/, "other.bin");
+    const deniedPath = await fetch(changed, { redirect: "error", signal: AbortSignal.timeout(30000) });
+    requireCondition(rejected(deniedPath.status), "SIGNED_PATH_NOT_ENFORCED");
+  }
   // Never print the URL. Actual provider expiration is verified after its deadline.
-  await delay(Math.max(0, grant.expiresAt - Date.now()) + 2000);
-  const expired = await fetch(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(30000) });
-  requireCondition(expired.status === 401 || expired.status === 403, "SIGNED_EXPIRY_NOT_ENFORCED");
+  await delay(Math.max(0, ...grants.map(grant => grant.expiresAt - Date.now())) + 2000);
+  for (const grant of grants) {
+    const expired = await fetch(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(30000) });
+    requireCondition(expired.status === 401 || expired.status === 403, "SIGNED_EXPIRY_NOT_ENFORCED");
+  }
   return { synthetic: true, role, key, identityBoundary, hash: digest(sample), readback: "verified", expiry: "rejected", negatives: invalid.length,
-    signedMethodAndPath: "rejected", ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false };
+    proofs, signedMethodAndPath: "rejected", ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false };
 }
 main().then(r => console.log(JSON.stringify(r))).catch(e => {
   console.error(safeError(e instanceof OperationsError ? e : new OperationsError("SYNTHETIC_PROBE_FAILED_DETAILS_WITHHELD"))); process.exitCode = 1;
