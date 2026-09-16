@@ -12,8 +12,15 @@ PR #11 behebt den Node-ESM-Importfehler; Main
 `0a6b95b3ba01edfb88fa86059bdf4e475872d9df`, beide CIs grün, kein Appdeploy.
 Lauf #14: synthetischer Backuptransport und nach Betreiberfreigabe Restore-Lesetest
 erfolgreich, einschließlich Readback/Hash, Rollen-/Pfad-/Methodenprüfungen und echtem
-URL-Ablauf. Noch offen: zusätzliche Live-Identitätsproben. Diese sind als reiner
-Testfix vorbereitet; reguläre Main-Freigabe erforderlich. Transportfreigabe bleibt false.
+URL-Ablauf. PR #12 ist integriert: Main `4ac84083c0af78b319fb2f9e944e3c7467f69645`.
+Run #15 inklusive beider Identitäten/Transportpfade erfolgreich. Transportflags true,
+Bridge acceptance; Automatisierung/Retention unverändert false. Run #16 erreicht den
+echten Export; nur database.dump ist gespeichert, Uploadphase fehlgeschlagen.
+Der nächste Auth-Overlay-Upload ist der vermutete Fehlerort, bislang nicht sicher belegt.
+Minimaler secretsicherer Diagnosefix vorbereitet; aktuelles Gate ist dessen reguläre
+Main-Freigabe. Kein Restore und kein gültiges vollständiges Backup vorhanden.
+Siehe [Run #16](../reports/ap9-4-acceptance-run16-20260916.md) und
+[Run #15](../reports/ap9-4-provider-run15-20260916.md).
 Siehe [Nachweis Lauf #14](../reports/ap9-4-provider-run14-20260916.md),
 [Diagnose Lauf #13](../reports/ap9-4-provider-run13-20260916.md)
 und [Diagnose Lauf #12](../reports/ap9-4-provider-run12-20260916.md)

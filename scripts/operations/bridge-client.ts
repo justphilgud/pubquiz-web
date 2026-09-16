@@ -1,7 +1,32 @@
 import { parseStoreIdFromDelegationToken } from "@vercel/blob";
-import { AUDIENCE, objectRule, runKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type Mode } from "./bridge/lib/contract";
+import { AUDIENCE, objectRule, runKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type Mode, type ObjectKind } from "./bridge/lib/contract";
 import { OperationsError, requireCondition } from "./guards";
 type Env = Readonly<Record<string, string | undefined>>;
+
+// Only fixed categories escape. Never emit a provider message, path, URL or header.
+export async function privateUploadFailure(response: Response, kind: ObjectKind): Promise<OperationsError> {
+  const kinds = { database: "DATABASE", "auth-overlay": "AUTH_OVERLAY", manifest: "MANIFEST", media: "MEDIA", probe: "PROBE" };
+  const artifact = Object.hasOwn(kinds, kind) ? kinds[kind] : "UNKNOWN";
+  const allowed = new Set(["content_type_not_allowed", "client_token_pathname_mismatch", "client_token_expired", "file_too_large",
+    "forbidden", "oidc_environment_not_allowed", "store_suspended", "store_not_found", "not_found", "client_token_not_allowed",
+    "bad_request", "service_unavailable", "rate_limited", "precondition_failed", "not_allowed", "internal_server_error"]);
+  let category = "UNKNOWN";
+  try {
+    const body: unknown = JSON.parse((await limitedResponse(response, 4096)).toString());
+    const error = body && typeof body === "object" && "error" in body ? body.error : undefined;
+    if (error && typeof error === "object") {
+      if ("code" in error && typeof error.code === "string" && allowed.has(error.code)) category = error.code.toUpperCase();
+      // Same bounded-message classification as @vercel/blob 2.4.0 getBlobError;
+      // the message itself is neither returned nor used in an exception.
+      const message = "message" in error && typeof error.message === "string" ? error.message : "";
+      if (message.includes("contentType") && message.includes("is not allowed")) category = "CONTENT_TYPE_NOT_ALLOWED";
+      else if (message.includes('"pathname"') && message.includes("does not match the token payload")) category = "CLIENT_TOKEN_PATHNAME_MISMATCH";
+      else if (message === "Token expired") category = "CLIENT_TOKEN_EXPIRED";
+      else if (message.includes("the file length cannot be greater than")) category = "FILE_TOO_LARGE";
+    }
+  } catch { /* Malformed, oversized or failed response streams remain fully redacted. */ }
+  return new OperationsError(`PRIVATE_UPLOAD_${artifact}_HTTP_${response.status}_${category}`);
+}
 
 export async function requestGithubToken(env: Env, request: typeof fetch = fetch): Promise<string> {
   try {
@@ -92,7 +117,7 @@ export class BridgeClient {
       const grant = await this.grant(name, bytes.length);
       const response = await this.request(grant.url, { method: "PUT", body: new Uint8Array(bytes), headers: { "content-type": "application/octet-stream" },
         redirect: "error", signal: AbortSignal.timeout(120000) });
-      requireCondition(response.ok, "PRIVATE_UPLOAD_REJECTED");
+      if (!response.ok) throw await privateUploadFailure(response, objectRule(name, this.mode).kind);
       const result = JSON.parse((await limitedResponse(response, 20000)).toString()) as { url?: string };
       requireCondition(result.url === `https://${STORE_HOST}/${this.key}/${name}`, "PRIVATE_UPLOAD_IDENTITY_MISMATCH");
     } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("SIGNED_UPLOAD_FAILED_DETAILS_WITHHELD"); }
