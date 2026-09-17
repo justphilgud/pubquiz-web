@@ -698,6 +698,58 @@
   }
 }
 
+@container presentation (max-width: 680px) {
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide.booking-slide {
+    grid-template-columns: minmax(0, 1fr) minmax(7.75rem, 0.42fr);
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-slide .presentation-flow-kicker {
+    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide.booking-slide h2 {
+    margin-bottom: 0.35rem;
+    font-size: clamp(1.6rem, 5.3cqw, 2rem);
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-subheadline {
+    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-description,
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-benefits,
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-contact {
+    font-size: 0.75rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-benefits {
+    display: grid;
+    gap: 0.2rem;
+    margin-block: 0.45rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-contact {
+    line-height: 1.35;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-qr {
+    width: min(100%, 7.75rem);
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-cta {
+    margin-block: 0.45rem 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-url {
+    font-size: 0.58rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .presentation-template[data-design-style="KOMM_ONE"] .presentation-content-inner > *,
   .presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-moment {
