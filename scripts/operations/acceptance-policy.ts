@@ -72,7 +72,7 @@ export function inspectRow(value: Record<string, unknown>, media: Set<string>, s
   exactKeys(tokens.typography, "family,displayWeight,bodyWeight");
   const typography = tokens.typography;
   requireCondition(brandFontOptions.some(f => f.value === typography.family) &&
-    typeof typography.displayWeight === "number" && [700, 800, 900].includes(typography.displayWeight) &&
+    typeof typography.displayWeight === "number" && [400, 700, 800, 900].includes(typography.displayWeight) &&
     typeof typography.bodyWeight === "number" && [400, 500, 600].includes(typography.bodyWeight), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
   for (const group of ["radii", "spacing"] as const) {
     exactKeys(tokens[group], "small,medium,large");
