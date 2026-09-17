@@ -180,8 +180,8 @@
 }
 
 @keyframes komm-one-arrive {
-  from { opacity: 0; transform: translateY(0.75rem); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Question canvases and information slides use the light half of the brand
