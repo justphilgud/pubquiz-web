@@ -123,8 +123,8 @@ Pixelmechanik, Sponsor- und Outro-Daten bleiben unverändert.
 
 ## Bewegung und Barrierefreiheit
 
-Ein kurzer Fade mit kleiner linearer Verschiebung unterstützt Folienwechsel und
-ein ruhiges Einblenden großer Flächen. Keine Funktion hängt vom Ende einer
+Ein kurzer Fade unterstützt Folienwechsel und ein ruhiges Einblenden großer
+Flächen. Keine Funktion hängt vom Ende einer
 Animation ab. Unter `prefers-reduced-motion: reduce` werden die Bewegungen
 vollständig entfernt. QR-Flächen bleiben weiß, Medien werden nicht zugunsten des
 Brandings verkleinert, und relevante Text-/Flächenkombinationen werden gegen die
