@@ -15,6 +15,11 @@ export function assertManualAcceptance(env: Environment) {
     env.GITHUB_EVENT_NAME === "workflow_dispatch" && env.AP94_MANUAL_ACCEPTANCE === "true", "MANUAL_ACCEPTANCE_REQUIRED");
   requireCondition(env.BACKUP_AUTOMATION_ENABLED === "false" && env.BACKUP_RETENTION_VERIFIED === "false", "ACCEPTANCE_SWITCHES_MUST_STAY_FALSE");
 }
+export function assertRestoreAcceptance(env: Environment) {
+  requireCondition(env.GITHUB_REPOSITORY === "justphilgud/pubquiz-web" && env.GITHUB_REF === "refs/heads/main" &&
+    env.GITHUB_EVENT_NAME === "workflow_dispatch" && env.AP94_MANUAL_ACCEPTANCE === "true" &&
+    env.AP96_RUN_RESTORE === "true", "MANUAL_RESTORE_ACCEPTANCE_REQUIRED");
+}
 export function pinnedRestoreConnection(env: Environment) {
   const value = env.RESTORE_TEST_DATABASE_URL;
   assertRestoreTarget(value, "restore-test", env.RESTORE_TEST_EXPECTED_HOST ?? "");

@@ -1,6 +1,8 @@
 name: AP9.4 Manual Backup and Isolated Restore
 
 on:
+  schedule:
+    - cron: '30 2 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -13,6 +15,22 @@ on:
         description: Verified current Production release SHA (required only for acceptance)
         required: false
         type: string
+      backup_type:
+        description: Why this backup is being created
+        type: choice
+        options: [manual, pre-deployment, pre-event]
+        default: manual
+        required: true
+      protect_backup:
+        description: Protect a manual backup from normal retention (pre-deployment/pre-event are always protected)
+        type: boolean
+        default: false
+        required: true
+      restore_after_backup:
+        description: Run the separately protected isolated restore job after backup
+        type: boolean
+        default: false
+        required: true
 
 permissions:
   contents: read
@@ -37,16 +55,34 @@ jobs:
       automation: ${{ steps.backup.outputs.automation }}
       retention: ${{ steps.backup.outputs.retention }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Gate scheduled automation
+        id: gate
+        shell: bash
+        env:
+          BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" && "$BACKUP_AUTOMATION_ENABLED" != "true" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Daily backup skipped: BACKUP_AUTOMATION_ENABLED is not true." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@v4
+      - if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm ci
-      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts
+      - if: steps.gate.outputs.run == 'true'
+        run: npm ci
+      - if: steps.gate.outputs.run == 'true'
+        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts
       - name: Record verified identity claims only
+        if: steps.gate.outputs.run == 'true'
         run: node --import tsx scripts/operations/print-claims.ts
       - name: Synthetic backup transport (no database credentials)
-        if: inputs.mode == 'synthetic'
+        if: steps.gate.outputs.run == 'true' && github.event_name == 'workflow_dispatch' && inputs.mode == 'synthetic'
         env:
           AP94_TRANSPORT_MODE: synthetic
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
@@ -54,16 +90,18 @@ jobs:
           BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
           BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
         run: node --import tsx scripts/operations/transport-probe.ts backup
-      - name: Explicit manual acceptance with automation and deletion disabled
-        if: inputs.mode == 'acceptance'
+      - name: Verified Production backup
+        if: steps.gate.outputs.run == 'true' && (github.event_name == 'schedule' || inputs.mode == 'acceptance')
         id: backup
         shell: bash
         env:
-          AP94_MANUAL_ACCEPTANCE: 'true'
+          AP94_MANUAL_ACCEPTANCE: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
           AP94_TRANSPORT_MODE: acceptance
           AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
-          PRODUCTION_RELEASE_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && vars.PRODUCTION_RELEASE_SHA || inputs.production_commit }}
+          AP96_BACKUP_TYPE: ${{ github.event_name == 'schedule' && 'scheduled' || inputs.backup_type }}
+          AP96_BACKUP_PROTECTED: ${{ github.event_name == 'schedule' && 'false' || inputs.protect_backup }}
           PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
           BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
@@ -74,12 +112,33 @@ jobs:
           node --input-type=module <<'NODE'
           import {readFileSync,appendFileSync} from 'node:fs';
           const r=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/ap94-result.json`,'utf8'));
-          appendFileSync(process.env.GITHUB_OUTPUT,`key=${r.key}\nmanifest=${r.manifestSha256}\nautomation=false\nretention=false\n`);
-          appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Backup readback verified.\n\nKey: ${r.key}\n\nManifest SHA-256: ${r.manifestSha256}\n\nBytes: ${r.bytes}\n\nSnapshot: ${r.snapshotAt}\n\nBackup ms: ${r.backupMs}\n\nRestore requires operations-restore reviewer approval.\n`);
+          appendFileSync(process.env.GITHUB_OUTPUT,`key=${r.key}\nmanifest=${r.manifestSha256}\nautomation=${process.env.BACKUP_AUTOMATION_ENABLED}\nretention=${process.env.BACKUP_RETENTION_VERIFIED}\n`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Backup readback verified.\n\nType: ${r.backup.type}\n\nProtected: ${r.backup.protected}\n\nKey: ${r.key}\n\nManifest SHA-256: ${r.manifestSha256}\n\nBytes: ${r.bytes}\n\nSnapshot: ${r.snapshotAt}\n\nBackup ms: ${r.backupMs}\n\nRestore runs only when explicitly requested and requires operations-restore reviewer approval.\n`);
+          NODE
+      - name: Retention policy evaluation after verified backup
+        if: steps.backup.outcome == 'success'
+        shell: bash
+        env:
+          AP94_TRANSPORT_MODE: acceptance
+          AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
+          AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
+          BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
+          BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
+          AP96_CURRENT_BACKUP_KEY: ${{ steps.backup.outputs.key }}
+          AP96_CURRENT_MANIFEST_SHA256: ${{ steps.backup.outputs.manifest }}
+        run: |
+          set -euo pipefail
+          node --import tsx scripts/operations/retention-cli.ts > "$RUNNER_TEMP/ap96-retention.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const r=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/ap96-retention.json`,'utf8'));
+          const kept=r.plan.decisions.filter(x=>x.action==='keep').map(x=>`${x.key} (${x.reason})`);
+          const removed=r.plan.decisions.filter(x=>x.action==='delete').map(x=>`${x.key} (${x.reason})`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,`\n## Retention ${r.dryRun?'dry run':'execution'}\n- Keep: ${kept.length}\n- Delete: ${removed.length}\n- Bytes before: ${r.plan.beforeBytes}\n- Bytes after: ${r.plan.afterBytes}\n- Foreign paths retained: ${r.plan.foreignObjects.length}\n\nKept:\n${kept.map(x=>`- ${x}`).join('\n')||'- none'}\n\nSelected for deletion:\n${removed.map(x=>`- ${x}`).join('\n')||'- none'}\n`);
           NODE
   restore:
     needs: backup
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.restore_after_backup
     permissions:
       contents: read
       id-token: write
@@ -108,6 +167,7 @@ jobs:
         if: inputs.mode == 'acceptance'
         env:
           AP94_MANUAL_ACCEPTANCE: 'true'
+          AP96_RUN_RESTORE: 'true'
           AP94_TRANSPORT_MODE: acceptance
           AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}

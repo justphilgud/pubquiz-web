@@ -16,7 +16,8 @@ async function main() {
   const env = process.env;
   requireCondition(env.GITHUB_REPOSITORY === "justphilgud/pubquiz-web" && env.GITHUB_REF === "refs/heads/main" &&
     env.GITHUB_EVENT_NAME === "workflow_dispatch" && env.AP94_TRANSPORT_MODE === "synthetic" &&
-    env.BACKUP_AUTOMATION_ENABLED === "false" && env.BACKUP_RETENTION_VERIFIED === "false" &&
+    (env.BACKUP_AUTOMATION_ENABLED === "true" || env.BACKUP_AUTOMATION_ENABLED === "false") &&
+    (env.BACKUP_RETENTION_VERIFIED === "true" || env.BACKUP_RETENTION_VERIFIED === "false") &&
     !Object.keys(env).some(k => /DATABASE_URL|BLOB_READ_WRITE_TOKEN/.test(k) && env[k]), "SYNTHETIC_CONTEXT_REQUIRED");
   const role = process.argv[2]; requireCondition(role === "backup" || role === "restore", "PROBE_ROLE_REQUIRED");
   const key = runKey("synthetic", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");

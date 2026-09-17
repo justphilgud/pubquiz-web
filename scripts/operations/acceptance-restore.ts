@@ -1,21 +1,25 @@
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assertManualAcceptance, pinnedRestoreConnection, RESTORE_TARGET, type Environment } from "./acceptance-policy";
+import { assertRestoreAcceptance, pinnedRestoreConnection, RESTORE_TARGET, type Environment } from "./acceptance-policy";
 import { requireCondition } from "./guards";
 import { libpqEnvironment } from "./libpq";
 import { PgSession, pgTool, toolsVersion } from "./pg-session";
 import { authInsertSql, collectSnapshot, compareSnapshots, sha256 } from "./snapshot";
 import { artifactName, backupKey, PrivateArtifacts, verifyMediaFiles } from "./private-artifacts";
 import type { AcceptanceManifest } from "./acceptance-backup";
+import { validateBackupMetadata } from "./backup-metadata";
 import { formatQuizPoints } from "../../app/quiz/formatQuizPoints";
 import { rankScores } from "../../app/rendering/presentation/presentationRankingPolicy";
 
 export function parseManifest(bytes: Buffer, expectedSha: string, key: string): AcceptanceManifest {
   requireCondition(/^[a-f0-9]{64}$/.test(expectedSha) && sha256(bytes) === expectedSha, "MANIFEST_CHECKSUM_MISMATCH");
   const m = JSON.parse(bytes.toString("utf8")) as AcceptanceManifest;
-  requireCondition(m.version === 2 && m.mode === "ap94-manual" && m.key === backupKey(key) &&
+  const legacy = m.version === 2 && m.mode === "ap94-manual" && m.backup === undefined;
+  const current = m.version === 3 && m.mode === "production-backup" && !!m.backup;
+  requireCondition((legacy || current) && m.key === backupKey(key) &&
     JSON.stringify(m.target) === JSON.stringify(RESTORE_TARGET), "MANIFEST_IDENTITY_MISMATCH");
+  if (current) validateBackupMetadata(m.backup);
   requireCondition(m.source.host === "ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech" && m.source.name === "neondb" &&
     m.source.schema === "pubquiz" && /^[a-f0-9]{40}$/.test(m.release), "MANIFEST_SOURCE_MISMATCH");
   requireCondition(m.authExcluded.slice().sort().join() === "pubquiz.teams.team_passwort,pubquiz.users.password_hash", "MANIFEST_AUTH_POLICY_MISMATCH");
@@ -45,7 +49,7 @@ export function restoreSql(directory: string, auth: Record<string, string>, mani
   return `${EMPTY_TARGET_SQL}\n${pre}\n${data}\nSET standard_conforming_strings=on;\n${authInsertSql(auth, manifest.expected.columns)}\n${post}`;
 }
 export async function acceptanceRestore(env: Environment) {
-  assertManualAcceptance(env); const connection = pinnedRestoreConnection(env); toolsVersion(env);
+  assertRestoreAcceptance(env); const connection = pinnedRestoreConnection(env); toolsVersion(env);
   const store = new PrivateArtifacts(env, env.AP94_BACKUP_KEY ?? "", "restore");
   const manifest = parseManifest(await store.read("manifest.json"), env.AP94_MANIFEST_SHA256 ?? "", store.key);
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-restore-"));

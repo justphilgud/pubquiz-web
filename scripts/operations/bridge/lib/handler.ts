@@ -1,6 +1,6 @@
 import { BridgeError, check, STORE_ID, REPOSITORY_ID, OWNER_ID, type Mode } from "./contract.js";
 import { verifyGithub, type Identity, type IdentityPins } from "./identity.js";
-import { grantAccess, type BlobProvider } from "./service.js";
+import { executeAccess, type BlobProvider } from "./service.js";
 
 type Env = Readonly<Record<string, string | undefined>>;
 export function configuration(env: Env): { mode: Mode; pins: IdentityPins } {
@@ -28,7 +28,7 @@ export async function handleAccess(request: Request, env: Env, provider: BlobPro
     try { for (;;) { const item = await reader.read(); if (item.done) break; length += item.value.length; check(length <= 2048); parts.push(item.value); } }
     finally { await reader.cancel().catch(() => undefined); }
     const body: unknown = JSON.parse(Buffer.concat(parts).toString("utf8"));
-    return new Response(JSON.stringify(await grantAccess(body, identity, config.mode, provider)), { status: 200, headers });
+    return new Response(JSON.stringify(await executeAccess(body, identity, config.mode, provider)), { status: 200, headers });
   } catch (error) {
     const code = error instanceof BridgeError ? error.code : "REQUEST_REJECTED";
     return new Response(JSON.stringify({ error: code }), { status: code === "CONFIG_REJECTED" || code === "PROVIDER_REJECTED" ? 503 : 403, headers });
