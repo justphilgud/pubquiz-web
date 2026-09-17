@@ -5,7 +5,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
-import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, auditColumns, inspectRow, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
+import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, assertRestoreAcceptance, auditColumns, inspectRow, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
 import { templateRegistry } from "../../app/rendering/templateRegistry";
 import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
 import { authInsertSql, compareSnapshots, sha256, type Snapshot } from "./snapshot";
@@ -243,10 +243,23 @@ test("artifact corruption, path traversal and stream overflow fail closed", asyn
   assert.throws(() => backupKey("production/../test"));
   await assert.rejects(boundedBytes(new ReadableStream({ start(c) { c.enqueue(new Uint8Array(20)); c.close(); } }), 10));
 });
-test("workflow keeps reviewer boundary and never invokes application deployment or retention", () => {
+test("workflow schedules only the existing backup core and keeps restore behind its explicit reviewer boundary", () => {
   const text = readFileSync(new URL("../../.github/workflows/ap94-acceptance.yml", import.meta.url), "utf8");
   assert.match(text, /environment: operations-backup/); assert.match(text, /environment: operations-restore/);
-  assert.match(text, /needs: backup/); assert.doesNotMatch(text, /schedule:|environment: production|upload-artifact|db:deploy|--prod|contents: write/);
+  assert.match(text, /schedule:/); assert.match(text, /cron: '30 2 \* \* \*'/);
+  assert.match(text, /restore_after_backup/); assert.match(text, /AP96_RUN_RESTORE: 'true'/);
+  assert.match(text, /BACKUP_AUTOMATION_ENABLED/); assert.match(text, /BACKUP_RETENTION_VERIFIED/);
+  assert.match(text, /steps\.backup\.outcome == 'success'/);
+  assert.ok(text.indexOf("acceptance-cli.ts backup") < text.indexOf("retention-cli.ts"));
+  assert.match(text, /needs: backup/); assert.match(text, /group: ap94-manual-acceptance/);
+  assert.doesNotMatch(text, /environment: production|upload-artifact|db:deploy|--prod|contents: write|BACKUP_BLOB_READ_WRITE_TOKEN/);
+});
+test("restore remains explicit workflow-dispatch only and is independent from automation switches", () => {
+  const restore = { ...env, AP96_RUN_RESTORE: "true", BACKUP_AUTOMATION_ENABLED: "true", BACKUP_RETENTION_VERIFIED: "true" };
+  assert.doesNotThrow(() => assertRestoreAcceptance(restore));
+  for (const [key, value] of Object.entries({ AP96_RUN_RESTORE: "false", GITHUB_EVENT_NAME: "schedule", GITHUB_REF: "refs/heads/other" })) {
+    assert.throws(() => assertRestoreAcceptance({ ...restore, [key]: value }), /MANUAL_RESTORE_ACCEPTANCE_REQUIRED/);
+  }
 });
 test("media original bytes roundtrip, content hash, URL mapping and corruption rejection", async t => {
   const directory = await mkdtemp(join(tmpdir(), "ap94-media-test-"));

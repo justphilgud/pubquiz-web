@@ -1,5 +1,5 @@
 import { parseStoreIdFromDelegationToken } from "@vercel/blob";
-import { AUDIENCE, objectRule, runKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type Mode, type ObjectKind } from "./bridge/lib/contract";
+import { AUDIENCE, objectRule, runKey, storedBackupKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type InventoryObject, type Mode, type ObjectKind } from "./bridge/lib/contract";
 import { OperationsError, requireCondition } from "./guards";
 type Env = Readonly<Record<string, string | undefined>>;
 
@@ -111,6 +111,48 @@ export class BridgeClient {
       requireCondition(response.status === 200, "PRIVATE_READBACK_FAILED");
       return await limitedResponse(response, grant.maximumSize);
     } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("SIGNED_READ_FAILED_DETAILS_WITHHELD"); }
+  }
+  async retentionInventory(): Promise<InventoryObject[]> {
+    try {
+      requireCondition(this.role === "backup" && this.mode === "acceptance", "RETENTION_CONTEXT_REJECTED");
+      const response = await this.access({ operation: "backup-inventory", store: STORE_ID });
+      requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
+      const result = JSON.parse((await limitedResponse(response, 1024 * 1024)).toString()) as { objects?: unknown; complete?: unknown };
+      requireCondition(result.complete === true && Array.isArray(result.objects) && result.objects.length <= 4096, "INVENTORY_RESPONSE_INVALID");
+      return result.objects.map(value => {
+        requireCondition(value !== null && typeof value === "object" && !Array.isArray(value), "INVENTORY_RESPONSE_INVALID");
+        const object = value as Record<string, unknown>;
+        requireCondition(Object.keys(object).sort().join() === "etag,pathname,size,uploadedAt" &&
+          typeof object.pathname === "string" && object.pathname.startsWith("production/acceptance/") && object.pathname.length <= 240 &&
+          typeof object.size === "number" && Number.isSafeInteger(object.size) && object.size > 0 &&
+          typeof object.uploadedAt === "string" && Number.isFinite(Date.parse(object.uploadedAt)) &&
+          typeof object.etag === "string" && /^[\x21-\x7e]{1,200}$/.test(object.etag), "INVENTORY_RESPONSE_INVALID");
+        return object as InventoryObject;
+      });
+    } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("RETENTION_INVENTORY_FAILED_DETAILS_WITHHELD"); }
+  }
+  async retentionReadManifest(key: string) {
+    try {
+      const body: AccessRequest = { operation: "backup-retention-read", store: STORE_ID, key: storedBackupKey(key),
+        name: "manifest.json", kind: "manifest" };
+      const response = await this.access(body);
+      requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
+      const grant = validateGrant(JSON.parse((await limitedResponse(response, 20000)).toString()), body);
+      const readback = await this.request(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(120000) });
+      requireCondition(readback.status === 200, "PRIVATE_READBACK_FAILED");
+      return await limitedResponse(readback, grant.maximumSize);
+    } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("RETENTION_MANIFEST_READ_FAILED_DETAILS_WITHHELD"); }
+  }
+  async retentionDelete(key: string, object: Pick<InventoryObject, "pathname" | "etag">) {
+    try {
+      const prefix = `${storedBackupKey(key)}/`;
+      requireCondition(object.pathname.startsWith(prefix), "RETENTION_OBJECT_PATH_REJECTED");
+      const name = object.pathname.slice(prefix.length);
+      const response = await this.access({ operation: "retention-delete", store: STORE_ID, key, name, etag: object.etag });
+      requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
+      const result = JSON.parse((await limitedResponse(response, 20000)).toString()) as Record<string, unknown>;
+      requireCondition(Object.keys(result).join() === "deleted" && result.deleted === true, "RETENTION_DELETE_RESPONSE_INVALID");
+    } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("RETENTION_DELETE_FAILED_DETAILS_WITHHELD"); }
   }
   async upload(name: string, bytes: Buffer) {
     try {

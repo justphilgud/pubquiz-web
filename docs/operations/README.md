@@ -12,13 +12,16 @@ Die Anwendung wird über den bestehenden Deploymentprozess veröffentlicht. Eine
 
 Die Datenhaltung erfolgt in PostgreSQL über Neon.
 
+## Backup und Restore
+
+- [Backup und Restore](./backup-und-restore.md)
+- [AP9.6 Backup-Automatisierung und Retention](./ap96-backup-automation.md)
+
 ## Noch zu dokumentieren
 
 - benötigte Umgebungsvariablen
 - Deploymentablauf
 - Datenbankmigrationen
-- Backup
-- Restore
 - Logging
 - Fehleranalyse
 - Verhalten bei Rollback

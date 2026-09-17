@@ -62,12 +62,6 @@ export function assertOperationTransport(url: URL) {
   requireCondition(url.searchParams.get("channel_binding") === "require", "DATABASE_CHANNEL_BINDING_REQUIRED");
 }
 
-export type BackupKind = "daily" | "weekly" | "release";
-export function backupPolicy(kind: string): { kind: BackupKind; retentionDays: number } {
-  requireCondition(["daily", "weekly", "release"].includes(kind), "BACKUP_KIND_INVALID");
-  return { kind: kind as BackupKind, retentionDays: kind === "daily" ? 14 : kind === "weekly" ? 56 : 186 };
-}
-
 export function assertDumpIntegrity(exitCode: number | null, bytes: number, listExitCode: number | null) {
   requireCondition(exitCode === 0 && bytes > 0 && listExitCode === 0, "BACKUP_INTEGRITY_FAILED");
 }

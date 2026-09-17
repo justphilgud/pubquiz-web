@@ -3,7 +3,7 @@ import test from "node:test";
 import { generateKeyPair, exportJWK, createLocalJWKSet, SignJWT } from "jose";
 import { AUDIENCE, ISSUER, REPOSITORY, STORE_ID, STORE_HOST, WORKFLOW, runKey, TTL_MS, type Grant } from "./bridge/lib/contract";
 import { verifyGithub, type Identity } from "./bridge/lib/identity";
-import { grantAccess, type BlobProvider, type Scope } from "./bridge/lib/service";
+import { executeAccess, grantAccess, type BlobProvider, type Scope } from "./bridge/lib/service";
 import { handleAccess, configuration } from "./bridge/lib/handler";
 import { createBlobProvider } from "./bridge/lib/provider";
 import { BridgeClient, validateGrant, privateUploadFailure } from "./bridge-client";
@@ -12,7 +12,7 @@ import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { presignUrl } from "@vercel/blob";
+import { del as blobDel, list as blobList, presignUrl } from "@vercel/blob";
 import { expectProbeDenial } from "./transport-probe-diagnostics";
 import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
 
@@ -137,12 +137,15 @@ test("live probe diagnostics redact arbitrary provider bodies, headers, URLs and
 
 const now = Date.now(); const seconds = Math.floor(now / 1000);
 const pins = { repositoryId: "1253336192", ownerId: "288915542" };
-const identity: Identity = { environment: "operations-backup", run: "123456", attempt: "1", expiresAt: now + TTL_MS };
+const identity: Identity = { environment: "operations-backup", eventName: "workflow_dispatch", run: "123456", attempt: "1", expiresAt: now + TTL_MS };
 const key = runKey("synthetic", identity.run, identity.attempt);
 const upload = { operation: "backup-upload", store: STORE_ID, key, name: "probe.bin", kind: "probe", bytes: 12 };
 const readback = { operation: "backup-readback", store: STORE_ID, key, name: "probe.bin", kind: "probe" };
 const env = { VERCEL_ENV: "production", VERCEL_PROJECT_ID: "prj_operations", AP94_OPERATIONS_PROJECT_ID: "prj_operations",
   BLOB_STORE_ID: STORE_ID, AP94_BRIDGE_MODE: "synthetic", AP94_GITHUB_REPOSITORY_ID: pins.repositoryId, AP94_GITHUB_OWNER_ID: pins.ownerId };
+const completeProvider = (provider: Pick<BlobProvider, "size" | "sign"> & Partial<BlobProvider>): BlobProvider => ({
+  async inventory() { return []; }, async remove() { return; }, ...provider,
+});
 const claims = { repository: REPOSITORY, repository_owner: "justphilgud", repository_id: pins.repositoryId, repository_owner_id: pins.ownerId,
   ref: "refs/heads/main", workflow_ref: WORKFLOW, event_name: "workflow_dispatch", environment: "operations-backup",
   sub: `repo:${REPOSITORY}:environment:operations-backup`, run_id: identity.run, run_attempt: identity.attempt, sha: "a".repeat(40),
@@ -183,7 +186,7 @@ test("Variant 2 adversarial HTTP boundary: verified JWT is the only authority", 
     ["28 caller cannot broaden MIME allowlist", {}, { ...upload, allowedContentTypes: ["*"] }],
   ];
   let providerCalls = 0;
-  const provider: BlobProvider = { async size() { providerCalls++; return null; }, async sign() { providerCalls++; return "unused"; } };
+  const provider = completeProvider({ async size() { providerCalls++; return null; }, async sign() { providerCalls++; return "unused"; } });
   const request = (token: string, body: object) => new Request("https://bridge.example/api/access", {
     method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json", "x-role": "backup" }, body: JSON.stringify(body) });
   for (const [name, delta, body] of cases) await t.test(name, async () => {
@@ -206,7 +209,7 @@ test("Variant 2 adversarial HTTP boundary: verified JWT is the only authority", 
     const token = await sign({}); const secretUrl = "https://private.invalid/object?signature=SYNTHETIC_SECRET";
     const logged: unknown[][] = [];
     for (const method of ["log", "error", "warn", "info", "debug"] as const) t.mock.method(console, method, (...args: unknown[]) => { logged.push(args); });
-    const failing: BlobProvider = { async size() { throw new Error(`${token} ${secretUrl}`); }, async sign() { throw new Error(secretUrl); } };
+    const failing = completeProvider({ async size() { throw new Error(`${token} ${secretUrl}`); }, async sign() { throw new Error(secretUrl); } });
     const result = await handleAccess(request(token, upload), env, failing, (jwt, p) => verifyGithub(jwt, p, now, jwks));
     assert.equal(await result.text(), '{"error":"PROVIDER_REJECTED"}'); assert.deepEqual(logged, []);
     t.mock.restoreAll();
@@ -232,6 +235,8 @@ test("real JWT signature verification: exact GitHub claims, expiry, issuer, audi
   assert.throws(() => configuration({ ...env, AP94_GITHUB_OWNER_ID: foreignPins.ownerId }));
   const restoreClaims = { environment: "operations-restore", sub: `repo:${REPOSITORY}:environment:operations-restore` };
   assert.equal((await verifyGithub(await sign(restoreClaims), pins, now, jwks)).environment, "operations-restore");
+  assert.equal((await verifyGithub(await sign({ event_name: "schedule" }), pins, now, jwks)).eventName, "schedule");
+  await assert.rejects(verifyGithub(await sign({ ...restoreClaims, event_name: "schedule" }), pins, now, jwks), /IDENTITY_REJECTED/);
   const alienKeys = await generateKeyPair("RS256");
   const forged = await new SignJWT(claims).setProtectedHeader({ alg: "RS256", kid: "synthetic" }).sign(alienKeys.privateKey);
   await assert.rejects(verifyGithub(forged, pins, now, jwks), /IDENTITY_REJECTED/);
@@ -239,7 +244,7 @@ test("real JWT signature verification: exact GitHub claims, expiry, issuer, audi
 
 test("authorization denies cross-role operations, wildcard/store/path/traversal/size/overwrite/delete before provider", async () => {
   let calls = 0;
-  const provider: BlobProvider = { async size() { calls++; return null; }, async sign() { calls++; return "unused"; } };
+  const provider = completeProvider({ async size() { calls++; return null; }, async sign() { calls++; return "unused"; } });
   for (const change of [
     { operation: "restore-read" }, { operation: "delete" }, { operation: "list" }, { store: "store_other" },
     { key: "production/acceptance/run-123456-1" }, { key: `${key}/*` }, { key: key.replace("123456", "999999") },
@@ -252,9 +257,33 @@ test("authorization denies cross-role operations, wildcard/store/path/traversal/
   assert.equal(calls, 0);
 });
 
+test("retention inventory and exact conditional deletion stay backup-only and cannot touch the current run", async () => {
+  const retentionIdentity: Identity = { ...identity, eventName: "schedule" };
+  const current = runKey("acceptance", identity.run, identity.attempt);
+  const old = "production/acceptance/run-123455-1";
+  const inventory = [{ pathname: `${old}/manifest.json`, size: 123, uploadedAt: new Date(now - 1000).toISOString(), etag: "etag-old" }];
+  const removals: [string, string][] = [];
+  const provider = completeProvider({
+    async size() { return 123; }, async sign() { return "unused"; },
+    async inventory(prefix) { assert.equal(prefix, "production/acceptance/"); return inventory; },
+    async remove(pathname, etag) { removals.push([pathname, etag]); },
+  });
+  assert.deepEqual(await executeAccess({ operation: "backup-inventory", store: STORE_ID }, retentionIdentity, "acceptance", provider, now),
+    { objects: inventory, complete: true });
+  assert.deepEqual(await executeAccess({ operation: "retention-delete", store: STORE_ID, key: old, name: "manifest.json", etag: "etag-old" },
+    retentionIdentity, "acceptance", provider, now), { deleted: true });
+  assert.deepEqual(removals, [[`${old}/manifest.json`, "etag-old"]]);
+  await assert.rejects(executeAccess({ operation: "retention-delete", store: STORE_ID, key: current, name: "manifest.json", etag: "etag-current" },
+    retentionIdentity, "acceptance", provider, now));
+  await assert.rejects(executeAccess({ operation: "retention-delete", store: STORE_ID, key: old, name: "../manifest.json", etag: "etag-old" },
+    retentionIdentity, "acceptance", provider, now));
+  await assert.rejects(executeAccess({ operation: "backup-inventory", store: STORE_ID },
+    { ...retentionIdentity, environment: "operations-restore", eventName: "workflow_dispatch" }, "acceptance", provider, now));
+});
+
 test("synthetic object roundtrip, readback, restore read only and expiration (provider model, not live proof)", async () => {
   const objects = new Map<string, Buffer>(); const grants = new Map<string, Scope>(); let clock = now;
-  const provider: BlobProvider = { async size(p) { return objects.get(p)?.length ?? null; }, async sign(s) { const u = `synthetic:${grants.size}`; grants.set(u, s); return u; } };
+  const provider = completeProvider({ async size(p) { return objects.get(p)?.length ?? null; }, async sign(s) { const u = `synthetic:${grants.size}`; grants.set(u, s); return u; } });
   function use(g: Grant, method: string, bytes?: Buffer) {
     const scope = grants.get(g.url)!; assert.ok(clock < scope.expiresAt, "expired"); assert.equal(method, scope.method);
     if (method === "PUT") { assert.ok(!objects.has(scope.pathname), "exists"); assert.ok(bytes && bytes.length <= scope.maximumSize); objects.set(scope.pathname, bytes); }
@@ -278,6 +307,8 @@ test("provider adapter delegates one exact object/operation and signs enforced i
   const calls: unknown[] = [];
   const provider = createBlobProvider({
     head: async () => { throw new Error("not used"); },
+    del: (async () => undefined) as typeof blobDel,
+    list: (async () => ({ blobs: [], hasMore: false })) as typeof blobList,
     issueSignedToken: async options => { calls.push(options); return { delegationToken: "synthetic", clientSigningToken: "synthetic", validUntil: now + TTL_MS }; },
     presignUrl: async (_token, options) => { calls.push(options); return { presignedUrl: "synthetic" }; },
   });
@@ -294,10 +325,35 @@ test("provider adapter delegates one exact object/operation and signs enforced i
   assert.equal("clientSigningToken" in (calls[1] as object), false);
 });
 
+test("provider inventory is prefix-bounded and deletion is one exact ETag-guarded object", async () => {
+  const calls: unknown[] = [];
+  const provider = createBlobProvider({
+    head: async () => { throw new Error("not used"); },
+    issueSignedToken: async () => { throw new Error("not used"); },
+    presignUrl: async () => { throw new Error("not used"); },
+    list: (async options => {
+      calls.push({ list: options });
+      return { blobs: [{ pathname: "production/acceptance/run-1-1/manifest.json", size: 10,
+        uploadedAt: new Date(now), etag: "etag-1", url: "private", downloadUrl: "private-download" }], hasMore: false };
+    }) as typeof blobList,
+    del: (async (pathname, options) => { calls.push({ del: { pathname, options } }); }) as typeof blobDel,
+  });
+  assert.deepEqual(await provider.inventory("production/acceptance/"), [{
+    pathname: "production/acceptance/run-1-1/manifest.json", size: 10,
+    uploadedAt: new Date(now).toISOString(), etag: "etag-1",
+  }]);
+  await provider.remove("production/acceptance/run-1-1/manifest.json", "etag-1");
+  const listed = (calls[0] as { list: Record<string, unknown> }).list;
+  assert.equal(listed.storeId, STORE_ID); assert.equal(listed.prefix, "production/acceptance/"); assert.equal(listed.limit, 1000);
+  const deleted = (calls[1] as { del: { pathname: string; options: Record<string, unknown> } }).del;
+  assert.equal(deleted.pathname, "production/acceptance/run-1-1/manifest.json");
+  assert.equal(deleted.options.storeId, STORE_ID); assert.equal(deleted.options.ifMatch, "etag-1");
+});
+
 test("HTTP boundary fails closed; redacts errors and rejects unsafe environment", async () => {
   for (const change of [{ VERCEL_ENV: "preview" }, { VERCEL_PROJECT_ID: "prj_pubquiz" }, { BLOB_STORE_ID: "other" },
     { DATABASE_URL: "synthetic-secret" }, { BLOB_READ_WRITE_TOKEN: "synthetic-secret" }, { AP94_BRIDGE_MODE: "" }]) assert.throws(() => configuration({ ...env, ...change }));
-  const provider: BlobProvider = { async size() { throw new Error("https://secret.example?token=DO_NOT_LOG"); }, async sign() { throw new Error("unused"); } };
+  const provider = completeProvider({ async size() { throw new Error("https://secret.example?token=DO_NOT_LOG"); }, async sign() { throw new Error("unused"); } });
   const request = (body: string) => new Request("https://bridge.example/api/access", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer a.b.c" }, body });
   const res = await handleAccess(request(JSON.stringify(upload)), env, provider, async () => identity);
   assert.equal(res.status, 503); assert.equal(await res.text(), '{"error":"PROVIDER_REJECTED"}');
@@ -326,7 +382,9 @@ test("bridge package and runtime import boundary contain no application or datab
   assert.doesNotMatch(restore, /store\.upload/);
   const workflow = readFileSync(new URL("../../.github/workflows/ap94-acceptance.yml", import.meta.url), "utf8");
   assert.equal((workflow.match(/id-token: write/g) ?? []).length, 2);
-  assert.doesNotMatch(workflow, /BACKUP_BLOB_READ_WRITE_TOKEN|schedule:/);
+  assert.doesNotMatch(workflow, /BACKUP_BLOB_READ_WRITE_TOKEN/);
+  assert.match(workflow, /schedule:/); assert.match(workflow, /30 2 \* \* \*/);
+  assert.match(workflow, /BACKUP_AUTOMATION_ENABLED/); assert.match(workflow, /BACKUP_RETENTION_VERIFIED/);
   assert.match(workflow, /default: synthetic/); assert.match(workflow, /AP94_OIDC_TRANSPORT_ACCEPTED/);
 });
 
@@ -335,10 +393,13 @@ test("runner-to-HTTP-to-SDK fixes exactly one MIME type per artifact, preserving
   const jwks = createLocalJWKSet({ keys: [{ ...await exportJWK(keys.publicKey), kid: "integration" }] });
   const jwt = await new SignJWT(claims).setProtectedHeader({ alg: "RS256", kid: "integration" }).sign(keys.privateKey);
   const bytes = Buffer.from("hello world!"); const objects = new Map<string, Buffer>();
-  const signingProvider = createBlobProvider({ head: async () => { throw new Error("unused"); }, issueSignedToken: async options => ({
+  const signingProvider = createBlobProvider({ head: async () => { throw new Error("unused"); },
+    del: (async () => undefined) as typeof blobDel,
+    list: (async () => ({ blobs: [], hasMore: false })) as typeof blobList,
+    issueSignedToken: async options => ({
     delegationToken: `${Buffer.from(JSON.stringify({ ...options, storeId: STORE_ID })).toString("base64url")}.synthetic`,
     clientSigningToken: Buffer.alloc(32, 7).toString("base64url"), validUntil: identity.expiresAt }), presignUrl });
-  const provider: BlobProvider = { async size(path) { return objects.get(path)?.length ?? null; }, sign: signingProvider.sign };
+  const provider = completeProvider({ async size(path) { return objects.get(path)?.length ?? null; }, sign: signingProvider.sign });
   const e = { AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app", AP94_TRANSPORT_MODE: "synthetic", GITHUB_RUN_ID: identity.run,
     GITHUB_RUN_ATTEMPT: identity.attempt, BACKUP_PRIVATE_BLOB_HOST: STORE_HOST, ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-request-token",
     ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/idtoken" };

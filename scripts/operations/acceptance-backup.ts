@@ -2,16 +2,18 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runKey } from "./bridge/lib/contract";
-import { assertManualAcceptance, AUTH_COLUMNS, RESTORE_TARGET, type Environment } from "./acceptance-policy";
+import { AUTH_COLUMNS, RESTORE_TARGET, type Environment } from "./acceptance-policy";
 import { operationConnection, assertReaderPrivileges, READER_PRIVILEGES_SQL, type ReaderPrivileges } from "./credentials";
 import { OperationsError, requireCondition } from "./guards";
 import { libpqEnvironment } from "./libpq";
 import { PgSession, pgTool, toolsVersion } from "./pg-session";
 import { collectSnapshot, sha256, type Snapshot } from "./snapshot";
 import { captureMedia, PrivateArtifacts, type Artifact } from "./private-artifacts";
+import { backupMetadataFromEnvironment, type BackupMetadata } from "./backup-metadata";
 
 export type AcceptanceManifest = {
-  version: 2; mode: "ap94-manual"; key: string; snapshotAt: string; completedAt: string;
+  version: 2 | 3; mode: "ap94-manual" | "production-backup"; key: string; snapshotAt: string; completedAt: string;
+  backup?: BackupMetadata;
   release: string; operationsCommit: string; source: { host: string; name: string; schema: string };
   target: typeof RESTORE_TARGET; authExcluded: string[];
   expected: Omit<Snapshot, "authRows">; artifacts: Artifact[];
@@ -32,7 +34,7 @@ export function backupPhaseError(error: unknown, phase: BackupPhase): Operations
   return new OperationsError(`BACKUP_${phase}_FAILED_DETAILS_WITHHELD`);
 }
 export async function acceptanceBackup(env: Environment) {
-  assertManualAcceptance(env);
+  const backup = backupMetadataFromEnvironment(env);
   requireCondition(/^[a-f0-9]{40}$/.test(env.PRODUCTION_RELEASE_SHA ?? "") && /^[a-f0-9]{40}$/.test(env.GITHUB_SHA ?? ""), "RELEASE_SHA_REQUIRED");
   const verified = operationConnection(env.PRODUCTION_BACKUP_DATABASE_URL, "production");
   toolsVersion(env);
@@ -69,7 +71,7 @@ export async function acceptanceBackup(env: Environment) {
     phase = "DATA_UPLOAD";
     for (const name of ["database.dump", "auth-redacted.json", ...media.map(m => m.name)]) artifacts.push(await store.upload(name, await readFile(join(directory, name))));
     const { authRows: _auth, ...expected } = state; void _auth;
-    const manifest: AcceptanceManifest = { version: 2, mode: "ap94-manual", key, snapshotAt: snapshot.time, completedAt: new Date().toISOString(),
+    const manifest: AcceptanceManifest = { version: 3, mode: "production-backup", key, snapshotAt: snapshot.time, completedAt: new Date().toISOString(), backup,
       release: env.PRODUCTION_RELEASE_SHA!, operationsCommit: env.GITHUB_SHA!, source: verified.identity, target: RESTORE_TARGET,
       authExcluded: Object.keys(AUTH_COLUMNS), expected, artifacts, media, sequenceSql, timings: { backupMs: Date.now() - started, mediaMs } };
     phase = "MANIFEST_UPLOAD";
@@ -78,7 +80,7 @@ export async function acceptanceBackup(env: Environment) {
     phase = "ANONYMOUS_READBACK";
     const anonymous = await fetch(`https://${env.BACKUP_PRIVATE_BLOB_HOST}/${key}/manifest.json`, { redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition([401, 403, 404].includes(anonymous.status), "PRIVATE_ANONYMOUS_ACCESS_NOT_REJECTED");
-    return { key, manifestSha256: sha256(bytes), bytes: artifacts.reduce((n, a) => n + a.bytes, 0), snapshotAt: snapshot.time,
+    return { key, manifestSha256: sha256(bytes), bytes: artifacts.reduce((n, a) => n + a.bytes, 0), snapshotAt: snapshot.time, backup,
       ...manifest.timings, authExcluded: true, privateReadback: "verified", restore: "required-reviewer-pending" };
   } catch (error) { throw backupPhaseError(error, phase); }
   finally {
