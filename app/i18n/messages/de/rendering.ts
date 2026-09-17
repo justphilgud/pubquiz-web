@@ -11,6 +11,7 @@ export const deRenderingMessages = {
     presentationCorporate: { label: "Corporate", description: "Ruhiges, professionelles Design mit klarer Hierarchie." },
     presentationBirthday: { label: "Storybook", description: "Persönliches Fotobuch-Design mit redaktioneller Bildsprache." },
     presentationEditorial: { label: "LOVD × ungegoogelt", description: "Warm-reduziertes Venue-Design mit großzügiger editorialer Hierarchie." },
+    presentationKommOne: { label: "Komm.ONE PubQuiz", description: "Moderne Quizbühne mit Midnight, Lagoon und gezielten Amarillo-Akzenten." },
     answerDefault: {
       label: "ungegoogelt Standard",
       description: "Das vertraute, mobil optimierte Antwortformular.",
@@ -22,6 +23,7 @@ export const deRenderingMessages = {
     answerCorporate: { label: "Corporate", description: "Sachliches Antwortformular für Firmenveranstaltungen." },
     answerBirthday: { label: "Storybook", description: "Ruhiges Antwortformular im persönlichen Fotobuch-Stil." },
     answerEditorial: { label: "LOVD × ungegoogelt", description: "Reduziertes Antwortformular in warmer LOVD-Eventoptik." },
+    answerKommOne: { label: "Komm.ONE PubQuiz", description: "Klares Antwortformular in der Komm.ONE-Markenwelt." },
   },
   fields: {
     presentationTemplate: "Präsentationstemplate",

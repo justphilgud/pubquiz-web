@@ -39,19 +39,24 @@ test("sponsor metadata round-trips without changing existing question configurat
   assert.equal(normalizeQuestionTemplateConfig({ sponsor: { logo: sponsor.logo, line: "a".repeat(81) } }), null);
 });
 
-test("optional sponsor renders on open/closed LOVD questions, never on other designs or solution", () => {
+test("optional sponsor renders on open/closed branded questions, never on other designs or solution", () => {
+  for (const style of ["EDITORIAL", "KOMM_ONE"] as const) {
+    for (const scenario of ["sponsor-open", "sponsor-choice"] as const) {
+      const fixture = buildPresentationQualityFixture(scenario, style);
+      assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture)), /Sponsor dieser Frage/);
+      if (fixture.slide.typ !== "frage") throw new Error("question fixture required");
+      const solution = { ...fixture, slide: { ...fixture.slide, typ: "aufloesung" as const } };
+      assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, solution)), /Sponsor dieser Frage/);
+    }
+  }
   for (const scenario of ["sponsor-open", "sponsor-choice"] as const) {
-    const fixture = buildPresentationQualityFixture(scenario, "EDITORIAL");
-    assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture)), /Sponsor dieser Frage/);
-    if (fixture.slide.typ !== "frage") throw new Error("question fixture required");
-    const solution = { ...fixture, slide: { ...fixture.slide, typ: "aufloesung" as const } };
-    assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, solution)), /Sponsor dieser Frage/);
     for (const style of ["NEON", "CORPORATE", "BIRTHDAY"] as const) {
       const other = buildPresentationQualityFixture(scenario, style);
       assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, other)), /Sponsor dieser Frage/);
     }
   }
   assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("normal", "EDITORIAL"))), /presentation-question-sponsor/);
+  assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("normal", "KOMM_ONE"))), /presentation-question-sponsor/);
 });
 
 test("sponsor adds only a noninteractive presentation position and retains all question/reveal identities", () => {
@@ -64,4 +69,7 @@ test("sponsor adds only a noninteractive presentation position and retains all q
   assert.equal(intro.slide.typ, "ablauf");
   assert.notEqual(parsePresentationSlideKey(getPresentationSlideKey(intro.slide))?.kind, "QUESTION");
   assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, intro)), /Präsentiert von/);
+
+  const kommOneIntro = buildPresentationQualityFixture("sponsor-intro", "KOMM_ONE");
+  assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, kommOneIntro)), /Präsentiert von/);
 });

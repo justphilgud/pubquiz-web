@@ -1931,7 +1931,7 @@ export async function getQuizPraesentation(
 
   const templates = await resolveQuizTemplates(quizId);
   return {
-    sponsorMomentsEnabled: templates?.theme.design.stylePreset === "EDITORIAL",
+    sponsorMomentsEnabled: templates?.theme.design.stylePreset === "EDITORIAL" || templates?.theme.design.stylePreset === "KOMM_ONE",
     quiz_id: quiz.quiz_id,
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,

@@ -6,6 +6,7 @@ export const presentationStylePresets = [
   { id: "CORPORATE", name: "Corporate", description: "Klare Flächen, sachliche Typografie und ein ruhiger Markenbereich.", useCase: "Firmenquiz, Workshop und Kundenevent", swatches: ["#f1f5f9", "#1d4ed8", "#334155"] },
   { id: "BIRTHDAY", name: "Storybook", description: "Eine ruhige, persönliche Fotobuch-Welt mit redaktioneller Typografie und kuratierten Erinnerungen.", useCase: "Geburtstag, Jubiläum und gemeinsamer Rückblick", swatches: ["#f5f0e8", "#8f2f4f", "#b89a68"] },
   { id: "EDITORIAL", name: "LOVD × ungegoogelt", description: "Warme Venue-Atmosphäre mit offener Fläche, präziser Typografie und ruhigen Akzenten.", useCase: "Gastronomie, Kultur und hochwertige Kollaborationen", swatches: ["#6A241C", "#FFF9E9", "#C64D3B"] },
+  { id: "KOMM_ONE", name: "Komm.ONE PubQuiz", description: "Digitale Markenbühne mit Midnight, Lagoon und präzisen Amarillo-Akzenten.", useCase: "Komm.ONE Veranstaltungen, Workshops und Quizabende", swatches: ["#003A40", "#00B2A9", "#F1C400"] },
 ] as const satisfies readonly { id: PresentationDesignStyle; name: string; description: string; useCase: string; swatches: readonly string[] }[];
 
 const templateIdByStyle: Record<PresentationDesignStyle, string> = {
@@ -13,6 +14,7 @@ const templateIdByStyle: Record<PresentationDesignStyle, string> = {
   CORPORATE: "corporate-reference",
   BIRTHDAY: "birthday-reference",
   EDITORIAL: "lovd-ungegoogelt",
+  KOMM_ONE: "komm-one-pubquiz",
 };
 
 export function createPresentationStylePreset(style: PresentationDesignStyle): PresentationTemplateConfig {
@@ -55,4 +57,5 @@ export const compatibleLayoutPresets: Record<PresentationDesignStyle, readonly P
   CORPORATE: ["CLASSIC", "SPLIT", "MAGAZINE"],
   BIRTHDAY: ["IMAGE_FOCUS", "MAGAZINE", "COLLAGE"],
   EDITORIAL: ["CLASSIC", "SPLIT", "MAGAZINE"],
+  KOMM_ONE: ["CLASSIC", "SPLIT", "IMAGE_FOCUS"],
 };

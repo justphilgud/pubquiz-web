@@ -680,8 +680,8 @@ export default function QuizAntwortClient({
     >
       <div className="mx-auto max-w-2xl space-y-6">
         <section className="answer-surface answer-brand-header rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {theme.design.stylePreset === "EDITORIAL" && theme.identity.logoUrl && (
-            <img src={theme.identity.logoUrl} alt="LOVD STELP" className="answer-editorial-logo" />
+          {(theme.design.stylePreset === "EDITORIAL" || theme.design.stylePreset === "KOMM_ONE") && theme.identity.logoUrl && (
+            <img src={theme.identity.logoUrl} alt={theme.design.stylePreset === "KOMM_ONE" ? "Komm.ONE" : "LOVD STELP"} className={theme.design.stylePreset === "KOMM_ONE" ? "answer-komm-one-logo" : "answer-editorial-logo"} />
           )}
           <div className="answer-brand-copy">
             <h1 className="break-words text-3xl font-bold">
