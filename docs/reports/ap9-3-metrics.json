@@ -1,0 +1,139 @@
+{
+  "name": "soak-complete",
+  "elapsedSeconds": 1895.7496899414064,
+  "requestCount": 267362,
+  "requestsPerSecond": 141.0323321789722,
+  "http5xxOrTransport": 2,
+  "errorPercent": 0.0007480494610303633,
+  "retries": 0,
+  "conflicts": 0,
+  "timeouts": 0,
+  "successfulSave": {
+    "count": 9619,
+    "p50": 175,
+    "p95": 626,
+    "p99": 1325,
+    "max": 1896.6381999999285
+  },
+  "allSave": {
+    "count": 9643,
+    "p50": 176,
+    "p95": 662,
+    "p99": 1346,
+    "max": 1896.6381999999285,
+    "success": 9619,
+    "reasons": {
+      "LIVE_STATE_CHANGED": 24
+    }
+  },
+  "join": {
+    "count": 40,
+    "p50": 696,
+    "p95": 1348,
+    "p99": 1404,
+    "max": 1403.527800001204,
+    "success": 40,
+    "reasons": {}
+  },
+  "snapshot": {
+    "count": 257679,
+    "p50": 66,
+    "p95": 129,
+    "p99": 759,
+    "max": 2086.023900002241,
+    "success": 257677,
+    "reasons": {
+      "TRANSPORT_OR_JSON_ERROR": 2
+    }
+  },
+  "lostConfirmed": 0,
+  "closedObservations": [
+    {
+      "deadline": "2026-09-12T23:26:44.533Z",
+      "firstClosedServerObservationAfterMs": 858
+    },
+    {
+      "deadline": "2026-09-12T23:42:24.264Z",
+      "firstClosedServerObservationAfterMs": 935
+    }
+  ],
+  "bins": [
+    {
+      "minute": 0,
+      "save": {
+        "count": 1597,
+        "p50": 181,
+        "p95": 789,
+        "p99": 1274,
+        "max": 1690.2172999978065
+      },
+      "generatorRssMB": 653.8515625
+    },
+    {
+      "minute": 5,
+      "save": {
+        "count": 1692,
+        "p50": 166,
+        "p95": 497,
+        "p99": 1337,
+        "max": 1720.597999997437
+      },
+      "generatorRssMB": 795.1953125
+    },
+    {
+      "minute": 10,
+      "save": {
+        "count": 1497,
+        "p50": 173,
+        "p95": 472,
+        "p99": 1282,
+        "max": 1531.378199994564
+      },
+      "generatorRssMB": 915.75
+    },
+    {
+      "minute": 15,
+      "save": {
+        "count": 1380,
+        "p50": 190,
+        "p95": 836,
+        "p99": 1387,
+        "max": 1568.2254000008106
+      },
+      "generatorRssMB": 1060.5859375
+    },
+    {
+      "minute": 20,
+      "save": {
+        "count": 1687,
+        "p50": 180,
+        "p95": 630,
+        "p99": 1464,
+        "max": 1896.6381999999285
+      },
+      "generatorRssMB": 1212.92578125
+    },
+    {
+      "minute": 25,
+      "save": {
+        "count": 1699,
+        "p50": 170,
+        "p95": 473,
+        "p99": 1209,
+        "max": 1554.1433999985456
+      },
+      "generatorRssMB": 1382.3515625
+    },
+    {
+      "minute": 30,
+      "save": {
+        "count": 67,
+        "p50": 196,
+        "p95": 314,
+        "p99": 327,
+        "max": 326.6916000023484
+      },
+      "generatorRssMB": 1518.34765625
+    }
+  ]
+}

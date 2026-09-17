@@ -3,6 +3,7 @@ import { resolveQuizLifecycle, type QuizLifecycle } from "@/app/quiz/quizLifecyc
 export type PresentationPlaybackCommand = "play" | "pause" | "stop" | null;
 
 export type PresentationLiveState = {
+  serverNow?: number;
   lifecycle: QuizLifecycle;
   lifecycleRevision: number;
   slideIndex: number;

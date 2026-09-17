@@ -9,6 +9,7 @@ import { parsePresentationSlideKey, resolvePresentationAudienceState, resolvePre
 import { selectQuizAnswerAssignments } from "@/app/quiz/quizAnswerLiveState";
 import { assertLifecycleRevision } from "@/app/quiz/quizLifecycle";
 import { parseQuizBlockPreviewSectionId } from "@/app/quiz/quizBlockLiveState";
+import { presentationCountdownDeadline } from "@/app/quiz/blockCountdown";
 
 function fixture() {
   const result = buildPresentationQualityFixture("sponsor-open", "EDITORIAL").quiz;
@@ -40,15 +41,32 @@ test("sponsor deck derives one explicit noninteractive position from the same qu
 
 // Execute the actual server action, with fail-closed DB/service spies. Unlike a
 // source-text assertion this catches any newly introduced mutation on this path.
-function navigationHarness(previousKey: string, previousIndex: number) {
+function navigationHarness(previousKey: string, previousIndex: number, expired = false) {
   const quiz = fixture();
   const writes: Record<string, unknown>[] = [];
   const syncCalls: string[] = [];
-  let state: Record<string, unknown> = { slide_key: previousKey, slide_index: previousIndex, lifecycle_revision: 1, countdown_status: "running", countdown_started_at: new Date(1000), countdown_dauer_sekunden: 60, quiz_started_at: new Date(500), quiz_stopped_at: null };
+  const deadline = new Date(Date.now() + (expired ? -60_000 : 60_000));
+  const closedBlocks: number[] = [];
+  let blockClosed = false;
+  let state: Record<string, unknown> = { slide_key: previousKey, slide_index: previousIndex, lifecycle_revision: 1, countdown_status: "running", countdown_started_at: new Date(deadline.getTime() - 60_000), countdown_dauer_sekunden: 60, quiz_started_at: new Date(500), quiz_stopped_at: null };
   const tx = new Proxy({ quiz_praesentation_status: {
+    findUnique: async () => state,
+    findUniqueOrThrow: async () => state,
     update: async ({ data }: { data: Record<string, unknown> }) => { writes.push(data); state = { ...state, ...data }; return state; },
     upsert: async ({ update }: { update: Record<string, unknown> }) => { writes.push(update); state = { ...state, ...update }; return state; },
+  }, quiz_block_freigaben: {
+    findMany: async ({ where }: { where: { answer_deadline_at: { lte: Date } } }) => !blockClosed && deadline <= where.answer_deadline_at.lte
+      ? [{ quiz_abschnitt_id: 1, quiz_block_freigabe_id: 1, answer_deadline_at: deadline }] : [],
+    update: async () => { blockClosed = true; },
   } }, { get(target, property) { if (!(property in target)) throw Error(`Unexpected database access: ${String(property)}`); return Reflect.get(target, property); } });
+  const interactionSource = ts.createSourceFile("interaction.server.ts", readFileSync("app/quiz/interaction/interaction.server.ts", "utf8"), ts.ScriptTarget.Latest, true);
+  const windowSource = interactionSource.statements.filter(node => ts.isFunctionDeclaration(node) && ["expireQuizBlockDeadlines", "requireQuizAnswerWindow"].includes(node.name?.text ?? "")).map(node => node.getText(interactionSource)).join("\n");
+  const windowExports: Record<string, unknown> = {};
+  runInNewContext(ts.transpileModule(windowSource, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, {
+    exports: windowExports, Date, presentationCountdownDeadline,
+    requireQuizRunning: async () => state,
+    closeBlockInteractions: async (_: unknown, _quiz: number, block: number) => { closedBlocks.push(block); },
+  });
   const dependencies: Record<string, unknown> = {
     "@/app/lib/prisma": { prisma: { $transaction: (work: (db: unknown) => unknown) => work(tx) } },
     "../../actions": { getQuizPraesentation: async () => quiz },
@@ -58,14 +76,14 @@ function navigationHarness(previousKey: string, previousIndex: number) {
     "../../quizLifecycle.server": { requireQuizNotStopped: async () => state },
     "@/app/rendering/presentation/presentationLiveState": { parsePresentationSlideKey },
     "@/app/quiz/quizBlockLiveState": { parseQuizBlockPreviewSectionId },
-    "@/app/quiz/interaction/interaction.server": { syncInteractionForPresentation: async (_: unknown, input: { slideKey: string }) => { syncCalls.push(input.slideKey); } },
+    "@/app/quiz/interaction/interaction.server": { ...windowExports, syncInteractionForPresentation: async (_: unknown, input: { slideKey: string }) => { syncCalls.push(input.slideKey); } },
     "@/app/lib/prismaQueryDiagnostics.server": { logLivePerformance: () => {}, withPrismaQueryDiagnostics: async (work: () => unknown) => ({ result: await work(), diagnostics: null }) },
   };
   const exports: Record<string, (...args: unknown[]) => Promise<unknown>> = {};
   const source = readFileSync("app/quiz/[quizId]/praesentation/statusActions.ts", "utf8");
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   runInNewContext(code, { exports, require: (name: string) => dependencies[name] ?? {}, performance, Date });
-  return { quiz, writes, syncCalls, state: () => state, navigate: exports.setPraesentationSlideIndex };
+  return { quiz, writes, syncCalls, closedBlocks, deadline, state: () => state, navigate: exports.setPraesentationSlideIndex };
 }
 
 for (const before of ["question:9:question", "question:9:solution", "flow:pause:BREAK", "flow:countdown:COUNTDOWN", "pixel-explanation:9"]) {
@@ -107,4 +125,18 @@ test("forged sponsor keys cannot bypass server deck validation", async () => {
   const h = navigationHarness("question:9:question", 0);
   await assert.rejects(h.navigate(h.quiz.quiz_id, 0, "sponsor:999999", 1), /Präsentationsposition/);
   assert.equal(h.writes.length, 0);
+});
+
+test("sponsor navigation preserves mandatory expiry of an already elapsed block deadline", async () => {
+  const h = navigationHarness("flow:countdown:COUNTDOWN", 0, true);
+  const deck = buildPraesentationSlides(h.quiz);
+  const index = deck.findIndex(s => s.typ === "ablauf" && s.presentationRole?.kind === "SPONSOR");
+  const key = getPresentationSlideKey(deck[index]);
+  await h.navigate(h.quiz.quiz_id, index, key, 1);
+  assert.deepEqual(h.closedBlocks, [1]);
+  assert.equal(h.state().countdown_status, "finished");
+  assert.equal((h.state().countdown_ended_at as Date).getTime(), h.deadline.getTime());
+  assert.equal(h.syncCalls.length, 0);
+  await h.navigate(h.quiz.quiz_id, index, key, 1);
+  assert.deepEqual(h.closedBlocks, [1]);
 });

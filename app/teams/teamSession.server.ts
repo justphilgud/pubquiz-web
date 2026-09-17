@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { requireQuizNotStopped } from "@/app/quiz/quizLifecycle.server";
 
 import { prisma } from "@/app/lib/prisma";
@@ -17,6 +18,7 @@ type StartTeamSessionInput = {
   teamName: string;
   playerCount: number;
   password?: string;
+  joinRequestId?: string;
 };
 
 export type StartTeamSessionResult =
@@ -46,6 +48,12 @@ export async function startGlobalTeamQuizSession(
 
   const normalizedName = normalizeTeamName(teamName);
   const suppliedPassword = normalizeTeamPassword(input.password);
+
+  if (input.joinRequestId !== undefined && !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.joinRequestId)) {
+    return { success: false, message: "Bitte den Teambeitritt erneut starten." };
+  }
+  const requestHash = input.joinRequestId
+    ? createHash("sha256").update(`${input.quizId}:${normalizedName}:${input.joinRequestId}`).digest("hex") : null;
 
   const execute = () => prisma.$transaction(async (transaction) => {
     const quiz = await transaction.quiz.findFirst({
@@ -77,7 +85,14 @@ export async function startGlobalTeamQuizSession(
           message: "Dieses Team ist archiviert. Bitte wendet euch an die Quizleitung.",
         } as const;
       }
-      if (!teamPasswordMatches(team.team_passwort, suppliedPassword)) {
+      const priorJoin = requestHash ? await transaction.quiz_team_sessions.findUnique({
+        where: { quiz_id_team_id: { quiz_id: input.quizId, team_id: team.team_id } },
+        select: { join_request_hash: true, erstellt_am: true },
+      }) : null;
+      const recovering = requestHash !== null && priorJoin?.join_request_hash === requestHash &&
+        Date.now() - priorJoin.erstellt_am.getTime() < 24 * 60 * 60 * 1000;
+      if (recovering) generatedPassword = team.team_passwort;
+      if (!recovering && !teamPasswordMatches(team.team_passwort, suppliedPassword)) {
         return {
           success: false,
           message: "Falsches Team-Passwort. Dieses Team existiert bereits – bitte meldet euch mit eurem Team-Passwort an.",
@@ -116,6 +131,7 @@ export async function startGlobalTeamQuizSession(
       create: {
         quiz_id: input.quizId,
         team_id: team.team_id,
+        join_request_hash: teamWasCreated ? requestHash : null,
         teamname: team.teamname,
         spieler_anzahl: input.playerCount,
       },

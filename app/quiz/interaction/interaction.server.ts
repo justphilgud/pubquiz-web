@@ -1,6 +1,7 @@
 import { draftInputFromStored, readInteractionSnapshot } from "./interactionStoredAnswer";
 import { Prisma } from "@/app/generated/prisma/client";
-import { requireQuizNotStopped } from "../quizLifecycle.server";
+import { lockQuizLifecycle, requireQuizNotStopped as requireQuizRunning } from "../quizLifecycle.server";
+import { presentationCountdownDeadline } from "../blockCountdown";
 import { resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { resolveQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
@@ -75,6 +76,61 @@ import {
 } from "@/app/umfragen/livePollRuntime.server";
 
 type DbClient = Prisma.TransactionClient;
+
+/** Caller holds the quiz lock; all writes and closes share quiz -> run -> draft. */
+export async function expireQuizBlockDeadlines(db: DbClient, quizId: number, now = new Date()) {
+  const expired = await db.quiz_block_freigaben.findMany({
+    where: { quiz_id: quizId, ist_geschlossen: false, answer_deadline_at: { lte: now } },
+    orderBy: { quiz_abschnitt_id: "asc" },
+  });
+  for (const block of expired) {
+    await closeBlockInteractions(db, quizId, block.quiz_abschnitt_id, "BLOCK_DEADLINE_EXPIRED");
+    await db.quiz_block_freigaben.update({
+      where: { quiz_block_freigabe_id: block.quiz_block_freigabe_id },
+      data: { ist_freigegeben: false, ist_geschlossen: true, geschlossen_ab: block.answer_deadline_at },
+    });
+  }
+  const status = await db.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } });
+  const deadline = status && presentationCountdownDeadline(status);
+  if (status?.countdown_status === "running" && deadline && deadline <= now) {
+    await db.quiz_praesentation_status.update({
+      where: { quiz_id: quizId },
+      data: { countdown_status: "finished", countdown_ended_at: deadline },
+    });
+  }
+}
+
+export async function requireQuizAnswerWindow(db: DbClient, quizId: number) {
+  await requireQuizRunning(db, quizId);
+  await expireQuizBlockDeadlines(db, quizId);
+  return db.quiz_praesentation_status.findUniqueOrThrow({ where: { quiz_id: quizId } });
+}
+
+const requireQuizNotStopped = requireQuizAnswerWindow;
+
+/** No timer process: the first relevant read materializes the elapsed boundary. */
+export async function ensureQuizBlockDeadlines(quizId: number) {
+  // Polls must not reserve a transaction/quiz lock when there is nothing to
+  // close. Read persisted deadlines afresh; writes still recheck under lock.
+  const [status, blocks] = await Promise.all([
+    prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } }),
+    prisma.quiz_block_freigaben.findMany({
+      where: { quiz_id: quizId, ist_geschlossen: false, answer_deadline_at: { not: null } },
+      select: { answer_deadline_at: true },
+    }),
+  ]);
+  const now = new Date();
+  const deadline = status && presentationCountdownDeadline(status);
+  if (status && !blocks.some(block => block.answer_deadline_at && block.answer_deadline_at <= now) &&
+    !(status.countdown_status === "running" && deadline && deadline <= now)) {
+    return status;
+  }
+  return prisma.$transaction(async (tx) => {
+    await lockQuizLifecycle(tx, quizId);
+    await expireQuizBlockDeadlines(tx, quizId);
+    return tx.quiz_praesentation_status.findUniqueOrThrow({ where: { quiz_id: quizId } });
+  }, { timeout: 30_000 });
+}
 
 function toJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -849,11 +905,12 @@ async function isRunReleasedForAnswerWrite(
 }
 
 export type SaveTeamAnswerDraftResult =
-  | { success: true; draftRevision: number; draftUpdatedAt: string }
+  | { success: true; draftRevision: number; draftUpdatedAt: string; confirmedDraft: TeamAnswerDraftInput }
   | {
       success: false;
       reason: "LIVE_STATE_CHANGED" | "REVISION_CONFLICT" | "FINALIZED";
       currentDraftRevision?: number;
+      currentDraft?: TeamAnswerDraftInput;
     };
 
 export async function saveTeamAnswerDraft(input: {
@@ -888,6 +945,7 @@ export async function saveTeamAnswerDraft(input: {
       where: { interaction_run_id: interactionRunId },
     });
     const now = new Date();
+    await expireQuizBlockDeadlines(tx, input.quizId, now);
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (
       !run ||
@@ -987,6 +1045,7 @@ export async function saveTeamAnswerDraft(input: {
         return {
           success: true,
           draftRevision: previous.draft_revision,
+          confirmedDraft: draftInputFromStored(previous),
           draftUpdatedAt: (
             previous.draft_updated_at ?? previous.aktualisiert_am
           ).toISOString(),
@@ -996,6 +1055,9 @@ export async function saveTeamAnswerDraft(input: {
         success: false,
         reason: "REVISION_CONFLICT",
         currentDraftRevision: currentRevision,
+        currentDraft: previous?.interaction_run_id === run.interaction_run_id
+          ? draftInputFromStored(previous)
+          : { answerText: null, selectedAnswerIds: [], structuredAnswers: [] },
       };
     }
     const requestedAnswerIds = [...input.draft.selectedAnswerIds];
@@ -1003,6 +1065,7 @@ export async function saveTeamAnswerDraft(input: {
       return {
         success: true,
         draftRevision: previous.draft_revision,
+          confirmedDraft: draftInputFromStored(previous),
         draftUpdatedAt: (previous.draft_updated_at ?? previous.aktualisiert_am).toISOString(),
       };
     }
@@ -1068,6 +1131,7 @@ export async function saveTeamAnswerDraft(input: {
     return {
       success: true,
       draftRevision: nextRevision,
+      confirmedDraft: { ...input.draft, structuredAnswers: nonEmptyFields.map(field => ({ ...field, answerText: field.answerText?.trim() ?? null })) },
       draftUpdatedAt: now.toISOString(),
     };
   });
@@ -1086,6 +1150,7 @@ export async function submitTeamAnswer(input: {
       where: { interaction_run_id: input.interactionRunId },
     });
     const now = new Date();
+    await expireQuizBlockDeadlines(tx, input.quizId, now);
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (run && readPixelLiveConfigSnapshot(run.config_snapshot)?.mode === "STAGED") {
       return { success: false, reason: "STAGED_AUTO_FINALIZED" as const };
@@ -1217,6 +1282,7 @@ export async function stopPixelQuestion(input: {
       where: { interaction_run_id: input.interactionRunId },
     });
     const now = new Date();
+    await expireQuizBlockDeadlines(tx, input.quizId, now);
     if (run) run = await expireDeadlineIfNecessary(tx, run.interaction_run_id, now);
     if (
       !run ||
@@ -1338,6 +1404,7 @@ export async function getQuizLiveSnapshotData(
     presentationQuestionAssignmentId?: number;
   } = {},
 ) {
+  await ensureQuizBlockDeadlines(quizId);
   const serverNow = new Date();
   const runQuery = () => prisma.quiz_interaction_runs.findFirst({
       where: {
@@ -1360,7 +1427,7 @@ export async function getQuizLiveSnapshotData(
         },
       },
     });
-  const [initialRun, blockRelease, presentationStatus] = await Promise.all([
+  const [initialRun, blockRelease, presentationStatus, ownAnswers] = await Promise.all([
     runQuery(),
     prisma.quiz_block_freigaben.findFirst({
       where: { quiz_id: quizId },
@@ -1370,6 +1437,12 @@ export async function getQuizLiveSnapshotData(
       ],
     }),
     prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId } }),
+    quizTeamSessionId !== null
+      ? prisma.team_antworten.aggregate({
+          where: { quiz_id: quizId, quiz_team_session_id: quizTeamSessionId },
+          _sum: { draft_revision: true },
+        })
+      : Promise.resolve(null),
   ]);
   let run = initialRun;
   const initialPixelConfig = run ? readPixelLiveConfigSnapshot(run.config_snapshot) : null;
@@ -1660,7 +1733,9 @@ export async function getQuizLiveSnapshotData(
     presentationState: resolvePresentationLiveState(presentationStatus),
     lifecycle: resolvePresentationLiveState(presentationStatus).lifecycle,
     questionHidden: run?.is_hidden ?? false,
-    liveRevision: [serializeQuizParticipantLiveRevision(blockRelease, run), presentationStatus?.updated_at.toISOString() ?? ""].join(":"),
+    liveRevision: [serializeQuizParticipantLiveRevision(blockRelease, run), presentationStatus?.updated_at.toISOString() ?? "",
+      ...(ownAnswers ? [`answers:${ownAnswers._sum.draft_revision ?? 0}`] : []),
+    ].join(":"),
     blockState: blockRelease
       ? {
           quizAbschnittId: blockRelease.quiz_abschnitt_id,
