@@ -56,12 +56,57 @@ SELECTs je tatsächlicher Erhebung plus Auth-/Rollenprüfung und Transaktionsste
 keine behaupteten gemessenen Request-/CPU-/Providerkosten. Cache kann mehrere Polls
 bedienen; tatsächliches Erhebungsalter bleibt sichtbar. Keine global verteilte Cachegarantie.
 
-## Noch offene Browserabnahme
+## Browserabnahme abgeschlossen — 17.09.2026
 
-Die eigene Preview zeigt korrekt die reguläre Anmeldung. Eine bestehende globale
-Admin-Anmeldung wurde angefordert. Keine Rollen-/Authänderung vorgenommen.
-Bis sie vorliegt, bleiben Desktop-/Schmalansicht, die vier UI-Szenarien, Screenshots
-und tatsächliche DB-/Request-/Payloadmesswerte ausdrücklich **noch nicht abgenommen**.
+Der Betreiber meldete sich regulär als bestehender Admin an. Keine Rollen-/Authänderung.
+Benutzermenü → Monitoring führt nach `/admin/monitoring`. Alle sechs Kacheln lesbar.
+
+| Browserfall | Beobachtung / Ergebnis |
+|---|---|
+| Echte Preview | Logische Preview und SHA b3bd441 korrekt, Anwendung/DB/Deployment grün |
+| Begrenzte Liveprojektion | 6+ RUNNING-Testquizze, Begrenzung korrekt gelb; alte Zustandsänderung nicht als Clientausfall interpretiert |
+| Gesunder synthetischer Zustand | DB 24 ms, grüner Livezustand, 12 registrierte Teams / 9 Antwortdatensätze; explizite SIMULATION-Kennzeichnung |
+| Warnzustand | DB 900 ms, gelbe DB-Kachel |
+| Fehlerzustand | Leseprüfung fehlgeschlagen, DB rot und Gesamtstatus Handlungsbedarf |
+| Kein Quiz | „Kein Quiz aktiv“, Live-Kachel grün |
+| Rückkehr zur Messung | Simulation verschwindet; echte Quizdaten und Release erneut sichtbar |
+| Ereignisse | Szenariowechsel getrennt als Simulation, roter Fehler und Rückkehr sichtbar |
+| Desktop | 1280 × 900 CSS-Pixel, scrollWidth 1265, kein horizontaler Überlauf; drei Kachelspalten |
+| Smartphone | 390 × 844 CSS-Pixel, scrollWidth 375, kein horizontaler Überlauf; einspaltig, Auswahl und Schalter nutzbar |
+| Geheimnisschutz | Keine Credential-/Connectionstring-/Hashmuster im sichtbaren Dashboard; keine Antwortinhalte/Teamnamen |
+| Pause / Veraltung / Wiederaufnahme | Bei pausierter Aktualisierung blieb die Erhebung 06:07:20 erhalten; nach 81 s korrekt „Zustand veraltet“ und Anwendung gelb. Anschließend automatische Aktualisierung und echte Datenquelle wiederhergestellt |
+
+Die Tests healthy/warning/error/no-quiz verändern keine Fachdatensätze. Der gesunde
+Test bleibt insgesamt bewusst gelb wegen der tatsächlichen Messlücken. Es wurde kein
+fiktiver gesamthaft grüner Productionzustand zur Abnahme eingeführt.
+
+### Gemessene Last, echte Preview (kleine Browserstichprobe)
+
+- SELECT-1-Probe: **3 ms** in beiden protokollierten Erhebungen.
+- Collector: **26 ms und 16 ms**, jeweils **3 SELECTs**, ohne Auth-/Rollenprüfung und
+  Transaktionssteuerung. Sechs Quizze mit den aktuellen Run-Aggregaten ausgegeben.
+- Browserrequests: **212 ms, 161 ms (Cacheantwort), 119 ms**.
+- JSON-Nutzdaten: jeweils **1.727 Byte unkomprimiert**.
+- Cacheantwort um 06:06:17 Europe/Berlin behielt korrekt die Erhebung 06:05:45 bei;
+  Antwortzeit wurde nicht als neue DB-Messung ausgegeben. Weitere Erhebung 06:06:50.
+- Keine zusätzliche Providerabfrage. Keine Productionmessung, kein CPU-/Kosten-/p95-
+  oder Kapazitätsnachweis aus diesen wenigen Beobachtungen abgeleitet.
+
+### Screenshots
+
+![Desktop mit echten Previewwerten](screenshots/ap95/desktop.png)
+
+![Schmale Ansicht mit deutlich gekennzeichnetem Fehler-Test](screenshots/ap95/error-narrow.png)
+
+### Abschlussbewertung
+
+**AP9.5 Monitoring V1 auf Preview abgenommen: Ja**, innerhalb der ausdrücklich
+dokumentierten V1-Messgrenzen. Keine neue Produktkorrektur während der Browserabnahme
+erforderlich. Code-/Build-/Typecheck-/Lint-/Testnachweise unverändert. Dokumentations-CI
+[35145477922](https://github.com/justphilgud/pubquiz-web/actions/runs/35145477922) ebenfalls
+erfolgreich. Abschließende lesende Providerprüfung am 17.09. bestätigt unverändertes
+Production-Deployment. Die V1-Abnahme schließt keine offenen AP9.4-Kriterien und keine
+V2-Telemetrie-/Alarmierungsanforderungen.
 
 ## V2
 
