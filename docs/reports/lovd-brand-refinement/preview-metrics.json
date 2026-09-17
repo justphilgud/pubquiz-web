@@ -1,0 +1,354 @@
+[
+  {
+    "scenario": "lovd-intro",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "normal",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "choice4",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "solution-long",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "lovd-countdown",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "lovd-ranking",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "lovd-final",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "sponsor-intro",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "sponsor-open",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "sponsor-choice",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "lovd-outro",
+    "size": {
+      "width": 1280,
+      "height": 720
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "scenario": "lovd-intro",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "normal",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "choice4",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "solution-long",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "lovd-countdown",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "lovd-ranking",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "lovd-final",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "sponsor-intro",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "sponsor-open",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "sponsor-choice",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "scenario": "lovd-outro",
+    "size": {
+      "width": 1920,
+      "height": 1080
+    },
+    "broken": 0,
+    "nonRegular": [],
+    "overflow": [
+      0
+    ],
+    "viewport": [
+      1920,
+      1080
+    ]
+  }
+]

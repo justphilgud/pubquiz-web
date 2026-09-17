@@ -340,3 +340,111 @@ Abgaben. Lifecycle, Finalisierung und Bewertung behalten ihre bestehenden Regeln
 
 [Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
 und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.
+
+## AP9.1: Bestätigter Speicherstand und Wiederaufnahme
+
+Die fachliche Interaktions-/Submission-Engine bleibt unverändert maßgeblich.
+`AnswerDraftController` orchestriert ausschließlich den Teilnehmer-Client:
+
+- Jeder lokale Inhalt behält seine Serverbasis, einen lokalen Änderungszähler und
+  den zuletzt bestätigten Serverinhalt. Polling aktualisiert eine schmutzige Basis
+  niemals mit fremdem Inhalt. Ein Konflikt sperrt Autosave bis zur bewussten Wahl.
+- Status: geändert, speichernd, bestätigt, Fehler, Konflikt, wiedergefunden oder
+  geschlossen. Nur die Bestätigung des aktuellen Inhalts darf „gespeichert“ anzeigen.
+  Die Save-Antwort enthält den tatsächlich persistierten Inhalt, auch bei einer
+  unveränderten, normalisierten Antwort ohne neue Revision.
+- Ein Save je Frage gleichzeitig; Änderungen währenddessen bleiben lokal geändert.
+  Autosave bündelt 1.200 ms. Transporttimeout 12 Sekunden. Nach Fehlern höchstens
+  drei automatische Wiederholungen (2/5/10 Sekunden), danach manuell oder bei Online.
+  Ein Timeout ist kein Beweis, dass der Server die Anfrage verworfen hat.
+- Unbestätigte Inhalte werden synchron je Quiz/Teamsitzung/Client im lokalen
+  Browserspeicher geschützt. Andere Fenster überschreiben oder löschen diese Kopie
+  nicht. Wiederherstellung akzeptiert nur strukturell gültige Einträge bis 24 Stunden.
+  Nach Reload wird niemals still replayt: frischer Serverstand und bewusste Wahl
+  sind nötig, außer er bestätigt bereits exakt diesen Inhalt. Gespeicherte Antworten
+  werden beim Gerätewechsel ausschließlich vom Server geladen.
+- Vor Verlassen wird bei unbestätigten Inhalten gewarnt; pagehide/visibilitychange
+  versuchen einen Save. Dies garantiert keine Netzübertragung beim Schließen oder
+  Sperren. Der lokale Schutz und der sichtbare Status bleiben deshalb notwendig.
+  Bei nicht verfügbarem Browserspeicher wird dessen Ausfall sichtbar gemeldet.
+- Konfliktanzeige zeigt lokalen und bestätigten Inhalt. „Gespeicherte Antwort
+  verwenden“ verwirft bewusst die lokale Variante; „Eigene Änderung übernehmen
+  und speichern“ setzt bewusst auf der angezeigten Serverbasis auf. Jeder weitere
+  konkurrierende Save wird weiterhin durch serverseitiges CAS abgewehrt.
+- Bei geschlossenem Run/Block keine lokale Übernahme und kein automatischer Retry.
+  Der Server prüft unverändert unter seinen Locks Lifecycle, Freigabe, Run,
+  Deadline und Finalisierung. Ein spät eintreffender Retry schafft keine Ausnahme.
+  Pixel-Stufen, letzter offener Schritt und Stop-Regeln bleiben unverändert.
+- `team-answer-draft` und `team-session` sind uncached POST-Transporte um vorhandene
+  Actions. Draft-Schreiben benötigt weiterhin das validierte Team-Sitzungstoken.
+  Polling nutzt den getrennten Read-Pfad mit begrenztem Fehler-Backoff.
+
+Beim Erstbeitritt schützt eine vor dem Request lokal gespeicherte UUID den erneuten
+Versuch nach verlorener Response. Ihr SHA-256-Hash wird bei neuem Team atomar in
+`quiz_team_sessions.join_request_hash` hinterlegt. Nur gleiche Quiz-/Team-/Kennung
+innerhalb von 24 Stunden kann die Sitzung samt erzeugtem Passwort wiedererhalten.
+Bestehende Teams bleiben passwortgeschützt; ein normaler Beitritt überschreibt den
+Nachweis nicht. Reset entfernt ihn mit der Sitzung. Keine neue Abhängigkeit.
+
+Regression: `answerDraftController.test.ts`, `participantRecovery.test.ts` und
+`teamJoinRecovery.test.ts`; zusätzlich bestehende Interaction-, Lifecycle-,
+Submission-, Evaluation- und Pixel-Suiten. Deadline-Tests führen den echten
+Save-Funktionskörper mit kontrollierter Transaktion und Uhr vor/an/nach Ablauf aus.
+
+Browser-Regressionsnachtrag: Nach Wiederaufnahme werden alte Sicherungskopien
+entfernt, sobald genau ihr Inhalt serverseitig bestätigt ist. Eine bewusst andere
+Wahl wird nur für das entscheidende Browserfenster als erledigt vermerkt; die
+ungespeicherte Kopie eines parallelen Fensters bleibt erhalten. Ein späterer Reload
+darf eine bereits bestätigte Sicherung nicht nochmals als Konflikt hervorholen.
+
+Browser-Netzwerkabnahme (12. September 2026): Der vollständige autorisierte
+Antwortstatus enthält zusätzlich `answerConfirmations` aus den eigenen gespeicherten
+Drafts, unabhängig von der Sichtbarkeit der Fragen. Die Projektion enthält nur
+Frage-/Run-ID, Revision und eigenen Antwortinhalt, keine Lösungen oder fremden
+Teamdaten. So kann eine vor Blockschluss angenommene Antwort auch nach verlorener
+Response und verschwundenem Formular bestätigt werden. Der Controller gleicht
+ausschließlich bereits bekannte, nicht sichtbare Antworten desselben Runs ab;
+er erteilt dabei keine Schreibfreigabe. Abweichende lokale Inhalte bleiben geschlossen
+und unbestätigt. Eine später eintreffende Ablehnung eines alten Retries darf eine
+zwischenzeitliche Snapshot-Bestätigung nicht wieder zurücknehmen. Die bestehende
+Statusanzeige zeigt bei dieser Wiederaufnahme den tatsächlich bestätigten Inhalt.
+
+## AP9.2: Serververbindlicher allgemeiner Blockcountdown
+
+`quiz_block_freigaben.answer_deadline_at` bindet den allgemeinen Countdown an den
+freigegebenen Block. Der bestehende Präsentationscountdown liefert exakt dieselbe
+Frist; Navigation darf die Blockfrist nicht löschen. Die additive Migration
+übernimmt bereits laufende Countdowns für offene Blöcke. Pixel-Run-Deadlines,
+Stufenzeiten und deren Finalisierung bleiben unverändert.
+
+Start und Reset arbeiten unter der bestehenden Quiz-Lifecycle-Sperre. Eine
+wiederholte Startanfrage verlängert nichts; nach Navigation wird eine vorhandene
+Blockfrist übernommen. Bewusstes Reset vor Ablauf kann den Countdown zurücknehmen.
+Reset nach Ablauf öffnet keinen Block. Eine ausdrückliche Blockfreigabe bleibt die
+bestehende Moderatoraktion und setzt eine alte Blockfrist zurück.
+
+`expireQuizBlockDeadlines` im vorhandenen Interaction-Service verwendet bei
+Serverzeit >= Deadline den bestehenden `closeBlockInteractions`-Pfad und setzt
+Blockfreigabe sowie Präsentationsstatus verbindlich auf geschlossen/beendet.
+Quiz-, Run- und Draft-Locks behalten dieselbe Reihenfolge. Autorisierte
+Teilnehmer-, Moderations-, Präsentations- und Auswertungsreads führen die Prüfung
+vor dem Laden aus; Save und Submission prüfen innerhalb ihrer Transaktion erneut.
+Auch der Legacy-Save prüft den Block unter der Quiz-Sperre nochmals.
+
+Ohne irgendeinen Request muss kein Prozess aufwachen: Die Annahmefrist gilt
+logisch sofort, ihre Persistierung/Finalisierung erfolgt beim nächsten relevanten
+Zugriff. Kein Scheduler, Cron, Worker oder separater Countdown-Lebenszyklus.
+Eine vor der Grenze unter den Locks angenommene Änderung bleibt rechtzeitig,
+auch wenn ihre Response später eintrifft oder verloren geht. Requeststart oder
+lokale Bearbeitungszeit allein begründen keine rechtzeitige Annahme.
+
+Die Moderation zeigt den serverseitigen Abschluss an; ihr Effect schließt keinen
+Block mehr. Die alte Meldung allein nach geplanter Folien-Verweildauer entfällt.
+Beide allgemeinen Pause-Renderer behalten nach `finished` 00:00. Serverzeit wird
+auch beim ersten Render zur Uhrsynchronisierung mitgegeben. Keine Designänderung.
+
+Regression: `blockCountdown.test.ts` führt die echten Start-, Reset-, Ablauf-,
+Schluss- und Save-Funktionskörper mit kontrollierter Uhr und einer serialisierten
+Transaktionsfixture aus. Die Datenbankadapter und Auto-Finalisierungspersistenz
+sind dabei Fakes; die reale Persistenz und alle Oberflächen werden zusätzlich
+auf Preview abgenommen.

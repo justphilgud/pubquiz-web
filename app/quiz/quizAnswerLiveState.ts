@@ -11,6 +11,9 @@ export function selectQuizAnswerAssignments<
   assignments: readonly TAssignment[],
   releasedAssignmentIds: readonly number[] | null = null,
 ) {
+  // This server-derived presentation state also wins over previously released runs
+  // when navigating back to a sponsor. No question payload is sent during it.
+  if (audienceState.kind === "NON_QUESTION" && audienceState.slideType === "SPONSOR") return [];
   if (releasedAssignmentIds !== null) {
     const visibleIds = new Set(releasedAssignmentIds);
     return assignments.filter((assignment) =>

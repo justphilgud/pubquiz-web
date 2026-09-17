@@ -101,6 +101,7 @@ export function clearQuestionTemplateFromDraft(draft: QuestionEditorDraft): Ques
     sourceTemplateId: null,
     questionText: switchesFromSpecialTemplate ? "" : draft.questionText,
     templateConfig: {
+      ...(draft.templateConfig.sponsor ? { sponsor: draft.templateConfig.sponsor } : {}),
       stageDurationsSeconds: draft.templateConfig.stageDurationsSeconds,
       createPixelQuestionByAnswer: draft.templateConfig.createPixelQuestionByAnswer,
     },

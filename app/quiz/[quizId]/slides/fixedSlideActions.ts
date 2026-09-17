@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { BOOKING_LIMITS, validateBooking } from "@/app/quiz/bookingSlide";
 import { prisma } from "@/lib/prisma";
 import {
   requireQuizEditor,
@@ -174,6 +175,12 @@ export async function saveOutroSlide(
         },
       });
     }
+    let bookingPatch: Partial<QuizFlowConfig> | undefined;
+    if (slideIdValue === "booking") {
+      const booking = validateBooking(Object.fromEntries(Object.keys(BOOKING_LIMITS).map(key => [key, text(formData, `booking_${key}`)])));
+      if (!booking.ok) return { status: "error", message: booking.message };
+      bookingPatch = { booking: booking.value };
+    }
     await saveSlideVisibility(
       quizId,
       slideIdValue,
@@ -184,7 +191,7 @@ export async function saveOutroSlide(
             body: text(formData, "body"),
             teamHint: text(formData, "ctaText"),
           }
-        : undefined,
+        : bookingPatch,
     );
 
     revalidatePath(`/quiz/${quizId}`);

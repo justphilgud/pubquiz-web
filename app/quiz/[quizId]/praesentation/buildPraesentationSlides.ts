@@ -1,3 +1,4 @@
+import { parseQuestionSponsor } from "@/app/rendering/presentation/questionSponsor";
 import type { QuizPraesentationResult } from "../../actions";
 import {
   isIntroSection,
@@ -52,6 +53,7 @@ export type Slide =
   }
   | {
     typ: "ablauf";
+    presentationRole?: { kind: "SPONSOR"; questionAssignmentId: number };
     element: QuizFlowItem;
     abschnitt: Abschnitt | null;
   }
@@ -114,6 +116,21 @@ export function buildPraesentationSlides(
   } = {},
 ): Slide[] {
   const result: Slide[] = [];
+  const appendSponsor = (frage: QuizPraesentationResult["fragen"][number], abschnitt: Abschnitt | null) => {
+    const sponsor = parseQuestionSponsor(frage.templateConfig?.sponsor);
+    if (!quiz.sponsorMomentsEnabled || !sponsor) return;
+    result.push({
+      typ: "ablauf", abschnitt,
+      presentationRole: { kind: "SPONSOR", questionAssignmentId: frage.quiz_fragen_id },
+      element: {
+        id: `sponsor:${frage.quiz_fragen_id}`, persistentId: null, type: "IMAGE",
+        anchorType: "BLOCK", anchorKey: String(abschnitt?.quiz_abschnitt_id ?? "QUIZ"),
+        sectionId: abschnitt?.quiz_abschnitt_id ?? null, order: 0, enabled: true,
+        label: "Sponsor-Moment", configVersion: 1, questionAssignmentId: null, isStandard: false,
+        config: { version: 1, title: sponsor.line, imageUrl: sponsor.logo, altText: "Sponsorlogo" },
+      },
+    });
+  };
 
   const sortierteAbschnitte = [...quiz.abschnitte].sort(
     (a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0)
@@ -226,6 +243,7 @@ export function buildPraesentationSlides(
         };
         if (entry.kind === "QUESTION") {
           if (shared.frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt, frage: shared.frage });
+          appendSponsor(shared.frage, abschnitt);
           result.push({ typ: "frage", ...shared });
         }
         else appendSolution(shared);
@@ -253,6 +271,7 @@ export function buildPraesentationSlides(
         fragenAnzahlImBlock: fragenImBlock.length,
       };
       if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt, frage });
+      appendSponsor(frage, abschnitt);
       result.push({ typ: "frage", ...shared });
       appendSolution(shared);
     });
@@ -265,6 +284,7 @@ export function buildPraesentationSlides(
   if (fragenOhneBlock.length > 0) {
     fragenOhneBlock.forEach((frage, index) => {
       if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt: null, frage });
+      appendSponsor(frage, null);
       result.push({
         typ: "frage",
         abschnitt: null,
@@ -290,6 +310,7 @@ export function buildPraesentationSlides(
 export function getPresentationSlideKey(slide: Slide) {
   if (slide.typ === "pixel-erklaerung") return `pixel-explanation:${slide.frage.quiz_fragen_id}`;
   if (slide.typ === "ablauf") {
+    if (slide.presentationRole?.kind === "SPONSOR") return `sponsor:${slide.presentationRole.questionAssignmentId}`;
     if (
       slide.element.type === "ROUND_INTRO" &&
       slide.abschnitt?.quiz_abschnitt_id

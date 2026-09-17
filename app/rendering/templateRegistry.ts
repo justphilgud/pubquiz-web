@@ -38,7 +38,7 @@ export type BrandFontFamily = (typeof brandFontOptions)[number]["value"];
 
 export type BrandTypographyTokens = {
   family: BrandFontFamily;
-  displayWeight: 700 | 800 | 900;
+  displayWeight: 400 | 700 | 800 | 900;
   bodyWeight: 400 | 500 | 600;
 };
 
@@ -345,11 +345,11 @@ const presentation = [
     design: presentationDesigns.EDITORIAL,
     tokens: {
       ...sharedSizing,
-      typography: { family: "var(--font-plus-jakarta-sans), Arial, sans-serif", displayWeight: 700, bodyWeight: 400 },
+      typography: { family: "var(--font-montserrat), Arial, sans-serif", displayWeight: 400, bodyWeight: 400 },
       radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
-      assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
-      colors: { primary: "#d45a3d", secondary: "#913727", accent: "#c84d34", background: "#74291d", surface: "#642218", surfaceStrong: "#4b180f", text: "#f6efe4", textMuted: "#d8c5b4", border: "#a6533d", correct: "#e3b65b", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
+      assets: { logo: "/branding/lovd/lovd-stelp-creme-rgb.png", backgroundImage: null },
+      colors: { primary: "#C64D3B", secondary: "#6A241C", accent: "#C64D3B", background: "#6A241C", surface: "#6A241C", surfaceStrong: "#141414", text: "#FFF9E9", textMuted: "#FFF9E9", border: "#C64D3B", correct: "#e3b65b", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
     },
   },
 ] as const satisfies readonly PresentationTemplate[];

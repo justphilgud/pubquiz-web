@@ -2,9 +2,13 @@
 
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
+import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
+import { SponsorMoment } from "./SponsorMoment";
+import { BookingSlide } from "./BookingSlide";
+import { parseQuestionSponsor } from "./questionSponsor";
 import { pixelRules } from "@/app/fragen/editor/templates/pixelRules";
 
 import {
@@ -2053,20 +2057,7 @@ function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
   const dauerSekunden =
     remoteCountdownDauerSekunden ?? slide.dauerSekunden;
 
-  const verstrichen =
-    remoteCountdownStartedAt && remoteCountdownStatus === "running"
-      ? Math.max(
-        0,
-        Math.floor(
-          (now - new Date(remoteCountdownStartedAt).getTime()) / 1000
-        )
-      )
-      : 0;
-
-  const aktuelleSekunden =
-    remoteCountdownStatus === "running"
-      ? Math.max(0, dauerSekunden - verstrichen)
-      : dauerSekunden;
+  const aktuelleSekunden = countdownRemainingSeconds(remoteCountdownStartedAt, dauerSekunden, remoteCountdownStatus, now);
 
   const minuten = Math.floor(aktuelleSekunden / 60);
   const sekunden = aktuelleSekunden % 60;
@@ -2327,16 +2318,7 @@ function renderYearlyStandingsSlide(
 function renderFlowPauseSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
   const config = slide.element.config;
   const duration = remoteCountdownDauerSekunden ?? config.durationSeconds ?? 300;
-  const elapsed =
-    remoteCountdownStartedAt && remoteCountdownStatus === "running"
-      ? Math.max(
-          0,
-          Math.floor((now - new Date(remoteCountdownStartedAt).getTime()) / 1000),
-        )
-      : 0;
-  const remaining = remoteCountdownStatus === "running"
-    ? Math.max(0, duration - elapsed)
-    : duration;
+  const remaining = countdownRemainingSeconds(remoteCountdownStartedAt, duration, remoteCountdownStatus, now);
 
   return (
     <section className="presentation-flow-slide presentation-flow-pause" data-flow-type={slide.element.type}>
@@ -2522,6 +2504,8 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
     );
   }
 
+  if (type === "BOOKING_CONTACT") return <BookingSlide content={config.booking} />;
+
   if (type === "QUESTION_SUBMISSION_QR") {
     return (
       <section className="presentation-flow-slide" data-flow-type={type}>
@@ -2621,6 +2605,7 @@ function renderAktuellenSlide() {
   }
 
   if (slide.typ === "ablauf") {
+    if (slide.presentationRole?.kind === "SPONSOR") return null;
     return renderFlowContentSlide(slide);
   }
   if (slide.typ === "pixel-erklaerung") {
@@ -2720,6 +2705,11 @@ function renderAktuellenSlide() {
       })
     : null;
 
+  const sponsorMoment = theme.design.stylePreset === "EDITORIAL" && slide?.typ === "ablauf" && slide.presentationRole?.kind === "SPONSOR"
+    ? { phase: "SPONSOR" as const, assignmentId: slide.presentationRole.questionAssignmentId, sponsor: parseQuestionSponsor({ logo: slide.element.config.imageUrl, line: slide.element.config.title }) }
+    : theme.design.stylePreset === "EDITORIAL" && slide?.typ === "frage"
+      ? { phase: "QUESTION" as const, assignmentId: slide.frage.quiz_fragen_id, sponsor: parseQuestionSponsor(slide.frage.templateConfig?.sponsor) }
+      : null;
   return (
     <QuizThemeScope
       theme={theme}
@@ -2735,11 +2725,12 @@ function renderAktuellenSlide() {
           slideLabel={slideLabel}
           slideNumber={slideIndex + 1}
           slideCount={slides.length}
+          sponsor={slide?.typ === "frage" ? parseQuestionSponsor(slide.frage.templateConfig?.sponsor) ?? undefined : undefined}
           storybookComposition={storybookComposition}
         />
       )}
       <PresentationDesignStage theme={theme} storybookComposition={storybookComposition} contentKey={`${slideIndex}:${slideContentKey}:${pollContentKey}:${theme.design.stylePreset}:${templateRevealCount}:${estimationPhase}`}>
-        {estimationPhase !== "HIDDEN"
+        {sponsorMoment?.phase !== "SPONSOR" && estimationPhase !== "HIDDEN"
           ? renderSchaetzfrageOverlay()
           : renderAktuellenSlide()}
       </PresentationDesignStage>
@@ -2776,8 +2767,9 @@ function renderAktuellenSlide() {
         (slide?.typ === "block" && slide.abschnitt.abschnitt_typ === "intro_qrcode")
       ) && <TeamJoinWelcome key={`${quiz.quiz_id}:${slideIndex}:${teamJoinState.joinObservation.lifecycleRevision}`}
         observation={teamJoinState.joinObservation} />}
+      <SponsorMoment moment={sponsorMoment?.sponsor ? { ...sponsorMoment, sponsor: sponsorMoment.sponsor } : null} />
       <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
-      {mediaOverlayActive && overlayMedia.length > 0 && (
+      {sponsorMoment?.phase !== "SPONSOR" && mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="presentation-media-overlay absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
           <div className="presentation-media-overlay-content grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">
             {overlayMedia.slice(0, 2).map((medium) =>

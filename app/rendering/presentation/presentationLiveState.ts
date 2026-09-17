@@ -3,6 +3,7 @@ import { resolveQuizLifecycle, type QuizLifecycle } from "@/app/quiz/quizLifecyc
 export type PresentationPlaybackCommand = "play" | "pause" | "stop" | null;
 
 export type PresentationLiveState = {
+  serverNow?: number;
   lifecycle: QuizLifecycle;
   lifecycleRevision: number;
   slideIndex: number;
@@ -123,6 +124,7 @@ const NON_QUESTION_STATUS_BY_TYPE: Readonly<Record<string, string>> = {
   CUSTOM_MESSAGE: "Das Quiz startet gleich",
   QUESTION_SUBMISSION_QR: "Das Quiz ist beendet",
   CALENDAR_SUBSCRIPTION: "Das Quiz ist beendet",
+  BOOKING_CONTACT: "Das Quiz ist beendet",
   CLOSING: "Das Quiz ist beendet",
   "vor-dem-start": "Das Quiz startet gleich",
   startsequenz: "Das Quiz startet gleich",
@@ -151,6 +153,9 @@ export function parsePresentationSlideKey(
   if (!slideKey) return null;
 
   const parts = slideKey.split(":");
+  if (parts[0] === "sponsor" && parts.length === 2 && parsePositiveInteger(parts[1])) {
+    return { kind: "NON_QUESTION", slideType: "SPONSOR", statusText: "Nächste Frage gleich …" };
+  }
   if (parts[0] === "pixel-explanation" && parts.length === 2 && parsePositiveInteger(parts[1])) {
     return { kind: "NON_QUESTION", slideType: "PIXEL_EXPLANATION", statusText: "Pixelbild: Gleich geht es los. Bitte die Spielregeln auf der Leinwand beachten." };
   }

@@ -75,8 +75,8 @@ test("answer forms resolve an accessible UI palette independently of presentatio
     const theme = createTheme(templateId, templateId);
 
     if (templateId === "lovd-ungegoogelt") {
-      assert.equal(theme.colors.background, "#74291d");
-      assert.equal(theme.colors.text, "#f6efe4");
+      assert.equal(theme.colors.background, "#6A241C");
+      assert.equal(theme.colors.text, "#FFF9E9");
       assert.equal(theme.ui.background, "#f8f4ee");
       assert.equal(theme.ui.text, "#24120e");
     }

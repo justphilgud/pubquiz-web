@@ -49,6 +49,7 @@ export const OUTRO_SLIDES = [
     title: "PubQuiz-Kalender",
     description: "Allgemeinen öffentlichen Kalender per QR-Code abonnieren",
   },
+  { id: "booking", title: "Buchung / Kontakt", description: "Quizabend anfragen, Kontakt und QR-Code" },
 ] as const;
 
 export type OutroSlideId = (typeof OUTRO_SLIDES)[number]["id"];
@@ -62,6 +63,7 @@ export const FIXED_SLIDE_FLOW_TYPES = {
   announcements: "CLOSING",
   questionSubmission: "QUESTION_SUBMISSION_QR",
   calendar: "CALENDAR_SUBSCRIPTION",
+  booking: "BOOKING_CONTACT",
 } as const;
 
 export type FixedSlideId = keyof typeof FIXED_SLIDE_FLOW_TYPES;

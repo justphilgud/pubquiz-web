@@ -152,3 +152,13 @@ varchar-array-to-text casts over literal elements. The validator now recognizes 
 that narrowly proven equivalence, retaining every other catalog/snapshot comparison.
 Full read-only validation of the existing target remains pending; the current combined
 restore workflow is not a read-only resume operation. Main integration requires approval.
+
+## Nach PR #15: Datenvergleich bestanden, Browser-Smoke separat offen
+
+PR #15 ist regulär auf Main `49ee7b68173ee574ed98c0912efbd8a187ef13ad` integriert;
+Main-/Bridge-CI sind grün, Production-Deploy wurde übersprungen. Ohne erneuten Backup
+oder Restore hat die vollständige lesende Nachvalidierung des vorhandenen Ziels alle
+Katalog-/Tabellen-/Stichproben-/Sequenz-/Migrations-/Auth-/Ergebnisvergleiche bestanden.
+[Nachvalidierungsbericht einschließlich Zeitgrenzen und Browser-Gate](../reports/ap9-4-run19-readonly-validation-20260916.md).
+Die oben beschriebenen historischen Vorbereitungsgates sind keine Aufforderung zum Retry.
+Der gesonderte Browser-Smoke bleibt erforderlich; Domain-Smoke und Datenvergleich ersetzen ihn nicht.

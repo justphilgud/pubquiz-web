@@ -1,7 +1,9 @@
 "use server";
+
+import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluationRevisionSelect } from "./evaluation/evaluationRevision";
-import { requireQuizNotStopped } from "./quizLifecycle.server";
+import { requireQuizAnswerWindow as requireQuizNotStopped, ensureQuizBlockDeadlines } from "./interaction/interaction.server";
 
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -181,7 +183,7 @@ export async function getQuizFixedSlideVisibility(quizId: number) {
   for (const [slideId, flowType] of Object.entries(FIXED_SLIDE_FLOW_TYPES)) {
     visibility[slideId as FixedSlideId] =
       items.find((item) => item.typ === flowType)?.ist_sichtbar ??
-      slideId !== "questionSubmission";
+      (slideId !== "questionSubmission" && slideId !== "booking");
   }
   return visibility;
 }
@@ -1693,6 +1695,8 @@ export async function removeFrageFromQuizByFrageId(data: {
   revalidatePath("/fragen");
 }
 export type QuizPraesentationResult = {
+  /** Server-resolved presentation capability, identical for navigation and both clients. */
+  sponsorMomentsEnabled?: boolean;
   quiz_id: number;
   intro_begruessungstitel: string | null;
   intro_begruessungstext: string | null;
@@ -1925,7 +1929,9 @@ export async function getQuizPraesentation(
     return null;
   }
 
+  const templates = await resolveQuizTemplates(quizId);
   return {
+    sponsorMomentsEnabled: templates?.theme.design.stylePreset === "EDITORIAL",
     quiz_id: quiz.quiz_id,
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,
@@ -2420,10 +2426,12 @@ export async function getQuizAntwortStatus(
       answerPhase: "NON_QUESTION" as const,
       presentationStatusText: null,
       teamProfile: null,
+      answerConfirmations: [],
       fragen: [],
     };
   }
 
+  await ensureQuizBlockDeadlines(quizId);
   await repairQuizSpecificOrderingAssignments(quizId);
 
   const quiz = await prisma.quiz.findUnique({
@@ -2530,7 +2538,8 @@ export async function getQuizAntwortStatus(
     })),
   );
 
-  const currentRun = interactionRuns.find((run) => run.is_current) ?? null;
+  const sponsorPosition = audienceState.kind === "NON_QUESTION" && audienceState.slideType === "SPONSOR";
+  const currentRun = sponsorPosition ? null : interactionRuns.find((run) => run.is_current) ?? null;
   const currentRunQuestion = currentRun?.quiz_fragen_id
     ? quiz.quiz_fragen.find(
         (entry) => entry.quiz_fragen_id === currentRun.quiz_fragen_id,
@@ -2620,29 +2629,25 @@ export async function getQuizAntwortStatus(
         },
       })
     : Promise.resolve([]);
-  const answerPromise =
-    fragenZurAnzeige.length > 0
-      ? prisma.team_antworten.findMany({
-          where: {
-            quiz_team_session_id: participantSession.quiz_team_session_id,
-            quiz_id: quizId,
-            quiz_fragen_id: {
-              in: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
-            },
-          },
-          include: {
-            antwortauswahlen: true,
-            submissions: {
-              orderBy: [
-                { submitted_at: "desc" as const },
-                { team_answer_submission_id: "desc" as const },
-              ],
-              take: 1,
-            },
-            antwortfelder: { include: { antwortfeld: true } },
-          },
-        })
-      : Promise.resolve([]);
+  // Own persisted content remains readable after its form disappears. Otherwise
+  // a lost save response cannot be reconciled after block close or navigation.
+  const answerPromise = prisma.team_antworten.findMany({
+    where: {
+      quiz_team_session_id: participantSession.quiz_team_session_id,
+      quiz_id: quizId,
+    },
+    include: {
+      antwortauswahlen: true,
+      submissions: {
+        orderBy: [
+          { submitted_at: "desc" as const },
+          { team_answer_submission_id: "desc" as const },
+        ],
+        take: 1,
+      },
+      antwortfelder: { include: { antwortfeld: true } },
+    },
+  });
 
   const [detaillierteFragen, gespeicherteAntworten] = await Promise.all([
     detailPromise,
@@ -2806,6 +2811,8 @@ export async function getQuizAntwortStatus(
 
   const presentationStatusText = liveState.lifecycle === "STOPPED"
     ? "Das Quiz ist beendet"
+    : sponsorPosition
+    ? "Nächste Frage gleich …"
     : offenerFragenblock
     ? null
     : currentRun?.state === "CLOSED"
@@ -2823,7 +2830,9 @@ export async function getQuizAntwortStatus(
     liveRevision: [serializeQuizParticipantLiveRevision(
       blockFreigabe ?? letzteBlockFreigabe,
       currentRun,
-    ), quiz.praesentation_status?.updated_at.toISOString() ?? ""].join(":"),
+    ), quiz.praesentation_status?.updated_at.toISOString() ?? "",
+      `answers:${gespeicherteAntworten.reduce((total, answer) => total + answer.draft_revision, 0)}`,
+    ].join(":"),
     activeQuizFragenId: currentRun?.quiz_fragen_id ?? null,
     abschnitte,
     offenerBlock:
@@ -2840,7 +2849,7 @@ export async function getQuizAntwortStatus(
         }
       : null,
     interactionState: currentRun?.state ?? (offenerFragenblock ? "OPEN" : "LOCKED"),
-    answerPhase: offenerFragenblock
+    answerPhase: sponsorPosition ? ("NON_QUESTION" as const) : offenerFragenblock
       ? ("QUESTION" as const)
       : currentRun
       ? currentRun.state === "REVEALED"
@@ -2849,6 +2858,19 @@ export async function getQuizAntwortStatus(
       : audienceState.phase,
     presentationStatusText,
     teamProfile: mapTeamProfile(participantSession.team),
+    answerConfirmations: gespeicherteAntworten.flatMap(answer => answer.interaction_run_id === null ? [] : [{
+      questionId: answer.quiz_fragen_id,
+      runId: answer.interaction_run_id,
+      revision: answer.draft_revision,
+      value: {
+        antwortText: answer.antwort_text,
+        antwortId: answer.antwort_id,
+        antwortIds: answer.antwortauswahlen.length > 0
+          ? answer.antwortauswahlen.map(selection => selection.antwort_id)
+          : answer.antwort_id === null ? [] : [answer.antwort_id],
+        antwortfelder: Object.fromEntries(answer.antwortfelder.map(field => [field.antwortfeld_id, field.antwort_text ?? ""])),
+      },
+    }]),
     fragen,
   };
 }
@@ -2883,6 +2905,7 @@ export async function startQuizTeamSession(data: {
   teamname: string;
   spielerAnzahl?: number | null;
   passwort?: string;
+  joinRequestId?: string;
 }) {
   const spielerAnzahl =
     typeof data.spielerAnzahl === "number" && data.spielerAnzahl > 0
@@ -2894,6 +2917,7 @@ export async function startQuizTeamSession(data: {
     teamName: data.teamname,
     playerCount: spielerAnzahl,
     password: data.passwort,
+    joinRequestId: data.joinRequestId,
   });
   if (!result.success) return result;
 
@@ -2956,6 +2980,7 @@ export async function freigabeQuizBlock(data: {
         ist_geschlossen: false,
         freigegeben_ab: new Date(),
         geschlossen_ab: null,
+        answer_deadline_at: null,
         aktuelle_quiz_fragen_id: null,
       },
       create: {
@@ -3530,8 +3555,13 @@ export async function saveTeamAntwort(data: {
     }
   }
 
-  await prisma.$transaction(async (tx) => {
+  const saved = await prisma.$transaction(async (tx) => {
     await requireQuizNotStopped(tx, data.quizId);
+    const currentBlock = await tx.quiz_block_freigaben.findFirst({
+      where: { quiz_id: data.quizId, quiz_abschnitt_id: data.quizAbschnittId },
+    });
+    if (!currentBlock?.ist_freigegeben || currentBlock.ist_geschlossen ||
+        (currentBlock.answer_deadline_at && currentBlock.answer_deadline_at <= new Date())) return false;
     const previousAnswer = await tx.team_antworten.findUnique({
       where: {
         quiz_fragen_id_quiz_team_session_id: {
@@ -3645,17 +3675,17 @@ export async function saveTeamAntwort(data: {
       }
     }
     await recalculateQuizAnswerEvaluation(teamAntwort.team_antwort_id, tx);
+    return true;
   });
 
-  return {
-    success: true,
-  };
+  return saved ? { success: true } : { success: false, reason: "LIVE_STATE_CHANGED" as const };
 }
 export async function getQuizFrageAuswertung(
   quizId: number,
   quizFragenId: number,
 ) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   await ensureQuizQuestionEvaluation(quizFragenId);
   const quizFrage = await prisma.quiz_fragen.findFirst({
     where: {
@@ -4094,6 +4124,7 @@ export async function updateQuizFragenStatistiken() {
 }
 export async function getQuizAuswertungUebersicht(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   const quizFragen = await prisma.quiz_fragen.findMany({
     where: {
       quiz_id: quizId,
@@ -4461,6 +4492,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number, db: Prisma.Transa
 
 export async function getQuizAuswertungAlleAntworten(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return loadQuizAuswertungAlleAntworten(quizId);
 }
 export async function updateQuizFragePunkteModus(data: {
@@ -4585,6 +4617,7 @@ async function loadQuizPunktestand(quizId: number, db: Prisma.TransactionClient 
 
 export async function getQuizPunktestand(quizId: number) {
   await requireQuizViewer(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction((tx) => loadQuizPunktestand(quizId, tx), {
     isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
   });
@@ -4672,11 +4705,13 @@ async function loadQuizEvaluationRevision(quizId: number, db: Prisma.Transaction
 
 export async function getQuizEvaluationRevision(quizId: number) {
   await requireQuizAdmin(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return loadQuizEvaluationRevision(quizId);
 }
 
 export async function getQuizAuswertungPageData(quizId: number) {
   await requireQuizAdmin(quizId);
+  await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction(async (tx) => {
     const [quiz, antworten, punktestand, backfillStatus, revision] = await Promise.all([
       tx.quiz.findUnique({ where: { quiz_id: quizId }, select: { quiz_id: true, titel: true } }),

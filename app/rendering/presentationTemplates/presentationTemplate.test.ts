@@ -145,8 +145,9 @@ test("LOVD editorial preset is a regular editable generator template with the or
   assert.equal(editorial.design.stylePreset, "EDITORIAL");
   assert.equal(editorial.design.composition.contentFrame, "OPEN_CANVAS");
   assert.equal(editorial.design.composition.answerTreatment, "EDITORIAL_ROWS");
-  assert.equal(editorial.tokens.assets.logo, "/branding/lovd/lovd-stelp.png");
-  assert.equal(editorial.tokens.typography.family, "var(--font-plus-jakarta-sans), Arial, sans-serif");
+  assert.equal(editorial.tokens.assets.logo, "/branding/lovd/lovd-stelp-creme-rgb.png");
+  assert.equal(editorial.tokens.typography.family, "var(--font-montserrat), Arial, sans-serif");
+  assert.equal(editorial.tokens.typography.displayWeight, 400);
   assert.equal(editorial.tokens.colors.correct, "#e3b65b");
   assert.ok(presentationTemplateAssetRolesByStyle.EDITORIAL.some(({ role }) => role === "LOGO"));
 

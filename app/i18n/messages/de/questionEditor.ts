@@ -196,7 +196,7 @@ export const deQuestionEditorMessages = {
     },
   },
   details: {
-    title: "Weitere Angaben", emptySummary: "Kategorien, interne Angaben und Ablaufdatum", category: "{count} Kategorie", categories: "{count} Kategorien",
+    title: "Weitere Funktionen", emptySummary: "Sponsor, Kategorien, interne Angaben und Ablaufdatum", category: "{count} Kategorie", categories: "{count} Kategorien",
     sourcePresent: "Quelle vorhanden", moderationPresent: "Moderationsnotiz vorhanden", expiryEnabled: "Ablaufdatum aktiviert", validUntil: "Gültig bis {date}", outdatedFrom: "Veraltet ab {date}", reviewFrom: "Prüfen ab {date}",
     categoryRequestPresent: "Älterer Kategorienwunsch vorhanden", categoryRequest: "Bestehender Kategorienwunsch", categoryRequestHelp: "Dieser Wunsch stammt aus dem bisherigen Verfahren. Neue Vorschläge legst du direkt über die Kategoriensuche an.", categoryRequestPlaceholder: "Zum Beispiel: Wissenschaft · Raumfahrt",
     expiryTitle: "Zeitlich begrenzte Frage", expiryDescription: "Nutze diese Einstellung für Fragen, deren Antwort nur bis zu einem bestimmten Zeitpunkt aktuell ist, zum Beispiel „Vogel des Jahres 2026“.",

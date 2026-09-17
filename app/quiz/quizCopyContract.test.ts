@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
+import { DEFAULT_BOOKING } from "./bookingSlide";
 
 test("copyQuiz preserves content references and order, remaps assignments, and never accesses runtime tables", async () => {
   const original = {
@@ -15,6 +16,7 @@ test("copyQuiz preserves content references and order, remaps assignments, and n
       { typ: "RULES", quiz_abschnitt_id: null, quiz_fragen_id: null, story_bezugs_quiz_fragen_id: null, anker_schluessel: "QUIZ", sortierung: 1, konfiguration: { rules: ["Regel A"] } },
       { typ: "QUESTION", quiz_abschnitt_id: 1, quiz_fragen_id: 11, story_bezugs_quiz_fragen_id: null, anker_schluessel: "1", sortierung: 2 },
       { typ: "STORY", quiz_abschnitt_id: 2, quiz_fragen_id: null, story_bezugs_quiz_fragen_id: 12, anker_schluessel: "2", story_element_revision_id: 7, sortierung: 3 },
+      { typ: "BOOKING_CONTACT", quiz_abschnitt_id: null, quiz_fragen_id: null, story_bezugs_quiz_fragen_id: null, anker_schluessel: "QUIZ", sortierung: 60, ist_sichtbar: true, konfiguration: { version: 1, booking: { ...DEFAULT_BOOKING, headline: "Individuelle Buchung" } } },
     ],
   };
   const before = structuredClone(original);
@@ -51,9 +53,11 @@ test("copyQuiz preserves content references and order, remaps assignments, and n
   assert.deepEqual(writes.questions.map(row => row.fragen_id), [101, 102]);
   assert.deepEqual(writes.questions.map(row => row.quiz_abschnitt_id), [21, 22]);
   assert.deepEqual(writes.questions.map(row => row.antwort_reihenfolge), [[3, 1, 2], [3, 1, 2]]);
-  assert.equal(writes.flows[1].quiz_fragen_id, 41);
-  assert.equal(writes.flows[2].story_bezugs_quiz_fragen_id, 42);
-  assert.equal(writes.flows[2].story_element_revision_id, 7);
-  assert.equal(writes.flows[2].anker_schluessel, "22");
+  assert.equal(writes.flows.find(row => row.typ === "QUESTION")?.quiz_fragen_id, 41);
+  assert.equal(writes.flows.find(row => row.typ === "STORY")?.story_bezugs_quiz_fragen_id, 42);
+  assert.equal(writes.flows.find(row => row.typ === "STORY")?.story_element_revision_id, 7);
+  assert.equal(writes.flows.find(row => row.typ === "STORY")?.anker_schluessel, "22");
+  assert.deepEqual(writes.flows.find(row => row.typ === "BOOKING_CONTACT")?.konfiguration, before.quiz_ablauf_elemente[3].konfiguration);
+  assert.equal(writes.flows.find(row => row.typ === "BOOKING_CONTACT")?.ist_sichtbar, true);
   assert.ok(Object.values(writes).flat().filter(row => "quiz_id" in row).every(row => row.quiz_id === 31));
 });

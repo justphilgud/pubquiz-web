@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import type { QuestionCategory } from "../types";
 import { CategorySection } from "./CategorySection";
 import { NotesSection } from "./NotesSection";
@@ -9,6 +9,7 @@ import { QuestionLifecycleSection } from "./QuestionLifecycleSection";
 import { validUntilToOutdatedFrom } from "../questionLifecycle";
 
 type AdditionalDetailsSectionProps = {
+  sponsor?: ReactNode;
   categories: QuestionCategory[];
   selectedCategoryIds: number[];
   sourceOrRemark: string;
@@ -27,6 +28,7 @@ type AdditionalDetailsSectionProps = {
 };
 
 export function AdditionalDetailsSection({
+  sponsor,
   categories,
   selectedCategoryIds,
   sourceOrRemark,
@@ -100,6 +102,7 @@ export function AdditionalDetailsSection({
 
       {isOpen && (
         <div id={contentId} className="space-y-4 border-t border-slate-200 p-4">
+          {sponsor}
           <CategorySection
             categories={categories}
             selectedCategoryIds={selectedCategoryIds}

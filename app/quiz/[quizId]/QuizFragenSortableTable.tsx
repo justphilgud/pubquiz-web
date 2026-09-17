@@ -2,6 +2,7 @@
 
 import type { CSSProperties, HTMLAttributes } from "react";
 import { useState } from "react";
+import { OUTRO_SLIDES } from "../fixedSlidesPolicy";
 import {
   DndContext,
   type DragEndEvent,
@@ -115,18 +116,7 @@ const introSlides = [
   ["preise", "Preise", "Preise für Platz 1 bis 3"],
 ] as const;
 
-const outroSlides = [
-  [
-    "bekanntmachungen",
-    "Bekanntmachungen",
-    "Hinweise, nächste Termine und Abschlussinfos",
-  ],
-  [
-    "calendar",
-    "PubQuiz-Kalender",
-    "Allgemeinen öffentlichen Kalender abonnieren",
-  ],
-] as const;
+const outroSlides = OUTRO_SLIDES;
 
 const numberFormatter = new Intl.NumberFormat("de-DE", {
   maximumFractionDigits: 2,
@@ -524,7 +514,7 @@ function DroppableBlock({
                 quizId={quizId}
                 typ="Outro"
                 count={outroSlides.length}
-                description="Bekanntmachungen und PubQuiz-Kalender"
+                description="Bekanntmachungen, Frageneinreichung, PubQuiz-Kalender und optionale Buchungs-/Kontaktfolie"
               />
             ) : gruppe.fragen.length === 0 && gruppe.stories.length === 0 && gruppe.polls.length === 0 ? (
               gruppe.blockTyp === "fragenblock" ? (

@@ -136,6 +136,7 @@ export type QuestionCategory = {
 export type QuestionMediaType = "IMAGE" | "AUDIO" | "VIDEO";
 
 export type MediaSlotKey =
+  | "sponsor_logo"
   | "question_image"
   | "question_audio"
   | "question_video"
@@ -195,6 +196,7 @@ export type FaceMorphPixelQuestionOptions = Record<
 >;
 
 export type QuestionTemplateConfig = {
+  sponsor?: import("@/app/rendering/presentation/questionSponsor").QuestionSponsor;
   pixelMode?: "CHALLENGE" | "STAGED";
   stageDurationsSeconds: PixelStageDurationsSeconds;
   createPixelQuestionByAnswer: FaceMorphPixelQuestionOptions;

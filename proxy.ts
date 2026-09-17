@@ -10,6 +10,8 @@ const PUBLIC_PATHS = [
   "/calendar/subscribe",
   "/api/auth",
   "/api/quiz/team-live-snapshot",
+  "/api/quiz/team-answer-draft",
+  "/api/quiz/team-session",
   "/api/team-profile-photo",
   "/frage-einreichen",
 ];

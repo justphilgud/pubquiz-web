@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Template assets have dynamic repository or managed Blob URLs and render inside a fixed presentation canvas. */
 import type { ReactNode } from "react";
+import { QuestionSponsorMark } from "./QuestionSponsorMark";
+import type { QuestionSponsor } from "./questionSponsor";
 
 import type { TemplateAssetReference } from "@/app/rendering/templateRegistry";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
@@ -12,6 +14,7 @@ type HeaderProps = {
   slideLabel: string;
   slideNumber: number;
   slideCount: number;
+  sponsor?: QuestionSponsor;
 };
 
 function displayIdentity(theme: ResolvedQuizTheme) {
@@ -46,6 +49,7 @@ export function PresentationDesignHeader({
   slideLabel,
   slideNumber,
   slideCount,
+  sponsor,
   storybookComposition = null,
 }: HeaderProps & { storybookComposition?: StorybookComposition | null }) {
   if (theme.design.stylePreset === "EDITORIAL") {
@@ -57,6 +61,7 @@ export function PresentationDesignHeader({
         ) : (
           <span className="presentation-editorial-wordmark">LOVD</span>
         )}
+        {sponsor && <QuestionSponsorMark sponsor={sponsor} />}
         <div className="presentation-editorial-progress" aria-label={`${slideLabel}, Folie ${slideNumber} von ${slideCount}`}>
           {slideLabel.toLocaleUpperCase("de-DE")} {progress}
         </div>

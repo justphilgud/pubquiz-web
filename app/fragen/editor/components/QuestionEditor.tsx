@@ -27,6 +27,7 @@ import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { PendingCategoryReviewDialog } from "./PendingCategoryReviewDialog";
 import { QuestionSection } from "./QuestionSection";
+import { QuestionSponsorSection } from "./QuestionSponsorSection";
 import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
 import { QuestionManagementActions } from "./QuestionManagementActions";
@@ -1142,6 +1143,11 @@ export function QuestionEditor({
         />}
 
         <AdditionalDetailsSection
+          sponsor={<QuestionSponsorSection value={draft.templateConfig.sponsor} disabled={isEditorDisabled}
+            questionId={savedQuestionId} templateId={draft.templateId}
+            environmentPrefix={mediaUploadPathnamePrefix}
+            onUploadStatusChange={(status) => setQuestionMediaUploadStatuses((current) => ({ ...current, sponsor_logo: status }))}
+            onChange={(sponsor) => setDraft((current) => ({ ...current, templateConfig: { ...current.templateConfig, sponsor } }))} />}
           categories={categories}
           selectedCategoryIds={draft.categoryIds}
           sourceOrRemark={draft.sourceOrRemark}
