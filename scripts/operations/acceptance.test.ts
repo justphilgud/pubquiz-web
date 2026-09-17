@@ -180,6 +180,27 @@ test("persisted presentation design tokens survive unchanged only at the reviewe
     assert.throws(() => inspectRow(row, new Set(), "pubquiz", "other"));
   }
 });
+test("reviewed display weights include LOVD 400 and reject unreviewed values", () => {
+  const baseTokens = structuredClone(templateRegistry.presentation[0].tokens);
+  const rowForWeight = (displayWeight: number) => ({
+    theme_config_json: {
+      version: 1,
+      tokens: {
+        ...structuredClone(baseTokens),
+        typography: { ...baseTokens.typography, displayWeight },
+      },
+    },
+  });
+
+  for (const displayWeight of [400, 700, 800, 900]) {
+    assert.doesNotThrow(() => inspectRow(rowForWeight(displayWeight), new Set(), "pubquiz", "presentation_templates"));
+  }
+
+  assert.throws(
+    () => inspectRow(rowForWeight(500), new Set(), "pubquiz", "presentation_templates"),
+    /DESIGN_TOKEN_VALUE_REVIEW_REQUIRED/,
+  );
+});
 test("legacy palette preserves a missing correct color but rejects any other missing/extra field", () => {
   const colors: Record<string, unknown> = { ...templateRegistry.presentation[0].tokens.colors };
   delete colors.correct;
