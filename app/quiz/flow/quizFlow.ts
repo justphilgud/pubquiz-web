@@ -1,4 +1,5 @@
 import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
+import { DEFAULT_BOOKING, validateBooking, type BookingContent } from "../bookingSlide";
 import { readLivePollRuntimeConfig, type LivePollRuntimeConfig } from "@/app/umfragen/livePoll";
 
 export const QUIZ_FLOW_ITEM_TYPES = [
@@ -18,6 +19,7 @@ export const QUIZ_FLOW_ITEM_TYPES = [
   "CUSTOM_MESSAGE",
   "QUESTION_SUBMISSION_QR",
   "CALENDAR_SUBSCRIPTION",
+  "BOOKING_CONTACT",
   "CLOSING",
   "QUESTION",
   "QUESTION_SOLUTION",
@@ -114,6 +116,7 @@ export type QuizFlowImage = {
 
 export type QuizFlowConfig = {
   version: 1;
+  booking?: BookingContent;
   title?: string;
   subtitle?: string;
   body?: string;
@@ -234,6 +237,7 @@ const TEXT_LIMITS = {
 
 const CONFIG_KEYS = new Set([
   "version",
+  "booking",
   ...Object.keys(TEXT_LIMITS),
   "rules",
   "durationSeconds",
@@ -351,6 +355,13 @@ export function validateQuizFlowConfig(
   }
 
   const result: QuizFlowConfig = { version: 1 };
+  if (type === "BOOKING_CONTACT") {
+    const booking = validateBooking(input.booking ?? DEFAULT_BOOKING);
+    if (!booking.ok) return booking;
+    result.booking = booking.value;
+  } else if (input.booking !== undefined) {
+    return { ok: false, message: "Buchungsinhalte sind nur für die Buchungsfolie erlaubt." };
+  }
   for (const [key, limit] of Object.entries(TEXT_LIMITS) as [
     keyof typeof TEXT_LIMITS,
     number,
@@ -735,6 +746,7 @@ export function buildDefaultQuizFlow(quiz: DefaultFlowQuiz): QuizFlowItem[] {
       title: "Kein PubQuiz mehr verpassen",
       body: "Scanne den QR-Code und abonniere unsere nächsten öffentlichen PubQuiz-Termine direkt in deinem Kalender.",
     }),
+    defaultItem("BOOKING_CONTACT", "AFTER_QUIZ", "QUIZ", null, 60, { version: 1, booking: DEFAULT_BOOKING }, false),
   );
 
   return result.sort(compareQuizFlowItems);
@@ -864,6 +876,7 @@ export function getQuizFlowTypeLabel(type: QuizFlowItemType) {
     CUSTOM_MESSAGE: "Freie Mitteilung",
     QUESTION_SUBMISSION_QR: "Frage einreichen",
     CALENDAR_SUBSCRIPTION: "PubQuiz-Kalender",
+    BOOKING_CONTACT: "Buchung / Kontakt",
     CLOSING: "Abschluss",
     QUESTION: "Frage",
     QUESTION_SOLUTION: "Auflösung",
@@ -954,6 +967,7 @@ export function getQuizFlowAnswerStatus(type: QuizFlowItemType) {
     type === "YEARLY_STANDINGS" ||
     type === "QUESTION_SUBMISSION_QR" ||
     type === "CALENDAR_SUBSCRIPTION" ||
+    type === "BOOKING_CONTACT" ||
     type === "CLOSING"
   ) {
     return "Das Quiz ist beendet";

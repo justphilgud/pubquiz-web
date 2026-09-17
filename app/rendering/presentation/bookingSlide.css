@@ -1,0 +1,20 @@
+.presentation-template[data-design-style] .presentation-flow-slide.booking-slide {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 4%;
+  height: 100%;
+  padding: 3.5% 5%;
+}
+.presentation-template[data-design-style] .booking-copy { min-width: 0; }
+.presentation-template[data-design-style] .presentation-flow-slide.booking-slide h2 { font-size: clamp(2rem, 4.6cqw, 5.6rem); line-height: 1.04; overflow-wrap: anywhere; margin: 0 0 3%; }
+.presentation-template[data-design-style] .booking-subheadline { font-size: clamp(1.2rem, 2.1cqw, 2.6rem); line-height: 1.18; margin-bottom: 3%; font-weight: 600; }
+.presentation-template[data-design-style] .booking-description { font-size: clamp(1rem, 1.45cqw, 1.9rem); line-height: 1.4; max-width: 48ch; }
+.presentation-template[data-design-style] .booking-benefits { display: flex; flex-wrap: wrap; gap: .65em 1.3em; margin: 4% 0; padding: 0; list-style: none; font-size: clamp(1rem, 1.3cqw, 1.75rem); font-weight: 600; }
+.presentation-template[data-design-style] .booking-benefits li::before { content: "✓ "; color: var(--brand-accent); }
+.presentation-template[data-design-style] .booking-contact { font-size: clamp(1rem, 1.3cqw, 1.75rem); line-height: 1.55; overflow-wrap: anywhere; }
+.presentation-template[data-design-style] .booking-action { text-align: center; min-width: 0; }
+.presentation-template[data-design-style] .booking-qr { background: white; border-radius: .8rem; padding: 6%; width: 80%; max-width: 29rem; margin: 0 auto; }
+.presentation-template[data-design-style] .booking-qr svg { display: block; width: 100%; height: auto; }
+.presentation-template[data-design-style] .booking-cta { font-size: clamp(1.2rem, 1.85cqw, 2.5rem); line-height: 1.25; font-weight: 700; margin: 5% 0 2%; }
+.presentation-template[data-design-style] .booking-url { overflow-wrap: anywhere; font-size: clamp(.85rem, 1cqw, 1.3rem); opacity: .8; }

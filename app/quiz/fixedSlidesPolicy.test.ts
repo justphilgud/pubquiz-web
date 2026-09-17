@@ -25,7 +25,7 @@ test("the common intro editor contains exactly the five fixed slides", () => {
 test("the outro contains announcements, optional question submission and calendar CTA", () => {
   assert.deepEqual(
     OUTRO_SLIDES.map((slide) => slide.title),
-    ["Bekanntmachungen", "Frage einreichen", "PubQuiz-Kalender"],
+    ["Bekanntmachungen", "Frage einreichen", "PubQuiz-Kalender", "Buchung / Kontakt"],
   );
 });
 
@@ -51,8 +51,9 @@ test("every editable fixed slide maps to one productive flow item", () => {
     "announcements",
     "questionSubmission",
     "calendar",
+    "booking",
   ]);
-  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 8);
+  assert.equal(new Set(Object.values(FIXED_SLIDE_FLOW_TYPES)).size, 9);
 });
 
 test("multi-word prizes remain one prize per line", () => {

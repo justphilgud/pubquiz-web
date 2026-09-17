@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import QRCode from "react-qr-code";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
 import { SponsorMoment } from "./SponsorMoment";
+import { BookingSlide } from "./BookingSlide";
 import { parseQuestionSponsor } from "./questionSponsor";
 import { pixelRules } from "@/app/fragen/editor/templates/pixelRules";
 
@@ -2523,6 +2524,8 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
       </section>
     );
   }
+
+  if (type === "BOOKING_CONTACT") return <BookingSlide content={config.booking} />;
 
   if (type === "QUESTION_SUBMISSION_QR") {
     return (

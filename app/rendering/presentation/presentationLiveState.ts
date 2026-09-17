@@ -123,6 +123,7 @@ const NON_QUESTION_STATUS_BY_TYPE: Readonly<Record<string, string>> = {
   CUSTOM_MESSAGE: "Das Quiz startet gleich",
   QUESTION_SUBMISSION_QR: "Das Quiz ist beendet",
   CALENDAR_SUBSCRIPTION: "Das Quiz ist beendet",
+  BOOKING_CONTACT: "Das Quiz ist beendet",
   CLOSING: "Das Quiz ist beendet",
   "vor-dem-start": "Das Quiz startet gleich",
   startsequenz: "Das Quiz startet gleich",

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./rendering/presentation/presentationReadability.css";
+@import "./rendering/presentation/bookingSlide.css";
 
 @keyframes pferdGalopp {
   0%, 50%, 100% { transform: translateY(0) rotate(-2deg) scale(1); }

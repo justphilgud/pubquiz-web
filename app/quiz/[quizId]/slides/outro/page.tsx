@@ -16,6 +16,7 @@ import {
   OUTRO_SLIDES,
 } from "@/app/quiz/fixedSlidesPolicy";
 import { PUBLIC_CALENDAR_LANDING_PATH } from "@/app/calendar/publicCalendar";
+import { BookingFields } from "./BookingFields";
 
 type Props = {
   params: Promise<{ quizId: string }>;
@@ -24,11 +25,12 @@ type Props = {
 
 export default async function OutroEditorPage({ params, searchParams }: Props) {
   const [{ quizId }, query] = await Promise.all([params, searchParams]);
-  const [quiz, slideVisibility, questionSubmissionSlide, calendarSlide] = await Promise.all([
+  const [quiz, slideVisibility, questionSubmissionSlide, calendarSlide, bookingSlide] = await Promise.all([
     getQuizDetails(Number(quizId)),
     getQuizFixedSlideVisibility(Number(quizId)),
     getFixedSlideConfig(Number(quizId), "questionSubmission"),
     getFixedSlideConfig(Number(quizId), "calendar"),
+    getFixedSlideConfig(Number(quizId), "booking"),
   ]);
 
   if (!quiz) {
@@ -42,9 +44,9 @@ export default async function OutroEditorPage({ params, searchParams }: Props) {
 
   return (
     <FixedSlideEditor
-      eyebrow="Outro · 3 feste Slides"
+      eyebrow="Outro · 4 feste Slides"
       title="Outro konfigurieren"
-      description="Bekanntmachungen, optionale Frageneinreichung und der allgemeine PubQuiz-Kalender bilden gemeinsam den Abschluss."
+      description="Bekanntmachungen, Frageneinreichung, Kalender und eine optionale Buchungsfolie bilden den Abschluss."
       initialItemId={initialItemId}
       backHref={`/quiz/${quizIdValue}`}
       items={[
@@ -173,6 +175,16 @@ export default async function OutroEditorPage({ params, searchParams }: Props) {
               </div>
             </FixedSlideForm>
           ),
+        },
+        {
+          id: "booking", title: "Buchung / Kontakt", description: "Quizabend anfragen, Kontakt und dynamischer QR-Code",
+          status: slideVisibility.booking ? "configured" : "notice",
+          panel: <FixedSlideForm action={saveOutroSlide} previewHref={`/quiz/${quizIdValue}/test`}>
+            <input type="hidden" name="quizId" value={quizIdValue} />
+            <input type="hidden" name="slideId" value="booking" />
+            <FixedSlideEnabledField defaultEnabled={slideVisibility.booking} />
+            <BookingFields content={bookingSlide.booking} />
+          </FixedSlideForm>,
         },
       ]}
     />
