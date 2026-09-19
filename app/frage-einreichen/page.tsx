@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { PublicQuestionSubmissionForm } from "./PublicQuestionSubmissionForm";
+import { APP_BRAND } from "@/app/branding/appBrand";
 
 export const metadata: Metadata = {
-  title: "Quizfrage einreichen | ungegoogelt",
+  title: "Quizfrage einreichen",
   description: "Reiche deine eigene Pubquiz-Frage zur redaktionellen Prüfung ein.",
 };
 
@@ -11,7 +12,7 @@ export default function PublicQuestionSubmissionPage() {
     <main className="min-h-screen bg-[#f5f2ea] px-4 py-8 text-slate-950 sm:py-14">
       <div className="mx-auto max-w-2xl">
         <header className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-600">ungegoogelt</p>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-600">{APP_BRAND.name}</p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-5xl">Welche Frage fehlt noch?</h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-slate-700 sm:text-lg">
             Schick uns eine kluge, überraschende oder herrlich unnütze Quizfrage. Jede Einreichung wird redaktionell geprüft und erst danach für Quizabende freigegeben.

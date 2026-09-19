@@ -1,8 +1,10 @@
+import { APP_BRAND } from "@/app/branding/appBrand";
+
 export const PUBLIC_CALENDAR_LANDING_PATH = "/kalender";
 export const PUBLIC_CALENDAR_FEED_PATH = "/calendar/public.ics";
 export const PUBLIC_CALENDAR_SUBSCRIBE_PATH = "/calendar/subscribe";
 
-export const PUBLIC_CALENDAR_NAME = "ungegoogelt PubQuiz-Termine";
+export const PUBLIC_CALENDAR_NAME = `${APP_BRAND.name} PubQuiz-Termine`;
 
 // Runtime contract: docs/architecture/quiz-runtime-contracts.md
 // Subscription CTAs use stable webcal feeds, not one-time calendar downloads.

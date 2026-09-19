@@ -4,10 +4,11 @@ import {
   buildPublicCalendarSubscriptionUrl,
 } from "@/app/calendar/publicCalendar";
 import { getCalendarRequestOrigin } from "@/app/calendar/calendarOrigin.server";
+import { APP_BRAND } from "@/app/branding/appBrand";
 
 export const metadata: Metadata = {
-  title: "PubQuiz-Termine abonnieren | ungegoogelt",
-  description: "Öffentliche ungegoogelt PubQuiz-Termine als Kalender abonnieren.",
+  title: "PubQuiz-Termine abonnieren",
+  description: `Öffentliche ${APP_BRAND.name} PubQuiz-Termine als Kalender abonnieren.`,
 };
 
 export default async function PublicCalendarPage() {
@@ -19,7 +20,7 @@ export default async function PublicCalendarPage() {
     <main className="min-h-dvh bg-slate-950 px-5 py-10 text-white sm:px-8 sm:py-16">
       <div className="mx-auto max-w-3xl">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-cyan-300">
-          ungegoogelt
+          {APP_BRAND.name}
         </p>
         <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-6xl">
           Kein PubQuiz mehr verpassen
