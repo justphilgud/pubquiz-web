@@ -66,9 +66,14 @@ export function AuthCard({
       <Card
         className={`w-full max-w-md p-10 ${
           isBrandAppearance
-            ? "border-white/15 bg-[var(--app-brand-dark-surface)] shadow-2xl shadow-slate-900/20"
+            ? "border-white/15 shadow-2xl shadow-slate-900/20"
             : "border-gray-300 bg-gray-50 shadow-lg"
         }`}
+        style={
+          isBrandAppearance
+            ? { backgroundColor: APP_BRAND.colors.darkSurface }
+            : undefined
+        }
       >
         <div className="mb-2 flex justify-center">
           <Image
