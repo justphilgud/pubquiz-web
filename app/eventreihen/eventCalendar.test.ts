@@ -246,7 +246,7 @@ test("general calendar aggregates only public active series and eligible quizzes
   );
 
   const unfolded = unfold(calendar);
-  assert.match(unfolded, /X-WR-CALNAME:ungegoogelt PubQuiz-Termine/);
+  assert.match(unfolded, /X-WR-CALNAME:Phil Gud Entertainment PubQuiz-Termine/);
   assert.match(unfolded, /SUMMARY:Öffentlicher Termin/);
   assert.match(unfolded, /DESCRIPTION:Öffentliche Reihe/);
   assert.doesNotMatch(unfolded, /Archiviert|Vergangen|Firmenquiz|Altbestand|Private Firmenreihe/);
