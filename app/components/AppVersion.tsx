@@ -1,4 +1,5 @@
 import { appEnvironment, appVersion } from "@/app/lib/appVersion";
+import { APP_BRAND } from "@/app/branding/appBrand";
 
 type AppVersionProps = {
   compact?: boolean;
@@ -23,7 +24,7 @@ export function AppVersion({ compact = false }: AppVersionProps) {
 
   return (
     <div className="text-xs leading-relaxed text-slate-500">
-      <div className="font-medium text-slate-700">ungegoogelt</div>
+      <div className="font-medium text-slate-700">{APP_BRAND.name}</div>
       <div>Version {appVersion}</div>
       <div>{getEnvironmentLabel(appEnvironment)}</div>
     </div>

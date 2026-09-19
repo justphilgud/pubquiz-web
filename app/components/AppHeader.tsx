@@ -18,6 +18,7 @@ import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { hasGlobalRole } from "@/app/roles/roleAssignmentPolicy";
 import { getPresentationTemplateCapabilities } from "@/app/rendering/presentationTemplates/presentationTemplatePermissions";
 import { canAccessStoryElementLibrary } from "@/app/story-elemente/storyElementPolicy";
+import { APP_BRAND } from "@/app/branding/appBrand";
 
 export default async function AppHeader() {
   const session = await auth();
@@ -66,12 +67,12 @@ export default async function AppHeader() {
           className="flex min-h-11 min-w-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
         >
           <Image
-            src="/logo.png"
-            alt="ungegoogelt"
-            width={180}
-            height={48}
+            src={APP_BRAND.assets.mark}
+            alt={APP_BRAND.name}
+            width={660}
+            height={720}
             priority
-            className="h-8 w-auto max-w-full sm:h-10"
+            className="h-10 w-auto sm:h-11"
           />
         </Link>
 

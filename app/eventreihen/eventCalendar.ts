@@ -107,7 +107,7 @@ function buildCalendar(
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//ungegoogelt//Eventreihen-Kalender//DE",
+    "PRODID:-//Phil Gud Entertainment//Eventreihen-Kalender//DE",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${escapeCalendarText(calendarName)}`,

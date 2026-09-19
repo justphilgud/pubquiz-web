@@ -18,7 +18,7 @@ type Props = {
 };
 
 export const metadata: Metadata = {
-  title: "Alle Quizze | ungegoogelt",
+  title: "Alle Quizze",
 };
 
 export default async function QuizPage({ searchParams }: Props) {

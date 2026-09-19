@@ -68,7 +68,7 @@ export default async function LoginPage({
   }
 
   return (
-    <AuthCard title="Quizverwaltung">
+    <AuthCard title="Quizverwaltung" appearance="brand">
       {params?.error && (
         <div className="mb-4">
           <Alert variant="danger" title="Login fehlgeschlagen">
