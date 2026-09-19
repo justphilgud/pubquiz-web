@@ -343,7 +343,7 @@ function buildPreviewFlowConfig(type: QuizFlowItemType): QuizFlowConfig {
   if (type === "WELCOME") return {
     ...base,
     title: "Willkommen zum PubQuiz",
-    subtitle: "LOVD × ungegoogelt",
+    subtitle: "LOVD × Phil Gud",
     body: "Macht es euch gemütlich – gleich beginnt der gemeinsame Quizabend.",
   };
   if (type === "RULES") return {

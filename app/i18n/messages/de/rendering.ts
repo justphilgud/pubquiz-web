@@ -1,8 +1,8 @@
 export const deRenderingMessages = {
   templates: {
     presentationDefault: {
-      label: "ungegoogelt Standard",
-      description: "Das bisherige farbstarke Präsentationsdesign.",
+      label: "ungegoogelt Neon",
+      description: "Mehrfarbige Neonbühne auf Basis des offiziellen ungegoogelt-Logos.",
     },
     presentationDark: {
       label: "ungegoogelt Dunkel",
@@ -10,11 +10,11 @@ export const deRenderingMessages = {
     },
     presentationCorporate: { label: "Corporate", description: "Ruhiges, professionelles Design mit klarer Hierarchie." },
     presentationBirthday: { label: "Storybook", description: "Persönliches Fotobuch-Design mit redaktioneller Bildsprache." },
-    presentationEditorial: { label: "LOVD × ungegoogelt", description: "Warm-reduziertes Venue-Design mit großzügiger editorialer Hierarchie." },
+    presentationEditorial: { label: "LOVD × Phil Gud", description: "Warm-reduziertes Venue-Design mit großzügiger editorialer Hierarchie." },
     presentationKommOne: { label: "Komm.ONE PubQuiz", description: "Moderne Quizbühne mit Midnight, Lagoon und gezielten Amarillo-Akzenten." },
     answerDefault: {
-      label: "ungegoogelt Standard",
-      description: "Das vertraute, mobil optimierte Antwortformular.",
+      label: "ungegoogelt Neon",
+      description: "Das mobil optimierte Antwortformular in der neuen ungegoogelt-Farbwelt.",
     },
     answerMinimal: {
       label: "Minimal",
@@ -22,7 +22,7 @@ export const deRenderingMessages = {
     },
     answerCorporate: { label: "Corporate", description: "Sachliches Antwortformular für Firmenveranstaltungen." },
     answerBirthday: { label: "Storybook", description: "Ruhiges Antwortformular im persönlichen Fotobuch-Stil." },
-    answerEditorial: { label: "LOVD × ungegoogelt", description: "Reduziertes Antwortformular in warmer LOVD-Eventoptik." },
+    answerEditorial: { label: "LOVD × Phil Gud", description: "Reduziertes Antwortformular in warmer LOVD-Eventoptik." },
     answerKommOne: { label: "Komm.ONE PubQuiz", description: "Klares Antwortformular in der Komm.ONE-Markenwelt." },
   },
   fields: {

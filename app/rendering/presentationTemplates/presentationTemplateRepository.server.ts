@@ -15,47 +15,50 @@ import {
 } from "./presentationTemplate";
 
 function systemTemplates(): ManagedPresentationTemplate[] {
-  return templateRegistry.presentation.map((template) => {
-    const runtimeTemplate: PresentationTemplate = template;
-    return {
-    id: template.id,
-    name: ({
-      "ungegoogelt-default": "ungegoogelt Neon",
-      "ungegoogelt-dark": "ungegoogelt Dunkel",
-      "corporate-reference": "Corporate",
-      "birthday-reference": "Storybook",
-      "lovd-ungegoogelt": "LOVD × ungegoogelt",
-      "komm-one-pubquiz": "Komm.ONE PubQuiz",
-    } as Record<string, string>)[template.id] ?? template.id,
-    description: ({
-      "ungegoogelt-default": "Systemtemplate mit dem etablierten ungegoogelt Neon-Auftritt.",
-      "ungegoogelt-dark": "Reduziertes dunkles Systemtemplate.",
-      "corporate-reference": "Sachliches Referenzdesign für Unternehmen, Workshops und Kundenveranstaltungen.",
-      "birthday-reference": "Persönliches Referenzdesign für hochwertige, redaktionelle Erinnerungsquizze.",
-      "lovd-ungegoogelt": "Warm-reduziertes Venue-Template für die LOVD × ungegoogelt Kollaboration.",
-      "komm-one-pubquiz": "Moderne Komm.ONE-Markenbühne für hochwertige Quizveranstaltungen.",
-    } as Record<string, string>)[template.id] ?? null,
-    status: "SYSTEM",
-    source: "SYSTEM",
-    isSystem: true,
-    contractVersion: 1,
-    config: {
-      version: 1,
-      tokens: template.tokens,
-      surfaces: {
-        presentation: template.variant,
-        moderation: runtimeTemplate.moderationVariant ?? "BRANDED",
-        answerForm: getAnswerFormTemplate(template.id)?.variant ?? "BRANDED",
-      },
-      design: structuredClone(template.design),
-    },
-    tags: ["System"],
-    sourceTemplateId: null,
-    creatorName: null,
-    updatedAt: null,
-    usageCount: 0,
-    };
-  });
+  return templateRegistry.presentation
+    .filter((template) => template.selectable)
+    .map((template) => {
+      const runtimeTemplate: PresentationTemplate = template;
+      return {
+        id: template.id,
+        name:
+          ({
+            "ungegoogelt-default": "ungegoogelt Neon",
+            "birthday-reference": "Storybook",
+            "lovd-ungegoogelt": "LOVD × Phil Gud",
+            "komm-one-pubquiz": "Komm.ONE PubQuiz",
+          } as Record<string, string>)[template.id] ?? template.id,
+        description:
+          ({
+            "ungegoogelt-default": "Mehrfarbige ungegoogelt-Neonbühne auf dunkler Fläche.",
+            "birthday-reference":
+              "Persönliches Referenzdesign für hochwertige, redaktionelle Erinnerungsquizze.",
+            "lovd-ungegoogelt":
+              "Warm-reduziertes Venue-Template für die LOVD × Phil Gud Kollaboration.",
+            "komm-one-pubquiz":
+              "Moderne Komm.ONE-Markenbühne für hochwertige Quizveranstaltungen.",
+          } as Record<string, string>)[template.id] ?? null,
+        status: "SYSTEM",
+        source: "SYSTEM",
+        isSystem: true,
+        contractVersion: 1,
+        config: {
+          version: 1,
+          tokens: template.tokens,
+          surfaces: {
+            presentation: template.variant,
+            moderation: runtimeTemplate.moderationVariant ?? "BRANDED",
+            answerForm: getAnswerFormTemplate(template.id)?.variant ?? "BRANDED",
+          },
+          design: structuredClone(template.design),
+        },
+        tags: ["System"],
+        sourceTemplateId: null,
+        creatorName: null,
+        updatedAt: null,
+        usageCount: 0,
+      };
+    });
 }
 
 function isMissingTable(error: unknown) {

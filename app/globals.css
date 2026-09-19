@@ -990,11 +990,110 @@ button {
   display: none;
 }
 
+.presentation-template[data-design-style="NEON"] {
+  isolation: isolate;
+}
+.presentation-template[data-design-style="NEON"]::before {
+  position: absolute;
+  z-index: 40;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: .45rem;
+  background: var(--neon-gradient);
+  content: "";
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-header,
+.presentation-template[data-design-style="NEON"] .presentation-neon-stage {
+  border-color: transparent !important;
+  background:
+    linear-gradient(color-mix(in srgb, var(--brand-surface-strong) 92%, transparent), color-mix(in srgb, var(--brand-surface) 88%, transparent)) padding-box,
+    var(--neon-gradient) border-box !important;
+  box-shadow: 0 0 1.5rem color-mix(in srgb, var(--neon-cyan) 18%, transparent) !important;
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-logo {
+  width: clamp(13rem, 23vw, 24rem);
+  max-height: 5rem;
+  flex-shrink: 0;
+  object-fit: contain;
+  object-position: left center;
+  filter: saturate(1.08) drop-shadow(0 0 .7rem color-mix(in srgb, var(--neon-pink) 22%, transparent));
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-divider {
+  background: linear-gradient(var(--neon-blue), var(--neon-green), var(--neon-orange), var(--neon-pink));
+  box-shadow: 0 0 .6rem color-mix(in srgb, var(--neon-cyan) 30%, transparent);
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-label {
+  color: var(--neon-cyan);
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-title {
+  color: var(--brand-text);
+  text-shadow: 0 0 .8rem color-mix(in srgb, var(--neon-violet) 35%, transparent);
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-progress {
+  display: grid;
+  min-width: 12rem;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid transparent;
+  border-radius: var(--brand-radius-medium);
+  background:
+    linear-gradient(var(--brand-surface-strong), var(--brand-surface-strong)) padding-box,
+    var(--neon-gradient) border-box;
+  padding: .8rem 1.25rem;
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.presentation-template[data-design-style="NEON"] .presentation-neon-progress strong:first-child { color: var(--neon-pink); }
+.presentation-template[data-design-style="NEON"] .presentation-neon-progress strong:last-child { color: var(--neon-orange); }
+.presentation-template[data-design-style="NEON"] .presentation-neon-progress span { color: var(--neon-cyan); }
+.presentation-template[data-design-style="NEON"] .presentation-question-card,
+.presentation-template[data-design-style="NEON"] .presentation-solution-question,
+.presentation-template[data-design-style="NEON"] .presentation-solution-result,
+.presentation-template[data-design-style="NEON"] .presentation-countdown-slide {
+  border-color: var(--neon-cyan) !important;
+  background:
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--neon-pink) 16%, transparent), transparent 34%),
+    color-mix(in srgb, var(--brand-surface) 94%, transparent) !important;
+  box-shadow: .5rem .5rem 0 color-mix(in srgb, var(--neon-pink) 78%, transparent) !important;
+}
+.presentation-template[data-design-style="NEON"] .presentation-answer-option,
+.presentation-template[data-design-style="NEON"] .presentation-ranking-podium article,
+.presentation-template[data-design-style="NEON"] .presentation-ranking-table :is(th, td) {
+  border-color: color-mix(in srgb, var(--neon-violet) 72%, transparent) !important;
+}
+.presentation-template[data-design-style="NEON"] [class*="text-pink"] { color: var(--neon-pink) !important; }
+.presentation-template[data-design-style="NEON"] [class*="text-cyan"] { color: var(--neon-cyan) !important; }
+.presentation-template[data-design-style="NEON"] [class*="text-yellow"] { color: var(--neon-orange) !important; }
+.presentation-template[data-design-style="NEON"] [class*="border-pink"] { border-color: var(--neon-pink) !important; }
+.presentation-template[data-design-style="NEON"] [class*="border-cyan"] { border-color: var(--neon-cyan) !important; }
+.presentation-template[data-design-style="NEON"] [class*="border-yellow"] { border-color: var(--neon-orange) !important; }
+.presentation-template[data-design-style="NEON"] .presentation-countdown-value,
+.presentation-template[data-design-style="NEON"] .presentation-ranking-podium article[data-place="1"] {
+  border-color: var(--neon-orange) !important;
+  box-shadow: .35rem .35rem 0 color-mix(in srgb, var(--neon-violet) 78%, transparent) !important;
+}
+.presentation-template[data-design-style="NEON"] .presentation-audio-stage .presentation-question-label {
+  color: var(--neon-cyan) !important;
+  filter: drop-shadow(0 0 .5rem color-mix(in srgb, var(--neon-cyan) 40%, transparent));
+}
+.presentation-template[data-design-style="NEON"] .presentation-audio-question {
+  text-shadow: 0 0 .8rem color-mix(in srgb, var(--neon-pink) 34%, transparent);
+}
+.presentation-template[data-design-style="NEON"] .presentation-audio-control {
+  border-color: var(--neon-pink) !important;
+  background:
+    radial-gradient(circle at center, color-mix(in srgb, var(--neon-pink) 16%, transparent), transparent 55%),
+    linear-gradient(135deg, color-mix(in srgb, var(--neon-blue) 16%, transparent), rgb(0 0 0 / 95%)) !important;
+  box-shadow: 0 0 1.2rem color-mix(in srgb, var(--neon-pink) 34%, transparent) !important;
+}
 .presentation-template[data-design-style="NEON"] .presentation-neon-orbit {
   position: absolute;
-  border: .25rem solid color-mix(in srgb, var(--brand-primary) 55%, transparent);
+  border: .2rem solid color-mix(in srgb, var(--neon-cyan) 44%, transparent);
   border-radius: 50%;
-  box-shadow: 0 0 2rem color-mix(in srgb, var(--brand-primary) 48%, transparent);
+  box-shadow: 0 0 1.4rem color-mix(in srgb, var(--neon-blue) 24%, transparent);
 }
 .presentation-template[data-design-style="NEON"] .presentation-neon-orbit-one {
   top: -12rem;
@@ -1008,7 +1107,7 @@ button {
   left: -10rem;
   width: 40rem;
   height: 40rem;
-  border-color: color-mix(in srgb, var(--brand-secondary) 58%, transparent);
+  border-color: color-mix(in srgb, var(--neon-pink) 42%, transparent);
   transform: rotate(-18deg) scaleY(.35);
 }
 .presentation-template[data-design-style="NEON"] .presentation-neon-key-visual {
@@ -1019,7 +1118,19 @@ button {
   height: 62%;
   object-fit: contain;
   opacity: .32;
-  filter: saturate(1.6) drop-shadow(0 0 2rem var(--brand-primary));
+  filter: saturate(1.2) drop-shadow(0 0 1.2rem color-mix(in srgb, var(--neon-cyan) 35%, transparent));
+}
+
+.answer-template[data-design-style="NEON"] {
+  border-top: .35rem solid transparent;
+  border-image: var(--neon-gradient) 1;
+}
+.answer-template[data-design-style="NEON"] .answer-brand-header {
+  border-bottom-color: var(--quiz-ui-primary) !important;
+}
+.answer-template[data-design-style="NEON"] .answer-primary-button {
+  background: var(--quiz-ui-primary) !important;
+  color: var(--quiz-ui-primary-text) !important;
 }
 
 .presentation-template .presentation-template-decoration-image {
@@ -1391,8 +1502,8 @@ button {
 
 .presentation-template[data-design-style="NEON"] .presentation-flow-editorial img,
 .presentation-template[data-design-style="NEON"] .presentation-flow-video-player {
-  border: 2px solid #67e8f9;
-  box-shadow: 8px 8px 0 #ec4899;
+  border: 2px solid var(--neon-cyan);
+  box-shadow: 8px 8px 0 color-mix(in srgb, var(--neon-pink) 82%, transparent);
 }
 
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-flow-editorial {
@@ -1405,14 +1516,16 @@ button {
 }
 
 .presentation-template[data-design-style="NEON"] .presentation-flow-slide {
-  border-color: #67e8f9;
-  background: radial-gradient(circle at 85% 15%, rgb(236 72 153 / 0.22), transparent 32%), rgb(2 6 23 / 0.88);
-  box-shadow: 8px 8px 0 #ec4899;
+  border-color: var(--neon-cyan);
+  background:
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--neon-pink) 20%, transparent), transparent 32%),
+    color-mix(in srgb, var(--brand-surface) 92%, transparent);
+  box-shadow: 8px 8px 0 color-mix(in srgb, var(--neon-violet) 74%, transparent);
 }
 
 .presentation-template[data-design-style="NEON"] .presentation-flow-kicker,
 .presentation-template[data-design-style="NEON"] .presentation-flow-slide h2 {
-  color: #fef08a;
+  color: var(--neon-orange);
   text-transform: uppercase;
 }
 
@@ -1658,7 +1771,7 @@ button {
   border-width: 2px;
 }
 
-/* LOVD × ungegoogelt: keep editorial composition tokens on presentation
+/* LOVD × Phil Gud: keep editorial composition tokens on presentation
    surfaces. Interactive answer surfaces retain the typography and logo but use
    the separate accessible UI palette defined later in this file. */
 .presentation-template[data-design-style="EDITORIAL"] {

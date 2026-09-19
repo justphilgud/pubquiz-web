@@ -4,7 +4,7 @@ import type {
   PresentationTemplateDesign,
   PresentationTemplate,
 } from "@/app/rendering/templateRegistry";
-import { brandFontOptions, presentationDesigns } from "@/app/rendering/templateRegistry";
+import { brandFontOptions, presentationDesigns, UNGEGOOGELT_NEON_COLORS } from "@/app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "./presentationTemplateAssets";
 import {
   normalizeStorybookConfiguration,
@@ -137,19 +137,19 @@ export const defaultPresentationTemplateConfig: PresentationTemplateConfig = {
   version: PRESENTATION_TEMPLATE_CONTRACT_VERSION,
   tokens: {
     colors: {
-      primary: "#38e8ff",
-      secondary: "#ff3bd4",
-      accent: "#ffd83b",
-      background: "#080014",
-      surface: "#020617",
+      primary: UNGEGOOGELT_NEON_COLORS.cyan,
+      secondary: UNGEGOOGELT_NEON_COLORS.pink,
+      accent: UNGEGOOGELT_NEON_COLORS.orange,
+      background: "#05020A",
+      surface: "#0B0612",
       surfaceStrong: "#000000",
-      text: "#ffffff",
-      textMuted: "#cbd5e1",
-      border: "#38e8ff",
-      correct: "#42ff5e",
-      success: "#42ff5e",
-      warning: "#ffd83b",
-      danger: "#ff4a4a",
+      text: "#FFFFFF",
+      textMuted: "#D9D4E5",
+      border: UNGEGOOGELT_NEON_COLORS.blue,
+      correct: UNGEGOOGELT_NEON_COLORS.green,
+      success: UNGEGOOGELT_NEON_COLORS.green,
+      warning: UNGEGOOGELT_NEON_COLORS.orange,
+      danger: UNGEGOOGELT_NEON_COLORS.coral,
     },
     typography: {
       family: "Arial, Helvetica, sans-serif",
@@ -159,7 +159,7 @@ export const defaultPresentationTemplateConfig: PresentationTemplateConfig = {
     radii: presentationTemplateOptions.radiusPresets.ROUNDED,
     spacing: presentationTemplateOptions.spacingPresets.COMFORTABLE,
     assets: {
-      logo: "/logo_transparent.png",
+      logo: "/logo_schriftzug_transparent.png",
       backgroundImage: null,
     },
   },

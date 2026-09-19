@@ -65,11 +65,11 @@ test("event series answer form follows the selected presentation", () => {
   const result = validateEventSeriesInput({
     name: "Sommerquiz",
     isPublic: false,
-    defaultPresentationTemplateId: "ungegoogelt-dark",
+    defaultPresentationTemplateId: "birthday-reference",
   });
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.equal(result.value.defaultAnswerFormTemplateId, "ungegoogelt-dark");
+    assert.equal(result.value.defaultAnswerFormTemplateId, "birthday-reference");
   }
 });
 
