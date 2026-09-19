@@ -79,6 +79,7 @@ test("the branded login keeps its styling scoped to the auth card", () => {
 
   assert.match(loginPage, /appearance="brand"/);
   assert.match(authCard, /APP_BRAND\.colors\.yellow/);
+  assert.match(authCard, /backgroundColor: APP_BRAND\.colors\.darkSurface/);
   assert.match(authCard, /var\(--app-brand-yellow\)/);
   assert.match(authCard, /button\[type=submit\]/);
   assert.doesNotMatch(authCard, /blue-/);
