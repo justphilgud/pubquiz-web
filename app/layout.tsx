@@ -13,6 +13,7 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 import "./globals.css";
+import "./rendering/presentation/kommOnePresentation.css";
 import { APP_BRAND } from "@/app/branding/appBrand";
 
 const geistSans = Geist({

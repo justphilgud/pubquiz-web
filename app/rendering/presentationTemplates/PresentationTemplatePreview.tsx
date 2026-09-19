@@ -550,6 +550,22 @@ const displayState: PresentationSlideDisplayState = {
 
 function AnswerFormDesignPreview({ theme }: { theme: ResolvedQuizTheme }) {
   const answers = ["Berlin", "Hamburg", "München", "Köln"];
+  if (theme.design.stylePreset === "KOMM_ONE") {
+    return (
+      <QuizThemeScope theme={theme} data-preview-surface="ANSWER_FORM" className="answer-template flex h-full w-full flex-col overflow-hidden bg-[var(--quiz-background)] px-16 py-12">
+        <header className="flex items-center justify-between border-b-2 border-[var(--quiz-primary)] pb-5">
+          {theme.identity.logoUrl && <img src={theme.identity.logoUrl} alt="Komm.ONE" className="h-12 w-auto" />}
+          <span className="text-sm font-bold tabular-nums text-[var(--quiz-text-muted)]">01 / 10</span>
+        </header>
+        <p className="mt-8 text-sm font-bold uppercase tracking-[.2em] text-[var(--quiz-primary)]">Frage 01</p>
+        <h2 className="mt-3 max-w-5xl text-5xl font-extrabold leading-tight">Welche Hauptstadt gehört zu Deutschland?</h2>
+        <div className="mt-8 grid flex-1 grid-cols-2 content-center gap-4">
+          {answers.map((answer, index) => <div key={answer} className="answer-surface grid grid-cols-[3.5rem_1fr] items-center border border-[var(--quiz-border)] bg-white text-xl font-semibold"><span className="grid h-full place-items-center bg-[var(--quiz-surface-strong)] py-5 font-extrabold text-[var(--quiz-primary)]">{String.fromCharCode(65 + index)}</span><span className="px-5">{answer}</span></div>)}
+        </div>
+        <button type="button" className="mt-6 min-h-14 self-end bg-[var(--quiz-primary)] px-12 text-lg font-bold text-white">Antwort übermitteln</button>
+      </QuizThemeScope>
+    );
+  }
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
       <QuizThemeScope theme={theme} data-preview-surface="ANSWER_FORM" className="answer-template flex h-full w-full flex-col overflow-hidden bg-[var(--quiz-background)] px-20 py-14">

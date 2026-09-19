@@ -65,6 +65,12 @@ export const presentationTemplateAssetRolesByStyle: Record<
     { role: "HERO_IMAGE", label: "Hauptbild", helpText: "Optionales ruhiges Motiv für bildgestützte Fragen.", multiple: false },
     { role: "BACKGROUND", label: "Hintergrund", helpText: "Optionales vollflächiges Hintergrundmotiv.", multiple: false },
   ],
+  KOMM_ONE: [
+    { role: "LOGO", label: "Komm.ONE-Logo", helpText: "Offizielle Wortmarke mit Schutzzone für Header und Auftakt.", multiple: false },
+    { role: "HERO_IMAGE", label: "Hauptbild", helpText: "Optionales ruhiges Motiv für bildgestützte Fragen.", multiple: false },
+    { role: "BACKGROUND", label: "Hintergrund", helpText: "Optionales zurückhaltendes Markenmotiv.", multiple: false },
+    { role: "DECORATION", label: "Grafische Elemente", helpText: "Optionale geometrische Markenbilder.", multiple: true },
+  ],
 };
 
 const localAssetPattern = /^\/(?!\/)[a-zA-Z0-9%() _./-]+\.(?:png|jpe?g|webp|svg)$/i;

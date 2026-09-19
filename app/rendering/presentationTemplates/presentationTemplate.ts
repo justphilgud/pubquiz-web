@@ -190,7 +190,7 @@ function isSafeAssetReference(value: unknown, nullable = false) {
 
 function normalizeDesign(value: unknown, presentationVariant: unknown) {
   const storedStyle = isRecord(value) ? value.stylePreset : null;
-  const fallback = storedStyle === "NEON" || storedStyle === "CORPORATE" || storedStyle === "BIRTHDAY" || storedStyle === "EDITORIAL"
+  const fallback = storedStyle === "NEON" || storedStyle === "CORPORATE" || storedStyle === "BIRTHDAY" || storedStyle === "EDITORIAL" || storedStyle === "KOMM_ONE"
     ? presentationDesigns[storedStyle]
     : presentationVariant === "DARK"
       ? presentationDesigns.CORPORATE
@@ -230,7 +230,7 @@ function validateDesign(value: unknown) {
     return [{ field: "config.design", message: "Semantische Designbausteine fehlen." }];
   }
   const style = value.stylePreset;
-  if (!["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL"].includes(String(style))) {
+  if (!["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL", "KOMM_ONE"].includes(String(style))) {
     errors.push({ field: "config.design.stylePreset", message: "Unbekannter Designstil." });
     return errors;
   }
@@ -258,7 +258,8 @@ function validateDesign(value: unknown) {
     CORPORATE: ["CLASSIC", "SPLIT", "MAGAZINE"],
     BIRTHDAY: ["IMAGE_FOCUS", "MAGAZINE", "COLLAGE"],
     EDITORIAL: ["CLASSIC", "SPLIT", "MAGAZINE"],
-  }[style as "NEON" | "CORPORATE" | "BIRTHDAY" | "EDITORIAL"];
+    KOMM_ONE: ["CLASSIC", "SPLIT", "IMAGE_FOCUS"],
+  }[style as "NEON" | "CORPORATE" | "BIRTHDAY" | "EDITORIAL" | "KOMM_ONE"];
   if (!compatibleLayouts.includes(String(value.composition.layoutPreset))) errors.push({ field: "config.design.composition.layoutPreset", message: "Der Aufbau passt nicht zum gewählten Designstil." });
   for (const key of ["headerStyle", "contentFrame", "mediaTreatment", "answerTreatment", "solutionTreatment"] as const) {
     if (value.composition[key] !== expected[key]) errors.push({ field: `config.design.composition.${key}`, message: "Der Baustein passt nicht zum gewählten Designstil." });

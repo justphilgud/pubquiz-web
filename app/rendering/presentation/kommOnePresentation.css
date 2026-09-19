@@ -1,0 +1,758 @@
+/* Komm.ONE Presentation: scoped visual system. Product and lifecycle behavior
+   remain in the shared renderer; this file owns only the KOMM_ONE appearance. */
+.presentation-template[data-design-style="KOMM_ONE"] {
+  --komm-one-lagoon: #00b2a9;
+  --komm-one-dark-lagoon: #008481;
+  --komm-one-lagoon-80: #33c1ba;
+  --komm-one-lagoon-60: #66d1cb;
+  --komm-one-lagoon-40: #99e0dc;
+  --komm-one-midnight: #003a40;
+  --komm-one-midnight-80: #336166;
+  --komm-one-midnight-60: #66898c;
+  --komm-one-midnight-40: #99b0b3;
+  --komm-one-amarillo: #f1c400;
+  --komm-one-dark-amarillo: #f0ad00;
+  --komm-one-basil: #00965e;
+  --komm-one-dark-red: #de3400;
+  --komm-one-warm-white: #f7f8f5;
+  --komm-one-white: #ffffff;
+  --brand-muted: var(--brand-text-muted);
+  --quiz-color-background: var(--komm-one-midnight);
+  --quiz-color-surface: var(--brand-surface);
+  --quiz-color-text: var(--brand-text);
+  --quiz-color-accent: var(--brand-accent);
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--komm-one-midnight) !important;
+  color: var(--komm-one-white);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-header {
+  height: clamp(4.5rem, 8.5vh, 6.5rem);
+  margin: 0;
+  border: 0 !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--komm-one-lagoon-80) 76%, transparent) !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--komm-one-midnight) 94%, transparent) !important;
+  padding: 0 clamp(1.5rem, 3vw, 3.5rem);
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-identity {
+  gap: clamp(1rem, 1.8vw, 2rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-logo {
+  width: clamp(9rem, 14vw, 15rem);
+  max-height: 3.9rem;
+  flex: none;
+  object-fit: contain;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-wordmark {
+  color: var(--komm-one-white);
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  font-weight: 800;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-label {
+  display: grid;
+  gap: 0.15rem;
+  border-left: 1px solid var(--komm-one-lagoon-80);
+  padding-left: clamp(1rem, 1.7vw, 1.75rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-label strong {
+  overflow: hidden;
+  color: var(--komm-one-lagoon-40);
+  font-size: clamp(0.72rem, 0.9vw, 1rem);
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-label span {
+  overflow: hidden;
+  color: var(--komm-one-white);
+  font-size: clamp(0.82rem, 1.05vw, 1.15rem);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-progress {
+  flex: none;
+  color: var(--komm-one-amarillo);
+  font-size: clamp(0.9rem, 1.2vw, 1.35rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-decoration {
+  z-index: 0;
+  overflow: hidden;
+  background: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-ribbon {
+  position: absolute;
+  display: block;
+  transform-origin: center;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-ribbon-primary {
+  top: -52%;
+  right: 7%;
+  width: clamp(8rem, 13vw, 15rem);
+  height: 205%;
+  transform: rotate(29deg);
+  background: var(--komm-one-lagoon);
+  opacity: 0.78;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-ribbon-secondary {
+  right: -8%;
+  bottom: -68%;
+  width: clamp(10rem, 18vw, 21rem);
+  height: 220%;
+  transform: rotate(-36deg);
+  background: var(--komm-one-dark-lagoon);
+  opacity: 0.78;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-ribbon-highlight {
+  top: -50%;
+  right: 29%;
+  width: clamp(2.2rem, 3.7vw, 4.4rem);
+  height: 210%;
+  transform: rotate(29deg);
+  background: var(--komm-one-amarillo);
+  opacity: 0.96;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-intro-logo {
+  position: absolute;
+  top: clamp(2rem, 5vh, 4.5rem);
+  left: clamp(2.5rem, 5vw, 6rem);
+  display: none;
+  width: clamp(13rem, 20vw, 22rem);
+  object-fit: contain;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"]:not(:has(.presentation-komm-one-header)) .presentation-komm-one-intro-logo {
+  display: block;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-brand-image {
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  width: min(32%, 32rem);
+  max-height: 42%;
+  object-fit: contain;
+  opacity: 0.16;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-stage {
+  margin: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: clamp(1.15rem, 2.3vw, 2.75rem) clamp(1.5rem, 3.4vw, 4rem);
+  box-shadow: none !important;
+  color: var(--komm-one-white);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"]:not(:has(.presentation-komm-one-header)) .presentation-komm-one-stage {
+  padding: clamp(8rem, 19vh, 13rem) clamp(2.5rem, 6vw, 7rem) clamp(2.5rem, 7vh, 5rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-storybook-content {
+  position: relative;
+  z-index: 2;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-content-inner > * {
+  animation: komm-one-arrive 360ms cubic-bezier(.22, .61, .36, 1) both;
+}
+
+@keyframes komm-one-arrive {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Question canvases and information slides use the light half of the brand
+   system. Reveal, countdown, finale, sponsor, booking, and outro stay dark. */
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage [data-presentation-layout]:not([data-presentation-layout="SOLUTION_FOCUS"])) .presentation-komm-one-stage,
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage .presentation-flow-slide:is([data-flow-type="QR_CODE"], [data-flow-type="RULES"], [data-flow-type="INTERMEDIATE_STANDINGS"], [data-flow-type="YEARLY_STANDINGS"], [data-flow-type="TEXT"], [data-flow-type="QUOTE"], [data-flow-type="ANECDOTE"], [data-flow-type="PORTRAIT"])) .presentation-komm-one-stage {
+  background: var(--komm-one-warm-white) !important;
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage [data-presentation-layout]:not([data-presentation-layout="SOLUTION_FOCUS"])) .presentation-komm-one-decoration,
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage .presentation-flow-slide:is([data-flow-type="QR_CODE"], [data-flow-type="RULES"], [data-flow-type="INTERMEDIATE_STANDINGS"], [data-flow-type="YEARLY_STANDINGS"], [data-flow-type="TEXT"], [data-flow-type="QUOTE"], [data-flow-type="ANECDOTE"], [data-flow-type="PORTRAIT"])) .presentation-komm-one-decoration {
+  background: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-question-card,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-answer-panel,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-question,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-result,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-poll-question,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-poll-results {
+  border: 0 !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-question-card h2,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-question h2,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-poll-question h2 {
+  color: inherit !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.035em;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [class*="shadow-"],
+.presentation-template[data-design-style="KOMM_ONE"] [class*="drop-shadow-"] {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage [data-presentation-layout]:not([data-presentation-layout="SOLUTION_FOCUS"])) :is(.presentation-question-card, .presentation-answer-panel, .presentation-poll-question, .presentation-poll-results, .presentation-media-fallback) {
+  color: var(--komm-one-midnight) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-question-label,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-label {
+  transform: none !important;
+  border: 0 !important;
+  border-radius: var(--quiz-radius-small) !important;
+  background: var(--komm-one-lagoon) !important;
+  box-shadow: none !important;
+  color: var(--komm-one-midnight) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-badge {
+  border: 0 !important;
+  border-radius: var(--quiz-radius-small) !important;
+  background: var(--komm-one-amarillo) !important;
+  color: var(--komm-one-midnight) !important;
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-answer-option {
+  border: 1px solid var(--komm-one-lagoon-60) !important;
+  border-left: 0.42rem solid var(--komm-one-dark-lagoon) !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  background: color-mix(in srgb, var(--komm-one-lagoon-40) 30%, var(--komm-one-white)) !important;
+  box-shadow: none !important;
+  color: var(--komm-one-midnight) !important;
+  font-weight: 700 !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-answer-option > span {
+  color: var(--komm-one-dark-lagoon) !important;
+  font-weight: 800;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-open-question {
+  border: 1px solid var(--komm-one-lagoon-60) !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  background: color-mix(in srgb, var(--komm-one-lagoon-40) 20%, var(--komm-one-white)) !important;
+  color: var(--komm-one-midnight-80) !important;
+  letter-spacing: 0.14em;
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"] .grid > div,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ordering-items > div,
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="STRUCTURED_RESPONSE"] > :last-child > div {
+  border: 1px solid var(--komm-one-lagoon-60) !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  background: var(--komm-one-white) !important;
+  box-shadow: none !important;
+  color: var(--komm-one-midnight) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"] .grid > div:first-child {
+  border-left: 0.45rem solid var(--komm-one-basil) !important;
+  color: var(--komm-one-basil) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"] .grid > div:last-child {
+  border-left: 0.45rem solid var(--komm-one-dark-red) !important;
+  color: var(--komm-one-dark-red) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-anagram-stimulus,
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"] h2,
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="ORDERING"] h2,
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="STRUCTURED_RESPONSE"] h2 {
+  color: var(--komm-one-midnight) !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-anagram-stimulus {
+  color: var(--komm-one-dark-lagoon) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-media-card,
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="MEDIA_FOCUS"] > :last-child,
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="REVEAL_SEQUENCE"] > :last-child {
+  border: 1px solid var(--komm-one-lagoon-60) !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  background: color-mix(in srgb, var(--komm-one-midnight) 94%, var(--komm-one-lagoon)) !important;
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-media-card :is(img, video),
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-editorial :is(img, video),
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-video-player {
+  border: 0;
+  border-radius: calc(var(--quiz-radius-medium) - 0.2rem);
+  box-shadow: none;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-audio-control {
+  border: 1px solid var(--komm-one-lagoon-80) !important;
+  border-radius: var(--quiz-radius-large) !important;
+  background: linear-gradient(135deg, var(--komm-one-midnight), color-mix(in srgb, var(--komm-one-midnight) 72%, var(--komm-one-dark-lagoon))) !important;
+  box-shadow: none !important;
+  color: var(--komm-one-white) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-audio-stage .presentation-question-label {
+  color: var(--komm-one-midnight) !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-audio-stage h2 {
+  color: var(--komm-one-midnight) !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-media-fallback {
+  border: 1px solid var(--komm-one-lagoon-60);
+  background: color-mix(in srgb, var(--komm-one-lagoon-40) 22%, var(--komm-one-white));
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-media-fallback-icon {
+  color: var(--komm-one-dark-lagoon);
+}
+
+/* Reveal and results deliberately return to Midnight. */
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage [data-presentation-layout="SOLUTION_FOCUS"]) .presentation-komm-one-stage {
+  color: var(--komm-one-white);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-question {
+  padding-left: clamp(1rem, 2vw, 2rem) !important;
+  border-left: 0.35rem solid var(--komm-one-lagoon) !important;
+  border-radius: 0 !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-result,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-poll-results {
+  border: 1px solid var(--komm-one-lagoon-80) !important;
+  background: color-mix(in srgb, var(--komm-one-midnight) 82%, var(--komm-one-dark-lagoon)) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-option,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-answer,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-correct-answer {
+  border: 1px solid var(--komm-one-midnight-60) !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  background: color-mix(in srgb, var(--komm-one-midnight) 90%, var(--komm-one-dark-lagoon)) !important;
+  box-shadow: none !important;
+  color: var(--komm-one-white) !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] :is(.presentation-solution-option, .presentation-solution-answer, .presentation-correct-answer)[data-correct="true"],
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-correct-answer {
+  border-color: var(--komm-one-basil) !important;
+  border-left: 0.42rem solid var(--komm-one-basil) !important;
+  background: color-mix(in srgb, var(--komm-one-basil) 18%, var(--komm-one-midnight)) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-option[data-correct="false"] {
+  color: var(--komm-one-midnight-40) !important;
+  opacity: 0.72;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-correct-answer-value {
+  color: var(--komm-one-white) !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+/* Shared flow content receives an event-scale, non-PowerPoint treatment. */
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide {
+  width: 100%;
+  align-items: stretch;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: clamp(1.5rem, 3.5vw, 4.25rem);
+  color: var(--komm-one-white);
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="CONTENT_CENTERED"] > p {
+  border: 0 !important;
+  background: var(--komm-one-dark-amarillo) !important;
+  color: var(--komm-one-midnight) !important;
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide::before {
+  width: clamp(3.5rem, 6vw, 7rem);
+  height: 0.35rem;
+  margin-bottom: clamp(1rem, 2.4vh, 2rem);
+  background: var(--komm-one-lagoon);
+  content: "";
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-kicker {
+  margin-bottom: 0.8rem;
+  color: var(--komm-one-amarillo);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide h2 {
+  max-width: 19ch;
+  color: inherit;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-subtitle,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-lead,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-quote-source,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-qr-layout p {
+  color: var(--komm-one-lagoon-40);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage .presentation-flow-slide:is([data-flow-type="QR_CODE"], [data-flow-type="RULES"], [data-flow-type="INTERMEDIATE_STANDINGS"], [data-flow-type="YEARLY_STANDINGS"], [data-flow-type="TEXT"], [data-flow-type="QUOTE"], [data-flow-type="ANECDOTE"], [data-flow-type="PORTRAIT"])) .presentation-flow-slide {
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage .presentation-flow-slide:is([data-flow-type="QR_CODE"], [data-flow-type="RULES"], [data-flow-type="INTERMEDIATE_STANDINGS"], [data-flow-type="YEARLY_STANDINGS"], [data-flow-type="TEXT"], [data-flow-type="QUOTE"], [data-flow-type="ANECDOTE"], [data-flow-type="PORTRAIT"])) :is(.presentation-flow-kicker, .presentation-flow-subtitle, .presentation-flow-lead, .presentation-flow-quote-source, .presentation-flow-qr-layout p) {
+  color: var(--komm-one-dark-lagoon);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-qr {
+  border: 1px solid var(--komm-one-midnight-40);
+  border-radius: var(--quiz-radius-medium);
+  background: var(--komm-one-white);
+  box-shadow: 0 1rem 3rem color-mix(in srgb, var(--komm-one-midnight) 14%, transparent);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-team-join-chip {
+  border-color: var(--komm-one-lagoon-60);
+  background: color-mix(in srgb, var(--komm-one-lagoon-40) 22%, var(--komm-one-white));
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-rules li,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-ranking-list li {
+  border: 1px solid var(--komm-one-lagoon-60);
+  border-left: 0.35rem solid var(--komm-one-dark-lagoon);
+  border-radius: var(--quiz-radius-medium);
+  background: color-mix(in srgb, var(--komm-one-lagoon-40) 18%, var(--komm-one-white));
+  color: var(--komm-one-midnight);
+  box-shadow: none;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-rules li > span,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-rank {
+  border-radius: var(--quiz-radius-small);
+  background: var(--komm-one-lagoon);
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-ranking-list li > span:last-child {
+  color: var(--komm-one-dark-lagoon);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-countdown,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-countdown-value {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  color: var(--komm-one-amarillo) !important;
+  font-size: clamp(7rem, 18vw, 19rem) !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800 !important;
+  letter-spacing: -0.06em;
+  line-height: 0.85 !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-legacy-slide,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-slide {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-kicker,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-question,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-solution {
+  border: 0 !important;
+  border-radius: var(--quiz-radius-medium) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-kicker {
+  background: var(--komm-one-lagoon) !important;
+  color: var(--komm-one-midnight) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-question {
+  background: var(--komm-one-warm-white) !important;
+  color: var(--komm-one-midnight) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-estimation-solution {
+  background: var(--komm-one-amarillo) !important;
+  color: var(--komm-one-midnight) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table :is(th, td) {
+  border-color: color-mix(in srgb, var(--komm-one-lagoon-60) 72%, transparent);
+  background: color-mix(in srgb, var(--komm-one-lagoon-40) 17%, var(--komm-one-white));
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table-place,
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table-points {
+  color: var(--komm-one-dark-lagoon) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-podium article {
+  border: 1px solid var(--komm-one-lagoon-60);
+  border-radius: var(--quiz-radius-medium);
+  background: color-mix(in srgb, var(--komm-one-midnight) 78%, var(--komm-one-dark-lagoon));
+  box-shadow: none;
+  color: var(--komm-one-white);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-podium article[data-place="1"] {
+  border-color: var(--komm-one-amarillo);
+  background: color-mix(in srgb, var(--komm-one-amarillo) 16%, var(--komm-one-midnight));
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-podium article > b {
+  color: var(--komm-one-amarillo);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .booking-slide::before {
+  background: var(--komm-one-amarillo);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide.booking-slide {
+  grid-template-columns: minmax(0, 1.35fr) minmax(17rem, 0.65fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 6rem);
+  padding: clamp(2rem, 4vw, 4.5rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .booking-copy {
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  max-width: 52rem;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .booking-action {
+  position: relative;
+  z-index: 2;
+  grid-column: 2;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .booking-qr {
+  border: 1px solid var(--komm-one-lagoon-40);
+  border-radius: var(--quiz-radius-medium);
+  background: var(--komm-one-white);
+  width: min(72%, 18rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .booking-benefits li::before,
+.presentation-template[data-design-style="KOMM_ONE"] .booking-cta {
+  color: var(--komm-one-amarillo);
+}
+
+/* Sponsor artwork remains unmodified and keeps its original aspect ratio. */
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-moment {
+  position: absolute;
+  inset: 15% 13% 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  border-top: 0.35rem solid var(--komm-one-amarillo);
+  background: var(--komm-one-warm-white);
+  color: var(--komm-one-midnight);
+  animation: komm-one-sponsor-arrive 360ms cubic-bezier(.22, .61, .36, 1) both;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-moment p {
+  color: var(--komm-one-dark-lagoon);
+  font-size: clamp(1.25rem, 2.2vw, 2.5rem);
+  font-weight: 700;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-moment img {
+  width: 100%;
+  height: 70%;
+  min-height: 0;
+  padding: clamp(1rem, 2.5vw, 2.5rem);
+  object-fit: contain;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-question-sponsor {
+  border: 1px solid color-mix(in srgb, var(--komm-one-lagoon-60) 62%, transparent);
+  background: color-mix(in srgb, var(--komm-one-midnight) 86%, transparent);
+  color: var(--komm-one-white);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-question-sponsor img {
+  object-fit: contain;
+}
+
+@keyframes komm-one-sponsor-arrive {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.answer-template[data-design-style="KOMM_ONE"] .answer-komm-one-logo {
+  width: min(13rem, 55vw);
+  max-height: 4rem;
+  margin-bottom: 1rem;
+  object-fit: contain;
+}
+
+@container presentation (max-width: 1000px) {
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-header {
+    height: 4.25rem;
+    padding-inline: 1rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-logo {
+    width: 8rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-label span {
+    display: none;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-komm-one-stage {
+    padding: 0.85rem 1rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide {
+    padding: 1rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-moment {
+    inset: 12% 7% 9%;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide.booking-slide {
+    grid-template-columns: minmax(0, 1.45fr) minmax(13rem, 0.55fr);
+    gap: 1.25rem;
+    padding: 1rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-qr {
+    width: min(66%, 13rem);
+  }
+}
+
+@container presentation (max-width: 680px) {
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide.booking-slide {
+    grid-template-columns: minmax(0, 1fr) minmax(7.75rem, 0.42fr);
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-slide .presentation-flow-kicker {
+    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-slide.booking-slide h2 {
+    margin-bottom: 0.35rem;
+    font-size: clamp(1.6rem, 5.3cqw, 2rem);
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-subheadline {
+    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-description,
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-benefits,
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-contact {
+    font-size: 0.75rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-benefits {
+    display: grid;
+    gap: 0.2rem;
+    margin-block: 0.45rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-contact {
+    line-height: 1.35;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-qr {
+    width: min(100%, 7.75rem);
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-cta {
+    margin-block: 0.45rem 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .presentation-template[data-design-style="KOMM_ONE"] .booking-url {
+    font-size: 0.58rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-content-inner > *,
+  .presentation-template[data-design-style="KOMM_ONE"] .presentation-sponsor-moment {
+    animation: none !important;
+  }
+}

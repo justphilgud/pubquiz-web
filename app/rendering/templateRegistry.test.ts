@@ -23,6 +23,22 @@ test("unknown IDs are rejected and only selectable templates are offered", () =>
   assert.equal(isSelectableAnswerFormTemplateId("missing"), false);
   assert.equal(isSelectablePresentationTemplateId("ungegoogelt-dark"), true);
   assert.equal(isSelectableAnswerFormTemplateId("minimal"), true);
+  assert.equal(isSelectablePresentationTemplateId("komm-one-pubquiz"), true);
+  assert.equal(isSelectableAnswerFormTemplateId("komm-one-pubquiz"), true);
+});
+
+test("Komm.ONE is an isolated presentation and answer-form pair with official local logos", () => {
+  const presentation = getPresentationTemplate("komm-one-pubquiz");
+  const answerForm = getAnswerFormTemplate("komm-one-pubquiz");
+
+  assert.equal(presentation?.design.stylePreset, "KOMM_ONE");
+  assert.equal(answerForm?.design.stylePreset, "KOMM_ONE");
+  assert.equal(presentation?.tokens.assets.logo, "/branding/komm-one/komm-one-on-dark.svg");
+  assert.equal(answerForm?.tokens.assets.logo, "/branding/komm-one/komm-one-on-light.svg");
+  assert.deepEqual(
+    [presentation?.tokens.colors.primary, presentation?.tokens.colors.secondary, presentation?.tokens.colors.accent, presentation?.tokens.colors.background],
+    ["#00B2A9", "#008481", "#F1C400", "#003A40"],
+  );
 });
 
 test("German and English labels and descriptions are complete", () => {

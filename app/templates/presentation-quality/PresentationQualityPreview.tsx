@@ -25,7 +25,7 @@ export function PresentationQualityPreview() {
       <summary>Interne Präsentationsreferenz</summary>
       <div className="flex flex-wrap gap-3 p-2">
         <label>Inhalt <select aria-label="Referenzinhalt" value={scenario} onChange={(event) => setScenario(event.target.value as QualityScenario)}>{qualityScenarios.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Vorlage <select aria-label="Referenzvorlage" value={style} onChange={(event) => setStyle(event.target.value as PresentationDesignStyle)}><option value="NEON">Standard</option><option value="EDITORIAL">LOVD</option><option value="CORPORATE">Corporate</option><option value="BIRTHDAY">Storybook</option></select></label>
+        <label>Vorlage <select aria-label="Referenzvorlage" value={style} onChange={(event) => setStyle(event.target.value as PresentationDesignStyle)}><option value="NEON">Standard</option><option value="EDITORIAL">LOVD</option><option value="KOMM_ONE">Komm.ONE</option><option value="CORPORATE">Corporate</option><option value="BIRTHDAY">Storybook</option></select></label>
         {scenario === "qr" && <><button onClick={() => addTeams(1)}>Ein Testbeitritt</button><button onClick={() => addTeams(3)}>Drei Testbeitritte</button><button onClick={() => addTeams(20)}>20 Testbeitritte</button></>}
         <p>Nur Referenzdaten · Vorschau bleibt stumm · keine Speicherung</p>
       </div>

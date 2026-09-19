@@ -2705,9 +2705,10 @@ function renderAktuellenSlide() {
       })
     : null;
 
-  const sponsorMoment = theme.design.stylePreset === "EDITORIAL" && slide?.typ === "ablauf" && slide.presentationRole?.kind === "SPONSOR"
+  const supportsSponsorMoment = theme.design.stylePreset === "EDITORIAL" || theme.design.stylePreset === "KOMM_ONE";
+  const sponsorMoment = supportsSponsorMoment && slide?.typ === "ablauf" && slide.presentationRole?.kind === "SPONSOR"
     ? { phase: "SPONSOR" as const, assignmentId: slide.presentationRole.questionAssignmentId, sponsor: parseQuestionSponsor({ logo: slide.element.config.imageUrl, line: slide.element.config.title }) }
-    : theme.design.stylePreset === "EDITORIAL" && slide?.typ === "frage"
+    : supportsSponsorMoment && slide?.typ === "frage"
       ? { phase: "QUESTION" as const, assignmentId: slide.frage.quiz_fragen_id, sponsor: parseQuestionSponsor(slide.frage.templateConfig?.sponsor) }
       : null;
   return (
