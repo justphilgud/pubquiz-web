@@ -1,10 +1,11 @@
 import type { CSSProperties } from "react";
 
-import type {
-  AnswerFormTemplate,
-  PresentationTemplate,
-  PresentationTemplateDesign,
-  TemplateSource,
+import {
+  UNGEGOOGELT_NEON_COLORS,
+  type AnswerFormTemplate,
+  type PresentationTemplate,
+  type PresentationTemplateDesign,
+  type TemplateSource,
 } from "../templateRegistry";
 import type { ResolvedTemplate } from "../templateResolver";
 import {
@@ -266,6 +267,7 @@ export function resolveQuizTheme({
 export type QuizThemeCssProperties = CSSProperties & {
   [key: `--quiz-${string}`]: string | number;
   [key: `--brand-${string}`]: string | number;
+  [key: `--neon-${string}`]: string | number;
 };
 
 export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties {
@@ -336,10 +338,23 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     fontFamily: theme.appearance.fontFamily,
   };
 
+  if (theme.design.stylePreset === "NEON") {
+    Object.assign(style, {
+      "--neon-pink": UNGEGOOGELT_NEON_COLORS.pink,
+      "--neon-orange": UNGEGOOGELT_NEON_COLORS.orange,
+      "--neon-green": UNGEGOOGELT_NEON_COLORS.green,
+      "--neon-cyan": UNGEGOOGELT_NEON_COLORS.cyan,
+      "--neon-blue": UNGEGOOGELT_NEON_COLORS.blue,
+      "--neon-violet": UNGEGOOGELT_NEON_COLORS.violet,
+      "--neon-coral": UNGEGOOGELT_NEON_COLORS.coral,
+      "--neon-gradient": `linear-gradient(90deg, ${UNGEGOOGELT_NEON_COLORS.blue} 0%, ${UNGEGOOGELT_NEON_COLORS.cyan} 16%, ${UNGEGOOGELT_NEON_COLORS.green} 32%, ${UNGEGOOGELT_NEON_COLORS.orange} 50%, ${UNGEGOOGELT_NEON_COLORS.coral} 66%, ${UNGEGOOGELT_NEON_COLORS.pink} 82%, ${UNGEGOOGELT_NEON_COLORS.violet} 100%)`,
+    });
+  }
+
   if (theme.assets.backgroundImage) {
     style.backgroundImage = `linear-gradient(${theme.colors.background}66, ${theme.colors.background}66), url("${theme.assets.backgroundImage}")`;
   } else if (theme.design.stylePreset === "NEON") {
-    style.backgroundImage = `radial-gradient(circle at 20% 20%, ${theme.colors.secondary} 0, ${theme.colors.secondary}22 24%, transparent 42%), radial-gradient(circle at 80% 10%, ${theme.colors.primary}66 0, ${theme.colors.primary}22 22%, transparent 38%), linear-gradient(135deg, #1a0033, ${theme.colors.background} 45%, #001a3a)`;
+    style.backgroundImage = `radial-gradient(circle at 14% 8%, ${UNGEGOOGELT_NEON_COLORS.blue}55 0, transparent 30%), radial-gradient(circle at 88% 12%, ${UNGEGOOGELT_NEON_COLORS.pink}44 0, transparent 28%), radial-gradient(circle at 24% 100%, ${UNGEGOOGELT_NEON_COLORS.green}2E 0, transparent 32%), linear-gradient(145deg, #000000, ${theme.colors.background} 52%, #090313)`;
   } else if (theme.design.stylePreset === "CORPORATE") {
     style.backgroundImage = `linear-gradient(120deg, ${theme.colors.background}, ${theme.colors.surfaceStrong})`;
   } else if (theme.design.stylePreset === "EDITORIAL" || theme.design.stylePreset === "KOMM_ONE") {

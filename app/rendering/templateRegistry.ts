@@ -202,6 +202,17 @@ const sharedSizing = {
   assets: { logo: "/logo_transparent.png", backgroundImage: null },
 } as const;
 
+/** Exact high-saturation anchor colours sampled from the official PNG logo. */
+export const UNGEGOOGELT_NEON_COLORS = {
+  pink: "#FF009C",
+  orange: "#FFB700",
+  green: "#00FF57",
+  cyan: "#00C0FF",
+  blue: "#008BFF",
+  violet: "#6A4CFF",
+  coral: "#FF4D68",
+} as const;
+
 export const presentationDesigns = {
   NEON: {
     stylePreset: "NEON",
@@ -241,7 +252,7 @@ export const presentationDesigns = {
     stylePreset: "EDITORIAL",
     composition: { layoutPreset: "MAGAZINE", headerStyle: "EDITORIAL_MARK", footerStyle: "COLLABORATION", contentFrame: "OPEN_CANVAS", mediaTreatment: "RECTANGULAR", answerTreatment: "EDITORIAL_ROWS", solutionTreatment: "ANSWER_BAND", decoration: "NONE" },
     imagery: { heroImage: null, solutionImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "SIDE" },
-    occasion: { personName: "", age: "", subtitle: "", eventTitle: "LOVD PubQuiz", extraText: "LOVD × ungegoogelt", identityPlacement: "HEADER" },
+    occasion: { personName: "", age: "", subtitle: "", eventTitle: "LOVD PubQuiz", extraText: "LOVD × Phil Gud", identityPlacement: "HEADER" },
     storybook: null,
   },
   KOMM_ONE: {
@@ -265,20 +276,21 @@ const presentation = [
     design: presentationDesigns.NEON,
     tokens: {
       ...sharedSizing,
+      assets: { logo: "/logo_schriftzug_transparent.png", backgroundImage: null },
       colors: {
-        primary: "#38e8ff",
-        secondary: "#ff3bd4",
-        accent: "#ffd83b",
-        background: "#080014",
-        surface: "#020617",
+        primary: UNGEGOOGELT_NEON_COLORS.cyan,
+        secondary: UNGEGOOGELT_NEON_COLORS.pink,
+        accent: UNGEGOOGELT_NEON_COLORS.orange,
+        background: "#05020A",
+        surface: "#0B0612",
         surfaceStrong: "#000000",
-        text: "#ffffff",
-        textMuted: "#cbd5e1",
-        border: "#38e8ff",
-        correct: "#42ff5e",
-        success: "#42ff5e",
-        warning: "#ffd83b",
-        danger: "#ff4a4a",
+        text: "#FFFFFF",
+        textMuted: "#D9D4E5",
+        border: UNGEGOOGELT_NEON_COLORS.blue,
+        correct: UNGEGOOGELT_NEON_COLORS.green,
+        success: UNGEGOOGELT_NEON_COLORS.green,
+        warning: UNGEGOOGELT_NEON_COLORS.orange,
+        danger: UNGEGOOGELT_NEON_COLORS.coral,
       },
     },
   },
@@ -288,7 +300,7 @@ const presentation = [
     variant: "DARK",
     labelKey: "presentationDark",
     category: "MINIMAL",
-    selectable: true,
+    selectable: false,
     preview: { exampleButtonKey: "previewButton" },
     design: presentationDesigns.CORPORATE,
     tokens: {
@@ -317,7 +329,7 @@ const presentation = [
     variant: "DARK",
     labelKey: "presentationCorporate",
     category: "MINIMAL",
-    selectable: true,
+    selectable: false,
     preview: { exampleButtonKey: "previewButton" },
     design: presentationDesigns.CORPORATE,
     tokens: {
@@ -350,7 +362,7 @@ const presentation = [
     category: "BRANDED",
     selectable: true,
     preview: { exampleButtonKey: "previewButton" },
-    displayName: "LOVD × ungegoogelt",
+    displayName: "LOVD × Phil Gud",
     design: presentationDesigns.EDITORIAL,
     tokens: {
       ...sharedSizing,
@@ -395,19 +407,19 @@ const answerForm = [
     tokens: {
       ...sharedSizing,
       colors: {
-        primary: "#0f172a",
-        secondary: "#047857",
-        accent: "#16a34a",
-        background: "#f1f5f9",
-        surface: "#ffffff",
-        surfaceStrong: "#f8fafc",
-        text: "#0f172a",
-        textMuted: "#475569",
-        border: "#cbd5e1",
+        primary: UNGEGOOGELT_NEON_COLORS.violet,
+        secondary: UNGEGOOGELT_NEON_COLORS.blue,
+        accent: UNGEGOOGELT_NEON_COLORS.pink,
+        background: "#F6F4FA",
+        surface: "#FFFFFF",
+        surfaceStrong: "#F1EDF7",
+        text: "#15121C",
+        textMuted: "#514B5C",
+        border: UNGEGOOGELT_NEON_COLORS.violet,
         correct: "#047857",
         success: "#047857",
-        warning: "#a16207",
-        danger: "#b91c1c",
+        warning: "#9A5E00",
+        danger: "#B4233A",
       },
     },
   },
@@ -449,7 +461,7 @@ const answerForm = [
   },
   {
     id: "corporate-reference", kind: "ANSWER_FORM", variant: "MINIMAL",
-    labelKey: "answerCorporate", category: "MINIMAL", selectable: true,
+    labelKey: "answerCorporate", category: "MINIMAL", selectable: false,
     preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.CORPORATE,
     tokens: { ...sharedSizing, typography: { family: "system-ui, sans-serif", displayWeight: 800, bodyWeight: 400 }, radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" }, colors: { primary: "#1d4ed8", secondary: "#334155", accent: "#0ea5e9", background: "#f1f5f9", surface: "#ffffff", surfaceStrong: "#e2e8f0", text: "#0f172a", textMuted: "#475569", border: "#94a3b8", correct: "#047857", success: "#047857", warning: "#a16207", danger: "#b91c1c" } },
   },

@@ -10,7 +10,7 @@ test("event series accepts registered defaults and rejects unknown IDs", () => {
   const valid = validateEventSeriesInput({
     name: "Reihe",
     isPublic: false,
-    defaultPresentationTemplateId: "ungegoogelt-dark",
+    defaultPresentationTemplateId: "ungegoogelt-default",
   });
   assert.equal(valid.ok, true);
 

@@ -6,8 +6,8 @@ export const enRenderingMessages: WidenMessageCatalog<
 > = {
   templates: {
     presentationDefault: {
-      label: "ungegoogelt Default",
-      description: "The established, colourful presentation design.",
+      label: "ungegoogelt Neon",
+      description: "A multicolour neon stage derived from the official ungegoogelt logo.",
     },
     presentationDark: {
       label: "ungegoogelt Dark",
@@ -15,11 +15,11 @@ export const enRenderingMessages: WidenMessageCatalog<
     },
     presentationCorporate: { label: "Corporate", description: "Calm professional design with a clear hierarchy." },
     presentationBirthday: { label: "Storybook", description: "Personal photo-book design with an editorial visual language." },
-    presentationEditorial: { label: "LOVD × ungegoogelt", description: "Warm, minimal venue design with spacious editorial hierarchy." },
+    presentationEditorial: { label: "LOVD × Phil Gud", description: "Warm, minimal venue design with spacious editorial hierarchy." },
     presentationKommOne: { label: "Komm.ONE PubQuiz", description: "Modern quiz stage using Midnight, Lagoon, and focused Amarillo accents." },
     answerDefault: {
-      label: "ungegoogelt Default",
-      description: "The familiar mobile-first answer form.",
+      label: "ungegoogelt Neon",
+      description: "The mobile-first answer form using the updated ungegoogelt colour system.",
     },
     answerMinimal: {
       label: "Minimal",
@@ -27,7 +27,7 @@ export const enRenderingMessages: WidenMessageCatalog<
     },
     answerCorporate: { label: "Corporate", description: "Professional answer form for company events." },
     answerBirthday: { label: "Storybook", description: "Quiet answer form in the personal photo-book style." },
-    answerEditorial: { label: "LOVD × ungegoogelt", description: "Minimal answer form in a warm LOVD event style." },
+    answerEditorial: { label: "LOVD × Phil Gud", description: "Minimal answer form in a warm LOVD event style." },
     answerKommOne: { label: "Komm.ONE PubQuiz", description: "Clear answer form in the Komm.ONE brand world." },
   },
   fields: {

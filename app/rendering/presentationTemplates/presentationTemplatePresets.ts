@@ -2,10 +2,9 @@ import { presentationDesigns, templateRegistry, type PresentationDesignStyle, ty
 import type { PresentationTemplateConfig } from "./presentationTemplate";
 
 export const presentationStylePresets = [
-  { id: "NEON", name: "ungegoogelt Neon", description: "Leuchtende Eventoptik mit starken Kontrasten und markanten Statusanzeigen.", useCase: "Pubquiz, Bühne und Live-Event", swatches: ["#080014", "#38e8ff", "#ff3bd4"] },
-  { id: "CORPORATE", name: "Corporate", description: "Klare Flächen, sachliche Typografie und ein ruhiger Markenbereich.", useCase: "Firmenquiz, Workshop und Kundenevent", swatches: ["#f1f5f9", "#1d4ed8", "#334155"] },
+  { id: "NEON", name: "ungegoogelt Neon", description: "Mehrfarbige Neonbühne mit der offiziellen ungegoogelt-Logofarbwelt.", useCase: "Pubquiz, Bühne und Live-Event", swatches: ["#008BFF", "#00FF57", "#FF009C"] },
   { id: "BIRTHDAY", name: "Storybook", description: "Eine ruhige, persönliche Fotobuch-Welt mit redaktioneller Typografie und kuratierten Erinnerungen.", useCase: "Geburtstag, Jubiläum und gemeinsamer Rückblick", swatches: ["#f5f0e8", "#8f2f4f", "#b89a68"] },
-  { id: "EDITORIAL", name: "LOVD × ungegoogelt", description: "Warme Venue-Atmosphäre mit offener Fläche, präziser Typografie und ruhigen Akzenten.", useCase: "Gastronomie, Kultur und hochwertige Kollaborationen", swatches: ["#6A241C", "#FFF9E9", "#C64D3B"] },
+  { id: "EDITORIAL", name: "LOVD × Phil Gud", description: "Warme Venue-Atmosphäre mit offener Fläche, präziser Typografie und ruhigen Akzenten.", useCase: "Gastronomie, Kultur und hochwertige Kollaborationen", swatches: ["#6A241C", "#FFF9E9", "#C64D3B"] },
   { id: "KOMM_ONE", name: "Komm.ONE PubQuiz", description: "Digitale Markenbühne mit Midnight, Lagoon und präzisen Amarillo-Akzenten.", useCase: "Komm.ONE Veranstaltungen, Workshops und Quizabende", swatches: ["#003A40", "#00B2A9", "#F1C400"] },
 ] as const satisfies readonly { id: PresentationDesignStyle; name: string; description: string; useCase: string; swatches: readonly string[] }[];
 

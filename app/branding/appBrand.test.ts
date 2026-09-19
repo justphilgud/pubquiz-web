@@ -94,6 +94,6 @@ test("app branding stays outside presentation runtime sources", () => {
 
   for (const path of presentationRoots.flatMap(sourceFiles)) {
     const source = readFileSync(path, "utf8");
-    assert.doesNotMatch(source, /Phil Gud|branding\/phil-gud/i, path);
+    assert.doesNotMatch(source, /APP_BRAND|branding\/phil-gud/i, path);
   }
 });

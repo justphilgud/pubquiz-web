@@ -39,7 +39,7 @@ import {
 import { selectDeterministicTemplateImage } from "./deterministicTemplateImage";
 import { getStorybookPeopleMode, getStorybookTitle } from "./storybook";
 import { resolveStorybookComposition } from "./storybookComposition";
-import { applyPresentationStylePreset, createPresentationStylePreset } from "./presentationTemplatePresets";
+import { applyPresentationStylePreset, createPresentationStylePreset, presentationStylePresets } from "./presentationTemplatePresets";
 import { templateRegistry } from "@/app/rendering/templateRegistry";
 import {
   applyPresentationTemplateAssetUpload,
@@ -138,6 +138,7 @@ test("presets are structurally distinct and preserve personal imagery when switc
   assert.deepEqual(applyPresentationStylePreset(birthday, "CORPORATE").design.imagery.personalImagePool, birthday.design.imagery.personalImagePool);
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "corporate-reference"));
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "birthday-reference"));
+  assert.deepEqual(presentationStylePresets.map(({ id }) => id), ["NEON", "BIRTHDAY", "EDITORIAL", "KOMM_ONE"]);
 });
 
 test("LOVD editorial preset is a regular editable generator template with the original logo asset", () => {
@@ -619,9 +620,13 @@ test("overview filters by text, status and source", () => {
     creatorName: null, updatedAt: null, usageCount: 0,
   };
   const user = { ...base, id: "sommer", name: "Sommer", status: "ACTIVE" as const, source: "USER" as const, isSystem: false, tags: ["Bühne"] };
+  const archived = { ...user, id: "archiv", name: "Archiv", status: "ARCHIVED" as const };
   assert.deepEqual(filterPresentationTemplates([base, user], { query: "bühne" }).map(({ id }) => id), ["sommer"]);
   assert.deepEqual(filterPresentationTemplates([base, user], { status: "SYSTEM" }).map(({ id }) => id), ["system"]);
   assert.deepEqual(filterPresentationTemplates([base, user], { source: "USER" }).map(({ id }) => id), ["sommer"]);
+  assert.deepEqual(filterPresentationTemplates([base, user, archived], {}).map(({ id }) => id), ["system", "sommer"]);
+  assert.deepEqual(filterPresentationTemplates([base, user, archived], { status: "ARCHIVED" }).map(({ id }) => id), ["archiv"]);
+  assert.deepEqual(filterPresentationTemplates([base, user, archived], { status: "ALL" }).map(({ id }) => id), ["system", "sommer", "archiv"]);
 });
 
 test("template management capabilities are admin-only in the MVP", () => {
@@ -788,7 +793,7 @@ test("LOVD uses one token-driven editorial treatment without visible neon color 
   const css = readFileSync("app/globals.css", "utf8");
   const designSystem = readFileSync("app/rendering/presentation/PresentationDesignSystem.tsx", "utf8");
   const answerForm = readFileSync("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx", "utf8");
-  const lovdCss = css.slice(css.indexOf("/* LOVD × ungegoogelt:"));
+  const lovdCss = css.slice(css.indexOf("/* LOVD × Phil Gud:"));
 
   assert.ok(lovdCss.length > 0);
   assert.doesNotMatch(lovdCss, /#(?:38e8ff|ff3bd4|ffd83b|00e5ff|ff00aa)/i);

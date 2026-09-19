@@ -152,17 +152,17 @@ export function PresentationDesignHeader({
   }
 
   return (
-    <header className="presentation-chrome presentation-neon-header mb-3 flex h-28 shrink-0 items-center justify-between rounded-3xl border-2 border-[#38E8FF] bg-black/85 px-8 shadow-[0_0_24px_#38E8FF]">
-      <div className="flex items-center gap-6">
+    <header className="presentation-chrome presentation-neon-header relative mb-3 flex h-28 shrink-0 items-center justify-between px-8">
+      <div className="flex min-w-0 items-center gap-6">
         {theme.identity.logoUrl && (
-          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="h-24 w-24 object-contain" />
+          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="ungegoogelt" className="presentation-neon-logo" />
         )}
-        <div className="presentation-divider h-16 w-px bg-[#38E8FF] shadow-[0_0_10px_#38E8FF]" />
-        <div>
-          <div className="presentation-primary-text text-sm font-black uppercase tracking-[0.35em] text-[#38E8FF]">
+        <div className="presentation-neon-divider h-16 w-px" />
+        <div className="min-w-0">
+          <div className="presentation-neon-label text-sm font-black uppercase tracking-[0.35em]">
             {slideLabel}
           </div>
-          <div className="presentation-accent-text text-3xl font-black text-[#FFD83B] drop-shadow-[0_0_8px_#FFD83B]">
+          <div className="presentation-neon-title truncate text-3xl font-black">
             {displayIdentity(theme)}
           </div>
           {theme.design.occasion.subtitle && (
@@ -172,14 +172,10 @@ export function PresentationDesignHeader({
           )}
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="rounded-2xl border-2 border-[#FF3BD4] px-6 py-3 text-2xl font-black text-[#FF3BD4] shadow-[0_0_12px_#FF3BD4]">
-          {slideNumber}
-        </div>
-        <div className="text-3xl font-black text-[#38E8FF]">/</div>
-        <div className="rounded-2xl border-2 border-[#FFD83B] px-6 py-3 text-2xl font-black text-[#FFD83B] shadow-[0_0_12px_#FFD83B]">
-          {slideCount}
-        </div>
+      <div className="presentation-neon-progress" aria-label={`${slideLabel}, Folie ${slideNumber} von ${slideCount}`}>
+        <strong>{String(slideNumber).padStart(2, "0")}</strong>
+        <span aria-hidden="true">/</span>
+        <strong>{String(slideCount).padStart(2, "0")}</strong>
       </div>
     </header>
   );
@@ -232,7 +228,7 @@ export function PresentationDesignBackdrop({
           <img data-template-asset-role="LOGO" data-logo-framing="lovd-wordmark" src={theme.identity.logoUrl} alt="" className="presentation-editorial-intro-logo" />
         )}
         <span className="presentation-editorial-intro-title">PUBQUIZ</span>
-        <span className="presentation-editorial-intro-collaboration">{theme.design.occasion.extraText || "LOVD × ungegoogelt"}</span>
+        <span className="presentation-editorial-intro-collaboration">{theme.design.occasion.extraText || "LOVD × Phil Gud"}</span>
       </div>
     );
   }
@@ -361,7 +357,7 @@ export function PresentationDesignFooter({
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
       <footer className="presentation-editorial-footer relative z-20 flex shrink-0 items-center justify-end">
-        <span>{theme.design.occasion.extraText || "LOVD × ungegoogelt"}</span>
+        <span>{theme.design.occasion.extraText || "LOVD × Phil Gud"}</span>
       </footer>
     );
   }

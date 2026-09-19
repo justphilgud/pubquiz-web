@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
-import type {
-  AnswerFormTemplate,
-  PresentationTemplate,
+import {
+  UNGEGOOGELT_NEON_COLORS,
+  type AnswerFormTemplate,
+  type PresentationTemplate,
 } from "./templateRegistry";
 
 export type TemplateCssProperties = CSSProperties & {
@@ -42,14 +43,14 @@ export function presentationTemplateStyle(
   template: PresentationTemplate,
 ): TemplateCssProperties {
   const variables = tokenVariables(template);
-  const { primary, secondary, background } = template.tokens.colors;
+  const { primary, background } = template.tokens.colors;
   return {
     ...variables,
     backgroundImage:
       template.design.stylePreset === "EDITORIAL" || template.design.stylePreset === "KOMM_ONE"
         ? "none"
         : template.variant === "NEON"
-        ? `radial-gradient(circle at 20% 20%, ${secondary} 0, ${secondary}22 24%, transparent 42%), radial-gradient(circle at 80% 10%, ${primary}66 0, ${primary}22 22%, transparent 38%), linear-gradient(135deg, #1a0033, ${background} 45%, #001a3a)`
+        ? `radial-gradient(circle at 14% 8%, ${UNGEGOOGELT_NEON_COLORS.blue}55 0, transparent 30%), radial-gradient(circle at 88% 12%, ${UNGEGOOGELT_NEON_COLORS.pink}44 0, transparent 28%), radial-gradient(circle at 24% 100%, ${UNGEGOOGELT_NEON_COLORS.green}2E 0, transparent 32%), linear-gradient(145deg, #000000, ${background} 52%, #090313)`
         : `radial-gradient(circle at 50% 0%, ${primary}22, transparent 42%), linear-gradient(145deg, ${background}, #000000)`,
     backgroundColor: background,
     color: template.tokens.colors.text,
