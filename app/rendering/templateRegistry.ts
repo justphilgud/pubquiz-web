@@ -118,7 +118,7 @@ export type BrandTokens = {
   assets: BrandAssetTokens;
 };
 
-export type PresentationDesignStyle = "NEON" | "CORPORATE" | "BIRTHDAY" | "EDITORIAL";
+export type PresentationDesignStyle = "NEON" | "CORPORATE" | "BIRTHDAY" | "EDITORIAL" | "KOMM_ONE";
 
 export type PresentationTemplateDesign = {
   stylePreset: PresentationDesignStyle;
@@ -157,11 +157,13 @@ export type TemplateMessageKey =
   | "presentationCorporate"
   | "presentationBirthday"
   | "presentationEditorial"
+  | "presentationKommOne"
   | "answerDefault"
   | "answerMinimal"
   | "answerCorporate"
   | "answerBirthday"
-  | "answerEditorial";
+  | "answerEditorial"
+  | "answerKommOne";
 
 type TemplateMetadata = {
   labelKey: TemplateMessageKey;
@@ -240,6 +242,13 @@ export const presentationDesigns = {
     composition: { layoutPreset: "MAGAZINE", headerStyle: "EDITORIAL_MARK", footerStyle: "COLLABORATION", contentFrame: "OPEN_CANVAS", mediaTreatment: "RECTANGULAR", answerTreatment: "EDITORIAL_ROWS", solutionTreatment: "ANSWER_BAND", decoration: "NONE" },
     imagery: { heroImage: null, solutionImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "SIDE" },
     occasion: { personName: "", age: "", subtitle: "", eventTitle: "LOVD PubQuiz", extraText: "LOVD × ungegoogelt", identityPlacement: "HEADER" },
+    storybook: null,
+  },
+  KOMM_ONE: {
+    stylePreset: "KOMM_ONE",
+    composition: { layoutPreset: "SPLIT", headerStyle: "BRAND_BAR", footerStyle: "NONE", contentFrame: "OPEN_CANVAS", mediaTreatment: "RECTANGULAR", answerTreatment: "CORPORATE_ROWS", solutionTreatment: "RESULT_BAND", decoration: "GEOMETRIC_LINES" },
+    imagery: { heroImage: null, solutionImage: null, decorativeImages: [], personalImagePool: [], overlay: "NONE", placement: "SIDE" },
+    occasion: { personName: "", age: "", subtitle: "Kommunal. Digital. Gemeinsam.", eventTitle: "Komm.ONE PubQuiz", extraText: "", identityPlacement: "HEADER" },
     storybook: null,
   },
 } as const satisfies Record<PresentationDesignStyle, PresentationTemplateDesign>;
@@ -352,6 +361,25 @@ const presentation = [
       colors: { primary: "#C64D3B", secondary: "#6A241C", accent: "#C64D3B", background: "#6A241C", surface: "#6A241C", surfaceStrong: "#141414", text: "#FFF9E9", textMuted: "#FFF9E9", border: "#C64D3B", correct: "#e3b65b", success: "#6f9b72", warning: "#d5a64b", danger: "#d66558" },
     },
   },
+  {
+    id: "komm-one-pubquiz",
+    kind: "PRESENTATION",
+    variant: "DARK",
+    labelKey: "presentationKommOne",
+    category: "BRANDED",
+    selectable: true,
+    preview: { exampleButtonKey: "previewButton" },
+    displayName: "Komm.ONE PubQuiz",
+    design: presentationDesigns.KOMM_ONE,
+    tokens: {
+      ...sharedSizing,
+      typography: { family: "var(--font-plus-jakarta-sans), Arial, sans-serif", displayWeight: 800, bodyWeight: 400 },
+      radii: { small: "0.5rem", medium: "1rem", large: "1.5rem" },
+      spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
+      assets: { logo: "/branding/komm-one/komm-one-on-dark.svg", backgroundImage: null },
+      colors: { primary: "#00B2A9", secondary: "#008481", accent: "#F1C400", background: "#003A40", surface: "#F7F8F5", surfaceStrong: "#003A40", text: "#FFFFFF", textMuted: "#99E0DC", border: "#33C1BA", correct: "#00965E", success: "#00965E", warning: "#F0AD00", danger: "#DE3400" },
+    },
+  },
 ] as const satisfies readonly PresentationTemplate[];
 
 const answerForm = [
@@ -442,6 +470,19 @@ const answerForm = [
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
       assets: { logo: "/branding/lovd/lovd-stelp.png", backgroundImage: null },
       colors: { primary: "#7f2f23", secondary: "#6b382e", accent: "#a6422e", background: "#f8f4ee", surface: "#ffffff", surfaceStrong: "#f5eee7", text: "#24120e", textMuted: "#5f473f", border: "#8a6f65", correct: "#166534", success: "#166534", warning: "#92400e", danger: "#b91c1c" },
+    },
+  },
+  {
+    id: "komm-one-pubquiz", kind: "ANSWER_FORM", variant: "MINIMAL",
+    labelKey: "answerKommOne", category: "BRANDED", selectable: true,
+    preview: { exampleButtonKey: "previewButton" }, displayName: "Komm.ONE PubQuiz", design: presentationDesigns.KOMM_ONE,
+    tokens: {
+      ...sharedSizing,
+      typography: { family: "var(--font-plus-jakarta-sans), Arial, sans-serif", displayWeight: 800, bodyWeight: 400 },
+      radii: { small: "0.5rem", medium: "1rem", large: "1.5rem" },
+      spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
+      assets: { logo: "/branding/komm-one/komm-one-on-light.svg", backgroundImage: null },
+      colors: { primary: "#008481", secondary: "#003A40", accent: "#F0AD00", background: "#F7F8F5", surface: "#FFFFFF", surfaceStrong: "#E5F5F4", text: "#003A40", textMuted: "#336166", border: "#66898C", correct: "#00965E", success: "#00965E", warning: "#F0AD00", danger: "#DE3400" },
     },
   },
 ] as const satisfies readonly AnswerFormTemplate[];

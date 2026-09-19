@@ -52,6 +52,29 @@ export function PresentationDesignHeader({
   sponsor,
   storybookComposition = null,
 }: HeaderProps & { storybookComposition?: StorybookComposition | null }) {
+  if (theme.design.stylePreset === "KOMM_ONE") {
+    const progress = `${String(slideNumber).padStart(2, "0")} / ${String(slideCount).padStart(2, "0")}`;
+    return (
+      <header className="presentation-chrome presentation-komm-one-header relative z-20 flex shrink-0 items-center justify-between">
+        <div className="presentation-komm-one-identity flex min-w-0 items-center">
+          {theme.identity.logoUrl ? (
+            <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="Komm.ONE" className="presentation-komm-one-logo" />
+          ) : (
+            <span className="presentation-komm-one-wordmark">Komm.ONE</span>
+          )}
+          <div className="presentation-komm-one-label min-w-0">
+            <strong>{slideLabel}</strong>
+            <span>{displayIdentity(theme)}</span>
+          </div>
+        </div>
+        {sponsor && <QuestionSponsorMark sponsor={sponsor} />}
+        <div className="presentation-komm-one-progress" aria-label={`${slideLabel}, Folie ${slideNumber} von ${slideCount}`}>
+          {progress}
+        </div>
+      </header>
+    );
+  }
+
   if (theme.design.stylePreset === "EDITORIAL") {
     const progress = `${String(slideNumber).padStart(2, "0")} / ${String(slideCount).padStart(2, "0")}`;
     return (
@@ -185,6 +208,23 @@ export function PresentationDesignBackdrop({
     />
   ));
 
+  if (theme.design.stylePreset === "KOMM_ONE") {
+    return (
+      <div className="presentation-decoration presentation-komm-one-decoration pointer-events-none absolute inset-0" aria-hidden="true">
+        <span className="presentation-komm-one-ribbon presentation-komm-one-ribbon-primary" />
+        <span className="presentation-komm-one-ribbon presentation-komm-one-ribbon-secondary" />
+        <span className="presentation-komm-one-ribbon presentation-komm-one-ribbon-highlight" />
+        {theme.identity.logoUrl && (
+          <img data-template-asset-role="LOGO" src={theme.identity.logoUrl} alt="" className="presentation-komm-one-intro-logo" />
+        )}
+        {theme.assets.heroImage && (
+          <img data-template-asset-role="HERO_IMAGE" src={theme.assets.heroImage} alt="" className="presentation-komm-one-brand-image" />
+        )}
+        {decorations}
+      </div>
+    );
+  }
+
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
       <div className="presentation-decoration presentation-editorial-decoration pointer-events-none absolute inset-0" aria-hidden="true">
@@ -291,6 +331,7 @@ export function PresentationDesignStage({
     CORPORATE: "presentation-corporate-stage p-6",
     BIRTHDAY: "presentation-birthday-stage p-5",
     EDITORIAL: "presentation-editorial-stage px-3 pb-10 pt-3",
+    KOMM_ONE: "presentation-komm-one-stage",
   }[theme.design.stylePreset];
 
   return (

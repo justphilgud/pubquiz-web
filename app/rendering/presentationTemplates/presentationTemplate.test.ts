@@ -105,7 +105,7 @@ test("normalizes legacy configurations and validates all semantic design styles"
   const legacy = structuredClone(defaultPresentationTemplateConfig) as Partial<typeof defaultPresentationTemplateConfig>;
   delete legacy.design;
   assert.equal(parsePresentationTemplateConfig(legacy)?.design.stylePreset, "NEON");
-  for (const style of ["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL"] as const) {
+  for (const style of ["NEON", "CORPORATE", "BIRTHDAY", "EDITORIAL", "KOMM_ONE"] as const) {
     assert.equal(validatePresentationTemplateDraft({ ...draft(), config: createPresentationStylePreset(style) }).ok, true);
   }
   const legacyBirthday = createPresentationStylePreset("BIRTHDAY") as unknown as { design: { imagery: { solutionImage?: string | null } } };
@@ -157,6 +157,28 @@ test("LOVD editorial preset is a regular editable generator template with the or
   assert.equal(result.ok, true);
   assert.ok(templateRegistry.presentation.some(({ id }) => id === "lovd-ungegoogelt"));
   assert.ok(templateRegistry.answerForm.some(({ id }) => id === "lovd-ungegoogelt"));
+});
+
+test("Komm.ONE preset keeps the extracted corporate assets and palette in its own scoped style", () => {
+  const kommOne = createPresentationStylePreset("KOMM_ONE");
+  const lightLogo = readFileSync("public/branding/komm-one/komm-one-on-light.svg", "utf8");
+  const darkLogo = readFileSync("public/branding/komm-one/komm-one-on-dark.svg", "utf8");
+  const css = readFileSync("app/rendering/presentation/kommOnePresentation.css", "utf8");
+
+  assert.equal(kommOne.design.stylePreset, "KOMM_ONE");
+  assert.equal(kommOne.tokens.assets.logo, "/branding/komm-one/komm-one-on-dark.svg");
+  assert.equal(kommOne.tokens.typography.family, "var(--font-plus-jakarta-sans), Arial, sans-serif");
+  assert.deepEqual(
+    [kommOne.tokens.colors.primary, kommOne.tokens.colors.secondary, kommOne.tokens.colors.accent, kommOne.tokens.colors.background, kommOne.tokens.colors.correct, kommOne.tokens.colors.danger],
+    ["#00B2A9", "#008481", "#F1C400", "#003A40", "#00965E", "#DE3400"],
+  );
+  assert.deepEqual(presentationTemplateAssetRolesByStyle.KOMM_ONE.map(({ role }) => role), ["LOGO", "HERO_IMAGE", "BACKGROUND", "DECORATION"]);
+  assert.match(lightLogo, /viewBox="0 0 316 81\.4"/);
+  assert.match(lightLogo, /#003A40/);
+  assert.match(darkLogo, /viewBox="0 0 316 81\.4"/);
+  assert.match(darkLogo, /#FFFFFF/);
+  assert.match(css, /data-design-style="KOMM_ONE"/);
+  assert.doesNotMatch(css, /data-design-style="(?:NEON|CORPORATE|BIRTHDAY|EDITORIAL)"/);
 });
 
 test("legacy template colors derive the missing correct-answer token from warning", () => {
@@ -651,7 +673,7 @@ test("preview registry documents and renders every visible entry through its dec
     assert.ok(generatorSource.includes("group.label") || source.includes(label));
   }
 
-  for (const style of ["NEON", "CORPORATE", "EDITORIAL"] as const) {
+  for (const style of ["NEON", "CORPORATE", "EDITORIAL", "KOMM_ONE"] as const) {
     const ids = getPresentationPreviewGroups(style).flatMap((group) => group.scenarios.map(({ id }) => id));
     assert.equal(ids.some((id) => id.startsWith("STORYBOOK_")), false);
   }

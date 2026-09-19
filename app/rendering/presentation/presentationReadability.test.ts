@@ -38,7 +38,7 @@ test("PRES-INV-08: warnings begin above recommendations and never block editing"
   assert.ok(templatePresentationTexts({ kind: "ORDERING", scoring: "EXACT", items: [{ id: "1", text, explanation: "" }] }).some((entry) => presentationContentWarning(entry.text, entry.role)));
 });
 
-for (const style of ["NEON", "EDITORIAL", "BIRTHDAY", "CORPORATE"] as const) {
+for (const style of ["NEON", "EDITORIAL", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
   test(`PRES-INV-03/05/12: ${style} preserves complete long choices and legacy text`, () => {
     for (const scenario of qualityScenarios) {
       const fixture = buildPresentationQualityFixture(scenario, style);

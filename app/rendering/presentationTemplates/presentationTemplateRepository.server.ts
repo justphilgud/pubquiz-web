@@ -25,6 +25,7 @@ function systemTemplates(): ManagedPresentationTemplate[] {
       "corporate-reference": "Corporate",
       "birthday-reference": "Storybook",
       "lovd-ungegoogelt": "LOVD × ungegoogelt",
+      "komm-one-pubquiz": "Komm.ONE PubQuiz",
     } as Record<string, string>)[template.id] ?? template.id,
     description: ({
       "ungegoogelt-default": "Systemtemplate mit dem etablierten ungegoogelt Neon-Auftritt.",
@@ -32,6 +33,7 @@ function systemTemplates(): ManagedPresentationTemplate[] {
       "corporate-reference": "Sachliches Referenzdesign für Unternehmen, Workshops und Kundenveranstaltungen.",
       "birthday-reference": "Persönliches Referenzdesign für hochwertige, redaktionelle Erinnerungsquizze.",
       "lovd-ungegoogelt": "Warm-reduziertes Venue-Template für die LOVD × ungegoogelt Kollaboration.",
+      "komm-one-pubquiz": "Moderne Komm.ONE-Markenbühne für hochwertige Quizveranstaltungen.",
     } as Record<string, string>)[template.id] ?? null,
     status: "SYSTEM",
     source: "SYSTEM",
