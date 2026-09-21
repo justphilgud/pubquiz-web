@@ -149,6 +149,10 @@
 .presentation-template.presentation-readable[data-design-style] .presentation-media-card > div:last-child { flex-shrink: 0; }
 
 /* Give long questions a real reading column, including beside an image. */
+.presentation-template.presentation-readable [data-presentation-layout="MEDIA_FOCUS"][data-question-template="kunstwerk"] {
+  --pres-question: clamp(2.25rem, 2.9cqw, 2.75rem);
+  grid-template-columns: minmax(0, .62fr) minmax(0, 1.38fr);
+}
 .presentation-template.presentation-readable[data-question-density="extended"] :is([data-presentation-layout="MEDIA_FOCUS"], [data-presentation-layout="SOLUTION_FOCUS"]):not(.presentation-storybook-solution) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .presentation-template.presentation-readable[data-question-density="extended"] [data-presentation-layout="SOLUTION_FOCUS"]:not(.presentation-storybook-solution) { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); }
 .presentation-template.presentation-readable[data-design-style="BIRTHDAY"]:is([data-question-density="compact"], [data-question-density="extended"], [data-answer-density="extended"]) .presentation-storybook-content { padding-right: 0 !important; }

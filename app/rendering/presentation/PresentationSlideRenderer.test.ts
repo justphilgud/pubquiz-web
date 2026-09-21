@@ -13,6 +13,7 @@ import {
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "./PresentationSlideRenderer";
+import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import {
   resolveIntermediateStandingsAudience,
@@ -830,4 +831,40 @@ test("artwork solution renders the image, artist, compact title alternatives and
   );
   assert.match(rendererSource, /frage\.templateId === questionTemplateIds\.artwork/);
   assert.match(rendererSource, /medium\.slotKey === "question_image"/);
+});
+
+test("artwork question exposes an isolated layout hook without changing other media templates", () => {
+  for (const scenario of ["artwork", "artwork-long"] as const) {
+    const fixture = buildPresentationQualityFixture(scenario, "EDITORIAL");
+    const markup = renderToStaticMarkup(
+      createElement(PresentationSlideRenderer, fixture),
+    );
+    assert.match(markup, /data-question-template="kunstwerk"/);
+    assert.ok(
+      markup.includes(
+        scenario === "artwork"
+          ? "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?"
+          : "Von welchem Künstler stammt das abgebildete Kunstwerk und unter welchem Titel ist es bekannt?",
+      ),
+    );
+    assert.match(markup, /artwork-layout-test\.svg/);
+    assert.match(markup, /object-contain/);
+  }
+
+  const standardMedia = renderToStaticMarkup(
+    createElement(
+      PresentationSlideRenderer,
+      buildPresentationQualityFixture("image-long", "EDITORIAL"),
+    ),
+  );
+  assert.doesNotMatch(standardMedia, /data-question-template="kunstwerk"/);
+
+  const pixel = renderToStaticMarkup(
+    createElement(
+      PresentationSlideRenderer,
+      buildPresentationQualityFixture("pixel", "EDITORIAL"),
+    ),
+  );
+  assert.match(pixel, /data-question-template="pixelbild"/);
+  assert.doesNotMatch(pixel, /data-question-template="kunstwerk"/);
 });

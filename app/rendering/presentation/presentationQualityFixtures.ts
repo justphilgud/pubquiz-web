@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro"] as const;
+export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -78,6 +78,13 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.frage = "Welcher Wolkenkratzer ist auf diesem Bild zu sehen? Das Gebäude steht in der Hauptstadt Taiwans und gehörte bei seiner Eröffnung zu den höchsten Bauwerken der Welt. Seine gestuften Abschnitte erinnern an Bambus. Nennt den Namen dieses bekannten Wahrzeichens.";
     question.antworten[0].antwort = "Taipei 101";
     question.medien = [{ medien_id: 1, datei: "bilder/wahrzeichen/taipei-101_standard.jpg", medientyp: "Bild", sortierung: 1, bemerkung: "Taipei 101 – Bildbeispiel für Text und Medium" }];
+  }
+  if (scenario === "artwork" || scenario === "artwork-long") {
+    question.templateId = questionTemplateIds.artwork;
+    question.frage = scenario === "artwork"
+      ? "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?"
+      : "Von welchem Künstler stammt das abgebildete Kunstwerk und unter welchem Titel ist es bekannt?";
+    question.medien = [{ medien_id: 1, datei: "artwork-layout-test.svg", medientyp: "Bild", sortierung: 1, bemerkung: "Kunstwerk für Layouttest", slotKey: "question_image" }];
   }
   if (scenario.startsWith("structured")) {
     question.templateId = null;

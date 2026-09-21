@@ -865,6 +865,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     return (
       <div
         data-presentation-layout={layoutVariant}
+        data-question-template={frage.templateId ?? undefined}
         data-pixel-reveal-step={pixelRevealStep ?? undefined}
         className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]"
       >

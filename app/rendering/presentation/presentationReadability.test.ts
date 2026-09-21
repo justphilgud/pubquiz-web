@@ -26,6 +26,16 @@ test("PRES-INV-01/02/04: text lengths select only three bounded typography varia
   assert.doesNotMatch(css, /line-clamp|text-overflow:\s*ellipsis/);
 });
 
+test("artwork layout adjustment is scoped to the artwork template and keeps strict typography bounds", () => {
+  const css = readFileSync(new URL("./presentationReadability.css", import.meta.url), "utf8");
+  assert.match(
+    css,
+    /\[data-presentation-layout="MEDIA_FOCUS"\]\[data-question-template="kunstwerk"\]\s*\{[^}]*--pres-question:\s*clamp\(2\.25rem,\s*2\.9cqw,\s*2\.75rem\);[^}]*grid-template-columns:\s*minmax\(0,\s*\.62fr\)\s*minmax\(0,\s*1\.38fr\);/,
+  );
+  assert.equal(css.match(/data-question-template="kunstwerk"/g)?.length, 1);
+  assert.doesNotMatch(css, /data-question-template="(?:pixelbild|musik_rueckwaerts|facemorph)"/);
+});
+
 test("PRES-INV-08: warnings begin above recommendations and never block editing", () => {
   assert.equal(presentationContentWarning("A".repeat(220), "question"), null);
   assert.match(presentationContentWarning("A".repeat(221), "question")!, /221 \/ empfohlen 220/);
