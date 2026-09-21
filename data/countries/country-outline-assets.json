@@ -1,0 +1,172 @@
+{
+  "version": 1,
+  "source": {
+    "name": "Natural Earth Admin 0 – Countries",
+    "version": "5.1.1",
+    "file": "ne_10m_admin_0_countries.geojson",
+    "sha256": "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255",
+    "license": "Public domain"
+  },
+  "assets": [
+    {
+      "iso2": "DE",
+      "iso3": "DEU",
+      "nameDe": "Deutschland",
+      "sourceFeatureName": "Germany",
+      "sourceFeatureIso3": "DEU",
+      "geometryType": "MultiPolygon",
+      "totalPolygonParts": 22,
+      "retainedPolygonParts": 18,
+      "omittedAreaRatio": 0.00003546,
+      "canvas": {
+        "width": 1200,
+        "height": 900,
+        "padding": 72
+      },
+      "renderedBounds": {
+        "minX": 325.09,
+        "maxX": 874.91,
+        "minY": 72,
+        "maxY": 828
+      },
+      "svg": {
+        "path": "public/country-outlines/de.svg",
+        "bytes": 45037,
+        "sha256": "d7c2a891a46eb0c99f600a7d98079ebf7fd3f610692efe723d2c2b2eb189c893"
+      },
+      "webp": {
+        "path": "public/country-outlines/de.webp",
+        "bytes": 13514,
+        "sha256": "f3819f6d95a6c46a9838d8d3f3c57bd4fce5a6df3db468d8b20511be951e66d9"
+      }
+    },
+    {
+      "iso2": "IT",
+      "iso3": "ITA",
+      "nameDe": "Italien",
+      "sourceFeatureName": "Italy",
+      "sourceFeatureIso3": "ITA",
+      "geometryType": "MultiPolygon",
+      "totalPolygonParts": 29,
+      "retainedPolygonParts": 25,
+      "omittedAreaRatio": 0.00003626,
+      "canvas": {
+        "width": 1200,
+        "height": 900,
+        "padding": 72
+      },
+      "renderedBounds": {
+        "minX": 311.26,
+        "maxX": 888.74,
+        "minY": 72,
+        "maxY": 828
+      },
+      "svg": {
+        "path": "public/country-outlines/it.svg",
+        "bytes": 50156,
+        "sha256": "6b616dd58c45b43285ce0f7d561343de1f72642ad568f41adca582f42881cd9c"
+      },
+      "webp": {
+        "path": "public/country-outlines/it.webp",
+        "bytes": 14026,
+        "sha256": "66ed90cc734d924f8b2a4c999e8c22b13cf88eddd69e7916ce9a3b1535c520fa"
+      }
+    },
+    {
+      "iso2": "CL",
+      "iso3": "CHL",
+      "nameDe": "Chile",
+      "sourceFeatureName": "Chile",
+      "sourceFeatureIso3": "CHL",
+      "geometryType": "MultiPolygon",
+      "totalPolygonParts": 163,
+      "retainedPolygonParts": 156,
+      "omittedAreaRatio": 0.00025755,
+      "canvas": {
+        "width": 1200,
+        "height": 900,
+        "padding": 72
+      },
+      "renderedBounds": {
+        "minX": 504.02,
+        "maxX": 695.98,
+        "minY": 72,
+        "maxY": 828
+      },
+      "svg": {
+        "path": "public/country-outlines/cl.svg",
+        "bytes": 257122,
+        "sha256": "e185fc8587aed14ca373d70072d075bfd125e346e4ab9b359275156650fb474b"
+      },
+      "webp": {
+        "path": "public/country-outlines/cl.webp",
+        "bytes": 8992,
+        "sha256": "5601592831eca502d7eff4caf19cb74b51cee5416e7c3714d702f42a5ab1b485"
+      }
+    },
+    {
+      "iso2": "AU",
+      "iso3": "AUS",
+      "nameDe": "Australien",
+      "sourceFeatureName": "Australia",
+      "sourceFeatureIso3": "AUS",
+      "geometryType": "MultiPolygon",
+      "totalPolygonParts": 94,
+      "retainedPolygonParts": 25,
+      "omittedAreaRatio": 0.00052278,
+      "canvas": {
+        "width": 1200,
+        "height": 900,
+        "padding": 72
+      },
+      "renderedBounds": {
+        "minX": 174.92,
+        "maxX": 1025.08,
+        "minY": 72,
+        "maxY": 828
+      },
+      "svg": {
+        "path": "public/country-outlines/au.svg",
+        "bytes": 182752,
+        "sha256": "e4ea4084f4007cb8389fdae961ca0841d976ff81f891ff7ae4f3c7d3cdd59fdd"
+      },
+      "webp": {
+        "path": "public/country-outlines/au.webp",
+        "bytes": 15686,
+        "sha256": "a01e8102639aaca392e7b3e25d66dd267fb6cc3cb6eaf869319db72e645e9762"
+      }
+    },
+    {
+      "iso2": "GM",
+      "iso3": "GMB",
+      "nameDe": "Gambia",
+      "sourceFeatureName": "Gambia",
+      "sourceFeatureIso3": "GMB",
+      "geometryType": "Polygon",
+      "totalPolygonParts": 1,
+      "retainedPolygonParts": 1,
+      "omittedAreaRatio": 0,
+      "canvas": {
+        "width": 1200,
+        "height": 900,
+        "padding": 72
+      },
+      "renderedBounds": {
+        "minX": 72,
+        "maxX": 1128,
+        "minY": 313.89,
+        "maxY": 586.11
+      },
+      "svg": {
+        "path": "public/country-outlines/gm.svg",
+        "bytes": 6345,
+        "sha256": "6de4acdd53e8f0f1252272f6d8f3de4eed7dba87d91de4ca8d3b9fff97e99f9e"
+      },
+      "webp": {
+        "path": "public/country-outlines/gm.webp",
+        "bytes": 10080,
+        "sha256": "ae696f23d68d4e0c4125c2bafd8dfefc3e294b6797e3c7beef4fa7e23fee8366"
+      }
+    }
+  ]
+}

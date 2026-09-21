@@ -1,0 +1,5213 @@
+[
+  {
+    "questionId": 133,
+    "iso2": "JP",
+    "nameDe": "Japan",
+    "answers": [
+      {
+        "iso2": "JP",
+        "nameDe": "Japan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KR",
+        "nameDe": "Südkorea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CY",
+        "nameDe": "Zypern",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SM",
+        "nameDe": "San Marino",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 134,
+    "iso2": "HT",
+    "nameDe": "Haiti",
+    "answers": [
+      {
+        "iso2": "HT",
+        "nameDe": "Haiti",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LI",
+        "nameDe": "Liechtenstein",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AG",
+        "nameDe": "Antigua und Barbuda",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BZ",
+        "nameDe": "Belize",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 135,
+    "iso2": "HR",
+    "nameDe": "Kroatien",
+    "answers": [
+      {
+        "iso2": "HR",
+        "nameDe": "Kroatien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NL",
+        "nameDe": "Niederlande",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HU",
+        "nameDe": "Ungarn",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PY",
+        "nameDe": "Paraguay",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 136,
+    "iso2": "GB",
+    "nameDe": "Vereinigtes Königreich",
+    "answers": [
+      {
+        "iso2": "GB",
+        "nameDe": "Vereinigtes Königreich",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IS",
+        "nameDe": "Island",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NO",
+        "nameDe": "Norwegen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 137,
+    "iso2": "SI",
+    "nameDe": "Slowenien",
+    "answers": [
+      {
+        "iso2": "SI",
+        "nameDe": "Slowenien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RU",
+        "nameDe": "Russland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SK",
+        "nameDe": "Slowakei",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BG",
+        "nameDe": "Bulgarien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 138,
+    "iso2": "AD",
+    "nameDe": "Andorra",
+    "answers": [
+      {
+        "iso2": "AD",
+        "nameDe": "Andorra",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MD",
+        "nameDe": "Moldawien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BE",
+        "nameDe": "Belgien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 139,
+    "iso2": "AE",
+    "nameDe": "Vereinigte Arabische Emirate",
+    "answers": [
+      {
+        "iso2": "AE",
+        "nameDe": "Vereinigte Arabische Emirate",
+        "isCorrect": true
+      },
+      {
+        "iso2": "JO",
+        "nameDe": "Jordanien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SY",
+        "nameDe": "Syrien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KW",
+        "nameDe": "Kuwait",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 140,
+    "iso2": "AF",
+    "nameDe": "Afghanistan",
+    "answers": [
+      {
+        "iso2": "AF",
+        "nameDe": "Afghanistan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BB",
+        "nameDe": "Barbados",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 141,
+    "iso2": "AG",
+    "nameDe": "Antigua und Barbuda",
+    "answers": [
+      {
+        "iso2": "AG",
+        "nameDe": "Antigua und Barbuda",
+        "isCorrect": true
+      },
+      {
+        "iso2": "HT",
+        "nameDe": "Haiti",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TT",
+        "nameDe": "Trinidad und Tobago",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GD",
+        "nameDe": "Grenada",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 142,
+    "iso2": "AL",
+    "nameDe": "Albanien",
+    "answers": [
+      {
+        "iso2": "AL",
+        "nameDe": "Albanien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ME",
+        "nameDe": "Montenegro",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 143,
+    "iso2": "AM",
+    "nameDe": "Armenien",
+    "answers": [
+      {
+        "iso2": "AM",
+        "nameDe": "Armenien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MV",
+        "nameDe": "Malediven",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LA",
+        "nameDe": "Laos",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 144,
+    "iso2": "AO",
+    "nameDe": "Angola",
+    "answers": [
+      {
+        "iso2": "AO",
+        "nameDe": "Angola",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LY",
+        "nameDe": "Libyen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 145,
+    "iso2": "AR",
+    "nameDe": "Argentinien",
+    "answers": [
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "HN",
+        "nameDe": "Honduras",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LC",
+        "nameDe": "St. Lucia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 146,
+    "iso2": "AT",
+    "nameDe": "Österreich",
+    "answers": [
+      {
+        "iso2": "AT",
+        "nameDe": "Österreich",
+        "isCorrect": true
+      },
+      {
+        "iso2": "HU",
+        "nameDe": "Ungarn",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LV",
+        "nameDe": "Lettland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NL",
+        "nameDe": "Niederlande",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 147,
+    "iso2": "AU",
+    "nameDe": "Australien",
+    "answers": [
+      {
+        "iso2": "AU",
+        "nameDe": "Australien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NZ",
+        "nameDe": "Neuseeland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TV",
+        "nameDe": "Tuvalu",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 148,
+    "iso2": "AZ",
+    "nameDe": "Aserbaidschan",
+    "answers": [
+      {
+        "iso2": "AZ",
+        "nameDe": "Aserbaidschan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "UZ",
+        "nameDe": "Usbekistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KH",
+        "nameDe": "Kambodscha",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 149,
+    "iso2": "BA",
+    "nameDe": "Bosnien und Herzegowina",
+    "answers": [
+      {
+        "iso2": "BA",
+        "nameDe": "Bosnien und Herzegowina",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MD",
+        "nameDe": "Moldawien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BB",
+        "nameDe": "Barbados",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 150,
+    "iso2": "BB",
+    "nameDe": "Barbados",
+    "answers": [
+      {
+        "iso2": "BB",
+        "nameDe": "Barbados",
+        "isCorrect": true
+      },
+      {
+        "iso2": "VC",
+        "nameDe": "St. Vincent und die Grenadinen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AF",
+        "nameDe": "Afghanistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BZ",
+        "nameDe": "Belize",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 151,
+    "iso2": "BD",
+    "nameDe": "Bangladesch",
+    "answers": [
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AF",
+        "nameDe": "Afghanistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TM",
+        "nameDe": "Turkmenistan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 152,
+    "iso2": "BE",
+    "nameDe": "Belgien",
+    "answers": [
+      {
+        "iso2": "BE",
+        "nameDe": "Belgien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AD",
+        "nameDe": "Andorra",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 153,
+    "iso2": "BF",
+    "nameDe": "Burkina Faso",
+    "answers": [
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AO",
+        "nameDe": "Angola",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 154,
+    "iso2": "BG",
+    "nameDe": "Bulgarien",
+    "answers": [
+      {
+        "iso2": "BG",
+        "nameDe": "Bulgarien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RU",
+        "nameDe": "Russland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SK",
+        "nameDe": "Slowakei",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SI",
+        "nameDe": "Slowenien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 155,
+    "iso2": "BH",
+    "nameDe": "Bahrain",
+    "answers": [
+      {
+        "iso2": "BH",
+        "nameDe": "Bahrain",
+        "isCorrect": true
+      },
+      {
+        "iso2": "QA",
+        "nameDe": "Katar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MT",
+        "nameDe": "Malta",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MG",
+        "nameDe": "Madagaskar",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 156,
+    "iso2": "BI",
+    "nameDe": "Burundi",
+    "answers": [
+      {
+        "iso2": "BI",
+        "nameDe": "Burundi",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MR",
+        "nameDe": "Mauretanien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MM",
+        "nameDe": "Myanmar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CG",
+        "nameDe": "Republik Kongo",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 157,
+    "iso2": "BJ",
+    "nameDe": "Benin",
+    "answers": [
+      {
+        "iso2": "BJ",
+        "nameDe": "Benin",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ML",
+        "nameDe": "Mali",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CM",
+        "nameDe": "Kamerun",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 158,
+    "iso2": "BN",
+    "nameDe": "Brunei",
+    "answers": [
+      {
+        "iso2": "BN",
+        "nameDe": "Brunei",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BT",
+        "nameDe": "Bhutan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MM",
+        "nameDe": "Myanmar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LK",
+        "nameDe": "Sri Lanka",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 159,
+    "iso2": "BO",
+    "nameDe": "Bolivien",
+    "answers": [
+      {
+        "iso2": "BO",
+        "nameDe": "Bolivien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PY",
+        "nameDe": "Paraguay",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NE",
+        "nameDe": "Niger",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 160,
+    "iso2": "BR",
+    "nameDe": "Brasilien",
+    "answers": [
+      {
+        "iso2": "BR",
+        "nameDe": "Brasilien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "DM",
+        "nameDe": "Dominica",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 161,
+    "iso2": "BS",
+    "nameDe": "Bahamas",
+    "answers": [
+      {
+        "iso2": "BS",
+        "nameDe": "Bahamas",
+        "isCorrect": true
+      },
+      {
+        "iso2": "DM",
+        "nameDe": "Dominica",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BR",
+        "nameDe": "Brasilien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 162,
+    "iso2": "BT",
+    "nameDe": "Bhutan",
+    "answers": [
+      {
+        "iso2": "BT",
+        "nameDe": "Bhutan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MM",
+        "nameDe": "Myanmar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LK",
+        "nameDe": "Sri Lanka",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 163,
+    "iso2": "BW",
+    "nameDe": "Botswana",
+    "answers": [
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FJ",
+        "nameDe": "Fidschi",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 164,
+    "iso2": "BY",
+    "nameDe": "Belarus",
+    "answers": [
+      {
+        "iso2": "BY",
+        "nameDe": "Belarus",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VU",
+        "nameDe": "Vanuatu",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 165,
+    "iso2": "BZ",
+    "nameDe": "Belize",
+    "answers": [
+      {
+        "iso2": "BZ",
+        "nameDe": "Belize",
+        "isCorrect": true
+      },
+      {
+        "iso2": "HT",
+        "nameDe": "Haiti",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BB",
+        "nameDe": "Barbados",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LA",
+        "nameDe": "Laos",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 166,
+    "iso2": "CA",
+    "nameDe": "Kanada",
+    "answers": [
+      {
+        "iso2": "CA",
+        "nameDe": "Kanada",
+        "isCorrect": true
+      },
+      {
+        "iso2": "PE",
+        "nameDe": "Peru",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 167,
+    "iso2": "CD",
+    "nameDe": "Demokratische Republik Kongo",
+    "answers": [
+      {
+        "iso2": "CD",
+        "nameDe": "Demokratische Republik Kongo",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NA",
+        "nameDe": "Namibia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 168,
+    "iso2": "CF",
+    "nameDe": "Zentralafrikanische Republik",
+    "answers": [
+      {
+        "iso2": "CF",
+        "nameDe": "Zentralafrikanische Republik",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GQ",
+        "nameDe": "Äquatorialguinea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CM",
+        "nameDe": "Kamerun",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MZ",
+        "nameDe": "Mosambik",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 169,
+    "iso2": "CG",
+    "nameDe": "Republik Kongo",
+    "answers": [
+      {
+        "iso2": "CG",
+        "nameDe": "Republik Kongo",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BJ",
+        "nameDe": "Benin",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ML",
+        "nameDe": "Mali",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 170,
+    "iso2": "CH",
+    "nameDe": "Schweiz",
+    "answers": [
+      {
+        "iso2": "CH",
+        "nameDe": "Schweiz",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TN",
+        "nameDe": "Tunesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ME",
+        "nameDe": "Montenegro",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 171,
+    "iso2": "CI",
+    "nameDe": "Elfenbeinküste",
+    "answers": [
+      {
+        "iso2": "CI",
+        "nameDe": "Elfenbeinküste",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GN",
+        "nameDe": "Guinea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NG",
+        "nameDe": "Nigeria",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PE",
+        "nameDe": "Peru",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 172,
+    "iso2": "CL",
+    "nameDe": "Chile",
+    "answers": [
+      {
+        "iso2": "CL",
+        "nameDe": "Chile",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CZ",
+        "nameDe": "Tschechien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PL",
+        "nameDe": "Polen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "US",
+        "nameDe": "Vereinigte Staaten",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 173,
+    "iso2": "CM",
+    "nameDe": "Kamerun",
+    "answers": [
+      {
+        "iso2": "CM",
+        "nameDe": "Kamerun",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BJ",
+        "nameDe": "Benin",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CG",
+        "nameDe": "Republik Kongo",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TD",
+        "nameDe": "Tschad",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 174,
+    "iso2": "CN",
+    "nameDe": "China",
+    "answers": [
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VN",
+        "nameDe": "Vietnam",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TR",
+        "nameDe": "Türkei",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 175,
+    "iso2": "CO",
+    "nameDe": "Kolumbien",
+    "answers": [
+      {
+        "iso2": "CO",
+        "nameDe": "Kolumbien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "EC",
+        "nameDe": "Ecuador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VE",
+        "nameDe": "Venezuela",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 176,
+    "iso2": "CR",
+    "nameDe": "Costa Rica",
+    "answers": [
+      {
+        "iso2": "CR",
+        "nameDe": "Costa Rica",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SR",
+        "nameDe": "Suriname",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CU",
+        "nameDe": "Kuba",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TH",
+        "nameDe": "Thailand",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 177,
+    "iso2": "CU",
+    "nameDe": "Kuba",
+    "answers": [
+      {
+        "iso2": "CU",
+        "nameDe": "Kuba",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CR",
+        "nameDe": "Costa Rica",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SR",
+        "nameDe": "Suriname",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 178,
+    "iso2": "CV",
+    "nameDe": "Kap Verde",
+    "answers": [
+      {
+        "iso2": "CV",
+        "nameDe": "Kap Verde",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RW",
+        "nameDe": "Ruanda",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 179,
+    "iso2": "CY",
+    "nameDe": "Zypern",
+    "answers": [
+      {
+        "iso2": "CY",
+        "nameDe": "Zypern",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SM",
+        "nameDe": "San Marino",
+        "isCorrect": false
+      },
+      {
+        "iso2": "JP",
+        "nameDe": "Japan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KR",
+        "nameDe": "Südkorea",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 180,
+    "iso2": "CZ",
+    "nameDe": "Tschechien",
+    "answers": [
+      {
+        "iso2": "CZ",
+        "nameDe": "Tschechien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "PL",
+        "nameDe": "Polen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CL",
+        "nameDe": "Chile",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SK",
+        "nameDe": "Slowakei",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 181,
+    "iso2": "DE",
+    "nameDe": "Deutschland",
+    "answers": [
+      {
+        "iso2": "DE",
+        "nameDe": "Deutschland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LI",
+        "nameDe": "Liechtenstein",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MZ",
+        "nameDe": "Mosambik",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 182,
+    "iso2": "DJ",
+    "nameDe": "Dschibuti",
+    "answers": [
+      {
+        "iso2": "DJ",
+        "nameDe": "Dschibuti",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "RW",
+        "nameDe": "Ruanda",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MG",
+        "nameDe": "Madagaskar",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 183,
+    "iso2": "DK",
+    "nameDe": "Dänemark",
+    "answers": [
+      {
+        "iso2": "DK",
+        "nameDe": "Dänemark",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LV",
+        "nameDe": "Lettland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AT",
+        "nameDe": "Österreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MK",
+        "nameDe": "Nordmazedonien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 184,
+    "iso2": "DM",
+    "nameDe": "Dominica",
+    "answers": [
+      {
+        "iso2": "DM",
+        "nameDe": "Dominica",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BS",
+        "nameDe": "Bahamas",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BR",
+        "nameDe": "Brasilien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 185,
+    "iso2": "DO",
+    "nameDe": "Dominikanische Republik",
+    "answers": [
+      {
+        "iso2": "DO",
+        "nameDe": "Dominikanische Republik",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LV",
+        "nameDe": "Lettland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TT",
+        "nameDe": "Trinidad und Tobago",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PY",
+        "nameDe": "Paraguay",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 186,
+    "iso2": "DZ",
+    "nameDe": "Algerien",
+    "answers": [
+      {
+        "iso2": "DZ",
+        "nameDe": "Algerien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CM",
+        "nameDe": "Kamerun",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 187,
+    "iso2": "EC",
+    "nameDe": "Ecuador",
+    "answers": [
+      {
+        "iso2": "EC",
+        "nameDe": "Ecuador",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CO",
+        "nameDe": "Kolumbien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VE",
+        "nameDe": "Venezuela",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 188,
+    "iso2": "EE",
+    "nameDe": "Estland",
+    "answers": [
+      {
+        "iso2": "EE",
+        "nameDe": "Estland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RS",
+        "nameDe": "Serbien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FI",
+        "nameDe": "Finnland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 189,
+    "iso2": "EG",
+    "nameDe": "Ägypten",
+    "answers": [
+      {
+        "iso2": "EG",
+        "nameDe": "Ägypten",
+        "isCorrect": true
+      },
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SD",
+        "nameDe": "Sudan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 190,
+    "iso2": "ER",
+    "nameDe": "Eritrea",
+    "answers": [
+      {
+        "iso2": "ER",
+        "nameDe": "Eritrea",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 191,
+    "iso2": "ES",
+    "nameDe": "Spanien",
+    "answers": [
+      {
+        "iso2": "ES",
+        "nameDe": "Spanien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MK",
+        "nameDe": "Nordmazedonien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ME",
+        "nameDe": "Montenegro",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 192,
+    "iso2": "ET",
+    "nameDe": "Äthiopien",
+    "answers": [
+      {
+        "iso2": "ET",
+        "nameDe": "Äthiopien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ZM",
+        "nameDe": "Sambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GA",
+        "nameDe": "Gabun",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 193,
+    "iso2": "FI",
+    "nameDe": "Finnland",
+    "answers": [
+      {
+        "iso2": "FI",
+        "nameDe": "Finnland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SM",
+        "nameDe": "San Marino",
+        "isCorrect": false
+      },
+      {
+        "iso2": "EE",
+        "nameDe": "Estland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 194,
+    "iso2": "FJ",
+    "nameDe": "Fidschi",
+    "answers": [
+      {
+        "iso2": "FJ",
+        "nameDe": "Fidschi",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TV",
+        "nameDe": "Tuvalu",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 195,
+    "iso2": "FM",
+    "nameDe": "Mikronesien",
+    "answers": [
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FJ",
+        "nameDe": "Fidschi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LC",
+        "nameDe": "St. Lucia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 196,
+    "iso2": "FR",
+    "nameDe": "Frankreich",
+    "answers": [
+      {
+        "iso2": "FR",
+        "nameDe": "Frankreich",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IT",
+        "nameDe": "Italien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IE",
+        "nameDe": "Irland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 197,
+    "iso2": "GA",
+    "nameDe": "Gabun",
+    "answers": [
+      {
+        "iso2": "GA",
+        "nameDe": "Gabun",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ST",
+        "nameDe": "São Tomé und Príncipe",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SL",
+        "nameDe": "Sierra Leone",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SE",
+        "nameDe": "Schweden",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 198,
+    "iso2": "GD",
+    "nameDe": "Grenada",
+    "answers": [
+      {
+        "iso2": "GD",
+        "nameDe": "Grenada",
+        "isCorrect": true
+      },
+      {
+        "iso2": "VE",
+        "nameDe": "Venezuela",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VC",
+        "nameDe": "St. Vincent und die Grenadinen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 199,
+    "iso2": "GE",
+    "nameDe": "Georgien",
+    "answers": [
+      {
+        "iso2": "GE",
+        "nameDe": "Georgien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "JP",
+        "nameDe": "Japan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KR",
+        "nameDe": "Südkorea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CY",
+        "nameDe": "Zypern",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 200,
+    "iso2": "GH",
+    "nameDe": "Ghana",
+    "answers": [
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BO",
+        "nameDe": "Bolivien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NE",
+        "nameDe": "Niger",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 201,
+    "iso2": "GM",
+    "nameDe": "Gambia",
+    "answers": [
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 202,
+    "iso2": "GN",
+    "nameDe": "Guinea",
+    "answers": [
+      {
+        "iso2": "GN",
+        "nameDe": "Guinea",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CI",
+        "nameDe": "Elfenbeinküste",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GW",
+        "nameDe": "Guinea-Bissau",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TG",
+        "nameDe": "Togo",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 203,
+    "iso2": "GQ",
+    "nameDe": "Äquatorialguinea",
+    "answers": [
+      {
+        "iso2": "GQ",
+        "nameDe": "Äquatorialguinea",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IR",
+        "nameDe": "Iran",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KW",
+        "nameDe": "Kuwait",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CG",
+        "nameDe": "Republik Kongo",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 204,
+    "iso2": "GR",
+    "nameDe": "Griechenland",
+    "answers": [
+      {
+        "iso2": "GR",
+        "nameDe": "Griechenland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 205,
+    "iso2": "GT",
+    "nameDe": "Guatemala",
+    "answers": [
+      {
+        "iso2": "GT",
+        "nameDe": "Guatemala",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LC",
+        "nameDe": "St. Lucia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 206,
+    "iso2": "GW",
+    "nameDe": "Guinea-Bissau",
+    "answers": [
+      {
+        "iso2": "GW",
+        "nameDe": "Guinea-Bissau",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GN",
+        "nameDe": "Guinea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 207,
+    "iso2": "GY",
+    "nameDe": "Guyana",
+    "answers": [
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BS",
+        "nameDe": "Bahamas",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SR",
+        "nameDe": "Suriname",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BR",
+        "nameDe": "Brasilien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 208,
+    "iso2": "HN",
+    "nameDe": "Honduras",
+    "answers": [
+      {
+        "iso2": "HN",
+        "nameDe": "Honduras",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 209,
+    "iso2": "HU",
+    "nameDe": "Ungarn",
+    "answers": [
+      {
+        "iso2": "HU",
+        "nameDe": "Ungarn",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NL",
+        "nameDe": "Niederlande",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AT",
+        "nameDe": "Österreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HR",
+        "nameDe": "Kroatien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 210,
+    "iso2": "ID",
+    "nameDe": "Indonesien",
+    "answers": [
+      {
+        "iso2": "ID",
+        "nameDe": "Indonesien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SG",
+        "nameDe": "Singapur",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MC",
+        "nameDe": "Monaco",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KI",
+        "nameDe": "Kiribati",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 211,
+    "iso2": "IE",
+    "nameDe": "Irland",
+    "answers": [
+      {
+        "iso2": "IE",
+        "nameDe": "Irland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IT",
+        "nameDe": "Italien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FR",
+        "nameDe": "Frankreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 212,
+    "iso2": "IL",
+    "nameDe": "Israel",
+    "answers": [
+      {
+        "iso2": "IL",
+        "nameDe": "Israel",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "UY",
+        "nameDe": "Uruguay",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 213,
+    "iso2": "IN",
+    "nameDe": "Indien",
+    "answers": [
+      {
+        "iso2": "IN",
+        "nameDe": "Indien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TJ",
+        "nameDe": "Tadschikistan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 214,
+    "iso2": "IQ",
+    "nameDe": "Irak",
+    "answers": [
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": true
+      },
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "EG",
+        "nameDe": "Ägypten",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IN",
+        "nameDe": "Indien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 215,
+    "iso2": "IR",
+    "nameDe": "Iran",
+    "answers": [
+      {
+        "iso2": "IR",
+        "nameDe": "Iran",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GQ",
+        "nameDe": "Äquatorialguinea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SY",
+        "nameDe": "Syrien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KW",
+        "nameDe": "Kuwait",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 216,
+    "iso2": "IS",
+    "nameDe": "Island",
+    "answers": [
+      {
+        "iso2": "IS",
+        "nameDe": "Island",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SE",
+        "nameDe": "Schweden",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 217,
+    "iso2": "IT",
+    "nameDe": "Italien",
+    "answers": [
+      {
+        "iso2": "IT",
+        "nameDe": "Italien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FR",
+        "nameDe": "Frankreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IE",
+        "nameDe": "Irland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 218,
+    "iso2": "JM",
+    "nameDe": "Jamaika",
+    "answers": [
+      {
+        "iso2": "JM",
+        "nameDe": "Jamaika",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BS",
+        "nameDe": "Bahamas",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 219,
+    "iso2": "JO",
+    "nameDe": "Jordanien",
+    "answers": [
+      {
+        "iso2": "JO",
+        "nameDe": "Jordanien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AE",
+        "nameDe": "Vereinigte Arabische Emirate",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SY",
+        "nameDe": "Syrien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KW",
+        "nameDe": "Kuwait",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 220,
+    "iso2": "KE",
+    "nameDe": "Kenia",
+    "answers": [
+      {
+        "iso2": "KE",
+        "nameDe": "Kenia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ZM",
+        "nameDe": "Sambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SS",
+        "nameDe": "Südsudan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 221,
+    "iso2": "KG",
+    "nameDe": "Kirgisistan",
+    "answers": [
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "VN",
+        "nameDe": "Vietnam",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TR",
+        "nameDe": "Türkei",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 222,
+    "iso2": "KH",
+    "nameDe": "Kambodscha",
+    "answers": [
+      {
+        "iso2": "KH",
+        "nameDe": "Kambodscha",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KP",
+        "nameDe": "Nordkorea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SZ",
+        "nameDe": "Eswatini",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AZ",
+        "nameDe": "Aserbaidschan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 223,
+    "iso2": "KI",
+    "nameDe": "Kiribati",
+    "answers": [
+      {
+        "iso2": "KI",
+        "nameDe": "Kiribati",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MC",
+        "nameDe": "Monaco",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ID",
+        "nameDe": "Indonesien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 224,
+    "iso2": "KM",
+    "nameDe": "Komoren",
+    "answers": [
+      {
+        "iso2": "KM",
+        "nameDe": "Komoren",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BJ",
+        "nameDe": "Benin",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ZA",
+        "nameDe": "Südafrika",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NE",
+        "nameDe": "Niger",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 225,
+    "iso2": "KN",
+    "nameDe": "St. Kitts und Nevis",
+    "answers": [
+      {
+        "iso2": "KN",
+        "nameDe": "St. Kitts und Nevis",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ZM",
+        "nameDe": "Sambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "DM",
+        "nameDe": "Dominica",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AG",
+        "nameDe": "Antigua und Barbuda",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 226,
+    "iso2": "KP",
+    "nameDe": "Nordkorea",
+    "answers": [
+      {
+        "iso2": "KP",
+        "nameDe": "Nordkorea",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KH",
+        "nameDe": "Kambodscha",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SZ",
+        "nameDe": "Eswatini",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 227,
+    "iso2": "KR",
+    "nameDe": "Südkorea",
+    "answers": [
+      {
+        "iso2": "KR",
+        "nameDe": "Südkorea",
+        "isCorrect": true
+      },
+      {
+        "iso2": "JP",
+        "nameDe": "Japan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CY",
+        "nameDe": "Zypern",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SM",
+        "nameDe": "San Marino",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 228,
+    "iso2": "KW",
+    "nameDe": "Kuwait",
+    "answers": [
+      {
+        "iso2": "KW",
+        "nameDe": "Kuwait",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AE",
+        "nameDe": "Vereinigte Arabische Emirate",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GQ",
+        "nameDe": "Äquatorialguinea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IR",
+        "nameDe": "Iran",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 229,
+    "iso2": "KZ",
+    "nameDe": "Kasachstan",
+    "answers": [
+      {
+        "iso2": "KZ",
+        "nameDe": "Kasachstan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TV",
+        "nameDe": "Tuvalu",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 230,
+    "iso2": "LA",
+    "nameDe": "Laos",
+    "answers": [
+      {
+        "iso2": "LA",
+        "nameDe": "Laos",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MV",
+        "nameDe": "Malediven",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TL",
+        "nameDe": "Osttimor",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MR",
+        "nameDe": "Mauretanien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 231,
+    "iso2": "LB",
+    "nameDe": "Libanon",
+    "answers": [
+      {
+        "iso2": "LB",
+        "nameDe": "Libanon",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TJ",
+        "nameDe": "Tadschikistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IR",
+        "nameDe": "Iran",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AT",
+        "nameDe": "Österreich",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 232,
+    "iso2": "LC",
+    "nameDe": "St. Lucia",
+    "answers": [
+      {
+        "iso2": "LC",
+        "nameDe": "St. Lucia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GT",
+        "nameDe": "Guatemala",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 233,
+    "iso2": "LI",
+    "nameDe": "Liechtenstein",
+    "answers": [
+      {
+        "iso2": "LI",
+        "nameDe": "Liechtenstein",
+        "isCorrect": true
+      },
+      {
+        "iso2": "HT",
+        "nameDe": "Haiti",
+        "isCorrect": false
+      },
+      {
+        "iso2": "WS",
+        "nameDe": "Samoa",
+        "isCorrect": false
+      },
+      {
+        "iso2": "UA",
+        "nameDe": "Ukraine",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 234,
+    "iso2": "LK",
+    "nameDe": "Sri Lanka",
+    "answers": [
+      {
+        "iso2": "LK",
+        "nameDe": "Sri Lanka",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TL",
+        "nameDe": "Osttimor",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BT",
+        "nameDe": "Bhutan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 235,
+    "iso2": "LR",
+    "nameDe": "Liberia",
+    "answers": [
+      {
+        "iso2": "LR",
+        "nameDe": "Liberia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "US",
+        "nameDe": "Vereinigte Staaten",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SC",
+        "nameDe": "Seychellen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 236,
+    "iso2": "LS",
+    "nameDe": "Lesotho",
+    "answers": [
+      {
+        "iso2": "LS",
+        "nameDe": "Lesotho",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SL",
+        "nameDe": "Sierra Leone",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 237,
+    "iso2": "LT",
+    "nameDe": "Litauen",
+    "answers": [
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "VE",
+        "nameDe": "Venezuela",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MM",
+        "nameDe": "Myanmar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BG",
+        "nameDe": "Bulgarien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 238,
+    "iso2": "LU",
+    "nameDe": "Luxemburg",
+    "answers": [
+      {
+        "iso2": "LU",
+        "nameDe": "Luxemburg",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NL",
+        "nameDe": "Niederlande",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HU",
+        "nameDe": "Ungarn",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PY",
+        "nameDe": "Paraguay",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 239,
+    "iso2": "LV",
+    "nameDe": "Lettland",
+    "answers": [
+      {
+        "iso2": "LV",
+        "nameDe": "Lettland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "DK",
+        "nameDe": "Dänemark",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AT",
+        "nameDe": "Österreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HU",
+        "nameDe": "Ungarn",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 240,
+    "iso2": "LY",
+    "nameDe": "Libyen",
+    "answers": [
+      {
+        "iso2": "LY",
+        "nameDe": "Libyen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AO",
+        "nameDe": "Angola",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VU",
+        "nameDe": "Vanuatu",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 241,
+    "iso2": "MA",
+    "nameDe": "Marokko",
+    "answers": [
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TN",
+        "nameDe": "Tunesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TR",
+        "nameDe": "Türkei",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 242,
+    "iso2": "MC",
+    "nameDe": "Monaco",
+    "answers": [
+      {
+        "iso2": "MC",
+        "nameDe": "Monaco",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ID",
+        "nameDe": "Indonesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SG",
+        "nameDe": "Singapur",
+        "isCorrect": false
+      },
+      {
+        "iso2": "RS",
+        "nameDe": "Serbien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 243,
+    "iso2": "MD",
+    "nameDe": "Moldawien",
+    "answers": [
+      {
+        "iso2": "MD",
+        "nameDe": "Moldawien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AD",
+        "nameDe": "Andorra",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 244,
+    "iso2": "ME",
+    "nameDe": "Montenegro",
+    "answers": [
+      {
+        "iso2": "ME",
+        "nameDe": "Montenegro",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AL",
+        "nameDe": "Albanien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MK",
+        "nameDe": "Nordmazedonien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 245,
+    "iso2": "MG",
+    "nameDe": "Madagaskar",
+    "answers": [
+      {
+        "iso2": "MG",
+        "nameDe": "Madagaskar",
+        "isCorrect": true
+      },
+      {
+        "iso2": "QA",
+        "nameDe": "Katar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BH",
+        "nameDe": "Bahrain",
+        "isCorrect": false
+      },
+      {
+        "iso2": "DJ",
+        "nameDe": "Dschibuti",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 246,
+    "iso2": "MH",
+    "nameDe": "Marshallinseln",
+    "answers": [
+      {
+        "iso2": "MH",
+        "nameDe": "Marshallinseln",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SB",
+        "nameDe": "Salomonen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NZ",
+        "nameDe": "Neuseeland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 247,
+    "iso2": "MK",
+    "nameDe": "Nordmazedonien",
+    "answers": [
+      {
+        "iso2": "MK",
+        "nameDe": "Nordmazedonien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ME",
+        "nameDe": "Montenegro",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ES",
+        "nameDe": "Spanien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LV",
+        "nameDe": "Lettland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 248,
+    "iso2": "ML",
+    "nameDe": "Mali",
+    "answers": [
+      {
+        "iso2": "ML",
+        "nameDe": "Mali",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TD",
+        "nameDe": "Tschad",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BJ",
+        "nameDe": "Benin",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 249,
+    "iso2": "MM",
+    "nameDe": "Myanmar",
+    "answers": [
+      {
+        "iso2": "MM",
+        "nameDe": "Myanmar",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BT",
+        "nameDe": "Bhutan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VE",
+        "nameDe": "Venezuela",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 250,
+    "iso2": "MN",
+    "nameDe": "Mongolei",
+    "answers": [
+      {
+        "iso2": "MN",
+        "nameDe": "Mongolei",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MV",
+        "nameDe": "Malediven",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 251,
+    "iso2": "MR",
+    "nameDe": "Mauretanien",
+    "answers": [
+      {
+        "iso2": "MR",
+        "nameDe": "Mauretanien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LA",
+        "nameDe": "Laos",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MV",
+        "nameDe": "Malediven",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 252,
+    "iso2": "MT",
+    "nameDe": "Malta",
+    "answers": [
+      {
+        "iso2": "MT",
+        "nameDe": "Malta",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BH",
+        "nameDe": "Bahrain",
+        "isCorrect": false
+      },
+      {
+        "iso2": "QA",
+        "nameDe": "Katar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MG",
+        "nameDe": "Madagaskar",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 253,
+    "iso2": "MU",
+    "nameDe": "Mauritius",
+    "answers": [
+      {
+        "iso2": "MU",
+        "nameDe": "Mauritius",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 254,
+    "iso2": "MV",
+    "nameDe": "Malediven",
+    "answers": [
+      {
+        "iso2": "MV",
+        "nameDe": "Malediven",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LA",
+        "nameDe": "Laos",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 255,
+    "iso2": "MW",
+    "nameDe": "Malawi",
+    "answers": [
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KE",
+        "nameDe": "Kenia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ZM",
+        "nameDe": "Sambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 256,
+    "iso2": "MX",
+    "nameDe": "Mexiko",
+    "answers": [
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IT",
+        "nameDe": "Italien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FR",
+        "nameDe": "Frankreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IE",
+        "nameDe": "Irland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 257,
+    "iso2": "MY",
+    "nameDe": "Malaysia",
+    "answers": [
+      {
+        "iso2": "MY",
+        "nameDe": "Malaysia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TL",
+        "nameDe": "Osttimor",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LK",
+        "nameDe": "Sri Lanka",
+        "isCorrect": false
+      },
+      {
+        "iso2": "WS",
+        "nameDe": "Samoa",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 258,
+    "iso2": "MZ",
+    "nameDe": "Mosambik",
+    "answers": [
+      {
+        "iso2": "MZ",
+        "nameDe": "Mosambik",
+        "isCorrect": true
+      },
+      {
+        "iso2": "DE",
+        "nameDe": "Deutschland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 259,
+    "iso2": "NA",
+    "nameDe": "Namibia",
+    "answers": [
+      {
+        "iso2": "NA",
+        "nameDe": "Namibia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CD",
+        "nameDe": "Demokratische Republik Kongo",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ZA",
+        "nameDe": "Südafrika",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 260,
+    "iso2": "NE",
+    "nameDe": "Niger",
+    "answers": [
+      {
+        "iso2": "NE",
+        "nameDe": "Niger",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IN",
+        "nameDe": "Indien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "EG",
+        "nameDe": "Ägypten",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 261,
+    "iso2": "NG",
+    "nameDe": "Nigeria",
+    "answers": [
+      {
+        "iso2": "NG",
+        "nameDe": "Nigeria",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CI",
+        "nameDe": "Elfenbeinküste",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GT",
+        "nameDe": "Guatemala",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IT",
+        "nameDe": "Italien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 262,
+    "iso2": "NI",
+    "nameDe": "Nicaragua",
+    "answers": [
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HN",
+        "nameDe": "Honduras",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 263,
+    "iso2": "NL",
+    "nameDe": "Niederlande",
+    "answers": [
+      {
+        "iso2": "NL",
+        "nameDe": "Niederlande",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LU",
+        "nameDe": "Luxemburg",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HU",
+        "nameDe": "Ungarn",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HR",
+        "nameDe": "Kroatien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 264,
+    "iso2": "NO",
+    "nameDe": "Norwegen",
+    "answers": [
+      {
+        "iso2": "NO",
+        "nameDe": "Norwegen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LV",
+        "nameDe": "Lettland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 265,
+    "iso2": "NP",
+    "nameDe": "Nepal",
+    "answers": [
+      {
+        "iso2": "NP",
+        "nameDe": "Nepal",
+        "isCorrect": true
+      },
+      {
+        "iso2": "JP",
+        "nameDe": "Japan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GE",
+        "nameDe": "Georgien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "OM",
+        "nameDe": "Oman",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 266,
+    "iso2": "NR",
+    "nameDe": "Nauru",
+    "answers": [
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AU",
+        "nameDe": "Australien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NZ",
+        "nameDe": "Neuseeland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SB",
+        "nameDe": "Salomonen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 267,
+    "iso2": "NZ",
+    "nameDe": "Neuseeland",
+    "answers": [
+      {
+        "iso2": "NZ",
+        "nameDe": "Neuseeland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AU",
+        "nameDe": "Australien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TV",
+        "nameDe": "Tuvalu",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 268,
+    "iso2": "OM",
+    "nameDe": "Oman",
+    "answers": [
+      {
+        "iso2": "OM",
+        "nameDe": "Oman",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AZ",
+        "nameDe": "Aserbaidschan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GW",
+        "nameDe": "Guinea-Bissau",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BY",
+        "nameDe": "Belarus",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 269,
+    "iso2": "PA",
+    "nameDe": "Panama",
+    "answers": [
+      {
+        "iso2": "PA",
+        "nameDe": "Panama",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GT",
+        "nameDe": "Guatemala",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PY",
+        "nameDe": "Paraguay",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 270,
+    "iso2": "PE",
+    "nameDe": "Peru",
+    "answers": [
+      {
+        "iso2": "PE",
+        "nameDe": "Peru",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FR",
+        "nameDe": "Frankreich",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IT",
+        "nameDe": "Italien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 271,
+    "iso2": "PG",
+    "nameDe": "Papua-Neuguinea",
+    "answers": [
+      {
+        "iso2": "PG",
+        "nameDe": "Papua-Neuguinea",
+        "isCorrect": true
+      },
+      {
+        "iso2": "VU",
+        "nameDe": "Vanuatu",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AO",
+        "nameDe": "Angola",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 272,
+    "iso2": "PH",
+    "nameDe": "Philippinen",
+    "answers": [
+      {
+        "iso2": "PH",
+        "nameDe": "Philippinen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "QA",
+        "nameDe": "Katar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LI",
+        "nameDe": "Liechtenstein",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AZ",
+        "nameDe": "Aserbaidschan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 273,
+    "iso2": "PK",
+    "nameDe": "Pakistan",
+    "answers": [
+      {
+        "iso2": "PK",
+        "nameDe": "Pakistan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "QA",
+        "nameDe": "Katar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TM",
+        "nameDe": "Turkmenistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PH",
+        "nameDe": "Philippinen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 274,
+    "iso2": "PL",
+    "nameDe": "Polen",
+    "answers": [
+      {
+        "iso2": "PL",
+        "nameDe": "Polen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CZ",
+        "nameDe": "Tschechien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SK",
+        "nameDe": "Slowakei",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CL",
+        "nameDe": "Chile",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 275,
+    "iso2": "PT",
+    "nameDe": "Portugal",
+    "answers": [
+      {
+        "iso2": "PT",
+        "nameDe": "Portugal",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BE",
+        "nameDe": "Belgien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AD",
+        "nameDe": "Andorra",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 276,
+    "iso2": "PW",
+    "nameDe": "Palau",
+    "answers": [
+      {
+        "iso2": "PW",
+        "nameDe": "Palau",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KZ",
+        "nameDe": "Kasachstan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 277,
+    "iso2": "PY",
+    "nameDe": "Paraguay",
+    "answers": [
+      {
+        "iso2": "PY",
+        "nameDe": "Paraguay",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NL",
+        "nameDe": "Niederlande",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HR",
+        "nameDe": "Kroatien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LU",
+        "nameDe": "Luxemburg",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 278,
+    "iso2": "QA",
+    "nameDe": "Katar",
+    "answers": [
+      {
+        "iso2": "QA",
+        "nameDe": "Katar",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BH",
+        "nameDe": "Bahrain",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MG",
+        "nameDe": "Madagaskar",
+        "isCorrect": false
+      },
+      {
+        "iso2": "PH",
+        "nameDe": "Philippinen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 279,
+    "iso2": "RO",
+    "nameDe": "Rumänien",
+    "answers": [
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AD",
+        "nameDe": "Andorra",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MD",
+        "nameDe": "Moldawien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TD",
+        "nameDe": "Tschad",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 280,
+    "iso2": "RS",
+    "nameDe": "Serbien",
+    "answers": [
+      {
+        "iso2": "RS",
+        "nameDe": "Serbien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MC",
+        "nameDe": "Monaco",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SG",
+        "nameDe": "Singapur",
+        "isCorrect": false
+      },
+      {
+        "iso2": "EE",
+        "nameDe": "Estland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 281,
+    "iso2": "RU",
+    "nameDe": "Russland",
+    "answers": [
+      {
+        "iso2": "RU",
+        "nameDe": "Russland",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BG",
+        "nameDe": "Bulgarien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SK",
+        "nameDe": "Slowakei",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SI",
+        "nameDe": "Slowenien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 282,
+    "iso2": "RW",
+    "nameDe": "Ruanda",
+    "answers": [
+      {
+        "iso2": "RW",
+        "nameDe": "Ruanda",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CV",
+        "nameDe": "Kap Verde",
+        "isCorrect": false
+      },
+      {
+        "iso2": "UA",
+        "nameDe": "Ukraine",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 283,
+    "iso2": "SA",
+    "nameDe": "Saudi-Arabien",
+    "answers": [
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TM",
+        "nameDe": "Turkmenistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AF",
+        "nameDe": "Afghanistan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 284,
+    "iso2": "SB",
+    "nameDe": "Salomonen",
+    "answers": [
+      {
+        "iso2": "SB",
+        "nameDe": "Salomonen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MH",
+        "nameDe": "Marshallinseln",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NZ",
+        "nameDe": "Neuseeland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 285,
+    "iso2": "SC",
+    "nameDe": "Seychellen",
+    "answers": [
+      {
+        "iso2": "SC",
+        "nameDe": "Seychellen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ER",
+        "nameDe": "Eritrea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MU",
+        "nameDe": "Mauritius",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 286,
+    "iso2": "SD",
+    "nameDe": "Sudan",
+    "answers": [
+      {
+        "iso2": "SD",
+        "nameDe": "Sudan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "EG",
+        "nameDe": "Ägypten",
+        "isCorrect": false
+      },
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 287,
+    "iso2": "SE",
+    "nameDe": "Schweden",
+    "answers": [
+      {
+        "iso2": "SE",
+        "nameDe": "Schweden",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IS",
+        "nameDe": "Island",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GA",
+        "nameDe": "Gabun",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NR",
+        "nameDe": "Nauru",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 288,
+    "iso2": "SG",
+    "nameDe": "Singapur",
+    "answers": [
+      {
+        "iso2": "SG",
+        "nameDe": "Singapur",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ID",
+        "nameDe": "Indonesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MC",
+        "nameDe": "Monaco",
+        "isCorrect": false
+      },
+      {
+        "iso2": "RS",
+        "nameDe": "Serbien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 289,
+    "iso2": "SK",
+    "nameDe": "Slowakei",
+    "answers": [
+      {
+        "iso2": "SK",
+        "nameDe": "Slowakei",
+        "isCorrect": true
+      },
+      {
+        "iso2": "RU",
+        "nameDe": "Russland",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BG",
+        "nameDe": "Bulgarien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SI",
+        "nameDe": "Slowenien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 290,
+    "iso2": "SL",
+    "nameDe": "Sierra Leone",
+    "answers": [
+      {
+        "iso2": "SL",
+        "nameDe": "Sierra Leone",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GA",
+        "nameDe": "Gabun",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 291,
+    "iso2": "SM",
+    "nameDe": "San Marino",
+    "answers": [
+      {
+        "iso2": "SM",
+        "nameDe": "San Marino",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CY",
+        "nameDe": "Zypern",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 292,
+    "iso2": "SN",
+    "nameDe": "Senegal",
+    "answers": [
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ML",
+        "nameDe": "Mali",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TD",
+        "nameDe": "Tschad",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BJ",
+        "nameDe": "Benin",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 293,
+    "iso2": "SO",
+    "nameDe": "Somalia",
+    "answers": [
+      {
+        "iso2": "SO",
+        "nameDe": "Somalia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BW",
+        "nameDe": "Botswana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KZ",
+        "nameDe": "Kasachstan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 294,
+    "iso2": "SR",
+    "nameDe": "Suriname",
+    "answers": [
+      {
+        "iso2": "SR",
+        "nameDe": "Suriname",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CR",
+        "nameDe": "Costa Rica",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GY",
+        "nameDe": "Guyana",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TH",
+        "nameDe": "Thailand",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 295,
+    "iso2": "SS",
+    "nameDe": "Südsudan",
+    "answers": [
+      {
+        "iso2": "SS",
+        "nameDe": "Südsudan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KE",
+        "nameDe": "Kenia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GA",
+        "nameDe": "Gabun",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 296,
+    "iso2": "ST",
+    "nameDe": "São Tomé und Príncipe",
+    "answers": [
+      {
+        "iso2": "ST",
+        "nameDe": "São Tomé und Príncipe",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GA",
+        "nameDe": "Gabun",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TG",
+        "nameDe": "Togo",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GH",
+        "nameDe": "Ghana",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 297,
+    "iso2": "SV",
+    "nameDe": "El Salvador",
+    "answers": [
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HN",
+        "nameDe": "Honduras",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LS",
+        "nameDe": "Lesotho",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 298,
+    "iso2": "SY",
+    "nameDe": "Syrien",
+    "answers": [
+      {
+        "iso2": "SY",
+        "nameDe": "Syrien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AE",
+        "nameDe": "Vereinigte Arabische Emirate",
+        "isCorrect": false
+      },
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 299,
+    "iso2": "SZ",
+    "nameDe": "Eswatini",
+    "answers": [
+      {
+        "iso2": "SZ",
+        "nameDe": "Eswatini",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KP",
+        "nameDe": "Nordkorea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TG",
+        "nameDe": "Togo",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 300,
+    "iso2": "TD",
+    "nameDe": "Tschad",
+    "answers": [
+      {
+        "iso2": "TD",
+        "nameDe": "Tschad",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SN",
+        "nameDe": "Senegal",
+        "isCorrect": false
+      },
+      {
+        "iso2": "RO",
+        "nameDe": "Rumänien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ML",
+        "nameDe": "Mali",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 301,
+    "iso2": "TG",
+    "nameDe": "Togo",
+    "answers": [
+      {
+        "iso2": "TG",
+        "nameDe": "Togo",
+        "isCorrect": true
+      },
+      {
+        "iso2": "ST",
+        "nameDe": "São Tomé und Príncipe",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SZ",
+        "nameDe": "Eswatini",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 302,
+    "iso2": "TH",
+    "nameDe": "Thailand",
+    "answers": [
+      {
+        "iso2": "TH",
+        "nameDe": "Thailand",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SR",
+        "nameDe": "Suriname",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CR",
+        "nameDe": "Costa Rica",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MV",
+        "nameDe": "Malediven",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 303,
+    "iso2": "TJ",
+    "nameDe": "Tadschikistan",
+    "answers": [
+      {
+        "iso2": "TJ",
+        "nameDe": "Tadschikistan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IN",
+        "nameDe": "Indien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 304,
+    "iso2": "TL",
+    "nameDe": "Osttimor",
+    "answers": [
+      {
+        "iso2": "TL",
+        "nameDe": "Osttimor",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VN",
+        "nameDe": "Vietnam",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TR",
+        "nameDe": "Türkei",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 305,
+    "iso2": "TM",
+    "nameDe": "Turkmenistan",
+    "answers": [
+      {
+        "iso2": "TM",
+        "nameDe": "Turkmenistan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BD",
+        "nameDe": "Bangladesch",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BR",
+        "nameDe": "Brasilien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 306,
+    "iso2": "TN",
+    "nameDe": "Tunesien",
+    "answers": [
+      {
+        "iso2": "TN",
+        "nameDe": "Tunesien",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 307,
+    "iso2": "TO",
+    "nameDe": "Tonga",
+    "answers": [
+      {
+        "iso2": "TO",
+        "nameDe": "Tonga",
+        "isCorrect": true
+      },
+      {
+        "iso2": "WS",
+        "nameDe": "Samoa",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 308,
+    "iso2": "TR",
+    "nameDe": "Türkei",
+    "answers": [
+      {
+        "iso2": "TR",
+        "nameDe": "Türkei",
+        "isCorrect": true
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "VN",
+        "nameDe": "Vietnam",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 309,
+    "iso2": "TT",
+    "nameDe": "Trinidad und Tobago",
+    "answers": [
+      {
+        "iso2": "TT",
+        "nameDe": "Trinidad und Tobago",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "WS",
+        "nameDe": "Samoa",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 310,
+    "iso2": "TV",
+    "nameDe": "Tuvalu",
+    "answers": [
+      {
+        "iso2": "TV",
+        "nameDe": "Tuvalu",
+        "isCorrect": true
+      },
+      {
+        "iso2": "FJ",
+        "nameDe": "Fidschi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NZ",
+        "nameDe": "Neuseeland",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 311,
+    "iso2": "TZ",
+    "nameDe": "Tansania",
+    "answers": [
+      {
+        "iso2": "TZ",
+        "nameDe": "Tansania",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TM",
+        "nameDe": "Turkmenistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "ZM",
+        "nameDe": "Sambia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 312,
+    "iso2": "UA",
+    "nameDe": "Ukraine",
+    "answers": [
+      {
+        "iso2": "UA",
+        "nameDe": "Ukraine",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LI",
+        "nameDe": "Liechtenstein",
+        "isCorrect": false
+      },
+      {
+        "iso2": "RW",
+        "nameDe": "Ruanda",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MZ",
+        "nameDe": "Mosambik",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 313,
+    "iso2": "UG",
+    "nameDe": "Uganda",
+    "answers": [
+      {
+        "iso2": "UG",
+        "nameDe": "Uganda",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MZ",
+        "nameDe": "Mosambik",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TG",
+        "nameDe": "Togo",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 314,
+    "iso2": "US",
+    "nameDe": "Vereinigte Staaten",
+    "answers": [
+      {
+        "iso2": "US",
+        "nameDe": "Vereinigte Staaten",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MX",
+        "nameDe": "Mexiko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SR",
+        "nameDe": "Suriname",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LR",
+        "nameDe": "Liberia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 315,
+    "iso2": "UY",
+    "nameDe": "Uruguay",
+    "answers": [
+      {
+        "iso2": "UY",
+        "nameDe": "Uruguay",
+        "isCorrect": true
+      },
+      {
+        "iso2": "AR",
+        "nameDe": "Argentinien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "FM",
+        "nameDe": "Mikronesien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IL",
+        "nameDe": "Israel",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 316,
+    "iso2": "UZ",
+    "nameDe": "Usbekistan",
+    "answers": [
+      {
+        "iso2": "UZ",
+        "nameDe": "Usbekistan",
+        "isCorrect": true
+      },
+      {
+        "iso2": "NI",
+        "nameDe": "Nicaragua",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SV",
+        "nameDe": "El Salvador",
+        "isCorrect": false
+      },
+      {
+        "iso2": "HN",
+        "nameDe": "Honduras",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 317,
+    "iso2": "VC",
+    "nameDe": "St. Vincent und die Grenadinen",
+    "answers": [
+      {
+        "iso2": "VC",
+        "nameDe": "St. Vincent und die Grenadinen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "BB",
+        "nameDe": "Barbados",
+        "isCorrect": false
+      },
+      {
+        "iso2": "GD",
+        "nameDe": "Grenada",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BR",
+        "nameDe": "Brasilien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 318,
+    "iso2": "VE",
+    "nameDe": "Venezuela",
+    "answers": [
+      {
+        "iso2": "VE",
+        "nameDe": "Venezuela",
+        "isCorrect": true
+      },
+      {
+        "iso2": "LT",
+        "nameDe": "Litauen",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CO",
+        "nameDe": "Kolumbien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "EC",
+        "nameDe": "Ecuador",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 319,
+    "iso2": "VN",
+    "nameDe": "Vietnam",
+    "answers": [
+      {
+        "iso2": "VN",
+        "nameDe": "Vietnam",
+        "isCorrect": true
+      },
+      {
+        "iso2": "KG",
+        "nameDe": "Kirgisistan",
+        "isCorrect": false
+      },
+      {
+        "iso2": "CN",
+        "nameDe": "China",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TR",
+        "nameDe": "Türkei",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 320,
+    "iso2": "VU",
+    "nameDe": "Vanuatu",
+    "answers": [
+      {
+        "iso2": "VU",
+        "nameDe": "Vanuatu",
+        "isCorrect": true
+      },
+      {
+        "iso2": "PG",
+        "nameDe": "Papua-Neuguinea",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LY",
+        "nameDe": "Libyen",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 321,
+    "iso2": "WS",
+    "nameDe": "Samoa",
+    "answers": [
+      {
+        "iso2": "WS",
+        "nameDe": "Samoa",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "TO",
+        "nameDe": "Tonga",
+        "isCorrect": false
+      },
+      {
+        "iso2": "LI",
+        "nameDe": "Liechtenstein",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 322,
+    "iso2": "YE",
+    "nameDe": "Jemen",
+    "answers": [
+      {
+        "iso2": "YE",
+        "nameDe": "Jemen",
+        "isCorrect": true
+      },
+      {
+        "iso2": "IQ",
+        "nameDe": "Irak",
+        "isCorrect": false
+      },
+      {
+        "iso2": "EG",
+        "nameDe": "Ägypten",
+        "isCorrect": false
+      },
+      {
+        "iso2": "IN",
+        "nameDe": "Indien",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 323,
+    "iso2": "ZA",
+    "nameDe": "Südafrika",
+    "answers": [
+      {
+        "iso2": "ZA",
+        "nameDe": "Südafrika",
+        "isCorrect": true
+      },
+      {
+        "iso2": "GM",
+        "nameDe": "Gambia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "NA",
+        "nameDe": "Namibia",
+        "isCorrect": false
+      },
+      {
+        "iso2": "BF",
+        "nameDe": "Burkina Faso",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 324,
+    "iso2": "ZM",
+    "nameDe": "Sambia",
+    "answers": [
+      {
+        "iso2": "ZM",
+        "nameDe": "Sambia",
+        "isCorrect": true
+      },
+      {
+        "iso2": "MW",
+        "nameDe": "Malawi",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SA",
+        "nameDe": "Saudi-Arabien",
+        "isCorrect": false
+      },
+      {
+        "iso2": "KE",
+        "nameDe": "Kenia",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionId": 325,
+    "iso2": "ZW",
+    "nameDe": "Simbabwe",
+    "answers": [
+      {
+        "iso2": "ZW",
+        "nameDe": "Simbabwe",
+        "isCorrect": true
+      },
+      {
+        "iso2": "TG",
+        "nameDe": "Togo",
+        "isCorrect": false
+      },
+      {
+        "iso2": "MA",
+        "nameDe": "Marokko",
+        "isCorrect": false
+      },
+      {
+        "iso2": "SZ",
+        "nameDe": "Eswatini",
+        "isCorrect": false
+      }
+    ]
+  }
+]
