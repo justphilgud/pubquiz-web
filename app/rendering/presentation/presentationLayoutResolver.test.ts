@@ -111,6 +111,24 @@ test("template semantics select choice, boolean, ordering, audio and reveal layo
     reason: "FACE_MORPH_TEMPLATE",
     contentRole: "FACE_MORPH",
   });
+  assert.deepEqual(
+    resolve({
+      templateId: questionTemplateIds.artwork,
+      structuredFieldCount: 2,
+      media: [
+        {
+          fileName: "mona-lisa.svg",
+          mediaType: "Bild",
+          scope: "QUESTION",
+        },
+      ],
+    }),
+    {
+      variant: "MEDIA_FOCUS",
+      source: "AUTO",
+      reason: "ARTWORK_TEMPLATE",
+    },
+  );
   assert.equal(
     resolve({ templateId: questionTemplateIds.estimate }).variant,
     "CONTENT_CENTERED",

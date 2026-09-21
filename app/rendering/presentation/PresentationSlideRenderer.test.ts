@@ -6,6 +6,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { buildStorybookExperienceRuntime } from "@/app/rendering/presentationTemplates/storybookExperienceFixture";
+import {
+  ArtworkSolutionSlide,
+  formatArtworkAlternatives,
+} from "./ArtworkSolutionSlide";
 import PresentationSlideRenderer, {
   type PresentationSlideDisplayState,
 } from "./PresentationSlideRenderer";
@@ -794,4 +798,33 @@ test("B09: untimed open stage is visibly distinct from a closed answer phase", (
     assert.match(html, state === "OPEN" ? /Offen bis zum Abschluss durch Moderation/ : /Antwortphase beendet/);
     if (state === "OPEN") assert.doesNotMatch(html, /Antwortphase beendet|[0-9]+ s</);
   }
+});
+
+test("artwork solution renders the image, artist, compact title alternatives and source", () => {
+  const markup = renderToStaticMarkup(
+    createElement(ArtworkSolutionSlide, {
+      questionText:
+        "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?",
+      source: "Wikimedia Commons · public domain",
+      image: {
+        src: "https://example.test/mona-lisa.svg",
+        alt: "Mona Lisa",
+      },
+      artistSolutions: ["Leonardo da Vinci"],
+      titleSolutions: ["Mona Lisa", "La Gioconda", "Mona Lisa"],
+    }),
+  );
+
+  assert.match(markup, /data-artwork-solution/);
+  assert.match(markup, /mona-lisa\.svg/);
+  assert.match(markup, /object-contain/);
+  assert.match(markup, /Leonardo da Vinci/);
+  assert.match(markup, /Mona Lisa \(La Gioconda\)/);
+  assert.match(markup, /Wikimedia Commons · public domain/);
+  assert.equal(
+    formatArtworkAlternatives(["Mona Lisa", "La Gioconda"]),
+    "Mona Lisa (La Gioconda)",
+  );
+  assert.match(rendererSource, /frage\.templateId === questionTemplateIds\.artwork/);
+  assert.match(rendererSource, /medium\.slotKey === "question_image"/);
 });

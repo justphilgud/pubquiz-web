@@ -58,7 +58,10 @@ import {
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
 import type { LiveChoiceResultState } from "@/app/quiz/liveResults/liveChoiceResults";
 import type { LiveTextResultState } from "@/app/quiz/liveResults/liveTextResults";
-import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import {
+  isPollQuestionTemplateId,
+  questionTemplateIds,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { resolveQuizSpecificOrderingParticipantItems } from "@/app/quiz/orderingQuestionOrder";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
@@ -72,6 +75,7 @@ import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswe
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
 import { presentationTextDensity } from "./presentationReadability";
+import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
 
 type ScoreEntry = {
   teamId?: number;
@@ -1423,6 +1427,30 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const faceMorphMedium = frage.medien.find(
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));
+
+  if (frage.templateId === questionTemplateIds.artwork) {
+    const artworkMedium = frage.medien.find(
+      (medium) => medium.slotKey === "question_image" && isBild(medium.datei),
+    ) ?? frage.medien.find((medium) => isBild(medium.datei));
+    const [artistField, titleField] = richtigeAntwortfeldLoesungen;
+
+    return (
+      <ArtworkSolutionSlide
+        questionText={frage.frage}
+        source={frage.quelle}
+        image={artworkMedium ? {
+          src: getMediumUrl(artworkMedium.datei),
+          alt: artworkMedium.bemerkung ?? `Kunstwerk zu: ${frage.frage}`,
+        } : null}
+        artistSolutions={(artistField?.loesungen ?? []).map(
+          (solution) => solution.loesung_text,
+        )}
+        titleSolutions={(titleField?.loesungen ?? []).map(
+          (solution) => solution.loesung_text,
+        )}
+      />
+    );
+  }
 
   if (isPollQuestionTemplateId(frage.templateId)) {
     return (

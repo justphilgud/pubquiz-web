@@ -82,3 +82,56 @@ test("new reverse questions require a current successful output", () => {
   current.generatorRuns![0].status = "STALE";
   assert.equal(evaluateQuestionQuality(current).blockers.some((issue) => issue.code === "GENERATOR_OUTPUT_STALE"), true);
 });
+
+test("artwork requires exactly the existing question image slot", () => {
+  const current = draft([]);
+  current.templateId = "kunstwerk";
+  current.questionText =
+    "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?";
+  current.answers = [
+    {
+      id: "artist",
+      fieldGroupId: "artist",
+      fieldLabel: "Künstler",
+      isRequired: true,
+      text: "Leonardo da Vinci",
+      isCorrect: true,
+      additionalInfo: "",
+      media: null,
+    },
+    {
+      id: "title",
+      fieldGroupId: "title",
+      fieldLabel: "Titel",
+      isRequired: true,
+      text: "Mona Lisa",
+      isCorrect: true,
+      additionalInfo: "",
+      media: null,
+    },
+  ];
+
+  assert.equal(
+    evaluateQuestionQuality(current).blockers.some(
+      (issue) => issue.code === "MEDIA_SLOT_REQUIRED",
+    ),
+    true,
+  );
+
+  current.questionMedia = [
+    {
+      slotKey: "question_image",
+      existingMediaId: 17,
+      url: "https://blob.example/artwork/mona-lisa.webp",
+      mediaType: "IMAGE",
+      operation: "UNCHANGED",
+      existingMediaCount: 1,
+    },
+  ];
+  assert.equal(
+    evaluateQuestionQuality(current).blockers.some(
+      (issue) => issue.code === "MEDIA_SLOT_REQUIRED",
+    ),
+    false,
+  );
+});

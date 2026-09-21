@@ -338,6 +338,7 @@ export type QuestionTemplateDefinition = {
     | "multipleChoice"
     | "faceMorph"
     | "musicReverse"
+    | "artwork"
     | "musicEightBit"
     | "pixelImage"
     | "trueFalse"
@@ -352,7 +353,7 @@ export type QuestionTemplateDefinition = {
   questionLabelKey: "question" | "statement" | "task" | "searchTarget";
   allowsOptionalQuestionImage: boolean;
   initialAnswers: Array<{
-    fieldLabelKey?: "personA" | "personB" | "artist" | "title" | "solution";
+    fieldLabelKey?: "personA" | "personB" | "artist" | "visualArtist" | "title" | "solution";
     isCorrect?: boolean;
   }>;
   mediaSlots: Array<{ slotKey: MediaSlotKey; required: boolean }>;
