@@ -32,9 +32,9 @@ export function ArtworkSolutionSlide({
   return (
     <div
       data-artwork-solution
-      className="grid h-full min-h-0 gap-5 lg:grid-cols-[1.35fr_0.65fr]"
+      className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1.35fr_0.65fr]"
     >
-      <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-5 shadow-[8px_8px_0_#ff00aa]">
+      <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-4 shadow-[8px_8px_0_#ff00aa]">
         {image ? (
           <img
             src={image.src}
@@ -48,36 +48,36 @@ export function ArtworkSolutionSlide({
         )}
       </div>
 
-      <div className="presentation-solution-result flex min-h-0 flex-col rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
-        <div className="text-sm font-black uppercase tracking-[0.3em] text-emerald-300">
+      <div className="presentation-solution-result flex min-h-0 flex-col overflow-hidden rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-4 shadow-[8px_8px_0_#facc15] xl:p-5">
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-300">
           Auflösung
         </div>
-        <h2 className="mt-3 text-2xl font-black leading-tight text-white/75">
+        <h2 className="mt-2 text-xl font-black leading-tight text-white/75 xl:text-2xl">
           {questionText}
         </h2>
 
-        <div className="mt-7 grid content-center gap-5">
-          <section className="rounded-2xl border-2 border-cyan-300 bg-black/35 p-5">
+        <div className="mt-4 grid content-center gap-3">
+          <section className="rounded-2xl border-2 border-cyan-300 bg-black/35 p-3 xl:p-4">
             <div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-200">
               Künstler
             </div>
-            <div className="mt-2 text-3xl font-black leading-tight text-white xl:text-4xl">
+            <div className="mt-1 text-2xl font-black leading-tight text-white xl:text-3xl">
               {formatArtworkAlternatives(artistSolutions)}
             </div>
           </section>
 
-          <section className="rounded-2xl border-2 border-yellow-300 bg-black/35 p-5">
+          <section className="rounded-2xl border-2 border-yellow-300 bg-black/35 p-3 xl:p-4">
             <div className="text-xs font-black uppercase tracking-[0.25em] text-yellow-200">
               Titel
             </div>
-            <div className="mt-2 text-3xl font-black leading-tight text-white xl:text-4xl">
+            <div className="mt-1 text-2xl font-black leading-tight text-white xl:text-3xl">
               {formatArtworkAlternatives(titleSolutions)}
             </div>
           </section>
         </div>
 
         {source && (
-          <div className="mt-auto pt-5 text-sm font-bold text-white/55">
+          <div className="mt-3 break-words text-[11px] font-bold leading-snug text-white/55 [overflow-wrap:anywhere] xl:text-xs">
             Quelle: {source}
           </div>
         )}

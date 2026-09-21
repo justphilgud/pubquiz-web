@@ -805,7 +805,8 @@ test("artwork solution renders the image, artist, compact title alternatives and
     createElement(ArtworkSolutionSlide, {
       questionText:
         "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?",
-      source: "Wikimedia Commons · public domain",
+      source:
+        "Wikimedia Commons · public domain · https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF.jpg",
       image: {
         src: "https://example.test/mona-lisa.svg",
         alt: "Mona Lisa",
@@ -821,6 +822,8 @@ test("artwork solution renders the image, artist, compact title alternatives and
   assert.match(markup, /Leonardo da Vinci/);
   assert.match(markup, /Mona Lisa \(La Gioconda\)/);
   assert.match(markup, /Wikimedia Commons · public domain/);
+  assert.match(markup, /overflow-hidden/);
+  assert.match(markup, /overflow-wrap:anywhere/);
   assert.equal(
     formatArtworkAlternatives(["Mona Lisa", "La Gioconda"]),
     "Mona Lisa (La Gioconda)",
