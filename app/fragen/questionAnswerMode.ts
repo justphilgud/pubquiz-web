@@ -13,6 +13,7 @@ export type DerivedQuestionAnswerMode =
 
 const openSpecialTemplateIds = [
   questionTemplateIds.faceMorph,
+  questionTemplateIds.artwork,
   questionTemplateIds.musicReverse,
   questionTemplateIds.musicEightBit,
   questionTemplateIds.pixelImage,
