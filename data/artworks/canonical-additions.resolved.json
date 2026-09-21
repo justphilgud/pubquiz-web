@@ -1,0 +1,2817 @@
+[
+  {
+    "title": "The Scream",
+    "expectedArtist": "Edvard Munch",
+    "selected": {
+      "id": "Q18891156",
+      "label": "The Scream",
+      "description": "1893 painting by Norwegian artist Edvard Munch",
+      "creators": [
+        "Edvard Munch"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q18891156",
+        "label": "The Scream",
+        "description": "1893 painting by Norwegian artist Edvard Munch",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q122314337",
+        "label": "The Scream",
+        "description": "2019 video game",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q471379",
+        "label": "The Scream",
+        "description": "group of paintings by Edvard Munch",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q1188720",
+        "label": "The Scream",
+        "description": "album by Siouxsie and the Banshees",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q18891155",
+        "label": "The Scream",
+        "description": "pastel drawing by Edvard Munch (1893)",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q18891158",
+        "label": "The Scream",
+        "description": "painting by Edvard Munch (1910)",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q18891157",
+        "label": "The Scream",
+        "description": "pastel by Edvard Munch (1895)",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q1101680",
+        "label": "The Scream",
+        "description": "American band",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q920580",
+        "label": "De Schreeuw",
+        "description": "sculpture by Jeroen Henneman",
+        "creators": [
+          "Jeroen Henneman"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q114513419",
+        "label": "The Scream",
+        "description": "episode of Switched at Birth (S3 E6)",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Great Wave off Kanagawa",
+    "expectedArtist": "Katsushika Hokusai",
+    "selected": {
+      "id": "Q252485",
+      "label": "The Great Wave off Kanagawa",
+      "description": "woodblock print by Hokusai",
+      "creators": [
+        "Katsushika Hokusai"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q252485",
+        "label": "The Great Wave off Kanagawa",
+        "description": "woodblock print by Hokusai",
+        "creators": [
+          "Katsushika Hokusai"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q28912605",
+        "label": "The Great Wave off Kanagawa",
+        "description": "original impression of a woodblock print by Katsushika Hokusai in the Metropolitan Museum",
+        "creators": [
+          "Katsushika Hokusai"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q28913656",
+        "label": "The Great Wave off Kanagawa",
+        "description": "3 original impression of a woodblock print by Katsushika Hokusai in the British Museum",
+        "creators": [
+          "Katsushika Hokusai"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q28924776",
+        "label": "The Great Wave off Kanagawa",
+        "description": "original impression of a woodblock print by Katsushika Hokusai in the Los Angeles County Museum of Art‎",
+        "creators": [
+          "Katsushika Hokusai"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Fine Wind, Clear Morning",
+    "expectedArtist": "Katsushika Hokusai",
+    "selected": {
+      "id": "Q3565037",
+      "label": "Fine Wind, Clear Morning",
+      "description": "wood block print by Japanese artist Katsushika Hokusai",
+      "creators": [
+        "Katsushika Hokusai"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q3565037",
+        "label": "Fine Wind, Clear Morning",
+        "description": "wood block print by Japanese artist Katsushika Hokusai",
+        "creators": [
+          "Katsushika Hokusai"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Sudden Shower over Shin-Ōhashi bridge and Atake",
+    "expectedArtist": "Hiroshige",
+    "selected": {
+      "id": "Q5826309",
+      "label": "Sudden Shower over Shin-Ōhashi Bridge and Atake",
+      "description": "1857 woodblock print by Hiroshige",
+      "creators": [
+        "Utagawa Hiroshige"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q5826309",
+        "label": "Sudden Shower over Shin-Ōhashi Bridge and Atake",
+        "description": "1857 woodblock print by Hiroshige",
+        "creators": [
+          "Utagawa Hiroshige"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q60780869",
+        "label": "Sudden Shower over Shin-Ōhashi Bridge and Atake, from the series One Hundred Famous Views of Edo",
+        "description": "print by Utagawa Hiroshige (Japanese, 1797-1858) (1921.318)",
+        "creators": [
+          "Utagawa Hiroshige"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q79937274",
+        "label": "Sudden Shower over Shin-Ōhashi Bridge and Atake, from the series One Hundred Famous Views of Edo",
+        "description": "print by Utagawa Hiroshige (Japanese, 1797-1858) (1985.318)",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Plum Park in Kameido",
+    "expectedArtist": "Hiroshige",
+    "selected": {
+      "id": "Q21127606",
+      "label": "Plum Park in Kameido",
+      "description": "1857 woodblock print by Hiroshige",
+      "creators": [
+        "Utagawa Hiroshige"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q21127606",
+        "label": "Plum Park in Kameido",
+        "description": "1857 woodblock print by Hiroshige",
+        "creators": [
+          "Utagawa Hiroshige"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Three Beauties of the Present Day",
+    "expectedArtist": "Utamaro",
+    "selected": {
+      "id": "Q18210019",
+      "label": "Three Beauties of the Present Day",
+      "description": "woodblock print by Utamaro",
+      "creators": [
+        "Kitagawa Utamaro"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q18210019",
+        "label": "Three Beauties of the Present Day",
+        "description": "woodblock print by Utamaro",
+        "creators": [
+          "Kitagawa Utamaro"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Actor Ōtani Oniji III as Yakko Edobei",
+    "expectedArtist": "Sharaku",
+    "selected": null,
+    "matches": []
+  },
+  {
+    "title": "Wind God and Thunder God Screens",
+    "expectedArtist": "Tawaraya Sōtatsu",
+    "selected": null,
+    "matches": []
+  },
+  {
+    "title": "Pine Trees screen",
+    "expectedArtist": "Hasegawa Tōhaku",
+    "selected": {
+      "id": "Q11531476",
+      "label": "Pine Trees",
+      "description": "couple of folding screens by Hasegawa Tōhaku",
+      "creators": [
+        "Hasegawa Tōhaku"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q11531476",
+        "label": "Pine Trees",
+        "description": "couple of folding screens by Hasegawa Tōhaku",
+        "creators": [
+          "Hasegawa Tōhaku"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Landscape of the Four Seasons",
+    "expectedArtist": "Sesshū Tōyō",
+    "selected": {
+      "id": "Q42192051",
+      "label": "Landscape of the Four Seasons",
+      "creators": [
+        "Sesshū Tōyō"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q42192051",
+        "label": "Landscape of the Four Seasons",
+        "creators": [
+          "Sesshū Tōyō"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q64556282",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Fan Qi",
+        "creators": [
+          "Fan Qi"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q58023091",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Sesson Shukei (Artic 1958.167-168)",
+        "creators": [
+          "Sesson Shukei"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q60473183",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Yi Sumun (Korean, b. c. 1404) (1976.92.1)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q78679915",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Matsubayashi Keigetsu",
+        "creators": [
+          "Matsubayashi Keigetsu"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q60473190",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Yi Sumun (Korean, b. c. 1404) (1976.92.2)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q60473174",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Yi Sumun (Korean, b. c. 1404) (1976.92)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q58022724",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Sesson Shukei",
+        "creators": [
+          "Sesson Shukei"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q58024399",
+        "label": "Landscape of the Four Seasons",
+        "description": "painting by Sesson Shukei (Artic 1958.168)",
+        "creators": [
+          "Sesson Shukei"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q78922074",
+        "label": "Landscape of the four seasons in the styles of old masters",
+        "description": "painting by Wei Zhike",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Along the River During the Qingming Festival",
+    "expectedArtist": "Zhang Zeduan",
+    "selected": {
+      "id": "Q714802",
+      "label": "Along the River During the Qingming Festival",
+      "description": "painting attributed to Zhang Zeduan",
+      "creators": [
+        "Zhang Zeduan"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q135051881",
+        "label": "Along the River During the Qingming Festival",
+        "description": "2024 video game developed by Fantasy Li",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q714802",
+        "label": "Along the River During the Qingming Festival",
+        "description": "painting attributed to Zhang Zeduan",
+        "creators": [
+          "Zhang Zeduan"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q88862987",
+        "label": "Along the River During the Qingming Festival",
+        "description": "Qing court version of Along the River During the Qingming Festival",
+        "creators": [
+          "Chen Mei",
+          "Sun Hu",
+          "Jin Kun"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q119341492",
+        "label": "Along the River During the Qingming Festival in Korean Literature of the 18th Century",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Travelers among Mountains and Streams",
+    "expectedArtist": "Fan Kuan",
+    "selected": {
+      "id": "Q15907822",
+      "label": "Travelers Among Mountains and Streams",
+      "description": "painting by Fan Kuan",
+      "creators": [
+        "Fan Kuan"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q15907822",
+        "label": "Travelers Among Mountains and Streams",
+        "description": "painting by Fan Kuan",
+        "creators": [
+          "Fan Kuan"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Early Spring",
+    "expectedArtist": "Guo Xi",
+    "selected": {
+      "id": "Q5136665",
+      "label": "Early Spring",
+      "description": "painting",
+      "creators": [
+        "Guo Xi"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q5136665",
+        "label": "Early Spring",
+        "description": "painting",
+        "creators": [
+          "Guo Xi"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q5133706",
+        "label": "Early Spring",
+        "description": "1986 film by Astrid Henning-Jensen",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q18889777",
+        "label": "Early Spring",
+        "description": "painting by Edvard Munch (1916)",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q18889776",
+        "label": "Early Spring",
+        "description": "painting by Edvard Munch (1905)",
+        "creators": [
+          "Edvard Munch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q27895857",
+        "label": "Early Spring",
+        "description": "painting by Arthur Parton",
+        "creators": [
+          "Arthur Parton"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q49274192",
+        "label": "Early Spring",
+        "description": "painting by Takeuchi Seiho",
+        "creators": [
+          "Takeuchi Seihō"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q60514254",
+        "label": "Early Spring",
+        "description": "painting by Ernest Lawson (American, 1873-1939) (1938.48)",
+        "creators": [
+          "Ernest Lawson"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q55425339",
+        "label": "Early Spring",
+        "description": "painting by Gerhard Munthe",
+        "creators": [
+          "Gerhard Munthe"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q113990508",
+        "label": "Early spring",
+        "creators": [
+          "Stanisław Ignacy Witkiewicz"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q2533907",
+        "label": "prespring",
+        "description": "season between winter and spring; one of the 8 Sámi seasons",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Night-Shining White",
+    "expectedArtist": "Han Gan",
+    "selected": {
+      "id": "Q28092249",
+      "label": "Night-Shining White",
+      "description": "Tang dynasty handscroll (China) by Han Gan depicting a horse (MET, 1977.78)",
+      "creators": [
+        "Han Gan"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q28092249",
+        "label": "Night-Shining White",
+        "description": "Tang dynasty handscroll (China) by Han Gan depicting a horse (MET, 1977.78)",
+        "creators": [
+          "Han Gan"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q58506483",
+        "label": "Night-Shining White: Traces of a T'ang Dynasty Horse in Two Media",
+        "description": "article published June 1986 in T'ang Studies",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Five Oxen",
+    "expectedArtist": "Han Huang",
+    "selected": {
+      "id": "Q10881982",
+      "label": "Five Oxen",
+      "description": "Chinese painting",
+      "creators": [
+        "Han Huang"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q10881982",
+        "label": "Five Oxen",
+        "description": "Chinese painting",
+        "creators": [
+          "Han Huang"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Dwelling in the Fuchun Mountains",
+    "expectedArtist": "Huang Gongwang",
+    "selected": {
+      "id": "Q706846",
+      "label": "Dwelling in the Fuchun Mountains",
+      "description": "historically significant Chinese landscape painting by Huang Gongwang (1269-1354)",
+      "creators": [
+        "Huang Gongwang"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q706846",
+        "label": "Dwelling in the Fuchun Mountains",
+        "description": "historically significant Chinese landscape painting by Huang Gongwang (1269-1354)",
+        "creators": [
+          "Huang Gongwang"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q63406127",
+        "label": "Dwelling in the Fuchun Mountains",
+        "description": "2019 film by Gu Xiaogang",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q16976930",
+        "label": "Dwelling in the Fu-chun Mountains",
+        "description": "painting by Huang Gongwang",
+        "creators": [
+          "Huang Gongwang"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q121416417",
+        "label": "Dwelling in the Fuchun Mountains (Ziming Scroll)",
+        "creators": [
+          "Huang Gongwang"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Six Gentlemen",
+    "expectedArtist": "Ni Zan",
+    "selected": {
+      "id": "Q22959711",
+      "label": "Six Gentlemen",
+      "description": "painting by Ni Zan",
+      "creators": [
+        "Ni Zan"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q22959711",
+        "label": "Six Gentlemen",
+        "description": "painting by Ni Zan",
+        "creators": [
+          "Ni Zan"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q8426039",
+        "label": "Six gentlemen of the Hundred Days' Reform",
+        "description": "Chines intellectuals executed in 1898",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q75592071",
+        "label": "Six gentlemen golfers on golf course",
+        "description": "photograph by Percy Benzie Abery",
+        "creators": [
+          "Percy Benzie Abery"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q75597204",
+        "label": "Six gentlemen golfers on a golf course",
+        "description": "photograph by Percy Benzie Abery",
+        "creators": [
+          "Percy Benzie Abery"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q25100441",
+        "label": "Six Gentlemen",
+        "description": "Wikimedia disambiguation page",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Listening to the Qin",
+    "expectedArtist": "Emperor Huizong",
+    "selected": {
+      "id": "Q116459640",
+      "label": "Listening to the Qin",
+      "description": "hanging scroll by Emperor Huizong of Northern Song Dynasty",
+      "creators": [
+        "Emperor Huizong of Song"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q60473323",
+        "label": "Listening to the Qin",
+        "description": "painting by Tang Yin (Chinese, 1470-1523) (1977.199)",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q112201406",
+        "label": "Listening to the Qin",
+        "description": "painting by unknown artist, China",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q116459640",
+        "label": "Listening to the Qin",
+        "description": "hanging scroll by Emperor Huizong of Northern Song Dynasty",
+        "creators": [
+          "Emperor Huizong of Song"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q60475259",
+        "label": "Listening to the Qin (Zither)",
+        "description": "painting by Liu Songnian (Chinese, c. 1150-after 1225) (1983.85)",
+        "creators": [
+          "Liu Songnian"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q64558451",
+        "label": "Listening to the Qin by Candlelight",
+        "description": "painting by anonymous Chinese painter",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Emperor Taizong Receiving the Tibetan Envoy",
+    "expectedArtist": "Yan Liben",
+    "selected": {
+      "id": "Q4997694",
+      "label": "Bunian Tu",
+      "description": "painting by Yan Liben",
+      "creators": [
+        "Yan Liben"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q4997694",
+        "label": "Bunian Tu",
+        "description": "painting by Yan Liben",
+        "creators": [
+          "Yan Liben"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Dream Journey to the Peach Blossom Land",
+    "expectedArtist": "An Gyeon",
+    "selected": null,
+    "matches": [
+      {
+        "id": "Q12595455",
+        "label": "Dream Journey to the Peach Blossom Land",
+        "description": "1447 painting by An Gyeon",
+        "creators": [
+          "An Kyŏn"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Inwangjesaekdo",
+    "expectedArtist": "Jeong Seon",
+    "selected": null,
+    "matches": []
+  },
+  {
+    "title": "Shakuntala looking back to glimpse Dushyanta",
+    "expectedArtist": "Raja Ravi Varma",
+    "selected": null,
+    "matches": []
+  },
+  {
+    "title": "Hamsa Damayanti",
+    "expectedArtist": "Raja Ravi Varma",
+    "selected": {
+      "id": "Q107426838",
+      "label": "Hamsa Damayanti",
+      "description": "painting by Raja Ravi Varma",
+      "creators": [
+        "Raja Ravi Varma"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q107426838",
+        "label": "Hamsa Damayanti",
+        "description": "painting by Raja Ravi Varma",
+        "creators": [
+          "Raja Ravi Varma"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q31316771",
+        "label": "Hamsa Damayanti Mattu Itara Rupakagalu",
+        "description": "P. T. Narasimhachar book",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Galaxy of Musicians",
+    "expectedArtist": "Raja Ravi Varma",
+    "selected": {
+      "id": "Q55373282",
+      "label": "Galaxy of Musicians",
+      "description": "painting by Raja Ravi Varma",
+      "creators": [
+        "Raja Ravi Varma"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q55373282",
+        "label": "Galaxy of Musicians",
+        "description": "painting by Raja Ravi Varma",
+        "creators": [
+          "Raja Ravi Varma"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Bharat Mata",
+    "expectedArtist": "Abanindranath Tagore",
+    "selected": {
+      "id": "Q4901133",
+      "label": "Bharat Mata",
+      "description": "1905 painting by Abanindranath Tagore",
+      "creators": [
+        "Abanindranath Tagore"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q4901133",
+        "label": "Bharat Mata",
+        "description": "1905 painting by Abanindranath Tagore",
+        "creators": [
+          "Abanindranath Tagore"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q2072991",
+        "label": "Bhārat Mātā",
+        "description": "national personification of India as a mother goddess",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q4901134",
+        "label": "Bharat Mata Ki Jai",
+        "description": "television series",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q24949703",
+        "label": "Bharat mata ki jai",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q19882307",
+        "label": "Bharat Mata Mandir",
+        "description": "temple in Varanasi, India",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q1411238",
+        "label": "Mother India",
+        "description": "1957 film directed by Mehboob Khan",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q31368520",
+        "label": "Bharat Mata Temple, Kanyakumari",
+        "description": "Hindu Temple in Kanyakumari, Tamil Nadu",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q15670805",
+        "label": "Bharat Mata Mandir, Haridwar",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q91414982",
+        "label": "Bharat Mata Phy. T.T. College, Kishanganj",
+        "description": "college affiliated to the University of Kota",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Passing of Shah Jahan",
+    "expectedArtist": "Abanindranath Tagore",
+    "selected": {
+      "id": "Q48734985",
+      "label": "The Passing of Shah Jahan",
+      "description": "painting by Abanindranath Tagore",
+      "creators": [
+        "Abanindranath Tagore"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q48734985",
+        "label": "The Passing of Shah Jahan",
+        "description": "painting by Abanindranath Tagore",
+        "creators": [
+          "Abanindranath Tagore"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Independence or Death",
+    "expectedArtist": "Pedro Américo",
+    "selected": {
+      "id": "Q10301958",
+      "label": "Independence or Death",
+      "description": "painting by Pedro Américo",
+      "creators": [
+        "Pedro Américo"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q10301958",
+        "label": "Independence or Death",
+        "description": "painting by Pedro Américo",
+        "creators": [
+          "Pedro Américo"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q125604077",
+        "label": "Independence or Death! The Story of the Paraguayan War. By Charles J. Kolinski (Gainesville: University of Florida Press, 1965. Pp. xvi, 236. $6.50.)",
+        "description": "journal article from 'The Americas' published in 2004",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q58569226",
+        "label": "Independence or Death! British Sailors and Brazilian Independence, 1822–1825",
+        "description": "article",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "First Mass in Brazil",
+    "expectedArtist": "Victor Meirelles",
+    "selected": null,
+    "matches": [
+      {
+        "id": "Q10353856",
+        "label": "First Mass in Brazil",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Battle of Avay",
+    "expectedArtist": "Pedro Américo",
+    "selected": null,
+    "matches": [
+      {
+        "id": "Q3647744",
+        "label": "Battle of Avay",
+        "description": "1868 battle of the Paraguayan War",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Oath of the Thirty-Three Orientals",
+    "expectedArtist": "Juan Manuel Blanes",
+    "selected": null,
+    "matches": []
+  },
+  {
+    "title": "The Valley of Mexico from the Santa Isabel Mountain Range",
+    "expectedArtist": "José María Velasco Gómez",
+    "selected": {
+      "id": "Q28808756",
+      "label": "The Valley of Mexico from the Santa Isabel Mountain Range",
+      "description": "painting by José María Velasco",
+      "creators": [
+        "José María Velasco Gómez Obregón"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q28808756",
+        "label": "The Valley of Mexico from the Santa Isabel Mountain Range",
+        "description": "painting by José María Velasco",
+        "creators": [
+          "José María Velasco Gómez Obregón"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "La mazamorra",
+    "expectedArtist": "Fernando Fader",
+    "selected": {
+      "id": "Q27950828",
+      "label": "La mazamorra",
+      "description": "painting by Fernando Fader",
+      "creators": [
+        "Fernando Fader"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q27950828",
+        "label": "La mazamorra",
+        "description": "painting by Fernando Fader",
+        "creators": [
+          "Fernando Fader"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q20221451",
+        "label": "La Mazamorra",
+        "description": "human settlement in Mexico",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q11930598",
+        "label": "La Mazamorra",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Creation of Adam",
+    "expectedArtist": "Michelangelo",
+    "selected": {
+      "id": "Q500242",
+      "label": "The Creation of Adam",
+      "description": "fresco by Michelangelo, part of the Sistine Chapel ceiling",
+      "creators": [
+        "Michelangelo"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q500242",
+        "label": "The Creation of Adam",
+        "description": "fresco by Michelangelo, part of the Sistine Chapel ceiling",
+        "creators": [
+          "Michelangelo"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q27760813",
+        "label": "The Creation of Adam",
+        "description": "painting by Francisco Bayeu y Subías",
+        "creators": [
+          "Francisco Bayeu"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q20808697",
+        "label": "The Creation of Adam",
+        "description": "painting by Carlo Cornara",
+        "creators": [
+          "Carlo Cornara"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q4429824",
+        "label": "The Creation of Adam",
+        "description": "1993 film by Yury Pavlov",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q123665829",
+        "label": "The creation of Adam",
+        "description": "1747-1801, print, etching",
+        "creators": [
+          "Georg Balthasar Probst"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q119851535",
+        "label": "The Creation of Adam",
+        "description": "painting by unknown artist, Art Collection, Durham University",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q61717807",
+        "label": "The Creation of Adam",
+        "creators": [
+          "Friedel Stern"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q27690162",
+        "label": "The Creation of Adam. The Hermitage of the Vera Cruz de Maderuelo",
+        "description": "painting by anonymous painter",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q30056155",
+        "label": "the creation of Adam and Eve in the Garden of Eden",
+        "description": "painting by Jacob Bouttats",
+        "creators": [
+          "Jacob Bouttats"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q49216820",
+        "label": "The Creation of Adam and Eve",
+        "description": "painting by Master of Apollo and Daphne",
+        "creators": [
+          "Master of Apollo and Daphne"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Last Judgment",
+    "expectedArtist": "Michelangelo",
+    "selected": {
+      "id": "Q567861",
+      "label": "The Last Judgment",
+      "description": "fresco by Michelangelo in the Sistine Chapel",
+      "creators": [
+        "Michelangelo"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q1821239",
+        "label": "Day of Judgment",
+        "description": "eschatological concept in Zoroastrianism and the Abrahamic religions about a judgment of human beings during end times",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q140698622",
+        "label": "The Last Judgment",
+        "description": "painting by Domenico Beccafumi",
+        "creators": [
+          "Domenico Beccafumi"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q567861",
+        "label": "The Last Judgment",
+        "description": "fresco by Michelangelo in the Sistine Chapel",
+        "creators": [
+          "Michelangelo"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q1387483",
+        "label": "The Last Judgment",
+        "description": "triptych by Hieronymus Bosch in the Akademie der Künste, Vienna",
+        "creators": [
+          "Hieronymus Bosch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q1169199",
+        "label": "The Last Judgment (Beaune Altarpiece)",
+        "description": "15th century altarpiece by Rogier van der Weyden",
+        "creators": [
+          "Rogier van der Weyden"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q1995698",
+        "label": "The Last Judgment",
+        "description": "painting by Hieronymus Bosch",
+        "creators": [
+          "Hieronymus Bosch"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q701035",
+        "label": "The Last Judgment",
+        "description": "triptych by Hans Memling in Gdansk",
+        "creators": [
+          "Hans Memling"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3223807",
+        "label": "The Last Judgment",
+        "description": "painting by Fra Angelico in the Museo Nazionale di San Marco",
+        "creators": [
+          "Fra Angelico"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q27697961",
+        "label": "The Last Judgment",
+        "description": "painting by Juan Correa de Vivar",
+        "creators": [
+          "Juan Correa de Vivar"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q64557489",
+        "label": "The Last Judgment",
+        "description": "painting by Lucas Cranach the Elder in the Nelson-Atkins Museum of Art",
+        "creators": [
+          "Lucas Cranach the Elder"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The School of Athens",
+    "expectedArtist": "Raphael",
+    "selected": {
+      "id": "Q186953",
+      "label": "The School of Athens",
+      "description": "fresco by Raphael",
+      "creators": [
+        "Raphael"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q186953",
+        "label": "The School of Athens",
+        "description": "fresco by Raphael",
+        "creators": [
+          "Raphael"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q106102910",
+        "label": "The School of Athens",
+        "description": "tapestry by Raphael",
+        "creators": [
+          "Gobelins Tapestry Manufactory"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q87282936",
+        "label": "The School of Athens",
+        "description": "episode of In Our Time",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q138465671",
+        "label": "The School of Athens",
+        "description": "print by Louis Jacoby (Nasjonalmuseet, NG.K&H.A.17628)",
+        "creators": [
+          "Louis Jacoby",
+          "Society for Reproducing Art, Vienna"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q119454663",
+        "label": "The School of Athens",
+        "description": "painting by Raphael (1483–1520) (copy after), Corpus Christi College, University of Cambridge",
+        "creators": [
+          "Raphael"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q119454623",
+        "label": "The School of Athens",
+        "description": "painting by Raphael (1483–1520) (after), Ashmolean Museum, Oxford",
+        "creators": [
+          "Raphael"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q49294975",
+        "label": "The School of Athens: The Law of Falling Bodies",
+        "description": "painting by John Reynolds",
+        "creators": [
+          "John Reynolds"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q119007077",
+        "label": "The School of Athens (after Raphael)",
+        "description": "painting by Anton Raphael Mengs (1728–1779), Victoria and Albert Museum",
+        "creators": [
+          "Anton Raphael Mengs"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q75406902",
+        "label": "The School of Athens Arcades, for the \"Chinea\" Festival",
+        "description": "print in the National Gallery of Art (NGA 102574)",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Disputation of the Sacrament",
+    "expectedArtist": "Raphael",
+    "selected": null,
+    "matches": []
+  },
+  {
+    "title": "The Expulsion from the Garden of Eden",
+    "expectedArtist": "Masaccio",
+    "selected": null,
+    "matches": [
+      {
+        "id": "Q64962938",
+        "label": "The Expulsion from the Garden of Eden",
+        "description": "print in the National Gallery of Art (NGA 3904)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q64962922",
+        "label": "The Expulsion from the Garden of Eden",
+        "description": "print in the National Gallery of Art (NGA 3895)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q106879140",
+        "label": "The Expulsion from the Garden of Eden, after Masaccio",
+        "description": "painting by Nicholas Lochoff",
+        "creators": [
+          "Nicholas Lochoff"
+        ],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Tribute Money",
+    "expectedArtist": "Masaccio",
+    "selected": null,
+    "matches": [
+      {
+        "id": "Q504136",
+        "label": "Render unto Caesar",
+        "description": "a phrase attributed to Jesus in the synoptic gospels",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q2459887",
+        "label": "The Tribute Money",
+        "description": "painting by Titian in the Gemäldegalerie Alte Meister, Dresden",
+        "creators": [
+          "Titian"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q28803514",
+        "label": "Christ of the Coin",
+        "description": "painting by Anthony van Dyck in the Musei di Strada Nuova, Genoa",
+        "creators": [
+          "Anthony van Dyck"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q18600222",
+        "label": "The Tribute Money",
+        "description": "painting by Jacob Adriaensz. Backer",
+        "creators": [
+          "Jacob Adriaensz Backer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q21568740",
+        "label": "The Tribute Money",
+        "description": "1655 painting attributed to Gerbrand van den Eeckhout",
+        "creators": [
+          "Rembrandt",
+          "Gerbrand van den Eeckhout"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q21423346",
+        "label": "The Tribute Money",
+        "description": "painting attributed to Rembrandt, 1631, National Gallery of Canada",
+        "creators": [
+          "Rembrandt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q20199180",
+        "label": "The Tribute Money",
+        "description": "painting by Peter Paul Rubens",
+        "creators": [
+          "Peter Paul Rubens"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q28775701",
+        "label": "The Tribute Money",
+        "description": "painting by Bernardo Strozzi in the Museum of Fine Arts, Budapest",
+        "creators": [
+          "Bernardo Strozzi"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q62015666",
+        "label": "The Tribute Money",
+        "description": "painting by Jacek Malczewski",
+        "creators": [
+          "Jacek Malczewski"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q19858745",
+        "label": "The Tribute Money",
+        "description": "painting by James Tissot",
+        "creators": [
+          "James Tissot"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Lamentation",
+    "expectedArtist": "Giotto",
+    "selected": {
+      "id": "Q2067212",
+      "label": "Lamentation",
+      "description": "fresco by Giotto di Bondonne",
+      "creators": [
+        "Giotto"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q174864",
+        "label": "elegy",
+        "description": "literary genre",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q140814673",
+        "label": "Lamentation",
+        "description": "painting by Domenico Panetti",
+        "creators": [
+          "Domenico Panetti"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q121688758",
+        "label": "Lamentation",
+        "description": "painting by Maarten van Heemskerck, circa1545, 122.5 x 139 cm",
+        "creators": [
+          "Maarten van Heemskerck"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q1471717",
+        "label": "lament",
+        "description": "artistic genre",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q1229479",
+        "label": "lamentation",
+        "description": "expression of grief in song, music, or poetry",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q1684811",
+        "label": "complaint",
+        "description": "song/poetic form of multiple couplets expressing sorrow",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q6075225",
+        "label": "Lamentation",
+        "description": "painting by El Greco",
+        "creators": [
+          "El Greco"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3216716",
+        "label": "lamentation",
+        "description": "grief",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q2067212",
+        "label": "Lamentation",
+        "description": "fresco by Giotto di Bondonne",
+        "creators": [
+          "Giotto"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q6153533",
+        "label": "The Lamentation over the Dead Christ",
+        "description": "triptych by Quentin Matsys",
+        "creators": [
+          "Quinten Metsys"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Kiss of Judas",
+    "expectedArtist": "Giotto",
+    "selected": {
+      "id": "Q3504778",
+      "label": "Kiss of Judas",
+      "description": "fresco by Giotto di Bondone",
+      "creators": [
+        "Giotto"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q10289604",
+        "label": "Kiss of Judas",
+        "description": "kiss by which Judas Iscariot identified and betrayed Jesus Christ",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q3504778",
+        "label": "Kiss of Judas",
+        "description": "fresco by Giotto di Bondone",
+        "creators": [
+          "Giotto"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q47642150",
+        "label": "Kiss of Judas",
+        "description": "painting by Wilhelm Marstrand",
+        "creators": [
+          "Wilhelm Marstrand"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3632581",
+        "label": "Kiss of Judas",
+        "description": "sculpture by Giuseppe Runggaldier",
+        "creators": [
+          "Giuseppe Runggaldier"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q80456626",
+        "label": "Kiss of Judas",
+        "description": "statue in Český Krumlov",
+        "creators": [
+          "Josef Pabl",
+          "Jan Plansker"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q26836023",
+        "label": "Kiss of Judas",
+        "description": "sculpture by Josep Llimona",
+        "creators": [
+          "Josep Llimona i Bruguera"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q3793030",
+        "label": "The Kiss of Judas",
+        "description": "1988 film by Paolo Benvenuti",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q140456904",
+        "label": "Kiss of Judas",
+        "description": "wall mosaic by Mario Barberis in the Church of All Nations in Jerusalem",
+        "creators": [
+          "Mario Barberis"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q129665668",
+        "label": "Kiss of Judas",
+        "description": "mosaic by Coppo di Marcovaldo",
+        "creators": [
+          "Coppo di Marcovaldo"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Annunciation",
+    "expectedArtist": "Fra Angelico",
+    "selected": null,
+    "matches": [
+      {
+        "id": "Q154326",
+        "label": "Annunciation",
+        "description": "announcement of the birth of Jesus to Mary",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q131450095",
+        "label": "Annunciation",
+        "description": "painting in the Diocesan museum and lapidary of Nola, Nola, Italy, by Cristoforo Scacco di Verona",
+        "creators": [
+          "Cristoforo Scacco di Verona"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q139665324",
+        "label": "Annunciation",
+        "description": "painting by",
+        "creators": [
+          "Cosimo Tura"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3202069",
+        "label": "The Annunciation",
+        "description": "painting by Sandro Botticelli in the Metropolitan Museum of Art",
+        "creators": [
+          "Sandro Botticelli"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q135642182",
+        "label": "Annunciation",
+        "description": "painting by Juan de Bustamante",
+        "creators": [
+          "Juan de Bustamante"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q140592116",
+        "label": "Annunciation",
+        "description": "painting by Alfred Diethe",
+        "creators": [
+          "Alfred Diethe"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q135726535",
+        "label": "Annunciation",
+        "description": "painting by Maestro di San Martino a Mensola",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q135616330",
+        "label": "Annunciation",
+        "description": "painting by Francesco Bissolo",
+        "creators": [
+          "Francesco Bissolo"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q9392232",
+        "label": "Annunciation",
+        "description": "painting by Hans Memling",
+        "creators": [
+          "Hans Memling"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q1217213",
+        "label": "Annunciation",
+        "description": "painting by Leonardo da Vinci and Andrea del Verrocchio",
+        "creators": [
+          "Leonardo da Vinci"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Parnassus",
+    "expectedArtist": "Raphael",
+    "selected": {
+      "id": "Q2715152",
+      "label": "The Parnassus",
+      "description": "fresco by Raphael",
+      "creators": [
+        "Raphael"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q2715152",
+        "label": "The Parnassus",
+        "description": "fresco by Raphael",
+        "creators": [
+          "Raphael"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q96142796",
+        "label": "The Parnassus",
+        "description": "Greek Wikipedia duplicate item",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q56047568",
+        "label": "THE PARNASSUS BOICUS AND THE GERMAN LANGUAGE",
+        "description": "article",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Melencolia I",
+    "expectedArtist": "Albrecht Dürer",
+    "selected": {
+      "id": "Q1362177",
+      "label": "Melencolia I",
+      "description": "1514 engraving by Albrecht Dürer",
+      "creators": [
+        "Albrecht Dürer"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q1362177",
+        "label": "Melencolia I",
+        "description": "1514 engraving by Albrecht Dürer",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q48696813",
+        "label": "Melencolia I.",
+        "description": "scientific article published in April 2003",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q139325926",
+        "label": "Melencolia II",
+        "creators": [
+          "René Donais"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q123558637",
+        "label": "Melencolia I ou La Mélancolie",
+        "description": "print by Albrecht DURER",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q123555823",
+        "label": "Melencolia I ou La Mélancolie",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Four Horsemen",
+    "expectedArtist": "Albrecht Dürer",
+    "selected": {
+      "id": "Q5980742",
+      "label": "The Four Horsemen, from The Apocalypse",
+      "description": "woodcut by Albrecht Dürer from the series Apocalypse",
+      "creators": [
+        "Albrecht Dürer"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q5980742",
+        "label": "The Four Horsemen, from The Apocalypse",
+        "description": "woodcut by Albrecht Dürer from the series Apocalypse",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q202784",
+        "label": "The Four Horsemen",
+        "description": "professional wrestling stable",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q1333450",
+        "label": "The Four Horsemen",
+        "description": "American band",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q3111271",
+        "label": "The Four Horsemen",
+        "description": "song composed by Dave Mustaine with lyrics by James Hetfield performed by Metallica",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q2259212",
+        "label": "Discussions with Richard Dawkins, Episode 1: The Four Horsemen",
+        "description": "2008 film",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q106577448",
+        "label": "The Four Horsemen",
+        "description": "print by Martin Barooshian",
+        "creators": [
+          "Martin Barooshian"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q7735010",
+        "label": "The Four Horsemen",
+        "description": "album by Ultramagnetic MCs",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q17499966",
+        "label": "The Four Horsemen",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q7735013",
+        "label": "The Four Horsemen of the Apocalypse",
+        "description": "video game",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q58155",
+        "label": "Four Horsemen of the Apocalypse",
+        "description": "figures in the New Testament believed to start the apocalypse",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Dürer's Rhinoceros",
+    "expectedArtist": "Albrecht Dürer",
+    "selected": {
+      "id": "Q748518",
+      "label": "The Rhinoceros",
+      "description": "woodcut by Albrecht Dürer",
+      "creators": [
+        "Albrecht Dürer"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q748518",
+        "label": "The Rhinoceros",
+        "description": "woodcut by Albrecht Dürer",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q110730934",
+        "label": "Dürer's Rhinoceros",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q97211441",
+        "label": "Dürer's Rhinoceros",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q114859996",
+        "label": "Dürer’s rhinoceros and what he or she was wearing: Carnations, luxury gardens, identity formation, and urban splendor, 1460–1550",
+        "description": "scientific article published on 12 August 2015",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Adam and Eve",
+    "expectedArtist": "Albrecht Dürer",
+    "selected": {
+      "id": "Q3898508",
+      "label": "Adam and Eve",
+      "description": "series of engravings by Albrecht Dürer",
+      "creators": [
+        "Albrecht Dürer"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q64511780",
+        "label": "Adam and Eve",
+        "description": "painting by Joaquín Torres-García",
+        "creators": [
+          "Joaquín Torres-García"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q58701",
+        "label": "Adam and Eve",
+        "description": "first man and woman in Abrahamic creation myth",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q124253324",
+        "label": "Adam and Eve",
+        "creators": [
+          "Faustino Brughetti"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3898508",
+        "label": "Adam and Eve",
+        "description": "series of engravings by Albrecht Dürer",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q4678604",
+        "label": "Adam & Eve",
+        "description": "American marketer of sex toys and other adult products",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q9140602",
+        "label": "The Fall of Man",
+        "description": "painting by Titian",
+        "creators": [
+          "Titian"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3605057",
+        "label": "The Fall of Man",
+        "description": "painting by Peter Paul Rubens",
+        "creators": [
+          "Peter Paul Rubens"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q3605052",
+        "label": "Adam and Eve",
+        "description": "paintings by Hans Baldung",
+        "creators": [
+          "Hans Baldung Grien"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q20815",
+        "label": "Aplectrum",
+        "description": "genus of plants",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q351300",
+        "label": "Adam and Eve",
+        "description": "two paintings by Albrecht Dürer in the Museo del Prado",
+        "creators": [
+          "Albrecht Dürer"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Sleep of Reason Produces Monsters",
+    "expectedArtist": "Francisco Goya",
+    "selected": {
+      "id": "Q671237",
+      "label": "The Sleep of Reason Produces Monsters",
+      "description": "aquatint by Francisco de goya from the series Los Caprichos",
+      "creators": [
+        "Francisco Goya"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q671237",
+        "label": "The Sleep of Reason Produces Monsters",
+        "description": "aquatint by Francisco de goya from the series Los Caprichos",
+        "creators": [
+          "Francisco Goya"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q114463925",
+        "label": "The Sleep of Reason Produces Monsters",
+        "description": "episode of Switched at Birth (S1 E21)",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q91948627",
+        "label": "The Sleep of Reason Produces Monsters (El sueno de la razon produce monstruos) From the series, Los Caprichos, pl. 43, 1795-1798/second ed.",
+        "description": "visual artwork by Francisco José de Goya y Lucientes",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q79513557",
+        "label": "The Sleep of Reason Produces Monsters, Plate 43",
+        "description": "print by Francisco de Goya (Spanish, 1746-1828) (1922.638)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q73247927",
+        "label": "The sleep of reason produces monsters -- human costs of economic sanctions",
+        "description": "scientific article published on 01 April 1997",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Three Trees",
+    "expectedArtist": "Rembrandt",
+    "selected": {
+      "id": "Q4462833",
+      "label": "The Three Trees",
+      "description": "print by Rembrandt",
+      "creators": [
+        "Rembrandt"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q4462833",
+        "label": "The Three Trees",
+        "description": "print by Rembrandt",
+        "creators": [
+          "Rembrandt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q20491012",
+        "label": "The Three Trees",
+        "description": "painting by W. L. Lathrop",
+        "creators": [
+          "William Langson Lathrop"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q138303648",
+        "label": "The Three Trees",
+        "description": "pub in West Bletchley, Milton Keynes, Buckinghamshire, England, UK",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q1218057",
+        "label": "The Three Trees",
+        "description": "short story by Anna Seghers",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q65026733",
+        "label": "The Three Trees",
+        "description": "print in the National Gallery of Art (NGA 9942)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q65364833",
+        "label": "The Three Trees",
+        "description": "print in the National Gallery of Art (NGA 43418)",
+        "creators": [
+          "Rembrandt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q65082060",
+        "label": "The Three Trees",
+        "description": "print in the National Gallery of Art (NGA 35123)",
+        "creators": [
+          "Rembrandt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q80042452",
+        "label": "The Three Trees",
+        "description": "print by Rembrandt van Rijn (Dutch, 1606-1669) (1966.334)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q65024916",
+        "label": "The Three Trees",
+        "description": "print in the National Gallery of Art (NGA 11628)",
+        "creators": [
+          "Rembrandt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q79901727",
+        "label": "The Three Trees",
+        "description": "print by James Bretherton (British, 1844); Rembrandt van Rijn (Dutch, 1606-1669) (1944.95)",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Hundred Guilder Print",
+    "expectedArtist": "Rembrandt",
+    "selected": {
+      "id": "Q80018842",
+      "label": "The Hundred Guilder Print",
+      "description": "print by Rembrandt van Rijn (Dutch, 1606-1669) (1942.757)",
+      "creators": [
+        "Rembrandt"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q80017105",
+        "label": "The Hundred Guilder Print",
+        "description": "print by Rembrandt van Rijn (Dutch, 1606-1669) (1942.116)",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q80018842",
+        "label": "The Hundred Guilder Print",
+        "description": "print by Rembrandt van Rijn (Dutch, 1606-1669) (1942.757)",
+        "creators": [
+          "Rembrandt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q65511016",
+        "label": "The Hundred Guilder Print",
+        "description": "print in the National Gallery of Art (NGA 50674)",
+        "creators": [
+          "Léopold Flameng"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Ancient of Days",
+    "expectedArtist": "William Blake",
+    "selected": {
+      "id": "Q2324840",
+      "label": "The Ancient of Days",
+      "description": "painting and series of works by William Blake",
+      "creators": [
+        "William Blake"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q2324840",
+        "label": "The Ancient of Days",
+        "description": "painting and series of works by William Blake",
+        "creators": [
+          "William Blake"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q2070841",
+        "label": "Ancient of Days",
+        "description": "name for God in the Book of Daniel",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q83557007",
+        "label": "The Ancient of Days",
+        "description": "by William Blake",
+        "creators": [
+          "William Blake"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q23699669",
+        "label": "The Ancient of Days",
+        "description": "1827 impression by Blake",
+        "creators": [
+          "William Blake"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q135456766",
+        "label": "The Ancient of Days",
+        "description": "novel by Irving A. Greenfield",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Washington Crossing the Delaware",
+    "expectedArtist": "Emanuel Leutze",
+    "selected": {
+      "id": "Q509806",
+      "label": "Washington Crossing the Delaware",
+      "description": "painting by Emanuel Leutze, Metropolitan Museum of Art",
+      "creators": [
+        "Emanuel Leutze"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q509806",
+        "label": "Washington Crossing the Delaware",
+        "description": "painting by Emanuel Leutze, Metropolitan Museum of Art",
+        "creators": [
+          "Emanuel Leutze"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q16948333",
+        "label": "Washington Crossing the Delaware",
+        "description": "1953 painting by Larry Rivers",
+        "creators": [
+          "Larry Rivers"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q110819859",
+        "label": "Washington Crossing the Delaware",
+        "description": "painting by Emanuel Leutze",
+        "creators": [
+          "Emanuel Leutze"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q108691541",
+        "label": "Washington Crossing the Delaware",
+        "description": "painting by George Washington Mark",
+        "creators": [
+          "George Washington Mark"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q20812745",
+        "label": "Washington Crossing the Delaware",
+        "description": "anonymous painting",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q64515724",
+        "label": "Washington Crossing the Delaware",
+        "description": "1960 painting by Larry Rivers",
+        "creators": [
+          "Larry Rivers"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q64509756",
+        "label": "Washington Crossing the Delaware",
+        "description": "painting by Allen Tucker",
+        "creators": [
+          "Allen Tucker"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q106857591",
+        "label": "Washington Crossing the Delaware",
+        "description": "painting by Justin McCarthy",
+        "creators": [
+          "Justin McCarthy"
+        ],
+        "hasImage": false
+      },
+      {
+        "id": "Q7971587",
+        "label": "Washington's crossing of the Delaware River",
+        "description": "1776 military operation",
+        "creators": [],
+        "hasImage": true
+      },
+      {
+        "id": "Q7971805",
+        "label": "Washington Crossing the Delaware",
+        "description": "poem",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Gross Clinic",
+    "expectedArtist": "Thomas Eakins",
+    "selected": {
+      "id": "Q1213936",
+      "label": "The Gross Clinic",
+      "description": "painting by Thomas Eakins",
+      "creators": [
+        "Thomas Eakins"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q1213936",
+        "label": "The Gross Clinic",
+        "description": "painting by Thomas Eakins",
+        "creators": [
+          "Thomas Eakins"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q38515115",
+        "label": "The Gross Clinic",
+        "description": "scientific article published on May 1, 1991",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q33425180",
+        "label": "The Gross Clinic--portrait of a pioneer",
+        "description": "scientific article",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q38435364",
+        "label": "The Gross clinic, the Agnew clinic, and the Listerian revolution",
+        "description": "scientific article published on November 1, 2011",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Snap the Whip",
+    "expectedArtist": "Winslow Homer",
+    "selected": {
+      "id": "Q19925470",
+      "label": "Snap the Whip",
+      "description": "painting by Winslow Homer in the Metropolitan Museum of Art",
+      "creators": [
+        "Winslow Homer"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q19925470",
+        "label": "Snap the Whip",
+        "description": "painting by Winslow Homer in the Metropolitan Museum of Art",
+        "creators": [
+          "Winslow Homer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q18209719",
+        "label": "Snap the Whip",
+        "description": "painting by Winslow Homer in the Butler Institute of American Art",
+        "creators": [
+          "Winslow Homer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q96741343",
+        "label": "Snap the Whip",
+        "description": "series of paintings and prints by Winslow Homer",
+        "creators": [
+          "Winslow Homer"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q74073755",
+        "label": "Snap-the-Whip",
+        "description": "print in the National Gallery of Art (NGA 67338)",
+        "creators": [],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Heart of the Andes",
+    "expectedArtist": "Frederic Edwin Church",
+    "selected": {
+      "id": "Q334604",
+      "label": "Heart of the Andes",
+      "description": "painting by Frederic Edwin Church",
+      "creators": [
+        "Frederic Edwin Church"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q334604",
+        "label": "Heart of the Andes",
+        "description": "painting by Frederic Edwin Church",
+        "creators": [
+          "Frederic Edwin Church"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q64533420",
+        "label": "The Heart of the Andes",
+        "description": "drawing in the National Gallery of Art (NGA 53117)",
+        "creators": [],
+        "hasImage": false
+      },
+      {
+        "id": "Q77015286",
+        "label": "The Heart of the Andes",
+        "description": "print in the National Gallery of Art (NGA 197981)",
+        "creators": [
+          "William Forrest"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q75118247",
+        "label": "The Heart of the Andes",
+        "description": "print in the National Gallery of Art (NGA 74840)",
+        "creators": [
+          "William Forrest"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "Among the Sierra Nevada, California",
+    "expectedArtist": "Albert Bierstadt",
+    "selected": {
+      "id": "Q20475372",
+      "label": "Among the Sierra Nevada, California",
+      "description": "painting by Albert Bierstadt",
+      "creators": [
+        "Albert Bierstadt"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q20475372",
+        "label": "Among the Sierra Nevada, California",
+        "description": "painting by Albert Bierstadt",
+        "creators": [
+          "Albert Bierstadt"
+        ],
+        "hasImage": true
+      }
+    ]
+  },
+  {
+    "title": "The Banjo Lesson",
+    "expectedArtist": "Henry Ossawa Tanner",
+    "selected": {
+      "id": "Q20180595",
+      "label": "The Banjo Lesson",
+      "description": "painting by Henry Ossawa Tanner",
+      "creators": [
+        "Henry Ossawa Tanner"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q20180595",
+        "label": "The Banjo Lesson",
+        "description": "painting by Henry Ossawa Tanner",
+        "creators": [
+          "Henry Ossawa Tanner"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q65362432",
+        "label": "The Banjo Lesson",
+        "description": "print in the National Gallery of Art (NGA 45972)",
+        "creators": [
+          "Mary Cassatt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q38420887",
+        "label": "The banjo lesson: Henry Ossawa Tanner",
+        "description": "scientific article published on May 2014",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Thankful Poor",
+    "expectedArtist": "Henry Ossawa Tanner",
+    "selected": {
+      "id": "Q104836934",
+      "label": "The Thankful Poor",
+      "description": "painting by Henry Ossawa Tanner",
+      "creators": [
+        "Henry Ossawa Tanner"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q104836934",
+        "label": "The Thankful Poor",
+        "description": "painting by Henry Ossawa Tanner",
+        "creators": [
+          "Henry Ossawa Tanner"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q107417356",
+        "label": "The Thankful Poor",
+        "description": "scholarly article",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "The Child's Bath",
+    "expectedArtist": "Mary Cassatt",
+    "selected": {
+      "id": "Q3172226",
+      "label": "The Child's Bath",
+      "description": "painting by Mary Cassatt",
+      "creators": [
+        "Mary Cassatt"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q3172226",
+        "label": "The Child's Bath",
+        "description": "painting by Mary Cassatt",
+        "creators": [
+          "Mary Cassatt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q38453988",
+        "label": "The Child's Bath",
+        "description": "scientific article published on October 2008",
+        "creators": [],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "In the Loge",
+    "expectedArtist": "Mary Cassatt",
+    "selected": {
+      "id": "Q14915747",
+      "label": "In the Loge",
+      "description": "painting by Mary Cassatt",
+      "creators": [
+        "Mary Cassatt"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q14915747",
+        "label": "In the Loge",
+        "description": "painting by Mary Cassatt",
+        "creators": [
+          "Mary Cassatt"
+        ],
+        "hasImage": true
+      },
+      {
+        "id": "Q65364367",
+        "label": "In the Loge",
+        "description": "print in the National Gallery of Art (NGA 41797)",
+        "creators": [
+          "Pierre Bonnard"
+        ],
+        "hasImage": false
+      }
+    ]
+  },
+  {
+    "title": "Little Girl in a Blue Armchair",
+    "expectedArtist": "Mary Cassatt",
+    "selected": {
+      "id": "Q3640080",
+      "label": "Little Girl in a Blue Armchair",
+      "description": "painting by Mary Cassatt",
+      "creators": [
+        "Mary Cassatt"
+      ],
+      "hasImage": true
+    },
+    "matches": [
+      {
+        "id": "Q3640080",
+        "label": "Little Girl in a Blue Armchair",
+        "description": "painting by Mary Cassatt",
+        "creators": [
+          "Mary Cassatt"
+        ],
+        "hasImage": true
+      }
+    ]
+  }
+]

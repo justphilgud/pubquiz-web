@@ -1,0 +1,4202 @@
+[
+  {
+    "wikidataId": "Q12418",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mona%20Lisa%2C%20by%20Leonardo%20da%20Vinci%2C%20from%20C2RMF%20natural%20color.jpg",
+    "sitelinks": 134
+  },
+  {
+    "wikidataId": "Q128910",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20%281452-1519%29%20-%20The%20Last%20Supper%20%281495-1498%29.jpg",
+    "sitelinks": 84
+  },
+  {
+    "wikidataId": "Q45585",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Starry%20Night%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 75
+  },
+  {
+    "wikidataId": "Q185372",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/1665%20Girl%20with%20a%20Pearl%20Earring.jpg",
+    "sitelinks": 71
+  },
+  {
+    "wikidataId": "Q29530",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Libert%C3%A9%20guidant%20le%20peuple%20-%20Eug%C3%A8ne%20Delacroix%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20RF%20129%20-%20apr%C3%A8s%20restauration%202024.jpg",
+    "sitelinks": 67
+  },
+  {
+    "wikidataId": "Q175036",
+    "artistId": "Q5593",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mural%20del%20%22Guernica%22%20de%20Picasso.jpg",
+    "sitelinks": 67
+  },
+  {
+    "wikidataId": "Q151047",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sandro%20Botticelli%20-%20La%20nascita%20di%20Venere%20-%20Google%20Art%20Project%20-%20edited.jpg",
+    "sitelinks": 56
+  },
+  {
+    "wikidataId": "Q219831",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20ronda%20de%20noche%2C%20por%20Rembrandt%20van%20Rijn.jpg",
+    "sitelinks": 56
+  },
+  {
+    "wikidataId": "Q208758",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Las%20Meninas%2C%20by%20Diego%20Vel%C3%A1zquez%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 55
+  },
+  {
+    "wikidataId": "Q154469",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/De%20aardappeleters%20-%20s0005V1962%20-%20Van%20Gogh%20Museum.jpg",
+    "sitelinks": 52
+  },
+  {
+    "wikidataId": "Q328523",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Monet%20-%20Impression%2C%20Sunrise.jpg",
+    "sitelinks": 51
+  },
+  {
+    "wikidataId": "Q334138",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Origin-of-the-World.jpg",
+    "sitelinks": 50
+  },
+  {
+    "wikidataId": "Q698487",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Kiss%20-%20Gustav%20Klimt%20-%20Google%20Cultural%20Institute.jpg",
+    "sitelinks": 50
+  },
+  {
+    "wikidataId": "Q1752990",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Death%20of%20Socrates%20MET%20DP-13139-001.jpg",
+    "sitelinks": 50
+  },
+  {
+    "wikidataId": "Q321303",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Garden%20of%20Earthly%20Delights%20by%20Bosch%20High%20Resolution%202.jpg",
+    "sitelinks": 48
+  },
+  {
+    "wikidataId": "Q474338",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Lady%20with%20an%20Ermine%20-%20Leonardo%20da%20Vinci%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 48
+  },
+  {
+    "wikidataId": "Q1892745",
+    "artistId": "Q1089243",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%2C%20Salvator%20Mundi%2C%20c.1500%2C%20oil%20on%20walnut%2C%2045.4%20%C3%97%2065.6%20cm.jpg",
+    "sitelinks": 47
+  },
+  {
+    "wikidataId": "Q311243",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Friedrich%2C%20Caspar%20David%20-%20Wanderer%20%C3%BCber%20dem%20Nebelmeer.jpg",
+    "sitelinks": 47
+  },
+  {
+    "wikidataId": "Q1892745",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%2C%20Salvator%20Mundi%2C%20c.1500%2C%20oil%20on%20walnut%2C%2045.4%20%C3%97%2065.6%20cm.jpg",
+    "sitelinks": 47
+  },
+  {
+    "wikidataId": "Q212616",
+    "artistId": "Q184212",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/JEAN%20LOUIS%20TH%C3%89ODORE%20G%C3%89RICAULT%20-%20La%20Balsa%20de%20la%20Medusa%20%28Museo%20del%20Louvre%2C%201818-19%29.jpg",
+    "sitelinks": 46
+  },
+  {
+    "wikidataId": "Q478271",
+    "artistId": "Q172911",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ilja%20Jefimowitsch%20Repin%20-%20Reply%20of%20the%20Zaporozhian%20Cossacks%20-%20Yorck.jpg",
+    "sitelinks": 45
+  },
+  {
+    "wikidataId": "Q464782",
+    "artistId": "Q217434",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Grant%20Wood%20-%20American%20Gothic%20%281930%29.jpg",
+    "sitelinks": 44
+  },
+  {
+    "wikidataId": "Q152509",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20Luncheon%20on%20the%20Grass%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 44
+  },
+  {
+    "wikidataId": "Q1091086",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Francisco%20de%20Goya%20y%20Lucientes%20-%20Los%20fusilamientos%20del%20tres%20de%20mayo%20-%201814.jpg",
+    "sitelinks": 44
+  },
+  {
+    "wikidataId": "Q152867",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Maja%20desnuda%20%28museo%20del%20Prado%29.jpg",
+    "sitelinks": 44
+  },
+  {
+    "wikidataId": "Q683274",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Renoir%2C%20Pierre-Auguste%20-%20Dance%20at%20Le%20Moulin%20de%20la%20Galette%2C%201876.jpg",
+    "sitelinks": 43
+  },
+  {
+    "wikidataId": "Q167605",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20Het%20melkmeisje%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 43
+  },
+  {
+    "wikidataId": "Q661378",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20-%20The%20Anatomy%20Lesson%20of%20Dr%20Nicolaes%20Tulp.jpg",
+    "sitelinks": 43
+  },
+  {
+    "wikidataId": "Q220859",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Eyck%20-%20Arnolfini%20Portrait.jpg",
+    "sitelinks": 42
+  },
+  {
+    "wikidataId": "Q634122",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Korenveld%20met%20kraaien%20-%20s0149V1962%20-%20Van%20Gogh%20Museum.jpg",
+    "sitelinks": 42
+  },
+  {
+    "wikidataId": "Q2282256",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Irises-Vincent%20van%20Gogh.jpg",
+    "sitelinks": 41
+  },
+  {
+    "wikidataId": "Q476458",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20Serment%20des%20Horaces%20-%20Jacques-Louis%20David%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%203692%20%3B%20MR%201432.jpg",
+    "sitelinks": 41
+  },
+  {
+    "wikidataId": "Q549847",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sandro%20Botticelli%20-%20La%20Primavera%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 41
+  },
+  {
+    "wikidataId": "Q737062",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20Olympia%20-%20Google%20Art%20Project%203.jpg",
+    "sitelinks": 40
+  },
+  {
+    "wikidataId": "Q523974",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20View%20of%20Delft%20-%2092%20-%20Mauritshuis.jpg",
+    "sitelinks": 39
+  },
+  {
+    "wikidataId": "Q1267893",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ginevra%20de%27%20Benci%20-%20National%20Gallery%20of%20Art.jpg",
+    "sitelinks": 39
+  },
+  {
+    "wikidataId": "Q727875",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tiziano%27s%20Venere%20di%20Urbino%20%28from%20The%20History%20BLog%29.jpg",
+    "sitelinks": 39
+  },
+  {
+    "wikidataId": "Q1025704",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Terrace%20of%20a%20Caf%C3%A9%20at%20Night%20%28Place%20du%20Forum%29%201888.jpg",
+    "sitelinks": 39
+  },
+  {
+    "wikidataId": "Q636537",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jacques-Louis%20David%20-%20Marat%20assassinated%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 39
+  },
+  {
+    "wikidataId": "Q734834",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ghent%20Altarpiece%20by%20Jan%20van%20Eyck%20ALL.jpg",
+    "sitelinks": 38
+  },
+  {
+    "wikidataId": "Q1245354",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Un%20bar%20aux%20Folies-Berg%C3%A8re%20d%27E.%20Manet%20%28Fondation%20Vuitton%2C%20Paris%29%20%2833539037428%29.jpg",
+    "sitelinks": 38
+  },
+  {
+    "wikidataId": "Q734834",
+    "artistId": "Q364350",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ghent%20Altarpiece%20by%20Jan%20van%20Eyck%20ALL.jpg",
+    "sitelinks": 38
+  },
+  {
+    "wikidataId": "Q563727",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sainte%20Anne%20Leonard.jpg",
+    "sitelinks": 38
+  },
+  {
+    "wikidataId": "Q500985",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20Hunters%20in%20the%20Snow%20%28Winter%29%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 38
+  },
+  {
+    "wikidataId": "Q83872",
+    "artistId": "Q203401",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Nighthawks%20by%20Edward%20Hopper%201942.jpg",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q604761",
+    "artistId": "Q192720",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Thomas%20Gainsborough%20-%20The%20Blue%20Boy%20%28c.%201770%29.jpg",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q1133420",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Velazquez-The%20Surrender%20of%20Breda.jpg",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q1231009",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20Sacre%20de%20Napol%C3%A9on%20-%20Jacques-Louis%20David%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%203699%20%3B%20MR%201437.jpg",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q1464531",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Starry%20Night%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q674846",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20Willem%20van%20Gogh%20076.jpg",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q1142058",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%2C%20Madonna%20Benois.JPG",
+    "sitelinks": 37
+  },
+  {
+    "wikidataId": "Q1150997",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Francisco%20de%20Goya%2C%20Saturno%20devorando%20a%20su%20hijo%20%281819-1823%29.jpg",
+    "sitelinks": 36
+  },
+  {
+    "wikidataId": "Q533619",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20%28der%20%C3%84ltere%29%20%28ca.%201525%20-%201569%29%20-%20Die%20niederl%C3%A4ndischen%20Sprichw%C3%B6rter%20-%201720%20-%20Gem%C3%A4ldegalerie.jpg",
+    "sitelinks": 36
+  },
+  {
+    "wikidataId": "Q1213917",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20The%20Church%20in%20Auvers-sur-Oise%2C%20View%20from%20the%20Chevet%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 36
+  },
+  {
+    "wikidataId": "Q500812",
+    "artistId": "Q8459",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giorgione%20-%20Sleeping%20Venus%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 36
+  },
+  {
+    "wikidataId": "Q1926628",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Red%20Vineyard%20at%20Arles%20%281888%29.jpg",
+    "sitelinks": 36
+  },
+  {
+    "wikidataId": "Q500812",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giorgione%20-%20Sleeping%20Venus%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 36
+  },
+  {
+    "wikidataId": "Q1070896",
+    "artistId": "Q181568",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hovhannes%20Aivazovsky%20-%20The%20Ninth%20Wave%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 35
+  },
+  {
+    "wikidataId": "Q175628",
+    "artistId": "Q172911",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ilya%20Repin%20-%20Barge%20Haulers%20on%20the%20Volga%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 35
+  },
+  {
+    "wikidataId": "Q1044742",
+    "artistId": "Q34013",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/A%20Sunday%20on%20La%20Grande%20Jatte%2C%20Georges%20Seurat%2C%201884.jpg",
+    "sitelinks": 35
+  },
+  {
+    "wikidataId": "Q2200610",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20The%20yellow%20house%20%28%27The%20street%27%29.jpg",
+    "sitelinks": 35
+  },
+  {
+    "wikidataId": "Q328079",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20-%20The%20Sistine%20Madonna%20-%20Google%20Arts%20%26%20Culture.jpg",
+    "sitelinks": 35
+  },
+  {
+    "wikidataId": "Q354396",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustav%20Klimt%2C%201907%2C%20Adele%20Bloch-Bauer%20I%2C%20Neue%20Galerie%20New%20York.jpg",
+    "sitelinks": 34
+  },
+  {
+    "wikidataId": "Q930137",
+    "artistId": "Q8459",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giorgione%20-%20Das%20Gewitter.jpg",
+    "sitelinks": 34
+  },
+  {
+    "wikidataId": "Q1170315",
+    "artistId": "Q130777",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%D0%A7%D1%91%D1%80%D0%BD%D1%8B%D0%B9%20%D1%81%D1%83%D0%BF%D1%80%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D0%BA%D0%B2%D0%B0%D0%B4%D1%80%D0%B0%D1%82.%201915.%20%D0%93%D0%A2%D0%93.png",
+    "sitelinks": 33
+  },
+  {
+    "wikidataId": "Q2629559",
+    "artistId": "Q127171",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Fragonard%2C%20The%20Swing.jpg",
+    "sitelinks": 33
+  },
+  {
+    "wikidataId": "Q1978815",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20grande%20odalisque%20-%20Jean-Auguste%20Dominique%20Ingres%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20RF%201158.jpg",
+    "sitelinks": 33
+  },
+  {
+    "wikidataId": "Q783215",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20-%20Saint%20John%20the%20Baptist%20C2RMF%20retouched.jpg",
+    "sitelinks": 33
+  },
+  {
+    "wikidataId": "Q1212937",
+    "artistId": "Q48319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hans%20Holbein%20the%20Younger%20-%20The%20Ambassadors%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 33
+  },
+  {
+    "wikidataId": "Q546241",
+    "artistId": "8ae9eff5d369995d380e8b3a3c59c98e",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vladimirskaja%20ikona%20Bo%C5%BEiej%20Materi.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q1065493",
+    "artistId": "Q159606",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Everett%20Millais%20-%20Ophelia%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q540488",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20-%20A%20Burial%20at%20Ornans%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q544315",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20The%20Astronomer%20-%201668.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q1283024",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20The%20Birth%20of%20Venus%20%281879%29.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q656434",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Belle%20Ferroni%C3%A8re%20-%20Google%20Arts.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q969377",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20%E2%80%94%20The%20Calling%20of%20Saint%20Matthew.jpg",
+    "sitelinks": 32
+  },
+  {
+    "wikidataId": "Q4195595",
+    "artistId": "Q172911",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Iv%C3%A1n%20el%20Terrible%20y%20su%20hijo%2C%20por%20Ili%C3%A1%20Repin.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q326503",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20-%20Le%20Sommeil%20%281866%29%2C%20Paris%2C%20Petit%20Palais.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q588695",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20-%20The%20Art%20of%20Painting%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q890678",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gauguin%20-%20Where%20Do%20We%20Come%20From%3F%20What%20Are%20We%3F%20Where%20Are%20We%20Going%3F%20%281897-98%29.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q500951",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Gauguin%20-%20The%20Yellow%20Christ%20%28Le%20Christ%20jaune%29%201889.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q2246489",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20Christ%20in%20the%20Storm%20on%20the%20Lake%20of%20Galilee.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q546297",
+    "artistId": "Q5681",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Lamentaci%C3%B3n%20sobre%20Cristo%20muerto%2C%20por%20Andrea%20Mantegna.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q766782",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20Harmensz.%20van%20Rijn%20-%20Portret%20van%20een%20paar%20als%20oudtestamentische%20figuren%2C%20genaamd%20%27Het%20Joodse%20bruidje%27%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q1061035",
+    "artistId": "Q7836",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Magritte%20treachery.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q1638622",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%2C%20Adoration%2C%20c1481%2C%20Uffizi.jpg",
+    "sitelinks": 31
+  },
+  {
+    "wikidataId": "Q586035",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20Gezicht%20op%20huizen%20in%20Delft%2C%20bekend%20als%20%27Het%20straatje%27%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q275349",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Vel%C3%A1zquez%20-%20Rokeby%20Venus.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q3869871",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Gauguin%2C%20Nafea%20Faa%20Ipoipo%3F%20%28When%20Will%20You%20Marry%3F%29%201892%2C%20oil%20on%20canvas%2C%20101%20x%2077%20cm.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q185255",
+    "artistId": "Q9440",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Les%20Noces%20de%20Cana%20-%20Paolo%20Veronese%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%20142%20%3B%20MR%20384.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q644856",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Triumph%20of%20Death%20by%20Pieter%20Bruegel%20the%20Elder.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q14866847",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sunset%20at%20Montmajour%201888%20Van%20Gogh.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q1217213",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Annunciation%20%28Leonardo%29%20%28cropped%29.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q153441",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Sanzio%20-%20La%20Fornarina%20%28ca.%201519-1520%29.jpg",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q1473546",
+    "artistId": "Q5592",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tondo%20Doni%202015.png",
+    "sitelinks": 30
+  },
+  {
+    "wikidataId": "Q2666439",
+    "artistId": "Q193064",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Shishkin%2C%20Ivan%20-%20Morning%20in%20a%20Pine%20Forest.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q687182",
+    "artistId": "Q203643",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Whistlers%20Mother%20high%20res.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1059211",
+    "artistId": "Q183458",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Verrocchio%20and%20Leonardo%2C%20Baptism%20of%20Christ%2C%20c1470-75%2C%20Uffizi.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q2366825",
+    "artistId": "Q159297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Constable%20-%20The%20Hay%20Wain%20%281821%29.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1167178",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Courbet%20LAtelier%20du%20peintre.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q984058",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Velazquez-las%20hilanderas.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1133821",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Mort%20de%20Sardanapale%20-%20Eug%C3%A8ne%20Delacroix%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20RF%202346.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q2666439",
+    "artistId": "Q958052",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Shishkin%2C%20Ivan%20-%20Morning%20in%20a%20Pine%20Forest.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q512755",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20Harmensz%20van%20Rijn%20-%20Return%20of%20the%20Prodigal%20Son%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q698015",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/LEONARDO-DA-VINCI%20-%20MADONNA-MIT-DER-NELKE-7779%20917154%20BSTGS.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1239950",
+    "artistId": "Q46373",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edgar%20Degas%20-%20In%20a%20Caf%C3%A9%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1192570",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bruegel%2C%20Pieter%20%28I%29%20-%20Blind%20leading%20the%20blind%20Google%20Art%20Project.jpeg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1059211",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Verrocchio%20and%20Leonardo%2C%20Baptism%20of%20Christ%2C%20c1470-75%2C%20Uffizi.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q920030",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20familia%20de%20Carlos%20IV%2C%20por%20Francisco%20de%20Goya.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1327676",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20attributed%20-%20Madonna%20Litta.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q2727560",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20decapitaci%C3%B3n%20de%20San%20Juan%20Bautista%2C%20por%20Caravaggio.jpg",
+    "sitelinks": 29
+  },
+  {
+    "wikidataId": "Q1167907",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%20-%20Luncheon%20of%20the%20Boating%20Party%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q1215604",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean%20Auguste%20Dominique%20Ingres%20-%20The%20Spring%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q1215604",
+    "artistId": "Q3370554",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean%20Auguste%20Dominique%20Ingres%20-%20The%20Spring%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q2290433",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sc%C3%A8ne%20des%20massacres%20de%20Scio%2C%20Eug%C3%A8ne%20Delacroix%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%203823%20%3B%20C3.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q94802",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Greco%20-%20The%20Burial%20of%20the%20Count%20of%20Orgaz.JPG",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q1215604",
+    "artistId": "Q2833597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean%20Auguste%20Dominique%20Ingres%20-%20The%20Spring%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q1651874",
+    "artistId": "Q214062",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Wright%20of%20Derby%2C%20The%20Orrery.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q603751",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20Peasant%20Wedding%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q318947",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Supper%20at%20Emmaus%20-%20National%20Gallery%20London.jpeg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q2546309",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/D%C3%BCrer%20Alte%20Pinakothek.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q2344505",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%2C%20Madonna%20del%20Cardellino%2C%201507%2C%20Uffizi.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q500554",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/At%20Eternity%27s%20Gate%20-%20Vincent%20Van%20Gogh.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q2293905",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Medusa%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q2470123",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Judith%20Beheading%20Holofernes%20-%20Caravaggio.jpg",
+    "sitelinks": 28
+  },
+  {
+    "wikidataId": "Q2629423",
+    "artistId": "Q127171",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Fragonard%2C%20The%20Reader.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q334360",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caspar%20David%20Friedrich%20-%20Abtei%20im%20Eichwald%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q1195035",
+    "artistId": "Q223725",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Beso%20%28Pinacoteca%20de%20Brera%2C%20Mil%C3%A1n%2C%201859%29.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q883994",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Toledo%20MET%20DP349564.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q2735507",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Goya%20Maja%20ubrana2.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q2030685",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20-%20Spozalizio%20-%20Web%20Gallery%20of%20Art.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q474024",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Cupid%20as%20Victor%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q1122842",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Die%20Elster%20auf%20dem%20Galgen.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q2293936",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Young%20Sick%20Bacchus-Caravaggio%20%281593%29.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q2338404",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20-%20Portrait%20of%20a%20Musician%20-%20Pinacoteca%20Ambrosiana.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q877191",
+    "artistId": "Q8459",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giorgione%20-%20Three%20Philosophers%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 27
+  },
+  {
+    "wikidataId": "Q1219263",
+    "artistId": "Q156386",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Boh%C3%A9mienne%20endormie.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q194137",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Friedrich%2C%20Caspar%20David%20-%20Eismeer.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q1217003",
+    "artistId": "Q207758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Kramskoy%20Portrait%20of%20a%20Woman.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q969367",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20Woman%20Holding%20a%20Balance%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q2354251",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Eug%C3%A8ne%20Delacroix%20-%20The%20Barque%20of%20Dante.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q775407",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20The%20Balcony%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q2027662",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20Bain%20Turc%2C%20by%20Jean%20Auguste%20Dominique%20Ingres%2C%20from%20C2RMFFXD.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q700251",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20-%20Brieflezend%20meisje%20bij%20het%20venster%20%28ca.%201657-59%29.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q2293953",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Venus%20and%20Mars.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q568847",
+    "artistId": "Q68631",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Descendimiento%2C%20by%20Rogier%20van%20der%20Weyden%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q597114",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Death%20of%20the%20Virgin-Caravaggio%20%281606%29.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q2294441",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20Harmensz.%20van%20Rijn%20026.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q1899740",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tizian%20041.jpg",
+    "sitelinks": 26
+  },
+  {
+    "wikidataId": "Q2664039",
+    "artistId": "Q155626",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sargent%20MadameX.jpeg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q1516449",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Virgin%20with%20Chancellor%20Rolin%20by%20Jan%20van%20Eyck%20%28Louvre%29.webp",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q2339059",
+    "artistId": "Q159758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Turner%20-%20Rain%2C%20Steam%20and%20Speed%20-%20National%20Gallery%20file.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q1368055",
+    "artistId": "Q148458",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-Fran%C3%A7ois%20Millet%20-%20Des%20glaneuses.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q1167796",
+    "artistId": "Q214062",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/An%20Experiment%20on%20a%20Bird%20in%20an%20Air%20Pump%20by%20Joseph%20Wright%20of%20Derby%2C%201768.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q2011510",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Baco%2C%20por%20Caravaggio.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q2521909",
+    "artistId": "Q4768",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Karl%20Brullov%20-%20The%20Last%20Day%20of%20Pompeii%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q1167932",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt-Belsazar.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q2610675",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Fortune%20Teller-Caravaggio%20%28Louvre%29.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q2045726",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Ruben%27s%20copy%20of%20the%20lost%20Battle%20of%20Anghiari.jpg",
+    "sitelinks": 25
+  },
+  {
+    "wikidataId": "Q1247110",
+    "artistId": "20e9cd436e0998b3d9617764a486424c",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20Landscape%20with%20the%20Fall%20of%20Icarus%20-%20Brussels%2C%20Royal%20Museums%20of%20Fine%20Arts%20of%20Belgium%20-%20Google%20Arts%20%26%20Culture.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q405814",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jheronimus%20Bosch%20011.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q210277",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%89douard%20Manet%20-%20Music%20in%20the%20Tuileries%20Gardens.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q166937",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%2C%20Johannes%20-%20Woman%20reading%20a%20letter%20-%20ca.%201662-1663.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q210277",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/MANET%20-%20M%C3%BAsica%20en%20las%20Tuller%C3%ADas%20%28National%20Gallery%2C%20Londres%2C%201862%29.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2409245",
+    "artistId": "Q312616",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Petrus%20Christus%20-%20Portrait%20of%20a%20Young%20Woman%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q45130",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%2C%20Der%20Geograf%2C%201669.png",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2409245",
+    "artistId": "Q312616",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Petrus%20Christus%20%28um%201410-20%20-%20um%201475%29%20-%20Portrait%20of%20a%20Young%20Lady%20-%20532%20-%20Gem%C3%A4ldegalerie.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q1652023",
+    "artistId": "Q214062",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Joseph%20Wright%20of%20Derby%20The%20Alchemist.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q1169395",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20The%20Concert.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2336984",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20Lady%20at%20the%20Virginal%20with%20a%20Gentleman%2C%20%27The%20Music%20Lesson%27%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2697937",
+    "artistId": "Q5603",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Campbell%27s%20Soup%20Cans%20by%20Andy%20Warhol.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q7536969",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Kop%20van%20een%20skelet%20met%20brandende%20sigaret%20-%20s0083V1962%20-%20Van%20Gogh%20Museum.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q948034",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20velada%2C%20por%20Rafael.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2983399",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20dos%20de%20mayo%20de%201808%20en%20Madrid.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q794077",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tiziano%20-%20Amor%20Sacro%20y%20Amor%20Profano%20%28Galer%C3%ADa%20Borghese%2C%20Roma%2C%201514%29FXD.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q5930190",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Road%20with%20Cypress%20and%20Star%20-%20c.%2012-15%20May%201890.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2360329",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rapha%C3%ABl%20-%20Les%20Trois%20Gr%C3%A2ces%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q488825",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Zanobi-Altar.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q2627056",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/David%20with%20the%20Head%20of%20Goliath-Caravaggio%20%281610%29.jpg",
+    "sitelinks": 24
+  },
+  {
+    "wikidataId": "Q701035",
+    "artistId": "Q106851",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Das%20J%C3%BCngste%20Gericht%20%28Memling%29.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q1217288",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Temptation%20of%20Saint%20Anthony.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2247406",
+    "artistId": "Q212657",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Artemisia%20Gentileschi%20-%20Judith%20Beheading%20Holofernes%20-%20WGA8563.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2304870",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hieronymus%20Bosch-%20The%20Seven%20Deadly%20Sins%20and%20the%20Four%20Last%20Things.JPG",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q846213",
+    "artistId": "Q160252",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Flaming%20June%2C%20by%20Frederic%20Lord%20Leighton%20%281830-1896%29.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q701035",
+    "artistId": "Q106851",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Memling%2C%20giudizio%20universale%2020.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q8030760",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Woman%20with%20a%20Parrot%20MET%20DT43.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q1216387",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20The%20lacemaker%20%28c.1669-1671%29.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q1445107",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustav%20Klimt%20010.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q63692",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20The%20Procuress%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q467376",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20De%20Soldaat%20en%20het%20Lachende%20Meisje%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2270938",
+    "artistId": "Q35548",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20C%C3%A9zanne%2C%20French%20-%20The%20Large%20Bathers%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q1118456",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Swing-Renoir.jpeg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q776175",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder-%20The%20Harvesters%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q663133",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20The%20Cardsharps%20%281596-97%29%20Kimbell%20Art%20Museum.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2338417",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20%E2%80%94%20The%20Martyrdom%20of%20Saint%20Matthew.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q1171740",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Whitehousenight.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2665048",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William%20Bouguereau%20-%20Dante%20and%20Virgile%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q972196",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20da%20Vinci%20%E2%80%94%20Jerome.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q685916",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Crucifixion%20of%20Saint%20Peter-Caravaggio%20%28c.1600%29.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2610936",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Boy%20with%20a%20Basket%20of%20Fruit-Caravaggio%20%281593%29.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q509806",
+    "artistId": "Q452321",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Washington%20Crossing%20the%20Delaware%20MET%20DP215410.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2439462",
+    "artistId": "Q68631",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rogier%20van%20der%20Weyden%20-%20Portrait%20of%20a%20Lady%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2035209",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20%281483-1520%29%20-%20La%20Madonna%20del%20Granduca%20-%20178%20-%20Galleria%20Palatina.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q867403",
+    "artistId": "Q9348",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Parmigianino%20-%20Madonna%20and%20Child%20with%20Angels%2C%20known%20as%20the%20Madonna%20with%20the%20Long%20Neck.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q1430990",
+    "artistId": "Q7803",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Angelo%20Bronzino%20-%20Venus%2C%20Cupid%2C%20Folly%20and%20Time%20-%20National%20Gallery%2C%20London.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q26220165",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20The%20Parsonage%20Garden%20at%20Nuenen.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q13528770",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Portrait%20of%20Pere%20Tanguy%201887-8.JPG",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2344437",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Transfigurazione%20%28Raffaello%29%20September%202015-1a.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q254923",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%2C%20The%20Alba%20Madonna%2C%20c.%201510%2C%20NGA%2026.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q2653851",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Rubens%20-%20Raising%20of%20the%20Cross%20%28Cathedral%20of%20Antwerp%29.jpg",
+    "sitelinks": 23
+  },
+  {
+    "wikidataId": "Q257580",
+    "artistId": "Q159758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Turner%2C%20J.%20M.%20W.%20-%20The%20Fighting%20T%C3%A9m%C3%A9raire%20tugged%20to%20her%20last%20Berth%20to%20be%20broken.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2317837",
+    "artistId": "Q122382",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Henry%20Fuseli%20-%20The%20Nightmare.JPG",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q9295442",
+    "artistId": "Q212754",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Waterhouse%20Hylas%20and%20the%20Nymphs%20Manchester%20Art%20Gallery%201896.15.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2213811",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jheronimus%20Bosch%20-%20De%20hooiwagen%20%28c.1516%2C%20Prado%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q1452762",
+    "artistId": "Q295144",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Caillebotte%20-%20Paris%20Street%2C%20Rainy%20Day%20-%201964.336%20-%20Art%20Institute%20of%20Chicago.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2395218",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20-%20Woman%20with%20a%20Parasol%20-%20Madame%20Monet%20and%20Her%20Son%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2501284",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%2C%20French%20-%20The%20Large%20Bathers%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q432253",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20-%20Jardin%20%C3%A0%20Sainte-Adresse.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q930535",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Gauguin%20056.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q1240092",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Vel%C3%A1zquez%2C%20Portrait%20du%20pape%20Innocent%20X%2C%201650%2C%20huile%20sur%20toile%2C%20140%20%C3%97%20120%20cm%2C%20Rome%2C%20Galleria%20Doria%20Pamphilj%20%28inv.%20237%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2734892",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20024.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2324643",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Judith%201%20%28cropped%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q927449",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20%28Jan%29%20Vermeer%20-%20Christ%20in%20the%20House%20of%20Martha%20and%20Mary%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2535473",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Velazquez%20-%20%D0%97%D0%B0%D0%B2%D1%82%D1%80%D0%B0%D0%BA%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2471800",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Velazquez%20-%20An%20Old%20Woman%20Cooking%20Eggs%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q39013",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Woman%20in%20the%20Waves%20MET%20DT887.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q386453",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20019.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q3808227",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Auguste%20Renoir%20-%20Young%20Girls%20at%20the%20Piano%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2343778",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Vierge%20%C3%A0%20l%27Enfant%20avec%20le%20petit%20saint%20Jean%20Baptiste%20-%20Rapha%C3%ABl%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%20602%20%3B%20MR%20433.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q3555076",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20Nymphs%20and%20Satyr%20%281873%29%20HQ.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q951105",
+    "artistId": "Q9440",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Feast%20in%20the%20House%20of%20Levi%20by%20Paolo%20Veronese%20%28edited%202%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q555821",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Sanzio.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q1314013",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Intervention%20of%20the%20Sabine%20Women%20-%20David%20%28Louvre%20INV%203691%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q966681",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20Madonna%20della%20seggiola.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q1123378",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Carlos%20V%20en%20M%C3%BChlberg%2C%20by%20Titian%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q552040",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sanzio%20Raffaello%20-%20Visione%20del%20cavaliere%20%28circa%201504%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q3555076",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William-Adolphe%20Bouguereau%20-%20Nymphs%20and%20Satyr%20-%201955.658%20-%20Clark%20Art%20Institute.tiff",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2327759",
+    "artistId": "Q5592",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Michelangelo%20Buonarroti%20-%20The%20Torment%20of%20Saint%20Anthony%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2337873",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20La%20inspiraci%C3%B3n%20de%20San%20Mateo%20%28San%20Luigi%20dei%20Francesi%2C%20Roma%29.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q2404992",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20-%20Aristotle%20with%20a%20Bust%20of%20Homer%20-%20WGA19232.jpg",
+    "sitelinks": 22
+  },
+  {
+    "wikidataId": "Q1787143",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Friedrich%2C%20Caspar%20David%20-%20Kreidefelsen%20auf%20R%C3%BCgen.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q680128",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bosch%20-%20Christ%20Carrying%20the%20Cross%2C%20ca.%201510%20-%20ca.%201516%2C%20Inv.%201902-H.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q15008032",
+    "artistId": "Q17169",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giovanni%20Bellini%20and%20Titian%20-%20The%20Feast%20of%20the%20Gods%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2571560",
+    "artistId": "Q148458",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/JEAN-FRAN%C3%87OIS%20MILLET%20-%20El%20%C3%81ngelus%20%28Museo%20de%20Orsay%2C%201857-1859.%20%C3%93leo%20sobre%20lienzo%2C%2055.5%20x%2066%20cm%29.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q531329",
+    "artistId": "Q183221",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/L%27Embarquement%20pour%20Cyth%C3%A8re%2C%20by%20Antoine%20Watteau%2C%20from%20C2RMF%20retouched.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q542066",
+    "artistId": "aff25ac9d91201867caca2ac3df7ceb8",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gabrielle%20d%27Estr%C3%A9es%20et%20une%20de%20ses%20s%C5%93urs%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20RF%201937%201.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q241455",
+    "artistId": "Q153746",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Albrecht%20Altdorfer%20-%20Schlacht%20bei%20Issus%20%28Alte%20Pinakothek%2C%20M%C3%BCnchen%29%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2480921",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Eyck%2C%20Jan%20van%20-%20Madonna%20with%20Canon%20van%20der%20Paele.jpeg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q1747569",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20van%20Eyck%20-%20Madonna%20in%20the%20Church%20-%20WGA7590.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q1212861",
+    "artistId": "Q310437",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Alexandre%20Cabanel%20-%20The%20Birth%20of%20Venus%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q1114571",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%2C%20The%20Umbrellas%2C%20ca.%201881-86.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q1169874",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20006.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q3080509",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-Auguste-Dominique%20Ingres%20-%20La%20Baigneuse%20Valpin%C3%A7on.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2278818",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20In%20the%20caf%C3%A9%20-%20Agostina%20Segatori%20in%20Le%20Tambourin%20-%20Google%20Art%20Project%202.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q655705",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Musicians%20MET%20DP-687-001.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2472983",
+    "artistId": "Q9319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jacopo%20Tintoretto%20-%20The%20Last%20Supper%20-%20WGA22649.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2046100",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tiziano%20-%20Flora%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q1170480",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20-%20De%20Staalmeesters-%20het%20college%20van%20staalmeesters%20%28waardijns%29%20van%20het%20Amsterdamse%20lakenbereidersgilde%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2344357",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/PalaOddiRaffaello.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q2610729",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20of%20Pope%20Leo%20X%20and%20his%20cousins%2C%20cardinals%20Giulio%20de%27%20Medici%20and%20Luigi%20de%27%20Rossi%20%28by%20Raphael%29.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q1212920",
+    "artistId": "Q5822",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piero%20della%20Francesca%20Flagellazione-gndm-full.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q15008032",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giovanni%20Bellini%20and%20Titian%20-%20The%20Feast%20of%20the%20Gods%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q745098",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rest%20on%20the%20Flight%20into%20Egypt-Caravaggio%20%28c.1597%29.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q585437",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Boy%20Bitten%20by%20a%20Lizard.jpg",
+    "sitelinks": 21
+  },
+  {
+    "wikidataId": "Q6609268",
+    "artistId": "Q189117",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Matejko%2C%20Sta%C5%84czyk.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q644936",
+    "artistId": "Q1375268",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Rubens%20-%20The%20Rape%20of%20the%20Daughters%20of%20Leucippus.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1619527",
+    "artistId": "Q192720",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Thomas%20Gainsborough%20-%20Mr.%20und%20Mrs.%20Andrews%20%28c.%201750%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1560719",
+    "artistId": "Q155626",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Singer%20Sargent%20-%20Carnation%2C%20Lily%2C%20Lily%2C%20Rose%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q472799",
+    "artistId": "Q1693898",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mary%2C%20Untier%20of%20Knots%20by%20Schmidtner.png",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2354080",
+    "artistId": "Q207758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ivan%20Kramskoy%20-%20%D0%A5%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%81%20%D0%B2%20%D0%BF%D1%83%D1%81%D1%82%D1%8B%D0%BD%D0%B5%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q5332757",
+    "artistId": "Q212754",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20William%20Waterhouse%20-%20Echo%20and%20Narcissus%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q6609268",
+    "artistId": "Q189117",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Matejko%2C%20Sta%C5%84czyk%20-%20hi-res%20tiff.tif",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q693746",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Friedrich%2C%20Caspar%20David%20-%20M%C3%B6nch%20am%20Meer%20-%20Alte%20Nationalgalerie%20in%20Berlin.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q7769644",
+    "artistId": "Q1190012",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Osman%20Hamdi%20Bey%20-%20The%20Tortoise%20Trainer%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2445726",
+    "artistId": "Q212754",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20William%20Waterhouse%20-%20The%20Lady%20of%20Shalott%20-%20Google%20Art%20Project%20%28derivative%20work%20-%20AutoContrast%20edit%20in%20LCH%20space%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q6609268",
+    "artistId": "Q189117",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Matejko%20-%20Sta%C5%84czyk%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q11791202",
+    "artistId": "Q172911",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ilya%20Repin%20Unexpected%20visitors.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2636368",
+    "artistId": "Q189117",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Matejko%2C%20Bitwa%20pod%20Grunwaldem.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q3205872",
+    "artistId": "Q353628",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Kuindzhi%20Moonlit%20night%20on%20the%20Dnieper%201880%20grm%20x2.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2914912",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20018.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1090837",
+    "artistId": "Q34013",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Baigneurs%20a%20Asnieres.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q276174",
+    "artistId": "Q240526",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Roses%20of%20Heliogabalus.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q74339",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%20%281841-1919%29%20-%20Theatre%20Box%20%28La%20Loge%29%20-%20P.1948.SC.338%20-%20Courtauld%20Gallery.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1212098",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20Le%20Chemin%20de%20fer%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q3642171",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20-%20Bonjour%20Monsieur%20Courbet%20-%20Mus%C3%A9e%20Fabre.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q18686031",
+    "artistId": "Q215251",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hugo%20van%20der%20Goes%20-%20Portinari%20Triptych%20%28c.%201477%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2714617",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Expolio%2C%20por%20El%20Greco.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1782583",
+    "artistId": "Q214062",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Joseph%20Wright%20of%20Derby%20-%20Indian%20Widow%20-%20WGA25901.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q74339",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Loge%20de%20P.-A.%20Renoir%20%28Fondation%20Vuitton%2C%20Paris%29%20%2846499625955%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q107486133",
+    "artistId": "Q310437",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Fallen%20Angel%20%28Alexandre%20Cabanel%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q684935",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20young%20women%20sleeping.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q26250",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Manet%2C%20Edouard%20-%20Young%20Flautist%2C%20or%20The%20Fifer%2C%201866%20%282%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q123935",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vel%C3%A1zquez%20-%20El%20Triunfo%20de%20Baco%20o%20Los%20Borrachos%20%28Museo%20del%20Prado%2C%201628-29%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q247282",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vel%C3%A1zquez%20-%20La%20Fragua%20de%20Vulcano%20%28Museo%20del%20Prado%2C%201630%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q630121",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%20-%20Two%20Sisters%20%28On%20the%20Terrace%29%20-%201933.455%20-%20Art%20Institute%20of%20Chicago.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q644936",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Rubens%20-%20The%20Rape%20of%20the%20Daughters%20of%20Leucippus.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1213151",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Entombment%20of%20Christ-Caravaggio%20%28c.1602-3%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2622172",
+    "artistId": "Q46373",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edgar%20Degas%20-%20The%20Bellelli%20Family%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1432536",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Amandelbloesem%20-%20s0176V1962%20-%20Van%20Gogh%20Museum.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q1213160",
+    "artistId": "Q5592",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Entombment%20Michelangelo.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q16950902",
+    "artistId": "Q7422343",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sarah%20Goodridge%20Beauty%20Revealed%20The%20Metropolitan%20Museum%20of%20Art.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q3630735",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Self-Portrait%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2528145",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20Allegorie%20der%20Zeit.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2344396",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Sanzio%20-%20Lady%20with%20unicorn.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2273517",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Conversion%20on%20the%20Way%20to%20Damascus-Caravaggio%20%28c.1600-1%29.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2500226",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%2C%20pala%20baglioni%2C%20deposizione.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2528177",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20Diana%20and%20Actaeon%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2452858",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20-%20Madonna%20in%20the%20Meadow%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q2628761",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Albrecht%20D%C3%BCrer%20-%20Adorazione%20dei%20Magi%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q700834",
+    "artistId": "Q8457",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Antonio%20Allegri%2C%20called%20Correggio%20-%20Jupiter%20and%20Io%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q5962062",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/L%27Aurore%20%28Dawn%29%20-%20William-Adolphe%20Bouguereau%20-%20Google%20Cultural%20Institute.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q700834",
+    "artistId": "Q8457",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Antonio%20Allegri%2C%20gen.%20Correggio%2C%20Kunsthistorisches%20Museum%20Wien%2C%20Gem%C3%A4ldegalerie%20-%20Jupiter%20und%20Io%20-%20GG%20274%20-%20Kunsthistorisches%20Museum.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q697332",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20Children%E2%80%99s%20Games%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 20
+  },
+  {
+    "wikidataId": "Q3224275",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-L%C3%A9on%20G%C3%A9r%C3%B4me%20-%20Le%20March%C3%A9%20d%27esclaves.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q477764",
+    "artistId": "Q159606",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Everett%20Millais%20-%20The%20Blind%20Girl%2C%201854-56.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q39537",
+    "artistId": "Q212754",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Circe%20Offering%20the%20Cup%20to%20Odysseus%20%282457%20x%204023px%20ed.%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q3877556",
+    "artistId": "Q120993",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Modigliani%20-%20Nu%20couch%C3%A9.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1237863",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-Leon%20Gerome%20Pollice%20Verso.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1282840",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ingres%2C%20Napoleon%20on%20his%20Imperial%20throne.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1220013",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Greco%2C%20The%20Vision%20of%20Saint%20John%20%281608-1614%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q13726073",
+    "artistId": "Q352954",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Carel%20Fabritius%20-%20The%20Goldfinch%20-%20605%20-%20Mauritshuis.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q782639",
+    "artistId": "Q3159680",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20-%20The%20Glass%20of%20Wine%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q782639",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20-%20The%20Glass%20of%20Wine%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q3716086",
+    "artistId": "Q297838",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jos%C3%A9%20de%20Ribera%20026.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q2052008",
+    "artistId": "Q297838",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20sue%C3%B1o%20de%20Jacob%2C%20by%20Jos%C3%A9%20de%20Ribera%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1293985",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20027.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1245388",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20Madonna%20of%20the%20Pinks.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q2627034",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Saint%20Catherine%20of%20Alexandria%20%28Caravaggio%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q746716",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Narciso%20%281597-1599%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1328065",
+    "artistId": "Q7803",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bronzino%20-%20Eleonora%20di%20Toledo%20col%20figlio%20Giovanni%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q602813",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffael%20%281483%20-%201520%29%20-%20The%20Virgin%20and%20Child%20-%20Solly%20Madonna%20-%20141%20-%20Gem%C3%A4ldegalerie.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q2551625",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sandro%20Botticelli%20-%20Madonna%20del%20Magnificat%20C.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q919294",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Madonna%20Connestabile.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1169199",
+    "artistId": "Q68631",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rogier%20van%20der%20Weyden%20-%20Beaune%20Altarpiece%20%281443%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1134250",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20Massacre%20of%20the%20Innocents%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q2732274",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Penitent%20Magdalene-Caravaggio%20%281594-6%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q698254",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20d.%20%C3%84.%2C%20%2C%20Kunsthistorisches%20Museum%20Wien%2C%20Gem%C3%A4ldegalerie%20-%20Heimkehr%20der%20Herde%20%28Herbst%29%20-%20GG%201018%20-%20Kunsthistorisches%20Museum.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q698228",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Michelangelo%20Merisi%2C%20called%20Caravaggio%20-%20Madonna%20of%20the%20Rosary%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q2419166",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20incredulity.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1755464",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Albrecht%20D%C3%BCrer%2C%20Knight%2C%20Death%20and%20Devil%2C%201513%2C%20NGA%206637.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q80869",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dulle%20Griet%2C%20by%20Pieter%20Brueghel%20%28I%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q1206860",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20Bacchus%20and%20Ariadne.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q2713203",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Madonna%20di%20Loreto-Caravaggio%20%28c.1604-6%29.jpg",
+    "sitelinks": 19
+  },
+  {
+    "wikidataId": "Q650635",
+    "artistId": "Q167654",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Frans%20Hals%20002.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q27157216",
+    "artistId": "Q183245",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Watts%20%E2%80%93%20After%20the%20Deluge.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q285392",
+    "artistId": "f1664f0be42080933843168150f70f32",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Robert%20Campin%20-%20Triptych%20with%20the%20Annunciation%2C%20known%20as%20the%20%22Merode%20Altarpiece%22%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q6543739",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-L%C3%A9on%20G%C3%A9r%C3%B4me%2C%20Phryne%20revealed%20before%20the%20Areopagus%20%281861%29%20-%2001.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1214313",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caspar%20David%20Friedrich%20-%20Die%20Lebensstufen%20%28ca.%201834%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2400652",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jheronimus%20Bosch%20-%20The%20Pedlar%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2561558",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20014.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q467359",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%2C%20Allegory%20of%20the%20Catholic%20Faith%2C%20The%20Metropolitan%20Museum%20of%20Art.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2324840",
+    "artistId": "Q41513",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Europe%20a%20Prophecy%20copy%20K%20plate%2001.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q32234",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20Diana%20and%20her%20Nymphs%20-%20406%20-%20Mauritshuis.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q735061",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Johannes%20Vermeer%20-%20%27De%20liefdesbrief%27%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2624258",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20-%20Jonge%20vrouw%20staande%20bij%20een%20virginaal%20%28ca.%201670-72%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q4429116",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20-%20The%20Magpie%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q151143",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20-%20Young%20Woman%20with%20a%20Pearl%20Necklace%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q641666",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Woman%20writing%20a%20letter%2C%20with%20her%20maid%2C%20by%20Johannes%20Vermeer.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2275610",
+    "artistId": "Q34013",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Georges%20Seurat%20-%20The%20Circus%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1766454",
+    "artistId": "Q295144",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Caillebotte%20-%20The%20Floor%20Planers%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q536024",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/1877%20Manet%20Nana%20anagoria.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q6402081",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20caballero%20de%20la%20mano%20en%20el%20pecho%2C%20by%20El%20Greco%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q979440",
+    "artistId": "Q221043",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Simone%20Martini%20%E2%80%94%20Annunciation%20with%20St.%20Margaret%20and%20St.%20Ansanus.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1764395",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20vision%20apr%C3%A8s%20le%20sermon%20%28Paul%20Gauguin%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q4156438",
+    "artistId": "Q217128",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Valentin%20Serov%20-%20%D0%94%D0%B5%D0%B2%D0%BE%D1%87%D0%BA%D0%B0%20%D1%81%20%D0%BF%D0%B5%D1%80%D1%81%D0%B8%D0%BA%D0%B0%D0%BC%D0%B8.%20%D0%9F%D0%BE%D1%80%D1%82%D1%80%D0%B5%D1%82%20%D0%92.%D0%A1.%D0%9C%D0%B0%D0%BC%D0%BE%D0%BD%D1%82%D0%BE%D0%B2%D0%BE%D0%B9%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1251572",
+    "artistId": "Q214062",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Joseph%20Wright%20of%20Derby.%20Romeo%20and%20Juliet.%20The%20Tomb%20Scene.%20exhibited%201790%20and%201791.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q614047",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20-%20Girl%20with%20a%20Red%20Hat.JPG",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1212737",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Femmes%20d%27Alger%20dans%20leur%20appartement%2C%20Eug%C3%A8ne%20Delacroix%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%203824.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q546977",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Baldassare%20Castiglione%2C%20by%20Raffaello%20Sanzio%2C%20from%20C2RMF%20retouched.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1198912",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Albrecht%20D%C3%BCrer%2C%20Saint%20Jerome%20in%20His%20Study%2C%201514%2C%20NGA%206642.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2610709",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Madonna%20di%20Foligno%20%28Raphael%29%20September%202015-1a.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1313605",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Emperor%20Napoleon%20in%20His%20Study%20at%20the%20Tuileries%2C%20by%20Jacques-Louis%20David%20%281812%29%20-%20National%20Gallery%20of%20Art%20%28Samuel%20H.%20Kress%20Foundation%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2072801",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Profile%20of%20a%20Young%20Fiancee%20-%20da%20Vinci.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2308934",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Study%20for%20the%20Kneeling%20Leda.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2388965",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Selbstportr%C3%A4t%2C%20by%20Albrecht%20D%C3%BCrer%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q500936",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Goya%20Dog.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q979440",
+    "artistId": "Q504963",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Simone%20Martini%20%E2%80%94%20Annunciation%20with%20St.%20Margaret%20and%20St.%20Ansanus.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q698219",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Gloomy%20Day%20%28Bruegel%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q594406",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20The%20Fall%20of%20the%20Rebel%20Angels%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1118295",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20Willem%20van%20Gogh%20138.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q689236",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20d.%20%C3%84.%20066.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q686107",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20d.%20%C3%84.%20007b.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1213437",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Die%20Heuernte.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1217187",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sandro%20Botticelli%20La%20calumnia%20de%20Apeles.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q510799",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Saint%20Jerome%20in%20his%20study%20-%20Oratory%20of%20St%20John%20the%20Baptist%2C%20St%20John%E2%80%99s%20Co-Cathedral%2C%20Valletta.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q18002417",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tizian%20085.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1170194",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Albrecht%20D%C3%BCrer%20-%20Das%20Rosenkranzfest%20%281506%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2426058",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pallade%20col%20Centauro%2C%20Sandro%20Botticelli%20%281482%29.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q572697",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Frari%20%28Venice%29%20nave%20left%20-%20Altar%20of%20Madona%20di%20Ca%27Pesaro.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q369810",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William%20Bouguereau%20-%20El%20primer%20duelo.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q1198912",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Albrecht%20D%C3%BCrer%20-%20St.%20Jerome%20in%20His%20Study%20-%201989.232%20-%20Cleveland%20Museum%20of%20Art.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q798034",
+    "artistId": "Q469379",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bacchus%20-%20Leonardo%20da%20Vinci%20workshop%20-%20Louvre%20INV%20780.jpg",
+    "sitelinks": 18
+  },
+  {
+    "wikidataId": "Q2594673",
+    "artistId": "d4b4117da05a2b47b8d8581dd75900f1",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Samson%20and%20Delilah%20by%20Rubens.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q960447",
+    "artistId": "Q156386",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Surprised-Rousseau.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q970968",
+    "artistId": "Q203643",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Whistler%20James%20Symphony%20in%20White%20no%201%20%28The%20White%20Girl%29%201862.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q17275221",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean%20L%C3%A9on%20Gerome%201896%20La%20V%C3%A9rit%C3%A9%20sortant%20du%20puits.JPG",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q4062416",
+    "artistId": "Q120993",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Alice%20%28Amedeo%20Modigliani%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q474409",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Lucca%20Madonna%20%28SM%20944%29.png",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3172226",
+    "artistId": "Q173223",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mary%20Cassatt%20-%20The%20Child%27s%20Bath%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3172226",
+    "artistId": "Q173223",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Child%27s%20Bath%20by%20Mary%20Cassatt%201893.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2915406",
+    "artistId": "Q151803",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piet%20Mondrian%2C%201942%20-%20Broadway%20Boogie%20Woogie.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3556817",
+    "artistId": "Q180932",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diane%20sortant%20du%20bain%20-%20Fran%C3%A7ois%20Boucher%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%202712.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2203011",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jheronimus%20Bosch%20050.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q960157",
+    "artistId": "Q159606",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Everett%20Millais%20-%20Christ%20in%20the%20House%20of%20His%20Parents%20%28%60The%20Carpenter%27s%20Shop%27%29%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1757920",
+    "artistId": "Q211763",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hunt%2C%20William%20Homan%20-%20The%20Light%20of%20the%20World%20-%201853-54.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q23915",
+    "artistId": "Q191423",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ghirlandaio%2C%20Domenico%20-%20An%20Old%20Man%20and%20His%20Grandson%20-%20Louvre%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q59815",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%89douard%20Manet%20-%20Le%20Vieux%20Musicien.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2899286",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20Berthe%20Morisot%20With%20a%20Bouquet%20of%20Violets%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2627810",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20aguador%20de%20Sevilla%2C%20por%20Diego%20Vel%C3%A1zquez.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3633456",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Danse%20%C3%A0%20la%20ville%20%28Pierre-Auguste%20Renoir%29-WUS07474%20%28cropped%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1659469",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Auguste%20Renoir%20-%20En%20%C3%A9t%C3%A9%20-%20La%20boh%C3%A9mienne%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q18620351",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%89douard%20Manet%20-%20Jeanne%20%28Spring%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q4660880",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Young%20Woman%20Seated%20at%20a%20Virginal%2C%20Johannes%20Vermeer%2C%201670-1672%2C%20oil%20on%20canvas%2C%2025.5%20by%2020.1%20cm%2C%20The%20Leiden%20Collection.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3500414",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tavern%20Scene%20with%20Two%20Men%20and%20a%20Girl%204a61eaa.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q4157667",
+    "artistId": "Q215100",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vrubel%20Demon.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q4188993",
+    "artistId": "Q216406",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Beguiling%20of%20Merlin.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2783729",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Lise%20with%20a%20Parasol.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3500414",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Vel%C3%A1zquez%20005.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1114718",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre%20Auguste%20Renoir%20-%20Country%20Dance%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3137278",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dominique%20Ingres%20-%20Mme%20Moitessier.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q106522623",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustav%20Klimt%20-%20Dame%20mit%20F%C3%A4cher.jpeg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2528741",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Cristo%20crucificado.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q6065609",
+    "artistId": "Q351746",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Joaqu%C3%ADn%20Sorolla%20y%20Bastida%20-%20Strolling%20along%20the%20Seashore%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3829156",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Klimt%20-%20The%20Three%20Ages%20of%20Woman%20%281905%29%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q609572",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Gauguin%20-%20Mana%C3%B2%20tupapa%C3%BA%20%28Spirit%20of%20the%20Dead%20Watching%29%20-%201965-1%20-%20Albright%E2%80%93Knox%20Art%20Gallery.tiff",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q958245",
+    "artistId": "Q319843",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ford%20Madox%20Brown%20-%20The%20Last%20of%20England%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1213453",
+    "artistId": "Q322582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/PAUL%20DELAROCHE%20-%20Ejecuci%C3%B3n%20de%20Lady%20Jane%20Grey%20%28National%20Gallery%20de%20Londres%2C%201834%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3181999",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Eug%C3%A8ne%20Delacroix%20-%20La%20Gr%C3%A8ce%20sur%20les%20ruines%20de%20Missolonghi%2C%201826.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2267440",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20-%20Jonge%20vrouw%20aan%20een%20virginaal%20%28ca.%201670-72%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q681876",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20022.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q598913",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/CrocefissioneRaffaello.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2667782",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Rubens%20-%20Descent%20from%20the%20Cross%20-%20WGA20212.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2428778",
+    "artistId": "Q5580",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20de%20l%27artiste%20tenant%20un%20chardon%20-%20Albrecht%20D%C3%BCrer%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20RF%202382.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1527541",
+    "artistId": "Q8457",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Correggio%20-%20The%20Holy%20Night%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q325267",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20-%20Moses%20with%20the%20Ten%20Commandments%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q571416",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Rubens%20-%20Rubens%20and%20Isabella%20Brant%20in%20the%20honeysuckle%20bower.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2528106",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Sanzio%20-%20Ritratto%20di%20Bindo%20Altoviti.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2715177",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20Saint%20Jerome%20-%20Galleria%20Borghese.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2627028",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20%28attr.%29%2C%20Portrait%20of%20Elisabetta%20Gonzaga%2C%201506%2C%20Uffizi.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2667782",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Paul%20Rubens%20065%20exterior.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2528477",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Aquelarre.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q167536",
+    "artistId": "Q5577",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20gran%20masturbador.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q4373363",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Idealised%20Portrait%20of%20a%20Lady%20%28Portrait%20of%20Simonetta%20Vespucci%20as%20Nymph%29%20%28SM%20936%29.png",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q556553",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Brueghel%20Land%20of%20Cockaigne%20IMG%204843.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q32496",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bethsab%C3%A9e%20au%20bain%20tenant%20la%20lettre%20du%20roi%20David%20-%20Rembrandt%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20MI%20957.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2607050",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Madonna%20Cowper.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2059447",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20d.%20%C3%84.%20035-2.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q3607521",
+    "artistId": "Q82445",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Henri%20de%20Toulouse-Lautrec%20-%20At%20the%20Moulin%20Rouge%20-%201928.610%20-%20Art%20Institute%20of%20Chicago.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1132723",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20Willem%20van%20Gogh%20037.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1796098",
+    "artistId": "Q5822",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piero%20della%20Francesca%20046.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q286096",
+    "artistId": "Q68631",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Weyden%20madonna%201440.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2632688",
+    "artistId": "Q5822",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piero%20della%20Francesca%20-%20Battesimo%20di%20Cristo%20%28National%20Gallery%2C%20London%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2594673",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Samson%20and%20Delilah%20by%20Rubens.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q22329831",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20Willem%20van%20Gogh%20102.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2626595",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Seven%20Works%20of%20Mercy-Caravaggio%20%281607%29.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q23922",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20d%27une%20Femme%20%C3%A0%20sa%20Toilette%2C%20by%20Titian%2C%20from%20C2RMF%20retouched.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q512971",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William-Adolphe%20Bouguereau%20-%20The%20Little%20Shepherdess%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2268524",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Three%20Graces%2C%20by%20Peter%20Paul%20Rubens%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q1555137",
+    "artistId": "Q44032",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Egon%20Schiele%20-%20Portrait%20of%20Wally%20Neuzil%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q16333797",
+    "artistId": "Q7751",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vertumnus%20%C3%A5rstidernas%20gud%20m%C3%A5lad%20av%20Giuseppe%20Arcimboldo%201591%20-%20Skoklosters%20slott%20-%2091503.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2665840",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Accademia%20-%20Piet%C3%A0%20by%20Titian.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q2665840",
+    "artistId": "Q651795",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Accademia%20-%20Piet%C3%A0%20by%20Titian.jpg",
+    "sitelinks": 17
+  },
+  {
+    "wikidataId": "Q965124",
+    "artistId": "Q167654",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Frans%20Hals%20%E2%80%93%20The%20Laughing%20Cavalier.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2712679",
+    "artistId": "Q186748",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dante%20Gabriel%20Rossetti%20-%20Beata%20Beatrix%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q6609114",
+    "artistId": "Q189117",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Matejko-Astronomer%20Copernicus-Conversation%20with%20God.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q323079",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20van%20Eyck%20-%20Triptych%20of%20Mary%20and%20Child%2C%20St.%20Michael%2C%20and%20the%20Catherine%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2276130",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hieronymus%20Bosch%20-%20Triptych%20of%20the%20Adoration%20of%20the%20Magi%20-%20WGA2606.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2392901",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20van%20Eyck%20-%20Portrait%20of%20a%20Man%20%28Self%20Portrait%3F%29%201433.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2712679",
+    "artistId": "Q186748",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dante%20gabriel%20rossetti%2C%20beata%20beatrix%2C%201864-0%20ca.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2623789",
+    "artistId": "Q191423",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Domenico%20Ghirlandaio%2C%201489-1490%20-%20Portrait%20of%20Giovanna%20Tornabuoni%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2712679",
+    "artistId": "Q186748",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rossetti%2C%20Beata%20Beatrix.JPG",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q532486",
+    "artistId": "Q212657",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gentileschi%20judith1.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1248830",
+    "artistId": "Q151803",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piet%20Mondriaan%20Victory%20Boogie%20Woogie.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q232087",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caspar%20David%20Friedrich%20-%20Two%20Men%20Contemplating%20the%20Moon%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q579455",
+    "artistId": "Q130777",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/White%20on%20White%20%28Malevich%2C%201918%29.png",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q323079",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gem%C3%A4ldegalerie%20Alte%20Meister%20%28Dresden%29%20Galeriewerk%20Braun%201836a.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q17086791",
+    "artistId": "Q130777",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Red%20Square.%20Visual%20Realism%20of%20a%20Peasant%20Woman%20in%20Two%20Dimensions.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2734881",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Annunciation%20-%20Jan%20van%20Eyck%20-%201434%20-%20NG%20Wash%20DC.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q398973",
+    "artistId": "Q159297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Constable%20-%20Salisbury%20Cathedral%20from%20the%20Bishop%27s%20Grounds.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q430069",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ecce%20Homo%20%28SM%201577%29.png",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q646337",
+    "artistId": "Q203643",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Whistler-Nocturne%20in%20black%20and%20gold.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4808020",
+    "artistId": "Q203401",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Automat-edward-hopper-1927.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4231515",
+    "artistId": "Q189117",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Konstytucja%203%20Maja.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2270768",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Cutting%20the%20Stone%20%28Bosch%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4068125",
+    "artistId": "Q127017",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/1871%20Vereshchagin%20Apotheose%20des%20Krieges%20anagoria.JPG",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3978274",
+    "artistId": "Q212657",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Susanna%20and%20the%20Elders%20%281610%29%2C%20Artemisia%20GentileschiFXD.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2354033",
+    "artistId": "Q172911",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ilya%20Repin%20-%20%D0%9A%D1%80%D0%B5%D1%81%D1%82%D0%BD%D1%8B%D0%B9%20%D1%85%D0%BE%D0%B4%20%D0%B2%20%D0%9A%D1%83%D1%80%D1%81%D0%BA%D0%BE%D0%B9%20%D0%B3%D1%83%D0%B1%D0%B5%D1%80%D0%BD%D0%B8%D0%B8%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q977777",
+    "artistId": "Q186748",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dante%20Gabriel%20Rossetti%20-%20Proserpine%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2529703",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20049.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4451145",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dance-At-Bougival.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3173195",
+    "artistId": "Q369263",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Declaration%20of%20Independence%20%281819%29%2C%20by%20John%20Trumbull.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1167912",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Monet%20dejeunersurlherbe.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q334604",
+    "artistId": "Q366212",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Church%20Heart%20of%20the%20Andes.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1219698",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20Girl%20Interrupted%20at%20Her%20Music.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3739396",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20Lady%20Maidservant%20Holding%20Letter.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4717953",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Retrato%20de%20Juan%20Pareja%2C%20by%20Diego%20Vel%C3%A1zquez.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1683743",
+    "artistId": "Q41406",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edvard%20Munch%20-%20Vampire%20-%20MM.M.00292%20-%20Munch%20Museum.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3234845",
+    "artistId": "Q34013",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Georges%20Seurat%20-%20Models%20%28Poseuses%29%20-%20BF811%20-%20Barnes%20Foundation.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q5967091",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/KlimtPanna.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q731639",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20The%20Plum%20-%20National%20Gallery%20of%20Art.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q958088",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer-Portrait%20of%20a%20Young%20Woman.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q766212",
+    "artistId": "Q214905",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Thomas%20Eakins%20-%20Swimming%20%281895%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4891521",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Source%20MET%20DP124050.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3119110",
+    "artistId": "Q33477",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jeune%20Orpheline%20au%20cimeti%C3%A8re%20-%20Eug%C3%A8ne%20Delacroix%20-%20Muse%20du%20Louvre%20Peintures%20RF%201652%20-%20photo%202.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2841473",
+    "artistId": "Q365544",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hans%20Gude%2C%20Adolph%20Tidemand%20-%20Bridal%20Procession%20on%20the%20Hardangerfjord%20-%20NG.M.00467%20-%20National%20Museum%20of%20Art%2C%20Architecture%20and%20Design.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4891521",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20-%20La%20Font%20%281862%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2255224",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Greco%20%28Domenikos%20Theotokopoulos%29%20-%20Laoco%C3%B6n%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2841473",
+    "artistId": "Q365544",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Adolph%20Tidemand%20%26%20Hans%20Gude%20-%20Bridal%20Procession%20on%20the%20Hardangerfjord%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1167912",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20-%20Le%20dejeurner%20sur%20l%27herbe%20%28left%20panel%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q713211",
+    "artistId": "Q271884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Save%20freedom%20of%20speech.%20Buy%20war%20bonds%20%28cropped%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2504917",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Gauguin%20-%20The%20Green%20Christ%20%281889%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2343939",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffael%20021.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q835286",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jacques-Louis%20David%20-%20Mars%20desarme%20par%20Venus.JPG",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2537695",
+    "artistId": "Q8459",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Judith%20Holofernes%20Giorgione.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q677682",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rafael%20-%20ressureicaocristo01.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2713620",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/PalaAnsidei.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2016193",
+    "artistId": "Q7814",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Madonna%20di%20Ognissanti%20by%20Giotto.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2276546",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael-LaDonnaGravida%281505-1506%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4118041",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Vase%20mit%20Pechnelken.jpeg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1087244",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20%28I%29%20-%20Christ%20and%20the%20woman%20taken%20in%20adultery.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q180632",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20%E2%80%93%20Portrait%20of%20Pope%20Paul%20III%20with%20his%20Grandsons%20%E2%80%93%20Google%20Art%20Project%20%E2%80%93%20edited.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q9397770",
+    "artistId": "Q958927",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Aleksander%20Gierymski%2C%20%C5%BByd%C3%B3wka%20z%20pomara%C5%84czami.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q4680634",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Anbetung%20der%20K%C3%B6nige%20%28Bruegel%2C%201564%29.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3702434",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20The%20Wedding%20Dance%20-%2030.374%20-%20Detroit%20Institute%20of%20Arts.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1437492",
+    "artistId": "Q5589",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Matisse-Woman-with-a-Hat.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1227359",
+    "artistId": "Q5822",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piero%20della%20Francesca%20-%20Ritratti%20dei%20Duchi%20di%20Urbino%20Federico%20da%20Montefeltro%20e%20Battista%20Sforza%20-%20detail%20-03.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1111394",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20-%20Rembrandt%20and%20Saskia%20in%20the%20Scene%20of%20the%20Prodigal%20Son%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q375216",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20The%20Numbering%20at%20Bethlehem%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2841473",
+    "artistId": "Q701669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Adolph%20Tidemand%20%26%20Hans%20Gude%20-%20Bridal%20Procession%20on%20the%20Hardangerfjord%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1243299",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20-%20The%20Abduction%20of%20Europa%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2629134",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20Madonna%20Pasadena.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2097931",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20%E2%80%94%20Supper%20at%20Emmaus.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2663568",
+    "artistId": "Q5577",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Dal%C3%AD%20en%20el%20palacio%20de%20BA%2002.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2393412",
+    "artistId": "Q9319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/JACOPO-TINTORETTO-JACOPO-ROBUSTI%20VULKAN-UEBERRASCHT-VENUS-UND-MARS%20CC-BY-SA%20BSTGS%209257.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2841473",
+    "artistId": "Q701669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hans%20Gude%2C%20Adolph%20Tidemand%20-%20Bridal%20Procession%20on%20the%20Hardangerfjord%20-%20NG.M.00467%20-%20National%20Museum%20of%20Art%2C%20Architecture%20and%20Design.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q3784247",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tiziano%20Vecellio%20%28Pieve%20di%20Cadore%201488-90%20-%20Venezia%201576%29%20-%20Ritratto%20di%20gentildonna%20%28La%20Bella%29%20-%2018%20-%20Galleria%20Palatina.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q2273890",
+    "artistId": "Q9319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tintoretto%20-%20Miracle%20of%20the%20Slave.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1227359",
+    "artistId": "Q5822",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piero%20della%20Francesca%20044.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q948894",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vangogh%20mousme.jpg",
+    "sitelinks": 16
+  },
+  {
+    "wikidataId": "Q1387483",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Last%20judgement%20Bosch.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3212360",
+    "artistId": "Q207298",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Fr%C3%A9d%C3%A9ric%20Bazille%20-%20The%20Pink%20Dress%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q507120",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caspar%20David%20Friedrich%20-%20Gebirgslandschaft%20mit%20Regenbogen.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1523789",
+    "artistId": "Q123071",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Arnold%20Boecklin-fiedelnder%20Tod.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3630745",
+    "artistId": "Q212657",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Self-Portrait%20as%20the%20Allegory%20of%20Painting%20%28La%20Pittura%29%20-%20Artemisia%20Gentileschi.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3373691",
+    "artistId": "Q212593",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hendrick%20Avercamp%20-%20Winterlandschap%20met%20ijsvermaak.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2909909",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bonaparte%20ante%20la%20Esfinge%2C%20por%20Jean-L%C3%A9on%20G%C3%A9r%C3%B4me.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1150782",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Eyck%2C%20Jan%20van%20-%20Portrait%20of%20a%20Young%20Man%20%28Tymotheos%29%20-%20National%20Gallery%2C%20London.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q644106",
+    "artistId": "Q155626",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Singer%20Sargent%20001.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1387483",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jheronimus%20Bosch%20097%20exterior%2002.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3220204",
+    "artistId": "Q127171",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-Honor%C3%A9%20Fragonard%20-%20The%20Stolen%20Kiss.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3206722",
+    "artistId": "Q167654",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Boh%C3%A9mienne%20-%20Frans%20Hals%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20MI%20926.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q389198",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Rodr%C3%ADguez%20de%20Silva%20y%20Vel%C3%A1zquez%20%281599%20-%201660%29%20-%20The%20Three%20Musicians%20-%20413F%20-%20Gem%C3%A4ldegalerie.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2024709",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Spanish%20Singer%20MET%20dp130799.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q10908882",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Grenouill%C3%A8re%20%28Auguste%20Renoir%29%20-%20Nationalmuseum%20-%2019486.tif",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q642198",
+    "artistId": "Q348024",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Crivelli%20Carlo%2C%20Annunciation.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2467082",
+    "artistId": "Q215305",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Visitaci%C3%B3n%20de%20Rafael.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3823474",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Promenade%2C%20by%20Pierre-Auguste%20Renoir%2C%20edited.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3498655",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Ingres%20Venere%20Anadiomene.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1787460",
+    "artistId": "Q316016",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Watsonandtheshark-original.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q40432",
+    "artistId": "Q241732",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rosa%20Bonheur%2C%20The%20Horse%20Fair%2C%201852%E2%80%9355.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2467082",
+    "artistId": "Q2327761",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Visitaci%C3%B3n%20de%20Rafael.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2985455",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Louis-Francois%20Bertin.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3751961",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20of%20the%20Artist%20called%20The%20Wounded%20Man%20%28L%27homme%20bless%C3%A9%29%20by%20Gustave%20Courbet.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3227448",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%89douard%20Manet%20-%20Le%20Suicid%C3%A9%20-%2063%20-%20Foundation%20E.G.%20B%C3%BChrle%20Collection.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q4808368",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%2C%20Femme%20nue%20couch%C3%A9e%2C%201862.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q734082",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%2C%201867%2C%20Regatta%20at%20Sainte-Adresse%2C%20Metropolitan%20Museum%20of%20Art.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2273943",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vel%C3%A1zquez%20-%20Adoraci%C3%B3n%20de%20los%20Reyes%20%28Museo%20del%20Prado%2C%201619%29.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q941549",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet%20La%20Grenouill%C3%A9re.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2093283",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20zonnebloemen%20schilderend%20-%20s0225V1962%20-%20Van%20Gogh%20Museum.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q17001535",
+    "artistId": "Q34661",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustav%20Klimt%20-%20Death%20and%20Life%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q839359",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20-%20Woman%20with%20a%20Lute%20near%20a%20window.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1627187",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Eh%20quoi%21%20Tu%20es%20jaloux%3F%20by%20Paul%20Gauguin.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3937570",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%20-%20Ir%C3%A8ne%20Cahen%20d%27Anvers%20%28La%20Petite%20Ir%C3%A8ne%29%20-%2090%20-%20Foundation%20E.G.%20B%C3%BChrle%20Collection.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q94006",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vermeer%20saint%20praxedis.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q17512050",
+    "artistId": "Q334001",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Thomas%20Cole%20-%20Architect%E2%80%99s%20Dream%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3227448",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20-%20Le%20Suicid%C3%A9.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2909916",
+    "artistId": "Q216999",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Antoine-Jean%20Gros%20-%20Bonaparte%20Visiting%20the%20Plague%20Victims%20of%20Jaffa.jpeg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3220204",
+    "artistId": "Q271484",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-Honor%C3%A9%20Fragonard%20-%20The%20Stolen%20Kiss.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3203447",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Courbet%20-%20L%27Hallali%20du%20cerf.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1192090",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%89douard%20Manet%20-%20The%20Absinthe%20Drinker.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2422889",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20missing.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q873639",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bruegel%2C%20Pieter%20%28I%29%20-%20Winterlandschap%20met%20schaatsers%20en%20vogelknip%2C%201565.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2479220",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Judith%20at%20the%20Banquet%20of%20Holofernes%20%28previously%20known%20as%20Artemisia%29%2C%20by%20Rembrandt%2C%20from%20Prado%20in%20Google%20Earth.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2413468",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20coloso.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2270955",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/David%20and%20Goliath%20by%20Caravaggio.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2529918",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Saint%20Georges%20luttant%20avec%20le%20dragon%20-%20Rapha%C3%ABl%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%20609%20%3B%20MR%20440.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1198007",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20vino%20de%20la%20fiesta%20de%20San%20Mart%C3%ADn%20%28Pieter%20Brueghel%20el%20Viejo%29%20%28restaurada%29.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q7232350",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Bildnis%20der%20Mutter%20des%20K%C3%BCnstlers.jpeg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2467082",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Visitaci%C3%B3n%20de%20Rafael.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2225699",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Harmensz%20van%20Rijn%20Rembrandt%20-%20%D0%A4%D0%BB%D0%BE%D1%80%D0%B0%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q974674",
+    "artistId": "Q5669",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mystic%20Nativity%2C%20Sandro%20Botticelli.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q706846",
+    "artistId": "Q702525",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%E5%AF%8C%E6%98%A5%E5%B1%B1%E5%B1%85%E5%9C%96%28%E7%84%A1%E7%94%A8%E5%B8%AB%E5%8D%B7%29.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q4448822",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20%28Tiziano%20Vecellio%29%2C%20between%201485%20and%201490-1576%20-%20Repentant%20Mary%20Magdalene%20-%20%D0%93%D0%AD-117%20-%20Hermitage%20Museum.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2344593",
+    "artistId": "Q483992",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bouguereau%20first%20kiss.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3772184",
+    "artistId": "Q43270",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pieter%20Bruegel%20the%20Elder%20-%20The%20Beggars%20%281568%29.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q16965482",
+    "artistId": "Q547055",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Fra%20et%20romersk%20osteria.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2646680",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20Harmensz.%20van%20Rijn%20150.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q4310527",
+    "artistId": "Q48319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Holbein%20%E2%80%94%20Dead%20Christ.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q1448728",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caravaggio%20-%20The%20Annunciation.JPG",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3940915",
+    "artistId": "Q5599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Romulus%20and%20Remus%20by%20Peter%20Paul%20Rubens.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2535563",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rafael%20-%20Retrato%20de%20um%20Cardeal.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2538580",
+    "artistId": "Q5589",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Joie%20de%20vivre%2C%20par%20Henri%20Matisse.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2619037",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Juliette%20R%C3%A9camier%2C%20n%C3%A9e%20Bernard%20-%20Jacques-Louis%20David%20-%20Mus%C3%A9e%20duLouvre%20Peintures%20INV%203708.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q921429",
+    "artistId": "Q5589",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Desserte%20rouge%2C%20par%20Henri%20Matisse.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q797902",
+    "artistId": "Q762",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Lascapigliata.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2420918",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Santi%20-%20Madonna%20della%20Rosa%20%28Prado%29.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2146810",
+    "artistId": "Q561916",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Reverend%20Robert%20Walker%20%281755%20-%201808%29%20Skating%20on%20Duddingston%20Loch.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2146810",
+    "artistId": "Q561916",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Sir%20Henry%20Raeburn%20-%20Reverend%20Robert%20Walker%20%281755%20-%201808%29%20Skating%20on%20Duddingston%20Loch%20-%20NG%202112%20-%20National%20Galleries%20of%20Scotland.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q3039856",
+    "artistId": "Q68631",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Magdalen%20Reading%20Rogier.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q874058",
+    "artistId": "Q68631",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Der%20Dreik%C3%B6nigsaltar%20Rogier%20van%20der%20Weyden.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q4233325",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Tree%20Roots%20and%20Trunks%20%28F816%29.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2664637",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Christ%20Falling%20on%20the%20Way%20to%20Calvary%20-%20Raphael.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q28092249",
+    "artistId": "Q561952",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%E5%94%90%20%E9%9F%93%E5%B9%B9%20%E7%85%A7%E5%A4%9C%E7%99%BD%E5%9C%96%20%E5%8D%B7-Night-Shining%20White%20MET%20DP153679.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q4126322",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20Willem%20van%20Gogh%20098.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q2715353",
+    "artistId": "Q5594",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Antonello%20da%20Messina%20-%20St%20Jerome%20in%20his%20study%20-%20National%20Gallery%20London.jpg",
+    "sitelinks": 15
+  },
+  {
+    "wikidataId": "Q822535",
+    "artistId": "Q159606",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Everett%20Millais%20-%20Isabella.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2126369",
+    "artistId": "3ea9d533d112cc12b409d29edc8f3369",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gioconda%20%28copia%20del%20Museo%20del%20Prado%20restaurada%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q884782",
+    "artistId": "Q104884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Caspar%20David%20Friedrich%20-%20Das%20Kreuz%20im%20Gebirge.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2155289",
+    "artistId": "89011985b6d726cc4876ec47e46dfece",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hieronymus%20Bosch%20051.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q574004",
+    "artistId": "Q102272",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20van%20Eyck%20-%20Diptych%20-%20WGA07587.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3818263",
+    "artistId": "Q151803",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piet%20Mondrian%2C%201908-10%2C%20Evening%3B%20Red%20Tree%20%28Avond%3B%20De%20rode%20boom%29%2C%20oil%20on%20canvas%2C%2070%20x%2099%20cm%2C%20Gemeentemuseum%20Den%20Haag.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3777363",
+    "artistId": "Q167654",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Young%20Man%20with%20a%20Skull%2C%20Frans%20Hals%2C%20National%20Gallery%2C%20London.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q7715071",
+    "artistId": "Q211763",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/William%20Holman%20Hunt%20-%20The%20Awakening%20Conscience%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q17491812",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jean-L%C3%A9on%20G%C3%A9r%C3%B4me%20-%20Young%20Greeks%20Attending%20a%20Cock%20Fight%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q5526647",
+    "artistId": "Q155626",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Singer%20Sargent%20-%20Gassed%20%281919%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q7401211",
+    "artistId": "Q212754",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20William%20Waterhouse%20-%20Saint%20Eulalia%20-%201885.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q5121363",
+    "artistId": "Q212754",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/J.%20W.%20Waterhouse%20-%20Circe%20Invidiosa%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q9392232",
+    "artistId": "Q106851",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Annunciation%20Memling.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q4148585",
+    "artistId": "Q159606",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Millais%20-%20Herbstbl%C3%A4tter.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3211036",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gerome%20venus.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q5906548",
+    "artistId": "Q209615",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/H%C3%A9rcules%20lucha%20con%20el%20le%C3%B3n%20de%20Nemea%2C%20por%20Zurbar%C3%A1n.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q4478998",
+    "artistId": "Q110228",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Le%20matin%20de%20l%27%20ex%C3%A9cution%20des%20streltsy.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2567058",
+    "artistId": "Q130531",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Hieronymus%20Bosch%20054.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q323141",
+    "artistId": "13f2bd0795b0d518c703a2cbff80f758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/HMF%20Duerer%20Gruenewald%20Harrich%20Heller-Altar%20DSC%206312.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1115613",
+    "artistId": "Q17169",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bellini%2C%20Giovanni%20-%20Madonna%20of%20the%20Meadow.jpeg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q323141",
+    "artistId": "Q154338",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/HMF%20Duerer%20Gruenewald%20Harrich%20Heller-Altar%20DSC%206312.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q12899114",
+    "artistId": "Q212499",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Cleopatra%20and%20Caesar%20by%20Jean-Leon-Gerome.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q548141",
+    "artistId": "Q156386",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Henri%20Rousseau%20005.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q8874171",
+    "artistId": "Q183245",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Assistants%20and%20George%20Frederic%20Watts%20-%20Hope%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1813497",
+    "artistId": "ffbef093f41550ffa45b30c5b91a3156",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Wilton%20Diptych.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3027255",
+    "artistId": "Q159758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Turner%20-%20Dido.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q219344",
+    "artistId": "Q159758",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Slave-ship.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q323141",
+    "artistId": "Q1690972",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/HMF%20Duerer%20Gruenewald%20Harrich%20Heller-Altar%20DSC%206312.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q14127232",
+    "artistId": "Q241732",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rosa%20Bonheur%20-%20Ploughing%20in%20Nevers%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2264914",
+    "artistId": "Q297",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Rodriguez%20de%20Silva%20y%20Vel%C3%A1zquez%20-%20Infanta%20Margarita%20Teresa%20in%20a%20Blue%20Dress%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q6119366",
+    "artistId": "Q301",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/El%20Greco%20-%20San%20Mart%C3%ADn%20y%20el%20mendigo.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1897389",
+    "artistId": "Q314548",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gerrit%20van%20Honthorst%20-%20De%20koppelaarster.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1118465",
+    "artistId": "Q37693",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Gauguin%20Ia%20Orana%20Maria%20%28Hail%20Mary%29%20The%20Metropolitan%20Museum%20of%20Art1.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q914984",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/A%20Lady%20Writing%20by%20Johannes%20Vermeer%2C%201665-6.png",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2706250",
+    "artistId": "Q314275",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Quentin%20Matsys%20-%20A%20Grotesque%20old%20woman.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q5818528",
+    "artistId": "Q23380",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%C5%92dipe%20explique%20l%27%C3%A9nigme%20du%20sphinx%20-%20Jean-Auguste%20Dominique%20Ingres%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20RF%20218.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q714794",
+    "artistId": "Q271884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Save%20freedom%20of%20worship%20-%20each%20according%20to%20the%20dictates%20of%20his%20own%20conscience%20-%20buy%20war%20bonds%20-%20DPLA%20-%2053555da1e5d465382a13d28a0910efaf.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3222585",
+    "artistId": "Q34618",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gustave%20Courbet%20-%20Le%20D%C3%A9sesp%C3%A9r%C3%A9%20%281843%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2633689",
+    "artistId": "Q280851",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Piero%20di%20Cosimo%20-%20Portrait%20de%20femme%20dit%20de%20Simonetta%20Vespucci%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1055117",
+    "artistId": "Q312393",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gentile%20da%20Fabriano%20-%20Adorazione%20dei%20Magi%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3138984",
+    "artistId": "Q35548",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mardi%20gras%2C%20par%20Paul%20C%C3%A9zanne%2C%20Yorck.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3842290",
+    "artistId": "Q297838",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Mujer%20barbuda%20ribera.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3807740",
+    "artistId": "Q39931",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%20096.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3088614",
+    "artistId": "Q40599",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Edouard%20Manet%20Die%20ueberraschte%20Nymphe.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q4358442",
+    "artistId": "Q41264",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jan%20Vermeer%20van%20Delft%20013.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q10322900",
+    "artistId": "Q296",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Claude%20Monet-Madame%20Monet%20en%20costume%20japonais.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q714804",
+    "artistId": "Q271884",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/%22Freedom%20from%20Fear%22%20-%20NARA%20-%20513538.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1652981",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tizian%20094.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3332564",
+    "artistId": "Q5594",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Antonello%20da%20Messina%2C%20Annunciata%20di%20Palermo%2C%20circa%201475-77%20-FG2.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q9391004",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Green%20Field%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q650086",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/P1150002%20Cognacq-Jay%20Rembrandt%20anesse%20de%20Balaam%20rwk.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2459887",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20The%20Tribute%20Money%20-%20Google%20Art%20Project%20%28715452%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3978277",
+    "artistId": "Q9319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jacopo%20Robusti%2C%20called%20Tintoretto%20-%20Susanna%20and%20the%20Elders%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2902188",
+    "artistId": "Q5589",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Raie%20verte%2C%20par%20Henri%20Matisse.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1585399",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20of%20Do%C3%B1a%20Isabel%20de%20Porcel%20by%20Francisco%20Goya.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1720631",
+    "artistId": "Q8459",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Giorgione%20-%20Pala%20di%20Castelfranco.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3632485",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bacanal%20de%20los%20andrios.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q965822",
+    "artistId": "Q5681",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Vierge%20de%20la%20Victoire%20-%20Andrea%20Mantegna%20-%20Mus%C3%A9e%20du%20Louvre%20Peintures%20INV%20369%20%3B%20MR%20337.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q1633898",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20Portrait%20of%20a%20Lady%20%28%27La%20Schiavona%27%29%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q455319",
+    "artistId": "Q48319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Darmstadtmadonna.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q7920648",
+    "artistId": "Q47551",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20Venus%20with%20a%20Mirror%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3299143",
+    "artistId": "Q964791",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Paul%20Chabas%20September%20Morn%20The%20Metropolitan%20Museum%20of%20Art.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q23688702",
+    "artistId": "Q958927",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Gierymski%20In%20the%20arbour.png",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q6426375",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Landschaft%20im%20Schnee.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2427320",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rapha%C3%ABl%20-%20La%20Madone%20de%20Lorette%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3035829",
+    "artistId": "Q5432",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Don%20Manuel%20Osorio%20Manrique%20de%20Z%C3%BA%C3%B1iga.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2275653",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Sanzio%20-%20Self-portrait%20with%20a%20friend%20-%20Google%20Art%20project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2631335",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Sanzio%20-%20Sacra%20Famiglia%20con%20Rafael%2C%20Tobia%20e%20San%20Girolamo%2C%20o%20Vergine%20del%20pesce.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q23688702",
+    "artistId": "Q958927",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Aleksander%20Gierymski%20-%20In%20the%20summer%20house%20-%20MP%20334%20-%20National%20Museum%20in%20Warsaw.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2535486",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Tempi%20Madonna%20-%20Raphael.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2274267",
+    "artistId": "Q9319",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Jacopo%20Tintoretto%20-%20The%20Origin%20of%20the%20Milky%20Way%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2503581",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Aldobrandini%20Madonna.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2713671",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffaello%20Santi%20-%20Sacra%20Famiglia%20Canigiani%20%28Alte%20Pinakothek%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2533791",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/David%20Brutus.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3590926",
+    "artistId": "Q83155",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/David-Antiochus%20et%20Stratonice.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2165279",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raffael%20020.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2622161",
+    "artistId": "Q5597",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20-%20Saint%20George%20and%20the%20Dragon%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q4892867",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20De%20oogst%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q493792",
+    "artistId": "Q7803",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Andrea%20Doria%20as%20Neptune.%20Bronzino%20%28Agnolo%20di%20Cosimo%29%20c.%201545-6.%20Paolo%20Giovo%20collection.%20Pinacoteca%20di%20Brera.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q17343012",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%20Harmensz%20van%20Rijn%20-%20Jacob%20III%20de%20Gheyn%20-%20Google%20Art%20Project.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q18756478",
+    "artistId": "Q766362",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Candaules%2C%20King%20of%20Lydia%2C%20Shews%20his%20Wife%20by%20Stealth%20to%20Gyges%2C%20One%20of%20his%20Ministers%2C%20as%20She%20Goes%20to%20Bed-WUS07220%20%28cropped%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q20919545",
+    "artistId": "Q766362",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Etty%20%E2%80%93%20The%20Dawn%20of%20Love.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q2609235",
+    "artistId": "Q42207",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Saint%20Francis%20of%20Assisi%20in%20Ecstasy-Caravaggio%20%28c.1595%29.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q3630751",
+    "artistId": "Q5598",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Rembrandt%2C%20Self%20Portrait%20at%20the%20Age%20of%2034.jpg",
+    "sitelinks": 14
+  },
+  {
+    "wikidataId": "Q4987244",
+    "artistId": "Q5582",
+    "imageSource": "http://commons.wikimedia.org/wiki/Special:FilePath/Bulb%20Fields.jpg",
+    "sitelinks": 14
+  }
+]
