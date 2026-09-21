@@ -301,8 +301,8 @@ export async function deleteExactLegacyE2eQuestions(confirmation: string) {
   const legacy = questions.filter((question) => question.fragen_id !== reference?.fragen_id && !parseQid(question.quelle));
   const described = legacy.map(describeLegacy);
   const expected = [
-    { questionId: 109, artist: "Vincent van Gogh", title: "Sternennacht" },
-    { questionId: 110, artist: "Edvard Munch", title: "Der Schrei" },
+    { questionId: 109, artist: "Vincent van Gogh", title: "Sternennacht (The Starry Night)" },
+    { questionId: 110, artist: "Edvard Munch", title: "Der Schrei (The Scream)" },
   ];
   if (described.length !== expected.length || expected.some((item) => !described.some((question) =>
     question.questionId === item.questionId && question.artist === item.artist && question.title === item.title && question.categories.length === 1 && question.categories[0] === LEGACY_CATEGORY,

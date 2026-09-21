@@ -30,7 +30,7 @@ test("media is verified before and after upload", () => {
 });
 
 test("legacy cleanup can only target the two inventoried preview E2E questions", () => {
-  assert.match(service, /questionId: 109, artist: "Vincent van Gogh", title: "Sternennacht"/);
-  assert.match(service, /questionId: 110, artist: "Edvard Munch", title: "Der Schrei"/);
+  assert.match(service, /questionId: 109, artist: "Vincent van Gogh", title: "Sternennacht \(The Starry Night\)"/);
+  assert.match(service, /questionId: 110, artist: "Edvard Munch", title: "Der Schrei \(The Scream\)"/);
   assert.match(service, /ARTWORK_IMPORT_LEGACY_SET_MISMATCH/);
 });
