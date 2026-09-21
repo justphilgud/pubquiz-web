@@ -19,6 +19,10 @@ import {
 
 const execFileAsync = promisify(execFile);
 const viewport: { width: number; height: number } = { width: 1280, height: 720 };
+const artworkSvg = readFileSync(
+  new URL("../../../public/medien/artwork-layout-test.svg", import.meta.url),
+  "utf8",
+);
 
 type LayoutMeasurement = {
   viewport: typeof viewport;
@@ -211,7 +215,7 @@ test("artwork questions fit completely in a real 1280x720 browser viewport", asy
   const server = createServer((request, response) => {
     if (request.url === "/medien/artwork-layout-test.svg") {
       response.writeHead(200, { "Content-Type": "image/svg+xml" });
-      response.end('<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="2869" viewBox="0 0 1920 2869"><rect width="1920" height="2869" fill="#d9b98c"/><circle cx="960" cy="1080" r="520" fill="#394867"/><path d="M260 2520L960 1520L1660 2520Z" fill="#9b2226"/></svg>');
+      response.end(artworkSvg);
       return;
     }
     const page = pages.get(request.url ?? "");
