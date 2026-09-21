@@ -222,6 +222,12 @@ function layoutContractForDefinition(
       allowedVariants: withSolution("MEDIA_FOCUS"),
     };
   }
+  if (definition.id === questionTemplateIds.artwork) {
+    return {
+      defaultVariant: "MEDIA_FOCUS",
+      allowedVariants: withSolution("MEDIA_FOCUS"),
+    };
+  }
   if (definition.id === questionTemplateIds.googleReviews) {
     return {
       defaultVariant: "REVEAL_SEQUENCE",

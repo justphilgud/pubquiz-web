@@ -359,6 +359,7 @@ test("only productive standalone templates are available for filtering", () => {
     .map((template) => template.id);
   assert.ok(filterableIds.includes(questionTemplateIds.standard));
   assert.ok(filterableIds.includes(questionTemplateIds.faceMorph));
+  assert.ok(filterableIds.includes(questionTemplateIds.artwork));
   assert.ok(filterableIds.includes(questionTemplateIds.musicReverse));
   assert.ok(filterableIds.includes(questionTemplateIds.pixelImage));
   assert.ok(filterableIds.includes(questionTemplateIds.trueFalse));
@@ -423,6 +424,7 @@ test("answer mode is derived from central template semantics, not answer count",
   );
   for (const templateId of [
     questionTemplateIds.faceMorph,
+    questionTemplateIds.artwork,
     questionTemplateIds.musicReverse,
     questionTemplateIds.pixelImage,
   ]) {

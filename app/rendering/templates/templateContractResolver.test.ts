@@ -90,6 +90,7 @@ test("template semantics are derived from definitions and focused overlays", () 
     [questionTemplateIds.googleReviews, "TEXT", "MANUAL"],
     [questionTemplateIds.faceMorph, "STRUCTURED_TEXT", "MANUAL"],
     [questionTemplateIds.musicReverse, "STRUCTURED_TEXT", "MANUAL"],
+    [questionTemplateIds.artwork, "STRUCTURED_TEXT", "MANUAL"],
     [questionTemplateIds.musicEightBit, "TEXT", "MANUAL"],
     [questionTemplateIds.pixelImage, "TEXT", "MANUAL"],
   ] as const;
@@ -164,6 +165,7 @@ test("contract media references delegate scope and MIME rules to the central slo
   const standard = getQuestionTemplateContract(questionTemplateIds.standard)!;
   const faceMorph = getQuestionTemplateContract(questionTemplateIds.faceMorph)!;
   const reverse = getQuestionTemplateContract(questionTemplateIds.musicReverse)!;
+  const artwork = getQuestionTemplateContract(questionTemplateIds.artwork)!;
 
   assert.equal(
     standard.components.slots.find(
@@ -195,6 +197,15 @@ test("contract media references delegate scope and MIME rules to the central slo
     )?.type,
     "GENERATED",
   );
+  const artworkImage = artwork.components.slots.find(
+    (slot) => slot.mediaSlotKeys?.includes("question_image"),
+  );
+  assert.equal(artworkImage?.minItems, 1);
+  assert.equal(artwork.layout.defaultVariant, "MEDIA_FOCUS");
+  assert.deepEqual(artwork.layout.allowedVariants, [
+    "MEDIA_FOCUS",
+    "SOLUTION_FOCUS",
+  ]);
 });
 
 test("special contracts expose their existing authoring and media capabilities", () => {

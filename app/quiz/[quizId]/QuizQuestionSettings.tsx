@@ -88,6 +88,7 @@ const reasonLabels: Record<PresentationLayoutReason, string> = {
   MULTIPLE_CHOICE_TEMPLATE: "Durch die Multiple-Choice-Vorlage",
   AUDIO_TEMPLATE: "Durch die Audiovorlage",
   FACE_MORPH_TEMPLATE: "Durch die Bildvorlage",
+  ARTWORK_TEMPLATE: "Durch die Kunstwerkvorlage",
   STRUCTURED_RESPONSE: "Durch die strukturierten Antwortfelder",
   AUDIO_MEDIUM: "Durch das vorhandene Audiomedium",
   VISUAL_MEDIUM: "Durch das vorhandene Bild- oder Videomedium",
