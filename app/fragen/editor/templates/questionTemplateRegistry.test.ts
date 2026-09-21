@@ -15,6 +15,17 @@ const editorActions = readFileSync(
   new URL("../actions.ts", import.meta.url),
   "utf8",
 );
+const artworkMigration = readFileSync(
+  new URL(
+    "../../../../prisma/migrations/20260921120000_add_artwork_question_template/migration.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
+const seedSource = readFileSync(
+  new URL("../../../../prisma/seed.ts", import.meta.url),
+  "utf8",
+);
 
 const questionTemplates = localizeQuestionTemplates(
   loadQuestionEditorMessages("de"),
@@ -146,4 +157,49 @@ test("required template media stays distinct from general optional media", () =>
   assert.equal(faceMorph.mediaSlots[0].key, "face_morph_result");
   assert.equal(faceMorph.mediaSlots[0].required, true);
   assert.equal(faceMorph.mediaSlots[0].allowedMediaType, "IMAGE");
+});
+
+test("artwork is a selectable two-field template with one required question image", () => {
+  const artwork = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.artwork,
+  );
+
+  assert.ok(artwork);
+  assert.equal(artwork.id, "kunstwerk");
+  assert.equal(artwork.selectable, true);
+  assert.equal(
+    artwork.defaultQuestionText,
+    "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?",
+  );
+  assert.deepEqual(
+    artwork.initialAnswers.map((answer) => [answer.fieldLabel, answer.isCorrect]),
+    [
+      ["Künstler", true],
+      ["Titel", true],
+    ],
+  );
+  assert.deepEqual(
+    artwork.mediaSlots.map((slot) => [
+      slot.key,
+      slot.required,
+      slot.allowedMediaType,
+    ]),
+    [["question_image", true, "IMAGE"]],
+  );
+});
+
+test("artwork master data is idempotent and seed-consistent without schema DDL", () => {
+  assert.match(artworkMigration, /ON CONFLICT \(code\) DO UPDATE/);
+  assert.match(artworkMigration, /WHERE code = 'kunstwerk'/);
+  assert.match(artworkMigration, /'Künstler'/);
+  assert.match(artworkMigration, /'Titel'/);
+  assert.match(artworkMigration, /NOT EXISTS/);
+  assert.doesNotMatch(
+    artworkMigration,
+    /CREATE\s+(?:TABLE|TYPE)|ALTER\s+TABLE|ADD\s+COLUMN/i,
+  );
+  assert.match(seedSource, /code: "kunstwerk"/);
+  assert.match(seedSource, /label: "Künstler"/);
+  assert.match(seedSource, /label: "Titel"/);
 });

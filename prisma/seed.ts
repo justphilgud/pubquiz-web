@@ -99,6 +99,22 @@ async function main() {
   });
 
   await createVorlage({
+    code: "kunstwerk",
+    name: "Kunstwerk",
+    slide_typ: "image_guess",
+    antwortfelder: [
+      {
+        label: "Künstler",
+        sortierung: 1,
+      },
+      {
+        label: "Titel",
+        sortierung: 2,
+      },
+    ],
+  });
+
+  await createVorlage({
     code: "bild_raten",
     name: "Bild raten",
     slide_typ: "image_guess",

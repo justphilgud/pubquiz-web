@@ -27,6 +27,7 @@ export type PresentationLayoutReason =
   | "MULTIPLE_CHOICE_TEMPLATE"
   | "AUDIO_TEMPLATE"
   | "FACE_MORPH_TEMPLATE"
+  | "ARTWORK_TEMPLATE"
   | "STRUCTURED_RESPONSE"
   | "AUDIO_MEDIUM"
   | "VISUAL_MEDIUM"
@@ -167,6 +168,9 @@ export function resolvePresentationLayout(
   } else if (canonicalTemplateId === questionTemplateIds.faceMorph) {
     preferred = "MEDIA_FOCUS";
     reason = "FACE_MORPH_TEMPLATE";
+  } else if (canonicalTemplateId === questionTemplateIds.artwork) {
+    preferred = "MEDIA_FOCUS";
+    reason = "ARTWORK_TEMPLATE";
   } else if (input.structuredFieldCount > 0) {
     preferred = "STRUCTURED_RESPONSE";
     reason = "STRUCTURED_RESPONSE";

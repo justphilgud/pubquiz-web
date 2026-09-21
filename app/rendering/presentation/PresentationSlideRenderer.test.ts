@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import {
+  ArtworkSolutionSlide,
+  formatArtworkAlternatives,
+} from "./ArtworkSolutionSlide";
 
 const rendererSource = readFileSync(
   new URL("./PresentationSlideRenderer.tsx", import.meta.url),
@@ -71,4 +77,33 @@ test("calendar CTA leaves the team join QR payload and overflow UI intact", () =
   assert.match(rendererSource, /teamJoinState\.teamNames\.map/);
   assert.match(rendererSource, /teamJoinState\.remainingTeams > 0/);
   assert.match(rendererSource, /\+ \{teamJoinState\.remainingTeams\} weitere/);
+});
+
+test("artwork solution renders the image, artist, compact title alternatives and source", () => {
+  const markup = renderToStaticMarkup(
+    createElement(ArtworkSolutionSlide, {
+      questionText:
+        "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?",
+      source: "Wikimedia Commons · public domain",
+      image: {
+        src: "https://example.test/mona-lisa.svg",
+        alt: "Mona Lisa",
+      },
+      artistSolutions: ["Leonardo da Vinci"],
+      titleSolutions: ["Mona Lisa", "La Gioconda", "Mona Lisa"],
+    }),
+  );
+
+  assert.match(markup, /data-artwork-solution/);
+  assert.match(markup, /mona-lisa\.svg/);
+  assert.match(markup, /object-contain/);
+  assert.match(markup, /Leonardo da Vinci/);
+  assert.match(markup, /Mona Lisa \(La Gioconda\)/);
+  assert.match(markup, /Wikimedia Commons · public domain/);
+  assert.equal(
+    formatArtworkAlternatives(["Mona Lisa", "La Gioconda"]),
+    "Mona Lisa (La Gioconda)",
+  );
+  assert.match(rendererSource, /frage\.templateId === questionTemplateIds\.artwork/);
+  assert.match(rendererSource, /medium\.slotKey === "question_image"/);
 });

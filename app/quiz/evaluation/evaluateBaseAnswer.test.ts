@@ -79,6 +79,37 @@ test("structured answers cover all and no matching components", () => {
   assert.equal(wrong.status, "WRONG");
 });
 
+test("artwork awards one half point per field and accepts alternate titles", () => {
+  const input = {
+    ...defaults,
+    templateId: "kunstwerk",
+    structuredFields: [
+      { id: 1, acceptedSolutions: ["Leonardo da Vinci"] },
+      { id: 2, acceptedSolutions: ["Mona Lisa", "La Gioconda"] },
+    ],
+  };
+  const cases = [
+    ["Leonardo da Vinci", "Mona Lisa", "CORRECT", "1"],
+    ["Leonardo da Vinci", "Falscher Titel", "PARTIAL", "0.5"],
+    ["Falscher Künstler", "La Gioconda", "PARTIAL", "0.5"],
+    ["Falscher Künstler", "Falscher Titel", "WRONG", "0"],
+    ["", "", "UNANSWERED", "0"],
+  ] as const;
+
+  for (const [artist, title, status, points] of cases) {
+    const result = evaluateBaseAnswer({
+      ...input,
+      structuredAnswers: new Map([
+        [1, artist],
+        [2, title],
+      ]),
+    });
+    assert.equal(result.status, status);
+    assert.equal(result.basePoints.toString(), points);
+    assert.equal(result.maxPoints.toString(), "1");
+  }
+});
+
 test("poll submissions have no evaluation, maximum or points mode", () => {
   const result = evaluateBaseAnswer({
     ...defaults,

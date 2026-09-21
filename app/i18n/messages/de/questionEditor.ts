@@ -59,6 +59,11 @@ export const deQuestionEditorMessages = {
       defaultQuestion: "Welcher Song wurde hier rückwärts abgespielt? Nennt Interpret und Titel.", artist: "Interpret", title: "Titel",
       mediaLabel: "Rückwärts abgespielte Audiodatei", mediaHelp: "Lade die bereits rückwärts vorbereitete MP3-, WAV- oder OGG-Datei hoch.",
     },
+    artwork: {
+      name: "Kunstwerk",
+      description: "Künstler und Titel eines abgebildeten Kunstwerks erkennen.",
+      defaultQuestion: "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?",
+    },
     musicEightBit: {
       name: "Bitcrush-Musik", description: "Songtitel anhand einer technisch reduzierten Retro-Lo-Fi-Version erkennen.",
       defaultQuestion: "Welcher Song ist in dieser Bitcrush-Version zu hören?",
@@ -77,7 +82,7 @@ export const deQuestionEditorMessages = {
     pollMulti: { name: "Umfrage: mehrere Auswahlen", description: "Teams können mehrere Optionen wählen; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
     pollScale: { name: "Umfrage: Skala", description: "Teams stimmen auf einer frei beschriftbaren Skala ab; es gibt keine Punkte.", defaultQuestion: "" },
   },
-  templateFields: { personA: "Person A", personB: "Person B", artist: "Interpret", title: "Titel", solution: "Lösung" },
+  templateFields: { personA: "Person A", personB: "Person B", artist: "Interpret", visualArtist: "Künstler", title: "Titel", solution: "Lösung" },
   templateMedia: {
     faceMorphLabel: "FaceMorph-Bild", faceMorphHelp: "Lade das fertig erstellte FaceMorph als JPEG, PNG oder WebP hoch.",
     musicReverseLabel: "Rückwärts abgespielte Audiodatei", musicReverseHelp: "Lade die bereits rückwärts vorbereitete MP3-, WAV- oder OGG-Datei hoch.",

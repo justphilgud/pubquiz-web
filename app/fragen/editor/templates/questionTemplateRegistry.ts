@@ -3,6 +3,7 @@ export const questionTemplateIds = {
   multipleChoice: "multiple_choice",
   faceMorph: "face_morph",
   musicReverse: "musik_rueckwaerts",
+  artwork: "kunstwerk",
   musicEightBit: "eight_bit",
   pixelImage: "pixelbild",
   trueFalse: "wahr_falsch",

@@ -214,6 +214,58 @@ test("applying the pixel template creates a canonical editable draft", () => {
   });
 });
 
+test("applying artwork creates the default prompt and ordered structured fields", () => {
+  const artwork = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.artwork,
+  );
+
+  assert.ok(artwork);
+  const changed = applyQuestionTemplateToDraft(
+    { ...createDraft(), questionText: "", questionMedia: [] },
+    artwork,
+    (() => {
+      let index = 0;
+      return () => `artwork-field-${++index}`;
+    })(),
+  );
+
+  assert.equal(changed.templateId, questionTemplateIds.artwork);
+  assert.equal(
+    changed.questionText,
+    "Von welchem Künstler stammt dieses Kunstwerk und wie heißt es?",
+  );
+  assert.deepEqual(
+    changed.answers.map((answer) => ({
+      fieldGroupId: answer.fieldGroupId,
+      fieldLabel: answer.fieldLabel,
+      isRequired: answer.isRequired,
+      isCorrect: answer.isCorrect,
+    })),
+    [
+      {
+        fieldGroupId: "artwork-field-1",
+        fieldLabel: "Künstler",
+        isRequired: true,
+        isCorrect: true,
+      },
+      {
+        fieldGroupId: "artwork-field-2",
+        fieldLabel: "Titel",
+        isRequired: true,
+        isCorrect: true,
+      },
+    ],
+  );
+  assert.deepEqual(
+    getActiveQuestionMediaSlots(artwork, []).map((slot) => [
+      slot.key,
+      slot.required,
+    ]),
+    [["question_image", true]],
+  );
+});
+
 test("a template switch reports an incompatible retained required medium", () => {
   const audioMedia: QuestionMediaDraft = {
     slotKey: "music_reverse_audio",

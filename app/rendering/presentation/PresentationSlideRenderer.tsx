@@ -45,8 +45,12 @@ import {
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
 import type { PollLiveState } from "@/app/quiz/interaction/pollInteraction";
-import { isPollQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import {
+  isPollQuestionTemplateId,
+  questionTemplateIds,
+} from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { applyQuizSpecificOrderingItemOrder } from "@/app/quiz/orderingQuestionOrder";
+import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
 
 type ScoreEntry = {
   teamname: string;
@@ -1122,6 +1126,30 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const hatAntwortfelderLoesungen = richtigeAntwortfeldLoesungen.some(
     (feld) => feld.loesungen.length > 0
   );
+
+  if (frage.templateId === questionTemplateIds.artwork) {
+    const artworkMedium = frage.medien.find(
+      (medium) => medium.slotKey === "question_image" && isBild(medium.datei),
+    ) ?? frage.medien.find((medium) => isBild(medium.datei));
+    const [artistField, titleField] = richtigeAntwortfeldLoesungen;
+
+    return (
+      <ArtworkSolutionSlide
+        questionText={frage.frage}
+        source={frage.quelle}
+        image={artworkMedium ? {
+          src: getMediumUrl(artworkMedium.datei),
+          alt: artworkMedium.bemerkung ?? `Kunstwerk zu: ${frage.frage}`,
+        } : null}
+        artistSolutions={(artistField?.loesungen ?? []).map(
+          (solution) => solution.loesung_text,
+        )}
+        titleSolutions={(titleField?.loesungen ?? []).map(
+          (solution) => solution.loesung_text,
+        )}
+      />
+    );
+  }
 
   if (isPollQuestionTemplateId(frage.templateId)) {
     return (

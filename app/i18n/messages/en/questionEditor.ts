@@ -33,6 +33,7 @@ export const enQuestionEditorMessages = {
     multipleChoice: { name: "Multiple choice", description: "Closed question with four answer choices." },
     faceMorph: { name: "FaceMorph", description: "Identify two people in one combined image.", defaultQuestion: "Which two people can you see in this image?", personA: "Person A", personB: "Person B" },
     musicReverse: { name: "Music reversed", description: "Identify the artist and title of a song played backwards.", defaultQuestion: "Which song is being played backwards? Name the artist and title.", artist: "Artist", title: "Title" },
+    artwork: { name: "Artwork", description: "Identify the artist and title of an artwork.", defaultQuestion: "Who created this artwork and what is its title?" },
     musicEightBit: { name: "Bitcrush music", description: "Identify a song from a digitally reduced retro lo-fi version.", defaultQuestion: "Which song can you hear in this bitcrushed version?" },
     pixelImage: { name: "Pixel image", description: "Identify a subject from a generated pixel graphic.", defaultQuestion: "What can you see in this pixel image?" },
     trueFalse: { name: "True or false", description: "Classify one statement as true or false.", defaultQuestion: "" },
@@ -64,7 +65,7 @@ export const enQuestionEditorMessages = {
     categoryRequestHelp: "This request uses the previous workflow. Create new suggestions directly through category search.",
     outdatedFrom: "Outdated from {date}", reviewFrom: "Review from {date}", lifecycleTitle: "Freshness", lifecycleDescription: "Choose whether the question is timeless, becomes outdated, or needs editorial review.", lifecycleTimeless: "Timeless", lifecycleOutdated: "Outdated from", lifecycleReview: "Review from", lifecycleDate: "Date", reviewHelp: "The question remains usable. An editorial review notice appears from this date.",
   },
-  templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", title: "Title", solution: "Solution" },
+  templateFields: { personA: "Person A", personB: "Person B", artist: "Artist", visualArtist: "Artist", title: "Title", solution: "Solution" },
   templateSelector: { selected: "Special question: {name}", change: "Change", clear: "Clear selection", select: "Select special question", searchLabel: "Search special questions", searchPlaceholder: "Search special question", empty: "No special question found." },
   question: {
     label: "Question",

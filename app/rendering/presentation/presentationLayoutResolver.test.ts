@@ -28,6 +28,7 @@ test("every productive question template resolves a valid layout", () => {
     questionTemplateIds.multipleChoice,
     questionTemplateIds.faceMorph,
     questionTemplateIds.musicReverse,
+    questionTemplateIds.artwork,
     questionTemplateIds.musicEightBit,
     questionTemplateIds.pixelImage,
     questionTemplateIds.trueFalse,
@@ -108,6 +109,24 @@ test("template semantics select choice, boolean, ordering, audio and reveal layo
   assert.equal(
     resolve({ templateId: questionTemplateIds.faceMorph }).variant,
     "MEDIA_FOCUS",
+  );
+  assert.deepEqual(
+    resolve({
+      templateId: questionTemplateIds.artwork,
+      structuredFieldCount: 2,
+      media: [
+        {
+          fileName: "mona-lisa.svg",
+          mediaType: "Bild",
+          scope: "QUESTION",
+        },
+      ],
+    }),
+    {
+      variant: "MEDIA_FOCUS",
+      source: "AUTO",
+      reason: "ARTWORK_TEMPLATE",
+    },
   );
   assert.equal(
     resolve({ templateId: questionTemplateIds.estimate }).variant,
