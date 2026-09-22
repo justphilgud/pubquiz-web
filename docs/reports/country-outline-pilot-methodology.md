@@ -14,7 +14,7 @@ Der erzeugte Plan liegt in `data/countries/country-question-plan.json`. Er enth�
 
 ## Natural-Earth-Quelle und Lizenz
 
-Quelle: Natural Earth, **Admin 0 – Countries**, Maßstab 1:10m, Version 5.1.1, Datei `ne_10m_admin_0_countries.geojson`. Der vollständige Quelldatensatz wird nur beim Build eingelesen. Im Repository liegt ausschließlich der auf Deutschland, Italien, Chile, Australien und Gambia reduzierte GeoJSON-Ausschnitt.
+Quelle: Natural Earth, **Admin 0 – Countries**, Maßstab 1:10m, Version 5.1.1, Datei `ne_10m_admin_0_countries.geojson`. Der vollständige Upstream-Datensatz wird nur beim Build eingelesen. Im Repository liegt das auf exakt die 193 UN-Mitglieder reduzierte Subset komprimiert und versioniert; sonstige Natural-Earth-Features werden nicht übernommen.
 
 Natural Earth stellt sämtliche Raster- und Vektordaten auf der eigenen Website als **Public Domain** bereit. Nutzung und Bearbeitung sind ohne Erlaubnis möglich; eine Nennung ist nicht erforderlich. Wir dokumentieren die Herkunft dennoch als „Made with Natural Earth“.
 
@@ -104,10 +104,26 @@ Die fünf Pilotassets und ihre Distraktorsätze bleiben bytegenau erhalten. Das 
 
 Für die 188 neuen Länder kombiniert die deterministische Rangfolge ein normalisiertes 16×12-Silhouettenraster, Seitenverhältnis, Anzahl erhaltener Teile, Region und Subregion. Nahezu identische Mehrfachdistraktoren werden begrenzt. Jeder Plan enthält exakt eine richtige und drei verschiedene falsche Antworten aus demselben 193er-Katalog. Die fünf akzeptierten Pilotsätze bleiben unverändert.
 
-`data/countries/country-outline-import-plan.json` enthält 193 eindeutige Quellenmarker der Form `COUNTRY_OUTLINE_V1; ISO=XX; NE=5.1.1`. Der Preview-Bestandsabgleich verwendet diesen Marker statt des identischen Fragewortlauts. Dadurch überspringt ein Wiederholungslauf vorhandene Länder, ohne einen zweiten Datensatz anzulegen. Der allgemeine Dateiimport wird bewusst nicht verwendet, weil seine Bestandsprüfung identische Fragetexte als Duplikat behandelt und diesen Anwendungsfall daher nicht korrekt abbildet.
+`data/countries/country-outline-import-plan.json` enthält 193 eindeutige Quellenmarker der Form `COUNTRY_OUTLINE_V1; ISO=XX; NE=5.1.1`. Der Production-Bestandsabgleich lädt alle Treffer des identischen Fragewortlauts und gleicht anschließend Marker, Wortlaut, geordnete Antworten, Richtig-Markierung, Kategorie, Template und Medienanzahl ab. Nur ein vollständig übereinstimmender Datensatz darf übersprungen werden; doppelte, unerwartete oder abweichende Marker stoppen den Lauf. Der allgemeine Dateiimport wird bewusst nicht verwendet, weil seine Bestandsprüfung identische Fragetexte als Duplikat behandelt und diesen Anwendungsfall daher nicht korrekt abbildet.
+
+`reconcileOutlineImport` bildet diesen Vertrag unabhängig vom Browserlauf ab. Ein leerer Bestand ergibt 193 anzulegende Fragen, ein vollständig passender Bestand 193 zu überspringende Fragen und ein Teilbestand nur die tatsächlich fehlenden Länder. Duplikate und semantische Abweichungen werden als Konflikt gemeldet. Der Import bleibt zusätzlich durch `writeAuthorized: false` gesperrt, bis eine ausdrückliche Production-Freigabe vorliegt.
 
 ### Automatische Qualitätsprüfung
 
 `data/countries/country-outline-qc.json` meldet 193 generierte Assets und keine offene kritische Abweichung. Die Reviewgruppen enthalten 7 Kleinstaaten, 95 Archipel-/Mehrteiler, 5 Antimeridianfälle, 11 Darstellungen mit bewusst verworfenen kleinen Teilen und 4 extreme Seitenverhältnisse. Vier Kontaktbögen unter `docs/reports/assets/country-outlines/` zeigen jeden Staat mit ISO-Code und deutschem Kurznamen; die Beschriftung ist ausschließlich Teil der Prüfübersicht und nie Bestandteil eines Quizassets.
 
 Die automatischen Tests prüfen die bijektive Zuordnung aller 193 Mitglieder, eindeutige Marker, genau 193 SVG-/WebP-Paare, Hash und Dateigröße, 4:3-Abmessungen, Padding, sichtbare Pixel, textfreie SVGs, vier Antworten mit exakt einer Lösung, ausschließlich UN-Mitglieder als Distraktoren, unveränderte Pilotsets, deterministischen Neuaufbau, das komprimierte Natural-Earth-Subset sowie die vollständigen Kontaktbögen.
+
+## Kontrollierter Abbruch am 22. September 2026
+
+Die Zielsetzung wurde vor dem vollständigen Preview-Import geändert: Preview bleibt bei repräsentativen Testdaten; der vollständige fachliche Bestand ist für Production vorgesehen. Der Sammellauf wurde nicht gestartet. Vor dem Stopp wurde genau eine zusätzliche Einzelprobe über den regulären Preview-Frageneditor gespeichert:
+
+| Frage-ID | Land | ISO | Zustand |
+| --- | --- | --- | --- |
+| 116 | Afghanistan | AF | freigegeben, global, Geografie, Standard, ein WebP, vier Antworten |
+
+Die fünf Pilotfragen 111–115 und Afghanistan 116 ergeben read-only bestätigt sechs Preview-Treffer. Es wurden keine weiteren Phase-2-Fragen angelegt. Frage 116 bleibt erhalten, weil für eine Preview-Löschung keine Freigabe vorliegt.
+
+Der Production-Bestand wurde danach ausschließlich lesend über den angemeldeten Frageneditor mit dem exakten Fragewortlaut geprüft. Ergebnis: 0 Treffer. Die fünf Preview-Pilotfragen gelten ausdrücklich nicht als Production-Bestand. Bei unverändertem Preflight sind daher 193 neue Production-Fragen zu erwarten.
+
+Production wurde nicht beschrieben. Vor einem späteren Import muss der read-only Bestandsabgleich unmittelbar erneut laufen; erst danach darf der Importplan mit expliziter Freigabe entsperrt werden.

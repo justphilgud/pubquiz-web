@@ -37,21 +37,38 @@ const plan = {
   outlineQuestions,
 };
 const importPlan = {
-  version: 1,
-  target: "Preview only",
-  idempotency: "sourceMarker",
+  version: 2,
+  target: "Production pending explicit approval",
+  writeAuthorized: false,
+  idempotency: {
+    key: "sourceMarker",
+    preflight: "Enumerate every exact-question match, load all result pages, and reconcile the unique COUNTRY_OUTLINE_V1 source marker before creating anything.",
+    conflictPolicy: "Stop on duplicate, unexpected, or semantically mismatching markers.",
+    resumePolicy: "Skip only an existing row whose marker, question, ordered answers, correct-answer flag, category, template, and media count all match the plan.",
+  },
   expectedTotal: 193,
-  expectedExistingPilot: 5,
-  expectedNew: 188,
+  productionInventoryReadOnly: {
+    observedAt: "2026-09-22T08:40:00+02:00",
+    matchingQuestionCount: 0,
+  },
+  expectedExisting: 0,
+  expectedNew: 193,
+  previewPilotIsNotProductionEvidence: true,
   questions: outlineQuestions.map((question) => ({
     ...question,
     category: "Geografie",
     templateId: "standard",
     source: `Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); ${question.sourceMarker}`,
-    expectedStateBeforePhase2: pilotIso2.has(question.iso2) ? "existing-pilot" : "missing",
+    pilotInPreview: pilotIso2.has(question.iso2),
+    expectedStateBeforeProductionImport: "missing",
   })),
 };
 
 await writeFile(outputPlanPath, `${JSON.stringify(plan, null, 2)}\n`, "utf8");
 await writeFile(outputImportPlanPath, `${JSON.stringify(importPlan, null, 2)}\n`, "utf8");
-console.log(JSON.stringify({ outlineQuestions: outlineQuestions.length, pilot: outlinePilot.length, newQuestions: outlineQuestions.length - outlinePilot.length }));
+console.log(JSON.stringify({
+  outlineQuestions: outlineQuestions.length,
+  pilotAssetsPreserved: outlinePilot.length,
+  nonPilotAssets: outlineQuestions.length - outlinePilot.length,
+  expectedNewProductionQuestions: importPlan.expectedNew,
+}));

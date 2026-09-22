@@ -1,10 +1,21 @@
 {
-  "version": 1,
-  "target": "Preview only",
-  "idempotency": "sourceMarker",
+  "version": 2,
+  "target": "Production pending explicit approval",
+  "writeAuthorized": false,
+  "idempotency": {
+    "key": "sourceMarker",
+    "preflight": "Enumerate every exact-question match, load all result pages, and reconcile the unique COUNTRY_OUTLINE_V1 source marker before creating anything.",
+    "conflictPolicy": "Stop on duplicate, unexpected, or semantically mismatching markers.",
+    "resumePolicy": "Skip only an existing row whose marker, question, ordered answers, correct-answer flag, category, template, and media count all match the plan."
+  },
   "expectedTotal": 193,
-  "expectedExistingPilot": 5,
-  "expectedNew": 188,
+  "productionInventoryReadOnly": {
+    "observedAt": "2026-09-22T08:40:00+02:00",
+    "matchingQuestionCount": 0
+  },
+  "expectedExisting": 0,
+  "expectedNew": 193,
+  "previewPilotIsNotProductionEvidence": true,
   "questions": [
     {
       "iso2": "AD",
@@ -39,7 +50,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AE",
@@ -74,7 +86,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AF",
@@ -109,7 +122,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AF; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AG",
@@ -144,7 +158,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AL",
@@ -179,7 +194,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AL; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AM",
@@ -214,7 +230,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AO",
@@ -249,7 +266,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AR",
@@ -284,7 +302,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AT",
@@ -319,7 +338,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AU",
@@ -354,7 +374,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AU; NE=5.1.1",
-      "expectedStateBeforePhase2": "existing-pilot"
+      "pilotInPreview": true,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "AZ",
@@ -389,7 +410,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=AZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BA",
@@ -424,7 +446,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BB",
@@ -459,7 +482,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BB; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BD",
@@ -494,7 +518,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BE",
@@ -529,7 +554,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BF",
@@ -564,7 +590,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BF; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BG",
@@ -599,7 +626,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BH",
@@ -634,7 +662,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BI",
@@ -669,7 +698,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BJ",
@@ -704,7 +734,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BJ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BN",
@@ -739,7 +770,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BO",
@@ -774,7 +806,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BR",
@@ -809,7 +842,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BS",
@@ -844,7 +878,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BS; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BT",
@@ -879,7 +914,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BW",
@@ -914,7 +950,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BY",
@@ -949,7 +986,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "BZ",
@@ -984,7 +1022,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=BZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CA",
@@ -1019,7 +1058,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CD",
@@ -1054,7 +1094,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CF",
@@ -1089,7 +1130,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CF; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CG",
@@ -1124,7 +1166,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CH",
@@ -1159,7 +1202,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CI",
@@ -1194,7 +1238,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CL",
@@ -1229,7 +1274,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CL; NE=5.1.1",
-      "expectedStateBeforePhase2": "existing-pilot"
+      "pilotInPreview": true,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CM",
@@ -1264,7 +1310,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CN",
@@ -1299,7 +1346,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CO",
@@ -1334,7 +1382,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CR",
@@ -1369,7 +1418,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CU",
@@ -1404,7 +1454,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CU; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CV",
@@ -1439,7 +1490,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CV; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CY",
@@ -1474,7 +1526,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "CZ",
@@ -1509,7 +1562,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=CZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "DE",
@@ -1544,7 +1598,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=DE; NE=5.1.1",
-      "expectedStateBeforePhase2": "existing-pilot"
+      "pilotInPreview": true,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "DJ",
@@ -1579,7 +1634,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=DJ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "DK",
@@ -1614,7 +1670,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=DK; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "DM",
@@ -1649,7 +1706,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=DM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "DO",
@@ -1684,7 +1742,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=DO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "DZ",
@@ -1719,7 +1778,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=DZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "EC",
@@ -1754,7 +1814,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=EC; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "EE",
@@ -1789,7 +1850,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=EE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "EG",
@@ -1824,7 +1886,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=EG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ER",
@@ -1859,7 +1922,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ER; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ES",
@@ -1894,7 +1958,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ES; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ET",
@@ -1929,7 +1994,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ET; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "FI",
@@ -1964,7 +2030,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=FI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "FJ",
@@ -1999,7 +2066,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=FJ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "FM",
@@ -2034,7 +2102,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=FM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "FR",
@@ -2069,7 +2138,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=FR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GA",
@@ -2104,7 +2174,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GB",
@@ -2139,7 +2210,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GB; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GD",
@@ -2174,7 +2246,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GE",
@@ -2209,7 +2282,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GH",
@@ -2244,7 +2318,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GM",
@@ -2279,7 +2354,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GM; NE=5.1.1",
-      "expectedStateBeforePhase2": "existing-pilot"
+      "pilotInPreview": true,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GN",
@@ -2314,7 +2390,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GQ",
@@ -2349,7 +2426,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GQ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GR",
@@ -2384,7 +2462,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GT",
@@ -2419,7 +2498,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GW",
@@ -2454,7 +2534,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "GY",
@@ -2489,7 +2570,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=GY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "HN",
@@ -2524,7 +2606,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=HN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "HR",
@@ -2559,7 +2642,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=HR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "HT",
@@ -2594,7 +2678,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=HT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "HU",
@@ -2629,7 +2714,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=HU; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ID",
@@ -2664,7 +2750,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ID; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IE",
@@ -2699,7 +2786,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IL",
@@ -2734,7 +2822,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IL; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IN",
@@ -2769,7 +2858,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IQ",
@@ -2804,7 +2894,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IQ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IR",
@@ -2839,7 +2930,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IS",
@@ -2874,7 +2966,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IS; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "IT",
@@ -2909,7 +3002,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=IT; NE=5.1.1",
-      "expectedStateBeforePhase2": "existing-pilot"
+      "pilotInPreview": true,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "JM",
@@ -2944,7 +3038,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=JM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "JO",
@@ -2979,7 +3074,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=JO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "JP",
@@ -3014,7 +3110,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=JP; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KE",
@@ -3049,7 +3146,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KG",
@@ -3084,7 +3182,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KH",
@@ -3119,7 +3218,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KI",
@@ -3154,7 +3254,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KM",
@@ -3189,7 +3290,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KN",
@@ -3224,7 +3326,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KP",
@@ -3259,7 +3362,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KP; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KR",
@@ -3294,7 +3398,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KW",
@@ -3329,7 +3434,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "KZ",
@@ -3364,7 +3470,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=KZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LA",
@@ -3399,7 +3506,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LB",
@@ -3434,7 +3542,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LB; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LC",
@@ -3469,7 +3578,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LC; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LI",
@@ -3504,7 +3614,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LK",
@@ -3539,7 +3650,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LK; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LR",
@@ -3574,7 +3686,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LS",
@@ -3609,7 +3722,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LS; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LT",
@@ -3644,7 +3758,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LU",
@@ -3679,7 +3794,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LU; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LV",
@@ -3714,7 +3830,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LV; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "LY",
@@ -3749,7 +3866,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=LY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MA",
@@ -3784,7 +3902,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MC",
@@ -3819,7 +3938,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MC; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MD",
@@ -3854,7 +3974,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ME",
@@ -3889,7 +4010,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ME; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MG",
@@ -3924,7 +4046,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MH",
@@ -3959,7 +4082,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MK",
@@ -3994,7 +4118,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MK; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ML",
@@ -4029,7 +4154,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ML; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MM",
@@ -4064,7 +4190,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MN",
@@ -4099,7 +4226,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MR",
@@ -4134,7 +4262,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MT",
@@ -4169,7 +4298,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MU",
@@ -4204,7 +4334,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MU; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MV",
@@ -4239,7 +4370,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MV; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MW",
@@ -4274,7 +4406,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MX",
@@ -4309,7 +4442,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MX; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MY",
@@ -4344,7 +4478,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "MZ",
@@ -4379,7 +4514,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=MZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NA",
@@ -4414,7 +4550,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NE",
@@ -4449,7 +4586,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NG",
@@ -4484,7 +4622,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NI",
@@ -4519,7 +4658,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NL",
@@ -4554,7 +4694,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NL; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NO",
@@ -4589,7 +4730,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NP",
@@ -4624,7 +4766,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NP; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NR",
@@ -4659,7 +4802,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "NZ",
@@ -4694,7 +4838,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=NZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "OM",
@@ -4729,7 +4874,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=OM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PA",
@@ -4764,7 +4910,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PE",
@@ -4799,7 +4946,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PG",
@@ -4834,7 +4982,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PH",
@@ -4869,7 +5018,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PK",
@@ -4904,7 +5054,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PK; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PL",
@@ -4939,7 +5090,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PL; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PT",
@@ -4974,7 +5126,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PW",
@@ -5009,7 +5162,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "PY",
@@ -5044,7 +5198,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=PY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "QA",
@@ -5079,7 +5234,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=QA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "RO",
@@ -5114,7 +5270,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=RO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "RS",
@@ -5149,7 +5306,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=RS; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "RU",
@@ -5184,7 +5342,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=RU; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "RW",
@@ -5219,7 +5378,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=RW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SA",
@@ -5254,7 +5414,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SB",
@@ -5289,7 +5450,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SB; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SC",
@@ -5324,7 +5486,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SC; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SD",
@@ -5359,7 +5522,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SE",
@@ -5394,7 +5558,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SG",
@@ -5429,7 +5594,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SI",
@@ -5464,7 +5630,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SI; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SK",
@@ -5499,7 +5666,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SK; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SL",
@@ -5534,7 +5702,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SL; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SM",
@@ -5569,7 +5738,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SN",
@@ -5604,7 +5774,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SO",
@@ -5639,7 +5810,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SR",
@@ -5674,7 +5846,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SS",
@@ -5709,7 +5882,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SS; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ST",
@@ -5744,7 +5918,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ST; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SV",
@@ -5779,7 +5954,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SV; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SY",
@@ -5814,7 +5990,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "SZ",
@@ -5849,7 +6026,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=SZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TD",
@@ -5884,7 +6062,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TD; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TG",
@@ -5919,7 +6098,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TH",
@@ -5954,7 +6134,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TH; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TJ",
@@ -5989,7 +6170,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TJ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TL",
@@ -6024,7 +6206,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TL; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TM",
@@ -6059,7 +6242,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TN",
@@ -6094,7 +6278,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TO",
@@ -6129,7 +6314,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TO; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TR",
@@ -6164,7 +6350,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TR; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TT",
@@ -6199,7 +6386,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TT; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TV",
@@ -6234,7 +6422,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TV; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "TZ",
@@ -6269,7 +6458,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=TZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "UA",
@@ -6304,7 +6494,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=UA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "UG",
@@ -6339,7 +6530,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=UG; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "US",
@@ -6374,7 +6566,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=US; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "UY",
@@ -6409,7 +6602,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=UY; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "UZ",
@@ -6444,7 +6638,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=UZ; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "VC",
@@ -6479,7 +6674,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=VC; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "VE",
@@ -6514,7 +6710,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=VE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "VN",
@@ -6549,7 +6746,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=VN; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "VU",
@@ -6584,7 +6782,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=VU; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "WS",
@@ -6619,7 +6818,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=WS; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "YE",
@@ -6654,7 +6854,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=YE; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ZA",
@@ -6689,7 +6890,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ZA; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ZM",
@@ -6724,7 +6926,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ZM; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     },
     {
       "iso2": "ZW",
@@ -6759,7 +6962,8 @@
       "category": "Geografie",
       "templateId": "standard",
       "source": "Natural Earth Admin 0 – Countries v5.1.1 (Public Domain); COUNTRY_OUTLINE_V1; ISO=ZW; NE=5.1.1",
-      "expectedStateBeforePhase2": "missing"
+      "pilotInPreview": false,
+      "expectedStateBeforeProductionImport": "missing"
     }
   ]
 }

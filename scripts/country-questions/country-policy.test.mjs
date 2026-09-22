@@ -10,6 +10,7 @@ import {
   OUTLINE_QUESTION,
   PILOT_COUNTRIES,
   buildOutlineQuestionPlan,
+  reconcileOutlineImport,
   selectFlagDistractors,
   validateCountryCatalogue,
   validateQuestionAnswers,
@@ -29,6 +30,9 @@ const outlineManifest = JSON.parse(
 );
 const qualityReport = JSON.parse(
   readFileSync("data/countries/country-outline-qc.json", "utf8"),
+);
+const productionPreflight = JSON.parse(
+  readFileSync("data/countries/country-outline-production-preflight.json", "utf8"),
 );
 
 function fileSha256(filename) {
@@ -179,23 +183,72 @@ test("automatic QC has no unresolved critical assets and contact sheets are comp
   }
 });
 
-test("preview import plan is complete and repeat-safe by unique source marker", () => {
-  assert.equal(importPlan.target, "Preview only");
-  assert.equal(importPlan.idempotency, "sourceMarker");
+test("production import plan is complete and write-gated", () => {
+  assert.equal(importPlan.target, "Production pending explicit approval");
+  assert.equal(importPlan.writeAuthorized, false);
+  assert.equal(importPlan.idempotency.key, "sourceMarker");
   assert.equal(importPlan.expectedTotal, 193);
-  assert.equal(importPlan.expectedExistingPilot, 5);
-  assert.equal(importPlan.expectedNew, 188);
+  assert.equal(importPlan.productionInventoryReadOnly.matchingQuestionCount, 0);
+  assert.equal(importPlan.expectedExisting, 0);
+  assert.equal(importPlan.expectedNew, 193);
+  assert.equal(importPlan.previewPilotIsNotProductionEvidence, true);
   assert.equal(importPlan.questions.length, 193);
   assert.equal(
     importPlan.questions.filter(
-      (question) => question.expectedStateBeforePhase2 === "existing-pilot",
+      (question) => question.expectedStateBeforeProductionImport === "missing",
     ).length,
-    5,
+    193,
   );
   assert.equal(
     new Set(importPlan.questions.map((question) => question.sourceMarker)).size,
     193,
   );
+});
+
+test("read-only Production inventory keeps the import write-gated", () => {
+  assert.equal(productionPreflight.environment, "Production");
+  assert.equal(productionPreflight.readOnly, true);
+  assert.equal(productionPreflight.matchingQuestionCount, 0);
+  assert.deepEqual(productionPreflight.existingSourceMarkers, []);
+  assert.equal(productionPreflight.expectedTotalAfterImport, 193);
+  assert.equal(productionPreflight.expectedNewQuestions, 193);
+  assert.equal(productionPreflight.writeAuthorized, false);
+  assert.equal(productionPreflight.productionChanged, false);
+});
+
+test("production import reconciliation is idempotent and fails closed", () => {
+  const planned = importPlan.questions;
+  const empty = reconcileOutlineImport(planned, []);
+  assert.equal(empty.create.length, 193);
+  assert.equal(empty.skip.length, 0);
+  assert.deepEqual(empty.conflicts, []);
+
+  const existing = planned.map((question, index) => ({
+    questionId: index + 1,
+    sourceMarker: question.sourceMarker,
+    question: question.question,
+    answers: question.answers,
+    category: question.category,
+    templateId: question.templateId,
+    mediaCount: 1,
+  }));
+  const repeated = reconcileOutlineImport(planned, existing);
+  assert.equal(repeated.create.length, 0);
+  assert.equal(repeated.skip.length, 193);
+  assert.deepEqual(repeated.conflicts, []);
+
+  const partial = reconcileOutlineImport(planned, existing.slice(0, 61));
+  assert.equal(partial.create.length, 132);
+  assert.equal(partial.skip.length, 61);
+  assert.deepEqual(partial.conflicts, []);
+
+  const duplicate = reconcileOutlineImport(planned, [existing[0], existing[0]]);
+  assert.equal(duplicate.conflicts[0].type, "duplicate-marker");
+
+  const mismatch = reconcileOutlineImport(planned, [
+    { ...existing[0], answers: existing[0].answers.slice(0, 3) },
+  ]);
+  assert.equal(mismatch.conflicts[0].type, "existing-question-mismatch");
 });
 
 test("flag selection prevents duplicate near-identical distractors", () => {

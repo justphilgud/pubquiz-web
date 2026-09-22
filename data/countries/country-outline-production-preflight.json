@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "observedAt": "2026-09-22T08:40:00+02:00",
+  "environment": "Production",
+  "query": "Welches Land ist anhand dieses Umrisses zu erkennen?",
+  "readOnly": true,
+  "matchingQuestionCount": 0,
+  "existingSourceMarkers": [],
+  "expectedTotalAfterImport": 193,
+  "expectedNewQuestions": 193,
+  "writeAuthorized": false,
+  "productionChanged": false,
+  "notes": [
+    "Preview pilot records are not counted as Production inventory.",
+    "Repeat the read-only inventory immediately before any authorized Production import.",
+    "Stop on duplicate, unexpected, or semantically mismatching source markers."
+  ]
+}

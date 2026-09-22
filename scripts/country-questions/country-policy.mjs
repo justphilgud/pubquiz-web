@@ -168,6 +168,75 @@ export function validateQuestionAnswers(question) {
   return new Set(names).size === 4 && question.answers.filter((answer) => answer.isCorrect).length === 1;
 }
 
+export function reconcileOutlineImport(plannedQuestions, existingQuestions) {
+  const plannedByMarker = new Map();
+  for (const question of plannedQuestions) {
+    if (!question.sourceMarker || plannedByMarker.has(question.sourceMarker)) {
+      throw new Error(`OUTLINE_IMPORT_PLAN_DUPLICATE_MARKER:${question.sourceMarker ?? "missing"}`);
+    }
+    plannedByMarker.set(question.sourceMarker, question);
+  }
+
+  const existingByMarker = new Map();
+  const conflicts = [];
+  for (const existing of existingQuestions) {
+    if (!existing.sourceMarker || !plannedByMarker.has(existing.sourceMarker)) {
+      conflicts.push({
+        type: "unexpected-marker",
+        questionId: existing.questionId ?? null,
+        sourceMarker: existing.sourceMarker ?? null,
+      });
+      continue;
+    }
+    if (existingByMarker.has(existing.sourceMarker)) {
+      conflicts.push({
+        type: "duplicate-marker",
+        questionId: existing.questionId ?? null,
+        sourceMarker: existing.sourceMarker,
+      });
+      continue;
+    }
+    existingByMarker.set(existing.sourceMarker, existing);
+  }
+
+  const create = [];
+  const skip = [];
+  for (const planned of plannedQuestions) {
+    const existing = existingByMarker.get(planned.sourceMarker);
+    if (!existing) {
+      create.push(planned);
+      continue;
+    }
+    const expectedAnswers = planned.answers.map(({ nameDe, isCorrect }) => ({
+      nameDe: normalizeCountryName(nameDe),
+      isCorrect,
+    }));
+    const actualAnswers = Array.isArray(existing.answers)
+      ? existing.answers.map(({ nameDe, isCorrect }) => ({
+          nameDe: normalizeCountryName(nameDe),
+          isCorrect,
+        }))
+      : [];
+    const matches =
+      existing.question === planned.question &&
+      JSON.stringify(actualAnswers) === JSON.stringify(expectedAnswers) &&
+      existing.category === "Geografie" &&
+      existing.templateId === "standard" &&
+      existing.mediaCount === 1;
+    if (!matches) {
+      conflicts.push({
+        type: "existing-question-mismatch",
+        questionId: existing.questionId ?? null,
+        sourceMarker: planned.sourceMarker,
+      });
+      continue;
+    }
+    skip.push({ planned, existing });
+  }
+
+  return { create, skip, conflicts };
+}
+
 export function squaredRgbDistance(left, right) {
   if (left.length !== right.length) throw new Error("FLAG_DESCRIPTOR_LENGTH_MISMATCH");
   let total = 0;
