@@ -86,15 +86,28 @@ Der Abnahmequiz ist `Länderumrisse Pilot-Abnahme 2026-09-21` (Preview-Quiz 55).
 - Produktcommit: `105d024512249b8d15d38b298d54a6cc582a36d3`.
 - Keine Schemaänderung und keine Datenbankmigration wurden eingeführt. `main` und Production-Anwendungscode blieben unverändert.
 
-## Vorschlag für Phase 2
+## Phase 2: vollständiger 193er-Katalog
 
-Phase 2 würde dieselbe Pipeline auf die übrigen 188 UN-Mitgliedstaaten anwenden und damit insgesamt 193 Umrissfragen liefern. Abhängige Gebiete und sonstige Natural-Earth-Einträge würden nicht automatisch zu eigenen Fragen; sie blieben nur dann Teil der Geometrie eines UN-Mitgliedstaats, wenn der dokumentierte Polygonfilter sie als charakteristisch und darstellungsrelevant einstuft.
+Die Phase-2-Pipeline verarbeitet exakt die 193 Einträge aus dem eingefrorenen UN-Mitgliedstaatenkatalog. Sonstige Natural-Earth-Features und abhängige Gebiete erzeugen keine eigenen Fragen. 192 Staaten werden direkt über `ADM0_A3` zugeordnet. Natural Earth 5.1.1 verwendet nur für Südsudan noch `SDS`; die geprüfte Aliasregel `SSD → SDS` ist im Assetmanifest maschinenlesbar hinterlegt. Das ausgewählte 193-Feature-Subset liegt komprimiert in `data/countries/natural-earth-v5.1.1-un-members.geojson.gz`. Der Hash der vollständigen Upstream-Datei bleibt `239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255`.
 
-Vor einem Vollimport sollte das Prüfmanifest vier gesonderte Reviewgruppen erzeugen:
+Die fünf Pilotassets und ihre Distraktorsätze bleiben bytegenau erhalten. Das Manifest kennzeichnet sie als `pilot-v1-preserved`. Die übrigen 188 Assets verwenden `full-rollout-v2`.
 
-1. **Kleinstaaten und Enklaven:** unter anderem Monaco, San Marino, Liechtenstein, Andorra und Vatikanstadt; Mindeststrichstärke und Padding werden visuell geprüft.
-2. **Insel- und Archipelstaaten:** unter anderem Indonesien, Japan, Philippinen, Griechenland und Neuseeland; charakteristische Inselketten müssen erhalten bleiben.
-3. **Weit gestreute oder Antimeridian-Geometrien:** unter anderem Fidschi, Kiribati und Tuvalu; Längengrad-Normalisierung darf die Hauptdarstellung nicht auseinanderziehen.
-4. **Überseeische Teile und Exklaven:** unter anderem Frankreich, Vereinigte Staaten, Russland und Aserbaidschan; entfernte Kleinstflächen werden nach Flächenanteil, Abstand und Wiedererkennungswert bewusst ein- oder ausgeschlossen.
+### Allgemeine Geometriepolitik
 
-Die Umriss-Distraktoren werden weiterhin deterministisch aus Seitenverhältnis, Formmerkmalen, Region und typischen Verwechslungen gewählt. Vor dem Import erfolgen automatisierte Prüfungen auf genau vier eindeutige Antworten, genau eine Lösung, gültige ISO-Zuordnung, Asset-Hash, sichtbare Pixel, Padding, Seitenverhältnis und zulässigen verworfenen Flächenanteil. Danach folgen gestaffelte Preview-Importe mit visueller Stichprobe pro Sonderfallgruppe und ein gemeinsamer offener/Multiple-Choice-Smoke. Ein Vollimport ist in diesem Pilot ausdrücklich nicht erfolgt.
+- Polygon und MultiPolygon werden über denselben Pfad verarbeitet.
+- Ringe werden zunächst einzeln am Antimeridian entrollt. Anschließend werden alle Polygonteile relativ zum größten Teil auf dieselbe Längengradkopie ausgerichtet. Diese Korrektur greift bei Fidschi, Kiribati, Neuseeland, Russland und den Vereinigten Staaten.
+- Staaten ohne dominantes Hauptpolygon sowie kleine Mehrteiler ohne 90-Prozent-Hauptinsel gelten als verteilt. Ihre signifikanten Inselteile bleiben erhalten und erhalten eine größere Mindeststrichstärke.
+- Bei einem klar dominanten Festland bleiben nahe Inseln und räumlich verbundene größere Teile erhalten. Weit entfernte, im Maßstab nicht sinnvoll gemeinsam darstellbare Teile dürfen entfallen. Das betrifft dokumentiert insbesondere Dänemark, Ecuador, Frankreich, Mauritius, Portugal und Palau. Die Entscheidung folgt für alle Staaten denselben Flächen-/Distanzgrenzen; es gibt keine länderspezifische Retusche.
+- Alle Ausgaben bleiben proportional, nutzen 4:3 und mindestens 72 Quellpixel Padding. Die SVG-Dateien enthalten ausschließlich Pfade und Hintergrund, weder Text noch eingebettete Bilder.
+
+### Distraktoren und Importvertrag
+
+Für die 188 neuen Länder kombiniert die deterministische Rangfolge ein normalisiertes 16×12-Silhouettenraster, Seitenverhältnis, Anzahl erhaltener Teile, Region und Subregion. Nahezu identische Mehrfachdistraktoren werden begrenzt. Jeder Plan enthält exakt eine richtige und drei verschiedene falsche Antworten aus demselben 193er-Katalog. Die fünf akzeptierten Pilotsätze bleiben unverändert.
+
+`data/countries/country-outline-import-plan.json` enthält 193 eindeutige Quellenmarker der Form `COUNTRY_OUTLINE_V1; ISO=XX; NE=5.1.1`. Der Preview-Bestandsabgleich verwendet diesen Marker statt des identischen Fragewortlauts. Dadurch überspringt ein Wiederholungslauf vorhandene Länder, ohne einen zweiten Datensatz anzulegen. Der allgemeine Dateiimport wird bewusst nicht verwendet, weil seine Bestandsprüfung identische Fragetexte als Duplikat behandelt und diesen Anwendungsfall daher nicht korrekt abbildet.
+
+### Automatische Qualitätsprüfung
+
+`data/countries/country-outline-qc.json` meldet 193 generierte Assets und keine offene kritische Abweichung. Die Reviewgruppen enthalten 7 Kleinstaaten, 95 Archipel-/Mehrteiler, 5 Antimeridianfälle, 11 Darstellungen mit bewusst verworfenen kleinen Teilen und 4 extreme Seitenverhältnisse. Vier Kontaktbögen unter `docs/reports/assets/country-outlines/` zeigen jeden Staat mit ISO-Code und deutschem Kurznamen; die Beschriftung ist ausschließlich Teil der Prüfübersicht und nie Bestandteil eines Quizassets.
+
+Die automatischen Tests prüfen die bijektive Zuordnung aller 193 Mitglieder, eindeutige Marker, genau 193 SVG-/WebP-Paare, Hash und Dateigröße, 4:3-Abmessungen, Padding, sichtbare Pixel, textfreie SVGs, vier Antworten mit exakt einer Lösung, ausschließlich UN-Mitglieder als Distraktoren, unveränderte Pilotsets, deterministischen Neuaufbau, das komprimierte Natural-Earth-Subset sowie die vollständigen Kontaktbögen.

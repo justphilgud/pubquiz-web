@@ -1,0 +1,761 @@
+{
+  "version": 1,
+  "generatedAssets": 193,
+  "criticalCount": 0,
+  "critical": [],
+  "reviewCount": 104,
+  "review": [
+    {
+      "iso2": "AD",
+      "nameDe": "Andorra",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "AE",
+      "nameDe": "Vereinigte Arabische Emirate",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "AG",
+      "nameDe": "Antigua und Barbuda",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "AO",
+      "nameDe": "Angola",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "AR",
+      "nameDe": "Argentinien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "AU",
+      "nameDe": "Australien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "AZ",
+      "nameDe": "Aserbaidschan",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "BD",
+      "nameDe": "Bangladesch",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "BH",
+      "nameDe": "Bahrain",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "BR",
+      "nameDe": "Brasilien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "BS",
+      "nameDe": "Bahamas",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "BZ",
+      "nameDe": "Belize",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "CA",
+      "nameDe": "Kanada",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "CL",
+      "nameDe": "Chile",
+      "groups": [
+        "archipelago-or-multipart",
+        "extreme-aspect-ratio"
+      ]
+    },
+    {
+      "iso2": "CN",
+      "nameDe": "China",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "CO",
+      "nameDe": "Kolumbien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "CR",
+      "nameDe": "Costa Rica",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "CU",
+      "nameDe": "Kuba",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "CV",
+      "nameDe": "Kap Verde",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "CY",
+      "nameDe": "Zypern",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "DE",
+      "nameDe": "Deutschland",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "DK",
+      "nameDe": "Dänemark",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "DO",
+      "nameDe": "Dominikanische Republik",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "EC",
+      "nameDe": "Ecuador",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "EE",
+      "nameDe": "Estland",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "EG",
+      "nameDe": "Ägypten",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "ER",
+      "nameDe": "Eritrea",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "ES",
+      "nameDe": "Spanien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "FI",
+      "nameDe": "Finnland",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "FJ",
+      "nameDe": "Fidschi",
+      "groups": [
+        "archipelago-or-multipart",
+        "antimeridian-adjusted"
+      ]
+    },
+    {
+      "iso2": "FM",
+      "nameDe": "Mikronesien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "FR",
+      "nameDe": "Frankreich",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "GB",
+      "nameDe": "Vereinigtes Königreich",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "GM",
+      "nameDe": "Gambia",
+      "groups": [
+        "extreme-aspect-ratio"
+      ]
+    },
+    {
+      "iso2": "GR",
+      "nameDe": "Griechenland",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "GW",
+      "nameDe": "Guinea-Bissau",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "HN",
+      "nameDe": "Honduras",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "HR",
+      "nameDe": "Kroatien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "HT",
+      "nameDe": "Haiti",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "ID",
+      "nameDe": "Indonesien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "IE",
+      "nameDe": "Irland",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "IN",
+      "nameDe": "Indien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "IR",
+      "nameDe": "Iran",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "IS",
+      "nameDe": "Island",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "IT",
+      "nameDe": "Italien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "JP",
+      "nameDe": "Japan",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "KH",
+      "nameDe": "Kambodscha",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "KI",
+      "nameDe": "Kiribati",
+      "groups": [
+        "archipelago-or-multipart",
+        "antimeridian-adjusted"
+      ]
+    },
+    {
+      "iso2": "KM",
+      "nameDe": "Komoren",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "KP",
+      "nameDe": "Nordkorea",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "KR",
+      "nameDe": "Südkorea",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "KW",
+      "nameDe": "Kuwait",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "KZ",
+      "nameDe": "Kasachstan",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "LI",
+      "nameDe": "Liechtenstein",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "LK",
+      "nameDe": "Sri Lanka",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "LU",
+      "nameDe": "Luxemburg",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "MC",
+      "nameDe": "Monaco",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "MG",
+      "nameDe": "Madagaskar",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MH",
+      "nameDe": "Marshallinseln",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MM",
+      "nameDe": "Myanmar",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MR",
+      "nameDe": "Mauretanien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MU",
+      "nameDe": "Mauritius",
+      "groups": [
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "MV",
+      "nameDe": "Malediven",
+      "groups": [
+        "archipelago-or-multipart",
+        "extreme-aspect-ratio"
+      ]
+    },
+    {
+      "iso2": "MW",
+      "nameDe": "Malawi",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MX",
+      "nameDe": "Mexiko",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MY",
+      "nameDe": "Malaysia",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "MZ",
+      "nameDe": "Mosambik",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "NG",
+      "nameDe": "Nigeria",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "NI",
+      "nameDe": "Nicaragua",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "NL",
+      "nameDe": "Niederlande",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "NO",
+      "nameDe": "Norwegen",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "NR",
+      "nameDe": "Nauru",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "NZ",
+      "nameDe": "Neuseeland",
+      "groups": [
+        "archipelago-or-multipart",
+        "antimeridian-adjusted"
+      ]
+    },
+    {
+      "iso2": "OM",
+      "nameDe": "Oman",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "PA",
+      "nameDe": "Panama",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "PG",
+      "nameDe": "Papua-Neuguinea",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "PH",
+      "nameDe": "Philippinen",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "PT",
+      "nameDe": "Portugal",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "PW",
+      "nameDe": "Palau",
+      "groups": [
+        "archipelago-or-multipart",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "RU",
+      "nameDe": "Russland",
+      "groups": [
+        "archipelago-or-multipart",
+        "antimeridian-adjusted"
+      ]
+    },
+    {
+      "iso2": "SA",
+      "nameDe": "Saudi-Arabien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "SB",
+      "nameDe": "Salomonen",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "SC",
+      "nameDe": "Seychellen",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "SE",
+      "nameDe": "Schweden",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "SG",
+      "nameDe": "Singapur",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "SM",
+      "nameDe": "San Marino",
+      "groups": [
+        "microstate"
+      ]
+    },
+    {
+      "iso2": "SV",
+      "nameDe": "El Salvador",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TH",
+      "nameDe": "Thailand",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TJ",
+      "nameDe": "Tadschikistan",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TL",
+      "nameDe": "Osttimor",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TM",
+      "nameDe": "Turkmenistan",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TN",
+      "nameDe": "Tunesien",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TO",
+      "nameDe": "Tonga",
+      "groups": [
+        "archipelago-or-multipart",
+        "extreme-aspect-ratio"
+      ]
+    },
+    {
+      "iso2": "TR",
+      "nameDe": "Türkei",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TV",
+      "nameDe": "Tuvalu",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "TZ",
+      "nameDe": "Tansania",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "UA",
+      "nameDe": "Ukraine",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "US",
+      "nameDe": "Vereinigte Staaten",
+      "groups": [
+        "archipelago-or-multipart",
+        "antimeridian-adjusted",
+        "omitted-small-parts"
+      ]
+    },
+    {
+      "iso2": "UZ",
+      "nameDe": "Usbekistan",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "VC",
+      "nameDe": "St. Vincent und die Grenadinen",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "VE",
+      "nameDe": "Venezuela",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "VN",
+      "nameDe": "Vietnam",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "VU",
+      "nameDe": "Vanuatu",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    },
+    {
+      "iso2": "YE",
+      "nameDe": "Jemen",
+      "groups": [
+        "archipelago-or-multipart"
+      ]
+    }
+  ],
+  "contactSheets": [
+    "docs/reports/assets/country-outlines/contact-sheet-01.webp",
+    "docs/reports/assets/country-outlines/contact-sheet-02.webp",
+    "docs/reports/assets/country-outlines/contact-sheet-03.webp",
+    "docs/reports/assets/country-outlines/contact-sheet-04.webp"
+  ]
+}

@@ -11,13 +11,16 @@ export const PILOT_COUNTRIES = [
 export const OUTLINE_QUESTION = "Welches Land ist anhand dieses Umrisses zu erkennen?";
 export const FLAG_QUESTION = "Welches Land hat diese Flagge?";
 
-const MANUAL_OUTLINE_DISTRACTORS = {
+export const MANUAL_OUTLINE_DISTRACTORS = {
   DE: ["PL", "AT", "CZ"],
   IT: ["HR", "GR", "PT"],
   CL: ["VN", "NO", "AR"],
   AU: ["MG", "ZA", "PG"],
   GM: ["SN", "TG", "MW"],
 };
+
+const OUTLINE_NEAR_TWIN_DISTANCE = 0.0035;
+const OUTLINE_DUPLICATE_DISTANCE = 0.0015;
 
 export function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -47,6 +50,115 @@ export function buildOutlinePilotPlan(countries) {
         ...distractors.map((entry) => ({ ...entry, isCorrect: false })),
       ],
     };
+  });
+}
+
+export function rankOutlineDistractors(country, countries) {
+  return countries
+    .filter((candidate) => candidate.iso2 !== country.iso2)
+    .map((candidate) => {
+      const visualDistance = squaredRgbDistance(
+        country.outlineDescriptor,
+        candidate.outlineDescriptor,
+      );
+      const aspectPenalty = Math.min(
+        0.12,
+        Math.abs(Math.log(country.outlineAspectRatio / candidate.outlineAspectRatio)) * 0.08,
+      );
+      const geographyPenalty = country.subregion === candidate.subregion
+        ? 0
+        : country.region === candidate.region
+          ? 0.035
+          : 0.085;
+      const partsPenalty = Math.min(
+        0.025,
+        Math.abs(
+          Math.log1p(country.retainedPolygonParts) -
+          Math.log1p(candidate.retainedPolygonParts),
+        ) * 0.012,
+      );
+      return {
+        candidate,
+        visualDistance,
+        score: visualDistance * 0.62 + aspectPenalty + geographyPenalty + partsPenalty,
+      };
+    })
+    .sort(
+      (left, right) =>
+        left.score - right.score ||
+        left.candidate.iso2.localeCompare(right.candidate.iso2),
+    );
+}
+
+export function selectOutlineDistractors(country, countries) {
+  const ranked = rankOutlineDistractors(country, countries);
+  const selected = [];
+  let nearTwinSelected = false;
+  for (const entry of ranked) {
+    const nearTwin = entry.visualDistance < OUTLINE_NEAR_TWIN_DISTANCE;
+    if (nearTwin && nearTwinSelected) continue;
+    const duplicatesAnotherDistractor = selected.some(
+      (selectedEntry) =>
+        squaredRgbDistance(
+          selectedEntry.outlineDescriptor,
+          entry.candidate.outlineDescriptor,
+        ) < OUTLINE_DUPLICATE_DISTANCE,
+    );
+    if (duplicatesAnotherDistractor) continue;
+    selected.push(entry.candidate);
+    nearTwinSelected ||= nearTwin;
+    if (selected.length === 3) break;
+  }
+  if (selected.length !== 3) {
+    throw new Error(`OUTLINE_DISTRACTOR_SELECTION_FAILED:${country.iso2}`);
+  }
+  return selected;
+}
+
+export function buildOutlineQuestionPlan(countries, assets) {
+  const assetByIso2 = new Map(assets.map((asset) => [asset.iso2, asset]));
+  const enriched = countries.map((country) => {
+    const asset = assetByIso2.get(country.iso2);
+    if (!asset) throw new Error(`OUTLINE_ASSET_MISSING:${country.iso2}`);
+    return {
+      ...country,
+      outlineDescriptor: asset.outlineDescriptor,
+      outlineAspectRatio: asset.outlineAspectRatio,
+      retainedPolygonParts: asset.retainedPolygonParts,
+    };
+  });
+  const byIso2 = new Map(enriched.map((country) => [country.iso2, country]));
+
+  return enriched.map((country) => {
+    const manual = MANUAL_OUTLINE_DISTRACTORS[country.iso2];
+    const distractors = manual
+      ? manual.map((iso2) => {
+          const match = byIso2.get(iso2);
+          if (!match) throw new Error(`OUTLINE_DISTRACTOR_MISSING:${iso2}`);
+          return match;
+        })
+      : selectOutlineDistractors(country, enriched);
+    const question = {
+      iso2: country.iso2,
+      iso3: country.iso3,
+      nameDe: country.nameDe,
+      question: OUTLINE_QUESTION,
+      sourceMarker: `COUNTRY_OUTLINE_V1; ISO=${country.iso2}; NE=5.1.1`,
+      assetPath: assetByIso2.get(country.iso2).webp.path,
+      distractorMethod: manual ? "pilot-preserved" : "deterministic-shape-geography-v1",
+      answers: [
+        { iso2: country.iso2, nameDe: country.nameDe, isCorrect: true },
+        ...distractors.map((entry) => ({
+          iso2: entry.iso2,
+          nameDe: entry.nameDe,
+          isCorrect: false,
+        })),
+      ],
+    };
+    if (!validateQuestionAnswers(question)) {
+      throw new Error(`OUTLINE_QUESTION_INVALID:${country.iso2}`);
+    }
+    return question;
   });
 }
 
