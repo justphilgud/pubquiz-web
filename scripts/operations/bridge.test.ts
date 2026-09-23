@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { generateKeyPair, exportJWK, createLocalJWKSet, SignJWT } from "jose";
-import { AUDIENCE, ISSUER, REPOSITORY, STORE_ID, STORE_HOST, WORKFLOW, runKey, TTL_MS, type Grant } from "./bridge/lib/contract";
+import { AUDIENCE, ISSUER, REPOSITORY, STORE_ID, STORE_HOST, WORKFLOW, objectRule, runKey, TTL_MS, type Grant } from "./bridge/lib/contract";
 import { verifyGithub, type Identity } from "./bridge/lib/identity";
 import { executeAccess, grantAccess, type BlobProvider, type Scope } from "./bridge/lib/service";
 import { handleAccess, configuration } from "./bridge/lib/handler";
@@ -301,6 +301,22 @@ test("synthetic object roundtrip, readback, restore read only and expiration (pr
   assert.equal(use(restore, "GET")?.toString(), "hello world!");
   assert.throws(() => use(restore, "DELETE")); assert.throws(() => use(restore, "PUT"));
   clock = get.expiresAt + 1; assert.throws(() => use(get, "GET"), /expired/);
+});
+
+test("diagnostic matrix permits only fixed synthetic names and exact size ceilings", () => {
+  const expected = new Map([
+    ["diagnostic-1k.bin", 1024],
+    ["diagnostic-100k.bin", 100 * 1024],
+    ["diagnostic-1m.bin", 1024 * 1024],
+    ["diagnostic-5m.bin", 5 * 1024 * 1024],
+    ["diagnostic-typical.bin", 2 * 1024 * 1024],
+  ]);
+  for (const [name, maximumSize] of expected) assert.deepEqual(objectRule(name, "synthetic"), {
+    kind: "probe", maximumSize, contentType: "application/octet-stream",
+  });
+  for (const name of ["diagnostic-10m.bin", "../diagnostic-1k.bin", "diagnostic-1k.json", "other.bin"]) {
+    assert.throws(() => objectRule(name, "synthetic"));
+  }
 });
 
 test("provider adapter delegates one exact object/operation and signs enforced immutable bounded PUT", async () => {

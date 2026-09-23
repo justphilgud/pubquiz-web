@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { type Environment } from "./acceptance-policy";
-import { BridgeClient } from "./bridge-client";
+import { BridgeClient, type UploadPosition } from "./bridge-client";
 import { requireCondition } from "./guards";
 import { sha256 } from "./snapshot";
 
@@ -31,8 +31,8 @@ export class PrivateArtifacts {
   async read(name: string) {
     return this.client.read(artifactName(name));
   }
-  async upload(name: string, bytes: Buffer): Promise<Artifact> {
-    await this.client.upload(artifactName(name), bytes);
+  async upload(name: string, bytes: Buffer, position?: UploadPosition): Promise<Artifact> {
+    await this.client.upload(artifactName(name), bytes, position);
     const evidence = { name, bytes: bytes.length, sha256: sha256(bytes) };
     verifyArtifact(await this.read(name), evidence);
     return evidence;

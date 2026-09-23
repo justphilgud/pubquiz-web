@@ -11,6 +11,13 @@ const samples = [
   { name: "probe.bin", bytes: sample },
   { name: "probe.json", bytes: Buffer.from('{"synthetic":true,"productionData":false}\n') },
 ];
+const diagnosticSamples = [
+  { name: "diagnostic-1k.bin", size: 1024, fill: 0x11 },
+  { name: "diagnostic-100k.bin", size: 100 * 1024, fill: 0x22 },
+  { name: "diagnostic-1m.bin", size: 1024 * 1024, fill: 0x33 },
+  { name: "diagnostic-5m.bin", size: 5 * 1024 * 1024, fill: 0x44 },
+  { name: "diagnostic-typical.bin", size: 2 * 1024 * 1024, fill: 0x55 },
+].map(item => ({ name: item.name, bytes: Buffer.alloc(item.size, item.fill) }));
 const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 async function main() {
   const env = process.env;
@@ -20,6 +27,9 @@ async function main() {
     (env.BACKUP_RETENTION_VERIFIED === "true" || env.BACKUP_RETENTION_VERIFIED === "false") &&
     !Object.keys(env).some(k => /DATABASE_URL|BLOB_READ_WRITE_TOKEN/.test(k) && env[k]), "SYNTHETIC_CONTEXT_REQUIRED");
   const role = process.argv[2]; requireCondition(role === "backup" || role === "restore", "PROBE_ROLE_REQUIRED");
+  requireCondition(env.AP94_UPLOAD_DIAGNOSTIC_MATRIX === undefined || ["true", "false"].includes(env.AP94_UPLOAD_DIAGNOSTIC_MATRIX),
+    "SYNTHETIC_CONTEXT_REQUIRED");
+  const activeSamples = env.AP94_UPLOAD_DIAGNOSTIC_MATRIX === "true" ? [...samples, ...diagnosticSamples] : samples;
   const key = runKey("synthetic", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
   const client = new BridgeClient(env, role, key);
   const body = { operation: role === "backup" ? "backup-readback" : "restore-read", store: STORE_ID, key, name: "probe.bin", kind: "probe" };
@@ -36,7 +46,7 @@ async function main() {
       role === "backup" && index === invalid.length - 1 ? "OBJECT_TOO_LARGE" : "REQUEST_REJECTED");
   }
   const rejected = (status: number) => [400, 401, 403, 404, 405, 409, 412, 413].includes(status);
-  for (const { name, bytes } of samples) if (role === "backup") {
+  for (const { name, bytes } of activeSamples) if (role === "backup") {
     const bounded = await client.grant(name, bytes.length);
     const headers = { "content-type": objectRule(name, "synthetic").contentType };
     const tooLarge = await fetch(bounded.url, { method: "PUT", body: new Uint8Array(bytes.length + 1), headers, redirect: "error", signal: AbortSignal.timeout(30000) });
@@ -48,7 +58,7 @@ async function main() {
   }
   const proofs = [];
   const grants = [];
-  for (const { name, bytes } of samples) {
+  for (const { name, bytes } of activeSamples) {
     const restored = await client.read(name);
     requireCondition(restored.length === bytes.length && digest(restored) === digest(bytes), "SYNTHETIC_HASH_MISMATCH");
     proofs.push({ name, bytes: bytes.length, sha256: digest(bytes), readback: "verified" });
@@ -70,7 +80,8 @@ async function main() {
     requireCondition(expired.status === 401 || expired.status === 403, "SIGNED_EXPIRY_NOT_ENFORCED");
   }
   return { synthetic: true, role, key, identityBoundary, hash: digest(sample), readback: "verified", expiry: "rejected", negatives: invalid.length,
-    proofs, signedMethodAndPath: "rejected", ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false };
+    proofs, diagnosticMatrix: env.AP94_UPLOAD_DIAGNOSTIC_MATRIX === "true", signedMethodAndPath: "rejected",
+    ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false };
 }
 main().then(r => console.log(JSON.stringify(r))).catch(e => {
   console.error(safeError(e instanceof OperationsError ? e : new OperationsError("SYNTHETIC_PROBE_FAILED_DETAILS_WITHHELD"))); process.exitCode = 1;

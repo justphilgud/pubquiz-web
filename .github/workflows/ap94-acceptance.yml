@@ -31,6 +31,11 @@ on:
         type: boolean
         default: false
         required: true
+      diagnostic_upload_matrix:
+        description: Synthetic-only sequential 1KB/100KB/1MB/5MB/typical upload diagnostics
+        type: boolean
+        default: false
+        required: true
 
 permissions:
   contents: read
@@ -77,7 +82,7 @@ jobs:
       - if: steps.gate.outputs.run == 'true'
         run: npm ci
       - if: steps.gate.outputs.run == 'true'
-        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts
+        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
       - name: Record verified identity claims only
         if: steps.gate.outputs.run == 'true'
         run: node --import tsx scripts/operations/print-claims.ts
@@ -89,6 +94,7 @@ jobs:
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
           BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
           BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
+          AP94_UPLOAD_DIAGNOSTIC_MATRIX: ${{ inputs.diagnostic_upload_matrix && 'true' || 'false' }}
         run: node --import tsx scripts/operations/transport-probe.ts backup
       - name: Verified Production backup
         if: steps.gate.outputs.run == 'true' && (github.event_name == 'schedule' || inputs.mode == 'acceptance')
@@ -162,6 +168,7 @@ jobs:
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
           BACKUP_AUTOMATION_ENABLED: 'false'
           BACKUP_RETENTION_VERIFIED: 'false'
+          AP94_UPLOAD_DIAGNOSTIC_MATRIX: ${{ inputs.diagnostic_upload_matrix && 'true' || 'false' }}
         run: node --import tsx scripts/operations/transport-probe.ts restore
       - name: Restore only after required reviewer approval
         if: inputs.mode == 'acceptance'
