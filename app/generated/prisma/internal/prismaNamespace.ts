@@ -438,6 +438,7 @@ export const ModelName = {
   meme_moderation_selections: 'meme_moderation_selections',
   meme_moderation_candidates: 'meme_moderation_candidates',
   meme_presentations: 'meme_presentations',
+  meme_result_entries: 'meme_result_entries',
   meme_votes: 'meme_votes',
   live_text_response_publications: 'live_text_response_publications',
   public_text_replacement_rules: 'public_text_replacement_rules',
@@ -460,7 +461,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3498,6 +3499,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    meme_result_entries: {
+      payload: Prisma.$meme_result_entriesPayload<ExtArgs>
+      fields: Prisma.meme_result_entriesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.meme_result_entriesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.meme_result_entriesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>
+        }
+        findFirst: {
+          args: Prisma.meme_result_entriesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.meme_result_entriesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>
+        }
+        findMany: {
+          args: Prisma.meme_result_entriesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>[]
+        }
+        create: {
+          args: Prisma.meme_result_entriesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>
+        }
+        createMany: {
+          args: Prisma.meme_result_entriesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.meme_result_entriesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>[]
+        }
+        delete: {
+          args: Prisma.meme_result_entriesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>
+        }
+        update: {
+          args: Prisma.meme_result_entriesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>
+        }
+        deleteMany: {
+          args: Prisma.meme_result_entriesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.meme_result_entriesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.meme_result_entriesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>[]
+        }
+        upsert: {
+          args: Prisma.meme_result_entriesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$meme_result_entriesPayload>
+        }
+        aggregate: {
+          args: Prisma.Meme_result_entriesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMeme_result_entries>
+        }
+        groupBy: {
+          args: Prisma.meme_result_entriesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Meme_result_entriesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.meme_result_entriesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Meme_result_entriesCountAggregateOutputType> | number
+        }
+      }
+    }
     meme_votes: {
       payload: Prisma.$meme_votesPayload<ExtArgs>
       fields: Prisma.meme_votesFieldRefs
@@ -4742,11 +4817,28 @@ export const Meme_presentationsScalarFieldEnum = {
   voting_opened_at: 'voting_opened_at',
   voting_closed_at: 'voting_closed_at',
   voting_closed_by_user_id: 'voting_closed_by_user_id',
+  result_finalized_at: 'result_finalized_at',
+  result_finalized_by_user_id: 'result_finalized_by_user_id',
+  result_revision: 'result_revision',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
 
 export type Meme_presentationsScalarFieldEnum = (typeof Meme_presentationsScalarFieldEnum)[keyof typeof Meme_presentationsScalarFieldEnum]
+
+
+export const Meme_result_entriesScalarFieldEnum = {
+  meme_result_entry_id: 'meme_result_entry_id',
+  meme_presentation_id: 'meme_presentation_id',
+  meme_moderation_candidate_id: 'meme_moderation_candidate_id',
+  vote_count: 'vote_count',
+  is_winner: 'is_winner',
+  awarded_points: 'awarded_points',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Meme_result_entriesScalarFieldEnum = (typeof Meme_result_entriesScalarFieldEnum)[keyof typeof Meme_result_entriesScalarFieldEnum]
 
 
 export const Meme_votesScalarFieldEnum = {
@@ -5513,6 +5605,7 @@ export type GlobalOmitConfig = {
   meme_moderation_selections?: Prisma.meme_moderation_selectionsOmit
   meme_moderation_candidates?: Prisma.meme_moderation_candidatesOmit
   meme_presentations?: Prisma.meme_presentationsOmit
+  meme_result_entries?: Prisma.meme_result_entriesOmit
   meme_votes?: Prisma.meme_votesOmit
   live_text_response_publications?: Prisma.live_text_response_publicationsOmit
   public_text_replacement_rules?: Prisma.public_text_replacement_rulesOmit

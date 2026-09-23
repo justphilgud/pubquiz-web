@@ -230,6 +230,12 @@ export type meme_moderation_candidates = Prisma.meme_moderation_candidatesModel
  */
 export type meme_presentations = Prisma.meme_presentationsModel
 /**
+ * Model meme_result_entries
+ * Immutable AP4 aggregate snapshot. Votes remain owned by AP3; these rows
+ * persist only the final count, winner flag and centrally awarded quiz point.
+ */
+export type meme_result_entries = Prisma.meme_result_entriesModel
+/**
  * Model meme_votes
  * One effective AP3 vote per quiz team. Updates while voting is open replace
  * the choice and increment the revision; AP1/AP2 submissions stay untouched.

@@ -115,3 +115,7 @@ Jeder Client rekonstruiert den Zustand aus dem gemeinsamen Live-Snapshot:
 
 AP4 muss Kandidaten weder neu interpretieren noch Votes deduplizieren. AP3
 berechnet noch keinen Gewinner und vergibt keine Punkte.
+
+Die darauf aufbauende produktive Finalisierung ist in
+[Meme beschriften – AP4](meme-caption-ap4.md) beschrieben. Sie liest diesen
+geschlossenen Stand, ohne Kandidaten oder Votes zu verändern.

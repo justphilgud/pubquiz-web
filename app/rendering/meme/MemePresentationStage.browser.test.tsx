@@ -73,6 +73,7 @@ function state(
     votingOpenedAt: null,
     votingClosedAt: null,
     progress: null,
+    result: null,
     team: null,
   };
 }

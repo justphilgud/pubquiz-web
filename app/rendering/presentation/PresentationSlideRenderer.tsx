@@ -78,6 +78,7 @@ import { presentationTextDensity } from "./presentationReadability";
 import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import { MemePresentationStage } from "@/app/rendering/meme/MemePresentationStage";
+import { MemeResultStage } from "@/app/rendering/meme/MemeResultStage";
 import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 import {
   DEFAULT_MEME_QUESTION_CONFIG,
@@ -1470,15 +1471,24 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   if (frage.templateId === "meme_beschriften") {
     const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
       frage.medien.find((medium) => isBild(medium.datei));
+    if (memePresentationState?.result) {
+      return (
+        <MemeResultStage
+          result={memePresentationState.result}
+          imageUrl={memePresentationState.imageUrl ?? (image ? getMediumUrl(image.datei) : null)}
+          revealCount={templateRevealCount}
+        />
+      );
+    }
     return (
       <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_0.75fr] gap-6">
         <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-4 shadow-[8px_8px_0_#ff00aa]">
           {image ? <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full" /> : <PresentationMediaFallback kind="IMAGE" />}
         </div>
         <div className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-emerald-300 bg-slate-950/85 p-8 text-center shadow-[8px_8px_0_#facc15]">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-emerald-300">Zeit abgelaufen</p>
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-emerald-300">Ergebnis ausstehend</p>
           <h2 className="mt-5 text-5xl font-black text-white">Meme-Runde beendet</h2>
-          <p className="mt-5 text-xl text-white/65">Auswahl und Präsentation der Memes folgen in einem späteren Schritt.</p>
+          <p className="mt-5 text-xl text-white/65">Die Moderation finalisiert jetzt Stimmen und Punkte.</p>
         </div>
       </section>
     );

@@ -3895,6 +3895,17 @@ export async function updateTeamAntwortBewertung(data: {
       await tx.$queryRaw`SELECT "quiz_id" FROM "pubquiz"."quiz" WHERE "quiz_id" = ${data.quizId} FOR UPDATE`;
       const existing = await requireQuizTeamAnswer(data.quizId, data.teamAntwortId, tx);
       assertEvaluationRevision(data.expectedRevision, evaluationRevision(existing));
+      const finalizedMemeResult = await tx.meme_presentations.findFirst({
+        where: {
+          quiz_id: data.quizId,
+          quiz_fragen_id: existing.quiz_fragen_id,
+          result_finalized_at: { not: null },
+        },
+        select: { meme_presentation_id: true },
+      });
+      if (finalizedMemeResult) {
+        throw new Error("Das finalisierte Meme-Voting bestimmt diese Punkte; eine manuelle Änderung ist nicht zulässig.");
+      }
       const effectiveSubmission = resolveEffectiveSubmission({
         interactionRunId: existing.interaction_run_id,
         draft: existing,

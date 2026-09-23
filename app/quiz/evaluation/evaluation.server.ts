@@ -246,6 +246,18 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   if (isPollQuestionTemplateId(templateId)) {
     return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
   }
+  if (templateId === "meme_beschriften") {
+    const finalizedMemeResult = await db.meme_presentations.findFirst({
+      where: {
+        quiz_fragen_id: quizQuestionId,
+        result_finalized_at: { not: null },
+      },
+      select: { meme_presentation_id: true },
+    });
+    if (finalizedMemeResult) {
+      return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
+    }
+  }
   const templateOrderingItems = orderingTemplateItems(
     assignment.fragen.template_config_json,
   );

@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 import type { MemePresentationTransition } from "@/app/quiz/memeVoting";
+import type { QuizSolutionStrategy } from "@/app/quiz/flow/quizFlow";
+import { finalizeMemeResultAction } from "@/app/quiz/memeResultsActions";
 import {
   startMemePresentationAction,
   transitionMemePresentationAction,
@@ -13,11 +15,13 @@ export default function MemePresentationControls({
   quizId,
   quizFragenId,
   state,
+  solutionStrategy,
   onChange,
 }: {
   quizId: number;
   quizFragenId: number;
   state: MemePresentationSnapshot;
+  solutionStrategy: QuizSolutionStrategy;
   onChange: (state: MemePresentationSnapshot) => void;
 }) {
   const [pending, setPending] = useState(false);
@@ -62,6 +66,31 @@ export default function MemePresentationControls({
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Der Meme-Ablauf konnte nicht geändert werden.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function finalizeResult() {
+    if (!state.presentationId) return;
+    setPending(true);
+    setMessage(null);
+    try {
+      const result = await finalizeMemeResultAction({
+        quizId,
+        quizFragenId,
+        presentationId: state.presentationId,
+      });
+      if (result.view) onChange(result.view);
+      setMessage(
+        result.alreadyFinalized
+          ? "Das Meme-Ergebnis war bereits finalisiert. Der aktuelle Stand wurde geladen."
+          : solutionStrategy === "END_OF_BLOCK"
+            ? "Ergebnis und Punkte sind final. Die Auflösung erscheint am Blockende."
+            : "Ergebnis und Punkte sind final. Du kannst jetzt zur Auflösung weitergehen.",
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Das Meme-Ergebnis konnte nicht finalisiert werden.");
     } finally {
       setPending(false);
     }
@@ -146,9 +175,23 @@ export default function MemePresentationControls({
       ) : null}
 
       {state.phase === "VOTING_CLOSED" ? (
-        <p className="mt-4 rounded-xl border border-emerald-400/40 bg-emerald-950/30 p-3 text-sm text-emerald-100">
-          Das Voting ist final geschlossen. Der stabile Kandidaten- und Stimmenstand steht AP4 bereit.
-        </p>
+        state.result ? (
+          <div className="mt-4 rounded-xl border border-emerald-400/40 bg-emerald-950/30 p-3 text-sm text-emerald-100">
+            <p className="font-bold">Ergebnis final · {state.result.totalVotes} Stimmen</p>
+            <p className="mt-1">
+              {state.result.entries.some((entry) => entry.isWinner)
+                ? `${state.result.entries.filter((entry) => entry.isWinner).map((entry) => `Meme ${entry.number} (${entry.teamName})`).join(", ")} erhält ${state.result.entries.filter((entry) => entry.isWinner).length === 1 ? "1 Punkt" : "je 1 Punkt"}.`
+                : "Keine gültige Stimme; es wurde kein Punkt vergeben."}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-950/30 p-3 text-sm text-amber-100">
+            <p>Das Voting ist geschlossen. Stimmen und Punkte sind noch nicht finalisiert.</p>
+            <button type="button" disabled={pending} onClick={() => void finalizeResult()} className="mt-3 min-h-11 rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white disabled:opacity-50">
+              Ergebnis finalisieren
+            </button>
+          </div>
+        )
       ) : null}
     </section>
   );

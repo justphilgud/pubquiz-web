@@ -280,6 +280,7 @@ export type meme_moderation_candidatesWhereInput = {
   submission?: Prisma.XOR<Prisma.Team_answer_submissionsScalarRelationFilter, Prisma.team_answer_submissionsWhereInput>
   reviewed_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   votes?: Prisma.Meme_votesListRelationFilter
+  result_entries?: Prisma.Meme_result_entriesListRelationFilter
 }
 
 export type meme_moderation_candidatesOrderByWithRelationInput = {
@@ -297,6 +298,7 @@ export type meme_moderation_candidatesOrderByWithRelationInput = {
   submission?: Prisma.team_answer_submissionsOrderByWithRelationInput
   reviewed_by?: Prisma.usersOrderByWithRelationInput
   votes?: Prisma.meme_votesOrderByRelationAggregateInput
+  result_entries?: Prisma.meme_result_entriesOrderByRelationAggregateInput
 }
 
 export type meme_moderation_candidatesWhereUniqueInput = Prisma.AtLeast<{
@@ -318,6 +320,7 @@ export type meme_moderation_candidatesWhereUniqueInput = Prisma.AtLeast<{
   submission?: Prisma.XOR<Prisma.Team_answer_submissionsScalarRelationFilter, Prisma.team_answer_submissionsWhereInput>
   reviewed_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   votes?: Prisma.Meme_votesListRelationFilter
+  result_entries?: Prisma.Meme_result_entriesListRelationFilter
 }, "meme_moderation_candidate_id" | "team_answer_submission_id" | "meme_moderation_selection_id_position">
 
 export type meme_moderation_candidatesOrderByWithAggregationInput = {
@@ -365,6 +368,7 @@ export type meme_moderation_candidatesCreateInput = {
   submission: Prisma.team_answer_submissionsCreateNestedOneWithoutMeme_moderation_candidateInput
   reviewed_by?: Prisma.usersCreateNestedOneWithoutModerierte_meme_kandidatenInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesUncheckedCreateInput = {
@@ -379,6 +383,7 @@ export type meme_moderation_candidatesUncheckedCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesUpdateInput = {
@@ -392,6 +397,7 @@ export type meme_moderation_candidatesUpdateInput = {
   submission?: Prisma.team_answer_submissionsUpdateOneRequiredWithoutMeme_moderation_candidateNestedInput
   reviewed_by?: Prisma.usersUpdateOneWithoutModerierte_meme_kandidatenNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateInput = {
@@ -406,6 +412,7 @@ export type meme_moderation_candidatesUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesCreateManyInput = {
@@ -603,6 +610,20 @@ export type EnumMemeModerationReviewStatusFieldUpdateOperationsInput = {
   set?: $Enums.MemeModerationReviewStatus
 }
 
+export type meme_moderation_candidatesCreateNestedOneWithoutResult_entriesInput = {
+  create?: Prisma.XOR<Prisma.meme_moderation_candidatesCreateWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUncheckedCreateWithoutResult_entriesInput>
+  connectOrCreate?: Prisma.meme_moderation_candidatesCreateOrConnectWithoutResult_entriesInput
+  connect?: Prisma.meme_moderation_candidatesWhereUniqueInput
+}
+
+export type meme_moderation_candidatesUpdateOneRequiredWithoutResult_entriesNestedInput = {
+  create?: Prisma.XOR<Prisma.meme_moderation_candidatesCreateWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUncheckedCreateWithoutResult_entriesInput>
+  connectOrCreate?: Prisma.meme_moderation_candidatesCreateOrConnectWithoutResult_entriesInput
+  upsert?: Prisma.meme_moderation_candidatesUpsertWithoutResult_entriesInput
+  connect?: Prisma.meme_moderation_candidatesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.meme_moderation_candidatesUpdateToOneWithWhereWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUpdateWithoutResult_entriesInput>, Prisma.meme_moderation_candidatesUncheckedUpdateWithoutResult_entriesInput>
+}
+
 export type meme_moderation_candidatesCreateNestedOneWithoutVotesInput = {
   create?: Prisma.XOR<Prisma.meme_moderation_candidatesCreateWithoutVotesInput, Prisma.meme_moderation_candidatesUncheckedCreateWithoutVotesInput>
   connectOrCreate?: Prisma.meme_moderation_candidatesCreateOrConnectWithoutVotesInput
@@ -669,6 +690,7 @@ export type meme_moderation_candidatesCreateWithoutSubmissionInput = {
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutCandidatesInput
   reviewed_by?: Prisma.usersCreateNestedOneWithoutModerierte_meme_kandidatenInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesUncheckedCreateWithoutSubmissionInput = {
@@ -682,6 +704,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutSubmissionInput = {
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesCreateOrConnectWithoutSubmissionInput = {
@@ -710,6 +733,7 @@ export type meme_moderation_candidatesUpdateWithoutSubmissionInput = {
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutCandidatesNestedInput
   reviewed_by?: Prisma.usersUpdateOneWithoutModerierte_meme_kandidatenNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateWithoutSubmissionInput = {
@@ -723,6 +747,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutSubmissionInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesCreateWithoutSelectionInput = {
@@ -735,6 +760,7 @@ export type meme_moderation_candidatesCreateWithoutSelectionInput = {
   submission: Prisma.team_answer_submissionsCreateNestedOneWithoutMeme_moderation_candidateInput
   reviewed_by?: Prisma.usersCreateNestedOneWithoutModerierte_meme_kandidatenInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesUncheckedCreateWithoutSelectionInput = {
@@ -748,6 +774,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutSelectionInput = {
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesCreateOrConnectWithoutSelectionInput = {
@@ -792,6 +819,76 @@ export type meme_moderation_candidatesScalarWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"meme_moderation_candidates"> | Date | string
 }
 
+export type meme_moderation_candidatesCreateWithoutResult_entriesInput = {
+  position: number
+  review_status?: $Enums.MemeModerationReviewStatus
+  review_revision?: number
+  reviewed_at?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutCandidatesInput
+  submission: Prisma.team_answer_submissionsCreateNestedOneWithoutMeme_moderation_candidateInput
+  reviewed_by?: Prisma.usersCreateNestedOneWithoutModerierte_meme_kandidatenInput
+  votes?: Prisma.meme_votesCreateNestedManyWithoutCandidateInput
+}
+
+export type meme_moderation_candidatesUncheckedCreateWithoutResult_entriesInput = {
+  meme_moderation_candidate_id?: number
+  meme_moderation_selection_id: number
+  team_answer_submission_id: number
+  position: number
+  review_status?: $Enums.MemeModerationReviewStatus
+  review_revision?: number
+  reviewed_by_user_id?: number | null
+  reviewed_at?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutCandidateInput
+}
+
+export type meme_moderation_candidatesCreateOrConnectWithoutResult_entriesInput = {
+  where: Prisma.meme_moderation_candidatesWhereUniqueInput
+  create: Prisma.XOR<Prisma.meme_moderation_candidatesCreateWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUncheckedCreateWithoutResult_entriesInput>
+}
+
+export type meme_moderation_candidatesUpsertWithoutResult_entriesInput = {
+  update: Prisma.XOR<Prisma.meme_moderation_candidatesUpdateWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUncheckedUpdateWithoutResult_entriesInput>
+  create: Prisma.XOR<Prisma.meme_moderation_candidatesCreateWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUncheckedCreateWithoutResult_entriesInput>
+  where?: Prisma.meme_moderation_candidatesWhereInput
+}
+
+export type meme_moderation_candidatesUpdateToOneWithWhereWithoutResult_entriesInput = {
+  where?: Prisma.meme_moderation_candidatesWhereInput
+  data: Prisma.XOR<Prisma.meme_moderation_candidatesUpdateWithoutResult_entriesInput, Prisma.meme_moderation_candidatesUncheckedUpdateWithoutResult_entriesInput>
+}
+
+export type meme_moderation_candidatesUpdateWithoutResult_entriesInput = {
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  review_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutCandidatesNestedInput
+  submission?: Prisma.team_answer_submissionsUpdateOneRequiredWithoutMeme_moderation_candidateNestedInput
+  reviewed_by?: Prisma.usersUpdateOneWithoutModerierte_meme_kandidatenNestedInput
+  votes?: Prisma.meme_votesUpdateManyWithoutCandidateNestedInput
+}
+
+export type meme_moderation_candidatesUncheckedUpdateWithoutResult_entriesInput = {
+  meme_moderation_candidate_id?: Prisma.IntFieldUpdateOperationsInput | number
+  meme_moderation_selection_id?: Prisma.IntFieldUpdateOperationsInput | number
+  team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  review_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  votes?: Prisma.meme_votesUncheckedUpdateManyWithoutCandidateNestedInput
+}
+
 export type meme_moderation_candidatesCreateWithoutVotesInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
@@ -802,6 +899,7 @@ export type meme_moderation_candidatesCreateWithoutVotesInput = {
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutCandidatesInput
   submission: Prisma.team_answer_submissionsCreateNestedOneWithoutMeme_moderation_candidateInput
   reviewed_by?: Prisma.usersCreateNestedOneWithoutModerierte_meme_kandidatenInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesUncheckedCreateWithoutVotesInput = {
@@ -815,6 +913,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutVotesInput = {
   reviewed_at?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesCreateOrConnectWithoutVotesInput = {
@@ -843,6 +942,7 @@ export type meme_moderation_candidatesUpdateWithoutVotesInput = {
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutCandidatesNestedInput
   submission?: Prisma.team_answer_submissionsUpdateOneRequiredWithoutMeme_moderation_candidateNestedInput
   reviewed_by?: Prisma.usersUpdateOneWithoutModerierte_meme_kandidatenNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateWithoutVotesInput = {
@@ -856,6 +956,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutVotesInput = {
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesCreateWithoutReviewed_byInput = {
@@ -868,6 +969,7 @@ export type meme_moderation_candidatesCreateWithoutReviewed_byInput = {
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutCandidatesInput
   submission: Prisma.team_answer_submissionsCreateNestedOneWithoutMeme_moderation_candidateInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesUncheckedCreateWithoutReviewed_byInput = {
@@ -881,6 +983,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutReviewed_byInput = {
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutCandidateInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutCandidateInput
 }
 
 export type meme_moderation_candidatesCreateOrConnectWithoutReviewed_byInput = {
@@ -931,6 +1034,7 @@ export type meme_moderation_candidatesUpdateWithoutSelectionInput = {
   submission?: Prisma.team_answer_submissionsUpdateOneRequiredWithoutMeme_moderation_candidateNestedInput
   reviewed_by?: Prisma.usersUpdateOneWithoutModerierte_meme_kandidatenNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateWithoutSelectionInput = {
@@ -944,6 +1048,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutSelectionInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateManyWithoutSelectionInput = {
@@ -980,6 +1085,7 @@ export type meme_moderation_candidatesUpdateWithoutReviewed_byInput = {
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutCandidatesNestedInput
   submission?: Prisma.team_answer_submissionsUpdateOneRequiredWithoutMeme_moderation_candidateNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateWithoutReviewed_byInput = {
@@ -993,6 +1099,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutReviewed_byInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutCandidateNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutCandidateNestedInput
 }
 
 export type meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byInput = {
@@ -1014,10 +1121,12 @@ export type meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byInput
 
 export type Meme_moderation_candidatesCountOutputType = {
   votes: number
+  result_entries: number
 }
 
 export type Meme_moderation_candidatesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   votes?: boolean | Meme_moderation_candidatesCountOutputTypeCountVotesArgs
+  result_entries?: boolean | Meme_moderation_candidatesCountOutputTypeCountResult_entriesArgs
 }
 
 /**
@@ -1037,6 +1146,13 @@ export type Meme_moderation_candidatesCountOutputTypeCountVotesArgs<ExtArgs exte
   where?: Prisma.meme_votesWhereInput
 }
 
+/**
+ * Meme_moderation_candidatesCountOutputType without action
+ */
+export type Meme_moderation_candidatesCountOutputTypeCountResult_entriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.meme_result_entriesWhereInput
+}
+
 
 export type meme_moderation_candidatesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   meme_moderation_candidate_id?: boolean
@@ -1053,6 +1169,7 @@ export type meme_moderation_candidatesSelect<ExtArgs extends runtime.Types.Exten
   submission?: boolean | Prisma.team_answer_submissionsDefaultArgs<ExtArgs>
   reviewed_by?: boolean | Prisma.meme_moderation_candidates$reviewed_byArgs<ExtArgs>
   votes?: boolean | Prisma.meme_moderation_candidates$votesArgs<ExtArgs>
+  result_entries?: boolean | Prisma.meme_moderation_candidates$result_entriesArgs<ExtArgs>
   _count?: boolean | Prisma.Meme_moderation_candidatesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["meme_moderation_candidates"]>
 
@@ -1107,6 +1224,7 @@ export type meme_moderation_candidatesInclude<ExtArgs extends runtime.Types.Exte
   submission?: boolean | Prisma.team_answer_submissionsDefaultArgs<ExtArgs>
   reviewed_by?: boolean | Prisma.meme_moderation_candidates$reviewed_byArgs<ExtArgs>
   votes?: boolean | Prisma.meme_moderation_candidates$votesArgs<ExtArgs>
+  result_entries?: boolean | Prisma.meme_moderation_candidates$result_entriesArgs<ExtArgs>
   _count?: boolean | Prisma.Meme_moderation_candidatesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type meme_moderation_candidatesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1127,6 +1245,7 @@ export type $meme_moderation_candidatesPayload<ExtArgs extends runtime.Types.Ext
     submission: Prisma.$team_answer_submissionsPayload<ExtArgs>
     reviewed_by: Prisma.$usersPayload<ExtArgs> | null
     votes: Prisma.$meme_votesPayload<ExtArgs>[]
+    result_entries: Prisma.$meme_result_entriesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     meme_moderation_candidate_id: number
@@ -1537,6 +1656,7 @@ export interface Prisma__meme_moderation_candidatesClient<T, Null = never, ExtAr
   submission<T extends Prisma.team_answer_submissionsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.team_answer_submissionsDefaultArgs<ExtArgs>>): Prisma.Prisma__team_answer_submissionsClient<runtime.Types.Result.GetResult<Prisma.$team_answer_submissionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   reviewed_by<T extends Prisma.meme_moderation_candidates$reviewed_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_moderation_candidates$reviewed_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   votes<T extends Prisma.meme_moderation_candidates$votesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_moderation_candidates$votesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_votesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  result_entries<T extends Prisma.meme_moderation_candidates$result_entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_moderation_candidates$result_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_result_entriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2017,6 +2137,30 @@ export type meme_moderation_candidates$votesArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.Meme_votesScalarFieldEnum | Prisma.Meme_votesScalarFieldEnum[]
+}
+
+/**
+ * meme_moderation_candidates.result_entries
+ */
+export type meme_moderation_candidates$result_entriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the meme_result_entries
+   */
+  select?: Prisma.meme_result_entriesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the meme_result_entries
+   */
+  omit?: Prisma.meme_result_entriesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.meme_result_entriesInclude<ExtArgs> | null
+  where?: Prisma.meme_result_entriesWhereInput
+  orderBy?: Prisma.meme_result_entriesOrderByWithRelationInput | Prisma.meme_result_entriesOrderByWithRelationInput[]
+  cursor?: Prisma.meme_result_entriesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Meme_result_entriesScalarFieldEnum | Prisma.Meme_result_entriesScalarFieldEnum[]
 }
 
 /**

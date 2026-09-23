@@ -34,8 +34,13 @@ Nach dem abgeschlossenen Meme-Review erscheint der Bereich **Meme-Präsentation
    die angemeldeten Teams abstimmen.
 5. Die Moderation sieht nur den neutralen Fortschritt der abgegebenen Stimmen,
    niemals Kandidaten-Zwischenstände.
-6. **Voting schließen** beendet die Abstimmung endgültig und übergibt den
-   stabilen Stand an die spätere AP4-Auswertung.
+6. **Voting schließen** beendet die Abstimmung endgültig.
+7. **Ergebnis finalisieren** zählt den geschlossenen Stimmenstand genau einmal,
+   vergibt einen Quizpunkt je Gewinnerteam und sperrt nachträgliche normale
+   Änderungen.
+8. Bei direkter Auflösung mit **Weiter** auf die Ergebnisfolie wechseln. Bei
+   später Auflösung läuft das Quiz weiter; die Teamnamen und Stimmen erscheinen
+   erst in der regulären Auflösungsphase am Blockende.
 
 Ein Team hat genau eine Stimme und kann sie während des offenen Votings ändern.
 Das eigene Meme bleibt sichtbar, ist aber gesperrt. Ein Team ohne eigenen
@@ -43,3 +48,10 @@ freigegebenen Kandidaten darf alle Kandidaten wählen. Reloads erhalten den
 aktuellen Ablauf und die eigene Auswahl; bei konkurrierenden Geräten gewinnt
 der zuerst bestätigte Schreibvorgang und der andere Client lädt den aktuellen
 Serverstand.
+
+Auf der Ergebnisfolie stehen Kandidatennummer, Meme, Team, Stimmen und Anteil.
+Bei Gleichstand sind alle Kandidaten mit der höchsten Stimmenzahl Gewinner und
+jedes zugehörige Team erhält einen Punkt. Ohne gültige Stimme wird kein Gewinner
+erfunden und kein Punkt vergeben. Mehr als vier Ergebnisse werden mit **Weiter**
+seitenweise gezeigt. Reload und zwei Moderatorfenster ändern das persistierte
+Ergebnis oder den Punktestand nicht erneut.

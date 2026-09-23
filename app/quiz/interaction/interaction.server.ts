@@ -1702,6 +1702,10 @@ export async function getQuizLiveSnapshotData(
         quizFragenId: memePresentationQuestionId,
         quizTeamSessionId,
         includeModeration: options.includeLiveModeration === true,
+        includeResult:
+          options.includeLiveModeration === true ||
+          (presentationIdentity?.kind === "QUESTION" &&
+            presentationIdentity.phase === "SOLUTION"),
       })
     : null;
   const pixelConfig = run

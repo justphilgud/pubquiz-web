@@ -455,6 +455,25 @@ export default function ModerationClient({
   }
 
   async function naechsterSlideAction() {
+    if (
+      aktuellerSlide?.typ === "frage" &&
+      aktuellerSlide.frage.templateId === "meme_beschriften" &&
+      !memePresentationState?.result
+    ) {
+      setActionError("Meme-Voting schließen und Ergebnis finalisieren, bevor du weitergehst.");
+      return;
+    }
+    if (
+      aktuellerSlide?.typ === "aufloesung" &&
+      aktuellerSlide.frage.templateId === "meme_beschriften" &&
+      memePresentationState?.result &&
+      endstandRevealCount < memePresentationState.result.pageCount
+    ) {
+      const nextPage = endstandRevealCount + 1;
+      setEndstandRevealCountLokal(nextPage);
+      await setEndstandRevealCount({ quizId, revealCount: nextPage });
+      return;
+    }
     if (aktuellerSlide?.typ === "funny") {
       const pageCount = getFunnyAnswerPageCount(funnyAnswers.length);
       if (endstandRevealCount < pageCount) {
@@ -1127,6 +1146,7 @@ export default function ModerationClient({
                 quizId={quizId}
                 quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
                 state={memePresentationState}
+                solutionStrategy={aktuellerSlide.solutionStrategy ?? "AFTER_EACH_QUESTION"}
                 onChange={setMemePresentationState}
               />
             ) : null}
