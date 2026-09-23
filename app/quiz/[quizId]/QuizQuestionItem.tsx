@@ -15,6 +15,7 @@ import type { StoryElementType } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
 import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
 import QuizEditorElementCard from "./QuizEditorElementCard";
+import QuizFrageSortierungButtons from "./QuizFrageSortierungButtons";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
@@ -53,6 +54,9 @@ type Props = {
   containerId: string;
   settingsActions: QuizQuestionSettingsActions;
   onRemove: (quizFragenId: number) => void;
+  isFirst: boolean;
+  isLast: boolean;
+  onMove: (direction: "up" | "down") => void | Promise<void>;
 };
 
 function getAnswerModeLabel(frage: QuizQuestion) {
@@ -82,6 +86,9 @@ export default function QuizQuestionItem({
   containerId,
   settingsActions,
   onRemove,
+  isFirst,
+  isLast,
+  onMove,
 }: Props) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const {
@@ -160,6 +167,15 @@ export default function QuizQuestionItem({
                 </span>
               )}
             </>}
+      sortingAction={
+        <QuizFrageSortierungButtons
+          quizId={quizId}
+          quizFragenId={frage.quiz_fragen_id}
+          isFirst={isFirst}
+          isLast={isLast}
+          onMove={onMove}
+        />
+      }
       configureAction={
           <button
             type="button"

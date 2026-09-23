@@ -67,3 +67,20 @@ export function buildQuizEditorElements(input: {
     left.order - right.order || left.key.localeCompare(right.key),
   );
 }
+
+export function moveQuizEditorElement(
+  elements: readonly QuizEditorElement[],
+  activeKey: string,
+  direction: "up" | "down",
+): QuizEditorElement[] {
+  const oldIndex = elements.findIndex((element) => element.key === activeKey);
+  const newIndex = oldIndex + (direction === "up" ? -1 : 1);
+  if (oldIndex < 0 || newIndex < 0 || newIndex >= elements.length) {
+    return [...elements];
+  }
+
+  const ordered = [...elements];
+  const [active] = ordered.splice(oldIndex, 1);
+  ordered.splice(newIndex, 0, active);
+  return ordered;
+}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Geist,
   Geist_Mono,
@@ -15,6 +15,8 @@ import {
 import "./globals.css";
 import "./rendering/presentation/kommOnePresentation.css";
 import { APP_BRAND } from "@/app/branding/appBrand";
+
+const isPreview = process.env.VERCEL_ENV === "preview";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,8 +43,17 @@ export const metadata: Metadata = {
     default: APP_BRAND.productName,
     template: `%s | ${APP_BRAND.name}`,
   },
-  applicationName: APP_BRAND.name,
+  applicationName: isPreview ? "PubQuiz Preview" : APP_BRAND.name,
   description: APP_BRAND.description,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: isPreview ? "PubQuiz Preview" : "PubQuiz",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: APP_BRAND.colors.darkSurface,
 };
 
 export default function RootLayout({
@@ -52,7 +63,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="de"
       className={`${geistSans.variable} ${geistMono.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${nunito.variable} ${oswald.variable} ${robotoSlab.variable} ${lora.variable} ${playfairDisplay.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

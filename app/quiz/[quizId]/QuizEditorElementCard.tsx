@@ -46,6 +46,7 @@ type Props = {
   metadata: ReactNode;
   configureAction: ReactNode;
   previewAction: ReactNode;
+  sortingAction?: ReactNode;
   overflowAction?: ReactNode;
   details?: ReactNode;
   dragAttributes: HTMLAttributes<HTMLButtonElement>;
@@ -63,6 +64,7 @@ export default function QuizEditorElementCard({
   metadata,
   configureAction,
   previewAction,
+  sortingAction,
   overflowAction,
   details,
   dragAttributes,
@@ -110,6 +112,7 @@ export default function QuizEditorElementCard({
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 pl-20 sm:pl-0">
+          {sortingAction}
           {configureAction}
           {previewAction}
           {overflowAction ? (

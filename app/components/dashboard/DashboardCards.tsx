@@ -160,7 +160,7 @@ export function DashboardPanel({
   className?: string;
 }) {
   return (
-    <Card className={`rounded-2xl p-5 md:p-6 ${className}`}>
+    <Card className={`min-w-0 rounded-2xl p-5 md:p-6 ${className}`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
