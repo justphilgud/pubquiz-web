@@ -60,6 +60,7 @@ Die zentralen Identitäten sind:
 | Pixel-Lifecycle und Punkteallokation | `app/quiz/interaction/pixelLiveInteraction.ts` |
 | Meme-Konfiguration, Payload und Deadline-Anzeige | `app/quiz/memeCaption.ts` |
 | Gemeinsames Meme-Rendering | `app/rendering/meme/MemeRenderer.tsx` |
+| Meme-Auswahl und Moderation nach Run-Ende | `app/quiz/memeModeration.server.ts` |
 | Poll-Aggregation | `app/quiz/interaction/pollInteraction.ts` |
 | Persistenzmodell | `prisma/schema.prisma` |
 
@@ -86,7 +87,8 @@ Wichtige Fallbacks:
 - Fehlen einem historischen strukturierten Template die Felder, fällt es kontrolliert auf `TEXT` zurück.
 - `meme_beschriften` wird `MEME_CAPTION`: zwei begrenzte Textfelder, ein
   gemeinsames Basisbild und keine Bewertung. Der vollständige AP1-Vertrag steht
-  in [Meme beschriften – AP1](meme-caption-ap1.md).
+  in [Meme beschriften – AP1](meme-caption-ap1.md). Auswahl und Review nach dem
+  Run-Ende stehen in [Meme beschriften – AP2](meme-caption-ap2.md).
 - Ein nicht auflösbarer Vertrag ergibt `NO_ANSWER`; ein bekannter, aber noch nicht gerenderter Typ wird mit `supported: false` markiert.
 
 Der bei Öffnung des Runs aufgelöste Contract wird in `quiz_interaction_runs.config_snapshot` gespeichert. Laufende Interaktionen bleiben damit an ihre konkrete Konfiguration gebunden.

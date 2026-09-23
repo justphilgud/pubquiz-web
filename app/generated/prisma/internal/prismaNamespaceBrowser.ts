@@ -89,6 +89,8 @@ export const ModelName = {
   frage_vorlage_antwortfelder: 'frage_vorlage_antwortfelder',
   quiz_praesentation_status: 'quiz_praesentation_status',
   team_antwort_auswahlen: 'team_antwort_auswahlen',
+  meme_moderation_selections: 'meme_moderation_selections',
+  meme_moderation_candidates: 'meme_moderation_candidates',
   live_text_response_publications: 'live_text_response_publications',
   public_text_replacement_rules: 'public_text_replacement_rules',
   users: 'users',
@@ -751,6 +753,40 @@ export const Team_antwort_auswahlenScalarFieldEnum = {
 } as const
 
 export type Team_antwort_auswahlenScalarFieldEnum = (typeof Team_antwort_auswahlenScalarFieldEnum)[keyof typeof Team_antwort_auswahlenScalarFieldEnum]
+
+
+export const Meme_moderation_selectionsScalarFieldEnum = {
+  meme_moderation_selection_id: 'meme_moderation_selection_id',
+  interaction_run_id: 'interaction_run_id',
+  quiz_fragen_id: 'quiz_fragen_id',
+  state: 'state',
+  revision: 'revision',
+  valid_submission_count: 'valid_submission_count',
+  selection_limit: 'selection_limit',
+  created_by_user_id: 'created_by_user_id',
+  finalized_by_user_id: 'finalized_by_user_id',
+  finalized_at: 'finalized_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Meme_moderation_selectionsScalarFieldEnum = (typeof Meme_moderation_selectionsScalarFieldEnum)[keyof typeof Meme_moderation_selectionsScalarFieldEnum]
+
+
+export const Meme_moderation_candidatesScalarFieldEnum = {
+  meme_moderation_candidate_id: 'meme_moderation_candidate_id',
+  meme_moderation_selection_id: 'meme_moderation_selection_id',
+  team_answer_submission_id: 'team_answer_submission_id',
+  position: 'position',
+  review_status: 'review_status',
+  review_revision: 'review_revision',
+  reviewed_by_user_id: 'reviewed_by_user_id',
+  reviewed_at: 'reviewed_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Meme_moderation_candidatesScalarFieldEnum = (typeof Meme_moderation_candidatesScalarFieldEnum)[keyof typeof Meme_moderation_candidatesScalarFieldEnum]
 
 
 export const Live_text_response_publicationsScalarFieldEnum = {

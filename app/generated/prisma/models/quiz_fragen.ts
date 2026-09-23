@@ -371,6 +371,7 @@ export type quiz_fragenWhereInput = {
   quiz_ablauf_elemente?: Prisma.Quiz_ablauf_elementeListRelationFilter
   story_ablauf_elemente?: Prisma.Quiz_ablauf_elementeListRelationFilter
   interaction_runs?: Prisma.Quiz_interaction_runsListRelationFilter
+  meme_moderation_selections?: Prisma.Meme_moderation_selectionsListRelationFilter
 }
 
 export type quiz_fragenOrderByWithRelationInput = {
@@ -400,6 +401,7 @@ export type quiz_fragenOrderByWithRelationInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeOrderByRelationAggregateInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeOrderByRelationAggregateInput
   interaction_runs?: Prisma.quiz_interaction_runsOrderByRelationAggregateInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsOrderByRelationAggregateInput
 }
 
 export type quiz_fragenWhereUniqueInput = Prisma.AtLeast<{
@@ -434,6 +436,7 @@ export type quiz_fragenWhereUniqueInput = Prisma.AtLeast<{
   quiz_ablauf_elemente?: Prisma.Quiz_ablauf_elementeListRelationFilter
   story_ablauf_elemente?: Prisma.Quiz_ablauf_elementeListRelationFilter
   interaction_runs?: Prisma.Quiz_interaction_runsListRelationFilter
+  meme_moderation_selections?: Prisma.Meme_moderation_selectionsListRelationFilter
 }, "quiz_fragen_id" | "quiz_id_fragen_id" | "quiz_id_sortierung">
 
 export type quiz_fragenOrderByWithAggregationInput = {
@@ -511,6 +514,7 @@ export type quiz_fragenCreateInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateInput = {
@@ -537,6 +541,7 @@ export type quiz_fragenUncheckedCreateInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUpdateInput = {
@@ -562,6 +567,7 @@ export type quiz_fragenUpdateInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateInput = {
@@ -588,6 +594,7 @@ export type quiz_fragenUncheckedUpdateInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenCreateManyInput = {
@@ -991,6 +998,20 @@ export type quiz_fragenUpdateOneWithoutInteraction_runsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.quiz_fragenUpdateToOneWithWhereWithoutInteraction_runsInput, Prisma.quiz_fragenUpdateWithoutInteraction_runsInput>, Prisma.quiz_fragenUncheckedUpdateWithoutInteraction_runsInput>
 }
 
+export type quiz_fragenCreateNestedOneWithoutMeme_moderation_selectionsInput = {
+  create?: Prisma.XOR<Prisma.quiz_fragenCreateWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUncheckedCreateWithoutMeme_moderation_selectionsInput>
+  connectOrCreate?: Prisma.quiz_fragenCreateOrConnectWithoutMeme_moderation_selectionsInput
+  connect?: Prisma.quiz_fragenWhereUniqueInput
+}
+
+export type quiz_fragenUpdateOneRequiredWithoutMeme_moderation_selectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.quiz_fragenCreateWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUncheckedCreateWithoutMeme_moderation_selectionsInput>
+  connectOrCreate?: Prisma.quiz_fragenCreateOrConnectWithoutMeme_moderation_selectionsInput
+  upsert?: Prisma.quiz_fragenUpsertWithoutMeme_moderation_selectionsInput
+  connect?: Prisma.quiz_fragenWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.quiz_fragenUpdateToOneWithWhereWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUpdateWithoutMeme_moderation_selectionsInput>, Prisma.quiz_fragenUncheckedUpdateWithoutMeme_moderation_selectionsInput>
+}
+
 export type quiz_fragenCreateWithoutFragenInput = {
   sortierung?: number | null
   richtigeantworten?: number | null
@@ -1013,6 +1034,7 @@ export type quiz_fragenCreateWithoutFragenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutFragenInput = {
@@ -1038,6 +1060,7 @@ export type quiz_fragenUncheckedCreateWithoutFragenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutFragenInput = {
@@ -1113,6 +1136,7 @@ export type quiz_fragenCreateWithoutQuizInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutQuizInput = {
@@ -1138,6 +1162,7 @@ export type quiz_fragenUncheckedCreateWithoutQuizInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutQuizInput = {
@@ -1188,6 +1213,7 @@ export type quiz_fragenCreateWithoutQuiz_abschnitteInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutQuiz_abschnitteInput = {
@@ -1213,6 +1239,7 @@ export type quiz_fragenUncheckedCreateWithoutQuiz_abschnitteInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutQuiz_abschnitteInput = {
@@ -1263,6 +1290,7 @@ export type quiz_fragenCreateWithoutQuiz_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutQuiz_ablauf_elementeInput = {
@@ -1288,6 +1316,7 @@ export type quiz_fragenUncheckedCreateWithoutQuiz_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutQuiz_ablauf_elementeInput = {
@@ -1317,6 +1346,7 @@ export type quiz_fragenCreateWithoutStory_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutStory_ablauf_elementeInput = {
@@ -1342,6 +1372,7 @@ export type quiz_fragenUncheckedCreateWithoutStory_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutStory_ablauf_elementeInput = {
@@ -1382,6 +1413,7 @@ export type quiz_fragenUpdateWithoutQuiz_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutQuiz_ablauf_elementeInput = {
@@ -1407,6 +1439,7 @@ export type quiz_fragenUncheckedUpdateWithoutQuiz_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUpsertWithoutStory_ablauf_elementeInput = {
@@ -1442,6 +1475,7 @@ export type quiz_fragenUpdateWithoutStory_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutStory_ablauf_elementeInput = {
@@ -1467,6 +1501,7 @@ export type quiz_fragenUncheckedUpdateWithoutStory_ablauf_elementeInput = {
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenCreateWithoutTeam_antwortenInput = {
@@ -1491,6 +1526,7 @@ export type quiz_fragenCreateWithoutTeam_antwortenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutTeam_antwortenInput = {
@@ -1516,6 +1552,7 @@ export type quiz_fragenUncheckedCreateWithoutTeam_antwortenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutTeam_antwortenInput = {
@@ -1556,6 +1593,7 @@ export type quiz_fragenUpdateWithoutTeam_antwortenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutTeam_antwortenInput = {
@@ -1581,6 +1619,7 @@ export type quiz_fragenUncheckedUpdateWithoutTeam_antwortenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenCreateWithoutInteraction_runsInput = {
@@ -1605,6 +1644,7 @@ export type quiz_fragenCreateWithoutInteraction_runsInput = {
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenUncheckedCreateWithoutInteraction_runsInput = {
@@ -1630,6 +1670,7 @@ export type quiz_fragenUncheckedCreateWithoutInteraction_runsInput = {
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutQuiz_frageInput
 }
 
 export type quiz_fragenCreateOrConnectWithoutInteraction_runsInput = {
@@ -1670,6 +1711,7 @@ export type quiz_fragenUpdateWithoutInteraction_runsInput = {
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutInteraction_runsInput = {
@@ -1695,6 +1737,125 @@ export type quiz_fragenUncheckedUpdateWithoutInteraction_runsInput = {
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
+}
+
+export type quiz_fragenCreateWithoutMeme_moderation_selectionsInput = {
+  sortierung?: number | null
+  richtigeantworten?: number | null
+  falscheantworten?: number | null
+  antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
+  praesentationslayout?: string | null
+  punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  punkte_modus?: string
+  risiko_pool_teamanzahl?: number | null
+  risiko_pool_fixiert_am?: Date | string | null
+  freie_antwort_erlaubt?: boolean
+  ergebnisdarstellung?: $Enums.QuizResultDisplayMode
+  verknuepfte_story_elemente_uebernehmen?: boolean
+  praesentationsdauer_messungen?: number | null
+  praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
+  quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
+  quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
+  team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
+  quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutQuiz_fragenInput
+  story_ablauf_elemente?: Prisma.quiz_ablauf_elementeCreateNestedManyWithoutStory_bezugs_frageInput
+  interaction_runs?: Prisma.quiz_interaction_runsCreateNestedManyWithoutQuiz_fragenInput
+}
+
+export type quiz_fragenUncheckedCreateWithoutMeme_moderation_selectionsInput = {
+  quiz_fragen_id?: number
+  quiz_id: number
+  fragen_id: number
+  sortierung?: number | null
+  richtigeantworten?: number | null
+  falscheantworten?: number | null
+  antwort_reihenfolge?: Prisma.quiz_fragenCreateantwort_reihenfolgeInput | number[]
+  praesentationslayout?: string | null
+  quiz_abschnitt_id?: number | null
+  punkte_basis?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  punkte_modus?: string
+  risiko_pool_teamanzahl?: number | null
+  risiko_pool_fixiert_am?: Date | string | null
+  freie_antwort_erlaubt?: boolean
+  ergebnisdarstellung?: $Enums.QuizResultDisplayMode
+  verknuepfte_story_elemente_uebernehmen?: boolean
+  praesentationsdauer_messungen?: number | null
+  praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
+  story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
+  interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
+}
+
+export type quiz_fragenCreateOrConnectWithoutMeme_moderation_selectionsInput = {
+  where: Prisma.quiz_fragenWhereUniqueInput
+  create: Prisma.XOR<Prisma.quiz_fragenCreateWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUncheckedCreateWithoutMeme_moderation_selectionsInput>
+}
+
+export type quiz_fragenUpsertWithoutMeme_moderation_selectionsInput = {
+  update: Prisma.XOR<Prisma.quiz_fragenUpdateWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUncheckedUpdateWithoutMeme_moderation_selectionsInput>
+  create: Prisma.XOR<Prisma.quiz_fragenCreateWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUncheckedCreateWithoutMeme_moderation_selectionsInput>
+  where?: Prisma.quiz_fragenWhereInput
+}
+
+export type quiz_fragenUpdateToOneWithWhereWithoutMeme_moderation_selectionsInput = {
+  where?: Prisma.quiz_fragenWhereInput
+  data: Prisma.XOR<Prisma.quiz_fragenUpdateWithoutMeme_moderation_selectionsInput, Prisma.quiz_fragenUncheckedUpdateWithoutMeme_moderation_selectionsInput>
+}
+
+export type quiz_fragenUpdateWithoutMeme_moderation_selectionsInput = {
+  sortierung?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  richtigeantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
+  praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
+  risiko_pool_teamanzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  risiko_pool_fixiert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freie_antwort_erlaubt?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ergebnisdarstellung?: Prisma.EnumQuizResultDisplayModeFieldUpdateOperationsInput | $Enums.QuizResultDisplayMode
+  verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
+  quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
+  quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
+  team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
+  quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
+  story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
+  interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+}
+
+export type quiz_fragenUncheckedUpdateWithoutMeme_moderation_selectionsInput = {
+  quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  sortierung?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  richtigeantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  falscheantworten?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  antwort_reihenfolge?: Prisma.quiz_fragenUpdateantwort_reihenfolgeInput | number[]
+  praesentationslayout?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quiz_abschnitt_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  punkte_basis?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  punkte_modus?: Prisma.StringFieldUpdateOperationsInput | string
+  risiko_pool_teamanzahl?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  risiko_pool_fixiert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freie_antwort_erlaubt?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ergebnisdarstellung?: Prisma.EnumQuizResultDisplayModeFieldUpdateOperationsInput | $Enums.QuizResultDisplayMode
+  verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
+  interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
 }
 
 export type quiz_fragenCreateManyFragenInput = {
@@ -1740,6 +1901,7 @@ export type quiz_fragenUpdateWithoutFragenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutFragenInput = {
@@ -1765,6 +1927,7 @@ export type quiz_fragenUncheckedUpdateWithoutFragenInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateManyWithoutFragenInput = {
@@ -1831,6 +1994,7 @@ export type quiz_fragenUpdateWithoutQuizInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutQuizInput = {
@@ -1856,6 +2020,7 @@ export type quiz_fragenUncheckedUpdateWithoutQuizInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateManyWithoutQuizInput = {
@@ -1922,6 +2087,7 @@ export type quiz_fragenUpdateWithoutQuiz_abschnitteInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateWithoutQuiz_abschnitteInput = {
@@ -1947,6 +2113,7 @@ export type quiz_fragenUncheckedUpdateWithoutQuiz_abschnitteInput = {
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
+  meme_moderation_selections?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutQuiz_frageNestedInput
 }
 
 export type quiz_fragenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
@@ -1980,6 +2147,7 @@ export type Quiz_fragenCountOutputType = {
   quiz_ablauf_elemente: number
   story_ablauf_elemente: number
   interaction_runs: number
+  meme_moderation_selections: number
 }
 
 export type Quiz_fragenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1987,6 +2155,7 @@ export type Quiz_fragenCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   quiz_ablauf_elemente?: boolean | Quiz_fragenCountOutputTypeCountQuiz_ablauf_elementeArgs
   story_ablauf_elemente?: boolean | Quiz_fragenCountOutputTypeCountStory_ablauf_elementeArgs
   interaction_runs?: boolean | Quiz_fragenCountOutputTypeCountInteraction_runsArgs
+  meme_moderation_selections?: boolean | Quiz_fragenCountOutputTypeCountMeme_moderation_selectionsArgs
 }
 
 /**
@@ -2027,6 +2196,13 @@ export type Quiz_fragenCountOutputTypeCountInteraction_runsArgs<ExtArgs extends 
   where?: Prisma.quiz_interaction_runsWhereInput
 }
 
+/**
+ * Quiz_fragenCountOutputType without action
+ */
+export type Quiz_fragenCountOutputTypeCountMeme_moderation_selectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.meme_moderation_selectionsWhereInput
+}
+
 
 export type quiz_fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   quiz_fragen_id?: boolean
@@ -2055,6 +2231,7 @@ export type quiz_fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   quiz_ablauf_elemente?: boolean | Prisma.quiz_fragen$quiz_ablauf_elementeArgs<ExtArgs>
   story_ablauf_elemente?: boolean | Prisma.quiz_fragen$story_ablauf_elementeArgs<ExtArgs>
   interaction_runs?: boolean | Prisma.quiz_fragen$interaction_runsArgs<ExtArgs>
+  meme_moderation_selections?: boolean | Prisma.quiz_fragen$meme_moderation_selectionsArgs<ExtArgs>
   _count?: boolean | Prisma.Quiz_fragenCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quiz_fragen"]>
 
@@ -2139,6 +2316,7 @@ export type quiz_fragenInclude<ExtArgs extends runtime.Types.Extensions.Internal
   quiz_ablauf_elemente?: boolean | Prisma.quiz_fragen$quiz_ablauf_elementeArgs<ExtArgs>
   story_ablauf_elemente?: boolean | Prisma.quiz_fragen$story_ablauf_elementeArgs<ExtArgs>
   interaction_runs?: boolean | Prisma.quiz_fragen$interaction_runsArgs<ExtArgs>
+  meme_moderation_selections?: boolean | Prisma.quiz_fragen$meme_moderation_selectionsArgs<ExtArgs>
   _count?: boolean | Prisma.Quiz_fragenCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type quiz_fragenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2162,6 +2340,7 @@ export type $quiz_fragenPayload<ExtArgs extends runtime.Types.Extensions.Interna
     quiz_ablauf_elemente: Prisma.$quiz_ablauf_elementePayload<ExtArgs>[]
     story_ablauf_elemente: Prisma.$quiz_ablauf_elementePayload<ExtArgs>[]
     interaction_runs: Prisma.$quiz_interaction_runsPayload<ExtArgs>[]
+    meme_moderation_selections: Prisma.$meme_moderation_selectionsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     quiz_fragen_id: number
@@ -2584,6 +2763,7 @@ export interface Prisma__quiz_fragenClient<T, Null = never, ExtArgs extends runt
   quiz_ablauf_elemente<T extends Prisma.quiz_fragen$quiz_ablauf_elementeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_fragen$quiz_ablauf_elementeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_ablauf_elementePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   story_ablauf_elemente<T extends Prisma.quiz_fragen$story_ablauf_elementeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_fragen$story_ablauf_elementeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_ablauf_elementePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   interaction_runs<T extends Prisma.quiz_fragen$interaction_runsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_fragen$interaction_runsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_interaction_runsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  meme_moderation_selections<T extends Prisma.quiz_fragen$meme_moderation_selectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_fragen$meme_moderation_selectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_moderation_selectionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3145,6 +3325,30 @@ export type quiz_fragen$interaction_runsArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.Quiz_interaction_runsScalarFieldEnum | Prisma.Quiz_interaction_runsScalarFieldEnum[]
+}
+
+/**
+ * quiz_fragen.meme_moderation_selections
+ */
+export type quiz_fragen$meme_moderation_selectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the meme_moderation_selections
+   */
+  select?: Prisma.meme_moderation_selectionsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the meme_moderation_selections
+   */
+  omit?: Prisma.meme_moderation_selectionsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.meme_moderation_selectionsInclude<ExtArgs> | null
+  where?: Prisma.meme_moderation_selectionsWhereInput
+  orderBy?: Prisma.meme_moderation_selectionsOrderByWithRelationInput | Prisma.meme_moderation_selectionsOrderByWithRelationInput[]
+  cursor?: Prisma.meme_moderation_selectionsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Meme_moderation_selectionsScalarFieldEnum | Prisma.Meme_moderation_selectionsScalarFieldEnum[]
 }
 
 /**

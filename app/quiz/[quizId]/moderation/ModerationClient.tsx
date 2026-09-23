@@ -51,6 +51,7 @@ import SlideNotes from "./components/SlideNotes";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
+import MemeModerationReview from "./components/MemeModerationReview";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import { resolvePresentationSequenceIndex, resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
@@ -220,6 +221,17 @@ export default function ModerationClient({
           : aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "VIDEO" && aktuellerSlide.element.config.videoUrl
             ? [{ medien_id: aktuellerSlide.element.persistentId ?? -1, datei: aktuellerSlide.element.config.videoUrl, medientyp: "Video", sortierung: 1, bemerkung: aktuellerSlide.element.config.description ?? null }]
         : [];
+  const memeImageFile =
+    aktuellerSlide?.typ === "frage" && memeState
+      ? aktuellerSlide.frage.medien.find(
+          (medium) => medium.slotKey === "question_image",
+        )?.datei ?? null
+      : null;
+  const memeImageUrl = memeImageFile
+    ? memeImageFile.startsWith("http://") || memeImageFile.startsWith("https://")
+      ? memeImageFile
+      : `/medien/${memeImageFile}`
+    : null;
 
   const [punktestand, setPunktestand] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
@@ -1094,6 +1106,15 @@ export default function ModerationClient({
                 </details>
               </section>
             )}
+
+            {aktuellerSlide?.typ === "frage" && memeState && memeImageUrl ? (
+              <MemeModerationReview
+                key={`${aktuellerSlide.frage.quiz_fragen_id}:${memeState.state}`}
+                quizId={quizId}
+                quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                imageUrl={memeImageUrl}
+              />
+            ) : null}
 
             <SlideNotes>
               <div className="space-y-2">

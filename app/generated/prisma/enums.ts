@@ -156,6 +156,24 @@ export const TeamAnswerSubmissionStatus = {
 export type TeamAnswerSubmissionStatus = (typeof TeamAnswerSubmissionStatus)[keyof typeof TeamAnswerSubmissionStatus]
 
 
+export const MemeModerationSelectionState = {
+  REVIEWING: 'REVIEWING',
+  COMPLETED: 'COMPLETED',
+  SKIPPED: 'SKIPPED'
+} as const
+
+export type MemeModerationSelectionState = (typeof MemeModerationSelectionState)[keyof typeof MemeModerationSelectionState]
+
+
+export const MemeModerationReviewStatus = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type MemeModerationReviewStatus = (typeof MemeModerationReviewStatus)[keyof typeof MemeModerationReviewStatus]
+
+
 export const QuizResultDisplayMode = {
   STANDARD: 'STANDARD',
   LIVE: 'LIVE'
