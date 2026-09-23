@@ -82,6 +82,7 @@ import {
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
 import { isMemeCaptionQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { getMemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -1496,6 +1497,11 @@ export async function getQuizLiveSnapshotData(
     run = await runQuery();
   }
   const presentationIdentity = parsePresentationSlideKey(presentationStatus?.slide_key);
+  const memePresentationQuestionId =
+    options.presentationQuestionAssignmentId ??
+    (presentationIdentity?.kind === "QUESTION"
+      ? presentationIdentity.questionAssignmentId
+      : undefined);
   // Read-model only: preserve the stored previous run and its natural deadlines,
   // but do not send its question/poll payload while the sponsor is displayed.
   if (presentationIdentity?.kind === "NON_QUESTION" && presentationIdentity.slideType === "SPONSOR") run = null;
@@ -1690,6 +1696,14 @@ export async function getQuizLiveSnapshotData(
     ).payload;
   }
   const submission = answer?.submissions[0] ?? null;
+  const memePresentationState = memePresentationQuestionId
+    ? await getMemePresentationSnapshot({
+        quizId,
+        quizFragenId: memePresentationQuestionId,
+        quizTeamSessionId,
+        includeModeration: options.includeLiveModeration === true,
+      })
+    : null;
   const pixelConfig = run
     ? readPixelLiveConfigSnapshot(run.config_snapshot)
     : null;
@@ -1939,6 +1953,7 @@ export async function getQuizLiveSnapshotData(
           maxPresentedMemes: memeConfig.maxPresentedMemes,
         }
       : null,
+    memePresentationState,
     teamSpecificState: quizTeamSessionId
       ? {
           isStopper,

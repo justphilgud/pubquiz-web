@@ -39,6 +39,7 @@ import { useAnswerDrafts } from "../../interaction/useAnswerDrafts";
 import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
+import MemeVotingPanel from "./MemeVotingPanel";
 import type { saveTeamAntwortDraft, startQuizTeamSession } from "../../actions";
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -226,6 +227,9 @@ export default function QuizAntwortClient({
     canSubmit: boolean;
   } | null>(null);
   const [livePollState, setLivePollState] = useState<QuizLiveSnapshot["livePollState"]>(null);
+  const [memePresentationState, setMemePresentationState] = useState<
+    QuizLiveSnapshot["memePresentationState"]
+  >(null);
   const livePollStateRef = useRef<QuizLiveSnapshot["livePollState"]>(null);
   const [livePollResponse, setLivePollResponse] = useState<{ selectedOptionId: string | null; text: string | null } | null>(null);
   const [livePollText, setLivePollText] = useState("");
@@ -374,6 +378,7 @@ export default function QuizAntwortClient({
         consecutiveFailures = 0;
         livePollStateRef.current = snapshot.livePollState;
         setLivePollState(snapshot.livePollState);
+        setMemePresentationState(snapshot.memePresentationState);
         if (snapshot.teamSpecificState?.livePollResponse) {
           const response = snapshot.teamSpecificState.livePollResponse;
           setLivePollResponse({ selectedOptionId: response.selectedOptionId, text: response.text });
@@ -448,6 +453,7 @@ export default function QuizAntwortClient({
           setSession(null);
           setLiveDaten(daten);
           setPixelState(null);
+          setMemePresentationState(null);
           setPixelTeamState(null);
           setCurrentSubmissionStatus(null);
           setMeldung("Die Team-Sitzung ist nicht mehr g\u00fcltig. Bitte erneut anmelden.");
@@ -812,6 +818,15 @@ export default function QuizAntwortClient({
             uploadEnvironmentPrefix={teamPhotoUploadEnvironment}
           />
         )}
+
+        {session && memePresentationState ? (
+          <MemeVotingPanel
+            quizId={liveDaten.quiz_id}
+            sessionToken={session.sessionToken}
+            state={memePresentationState}
+            onChange={setMemePresentationState}
+          />
+        ) : null}
 
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">

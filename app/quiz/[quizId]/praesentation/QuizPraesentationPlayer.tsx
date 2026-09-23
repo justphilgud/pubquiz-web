@@ -79,6 +79,9 @@ export default function QuizPraesentationPlayer({
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [memeState, setMemeState] = useState<MemeLiveState | null>(null);
+  const [memePresentationState, setMemePresentationState] = useState<
+    Awaited<ReturnType<typeof getQuizLiveSnapshot>>["memePresentationState"]
+  >(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
@@ -192,6 +195,7 @@ export default function QuizPraesentationPlayer({
         setSyncError(false);
         setPixelState(interactionSnapshot.pixelState);
         setMemeState(interactionSnapshot.memeState);
+        setMemePresentationState(interactionSnapshot.memePresentationState);
         setPollState(interactionSnapshot.pollState);
         setLiveResultState(interactionSnapshot.liveResultState);
         setLivePollState(interactionSnapshot.livePollState);
@@ -316,6 +320,7 @@ export default function QuizPraesentationPlayer({
             playbackCommandId: liveState.playbackCommandId,
             pixelState,
             memeState,
+            memePresentationState,
             pollState,
             liveResultState,
             livePollState,
