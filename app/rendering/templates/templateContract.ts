@@ -112,6 +112,7 @@ export type TemplateInteractionType =
   | "POLL_SINGLE"
   | "POLL_MULTI"
   | "POLL_SCALE"
+  | "MEME_CAPTION"
   | "BUZZER";
 
 export type TemplateEvaluationType =
@@ -138,6 +139,7 @@ export const compatibleEvaluationTypes = {
   POLL_SINGLE: ["NONE"],
   POLL_MULTI: ["NONE"],
   POLL_SCALE: ["NONE"],
+  MEME_CAPTION: ["NONE"],
   BUZZER: ["MANUAL"],
 } as const satisfies Record<
   TemplateInteractionType,
@@ -208,6 +210,12 @@ export type TemplateAnswerFormDefinition =
       type: "POLL_SCALE";
       source: "TEMPLATE_SCALE";
       inputMode: "decimal";
+    }
+  | {
+      type: "MEME_CAPTION";
+      source: "ANSWER_TEXT";
+      multiline: false;
+      inputMode: "text";
     }
   | {
       type: "BUZZER";

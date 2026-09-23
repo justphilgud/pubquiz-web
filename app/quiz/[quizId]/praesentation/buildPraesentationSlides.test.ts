@@ -52,6 +52,24 @@ test("AP3: each pixel question has a distinct explanation before opening the que
   assert.equal(slides.filter((slide) => slide.typ === "frage").length, 3);
 });
 
+test("AP1: each meme question has one explanation immediately before its question", () => {
+  const quiz = quizFixture();
+  quiz.fragen[0].templateId = "meme_beschriften";
+  quiz.fragen[0].memeConfig = {
+    version: 1,
+    responseDurationSeconds: 120,
+    maxPresentedMemes: 5,
+  };
+  const slides = buildPraesentationSlides(quiz);
+  const questionIndex = slides.findIndex(
+    (slide) => slide.typ === "frage" && slide.frage.quiz_fragen_id === 101,
+  );
+  assert.equal(slides[questionIndex - 1].typ, "meme-erklaerung");
+  assert.equal(getPresentationSlideKey(slides[questionIndex - 1]), "meme-explanation:101");
+  assert.equal(getPresentationSlideKey(slides[questionIndex]), "question:101:question");
+  assert.equal(slides.filter((slide) => slide.typ === "meme-erklaerung").length, 1);
+});
+
 function setBlockQuestions(
   quiz: QuizPraesentationResult,
   blocks: ReadonlyArray<{

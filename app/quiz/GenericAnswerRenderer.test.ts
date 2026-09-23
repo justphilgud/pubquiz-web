@@ -25,6 +25,7 @@ function render(
       interaction,
       value,
       disabled: false,
+      now: 0,
       onChange: () => undefined,
     }),
   );
@@ -178,6 +179,31 @@ test("ORDER rejects incomplete stored identifiers and restores the configured or
 test("NO_ANSWER and not-yet-implemented future interactions render no form", () => {
   assert.equal(render({ type: "NO_ANSWER" }), "");
   assert.equal(render({ type: "BUZZER", supported: false }), "");
+});
+
+test("MEME_CAPTION renders the shared local preview, both limited fields and countdown", () => {
+  const html = renderToStaticMarkup(createElement(GenericAnswerRenderer, {
+    questionAssignmentId: 42,
+    interaction: {
+      type: "MEME_CAPTION",
+      imageUrl: "base.webp",
+      maxLength: 80,
+    },
+    value: {
+      ...emptyDraft,
+      antwortText: JSON.stringify({ topText: "Oben", bottomText: "Unten" }),
+    },
+    disabled: false,
+    deadlineAt: new Date(20_000).toISOString(),
+    now: 8_000,
+    onChange: () => undefined,
+  }));
+  assert.match(html, /data-answer-interaction="MEME_CAPTION"/);
+  assert.match(html, /data-meme-renderer/);
+  assert.match(html, /Oben/);
+  assert.match(html, /Unten/);
+  assert.match(html, /12 s/);
+  assert.equal((html.match(/maxLength="80"/g) ?? []).length, 2);
 });
 
 test("poll choices and mobile scale render as first-class interactions", () => {

@@ -1,5 +1,6 @@
 import { Prisma } from "@/app/generated/prisma/client";
 import {
+  isMemeCaptionQuestionTemplateId,
   isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
@@ -12,7 +13,10 @@ export function getQuestionBaseMaximum(input: {
   orderingItemCount: number;
 }) {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
-  if (isPollQuestionTemplateId(templateId)) {
+  if (
+    isPollQuestionTemplateId(templateId) ||
+    isMemeCaptionQuestionTemplateId(templateId)
+  ) {
     return new Prisma.Decimal(0);
   }
   if (templateId === questionTemplateIds.ordering) {
@@ -56,8 +60,14 @@ export function validateQuestionPointsMode(input: {
   orderingItemCount: number;
 }) {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
-  if (isPollQuestionTemplateId(templateId) && input.pointsMode !== "standard") {
-    throw new Error("Umfragen dürfen keinen Punkte- oder Risikomodus verwenden.");
+  if (
+    (isPollQuestionTemplateId(templateId) ||
+      isMemeCaptionQuestionTemplateId(templateId)) &&
+    input.pointsMode !== "standard"
+  ) {
+    throw new Error(
+      "Fragen ohne Bewertung dürfen keinen Punkte- oder Risikomodus verwenden.",
+    );
   }
   if (
     templateId === questionTemplateIds.pixelImage &&

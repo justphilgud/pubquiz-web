@@ -74,6 +74,14 @@ import {
   loadLivePollPlacement,
   readLivePollRunSnapshot,
 } from "@/app/umfragen/livePollRuntime.server";
+import {
+  createMemeLiveConfigSnapshot,
+  createMemeRunWindow,
+  parseMemeQuestionConfig,
+  readMemeLiveConfigSnapshot,
+  type MemeQuestionConfig,
+} from "@/app/quiz/memeCaption";
+import { isMemeCaptionQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -141,12 +149,18 @@ function buildInteractionConfigSnapshot(input: {
   interaction: ResolvedQuizAnswerInteraction;
   templateId: string | null;
   templateConfig: QuestionTemplateConfig | null;
+  memeConfig: MemeQuestionConfig | null;
 }) {
   return input.templateId === "pixelbild"
     ? {
         interaction: input.interaction,
         liveInteraction: createPixelLiveConfigSnapshot(input.templateConfig),
       }
+    : isMemeCaptionQuestionTemplateId(input.templateId) && input.memeConfig
+      ? {
+          interaction: input.interaction,
+          liveInteraction: createMemeLiveConfigSnapshot(input.memeConfig),
+        }
     : { interaction: input.interaction };
 }
 
@@ -166,6 +180,11 @@ export async function resolveInteractionAssignment(
             orderBy: { antwort_id: "asc" },
           },
           antwortfelder: { orderBy: { sortierung: "asc" } },
+          medien: {
+            where: { slot_key: "question_image" },
+            orderBy: { sortierung: "asc" },
+            take: 1,
+          },
           vorlage: { select: { code: true } },
         },
       },
@@ -204,6 +223,7 @@ export async function resolveInteractionAssignment(
     effectiveAnswerMode: answerMode.effectiveMode,
     templateData: templateConfig?.templateData,
     orderingItems,
+    memeImageUrl: assignment.fragen.medien[0]?.datei ?? null,
     answerFields: assignment.fragen.antwortfelder.map((field) => ({
       id: field.antwortfeld_id,
       label: field.label,
@@ -218,6 +238,11 @@ export async function resolveInteractionAssignment(
     interaction,
     templateId: assignment.fragen.vorlage?.code ?? null,
     templateConfig,
+    memeConfig: isMemeCaptionQuestionTemplateId(
+      assignment.fragen.vorlage?.code ?? null,
+    )
+      ? parseMemeQuestionConfig(assignment.meme_config_json)
+      : null,
   };
 }
 
@@ -569,15 +594,25 @@ export async function syncInteractionForPresentation(
           input.quizId,
           identity.questionAssignmentId,
         ));
+    const memeConfig = resolved?.memeConfig ?? (
+      previousRun
+        ? readMemeLiveConfigSnapshot(previousRun.config_snapshot)
+        : null
+    );
+    const openedAt = new Date();
+    const memeRunWindow = memeConfig
+      ? createMemeRunWindow(memeConfig, openedAt)
+      : null;
     return db.quiz_interaction_runs.create({
       data: {
         quiz_id: input.quizId,
         quiz_fragen_id: identity.questionAssignmentId,
         interaction_type:
           previousRun?.interaction_type ?? resolved!.interaction.type,
-        state: "OPEN",
+        state: memeRunWindow?.state ?? "OPEN",
         is_current: true,
-        opened_at: new Date(),
+        opened_at: openedAt,
+        deadline_at: memeRunWindow?.deadlineAt ?? null,
         revision: 1,
         config_snapshot:
           previousRun?.config_snapshot ??
@@ -1658,6 +1693,9 @@ export async function getQuizLiveSnapshotData(
   const pixelConfig = run
     ? readPixelLiveConfigSnapshot(run.config_snapshot)
     : null;
+  const memeConfig = run
+    ? readMemeLiveConfigSnapshot(run.config_snapshot)
+    : null;
   const pixelStage = run && pixelConfig
     ? resolveEffectivePixelStage({
         openedAt: run.opened_at,
@@ -1891,6 +1929,14 @@ export async function getQuizLiveSnapshotData(
                   : null,
               }
             : null,
+        }
+      : null,
+    memeState: run && memeConfig
+      ? {
+          state: run.state,
+          deadlineAt: run.deadline_at?.toISOString() ?? null,
+          responseDurationSeconds: memeConfig.responseDurationSeconds,
+          maxPresentedMemes: memeConfig.maxPresentedMemes,
         }
       : null,
     teamSpecificState: quizTeamSessionId

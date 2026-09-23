@@ -454,7 +454,8 @@ export const Quiz_fragenScalarFieldEnum = {
   ergebnisdarstellung: 'ergebnisdarstellung',
   verknuepfte_story_elemente_uebernehmen: 'verknuepfte_story_elemente_uebernehmen',
   praesentationsdauer_messungen: 'praesentationsdauer_messungen',
-  praesentationsdauer_sekunden: 'praesentationsdauer_sekunden'
+  praesentationsdauer_sekunden: 'praesentationsdauer_sekunden',
+  meme_config_json: 'meme_config_json'
 } as const
 
 export type Quiz_fragenScalarFieldEnum = (typeof Quiz_fragenScalarFieldEnum)[keyof typeof Quiz_fragenScalarFieldEnum]

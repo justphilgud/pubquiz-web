@@ -1,4 +1,5 @@
 import {
+  isMemeCaptionQuestionTemplateId,
   isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
@@ -29,6 +30,10 @@ export function getQuizQuestionPointsDisplay(input: {
 
   if (isPollQuestionTemplateId(templateId)) {
     return { pointsLabel: null, modeLabel: "Umfrage", isDynamic: false };
+  }
+
+  if (isMemeCaptionQuestionTemplateId(templateId)) {
+    return { pointsLabel: null, modeLabel: "Kreativfrage", isDynamic: false };
   }
 
   if (templateId === questionTemplateIds.pixelImage) {

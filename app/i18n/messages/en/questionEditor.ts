@@ -45,6 +45,7 @@ export const enQuestionEditorMessages = {
     pollSingle: { name: "Poll: single choice", description: "Teams select exactly one option; there is no correct answer and no score.", defaultQuestion: "" },
     pollMulti: { name: "Poll: multiple choice", description: "Teams may select multiple options; there is no correct answer and no score.", defaultQuestion: "" },
     pollScale: { name: "Poll: scale", description: "Teams vote on a labelled scale; no points are awarded.", defaultQuestion: "" },
+    memeCaption: { name: "Caption a meme", description: "Teams add a top and bottom caption to a supplied image.", defaultQuestion: "Caption this image as a meme." },
   },
   management: {
     title: "Manage question", clone: "Clone question", cloning: "Cloning …", archive: "Archive", restore: "Restore", delete: "Delete permanently", deleting: "Deleting …",

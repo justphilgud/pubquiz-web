@@ -2,6 +2,11 @@
 
 import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTemplateList";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
+import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
+import {
+  parseStoredMemeCaptionPayload,
+  serializeMemeCaptionPayload,
+} from "@/app/quiz/memeCaption";
 
 export type TeamAnswerDraft = {
   antwortText: string | null;
@@ -15,6 +20,8 @@ type Props = {
   interaction: ResolvedQuizAnswerInteraction;
   value: TeamAnswerDraft | undefined;
   disabled: boolean;
+  deadlineAt?: string | null;
+  now: number;
   onChange: (value: TeamAnswerDraft) => void;
 };
 
@@ -55,6 +62,8 @@ export default function GenericAnswerRenderer({
   interaction,
   value,
   disabled,
+  deadlineAt = null,
+  now,
   onChange,
 }: Props) {
   if (interaction.type === "NO_ANSWER" || "supported" in interaction) {
@@ -71,6 +80,61 @@ export default function GenericAnswerRenderer({
         className="mt-4 min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
         placeholder={interaction.placeholder}
       />
+    );
+  }
+
+  if (interaction.type === "MEME_CAPTION") {
+    const payload = parseStoredMemeCaptionPayload(value?.antwortText ?? null);
+    const imageUrl = interaction.imageUrl.startsWith("http://") || interaction.imageUrl.startsWith("https://") || interaction.imageUrl.startsWith("/")
+      ? interaction.imageUrl
+      : `/medien/${interaction.imageUrl}`;
+    const remainingSeconds = deadlineAt
+      ? Math.max(0, Math.ceil((Date.parse(deadlineAt) - now) / 1_000))
+      : null;
+    const update = (next: { topText: string; bottomText: string }) => onChange({
+      antwortText: serializeMemeCaptionPayload(next),
+      antwortId: null,
+      antwortfelder: {},
+    });
+    return (
+      <section data-answer-interaction="MEME_CAPTION" className="mt-4 space-y-4">
+        <div className="overflow-hidden rounded-2xl border border-slate-300 bg-slate-950 p-2">
+          <MemeRenderer imageUrl={imageUrl} topText={payload.topText} bottomText={payload.bottomText} alt="Meme-Vorschau" />
+        </div>
+        <div className="flex items-center justify-between gap-4 rounded-xl bg-fuchsia-50 px-4 py-3 text-sm font-semibold text-fuchsia-950">
+          <span>Lokale Vorschau</span>
+          <span className="tabular-nums">{remainingSeconds === null ? "–" : `${remainingSeconds} s`}</span>
+        </div>
+        <label className="block">
+          <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
+            <span>Text oben</span><span>{payload.topText.length}/{interaction.maxLength}</span>
+          </span>
+          <input
+            type="text"
+            maxLength={interaction.maxLength}
+            disabled={disabled}
+            value={payload.topText}
+            onChange={(event) => update({ ...payload, topText: event.target.value })}
+            className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
+            placeholder="Text oben"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
+            <span>Text unten</span><span>{payload.bottomText.length}/{interaction.maxLength}</span>
+          </span>
+          <input
+            type="text"
+            maxLength={interaction.maxLength}
+            disabled={disabled}
+            value={payload.bottomText}
+            onChange={(event) => update({ ...payload, bottomText: event.target.value })}
+            className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
+            placeholder="Text unten"
+          />
+        </label>
+        <p className="text-xs text-slate-500">Mindestens eines der beiden Felder muss ausgefüllt sein.</p>
+      </section>
     );
   }
 

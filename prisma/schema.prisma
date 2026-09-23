@@ -475,6 +475,7 @@ model quiz_fragen {
   verknuepfte_story_elemente_uebernehmen Boolean                 @default(true)
   praesentationsdauer_messungen          Int?                    @default(0)
   praesentationsdauer_sekunden           Int?
+  meme_config_json                       Json?
   fragen                                 fragen                  @relation(fields: [fragen_id], references: [fragen_id], onUpdate: NoAction, map: "fk_quiz_fragen_fragen")
   quiz                                   quiz                    @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_quiz_fragen_quiz")
   quiz_abschnitte                        quiz_abschnitte?        @relation(fields: [quiz_abschnitt_id], references: [quiz_abschnitt_id])

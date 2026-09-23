@@ -9,7 +9,8 @@ export type QuestionAnswerMode =
   | "MULTIPLE_CHOICE"
   | "POLL_SINGLE"
   | "POLL_MULTI"
-  | "POLL_SCALE";
+  | "POLL_SCALE"
+  | "MEME_CAPTION";
 
 export type QuestionEvaluationMode =
   | "MANUAL"
@@ -30,7 +31,8 @@ export type QuestionTemplateSurfaceKind =
   | "ANAGRAM"
   | "GOOGLE_REVIEWS"
   | "POLL_OPTIONS"
-  | "POLL_SCALE";
+  | "POLL_SCALE"
+  | "MEME_CAPTION";
 
 export type AnagramWordCountPreference =
   | "AUTO"
@@ -349,7 +351,8 @@ export type QuestionTemplateDefinition = {
     | "googleReviews"
     | "pollSingle"
     | "pollMulti"
-    | "pollScale";
+    | "pollScale"
+    | "memeCaption";
   questionLabelKey: "question" | "statement" | "task" | "searchTarget";
   allowsOptionalQuestionImage: boolean;
   initialAnswers: Array<{

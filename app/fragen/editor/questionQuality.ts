@@ -4,6 +4,7 @@ import {
   findQuestionTemplate,
   isPollQuestionTemplateId,
   questionTemplateIds,
+  isMemeCaptionQuestionTemplateId,
 } from "./templates/questionTemplateRegistry";
 import { getMediaSlotDefinition } from "./mediaSlots";
 import { getGeneratorDefinition } from "./generators/registry";
@@ -154,6 +155,7 @@ export function evaluateQuestionQuality(
 
   if (
     template?.editorKind !== "STANDARD" &&
+    template?.editorKind !== "MEME_CAPTION" &&
     !specificTemplateIssue &&
     !normalizeQuestionTemplateConfig(draft.templateConfig, draft.templateId)
   ) {
@@ -228,6 +230,7 @@ export function evaluateQuestionQuality(
 
   if (
     !isPollQuestionTemplateId(draft.templateId) &&
+    !isMemeCaptionQuestionTemplateId(draft.templateId) &&
     !filledAnswers.some((answer) => answer.isCorrect)
   ) {
     blockers.push({ code: "CORRECT_ANSWER_REQUIRED", field: "answers" });

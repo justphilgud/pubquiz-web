@@ -78,6 +78,7 @@ import {
 } from "@/app/rendering/presentation/presentationRankingPolicy";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
+import type { MemeLiveState } from "@/app/quiz/memeCaption";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -143,6 +144,7 @@ export default function ModerationClient({
   const [initialClockOffset] = useState(() => (initialLiveState.serverNow ?? Date.now()) - Date.now());
   const pixelClockOffset = useRef(initialClockOffset);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
+  const [memeState, setMemeState] = useState<MemeLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
@@ -194,7 +196,8 @@ export default function ModerationClient({
   const currentSlideType = aktuellerSlide?.typ;
   const showTeamJoinState =
     (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "QR_CODE") ||
-    (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode");
+    (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode") ||
+    aktuellerSlide?.typ === "meme-erklaerung";
   const presentationQuestionAssignmentId =
     aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "funny" || aktuellerSlide?.typ === "aufloesung"
       ? aktuellerSlide.frage.quiz_fragen_id
@@ -351,6 +354,7 @@ export default function ModerationClient({
         if (!navigationPending.current) applyLiveState(snapshot.presentationState);
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
+        setMemeState(snapshot.memeState);
         pixelClockOffset.current = new Date(snapshot.serverNow).getTime() - Date.now();
         setPollState(snapshot.pollState);
         setLivePollState(snapshot.livePollState);
@@ -926,6 +930,7 @@ export default function ModerationClient({
               estimationQuestion={estimationQuestion}
               now={now + pixelClockOffset.current}
               pixelState={pixelState}
+              memeState={memeState}
               pollState={pollState}
               liveResultState={liveResultState}
               livePollState={livePollState}

@@ -76,6 +76,12 @@ import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
 import { presentationTextDensity } from "./presentationReadability";
 import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
+import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
+import {
+  DEFAULT_MEME_QUESTION_CONFIG,
+  memeCountdownRemainingSeconds,
+  type MemeLiveState,
+} from "@/app/quiz/memeCaption";
 
 type ScoreEntry = {
   teamId?: number;
@@ -114,6 +120,7 @@ type PresentationSlideSharedDisplayState = {
   playbackCommand: PresentationPlaybackCommand;
   playbackCommandId: number;
   pixelState?: PixelLiveState | null;
+  memeState?: MemeLiveState | null;
   pollState?: PollLiveState | null;
   liveResultState?: LiveChoiceResultState | LiveTextResultState | null;
   livePollState?: LivePollAudienceState | null;
@@ -294,6 +301,7 @@ export default function PresentationSlideRenderer({
     playbackCommand,
     playbackCommandId,
     pixelState = null,
+    memeState = null,
     pollState = null,
     liveResultState = null,
     livePollState = null,
@@ -607,6 +615,32 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const faceMorphMedium = frage.medien.find(
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));
+
+  if (frage.templateId === "meme_beschriften") {
+    const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
+      frage.medien.find((medium) => isBild(medium.datei));
+    const remaining = memeState
+      ? memeCountdownRemainingSeconds(memeState.deadlineAt, memeState.state, now)
+      : null;
+    return (
+      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_18rem] gap-6">
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-4 shadow-[8px_8px_0_#ff00aa]">
+          {image ? (
+            <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full max-h-full" />
+          ) : (
+            <PresentationMediaFallback kind="IMAGE" />
+          )}
+        </div>
+        <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/85 p-6 text-center shadow-[8px_8px_0_#ff00aa]">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-cyan-200">Meme beschriften</p>
+          <strong className="mt-4 text-[7rem] font-black leading-none text-yellow-200" aria-label={`${remaining ?? 0} Sekunden verbleibend`}>
+            {remaining ?? "–"}
+          </strong>
+          <p className="mt-4 text-xl font-bold text-white/70">Sekunden</p>
+        </aside>
+      </section>
+    );
+  }
 
   if (liveResultState?.kind === "TEXT" && liveResultState.visible) {
     return (
@@ -1428,6 +1462,23 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const faceMorphMedium = frage.medien.find(
     (medium) => medium.slotKey === "face_morph_result",
   ) ?? frage.medien.find((medium) => isBild(medium.datei));
+
+  if (frage.templateId === "meme_beschriften") {
+    const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
+      frage.medien.find((medium) => isBild(medium.datei));
+    return (
+      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_0.75fr] gap-6">
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-4 shadow-[8px_8px_0_#ff00aa]">
+          {image ? <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full" /> : <PresentationMediaFallback kind="IMAGE" />}
+        </div>
+        <div className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-emerald-300 bg-slate-950/85 p-8 text-center shadow-[8px_8px_0_#facc15]">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-emerald-300">Zeit abgelaufen</p>
+          <h2 className="mt-5 text-5xl font-black text-white">Meme-Runde beendet</h2>
+          <p className="mt-5 text-xl text-white/65">Auswahl und Präsentation der Memes folgen in einem späteren Schritt.</p>
+        </div>
+      </section>
+    );
+  }
 
   if (frage.templateId === questionTemplateIds.artwork) {
     const artworkMedium = frage.medien.find(
@@ -2644,6 +2695,31 @@ function renderAktuellenSlide() {
       <h1 className="text-5xl font-bold">{rules.title}</h1>
       <ul className="space-y-5 text-3xl">{rules.lines.map((line) => <li key={line}>{line}</li>)}</ul>
     </div>;
+  }
+  if (slide.typ === "meme-erklaerung") {
+    const config = slide.frage.memeConfig ?? DEFAULT_MEME_QUESTION_CONFIG;
+    const maximum = config.maxPresentedMemes === null
+      ? "Alle eingereichten Memes"
+      : `Maximal ${config.maxPresentedMemes} Memes`;
+    return (
+      <section data-slide-type="meme-explanation" className="flex h-full flex-col justify-center gap-8 rounded-[1.5rem] border-4 border-fuchsia-400 bg-slate-950/90 px-16 py-12 text-white shadow-[8px_8px_0_#22d3ee]">
+        <p className="text-xl font-black uppercase tracking-[0.25em] text-fuchsia-300">Meme-Runde</p>
+        <h1 className="text-6xl font-black">Beschriftet das Bild!</h1>
+        <ol className="grid gap-4 text-3xl font-bold">
+          <li>1. Oben und/oder unten euren Text eintragen.</li>
+          <li>2. Die Vorschau aktualisiert sich direkt auf eurem Gerät.</li>
+          <li>3. Vor Ablauf speichern und bestätigen.</li>
+        </ol>
+        <p className="text-2xl font-semibold text-cyan-100">
+          Die Antwortzeit startet erst, wenn die Moderation zur Frage weitergeht.
+        </p>
+        <div className="flex flex-wrap gap-5 text-2xl font-black">
+          <span className="rounded-2xl bg-cyan-300 px-6 py-4 text-slate-950">{config.responseDurationSeconds} Sekunden</span>
+          <span className="rounded-2xl bg-yellow-300 px-6 py-4 text-slate-950">{maximum}</span>
+          <span className="rounded-2xl border-2 border-white/35 px-6 py-4">{teamJoinState?.totalTeams ?? 0} Teams angemeldet</span>
+        </div>
+      </section>
+    );
   }
 
   if (slide.typ === "fixer-slide") {

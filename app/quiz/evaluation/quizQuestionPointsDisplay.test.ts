@@ -106,6 +106,21 @@ test("pixel question shows reveal range and suppresses invalid mode chips", () =
   }
 });
 
+test("meme caption question exposes no AP1 points", () => {
+  assert.deepEqual(
+    getQuizQuestionPointsDisplay({
+      templateId: "meme_beschriften",
+      pointsMode: "standard",
+      basePoints: 0,
+    }),
+    {
+      pointsLabel: null,
+      modeLabel: "Kreativfrage",
+      isDynamic: false,
+    },
+  );
+});
+
 test("singular, plural and insignificant zeroes are correct", () => {
   assert.equal(formatGermanPoints(1), "1 Punkt");
   assert.equal(formatGermanPoints(2), "2 Punkte");

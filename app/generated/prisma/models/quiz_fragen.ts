@@ -115,6 +115,7 @@ export type Quiz_fragenCountAggregateOutputType = {
   verknuepfte_story_elemente_uebernehmen: number
   praesentationsdauer_messungen: number
   praesentationsdauer_sekunden: number
+  meme_config_json: number
   _all: number
 }
 
@@ -208,6 +209,7 @@ export type Quiz_fragenCountAggregateInputType = {
   verknuepfte_story_elemente_uebernehmen?: true
   praesentationsdauer_messungen?: true
   praesentationsdauer_sekunden?: true
+  meme_config_json?: true
   _all?: true
 }
 
@@ -316,6 +318,7 @@ export type Quiz_fragenGroupByOutputType = {
   verknuepfte_story_elemente_uebernehmen: boolean
   praesentationsdauer_messungen: number | null
   praesentationsdauer_sekunden: number | null
+  meme_config_json: runtime.JsonValue | null
   _count: Quiz_fragenCountAggregateOutputType | null
   _avg: Quiz_fragenAvgAggregateOutputType | null
   _sum: Quiz_fragenSumAggregateOutputType | null
@@ -360,6 +363,7 @@ export type quiz_fragenWhereInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFilter<"quiz_fragen"> | boolean
   praesentationsdauer_messungen?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
   praesentationsdauer_sekunden?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  meme_config_json?: Prisma.JsonNullableFilter<"quiz_fragen">
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.quizWhereInput>
   quiz_abschnitte?: Prisma.XOR<Prisma.Quiz_abschnitteNullableScalarRelationFilter, Prisma.quiz_abschnitteWhereInput> | null
@@ -388,6 +392,7 @@ export type quiz_fragenOrderByWithRelationInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.SortOrder
   praesentationsdauer_messungen?: Prisma.SortOrderInput | Prisma.SortOrder
   praesentationsdauer_sekunden?: Prisma.SortOrderInput | Prisma.SortOrder
+  meme_config_json?: Prisma.SortOrderInput | Prisma.SortOrder
   fragen?: Prisma.fragenOrderByWithRelationInput
   quiz?: Prisma.quizOrderByWithRelationInput
   quiz_abschnitte?: Prisma.quiz_abschnitteOrderByWithRelationInput
@@ -421,6 +426,7 @@ export type quiz_fragenWhereUniqueInput = Prisma.AtLeast<{
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFilter<"quiz_fragen"> | boolean
   praesentationsdauer_messungen?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
   praesentationsdauer_sekunden?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  meme_config_json?: Prisma.JsonNullableFilter<"quiz_fragen">
   fragen?: Prisma.XOR<Prisma.FragenScalarRelationFilter, Prisma.fragenWhereInput>
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.quizWhereInput>
   quiz_abschnitte?: Prisma.XOR<Prisma.Quiz_abschnitteNullableScalarRelationFilter, Prisma.quiz_abschnitteWhereInput> | null
@@ -449,6 +455,7 @@ export type quiz_fragenOrderByWithAggregationInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.SortOrder
   praesentationsdauer_messungen?: Prisma.SortOrderInput | Prisma.SortOrder
   praesentationsdauer_sekunden?: Prisma.SortOrderInput | Prisma.SortOrder
+  meme_config_json?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.quiz_fragenCountOrderByAggregateInput
   _avg?: Prisma.quiz_fragenAvgOrderByAggregateInput
   _max?: Prisma.quiz_fragenMaxOrderByAggregateInput
@@ -478,6 +485,7 @@ export type quiz_fragenScalarWhereWithAggregatesInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolWithAggregatesFilter<"quiz_fragen"> | boolean
   praesentationsdauer_messungen?: Prisma.IntNullableWithAggregatesFilter<"quiz_fragen"> | number | null
   praesentationsdauer_sekunden?: Prisma.IntNullableWithAggregatesFilter<"quiz_fragen"> | number | null
+  meme_config_json?: Prisma.JsonNullableWithAggregatesFilter<"quiz_fragen">
 }
 
 export type quiz_fragenCreateInput = {
@@ -495,6 +503,7 @@ export type quiz_fragenCreateInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
@@ -523,6 +532,7 @@ export type quiz_fragenUncheckedCreateInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
@@ -544,6 +554,7 @@ export type quiz_fragenUpdateInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
@@ -572,6 +583,7 @@ export type quiz_fragenUncheckedUpdateInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
@@ -597,6 +609,7 @@ export type quiz_fragenCreateManyInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenUpdateManyMutationInput = {
@@ -614,6 +627,7 @@ export type quiz_fragenUpdateManyMutationInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenUncheckedUpdateManyInput = {
@@ -635,6 +649,7 @@ export type quiz_fragenUncheckedUpdateManyInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type Quiz_fragenListRelationFilter = {
@@ -684,6 +699,7 @@ export type quiz_fragenCountOrderByAggregateInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.SortOrder
   praesentationsdauer_messungen?: Prisma.SortOrder
   praesentationsdauer_sekunden?: Prisma.SortOrder
+  meme_config_json?: Prisma.SortOrder
 }
 
 export type quiz_fragenAvgOrderByAggregateInput = {
@@ -990,6 +1006,7 @@ export type quiz_fragenCreateWithoutFragenInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
@@ -1016,6 +1033,7 @@ export type quiz_fragenUncheckedCreateWithoutFragenInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
@@ -1070,6 +1088,7 @@ export type quiz_fragenScalarWhereInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFilter<"quiz_fragen"> | boolean
   praesentationsdauer_messungen?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
   praesentationsdauer_sekunden?: Prisma.IntNullableFilter<"quiz_fragen"> | number | null
+  meme_config_json?: Prisma.JsonNullableFilter<"quiz_fragen">
 }
 
 export type quiz_fragenCreateWithoutQuizInput = {
@@ -1087,6 +1106,7 @@ export type quiz_fragenCreateWithoutQuizInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
@@ -1113,6 +1133,7 @@ export type quiz_fragenUncheckedCreateWithoutQuizInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
@@ -1160,6 +1181,7 @@ export type quiz_fragenCreateWithoutQuiz_abschnitteInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutQuiz_fragenInput
@@ -1186,6 +1208,7 @@ export type quiz_fragenUncheckedCreateWithoutQuiz_abschnitteInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
@@ -1233,6 +1256,7 @@ export type quiz_fragenCreateWithoutQuiz_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
@@ -1260,6 +1284,7 @@ export type quiz_fragenUncheckedCreateWithoutQuiz_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -1285,6 +1310,7 @@ export type quiz_fragenCreateWithoutStory_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
@@ -1312,6 +1338,7 @@ export type quiz_fragenUncheckedCreateWithoutStory_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -1348,6 +1375,7 @@ export type quiz_fragenUpdateWithoutQuiz_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
@@ -1375,6 +1403,7 @@ export type quiz_fragenUncheckedUpdateWithoutQuiz_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -1406,6 +1435,7 @@ export type quiz_fragenUpdateWithoutStory_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
@@ -1433,6 +1463,7 @@ export type quiz_fragenUncheckedUpdateWithoutStory_ablauf_elementeInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -1453,6 +1484,7 @@ export type quiz_fragenCreateWithoutTeam_antwortenInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
@@ -1480,6 +1512,7 @@ export type quiz_fragenUncheckedCreateWithoutTeam_antwortenInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedCreateNestedManyWithoutQuiz_fragenInput
@@ -1516,6 +1549,7 @@ export type quiz_fragenUpdateWithoutTeam_antwortenInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
@@ -1543,6 +1577,7 @@ export type quiz_fragenUncheckedUpdateWithoutTeam_antwortenInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
   interaction_runs?: Prisma.quiz_interaction_runsUncheckedUpdateManyWithoutQuiz_fragenNestedInput
@@ -1563,6 +1598,7 @@ export type quiz_fragenCreateWithoutInteraction_runsInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen: Prisma.fragenCreateNestedOneWithoutQuiz_fragenInput
   quiz: Prisma.quizCreateNestedOneWithoutQuiz_fragenInput
   quiz_abschnitte?: Prisma.quiz_abschnitteCreateNestedOneWithoutQuiz_fragenInput
@@ -1590,6 +1626,7 @@ export type quiz_fragenUncheckedCreateWithoutInteraction_runsInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutQuiz_fragenInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutQuiz_fragenInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedCreateNestedManyWithoutStory_bezugs_frageInput
@@ -1626,6 +1663,7 @@ export type quiz_fragenUpdateWithoutInteraction_runsInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
@@ -1653,6 +1691,7 @@ export type quiz_fragenUncheckedUpdateWithoutInteraction_runsInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
@@ -1676,6 +1715,7 @@ export type quiz_fragenCreateManyFragenInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenUpdateWithoutFragenInput = {
@@ -1693,6 +1733,7 @@ export type quiz_fragenUpdateWithoutFragenInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
@@ -1719,6 +1760,7 @@ export type quiz_fragenUncheckedUpdateWithoutFragenInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
@@ -1743,6 +1785,7 @@ export type quiz_fragenUncheckedUpdateManyWithoutFragenInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenCreateManyQuizInput = {
@@ -1763,6 +1806,7 @@ export type quiz_fragenCreateManyQuizInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenUpdateWithoutQuizInput = {
@@ -1780,6 +1824,7 @@ export type quiz_fragenUpdateWithoutQuizInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz_abschnitte?: Prisma.quiz_abschnitteUpdateOneWithoutQuiz_fragenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
@@ -1806,6 +1851,7 @@ export type quiz_fragenUncheckedUpdateWithoutQuizInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
@@ -1830,6 +1876,7 @@ export type quiz_fragenUncheckedUpdateManyWithoutQuizInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenCreateManyQuiz_abschnitteInput = {
@@ -1850,6 +1897,7 @@ export type quiz_fragenCreateManyQuiz_abschnitteInput = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: number | null
   praesentationsdauer_sekunden?: number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type quiz_fragenUpdateWithoutQuiz_abschnitteInput = {
@@ -1867,6 +1915,7 @@ export type quiz_fragenUpdateWithoutQuiz_abschnitteInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   fragen?: Prisma.fragenUpdateOneRequiredWithoutQuiz_fragenNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutQuiz_fragenNestedInput
   team_antworten?: Prisma.team_antwortenUpdateManyWithoutQuiz_fragenNestedInput
@@ -1893,6 +1942,7 @@ export type quiz_fragenUncheckedUpdateWithoutQuiz_abschnitteInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   quiz_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutQuiz_fragenNestedInput
   story_ablauf_elemente?: Prisma.quiz_ablauf_elementeUncheckedUpdateManyWithoutStory_bezugs_frageNestedInput
@@ -1917,6 +1967,7 @@ export type quiz_fragenUncheckedUpdateManyWithoutQuiz_abschnitteInput = {
   verknuepfte_story_elemente_uebernehmen?: Prisma.BoolFieldUpdateOperationsInput | boolean
   praesentationsdauer_messungen?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   praesentationsdauer_sekunden?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meme_config_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -1996,6 +2047,7 @@ export type quiz_fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: boolean
   praesentationsdauer_sekunden?: boolean
+  meme_config_json?: boolean
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_fragen$quiz_abschnitteArgs<ExtArgs>
@@ -2025,6 +2077,7 @@ export type quiz_fragenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: boolean
   praesentationsdauer_sekunden?: boolean
+  meme_config_json?: boolean
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_fragen$quiz_abschnitteArgs<ExtArgs>
@@ -2049,6 +2102,7 @@ export type quiz_fragenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: boolean
   praesentationsdauer_sekunden?: boolean
+  meme_config_json?: boolean
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_abschnitte?: boolean | Prisma.quiz_fragen$quiz_abschnitteArgs<ExtArgs>
@@ -2073,9 +2127,10 @@ export type quiz_fragenSelectScalar = {
   verknuepfte_story_elemente_uebernehmen?: boolean
   praesentationsdauer_messungen?: boolean
   praesentationsdauer_sekunden?: boolean
+  meme_config_json?: boolean
 }
 
-export type quiz_fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_fragen_id" | "quiz_id" | "fragen_id" | "sortierung" | "richtigeantworten" | "falscheantworten" | "antwort_reihenfolge" | "praesentationslayout" | "quiz_abschnitt_id" | "punkte_basis" | "punkte_modus" | "risiko_pool_teamanzahl" | "risiko_pool_fixiert_am" | "freie_antwort_erlaubt" | "ergebnisdarstellung" | "verknuepfte_story_elemente_uebernehmen" | "praesentationsdauer_messungen" | "praesentationsdauer_sekunden", ExtArgs["result"]["quiz_fragen"]>
+export type quiz_fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"quiz_fragen_id" | "quiz_id" | "fragen_id" | "sortierung" | "richtigeantworten" | "falscheantworten" | "antwort_reihenfolge" | "praesentationslayout" | "quiz_abschnitt_id" | "punkte_basis" | "punkte_modus" | "risiko_pool_teamanzahl" | "risiko_pool_fixiert_am" | "freie_antwort_erlaubt" | "ergebnisdarstellung" | "verknuepfte_story_elemente_uebernehmen" | "praesentationsdauer_messungen" | "praesentationsdauer_sekunden" | "meme_config_json", ExtArgs["result"]["quiz_fragen"]>
 export type quiz_fragenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fragen?: boolean | Prisma.fragenDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
@@ -2127,6 +2182,7 @@ export type $quiz_fragenPayload<ExtArgs extends runtime.Types.Extensions.Interna
     verknuepfte_story_elemente_uebernehmen: boolean
     praesentationsdauer_messungen: number | null
     praesentationsdauer_sekunden: number | null
+    meme_config_json: runtime.JsonValue | null
   }, ExtArgs["result"]["quiz_fragen"]>
   composites: {}
 }
@@ -2575,6 +2631,7 @@ export interface quiz_fragenFieldRefs {
   readonly verknuepfte_story_elemente_uebernehmen: Prisma.FieldRef<"quiz_fragen", 'Boolean'>
   readonly praesentationsdauer_messungen: Prisma.FieldRef<"quiz_fragen", 'Int'>
   readonly praesentationsdauer_sekunden: Prisma.FieldRef<"quiz_fragen", 'Int'>
+  readonly meme_config_json: Prisma.FieldRef<"quiz_fragen", 'Json'>
 }
 
 
