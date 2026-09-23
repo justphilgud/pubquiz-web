@@ -36,6 +36,12 @@ on:
         type: boolean
         default: false
         required: true
+      synthetic_bridge_target:
+        description: Synthetic-only immutable Operations deployment; never used by acceptance backups
+        type: choice
+        options: [active-alias, verified-20260923]
+        default: active-alias
+        required: true
 
 permissions:
   contents: read
@@ -90,7 +96,7 @@ jobs:
         if: steps.gate.outputs.run == 'true' && github.event_name == 'workflow_dispatch' && inputs.mode == 'synthetic'
         env:
           AP94_TRANSPORT_MODE: synthetic
-          AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
+          AP94_BRIDGE_ORIGIN: ${{ inputs.synthetic_bridge_target == 'verified-20260923' && 'https://pubquiz-backup-operations-er4myw68b-just-phil-gud.vercel.app' || vars.AP94_BRIDGE_ORIGIN }}
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
           BACKUP_AUTOMATION_ENABLED: ${{ vars.BACKUP_AUTOMATION_ENABLED }}
           BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}

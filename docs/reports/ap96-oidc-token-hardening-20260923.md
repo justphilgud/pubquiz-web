@@ -48,4 +48,14 @@ ausgegeben.
 CI, synthetische Provider-Matrix, OIDC-Livediagnose und der eine freigegebene
 vollständige Production-Backup-Lauf werden nach Main-Integration ergänzt.
 
+Die erste synthetische Wiederholung nach dem Merge erreichte die Bridge 23-mal
+und belegte bereits 2 OIDC-Anforderungen, 8 Cache-Treffer sowie 0 Retries/Fehler.
+Sie zielte jedoch auf den stabilen, absichtlich im Modus `acceptance` laufenden
+Alias und wurde deshalb bei der synthetischen Größen-Negativprobe fachlich
+abgewiesen. Eine vorübergehende Änderung der persistenten GitHub-Environment-
+Variable wurde nicht ausgeführt. Stattdessen bietet der Workflow ausschließlich
+für `mode=synthetic` eine feste Auswahl des vorhandenen READY-Deployments
+`dpl_BWGA4sS287cmiv5buvNiQYWhXrjx`; der Acceptance-Pfad verwendet weiterhin
+ausschließlich `vars.AP94_BRIDGE_ORIGIN`.
+
 Der 193-Länderimport bleibt gesperrt (`writeAuthorized: false`).
