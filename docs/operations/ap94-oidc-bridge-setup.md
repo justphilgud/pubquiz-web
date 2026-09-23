@@ -281,6 +281,26 @@ Workflow-Identitäten keinen vollständigen Live-Fremdidentitätsnachweis behaup
 Redirects, Rate Limits und Providerfehler bestehen die Probe nicht. Keine Tokens,
 Antworttexte oder Signed URLs werden in Diagnosen aufgenommen.
 
+## Prozessinterne GitHub-OIDC-Nutzung
+
+Der Operations-Client bezieht GitHub-OIDC-JWTs direkt über den von GitHub Actions
+bereitgestellten Runner-Endpunkt. Ein erfolgreiches JWT bleibt ausschließlich im
+Arbeitsspeicher des laufenden Node-Prozesses und wird nach Audience getrennt
+gehalten. Der Client liest lokal nur `exp`, erneuert das Token 60 Sekunden vor
+Ablauf und überlässt Signatur- und Claim-Prüfung vollständig der Bridge.
+
+Nur der Abruf eines neuen GitHub-Tokens wird höchstens viermal versucht:
+Netzwerkfehler, HTTP 429 und HTTP 5xx erhalten begrenztes exponentielles Backoff,
+Jitter und ein auf 30 Sekunden begrenztes `Retry-After`. HTTP 400/401/403,
+ungültige Antworten und ungültige Ablaufclaims scheitern sofort. Eine 401/403 der
+Bridge wird nicht wiederholt. Gleichzeitige Anforderungen derselben Audience
+teilen sich genau einen laufenden Abruf.
+
+Die Diagnose nennt ausschließlich Bridge-Aufrufe, OIDC-HTTP-Anforderungen,
+Cache-Treffer, zusammengefasste Parallelabrufe, Refreshes, Retries und eine feste
+Fehlerklasse. JWTs, Runner-Request-Token und signierte URLs werden weder geloggt
+noch persistiert.
+
 Erst wenn alle Nachweise grün sind, separat `AP94_BRIDGE_MODE=acceptance` im
 Operations-Projekt und AP94_OIDC_TRANSPORT_ACCEPTED=true in beiden GitHub-Environments
 setzen und nur Operations neu deployen. Das sind neue manuelle Freigabeschritte nach

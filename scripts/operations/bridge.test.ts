@@ -15,6 +15,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { del as blobDel, list as blobList, presignUrl } from "@vercel/blob";
 import { expectProbeDenial, tamperedProbeUrl } from "./transport-probe-diagnostics";
 import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
+import { GithubOidcTokenProvider, GITHUB_OIDC_REFRESH_MARGIN_MS, MAX_GITHUB_OIDC_ATTEMPTS, type OidcRuntime } from "./oidc-token";
 
 test("upload denial preserves only artifact class, HTTP status and bounded provider category", async () => {
   const secret = "SECRET_CANARY_JWT_SIGNED_URL";
@@ -40,7 +41,8 @@ test("upload denial preserves only artifact class, HTTP status and bounded provi
 });
 
 test("identity probe separates signed wrong audience, tampering and both authentication layers", async () => {
-  const token = (aud: string) => `e30.${Buffer.from(JSON.stringify({ aud, repository: REPOSITORY })).toString("base64url")}.signature`;
+  const token = (aud: string) => `e30.${Buffer.from(JSON.stringify({ aud, repository: REPOSITORY,
+    exp: Math.floor(Date.now() / 1000) + 300 })).toString("base64url")}.signature`;
   const valid = token(AUDIENCE); const badAudience = token(`${AUDIENCE}:untrusted`);
   const sent: { edge: string | null; bearer: string | null }[] = [];
   const audiences: (string | null)[] = [];
@@ -133,6 +135,113 @@ test("live probe diagnostics redact arbitrary provider bodies, headers, URLs and
       new RegExp(`^Error: SYNTHETIC_CASE_2_HTTP_${response.status}_BODY_UNRECOGNIZED$`));
   }
   await assert.rejects(expectProbeDenial(new Response(), Number.NaN), /SYNTHETIC_CASE_INVALID/);
+});
+
+test("OIDC provider caches by audience, refreshes before expiry and single-flights concurrent acquisition", async () => {
+  let clock = 1_800_000_000_000; let requests = 0;
+  const waits: number[] = [];
+  const runtime: OidcRuntime = { now: () => clock, random: () => 0, sleep: async ms => { waits.push(ms); } };
+  const requestedAudiences: string[] = [];
+  let release: (() => void) | undefined;
+  const request: typeof fetch = async input => {
+    requests += 1;
+    const audience = new URL(String(input)).searchParams.get("audience")!; requestedAudiences.push(audience);
+    if (requests === 1) await new Promise<void>(resolve => { release = resolve; });
+    const token = `e30.${Buffer.from(JSON.stringify({ exp: Math.floor(clock / 1000) + 300, sequence: requests })).toString("base64url")}.signature`;
+    return Response.json({ value: token });
+  };
+  const provider = new GithubOidcTokenProvider({ ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "secret-request-token" }, request, runtime);
+  const first = provider.token(AUDIENCE); const concurrent = provider.token(AUDIENCE);
+  release?.();
+  assert.equal(await first, await concurrent); assert.equal(requests, 1);
+  assert.equal(await provider.token(AUDIENCE), await first); assert.equal(requests, 1);
+  await provider.token(`${AUDIENCE}:other`); assert.equal(requests, 2);
+  clock += 300_000 - GITHUB_OIDC_REFRESH_MARGIN_MS;
+  await provider.token(AUDIENCE); assert.equal(requests, 3);
+  clock += 301_000;
+  await provider.token(AUDIENCE); assert.equal(requests, 4);
+  assert.deepEqual(requestedAudiences, [AUDIENCE, `${AUDIENCE}:other`, AUDIENCE, AUDIENCE]);
+  assert.deepEqual(provider.diagnostics(), { bridgeCalls: 0, tokenRequests: 4, cacheHits: 1, singleFlightJoins: 1, refreshes: 2, retries: 0,
+    finalErrorClass: null });
+  assert.deepEqual(waits, []);
+});
+
+test("OIDC acquisition retries only network, 429 and 5xx failures with bounded delay", async () => {
+  const clock = 1_800_000_000_000; const waits: number[] = []; let calls = 0;
+  const runtime: OidcRuntime = { now: () => clock, random: () => 0, sleep: async ms => { waits.push(ms); } };
+  const token = `e30.${Buffer.from(JSON.stringify({ exp: Math.floor(clock / 1000) + 300 })).toString("base64url")}.signature`;
+  const request: typeof fetch = async () => {
+    calls += 1;
+    if (calls === 1) throw new Error("secret network detail");
+    if (calls === 2) return new Response(null, { status: 429, headers: { "retry-after": "9999" } });
+    if (calls === 3) return new Response(null, { status: 503 });
+    return Response.json({ value: token });
+  };
+  const provider = new GithubOidcTokenProvider({ ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "secret-request-token" }, request, runtime);
+  assert.equal(await provider.token(AUDIENCE), token);
+  assert.equal(calls, MAX_GITHUB_OIDC_ATTEMPTS);
+  assert.deepEqual(waits, [500, 30_000, 2_000]);
+  assert.deepEqual(provider.diagnostics(), { bridgeCalls: 0, tokenRequests: 4, cacheHits: 0, singleFlightJoins: 0, refreshes: 0, retries: 3,
+    finalErrorClass: null });
+
+  for (const status of [500, 503]) {
+    let attempts = 0;
+    const retrying = new GithubOidcTokenProvider({ ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+      ACTIONS_ID_TOKEN_REQUEST_TOKEN: "secret-request-token" }, async () => {
+      attempts += 1; return attempts === 1 ? new Response(null, { status }) : Response.json({ value: token });
+    }, runtime);
+    assert.equal(await retrying.token(AUDIENCE), token); assert.equal(attempts, 2); assert.equal(retrying.diagnostics().retries, 1);
+  }
+});
+
+test("OIDC acquisition never retries hard rejection or invalid token claims and exposes only safe diagnostics", async () => {
+  const clock = 1_800_000_000_000;
+  const runtime: OidcRuntime = { now: () => clock, random: () => 0, sleep: async () => assert.fail("must not retry") };
+  const env = { ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "SECRET_REQUEST_TOKEN" };
+  for (const status of [400, 401, 403]) {
+    let calls = 0; const provider = new GithubOidcTokenProvider(env, async () => { calls += 1; return new Response(null, { status }); }, runtime);
+    await assert.rejects(provider.token(AUDIENCE), new RegExp(`GITHUB_OIDC_HTTP_${status}`));
+    assert.equal(calls, 1); assert.equal(provider.diagnostics().retries, 0);
+  }
+  for (const value of ["not-a-jwt", `e30.${Buffer.from("{}").toString("base64url")}.signature`]) {
+    let calls = 0; const provider = new GithubOidcTokenProvider(env, async () => { calls += 1; return Response.json({ value }); }, runtime);
+    await assert.rejects(provider.token(AUDIENCE), /GITHUB_OIDC_TOKEN_(INVALID|EXP_INVALID)/);
+    assert.equal(calls, 1); assert.equal(provider.diagnostics().retries, 0);
+    assert.doesNotMatch(JSON.stringify(provider.diagnostics()), /SECRET_REQUEST_TOKEN|not-a-jwt|signature/);
+  }
+  const source = readFileSync(new URL("./oidc-token.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /node:fs|writeFile|appendFile|console\./);
+});
+
+test("OIDC retry exhaustion is bounded and Bridge authorization denials are never retried", async () => {
+  const clock = 1_800_000_000_000; let calls = 0;
+  const runtime: OidcRuntime = { now: () => clock, random: () => 0, sleep: async () => undefined };
+  const env = { ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "secret-request-token" };
+  const exhausted = new GithubOidcTokenProvider(env, async () => { calls += 1; return new Response(null, { status: 503 }); }, runtime);
+  await assert.rejects(exhausted.token(AUDIENCE), /GITHUB_OIDC_HTTP_503/);
+  assert.equal(calls, MAX_GITHUB_OIDC_ATTEMPTS);
+  assert.deepEqual(exhausted.diagnostics(), { bridgeCalls: 0, tokenRequests: 4, cacheHits: 0, singleFlightJoins: 0, refreshes: 0, retries: 3,
+    finalErrorClass: "GITHUB_OIDC_HTTP_503" });
+
+  const jwt = `e30.${Buffer.from(JSON.stringify({ exp: Math.floor(clock / 1000) + 300 })).toString("base64url")}.signature`;
+  let oidcCalls = 0; let bridgeCalls = 0;
+  const request: typeof fetch = async input => {
+    const url = new URL(String(input));
+    if (url.hostname.endsWith(".actions.githubusercontent.com")) { oidcCalls += 1; return Response.json({ value: jwt }); }
+    bridgeCalls += 1; return Response.json({ error: "IDENTITY_REJECTED" }, { status: 403 });
+  };
+  const provider = new GithubOidcTokenProvider(env, request, runtime);
+  const clientEnv = { ...env, AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app", AP94_TRANSPORT_MODE: "synthetic",
+    GITHUB_RUN_ID: "123456", GITHUB_RUN_ATTEMPT: "1", BACKUP_PRIVATE_BLOB_HOST: STORE_HOST };
+  const client = new BridgeClient(clientEnv, "backup", "synthetic/acceptance/run-123456-1", request, undefined, provider);
+  await assert.rejects(client.grant("probe.bin"), /BRIDGE_ACCESS_REJECTED/);
+  assert.equal(oidcCalls, 1); assert.equal(bridgeCalls, 1);
+  assert.deepEqual(provider.diagnostics(), { bridgeCalls: 1, tokenRequests: 1, cacheHits: 0, singleFlightJoins: 0, refreshes: 0, retries: 0,
+    finalErrorClass: null });
 });
 
 test("signed-path probe always changes the path for every supported filename shape", () => {

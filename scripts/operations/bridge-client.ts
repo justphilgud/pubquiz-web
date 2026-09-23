@@ -3,6 +3,7 @@ import { parseStoreIdFromDelegationToken } from "@vercel/blob";
 import { AUDIENCE, objectRule, runKey, storedBackupKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type InventoryObject, type Mode, type ObjectKind } from "./bridge/lib/contract";
 import { OperationsError, requireCondition } from "./guards";
 import { defaultUploadRetryRuntime, safeUploadResponse, uploadWithBoundedRetry, type UploadRetryRuntime } from "./upload-retry";
+import { GithubOidcTokenProvider, type OidcDiagnostics } from "./oidc-token";
 type Env = Readonly<Record<string, string | undefined>>;
 export type UploadPosition = { index: number; total: number };
 
@@ -31,19 +32,8 @@ export async function privateUploadFailure(response: Response, kind: ObjectKind)
   return new OperationsError(`PRIVATE_UPLOAD_${artifact}_HTTP_${response.status}_${category}`);
 }
 
-export async function requestGithubToken(env: Env, request: typeof fetch = fetch): Promise<string> {
-  try {
-    const url = new URL(env.ACTIONS_ID_TOKEN_REQUEST_URL ?? "");
-    requireCondition(url.protocol === "https:" && url.hostname.endsWith(".actions.githubusercontent.com") && !url.port &&
-      !url.username && !url.password && !url.hash && !!env.ACTIONS_ID_TOKEN_REQUEST_TOKEN, "GITHUB_OIDC_UNAVAILABLE");
-    url.searchParams.set("audience", AUDIENCE);
-    const response = await request(url, { headers: { authorization: `Bearer ${env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}` },
-      redirect: "error", signal: AbortSignal.timeout(15000) });
-    requireCondition(response.ok, "GITHUB_OIDC_REJECTED");
-    const data = JSON.parse((await limitedResponse(response, 20000)).toString()) as { value?: unknown };
-    requireCondition(typeof data.value === "string" && data.value.length <= 16000 && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(data.value), "GITHUB_OIDC_REJECTED");
-    return data.value;
-  } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("GITHUB_OIDC_FAILED_DETAILS_WITHHELD"); }
+export async function requestGithubToken(env: Env, request: typeof fetch = fetch, audience = AUDIENCE): Promise<string> {
+  return new GithubOidcTokenProvider(env, request).token(audience);
 }
 
 export async function limitedResponse(response: Response, limit: number): Promise<Buffer> {
@@ -77,16 +67,18 @@ export class BridgeClient {
   readonly origin: string;
   readonly key: string;
   readonly mode: Mode;
+  private readonly oidc: GithubOidcTokenProvider;
   constructor(private env: Env, private role: "backup" | "restore", key: string, private request: typeof fetch = fetch,
-    private uploadRetryRuntime: UploadRetryRuntime = defaultUploadRetryRuntime) {
+    private uploadRetryRuntime: UploadRetryRuntime = defaultUploadRetryRuntime, oidc?: GithubOidcTokenProvider) {
     this.origin = bridgeOrigin(env.AP94_BRIDGE_ORIGIN);
     requireCondition(env.AP94_TRANSPORT_MODE === "synthetic" || env.AP94_TRANSPORT_MODE === "acceptance", "BRIDGE_MODE_REQUIRED");
     this.mode = env.AP94_TRANSPORT_MODE;
     this.key = runKey(this.mode, env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
     requireCondition(key === this.key && env.BACKUP_PRIVATE_BLOB_HOST === STORE_HOST, "BRIDGE_KEY_OR_STORE_REJECTED");
     requireCondition(this.mode === "synthetic" || env.AP94_OIDC_TRANSPORT_ACCEPTED === "true", "OIDC_TRANSPORT_NOT_ACCEPTED");
+    this.oidc = oidc ?? new GithubOidcTokenProvider(env, request);
   }
-  private token() { return requestGithubToken(this.env, this.request); }
+  oidcDiagnostics(): OidcDiagnostics { return this.oidc.diagnostics(); }
   async grant(name: string, uploadBytes?: number): Promise<Grant> {
     try {
       requireCondition(uploadBytes === undefined || this.role === "backup", "RESTORE_READ_ONLY");
@@ -101,8 +93,9 @@ export class BridgeClient {
   }
   // Also used by the explicit synthetic acceptance harness for negative requests.
   async access(body: unknown) {
+    this.oidc.recordBridgeCall();
+    const token = await this.oidc.token(AUDIENCE);
     try {
-      const token = await this.token();
       return await this.request(`${this.origin}/api/access`, { method: "POST", headers: { "content-type": "application/json",
         authorization: `Bearer ${token}`, "x-vercel-trusted-oidc-idp-token": token }, body: JSON.stringify(body),
         redirect: "error", signal: AbortSignal.timeout(30000) });

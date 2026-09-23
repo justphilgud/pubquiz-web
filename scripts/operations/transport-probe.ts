@@ -6,6 +6,7 @@ import { OperationsError, requireCondition, safeError } from "./guards";
 import { createHash } from "node:crypto";
 import { expectProbeDenial, tamperedProbeUrl } from "./transport-probe-diagnostics";
 import { runIdentityProbe } from "./identity-probe";
+import { GithubOidcTokenProvider } from "./oidc-token";
 const sample = Buffer.from("AP9.4 OIDC bridge synthetic transport proof; no production data.\n");
 const samples = [
   { name: "probe.bin", bytes: sample },
@@ -19,6 +20,7 @@ const diagnosticSamples = [
   { name: "diagnostic-typical.bin", size: 2 * 1024 * 1024, fill: 0x55 },
 ].map(item => ({ name: item.name, bytes: Buffer.alloc(item.size, item.fill) }));
 const digest = (b: Buffer) => createHash("sha256").update(b).digest("hex");
+let liveOidc: GithubOidcTokenProvider | undefined;
 async function main() {
   const env = process.env;
   requireCondition(env.GITHUB_REPOSITORY === "justphilgud/pubquiz-web" && env.GITHUB_REF === "refs/heads/main" &&
@@ -31,9 +33,11 @@ async function main() {
     "SYNTHETIC_CONTEXT_REQUIRED");
   const activeSamples = env.AP94_UPLOAD_DIAGNOSTIC_MATRIX === "true" ? [...samples, ...diagnosticSamples] : samples;
   const key = runKey("synthetic", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
-  const client = new BridgeClient(env, role, key);
+  const oidc = new GithubOidcTokenProvider(env);
+  liveOidc = oidc;
+  const client = new BridgeClient(env, role, key, fetch, undefined, oidc);
   const body = { operation: role === "backup" ? "backup-readback" : "restore-read", store: STORE_ID, key, name: "probe.bin", kind: "probe" };
-  const identityBoundary = await runIdentityProbe(env, body);
+  const identityBoundary = await runIdentityProbe(env, body, fetch, oidc);
   const invalid = [
     { ...body, store: "store_other" }, { ...body, key: `${key}-other` }, { ...body, name: "../probe.bin" },
     { ...body, name: "manifest.json", kind: "manifest" }, { ...body, operation: "delete" }, { ...body, allowOverwrite: true },
@@ -81,8 +85,8 @@ async function main() {
   }
   return { synthetic: true, role, key, identityBoundary, hash: digest(sample), readback: "verified", expiry: "rejected", negatives: invalid.length,
     proofs, diagnosticMatrix: env.AP94_UPLOAD_DIAGNOSTIC_MATRIX === "true", signedMethodAndPath: "rejected",
-    ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false };
+    ...(role === "backup" ? { providerSizeAndOverwrite: "rejected" } : {}), deletion: false, oidc: client.oidcDiagnostics() };
 }
 main().then(r => console.log(JSON.stringify(r))).catch(e => {
   console.error(safeError(e instanceof OperationsError ? e : new OperationsError("SYNTHETIC_PROBE_FAILED_DETAILS_WITHHELD"))); process.exitCode = 1;
-});
+}).finally(() => { if (liveOidc) console.error(JSON.stringify({ event: "github-oidc-diagnostics", ...liveOidc.diagnostics() })); });

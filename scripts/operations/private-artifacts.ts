@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { type Environment } from "./acceptance-policy";
 import { BridgeClient, type UploadPosition } from "./bridge-client";
+import { type OidcDiagnostics } from "./oidc-token";
 import { requireCondition } from "./guards";
 import { sha256 } from "./snapshot";
 
@@ -28,6 +29,8 @@ export class PrivateArtifacts {
     backupKey(key); this.client = new BridgeClient(env, role, key);
   }
   async clientPreflight() { await this.client.grant("database.dump", 1); }
+  oidcDiagnostics(): OidcDiagnostics { return this.client.oidcDiagnostics(); }
+  emitOidcDiagnostics() { console.error(JSON.stringify({ event: "github-oidc-diagnostics", ...this.oidcDiagnostics() })); }
   async read(name: string) {
     return this.client.read(artifactName(name));
   }
