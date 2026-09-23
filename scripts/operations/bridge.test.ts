@@ -524,6 +524,12 @@ test("bridge package and runtime import boundary contain no application or datab
   assert.match(workflow, /schedule:/); assert.match(workflow, /30 2 \* \* \*/);
   assert.match(workflow, /BACKUP_AUTOMATION_ENABLED/); assert.match(workflow, /BACKUP_RETENTION_VERIFIED/);
   assert.match(workflow, /default: synthetic/); assert.match(workflow, /AP94_OIDC_TRANSPORT_ACCEPTED/);
+  assert.match(workflow, /synthetic_bridge_target:[\s\S]*options: \[active-alias, verified-20260923\]/);
+  assert.match(workflow, /inputs\.synthetic_bridge_target == 'verified-20260923'[\s\S]*pubquiz-backup-operations-er4myw68b-just-phil-gud\.vercel\.app/);
+  const acceptanceStep = workflow.slice(workflow.indexOf("- name: Verified Production backup"),
+    workflow.indexOf("- name: Retention policy evaluation after verified backup"));
+  assert.match(acceptanceStep, /AP94_BRIDGE_ORIGIN: \$\{\{ vars\.AP94_BRIDGE_ORIGIN \}\}/);
+  assert.doesNotMatch(acceptanceStep, /verified-20260923|er4myw68b/);
 });
 
 test("runner-to-HTTP-to-SDK fixes exactly one MIME type per artifact, preserving bounds and overwrite denial", async () => {
