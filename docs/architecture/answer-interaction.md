@@ -61,6 +61,7 @@ Die zentralen Identitäten sind:
 | Meme-Konfiguration, Payload und Deadline-Anzeige | `app/quiz/memeCaption.ts` |
 | Gemeinsames Meme-Rendering | `app/rendering/meme/MemeRenderer.tsx` |
 | Meme-Auswahl und Moderation nach Run-Ende | `app/quiz/memeModeration.server.ts` |
+| Meme-Präsentation, Abstimmung und AP4-Übergabe | `app/quiz/memeVoting.server.ts` |
 | Poll-Aggregation | `app/quiz/interaction/pollInteraction.ts` |
 | Persistenzmodell | `prisma/schema.prisma` |
 
@@ -88,7 +89,10 @@ Wichtige Fallbacks:
 - `meme_beschriften` wird `MEME_CAPTION`: zwei begrenzte Textfelder, ein
   gemeinsames Basisbild und keine Bewertung. Der vollständige AP1-Vertrag steht
   in [Meme beschriften – AP1](meme-caption-ap1.md). Auswahl und Review nach dem
-  Run-Ende stehen in [Meme beschriften – AP2](meme-caption-ap2.md).
+  Run-Ende stehen in [Meme beschriften – AP2](meme-caption-ap2.md). Die
+  anschließende anonyme Präsentation, das selbstwahlgeschützte Voting und die
+  stabile Übergabe an AP4 beschreibt
+  [Meme beschriften – AP3](meme-caption-ap3.md).
 - Ein nicht auflösbarer Vertrag ergibt `NO_ANSWER`; ein bekannter, aber noch nicht gerenderter Typ wird mit `supported: false` markiert.
 
 Der bei Öffnung des Runs aufgelöste Contract wird in `quiz_interaction_runs.config_snapshot` gespeichert. Laufende Interaktionen bleiben damit an ihre konkrete Konfiguration gebunden.

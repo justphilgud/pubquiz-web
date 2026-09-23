@@ -77,6 +77,8 @@ import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
 import { presentationTextDensity } from "./presentationReadability";
 import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
+import { MemePresentationStage } from "@/app/rendering/meme/MemePresentationStage";
+import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 import {
   DEFAULT_MEME_QUESTION_CONFIG,
   memeCountdownRemainingSeconds,
@@ -121,6 +123,7 @@ type PresentationSlideSharedDisplayState = {
   playbackCommandId: number;
   pixelState?: PixelLiveState | null;
   memeState?: MemeLiveState | null;
+  memePresentationState?: MemePresentationSnapshot | null;
   pollState?: PollLiveState | null;
   liveResultState?: LiveChoiceResultState | LiveTextResultState | null;
   livePollState?: LivePollAudienceState | null;
@@ -302,6 +305,7 @@ export default function PresentationSlideRenderer({
     playbackCommandId,
     pixelState = null,
     memeState = null,
+    memePresentationState = null,
     pollState = null,
     liveResultState = null,
     livePollState = null,
@@ -2682,6 +2686,15 @@ function renderAktuellenSlide() {
         Keine Slides vorhanden
       </div>
     );
+  }
+
+  if (
+    slide.typ === "frage" &&
+    slide.frage.templateId === "meme_beschriften" &&
+    memePresentationState &&
+    memePresentationState.phase !== "READY"
+  ) {
+    return <MemePresentationStage state={memePresentationState} />;
   }
 
   if (slide.typ === "ablauf") {

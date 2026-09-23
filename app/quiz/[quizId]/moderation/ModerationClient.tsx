@@ -52,6 +52,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
 import MemeModerationReview from "./components/MemeModerationReview";
+import MemePresentationControls from "./components/MemePresentationControls";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import { resolvePresentationSequenceIndex, resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
@@ -146,6 +147,9 @@ export default function ModerationClient({
   const pixelClockOffset = useRef(initialClockOffset);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
   const [memeState, setMemeState] = useState<MemeLiveState | null>(null);
+  const [memePresentationState, setMemePresentationState] = useState<
+    QuizLiveSnapshot["memePresentationState"]
+  >(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
@@ -367,6 +371,7 @@ export default function ModerationClient({
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
         setMemeState(snapshot.memeState);
+        setMemePresentationState(snapshot.memePresentationState);
         pixelClockOffset.current = new Date(snapshot.serverNow).getTime() - Date.now();
         setPollState(snapshot.pollState);
         setLivePollState(snapshot.livePollState);
@@ -943,6 +948,7 @@ export default function ModerationClient({
               now={now + pixelClockOffset.current}
               pixelState={pixelState}
               memeState={memeState}
+              memePresentationState={memePresentationState}
               pollState={pollState}
               liveResultState={liveResultState}
               livePollState={livePollState}
@@ -1113,6 +1119,15 @@ export default function ModerationClient({
                 quizId={quizId}
                 quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
                 imageUrl={memeImageUrl}
+              />
+            ) : null}
+
+            {aktuellerSlide?.typ === "frage" && memePresentationState ? (
+              <MemePresentationControls
+                quizId={quizId}
+                quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                state={memePresentationState}
+                onChange={setMemePresentationState}
               />
             ) : null}
 
