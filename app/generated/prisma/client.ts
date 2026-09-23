@@ -238,6 +238,16 @@ export type quiz_praesentation_status = Prisma.quiz_praesentation_statusModel
  */
 export type team_antwort_auswahlen = Prisma.team_antwort_auswahlenModel
 /**
+ * Model meme_moderation_selections
+ *
+ */
+export type meme_moderation_selections = Prisma.meme_moderation_selectionsModel
+/**
+ * Model meme_moderation_candidates
+ *
+ */
+export type meme_moderation_candidates = Prisma.meme_moderation_candidatesModel
+/**
  * Model live_text_response_publications
  *
  */
