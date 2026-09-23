@@ -63,25 +63,28 @@ export function MemeResultStage({
                 Bild nicht verfügbar
               </div>
             )}
-            <div className="flex min-w-0 flex-col justify-center gap-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-fuchsia-500 text-lg font-black">
+            <div className="flex min-w-0 flex-col justify-center gap-2 min-[1600px]:gap-3">
+              <div className="flex items-center gap-2 min-[1600px]:gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-fuchsia-500 text-base font-black min-[1600px]:h-12 min-[1600px]:w-12 min-[1600px]:text-lg">
                   {entry.number}
                 </span>
                 <TeamIdentityVisual
                   name={entry.teamName}
                   photoUrl={entry.photoUrl}
                   avatarCode={entry.avatarCode}
-                  className="h-12 w-12 shrink-0"
+                  className="h-10 w-10 shrink-0 min-[1600px]:h-12 min-[1600px]:w-12"
                 />
               </div>
-              <p className="truncate text-xl font-black">{entry.teamName}</p>
-              <p className="text-2xl font-black tabular-nums">
+              <p className="truncate text-lg font-black min-[1600px]:text-xl">{entry.teamName}</p>
+              <p className="text-xl font-black tabular-nums min-[1600px]:text-2xl">
                 {entry.voteCount} {entry.voteCount === 1 ? "Stimme" : "Stimmen"}
               </p>
-              <p className="text-base font-bold text-cyan-100">{entry.share.toFixed(1).replace(".0", "")} %</p>
+              <p className="text-sm font-bold text-cyan-100 min-[1600px]:text-base">{entry.share.toFixed(1).replace(".0", "")} %</p>
               {entry.isWinner ? (
-                <p className="rounded-xl bg-yellow-300 px-3 py-2 text-center text-base font-black text-slate-950">
+                <p
+                  data-meme-result-winner
+                  className="rounded-xl bg-yellow-300 px-3 py-1.5 text-center text-sm font-black text-slate-950 min-[1600px]:py-2 min-[1600px]:text-base"
+                >
                   Gewinner · +{entry.awardedPoints} Punkt
                 </p>
               ) : null}

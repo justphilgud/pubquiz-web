@@ -75,9 +75,10 @@ function html(snapshot: MemeResultSnapshot, revealCount: number, css: string) {
       document.querySelector('#result').textContent = JSON.stringify({
         viewport: { width: innerWidth, height: innerHeight }, stage: box(stage),
         items: [...stage.querySelectorAll('[data-meme-result-entry]')].map(box),
+        winnerLabels: [...stage.querySelectorAll('[data-meme-result-winner]')].map(box),
       });
     });`;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body class="m-0"><main style="width:100vw;height:100vh;overflow:hidden;background:#09090b">${markup}</main><pre id="result"></pre><script>${script}</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body class="m-0"><main style="width:100vw;height:100vh;overflow:hidden;background:#09090b"><div style="height:108px"></div><div style="height:calc(100vh - 108px)">${markup}</div></main><pre id="result"></pre><script>${script}</script></body></html>`;
 }
 
 function decode(value: string) {
@@ -111,6 +112,7 @@ test("AP4 result pages fit at 1280x720 and larger with one, four and eight candi
           viewport: { width: number; height: number };
           stage: { clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number };
           items: Array<{ left: number; top: number; right: number; bottom: number }>;
+          winnerLabels: Array<{ left: number; top: number; right: number; bottom: number; clientWidth: number; clientHeight: number }>;
         } | null = null;
         for (let attempt = 0; attempt < 3; attempt += 1) {
           const { stdout } = await execFileAsync(chrome, [
@@ -136,6 +138,15 @@ test("AP4 result pages fit at 1280x720 and larger with one, four and eight candi
         for (const item of measured.items) {
           assert.ok(item.left >= -1 && item.top >= -1, `${path} escapes top/left`);
           assert.ok(item.right <= viewport.width + 1 && item.bottom <= viewport.height + 1, `${path} escapes viewport`);
+        }
+        const expectedWinnerLabels = scenario.page === 1 ? 1 : 0;
+        assert.equal(measured.winnerLabels.length, expectedWinnerLabels, `${path} winner-label count`);
+        if (expectedWinnerLabels === 1) {
+          const winnerEntry = measured.items[0];
+          const winnerLabel = measured.winnerLabels[0];
+          assert.ok(winnerLabel.clientWidth > 0 && winnerLabel.clientHeight > 0, `${path} winner label has no size`);
+          assert.ok(winnerLabel.left >= winnerEntry.left && winnerLabel.right <= winnerEntry.right + 1, `${path} winner label escapes horizontally`);
+          assert.ok(winnerLabel.top >= winnerEntry.top && winnerLabel.bottom <= winnerEntry.bottom + 1, `${path} winner label is clipped vertically`);
         }
       }
     }
