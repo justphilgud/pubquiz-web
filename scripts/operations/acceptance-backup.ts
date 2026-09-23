@@ -55,7 +55,8 @@ export async function acceptanceBackup(env: Environment) {
   toolsVersion(env);
   const started = Date.now(); const key = runKey("acceptance", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
   const store = new PrivateArtifacts(env, key, "backup"); // check transport before opening the DB
-  await store.clientPreflight();
+  try { await store.clientPreflight(); }
+  catch (error) { store.emitOidcDiagnostics(); throw error; }
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-"));
   const session = new PgSession(verified.connectionString, env);
   let phase: BackupPhase = "SOURCE_SESSION";
@@ -97,9 +98,11 @@ export async function acceptanceBackup(env: Environment) {
     const anonymous = await fetch(`https://${env.BACKUP_PRIVATE_BLOB_HOST}/${key}/manifest.json`, { redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition([401, 403, 404].includes(anonymous.status), "PRIVATE_ANONYMOUS_ACCESS_NOT_REJECTED");
     return { key, manifestSha256: sha256(bytes), bytes: artifacts.reduce((n, a) => n + a.bytes, 0), snapshotAt: snapshot.time, backup,
-      ...manifest.timings, authExcluded: true, privateReadback: "verified", restore: "required-reviewer-pending" };
+      ...manifest.timings, authExcluded: true, privateReadback: "verified", restore: "required-reviewer-pending",
+      oidc: store.oidcDiagnostics() };
   } catch (error) { throw backupPhaseError(error, phase); }
   finally {
+    store.emitOidcDiagnostics();
     session.close();
     try { await rm(directory, { recursive: true, force: true }); }
     catch (error) { throw backupPhaseError(error, "CLEANUP"); }
