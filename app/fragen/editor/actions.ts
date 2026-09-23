@@ -24,6 +24,7 @@ import {
   findQuestionTemplate,
   getQuestionTemplatePersistenceIds,
   isPollQuestionTemplateId,
+  isMemeCaptionQuestionTemplateId,
   questionTemplateIds,
   representsSameQuestionTemplate,
   resolveCanonicalQuestionTemplateId,
@@ -474,6 +475,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
 
   const canonicalTemplateId = resolveCanonicalQuestionTemplateId(payload.templateId);
   const isPoll = isPollQuestionTemplateId(canonicalTemplateId);
+  const isMemeCaption = isMemeCaptionQuestionTemplateId(canonicalTemplateId);
   const answers = payload.answers.map((answer) => {
     if (
       !answer ||
@@ -545,7 +547,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
       fieldLabel,
       isRequired: answer.isRequired,
       text: answer.text.trim(),
-      isCorrect: isPoll ? false : answer.isCorrect,
+      isCorrect: isPoll || isMemeCaption ? false : answer.isCorrect,
       additionalInfo: answer.additionalInfo.trim(),
       media,
     };
@@ -616,6 +618,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
   if (
     requiresCompleteQuestion &&
     !isPoll &&
+    !isMemeCaption &&
     !answers.some((answer) => answer.text && answer.isCorrect)
   ) {
     throw new DraftValidationError(

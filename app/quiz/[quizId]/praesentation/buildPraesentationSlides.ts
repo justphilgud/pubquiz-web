@@ -47,6 +47,11 @@ export type FixerSlideTyp =
 
 export type Slide =
   | {
+    typ: "meme-erklaerung";
+    abschnitt: Abschnitt | null;
+    frage: QuizPraesentationResult["fragen"][number];
+  }
+  | {
     typ: "pixel-erklaerung";
     abschnitt: Abschnitt | null;
     frage: QuizPraesentationResult["fragen"][number];
@@ -243,7 +248,12 @@ export function buildPraesentationSlides(
         };
         if (entry.kind === "QUESTION") {
           if (shared.frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt, frage: shared.frage });
-          appendSponsor(shared.frage, abschnitt);
+          if (shared.frage.templateId === "meme_beschriften") {
+            appendSponsor(shared.frage, abschnitt);
+            result.push({ typ: "meme-erklaerung", abschnitt, frage: shared.frage });
+          } else {
+            appendSponsor(shared.frage, abschnitt);
+          }
           result.push({ typ: "frage", ...shared });
         }
         else appendSolution(shared);
@@ -271,7 +281,12 @@ export function buildPraesentationSlides(
         fragenAnzahlImBlock: fragenImBlock.length,
       };
       if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt, frage });
-      appendSponsor(frage, abschnitt);
+      if (frage.templateId === "meme_beschriften") {
+        appendSponsor(frage, abschnitt);
+        result.push({ typ: "meme-erklaerung", abschnitt, frage });
+      } else {
+        appendSponsor(frage, abschnitt);
+      }
       result.push({ typ: "frage", ...shared });
       appendSolution(shared);
     });
@@ -284,7 +299,12 @@ export function buildPraesentationSlides(
   if (fragenOhneBlock.length > 0) {
     fragenOhneBlock.forEach((frage, index) => {
       if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt: null, frage });
-      appendSponsor(frage, null);
+      if (frage.templateId === "meme_beschriften") {
+        appendSponsor(frage, null);
+        result.push({ typ: "meme-erklaerung", abschnitt: null, frage });
+      } else {
+        appendSponsor(frage, null);
+      }
       result.push({
         typ: "frage",
         abschnitt: null,
@@ -308,6 +328,7 @@ export function buildPraesentationSlides(
 }
 
 export function getPresentationSlideKey(slide: Slide) {
+  if (slide.typ === "meme-erklaerung") return `meme-explanation:${slide.frage.quiz_fragen_id}`;
   if (slide.typ === "pixel-erklaerung") return `pixel-explanation:${slide.frage.quiz_fragen_id}`;
   if (slide.typ === "ablauf") {
     if (slide.presentationRole?.kind === "SPONSOR") return `sponsor:${slide.presentationRole.questionAssignmentId}`;

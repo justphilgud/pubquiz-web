@@ -1,7 +1,8 @@
 // Synthetic-only live boundary tests. No provider URLs/JWTs enter diagnostics.
-import { bridgeOrigin, limitedResponse, requestGithubToken } from "./bridge-client";
+import { bridgeOrigin, limitedResponse } from "./bridge-client";
 import { OperationsError, requireCondition } from "./guards";
 import { AUDIENCE } from "./bridge/lib/contract";
+import { GithubOidcTokenProvider } from "./oidc-token";
 
 type Env = Readonly<Record<string, string | undefined>>;
 export const identityMutations: ReadonlyArray<readonly [string, Readonly<Record<string, unknown>>]> = [
@@ -44,18 +45,16 @@ export async function expectIdentityDenial(response: Response, number: number, l
   requireCondition(passed, `IDENTITY_PROBE_${number}_${layer.toUpperCase()}_HTTP_${response.status}_FAILED`);
 }
 
-export async function runIdentityProbe(env: Env, body: object, request: typeof fetch = fetch) {
+export async function runIdentityProbe(env: Env, body: object, request: typeof fetch = fetch,
+  oidc = new GithubOidcTokenProvider(env, request)) {
   requireCondition(env.AP94_TRANSPORT_MODE === "synthetic", "SYNTHETIC_CONTEXT_REQUIRED");
   const origin = bridgeOrigin(env.AP94_BRIDGE_ORIGIN);
-  const valid = await requestGithubToken(env, request);
-  const wrongAudience = await requestGithubToken(env, (input, init) => {
-    const url = new URL(String(input));
-    url.searchParams.set("audience", `${AUDIENCE}:untrusted`);
-    return request(url, init);
-  });
+  const valid = await oidc.token(AUDIENCE);
+  const wrongAudience = await oidc.token(`${AUDIENCE}:untrusted`);
   requireCondition(wrongAudience !== valid, "IDENTITY_PROBE_AUDIENCE_UNCHANGED");
   const send = async (edge: string | undefined, bearer: string | undefined) => {
     try {
+      oidc.recordBridgeCall();
       return await request(`${origin}/api/access`, { method: "POST", redirect: "manual",
         headers: { "content-type": "application/json", ...(edge ? { "x-vercel-trusted-oidc-idp-token": edge } : {}),
           ...(bearer ? { authorization: `Bearer ${bearer}` } : {}) },

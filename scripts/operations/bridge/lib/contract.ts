@@ -34,6 +34,14 @@ export function storedBackupKey(key: string) {
 }
 export function objectRule(name: string, mode: Mode): { kind: ObjectKind; maximumSize: number; contentType: ContentType } {
   if (mode === "synthetic") {
+    const diagnosticSizes: Readonly<Record<string, number>> = {
+      "diagnostic-1k.bin": 1024,
+      "diagnostic-100k.bin": 100 * 1024,
+      "diagnostic-1m.bin": 1024 * 1024,
+      "diagnostic-5m.bin": 5 * 1024 * 1024,
+      "diagnostic-typical.bin": 2 * 1024 * 1024,
+    };
+    if (Object.hasOwn(diagnosticSizes, name)) return { kind: "probe", maximumSize: diagnosticSizes[name], contentType: "application/octet-stream" };
     check(name === "probe.bin" || name === "probe.json");
     return { kind: "probe", maximumSize: 16 * 1024, contentType: name === "probe.json" ? "application/json" : "application/octet-stream" };
   }

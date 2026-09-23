@@ -5,6 +5,7 @@ import type {
   TemplateAnswerFormDefinition,
   TemplateInteractionType,
 } from "@/app/rendering/templates/templateContract";
+import { MEME_CAPTION_TEXT_MAX_LENGTH } from "@/app/quiz/memeCaption";
 
 type AnswerOption = {
   id: number;
@@ -22,6 +23,12 @@ type StructuredTextField = {
 type OrderingItem = {
   id: string;
   text: string;
+};
+
+type MemeCaptionInteraction = {
+  type: "MEME_CAPTION";
+  imageUrl: string;
+  maxLength: number;
 };
 
 export type ResolvedQuizAnswerInteraction =
@@ -81,6 +88,7 @@ export type ResolvedQuizAnswerInteraction =
       maxLabel: string;
       values: number[];
     }
+  | MemeCaptionInteraction
   | {
       type: Exclude<
         TemplateInteractionType,
@@ -94,6 +102,7 @@ export type ResolvedQuizAnswerInteraction =
         | "POLL_SINGLE"
         | "POLL_MULTI"
         | "POLL_SCALE"
+        | "MEME_CAPTION"
       >;
       supported: false;
     };
@@ -110,6 +119,7 @@ export type QuizAnswerInteractionInput = {
   }[];
   answerOptions: readonly AnswerOption[];
   orderingItems?: readonly OrderingItem[];
+  memeImageUrl?: string | null;
 };
 
 function getAnswerForm(
@@ -270,6 +280,13 @@ export function resolveQuizAnswerInteraction(
       minLabel: scale.minLabel,
       maxLabel: scale.maxLabel,
       values: Array.from({ length }, (_, index) => scale.min + index * scale.step),
+    };
+  }
+  if (answerForm.type === "MEME_CAPTION") {
+    return {
+      type: "MEME_CAPTION",
+      imageUrl: input.memeImageUrl ?? "",
+      maxLength: MEME_CAPTION_TEXT_MAX_LENGTH,
     };
   }
 

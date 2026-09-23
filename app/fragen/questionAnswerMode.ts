@@ -21,6 +21,7 @@ const openSpecialTemplateIds = [
   questionTemplateIds.translationReadAloud,
   questionTemplateIds.anagram,
   questionTemplateIds.googleReviews,
+  questionTemplateIds.memeCaption,
 ] as const;
 
 const closedSpecialTemplateIds = [

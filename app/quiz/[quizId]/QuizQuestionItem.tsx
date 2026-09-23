@@ -15,6 +15,8 @@ import type { StoryElementType } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
 import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
 import QuizEditorElementCard from "./QuizEditorElementCard";
+import QuizFrageSortierungButtons from "./QuizFrageSortierungButtons";
+import type { MemeQuestionConfig } from "@/app/quiz/memeCaption";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
@@ -44,6 +46,7 @@ export type QuizQuestion = {
     defaultPlacement: "BEFORE_QUESTION" | "AFTER_SOLUTION";
     placementOverride: StoryPlacementOverride;
   }>;
+  memeConfig?: MemeQuestionConfig | null;
 };
 
 type Props = {
@@ -53,6 +56,9 @@ type Props = {
   containerId: string;
   settingsActions: QuizQuestionSettingsActions;
   onRemove: (quizFragenId: number) => void;
+  isFirst: boolean;
+  isLast: boolean;
+  onMove: (direction: "up" | "down") => void | Promise<void>;
 };
 
 function getAnswerModeLabel(frage: QuizQuestion) {
@@ -82,6 +88,9 @@ export default function QuizQuestionItem({
   containerId,
   settingsActions,
   onRemove,
+  isFirst,
+  isLast,
+  onMove,
 }: Props) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const {
@@ -160,6 +169,15 @@ export default function QuizQuestionItem({
                 </span>
               )}
             </>}
+      sortingAction={
+        <QuizFrageSortierungButtons
+          quizId={quizId}
+          quizFragenId={frage.quiz_fragen_id}
+          isFirst={isFirst}
+          isLast={isLast}
+          onMove={onMove}
+        />
+      }
       configureAction={
           <button
             type="button"
@@ -194,6 +212,8 @@ export default function QuizQuestionItem({
           kannFreieAntwortAktivieren={frage.kann_freie_antwort_aktivieren}
           istPixelbild={frage.templateId === "pixelbild" || frage.templateId === "image_pixel"}
           istUmfrage={isPollQuestionTemplateId(frage.templateId)}
+          istMeme={frage.templateId === "meme_beschriften"}
+          memeConfig={frage.memeConfig ?? null}
           teilpunkteFaehig={frage.teilpunkte_faehig}
           storyElements={frage.storyElements}
           actions={settingsActions}

@@ -79,6 +79,26 @@ Bei einem Fehler:
   gültiges Backup klassifiziert;
 - darf der Betreiber erst nach Ursachenklärung einen neuen Attempt starten.
 
+Private Uploads werden weiterhin seriell ausgeführt. Für einen signierten PUT gilt
+eine eng begrenzte Transportwiederholung: höchstens vier Versuche, ausschließlich
+nach HTTP 429 oder 5xx, mit exponentiellem Backoff und beachtetem `Retry-After`
+(höchstens 60 Sekunden). HTTP 400, 401 und 403 werden nicht wiederholt. Jeder
+Versuch fordert eine neue objektgenaue Signed URL an. Nach einer transienten
+Antwort prüft ein privater Readback zuerst, ob der Provider das Objekt trotz
+verlorener Antwort bereits korrekt gespeichert hat. Exakte Größe und SHA-256
+müssen übereinstimmen; ein abweichendes vorhandenes Objekt bricht mit
+`PRIVATE_UPLOAD_HASH_CONFLICT` ab. Ein Manifest wird weiterhin erst nach allen
+vollständigen und verifizierten Datenartefakten hochgeladen.
+
+Die Uploaddiagnostik protokolliert nur Objektposition, Gesamtzahl, logischen Typ,
+Bytezahl, MIME-Typ, SHA-256, Versuch, HTTP-Status, Endpunktklasse, begrenztes
+`Retry-After` und allowlist-geprüfte Provider-Request-/Trace-IDs. Objektpfad,
+Signed URL, Token und Providertext werden nie ausgegeben. Der manuelle synthetische
+Modus kann mit `diagnostic_upload_matrix=true` zusätzlich eine serielle Matrix aus
+1 KB, 100 KB, 1 MB, 5 MB und einer repräsentativen 2-MB-Mediendatei ausführen.
+Diese festen Testobjekte liegen ausschließlich unter dem run-spezifischen
+Synthetic-Prefix und enthalten keine Production-Daten.
+
 ## Retention-Policy V1
 
 Die vorgeschlagene Policy ist:

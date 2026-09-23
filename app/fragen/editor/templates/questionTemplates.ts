@@ -329,6 +329,26 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
     generators: [],
     contentGenerators: [],
   },
+  {
+    id: questionTemplateIds.memeCaption,
+    icon: "message-square-quote",
+    enabled: true,
+    answerMode: "MEME_CAPTION",
+    evaluationMode: "NONE",
+    editorKind: "MEME_CAPTION",
+    presentationKind: "MEME_CAPTION",
+    answerFormKind: "MEME_CAPTION",
+    selectable: true,
+    availableForFiltering: true,
+    requiresAnswerImages: false,
+    translationKey: "memeCaption",
+    questionLabelKey: "question",
+    allowsOptionalQuestionImage: false,
+    initialAnswers: [],
+    mediaSlots: [{ slotKey: "question_image", required: true }],
+    generators: [],
+    contentGenerators: [],
+  },
 ];
 
 export const questionTemplateContractRegistry =

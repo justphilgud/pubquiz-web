@@ -12,6 +12,10 @@ import {
 } from "@/app/story-elemente/storyElement";
 import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement";
 import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
+import {
+  DEFAULT_MEME_QUESTION_CONFIG,
+  type MemeQuestionConfig,
+} from "@/app/quiz/memeCaption";
 
 export type QuizQuestionSettingsActions = {
   onPunkteModusChange: (
@@ -30,6 +34,10 @@ export type QuizQuestionSettingsActions = {
     quizFragenId: number,
     storyElementId: number,
     placementOverride: StoryPlacementOverride,
+  ) => void | Promise<void>;
+  onMemeConfigChange: (
+    quizFragenId: number,
+    config: MemeQuestionConfig,
   ) => void | Promise<void>;
 };
 
@@ -51,6 +59,8 @@ type Props = {
   kannFreieAntwortAktivieren: boolean;
   istPixelbild: boolean;
   istUmfrage: boolean;
+  istMeme: boolean;
+  memeConfig: MemeQuestionConfig | null;
   teilpunkteFaehig: boolean;
   storyElements: StoryElementSetting[];
   actions: QuizQuestionSettingsActions;
@@ -162,6 +172,8 @@ export default function QuizQuestionSettings({
   kannFreieAntwortAktivieren,
   istPixelbild,
   istUmfrage,
+  istMeme,
+  memeConfig,
   teilpunkteFaehig,
   storyElements,
   actions,
@@ -191,7 +203,7 @@ export default function QuizQuestionSettings({
         </span>
         <Select
           value={punkteModus ?? "standard"}
-          disabled={istUmfrage}
+          disabled={istUmfrage || istMeme}
           onChange={(event) =>
             void actions.onPunkteModusChange(quizFragenId, event.target.value)
           }
@@ -209,7 +221,9 @@ export default function QuizQuestionSettings({
           </option>
         </Select>
         <span className="block text-xs text-slate-500">
-          {istUmfrage
+          {istMeme
+            ? "Meme-Fragen werden in AP1 noch nicht bewertet."
+            : istUmfrage
             ? "Umfragen vergeben keine Punkte."
             : "Risikofragen sind nur bei Fragen ohne Teilpunkte möglich."}
         </span>
@@ -281,6 +295,73 @@ export default function QuizQuestionSettings({
           </span>
         </label>
       )}
+
+      {istMeme && (() => {
+        const config = memeConfig ?? DEFAULT_MEME_QUESTION_CONFIG;
+        return (
+          <section className="space-y-3 rounded-xl border border-fuchsia-200 bg-fuchsia-50 p-4 sm:col-span-2 lg:col-span-3">
+            <div>
+              <span className="block text-xs font-bold uppercase tracking-wide text-fuchsia-800">
+                Meme-Runde
+              </span>
+              <p className="mt-1 text-sm text-slate-700">
+                Diese Werte werden auf der Erklärfolie gezeigt und gelten für den serverseitigen Countdown.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="block text-sm font-semibold text-slate-900">Antwortzeit</span>
+                <Select
+                  value={String(config.responseDurationSeconds)}
+                  onChange={(event) => void actions.onMemeConfigChange(
+                    quizFragenId,
+                    { ...config, responseDurationSeconds: Number(event.target.value) },
+                  )}
+                  className="min-h-11 rounded-xl font-semibold"
+                >
+                  {[60, 90, 120, 180].map((seconds) => (
+                    <option key={seconds} value={seconds}>{seconds} Sekunden</option>
+                  ))}
+                </Select>
+              </label>
+              <div className="space-y-2">
+                <span className="block text-sm font-semibold text-slate-900">Später maximal zeigen</span>
+                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={config.maxPresentedMemes ?? ""}
+                    disabled={config.maxPresentedMemes === null}
+                    onChange={(event) => {
+                      const maximum = Number(event.target.value);
+                      if (Number.isInteger(maximum) && maximum >= 1 && maximum <= 100) {
+                        void actions.onMemeConfigChange(quizFragenId, {
+                          ...config,
+                          maxPresentedMemes: maximum,
+                        });
+                      }
+                    }}
+                    className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-semibold disabled:bg-slate-100"
+                    aria-label="Maximal präsentierte Memes"
+                  />
+                  <Checkbox
+                    checked={config.maxPresentedMemes === null}
+                    onChange={(event) => void actions.onMemeConfigChange(
+                      quizFragenId,
+                      {
+                        ...config,
+                        maxPresentedMemes: event.target.checked ? null : 5,
+                      },
+                    )}
+                    label="Alle"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {storyElements.length > 1 && (
         <section className="space-y-3 sm:col-span-2 lg:col-span-3">

@@ -12,3 +12,4 @@ Zentrale Module: Authentifizierung, Fragen, Quiz, Teams, Moderation, Präsentati
 - [Verbindliche Quiz Runtime Contracts](./quiz-runtime-contracts.md)
 - [Öffentliche Frageneinreichung](./public-question-submissions.md)
 - [Mobile redaktionelle Bedienbarkeit](./mobile-editor-ux.md)
+- [Mobile PWA für Fragen und Quizze](./mobile-pwa.md)

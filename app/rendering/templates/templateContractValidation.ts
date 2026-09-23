@@ -245,6 +245,7 @@ export function validateTemplateContract(
     "POLL_SINGLE",
     "POLL_MULTI",
     "POLL_SCALE",
+    "MEME_CAPTION",
   ].includes(template.interaction.defaultType);
   if (hasNonScoringDefault !== (template.evaluation.defaultType === "NONE")) {
     issues.push(

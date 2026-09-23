@@ -36,6 +36,7 @@ import {
   updateQuizAbschnittTitel,
   updateQuizQuestionFreeAnswerMode,
   updateQuizQuestionResultDisplayMode,
+  updateQuizQuestionMemeConfig,
   updateQuizFragenBlockSortierung,
 } from "../actions";
 import { synchronizeAutomaticBlockTitles } from "../quizStructure";
@@ -60,7 +61,9 @@ import {
 import QuizEditorElementCard from "./QuizEditorElementCard";
 import {
   buildQuizEditorElements,
+  moveQuizEditorElement,
 } from "./quizEditorElement";
+import type { MemeQuestionConfig } from "@/app/quiz/memeCaption";
 
 type Abschnitt = {
   quiz_abschnitt_id: number;
@@ -269,6 +272,7 @@ function DroppableBlock({
   onRemovePoll,
   onDeleteBlock,
   onRenameBlock,
+  onMoveQuestion,
   fragenrundenAnzahl,
 }: {
   gruppe: Gruppe;
@@ -280,6 +284,11 @@ function DroppableBlock({
   onRemovePoll: (placementId: number) => void;
   onDeleteBlock: (quizAbschnittId: number) => void | Promise<void>;
   onRenameBlock: (quizAbschnittId: number, currentTitle: string) => void | Promise<void>;
+  onMoveQuestion: (
+    quizFragenId: number,
+    sectionId: number | null,
+    direction: "up" | "down",
+  ) => void | Promise<void>;
   fragenrundenAnzahl: number;
 }) {
   const [isRenaming, setIsRenaming] = useState(false);
@@ -539,6 +548,13 @@ function DroppableBlock({
                   containerId={gruppe.containerId}
                   settingsActions={settingsActions}
                   onRemove={onRemove}
+                  isFirst={index === 0}
+                  isLast={index === editorElements.length - 1}
+                  onMove={(direction) => onMoveQuestion(
+                    element.question.quiz_fragen_id,
+                    gruppe.quizAbschnittId,
+                    direction,
+                  )}
                 />;
               }
               if (element.kind === "STORY") {
@@ -964,6 +980,69 @@ export default function QuizFragenSortableTable({
     setMeldung("Elementreihenfolge wurde gespeichert.");
   }
 
+  async function handleMoveQuestion(
+    quizFragenId: number,
+    sectionId: number | null,
+    direction: "up" | "down",
+  ) {
+    const activeKey = `question-${quizFragenId}`;
+    const targetElements = buildQuizEditorElements({
+      questions: items.filter((item) => item.quiz_abschnitt_id === sectionId),
+      stories: storyItems.filter((item) => item.quiz_abschnitt_id === sectionId),
+      polls: pollItems.filter((item) => item.quiz_abschnitt_id === sectionId),
+    });
+    const orderedElements = moveQuizEditorElement(
+      targetElements,
+      activeKey,
+      direction,
+    );
+    if (orderedElements.every((element, index) => element === targetElements[index])) {
+      return;
+    }
+    const orderByKey = new Map(
+      orderedElements.map((element, index) => [element.key, (index + 1) * 1_000]),
+    );
+    const orderedQuestions = items.map((question) => ({
+      ...question,
+      flowOrder: orderByKey.get(`question-${question.quiz_fragen_id}`) ?? question.flowOrder,
+    }));
+    const orderedStories = storyItems.map((story) => ({
+      ...story,
+      sortierung: orderByKey.get(`story-${story.placementId}`) ?? story.sortierung,
+    }));
+    const orderedPolls = pollItems.map((poll) => ({
+      ...poll,
+      sortierung: orderByKey.get(`poll-${poll.placementId}`) ?? poll.sortierung,
+    }));
+    const sectionOrder = new Map(
+      fragenrundeBlocks.map((block, index) => [block.quiz_abschnitt_id, index]),
+    );
+    const questionItems = [...orderedQuestions]
+      .sort((left, right) =>
+        (sectionOrder.get(left.quiz_abschnitt_id ?? -1) ?? Number.MAX_SAFE_INTEGER) -
+          (sectionOrder.get(right.quiz_abschnitt_id ?? -1) ?? Number.MAX_SAFE_INTEGER) ||
+        left.flowOrder - right.flowOrder ||
+        left.quiz_fragen_id - right.quiz_fragen_id,
+      )
+      .map((question, index) => ({ ...question, sortierung: index + 1 }));
+
+    await saveBlockSortierung(questionItems);
+    const sequenceResult = await updateQuizEditorElementSequence({
+      quizId,
+      sectionId,
+      itemKeys: orderedElements.map((element) => element.key),
+    });
+    if (!sequenceResult.success) {
+      setMeldung(sequenceResult.message);
+      return;
+    }
+
+    setItems(questionItems);
+    setStoryItems(orderedStories);
+    setPollItems(orderedPolls);
+    setMeldung("Fragenreihenfolge wurde gespeichert.");
+  }
+
   async function handlePunkteModusChange(
     quizFragenId: number,
     punkteModus: string,
@@ -1065,11 +1144,29 @@ export default function QuizFragenSortableTable({
     }
   }
 
+  async function handleMemeConfigChange(
+    quizFragenId: number,
+    config: MemeQuestionConfig,
+  ) {
+    try {
+      await updateQuizQuestionMemeConfig({ quizId, quizFragenId, config });
+      setItems((current) => current.map((item) =>
+        item.quiz_fragen_id === quizFragenId
+          ? { ...item, memeConfig: config }
+          : item,
+      ));
+      setMeldung("Meme-Konfiguration wurde gespeichert.");
+    } catch (error) {
+      setMeldung(error instanceof Error ? error.message : "Meme-Konfiguration konnte nicht gespeichert werden.");
+    }
+  }
+
   const settingsActions: QuizQuestionSettingsActions = {
     onPunkteModusChange: handlePunkteModusChange,
     onFreeAnswerChange: handleFreeAnswerChange,
     onResultDisplayModeChange: handleResultDisplayModeChange,
     onStoryPlacementOverrideChange: handleStoryPlacementOverrideChange,
+    onMemeConfigChange: handleMemeConfigChange,
   };
 
   async function handleDeleteBlock(quizAbschnittId: number) {
@@ -1155,6 +1252,7 @@ export default function QuizFragenSortableTable({
         onRemovePoll={handleRemovePoll}
         onDeleteBlock={handleDeleteBlock}
         onRenameBlock={handleRenameBlock}
+        onMoveQuestion={handleMoveQuestion}
         fragenrundenAnzahl={fragenrundeBlocks.length}
       />
     );

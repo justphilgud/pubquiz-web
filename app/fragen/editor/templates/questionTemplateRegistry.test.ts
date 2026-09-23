@@ -22,6 +22,13 @@ const artworkMigration = readFileSync(
   ),
   "utf8",
 );
+const memeMigration = readFileSync(
+  new URL(
+    "../../../../prisma/migrations/20260923160000_add_meme_caption_question/migration.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
 const seedSource = readFileSync(
   new URL("../../../../prisma/seed.ts", import.meta.url),
   "utf8",
@@ -202,4 +209,31 @@ test("artwork master data is idempotent and seed-consistent without schema DDL",
   assert.match(seedSource, /code: "kunstwerk"/);
   assert.match(seedSource, /label: "Künstler"/);
   assert.match(seedSource, /label: "Titel"/);
+});
+
+test("meme caption is selectable, image-backed and has no dummy solution", () => {
+  const meme = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.memeCaption,
+  );
+
+  assert.ok(meme);
+  assert.equal(meme.id, "meme_beschriften");
+  assert.equal(meme.selectable, true);
+  assert.deepEqual(meme.initialAnswers, []);
+  assert.deepEqual(
+    meme.mediaSlots.map((slot) => [
+      slot.key,
+      slot.required,
+      slot.allowedMediaType,
+    ]),
+    [["question_image", true, "IMAGE"]],
+  );
+});
+
+test("meme migration declares assignment configuration and idempotent master data", () => {
+  assert.match(memeMigration, /ADD COLUMN "meme_config_json" JSONB/);
+  assert.match(memeMigration, /ON CONFLICT \("code"\) DO UPDATE/);
+  assert.match(memeMigration, /'meme_beschriften'/);
+  assert.match(seedSource, /code: "meme_beschriften"/);
 });

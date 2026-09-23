@@ -38,6 +38,7 @@ import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import type { IntermediateStandingsAudienceEntry } from "@/app/rendering/presentation/presentationRankingPolicy";
+import type { MemeLiveState } from "@/app/quiz/memeCaption";
 
 type Props = {
   quiz: QuizPraesentationResult;
@@ -77,6 +78,7 @@ export default function QuizPraesentationPlayer({
   const serverClockOffsetRef = useRef(initialClockOffset);
   const [syncError, setSyncError] = useState(false);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
+  const [memeState, setMemeState] = useState<MemeLiveState | null>(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
@@ -111,7 +113,8 @@ export default function QuizPraesentationPlayer({
   const slide = slides[slideIndex];
   const showTeamJoinState =
     (slide?.typ === "ablauf" && slide.element.type === "QR_CODE") ||
-    (slide?.typ === "fixer-slide" && slide.slideTyp === "qrcode");
+    (slide?.typ === "fixer-slide" && slide.slideTyp === "qrcode") ||
+    slide?.typ === "meme-erklaerung";
   const presentationQuestionAssignmentId =
     slide?.typ === "frage" || slide?.typ === "funny" || slide?.typ === "aufloesung"
       ? slide.frage.quiz_fragen_id
@@ -188,6 +191,7 @@ export default function QuizPraesentationPlayer({
         });
         setSyncError(false);
         setPixelState(interactionSnapshot.pixelState);
+        setMemeState(interactionSnapshot.memeState);
         setPollState(interactionSnapshot.pollState);
         setLiveResultState(interactionSnapshot.liveResultState);
         setLivePollState(interactionSnapshot.livePollState);
@@ -311,6 +315,7 @@ export default function QuizPraesentationPlayer({
             playbackCommand: activated ? liveState.playbackCommand : null,
             playbackCommandId: liveState.playbackCommandId,
             pixelState,
+            memeState,
             pollState,
             liveResultState,
             livePollState,

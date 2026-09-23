@@ -81,6 +81,7 @@ export const deQuestionEditorMessages = {
     pollSingle: { name: "Umfrage: eine Auswahl", description: "Teams wählen genau eine Option; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
     pollMulti: { name: "Umfrage: mehrere Auswahlen", description: "Teams können mehrere Optionen wählen; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
     pollScale: { name: "Umfrage: Skala", description: "Teams stimmen auf einer frei beschriftbaren Skala ab; es gibt keine Punkte.", defaultQuestion: "" },
+    memeCaption: { name: "Meme beschriften", description: "Teams beschriften ein vorgegebenes Bild mit oberem und unterem Memetext.", defaultQuestion: "Beschriftet dieses Bild als Meme." },
   },
   templateFields: { personA: "Person A", personB: "Person B", artist: "Interpret", visualArtist: "Künstler", title: "Titel", solution: "Lösung" },
   templateMedia: {

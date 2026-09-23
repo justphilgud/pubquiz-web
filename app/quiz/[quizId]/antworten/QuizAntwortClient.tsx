@@ -995,7 +995,7 @@ export default function QuizAntwortClient({
                         </button>
                       )}
 
-                      {hatBild && frage.templateId !== "pixelbild" && (
+                      {hatBild && frage.templateId !== "pixelbild" && frage.templateId !== "meme_beschriften" && (
                         <button
                           type="button"
                           onClick={() =>
@@ -1020,6 +1020,8 @@ export default function QuizAntwortClient({
                           submissionLocksEditing ||
                           !session
                         }
+                        deadlineAt={frage.interactionRun?.deadlineAt ?? null}
+                        now={now}
                         onChange={(value) => controller.edit(frage.quiz_fragen_id, value)}
                       />
 
@@ -1047,6 +1049,27 @@ export default function QuizAntwortClient({
                             {isSubmitting
                               ? "Stop wird geprüft..."
                               : "Verpixelung für alle stoppen & Antwort abgeben"}
+                          </button>
+                        )}
+                        {frage.templateId === "meme_beschriften" &&
+                          session &&
+                          !blockIstGesperrt &&
+                          questionIsWritable &&
+                          !submissionLocksEditing && (
+                          <button
+                            type="button"
+                            onClick={() => void handleSubmit(frage.quiz_fragen_id)}
+                            disabled={
+                              isSubmitting ||
+                              (submissionStatus === "SUBMITTED" && !changedSinceSubmission)
+                            }
+                            className="answer-primary-button min-h-11 w-full rounded-xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed"
+                          >
+                            {isSubmitting
+                              ? "Wird gespeichert..."
+                              : submissionStatus === "SUBMITTED"
+                                ? "Änderung erneut abgeben"
+                                : "Meme verbindlich abgeben"}
                           </button>
                         )}
                         {frage.templateId === "pixelbild" &&

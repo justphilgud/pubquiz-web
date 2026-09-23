@@ -1,6 +1,7 @@
 import { Prisma } from "@/app/generated/prisma/client";
 import {
   isPollQuestionTemplateId,
+  isMemeCaptionQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
@@ -163,6 +164,15 @@ export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation
       maxPoints: ZERO,
       status: "UNANSWERED",
       details: { strategy: "NONE", reason: "POLL_HAS_NO_EVALUATION" },
+    };
+  }
+
+  if (isMemeCaptionQuestionTemplateId(templateId)) {
+    return {
+      basePoints: ZERO,
+      maxPoints: ZERO,
+      status: "UNANSWERED",
+      details: { strategy: "NONE", reason: "MEME_HAS_NO_AP1_EVALUATION" },
     };
   }
 

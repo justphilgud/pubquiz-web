@@ -21,6 +21,7 @@
 - [Präsentation](./user-guide/praesentation.md)
 - [Auswertung](./user-guide/ergebnisse-auswerten.md)
 - [FAQ](./user-guide/faq.md)
+- [Android-PWA installieren](./user-guide/mobile-pwa-android.md)
 
 ## Administration
 - [Übersicht](./admin-guide/README.md)
@@ -35,6 +36,7 @@
 - [Datenmodell](./architecture/datenmodell.md)
 - [Authentifizierung](./architecture/authentifizierung.md)
 - [Antwortformulare und Live-Interaction-Architektur](./architecture/answer-interaction.md)
+- [Mobile PWA für Fragen und Quizze](./architecture/mobile-pwa.md)
 - [Globale Teamidentität](./architecture/team-identity.md)
 - [Medienarchitektur](./architecture/medien.md)
 - [Deployment](./operations/umgebungen-und-deployment.md)

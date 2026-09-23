@@ -131,3 +131,30 @@ test("validates poll payloads with the productive payload shapes", () => {
     antwortText: "3", antwortId: null, antwortfelder: {},
   });
 });
+
+test("validates structured meme captions and rejects malformed or overlong fields", () => {
+  const meme = {
+    type: "MEME_CAPTION" as const,
+    imageUrl: "/medien/base.webp",
+    maxLength: 80,
+  };
+  const result = validate(meme, {
+    answerText: JSON.stringify({ topText: " Oben ", bottomText: "Unten" }),
+  });
+  assert.deepEqual(result, {
+    payload: { topText: "Oben", bottomText: "Unten" },
+    hasContent: true,
+  });
+  assert.equal(validate(meme, {
+    answerText: JSON.stringify({ topText: " ", bottomText: "" }),
+  }).hasContent, false);
+  assert.throws(() => validate(meme, { answerText: "kein-json" }), /kein gültiges JSON/);
+  assert.throws(() => validate(meme, {
+    answerText: JSON.stringify({ topText: "x".repeat(81), bottomText: "" }),
+  }), /höchstens 80 Zeichen/);
+  assert.deepEqual(interactionPayloadToDraft(meme, result.payload), {
+    antwortText: JSON.stringify({ topText: "Oben", bottomText: "Unten" }),
+    antwortId: null,
+    antwortfelder: {},
+  });
+});

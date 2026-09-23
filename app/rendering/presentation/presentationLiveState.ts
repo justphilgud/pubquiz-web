@@ -159,6 +159,13 @@ export function parsePresentationSlideKey(
   if (parts[0] === "pixel-explanation" && parts.length === 2 && parsePositiveInteger(parts[1])) {
     return { kind: "NON_QUESTION", slideType: "PIXEL_EXPLANATION", statusText: "Pixelbild: Gleich geht es los. Bitte die Spielregeln auf der Leinwand beachten." };
   }
+  if (parts[0] === "meme-explanation" && parts.length === 2 && parsePositiveInteger(parts[1])) {
+    return {
+      kind: "NON_QUESTION",
+      slideType: "MEME_EXPLANATION",
+      statusText: "Meme-Runde: Gleich startet die Antwortzeit.",
+    };
+  }
   if (parts[0] === "question" && parts.length === 3) {
     const questionAssignmentId = parsePositiveInteger(parts[1]);
     const phase = parts[2] === "question"

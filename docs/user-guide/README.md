@@ -9,6 +9,8 @@ Dieses Handbuch beschreibt den auf Preview geprüften Produktstand. Je nach Roll
 - **Eventmanager/Moderator:** eigene Eventreihen, Quizze, Moderation und Teams im zugewiesenen Scope.
 - **Quizteam:** einem Quiz beitreten, das globale Teamprofil pflegen und Antworten abgeben.
 
+Die Installation auf Android ist unter [PubQuiz auf Android installieren](mobile-pwa-android.md) beschrieben.
+
 ## Themen
 
 - [Content erstellen und finden](content-und-umfragen.md)

@@ -1,8 +1,16 @@
 import { limitedResponse } from "./bridge-client";
-import { OperationsError } from "./guards";
+import { OperationsError, requireCondition } from "./guards";
 
 const codes = new Set(["CONFIG_REJECTED", "IDENTITY_REJECTED", "REQUEST_REJECTED",
   "OBJECT_EXISTS", "OBJECT_MISSING", "OBJECT_TOO_LARGE", "PROVIDER_REJECTED"]);
+
+export function tamperedProbeUrl(value: string) {
+  const original = new URL(value);
+  const changed = new URL(original);
+  changed.pathname = `${original.pathname}-path-tampered`;
+  requireCondition(changed.pathname !== original.pathname, "SIGNED_PATH_TAMPER_UNCHANGED");
+  return changed;
+}
 
 // Never include response text, headers, URLs, tokens or exception messages in diagnostics.
 export async function expectProbeDenial(response: Response, caseNumber: number,
