@@ -4,7 +4,7 @@ import { BridgeClient } from "./bridge-client";
 import { objectRule, runKey, STORE_ID } from "./bridge/lib/contract";
 import { OperationsError, requireCondition, safeError } from "./guards";
 import { createHash } from "node:crypto";
-import { expectProbeDenial } from "./transport-probe-diagnostics";
+import { expectProbeDenial, tamperedProbeUrl } from "./transport-probe-diagnostics";
 import { runIdentityProbe } from "./identity-probe";
 const sample = Buffer.from("AP9.4 OIDC bridge synthetic transport proof; no production data.\n");
 const samples = [
@@ -69,7 +69,7 @@ async function main() {
       const denied = await fetch(grant.url, { method, redirect: "error", signal: AbortSignal.timeout(30000) });
       requireCondition(rejected(denied.status), "SIGNED_OPERATION_NOT_ENFORCED");
     }
-    const changed = new URL(grant.url); changed.pathname = changed.pathname.replace(/probe\.(bin|json)$/, "other.bin");
+    const changed = tamperedProbeUrl(grant.url);
     const deniedPath = await fetch(changed, { redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition(rejected(deniedPath.status), "SIGNED_PATH_NOT_ENFORCED");
   }

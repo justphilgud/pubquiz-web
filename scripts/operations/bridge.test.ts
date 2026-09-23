@@ -13,7 +13,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { del as blobDel, list as blobList, presignUrl } from "@vercel/blob";
-import { expectProbeDenial } from "./transport-probe-diagnostics";
+import { expectProbeDenial, tamperedProbeUrl } from "./transport-probe-diagnostics";
 import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
 
 test("upload denial preserves only artifact class, HTTP status and bounded provider category", async () => {
@@ -133,6 +133,19 @@ test("live probe diagnostics redact arbitrary provider bodies, headers, URLs and
       new RegExp(`^Error: SYNTHETIC_CASE_2_HTTP_${response.status}_BODY_UNRECOGNIZED$`));
   }
   await assert.rejects(expectProbeDenial(new Response(), Number.NaN), /SYNTHETIC_CASE_INVALID/);
+});
+
+test("signed-path probe always changes the path for every supported filename shape", () => {
+  for (const name of ["probe.bin", "probe.json", "diagnostic-1kb.bin", "diagnostic-5mb.bin", "arbitrary.name", "without-extension"]) {
+    const original = new URL(`https://${STORE_HOST}/synthetic/acceptance/run-1-1/${name}?synthetic-signature=unchanged`);
+    const originalText = original.toString();
+    const changed = tamperedProbeUrl(originalText);
+    assert.notEqual(changed.pathname, original.pathname);
+    assert.equal(changed.pathname, `${original.pathname}-path-tampered`);
+    assert.equal(changed.origin, original.origin);
+    assert.equal(changed.search, original.search);
+    assert.equal(original.toString(), originalText);
+  }
 });
 
 const now = Date.now(); const seconds = Math.floor(now / 1000);
