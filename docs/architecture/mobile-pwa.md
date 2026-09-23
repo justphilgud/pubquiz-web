@@ -5,7 +5,11 @@
 Die installierbare App ist dieselbe Next.js-Anwendung wie die Desktopansicht. Es
 gibt keinen zweiten mobilen Client, kein eigenes Backend und keine duplizierte
 Fachlogik. `app/manifest.ts` beschreibt Name, Start-URL, Farben und die beiden
-aus demselben Gudi-Motiv erzeugten App-Icons. Die bestehende Startseite stellt
+aus demselben Gudi-Motiv erzeugten App-Icons. Production verwendet den Namen
+`PubQuiz` und das pinke Icon. Vercel Preview verwendet den Namen
+`PubQuiz Preview` und ein cyanblaues Icon. Die Trennung wird ausschließlich aus
+`VERCEL_ENV` abgeleitet; je Deployment existiert weiterhin genau ein Manifest
+und eine installierbare App. Die bestehende Startseite stellt
 abhängig von den vorhandenen Berechtigungen die Einstiege in Fragen und Quizze
 bereit.
 
@@ -46,6 +50,9 @@ verändert.
 - Start-URL und Scope: `/`
 - Anzeige: `standalone`
 - Theme- und Hintergrundfarbe: Schwarz
-- Icons: `/pwa/icon-192.png` und `/pwa/icon-512.png`, jeweils für `any` und
-  `maskable` mit demselben Motiv ausgewiesen
+- Production-Icons: `/pwa/icon-192.png` und `/pwa/icon-512.png`
+- Preview-Icons: `/pwa/preview-icon-192.png` und
+  `/pwa/preview-icon-512.png`
+- Die jeweils aktiven Icons werden für `any` und `maskable` mit demselben Motiv
+  ausgewiesen
 - Datenbank- oder Schemaveränderung: keine

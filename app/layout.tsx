@@ -16,6 +16,8 @@ import "./globals.css";
 import "./rendering/presentation/kommOnePresentation.css";
 import { APP_BRAND } from "@/app/branding/appBrand";
 
+const isPreview = process.env.VERCEL_ENV === "preview";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -41,12 +43,12 @@ export const metadata: Metadata = {
     default: APP_BRAND.productName,
     template: `%s | ${APP_BRAND.name}`,
   },
-  applicationName: APP_BRAND.name,
+  applicationName: isPreview ? "PubQuiz Preview" : APP_BRAND.name,
   description: APP_BRAND.description,
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "PubQuiz",
+    title: isPreview ? "PubQuiz Preview" : "PubQuiz",
   },
 };
 

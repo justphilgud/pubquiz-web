@@ -8,12 +8,20 @@ die Webanwendung. Eine Internetverbindung ist auch nach der Installation nötig.
 1. Die PubQuiz-Adresse in Chrome öffnen und anmelden.
 2. Im Browsermenü **App installieren** oder **Zum Startbildschirm hinzufügen**
    wählen. Je nach Android- und Chrome-Version kann die Bezeichnung abweichen.
-3. Den Namen **PubQuiz** bestätigen.
+3. Den angezeigten Namen bestätigen:
+   - **PubQuiz** für Production mit pinkem Gudi-Symbol;
+   - **PubQuiz Preview** für Preview mit cyanblauem Gudi-Symbol.
 4. Die App über das Gudi-Symbol auf dem Startbildschirm öffnen.
 
 Nach der Anmeldung führt die Startseite zu **Neue Frage**, **Fragenredaktion**
 und – bei entsprechender Berechtigung – **Quizverwaltung**. Die sichtbaren
 Bereiche richten sich weiterhin nach der Rolle des angemeldeten Kontos.
+
+Production und Preview können parallel installiert werden. Sie verwenden
+unterschiedliche Adressen, Namen und Iconfarben. Nach einer Änderung von Name
+oder Icon eine bereits installierte Preview-App einmal deinstallieren und über
+die aktuelle Preview-Adresse neu installieren, falls Android die alte
+Darstellung noch zwischengespeichert zeigt.
 
 ## Grenzen des ersten Umfangs
 

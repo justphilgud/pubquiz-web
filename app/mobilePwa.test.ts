@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
-import manifest from "./manifest";
+import { buildManifest } from "./manifest";
 import {
   moveQuizEditorElement,
   type QuizEditorElement,
@@ -19,7 +19,7 @@ function pngSize(path: string) {
 const read = (path: string) => readFileSync(path, "utf8");
 
 test("the authenticated web app exposes one installable standalone manifest", () => {
-  const value = manifest();
+  const value = buildManifest("production");
 
   assert.equal(value.name, "Phil Gud Entertainment PubQuiz");
   assert.equal(value.short_name, "PubQuiz");
@@ -35,14 +35,48 @@ test("the authenticated web app exposes one installable standalone manifest", ()
   );
   assert.deepEqual(pngSize("public/pwa/icon-192.png"), { width: 192, height: 192 });
   assert.deepEqual(pngSize("public/pwa/icon-512.png"), { width: 512, height: 512 });
+  assert.deepEqual(
+    value.icons?.map((icon) => icon.src),
+    [
+      "/pwa/icon-192.png",
+      "/pwa/icon-192.png",
+      "/pwa/icon-512.png",
+      "/pwa/icon-512.png",
+    ],
+  );
   assert.equal(existsSync("public/sw.js"), false);
   assert.equal(existsSync("app/sw.ts"), false);
+});
+
+test("preview has a distinct install name and icon without changing production", () => {
+  const preview = buildManifest("preview");
+
+  assert.equal(preview.name, "PubQuiz Preview");
+  assert.equal(preview.short_name, "PubQuiz Preview");
+  assert.deepEqual(
+    preview.icons?.map((icon) => icon.src),
+    [
+      "/pwa/preview-icon-192.png",
+      "/pwa/preview-icon-192.png",
+      "/pwa/preview-icon-512.png",
+      "/pwa/preview-icon-512.png",
+    ],
+  );
+  assert.deepEqual(pngSize("public/pwa/preview-icon-192.png"), {
+    width: 192,
+    height: 192,
+  });
+  assert.deepEqual(pngSize("public/pwa/preview-icon-512.png"), {
+    width: 512,
+    height: 512,
+  });
 });
 
 test("mobile navigation reuses the authenticated questions and quiz routes", () => {
   const home = read("app/page.tsx");
   const header = read("app/components/AppHeader.tsx");
   const navigation = read("app/components/AppNav.tsx");
+  const dashboardCards = read("app/components/dashboard/DashboardCards.tsx");
   const questionLibrary = read("app/components/content/ContentLibraryPage.tsx");
   const questionEditor = read("app/fragen/editor/page.tsx");
   const quizList = read("app/quiz/page.tsx");
@@ -53,6 +87,7 @@ test("mobile navigation reuses the authenticated questions and quiz routes", () 
   assert.match(home, /href="\/quiz"/);
   assert.match(header, /grid-cols-\[minmax\(0,1fr\)_auto\]/);
   assert.match(navigation, /grid-cols-2/);
+  assert.match(dashboardCards, /min-w-0 rounded-2xl/);
   assert.match(questionLibrary, /requireQuestionEditor\(\)/);
   assert.match(questionEditor, /requireQuestionEditor\(\)/);
   assert.match(quizList, /requireActor\(\)/);
