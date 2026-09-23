@@ -1,7 +1,10 @@
+import { createHash } from "node:crypto";
 import { parseStoreIdFromDelegationToken } from "@vercel/blob";
 import { AUDIENCE, objectRule, runKey, storedBackupKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type InventoryObject, type Mode, type ObjectKind } from "./bridge/lib/contract";
 import { OperationsError, requireCondition } from "./guards";
+import { defaultUploadRetryRuntime, safeUploadResponse, uploadWithBoundedRetry, type UploadRetryRuntime } from "./upload-retry";
 type Env = Readonly<Record<string, string | undefined>>;
+export type UploadPosition = { index: number; total: number };
 
 // Only fixed categories escape. Never emit a provider message, path, URL or header.
 export async function privateUploadFailure(response: Response, kind: ObjectKind): Promise<OperationsError> {
@@ -74,7 +77,8 @@ export class BridgeClient {
   readonly origin: string;
   readonly key: string;
   readonly mode: Mode;
-  constructor(private env: Env, private role: "backup" | "restore", key: string, private request: typeof fetch = fetch) {
+  constructor(private env: Env, private role: "backup" | "restore", key: string, private request: typeof fetch = fetch,
+    private uploadRetryRuntime: UploadRetryRuntime = defaultUploadRetryRuntime) {
     this.origin = bridgeOrigin(env.AP94_BRIDGE_ORIGIN);
     requireCondition(env.AP94_TRANSPORT_MODE === "synthetic" || env.AP94_TRANSPORT_MODE === "acceptance", "BRIDGE_MODE_REQUIRED");
     this.mode = env.AP94_TRANSPORT_MODE;
@@ -154,14 +158,45 @@ export class BridgeClient {
       requireCondition(Object.keys(result).join() === "deleted" && result.deleted === true, "RETENTION_DELETE_RESPONSE_INVALID");
     } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("RETENTION_DELETE_FAILED_DETAILS_WITHHELD"); }
   }
-  async upload(name: string, bytes: Buffer) {
+  async upload(name: string, bytes: Buffer, position?: UploadPosition) {
     try {
-      const grant = await this.grant(name, bytes.length);
-      const response = await this.request(grant.url, { method: "PUT", body: new Uint8Array(bytes), headers: { "content-type": objectRule(name, this.mode).contentType },
-        redirect: "error", signal: AbortSignal.timeout(120000) });
-      if (!response.ok) throw await privateUploadFailure(response, objectRule(name, this.mode).kind);
-      const result = JSON.parse((await limitedResponse(response, 20000)).toString()) as { url?: string };
-      requireCondition(result.url === `https://${STORE_HOST}/${this.key}/${name}`, "PRIVATE_UPLOAD_IDENTITY_MISMATCH");
+      const rule = objectRule(name, this.mode);
+      const hash = createHash("sha256").update(bytes).digest("hex");
+      requireCondition(position === undefined || (Number.isSafeInteger(position.index) && Number.isSafeInteger(position.total) &&
+        position.index > 0 && position.total >= position.index), "UPLOAD_POSITION_INVALID");
+      const metadata = { objectIndex: position?.index ?? null, totalObjects: position?.total ?? null, logicalType: rule.kind,
+        bytes: bytes.length, contentType: rule.contentType, sha256: hash };
+      const result = await uploadWithBoundedRetry({
+        runtime: this.uploadRetryRuntime,
+        send: async attempt => {
+          console.error(JSON.stringify({ event: "private-upload-attempt", attempt, ...metadata }));
+          const grant = await this.grant(name, bytes.length);
+          return this.request(grant.url, { method: "PUT", body: new Uint8Array(bytes), headers: { "content-type": rule.contentType },
+            redirect: "error", signal: AbortSignal.timeout(120000) });
+        },
+        reconcile: async () => {
+          try {
+            const restored = await this.read(name);
+            requireCondition(restored.length === bytes.length && createHash("sha256").update(restored).digest("hex") === hash,
+              "PRIVATE_UPLOAD_HASH_CONFLICT");
+            console.error(JSON.stringify({ event: "private-upload-reconciled", ...metadata }));
+            return true;
+          } catch (error) {
+            if (error instanceof OperationsError && error.code === "PRIVATE_UPLOAD_HASH_CONFLICT") throw error;
+            return false;
+          }
+        },
+        onRetry: event => console.error(JSON.stringify({ event: "private-upload-retry", ...metadata, ...event })),
+      });
+      if (!result.response) return;
+      if (!result.response.ok) {
+        console.error(JSON.stringify({ event: "private-upload-failed", attempts: result.attempts, ...metadata,
+          ...safeUploadResponse(result.response, this.uploadRetryRuntime.now()) }));
+        throw await privateUploadFailure(result.response, rule.kind);
+      }
+      const payload = JSON.parse((await limitedResponse(result.response, 20000)).toString()) as { url?: string };
+      requireCondition(payload.url === `https://${STORE_HOST}/${this.key}/${name}`, "PRIVATE_UPLOAD_IDENTITY_MISMATCH");
+      console.error(JSON.stringify({ event: "private-upload-complete", attempts: result.attempts, ...metadata }));
     } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("SIGNED_UPLOAD_FAILED_DETAILS_WITHHELD"); }
   }
 }

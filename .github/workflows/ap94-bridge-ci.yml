@@ -17,5 +17,5 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix scripts/operations/bridge
       - run: npm run typecheck --prefix scripts/operations/bridge
-      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts
+      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
       - run: npx eslint scripts/operations --max-warnings=0

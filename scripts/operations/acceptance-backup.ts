@@ -33,6 +33,21 @@ export function backupPhaseError(error: unknown, phase: BackupPhase): Operations
   // Never interpolate error messages, causes, provider names, paths or URLs.
   return new OperationsError(`BACKUP_${phase}_FAILED_DETAILS_WITHHELD`);
 }
+export function backupUploadPlan(mediaNames: string[]) {
+  const data = ["database.dump", "auth-redacted.json", ...mediaNames];
+  const total = data.length + 1;
+  return {
+    data: data.map((name, index) => ({ name, position: { index: index + 1, total } })),
+    manifest: { name: "manifest.json", position: { index: total, total } },
+  } as const;
+}
+export async function uploadBackupData(plan: ReturnType<typeof backupUploadPlan>,
+  load: (name: string) => Promise<Buffer>,
+  upload: (name: string, bytes: Buffer, position: { index: number; total: number }) => Promise<Artifact>) {
+  const artifacts: Artifact[] = [];
+  for (const item of plan.data) artifacts.push(await upload(item.name, await load(item.name), item.position));
+  return artifacts;
+}
 export async function acceptanceBackup(env: Environment) {
   const backup = backupMetadataFromEnvironment(env);
   requireCondition(/^[a-f0-9]{40}$/.test(env.PRODUCTION_RELEASE_SHA ?? "") && /^[a-f0-9]{40}$/.test(env.GITHUB_SHA ?? ""), "RELEASE_SHA_REQUIRED");
@@ -67,15 +82,16 @@ export async function acceptanceBackup(env: Environment) {
     const mediaStart = Date.now(); const media = await captureMedia(state.media, directory); const mediaMs = Date.now() - mediaStart;
     phase = "AUTH_OVERLAY_FILE";
     await writeFile(join(directory, "auth-redacted.json"), JSON.stringify(state.authRows), { mode: 0o600 });
-    const artifacts: Artifact[] = [];
     phase = "DATA_UPLOAD";
-    for (const name of ["database.dump", "auth-redacted.json", ...media.map(m => m.name)]) artifacts.push(await store.upload(name, await readFile(join(directory, name))));
+    const uploadPlan = backupUploadPlan(media.map(item => item.name));
+    const artifacts = await uploadBackupData(uploadPlan, name => readFile(join(directory, name)),
+      (name, bytes, position) => store.upload(name, bytes, position));
     const { authRows: _auth, ...expected } = state; void _auth;
     const manifest: AcceptanceManifest = { version: 3, mode: "production-backup", key, snapshotAt: snapshot.time, completedAt: new Date().toISOString(), backup,
       release: env.PRODUCTION_RELEASE_SHA!, operationsCommit: env.GITHUB_SHA!, source: verified.identity, target: RESTORE_TARGET,
       authExcluded: Object.keys(AUTH_COLUMNS), expected, artifacts, media, sequenceSql, timings: { backupMs: Date.now() - started, mediaMs } };
     phase = "MANIFEST_UPLOAD";
-    const bytes = Buffer.from(JSON.stringify(manifest)); await store.upload("manifest.json", bytes);
+    const bytes = Buffer.from(JSON.stringify(manifest)); await store.upload(uploadPlan.manifest.name, bytes, uploadPlan.manifest.position);
     // An anonymous request must not be able to obtain the private manifest.
     phase = "ANONYMOUS_READBACK";
     const anonymous = await fetch(`https://${env.BACKUP_PRIVATE_BLOB_HOST}/${key}/manifest.json`, { redirect: "error", signal: AbortSignal.timeout(30000) });

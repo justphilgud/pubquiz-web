@@ -11,13 +11,32 @@ import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, ve
 import { authInsertSql, compareSnapshots, sha256, type Snapshot } from "./snapshot";
 import { canonicalCatalog, canonicalCatalogDefinition } from "./catalog-comparison";
 import catalogCastCases from "./fixtures/run19-catalog-casts.json";
-import { backupPhaseError, dumpArguments } from "./acceptance-backup";
+import { backupPhaseError, backupUploadPlan, dumpArguments, uploadBackupData } from "./acceptance-backup";
 import { PgSession, sessionFailureCategory } from "./pg-session";
 import { OperationsError, safeError } from "./guards";
 import { BlobAccessError, BlobFileTooLargeError, BlobError, BlobServiceRateLimited } from "@vercel/blob";
 import { privateBlobOperation } from "./blob-diagnostics";
 const env = { GITHUB_REPOSITORY: "justphilgud/pubquiz-web", GITHUB_REF: "refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", AP94_MANUAL_ACCEPTANCE: "true", BACKUP_AUTOMATION_ENABLED: "false", BACKUP_RETENTION_VERIFIED: "false" };
 const columns = Object.keys(AUTH_COLUMNS).map(key => { const [schema, table, column] = key.split("."); return { schema, table, column, type: "text", generated: "", identity: "", nullable: true, default: null } satisfies Column; });
+test("backup upload plan is sequential and publishes the manifest last", () => {
+  const media = [`media-${"a".repeat(64)}.bin`, `media-${"b".repeat(64)}.bin`];
+  const plan = backupUploadPlan(media);
+  assert.deepEqual(plan.data.map(item => item.name), ["database.dump", "auth-redacted.json", ...media]);
+  assert.equal(plan.manifest.name, "manifest.json");
+  assert.deepEqual(plan.data.map(item => item.position.index), [1, 2, 3, 4]);
+  assert.deepEqual(plan.manifest.position, { index: 5, total: 5 });
+  assert.ok(plan.data.every(item => item.position.total === 5));
+});
+test("failed data upload stops the series before manifest publication", async () => {
+  const media = [`media-${"a".repeat(64)}.bin`, `media-${"b".repeat(64)}.bin`];
+  const plan = backupUploadPlan(media); const calls: string[] = [];
+  await assert.rejects(uploadBackupData(plan, async name => Buffer.from(name), async (name, bytes) => {
+    calls.push(name); if (name === media[0]) throw new OperationsError("PRIVATE_UPLOAD_MEDIA_HTTP_503_SERVICE_UNAVAILABLE");
+    return { name, bytes: bytes.length, sha256: sha256(bytes) };
+  }), /PRIVATE_UPLOAD_MEDIA_HTTP_503_SERVICE_UNAVAILABLE/);
+  assert.deepEqual(calls, ["database.dump", "auth-redacted.json", media[0]]);
+  assert.ok(!calls.includes(plan.manifest.name)); assert.ok(!calls.includes(media[1]));
+});
 test("Run 19 catalog: all seven CHECKs and partial unique index survive PG array-cast deparsing", () => {
   assert.equal(catalogCastCases.length, 8);
   const empty: Snapshot = { columns: [], catalog: {}, tables: [], media: [], authRows: {}, resultRows: [] };
