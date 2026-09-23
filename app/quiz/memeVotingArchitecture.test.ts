@@ -29,6 +29,7 @@ test("AP3 enforces approved candidates, self-vote rejection and closed-vote reje
   assert.match(policy, /VOTING_CLOSED/);
   assert.match(policy, /SELF_VOTE/);
   assert.match(service, /pg_advisory_xact_lock/);
+  assert.match(service, /pg_advisory_xact_lock[\s\S]*::text AS lock_result/);
   assert.match(service, /REVISION_CONFLICT/);
 });
 

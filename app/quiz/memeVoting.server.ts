@@ -370,7 +370,9 @@ export async function submitMemeVote(input: {
 }) {
   return prisma.$transaction(async (tx) => {
     await lockPresentation(tx, input.presentationId);
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(${input.presentationId}, ${input.quizTeamSessionId})`;
+    await tx.$queryRaw<{ lock_result: string }[]>`
+      SELECT pg_advisory_xact_lock(${input.presentationId}, ${input.quizTeamSessionId})::text AS lock_result
+    `;
     const presentation = await tx.meme_presentations.findFirst({
       where: { meme_presentation_id: input.presentationId, quiz_id: input.quizId },
       include: {
