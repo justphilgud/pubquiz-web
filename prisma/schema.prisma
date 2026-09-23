@@ -1062,6 +1062,7 @@ model meme_moderation_candidates {
   submission                   team_answer_submissions    @relation(fields: [team_answer_submission_id], references: [team_answer_submission_id], onDelete: Cascade)
   reviewed_by                  users?                     @relation("MemeCandidateReviewer", fields: [reviewed_by_user_id], references: [id], onDelete: SetNull)
   votes                        meme_votes[]
+  result_entries               meme_result_entries[]
 
   @@unique([meme_moderation_selection_id, position], map: "uq_meme_candidate_selection_position")
   @@index([meme_moderation_selection_id, review_status], map: "idx_meme_candidate_selection_status")
@@ -1092,6 +1093,9 @@ model meme_presentations {
   voting_opened_at             DateTime?
   voting_closed_at             DateTime?
   voting_closed_by_user_id     Int?
+  result_finalized_at          DateTime?
+  result_finalized_by_user_id  Int?
+  result_revision              Int                        @default(0)
   created_at                   DateTime                   @default(now())
   updated_at                   DateTime                   @default(now()) @updatedAt
   selection                    meme_moderation_selections @relation(fields: [meme_moderation_selection_id], references: [meme_moderation_selection_id], onDelete: Cascade)
@@ -1099,10 +1103,31 @@ model meme_presentations {
   quiz_frage                   quiz_fragen                @relation(fields: [quiz_fragen_id], references: [quiz_fragen_id], onDelete: Cascade)
   started_by                   users?                     @relation("MemePresentationStarter", fields: [started_by_user_id], references: [id], onDelete: SetNull)
   voting_closed_by             users?                     @relation("MemePresentationCloser", fields: [voting_closed_by_user_id], references: [id], onDelete: SetNull)
+  result_finalized_by          users?                     @relation("MemeResultFinalizer", fields: [result_finalized_by_user_id], references: [id], onDelete: SetNull)
   votes                        meme_votes[]
+  result_entries               meme_result_entries[]
 
   @@index([quiz_id, state, updated_at], map: "idx_meme_presentation_quiz_state")
   @@index([quiz_fragen_id, updated_at], map: "idx_meme_presentation_question")
+  @@schema("pubquiz")
+}
+
+/// Immutable AP4 aggregate snapshot. Votes remain owned by AP3; these rows
+/// persist only the final count, winner flag and centrally awarded quiz point.
+model meme_result_entries {
+  meme_result_entry_id         Int                        @id @default(autoincrement())
+  meme_presentation_id         Int
+  meme_moderation_candidate_id Int
+  vote_count                   Int
+  is_winner                    Boolean                    @default(false)
+  awarded_points               Decimal                    @default(0) @db.Decimal(12, 4)
+  created_at                   DateTime                   @default(now())
+  updated_at                   DateTime                   @default(now()) @updatedAt
+  presentation                 meme_presentations         @relation(fields: [meme_presentation_id], references: [meme_presentation_id], onDelete: Cascade)
+  candidate                    meme_moderation_candidates @relation(fields: [meme_moderation_candidate_id], references: [meme_moderation_candidate_id], onDelete: Restrict)
+
+  @@unique([meme_presentation_id, meme_moderation_candidate_id], map: "uq_meme_result_presentation_candidate")
+  @@index([meme_presentation_id, is_winner], map: "idx_meme_result_presentation_winner")
   @@schema("pubquiz")
 }
 
@@ -1236,6 +1261,7 @@ model users {
   moderierte_meme_kandidaten        meme_moderation_candidates[] @relation("MemeCandidateReviewer")
   gestartete_meme_praesentationen   meme_presentations[]         @relation("MemePresentationStarter")
   geschlossene_meme_votings         meme_presentations[]         @relation("MemePresentationCloser")
+  finalisierte_meme_ergebnisse      meme_presentations[]         @relation("MemeResultFinalizer")
 
   @@schema("pubquiz")
 }

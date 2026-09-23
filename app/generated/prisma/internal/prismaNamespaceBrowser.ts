@@ -92,6 +92,7 @@ export const ModelName = {
   meme_moderation_selections: 'meme_moderation_selections',
   meme_moderation_candidates: 'meme_moderation_candidates',
   meme_presentations: 'meme_presentations',
+  meme_result_entries: 'meme_result_entries',
   meme_votes: 'meme_votes',
   live_text_response_publications: 'live_text_response_publications',
   public_text_replacement_rules: 'public_text_replacement_rules',
@@ -804,11 +805,28 @@ export const Meme_presentationsScalarFieldEnum = {
   voting_opened_at: 'voting_opened_at',
   voting_closed_at: 'voting_closed_at',
   voting_closed_by_user_id: 'voting_closed_by_user_id',
+  result_finalized_at: 'result_finalized_at',
+  result_finalized_by_user_id: 'result_finalized_by_user_id',
+  result_revision: 'result_revision',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
 
 export type Meme_presentationsScalarFieldEnum = (typeof Meme_presentationsScalarFieldEnum)[keyof typeof Meme_presentationsScalarFieldEnum]
+
+
+export const Meme_result_entriesScalarFieldEnum = {
+  meme_result_entry_id: 'meme_result_entry_id',
+  meme_presentation_id: 'meme_presentation_id',
+  meme_moderation_candidate_id: 'meme_moderation_candidate_id',
+  vote_count: 'vote_count',
+  is_winner: 'is_winner',
+  awarded_points: 'awarded_points',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Meme_result_entriesScalarFieldEnum = (typeof Meme_result_entriesScalarFieldEnum)[keyof typeof Meme_result_entriesScalarFieldEnum]
 
 
 export const Meme_votesScalarFieldEnum = {

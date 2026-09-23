@@ -4,6 +4,10 @@ import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { parseMemeCaptionPayload } from "@/app/quiz/memeCaption";
 import {
+  readMemeResultSnapshot,
+  type MemeResultSnapshot,
+} from "@/app/quiz/memeResults.server";
+import {
   countEligibleMemeVoters,
   createInitialMemePresentationState,
   getMemeOverviewPageCount,
@@ -64,6 +68,7 @@ export type MemePresentationSnapshot = {
   votingOpenedAt: string | null;
   votingClosedAt: string | null;
   progress: { votesCast: number; eligibleTeams: number; totalTeams: number } | null;
+  result: MemeResultSnapshot | null;
   team: {
     ownCandidateIds: number[];
     canVote: boolean;
@@ -125,6 +130,7 @@ export async function getMemePresentationSnapshot(input: {
   quizFragenId?: number;
   quizTeamSessionId?: number | null;
   includeModeration?: boolean;
+  includeResult?: boolean;
 }): Promise<MemePresentationSnapshot | null> {
   const selection = await findSelection(input);
   if (!selection || selection.state !== "COMPLETED") return null;
@@ -183,6 +189,15 @@ export async function getMemePresentationSnapshot(input: {
   }
 
   const phase = presentation?.state ?? "READY";
+  const result = presentation &&
+    presentation.result_finalized_at &&
+    (input.includeResult || input.includeModeration)
+    ? await readMemeResultSnapshot({
+        quizId: input.quizId,
+        quizFragenId: selection.quiz_fragen_id,
+        presentationId: presentation.meme_presentation_id,
+      })
+    : null;
   const exposeCandidates = !isTeam || phase === "VOTING_OPEN" || phase === "VOTING_CLOSED";
   const ownCandidateIds = voterTeamId === null
     ? []
@@ -220,6 +235,7 @@ export async function getMemePresentationSnapshot(input: {
     votingOpenedAt: presentation?.voting_opened_at?.toISOString() ?? null,
     votingClosedAt: presentation?.voting_closed_at?.toISOString() ?? null,
     progress,
+    result,
     team: isTeam
       ? {
           ownCandidateIds,

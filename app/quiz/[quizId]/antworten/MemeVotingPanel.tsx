@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import { submitMemeVoteAction } from "@/app/quiz/memeVotingActions";
 import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
+import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 
 export default function MemeVotingPanel({
   quizId,
@@ -59,6 +60,33 @@ export default function MemeVotingPanel({
   }
 
   const votingOpen = state.phase === "VOTING_OPEN";
+  if (state.result) {
+    const hasWinner = state.result.entries.some((entry) => entry.isWinner);
+    return (
+      <section className="answer-surface rounded-3xl border border-fuchsia-200 bg-white p-5 shadow-sm sm:p-6" data-meme-team-result>
+        <div className="answer-kicker text-sm font-semibold uppercase tracking-wide text-fuchsia-700">Meme-Ergebnis</div>
+        <h2 className="mt-2 text-2xl font-bold text-slate-950">
+          {hasWinner ? "Das Publikum hat entschieden" : "Keine gültigen Stimmen"}
+        </h2>
+        <p className="mt-2 text-sm text-slate-600">{state.result.totalVotes} abgegebene Stimmen · das Ergebnis ist final.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {state.result.entries.map((entry) => (
+            <article key={entry.candidateId} className={`rounded-2xl border p-4 ${entry.isWinner ? "border-amber-400 bg-amber-50" : "border-slate-200 bg-slate-50"}`}>
+              <div className="flex items-center gap-3">
+                <TeamIdentityVisual name={entry.teamName} photoUrl={entry.photoUrl} avatarCode={entry.avatarCode} />
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-950">Meme {entry.number} · {entry.teamName}</p>
+                  <p className="text-sm text-slate-600">{entry.voteCount} {entry.voteCount === 1 ? "Stimme" : "Stimmen"} · {entry.share.toFixed(1).replace(".0", "")} %</p>
+                </div>
+              </div>
+              {entry.isWinner ? <p className="mt-3 font-black text-amber-900">Gewinner · +{entry.awardedPoints} Punkt</p> : null}
+            </article>
+          ))}
+        </div>
+        {!hasWinner ? <p className="mt-4 font-semibold text-slate-700">Ohne abgegebene Stimme wird kein Punkt vergeben.</p> : null}
+      </section>
+    );
+  }
   if (!votingOpen && state.phase !== "VOTING_CLOSED") {
     return (
       <section className="answer-surface rounded-3xl border border-fuchsia-200 bg-white p-5 shadow-sm sm:p-6">

@@ -30,6 +30,7 @@ function snapshot(
     votingOpenedAt: phase === "VOTING_OPEN" ? "2026-09-23T20:00:00.000Z" : null,
     votingClosedAt: phase === "VOTING_CLOSED" ? "2026-09-23T20:01:00.000Z" : null,
     progress: null,
+    result: null,
     team: null,
   };
 }

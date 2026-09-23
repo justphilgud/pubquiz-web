@@ -37,6 +37,8 @@ export type Meme_presentationsAvgAggregateOutputType = {
   revision: number | null
   started_by_user_id: number | null
   voting_closed_by_user_id: number | null
+  result_finalized_by_user_id: number | null
+  result_revision: number | null
 }
 
 export type Meme_presentationsSumAggregateOutputType = {
@@ -49,6 +51,8 @@ export type Meme_presentationsSumAggregateOutputType = {
   revision: number | null
   started_by_user_id: number | null
   voting_closed_by_user_id: number | null
+  result_finalized_by_user_id: number | null
+  result_revision: number | null
 }
 
 export type Meme_presentationsMinAggregateOutputType = {
@@ -64,6 +68,9 @@ export type Meme_presentationsMinAggregateOutputType = {
   voting_opened_at: Date | null
   voting_closed_at: Date | null
   voting_closed_by_user_id: number | null
+  result_finalized_at: Date | null
+  result_finalized_by_user_id: number | null
+  result_revision: number | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -81,6 +88,9 @@ export type Meme_presentationsMaxAggregateOutputType = {
   voting_opened_at: Date | null
   voting_closed_at: Date | null
   voting_closed_by_user_id: number | null
+  result_finalized_at: Date | null
+  result_finalized_by_user_id: number | null
+  result_revision: number | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -98,6 +108,9 @@ export type Meme_presentationsCountAggregateOutputType = {
   voting_opened_at: number
   voting_closed_at: number
   voting_closed_by_user_id: number
+  result_finalized_at: number
+  result_finalized_by_user_id: number
+  result_revision: number
   created_at: number
   updated_at: number
   _all: number
@@ -114,6 +127,8 @@ export type Meme_presentationsAvgAggregateInputType = {
   revision?: true
   started_by_user_id?: true
   voting_closed_by_user_id?: true
+  result_finalized_by_user_id?: true
+  result_revision?: true
 }
 
 export type Meme_presentationsSumAggregateInputType = {
@@ -126,6 +141,8 @@ export type Meme_presentationsSumAggregateInputType = {
   revision?: true
   started_by_user_id?: true
   voting_closed_by_user_id?: true
+  result_finalized_by_user_id?: true
+  result_revision?: true
 }
 
 export type Meme_presentationsMinAggregateInputType = {
@@ -141,6 +158,9 @@ export type Meme_presentationsMinAggregateInputType = {
   voting_opened_at?: true
   voting_closed_at?: true
   voting_closed_by_user_id?: true
+  result_finalized_at?: true
+  result_finalized_by_user_id?: true
+  result_revision?: true
   created_at?: true
   updated_at?: true
 }
@@ -158,6 +178,9 @@ export type Meme_presentationsMaxAggregateInputType = {
   voting_opened_at?: true
   voting_closed_at?: true
   voting_closed_by_user_id?: true
+  result_finalized_at?: true
+  result_finalized_by_user_id?: true
+  result_revision?: true
   created_at?: true
   updated_at?: true
 }
@@ -175,6 +198,9 @@ export type Meme_presentationsCountAggregateInputType = {
   voting_opened_at?: true
   voting_closed_at?: true
   voting_closed_by_user_id?: true
+  result_finalized_at?: true
+  result_finalized_by_user_id?: true
+  result_revision?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -279,6 +305,9 @@ export type Meme_presentationsGroupByOutputType = {
   voting_opened_at: Date | null
   voting_closed_at: Date | null
   voting_closed_by_user_id: number | null
+  result_finalized_at: Date | null
+  result_finalized_by_user_id: number | null
+  result_revision: number
   created_at: Date
   updated_at: Date
   _count: Meme_presentationsCountAggregateOutputType | null
@@ -319,6 +348,9 @@ export type meme_presentationsWhereInput = {
   voting_opened_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
   voting_closed_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
   voting_closed_by_user_id?: Prisma.IntNullableFilter<"meme_presentations"> | number | null
+  result_finalized_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
+  result_finalized_by_user_id?: Prisma.IntNullableFilter<"meme_presentations"> | number | null
+  result_revision?: Prisma.IntFilter<"meme_presentations"> | number
   created_at?: Prisma.DateTimeFilter<"meme_presentations"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"meme_presentations"> | Date | string
   selection?: Prisma.XOR<Prisma.Meme_moderation_selectionsScalarRelationFilter, Prisma.meme_moderation_selectionsWhereInput>
@@ -326,7 +358,9 @@ export type meme_presentationsWhereInput = {
   quiz_frage?: Prisma.XOR<Prisma.Quiz_fragenScalarRelationFilter, Prisma.quiz_fragenWhereInput>
   started_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   voting_closed_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  result_finalized_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   votes?: Prisma.Meme_votesListRelationFilter
+  result_entries?: Prisma.Meme_result_entriesListRelationFilter
 }
 
 export type meme_presentationsOrderByWithRelationInput = {
@@ -342,6 +376,9 @@ export type meme_presentationsOrderByWithRelationInput = {
   voting_opened_at?: Prisma.SortOrderInput | Prisma.SortOrder
   voting_closed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  result_finalized_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   selection?: Prisma.meme_moderation_selectionsOrderByWithRelationInput
@@ -349,7 +386,9 @@ export type meme_presentationsOrderByWithRelationInput = {
   quiz_frage?: Prisma.quiz_fragenOrderByWithRelationInput
   started_by?: Prisma.usersOrderByWithRelationInput
   voting_closed_by?: Prisma.usersOrderByWithRelationInput
+  result_finalized_by?: Prisma.usersOrderByWithRelationInput
   votes?: Prisma.meme_votesOrderByRelationAggregateInput
+  result_entries?: Prisma.meme_result_entriesOrderByRelationAggregateInput
 }
 
 export type meme_presentationsWhereUniqueInput = Prisma.AtLeast<{
@@ -368,6 +407,9 @@ export type meme_presentationsWhereUniqueInput = Prisma.AtLeast<{
   voting_opened_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
   voting_closed_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
   voting_closed_by_user_id?: Prisma.IntNullableFilter<"meme_presentations"> | number | null
+  result_finalized_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
+  result_finalized_by_user_id?: Prisma.IntNullableFilter<"meme_presentations"> | number | null
+  result_revision?: Prisma.IntFilter<"meme_presentations"> | number
   created_at?: Prisma.DateTimeFilter<"meme_presentations"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"meme_presentations"> | Date | string
   selection?: Prisma.XOR<Prisma.Meme_moderation_selectionsScalarRelationFilter, Prisma.meme_moderation_selectionsWhereInput>
@@ -375,7 +417,9 @@ export type meme_presentationsWhereUniqueInput = Prisma.AtLeast<{
   quiz_frage?: Prisma.XOR<Prisma.Quiz_fragenScalarRelationFilter, Prisma.quiz_fragenWhereInput>
   started_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   voting_closed_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  result_finalized_by?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   votes?: Prisma.Meme_votesListRelationFilter
+  result_entries?: Prisma.Meme_result_entriesListRelationFilter
 }, "meme_presentation_id" | "meme_moderation_selection_id">
 
 export type meme_presentationsOrderByWithAggregationInput = {
@@ -391,6 +435,9 @@ export type meme_presentationsOrderByWithAggregationInput = {
   voting_opened_at?: Prisma.SortOrderInput | Prisma.SortOrder
   voting_closed_at?: Prisma.SortOrderInput | Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  result_finalized_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.meme_presentationsCountOrderByAggregateInput
@@ -416,6 +463,9 @@ export type meme_presentationsScalarWhereWithAggregatesInput = {
   voting_opened_at?: Prisma.DateTimeNullableWithAggregatesFilter<"meme_presentations"> | Date | string | null
   voting_closed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"meme_presentations"> | Date | string | null
   voting_closed_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"meme_presentations"> | number | null
+  result_finalized_at?: Prisma.DateTimeNullableWithAggregatesFilter<"meme_presentations"> | Date | string | null
+  result_finalized_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"meme_presentations"> | number | null
+  result_revision?: Prisma.IntWithAggregatesFilter<"meme_presentations"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"meme_presentations"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"meme_presentations"> | Date | string
 }
@@ -427,6 +477,8 @@ export type meme_presentationsCreateInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
@@ -434,7 +486,9 @@ export type meme_presentationsCreateInput = {
   quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
   started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
   voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateInput = {
@@ -450,9 +504,13 @@ export type meme_presentationsUncheckedCreateInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUpdateInput = {
@@ -462,6 +520,8 @@ export type meme_presentationsUpdateInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
@@ -469,7 +529,9 @@ export type meme_presentationsUpdateInput = {
   quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
   started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
   voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateInput = {
@@ -485,9 +547,13 @@ export type meme_presentationsUncheckedUpdateInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsCreateManyInput = {
@@ -503,6 +569,9 @@ export type meme_presentationsCreateManyInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -514,6 +583,8 @@ export type meme_presentationsUpdateManyMutationInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -531,6 +602,9 @@ export type meme_presentationsUncheckedUpdateManyInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -563,6 +637,9 @@ export type meme_presentationsCountOrderByAggregateInput = {
   voting_opened_at?: Prisma.SortOrder
   voting_closed_at?: Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrder
+  result_finalized_at?: Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -577,6 +654,8 @@ export type meme_presentationsAvgOrderByAggregateInput = {
   revision?: Prisma.SortOrder
   started_by_user_id?: Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
 }
 
 export type meme_presentationsMaxOrderByAggregateInput = {
@@ -592,6 +671,9 @@ export type meme_presentationsMaxOrderByAggregateInput = {
   voting_opened_at?: Prisma.SortOrder
   voting_closed_at?: Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrder
+  result_finalized_at?: Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -609,6 +691,9 @@ export type meme_presentationsMinOrderByAggregateInput = {
   voting_opened_at?: Prisma.SortOrder
   voting_closed_at?: Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrder
+  result_finalized_at?: Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -623,6 +708,8 @@ export type meme_presentationsSumOrderByAggregateInput = {
   revision?: Prisma.SortOrder
   started_by_user_id?: Prisma.SortOrder
   voting_closed_by_user_id?: Prisma.SortOrder
+  result_finalized_by_user_id?: Prisma.SortOrder
+  result_revision?: Prisma.SortOrder
 }
 
 export type Meme_presentationsScalarRelationFilter = {
@@ -750,6 +837,20 @@ export type EnumMemePresentationStateFieldUpdateOperationsInput = {
   set?: $Enums.MemePresentationState
 }
 
+export type meme_presentationsCreateNestedOneWithoutResult_entriesInput = {
+  create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_entriesInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_entriesInput>
+  connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutResult_entriesInput
+  connect?: Prisma.meme_presentationsWhereUniqueInput
+}
+
+export type meme_presentationsUpdateOneRequiredWithoutResult_entriesNestedInput = {
+  create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_entriesInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_entriesInput>
+  connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutResult_entriesInput
+  upsert?: Prisma.meme_presentationsUpsertWithoutResult_entriesInput
+  connect?: Prisma.meme_presentationsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.meme_presentationsUpdateToOneWithWhereWithoutResult_entriesInput, Prisma.meme_presentationsUpdateWithoutResult_entriesInput>, Prisma.meme_presentationsUncheckedUpdateWithoutResult_entriesInput>
+}
+
 export type meme_presentationsCreateNestedOneWithoutVotesInput = {
   create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutVotesInput, Prisma.meme_presentationsUncheckedCreateWithoutVotesInput>
   connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutVotesInput
@@ -778,6 +879,13 @@ export type meme_presentationsCreateNestedManyWithoutVoting_closed_byInput = {
   connect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
 }
 
+export type meme_presentationsCreateNestedManyWithoutResult_finalized_byInput = {
+  create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput> | Prisma.meme_presentationsCreateWithoutResult_finalized_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput[]
+  connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput | Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput[]
+  createMany?: Prisma.meme_presentationsCreateManyResult_finalized_byInputEnvelope
+  connect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+}
+
 export type meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput = {
   create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutStarted_byInput, Prisma.meme_presentationsUncheckedCreateWithoutStarted_byInput> | Prisma.meme_presentationsCreateWithoutStarted_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutStarted_byInput[]
   connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutStarted_byInput | Prisma.meme_presentationsCreateOrConnectWithoutStarted_byInput[]
@@ -789,6 +897,13 @@ export type meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byIn
   create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutVoting_closed_byInput, Prisma.meme_presentationsUncheckedCreateWithoutVoting_closed_byInput> | Prisma.meme_presentationsCreateWithoutVoting_closed_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutVoting_closed_byInput[]
   connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutVoting_closed_byInput | Prisma.meme_presentationsCreateOrConnectWithoutVoting_closed_byInput[]
   createMany?: Prisma.meme_presentationsCreateManyVoting_closed_byInputEnvelope
+  connect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+}
+
+export type meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput = {
+  create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput> | Prisma.meme_presentationsCreateWithoutResult_finalized_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput[]
+  connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput | Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput[]
+  createMany?: Prisma.meme_presentationsCreateManyResult_finalized_byInputEnvelope
   connect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
 }
 
@@ -820,6 +935,20 @@ export type meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput = {
   deleteMany?: Prisma.meme_presentationsScalarWhereInput | Prisma.meme_presentationsScalarWhereInput[]
 }
 
+export type meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput = {
+  create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput> | Prisma.meme_presentationsCreateWithoutResult_finalized_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput[]
+  connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput | Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput[]
+  upsert?: Prisma.meme_presentationsUpsertWithWhereUniqueWithoutResult_finalized_byInput | Prisma.meme_presentationsUpsertWithWhereUniqueWithoutResult_finalized_byInput[]
+  createMany?: Prisma.meme_presentationsCreateManyResult_finalized_byInputEnvelope
+  set?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  disconnect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  delete?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  connect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  update?: Prisma.meme_presentationsUpdateWithWhereUniqueWithoutResult_finalized_byInput | Prisma.meme_presentationsUpdateWithWhereUniqueWithoutResult_finalized_byInput[]
+  updateMany?: Prisma.meme_presentationsUpdateManyWithWhereWithoutResult_finalized_byInput | Prisma.meme_presentationsUpdateManyWithWhereWithoutResult_finalized_byInput[]
+  deleteMany?: Prisma.meme_presentationsScalarWhereInput | Prisma.meme_presentationsScalarWhereInput[]
+}
+
 export type meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput = {
   create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutStarted_byInput, Prisma.meme_presentationsUncheckedCreateWithoutStarted_byInput> | Prisma.meme_presentationsCreateWithoutStarted_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutStarted_byInput[]
   connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutStarted_byInput | Prisma.meme_presentationsCreateOrConnectWithoutStarted_byInput[]
@@ -848,6 +977,20 @@ export type meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedIn
   deleteMany?: Prisma.meme_presentationsScalarWhereInput | Prisma.meme_presentationsScalarWhereInput[]
 }
 
+export type meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput = {
+  create?: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput> | Prisma.meme_presentationsCreateWithoutResult_finalized_byInput[] | Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput[]
+  connectOrCreate?: Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput | Prisma.meme_presentationsCreateOrConnectWithoutResult_finalized_byInput[]
+  upsert?: Prisma.meme_presentationsUpsertWithWhereUniqueWithoutResult_finalized_byInput | Prisma.meme_presentationsUpsertWithWhereUniqueWithoutResult_finalized_byInput[]
+  createMany?: Prisma.meme_presentationsCreateManyResult_finalized_byInputEnvelope
+  set?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  disconnect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  delete?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  connect?: Prisma.meme_presentationsWhereUniqueInput | Prisma.meme_presentationsWhereUniqueInput[]
+  update?: Prisma.meme_presentationsUpdateWithWhereUniqueWithoutResult_finalized_byInput | Prisma.meme_presentationsUpdateWithWhereUniqueWithoutResult_finalized_byInput[]
+  updateMany?: Prisma.meme_presentationsUpdateManyWithWhereWithoutResult_finalized_byInput | Prisma.meme_presentationsUpdateManyWithWhereWithoutResult_finalized_byInput[]
+  deleteMany?: Prisma.meme_presentationsScalarWhereInput | Prisma.meme_presentationsScalarWhereInput[]
+}
+
 export type meme_presentationsCreateWithoutQuizInput = {
   state?: $Enums.MemePresentationState
   active_candidate_position?: number | null
@@ -855,13 +998,17 @@ export type meme_presentationsCreateWithoutQuizInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
   quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
   started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
   voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateWithoutQuizInput = {
@@ -876,9 +1023,13 @@ export type meme_presentationsUncheckedCreateWithoutQuizInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsCreateOrConnectWithoutQuizInput = {
@@ -923,6 +1074,9 @@ export type meme_presentationsScalarWhereInput = {
   voting_opened_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
   voting_closed_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
   voting_closed_by_user_id?: Prisma.IntNullableFilter<"meme_presentations"> | number | null
+  result_finalized_at?: Prisma.DateTimeNullableFilter<"meme_presentations"> | Date | string | null
+  result_finalized_by_user_id?: Prisma.IntNullableFilter<"meme_presentations"> | number | null
+  result_revision?: Prisma.IntFilter<"meme_presentations"> | number
   created_at?: Prisma.DateTimeFilter<"meme_presentations"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"meme_presentations"> | Date | string
 }
@@ -934,13 +1088,17 @@ export type meme_presentationsCreateWithoutQuiz_frageInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
   quiz: Prisma.quizCreateNestedOneWithoutMeme_presentationsInput
   started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
   voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateWithoutQuiz_frageInput = {
@@ -955,9 +1113,13 @@ export type meme_presentationsUncheckedCreateWithoutQuiz_frageInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsCreateOrConnectWithoutQuiz_frageInput = {
@@ -993,13 +1155,17 @@ export type meme_presentationsCreateWithoutSelectionInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   quiz: Prisma.quizCreateNestedOneWithoutMeme_presentationsInput
   quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
   started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
   voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateWithoutSelectionInput = {
@@ -1014,9 +1180,13 @@ export type meme_presentationsUncheckedCreateWithoutSelectionInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsCreateOrConnectWithoutSelectionInput = {
@@ -1042,13 +1212,17 @@ export type meme_presentationsUpdateWithoutSelectionInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz?: Prisma.quizUpdateOneRequiredWithoutMeme_presentationsNestedInput
   quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
   started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
   voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateWithoutSelectionInput = {
@@ -1063,6 +1237,108 @@ export type meme_presentationsUncheckedUpdateWithoutSelectionInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
+}
+
+export type meme_presentationsCreateWithoutResult_entriesInput = {
+  state?: $Enums.MemePresentationState
+  active_candidate_position?: number | null
+  overview_page?: number
+  revision?: number
+  voting_opened_at?: Date | string | null
+  voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
+  quiz: Prisma.quizCreateNestedOneWithoutMeme_presentationsInput
+  quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
+  started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
+  voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
+  votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+}
+
+export type meme_presentationsUncheckedCreateWithoutResult_entriesInput = {
+  meme_presentation_id?: number
+  meme_moderation_selection_id: number
+  quiz_id: number
+  quiz_fragen_id: number
+  state?: $Enums.MemePresentationState
+  active_candidate_position?: number | null
+  overview_page?: number
+  revision?: number
+  started_by_user_id?: number | null
+  voting_opened_at?: Date | string | null
+  voting_closed_at?: Date | string | null
+  voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+}
+
+export type meme_presentationsCreateOrConnectWithoutResult_entriesInput = {
+  where: Prisma.meme_presentationsWhereUniqueInput
+  create: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_entriesInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_entriesInput>
+}
+
+export type meme_presentationsUpsertWithoutResult_entriesInput = {
+  update: Prisma.XOR<Prisma.meme_presentationsUpdateWithoutResult_entriesInput, Prisma.meme_presentationsUncheckedUpdateWithoutResult_entriesInput>
+  create: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_entriesInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_entriesInput>
+  where?: Prisma.meme_presentationsWhereInput
+}
+
+export type meme_presentationsUpdateToOneWithWhereWithoutResult_entriesInput = {
+  where?: Prisma.meme_presentationsWhereInput
+  data: Prisma.XOR<Prisma.meme_presentationsUpdateWithoutResult_entriesInput, Prisma.meme_presentationsUncheckedUpdateWithoutResult_entriesInput>
+}
+
+export type meme_presentationsUpdateWithoutResult_entriesInput = {
+  state?: Prisma.EnumMemePresentationStateFieldUpdateOperationsInput | $Enums.MemePresentationState
+  active_candidate_position?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  overview_page?: Prisma.IntFieldUpdateOperationsInput | number
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
+  quiz?: Prisma.quizUpdateOneRequiredWithoutMeme_presentationsNestedInput
+  quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
+  started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
+  voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
+  votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+}
+
+export type meme_presentationsUncheckedUpdateWithoutResult_entriesInput = {
+  meme_presentation_id?: Prisma.IntFieldUpdateOperationsInput | number
+  meme_moderation_selection_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  state?: Prisma.EnumMemePresentationStateFieldUpdateOperationsInput | $Enums.MemePresentationState
+  active_candidate_position?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  overview_page?: Prisma.IntFieldUpdateOperationsInput | number
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  started_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
@@ -1075,6 +1351,8 @@ export type meme_presentationsCreateWithoutVotesInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
@@ -1082,6 +1360,8 @@ export type meme_presentationsCreateWithoutVotesInput = {
   quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
   started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
   voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateWithoutVotesInput = {
@@ -1097,8 +1377,12 @@ export type meme_presentationsUncheckedCreateWithoutVotesInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsCreateOrConnectWithoutVotesInput = {
@@ -1124,6 +1408,8 @@ export type meme_presentationsUpdateWithoutVotesInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
@@ -1131,6 +1417,8 @@ export type meme_presentationsUpdateWithoutVotesInput = {
   quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
   started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
   voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateWithoutVotesInput = {
@@ -1146,8 +1434,12 @@ export type meme_presentationsUncheckedUpdateWithoutVotesInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsCreateWithoutStarted_byInput = {
@@ -1157,13 +1449,17 @@ export type meme_presentationsCreateWithoutStarted_byInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
   quiz: Prisma.quizCreateNestedOneWithoutMeme_presentationsInput
   quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
   voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateWithoutStarted_byInput = {
@@ -1178,9 +1474,13 @@ export type meme_presentationsUncheckedCreateWithoutStarted_byInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsCreateOrConnectWithoutStarted_byInput = {
@@ -1200,13 +1500,17 @@ export type meme_presentationsCreateWithoutVoting_closed_byInput = {
   revision?: number
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
   quiz: Prisma.quizCreateNestedOneWithoutMeme_presentationsInput
   quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
   started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
+  result_finalized_by?: Prisma.usersCreateNestedOneWithoutFinalisierte_meme_ergebnisseInput
   votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsUncheckedCreateWithoutVoting_closed_byInput = {
@@ -1221,9 +1525,13 @@ export type meme_presentationsUncheckedCreateWithoutVoting_closed_byInput = {
   started_by_user_id?: number | null
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
   votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
 }
 
 export type meme_presentationsCreateOrConnectWithoutVoting_closed_byInput = {
@@ -1233,6 +1541,57 @@ export type meme_presentationsCreateOrConnectWithoutVoting_closed_byInput = {
 
 export type meme_presentationsCreateManyVoting_closed_byInputEnvelope = {
   data: Prisma.meme_presentationsCreateManyVoting_closed_byInput | Prisma.meme_presentationsCreateManyVoting_closed_byInput[]
+  skipDuplicates?: boolean
+}
+
+export type meme_presentationsCreateWithoutResult_finalized_byInput = {
+  state?: $Enums.MemePresentationState
+  active_candidate_position?: number | null
+  overview_page?: number
+  revision?: number
+  voting_opened_at?: Date | string | null
+  voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  selection: Prisma.meme_moderation_selectionsCreateNestedOneWithoutPresentationInput
+  quiz: Prisma.quizCreateNestedOneWithoutMeme_presentationsInput
+  quiz_frage: Prisma.quiz_fragenCreateNestedOneWithoutMeme_presentationsInput
+  started_by?: Prisma.usersCreateNestedOneWithoutGestartete_meme_praesentationenInput
+  voting_closed_by?: Prisma.usersCreateNestedOneWithoutGeschlossene_meme_votingsInput
+  votes?: Prisma.meme_votesCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesCreateNestedManyWithoutPresentationInput
+}
+
+export type meme_presentationsUncheckedCreateWithoutResult_finalized_byInput = {
+  meme_presentation_id?: number
+  meme_moderation_selection_id: number
+  quiz_id: number
+  quiz_fragen_id: number
+  state?: $Enums.MemePresentationState
+  active_candidate_position?: number | null
+  overview_page?: number
+  revision?: number
+  started_by_user_id?: number | null
+  voting_opened_at?: Date | string | null
+  voting_closed_at?: Date | string | null
+  voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  votes?: Prisma.meme_votesUncheckedCreateNestedManyWithoutPresentationInput
+  result_entries?: Prisma.meme_result_entriesUncheckedCreateNestedManyWithoutPresentationInput
+}
+
+export type meme_presentationsCreateOrConnectWithoutResult_finalized_byInput = {
+  where: Prisma.meme_presentationsWhereUniqueInput
+  create: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput>
+}
+
+export type meme_presentationsCreateManyResult_finalized_byInputEnvelope = {
+  data: Prisma.meme_presentationsCreateManyResult_finalized_byInput | Prisma.meme_presentationsCreateManyResult_finalized_byInput[]
   skipDuplicates?: boolean
 }
 
@@ -1268,6 +1627,22 @@ export type meme_presentationsUpdateManyWithWhereWithoutVoting_closed_byInput = 
   data: Prisma.XOR<Prisma.meme_presentationsUpdateManyMutationInput, Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byInput>
 }
 
+export type meme_presentationsUpsertWithWhereUniqueWithoutResult_finalized_byInput = {
+  where: Prisma.meme_presentationsWhereUniqueInput
+  update: Prisma.XOR<Prisma.meme_presentationsUpdateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedUpdateWithoutResult_finalized_byInput>
+  create: Prisma.XOR<Prisma.meme_presentationsCreateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedCreateWithoutResult_finalized_byInput>
+}
+
+export type meme_presentationsUpdateWithWhereUniqueWithoutResult_finalized_byInput = {
+  where: Prisma.meme_presentationsWhereUniqueInput
+  data: Prisma.XOR<Prisma.meme_presentationsUpdateWithoutResult_finalized_byInput, Prisma.meme_presentationsUncheckedUpdateWithoutResult_finalized_byInput>
+}
+
+export type meme_presentationsUpdateManyWithWhereWithoutResult_finalized_byInput = {
+  where: Prisma.meme_presentationsScalarWhereInput
+  data: Prisma.XOR<Prisma.meme_presentationsUpdateManyMutationInput, Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byInput>
+}
+
 export type meme_presentationsCreateManyQuizInput = {
   meme_presentation_id?: number
   meme_moderation_selection_id: number
@@ -1280,6 +1655,9 @@ export type meme_presentationsCreateManyQuizInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1291,13 +1669,17 @@ export type meme_presentationsUpdateWithoutQuizInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
   quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
   started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
   voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateWithoutQuizInput = {
@@ -1312,9 +1694,13 @@ export type meme_presentationsUncheckedUpdateWithoutQuizInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateManyWithoutQuizInput = {
@@ -1329,6 +1715,9 @@ export type meme_presentationsUncheckedUpdateManyWithoutQuizInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1345,6 +1734,9 @@ export type meme_presentationsCreateManyQuiz_frageInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1356,13 +1748,17 @@ export type meme_presentationsUpdateWithoutQuiz_frageInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutMeme_presentationsNestedInput
   started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
   voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateWithoutQuiz_frageInput = {
@@ -1377,9 +1773,13 @@ export type meme_presentationsUncheckedUpdateWithoutQuiz_frageInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateManyWithoutQuiz_frageInput = {
@@ -1394,6 +1794,9 @@ export type meme_presentationsUncheckedUpdateManyWithoutQuiz_frageInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1410,6 +1813,9 @@ export type meme_presentationsCreateManyStarted_byInput = {
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
   voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1426,6 +1832,28 @@ export type meme_presentationsCreateManyVoting_closed_byInput = {
   started_by_user_id?: number | null
   voting_opened_at?: Date | string | null
   voting_closed_at?: Date | string | null
+  result_finalized_at?: Date | string | null
+  result_finalized_by_user_id?: number | null
+  result_revision?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type meme_presentationsCreateManyResult_finalized_byInput = {
+  meme_presentation_id?: number
+  meme_moderation_selection_id: number
+  quiz_id: number
+  quiz_fragen_id: number
+  state?: $Enums.MemePresentationState
+  active_candidate_position?: number | null
+  overview_page?: number
+  revision?: number
+  started_by_user_id?: number | null
+  voting_opened_at?: Date | string | null
+  voting_closed_at?: Date | string | null
+  voting_closed_by_user_id?: number | null
+  result_finalized_at?: Date | string | null
+  result_revision?: number
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1437,13 +1865,17 @@ export type meme_presentationsUpdateWithoutStarted_byInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutMeme_presentationsNestedInput
   quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
   voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateWithoutStarted_byInput = {
@@ -1458,9 +1890,13 @@ export type meme_presentationsUncheckedUpdateWithoutStarted_byInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateManyWithoutStarted_byInput = {
@@ -1475,6 +1911,9 @@ export type meme_presentationsUncheckedUpdateManyWithoutStarted_byInput = {
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1486,13 +1925,17 @@ export type meme_presentationsUpdateWithoutVoting_closed_byInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
   quiz?: Prisma.quizUpdateOneRequiredWithoutMeme_presentationsNestedInput
   quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
   started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
+  result_finalized_by?: Prisma.usersUpdateOneWithoutFinalisierte_meme_ergebnisseNestedInput
   votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateWithoutVoting_closed_byInput = {
@@ -1507,9 +1950,13 @@ export type meme_presentationsUncheckedUpdateWithoutVoting_closed_byInput = {
   started_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
 }
 
 export type meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byInput = {
@@ -1524,6 +1971,69 @@ export type meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byInput = 
   started_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type meme_presentationsUpdateWithoutResult_finalized_byInput = {
+  state?: Prisma.EnumMemePresentationStateFieldUpdateOperationsInput | $Enums.MemePresentationState
+  active_candidate_position?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  overview_page?: Prisma.IntFieldUpdateOperationsInput | number
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  selection?: Prisma.meme_moderation_selectionsUpdateOneRequiredWithoutPresentationNestedInput
+  quiz?: Prisma.quizUpdateOneRequiredWithoutMeme_presentationsNestedInput
+  quiz_frage?: Prisma.quiz_fragenUpdateOneRequiredWithoutMeme_presentationsNestedInput
+  started_by?: Prisma.usersUpdateOneWithoutGestartete_meme_praesentationenNestedInput
+  voting_closed_by?: Prisma.usersUpdateOneWithoutGeschlossene_meme_votingsNestedInput
+  votes?: Prisma.meme_votesUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUpdateManyWithoutPresentationNestedInput
+}
+
+export type meme_presentationsUncheckedUpdateWithoutResult_finalized_byInput = {
+  meme_presentation_id?: Prisma.IntFieldUpdateOperationsInput | number
+  meme_moderation_selection_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  state?: Prisma.EnumMemePresentationStateFieldUpdateOperationsInput | $Enums.MemePresentationState
+  active_candidate_position?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  overview_page?: Prisma.IntFieldUpdateOperationsInput | number
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  started_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  votes?: Prisma.meme_votesUncheckedUpdateManyWithoutPresentationNestedInput
+  result_entries?: Prisma.meme_result_entriesUncheckedUpdateManyWithoutPresentationNestedInput
+}
+
+export type meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byInput = {
+  meme_presentation_id?: Prisma.IntFieldUpdateOperationsInput | number
+  meme_moderation_selection_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quiz_fragen_id?: Prisma.IntFieldUpdateOperationsInput | number
+  state?: Prisma.EnumMemePresentationStateFieldUpdateOperationsInput | $Enums.MemePresentationState
+  active_candidate_position?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  overview_page?: Prisma.IntFieldUpdateOperationsInput | number
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  started_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  voting_opened_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voting_closed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  result_finalized_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  result_revision?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1535,10 +2045,12 @@ export type meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byInput = 
 
 export type Meme_presentationsCountOutputType = {
   votes: number
+  result_entries: number
 }
 
 export type Meme_presentationsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   votes?: boolean | Meme_presentationsCountOutputTypeCountVotesArgs
+  result_entries?: boolean | Meme_presentationsCountOutputTypeCountResult_entriesArgs
 }
 
 /**
@@ -1558,6 +2070,13 @@ export type Meme_presentationsCountOutputTypeCountVotesArgs<ExtArgs extends runt
   where?: Prisma.meme_votesWhereInput
 }
 
+/**
+ * Meme_presentationsCountOutputType without action
+ */
+export type Meme_presentationsCountOutputTypeCountResult_entriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.meme_result_entriesWhereInput
+}
+
 
 export type meme_presentationsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   meme_presentation_id?: boolean
@@ -1572,6 +2091,9 @@ export type meme_presentationsSelect<ExtArgs extends runtime.Types.Extensions.In
   voting_opened_at?: boolean
   voting_closed_at?: boolean
   voting_closed_by_user_id?: boolean
+  result_finalized_at?: boolean
+  result_finalized_by_user_id?: boolean
+  result_revision?: boolean
   created_at?: boolean
   updated_at?: boolean
   selection?: boolean | Prisma.meme_moderation_selectionsDefaultArgs<ExtArgs>
@@ -1579,7 +2101,9 @@ export type meme_presentationsSelect<ExtArgs extends runtime.Types.Extensions.In
   quiz_frage?: boolean | Prisma.quiz_fragenDefaultArgs<ExtArgs>
   started_by?: boolean | Prisma.meme_presentations$started_byArgs<ExtArgs>
   voting_closed_by?: boolean | Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>
+  result_finalized_by?: boolean | Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>
   votes?: boolean | Prisma.meme_presentations$votesArgs<ExtArgs>
+  result_entries?: boolean | Prisma.meme_presentations$result_entriesArgs<ExtArgs>
   _count?: boolean | Prisma.Meme_presentationsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["meme_presentations"]>
 
@@ -1596,6 +2120,9 @@ export type meme_presentationsSelectCreateManyAndReturn<ExtArgs extends runtime.
   voting_opened_at?: boolean
   voting_closed_at?: boolean
   voting_closed_by_user_id?: boolean
+  result_finalized_at?: boolean
+  result_finalized_by_user_id?: boolean
+  result_revision?: boolean
   created_at?: boolean
   updated_at?: boolean
   selection?: boolean | Prisma.meme_moderation_selectionsDefaultArgs<ExtArgs>
@@ -1603,6 +2130,7 @@ export type meme_presentationsSelectCreateManyAndReturn<ExtArgs extends runtime.
   quiz_frage?: boolean | Prisma.quiz_fragenDefaultArgs<ExtArgs>
   started_by?: boolean | Prisma.meme_presentations$started_byArgs<ExtArgs>
   voting_closed_by?: boolean | Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>
+  result_finalized_by?: boolean | Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>
 }, ExtArgs["result"]["meme_presentations"]>
 
 export type meme_presentationsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1618,6 +2146,9 @@ export type meme_presentationsSelectUpdateManyAndReturn<ExtArgs extends runtime.
   voting_opened_at?: boolean
   voting_closed_at?: boolean
   voting_closed_by_user_id?: boolean
+  result_finalized_at?: boolean
+  result_finalized_by_user_id?: boolean
+  result_revision?: boolean
   created_at?: boolean
   updated_at?: boolean
   selection?: boolean | Prisma.meme_moderation_selectionsDefaultArgs<ExtArgs>
@@ -1625,6 +2156,7 @@ export type meme_presentationsSelectUpdateManyAndReturn<ExtArgs extends runtime.
   quiz_frage?: boolean | Prisma.quiz_fragenDefaultArgs<ExtArgs>
   started_by?: boolean | Prisma.meme_presentations$started_byArgs<ExtArgs>
   voting_closed_by?: boolean | Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>
+  result_finalized_by?: boolean | Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>
 }, ExtArgs["result"]["meme_presentations"]>
 
 export type meme_presentationsSelectScalar = {
@@ -1640,18 +2172,23 @@ export type meme_presentationsSelectScalar = {
   voting_opened_at?: boolean
   voting_closed_at?: boolean
   voting_closed_by_user_id?: boolean
+  result_finalized_at?: boolean
+  result_finalized_by_user_id?: boolean
+  result_revision?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type meme_presentationsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"meme_presentation_id" | "meme_moderation_selection_id" | "quiz_id" | "quiz_fragen_id" | "state" | "active_candidate_position" | "overview_page" | "revision" | "started_by_user_id" | "voting_opened_at" | "voting_closed_at" | "voting_closed_by_user_id" | "created_at" | "updated_at", ExtArgs["result"]["meme_presentations"]>
+export type meme_presentationsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"meme_presentation_id" | "meme_moderation_selection_id" | "quiz_id" | "quiz_fragen_id" | "state" | "active_candidate_position" | "overview_page" | "revision" | "started_by_user_id" | "voting_opened_at" | "voting_closed_at" | "voting_closed_by_user_id" | "result_finalized_at" | "result_finalized_by_user_id" | "result_revision" | "created_at" | "updated_at", ExtArgs["result"]["meme_presentations"]>
 export type meme_presentationsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   selection?: boolean | Prisma.meme_moderation_selectionsDefaultArgs<ExtArgs>
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
   quiz_frage?: boolean | Prisma.quiz_fragenDefaultArgs<ExtArgs>
   started_by?: boolean | Prisma.meme_presentations$started_byArgs<ExtArgs>
   voting_closed_by?: boolean | Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>
+  result_finalized_by?: boolean | Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>
   votes?: boolean | Prisma.meme_presentations$votesArgs<ExtArgs>
+  result_entries?: boolean | Prisma.meme_presentations$result_entriesArgs<ExtArgs>
   _count?: boolean | Prisma.Meme_presentationsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type meme_presentationsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1660,6 +2197,7 @@ export type meme_presentationsIncludeCreateManyAndReturn<ExtArgs extends runtime
   quiz_frage?: boolean | Prisma.quiz_fragenDefaultArgs<ExtArgs>
   started_by?: boolean | Prisma.meme_presentations$started_byArgs<ExtArgs>
   voting_closed_by?: boolean | Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>
+  result_finalized_by?: boolean | Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>
 }
 export type meme_presentationsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   selection?: boolean | Prisma.meme_moderation_selectionsDefaultArgs<ExtArgs>
@@ -1667,6 +2205,7 @@ export type meme_presentationsIncludeUpdateManyAndReturn<ExtArgs extends runtime
   quiz_frage?: boolean | Prisma.quiz_fragenDefaultArgs<ExtArgs>
   started_by?: boolean | Prisma.meme_presentations$started_byArgs<ExtArgs>
   voting_closed_by?: boolean | Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>
+  result_finalized_by?: boolean | Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>
 }
 
 export type $meme_presentationsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1677,7 +2216,9 @@ export type $meme_presentationsPayload<ExtArgs extends runtime.Types.Extensions.
     quiz_frage: Prisma.$quiz_fragenPayload<ExtArgs>
     started_by: Prisma.$usersPayload<ExtArgs> | null
     voting_closed_by: Prisma.$usersPayload<ExtArgs> | null
+    result_finalized_by: Prisma.$usersPayload<ExtArgs> | null
     votes: Prisma.$meme_votesPayload<ExtArgs>[]
+    result_entries: Prisma.$meme_result_entriesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     meme_presentation_id: number
@@ -1692,6 +2233,9 @@ export type $meme_presentationsPayload<ExtArgs extends runtime.Types.Extensions.
     voting_opened_at: Date | null
     voting_closed_at: Date | null
     voting_closed_by_user_id: number | null
+    result_finalized_at: Date | null
+    result_finalized_by_user_id: number | null
+    result_revision: number
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["meme_presentations"]>
@@ -2093,7 +2637,9 @@ export interface Prisma__meme_presentationsClient<T, Null = never, ExtArgs exten
   quiz_frage<T extends Prisma.quiz_fragenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.quiz_fragenDefaultArgs<ExtArgs>>): Prisma.Prisma__quiz_fragenClient<runtime.Types.Result.GetResult<Prisma.$quiz_fragenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   started_by<T extends Prisma.meme_presentations$started_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_presentations$started_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   voting_closed_by<T extends Prisma.meme_presentations$voting_closed_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_presentations$voting_closed_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  result_finalized_by<T extends Prisma.meme_presentations$result_finalized_byArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_presentations$result_finalized_byArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   votes<T extends Prisma.meme_presentations$votesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_presentations$votesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_votesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  result_entries<T extends Prisma.meme_presentations$result_entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.meme_presentations$result_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_result_entriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2135,6 +2681,9 @@ export interface meme_presentationsFieldRefs {
   readonly voting_opened_at: Prisma.FieldRef<"meme_presentations", 'DateTime'>
   readonly voting_closed_at: Prisma.FieldRef<"meme_presentations", 'DateTime'>
   readonly voting_closed_by_user_id: Prisma.FieldRef<"meme_presentations", 'Int'>
+  readonly result_finalized_at: Prisma.FieldRef<"meme_presentations", 'DateTime'>
+  readonly result_finalized_by_user_id: Prisma.FieldRef<"meme_presentations", 'Int'>
+  readonly result_revision: Prisma.FieldRef<"meme_presentations", 'Int'>
   readonly created_at: Prisma.FieldRef<"meme_presentations", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"meme_presentations", 'DateTime'>
 }
@@ -2576,6 +3125,25 @@ export type meme_presentations$voting_closed_byArgs<ExtArgs extends runtime.Type
 }
 
 /**
+ * meme_presentations.result_finalized_by
+ */
+export type meme_presentations$result_finalized_byArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
+}
+
+/**
  * meme_presentations.votes
  */
 export type meme_presentations$votesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2597,6 +3165,30 @@ export type meme_presentations$votesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.Meme_votesScalarFieldEnum | Prisma.Meme_votesScalarFieldEnum[]
+}
+
+/**
+ * meme_presentations.result_entries
+ */
+export type meme_presentations$result_entriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the meme_result_entries
+   */
+  select?: Prisma.meme_result_entriesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the meme_result_entries
+   */
+  omit?: Prisma.meme_result_entriesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.meme_result_entriesInclude<ExtArgs> | null
+  where?: Prisma.meme_result_entriesWhereInput
+  orderBy?: Prisma.meme_result_entriesOrderByWithRelationInput | Prisma.meme_result_entriesOrderByWithRelationInput[]
+  cursor?: Prisma.meme_result_entriesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Meme_result_entriesScalarFieldEnum | Prisma.Meme_result_entriesScalarFieldEnum[]
 }
 
 /**
