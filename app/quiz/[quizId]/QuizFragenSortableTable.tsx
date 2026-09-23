@@ -36,6 +36,7 @@ import {
   updateQuizAbschnittTitel,
   updateQuizQuestionFreeAnswerMode,
   updateQuizQuestionResultDisplayMode,
+  updateQuizQuestionMemeConfig,
   updateQuizFragenBlockSortierung,
 } from "../actions";
 import { synchronizeAutomaticBlockTitles } from "../quizStructure";
@@ -62,6 +63,7 @@ import {
   buildQuizEditorElements,
   moveQuizEditorElement,
 } from "./quizEditorElement";
+import type { MemeQuestionConfig } from "@/app/quiz/memeCaption";
 
 type Abschnitt = {
   quiz_abschnitt_id: number;
@@ -1142,11 +1144,29 @@ export default function QuizFragenSortableTable({
     }
   }
 
+  async function handleMemeConfigChange(
+    quizFragenId: number,
+    config: MemeQuestionConfig,
+  ) {
+    try {
+      await updateQuizQuestionMemeConfig({ quizId, quizFragenId, config });
+      setItems((current) => current.map((item) =>
+        item.quiz_fragen_id === quizFragenId
+          ? { ...item, memeConfig: config }
+          : item,
+      ));
+      setMeldung("Meme-Konfiguration wurde gespeichert.");
+    } catch (error) {
+      setMeldung(error instanceof Error ? error.message : "Meme-Konfiguration konnte nicht gespeichert werden.");
+    }
+  }
+
   const settingsActions: QuizQuestionSettingsActions = {
     onPunkteModusChange: handlePunkteModusChange,
     onFreeAnswerChange: handleFreeAnswerChange,
     onResultDisplayModeChange: handleResultDisplayModeChange,
     onStoryPlacementOverrideChange: handleStoryPlacementOverrideChange,
+    onMemeConfigChange: handleMemeConfigChange,
   };
 
   async function handleDeleteBlock(quizAbschnittId: number) {

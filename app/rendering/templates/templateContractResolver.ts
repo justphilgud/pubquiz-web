@@ -41,6 +41,7 @@ function interactionFromAnswerMode(
   if (answerMode === "POLL_SINGLE") return "POLL_SINGLE";
   if (answerMode === "POLL_MULTI") return "POLL_MULTI";
   if (answerMode === "POLL_SCALE") return "POLL_SCALE";
+  if (answerMode === "MEME_CAPTION") return "MEME_CAPTION";
   if (answerMode === "OPEN_TEXT") return "TEXT";
   if (answerMode === "NUMBER") return "NUMBER";
   if (answerMode === "ORDERING") return "ORDER";
@@ -132,6 +133,14 @@ function answerFormDefinition(
       type: "POLL_SCALE",
       source: "TEMPLATE_SCALE",
       inputMode: "decimal",
+    };
+  }
+  if (interaction === "MEME_CAPTION") {
+    return {
+      type: "MEME_CAPTION",
+      source: "ANSWER_TEXT",
+      multiline: false,
+      inputMode: "text",
     };
   }
   return { type: "BUZZER", source: "RUNTIME_ACTION" };

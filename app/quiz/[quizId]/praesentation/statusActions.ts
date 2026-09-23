@@ -180,6 +180,35 @@ export async function setPraesentationSlideIndex(
         data: { slide_index: slideIndex, slide_key: slideKey, slide_started_at: new Date() },
       });
     }
+    const previousIdentity = parsePresentationSlideKey(previousStatus.slide_key);
+    if (
+      slideIndex > previousStatus.slide_index &&
+      previousIdentity?.kind === "QUESTION" &&
+      previousIdentity.phase === "QUESTION"
+    ) {
+      const previousQuestion = await tx.quiz_fragen.findFirst({
+        where: {
+          quiz_fragen_id: previousIdentity.questionAssignmentId,
+          quiz_id: quizId,
+        },
+        select: {
+          fragen: { select: { vorlage: { select: { code: true } } } },
+        },
+      });
+      if (previousQuestion?.fragen.vorlage?.code === "meme_beschriften") {
+        const finalizedResult = await tx.meme_presentations.findFirst({
+          where: {
+            quiz_id: quizId,
+            quiz_fragen_id: previousIdentity.questionAssignmentId,
+            result_finalized_at: { not: null },
+          },
+          select: { meme_presentation_id: true },
+        });
+        if (!finalizedResult) {
+          throw new Error("Meme-Voting schließen und Ergebnis finalisieren, bevor du weitergehst.");
+        }
+      }
+    }
     if (slideIndex < previousStatus.slide_index) {
       const followingQuestionIds = slides.slice(slideIndex + 1).flatMap((slide) =>
         slide.typ === "frage" ? [slide.frage.quiz_fragen_id] : [],

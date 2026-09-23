@@ -58,6 +58,11 @@ Die zentralen Identitäten sind:
 | Auswahl des für die Bewertung wirksamen Snapshots | `app/quiz/evaluation/effectiveSubmission.ts` |
 | Basisbewertung | `app/quiz/evaluation/evaluateBaseAnswer.ts` |
 | Pixel-Lifecycle und Punkteallokation | `app/quiz/interaction/pixelLiveInteraction.ts` |
+| Meme-Konfiguration, Payload und Deadline-Anzeige | `app/quiz/memeCaption.ts` |
+| Gemeinsames Meme-Rendering | `app/rendering/meme/MemeRenderer.tsx` |
+| Meme-Auswahl und Moderation nach Run-Ende | `app/quiz/memeModeration.server.ts` |
+| Meme-Präsentation und Abstimmung | `app/quiz/memeVoting.server.ts` |
+| Meme-Ergebnis, zentrale Punkte und Auflösung | `app/quiz/memeResults.server.ts` |
 | Poll-Aggregation | `app/quiz/interaction/pollInteraction.ts` |
 | Persistenzmodell | `prisma/schema.prisma` |
 
@@ -82,6 +87,14 @@ Wichtige Fallbacks:
 - Ein geschlossener Fragetyp mit aktivem Freitext-Override wird `TEXT`, sofern der Vertrag dies erlaubt.
 - Vorhandene strukturierte Antwortfelder werden `STRUCTURED_TEXT`.
 - Fehlen einem historischen strukturierten Template die Felder, fällt es kontrolliert auf `TEXT` zurück.
+- `meme_beschriften` wird `MEME_CAPTION`: zwei begrenzte Textfelder, ein
+  gemeinsames Basisbild und keine Bewertung. Der vollständige AP1-Vertrag steht
+  in [Meme beschriften – AP1](meme-caption-ap1.md). Auswahl und Review nach dem
+  Run-Ende stehen in [Meme beschriften – AP2](meme-caption-ap2.md). Die
+  anschließende anonyme Präsentation, das selbstwahlgeschützte Voting und die
+  stabile Übergabe beschreibt [Meme beschriften – AP3](meme-caption-ap3.md).
+  Finale Zählung, Gleichstand, zentrale Punkte und direkte beziehungsweise
+  spätere Auflösung stehen in [Meme beschriften – AP4](meme-caption-ap4.md).
 - Ein nicht auflösbarer Vertrag ergibt `NO_ANSWER`; ein bekannter, aber noch nicht gerenderter Typ wird mit `supported: false` markiert.
 
 Der bei Öffnung des Runs aufgelöste Contract wird in `quiz_interaction_runs.config_snapshot` gespeichert. Laufende Interaktionen bleiben damit an ihre konkrete Konfiguration gebunden.
@@ -121,6 +134,7 @@ Ein Run beschreibt eine konkrete Öffnung der Interaktion. Er enthält Zustand, 
 Pro `quiz_fragen_id × quiz_team_session_id` existiert höchstens ein aktueller Draft. Seine Inhalte liegen weiterhin in den etablierten Feldern und Relationen:
 
 - `antwort_text` für Text, Zahl und serialisierte Reihenfolge;
+- `antwort_text` für die serialisierte Meme-Payload `{topText,bottomText}`;
 - `antwort_id` beziehungsweise `team_antwort_auswahlen` für Auswahltypen;
 - `team_antwortfelder` für strukturierte Antworten;
 - `interaction_run_id`, `draft_revision` und `draft_updated_at` für den Live-Lebenszyklus.

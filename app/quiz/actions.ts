@@ -79,6 +79,7 @@ import {
 } from "./evaluation/questionPointPolicy";
 import { getQuizQuestionPointsDisplay } from "./evaluation/quizQuestionPointsDisplay";
 import {
+  isMemeCaptionQuestionTemplateId,
   isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
@@ -155,6 +156,10 @@ import {
   type QuizResultDisplayMode,
 } from "@/app/quiz/liveResults/liveResultMode";
 import { canToggleLiveResultVisibility } from "@/app/quiz/liveResults/liveResultControls";
+import {
+  parseMemeQuestionConfig,
+  type MemeQuestionConfig,
+} from "@/app/quiz/memeCaption";
 
 async function getPresentationTemplateValidationOptions(
   additionallyAllowed: readonly string[] = [],
@@ -322,6 +327,7 @@ export type QuizDetailsResult = QuizResult & {
       defaultPlacement: "BEFORE_QUESTION" | "AFTER_SOLUTION";
       placementOverride: StoryPlacementOverride;
     }>;
+    memeConfig?: MemeQuestionConfig | null;
   }[];
 };
 
@@ -790,6 +796,12 @@ export async function copyQuiz(data: {
           antwort_reihenfolge: quizFrage.antwort_reihenfolge,
           freie_antwort_erlaubt: quizFrage.freie_antwort_erlaubt,
           ergebnisdarstellung: quizFrage.ergebnisdarstellung,
+          ...(quizFrage.meme_config_json === null
+            ? {}
+            : {
+                meme_config_json:
+                  quizFrage.meme_config_json as Prisma.InputJsonValue,
+              }),
         },
         session,
         tx,
@@ -1179,6 +1191,11 @@ export async function getQuizDetails(
         punkte_modus: eintrag.punkte_modus ?? "standard",
         freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
         ergebnisdarstellung: eintrag.ergebnisdarstellung,
+        memeConfig: isMemeCaptionQuestionTemplateId(
+          eintrag.fragen.vorlage?.code ?? null,
+        )
+          ? parseMemeQuestionConfig(eintrag.meme_config_json)
+          : null,
         live_ergebnis_unterstuetzt: liveResultSupported,
         kann_freie_antwort_aktivieren: answerMode.canEnableFreeAnswer,
         effektiver_antwortmodus: answerMode.effectiveMode,
@@ -1723,6 +1740,7 @@ export type QuizPraesentationResult = {
     frage: string;
     templateId: string | null;
     templateConfig: import("@/app/fragen/editor/types").QuestionTemplateConfig | null;
+    memeConfig?: MemeQuestionConfig | null;
 
     punkte_modus: string;
     freie_antwort_erlaubt: boolean;
@@ -2018,6 +2036,9 @@ export async function getQuizPraesentation(
         originalAnswerMode: answerMode.originalMode,
         effectiveAnswerMode: answerMode.effectiveMode,
         templateData: templateConfig?.templateData,
+        memeImageUrl: eintrag.fragen.medien.find(
+          (medium) => medium.slot_key === "question_image",
+        )?.datei ?? null,
         answerFields: eintrag.fragen.antwortfelder.map((feld) => ({
           id: feld.antwortfeld_id,
           label: feld.label,
@@ -2048,6 +2069,11 @@ export async function getQuizPraesentation(
       frage: eintrag.fragen.frage,
       templateId: eintrag.fragen.vorlage?.code ?? null,
       templateConfig,
+      memeConfig: isMemeCaptionQuestionTemplateId(
+        eintrag.fragen.vorlage?.code ?? null,
+      )
+        ? parseMemeQuestionConfig(eintrag.meme_config_json)
+        : null,
 
       punkte_modus: eintrag.punkte_modus ?? "standard",
       freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
@@ -2224,6 +2250,36 @@ export async function updateQuizQuestionResultDisplayMode(data: {
     data: { ergebnisdarstellung: data.mode },
   });
   revalidatePath(`/quiz/${data.quizId}`);
+  revalidatePath(`/quiz/${data.quizId}/moderation`);
+  revalidatePath(`/quiz/${data.quizId}/praesentation`);
+}
+
+export async function updateQuizQuestionMemeConfig(data: {
+  quizId: number;
+  quizFragenId: number;
+  config: MemeQuestionConfig;
+}) {
+  await requireQuizEditor(data.quizId);
+  const assignment = await prisma.quiz_fragen.findFirst({
+    where: { quiz_id: data.quizId, quiz_fragen_id: data.quizFragenId },
+    select: {
+      quiz_fragen_id: true,
+      fragen: { select: { vorlage: { select: { code: true } } } },
+    },
+  });
+  if (!assignment) throw new Error("Quizfrage gehört nicht zu diesem Quiz.");
+  if (!isMemeCaptionQuestionTemplateId(assignment.fragen.vorlage?.code ?? null)) {
+    throw new Error("Diese Quizfrage ist keine Meme-Frage.");
+  }
+  const config = parseMemeQuestionConfig(data.config);
+  if (!config) throw new Error("Die Meme-Konfiguration ist ungültig.");
+
+  await prisma.quiz_fragen.update({
+    where: { quiz_fragen_id: data.quizFragenId },
+    data: { meme_config_json: config },
+  });
+  revalidatePath(`/quiz/${data.quizId}`);
+  revalidatePath(`/quiz/${data.quizId}/antworten`);
   revalidatePath(`/quiz/${data.quizId}/moderation`);
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
 }
@@ -2703,6 +2759,9 @@ export async function getQuizAntwortStatus(
             effectiveAnswerMode: answerMode.effectiveMode,
             templateData: templateConfig?.templateData,
             orderingItems,
+            memeImageUrl: eintrag.fragen.medien.find(
+              (medium) => medium.slot_key === "question_image",
+            )?.datei ?? null,
             answerFields: eintrag.fragen.antwortfelder.map((field) => ({
               id: field.antwortfeld_id,
               label: field.label,
@@ -3836,6 +3895,17 @@ export async function updateTeamAntwortBewertung(data: {
       await tx.$queryRaw`SELECT "quiz_id" FROM "pubquiz"."quiz" WHERE "quiz_id" = ${data.quizId} FOR UPDATE`;
       const existing = await requireQuizTeamAnswer(data.quizId, data.teamAntwortId, tx);
       assertEvaluationRevision(data.expectedRevision, evaluationRevision(existing));
+      const finalizedMemeResult = await tx.meme_presentations.findFirst({
+        where: {
+          quiz_id: data.quizId,
+          quiz_fragen_id: existing.quiz_fragen_id,
+          result_finalized_at: { not: null },
+        },
+        select: { meme_presentation_id: true },
+      });
+      if (finalizedMemeResult) {
+        throw new Error("Das finalisierte Meme-Voting bestimmt diese Punkte; eine manuelle Änderung ist nicht zulässig.");
+      }
       const effectiveSubmission = resolveEffectiveSubmission({
         interactionRunId: existing.interaction_run_id,
         draft: existing,

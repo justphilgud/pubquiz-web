@@ -1,4 +1,9 @@
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
+import {
+  MEME_CAPTION_TEXT_MAX_LENGTH,
+  parseMemeCaptionPayload,
+  serializeMemeCaptionPayload,
+} from "@/app/quiz/memeCaption";
 
 export type TeamAnswerDraftInput = {
   answerText: string | null;
@@ -15,7 +20,8 @@ export type QuizInteractionPayload =
   | { value: string | number | null }
   | { optionId: number | null }
   | { optionIds: number[] }
-  | { itemIds: string[] };
+  | { itemIds: string[] }
+  | { topText: string; bottomText: string };
 
 export type ValidatedInteractionPayload = {
   payload: QuizInteractionPayload;
@@ -87,6 +93,25 @@ export function validateInteractionPayload(
     return {
       payload: { fields },
       hasContent: Object.values(fields).some((value) => value.length > 0),
+    };
+  }
+
+  if (interaction.type === "MEME_CAPTION") {
+    let rawPayload: unknown;
+    try {
+      rawPayload = JSON.parse(draft.answerText ?? "{}");
+    } catch {
+      throw new Error("Die Meme-Antwort ist kein gültiges JSON.");
+    }
+    const payload = parseMemeCaptionPayload(rawPayload);
+    if (!payload) {
+      throw new Error(
+        `Memetexte dürfen je Feld höchstens ${MEME_CAPTION_TEXT_MAX_LENGTH} Zeichen enthalten.`,
+      );
+    }
+    return {
+      payload,
+      hasContent: payload.topText.length > 0 || payload.bottomText.length > 0,
     };
   }
 
@@ -165,6 +190,20 @@ export function interactionPayloadToDraft(
       antwortfelder: Object.fromEntries(
         Object.entries(payload.fields).map(([key, value]) => [Number(key), value]),
       ),
+    };
+  }
+  if (
+    interaction.type === "MEME_CAPTION" &&
+    "topText" in payload &&
+    "bottomText" in payload
+  ) {
+    return {
+      antwortText: serializeMemeCaptionPayload({
+        topText: payload.topText,
+        bottomText: payload.bottomText,
+      }),
+      antwortId: null,
+      antwortfelder: {},
     };
   }
   if ((interaction.type === "SINGLE_CHOICE" || interaction.type === "POLL_SINGLE") && "optionId" in payload) {

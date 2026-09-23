@@ -15,7 +15,12 @@ export const questionTemplateIds = {
   pollSingle: "umfrage_einfach",
   pollMulti: "umfrage_mehrfach",
   pollScale: "umfrage_skala",
+  memeCaption: "meme_beschriften",
 } as const;
+
+export function isMemeCaptionQuestionTemplateId(templateId: string | null): boolean {
+  return resolveCanonicalQuestionTemplateId(templateId) === questionTemplateIds.memeCaption;
+}
 
 export function isPollQuestionTemplateId(templateId: string | null): boolean {
   const canonicalId = resolveCanonicalQuestionTemplateId(templateId);

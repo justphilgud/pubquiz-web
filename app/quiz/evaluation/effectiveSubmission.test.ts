@@ -155,6 +155,26 @@ test("decodes structured, multi-choice and ordering snapshots", () => {
   assert.equal(order?.answerText, '["a","c","b","d"]');
 });
 
+test("decodes a meme-caption snapshot into the canonical stored answer", () => {
+  const result = resolveEffectiveSubmission({
+    interactionRunId: 10,
+    draft,
+    submissions: [submission({
+      id: 4,
+      version: 1,
+      type: "MEME_CAPTION",
+      payload: { topText: "Oben", bottomText: "Unten" },
+    })],
+  });
+
+  assert.equal(
+    result?.answerText,
+    JSON.stringify({ topText: "Oben", bottomText: "Unten" }),
+  );
+  assert.deepEqual(result?.selectedAnswerIds, []);
+  assert.deepEqual([...result!.structuredAnswers], []);
+});
+
 test("never silently falls back to draft content for an invalid final payload", () => {
   assert.throws(
     () => resolveEffectiveSubmission({
@@ -165,6 +185,22 @@ test("never silently falls back to draft content for an invalid final payload", 
         version: 1,
         type: "MULTI_CHOICE",
         payload: { optionIds: [1, 1] },
+      })],
+    }),
+    /Submission-Snapshot ist ungültig/,
+  );
+});
+
+test("rejects an invalid meme-caption final snapshot", () => {
+  assert.throws(
+    () => resolveEffectiveSubmission({
+      interactionRunId: 10,
+      draft,
+      submissions: [submission({
+        id: 5,
+        version: 1,
+        type: "MEME_CAPTION",
+        payload: { topText: "Nur oben" },
       })],
     }),
     /Submission-Snapshot ist ungültig/,

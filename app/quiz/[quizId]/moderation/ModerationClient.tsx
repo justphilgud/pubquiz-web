@@ -51,6 +51,8 @@ import SlideNotes from "./components/SlideNotes";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
+import MemeModerationReview from "./components/MemeModerationReview";
+import MemePresentationControls from "./components/MemePresentationControls";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import { resolvePresentationSequenceIndex, resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
@@ -78,6 +80,7 @@ import {
 } from "@/app/rendering/presentation/presentationRankingPolicy";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
+import type { MemeLiveState } from "@/app/quiz/memeCaption";
 
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -143,6 +146,10 @@ export default function ModerationClient({
   const [initialClockOffset] = useState(() => (initialLiveState.serverNow ?? Date.now()) - Date.now());
   const pixelClockOffset = useRef(initialClockOffset);
   const [pixelState, setPixelState] = useState<PixelLiveState | null>(null);
+  const [memeState, setMemeState] = useState<MemeLiveState | null>(null);
+  const [memePresentationState, setMemePresentationState] = useState<
+    QuizLiveSnapshot["memePresentationState"]
+  >(null);
   const [pollState, setPollState] = useState<PollLiveState | null>(null);
   const [liveResultState, setLiveResultState] = useState<LiveChoiceResultState | LiveTextResultState | null>(null);
   const [livePollState, setLivePollState] = useState<LivePollAudienceState | null>(null);
@@ -194,7 +201,8 @@ export default function ModerationClient({
   const currentSlideType = aktuellerSlide?.typ;
   const showTeamJoinState =
     (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "QR_CODE") ||
-    (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode");
+    (aktuellerSlide?.typ === "fixer-slide" && aktuellerSlide.slideTyp === "qrcode") ||
+    aktuellerSlide?.typ === "meme-erklaerung";
   const presentationQuestionAssignmentId =
     aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "funny" || aktuellerSlide?.typ === "aufloesung"
       ? aktuellerSlide.frage.quiz_fragen_id
@@ -217,6 +225,17 @@ export default function ModerationClient({
           : aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "VIDEO" && aktuellerSlide.element.config.videoUrl
             ? [{ medien_id: aktuellerSlide.element.persistentId ?? -1, datei: aktuellerSlide.element.config.videoUrl, medientyp: "Video", sortierung: 1, bemerkung: aktuellerSlide.element.config.description ?? null }]
         : [];
+  const memeImageFile =
+    aktuellerSlide?.typ === "frage" && memeState
+      ? aktuellerSlide.frage.medien.find(
+          (medium) => medium.slotKey === "question_image",
+        )?.datei ?? null
+      : null;
+  const memeImageUrl = memeImageFile
+    ? memeImageFile.startsWith("http://") || memeImageFile.startsWith("https://")
+      ? memeImageFile
+      : `/medien/${memeImageFile}`
+    : null;
 
   const [punktestand, setPunktestand] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
@@ -351,6 +370,8 @@ export default function ModerationClient({
         if (!navigationPending.current) applyLiveState(snapshot.presentationState);
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
+        setMemeState(snapshot.memeState);
+        setMemePresentationState(snapshot.memePresentationState);
         pixelClockOffset.current = new Date(snapshot.serverNow).getTime() - Date.now();
         setPollState(snapshot.pollState);
         setLivePollState(snapshot.livePollState);
@@ -434,6 +455,25 @@ export default function ModerationClient({
   }
 
   async function naechsterSlideAction() {
+    if (
+      aktuellerSlide?.typ === "frage" &&
+      aktuellerSlide.frage.templateId === "meme_beschriften" &&
+      !memePresentationState?.result
+    ) {
+      setActionError("Meme-Voting schließen und Ergebnis finalisieren, bevor du weitergehst.");
+      return;
+    }
+    if (
+      aktuellerSlide?.typ === "aufloesung" &&
+      aktuellerSlide.frage.templateId === "meme_beschriften" &&
+      memePresentationState?.result &&
+      endstandRevealCount < memePresentationState.result.pageCount
+    ) {
+      const nextPage = endstandRevealCount + 1;
+      setEndstandRevealCountLokal(nextPage);
+      await setEndstandRevealCount({ quizId, revealCount: nextPage });
+      return;
+    }
     if (aktuellerSlide?.typ === "funny") {
       const pageCount = getFunnyAnswerPageCount(funnyAnswers.length);
       if (endstandRevealCount < pageCount) {
@@ -926,6 +966,8 @@ export default function ModerationClient({
               estimationQuestion={estimationQuestion}
               now={now + pixelClockOffset.current}
               pixelState={pixelState}
+              memeState={memeState}
+              memePresentationState={memePresentationState}
               pollState={pollState}
               liveResultState={liveResultState}
               livePollState={livePollState}
@@ -1089,6 +1131,25 @@ export default function ModerationClient({
                 </details>
               </section>
             )}
+
+            {aktuellerSlide?.typ === "frage" && memeState && memeImageUrl ? (
+              <MemeModerationReview
+                key={`${aktuellerSlide.frage.quiz_fragen_id}:${memeState.state}`}
+                quizId={quizId}
+                quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                imageUrl={memeImageUrl}
+              />
+            ) : null}
+
+            {aktuellerSlide?.typ === "frage" && memePresentationState ? (
+              <MemePresentationControls
+                quizId={quizId}
+                quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                state={memePresentationState}
+                solutionStrategy={aktuellerSlide.solutionStrategy ?? "AFTER_EACH_QUESTION"}
+                onChange={setMemePresentationState}
+              />
+            ) : null}
 
             <SlideNotes>
               <div className="space-y-2">

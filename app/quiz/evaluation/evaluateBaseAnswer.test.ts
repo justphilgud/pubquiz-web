@@ -128,6 +128,29 @@ test("poll submissions have no evaluation, maximum or points mode", () => {
   assert.throws(() => validateQuestionPointsMode({ templateId: "umfrage_mehrfach", pointsMode: "expertenbonus", correctAnswerCount: 0, structuredFieldCount: 0, orderingItemCount: 0 }), /keinen Punkte/);
 });
 
+test("meme submissions have no AP1 score or points mode", () => {
+  assert.equal(
+    getQuestionBaseMaximum({
+      templateId: "meme_beschriften",
+      correctAnswerCount: 0,
+      structuredFieldCount: 0,
+      orderingItemCount: 0,
+    }).toString(),
+    "0",
+  );
+  assert.throws(
+    () =>
+      validateQuestionPointsMode({
+        templateId: "meme_beschriften",
+        pointsMode: "expertenbonus",
+        correctAnswerCount: 0,
+        structuredFieldCount: 0,
+        orderingItemCount: 0,
+      }),
+    /keinen Punkte/,
+  );
+});
+
 test("pixel text ignores legacy structured fields and remains manually reviewable", () => {
   const result = evaluateBaseAnswer({
     ...defaults,

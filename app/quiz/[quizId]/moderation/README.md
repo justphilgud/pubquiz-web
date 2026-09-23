@@ -13,6 +13,7 @@ Der Moderationsmodus ist das zentrale Steuerungswerkzeug für die Durchführung 
 - Medien- und Audiosteuerung
 - Öffnen der Auswertung
 - Live-Überwachung des Quizfortschritts
+- Persistente Auswahl und Review abgeschlossener Meme-Einreichungen
 
 ---
 
@@ -163,6 +164,17 @@ Funktionen:
 - Hinweis, dass Antworten eingefroren wurden
 - Öffnen der Auswertung
 - Vollbild-Auswertung per IFrame
+
+## MemeModerationReview
+
+Nach dem serverseitigen Ende einer Meme-Antwortphase öffnet die Moderationsseite
+die genau einmal erzeugte, persistierte Auswahl. Die Komponente verwendet den
+gemeinsamen `MemeRenderer`, zeigt keine Teamnamen und erlaubt ausschließlich
+„Freigeben“ oder „Ausschließen“. Ein Ausschluss zieht keinen Ersatzkandidaten
+nach. Der Reviewabschluss verlangt vollständige Entscheidungen und mindestens
+einen freigegebenen Kandidaten; eine leere Einreichungsmenge kann explizit
+übersprungen werden. Optimistische Kandidaten- und Auswahlrevisionen verhindern
+stille Überschreibungen zwischen mehreren Moderatoren.
 
 ---
 

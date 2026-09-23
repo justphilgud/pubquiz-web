@@ -24,6 +24,8 @@ import type { TeamAvatarCode } from "@/app/teams/teamProfile";
 import type { FunnyAnswerEntry } from "@/app/quiz/funnyAnswerReveal";
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import type { IntermediateStandingsAudienceEntry } from "@/app/rendering/presentation/presentationRankingPolicy";
+import type { MemeLiveState } from "@/app/quiz/memeCaption";
+import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 
 type PunktestandEintrag = {
   teamId: number;
@@ -55,6 +57,8 @@ type Props = {
   } | null;
   now: number;
   pixelState: PixelLiveState | null;
+  memeState: MemeLiveState | null;
+  memePresentationState: MemePresentationSnapshot | null;
   pollState: PollLiveState | null;
   liveResultState: LiveChoiceResultState | LiveTextResultState | null;
   livePollState: LivePollAudienceState | null;
@@ -90,6 +94,8 @@ export default function CurrentSlidePanel({
   estimationQuestion,
   now,
   pixelState,
+  memeState,
+  memePresentationState,
   pollState,
   liveResultState,
   livePollState,
@@ -189,6 +195,8 @@ export default function CurrentSlidePanel({
                 playbackCommand,
                 playbackCommandId,
                 pixelState,
+                memeState,
+                memePresentationState,
                 pollState,
                 liveResultState,
                 livePollState,

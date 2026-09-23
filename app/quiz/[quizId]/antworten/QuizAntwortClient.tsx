@@ -39,6 +39,7 @@ import { useAnswerDrafts } from "../../interaction/useAnswerDrafts";
 import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
+import MemeVotingPanel from "./MemeVotingPanel";
 import type { saveTeamAntwortDraft, startQuizTeamSession } from "../../actions";
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -226,6 +227,9 @@ export default function QuizAntwortClient({
     canSubmit: boolean;
   } | null>(null);
   const [livePollState, setLivePollState] = useState<QuizLiveSnapshot["livePollState"]>(null);
+  const [memePresentationState, setMemePresentationState] = useState<
+    QuizLiveSnapshot["memePresentationState"]
+  >(null);
   const livePollStateRef = useRef<QuizLiveSnapshot["livePollState"]>(null);
   const [livePollResponse, setLivePollResponse] = useState<{ selectedOptionId: string | null; text: string | null } | null>(null);
   const [livePollText, setLivePollText] = useState("");
@@ -374,6 +378,7 @@ export default function QuizAntwortClient({
         consecutiveFailures = 0;
         livePollStateRef.current = snapshot.livePollState;
         setLivePollState(snapshot.livePollState);
+        setMemePresentationState(snapshot.memePresentationState);
         if (snapshot.teamSpecificState?.livePollResponse) {
           const response = snapshot.teamSpecificState.livePollResponse;
           setLivePollResponse({ selectedOptionId: response.selectedOptionId, text: response.text });
@@ -448,6 +453,7 @@ export default function QuizAntwortClient({
           setSession(null);
           setLiveDaten(daten);
           setPixelState(null);
+          setMemePresentationState(null);
           setPixelTeamState(null);
           setCurrentSubmissionStatus(null);
           setMeldung("Die Team-Sitzung ist nicht mehr g\u00fcltig. Bitte erneut anmelden.");
@@ -813,6 +819,15 @@ export default function QuizAntwortClient({
           />
         )}
 
+        {session && memePresentationState ? (
+          <MemeVotingPanel
+            quizId={liveDaten.quiz_id}
+            sessionToken={session.sessionToken}
+            state={memePresentationState}
+            onChange={setMemePresentationState}
+          />
+        ) : null}
+
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           {livePollState ? <div className="space-y-5">
@@ -995,7 +1010,7 @@ export default function QuizAntwortClient({
                         </button>
                       )}
 
-                      {hatBild && frage.templateId !== "pixelbild" && (
+                      {hatBild && frage.templateId !== "pixelbild" && frage.templateId !== "meme_beschriften" && (
                         <button
                           type="button"
                           onClick={() =>
@@ -1020,6 +1035,8 @@ export default function QuizAntwortClient({
                           submissionLocksEditing ||
                           !session
                         }
+                        deadlineAt={frage.interactionRun?.deadlineAt ?? null}
+                        now={now}
                         onChange={(value) => controller.edit(frage.quiz_fragen_id, value)}
                       />
 
@@ -1047,6 +1064,27 @@ export default function QuizAntwortClient({
                             {isSubmitting
                               ? "Stop wird geprüft..."
                               : "Verpixelung für alle stoppen & Antwort abgeben"}
+                          </button>
+                        )}
+                        {frage.templateId === "meme_beschriften" &&
+                          session &&
+                          !blockIstGesperrt &&
+                          questionIsWritable &&
+                          !submissionLocksEditing && (
+                          <button
+                            type="button"
+                            onClick={() => void handleSubmit(frage.quiz_fragen_id)}
+                            disabled={
+                              isSubmitting ||
+                              (submissionStatus === "SUBMITTED" && !changedSinceSubmission)
+                            }
+                            className="answer-primary-button min-h-11 w-full rounded-xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed"
+                          >
+                            {isSubmitting
+                              ? "Wird gespeichert..."
+                              : submissionStatus === "SUBMITTED"
+                                ? "Änderung erneut abgeben"
+                                : "Meme verbindlich abgeben"}
                           </button>
                         )}
                         {frage.templateId === "pixelbild" &&

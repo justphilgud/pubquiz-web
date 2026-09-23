@@ -239,3 +239,14 @@ test("resolves all poll contracts without falling back to question interactions"
     values: [1, 2, 3, 4, 5],
   });
 });
+
+test("resolves the meme contract with the existing question image", () => {
+  assert.deepEqual(resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+  }), {
+    type: "MEME_CAPTION",
+    imageUrl: "meme/base.webp",
+    maxLength: 80,
+  });
+});

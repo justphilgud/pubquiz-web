@@ -664,6 +664,57 @@ export type EnumQuestionTemplateStatusWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumQuestionTemplateStatusFilter<$PrismaModel>
 }
 
+export type EnumMemeModerationSelectionStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationSelectionState | Prisma.EnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationSelectionStateFilter<$PrismaModel> | $Enums.MemeModerationSelectionState
+}
+
+export type EnumMemeModerationSelectionStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationSelectionState | Prisma.EnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationSelectionStateWithAggregatesFilter<$PrismaModel> | $Enums.MemeModerationSelectionState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemeModerationSelectionStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemeModerationSelectionStateFilter<$PrismaModel>
+}
+
+export type EnumMemeModerationReviewStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationReviewStatus | Prisma.EnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationReviewStatusFilter<$PrismaModel> | $Enums.MemeModerationReviewStatus
+}
+
+export type EnumMemeModerationReviewStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationReviewStatus | Prisma.EnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationReviewStatusWithAggregatesFilter<$PrismaModel> | $Enums.MemeModerationReviewStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemeModerationReviewStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemeModerationReviewStatusFilter<$PrismaModel>
+}
+
+export type EnumMemePresentationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemePresentationState | Prisma.EnumMemePresentationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemePresentationStateFilter<$PrismaModel> | $Enums.MemePresentationState
+}
+
+export type EnumMemePresentationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemePresentationState | Prisma.EnumMemePresentationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemePresentationStateWithAggregatesFilter<$PrismaModel> | $Enums.MemePresentationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemePresentationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemePresentationStateFilter<$PrismaModel>
+}
+
 export type EnumUserRoleFilter<$PrismaModel = never> = {
   equals?: $Enums.UserRole | Prisma.EnumUserRoleFieldRefInput<$PrismaModel>
   in?: $Enums.UserRole[] | Prisma.ListEnumUserRoleFieldRefInput<$PrismaModel>
@@ -1339,6 +1390,57 @@ export type NestedEnumQuestionTemplateStatusWithAggregatesFilter<$PrismaModel = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumQuestionTemplateStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumQuestionTemplateStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumMemeModerationSelectionStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationSelectionState | Prisma.EnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationSelectionStateFilter<$PrismaModel> | $Enums.MemeModerationSelectionState
+}
+
+export type NestedEnumMemeModerationSelectionStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationSelectionState | Prisma.EnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationSelectionState[] | Prisma.ListEnumMemeModerationSelectionStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationSelectionStateWithAggregatesFilter<$PrismaModel> | $Enums.MemeModerationSelectionState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemeModerationSelectionStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemeModerationSelectionStateFilter<$PrismaModel>
+}
+
+export type NestedEnumMemeModerationReviewStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationReviewStatus | Prisma.EnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationReviewStatusFilter<$PrismaModel> | $Enums.MemeModerationReviewStatus
+}
+
+export type NestedEnumMemeModerationReviewStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemeModerationReviewStatus | Prisma.EnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemeModerationReviewStatus[] | Prisma.ListEnumMemeModerationReviewStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemeModerationReviewStatusWithAggregatesFilter<$PrismaModel> | $Enums.MemeModerationReviewStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemeModerationReviewStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemeModerationReviewStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumMemePresentationStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemePresentationState | Prisma.EnumMemePresentationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemePresentationStateFilter<$PrismaModel> | $Enums.MemePresentationState
+}
+
+export type NestedEnumMemePresentationStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MemePresentationState | Prisma.EnumMemePresentationStateFieldRefInput<$PrismaModel>
+  in?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MemePresentationState[] | Prisma.ListEnumMemePresentationStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMemePresentationStateWithAggregatesFilter<$PrismaModel> | $Enums.MemePresentationState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMemePresentationStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMemePresentationStateFilter<$PrismaModel>
 }
 
 export type NestedEnumUserRoleFilter<$PrismaModel = never> = {

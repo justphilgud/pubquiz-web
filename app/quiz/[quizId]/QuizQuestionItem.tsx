@@ -16,6 +16,7 @@ import type { StoryPlacementOverride } from "@/app/story-elemente/storyPlacement
 import type { QuizResultDisplayMode } from "@/app/quiz/liveResults/liveResultMode";
 import QuizEditorElementCard from "./QuizEditorElementCard";
 import QuizFrageSortierungButtons from "./QuizFrageSortierungButtons";
+import type { MemeQuestionConfig } from "@/app/quiz/memeCaption";
 
 export type QuizQuestion = {
   quiz_fragen_id: number;
@@ -45,6 +46,7 @@ export type QuizQuestion = {
     defaultPlacement: "BEFORE_QUESTION" | "AFTER_SOLUTION";
     placementOverride: StoryPlacementOverride;
   }>;
+  memeConfig?: MemeQuestionConfig | null;
 };
 
 type Props = {
@@ -210,6 +212,8 @@ export default function QuizQuestionItem({
           kannFreieAntwortAktivieren={frage.kann_freie_antwort_aktivieren}
           istPixelbild={frage.templateId === "pixelbild" || frage.templateId === "image_pixel"}
           istUmfrage={isPollQuestionTemplateId(frage.templateId)}
+          istMeme={frage.templateId === "meme_beschriften"}
+          memeConfig={frage.memeConfig ?? null}
           teilpunkteFaehig={frage.teilpunkte_faehig}
           storyElements={frage.storyElements}
           actions={settingsActions}

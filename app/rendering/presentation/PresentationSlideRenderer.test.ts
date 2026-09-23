@@ -66,6 +66,101 @@ test("AP3: live pixel audience displays stage and absolute countdown before and 
     if (stopped) assert.match(html, /Restantwortzeit/);
   }
 });
+
+test("AP1: meme intro stays untimed and live question shows only image plus authoritative countdown", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const baseQuestion = runtime.quiz.fragen[0];
+  assert.ok(baseQuestion);
+  const memeQuestion = {
+    ...baseQuestion,
+    frage: "Beschriftet dieses Meme",
+    templateId: "meme_beschriften",
+    memeConfig: {
+      version: 1 as const,
+      responseDurationSeconds: 120,
+      maxPresentedMemes: 4,
+    },
+    medien: [{
+      medien_id: 901,
+      datei: "questions/meme-base.webp",
+      medientyp: "Bild",
+      sortierung: 1,
+      bemerkung: "Meme-Basisbild",
+      slotKey: "question_image",
+    }],
+    bildMedien: [{
+      medien_id: 901,
+      datei: "questions/meme-base.webp",
+      medientyp: "Bild",
+      slotKey: "question_image",
+    }],
+    antworten: [],
+    antwortfelder: [],
+  };
+  const quiz = { ...runtime.quiz, fragen: [memeQuestion] };
+  const introSlide: Slide = {
+    typ: "meme-erklaerung",
+    abschnitt: null,
+    frage: memeQuestion,
+  };
+  const questionSlide: Slide = {
+    typ: "frage",
+    abschnitt: null,
+    frage: memeQuestion,
+    frageIndexImBlock: 1,
+    fragenAnzahlImBlock: 1,
+  };
+  const introHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz,
+    slide: introSlide,
+    slides: [introSlide, questionSlide],
+    slideIndex: 0,
+    slideLabel: "Meme-Runde",
+    theme: runtime.theme,
+    displayState: {
+      ...displayState,
+      teamJoinState: { teams: [], totalTeams: 3, remainingTeams: 3 },
+      memeState: null,
+    },
+  }));
+  assert.match(introHtml, /120 Sekunden/);
+  assert.match(introHtml, /Maximal 4 Memes/);
+  assert.match(introHtml, /3 Teams angemeldet/);
+  assert.doesNotMatch(introHtml, /Sekunden verbleibend/);
+
+  const liveHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz,
+    slide: questionSlide,
+    slides: [introSlide, questionSlide],
+    slideIndex: 1,
+    slideLabel: "Meme beschriften",
+    theme: runtime.theme,
+    displayState: {
+      ...displayState,
+      memeState: {
+        state: "COUNTDOWN",
+        deadlineAt: new Date(displayState.now + 42_000).toISOString(),
+        responseDurationSeconds: 120,
+        maxPresentedMemes: 4,
+      },
+      liveResultState: {
+        kind: "TEXT",
+        visible: true,
+        state: "COUNTDOWN",
+        finalAnswers: 1,
+        totalTeams: 3,
+        publicResponses: [{
+          submissionId: 1,
+          publicText: "Darf nicht auf der Leinwand erscheinen",
+        }],
+      },
+    },
+  }));
+  assert.match(liveHtml, /questions\/meme-base\.webp/);
+  assert.match(liveHtml, /42/);
+  assert.match(liveHtml, /42 Sekunden verbleibend/);
+  assert.doesNotMatch(liveHtml, /Darf nicht auf der Leinwand erscheinen|Live-Antworten/);
+});
 const playerSource = readFileSync(
   new URL(
     "../../quiz/[quizId]/praesentation/QuizPraesentationPlayer.tsx",

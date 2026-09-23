@@ -1,4 +1,8 @@
 import type { Prisma } from "@/app/generated/prisma/client";
+import {
+  parseMemeCaptionPayload,
+  serializeMemeCaptionPayload,
+} from "@/app/quiz/memeCaption";
 
 export type EffectiveAnswerContent = {
   answerText: string | null;
@@ -129,6 +133,17 @@ function contentFromSubmission(
     }
     return {
       answerText: JSON.stringify(payload.itemIds),
+      selectedAnswerIds: [],
+      structuredAnswers: new Map(),
+    };
+  }
+  if (interactionType === "MEME_CAPTION") {
+    const memePayload = parseMemeCaptionPayload(payload);
+    if (!memePayload) {
+      throw new Error("Der finale Submission-Snapshot ist ungültig.");
+    }
+    return {
+      answerText: serializeMemeCaptionPayload(memePayload),
       selectedAnswerIds: [],
       structuredAnswers: new Map(),
     };

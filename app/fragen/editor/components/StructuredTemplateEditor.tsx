@@ -605,6 +605,17 @@ function PollScaleEditor(props: EditorProps) {
   </section>;
 }
 
+function MemeCaptionEditor() {
+  return (
+    <section className="space-y-2 rounded-2xl border border-fuchsia-200 bg-fuchsia-50 p-4 text-slate-900">
+      <h2 className="font-semibold">Meme beschriften</h2>
+      <p className="text-sm leading-6 text-slate-700">
+        Das Pflichtbild wird oben im Medienbereich gepflegt. Antwortzeit und die später maximal gezeigten Memes werden je Quiz in der Fragenkonfiguration festgelegt. In AP1 gibt es keine richtige Antwort und keine Punkte.
+      </p>
+    </section>
+  );
+}
+
 const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorProps>>> = {
   TRUE_FALSE: TrueFalseEditor,
   ESTIMATE: EstimateEditor,
@@ -613,6 +624,7 @@ const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorP
   ANAGRAM: AnagramEditor,
   GOOGLE_REVIEWS: ReviewsEditor,
   POLL_SCALE: PollScaleEditor,
+  MEME_CAPTION: MemeCaptionEditor,
 };
 
 export function StructuredTemplateEditor({ kind, ...props }: Props) {
