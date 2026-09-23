@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Geist,
   Geist_Mono,
@@ -43,6 +43,15 @@ export const metadata: Metadata = {
   },
   applicationName: APP_BRAND.name,
   description: APP_BRAND.description,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "PubQuiz",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: APP_BRAND.colors.darkSurface,
 };
 
 export default function RootLayout({
@@ -52,7 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="de"
       className={`${geistSans.variable} ${geistMono.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${nunito.variable} ${oswald.variable} ${robotoSlab.variable} ${lora.variable} ${playfairDisplay.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

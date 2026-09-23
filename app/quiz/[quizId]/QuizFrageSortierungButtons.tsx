@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { moveQuizFrage } from "../actions";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
 };
 
 const arrowButtonClass =
-  "flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-slate-400 transition hover:bg-slate-100 hover:text-slate-800 active:scale-95";
+  "flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-lg font-semibold text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-900 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40";
 
 export default function QuizFrageSortierungButtons({
   quizId,
@@ -20,26 +21,35 @@ export default function QuizFrageSortierungButtons({
   isLast,
   onMove,
 }: Props) {
-  async function move(direction: "up" | "down") {
-    if (onMove) {
-      await onMove(direction);
-      return;
-    }
+  const [isMoving, setIsMoving] = useState(false);
 
-    await moveQuizFrage({
-      quizId,
-      quizFragenId,
-      direction,
-    });
+  async function move(direction: "up" | "down") {
+    if (isMoving) return;
+    setIsMoving(true);
+    try {
+      if (onMove) {
+        await onMove(direction);
+        return;
+      }
+
+      await moveQuizFrage({
+        quizId,
+        quizFragenId,
+        direction,
+      });
+    } finally {
+      setIsMoving(false);
+    }
   }
 
   return (
-    <div className="flex w-20 items-center justify-between">
+    <div className="flex items-center gap-2" aria-label="Frage verschieben">
       {isFirst ? (
-        <span className="h-8 w-8" />
+        <span className="h-11 w-11" aria-hidden="true" />
       ) : (
         <button
           type="button"
+          disabled={isMoving}
           onClick={() => move("up")}
           title="Nach oben"
           aria-label="Nach oben"
@@ -50,10 +60,11 @@ export default function QuizFrageSortierungButtons({
       )}
 
       {isLast ? (
-        <span className="h-8 w-8" />
+        <span className="h-11 w-11" aria-hidden="true" />
       ) : (
         <button
           type="button"
+          disabled={isMoving}
           onClick={() => move("down")}
           title="Nach unten"
           aria-label="Nach unten"
