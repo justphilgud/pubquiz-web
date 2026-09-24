@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { parseStoreIdFromDelegationToken } from "@vercel/blob";
-import { AUDIENCE, objectRule, runKey, storedBackupKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type InventoryObject, type Mode, type ObjectKind } from "./bridge/lib/contract";
+import { AUDIENCE, INVENTORY_MAX_PAGES, INVENTORY_PAGE_LIMIT, INVENTORY_TOTAL_LIMIT, inventoryCursor, objectRule, runKey, storedBackupKey, STORE_HOST, STORE_ID, TTL_MS, type AccessRequest, type Grant, type InventoryObject, type Mode, type ObjectKind } from "./bridge/lib/contract";
 import { OperationsError, requireCondition } from "./guards";
 import { defaultUploadRetryRuntime, safeUploadResponse, uploadWithBoundedRetry, type UploadRetryRuntime } from "./upload-retry";
 import { GithubOidcTokenProvider, type OidcDiagnostics } from "./oidc-token";
@@ -112,20 +112,35 @@ export class BridgeClient {
   async retentionInventory(): Promise<InventoryObject[]> {
     try {
       requireCondition(this.role === "backup" && this.mode === "acceptance", "RETENTION_CONTEXT_REJECTED");
-      const response = await this.access({ operation: "backup-inventory", store: STORE_ID });
-      requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
-      const result = JSON.parse((await limitedResponse(response, 1024 * 1024)).toString()) as { objects?: unknown; complete?: unknown };
-      requireCondition(result.complete === true && Array.isArray(result.objects) && result.objects.length <= 4096, "INVENTORY_RESPONSE_INVALID");
-      return result.objects.map(value => {
-        requireCondition(value !== null && typeof value === "object" && !Array.isArray(value), "INVENTORY_RESPONSE_INVALID");
-        const object = value as Record<string, unknown>;
-        requireCondition(Object.keys(object).sort().join() === "etag,pathname,size,uploadedAt" &&
-          typeof object.pathname === "string" && object.pathname.startsWith("production/acceptance/") && object.pathname.length <= 240 &&
-          typeof object.size === "number" && Number.isSafeInteger(object.size) && object.size > 0 &&
-          typeof object.uploadedAt === "string" && Number.isFinite(Date.parse(object.uploadedAt)) &&
-          typeof object.etag === "string" && /^[\x21-\x7e]{1,200}$/.test(object.etag), "INVENTORY_RESPONSE_INVALID");
-        return object as InventoryObject;
-      });
+      const inventory: InventoryObject[] = []; const cursors = new Set<string>(); let cursor: string | undefined; let pages = 0;
+      do {
+        pages += 1; requireCondition(pages <= INVENTORY_MAX_PAGES, "INVENTORY_RESPONSE_INVALID");
+        const response = await this.access({ operation: "backup-inventory", store: STORE_ID, ...(cursor ? { cursor } : {}) });
+        requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
+        const result = JSON.parse((await limitedResponse(response, 1024 * 1024)).toString()) as Record<string, unknown>;
+        requireCondition(Object.keys(result).sort().join() === "complete,cursor,objects" && typeof result.complete === "boolean" &&
+          Array.isArray(result.objects) && result.objects.length <= INVENTORY_PAGE_LIMIT &&
+          (result.cursor === null || inventoryCursor(result.cursor)) &&
+          result.complete === (result.cursor === null), "INVENTORY_RESPONSE_INVALID");
+        inventory.push(...result.objects.map(value => {
+          requireCondition(value !== null && typeof value === "object" && !Array.isArray(value), "INVENTORY_RESPONSE_INVALID");
+          const object = value as Record<string, unknown>;
+          requireCondition(Object.keys(object).sort().join() === "etag,pathname,size,uploadedAt" &&
+            typeof object.pathname === "string" && object.pathname.startsWith("production/acceptance/") && object.pathname.length <= 240 &&
+            typeof object.size === "number" && Number.isSafeInteger(object.size) && object.size > 0 &&
+            typeof object.uploadedAt === "string" && Number.isFinite(Date.parse(object.uploadedAt)) &&
+            typeof object.etag === "string" && /^[\x21-\x7e]{1,200}$/.test(object.etag), "INVENTORY_RESPONSE_INVALID");
+          return object as InventoryObject;
+        }));
+        requireCondition(inventory.length <= INVENTORY_TOTAL_LIMIT, "INVENTORY_RESPONSE_INVALID");
+        if (result.complete) cursor = undefined;
+        else {
+          const next = result.cursor as string;
+          requireCondition(!cursors.has(next), "INVENTORY_RESPONSE_INVALID");
+          cursors.add(next); cursor = next;
+        }
+      } while (cursor);
+      return inventory;
     } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("RETENTION_INVENTORY_FAILED_DETAILS_WITHHELD"); }
   }
   async retentionReadManifest(key: string) {

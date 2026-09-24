@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Synthetic transport proof first; real acceptance requires separate transport approval
+        description: Synthetic proof, real backup acceptance, claims, or non-destructive retention reuse
         type: choice
-        options: [synthetic, claims-only, acceptance]
+        options: [synthetic, claims-only, acceptance, retention-dry-run]
         default: synthetic
         required: true
       production_commit:
@@ -42,6 +42,14 @@ on:
         options: [active-alias, verified-20260923]
         default: active-alias
         required: true
+      retention_backup_key:
+        description: Existing validated backup key (retention-dry-run only)
+        required: false
+        type: string
+      retention_manifest_sha256:
+        description: Existing validated manifest SHA-256 (retention-dry-run only)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -128,16 +136,17 @@ jobs:
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Backup readback verified.\n\nType: ${r.backup.type}\n\nProtected: ${r.backup.protected}\n\nKey: ${r.key}\n\nManifest SHA-256: ${r.manifestSha256}\n\nBytes: ${r.bytes}\n\nSnapshot: ${r.snapshotAt}\n\nBackup ms: ${r.backupMs}\n\nBridge calls: ${r.oidc.bridgeCalls}\n\nOIDC token requests: ${r.oidc.tokenRequests}\n\nOIDC cache hits: ${r.oidc.cacheHits}\n\nOIDC single-flight joins: ${r.oidc.singleFlightJoins}\n\nOIDC refreshes: ${r.oidc.refreshes}\n\nOIDC retries: ${r.oidc.retries}\n\nOIDC final error: ${r.oidc.finalErrorClass ?? 'none'}\n\nRestore runs only when explicitly requested and requires operations-restore reviewer approval.\n`);
           NODE
       - name: Retention policy evaluation after verified backup
-        if: steps.backup.outcome == 'success'
+        if: steps.backup.outcome == 'success' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'retention-dry-run')
         shell: bash
         env:
           AP94_TRANSPORT_MODE: acceptance
           AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
-          BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
-          AP96_CURRENT_BACKUP_KEY: ${{ steps.backup.outputs.key }}
-          AP96_CURRENT_MANIFEST_SHA256: ${{ steps.backup.outputs.manifest }}
+          BACKUP_RETENTION_VERIFIED: ${{ inputs.mode == 'retention-dry-run' && 'false' || vars.BACKUP_RETENTION_VERIFIED }}
+          AP96_RETENTION_REUSE_EXISTING: ${{ inputs.mode == 'retention-dry-run' && 'true' || 'false' }}
+          AP96_CURRENT_BACKUP_KEY: ${{ inputs.mode == 'retention-dry-run' && inputs.retention_backup_key || steps.backup.outputs.key }}
+          AP96_CURRENT_MANIFEST_SHA256: ${{ inputs.mode == 'retention-dry-run' && inputs.retention_manifest_sha256 || steps.backup.outputs.manifest }}
         run: |
           set -euo pipefail
           node --import tsx scripts/operations/retention-cli.ts > "$RUNNER_TEMP/ap96-retention.json"
@@ -150,7 +159,7 @@ jobs:
           NODE
   restore:
     needs: backup
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.restore_after_backup
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && (inputs.mode == 'synthetic' || inputs.mode == 'acceptance') && inputs.restore_after_backup
     permissions:
       contents: read
       id-token: write

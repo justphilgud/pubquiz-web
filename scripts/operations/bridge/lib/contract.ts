@@ -8,6 +8,10 @@ export const OWNER_ID = "288915542";
 export const WORKFLOW = `${REPOSITORY}/.github/workflows/ap94-acceptance.yml@refs/heads/main`;
 export const ISSUER = "https://token.actions.githubusercontent.com";
 export const TTL_MS = 5 * 60 * 1000;
+export const INVENTORY_PAGE_LIMIT = 1000;
+export const INVENTORY_TOTAL_LIMIT = 32_000;
+export const INVENTORY_MAX_PAGES = 64;
+export const INVENTORY_CURSOR_LIMIT = 1024;
 export type Mode = "synthetic" | "acceptance";
 export type GrantOperation = "backup-upload" | "backup-readback" | "restore-read" | "backup-retention-read";
 export type Operation = GrantOperation | "backup-inventory" | "retention-delete";
@@ -16,7 +20,7 @@ export type ContentType = "application/json" | "application/octet-stream";
 export type AccessRequest = { operation: GrantOperation; store: string; key: string; name: string; kind: ObjectKind; bytes?: number };
 export type Grant = { url: string; method: "PUT" | "GET"; expiresAt: number; maximumSize: number };
 export type InventoryObject = { pathname: string; size: number; uploadedAt: string; etag: string };
-export type InventoryResult = { objects: InventoryObject[]; complete: true };
+export type InventoryResult = { objects: InventoryObject[]; cursor: string | null; complete: boolean };
 export type DeleteResult = { deleted: true };
 export class BridgeError extends Error {
   constructor(readonly code: "CONFIG_REJECTED" | "IDENTITY_REJECTED" | "REQUEST_REJECTED" | "OBJECT_EXISTS" | "OBJECT_MISSING" | "OBJECT_TOO_LARGE" | "PROVIDER_REJECTED") { super(code); }
@@ -31,6 +35,9 @@ export function runKey(mode: Mode, run: string, attempt: string) {
 export function storedBackupKey(key: string) {
   check(/^production\/acceptance\/run-[1-9][0-9]{0,19}-[1-9][0-9]{0,5}$/.test(key));
   return key;
+}
+export function inventoryCursor(value: unknown): value is string {
+  return typeof value === "string" && value.length <= INVENTORY_CURSOR_LIMIT && /^[\x21-\x7e]+$/.test(value);
 }
 export function objectRule(name: string, mode: Mode): { kind: ObjectKind; maximumSize: number; contentType: ContentType } {
   if (mode === "synthetic") {

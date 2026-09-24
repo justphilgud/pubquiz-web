@@ -266,7 +266,7 @@ const readback = { operation: "backup-readback", store: STORE_ID, key, name: "pr
 const env = { VERCEL_ENV: "production", VERCEL_PROJECT_ID: "prj_operations", AP94_OPERATIONS_PROJECT_ID: "prj_operations",
   BLOB_STORE_ID: STORE_ID, AP94_BRIDGE_MODE: "synthetic", AP94_GITHUB_REPOSITORY_ID: pins.repositoryId, AP94_GITHUB_OWNER_ID: pins.ownerId };
 const completeProvider = (provider: Pick<BlobProvider, "size" | "sign"> & Partial<BlobProvider>): BlobProvider => ({
-  async inventory() { return []; }, async remove() { return; }, ...provider,
+  async inventory() { return { objects: [], cursor: null, complete: true }; }, async remove() { return; }, ...provider,
 });
 const claims = { repository: REPOSITORY, repository_owner: "justphilgud", repository_id: pins.repositoryId, repository_owner_id: pins.ownerId,
   ref: "refs/heads/main", workflow_ref: WORKFLOW, event_name: "workflow_dispatch", environment: "operations-backup",
@@ -387,11 +387,14 @@ test("retention inventory and exact conditional deletion stay backup-only and ca
   const removals: [string, string][] = [];
   const provider = completeProvider({
     async size() { return 123; }, async sign() { return "unused"; },
-    async inventory(prefix) { assert.equal(prefix, "production/acceptance/"); return inventory; },
+    async inventory(prefix, cursor) {
+      assert.equal(prefix, "production/acceptance/"); assert.equal(cursor, undefined);
+      return { objects: inventory, cursor: null, complete: true };
+    },
     async remove(pathname, etag) { removals.push([pathname, etag]); },
   });
   assert.deepEqual(await executeAccess({ operation: "backup-inventory", store: STORE_ID }, retentionIdentity, "acceptance", provider, now),
-    { objects: inventory, complete: true });
+    { objects: inventory, cursor: null, complete: true });
   assert.deepEqual(await executeAccess({ operation: "retention-delete", store: STORE_ID, key: old, name: "manifest.json", etag: "etag-old" },
     retentionIdentity, "acceptance", provider, now), { deleted: true });
   assert.deepEqual(removals, [[`${old}/manifest.json`, "etag-old"]]);
@@ -401,6 +404,33 @@ test("retention inventory and exact conditional deletion stay backup-only and ca
     retentionIdentity, "acceptance", provider, now));
   await assert.rejects(executeAccess({ operation: "backup-inventory", store: STORE_ID },
     { ...retentionIdentity, environment: "operations-restore", eventName: "workflow_dispatch" }, "acceptance", provider, now));
+  await assert.rejects(executeAccess({ operation: "backup-inventory", store: STORE_ID, cursor: "x".repeat(1025) },
+    retentionIdentity, "acceptance", provider, now));
+});
+
+test("retention runner paginates inventory beyond the former 4096-object ceiling", async () => {
+  const total = 4_101; const pageSize = 1_000; let bridgeCalls = 0;
+  const objects = Array.from({ length: total }, (_, index) => ({
+    pathname: `production/acceptance/run-${1000 + Math.floor(index / 3)}-1/object-${index}.bin`,
+    size: index + 1, uploadedAt: new Date(now - index).toISOString(), etag: `etag-${index}`,
+  }));
+  const jwt = `e30.${Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 300 })).toString("base64url")}.signature`;
+  const request: typeof fetch = async (input, init) => {
+    const url = new URL(String(input));
+    if (url.hostname.endsWith(".actions.githubusercontent.com")) return Response.json({ value: jwt });
+    bridgeCalls += 1;
+    const body = JSON.parse(String(init?.body)) as { cursor?: string };
+    const offset = body.cursor ? Number(body.cursor.slice(2)) : 0;
+    const page = objects.slice(offset, offset + pageSize); const next = offset + page.length;
+    return Response.json({ objects: page, cursor: next < objects.length ? `p-${next}` : null, complete: next >= objects.length });
+  };
+  const clientEnv = { ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "secret-request-token", AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app",
+    AP94_TRANSPORT_MODE: "acceptance", AP94_OIDC_TRANSPORT_ACCEPTED: "true", GITHUB_RUN_ID: "123456",
+    GITHUB_RUN_ATTEMPT: "1", BACKUP_PRIVATE_BLOB_HOST: STORE_HOST };
+  const client = new BridgeClient(clientEnv, "backup", "production/acceptance/run-123456-1", request);
+  assert.deepEqual(await client.retentionInventory(), objects);
+  assert.equal(bridgeCalls, 5);
 });
 
 test("synthetic object roundtrip, readback, restore read only and expiration (provider model, not live proof)", async () => {
@@ -470,20 +500,23 @@ test("provider inventory is prefix-bounded and deletion is one exact ETag-guarde
     issueSignedToken: async () => { throw new Error("not used"); },
     presignUrl: async () => { throw new Error("not used"); },
     list: (async options => {
+      assert.ok(options);
       calls.push({ list: options });
       return { blobs: [{ pathname: "production/acceptance/run-1-1/manifest.json", size: 10,
-        uploadedAt: new Date(now), etag: "etag-1", url: "private", downloadUrl: "private-download" }], hasMore: false };
+        uploadedAt: new Date(now), etag: "etag-1", url: "private", downloadUrl: "private-download" }],
+        hasMore: !("cursor" in options), ...( "cursor" in options ? {} : { cursor: "next-page" }) };
     }) as typeof blobList,
     del: (async (pathname, options) => { calls.push({ del: { pathname, options } }); }) as typeof blobDel,
   });
-  assert.deepEqual(await provider.inventory("production/acceptance/"), [{
-    pathname: "production/acceptance/run-1-1/manifest.json", size: 10,
-    uploadedAt: new Date(now).toISOString(), etag: "etag-1",
-  }]);
+  const expected = [{ pathname: "production/acceptance/run-1-1/manifest.json", size: 10,
+    uploadedAt: new Date(now).toISOString(), etag: "etag-1" }];
+  assert.deepEqual(await provider.inventory("production/acceptance/"), { objects: expected, cursor: "next-page", complete: false });
+  assert.deepEqual(await provider.inventory("production/acceptance/", "next-page"), { objects: expected, cursor: null, complete: true });
   await provider.remove("production/acceptance/run-1-1/manifest.json", "etag-1");
   const listed = (calls[0] as { list: Record<string, unknown> }).list;
   assert.equal(listed.storeId, STORE_ID); assert.equal(listed.prefix, "production/acceptance/"); assert.equal(listed.limit, 1000);
-  const deleted = (calls[1] as { del: { pathname: string; options: Record<string, unknown> } }).del;
+  const second = (calls[1] as { list: Record<string, unknown> }).list; assert.equal(second.cursor, "next-page");
+  const deleted = (calls[2] as { del: { pathname: string; options: Record<string, unknown> } }).del;
   assert.equal(deleted.pathname, "production/acceptance/run-1-1/manifest.json");
   assert.equal(deleted.options.storeId, STORE_ID); assert.equal(deleted.options.ifMatch, "etag-1");
 });
