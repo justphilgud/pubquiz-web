@@ -28,6 +28,7 @@ type Props = {
   interaction: ResolvedQuizAnswerInteraction;
   value: TeamAnswerDraft | undefined;
   disabled: boolean;
+  submissionOpen?: boolean;
   deadlineAt?: string | null;
   now: number;
   onChange: (value: TeamAnswerDraft) => void;
@@ -83,6 +84,7 @@ function MemeCaptionAnswer({
   interaction,
   value,
   disabled,
+  submissionOpen,
   deadlineAt,
   now,
   onChange,
@@ -163,7 +165,7 @@ function MemeCaptionAnswer({
       <div className="flex items-center justify-between gap-4 rounded-xl bg-fuchsia-50 px-4 py-3 text-sm font-semibold text-fuchsia-950">
         <span>Lokale Vorschau</span>
         {remainingSeconds === null ? (
-          <span>Einreichungen geöffnet</span>
+          <span>{submissionOpen === false ? "Einreichungen beendet" : "Einreichungen geöffnet"}</span>
         ) : (
           <span className="tabular-nums">{remainingSeconds} s</span>
         )}
@@ -199,7 +201,7 @@ function MemeCaptionAnswer({
           {validationError}
         </p>
       ) : (
-        <p className="text-xs text-slate-500">Mindestens eine Caption muss ausgefüllt sein.</p>
+        <p className="text-xs text-slate-500">Je Caption sind maximal 80 Zeichen möglich.</p>
       )}
     </section>
   );
@@ -210,6 +212,7 @@ export default function GenericAnswerRenderer({
   interaction,
   value,
   disabled,
+  submissionOpen,
   deadlineAt = null,
   now,
   onChange,
@@ -238,6 +241,7 @@ export default function GenericAnswerRenderer({
         interaction={interaction}
         value={value}
         disabled={disabled}
+        submissionOpen={submissionOpen}
         deadlineAt={deadlineAt}
         now={now}
         onChange={onChange}
