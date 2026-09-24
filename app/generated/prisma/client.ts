@@ -67,6 +67,16 @@ export type public_question_submissions = Prisma.public_question_submissionsMode
  */
 export type public_question_rate_limits = Prisma.public_question_rate_limitsModel
 /**
+ * Model external_question_import_batches
+ * 
+ */
+export type external_question_import_batches = Prisma.external_question_import_batchesModel
+/**
+ * Model external_question_import_items
+ * 
+ */
+export type external_question_import_items = Prisma.external_question_import_itemsModel
+/**
  * Model fragen_relationen
  * 
  */

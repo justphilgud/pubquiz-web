@@ -402,6 +402,8 @@ export const ModelName = {
   fragen: 'fragen',
   public_question_submissions: 'public_question_submissions',
   public_question_rate_limits: 'public_question_rate_limits',
+  external_question_import_batches: 'external_question_import_batches',
+  external_question_import_items: 'external_question_import_items',
   fragen_relationen: 'fragen_relationen',
   fragen_kategorien: 'fragen_kategorien',
   fragenkategorie: 'fragenkategorie',
@@ -461,7 +463,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -832,6 +834,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.public_question_rate_limitsCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.Public_question_rate_limitsCountAggregateOutputType> | number
+        }
+      }
+    }
+    external_question_import_batches: {
+      payload: Prisma.$external_question_import_batchesPayload<ExtArgs>
+      fields: Prisma.external_question_import_batchesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.external_question_import_batchesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.external_question_import_batchesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>
+        }
+        findFirst: {
+          args: Prisma.external_question_import_batchesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.external_question_import_batchesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>
+        }
+        findMany: {
+          args: Prisma.external_question_import_batchesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>[]
+        }
+        create: {
+          args: Prisma.external_question_import_batchesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>
+        }
+        createMany: {
+          args: Prisma.external_question_import_batchesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.external_question_import_batchesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>[]
+        }
+        delete: {
+          args: Prisma.external_question_import_batchesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>
+        }
+        update: {
+          args: Prisma.external_question_import_batchesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>
+        }
+        deleteMany: {
+          args: Prisma.external_question_import_batchesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.external_question_import_batchesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.external_question_import_batchesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>[]
+        }
+        upsert: {
+          args: Prisma.external_question_import_batchesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_batchesPayload>
+        }
+        aggregate: {
+          args: Prisma.External_question_import_batchesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExternal_question_import_batches>
+        }
+        groupBy: {
+          args: Prisma.external_question_import_batchesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.External_question_import_batchesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.external_question_import_batchesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.External_question_import_batchesCountAggregateOutputType> | number
+        }
+      }
+    }
+    external_question_import_items: {
+      payload: Prisma.$external_question_import_itemsPayload<ExtArgs>
+      fields: Prisma.external_question_import_itemsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.external_question_import_itemsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.external_question_import_itemsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>
+        }
+        findFirst: {
+          args: Prisma.external_question_import_itemsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.external_question_import_itemsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>
+        }
+        findMany: {
+          args: Prisma.external_question_import_itemsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>[]
+        }
+        create: {
+          args: Prisma.external_question_import_itemsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>
+        }
+        createMany: {
+          args: Prisma.external_question_import_itemsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.external_question_import_itemsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>[]
+        }
+        delete: {
+          args: Prisma.external_question_import_itemsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>
+        }
+        update: {
+          args: Prisma.external_question_import_itemsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>
+        }
+        deleteMany: {
+          args: Prisma.external_question_import_itemsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.external_question_import_itemsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.external_question_import_itemsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>[]
+        }
+        upsert: {
+          args: Prisma.external_question_import_itemsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$external_question_import_itemsPayload>
+        }
+        aggregate: {
+          args: Prisma.External_question_import_itemsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExternal_question_import_items>
+        }
+        groupBy: {
+          args: Prisma.external_question_import_itemsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.External_question_import_itemsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.external_question_import_itemsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.External_question_import_itemsCountAggregateOutputType> | number
         }
       }
     }
@@ -4210,6 +4360,61 @@ export const Public_question_rate_limitsScalarFieldEnum = {
 export type Public_question_rate_limitsScalarFieldEnum = (typeof Public_question_rate_limitsScalarFieldEnum)[keyof typeof Public_question_rate_limitsScalarFieldEnum]
 
 
+export const External_question_import_batchesScalarFieldEnum = {
+  import_batch_id: 'import_batch_id',
+  provider: 'provider',
+  requested_count: 'requested_count',
+  fetched_count: 'fetched_count',
+  status: 'status',
+  report_json: 'report_json',
+  error_message: 'error_message',
+  created_by_user_id: 'created_by_user_id',
+  started_at: 'started_at',
+  completed_at: 'completed_at'
+} as const
+
+export type External_question_import_batchesScalarFieldEnum = (typeof External_question_import_batchesScalarFieldEnum)[keyof typeof External_question_import_batchesScalarFieldEnum]
+
+
+export const External_question_import_itemsScalarFieldEnum = {
+  import_item_id: 'import_item_id',
+  import_batch_id: 'import_batch_id',
+  provider: 'provider',
+  external_reference: 'external_reference',
+  license: 'license',
+  license_url: 'license_url',
+  original_language: 'original_language',
+  original_category: 'original_category',
+  original_difficulty: 'original_difficulty',
+  original_type: 'original_type',
+  original_question: 'original_question',
+  original_correct_answer: 'original_correct_answer',
+  original_incorrect_answers: 'original_incorrect_answers',
+  provider_payload_json: 'provider_payload_json',
+  prepared_question: 'prepared_question',
+  prepared_correct_answer: 'prepared_correct_answer',
+  prepared_incorrect_answers: 'prepared_incorrect_answers',
+  explanation: 'explanation',
+  verification_source_url: 'verification_source_url',
+  verification_source_title: 'verification_source_title',
+  suggested_category_id: 'suggested_category_id',
+  suggested_category_name: 'suggested_category_name',
+  mapped_difficulty: 'mapped_difficulty',
+  status: 'status',
+  issue_codes: 'issue_codes',
+  duplicate_candidates: 'duplicate_candidates',
+  content_fingerprint: 'content_fingerprint',
+  question_id: 'question_id',
+  imported_at: 'imported_at',
+  verified_at: 'verified_at',
+  reviewed_at: 'reviewed_at',
+  reviewed_by_user_id: 'reviewed_by_user_id',
+  rejection_reason: 'rejection_reason'
+} as const
+
+export type External_question_import_itemsScalarFieldEnum = (typeof External_question_import_itemsScalarFieldEnum)[keyof typeof External_question_import_itemsScalarFieldEnum]
+
+
 export const Fragen_relationenScalarFieldEnum = {
   fragen_relation_id: 'fragen_relation_id',
   quell_fragen_id: 'quell_fragen_id',
@@ -5094,6 +5299,34 @@ export type ListEnumQuestionScopeFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'ExternalQuestionImportBatchStatus'
+ */
+export type EnumExternalQuestionImportBatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExternalQuestionImportBatchStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ExternalQuestionImportBatchStatus[]'
+ */
+export type ListEnumExternalQuestionImportBatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExternalQuestionImportBatchStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ExternalQuestionImportItemStatus'
+ */
+export type EnumExternalQuestionImportItemStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExternalQuestionImportItemStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ExternalQuestionImportItemStatus[]'
+ */
+export type ListEnumExternalQuestionImportItemStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExternalQuestionImportItemStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'CategoryStatus'
  */
 export type EnumCategoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CategoryStatus'>
@@ -5570,6 +5803,8 @@ export type GlobalOmitConfig = {
   fragen?: Prisma.fragenOmit
   public_question_submissions?: Prisma.public_question_submissionsOmit
   public_question_rate_limits?: Prisma.public_question_rate_limitsOmit
+  external_question_import_batches?: Prisma.external_question_import_batchesOmit
+  external_question_import_items?: Prisma.external_question_import_itemsOmit
   fragen_relationen?: Prisma.fragen_relationenOmit
   fragen_kategorien?: Prisma.fragen_kategorienOmit
   fragenkategorie?: Prisma.fragenkategorieOmit

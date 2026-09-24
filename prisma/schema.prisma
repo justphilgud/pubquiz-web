@@ -82,6 +82,7 @@ model fragen {
   eventreihen                  fragen_eventreihen[]
   story_element_verknuepfungen frage_story_elemente[]
   public_submission             public_question_submissions?
+  external_import_item          external_question_import_items?
 
   @@index([created_by_user_id, review_status, ist_archiviert], map: "idx_fragen_eigene_arbeitsliste")
   @@index([review_status, ist_archiviert, submitted_at], map: "idx_fragen_review_queue")
@@ -112,6 +113,71 @@ model public_question_rate_limits {
 
   @@unique([request_fingerprint, window_start], map: "uq_public_question_rate_limit_window")
   @@index([updated_at], map: "idx_public_question_rate_limits_updated_at")
+  @@schema("pubquiz")
+}
+
+model external_question_import_batches {
+  import_batch_id Int                               @id @default(autoincrement())
+  provider        String                            @db.VarChar(80)
+  requested_count Int
+  fetched_count   Int                               @default(0)
+  status          ExternalQuestionImportBatchStatus @default(FETCHING)
+  report_json     Json?
+  error_message   String?
+  created_by_user_id Int
+  started_at      DateTime                          @default(now())
+  completed_at    DateTime?
+  created_by      users                             @relation("ExternalQuestionImportBatchCreator", fields: [created_by_user_id], references: [id], onDelete: Restrict)
+  items           external_question_import_items[]
+
+  @@index([provider, started_at], map: "idx_external_import_batch_provider_started")
+  @@index([status, started_at], map: "idx_external_import_batch_status_started")
+  @@schema("pubquiz")
+}
+
+model external_question_import_items {
+  import_item_id             Int                              @id @default(autoincrement())
+  import_batch_id            Int
+  provider                   String                           @db.VarChar(80)
+  external_reference         String                           @db.VarChar(128)
+  license                    String                           @db.VarChar(80)
+  license_url                String
+  original_language          String                           @db.VarChar(10)
+  original_category          String
+  original_difficulty        String                           @db.VarChar(40)
+  original_type              String                           @db.VarChar(40)
+  original_question          String
+  original_correct_answer    String
+  original_incorrect_answers Json
+  provider_payload_json      Json
+  prepared_question          String?
+  prepared_correct_answer    String?
+  prepared_incorrect_answers Json?
+  explanation                String?
+  verification_source_url    String?
+  verification_source_title  String?
+  suggested_category_id      Int?
+  suggested_category_name    String?
+  mapped_difficulty          Decimal?                         @db.Decimal(5, 2)
+  status                     ExternalQuestionImportItemStatus @default(IMPORTED)
+  issue_codes                Json                              @default("[]")
+  duplicate_candidates       Json                              @default("[]")
+  content_fingerprint        String                            @db.VarChar(64)
+  question_id                Int?                              @unique(map: "uq_external_import_item_question")
+  imported_at                DateTime                          @default(now())
+  verified_at                DateTime?
+  reviewed_at                DateTime?
+  reviewed_by_user_id        Int?
+  rejection_reason           String?
+  batch                      external_question_import_batches @relation(fields: [import_batch_id], references: [import_batch_id], onDelete: Cascade)
+  suggested_category         fragenkategorie?                  @relation(fields: [suggested_category_id], references: [fragenkategorie_id], onDelete: SetNull)
+  question                   fragen?                           @relation(fields: [question_id], references: [fragen_id], onDelete: SetNull)
+  reviewed_by                users?                            @relation("ExternalQuestionImportItemReviewer", fields: [reviewed_by_user_id], references: [id], onDelete: SetNull)
+
+  @@unique([provider, external_reference], map: "uq_external_import_provider_reference")
+  @@index([import_batch_id, status], map: "idx_external_import_item_batch_status")
+  @@index([content_fingerprint], map: "idx_external_import_item_fingerprint")
+  @@index([suggested_category_id], map: "idx_external_import_item_category")
   @@schema("pubquiz")
 }
 
@@ -156,6 +222,7 @@ model fragenkategorie {
   updated_at         DateTime            @default(now()) @updatedAt
   fragen_kategorien  fragen_kategorien[]
   created_by         users?              @relation("CategoryCreator", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+  external_import_items external_question_import_items[]
 
   @@index([status, kategorie], map: "idx_fragenkategorie_status_name")
   @@index([created_by_user_id], map: "idx_fragenkategorie_created_by")
@@ -912,6 +979,26 @@ enum QuestionReviewStatus {
   @@schema("pubquiz")
 }
 
+enum ExternalQuestionImportBatchStatus {
+  FETCHING
+  PROCESSING
+  REVIEW_READY
+  COMPLETED
+  FAILED
+
+  @@schema("pubquiz")
+}
+
+enum ExternalQuestionImportItemStatus {
+  IMPORTED
+  AUTO_REJECTED
+  REVIEW_REQUIRED
+  APPROVED
+  REJECTED
+
+  @@schema("pubquiz")
+}
+
 enum QuestionTemplateKind {
   SYSTEM
   DYNAMIC
@@ -1264,6 +1351,8 @@ model users {
   gestartete_meme_praesentationen   meme_presentations[]         @relation("MemePresentationStarter")
   geschlossene_meme_votings         meme_presentations[]         @relation("MemePresentationCloser")
   finalisierte_meme_ergebnisse      meme_presentations[]         @relation("MemeResultFinalizer")
+  erstellte_externe_frageimporte    external_question_import_batches[] @relation("ExternalQuestionImportBatchCreator")
+  bewertete_externe_frageimporte    external_question_import_items[]   @relation("ExternalQuestionImportItemReviewer")
 
   @@schema("pubquiz")
 }

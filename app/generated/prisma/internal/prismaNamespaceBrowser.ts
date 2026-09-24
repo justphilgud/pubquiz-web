@@ -56,6 +56,8 @@ export const ModelName = {
   fragen: 'fragen',
   public_question_submissions: 'public_question_submissions',
   public_question_rate_limits: 'public_question_rate_limits',
+  external_question_import_batches: 'external_question_import_batches',
+  external_question_import_items: 'external_question_import_items',
   fragen_relationen: 'fragen_relationen',
   fragen_kategorien: 'fragen_kategorien',
   fragenkategorie: 'fragenkategorie',
@@ -196,6 +198,61 @@ export const Public_question_rate_limitsScalarFieldEnum = {
 } as const
 
 export type Public_question_rate_limitsScalarFieldEnum = (typeof Public_question_rate_limitsScalarFieldEnum)[keyof typeof Public_question_rate_limitsScalarFieldEnum]
+
+
+export const External_question_import_batchesScalarFieldEnum = {
+  import_batch_id: 'import_batch_id',
+  provider: 'provider',
+  requested_count: 'requested_count',
+  fetched_count: 'fetched_count',
+  status: 'status',
+  report_json: 'report_json',
+  error_message: 'error_message',
+  created_by_user_id: 'created_by_user_id',
+  started_at: 'started_at',
+  completed_at: 'completed_at'
+} as const
+
+export type External_question_import_batchesScalarFieldEnum = (typeof External_question_import_batchesScalarFieldEnum)[keyof typeof External_question_import_batchesScalarFieldEnum]
+
+
+export const External_question_import_itemsScalarFieldEnum = {
+  import_item_id: 'import_item_id',
+  import_batch_id: 'import_batch_id',
+  provider: 'provider',
+  external_reference: 'external_reference',
+  license: 'license',
+  license_url: 'license_url',
+  original_language: 'original_language',
+  original_category: 'original_category',
+  original_difficulty: 'original_difficulty',
+  original_type: 'original_type',
+  original_question: 'original_question',
+  original_correct_answer: 'original_correct_answer',
+  original_incorrect_answers: 'original_incorrect_answers',
+  provider_payload_json: 'provider_payload_json',
+  prepared_question: 'prepared_question',
+  prepared_correct_answer: 'prepared_correct_answer',
+  prepared_incorrect_answers: 'prepared_incorrect_answers',
+  explanation: 'explanation',
+  verification_source_url: 'verification_source_url',
+  verification_source_title: 'verification_source_title',
+  suggested_category_id: 'suggested_category_id',
+  suggested_category_name: 'suggested_category_name',
+  mapped_difficulty: 'mapped_difficulty',
+  status: 'status',
+  issue_codes: 'issue_codes',
+  duplicate_candidates: 'duplicate_candidates',
+  content_fingerprint: 'content_fingerprint',
+  question_id: 'question_id',
+  imported_at: 'imported_at',
+  verified_at: 'verified_at',
+  reviewed_at: 'reviewed_at',
+  reviewed_by_user_id: 'reviewed_by_user_id',
+  rejection_reason: 'rejection_reason'
+} as const
+
+export type External_question_import_itemsScalarFieldEnum = (typeof External_question_import_itemsScalarFieldEnum)[keyof typeof External_question_import_itemsScalarFieldEnum]
 
 
 export const Fragen_relationenScalarFieldEnum = {
