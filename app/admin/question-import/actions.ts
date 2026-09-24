@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/app/lib/permissions";
 import { getCurrentUserId } from "@/app/services/questionService";
@@ -39,8 +40,10 @@ export async function startOpenTdbPilotAction() {
 export async function processOpenTdbPhaseTwoAction(formData: FormData) {
   await requireAdmin();
   const batchId = positiveInteger(formData.get("batchId"), "BATCH_ID");
+  const oidcToken = (await headers()).get("x-vercel-oidc-token") ?? undefined;
   const result = await processOpenTdbPhaseTwo({
     batchId,
+    authorizationToken: oidcToken,
     retryFailures: text(formData, "mode") === "retry",
   });
   revalidatePath("/admin/question-import");

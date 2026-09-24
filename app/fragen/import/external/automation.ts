@@ -344,13 +344,19 @@ function prompt(question: ExternalQuestion, availableCategories: readonly string
 export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestionAutomationAdapter {
   readonly model = OPENTDB_AUTOMATION_MODEL;
 
-  constructor(private readonly request: typeof fetch = fetch) {}
+  constructor(
+    private readonly request: typeof fetch = fetch,
+    private readonly runtimeToken?: string,
+  ) {}
 
   async process(input: {
     question: ExternalQuestion;
     availableCategories: readonly string[];
   }): Promise<ExternalQuestionAutomationResult> {
-    const token = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+    const token =
+      process.env.AI_GATEWAY_API_KEY ||
+      this.runtimeToken ||
+      process.env.VERCEL_OIDC_TOKEN;
     if (!token) throw new Error("OPENTDB_AUTOMATION_CREDENTIAL_MISSING");
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {

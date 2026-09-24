@@ -42,7 +42,10 @@ Prüfqueue)“ erzeugt eine Standardfrage mit `review_status = IN_REVIEW` und
 ## Enrichment und Faktenprüfung
 
 Phase 2 verwendet in Preview Vercel AI Gateway mit dem kurzlebigen, vom
-Deployment bereitgestellten `VERCEL_OIDC_TOKEN`. Es wird kein statisches
+Deployment bereitgestellten OIDC-Token. In Vercel Functions liest die
+authentifizierte Server Action den Token aus dem providerverwalteten
+`x-vercel-oidc-token`-Request-Header; Builds und lokale Vercel-Entwicklung
+können ihn als `VERCEL_OIDC_TOKEN` erhalten. Es wird kein statisches
 KI-Credential im Projekt gespeichert. Der Adapter arbeitet über einen streng
 validierten strukturierten Vertrag und verwendet `perplexity/sonar`, dessen
 Anfragen eine Live-Websuche ausführen.
