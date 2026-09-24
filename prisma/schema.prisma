@@ -154,19 +154,33 @@ model external_question_import_items {
   prepared_correct_answer    String?
   prepared_incorrect_answers Json?
   explanation                String?
+  localization_status        ExternalQuestionLocalizationStatus @default(NOT_RUN)
+  localization_note          String?
+  verification_status        ExternalQuestionVerificationStatus @default(NOT_RUN)
+  verification_note          String?
   verification_source_url    String?
   verification_source_title  String?
+  verification_sources       Json                              @default("[]")
   suggested_category_id      Int?
   suggested_category_name    String?
   mapped_difficulty          Decimal?                         @db.Decimal(5, 2)
   status                     ExternalQuestionImportItemStatus @default(IMPORTED)
   issue_codes                Json                              @default("[]")
   duplicate_candidates       Json                              @default("[]")
+  automation_changes         Json                              @default("[]")
+  automation_model           String?                           @db.VarChar(120)
+  automation_rejection_reason String?
+  automation_started_at      DateTime?
+  automation_completed_at    DateTime?
+  automation_error           String?
   content_fingerprint        String                            @db.VarChar(64)
   question_id                Int?                              @unique(map: "uq_external_import_item_question")
   imported_at                DateTime                          @default(now())
   verified_at                DateTime?
   reviewed_at                DateTime?
+  review_started_at          DateTime?
+  review_edit_count          Int                               @default(0)
+  manually_edited            Boolean                           @default(false)
   reviewed_by_user_id        Int?
   rejection_reason           String?
   batch                      external_question_import_batches @relation(fields: [import_batch_id], references: [import_batch_id], onDelete: Cascade)
@@ -992,9 +1006,30 @@ enum ExternalQuestionImportBatchStatus {
 enum ExternalQuestionImportItemStatus {
   IMPORTED
   AUTO_REJECTED
+  READY_FOR_REVIEW
   REVIEW_REQUIRED
+  REJECT_RECOMMENDED
   APPROVED
   REJECTED
+
+  @@schema("pubquiz")
+}
+
+enum ExternalQuestionLocalizationStatus {
+  NOT_RUN
+  LOCALIZED
+  REVIEW_REQUIRED
+  FAILED
+
+  @@schema("pubquiz")
+}
+
+enum ExternalQuestionVerificationStatus {
+  NOT_RUN
+  VERIFIED
+  CONTRADICTED
+  AMBIGUOUS
+  NO_RELIABLE_SOURCE
 
   @@schema("pubquiz")
 }

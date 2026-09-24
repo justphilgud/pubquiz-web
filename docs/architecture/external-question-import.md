@@ -9,10 +9,12 @@ OpenTDB; das Domänenmodell bleibt providerunabhängig.
 ```text
 ExternalQuestionProvider
   → Normalization
+  → Localization
   → Filtering
   → Enrichment
   → Verification
   → DuplicateCheck
+  → QualityGate
   → Review
   → bestehender Question-Lifecycle
 ```
@@ -39,12 +41,18 @@ Prüfqueue)“ erzeugt eine Standardfrage mit `review_status = IN_REVIEW` und
 
 ## Enrichment und Faktenprüfung
 
-Im Repository existiert derzeit keine freigegebene LLM- oder
-Übersetzungsinfrastruktur. Enrichment wird deshalb über einen streng
-validierten strukturierten Vertrag angenommen. Ohne deutsche Lokalisierung und
-belastbare HTTPS-Fachquelle bleibt der Datensatz blockiert. Ein künftiger
-LLM-Adapter darf nur diesen Vertrag befüllen und muss seine Ausgabe erneut
-validieren.
+Phase 2 verwendet in Preview Vercel AI Gateway mit dem kurzlebigen, vom
+Deployment bereitgestellten `VERCEL_OIDC_TOKEN`. Es wird kein statisches
+KI-Credential im Projekt gespeichert. Der Adapter arbeitet über einen streng
+validierten strukturierten Vertrag und verwendet `perplexity/sonar`, dessen
+Anfragen eine Live-Websuche ausführen.
+
+Eine vom Modell genannte Quellen-URL wird nur gespeichert, wenn sie zugleich in
+den vom Gateway gelieferten Suchzitaten vorkommt. OpenTDB und Quizseiten werden
+als Fachquelle abgewiesen. Ein ausschließlich auf Wikipedia, Fandom oder Reddit
+gestütztes Ergebnis darf nicht `VERIFIED` werden. Ohne natürliche deutsche
+Lokalisierung und belastbare HTTPS-Fachquelle bleibt der Datensatz blockiert.
+Freie Modellausgaben gelangen nicht ungeprüft in die Datenbank.
 
 Deterministische Regeln markieren unter anderem zeitabhängige,
 sprachabhängige, lokal stark gebundene, strukturell ungültige und doppelte
@@ -60,13 +68,25 @@ das Quellenfeld die fachliche Quelle mit dem Hinweis auf die bearbeitete bzw.
 
 ## Umgebungsschutz
 
-Der 100-Fragen-Pilot kann nur in `preview` gestartet werden. Lokal ist er nur
+Der 100-Fragen-Pilot und seine Phase-2-Aufbereitung können nur in `preview`
+gestartet werden. Lokal ist der Schreibpfad nur
 mit dem expliziten Schalter `OPENTDB_PILOT_ALLOW_LOCAL=true` möglich. In
 Production verweigern alle schreibenden Importaktionen die Ausführung.
 
+Phase 2 akzeptiert ausschließlich den bereits vorhandenen Batch `#1` mit exakt
+100 Datensätzen. Jeder Aufruf verarbeitet höchstens fünf noch nicht bearbeitete
+Kandidaten. Fehler werden am einzelnen Kandidaten gespeichert und brechen nicht
+den restlichen Batch ab. Ein erneuter Providerabruf findet nicht statt.
+
+Das Quality Gate unterscheidet `READY_FOR_REVIEW`, `REVIEW_REQUIRED` und
+`REJECT_RECOMMENDED`. Keine dieser Einstufungen veröffentlicht eine Frage. Erst
+eine explizite Adminaktion erzeugt wie bisher eine unveröffentlichte Frage mit
+`review_status = IN_REVIEW`.
+
 ## Offene Ausbaustufe
 
-Vor einem Production-Massendurchlauf braucht es einen freigegebenen
-Übersetzungs-/Enrichment-Adapter, eine belastbare Quellenrecherche je Frage und
-eine Pilotentscheidung anhand der gemessenen Akzeptanzquote. Die bestehende
-Implementierung skaliert diese Schritte bewusst nicht automatisch hoch.
+Vor einem Production-Massendurchlauf braucht es weiterhin die menschliche
+Stichprobe mit Annahme-, Änderungs- und Reviewzeitmessung. Der Phase-2-Adapter
+ist absichtlich an Preview, Batch `#1` und den manuellen Fragen-Lifecycle
+gebunden. Eine spätere Freigabe für weitere Quellen oder Production ist eine
+separate Entscheidung.
