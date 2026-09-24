@@ -206,6 +206,21 @@ test("MEME_CAPTION renders the shared local preview, both limited fields and cou
   assert.equal((html.match(/maxLength="80"/g) ?? []).length, 2);
 });
 
+test("MEME_CAPTION renders an untimed open state without a pseudo countdown", () => {
+  const html = renderToStaticMarkup(createElement(GenericAnswerRenderer, {
+    questionAssignmentId: 42,
+    interaction: { type: "MEME_CAPTION", imageUrl: "base.webp", maxLength: 80 },
+    value: { ...emptyDraft, antwortText: JSON.stringify({ topText: "x".repeat(80), bottomText: "y".repeat(80) }) },
+    disabled: false,
+    deadlineAt: null,
+    now: 8_000,
+    onChange: () => undefined,
+  }));
+  assert.match(html, /Einreichungen geöffnet/);
+  assert.match(html, /80\/80/);
+  assert.doesNotMatch(html, />–<|Sekunden verbleibend|tabular-nums/);
+});
+
 test("poll choices and mobile scale render as first-class interactions", () => {
   const options = [{ id: 1, label: "Option A" }, { id: 2, label: "Option B" }];
   const single = render({ type: "POLL_SINGLE", selectionMode: "SINGLE", options });

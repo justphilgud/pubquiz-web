@@ -1,6 +1,6 @@
 # What the Meme! – AP1
 
-Stand: 23. September 2026
+Stand: 24. September 2026
 
 ## Umfang
 
@@ -19,8 +19,9 @@ Memes, Voting, Gewinner und Punkte folgen in AP2 bis AP4.
   Quiz und nicht zur globalen Frage.
 - Präsentationsnavigation und `quiz_interaction_runs` öffnen den Run. Das
   Erreichen der vorgelagerten `meme-erklaerung` öffnet noch keinen Run; erst der
-  nächste Moderationsschritt auf die Frage erzeugt `COUNTDOWN` und
-  `deadline_at`.
+  nächste Moderationsschritt auf die Frage erzeugt bei aktivierter
+  Zeitbegrenzung `COUNTDOWN` und `deadline_at`. Ohne Zeitbegrenzung entsteht
+  `OPEN` ohne Deadline.
 - Drafts bleiben in `team_antworten`; finale, versionierte und idempotente
   Snapshots bleiben in `team_answer_submissions`. Reload, Mehrgeräte-Konflikte,
   verlorene Responses und Deadline-Ablehnung verwenden unverändert den
@@ -37,14 +38,16 @@ Präsentationscountdown. Seine Frist existiert ausschließlich in
 ```ts
 type MemeQuestionConfig = {
   version: 1;
-  responseDurationSeconds: number; // 60 bis 600
+  timerEnabled: boolean;
+  responseDurationSeconds: number | null; // aktiv: 60 bis 600; inaktiv: null
   maxPresentedMemes: number | null; // 1 bis 100; null bedeutet „Alle“
 };
 ```
 
-Standard sind 90 Sekunden und maximal fünf später präsentierte Memes. AP1 zeigt
-das Limit auf der Introfolie und speichert es; eine Auswahl findet noch nicht
-statt.
+Standard sind ein aktiver Timer mit 90 Sekunden und maximal fünf später
+präsentierte Memes. Bestehende Konfigurationen ohne `timerEnabled` werden aus
+Kompatibilitätsgründen als zeitbegrenzt gelesen. AP1 zeigt den Zeitmodus auf der
+Introfolie und speichert ihn; eine Auswahl findet noch nicht statt.
 
 ## Antwortvertrag
 
@@ -56,8 +59,10 @@ serialisierte Draftform:
 ```
 
 Der Submission-Snapshot enthält dieselben strukturierten Felder als JSON. Beide
-Felder werden getrimmt, sind einzeln optional und auf jeweils 80 Zeichen
-begrenzt. Mindestens eines muss für eine gültige Submission befüllt sein. Der
+Für `Text oben` und `Text unten` gelten jeweils maximal 80 Zeichen. Client,
+Server und Renderer verwenden dieselbe fachliche Grenze. Die Rohfelder werden
+vor dem Trimmen auf diese Länge geprüft, anschließend getrimmt und sind einzeln
+optional. Mindestens eines muss für eine gültige Submission befüllt sein. Der
 Server validiert Form, Länge, Run-, Team- und Fragenidentität sowie die aktuelle
 Deadline erneut. Meme-Fragen haben in AP1 keine Bewertung und ein
 Basispunktemaximum von 0.
@@ -68,7 +73,10 @@ Basispunktemaximum von 0.
 und unteren Text. Die Teamvorschau aktualisiert diese React-Komponente lokal bei
 jeder Eingabe. Dabei entstehen weder Requests noch neue Dateien oder
 Blobobjekte. Die Präsentation nutzt dieselbe Bildkomponente während der
-Bearbeitung ohne Teamtexte und zeigt daneben nur den Countdown.
+Bearbeitung ohne Teamtexte. Bei aktivem Timer zeigt sie daneben den Countdown;
+ohne Timer zeigt sie ausschließlich den offenen beziehungsweise beendeten
+Einreichungsstatus. Die Schriftgröße wird für längere Captions im gemeinsamen
+Renderer abgestuft, sodass auch 80 Zeichen im vorgesehenen Bereich bleiben.
 
 ## Bedienung
 
@@ -84,16 +92,22 @@ Bearbeitung ohne Teamtexte und zeigt daneben nur den Countdown.
 ### Quizkonfiguration
 
 1. Die freigegebene Frage dem Quiz hinzufügen.
-2. In den Einstellungen der Quizfrage die Antwortzeit wählen.
-3. Eine maximale Zahl oder „Alle“ einstellen.
-4. Die Werte werden sofort für diese Zuweisung gespeichert.
+2. **Zeitbegrenzung** aktivieren oder deaktivieren.
+3. Bei aktiver Zeitbegrenzung die Antwortzeit wählen.
+4. Eine maximale Zahl oder „Alle“ einstellen.
+5. Die Werte werden sofort für diese Zuweisung gespeichert.
 
 ### Moderation
 
-Die Meme-Erklärfolie zeigt Aufgabe, Zeit, späteres Präsentationslimit und die
-aktuelle Teamzahl. Während dieser Folie läuft kein Meme-Timer. „Meme-Frage
-starten“ wechselt auf die Frage und öffnet die serverseitige Frist. Nach Ablauf
-wird die Eingabe gesperrt; ein verspäteter Request wird serverseitig abgewiesen.
+Die Meme-Erklärfolie zeigt Aufgabe, Zeitmodus, späteres Präsentationslimit und
+die aktuelle Teamzahl. Während dieser Folie läuft kein Meme-Timer. „Meme-Frage
+starten“ wechselt auf die Frage. Bei aktivem Timer öffnet dies die serverseitige
+Frist; nach Ablauf wird die Eingabe gesperrt und ein verspäteter Request
+serverseitig abgewiesen. Bei deaktivierter Zeitbegrenzung bleibt die
+Meme-Einreichung geöffnet, bis ein berechtigter Moderator sie serverseitig über
+**Einreichungen beenden** beendet. Reloads rekonstruieren `OPEN` oder `CLOSED`
+aus dem Interaction-Run; parallele Moderatorclients verwenden denselben
+idempotenten Close-Übergang.
 
 ## Abnahme
 

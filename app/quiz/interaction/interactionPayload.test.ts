@@ -157,4 +157,16 @@ test("validates structured meme captions and rejects malformed or overlong field
     antwortId: null,
     antwortfelder: {},
   });
+
+  for (const field of ["topText", "bottomText"] as const) {
+    for (const length of [79, 80]) {
+      const payload = { topText: "", bottomText: "", [field]: "x".repeat(length) };
+      assert.equal(validate(meme, { answerText: JSON.stringify(payload) }).hasContent, true);
+    }
+    const payload = { topText: "", bottomText: "", [field]: "x".repeat(81) };
+    assert.throws(
+      () => validate(meme, { answerText: JSON.stringify(payload) }),
+      /höchstens 80 Zeichen/,
+    );
+  }
 });

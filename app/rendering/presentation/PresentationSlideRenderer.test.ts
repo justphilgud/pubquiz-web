@@ -67,7 +67,7 @@ test("AP3: live pixel audience displays stage and absolute countdown before and 
   }
 });
 
-test("AP1: meme intro stays untimed and live question shows only image plus authoritative countdown", () => {
+test("meme intro and live question reflect the authoritative timed or untimed configuration", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const baseQuestion = runtime.quiz.fragen[0];
   assert.ok(baseQuestion);
@@ -77,6 +77,7 @@ test("AP1: meme intro stays untimed and live question shows only image plus auth
     templateId: "meme_beschriften",
     memeConfig: {
       version: 1 as const,
+      timerEnabled: true as const,
       responseDurationSeconds: 120,
       maxPresentedMemes: 4,
     },
@@ -123,7 +124,7 @@ test("AP1: meme intro stays untimed and live question shows only image plus auth
       memeState: null,
     },
   }));
-  assert.match(introHtml, /120 Sekunden/);
+  assert.match(introHtml, /2 Minuten/);
   assert.match(introHtml, /Maximal 4 Memes/);
   assert.match(introHtml, /3 Teams angemeldet/);
   assert.doesNotMatch(introHtml, /Sekunden verbleibend/);
@@ -140,6 +141,7 @@ test("AP1: meme intro stays untimed and live question shows only image plus auth
       memeState: {
         state: "COUNTDOWN",
         deadlineAt: new Date(displayState.now + 42_000).toISOString(),
+        timerEnabled: true,
         responseDurationSeconds: 120,
         maxPresentedMemes: 4,
       },
@@ -160,6 +162,50 @@ test("AP1: meme intro stays untimed and live question shows only image plus auth
   assert.match(liveHtml, /42/);
   assert.match(liveHtml, /42 Sekunden verbleibend/);
   assert.doesNotMatch(liveHtml, /Darf nicht auf der Leinwand erscheinen|Live-Antworten/);
+
+  const untimedQuestion = {
+    ...memeQuestion,
+    memeConfig: {
+      version: 1 as const,
+      timerEnabled: false as const,
+      responseDurationSeconds: null,
+      maxPresentedMemes: 4,
+    },
+  };
+  const untimedIntro: Slide = { typ: "meme-erklaerung", abschnitt: null, frage: untimedQuestion };
+  const untimedLive: Slide = { ...questionSlide, frage: untimedQuestion };
+  const untimedIntroHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz: { ...quiz, fragen: [untimedQuestion] },
+    slide: untimedIntro,
+    slides: [untimedIntro, untimedLive],
+    slideIndex: 0,
+    slideLabel: "Meme-Runde",
+    theme: runtime.theme,
+    displayState: { ...displayState, teamJoinState: { teams: [], totalTeams: 3, remainingTeams: 3 } },
+  }));
+  assert.match(untimedIntroHtml, /Moderator beendet die Einreichungsphase|Ohne Zeitlimit/);
+  assert.doesNotMatch(untimedIntroHtml, /\d+ Sekunden|\d+ Minuten/);
+
+  const untimedLiveHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz: { ...quiz, fragen: [untimedQuestion] },
+    slide: untimedLive,
+    slides: [untimedIntro, untimedLive],
+    slideIndex: 1,
+    slideLabel: "What the Meme!",
+    theme: runtime.theme,
+    displayState: {
+      ...displayState,
+      memeState: {
+        state: "OPEN",
+        deadlineAt: null,
+        timerEnabled: false,
+        responseDurationSeconds: null,
+        maxPresentedMemes: 4,
+      },
+    },
+  }));
+  assert.match(untimedLiveHtml, /Einreichungen geöffnet/);
+  assert.doesNotMatch(untimedLiveHtml, /Sekunden verbleibend|>–</);
 });
 const playerSource = readFileSync(
   new URL(

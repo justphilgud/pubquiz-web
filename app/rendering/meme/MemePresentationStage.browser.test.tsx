@@ -64,8 +64,8 @@ function state(
     candidates: Array.from({ length: candidateCount }, (_, index) => ({
       candidateId: index + 1,
       number: index + 1,
-      topText: `Ein gut lesbarer oberer Text ${index + 1}`,
-      bottomText: `Ein gut lesbarer unterer Text ${index + 1}`,
+      topText: "W".repeat(80),
+      bottomText: "M".repeat(80),
     })),
     activeCandidateNumber: phase === "PRESENTING" ? 1 : null,
     overviewPage,
@@ -94,6 +94,10 @@ function pageHtml(snapshot: MemePresentationSnapshot, css: string) {
         section: box(section),
         items: [...section.querySelectorAll('article, figure')].map(box),
         articleCount: section.querySelectorAll('article').length,
+        captions: [...section.querySelectorAll('[data-meme-caption]')].map((caption) => ({
+          box: box(caption),
+          figure: box(caption.closest('figure')),
+        })),
       };
       document.querySelector('#result').textContent = JSON.stringify(result);
     });
@@ -148,6 +152,10 @@ test("AP3 meme presentation fits single and paginated overview at 1280x720 and l
           section: { clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number };
           items: Array<{ left: number; top: number; right: number; bottom: number }>;
           articleCount: number;
+          captions: Array<{
+            box: { clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number; left: number; top: number; right: number; bottom: number };
+            figure: { left: number; top: number; right: number; bottom: number };
+          }>;
         } | null = null;
         for (let attempt = 0; attempt < 3; attempt += 1) {
           const { stdout } = await execFileAsync(chrome, [
@@ -174,6 +182,16 @@ test("AP3 meme presentation fits single and paginated overview at 1280x720 and l
         for (const item of result.items) {
           assert.ok(item.left >= -1 && item.top >= -1, `${path} escapes top/left`);
           assert.ok(item.right <= viewport.width + 1 && item.bottom <= viewport.height + 1, `${path} escapes viewport`);
+        }
+        for (const caption of result.captions) {
+          assert.ok(caption.box.scrollWidth <= caption.box.clientWidth + 2, `${path} caption horizontal overflow`);
+          assert.ok(caption.box.left >= caption.figure.left - 1 && caption.box.right <= caption.figure.right + 1, `${path} caption escapes figure horizontally`);
+          assert.ok(caption.box.top >= caption.figure.top - 1 && caption.box.bottom <= caption.figure.bottom + 1, `${path} caption escapes figure vertically`);
+        }
+        for (let index = 0; index < result.captions.length; index += 2) {
+          const top = result.captions[index];
+          const bottom = result.captions[index + 1];
+          assert.ok(top && bottom && top.box.bottom <= bottom.box.top + 1, `${path} top and bottom captions overlap`);
         }
       }
     }

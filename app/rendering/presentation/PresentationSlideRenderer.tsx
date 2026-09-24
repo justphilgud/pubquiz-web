@@ -624,6 +624,8 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   if (frage.templateId === "meme_beschriften") {
     const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
       frage.medien.find((medium) => isBild(medium.datei));
+    const memeConfig = frage.memeConfig ?? DEFAULT_MEME_QUESTION_CONFIG;
+    const timerEnabled = memeState?.timerEnabled ?? memeConfig.timerEnabled;
     const remaining = memeState
       ? memeCountdownRemainingSeconds(memeState.deadlineAt, memeState.state, now)
       : null;
@@ -638,10 +640,20 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         </div>
         <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/85 p-6 text-center shadow-[8px_8px_0_#ff00aa]">
           <p className="text-sm font-black uppercase tracking-[0.25em] text-cyan-200">What the Meme!</p>
-          <strong className="mt-4 text-[7rem] font-black leading-none text-yellow-200" aria-label={`${remaining ?? 0} Sekunden verbleibend`}>
-            {remaining ?? "–"}
-          </strong>
-          <p className="mt-4 text-xl font-bold text-white/70">Sekunden</p>
+          {timerEnabled ? (
+            <>
+              <strong className="mt-4 text-[7rem] font-black leading-none text-yellow-200" aria-label={`${remaining ?? 0} Sekunden verbleibend`}>
+                {remaining ?? 0}
+              </strong>
+              <p className="mt-4 text-xl font-bold text-white/70">Sekunden</p>
+            </>
+          ) : (
+            <strong className="mt-5 text-4xl font-black leading-tight text-yellow-200" data-meme-submissions-open>
+              {memeState?.state === "CLOSED" || memeState?.state === "REVEALED"
+                ? "Einreichungen beendet"
+                : "Einreichungen geöffnet"}
+            </strong>
+          )}
         </aside>
       </section>
     );
@@ -2721,6 +2733,11 @@ function renderAktuellenSlide() {
   }
   if (slide.typ === "meme-erklaerung") {
     const config = slide.frage.memeConfig ?? DEFAULT_MEME_QUESTION_CONFIG;
+    const durationLabel = config.timerEnabled
+      ? config.responseDurationSeconds % 60 === 0
+        ? `${config.responseDurationSeconds / 60} ${config.responseDurationSeconds === 60 ? "Minute" : "Minuten"}`
+        : `${config.responseDurationSeconds} Sekunden`
+      : null;
     const maximum = config.maxPresentedMemes === null
       ? "Alle eingereichten Memes"
       : `Maximal ${config.maxPresentedMemes} Memes`;
@@ -2731,13 +2748,19 @@ function renderAktuellenSlide() {
         <ol className="grid gap-4 text-3xl font-bold">
           <li>1. Oben und/oder unten euren Text eintragen.</li>
           <li>2. Die Vorschau aktualisiert sich direkt auf eurem Gerät.</li>
-          <li>3. Vor Ablauf speichern und bestätigen.</li>
+          <li>3. {config.timerEnabled
+            ? "Vor Ablauf speichern und bestätigen."
+            : "Speichern und bestätigen, bis die Moderation die Einreichungen beendet."}</li>
         </ol>
         <p className="text-2xl font-semibold text-cyan-100">
-          Die Antwortzeit startet erst, wenn die Moderation zur Frage weitergeht.
+          {config.timerEnabled
+            ? `Ihr habt gleich ${durationLabel} Zeit. Die Zeit startet erst, wenn die Moderation zur Frage weitergeht.`
+            : "Erstellt euer Meme. Der Moderator beendet die Einreichungsphase."}
         </p>
         <div className="flex flex-wrap gap-5 text-2xl font-black">
-          <span className="rounded-2xl bg-cyan-300 px-6 py-4 text-slate-950">{config.responseDurationSeconds} Sekunden</span>
+          <span className="rounded-2xl bg-cyan-300 px-6 py-4 text-slate-950">
+            {durationLabel ?? "Ohne Zeitlimit"}
+          </span>
           <span className="rounded-2xl bg-yellow-300 px-6 py-4 text-slate-950">{maximum}</span>
           <span className="rounded-2xl border-2 border-white/35 px-6 py-4">{teamJoinState?.totalTeams ?? 0} Teams angemeldet</span>
         </div>

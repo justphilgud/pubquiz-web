@@ -22,6 +22,14 @@ Content-Umfragen verwenden ebenfalls OPEN und CLOSE, bleiben aber ohne Punkte. B
 
 ## Meme-Präsentation und Voting
 
+Eine Meme-Runde kann mit Countdown oder ohne Zeitbegrenzung konfiguriert sein.
+Ohne Zeitbegrenzung zeigt die Moderation während der offenen Frage
+**Einreichungen beenden**. Diese Aktion schließt den serverseitigen
+Interaction-Run; auch bereits geöffnete Teamclients können danach weder neu
+speichern noch bestehende Einreichungen ändern. Ein Reload öffnet den Run nicht
+erneut. Anschließend folgen dieselbe Auswahl und derselbe Review wie beim
+automatischen Timerende.
+
 Nach dem abgeschlossenen Meme-Review erscheint der Bereich **Meme-Präsentation
 & Voting**:
 

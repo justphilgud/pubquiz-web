@@ -103,7 +103,11 @@ export default function GenericAnswerRenderer({
         </div>
         <div className="flex items-center justify-between gap-4 rounded-xl bg-fuchsia-50 px-4 py-3 text-sm font-semibold text-fuchsia-950">
           <span>Lokale Vorschau</span>
-          <span className="tabular-nums">{remainingSeconds === null ? "–" : `${remainingSeconds} s`}</span>
+          {remainingSeconds === null ? (
+            <span>Einreichungen geöffnet</span>
+          ) : (
+            <span className="tabular-nums">{remainingSeconds} s</span>
+          )}
         </div>
         <label className="block">
           <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">

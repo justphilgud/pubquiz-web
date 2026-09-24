@@ -1950,12 +1950,21 @@ export async function getQuizLiveSnapshotData(
         }
       : null,
     memeState: run && memeConfig
-      ? {
-          state: run.state,
-          deadlineAt: run.deadline_at?.toISOString() ?? null,
-          responseDurationSeconds: memeConfig.responseDurationSeconds,
-          maxPresentedMemes: memeConfig.maxPresentedMemes,
-        }
+      ? memeConfig.timerEnabled
+        ? {
+            state: run.state,
+            deadlineAt: run.deadline_at?.toISOString() ?? null,
+            timerEnabled: true as const,
+            responseDurationSeconds: memeConfig.responseDurationSeconds,
+            maxPresentedMemes: memeConfig.maxPresentedMemes,
+          }
+        : {
+            state: run.state,
+            deadlineAt: null,
+            timerEnabled: false as const,
+            responseDurationSeconds: null,
+            maxPresentedMemes: memeConfig.maxPresentedMemes,
+          }
       : null,
     memePresentationState,
     teamSpecificState: quizTeamSessionId
