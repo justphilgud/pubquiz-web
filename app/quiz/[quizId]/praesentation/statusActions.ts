@@ -433,6 +433,10 @@ export async function resetQuizDurchlauf(quizId: number, expectedRevision: numbe
   return prisma.$transaction(async (tx) => {
     const status = await lockQuizLifecycle(tx, quizId);
     assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
+    // Result entries and votes restrict candidate deletion. Remove those quiz-scoped
+    // aggregates first so the session cascade can remove submissions and candidates.
+    await tx.meme_result_entries.deleteMany({ where: { presentation: { quiz_id: quizId } } });
+    await tx.meme_votes.deleteMany({ where: { presentation: { quiz_id: quizId } } });
     // Session cascades remove drafts, field values, choices and submission snapshots.
     await tx.quiz_team_sessions.deleteMany({ where: { quiz_id: quizId } });
     await tx.quiz_interaction_runs.deleteMany({ where: { quiz_id: quizId } });
