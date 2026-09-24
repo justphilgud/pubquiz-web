@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { findDuplicateCandidates } from "./duplicates";
 import {
+  validateGatewayAutomationResponse,
+  VercelAiGatewayQuestionAutomationAdapter,
+} from "./automation";
+import {
   decodeHtmlEntities,
   decodeOpenTdbText,
   normalizeOpenTdbQuestion,
@@ -214,4 +218,136 @@ test("pilot writes are allowed in Preview and denied in Production", () => {
   assert.equal(canWriteOpenTdbPilot({ environment: "production", allowLocal: true }), false);
   assert.equal(canWriteOpenTdbPilot({ environment: "development", allowLocal: false }), false);
   assert.equal(canWriteOpenTdbPilot({ environment: "development", allowLocal: true }), true);
+});
+
+function gatewayPayload(overrides: Record<string, unknown> = {}) {
+  return {
+    localizedQuestion: "Wie viel ist zwei plus zwei?",
+    localizedCorrectAnswer: "4",
+    localizedIncorrectAnswers: ["2", "3", "5"],
+    explanation: "Zwei plus zwei ergibt vier.",
+    suggestedCategoryName: "Allgemeinwissen",
+    localizationStatus: "LOCALIZED",
+    localizationNote: "Natürlich ins Deutsche übertragen.",
+    verificationStatus: "VERIFIED",
+    verificationNote: "Die Quelle bestätigt das Ergebnis.",
+    sourceUrls: ["https://example.edu/mathematics/addition"],
+    flags: {
+      ambiguous: false,
+      languageDependent: false,
+      localContext: false,
+      poorDistractor: false,
+      sourceQualityLow: false,
+      timeSensitive: false,
+    },
+    changes: ["Frage und Antworten lokalisiert"],
+    qualityNotes: [],
+    rejectRecommended: false,
+    rejectionReason: "",
+    ...overrides,
+  };
+}
+
+test("gateway enrichment accepts only provider-cited HTTPS sources", () => {
+  const result = validateGatewayAutomationResponse({
+    choices: [{ message: { content: JSON.stringify(gatewayPayload()) } }],
+    search_results: [{
+      title: "University Mathematics",
+      url: "https://example.edu/mathematics/addition",
+    }],
+    citations: ["https://example.edu/mathematics/addition"],
+  }, ["Allgemeinwissen"]);
+  assert.equal(result.verificationStatus, "VERIFIED");
+  assert.deepEqual(result.verificationSources, [{
+    title: "University Mathematics",
+    url: "https://example.edu/mathematics/addition",
+  }]);
+  assert.equal(result.enrichment.suggestedCategoryName, "Allgemeinwissen");
+});
+
+test("uncited or low-quality-only claims cannot become VERIFIED", () => {
+  const uncited = validateGatewayAutomationResponse({
+    choices: [{ message: { content: JSON.stringify(gatewayPayload({
+      sourceUrls: ["https://invented.example/fact"],
+    })) } }],
+    citations: ["https://en.wikipedia.org/wiki/Addition"],
+  }, ["Allgemeinwissen"]);
+  assert.equal(uncited.verificationStatus, "NO_RELIABLE_SOURCE");
+  assert.deepEqual(uncited.verificationSources, []);
+
+  const wikipediaOnly = validateGatewayAutomationResponse({
+    choices: [{ message: { content: JSON.stringify(gatewayPayload({
+      sourceUrls: ["https://en.wikipedia.org/wiki/Addition"],
+    })) } }],
+    citations: ["https://en.wikipedia.org/wiki/Addition"],
+  }, ["Allgemeinwissen"]);
+  assert.equal(wikipediaOnly.verificationStatus, "NO_RELIABLE_SOURCE");
+  assert.equal(wikipediaOnly.flags.sourceQualityLow, true);
+});
+
+test("phase-two quality gate produces reproducible review statuses", () => {
+  const question = normalizeOpenTdbQuestion(rawQuestion());
+  assert.ok(question);
+  const ready = prepareExternalQuestion({
+    question,
+    automation: validateGatewayAutomationResponse({
+      choices: [{ message: { content: JSON.stringify(gatewayPayload()) } }],
+      citations: ["https://example.edu/mathematics/addition"],
+    }, ["Allgemeinwissen"]),
+  });
+  assert.equal(ready.qualityStatus, "READY_FOR_REVIEW");
+
+  const timeSensitive = prepareExternalQuestion({
+    question,
+    automation: validateGatewayAutomationResponse({
+      choices: [{ message: { content: JSON.stringify(gatewayPayload({
+        flags: { ...gatewayPayload().flags, timeSensitive: true },
+      })) } }],
+      citations: ["https://example.edu/mathematics/addition"],
+    }, ["Allgemeinwissen"]),
+  });
+  assert.equal(timeSensitive.qualityStatus, "REVIEW_REQUIRED");
+  assert.ok(timeSensitive.issues.includes("TIME_SENSITIVE"));
+
+  const contradicted = prepareExternalQuestion({
+    question,
+    automation: validateGatewayAutomationResponse({
+      choices: [{ message: { content: JSON.stringify(gatewayPayload({
+        verificationStatus: "CONTRADICTED",
+        rejectRecommended: true,
+        rejectionReason: "Die Ausgangsantwort ist falsch.",
+      })) } }],
+      citations: ["https://example.edu/mathematics/addition"],
+    }, ["Allgemeinwissen"]),
+  });
+  assert.equal(contradicted.qualityStatus, "REJECT_RECOMMENDED");
+  assert.ok(contradicted.issues.includes("FACT_CONTRADICTED"));
+});
+
+test("gateway adapter uses short-lived Vercel OIDC without exposing it", async () => {
+  const previousOidc = process.env.VERCEL_OIDC_TOKEN;
+  const previousGatewayKey = process.env.AI_GATEWAY_API_KEY;
+  delete process.env.AI_GATEWAY_API_KEY;
+  process.env.VERCEL_OIDC_TOKEN = "test-oidc-token";
+  try {
+    const adapter = new VercelAiGatewayQuestionAutomationAdapter(async (_input, init) => {
+      assert.equal(new Headers(init?.headers).get("authorization"), "Bearer test-oidc-token");
+      return Response.json({
+        choices: [{ message: { content: JSON.stringify(gatewayPayload()) } }],
+        citations: ["https://example.edu/mathematics/addition"],
+      });
+    });
+    const question = normalizeOpenTdbQuestion(rawQuestion());
+    assert.ok(question);
+    const result = await adapter.process({
+      question,
+      availableCategories: ["Allgemeinwissen"],
+    });
+    assert.equal(result.verificationStatus, "VERIFIED");
+  } finally {
+    if (previousOidc === undefined) delete process.env.VERCEL_OIDC_TOKEN;
+    else process.env.VERCEL_OIDC_TOKEN = previousOidc;
+    if (previousGatewayKey === undefined) delete process.env.AI_GATEWAY_API_KEY;
+    else process.env.AI_GATEWAY_API_KEY = previousGatewayKey;
+  }
 });

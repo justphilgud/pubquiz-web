@@ -1,8 +1,12 @@
 import { findDuplicateCandidates } from "./duplicates";
-import { evaluateExternalQuestionQuality } from "./quality";
+import {
+  determineExternalQuestionQualityStatus,
+  evaluateExternalQuestionQuality,
+} from "./quality";
 import type {
   ExistingQuestionForDuplicateCheck,
   ExternalQuestion,
+  ExternalQuestionAutomationResult,
   ExternalQuestionEnrichment,
   PreparedExternalQuestion,
 } from "./types";
@@ -10,12 +14,15 @@ import type {
 export function prepareExternalQuestion(input: {
   question: ExternalQuestion;
   enrichment?: ExternalQuestionEnrichment | null;
+  automation?: ExternalQuestionAutomationResult | null;
   existingQuestions?: readonly ExistingQuestionForDuplicateCheck[];
 }): PreparedExternalQuestion {
-  const enrichment = input.enrichment ?? null;
+  const automation = input.automation ?? null;
+  const enrichment = input.enrichment ?? automation?.enrichment ?? null;
   const quality = evaluateExternalQuestionQuality({
     question: input.question,
     enrichment,
+    automation,
   });
   const duplicateCandidates = findDuplicateCandidates(
     enrichment?.question ?? input.question.question,
@@ -28,14 +35,22 @@ export function prepareExternalQuestion(input: {
     issues.add("POTENTIAL_SEMANTIC_DUPLICATE");
   }
 
+  const autoRejected =
+    quality.autoRejected || issues.has("POTENTIAL_EXACT_DUPLICATE");
+  const issueList = [...issues];
   return {
     ...input.question,
     enrichment,
+    automation,
     mappedDifficulty: quality.mappedDifficulty,
     suggestedCategoryName: quality.suggestedCategoryName,
-    issues: [...issues],
-    autoRejected:
-      quality.autoRejected || issues.has("POTENTIAL_EXACT_DUPLICATE"),
+    issues: issueList,
+    autoRejected,
     duplicateCandidates,
+    qualityStatus: determineExternalQuestionQualityStatus({
+      autoRejected,
+      automation,
+      issues: issueList,
+    }),
   };
 }

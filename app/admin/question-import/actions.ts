@@ -6,8 +6,10 @@ import { requireAdmin } from "@/app/lib/permissions";
 import { getCurrentUserId } from "@/app/services/questionService";
 import {
   approveExternalQuestion,
+  processOpenTdbPhaseTwo,
   rejectExternalQuestion,
   saveExternalQuestionPreparation,
+  startExternalQuestionReview,
   startOpenTdbPilot,
 } from "@/app/fragen/import/external/externalQuestionImport.server";
 
@@ -32,6 +34,32 @@ export async function startOpenTdbPilotAction() {
   const result = await startOpenTdbPilot({ userId: getCurrentUserId(session) });
   revalidatePath("/admin/question-import");
   redirect(`/admin/question-import?batch=${result.import_batch_id}`);
+}
+
+export async function processOpenTdbPhaseTwoAction(formData: FormData) {
+  await requireAdmin();
+  const batchId = positiveInteger(formData.get("batchId"), "BATCH_ID");
+  const result = await processOpenTdbPhaseTwo({
+    batchId,
+    retryFailures: text(formData, "mode") === "retry",
+  });
+  revalidatePath("/admin/question-import");
+  redirect(
+    `/admin/question-import?batch=${batchId}&processed=${result.processed}&succeeded=${result.succeeded}&failed=${result.failed}`,
+  );
+}
+
+export async function startExternalQuestionReviewAction(formData: FormData) {
+  const session = await requireAdmin();
+  const itemId = positiveInteger(formData.get("itemId"), "ITEM_ID");
+  const batchId = positiveInteger(formData.get("batchId"), "BATCH_ID");
+  const page = positiveInteger(formData.get("page"), "PAGE");
+  await startExternalQuestionReview({
+    itemId,
+    userId: getCurrentUserId(session),
+  });
+  revalidatePath("/admin/question-import");
+  redirect(`/admin/question-import?batch=${batchId}&page=${page}#item-${itemId}`);
 }
 
 export async function saveExternalQuestionAction(formData: FormData) {

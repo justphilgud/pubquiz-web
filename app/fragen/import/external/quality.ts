@@ -1,8 +1,10 @@
 import { normalizeQuestionForSimilarity } from "@/app/fragen/editor/questionSimilarity";
 import type {
   ExternalQuestion,
+  ExternalQuestionAutomationResult,
   ExternalQuestionEnrichment,
   ExternalQuestionIssueCode,
+  ExternalQuestionQualityStatus,
 } from "./types";
 
 const CATEGORY_MAPPING: Record<string, string> = {
@@ -68,9 +70,11 @@ function answerIssues(
 export function evaluateExternalQuestionQuality(input: {
   question: ExternalQuestion;
   enrichment: ExternalQuestionEnrichment | null;
+  automation?: ExternalQuestionAutomationResult | null;
 }) {
   const issues = new Set<ExternalQuestionIssueCode>();
   const { question, enrichment } = input;
+  const automation = input.automation ?? null;
   const categorySuggestion =
     enrichment?.suggestedCategoryName || mapOpenTdbCategory(question.category);
 
@@ -102,6 +106,28 @@ export function evaluateExternalQuestionQuality(input: {
     }
   }
 
+  if (automation) {
+    if (automation.localizationStatus === "REVIEW_REQUIRED") {
+      issues.add("LOCALIZATION_UNCERTAIN");
+    }
+    if (automation.verificationStatus === "CONTRADICTED") {
+      issues.add("FACT_CONTRADICTED");
+    } else if (automation.verificationStatus === "AMBIGUOUS") {
+      issues.add("FACT_AMBIGUOUS");
+    } else if (
+      automation.verificationStatus === "NO_RELIABLE_SOURCE" ||
+      automation.verificationSources.length === 0
+    ) {
+      issues.add("MISSING_FACT_SOURCE");
+    }
+    if (automation.flags.ambiguous) issues.add("AMBIGUOUS_QUESTION");
+    if (automation.flags.languageDependent) issues.add("LANGUAGE_DEPENDENT");
+    if (automation.flags.localContext) issues.add("LOCALE_SPECIFIC");
+    if (automation.flags.poorDistractor) issues.add("POOR_DISTRACTOR");
+    if (automation.flags.sourceQualityLow) issues.add("SOURCE_QUALITY_LOW");
+    if (automation.flags.timeSensitive) issues.add("TIME_SENSITIVE");
+  }
+
   const autoRejected =
     issues.has("MALFORMED_CONTENT") ||
     issues.has("DUPLICATE_ANSWER") ||
@@ -113,4 +139,29 @@ export function evaluateExternalQuestionQuality(input: {
     suggestedCategoryName: categorySuggestion || question.category,
     mappedDifficulty: mapOpenTdbDifficulty(question.difficulty),
   };
+}
+
+export function determineExternalQuestionQualityStatus(input: {
+  autoRejected: boolean;
+  automation: ExternalQuestionAutomationResult | null;
+  issues: readonly ExternalQuestionIssueCode[];
+}): ExternalQuestionQualityStatus {
+  if (input.autoRejected) {
+    return input.automation ? "REJECT_RECOMMENDED" : "AUTO_REJECTED";
+  }
+  if (
+    input.automation?.rejectRecommended ||
+    input.automation?.verificationStatus === "CONTRADICTED"
+  ) {
+    return "REJECT_RECOMMENDED";
+  }
+  if (!input.automation) return "REVIEW_REQUIRED";
+  if (
+    input.automation.localizationStatus !== "LOCALIZED" ||
+    input.automation.verificationStatus !== "VERIFIED" ||
+    input.issues.length > 0
+  ) {
+    return "REVIEW_REQUIRED";
+  }
+  return "READY_FOR_REVIEW";
 }
