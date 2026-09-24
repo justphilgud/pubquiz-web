@@ -67,7 +67,9 @@ export function AutoFitText({ text, zone, overlay = false, externalHeightCqw, on
     function fitsAt(fontSize: number) {
       textElement.style.fontSize = `${fontSize}px`;
       const lineHeight = fontSize * LINE_HEIGHT;
-      const renderedLines = Math.ceil((textElement.scrollHeight - 0.5) / lineHeight);
+      // Browser layout rounds scrollHeight to full pixels. Allow that single
+      // rounding pixel so an exact two-line caption is not counted as three.
+      const renderedLines = Math.ceil((textElement.scrollHeight - 1) / lineHeight);
       return renderedLines <= zone.maxLines &&
         textElement.scrollHeight <= availableHeight + 1 &&
         textElement.scrollWidth <= textElement.clientWidth + 1;

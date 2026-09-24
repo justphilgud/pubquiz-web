@@ -20,6 +20,8 @@ const viewports = [
   { width: 360, height: 800 },
   { width: 390, height: 844 },
   { width: 430, height: 932 },
+  // Mirrors the 570 px renderer width observed in the Preview answer card.
+  { width: 602, height: 900 },
   { width: 1280, height: 720 },
   { width: 1920, height: 1080 },
 ] as const;
