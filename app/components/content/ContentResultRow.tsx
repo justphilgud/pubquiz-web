@@ -1,9 +1,12 @@
 import { MediaBadge, ScopeBadge, StatusBadge, UsageSummary } from "./ContentBadges";
 import ContentActions from "./ContentActions";
-import type { ContentQuizOption, ContentSearchItem } from "./contentLibrary";
+import type { ContentQuizOption, ContentSearchItem, ContentTemplateOption } from "./contentLibrary";
 
-export default function ContentResultRow({ item, quizzes }: { item: ContentSearchItem; quizzes: ContentQuizOption[] }) {
+export default function ContentResultRow({ item, quizzes, templates }: { item: ContentSearchItem; quizzes: ContentQuizOption[]; templates: ContentTemplateOption[] }) {
   const detailsId = `content-details-${item.contentType.toLowerCase()}-${item.id}`;
+  const templateName = item.questionMetrics
+    ? templates.find((template) => template.id === item.questionMetrics?.template)?.name ?? item.questionMetrics.template
+    : null;
   return <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
     <div className="flex flex-wrap items-center gap-2"><ContentTypeBadge type={item.contentType} /><StatusBadge status={item.status} archived={item.archived} />{item.lifecycleStatus && <StatusBadge status={item.lifecycleStatus} archived={false} />}<ScopeBadge scope={item.scope} />{item.contentType !== "POLL" && <MediaBadge count={item.mediaCount} />}</div>
     <h2 className="mt-3 break-words text-xl font-black text-slate-950">{item.title}</h2>
@@ -13,7 +16,7 @@ export default function ContentResultRow({ item, quizzes }: { item: ContentSearc
         <Metric label="Kategorie" value={item.questionMetrics.categories.join(", ") || "Nicht gesetzt"} />
         <Metric label="Quelle" value={item.questionMetrics.source || "Nicht gesetzt"} />
         <Metric label="Antwortart" value={item.questionMetrics.answerMode} />
-        <Metric label="Template" value={item.questionMetrics.template} />
+        <Metric label="Template" value={templateName ?? item.questionMetrics.template} />
         <Metric label="Antworten" value={String(item.questionMetrics.answerCount)} />
         <Metric label="Medien Frage / Antworten" value={`${item.questionMetrics.questionMediaCount} / ${item.questionMetrics.answerMediaCount}`} />
         <Metric label="Quiz-Verwendungen" value={String(item.quizUsages.length)} />

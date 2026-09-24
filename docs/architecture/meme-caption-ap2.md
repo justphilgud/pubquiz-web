@@ -1,4 +1,4 @@
-# Meme beschriften – AP2 Auswahl und Moderation
+# What the Meme! – AP2 Auswahl und Moderation
 
 Stand: 23. September 2026
 

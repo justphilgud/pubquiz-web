@@ -89,12 +89,12 @@ Wichtige Fallbacks:
 - Fehlen einem historischen strukturierten Template die Felder, fällt es kontrolliert auf `TEXT` zurück.
 - `meme_beschriften` wird `MEME_CAPTION`: zwei begrenzte Textfelder, ein
   gemeinsames Basisbild und keine Bewertung. Der vollständige AP1-Vertrag steht
-  in [Meme beschriften – AP1](meme-caption-ap1.md). Auswahl und Review nach dem
-  Run-Ende stehen in [Meme beschriften – AP2](meme-caption-ap2.md). Die
+  in [What the Meme! – AP1](meme-caption-ap1.md). Auswahl und Review nach dem
+  Run-Ende stehen in [What the Meme! – AP2](meme-caption-ap2.md). Die
   anschließende anonyme Präsentation, das selbstwahlgeschützte Voting und die
-  stabile Übergabe beschreibt [Meme beschriften – AP3](meme-caption-ap3.md).
+  stabile Übergabe beschreibt [What the Meme! – AP3](meme-caption-ap3.md).
   Finale Zählung, Gleichstand, zentrale Punkte und direkte beziehungsweise
-  spätere Auflösung stehen in [Meme beschriften – AP4](meme-caption-ap4.md).
+  spätere Auflösung stehen in [What the Meme! – AP4](meme-caption-ap4.md).
 - Ein nicht auflösbarer Vertrag ergibt `NO_ANSWER`; ein bekannter, aber noch nicht gerenderter Typ wird mit `supported: false` markiert.
 
 Der bei Öffnung des Runs aufgelöste Contract wird in `quiz_interaction_runs.config_snapshot` gespeichert. Laufende Interaktionen bleiben damit an ihre konkrete Konfiguration gebunden.

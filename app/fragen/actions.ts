@@ -201,18 +201,41 @@ export async function searchFragen(data: {
           typeof status === "string" && allowedStatuses.has(status),
       )
     : [];
-  const allowedTemplateIds = new Set(
+  const allowedStaticTemplateIds = new Set(
     questionTemplateDefinitions
       .filter((template) => template.enabled && template.availableForFiltering)
       .map((template) => template.id),
   );
-  const templateIds = Array.isArray(data.templateIds)
+  const requestedTemplateIds = Array.isArray(data.templateIds)
     ? data.templateIds.filter(
         (templateId): templateId is string =>
-          typeof templateId === "string" &&
-          allowedTemplateIds.has(templateId),
+          typeof templateId === "string",
       )
     : [];
+  const requestedDynamicTemplateIds = requestedTemplateIds.flatMap(
+    (templateId) => {
+      const match = /^dynamic:(\d+)$/.exec(templateId);
+      const id = match ? Number(match[1]) : 0;
+      return Number.isSafeInteger(id) && id > 0 ? [id] : [];
+    },
+  );
+  const activeDynamicTemplates = requestedDynamicTemplateIds.length > 0
+    ? await prisma.frage_vorlagen.findMany({
+        where: {
+          vorlage_id: { in: requestedDynamicTemplateIds },
+          art: "DYNAMIC",
+          status: "ACTIVE",
+          ist_aktiv: true,
+        },
+        select: { vorlage_id: true },
+      })
+    : [];
+  const activeDynamicTemplateIds = new Set(
+    activeDynamicTemplates.map((template) => template.vorlage_id),
+  );
+  const templateIds = requestedTemplateIds.filter((templateId) =>
+    allowedStaticTemplateIds.has(templateId),
+  );
   const sourceState =
     data.sourceState === "with" || data.sourceState === "without"
       ? data.sourceState
@@ -290,29 +313,34 @@ export async function searchFragen(data: {
     },
   );
   const templateConditions: Prisma.fragenWhereInput[] =
-    templateIds.map((templateId) =>
-      templateId === "standard"
-        ? {
-            OR: [
-              { vorlage_id: null },
-              { vorlage: { code: "standard" } },
-              {
-                vorlage: {
-                  code: {
-                    in: [...getClosedQuestionTemplatePersistenceIds()],
+    [
+      ...templateIds.map((templateId) =>
+        templateId === "standard"
+          ? {
+              OR: [
+                { vorlage_id: null },
+                { vorlage: { code: "standard" } },
+                {
+                  vorlage: {
+                    code: {
+                      in: [...getClosedQuestionTemplatePersistenceIds()],
+                    },
                   },
                 },
-              },
-            ],
-          }
-        : {
-            vorlage: {
-              code: {
-                in: [...getQuestionTemplatePersistenceIds(templateId)],
+              ],
+            }
+          : {
+              vorlage: {
+                code: {
+                  in: [...getQuestionTemplatePersistenceIds(templateId)],
+                },
               },
             },
-          },
-    );
+      ),
+      ...[...activeDynamicTemplateIds].map((sourceTemplateId) => ({
+        source_vorlage_id: sourceTemplateId,
+      })),
+    ];
   const mediaState =
     data.mediaState === "with" || data.mediaState === "without"
       ? data.mediaState
@@ -494,8 +522,10 @@ export async function searchFragen(data: {
       eventreihen: frage.eventreihen.map((entry) => entry.eventreihe.name),
       eventreihe_ids: frage.eventreihen.map((entry) => entry.eventreihe_id),
       template_id:
-        resolveCanonicalQuestionTemplateId(frage.vorlage?.code ?? null) ??
-        "standard",
+        frage.source_vorlage_id !== null
+          ? `dynamic:${frage.source_vorlage_id}`
+          : resolveCanonicalQuestionTemplateId(frage.vorlage?.code ?? null) ??
+            "standard",
       answer_mode: getQuestionAnswerMode({
         templateId: frage.vorlage?.code ?? null,
         answers: frage.antworten.map((answer) => ({

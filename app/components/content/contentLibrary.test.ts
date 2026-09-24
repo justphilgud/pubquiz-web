@@ -47,8 +47,53 @@ test("content entry routes declare the expected initial filters", () => {
 
 test("shared content filters parse and serialize mixed search state", () => {
   const filters = parseContentFilters(new URLSearchParams("q=musik&contentType=ALL&storyType=AUDIO&status=ACTIVE&media=WITH&usage=USED"), "QUESTION");
-  assert.deepEqual(filters, { query: "musik", contentType: "ALL", categoryIds: [], storyType: "AUDIO", status: "ACTIVE", questionLifecycle: "ALL", media: "WITH", usage: "USED", eventSeriesId: null });
+  assert.deepEqual(filters, { query: "musik", contentType: "ALL", templateId: null, categoryIds: [], storyType: "AUDIO", status: "ACTIVE", questionLifecycle: "ALL", media: "WITH", usage: "USED", eventSeriesId: null });
   assert.equal(serializeContentFilters(filters).toString(), "q=musik&storyType=AUDIO&status=ACTIVE&media=WITH&usage=USED");
+});
+
+test("question template filter round-trips with text, category and URL state", () => {
+  const allowedTemplates = ["standard", "kunstwerk", "meme_beschriften"];
+  const filters = parseContentFilters(
+    new URLSearchParams("q=Olympia&contentType=QUESTION&template=meme_beschriften&categoryId=4&status=ACTIVE"),
+    undefined,
+    allowedTemplates,
+  );
+
+  assert.equal(filters.templateId, "meme_beschriften");
+  assert.equal(filters.query, "Olympia");
+  assert.deepEqual(filters.categoryIds, [4]);
+  assert.equal(filters.status, "ACTIVE");
+  assert.equal(
+    serializeContentFilters(filters).toString(),
+    "q=Olympia&contentType=QUESTION&template=meme_beschriften&categoryId=4&status=ACTIVE",
+  );
+  assert.equal(
+    parseContentFilters(
+      new URLSearchParams("contentType=QUESTION&template=unknown"),
+      undefined,
+      allowedTemplates,
+    ).templateId,
+    null,
+  );
+});
+
+test("template filtering is single-select, registry-fed and server-side", () => {
+  const filters = readFileSync(new URL("./ContentFilters.tsx", import.meta.url), "utf8");
+  const page = readFileSync(new URL("./ContentLibraryPage.tsx", import.meta.url), "utf8");
+  const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
+
+  assert.match(filters, /<option value="">Alle Templates<\/option>/);
+  assert.match(filters, /templates\.filter\(\(template\) => template\.availableForFiltering\)/);
+  assert.match(page, /localizeQuestionTemplates/);
+  assert.match(page, /loadDynamicQuestionTemplates\(baseTemplates\)/);
+  assert.match(actions, /templateIds: filters\.templateId \? \[filters\.templateId\] : \[\]/);
+  assert.match(actions, /restrictToQuestionTemplate = filters\.templateId !== null/);
+  assert.match(actions, /includeStories = !restrictToQuestionTemplate/);
+  assert.match(actions, /includePolls = !restrictToQuestionTemplate/);
+  const questionSearch = readFileSync(new URL("../../fragen/actions.ts", import.meta.url), "utf8");
+  assert.match(questionSearch, /source_vorlage_id: sourceTemplateId/);
+  assert.match(questionSearch, /`dynamic:\$\{frage\.source_vorlage_id\}`/);
+  assert.doesNotMatch(filters, /meme_beschriften|kunstwerk|pixelbild/);
 });
 
 test("question lifecycle filters round-trip and are removed for story-only views", () => {
@@ -165,13 +210,13 @@ test("content workspace links directly to canonical creation routes", () => {
 
 test("type changes discard irrelevant filters and preserve relevant ones", () => {
   assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=QUESTION&storyType=AUDIO&categoryId=4")), {
-    query: "", contentType: "QUESTION", categoryIds: [4], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
+    query: "", contentType: "QUESTION", templateId: null, categoryIds: [4], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
   });
   assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=STORY_ELEMENT&storyType=AUDIO&categoryId=4")), {
-    query: "", contentType: "STORY_ELEMENT", categoryIds: [], storyType: "AUDIO", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
+    query: "", contentType: "STORY_ELEMENT", templateId: null, categoryIds: [], storyType: "AUDIO", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
   });
   assert.deepEqual(parseContentFilters(new URLSearchParams("contentType=POLL&storyType=AUDIO&categoryId=4&questionLifecycle=OUTDATED")), {
-    query: "", contentType: "POLL", categoryIds: [], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
+    query: "", contentType: "POLL", templateId: null, categoryIds: [], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null,
   });
 });
 

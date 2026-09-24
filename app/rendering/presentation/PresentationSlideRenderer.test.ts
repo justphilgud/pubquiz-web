@@ -133,7 +133,7 @@ test("AP1: meme intro stays untimed and live question shows only image plus auth
     slide: questionSlide,
     slides: [introSlide, questionSlide],
     slideIndex: 1,
-    slideLabel: "Meme beschriften",
+    slideLabel: "What the Meme!",
     theme: runtime.theme,
     displayState: {
       ...displayState,
