@@ -272,7 +272,9 @@ export function validateGatewayAutomationResponse(
   const citedSources = providerSources(response);
   const citedByKey = new Map(citedSources.map((source) => [sourceKey(source.url), source]));
   const requestedSourceKeys = new Set(payload.sourceUrls.map(sourceKey).filter(Boolean));
-  const verificationSources = citedSources.filter((source) => requestedSourceKeys.has(sourceKey(source.url)));
+  const verificationSources = requestedSourceKeys.size === 0
+    ? citedSources
+    : citedSources.filter((source) => requestedSourceKeys.has(sourceKey(source.url)));
   const reliableSources = verificationSources.filter((source) => !isLowQualitySource(source.url));
   const requestedCategory = availableCategories.find(
     (category) => normalizeComparable(category) === normalizeComparable(payload.suggestedCategoryName),
