@@ -81,10 +81,21 @@ import {
   readMemeLiveConfigSnapshot,
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
+import { isMemeCaptionPayloadReadable } from "@/app/quiz/memeCaptionLayout";
 import { isMemeCaptionQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { getMemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 
 type DbClient = Prisma.TransactionClient;
+
+function isReadableMemeSubmission(
+  interactionType: string,
+  payload: QuizInteractionPayload,
+) {
+  if (interactionType !== "MEME_CAPTION") return true;
+  return "topText" in payload &&
+    "bottomText" in payload &&
+    isMemeCaptionPayloadReadable(payload);
+}
 
 /** Caller holds the quiz lock; all writes and closes share quiz -> run -> draft. */
 export async function expireQuizBlockDeadlines(db: DbClient, quizId: number, now = new Date()) {
@@ -321,6 +332,9 @@ async function autoFinalizeDrafts(
       interaction,
       draftInputFromStored(draft),
     );
+    if (!isReadableMemeSubmission(run.interaction_type, validated.payload)) {
+      continue;
+    }
     const teamSubmissions = existing.filter(
       (submission) => submission.quiz_team_session_id === draft.quiz_team_session_id,
     );
@@ -1225,6 +1239,9 @@ export async function submitTeamAnswer(input: {
     const validated = validateInteractionPayload(interaction, draftInputFromStored(draft));
     if (!validated.hasContent) {
       return { success: false, reason: "EMPTY_DRAFT" as const };
+    }
+    if (!isReadableMemeSubmission(run.interaction_type, validated.payload)) {
+      return { success: false, reason: "MEME_CAPTION_TOO_LONG" as const };
     }
     const existingSubmissions = await tx.team_answer_submissions.findMany({
       where: {
