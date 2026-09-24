@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { resolveParticipantInteractionFromSnapshot } from "@/app/quiz/interaction/interactionStoredAnswer";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import {
@@ -271,4 +272,37 @@ test("resolves custom caption zones into the immutable interaction contract", ()
   });
   assert.equal(interaction.type, "MEME_CAPTION");
   assert.equal(interaction.type === "MEME_CAPTION" ? interaction.layout?.zones[0].id : null, "bubble");
+});
+
+test("participant meme forms keep the run snapshot after the question layout changes", () => {
+  const currentInteraction = resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+  });
+  const snapshottedInteraction = resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+    memeCaptionLayout: {
+      version: 1,
+      mode: "CUSTOM",
+      zones: [{ id: "left", label: "Person links", placement: "IMAGE", x: 5, y: 5, width: 40, height: 35, order: 1, maxLines: 2, required: true }],
+    },
+  });
+
+  const resolved = resolveParticipantInteractionFromSnapshot(
+    { interaction: snapshottedInteraction },
+    currentInteraction,
+  );
+  assert.equal(resolved.type, "MEME_CAPTION");
+  assert.equal(resolved.type === "MEME_CAPTION" ? resolved.layout?.mode : null, "CUSTOM");
+  assert.equal(resolved.type === "MEME_CAPTION" ? resolved.layout?.zones[0].label : null, "Person links");
+});
+
+test("participant non-meme forms keep the current read model", () => {
+  const currentInteraction = resolve({ templateId: null });
+  const resolved = resolveParticipantInteractionFromSnapshot(
+    { interaction: { type: "TEXT", multiline: true, inputMode: "text", placeholder: "Veraltet" } },
+    currentInteraction,
+  );
+  assert.deepEqual(resolved, currentInteraction);
 });

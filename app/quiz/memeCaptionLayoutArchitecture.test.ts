@@ -14,6 +14,7 @@ const answerRenderer = readFileSync(
   new URL("./[quizId]/antworten/GenericAnswerRenderer.tsx", import.meta.url),
   "utf8",
 );
+const quizActions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
 
 test("AP5 keeps one shared renderer and reusable AutoFitText", () => {
   assert.match(renderer, /AutoFitText/);
@@ -28,4 +29,12 @@ test("client and server both block unreadable final meme submissions", () => {
   assert.match(interactionServer, /MEME_CAPTION_TOO_LONG/);
   assert.match(interactionServer, /isReadableMemeSubmission/);
   assert.match(interactionServer, /continue;/);
+});
+
+test("AP6 participant forms receive custom zones and preserve the immutable run snapshot", () => {
+  assert.match(quizActions, /memeCaptionLayout:\s*templateConfig\?\.memeCaptionLayout/);
+  assert.match(
+    quizActions,
+    /resolveParticipantInteractionFromSnapshot\([\s\S]*interactionRun\?\.config_snapshot[\s\S]*currentInteraction/,
+  );
 });
