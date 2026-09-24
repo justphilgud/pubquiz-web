@@ -47,3 +47,11 @@ test("requires at least one field at submission level while preserving valid str
   assert.equal(parseMemeCaptionPayload({ topText: "x".repeat(81), bottomText: "" }), null);
   assert.equal(parseMemeCaptionPayload({ topText: "oben" }), null);
 });
+
+test("zoned payloads trim stable caption IDs while legacy payloads stay valid", () => {
+  assert.deepEqual(parseMemeCaptionPayload({ captions: { bubble: " Hallo ", panel_2: " Welt " } }), {
+    captions: { bubble: "Hallo", panel_2: "Welt" },
+  });
+  assert.equal(parseMemeCaptionPayload({ captions: { "not valid": "Text" } }), null);
+  assert.equal(parseMemeCaptionPayload({ captions: { bubble: "x".repeat(81) } }), null);
+});

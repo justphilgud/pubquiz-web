@@ -158,3 +158,25 @@ test("validates structured meme captions and rejects malformed or overlong field
     antwortfelder: {},
   });
 });
+
+test("validates custom caption maps against the snapshotted zone contract", () => {
+  const meme = {
+    type: "MEME_CAPTION" as const,
+    imageUrl: "/medien/base.webp",
+    maxLength: 80,
+    layout: {
+      version: 1 as const,
+      mode: "CUSTOM" as const,
+      zones: [{ id: "bubble", label: "Sprechblase", placement: "IMAGE" as const, x: 50, y: 5, width: 40, height: 30, order: 1, maxLines: 2 as const, required: true }],
+    },
+  };
+  const result = validate(meme, { answerText: JSON.stringify({ captions: { bubble: " Hallo " } }) });
+  assert.deepEqual(result, { payload: { captions: { bubble: "Hallo" } }, hasContent: true });
+  assert.throws(() => validate(meme, { answerText: JSON.stringify({ captions: { unknown: "Text" } }) }), /Caption-Zonen/);
+  assert.throws(() => validate(meme, { answerText: JSON.stringify({ captions: { bubble: "" } }) }), /erforderlichen/);
+  assert.deepEqual(interactionPayloadToDraft(meme, result.payload), {
+    antwortText: JSON.stringify({ captions: { bubble: "Hallo" } }),
+    antwortId: null,
+    antwortfelder: {},
+  });
+});

@@ -15,6 +15,12 @@ export type MemeQuestionConfig = {
 export type MemeCaptionPayload = {
   topText: string;
   bottomText: string;
+} | {
+  captions: Record<string, string>;
+};
+
+export type MemeCaptionValues = {
+  captions: Record<string, string>;
 };
 
 export type MemeLiveState = {
@@ -63,20 +69,30 @@ export function parseMemeQuestionConfig(value: unknown): MemeQuestionConfig | nu
 
 export function parseMemeCaptionPayload(value: unknown): MemeCaptionPayload | null {
   if (!isRecord(value)) return null;
-  if (typeof value.topText !== "string" || typeof value.bottomText !== "string") {
-    return null;
+  if (typeof value.topText === "string" && typeof value.bottomText === "string") {
+    const payload = {
+      topText: value.topText.trim(),
+      bottomText: value.bottomText.trim(),
+    };
+    if (
+      payload.topText.length > MEME_CAPTION_TEXT_MAX_LENGTH ||
+      payload.bottomText.length > MEME_CAPTION_TEXT_MAX_LENGTH
+    ) {
+      return null;
+    }
+    return payload;
   }
-  const payload = {
-    topText: value.topText.trim(),
-    bottomText: value.bottomText.trim(),
-  };
-  if (
-    payload.topText.length > MEME_CAPTION_TEXT_MAX_LENGTH ||
-    payload.bottomText.length > MEME_CAPTION_TEXT_MAX_LENGTH
-  ) {
-    return null;
+  if (!isRecord(value.captions)) return null;
+  const captions: Record<string, string> = {};
+  for (const [key, caption] of Object.entries(value.captions)) {
+    if (
+      !/^[a-z0-9][a-z0-9_-]{0,63}$/u.test(key) ||
+      typeof caption !== "string" ||
+      caption.trim().length > MEME_CAPTION_TEXT_MAX_LENGTH
+    ) return null;
+    captions[key] = caption.trim();
   }
-  return payload;
+  return { captions };
 }
 
 export function serializeMemeCaptionPayload(payload: MemeCaptionPayload) {
@@ -90,6 +106,21 @@ export function parseStoredMemeCaptionPayload(value: string | null): MemeCaption
   } catch {
     return { topText: "", bottomText: "" };
   }
+}
+
+export function memeCaptionPayloadValues(payload: MemeCaptionPayload): MemeCaptionValues {
+  return "captions" in payload
+    ? { captions: { ...payload.captions } }
+    : { captions: { top: payload.topText, bottom: payload.bottomText } };
+}
+
+export function parseStoredMemeCaptionValues(value: string | null): MemeCaptionValues {
+  const payload = parseStoredMemeCaptionPayload(value);
+  return memeCaptionPayloadValues(payload);
+}
+
+export function hasMemeCaptionContent(payload: MemeCaptionPayload) {
+  return Object.values(memeCaptionPayloadValues(payload).captions).some(Boolean);
 }
 
 export function createMemeLiveConfigSnapshot(config: MemeQuestionConfig) {

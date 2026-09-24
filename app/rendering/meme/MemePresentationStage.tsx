@@ -39,6 +39,8 @@ export function MemePresentationStage({
           imageUrl={state.imageUrl}
           topText={activeCandidate.topText}
           bottomText={activeCandidate.bottomText}
+          captions={activeCandidate.captions}
+          layout={activeCandidate.layout}
           alt={`Meme ${activeCandidate.number}`}
           className="max-h-[78%] max-w-4xl border-2 border-white/30 shadow-2xl"
         />
@@ -84,6 +86,8 @@ export function MemePresentationStage({
               imageUrl={state.imageUrl!}
               topText={candidate.topText}
               bottomText={candidate.bottomText}
+              captions={candidate.captions}
+              layout={candidate.layout}
               alt={`Meme ${candidate.number}`}
               className="max-h-full border border-white/20"
             />

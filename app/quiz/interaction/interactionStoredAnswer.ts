@@ -13,6 +13,15 @@ export function readInteractionSnapshot(value: Prisma.JsonValue) {
   return interaction as ResolvedQuizAnswerInteraction;
 }
 
+export function resolveParticipantInteractionFromSnapshot(
+  value: Prisma.JsonValue | null | undefined,
+  currentInteraction: ResolvedQuizAnswerInteraction,
+) {
+  if (!value) return currentInteraction;
+  const snapshot = readInteractionSnapshot(value);
+  return snapshot.type === "MEME_CAPTION" ? snapshot : currentInteraction;
+}
+
 export function draftInputFromStored(answer: {
   antwort_text: string | null;
   antwort_id: number | null;

@@ -6,6 +6,8 @@ import type {
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
 import { parseQuestionTemplateData } from "./templates/questionTemplateData";
 import { parseQuestionSponsor } from "@/app/rendering/presentation/questionSponsor";
+import { parseMemeCaptionLayoutConfig } from "@/app/quiz/memeCaptionZones";
+import { DEFAULT_MEME_CAPTION_LAYOUT } from "@/app/quiz/memeCaptionZones";
 
 export const PIXEL_STAGE_DURATION_MIN_SECONDS = 1;
 export const PIXEL_STAGE_DURATION_MAX_SECONDS = 120;
@@ -34,14 +36,19 @@ export function parseQuestionTemplateConfigDraft(
       templateId,
       false,
     );
-    return templateData
-      ? { ...DEFAULT_PIXEL_TEMPLATE_CONFIG, templateData }
+    const base = templateId === questionTemplateIds.memeCaption
+      ? { ...DEFAULT_PIXEL_TEMPLATE_CONFIG, memeCaptionLayout: DEFAULT_MEME_CAPTION_LAYOUT }
       : DEFAULT_PIXEL_TEMPLATE_CONFIG;
+    return templateData
+      ? { ...base, templateData }
+      : base;
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const config = value as Record<string, unknown>;
   const sponsor = parseQuestionSponsor(config.sponsor);
   if (sponsor === null) return null;
+  const memeCaptionLayout = parseMemeCaptionLayoutConfig(config.memeCaptionLayout);
+  if (memeCaptionLayout === null) return null;
   if (config.pixelMode !== undefined && config.pixelMode !== "CHALLENGE" && config.pixelMode !== "STAGED") return null;
   const pixelMode = config.pixelMode as "CHALLENGE" | "STAGED" | undefined;
   const durations = config.stageDurationsSeconds;
@@ -90,6 +97,7 @@ export function parseQuestionTemplateConfigDraft(
     return {
       ...DEFAULT_PIXEL_TEMPLATE_CONFIG,
       ...(sponsor ? { sponsor } : {}),
+      ...(templateId === questionTemplateIds.memeCaption ? { memeCaptionLayout } : {}),
       ...(pixelMode ? { pixelMode } : {}),
       createPixelQuestionByAnswer: { answer1, answer2 },
       ...(templateData ? { templateData } : {}),
@@ -103,6 +111,7 @@ export function parseQuestionTemplateConfigDraft(
   }
   return {
     ...(sponsor ? { sponsor } : {}),
+    ...(templateId === questionTemplateIds.memeCaption ? { memeCaptionLayout } : {}),
     ...(pixelMode ? { pixelMode } : {}),
     stageDurationsSeconds: {
       stage3: Number(candidate.stage3),
