@@ -9,7 +9,8 @@ Unter **Content** werden Fragen, Story-Elemente und Umfragen gemeinsam verwaltet
 1. **Content** öffnen.
 2. Einen Suchbegriff eingeben.
 3. Über den Inhaltstyp zwischen Fragen, Story-Elementen und Umfragen filtern.
-4. Den Treffer öffnen oder über die direkte Erstellen-Aktion einen neuen Inhalt anlegen.
+4. Bei Fragen optional ein **Template** auswählen, etwa **What the Meme!**. **Alle Templates** hebt diese Einschränkung wieder auf; Suchtext, Kategorien und Status bleiben kombinierbar.
+5. Den Treffer öffnen oder über die direkte Erstellen-Aktion einen neuen Inhalt anlegen.
 
 ## Story-Elemente
 

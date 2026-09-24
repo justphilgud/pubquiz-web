@@ -62,7 +62,7 @@ async function main() {
     { code: "uebersetzt_vorgelesen", name: "Übersetzt vorgelesen", slide_typ: "translated_audio" },
     { code: "anagramm", name: "Anagramm", slide_typ: "anagram" },
     { code: "google_rezensionen", name: "Google-Rezensionen", slide_typ: "review_sequence" },
-    { code: "meme_beschriften", name: "Meme beschriften", slide_typ: "meme_caption" },
+    { code: "meme_beschriften", name: "What the Meme!", slide_typ: "meme_caption" },
   ]) {
     await createVorlage({ ...template, antwortfelder: [] });
   }

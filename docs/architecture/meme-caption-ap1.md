@@ -1,4 +1,4 @@
-# Meme beschriften – AP1
+# What the Meme! – AP1
 
 Stand: 23. September 2026
 
@@ -74,7 +74,7 @@ Bearbeitung ohne Teamtexte und zeigt daneben nur den Countdown.
 
 ### Editor
 
-1. Neue Frage anlegen und „Meme beschriften“ wählen.
+1. Neue Frage anlegen und „What the Meme!“ wählen.
 2. Überschrift, Metadaten, Quelle und gegebenenfalls Sponsor pflegen.
 3. Im erforderlichen Bildslot das Basisbild über die vorhandene
    Medienbibliothek wählen oder hochladen.

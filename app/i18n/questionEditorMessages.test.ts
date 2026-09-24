@@ -118,6 +118,17 @@ test("template ids stay technical while translations change", () => {
   assert.equal(englishFaceMorph?.defaultQuestionText, "Which two people can you see in this image?");
 });
 
+test("meme template keeps its technical id and uses the shared visible name", () => {
+  const german = localizeQuestionTemplates(loadQuestionEditorMessages("de"));
+  const english = localizeQuestionTemplates(loadQuestionEditorMessages("en"));
+  const germanMeme = german.find((template) => template.id === questionTemplateIds.memeCaption);
+  const englishMeme = english.find((template) => template.id === questionTemplateIds.memeCaption);
+
+  assert.equal(germanMeme?.id, "meme_beschriften");
+  assert.equal(germanMeme?.name, "What the Meme!");
+  assert.equal(englishMeme?.name, "What the Meme!");
+});
+
 test("bitcrush copy does not claim 8-bit or chiptune synthesis", () => {
   const de = loadQuestionEditorMessages("de");
   const en = loadQuestionEditorMessages("en");
