@@ -9,6 +9,7 @@ import {
   MEME_CAPTION_MIN_FONT_CQW,
   MEME_CAPTION_PREFERRED_FONT_CQW,
 } from "./memeCaptionLayout";
+import { resolveMemeCaptionLayout } from "./memeCaptionZones";
 
 test("short captions stay large while empty captions need no row", () => {
   assert.deepEqual(analyzeMemeCaptionLayout(""), {
@@ -68,4 +69,16 @@ test("top and bottom captions share the same readability contract", () => {
     }),
     false,
   );
+});
+
+test("custom geometry and required zones participate in deterministic validation", () => {
+  const layout = resolveMemeCaptionLayout({
+    version: 1,
+    mode: "CUSTOM",
+    zones: [{ id: "panel", label: "Panel", placement: "IMAGE", x: 5, y: 5, width: 35, height: 20, order: 1, maxLines: 2, required: true }],
+  });
+  assert.equal(isMemeCaptionPayloadReadable({ captions: { panel: "" } }, layout), false);
+  assert.equal(isMemeCaptionPayloadReadable({ captions: { panel: "Kurzer Text" } }, layout), true);
+  assert.equal(isMemeCaptionPayloadReadable({ captions: { panel: "W".repeat(80) } }, layout), false);
+  assert.equal(isMemeCaptionPayloadReadable({ captions: { unknown: "Text" } }, layout), false);
 });

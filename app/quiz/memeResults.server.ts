@@ -3,7 +3,9 @@ import "server-only";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { CURRENT_QUIZ_ANSWER_EVALUATION_VERSION } from "@/app/quiz/evaluation/evaluationCompleteness";
-import { parseMemeCaptionPayload } from "@/app/quiz/memeCaption";
+import { memeCaptionPayloadValues, parseMemeCaptionPayload } from "@/app/quiz/memeCaption";
+import { resolveMemeCaptionLayout, type ResolvedMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
+import { readInteractionSnapshot } from "@/app/quiz/interaction/interactionStoredAnswer";
 import {
   calculateMemeResult,
   getMemeResultPageCount,
@@ -15,6 +17,8 @@ export type MemeResultSnapshotEntry = {
   number: number;
   topText: string;
   bottomText: string;
+  captions?: Record<string, string>;
+  layout?: ResolvedMemeCaptionLayout;
   teamName: string;
   avatarCode: TeamAvatarCode;
   photoUrl: string | null;
@@ -202,6 +206,7 @@ export async function readMemeResultSnapshot(input: {
       quiz_fragen_id: true,
       result_finalized_at: true,
       result_revision: true,
+      selection: { select: { interaction_run: { select: { config_snapshot: true } } } },
       result_entries: {
         orderBy: { candidate: { position: "asc" } },
         select: {
@@ -245,16 +250,25 @@ export async function readMemeResultSnapshot(input: {
     0,
     ...presentation.result_entries.map((entry) => entry.vote_count),
   );
+  const interaction = readInteractionSnapshot(
+    presentation.selection.interaction_run.config_snapshot,
+  );
+  const layout = interaction.type === "MEME_CAPTION"
+    ? resolveMemeCaptionLayout(interaction.layout)
+    : resolveMemeCaptionLayout(null);
   const entries = presentation.result_entries.map((entry) => {
     const payload = parseMemeCaptionPayload(entry.candidate.submission.payload);
     if (!payload) throw new Error("Ein finalisierter Meme-Kandidat ist ungültig.");
+    const captions = memeCaptionPayloadValues(payload).captions;
     const session = entry.candidate.submission.quiz_team_session;
     const profile = mapTeamProfile(session.team);
     return {
       candidateId: entry.candidate.meme_moderation_candidate_id,
       number: entry.candidate.position,
-      topText: payload.topText,
-      bottomText: payload.bottomText,
+      topText: captions.top ?? "",
+      bottomText: captions.bottom ?? "",
+      captions,
+      layout,
       teamName: session.teamname,
       avatarCode: profile.avatarCode,
       photoUrl: profile.photoUrl,

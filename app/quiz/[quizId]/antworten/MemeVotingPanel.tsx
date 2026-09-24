@@ -146,6 +146,8 @@ export default function MemeVotingPanel({
                   imageUrl={state.imageUrl}
                   topText={candidate.topText}
                   bottomText={candidate.bottomText}
+                  captions={candidate.captions}
+                  layout={candidate.layout}
                   alt={`Meme ${candidate.number}`}
                 />
               ) : null}

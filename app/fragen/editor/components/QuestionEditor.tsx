@@ -75,6 +75,7 @@ import {
   withoutFaceMorphPixelQuestionOptions,
 } from "../pixelTemplateConfig";
 import { PixelStageTimingFields } from "./PixelStageTimingFields";
+import { MemeCaptionLayoutEditor } from "./MemeCaptionLayoutEditor";
 import { getGeneratorDefinition } from "../generators/registry";
 import {
   applySavedAnswerState,
@@ -1082,6 +1083,22 @@ export function QuestionEditor({
             }}
           />
         )}
+
+        {selectedTemplate?.id === questionTemplateIds.memeCaption ? (
+          <MemeCaptionLayoutEditor
+            value={draft.templateConfig.memeCaptionLayout}
+            imageUrl={draft.questionMedia.find((medium) => medium.slotKey === "question_image" && medium.operation !== "REMOVE")?.url ?? null}
+            disabled={isEditorDisabled}
+            validationError={fieldError?.target === "templateMemeCaptionLayout" ? fieldError.text : null}
+            onChange={(memeCaptionLayout) => {
+              if (fieldError?.target === "templateMemeCaptionLayout") setFieldError(null);
+              setDraft((current) => ({
+                ...current,
+                templateConfig: { ...current.templateConfig, memeCaptionLayout },
+              }));
+            }}
+          />
+        ) : null}
 
         {similarQuestions.length > 0 && (
           <aside className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">

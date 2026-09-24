@@ -13,6 +13,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { MemeRenderer } from "./MemeRenderer";
+import { resolveMemeCaptionLayout, type ResolvedMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 
 const execFileAsync = promisify(execFile);
 const viewports = [
@@ -28,6 +29,8 @@ type Scenario = {
   bottomText: string;
   image: string;
   fits: boolean;
+  captions?: Record<string, string>;
+  layout?: ResolvedMemeCaptionLayout;
 };
 
 const scenarios = new Map<string, Scenario>([
@@ -37,6 +40,47 @@ const scenarios = new Map<string, Scenario>([
   ["/both", { topText: "Quizmaster: ganz einfach", bottomText: "Die Teams nach Frage eins", image: "/wide.svg", fits: true }],
   ["/wrapped", { topText: "Wenn der Quizmaster sagt, diese Runde wird wirklich ganz einfach", bottomText: "Fünf große Boxkämpfer jagen Österreich quer über Sylt", image: "/portrait.svg", fits: true }],
   ["/too-long", { topText: "W".repeat(80), bottomText: "", image: "/wide.svg", fits: false }],
+  ["/zones", {
+    topText: "", bottomText: "", image: "/wide.svg", fits: true,
+    captions: { left: "Linkes Panel", right: "Rechtes Panel" },
+    layout: resolveMemeCaptionLayout({ version: 1, mode: "CUSTOM", zones: [
+      { id: "left", label: "Links", placement: "IMAGE", x: 4, y: 8, width: 42, height: 32, order: 1, maxLines: 2, required: false },
+      { id: "right", label: "Rechts", placement: "IMAGE", x: 54, y: 58, width: 42, height: 32, order: 2, maxLines: 2, required: false },
+    ] }),
+  }],
+  ["/two-people", {
+    topText: "", bottomText: "", image: "/wide.svg", fits: true,
+    captions: { "person-left": "Ich habe eine Idee", "person-right": "Das wird lustig" },
+    layout: resolveMemeCaptionLayout({ version: 1, mode: "CUSTOM", zones: [
+      { id: "person-left", label: "Person links", placement: "IMAGE", x: 3, y: 5, width: 44, height: 28, order: 1, maxLines: 2, required: false },
+      { id: "person-right", label: "Person rechts", placement: "IMAGE", x: 53, y: 5, width: 44, height: 28, order: 2, maxLines: 2, required: false },
+    ] }),
+  }],
+  ["/two-panels", {
+    topText: "", bottomText: "", image: "/wide.svg", fits: true,
+    captions: { "panel-one": "Vor dem PubQuiz", "panel-two": "Nach der letzten Runde" },
+    layout: resolveMemeCaptionLayout({ version: 1, mode: "CUSTOM", zones: [
+      { id: "panel-one", label: "Panel eins", placement: "IMAGE", x: 4, y: 64, width: 43, height: 30, order: 1, maxLines: 2, required: false },
+      { id: "panel-two", label: "Panel zwei", placement: "IMAGE", x: 53, y: 64, width: 43, height: 30, order: 2, maxLines: 2, required: false },
+    ] }),
+  }],
+  ["/small-label", {
+    topText: "", bottomText: "", image: "/portrait.svg", fits: true,
+    captions: { label: "Plot Twist" },
+    layout: resolveMemeCaptionLayout({ version: 1, mode: "CUSTOM", zones: [
+      { id: "label", label: "Kleine Sprechblase", placement: "IMAGE", x: 58, y: 12, width: 30, height: 20, order: 1, maxLines: 1, required: false },
+    ] }),
+  }],
+  ["/four-zones", {
+    topText: "", bottomText: "", image: "/wide.svg", fits: true,
+    captions: { a: "Eins", b: "Zwei", c: "Drei", d: "Vier" },
+    layout: resolveMemeCaptionLayout({ version: 1, mode: "CUSTOM", zones: [
+      { id: "a", label: "Oben links", placement: "IMAGE", x: 3, y: 4, width: 44, height: 25, order: 1, maxLines: 1, required: false },
+      { id: "b", label: "Oben rechts", placement: "IMAGE", x: 53, y: 4, width: 44, height: 25, order: 2, maxLines: 1, required: false },
+      { id: "c", label: "Unten links", placement: "IMAGE", x: 3, y: 71, width: 44, height: 25, order: 3, maxLines: 1, required: false },
+      { id: "d", label: "Unten rechts", placement: "IMAGE", x: 53, y: 71, width: 44, height: 25, order: 4, maxLines: 1, required: false },
+    ] }),
+  }],
 ] as const);
 
 function chromeExecutable() {
@@ -75,6 +119,8 @@ function pageHtml(
     imageUrl: scenario.image,
     topText: scenario.topText,
     bottomText: scenario.bottomText,
+    captions: scenario.captions,
+    layout: scenario.layout,
     alt: "Testmotiv",
   }));
   const script = String.raw`
@@ -110,7 +156,7 @@ function decode(value: string) {
     .replaceAll("&amp;", "&");
 }
 
-test("AP5 captions stay separated, readable and image-first from mobile to projection", async () => {
+test("AP5 standard and AP6 zone layouts stay readable from mobile to projection", async () => {
   const chrome = chromeExecutable();
   const css = await applicationCss();
   const wide = '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600"><rect width="1600" height="600" fill="#334155"/></svg>';
@@ -149,7 +195,7 @@ test("AP5 captions stay separated, readable and image-first from mobile to proje
           figure: { clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number };
           image: { clientHeight: number; top: number; bottom: number };
           captions: Array<{
-            position: "top" | "bottom";
+            position: string;
             fit: string;
             caption: { clientWidth: number; clientHeight: number; top: number; bottom: number };
             text: { clientWidth: number; clientHeight: number; scrollWidth: number; scrollHeight: number };
@@ -158,7 +204,9 @@ test("AP5 captions stay separated, readable and image-first from mobile to proje
 
         assert.ok(measured.figure.scrollWidth <= measured.figure.clientWidth + 1, `${path} horizontal overflow at ${viewport.width}`);
         assert.ok(measured.figure.scrollHeight <= measured.figure.clientHeight + 1, `${path} vertical overflow at ${viewport.width}`);
-        assert.equal(measured.captions.length, Number(Boolean(scenario.topText)) + Number(Boolean(scenario.bottomText)));
+        assert.equal(measured.captions.length, scenario.captions
+          ? Object.values(scenario.captions).filter(Boolean).length
+          : Number(Boolean(scenario.topText)) + Number(Boolean(scenario.bottomText)));
 
         if (scenario.fits) {
           for (const caption of measured.captions) {

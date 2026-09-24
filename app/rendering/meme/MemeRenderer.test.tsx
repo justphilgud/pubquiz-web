@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { MemeRenderer } from "./MemeRenderer";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 
 function render(topText = "", bottomText = "") {
   return renderToStaticMarkup(createElement(MemeRenderer, {
@@ -46,4 +47,33 @@ test("legacy topText and bottomText payloads remain directly renderable", () => 
   assert.match(html, /Bestehender Text oben/);
   assert.match(html, /Bestehender Text unten/);
   assert.match(html, /data-auto-fit-text=/);
+});
+
+test("custom image zones use the same renderer and relative geometry", () => {
+  const layout = resolveMemeCaptionLayout({
+    version: 1,
+    mode: "CUSTOM",
+    zones: [{
+      id: "speech",
+      label: "Sprechblase",
+      placement: "IMAGE",
+      x: 12,
+      y: 18,
+      width: 42,
+      height: 28,
+      order: 1,
+      maxLines: 2,
+      required: true,
+    }],
+  });
+  const html = renderToStaticMarkup(createElement(MemeRenderer, {
+    imageUrl: "/meme.webp",
+    alt: "Meme",
+    captions: { speech: "Hallo Zone" },
+    layout,
+  }));
+  assert.match(html, /data-meme-layout="CUSTOM"/);
+  assert.match(html, /data-meme-image-zone="speech"/);
+  assert.match(html, /left:12%;top:18%;width:42%;height:28%/);
+  assert.match(html, /Hallo Zone/);
 });
