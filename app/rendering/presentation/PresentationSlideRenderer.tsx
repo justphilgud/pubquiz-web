@@ -638,10 +638,20 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         </div>
         <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center shadow-[8px_8px_0_var(--quiz-primary)]">
           <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-primary)]">What the Meme!</p>
-          <strong className="mt-4 text-[7rem] font-black leading-none text-[var(--quiz-accent)]" aria-label={`${remaining ?? 0} Sekunden verbleibend`}>
-            {remaining ?? "–"}
-          </strong>
-          <p className="mt-4 text-xl font-bold text-[var(--quiz-text-muted)]">Sekunden</p>
+          {remaining === null ? (
+            <strong className="mt-4 text-3xl font-black leading-tight text-[var(--quiz-accent)]">
+              {memeState?.state === "CLOSED" || memeState?.state === "REVEALED"
+                ? "Einreichungen beendet"
+                : "Einreichungen geöffnet"}
+            </strong>
+          ) : (
+            <>
+              <strong className="mt-4 text-[7rem] font-black leading-none text-[var(--quiz-accent)]" aria-label={`${remaining} Sekunden verbleibend`}>
+                {remaining}
+              </strong>
+              <p className="mt-4 text-xl font-bold text-[var(--quiz-text-muted)]">Sekunden</p>
+            </>
+          )}
         </aside>
       </section>
     );
@@ -2721,6 +2731,11 @@ function renderAktuellenSlide() {
   }
   if (slide.typ === "meme-erklaerung") {
     const config = slide.frage.memeConfig ?? DEFAULT_MEME_QUESTION_CONFIG;
+    const timingText = config.timerEnabled
+      ? config.responseDurationSeconds % 60 === 0
+        ? `Ihr habt gleich ${config.responseDurationSeconds / 60} Minuten Zeit.`
+        : `Ihr habt gleich ${config.responseDurationSeconds} Sekunden Zeit.`
+      : "Erstellt euer Meme. Der Moderator beendet die Einreichungsphase.";
     const maximum = config.maxPresentedMemes === null
       ? "Alle eingereichten Memes"
       : `Maximal ${config.maxPresentedMemes} Memes`;
@@ -2731,13 +2746,15 @@ function renderAktuellenSlide() {
         <ol className="grid gap-4 text-3xl font-bold">
           <li>1. Die vorgesehenen Textbereiche ausfüllen.</li>
           <li>2. Die Vorschau aktualisiert sich direkt auf eurem Gerät.</li>
-          <li>3. Vor Ablauf speichern und bestätigen.</li>
+          <li>3. Speichern und bestätigen.</li>
         </ol>
         <p className="text-2xl font-semibold text-[var(--quiz-secondary)]">
-          Die Antwortzeit startet erst, wenn die Moderation zur Frage weitergeht.
+          {timingText}
         </p>
         <div className="flex flex-wrap gap-5 text-2xl font-black">
-          <span className="rounded-2xl bg-[var(--quiz-secondary)] px-6 py-4 text-[var(--quiz-background)]">{config.responseDurationSeconds} Sekunden</span>
+          <span className="rounded-2xl bg-[var(--quiz-secondary)] px-6 py-4 text-[var(--quiz-background)]">
+            {config.timerEnabled ? `${config.responseDurationSeconds} Sekunden` : "Ohne Zeitlimit"}
+          </span>
           <span className="rounded-2xl bg-[var(--quiz-accent)] px-6 py-4 text-[var(--quiz-background)]">{maximum}</span>
           <span className="rounded-2xl border-2 border-[var(--quiz-border)] px-6 py-4">{teamJoinState?.totalTeams ?? 0} Teams angemeldet</span>
         </div>

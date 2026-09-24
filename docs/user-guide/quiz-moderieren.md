@@ -22,6 +22,13 @@ Content-Umfragen verwenden ebenfalls OPEN und CLOSE, bleiben aber ohne Punkte. B
 
 ## Meme-Präsentation und Voting
 
+Bei einer Meme-Frage mit deaktivierter Zeitbegrenzung bleibt die
+Einreichungsphase ohne Countdown geöffnet. Die berechtigte Moderation beendet
+sie mit **Einreichungen beenden**. Dieser Serverübergang ist verbindlich:
+veraltete Teamclients können danach nicht mehr speichern, und parallele
+Moderationsfenster konvergieren beim nächsten Snapshot auf denselben
+geschlossenen Run.
+
 Final abgegebene Memes erscheinen bereits während der laufenden Antwortphase
 anonym in der Moderation. Sie können sofort freigegeben oder ausgeschlossen
 werden. Der Review kann erst abgeschlossen werden, wenn die Antwortphase

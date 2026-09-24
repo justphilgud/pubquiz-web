@@ -9,6 +9,7 @@ import {
 
 import {
   analyzeMemeCaptionLayout,
+  MEME_CAPTION_EXTERNAL_MIN_FONT_CQW,
   MEME_CAPTION_MIN_FONT_CQW,
 } from "@/app/quiz/memeCaptionLayout";
 import type { MemeCaptionZone } from "@/app/quiz/memeCaptionZones";
@@ -47,9 +48,12 @@ export function AutoFitText({ text, zone, overlay = false, externalHeightCqw, on
     const textElement = content;
 
     const canvasWidth = caption.closest<HTMLElement>("[data-meme-renderer]")?.clientWidth ?? caption.clientWidth;
+    const minimumFontCqw = zone.placement === "IMAGE"
+      ? MEME_CAPTION_MIN_FONT_CQW
+      : MEME_CAPTION_EXTERNAL_MIN_FONT_CQW;
     const minimum = Math.max(
-      12,
-      canvasWidth * (MEME_CAPTION_MIN_FONT_CQW / 100),
+      zone.placement === "IMAGE" ? 12 : 8,
+      canvasWidth * (minimumFontCqw / 100),
     );
     const preferred = Math.min(
       MAX_FONT_SIZE_PX,
@@ -89,7 +93,7 @@ export function AutoFitText({ text, zone, overlay = false, externalHeightCqw, on
     setMeasuredFontSize(best);
     setFits(nextFits);
     fitCallbackRef.current?.(zone.id, text, nextFits);
-  }, [analysis.fontSizeCqw, text, zone.id, zone.maxLines]);
+  }, [analysis.fontSizeCqw, text, zone.id, zone.maxLines, zone.placement]);
 
   useLayoutEffect(() => {
     const caption = captionRef.current;

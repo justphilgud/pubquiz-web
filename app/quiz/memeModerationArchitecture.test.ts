@@ -13,6 +13,14 @@ const review = readFileSync(
   "app/quiz/[quizId]/moderation/components/MemeModerationReview.tsx",
   "utf8",
 );
+const submissionControls = readFileSync(
+  "app/quiz/[quizId]/moderation/components/MemeSubmissionControls.tsx",
+  "utf8",
+);
+const interactionService = readFileSync(
+  "app/quiz/interaction/interaction.server.ts",
+  "utf8",
+);
 
 test("persists exactly one stable selection per interaction run and one stable position", () => {
   assert.match(schema, /interaction_run_id\s+Int\s+@unique/);
@@ -36,7 +44,7 @@ test("review updates use optimistic revisions and never mutate AP1 submissions",
 test("every AP2 Server Action repeats live-controller authorization", () => {
   const exportedActions = [...actions.matchAll(/export async function /g)].length;
   const authorizationChecks = [...actions.matchAll(/requireQuizLiveController\(input\.quizId\)/g)].length;
-  assert.equal(exportedActions, 3);
+  assert.equal(exportedActions, 4);
   assert.equal(authorizationChecks, exportedActions);
 });
 
@@ -70,4 +78,15 @@ test("a completed empty review lets the central Weiter flow leave the Meme quest
   );
   assert.match(review, /selectionState === "SKIPPED"/);
   assert.match(moderationClient, /prepared\?\.skipped/);
+});
+
+test("untimed Meme submissions close through the existing authoritative and idempotent run transition", () => {
+  assert.match(submissionControls, /Einreichungen beenden/);
+  assert.match(submissionControls, /state\.timerEnabled/);
+  assert.match(actions, /closeUntimedMemeSubmissionPhaseAction/);
+  assert.match(actions, /if \(!config \|\| config\.timerEnabled\)/);
+  assert.match(actions, /closeQuizQuestionInteraction/);
+  assert.match(actions, /MODERATOR_CLOSED_MEME_SUBMISSIONS/);
+  assert.match(interactionService, /if \(run\.state === "OPEN" \|\| run\.state === "COUNTDOWN"\)/);
+  assert.match(interactionService, /return run;/);
 });

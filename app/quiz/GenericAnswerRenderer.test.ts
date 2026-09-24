@@ -206,7 +206,22 @@ test("MEME_CAPTION renders the shared local preview, both limited fields and cou
   assert.equal((html.match(/maxLength="80"/g) ?? []).length, 2);
 });
 
-test("MEME_CAPTION warns when real layout rules cannot keep text readable", () => {
+test("MEME_CAPTION renders an untimed open state without a pseudo countdown", () => {
+  const html = renderToStaticMarkup(createElement(GenericAnswerRenderer, {
+    questionAssignmentId: 42,
+    interaction: { type: "MEME_CAPTION", imageUrl: "base.webp", maxLength: 80 },
+    value: { ...emptyDraft, antwortText: JSON.stringify({ topText: "x".repeat(80), bottomText: "y".repeat(80) }) },
+    disabled: false,
+    deadlineAt: null,
+    now: 8_000,
+    onChange: () => undefined,
+  }));
+  assert.match(html, /Einreichungen geöffnet/);
+  assert.match(html, /80\/80/);
+  assert.doesNotMatch(html, />–<|Sekunden verbleibend|tabular-nums/);
+});
+
+test("MEME_CAPTION keeps the full 80-character standard boundary submittable", () => {
   const html = render(
     {
       type: "MEME_CAPTION",
@@ -215,13 +230,13 @@ test("MEME_CAPTION warns when real layout rules cannot keep text readable", () =
     },
     {
       ...emptyDraft,
-      antwortText: JSON.stringify({ topText: "W".repeat(80), bottomText: "" }),
+      antwortText: JSON.stringify({ topText: "W".repeat(80), bottomText: "M".repeat(80) }),
     },
   );
 
-  assert.match(html, /data-meme-caption-validation="overflow"/);
-  assert.match(html, /Dein Text ist zu lang/);
-  assert.match(html, /aria-invalid="true"/);
+  assert.doesNotMatch(html, /data-meme-caption-validation="overflow"/);
+  assert.doesNotMatch(html, /Dein Text ist zu lang/);
+  assert.equal((html.match(/80\/80/g) ?? []).length, 2);
 });
 
 test("poll choices and mobile scale render as first-class interactions", () => {
