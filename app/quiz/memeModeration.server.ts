@@ -9,7 +9,9 @@ import {
   type MemeReviewStatus,
   type StoredMemeSubmission,
 } from "@/app/quiz/memeModeration";
-import { parseMemeCaptionPayload, readMemeLiveConfigSnapshot } from "@/app/quiz/memeCaption";
+import { memeCaptionPayloadValues, parseMemeCaptionPayload, readMemeLiveConfigSnapshot } from "@/app/quiz/memeCaption";
+import { resolveMemeCaptionLayout, type ResolvedMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
+import { readInteractionSnapshot } from "@/app/quiz/interaction/interactionStoredAnswer";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -19,8 +21,8 @@ export type MemeModerationCandidateView = {
   position: number;
   reviewStatus: MemeReviewStatus;
   reviewRevision: number;
-  topText: string;
-  bottomText: string;
+  captions: Record<string, string>;
+  layout: ResolvedMemeCaptionLayout;
 };
 
 export type MemeModerationView =
@@ -49,10 +51,15 @@ type StoredSelection = Prisma.meme_moderation_selectionsGetPayload<{
     candidates: {
       include: { submission: true };
     };
+    interaction_run: { select: { config_snapshot: true } };
   };
 }>;
 
 function toView(selection: StoredSelection): MemeModerationView {
+  const interaction = readInteractionSnapshot(selection.interaction_run.config_snapshot);
+  const layout = interaction.type === "MEME_CAPTION"
+    ? resolveMemeCaptionLayout(interaction.layout)
+    : resolveMemeCaptionLayout(null);
   const candidates = selection.candidates
     .map((candidate) => {
       const payload = parseMemeCaptionPayload(candidate.submission.payload);
@@ -65,8 +72,8 @@ function toView(selection: StoredSelection): MemeModerationView {
         position: candidate.position,
         reviewStatus: candidate.review_status,
         reviewRevision: candidate.review_revision,
-        topText: payload.topText,
-        bottomText: payload.bottomText,
+        captions: memeCaptionPayloadValues(payload).captions,
+        layout,
       };
     })
     .sort((left, right) => left.position - right.position);
@@ -88,6 +95,7 @@ function toView(selection: StoredSelection): MemeModerationView {
 }
 
 const selectionInclude = {
+  interaction_run: { select: { config_snapshot: true } },
   candidates: {
     include: { submission: true },
     orderBy: { position: "asc" as const },
@@ -296,8 +304,8 @@ export type ApprovedMemeCandidate = {
   submissionId: number;
   quizFragenId: number;
   teamId: number;
-  topText: string;
-  bottomText: string;
+  captions: Record<string, string>;
+  layout: ResolvedMemeCaptionLayout;
   position: number;
   reviewStatus: "APPROVED";
   selected: true;
@@ -315,6 +323,7 @@ export async function readApprovedMemeCandidatesForAp3(input: {
     },
     orderBy: { interaction_run_id: "desc" },
     include: {
+      interaction_run: { select: { config_snapshot: true } },
       candidates: {
         where: { review_status: "APPROVED" },
         orderBy: { position: "asc" },
@@ -329,6 +338,10 @@ export async function readApprovedMemeCandidatesForAp3(input: {
     },
   });
   if (!selection) return [];
+  const interaction = readInteractionSnapshot(selection.interaction_run.config_snapshot);
+  const layout = interaction.type === "MEME_CAPTION"
+    ? resolveMemeCaptionLayout(interaction.layout)
+    : resolveMemeCaptionLayout(null);
   return selection.candidates.map((candidate) => {
     const payload = parseMemeCaptionPayload(candidate.submission.payload);
     if (!payload) throw new Error("Ein freigegebener Meme-Kandidat ist ungültig.");
@@ -336,8 +349,8 @@ export async function readApprovedMemeCandidatesForAp3(input: {
       submissionId: candidate.team_answer_submission_id,
       quizFragenId: selection.quiz_fragen_id,
       teamId: candidate.submission.quiz_team_session.team_id,
-      topText: payload.topText,
-      bottomText: payload.bottomText,
+      captions: memeCaptionPayloadValues(payload).captions,
+      layout,
       position: candidate.position,
       reviewStatus: "APPROVED",
       selected: true,

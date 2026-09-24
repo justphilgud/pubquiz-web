@@ -6,13 +6,15 @@ import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTem
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import {
-  parseStoredMemeCaptionPayload,
+  parseStoredMemeCaptionValues,
   serializeMemeCaptionPayload,
 } from "@/app/quiz/memeCaption";
 import {
   analyzeMemeCaptionLayout,
+  isMemeCaptionPayloadReadable,
   MEME_CAPTION_TOO_LONG_MESSAGE,
 } from "@/app/quiz/memeCaptionLayout";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 
 export type TeamAnswerDraft = {
   antwortText: string | null;
@@ -88,26 +90,30 @@ function MemeCaptionAnswer({
 }: Omit<Props, "questionAssignmentId"> & {
   interaction: Extract<ResolvedQuizAnswerInteraction, { type: "MEME_CAPTION" }>;
 }) {
-  const payload = parseStoredMemeCaptionPayload(value?.antwortText ?? null);
+  const layout = resolveMemeCaptionLayout(interaction.layout);
+  const storedValues = parseStoredMemeCaptionValues(value?.antwortText ?? null).captions;
+  const values = Object.fromEntries(
+    layout.zones.map((zone) => [zone.id, storedValues[zone.id] ?? ""]),
+  );
   const validationCallbackRef = useRef(onValidationChange);
-  const [measuredFit, setMeasuredFit] = useState<{
-    top: MemeFitState | null;
-    bottom: MemeFitState | null;
-  }>({ top: null, bottom: null });
+  const [measuredFit, setMeasuredFit] = useState<Record<string, MemeFitState>>({});
   const remainingSeconds = deadlineAt
     ? Math.max(0, Math.ceil((Date.parse(deadlineAt) - now) / 1_000))
     : null;
-  const topAnalysis = analyzeMemeCaptionLayout(payload.topText);
-  const bottomAnalysis = analyzeMemeCaptionLayout(payload.bottomText);
-  const topFits = topAnalysis.fits && !(
-    measuredFit.top?.text === payload.topText && !measuredFit.top.fits
+  const zoneFit = Object.fromEntries(layout.zones.map((zone) => {
+    const text = values[zone.id] ?? "";
+    const deterministic = analyzeMemeCaptionLayout(text, zone).fits;
+    const measured = measuredFit[zone.id];
+    return [zone.id, deterministic && !(measured?.text === text && !measured.fits)];
+  }));
+  const missingRequired = layout.zones.some(
+    (zone) => zone.required && !(values[zone.id] ?? "").trim(),
   );
-  const bottomFits = bottomAnalysis.fits && !(
-    measuredFit.bottom?.text === payload.bottomText && !measuredFit.bottom.fits
-  );
-  const validationError = topFits && bottomFits
-    ? null
-    : MEME_CAPTION_TOO_LONG_MESSAGE;
+  const validationError = missingRequired
+    ? "Bitte fülle alle erforderlichen Caption-Zonen aus."
+    : isMemeCaptionPayloadReadable({ captions: values }, layout) && Object.values(zoneFit).every(Boolean)
+      ? null
+      : MEME_CAPTION_TOO_LONG_MESSAGE;
 
   useEffect(() => {
     validationCallbackRef.current = onValidationChange;
@@ -122,19 +128,23 @@ function MemeCaptionAnswer({
   }, []);
 
   const handleFitChange = useCallback((
-    position: "top" | "bottom",
+    zoneId: string,
     text: string,
     fits: boolean,
   ) => {
     setMeasuredFit((current) => {
-      const previous = current[position];
+      const previous = current[zoneId];
       if (previous?.text === text && previous.fits === fits) return current;
-      return { ...current, [position]: { text, fits } };
+      return { ...current, [zoneId]: { text, fits } };
     });
   }, [setMeasuredFit]);
 
-  const update = (next: { topText: string; bottomText: string }) => onChange({
-    antwortText: serializeMemeCaptionPayload(next),
+  const update = (next: Record<string, string>) => onChange({
+    antwortText: serializeMemeCaptionPayload(
+      layout.mode === "STANDARD"
+        ? { topText: next.top ?? "", bottomText: next.bottom ?? "" }
+        : { captions: next },
+    ),
     antwortId: null,
     antwortfelder: {},
   });
@@ -144,8 +154,8 @@ function MemeCaptionAnswer({
       <div className="overflow-hidden rounded-2xl border border-slate-300 bg-slate-950 p-2">
         <MemeRenderer
           imageUrl={resolveMemeImageUrl(interaction.imageUrl)}
-          topText={payload.topText}
-          bottomText={payload.bottomText}
+          captions={values}
+          layout={layout}
           alt="Meme-Vorschau"
           onCaptionFitChange={handleFitChange}
         />
@@ -154,36 +164,28 @@ function MemeCaptionAnswer({
         <span>Lokale Vorschau</span>
         <span className="tabular-nums">{remainingSeconds === null ? "–" : `${remainingSeconds} s`}</span>
       </div>
-      <label className="block">
-        <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
-          <span>Text oben</span><span>{payload.topText.length}/{interaction.maxLength}</span>
-        </span>
-        <input
-          type="text"
-          maxLength={interaction.maxLength}
-          disabled={disabled}
-          aria-invalid={!topFits}
-          value={payload.topText}
-          onChange={(event) => update({ ...payload, topText: event.target.value })}
-          className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-          placeholder="Text oben"
-        />
-      </label>
-      <label className="block">
-        <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
-          <span>Text unten</span><span>{payload.bottomText.length}/{interaction.maxLength}</span>
-        </span>
-        <input
-          type="text"
-          maxLength={interaction.maxLength}
-          disabled={disabled}
-          aria-invalid={!bottomFits}
-          value={payload.bottomText}
-          onChange={(event) => update({ ...payload, bottomText: event.target.value })}
-          className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-          placeholder="Text unten"
-        />
-      </label>
+      {layout.zones.map((zone) => {
+        const text = values[zone.id] ?? "";
+        return (
+          <label key={zone.id} className="block">
+            <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
+              <span>{zone.label}{zone.required ? " *" : ""}</span>
+              <span>{text.length}/{interaction.maxLength}</span>
+            </span>
+            <input
+              type="text"
+              maxLength={interaction.maxLength}
+              required={zone.required}
+              disabled={disabled}
+              aria-invalid={!zoneFit[zone.id] || (zone.required && !text.trim())}
+              value={text}
+              onChange={(event) => update({ ...values, [zone.id]: event.target.value })}
+              className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
+              placeholder={zone.label}
+            />
+          </label>
+        );
+      })}
       {validationError ? (
         <p
           role="alert"
@@ -193,7 +195,7 @@ function MemeCaptionAnswer({
           {validationError}
         </p>
       ) : (
-        <p className="text-xs text-slate-500">Mindestens eines der beiden Felder muss ausgefüllt sein.</p>
+        <p className="text-xs text-slate-500">Mindestens eine Caption muss ausgefüllt sein.</p>
       )}
     </section>
   );

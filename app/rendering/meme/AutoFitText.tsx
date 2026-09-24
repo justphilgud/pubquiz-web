@@ -9,15 +9,16 @@ import {
 
 import {
   analyzeMemeCaptionLayout,
-  MEME_CAPTION_MAX_LINES,
   MEME_CAPTION_MIN_FONT_CQW,
 } from "@/app/quiz/memeCaptionLayout";
+import type { MemeCaptionZone } from "@/app/quiz/memeCaptionZones";
 
 type Props = {
   text: string;
-  position: "top" | "bottom";
+  zone: MemeCaptionZone;
+  overlay?: boolean;
   onFitChange?: (
-    position: "top" | "bottom",
+    zoneId: string,
     text: string,
     fits: boolean,
   ) => void;
@@ -26,11 +27,11 @@ type Props = {
 const LINE_HEIGHT = 1.02;
 const MAX_FONT_SIZE_PX = 76;
 
-export function AutoFitText({ text, position, onFitChange }: Props) {
+export function AutoFitText({ text, zone, overlay = false, onFitChange }: Props) {
   const captionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const fitCallbackRef = useRef(onFitChange);
-  const analysis = analyzeMemeCaptionLayout(text);
+  const analysis = analyzeMemeCaptionLayout(text, zone);
   const [measuredFontSize, setMeasuredFontSize] = useState<number | null>(null);
   const [fits, setFits] = useState(analysis.fits);
 
@@ -44,13 +45,14 @@ export function AutoFitText({ text, position, onFitChange }: Props) {
     if (!caption || !content || caption.clientWidth === 0) return;
     const textElement = content;
 
+    const canvasWidth = caption.closest<HTMLElement>("[data-meme-renderer]")?.clientWidth ?? caption.clientWidth;
     const minimum = Math.max(
       12,
-      caption.clientWidth * (MEME_CAPTION_MIN_FONT_CQW / 100),
+      canvasWidth * (MEME_CAPTION_MIN_FONT_CQW / 100),
     );
     const preferred = Math.min(
       MAX_FONT_SIZE_PX,
-      Math.max(minimum, caption.clientWidth * (analysis.fontSizeCqw / 100)),
+      Math.max(minimum, canvasWidth * (analysis.fontSizeCqw / 100)),
     );
     const computed = window.getComputedStyle(caption);
     const availableHeight = caption.clientHeight -
@@ -61,7 +63,7 @@ export function AutoFitText({ text, position, onFitChange }: Props) {
       textElement.style.fontSize = `${fontSize}px`;
       const lineHeight = fontSize * LINE_HEIGHT;
       const renderedLines = Math.ceil((textElement.scrollHeight - 0.5) / lineHeight);
-      return renderedLines <= MEME_CAPTION_MAX_LINES &&
+      return renderedLines <= zone.maxLines &&
         textElement.scrollHeight <= availableHeight + 1 &&
         textElement.scrollWidth <= textElement.clientWidth + 1;
     }
@@ -85,8 +87,8 @@ export function AutoFitText({ text, position, onFitChange }: Props) {
 
     setMeasuredFontSize(best);
     setFits(nextFits);
-    fitCallbackRef.current?.(position, text, nextFits);
-  }, [analysis.fontSizeCqw, position, text]);
+    fitCallbackRef.current?.(zone.id, text, nextFits);
+  }, [analysis.fontSizeCqw, text, zone.id, zone.maxLines]);
 
   useLayoutEffect(() => {
     const caption = captionRef.current;
@@ -111,9 +113,10 @@ export function AutoFitText({ text, position, onFitChange }: Props) {
   return (
     <figcaption
       ref={captionRef}
-      data-meme-caption={position}
+      data-meme-caption={zone.id}
+      data-meme-caption-placement={zone.placement}
       data-meme-caption-fit={fits ? "true" : "false"}
-      className="flex min-h-0 items-center justify-center overflow-hidden bg-slate-100 px-[3cqw] py-[0.75cqw] text-center font-bold tracking-[-0.02em] text-slate-950"
+      className={`flex h-full min-h-0 w-full items-center justify-center overflow-hidden px-[3cqw] py-[0.75cqw] text-center font-bold tracking-[-0.02em] ${overlay ? "bg-black/55 text-white [text-shadow:0_2px_4px_rgb(0_0_0/0.9)]" : "bg-slate-100 text-slate-950"}`}
     >
       <span
         ref={textRef}

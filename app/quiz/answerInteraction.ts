@@ -6,6 +6,10 @@ import type {
   TemplateInteractionType,
 } from "@/app/rendering/templates/templateContract";
 import { MEME_CAPTION_TEXT_MAX_LENGTH } from "@/app/quiz/memeCaption";
+import {
+  resolveMemeCaptionLayout,
+  type ResolvedMemeCaptionLayout,
+} from "@/app/quiz/memeCaptionZones";
 
 type AnswerOption = {
   id: number;
@@ -29,6 +33,7 @@ type MemeCaptionInteraction = {
   type: "MEME_CAPTION";
   imageUrl: string;
   maxLength: number;
+  layout?: ResolvedMemeCaptionLayout;
 };
 
 export type ResolvedQuizAnswerInteraction =
@@ -120,6 +125,7 @@ export type QuizAnswerInteractionInput = {
   answerOptions: readonly AnswerOption[];
   orderingItems?: readonly OrderingItem[];
   memeImageUrl?: string | null;
+  memeCaptionLayout?: unknown;
 };
 
 function getAnswerForm(
@@ -287,6 +293,7 @@ export function resolveQuizAnswerInteraction(
       type: "MEME_CAPTION",
       imageUrl: input.memeImageUrl ?? "",
       maxLength: MEME_CAPTION_TEXT_MAX_LENGTH,
+      layout: resolveMemeCaptionLayout(input.memeCaptionLayout),
     };
   }
 

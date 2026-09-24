@@ -12,6 +12,7 @@ import {
   getDefaultQuestionTemplateData,
 } from "./templates/questionTemplateData";
 import { resolveCanonicalQuestionTemplateId } from "./templates/questionTemplateRegistry";
+import { DEFAULT_MEME_CAPTION_LAYOUT } from "@/app/quiz/memeCaptionZones";
 
 export type QuestionTemplateChangeImpact = {
   overwritesContent: boolean;
@@ -83,6 +84,11 @@ export function applyQuestionTemplateToDraft(
           ...draft.templateConfig,
           ...(structuralTemplateId === "pixelbild" && draft.templateId !== "pixelbild" ? {
             pixelMode: "CHALLENGE" as const,
+          } : {}),
+          ...(structuralTemplateId === "meme_beschriften" ? {
+            memeCaptionLayout: draft.templateId === "meme_beschriften"
+              ? draft.templateConfig.memeCaptionLayout ?? DEFAULT_MEME_CAPTION_LAYOUT
+              : DEFAULT_MEME_CAPTION_LAYOUT,
           } : {}),
           ...(templateData ? { templateData } : {}),
         },

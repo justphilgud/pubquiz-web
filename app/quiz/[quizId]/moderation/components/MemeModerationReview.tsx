@@ -204,8 +204,8 @@ export default function MemeModerationReview({
               </div>
               <MemeRenderer
                 imageUrl={imageUrl}
-                topText={candidate.topText}
-                bottomText={candidate.bottomText}
+                captions={candidate.captions}
+                layout={candidate.layout}
                 alt={`Meme-Kandidat ${candidate.position}`}
               />
               <div className="mt-3 grid grid-cols-2 gap-2">

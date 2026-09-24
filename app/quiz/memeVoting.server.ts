@@ -2,7 +2,9 @@ import "server-only";
 
 import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
-import { parseMemeCaptionPayload } from "@/app/quiz/memeCaption";
+import { memeCaptionPayloadValues, parseMemeCaptionPayload } from "@/app/quiz/memeCaption";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
+import { readInteractionSnapshot } from "@/app/quiz/interaction/interactionStoredAnswer";
 import {
   readMemeResultSnapshot,
   type MemeResultSnapshot,
@@ -21,6 +23,7 @@ import {
 type DbClient = Prisma.TransactionClient;
 
 const selectionInclude = {
+  interaction_run: { select: { config_snapshot: true } },
   quiz_frage: {
     select: {
       quiz_fragen_id: true,
@@ -83,14 +86,21 @@ function mediaUrl(file: string | undefined) {
 }
 
 function candidatesFromSelection(selection: SelectionRecord) {
+  const interaction = readInteractionSnapshot(selection.interaction_run.config_snapshot);
+  const layout = interaction.type === "MEME_CAPTION"
+    ? resolveMemeCaptionLayout(interaction.layout)
+    : resolveMemeCaptionLayout(null);
   return selection.candidates.map((candidate) => {
     const payload = parseMemeCaptionPayload(candidate.submission.payload);
     if (!payload) throw new Error("Ein freigegebener Meme-Kandidat ist ungültig.");
+    const captions = memeCaptionPayloadValues(payload).captions;
     return {
       candidateId: candidate.meme_moderation_candidate_id,
       number: candidate.position,
-      topText: payload.topText,
-      bottomText: payload.bottomText,
+      topText: captions.top ?? "",
+      bottomText: captions.bottom ?? "",
+      captions,
+      layout,
       ownerTeamId: candidate.submission.quiz_team_session.team_id,
     };
   });
@@ -227,6 +237,8 @@ export async function getMemePresentationSnapshot(input: {
           number: candidate.number,
           topText: candidate.topText,
           bottomText: candidate.bottomText,
+          captions: candidate.captions,
+          layout: candidate.layout,
         }))
       : [],
     activeCandidateNumber: presentation?.active_candidate_position ?? null,

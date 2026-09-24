@@ -199,6 +199,7 @@ export type FaceMorphPixelQuestionOptions = Record<
 
 export type QuestionTemplateConfig = {
   sponsor?: import("@/app/rendering/presentation/questionSponsor").QuestionSponsor;
+  memeCaptionLayout?: import("@/app/quiz/memeCaptionZones").MemeCaptionLayoutConfig;
   pixelMode?: "CHALLENGE" | "STAGED";
   stageDurationsSeconds: PixelStageDurationsSeconds;
   createPixelQuestionByAnswer: FaceMorphPixelQuestionOptions;
@@ -445,6 +446,7 @@ export type QuestionValidationTarget =
   | "templateUnit"
   | "templatePlaceAverageRating"
   | "templatePlaceReviewCount"
+  | "templateMemeCaptionLayout"
   | "answers"
   | "categories"
   | "validUntil"
