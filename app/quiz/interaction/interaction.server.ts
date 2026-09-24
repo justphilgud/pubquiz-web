@@ -81,10 +81,21 @@ import {
   readMemeLiveConfigSnapshot,
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
+import { isMemeCaptionPayloadReadable } from "@/app/quiz/memeCaptionLayout";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 import { isMemeCaptionQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { getMemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 
 type DbClient = Prisma.TransactionClient;
+
+function isReadableMemeSubmission(
+  interaction: ResolvedQuizAnswerInteraction,
+  payload: QuizInteractionPayload,
+) {
+  if (interaction.type !== "MEME_CAPTION") return true;
+  if (!("topText" in payload && "bottomText" in payload) && !("captions" in payload)) return false;
+  return isMemeCaptionPayloadReadable(payload, resolveMemeCaptionLayout(interaction.layout));
+}
 
 /** Caller holds the quiz lock; all writes and closes share quiz -> run -> draft. */
 export async function expireQuizBlockDeadlines(db: DbClient, quizId: number, now = new Date()) {
@@ -225,6 +236,7 @@ export async function resolveInteractionAssignment(
     templateData: templateConfig?.templateData,
     orderingItems,
     memeImageUrl: assignment.fragen.medien[0]?.datei ?? null,
+    memeCaptionLayout: templateConfig?.memeCaptionLayout,
     answerFields: assignment.fragen.antwortfelder.map((field) => ({
       id: field.antwortfeld_id,
       label: field.label,
@@ -321,6 +333,9 @@ async function autoFinalizeDrafts(
       interaction,
       draftInputFromStored(draft),
     );
+    if (!isReadableMemeSubmission(interaction, validated.payload)) {
+      continue;
+    }
     const teamSubmissions = existing.filter(
       (submission) => submission.quiz_team_session_id === draft.quiz_team_session_id,
     );
@@ -1226,6 +1241,9 @@ export async function submitTeamAnswer(input: {
     if (!validated.hasContent) {
       return { success: false, reason: "EMPTY_DRAFT" as const };
     }
+    if (!isReadableMemeSubmission(interaction, validated.payload)) {
+      return { success: false, reason: "MEME_CAPTION_TOO_LONG" as const };
+    }
     const existingSubmissions = await tx.team_answer_submissions.findMany({
       where: {
         interaction_run_id: run.interaction_run_id,
@@ -1950,12 +1968,21 @@ export async function getQuizLiveSnapshotData(
         }
       : null,
     memeState: run && memeConfig
-      ? {
-          state: run.state,
-          deadlineAt: run.deadline_at?.toISOString() ?? null,
-          responseDurationSeconds: memeConfig.responseDurationSeconds,
-          maxPresentedMemes: memeConfig.maxPresentedMemes,
-        }
+      ? memeConfig.timerEnabled
+        ? {
+            state: run.state,
+            deadlineAt: run.deadline_at?.toISOString() ?? null,
+            timerEnabled: true as const,
+            responseDurationSeconds: memeConfig.responseDurationSeconds,
+            maxPresentedMemes: memeConfig.maxPresentedMemes,
+          }
+        : {
+            state: run.state,
+            deadlineAt: null,
+            timerEnabled: false as const,
+            responseDurationSeconds: null,
+            maxPresentedMemes: memeConfig.maxPresentedMemes,
+          }
       : null,
     memePresentationState,
     teamSpecificState: quizTeamSessionId

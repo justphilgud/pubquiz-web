@@ -624,24 +624,34 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   if (frage.templateId === "meme_beschriften") {
     const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
       frage.medien.find((medium) => isBild(medium.datei));
-    const remaining = memeState
+    const remaining = memeState?.timerEnabled
       ? memeCountdownRemainingSeconds(memeState.deadlineAt, memeState.state, now)
       : null;
     return (
-      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_18rem] gap-6">
-        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-4 shadow-[8px_8px_0_#ff00aa]">
+      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_18rem] gap-6 text-[var(--quiz-text)]">
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-4 shadow-[8px_8px_0_var(--quiz-primary)]">
           {image ? (
             <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full max-h-full" />
           ) : (
             <PresentationMediaFallback kind="IMAGE" />
           )}
         </div>
-        <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/85 p-6 text-center shadow-[8px_8px_0_#ff00aa]">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-cyan-200">What the Meme!</p>
-          <strong className="mt-4 text-[7rem] font-black leading-none text-yellow-200" aria-label={`${remaining ?? 0} Sekunden verbleibend`}>
-            {remaining ?? "–"}
-          </strong>
-          <p className="mt-4 text-xl font-bold text-white/70">Sekunden</p>
+        <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center shadow-[8px_8px_0_var(--quiz-primary)]">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-primary)]">What the Meme!</p>
+          {remaining === null ? (
+            <strong className="mt-4 text-3xl font-black leading-tight text-[var(--quiz-accent)]">
+              {memeState?.state === "CLOSED" || memeState?.state === "REVEALED"
+                ? "Einreichungen beendet"
+                : "Einreichungen geöffnet"}
+            </strong>
+          ) : (
+            <>
+              <strong className="mt-4 text-[7rem] font-black leading-none text-[var(--quiz-accent)]" aria-label={`${remaining} Sekunden verbleibend`}>
+                {remaining}
+              </strong>
+              <p className="mt-4 text-xl font-bold text-[var(--quiz-text-muted)]">Sekunden</p>
+            </>
+          )}
         </aside>
       </section>
     );
@@ -1481,14 +1491,14 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
       );
     }
     return (
-      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_0.75fr] gap-6">
-        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-4 shadow-[8px_8px_0_#ff00aa]">
+      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_0.75fr] gap-6 text-[var(--quiz-text)]">
+        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-4 shadow-[8px_8px_0_var(--quiz-primary)]">
           {image ? <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full" /> : <PresentationMediaFallback kind="IMAGE" />}
         </div>
-        <div className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-emerald-300 bg-slate-950/85 p-8 text-center shadow-[8px_8px_0_#facc15]">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-emerald-300">Ergebnis ausstehend</p>
-          <h2 className="mt-5 text-5xl font-black text-white">Meme-Runde beendet</h2>
-          <p className="mt-5 text-xl text-white/65">Die Moderation finalisiert jetzt Stimmen und Punkte.</p>
+        <div className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-8 text-center shadow-[8px_8px_0_var(--quiz-primary)]">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-primary)]">Ergebnis ausstehend</p>
+          <h2 className="mt-5 text-5xl font-black">Meme-Runde beendet</h2>
+          <p className="mt-5 text-xl text-[var(--quiz-text-muted)]">Die Moderation finalisiert jetzt Stimmen und Punkte.</p>
         </div>
       </section>
     );
@@ -2721,25 +2731,32 @@ function renderAktuellenSlide() {
   }
   if (slide.typ === "meme-erklaerung") {
     const config = slide.frage.memeConfig ?? DEFAULT_MEME_QUESTION_CONFIG;
+    const timingText = config.timerEnabled
+      ? config.responseDurationSeconds % 60 === 0
+        ? `Ihr habt gleich ${config.responseDurationSeconds / 60} Minuten Zeit.`
+        : `Ihr habt gleich ${config.responseDurationSeconds} Sekunden Zeit.`
+      : "Erstellt euer Meme. Der Moderator beendet die Einreichungsphase.";
     const maximum = config.maxPresentedMemes === null
       ? "Alle eingereichten Memes"
       : `Maximal ${config.maxPresentedMemes} Memes`;
     return (
-      <section data-slide-type="meme-explanation" className="flex h-full flex-col justify-center gap-8 rounded-[1.5rem] border-4 border-fuchsia-400 bg-slate-950/90 px-16 py-12 text-white shadow-[8px_8px_0_#22d3ee]">
-        <p className="text-xl font-black uppercase tracking-[0.25em] text-fuchsia-300">Meme-Runde</p>
-        <h1 className="text-6xl font-black">Beschriftet das Bild!</h1>
+      <section data-slide-type="meme-explanation" className="flex h-full flex-col justify-center gap-8 rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] px-16 py-12 text-[var(--quiz-text)] shadow-[8px_8px_0_var(--quiz-primary)]">
+        <p className="text-xl font-black uppercase tracking-[0.25em] text-[var(--quiz-primary)]">What the Meme!</p>
+        <h1 className="text-6xl font-black">What the Meme!</h1>
         <ol className="grid gap-4 text-3xl font-bold">
-          <li>1. Oben und/oder unten euren Text eintragen.</li>
+          <li>1. Die vorgesehenen Textbereiche ausfüllen.</li>
           <li>2. Die Vorschau aktualisiert sich direkt auf eurem Gerät.</li>
-          <li>3. Vor Ablauf speichern und bestätigen.</li>
+          <li>3. Speichern und bestätigen.</li>
         </ol>
-        <p className="text-2xl font-semibold text-cyan-100">
-          Die Antwortzeit startet erst, wenn die Moderation zur Frage weitergeht.
+        <p className="text-2xl font-semibold text-[var(--quiz-secondary)]">
+          {timingText}
         </p>
         <div className="flex flex-wrap gap-5 text-2xl font-black">
-          <span className="rounded-2xl bg-cyan-300 px-6 py-4 text-slate-950">{config.responseDurationSeconds} Sekunden</span>
-          <span className="rounded-2xl bg-yellow-300 px-6 py-4 text-slate-950">{maximum}</span>
-          <span className="rounded-2xl border-2 border-white/35 px-6 py-4">{teamJoinState?.totalTeams ?? 0} Teams angemeldet</span>
+          <span className="rounded-2xl bg-[var(--quiz-secondary)] px-6 py-4 text-[var(--quiz-background)]">
+            {config.timerEnabled ? `${config.responseDurationSeconds} Sekunden` : "Ohne Zeitlimit"}
+          </span>
+          <span className="rounded-2xl bg-[var(--quiz-accent)] px-6 py-4 text-[var(--quiz-background)]">{maximum}</span>
+          <span className="rounded-2xl border-2 border-[var(--quiz-border)] px-6 py-4">{teamJoinState?.totalTeams ?? 0} Teams angemeldet</span>
         </div>
       </section>
     );
@@ -2776,6 +2793,11 @@ function renderAktuellenSlide() {
 }
 
   const overlayMedia = currentSlideMedia;
+  const isMemeQuestionOrSolution = Boolean(
+    slide &&
+    (slide.typ === "frage" || slide.typ === "aufloesung") &&
+    slide.frage.templateId === "meme_beschriften",
+  );
   const editorialFlowImage = slide?.typ === "ablauf"
     ? slide.element.config.imageUrl ?? slide.element.config.images?.[0]?.url
     : null;
@@ -2898,7 +2920,7 @@ function renderAktuellenSlide() {
         observation={teamJoinState.joinObservation} />}
       <SponsorMoment moment={sponsorMoment?.sponsor ? { ...sponsorMoment, sponsor: sponsorMoment.sponsor } : null} />
       <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
-      {sponsorMoment?.phase !== "SPONSOR" && mediaOverlayActive && overlayMedia.length > 0 && (
+      {sponsorMoment?.phase !== "SPONSOR" && !isMemeQuestionOrSolution && mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="presentation-media-overlay absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
           <div className="presentation-media-overlay-content grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">
             {overlayMedia.slice(0, 2).map((medium) =>

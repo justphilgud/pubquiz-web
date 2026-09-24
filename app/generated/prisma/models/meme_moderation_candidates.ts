@@ -50,6 +50,7 @@ export type Meme_moderation_candidatesMinAggregateOutputType = {
   team_answer_submission_id: number | null
   position: number | null
   review_status: $Enums.MemeModerationReviewStatus | null
+  selected_for_presentation: boolean | null
   review_revision: number | null
   reviewed_by_user_id: number | null
   reviewed_at: Date | null
@@ -63,6 +64,7 @@ export type Meme_moderation_candidatesMaxAggregateOutputType = {
   team_answer_submission_id: number | null
   position: number | null
   review_status: $Enums.MemeModerationReviewStatus | null
+  selected_for_presentation: boolean | null
   review_revision: number | null
   reviewed_by_user_id: number | null
   reviewed_at: Date | null
@@ -76,6 +78,7 @@ export type Meme_moderation_candidatesCountAggregateOutputType = {
   team_answer_submission_id: number
   position: number
   review_status: number
+  selected_for_presentation: number
   review_revision: number
   reviewed_by_user_id: number
   reviewed_at: number
@@ -109,6 +112,7 @@ export type Meme_moderation_candidatesMinAggregateInputType = {
   team_answer_submission_id?: true
   position?: true
   review_status?: true
+  selected_for_presentation?: true
   review_revision?: true
   reviewed_by_user_id?: true
   reviewed_at?: true
@@ -122,6 +126,7 @@ export type Meme_moderation_candidatesMaxAggregateInputType = {
   team_answer_submission_id?: true
   position?: true
   review_status?: true
+  selected_for_presentation?: true
   review_revision?: true
   reviewed_by_user_id?: true
   reviewed_at?: true
@@ -135,6 +140,7 @@ export type Meme_moderation_candidatesCountAggregateInputType = {
   team_answer_submission_id?: true
   position?: true
   review_status?: true
+  selected_for_presentation?: true
   review_revision?: true
   reviewed_by_user_id?: true
   reviewed_at?: true
@@ -235,6 +241,7 @@ export type Meme_moderation_candidatesGroupByOutputType = {
   team_answer_submission_id: number
   position: number
   review_status: $Enums.MemeModerationReviewStatus
+  selected_for_presentation: boolean
   review_revision: number
   reviewed_by_user_id: number | null
   reviewed_at: Date | null
@@ -271,6 +278,7 @@ export type meme_moderation_candidatesWhereInput = {
   team_answer_submission_id?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   position?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFilter<"meme_moderation_candidates"> | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFilter<"meme_moderation_candidates"> | boolean
   review_revision?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   reviewed_by_user_id?: Prisma.IntNullableFilter<"meme_moderation_candidates"> | number | null
   reviewed_at?: Prisma.DateTimeNullableFilter<"meme_moderation_candidates"> | Date | string | null
@@ -289,6 +297,7 @@ export type meme_moderation_candidatesOrderByWithRelationInput = {
   team_answer_submission_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
+  selected_for_presentation?: Prisma.SortOrder
   review_revision?: Prisma.SortOrder
   reviewed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -311,6 +320,7 @@ export type meme_moderation_candidatesWhereUniqueInput = Prisma.AtLeast<{
   meme_moderation_selection_id?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   position?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFilter<"meme_moderation_candidates"> | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFilter<"meme_moderation_candidates"> | boolean
   review_revision?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   reviewed_by_user_id?: Prisma.IntNullableFilter<"meme_moderation_candidates"> | number | null
   reviewed_at?: Prisma.DateTimeNullableFilter<"meme_moderation_candidates"> | Date | string | null
@@ -329,6 +339,7 @@ export type meme_moderation_candidatesOrderByWithAggregationInput = {
   team_answer_submission_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
+  selected_for_presentation?: Prisma.SortOrder
   review_revision?: Prisma.SortOrder
   reviewed_by_user_id?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -350,6 +361,7 @@ export type meme_moderation_candidatesScalarWhereWithAggregatesInput = {
   team_answer_submission_id?: Prisma.IntWithAggregatesFilter<"meme_moderation_candidates"> | number
   position?: Prisma.IntWithAggregatesFilter<"meme_moderation_candidates"> | number
   review_status?: Prisma.EnumMemeModerationReviewStatusWithAggregatesFilter<"meme_moderation_candidates"> | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolWithAggregatesFilter<"meme_moderation_candidates"> | boolean
   review_revision?: Prisma.IntWithAggregatesFilter<"meme_moderation_candidates"> | number
   reviewed_by_user_id?: Prisma.IntNullableWithAggregatesFilter<"meme_moderation_candidates"> | number | null
   reviewed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"meme_moderation_candidates"> | Date | string | null
@@ -360,6 +372,7 @@ export type meme_moderation_candidatesScalarWhereWithAggregatesInput = {
 export type meme_moderation_candidatesCreateInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -377,6 +390,7 @@ export type meme_moderation_candidatesUncheckedCreateInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -389,6 +403,7 @@ export type meme_moderation_candidatesUncheckedCreateInput = {
 export type meme_moderation_candidatesUpdateInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -406,6 +421,7 @@ export type meme_moderation_candidatesUncheckedUpdateInput = {
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -421,6 +437,7 @@ export type meme_moderation_candidatesCreateManyInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -431,6 +448,7 @@ export type meme_moderation_candidatesCreateManyInput = {
 export type meme_moderation_candidatesUpdateManyMutationInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -443,6 +461,7 @@ export type meme_moderation_candidatesUncheckedUpdateManyInput = {
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -476,6 +495,7 @@ export type meme_moderation_candidatesCountOrderByAggregateInput = {
   team_answer_submission_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
+  selected_for_presentation?: Prisma.SortOrder
   review_revision?: Prisma.SortOrder
   reviewed_by_user_id?: Prisma.SortOrder
   reviewed_at?: Prisma.SortOrder
@@ -498,6 +518,7 @@ export type meme_moderation_candidatesMaxOrderByAggregateInput = {
   team_answer_submission_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
+  selected_for_presentation?: Prisma.SortOrder
   review_revision?: Prisma.SortOrder
   reviewed_by_user_id?: Prisma.SortOrder
   reviewed_at?: Prisma.SortOrder
@@ -511,6 +532,7 @@ export type meme_moderation_candidatesMinOrderByAggregateInput = {
   team_answer_submission_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
   review_status?: Prisma.SortOrder
+  selected_for_presentation?: Prisma.SortOrder
   review_revision?: Prisma.SortOrder
   reviewed_by_user_id?: Prisma.SortOrder
   reviewed_at?: Prisma.SortOrder
@@ -683,6 +705,7 @@ export type meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNeste
 export type meme_moderation_candidatesCreateWithoutSubmissionInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -698,6 +721,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutSubmissionInput = {
   meme_moderation_selection_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -726,6 +750,7 @@ export type meme_moderation_candidatesUpdateToOneWithWhereWithoutSubmissionInput
 export type meme_moderation_candidatesUpdateWithoutSubmissionInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -741,6 +766,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutSubmissionInput = {
   meme_moderation_selection_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -753,6 +779,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutSubmissionInput = {
 export type meme_moderation_candidatesCreateWithoutSelectionInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -768,6 +795,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutSelectionInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -812,6 +840,7 @@ export type meme_moderation_candidatesScalarWhereInput = {
   team_answer_submission_id?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   position?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFilter<"meme_moderation_candidates"> | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFilter<"meme_moderation_candidates"> | boolean
   review_revision?: Prisma.IntFilter<"meme_moderation_candidates"> | number
   reviewed_by_user_id?: Prisma.IntNullableFilter<"meme_moderation_candidates"> | number | null
   reviewed_at?: Prisma.DateTimeNullableFilter<"meme_moderation_candidates"> | Date | string | null
@@ -822,6 +851,7 @@ export type meme_moderation_candidatesScalarWhereInput = {
 export type meme_moderation_candidatesCreateWithoutResult_entriesInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -838,6 +868,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutResult_entriesInput 
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -865,6 +896,7 @@ export type meme_moderation_candidatesUpdateToOneWithWhereWithoutResult_entriesI
 export type meme_moderation_candidatesUpdateWithoutResult_entriesInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -881,6 +913,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutResult_entriesInput 
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -892,6 +925,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutResult_entriesInput 
 export type meme_moderation_candidatesCreateWithoutVotesInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -908,6 +942,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutVotesInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -935,6 +970,7 @@ export type meme_moderation_candidatesUpdateToOneWithWhereWithoutVotesInput = {
 export type meme_moderation_candidatesUpdateWithoutVotesInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -951,6 +987,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutVotesInput = {
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -962,6 +999,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutVotesInput = {
 export type meme_moderation_candidatesCreateWithoutReviewed_byInput = {
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -978,6 +1016,7 @@ export type meme_moderation_candidatesUncheckedCreateWithoutReviewed_byInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -1017,6 +1056,7 @@ export type meme_moderation_candidatesCreateManySelectionInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_by_user_id?: number | null
   reviewed_at?: Date | string | null
@@ -1027,6 +1067,7 @@ export type meme_moderation_candidatesCreateManySelectionInput = {
 export type meme_moderation_candidatesUpdateWithoutSelectionInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1042,6 +1083,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutSelectionInput = {
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1056,6 +1098,7 @@ export type meme_moderation_candidatesUncheckedUpdateManyWithoutSelectionInput =
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_by_user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1069,6 +1112,7 @@ export type meme_moderation_candidatesCreateManyReviewed_byInput = {
   team_answer_submission_id: number
   position: number
   review_status?: $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: boolean
   review_revision?: number
   reviewed_at?: Date | string | null
   created_at?: Date | string
@@ -1078,6 +1122,7 @@ export type meme_moderation_candidatesCreateManyReviewed_byInput = {
 export type meme_moderation_candidatesUpdateWithoutReviewed_byInput = {
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1094,6 +1139,7 @@ export type meme_moderation_candidatesUncheckedUpdateWithoutReviewed_byInput = {
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1108,6 +1154,7 @@ export type meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byInput
   team_answer_submission_id?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   review_status?: Prisma.EnumMemeModerationReviewStatusFieldUpdateOperationsInput | $Enums.MemeModerationReviewStatus
+  selected_for_presentation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   review_revision?: Prisma.IntFieldUpdateOperationsInput | number
   reviewed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1160,6 +1207,7 @@ export type meme_moderation_candidatesSelect<ExtArgs extends runtime.Types.Exten
   team_answer_submission_id?: boolean
   position?: boolean
   review_status?: boolean
+  selected_for_presentation?: boolean
   review_revision?: boolean
   reviewed_by_user_id?: boolean
   reviewed_at?: boolean
@@ -1179,6 +1227,7 @@ export type meme_moderation_candidatesSelectCreateManyAndReturn<ExtArgs extends 
   team_answer_submission_id?: boolean
   position?: boolean
   review_status?: boolean
+  selected_for_presentation?: boolean
   review_revision?: boolean
   reviewed_by_user_id?: boolean
   reviewed_at?: boolean
@@ -1195,6 +1244,7 @@ export type meme_moderation_candidatesSelectUpdateManyAndReturn<ExtArgs extends 
   team_answer_submission_id?: boolean
   position?: boolean
   review_status?: boolean
+  selected_for_presentation?: boolean
   review_revision?: boolean
   reviewed_by_user_id?: boolean
   reviewed_at?: boolean
@@ -1211,6 +1261,7 @@ export type meme_moderation_candidatesSelectScalar = {
   team_answer_submission_id?: boolean
   position?: boolean
   review_status?: boolean
+  selected_for_presentation?: boolean
   review_revision?: boolean
   reviewed_by_user_id?: boolean
   reviewed_at?: boolean
@@ -1218,7 +1269,7 @@ export type meme_moderation_candidatesSelectScalar = {
   updated_at?: boolean
 }
 
-export type meme_moderation_candidatesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"meme_moderation_candidate_id" | "meme_moderation_selection_id" | "team_answer_submission_id" | "position" | "review_status" | "review_revision" | "reviewed_by_user_id" | "reviewed_at" | "created_at" | "updated_at", ExtArgs["result"]["meme_moderation_candidates"]>
+export type meme_moderation_candidatesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"meme_moderation_candidate_id" | "meme_moderation_selection_id" | "team_answer_submission_id" | "position" | "review_status" | "selected_for_presentation" | "review_revision" | "reviewed_by_user_id" | "reviewed_at" | "created_at" | "updated_at", ExtArgs["result"]["meme_moderation_candidates"]>
 export type meme_moderation_candidatesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   selection?: boolean | Prisma.meme_moderation_selectionsDefaultArgs<ExtArgs>
   submission?: boolean | Prisma.team_answer_submissionsDefaultArgs<ExtArgs>
@@ -1253,6 +1304,7 @@ export type $meme_moderation_candidatesPayload<ExtArgs extends runtime.Types.Ext
     team_answer_submission_id: number
     position: number
     review_status: $Enums.MemeModerationReviewStatus
+    selected_for_presentation: boolean
     review_revision: number
     reviewed_by_user_id: number | null
     reviewed_at: Date | null
@@ -1691,6 +1743,7 @@ export interface meme_moderation_candidatesFieldRefs {
   readonly team_answer_submission_id: Prisma.FieldRef<"meme_moderation_candidates", 'Int'>
   readonly position: Prisma.FieldRef<"meme_moderation_candidates", 'Int'>
   readonly review_status: Prisma.FieldRef<"meme_moderation_candidates", 'MemeModerationReviewStatus'>
+  readonly selected_for_presentation: Prisma.FieldRef<"meme_moderation_candidates", 'Boolean'>
   readonly review_revision: Prisma.FieldRef<"meme_moderation_candidates", 'Int'>
   readonly reviewed_by_user_id: Prisma.FieldRef<"meme_moderation_candidates", 'Int'>
   readonly reviewed_at: Prisma.FieldRef<"meme_moderation_candidates", 'DateTime'>

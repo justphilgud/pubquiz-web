@@ -51,8 +51,10 @@ import SlideNotes from "./components/SlideNotes";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
-import MemeModerationReview from "./components/MemeModerationReview";
-import MemePresentationControls from "./components/MemePresentationControls";
+import MemeModerationReview, { type MemeModerationReviewHandle } from "./components/MemeModerationReview";
+import MemePresentationControls, { type MemePresentationControlsHandle } from "./components/MemePresentationControls";
+import MemeSubmissionControls from "./components/MemeSubmissionControls";
+import { startMemePresentationAction } from "@/app/quiz/memeVotingActions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
 import { resolvePresentationSequenceIndex, resolvePresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
@@ -188,6 +190,8 @@ export default function ModerationClient({
   const quizStartedAt = lifecycleState.quizStartedAt;
   const [questionHidden, setQuestionHidden] = useState(false);
   const navigationPending = useRef(false);
+  const memeReviewRef = useRef<MemeModerationReviewHandle>(null);
+  const memePresentationControlsRef = useRef<MemePresentationControlsHandle>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [antwortStatus, setAntwortStatus] = useState(initialAntwortStatus);
   const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(
@@ -245,7 +249,11 @@ export default function ModerationClient({
   >([]);
   const [yearlyStandings, setYearlyStandings] = useState<YearlyRankingEntry[]>([]);
 
-  const hatMedien = aktuelleMedien.length > 0;
+  const hatMedien = aktuelleMedien.length > 0 && !(
+    aktuellerSlide &&
+    (aktuellerSlide.typ === "frage" || aktuellerSlide.typ === "aufloesung") &&
+    aktuellerSlide.frage.templateId === "meme_beschriften"
+  );
 
   const hatAudioAufFixemSlide =
     aktuellerSlide?.typ === "fixer-slide" &&
@@ -460,8 +468,40 @@ export default function ModerationClient({
       aktuellerSlide.frage.templateId === "meme_beschriften" &&
       !memePresentationState?.result
     ) {
-      setActionError("Meme-Voting schließen und Ergebnis finalisieren, bevor du weitergehst.");
-      return;
+      setActionError(null);
+      if (memeState?.state === "OPEN" || memeState?.state === "COUNTDOWN") {
+        try {
+          const result = await closeQuizQuestionAnswerPhase({
+            quizId,
+            quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
+          });
+          setMemeState({ ...memeState, state: result.state });
+        } catch (error) {
+          setActionError(error instanceof Error ? error.message : "Die Meme-Antwortphase konnte nicht geschlossen werden.");
+        }
+        return;
+      }
+      if (!memePresentationState) {
+        const prepared = await memeReviewRef.current?.preparePresentation();
+        if (prepared?.ready) {
+          try {
+            const result = await startMemePresentationAction({
+              quizId,
+              quizFragenId: aktuellerSlide.frage.quiz_fragen_id,
+              selectionId: prepared.selectionId,
+            });
+            if (result.view) setMemePresentationState(result.view);
+          } catch (error) {
+            setActionError(error instanceof Error ? error.message : "Die Meme-Präsentation konnte nicht gestartet werden.");
+          }
+          return;
+        }
+        if (!prepared?.skipped) {
+          setActionError("Prüfe die final eingereichten Memes und schließe den Review ab.");
+          return;
+        }
+      }
+      if (await memePresentationControlsRef.current?.advance()) return;
     }
     if (
       aktuellerSlide?.typ === "aufloesung" &&
@@ -975,6 +1015,33 @@ export default function ModerationClient({
               funnyAnswers={funnyAnswers}
             />
 
+            <div className="sticky top-0 z-20 rounded-xl border border-zinc-800 bg-zinc-950/95 p-2 shadow-lg backdrop-blur">
+              <ModerationToolbar
+                blockFreigegeben={blockFreigegeben}
+                mediumOverlayAktiv={mediumOverlayAktiv}
+                audioLaeuft={audioLaeuft}
+                hatMedien={hatMedien}
+                hatAudio={hatAudio}
+                istCountdownSlide={istCountdownSlide}
+                countdownDauerMinuten={countdownDauerMinuten}
+                countdownRestSekunden={countdownRestSekunden}
+                showSchaetzfrageControls={aktuellerSlide?.typ === "endstand"}
+                onZurErstenSlide={zurErstenSlide}
+                onZurueck={vorherigerSlide}
+                onWeiter={naechsterSlideAction}
+                onBlockToggle={handleBlockToggle}
+                onMediumToggle={handleMediumToggle}
+                onAudioToggle={handleAudioPlay}
+                onAuswertungOeffnen={handleAuswertungOeffnen}
+                onSchaetzfrageStarten={handleSchaetzfrageStarten}
+                onSchaetzfrageLoesungZeigen={handleSchaetzfrageLoesungZeigen}
+                onSchaetzfrageZurueck={handleSchaetzfrageZurueck}
+                onCountdownDauerChange={setCountdownDauerMinuten}
+                onCountdownStart={handleCountdownStart}
+                onCountdownReset={handleCountdownReset}
+              />
+            </div>
+
             {aktuellerSlide?.typ === "frage" && naechsterSlide?.typ === "funny" && funnyAnswers.length > 0 && (
               <section className="rounded-2xl border border-pink-500/50 bg-pink-950/30 p-4">
                 <h2 className="font-bold">{funnyAnswers.length} skurrile {funnyAnswers.length === 1 ? "Antwort" : "Antworten"}</h2>
@@ -1133,16 +1200,26 @@ export default function ModerationClient({
             )}
 
             {aktuellerSlide?.typ === "frage" && memeState && memeImageUrl ? (
-              <MemeModerationReview
-                key={`${aktuellerSlide.frage.quiz_fragen_id}:${memeState.state}`}
-                quizId={quizId}
-                quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
-                imageUrl={memeImageUrl}
-              />
+              <>
+                <MemeSubmissionControls
+                  quizId={quizId}
+                  quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                  state={memeState}
+                  onChange={setMemeState}
+                />
+                <MemeModerationReview
+                  ref={memeReviewRef}
+                  key={`${aktuellerSlide.frage.quiz_fragen_id}:${memeState.state}`}
+                  quizId={quizId}
+                  quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                  imageUrl={memeImageUrl}
+                />
+              </>
             ) : null}
 
             {aktuellerSlide?.typ === "frage" && memePresentationState ? (
               <MemePresentationControls
+                ref={memePresentationControlsRef}
                 quizId={quizId}
                 quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
                 state={memePresentationState}
@@ -1186,30 +1263,6 @@ export default function ModerationClient({
               </div>
             </SlideNotes>
 
-            <ModerationToolbar
-              blockFreigegeben={blockFreigegeben}
-              mediumOverlayAktiv={mediumOverlayAktiv}
-              audioLaeuft={audioLaeuft}
-              hatMedien={hatMedien}
-              hatAudio={hatAudio}
-              istCountdownSlide={istCountdownSlide}
-              countdownDauerMinuten={countdownDauerMinuten}
-              countdownRestSekunden={countdownRestSekunden}
-              showSchaetzfrageControls={aktuellerSlide?.typ === "endstand"}
-              onZurErstenSlide={zurErstenSlide}
-              onZurueck={vorherigerSlide}
-              onWeiter={naechsterSlideAction}
-              onBlockToggle={handleBlockToggle}
-              onMediumToggle={handleMediumToggle}
-              onAudioToggle={handleAudioPlay}
-              onAuswertungOeffnen={handleAuswertungOeffnen}
-              onSchaetzfrageStarten={handleSchaetzfrageStarten}
-              onSchaetzfrageLoesungZeigen={handleSchaetzfrageLoesungZeigen}
-              onSchaetzfrageZurueck={handleSchaetzfrageZurueck}
-              onCountdownDauerChange={setCountdownDauerMinuten}
-              onCountdownStart={handleCountdownStart}
-              onCountdownReset={handleCountdownReset}
-            />
           </section>
 
           <ModerationSidebar

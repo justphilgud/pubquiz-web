@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
 import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
-import type { MemePresentationTransition } from "@/app/quiz/memeVoting";
+import { getNextMemeAdvanceCommand, type MemePresentationTransition } from "@/app/quiz/memeVoting";
 import type { QuizSolutionStrategy } from "@/app/quiz/flow/quizFlow";
 import { finalizeMemeResultAction } from "@/app/quiz/memeResultsActions";
 import {
@@ -11,19 +11,23 @@ import {
   transitionMemePresentationAction,
 } from "@/app/quiz/memeVotingActions";
 
-export default function MemePresentationControls({
-  quizId,
-  quizFragenId,
-  state,
-  solutionStrategy,
-  onChange,
-}: {
+export type MemePresentationControlsHandle = {
+  advance: () => Promise<boolean>;
+};
+
+const MemePresentationControls = forwardRef<MemePresentationControlsHandle, {
   quizId: number;
   quizFragenId: number;
   state: MemePresentationSnapshot;
   solutionStrategy: QuizSolutionStrategy;
   onChange: (state: MemePresentationSnapshot) => void;
-}) {
+}>(function MemePresentationControls({
+  quizId,
+  quizFragenId,
+  state,
+  solutionStrategy,
+  onChange,
+}, ref) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -101,6 +105,20 @@ export default function MemePresentationControls({
   );
   const lastOverviewPage = state.overviewPageCount - 1;
 
+  useImperativeHandle(ref, () => ({
+    async advance() {
+      const command = getNextMemeAdvanceCommand({
+        ...state,
+        hasResult: Boolean(state.result),
+      });
+      if (command === "NEXT_QUIZ_SLIDE") return false;
+      if (command === "START_PRESENTATION") await start();
+      else if (command === "FINALIZE_RESULT") await finalizeResult();
+      else await transition(command);
+      return true;
+    },
+  }));
+
   return (
     <section className="rounded-2xl border border-cyan-500/50 bg-cyan-950/30 p-4" data-meme-presentation-controls>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -130,19 +148,15 @@ export default function MemePresentationControls({
       ) : null}
 
       {state.phase === "READY" ? (
-        <button type="button" disabled={pending} onClick={() => void start()} className="mt-4 min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-          Präsentationsphase starten
-        </button>
+        <p className="mt-4 text-sm text-zinc-200">Mit dem zentralen „Weiter“ startest du die Präsentationsphase.</p>
       ) : null}
 
       {state.phase === "PRESENTING" ? (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <button type="button" disabled={pending || activeIndex <= 0} onClick={() => void transition("PREVIOUS_CANDIDATE")} className="min-h-11 rounded-xl border border-zinc-500 px-4 py-2 font-bold disabled:opacity-40">
             Vorheriges Meme
           </button>
-          <button type="button" disabled={pending} onClick={() => void transition("NEXT_CANDIDATE")} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-            {activeIndex === state.candidates.length - 1 ? "Zur Übersicht" : "Nächstes Meme"}
-          </button>
+          <p className="text-sm text-zinc-200">„Weiter“ zeigt {activeIndex === state.candidates.length - 1 ? "die Übersicht" : "das nächste Meme"}.</p>
         </div>
       ) : null}
 
@@ -151,15 +165,7 @@ export default function MemePresentationControls({
           <button type="button" disabled={pending || state.overviewPage <= 0} onClick={() => void transition("PREVIOUS_OVERVIEW_PAGE")} className="min-h-11 rounded-xl border border-zinc-500 px-4 py-2 font-bold disabled:opacity-40">
             Vorherige Übersichtsseite
           </button>
-          {state.overviewPage < lastOverviewPage ? (
-            <button type="button" disabled={pending} onClick={() => void transition("NEXT_OVERVIEW_PAGE")} className="min-h-11 rounded-xl bg-cyan-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-              Nächste Übersichtsseite
-            </button>
-          ) : (
-            <button type="button" disabled={pending} onClick={() => void transition("OPEN_VOTING")} className="min-h-11 rounded-xl bg-fuchsia-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-              Voting öffnen
-            </button>
-          )}
+          <p className="text-sm text-zinc-200">„Weiter“ {state.overviewPage < lastOverviewPage ? "zeigt die nächste Übersichtsseite" : "öffnet das Voting"}.</p>
         </div>
       ) : null}
 
@@ -168,9 +174,7 @@ export default function MemePresentationControls({
           <p className="text-sm text-zinc-200">
             <strong>{state.progress?.votesCast ?? 0}</strong> von <strong>{state.progress?.eligibleTeams ?? 0}</strong> stimmberechtigten Teams haben abgestimmt. Keine Zwischenstände werden angezeigt.
           </p>
-          <button type="button" disabled={pending} onClick={() => void transition("CLOSE_VOTING")} className="min-h-11 rounded-xl border border-red-400/70 px-4 py-2 font-bold text-red-100 disabled:opacity-50">
-            Voting schließen
-          </button>
+          <p className="text-sm text-zinc-200">„Weiter“ schließt das Voting.</p>
         </div>
       ) : null}
 
@@ -187,12 +191,12 @@ export default function MemePresentationControls({
         ) : (
           <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-950/30 p-3 text-sm text-amber-100">
             <p>Das Voting ist geschlossen. Stimmen und Punkte sind noch nicht finalisiert.</p>
-            <button type="button" disabled={pending} onClick={() => void finalizeResult()} className="mt-3 min-h-11 rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white disabled:opacity-50">
-              Ergebnis finalisieren
-            </button>
+            <p className="mt-2">„Weiter“ finalisiert Ergebnis und Punkte.</p>
           </div>
         )
       ) : null}
     </section>
   );
-}
+});
+
+export default MemePresentationControls;

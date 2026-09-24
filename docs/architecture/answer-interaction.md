@@ -59,6 +59,8 @@ Die zentralen Identitäten sind:
 | Basisbewertung | `app/quiz/evaluation/evaluateBaseAnswer.ts` |
 | Pixel-Lifecycle und Punkteallokation | `app/quiz/interaction/pixelLiveInteraction.ts` |
 | Meme-Konfiguration, Payload und Deadline-Anzeige | `app/quiz/memeCaption.ts` |
+| Meme-Lesbarkeit, Umbruch und Größenregeln | `app/quiz/memeCaptionLayout.ts` |
+| Meme-Zonen, Presets und versionierte Layoutvalidierung | `app/quiz/memeCaptionZones.ts` |
 | Gemeinsames Meme-Rendering | `app/rendering/meme/MemeRenderer.tsx` |
 | Meme-Auswahl und Moderation nach Run-Ende | `app/quiz/memeModeration.server.ts` |
 | Meme-Präsentation und Abstimmung | `app/quiz/memeVoting.server.ts` |
@@ -94,7 +96,9 @@ Wichtige Fallbacks:
   anschließende anonyme Präsentation, das selbstwahlgeschützte Voting und die
   stabile Übergabe beschreibt [What the Meme! – AP3](meme-caption-ap3.md).
   Finale Zählung, Gleichstand, zentrale Punkte und direkte beziehungsweise
-  spätere Auflösung stehen in [What the Meme! – AP4](meme-caption-ap4.md).
+  spätere Auflösung stehen in [What the Meme! – AP4](meme-caption-ap4.md). Der
+  bildschonende Caption-Aufbau und die gemeinsame Auto-Fit-Regel stehen in
+  [What the Meme! – AP5](meme-caption-ap5.md).
 - Ein nicht auflösbarer Vertrag ergibt `NO_ANSWER`; ein bekannter, aber noch nicht gerenderter Typ wird mit `supported: false` markiert.
 
 Der bei Öffnung des Runs aufgelöste Contract wird in `quiz_interaction_runs.config_snapshot` gespeichert. Laufende Interaktionen bleiben damit an ihre konkrete Konfiguration gebunden.

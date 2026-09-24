@@ -708,6 +708,9 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     ? normalizeQuestionTemplateConfig(payload.templateConfig, templateId)
     : parseQuestionTemplateConfigDraft(payload.templateConfig, templateId);
   if (!templateConfig) {
+    if (templateId === questionTemplateIds.memeCaption) {
+      throw new DraftValidationError("Das Caption-Layout ist ungültig.", "templateMemeCaptionLayout");
+    }
     throw new DraftValidationError("Die Anzeigedauern der Pixelstufen sind ungültig.", "questionMedia");
   }
 

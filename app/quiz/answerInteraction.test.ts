@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { resolveParticipantInteractionFromSnapshot } from "@/app/quiz/interaction/interactionStoredAnswer";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import {
@@ -248,5 +249,60 @@ test("resolves the meme contract with the existing question image", () => {
     type: "MEME_CAPTION",
     imageUrl: "meme/base.webp",
     maxLength: 80,
+    layout: {
+      version: 1,
+      mode: "STANDARD",
+      zones: [
+        { id: "top", label: "Text oben", placement: "EXTERNAL_TOP", x: 0, y: 0, width: 100, height: 21, order: 1, maxLines: 2, required: false },
+        { id: "bottom", label: "Text unten", placement: "EXTERNAL_BOTTOM", x: 0, y: 79, width: 100, height: 21, order: 2, maxLines: 2, required: false },
+      ],
+    },
   });
+});
+
+test("resolves custom caption zones into the immutable interaction contract", () => {
+  const interaction = resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+    memeCaptionLayout: {
+      version: 1,
+      mode: "CUSTOM",
+      zones: [{ id: "bubble", label: "Sprechblase", placement: "IMAGE", x: 50, y: 5, width: 40, height: 30, order: 1, maxLines: 2, required: true }],
+    },
+  });
+  assert.equal(interaction.type, "MEME_CAPTION");
+  assert.equal(interaction.type === "MEME_CAPTION" ? interaction.layout?.zones[0].id : null, "bubble");
+});
+
+test("participant meme forms keep the run snapshot after the question layout changes", () => {
+  const currentInteraction = resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+  });
+  const snapshottedInteraction = resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+    memeCaptionLayout: {
+      version: 1,
+      mode: "CUSTOM",
+      zones: [{ id: "left", label: "Person links", placement: "IMAGE", x: 5, y: 5, width: 40, height: 35, order: 1, maxLines: 2, required: true }],
+    },
+  });
+
+  const resolved = resolveParticipantInteractionFromSnapshot(
+    { interaction: snapshottedInteraction },
+    currentInteraction,
+  );
+  assert.equal(resolved.type, "MEME_CAPTION");
+  assert.equal(resolved.type === "MEME_CAPTION" ? resolved.layout?.mode : null, "CUSTOM");
+  assert.equal(resolved.type === "MEME_CAPTION" ? resolved.layout?.zones[0].label : null, "Person links");
+});
+
+test("participant non-meme forms keep the current read model", () => {
+  const currentInteraction = resolve({ templateId: null });
+  const resolved = resolveParticipantInteractionFromSnapshot(
+    { interaction: { type: "TEXT", multiline: true, inputMode: "text", placeholder: "Veraltet" } },
+    currentInteraction,
+  );
+  assert.deepEqual(resolved, currentInteraction);
 });

@@ -48,3 +48,25 @@ test("AP3 exposes neutral progress only to moderation and provides a closed AP4 
   assert.match(service, /state: "VOTING_CLOSED" as const/);
   assert.doesNotMatch(read("app/rendering/meme/MemePresentationStage.tsx"), /votesCast|eligibleTeams|ranking|share|Prozent/);
 });
+
+test("Meme stages inherit every visual accent from the selected presentation theme", () => {
+  const stage = read("app/rendering/meme/MemePresentationStage.tsx");
+  const result = read("app/rendering/meme/MemeResultStage.tsx");
+  const presentation = read("app/rendering/presentation/PresentationSlideRenderer.tsx");
+  const questionStart = presentation.indexOf('if (frage.templateId === "meme_beschriften")');
+  const solutionStart = presentation.indexOf('if (frage.templateId === "meme_beschriften")', questionStart + 1);
+  const memeQuestion = presentation.slice(
+    questionStart,
+    presentation.indexOf('if (liveResultState?.kind === "TEXT"'),
+  );
+  const memeSolution = presentation.slice(
+    solutionStart,
+    presentation.indexOf('if (frage.templateId === questionTemplateIds.artwork)', solutionStart),
+  );
+  for (const source of [stage, result, memeQuestion, memeSolution]) {
+    assert.match(source, /var\(--quiz-primary\)/);
+    assert.match(source, /var\(--quiz-border\)/);
+    assert.doesNotMatch(source, /fuchsia-|cyan-|yellow-|slate-950|#f0abfc|#22d3ee|#ff00aa/);
+  }
+  assert.match(presentation, /!isMemeQuestionOrSolution && mediaOverlayActive/);
+});

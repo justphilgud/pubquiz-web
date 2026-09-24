@@ -305,25 +305,54 @@ export default function QuizQuestionSettings({
                 Meme-Runde
               </span>
               <p className="mt-1 text-sm text-slate-700">
-                Diese Werte werden auf der Erklärfolie gezeigt und gelten für den serverseitigen Countdown.
+                Die Erklärfolie übernimmt Zeitmodus und Präsentationslimit. Ohne Zeitbegrenzung beendet die Moderation die Einreichungen serverseitig.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="space-y-2">
-                <span className="block text-sm font-semibold text-slate-900">Antwortzeit</span>
-                <Select
-                  value={String(config.responseDurationSeconds)}
+              <div className="space-y-2">
+                <span className="block text-sm font-semibold text-slate-900">Zeitbegrenzung</span>
+                <Checkbox
+                  checked={config.timerEnabled}
                   onChange={(event) => void actions.onMemeConfigChange(
                     quizFragenId,
-                    { ...config, responseDurationSeconds: Number(event.target.value) },
+                    event.target.checked
+                      ? {
+                          version: 1,
+                          timerEnabled: true,
+                          responseDurationSeconds: 90,
+                          maxPresentedMemes: config.maxPresentedMemes,
+                        }
+                      : {
+                          version: 1,
+                          timerEnabled: false,
+                          responseDurationSeconds: null,
+                          maxPresentedMemes: config.maxPresentedMemes,
+                        },
                   )}
-                  className="min-h-11 rounded-xl font-semibold"
-                >
-                  {[60, 90, 120, 180].map((seconds) => (
-                    <option key={seconds} value={seconds}>{seconds} Sekunden</option>
-                  ))}
-                </Select>
-              </label>
+                  label={config.timerEnabled ? "Aktiv" : "Deaktiviert"}
+                />
+              </div>
+              {config.timerEnabled ? (
+                <label className="space-y-2">
+                  <span className="block text-sm font-semibold text-slate-900">Antwortzeit</span>
+                  <Select
+                    value={String(config.responseDurationSeconds)}
+                    onChange={(event) => void actions.onMemeConfigChange(
+                      quizFragenId,
+                      { ...config, responseDurationSeconds: Number(event.target.value) },
+                    )}
+                    className="min-h-11 rounded-xl font-semibold"
+                  >
+                    {[60, 90, 120, 180].map((seconds) => (
+                      <option key={seconds} value={seconds}>{seconds} Sekunden</option>
+                    ))}
+                  </Select>
+                </label>
+              ) : (
+                <p className="self-end rounded-xl border border-fuchsia-200 bg-white px-3 py-3 text-sm text-slate-700">
+                  Offen, bis die Moderation „Einreichungen beenden“ wählt.
+                </p>
+              )}
               <div className="space-y-2">
                 <span className="block text-sm font-semibold text-slate-900">Später maximal zeigen</span>
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">

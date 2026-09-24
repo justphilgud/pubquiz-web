@@ -45,7 +45,7 @@ export const enQuestionEditorMessages = {
     pollSingle: { name: "Poll: single choice", description: "Teams select exactly one option; there is no correct answer and no score.", defaultQuestion: "" },
     pollMulti: { name: "Poll: multiple choice", description: "Teams may select multiple options; there is no correct answer and no score.", defaultQuestion: "" },
     pollScale: { name: "Poll: scale", description: "Teams vote on a labelled scale; no points are awarded.", defaultQuestion: "" },
-    memeCaption: { name: "What the Meme!", description: "Teams add a top and bottom caption to a supplied image.", defaultQuestion: "Caption this image as a meme." },
+    memeCaption: { name: "What the Meme!", description: "Teams add a top and bottom caption to a supplied image.", defaultQuestion: "What the Meme!" },
   },
   management: {
     title: "Manage question", clone: "Clone question", cloning: "Cloning …", archive: "Archive", restore: "Restore", delete: "Delete permanently", deleting: "Deleting …",
@@ -133,7 +133,7 @@ export const enQuestionEditorMessages = {
     LABELED_ANSWERS_INCONSISTENT: "Labelled answer data is technically inconsistent", SOURCE_MISSING: "Source is missing", CATEGORY_MISSING: "Category is missing",
     GENERATOR_INPUT_REQUIRED: "The required generator input is missing", GENERATOR_OUTPUT_REQUIRED: "The generated output is missing", GENERATOR_IN_PROGRESS: "Generation is still running",
     GENERATOR_FAILED: "Generation failed", GENERATOR_OUTPUT_STALE: "The generated output is stale", GENERATOR_OUTPUT_MISMATCH: "The output does not match the current input",
-    GENERATOR_OUTPUT_MISSING: "A successful generator run has no output", GENERATOR_LEGACY_OUTPUT: "Legacy output without a generator run", GENERATOR_CONFLICT: "Generator data is conflicting", PIXEL_STAGE_DURATIONS_INVALID: "Each pixel stage duration must be between 1 and 120 seconds", ESTIMATE_UNIT_REQUIRED: "Please enter a unit for the estimate question.", GOOGLE_PLACE_AVERAGE_RATING_INVALID: "The average rating must be between 0 and 5.", GOOGLE_PLACE_REVIEW_COUNT_INVALID: "The review count must be a non-negative integer.",
+    GENERATOR_OUTPUT_MISSING: "A successful generator run has no output", GENERATOR_LEGACY_OUTPUT: "Legacy output without a generator run", GENERATOR_CONFLICT: "Generator data is conflicting", PIXEL_STAGE_DURATIONS_INVALID: "Each pixel stage duration must be between 1 and 120 seconds", MEME_CAPTION_LAYOUT_INVALID: "The caption layout needs one to four valid zones with a unique order.", ESTIMATE_UNIT_REQUIRED: "Please enter a unit for the estimate question.", GOOGLE_PLACE_AVERAGE_RATING_INVALID: "The average rating must be between 0 and 5.", GOOGLE_PLACE_REVIEW_COUNT_INVALID: "The review count must be a non-negative integer.",
     ADDITIONAL_INFO_MISSING: "Additional information for multiple comparison values is missing", UNKNOWN: "Unknown quality issue",
   },
   errors: {

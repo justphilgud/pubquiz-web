@@ -1,12 +1,20 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTemplateList";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import {
-  parseStoredMemeCaptionPayload,
+  parseStoredMemeCaptionValues,
   serializeMemeCaptionPayload,
 } from "@/app/quiz/memeCaption";
+import {
+  analyzeMemeCaptionLayout,
+  isMemeCaptionPayloadReadable,
+  MEME_CAPTION_TOO_LONG_MESSAGE,
+} from "@/app/quiz/memeCaptionLayout";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 
 export type TeamAnswerDraft = {
   antwortText: string | null;
@@ -20,9 +28,16 @@ type Props = {
   interaction: ResolvedQuizAnswerInteraction;
   value: TeamAnswerDraft | undefined;
   disabled: boolean;
+  submissionOpen?: boolean;
   deadlineAt?: string | null;
   now: number;
   onChange: (value: TeamAnswerDraft) => void;
+  onValidationChange?: (message: string | null) => void;
+};
+
+type MemeFitState = {
+  text: string;
+  fits: boolean;
 };
 
 function textDraft(value: string): TeamAnswerDraft {
@@ -57,14 +72,151 @@ function readOrderingIds(
   return configuredIds;
 }
 
+function resolveMemeImageUrl(imageUrl: string) {
+  return imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://") ||
+    imageUrl.startsWith("/")
+    ? imageUrl
+    : `/medien/${imageUrl}`;
+}
+
+function MemeCaptionAnswer({
+  interaction,
+  value,
+  disabled,
+  submissionOpen,
+  deadlineAt,
+  now,
+  onChange,
+  onValidationChange,
+}: Omit<Props, "questionAssignmentId"> & {
+  interaction: Extract<ResolvedQuizAnswerInteraction, { type: "MEME_CAPTION" }>;
+}) {
+  const layout = resolveMemeCaptionLayout(interaction.layout);
+  const storedValues = parseStoredMemeCaptionValues(value?.antwortText ?? null).captions;
+  const values = Object.fromEntries(
+    layout.zones.map((zone) => [zone.id, storedValues[zone.id] ?? ""]),
+  );
+  const validationCallbackRef = useRef(onValidationChange);
+  const [measuredFit, setMeasuredFit] = useState<Record<string, MemeFitState>>({});
+  const remainingSeconds = deadlineAt
+    ? Math.max(0, Math.ceil((Date.parse(deadlineAt) - now) / 1_000))
+    : null;
+  const zoneFit = Object.fromEntries(layout.zones.map((zone) => {
+    const text = values[zone.id] ?? "";
+    const deterministic = analyzeMemeCaptionLayout(text, zone).fits;
+    const measured = measuredFit[zone.id];
+    return [zone.id, deterministic && !(measured?.text === text && !measured.fits)];
+  }));
+  const missingRequired = layout.zones.some(
+    (zone) => zone.required && !(values[zone.id] ?? "").trim(),
+  );
+  const validationError = missingRequired
+    ? "Bitte fülle alle erforderlichen Caption-Zonen aus."
+    : isMemeCaptionPayloadReadable({ captions: values }, layout) && Object.values(zoneFit).every(Boolean)
+      ? null
+      : MEME_CAPTION_TOO_LONG_MESSAGE;
+
+  useEffect(() => {
+    validationCallbackRef.current = onValidationChange;
+  }, [onValidationChange]);
+
+  useEffect(() => {
+    validationCallbackRef.current?.(validationError);
+  }, [validationError]);
+
+  useEffect(() => () => {
+    validationCallbackRef.current?.(null);
+  }, []);
+
+  const handleFitChange = useCallback((
+    zoneId: string,
+    text: string,
+    fits: boolean,
+  ) => {
+    setMeasuredFit((current) => {
+      const previous = current[zoneId];
+      if (previous?.text === text && previous.fits === fits) return current;
+      return { ...current, [zoneId]: { text, fits } };
+    });
+  }, [setMeasuredFit]);
+
+  const update = (next: Record<string, string>) => onChange({
+    antwortText: serializeMemeCaptionPayload(
+      layout.mode === "STANDARD"
+        ? { topText: next.top ?? "", bottomText: next.bottom ?? "" }
+        : { captions: next },
+    ),
+    antwortId: null,
+    antwortfelder: {},
+  });
+
+  return (
+    <section data-answer-interaction="MEME_CAPTION" className="mt-4 space-y-4">
+      <div className="overflow-hidden rounded-2xl border border-slate-300 bg-slate-950 p-2">
+        <MemeRenderer
+          imageUrl={resolveMemeImageUrl(interaction.imageUrl)}
+          captions={values}
+          layout={layout}
+          alt="Meme-Vorschau"
+          onCaptionFitChange={handleFitChange}
+        />
+      </div>
+      <div className="flex items-center justify-between gap-4 rounded-xl bg-fuchsia-50 px-4 py-3 text-sm font-semibold text-fuchsia-950">
+        <span>Lokale Vorschau</span>
+        {remainingSeconds === null ? (
+          <span>{submissionOpen === false ? "Einreichungen beendet" : "Einreichungen geöffnet"}</span>
+        ) : (
+          <span className="tabular-nums">{remainingSeconds} s</span>
+        )}
+      </div>
+      {layout.zones.map((zone) => {
+        const text = values[zone.id] ?? "";
+        return (
+          <label key={zone.id} className="block">
+            <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
+              <span>{zone.label}{zone.required ? " *" : ""}</span>
+              <span>{text.length}/{interaction.maxLength}</span>
+            </span>
+            <input
+              type="text"
+              maxLength={interaction.maxLength}
+              required={zone.required}
+              disabled={disabled}
+              aria-invalid={!zoneFit[zone.id] || (zone.required && !text.trim())}
+              value={text}
+              onChange={(event) => update({ ...values, [zone.id]: event.target.value })}
+              className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
+              placeholder={zone.label}
+            />
+          </label>
+        );
+      })}
+      {validationError ? (
+        <p
+          role="alert"
+          data-meme-caption-validation="overflow"
+          className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-950"
+        >
+          {validationError}
+        </p>
+      ) : (
+        <p className="text-xs text-slate-500">Je Caption sind maximal 80 Zeichen möglich.</p>
+      )}
+    </section>
+  );
+}
+
 export default function GenericAnswerRenderer({
   questionAssignmentId,
   interaction,
   value,
   disabled,
+  submissionOpen,
   deadlineAt = null,
   now,
   onChange,
+  onValidationChange,
 }: Props) {
   if (interaction.type === "NO_ANSWER" || "supported" in interaction) {
     return null;
@@ -84,57 +236,17 @@ export default function GenericAnswerRenderer({
   }
 
   if (interaction.type === "MEME_CAPTION") {
-    const payload = parseStoredMemeCaptionPayload(value?.antwortText ?? null);
-    const imageUrl = interaction.imageUrl.startsWith("http://") || interaction.imageUrl.startsWith("https://") || interaction.imageUrl.startsWith("/")
-      ? interaction.imageUrl
-      : `/medien/${interaction.imageUrl}`;
-    const remainingSeconds = deadlineAt
-      ? Math.max(0, Math.ceil((Date.parse(deadlineAt) - now) / 1_000))
-      : null;
-    const update = (next: { topText: string; bottomText: string }) => onChange({
-      antwortText: serializeMemeCaptionPayload(next),
-      antwortId: null,
-      antwortfelder: {},
-    });
     return (
-      <section data-answer-interaction="MEME_CAPTION" className="mt-4 space-y-4">
-        <div className="overflow-hidden rounded-2xl border border-slate-300 bg-slate-950 p-2">
-          <MemeRenderer imageUrl={imageUrl} topText={payload.topText} bottomText={payload.bottomText} alt="Meme-Vorschau" />
-        </div>
-        <div className="flex items-center justify-between gap-4 rounded-xl bg-fuchsia-50 px-4 py-3 text-sm font-semibold text-fuchsia-950">
-          <span>Lokale Vorschau</span>
-          <span className="tabular-nums">{remainingSeconds === null ? "–" : `${remainingSeconds} s`}</span>
-        </div>
-        <label className="block">
-          <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
-            <span>Text oben</span><span>{payload.topText.length}/{interaction.maxLength}</span>
-          </span>
-          <input
-            type="text"
-            maxLength={interaction.maxLength}
-            disabled={disabled}
-            value={payload.topText}
-            onChange={(event) => update({ ...payload, topText: event.target.value })}
-            className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-            placeholder="Text oben"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-2 flex justify-between gap-3 text-sm font-semibold text-slate-700">
-            <span>Text unten</span><span>{payload.bottomText.length}/{interaction.maxLength}</span>
-          </span>
-          <input
-            type="text"
-            maxLength={interaction.maxLength}
-            disabled={disabled}
-            value={payload.bottomText}
-            onChange={(event) => update({ ...payload, bottomText: event.target.value })}
-            className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
-            placeholder="Text unten"
-          />
-        </label>
-        <p className="text-xs text-slate-500">Mindestens eines der beiden Felder muss ausgefüllt sein.</p>
-      </section>
+      <MemeCaptionAnswer
+        interaction={interaction}
+        value={value}
+        disabled={disabled}
+        submissionOpen={submissionOpen}
+        deadlineAt={deadlineAt}
+        now={now}
+        onChange={onChange}
+        onValidationChange={onValidationChange}
+      />
     );
   }
 

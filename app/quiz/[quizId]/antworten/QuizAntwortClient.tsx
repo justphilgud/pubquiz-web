@@ -19,6 +19,7 @@ import {
   interactionPayloadToDraft,
   type QuizInteractionPayload,
 } from "@/app/quiz/interaction/interactionPayload";
+import { MEME_CAPTION_TOO_LONG_MESSAGE } from "@/app/quiz/memeCaptionLayout";
 import {
   isDraftChangedSinceSubmission,
   resolveInteractionSubmissionPolicy,
@@ -40,6 +41,7 @@ import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
 import MemeVotingPanel from "./MemeVotingPanel";
+import { PasswordInput } from "@/app/components/PasswordInput";
 import type { saveTeamAntwortDraft, startQuizTeamSession } from "../../actions";
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -214,6 +216,8 @@ export default function QuizAntwortClient({
   >({});
   const [locallyEditedSinceSubmission, setLocallyEditedSinceSubmission] =
     useState<Record<number, boolean | undefined>>({});
+  const [interactionValidationErrors, setInteractionValidationErrors] =
+    useState<Record<number, string | undefined>>({});
   const hydratedSessionTokenRef = useRef<string | null>(null);
   const [currentSubmissionStatus, setCurrentSubmissionStatus] = useState<
     "SUBMITTED" | "AUTO_FINALIZED" | null
@@ -565,12 +569,18 @@ export default function QuizAntwortClient({
     setSubmissionStatuses({});
     setSubmissionDraftRevisions({});
     setLocallyEditedSinceSubmission({});
+    setInteractionValidationErrors({});
     setCurrentSubmissionStatus(null);
   }
 
   async function handleSubmit(quizFragenId: number) {
     const draft = antworten[quizFragenId];
     const run = liveDaten.interactionRun;
+    const validationError = interactionValidationErrors[quizFragenId];
+    if (validationError) {
+      setMeldung(validationError);
+      return;
+    }
     if (!session || !draft || !run || !speicherBlockId) {
       setMeldung("Bitte zuerst eine Antwort eintragen.");
       return;
@@ -596,6 +606,8 @@ export default function QuizAntwortClient({
         setMeldung(
           submitted.reason === "EMPTY_DRAFT"
             ? "Bitte zuerst eine Antwort eintragen."
+            : submitted.reason === "MEME_CAPTION_TOO_LONG"
+              ? MEME_CAPTION_TOO_LONG_MESSAGE
             : "Die Antwortzeit ist inzwischen beendet.",
         );
         return;
@@ -740,19 +752,15 @@ export default function QuizAntwortClient({
               </label>
 
               {teamExistiert && (
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-700">
-                    Team-Passwort
-                  </span>
-
-                  <input
-                    type="password"
-                    value={teamPasswort}
-                    onChange={(e) => setTeamPasswort(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-                    placeholder="Passwort eingeben"
-                  />
-                </label>
+                <PasswordInput
+                  label="Team-Passwort"
+                  name="team-password"
+                  autoComplete="current-password"
+                  value={teamPasswort}
+                  onChange={(event) => setTeamPasswort(event.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+                  placeholder="Passwort eingeben"
+                />
               )}
 
               <button
@@ -1035,9 +1043,21 @@ export default function QuizAntwortClient({
                           submissionLocksEditing ||
                           !session
                         }
+                        submissionOpen={questionIsWritable}
                         deadlineAt={frage.interactionRun?.deadlineAt ?? null}
                         now={now}
                         onChange={(value) => controller.edit(frage.quiz_fragen_id, value)}
+                        onValidationChange={(message) => {
+                          setInteractionValidationErrors((current) => {
+                            if (current[frage.quiz_fragen_id] === (message ?? undefined)) {
+                              return current;
+                            }
+                            const next = { ...current };
+                            if (message) next[frage.quiz_fragen_id] = message;
+                            else delete next[frage.quiz_fragen_id];
+                            return next;
+                          });
+                        }}
                       />
 
                       <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
@@ -1076,6 +1096,7 @@ export default function QuizAntwortClient({
                             onClick={() => void handleSubmit(frage.quiz_fragen_id)}
                             disabled={
                               isSubmitting ||
+                              Boolean(interactionValidationErrors[frage.quiz_fragen_id]) ||
                               (submissionStatus === "SUBMITTED" && !changedSinceSubmission)
                             }
                             className="answer-primary-button min-h-11 w-full rounded-xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed"

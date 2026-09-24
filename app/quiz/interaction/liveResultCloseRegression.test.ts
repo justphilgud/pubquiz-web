@@ -203,7 +203,7 @@ test("only the last pre-close change remains effective and post-close writes are
   assert.equal(isQuizInteractionWritable("CLOSED", null, new Date()), false);
 });
 
-test("the production close action targets the validated run and never deletes submissions", () => {
+test("the production close action targets live-result and Meme runs without deleting submissions", () => {
   const actions = readFileSync("app/quiz/actions.ts", "utf8");
   const service = readFileSync(
     "app/quiz/interaction/interaction.server.ts",
@@ -220,6 +220,8 @@ test("the production close action targets the validated run and never deletes su
 
   assert.match(closeAction, /interactionRunId: run\.interaction_run_id/);
   assert.doesNotMatch(closeAction, /closeCurrentInteraction/);
+  assert.match(closeAction, /ergebnisdarstellung: "LIVE"/);
+  assert.match(closeAction, /interaction_type: "MEME_CAPTION"/);
   assert.match(closeService, /run\.quiz_id !== input\.quizId/);
   assert.match(closeService, /run\.quiz_fragen_id !== input\.quizFragenId/);
   assert.match(closeService, /resolveInteractionClosePolicy\("LIVE_RESULT"\)/);

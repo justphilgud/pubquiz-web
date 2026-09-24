@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   collectValidMemeSubmissions,
   createMemeSelectionPlan,
+  randomizeMemeCandidates,
   validateMemeReviewCompletion,
   type StoredMemeSubmission,
 } from "./memeModeration";
@@ -73,6 +74,13 @@ test("fixed limits select distinct candidates and retain all below or at the lim
   assert.equal(new Set(selected.map((entry) => entry.quiz_team_session_id)).size, 4);
   assert.equal(createMemeSelectionPlan(valid.slice(0, 3), 8, () => 0).selected.length, 3);
   assert.equal(createMemeSelectionPlan(valid.slice(0, 4), 4, () => 0).selected.length, 4);
+});
+
+test("final presentation selection randomizes only approved inputs and applies the limit once", () => {
+  const approved = ["A", "B", "C", "D"];
+  assert.deepEqual(randomizeMemeCandidates(approved, 2, () => 0), ["B", "C"]);
+  assert.deepEqual(randomizeMemeCandidates(approved, null, () => 0), ["B", "C", "D", "A"]);
+  assert.throws(() => randomizeMemeCandidates(approved, null, () => 99));
 });
 
 test("review completion requires decisions and at least one approved candidate", () => {

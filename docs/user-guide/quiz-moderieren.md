@@ -22,25 +22,35 @@ Content-Umfragen verwenden ebenfalls OPEN und CLOSE, bleiben aber ohne Punkte. B
 
 ## Meme-Präsentation und Voting
 
-Nach dem abgeschlossenen Meme-Review erscheint der Bereich **Meme-Präsentation
-& Voting**:
+Bei einer Meme-Frage mit deaktivierter Zeitbegrenzung bleibt die
+Einreichungsphase ohne Countdown geöffnet. Die berechtigte Moderation beendet
+sie mit **Einreichungen beenden**. Dieser Serverübergang ist verbindlich:
+veraltete Teamclients können danach nicht mehr speichern, und parallele
+Moderationsfenster konvergieren beim nächsten Snapshot auf denselben
+geschlossenen Run.
 
-1. **Präsentationsphase starten** zeigt Meme 1 anonym auf der Leinwand.
-2. Mit **Nächstes Meme** werden alle freigegebenen Kandidaten in der stabilen
-   AP2-Reihenfolge gezeigt. Nach dem letzten Kandidaten folgt die Übersicht.
-3. Bei mehr als vier Kandidaten mit **Nächste Übersichtsseite** durch alle
-   Seiten navigieren.
-4. Auf der letzten Übersichtsseite **Voting öffnen** wählen. Erst jetzt können
-   die angemeldeten Teams abstimmen.
-5. Die Moderation sieht nur den neutralen Fortschritt der abgegebenen Stimmen,
-   niemals Kandidaten-Zwischenstände.
-6. **Voting schließen** beendet die Abstimmung endgültig.
-7. **Ergebnis finalisieren** zählt den geschlossenen Stimmenstand genau einmal,
-   vergibt einen Quizpunkt je Gewinnerteam und sperrt nachträgliche normale
-   Änderungen.
-8. Bei direkter Auflösung mit **Weiter** auf die Ergebnisfolie wechseln. Bei
-   später Auflösung läuft das Quiz weiter; die Teamnamen und Stimmen erscheinen
-   erst in der regulären Auflösungsphase am Blockende.
+Final abgegebene Memes erscheinen bereits während der laufenden Antwortphase
+anonym in der Moderation. Sie können sofort freigegeben oder ausgeschlossen
+werden. Der Review kann erst abgeschlossen werden, wenn die Antwortphase
+geschlossen ist und alle bis dahin gültigen Einreichungen entschieden wurden.
+
+Der zentrale **Weiter**-Button direkt unter der aktuellen Folie steuert danach
+den gesamten Ablauf. Der vorhandene Weiter-Hotkey löst dieselben Schritte aus:
+
+1. laufende Antwortphase schließen;
+2. Review abschließen, Kandidaten einmal zufällig anordnen und Meme 1 starten;
+3. alle freigegebenen Kandidaten in der gespeicherten Reihenfolge zeigen;
+4. durch alle Übersichtsseiten wechseln;
+5. Voting öffnen und nach der Abstimmung schließen;
+6. Ergebnis genau einmal finalisieren;
+7. entsprechend der gewählten Auflösung zur Ergebnisfolie oder zur nächsten
+   regulären Quizfolie wechseln.
+
+Die Moderation sieht beim offenen Voting nur den neutralen Fortschritt der
+abgegebenen Stimmen, niemals Kandidaten-Zwischenstände. Direkte
+Rückwärtsaktionen bleiben im Meme-Bereich verfügbar; die primäre
+Vorwärtsnavigation erfolgt immer über **Weiter**. Tastenkürzel greifen nicht,
+solange ein Eingabefeld oder editierbarer Text fokussiert ist.
 
 Ein Team hat genau eine Stimme und kann sie während des offenen Votings ändern.
 Das eigene Meme bleibt sichtbar, ist aber gesperrt. Ein Team ohne eigenen

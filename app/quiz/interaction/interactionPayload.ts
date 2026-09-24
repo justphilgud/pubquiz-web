@@ -1,6 +1,9 @@
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 import {
   MEME_CAPTION_TEXT_MAX_LENGTH,
+  hasMemeCaptionContent,
+  memeCaptionPayloadValues,
   parseMemeCaptionPayload,
   serializeMemeCaptionPayload,
 } from "@/app/quiz/memeCaption";
@@ -21,7 +24,8 @@ export type QuizInteractionPayload =
   | { optionId: number | null }
   | { optionIds: number[] }
   | { itemIds: string[] }
-  | { topText: string; bottomText: string };
+  | { topText: string; bottomText: string }
+  | { captions: Record<string, string> };
 
 export type ValidatedInteractionPayload = {
   payload: QuizInteractionPayload;
@@ -109,9 +113,18 @@ export function validateInteractionPayload(
         `Memetexte dürfen je Feld höchstens ${MEME_CAPTION_TEXT_MAX_LENGTH} Zeichen enthalten.`,
       );
     }
+    const values = memeCaptionPayloadValues(payload).captions;
+    const layout = resolveMemeCaptionLayout(interaction.layout);
+    const zoneIds = new Set(layout.zones.map((zone) => zone.id));
+    if (Object.keys(values).some((zoneId) => !zoneIds.has(zoneId))) {
+      throw new Error("Die übermittelten Caption-Zonen sind ungültig.");
+    }
+    if (layout.zones.some((zone) => zone.required && !(values[zone.id] ?? "").trim())) {
+      throw new Error("Bitte fülle alle erforderlichen Caption-Zonen aus.");
+    }
     return {
       payload,
-      hasContent: payload.topText.length > 0 || payload.bottomText.length > 0,
+      hasContent: hasMemeCaptionContent(payload),
     };
   }
 
@@ -194,14 +207,10 @@ export function interactionPayloadToDraft(
   }
   if (
     interaction.type === "MEME_CAPTION" &&
-    "topText" in payload &&
-    "bottomText" in payload
+    (("topText" in payload && "bottomText" in payload) || "captions" in payload)
   ) {
     return {
-      antwortText: serializeMemeCaptionPayload({
-        topText: payload.topText,
-        bottomText: payload.bottomText,
-      }),
+      antwortText: serializeMemeCaptionPayload(payload),
       antwortId: null,
       antwortfelder: {},
     };

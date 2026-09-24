@@ -11,6 +11,7 @@ import {
   withoutFaceMorphPixelQuestionOptions,
 } from "./pixelTemplateConfig";
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
+import { DEFAULT_MEME_CAPTION_LAYOUT } from "@/app/quiz/memeCaptionZones";
 
 test("pixel stage durations default to 15 seconds and validate integer bounds", () => {
   assert.deepEqual(normalizeQuestionTemplateConfig(null), DEFAULT_PIXEL_TEMPLATE_CONFIG);
@@ -105,4 +106,24 @@ test("draft parsing preserves numeric invalid durations but rejects free strings
   assert.equal(parseQuestionTemplateConfigDraft({
     stageDurationsSeconds: { stage3: "20", stage2: 20, stage1: 20 },
   }), null);
+});
+
+test("meme layout defaults safely and custom zones survive normalization", () => {
+  assert.deepEqual(
+    normalizeQuestionTemplateConfig(null, questionTemplateIds.memeCaption)?.memeCaptionLayout,
+    DEFAULT_MEME_CAPTION_LAYOUT,
+  );
+  const custom = {
+    version: 1 as const,
+    mode: "CUSTOM" as const,
+    zones: [{ id: "panel", label: "Panel", placement: "IMAGE" as const, x: 10, y: 10, width: 40, height: 30, order: 1, maxLines: 2 as const, required: false }],
+  };
+  assert.deepEqual(
+    normalizeQuestionTemplateConfig({ memeCaptionLayout: custom }, questionTemplateIds.memeCaption)?.memeCaptionLayout,
+    custom,
+  );
+  assert.equal(
+    normalizeQuestionTemplateConfig({ memeCaptionLayout: { ...custom, zones: [] } }, questionTemplateIds.memeCaption),
+    null,
+  );
 });

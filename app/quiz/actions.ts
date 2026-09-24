@@ -112,6 +112,7 @@ import {
 } from "./quizAnswerLiveState";
 import { serializeQuizParticipantLiveRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
+import { resolveParticipantInteractionFromSnapshot } from "./interaction/interactionStoredAnswer";
 import { supportsFunnyAnswerReveal } from "./funnyAnswerReveal";
 import { repairQuizSpecificOrderingAssignments } from "./orderingQuestionOrder.server";
 import {
@@ -2765,7 +2766,7 @@ export async function getQuizAntwortStatus(
                   eintrag.antwort_reihenfolge,
                 ) ?? []
               : undefined;
-          const interaction = resolveQuizAnswerInteraction({
+          const currentInteraction = resolveQuizAnswerInteraction({
             templateId: eintrag.fragen.vorlage?.code ?? null,
             originalAnswerMode: answerMode.originalMode,
             effectiveAnswerMode: answerMode.effectiveMode,
@@ -2774,6 +2775,7 @@ export async function getQuizAntwortStatus(
             memeImageUrl: eintrag.fragen.medien.find(
               (medium) => medium.slot_key === "question_image",
             )?.datei ?? null,
+            memeCaptionLayout: templateConfig?.memeCaptionLayout,
             answerFields: eintrag.fragen.antwortfelder.map((field) => ({
               id: field.antwortfeld_id,
               label: field.label,
@@ -2788,6 +2790,10 @@ export async function getQuizAntwortStatus(
                 label: antwort.antwort,
               })),
           });
+          const interaction = resolveParticipantInteractionFromSnapshot(
+            interactionRun?.config_snapshot,
+            currentInteraction,
+          );
           return {
             quiz_fragen_id: eintrag.quiz_fragen_id,
             fragen_id: eintrag.fragen.fragen_id,
@@ -3250,7 +3256,10 @@ export async function closeQuizQuestionAnswerPhase(data: {
       quiz_id: data.quizId,
       quiz_fragen_id: data.quizFragenId,
       is_current: true,
-      quiz_fragen: { ergebnisdarstellung: "LIVE" },
+      OR: [
+        { quiz_fragen: { ergebnisdarstellung: "LIVE" } },
+        { interaction_type: "MEME_CAPTION" },
+      ],
     },
     select: { interaction_run_id: true },
   });
