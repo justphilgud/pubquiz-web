@@ -782,6 +782,7 @@ export const Meme_moderation_candidatesScalarFieldEnum = {
   team_answer_submission_id: 'team_answer_submission_id',
   position: 'position',
   review_status: 'review_status',
+  selected_for_presentation: 'selected_for_presentation',
   review_revision: 'review_revision',
   reviewed_by_user_id: 'reviewed_by_user_id',
   reviewed_at: 'reviewed_at',

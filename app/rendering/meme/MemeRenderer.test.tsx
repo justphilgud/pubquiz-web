@@ -32,14 +32,21 @@ test("caption rows disappear independently while the image remains", () => {
   assert.ok(bottomOnly.indexOf("data-meme-image") < bottomOnly.indexOf("Nur unten"));
 });
 
-test("both captions render in separate modern bands around the shared image", () => {
+test("short captions render in dynamic black bands around the shared image", () => {
   const html = render("Oben", "Unten");
-  assert.match(html, /grid-template-rows:21% minmax\(0, 1fr\) 21%/);
+  assert.match(html, /grid-template-rows:13% minmax\(0, 1fr\) 13%/);
   assert.equal((html.match(/<figcaption/g) ?? []).length, 2);
-  assert.match(html, /bg-slate-100/);
-  assert.doesNotMatch(html, /Impact|text-shadow|-webkit-text-stroke|absolute/);
+  assert.match(html, /bg-black text-white/);
+  assert.match(html, /font-family:Arial, Helvetica, sans-serif/);
+  assert.doesNotMatch(html, /bg-slate-100|Impact|-webkit-text-stroke/);
   assert.ok(html.indexOf("Oben") < html.indexOf("data-meme-image"));
   assert.ok(html.indexOf("data-meme-image") < html.indexOf("Unten"));
+});
+
+test("two-line captions grow their own band without changing the 4:3 canvas", () => {
+  const html = render("Das ist ein längerer Memetext mit mehreren kurzen Wörtern", "Kurz");
+  assert.match(html, /grid-template-rows:21% minmax\(0, 1fr\) 13%/);
+  assert.match(html, /aspect-\[4\/3\]/);
 });
 
 test("legacy topText and bottomText payloads remain directly renderable", () => {

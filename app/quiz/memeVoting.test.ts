@@ -9,6 +9,7 @@ import {
   planMemeVoteWrite,
   teamCanVoteForCandidate,
   transitionMemePresentation,
+  getNextMemeAdvanceCommand,
 } from "./memeVoting";
 
 test("AP3 keeps AP2 candidate numbers stable while presenting and reloading", () => {
@@ -24,6 +25,23 @@ test("AP3 keeps AP2 candidate numbers stable while presenting and reloading", ()
   const third = transitionMemePresentation(second!, numbers, "NEXT_CANDIDATE");
   assert.equal(third?.activeCandidatePosition, 4);
   assert.equal(transitionMemePresentation(third!, numbers, "PREVIOUS_CANDIDATE")?.activeCandidatePosition, 2);
+});
+
+test("the central Weiter action follows the complete Meme state machine", () => {
+  const base = {
+    activeCandidateNumber: 1,
+    candidates: [{ number: 1 }, { number: 2 }],
+    overviewPage: 0,
+    overviewPageCount: 2,
+    hasResult: false,
+  };
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "READY" }), "START_PRESENTATION");
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "PRESENTING" }), "NEXT_CANDIDATE");
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "OVERVIEW" }), "NEXT_OVERVIEW_PAGE");
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "OVERVIEW", overviewPage: 1 }), "OPEN_VOTING");
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "VOTING_OPEN" }), "CLOSE_VOTING");
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "VOTING_CLOSED" }), "FINALIZE_RESULT");
+  assert.equal(getNextMemeAdvanceCommand({ ...base, phase: "VOTING_CLOSED", hasResult: true }), "NEXT_QUIZ_SLIDE");
 });
 
 test("AP3 overview paginates without an artificial candidate limit", () => {

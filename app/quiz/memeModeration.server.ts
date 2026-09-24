@@ -4,7 +4,7 @@ import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import {
   collectValidMemeSubmissions,
-  createMemeSelectionPlan,
+  randomizeMemeCandidates,
   validateMemeReviewCompletion,
   type MemeReviewStatus,
   type StoredMemeSubmission,
@@ -21,6 +21,7 @@ export type MemeModerationCandidateView = {
   position: number;
   reviewStatus: MemeReviewStatus;
   reviewRevision: number;
+  selectedForPresentation: boolean;
   captions: Record<string, string>;
   layout: ResolvedMemeCaptionLayout;
 };
@@ -35,6 +36,7 @@ export type MemeModerationView =
       selectionId: number;
       interactionRunId: number;
       selectionState: "REVIEWING" | "COMPLETED" | "SKIPPED";
+      answerPhaseOpen: boolean;
       revision: number;
       validSubmissionCount: number;
       selectionLimit: number | null;
@@ -42,6 +44,7 @@ export type MemeModerationView =
       approvedCount: number;
       rejectedCount: number;
       pendingCount: number;
+      presentedCount: number;
       candidates: MemeModerationCandidateView[];
     }
   | { phase: "UNAVAILABLE" };
@@ -51,7 +54,7 @@ type StoredSelection = Prisma.meme_moderation_selectionsGetPayload<{
     candidates: {
       include: { submission: true };
     };
-    interaction_run: { select: { config_snapshot: true } };
+    interaction_run: { select: { config_snapshot: true; state: true } };
   };
 }>;
 
@@ -72,6 +75,7 @@ function toView(selection: StoredSelection): MemeModerationView {
         position: candidate.position,
         reviewStatus: candidate.review_status,
         reviewRevision: candidate.review_revision,
+        selectedForPresentation: candidate.selected_for_presentation,
         captions: memeCaptionPayloadValues(payload).captions,
         layout,
       };
@@ -83,6 +87,7 @@ function toView(selection: StoredSelection): MemeModerationView {
     selectionId: selection.meme_moderation_selection_id,
     interactionRunId: selection.interaction_run_id,
     selectionState: selection.state,
+    answerPhaseOpen: selection.interaction_run.state === "OPEN" || selection.interaction_run.state === "COUNTDOWN",
     revision: selection.revision,
     validSubmissionCount: selection.valid_submission_count,
     selectionLimit: selection.selection_limit,
@@ -90,12 +95,13 @@ function toView(selection: StoredSelection): MemeModerationView {
     approvedCount: candidates.filter((item) => item.reviewStatus === "APPROVED").length,
     rejectedCount: candidates.filter((item) => item.reviewStatus === "REJECTED").length,
     pendingCount: candidates.filter((item) => item.reviewStatus === "PENDING_REVIEW").length,
+    presentedCount: candidates.filter((item) => item.selectedForPresentation).length,
     candidates,
   };
 }
 
 const selectionInclude = {
-  interaction_run: { select: { config_snapshot: true } },
+  interaction_run: { select: { config_snapshot: true, state: true } },
   candidates: {
     include: { submission: true },
     orderBy: { position: "asc" as const },
@@ -127,6 +133,83 @@ async function lockSelection(db: DbClient, selectionId: number) {
   `;
 }
 
+async function readValidSubmissions(db: DbClient, interactionRunId: number) {
+  const stored = await db.team_answer_submissions.findMany({
+    where: { interaction_run_id: interactionRunId },
+    select: {
+      team_answer_submission_id: true,
+      interaction_run_id: true,
+      quiz_team_session_id: true,
+      submission_version: true,
+      status: true,
+      interaction_type: true,
+      payload: true,
+    },
+  });
+  return collectValidMemeSubmissions(
+    interactionRunId,
+    stored as StoredMemeSubmission[],
+  );
+}
+
+async function syncReviewCandidates(
+  db: DbClient,
+  selection: StoredSelection,
+  valid: Awaited<ReturnType<typeof readValidSubmissions>>,
+) {
+  if (selection.state !== "REVIEWING") return selection;
+  const byTeam = new Map(
+    selection.candidates.map((candidate) => [
+      candidate.submission.quiz_team_session_id,
+      candidate,
+    ]),
+  );
+  let changed = selection.valid_submission_count !== valid.length;
+  let nextPosition = selection.candidates.reduce(
+    (maximum, candidate) => Math.max(maximum, candidate.position),
+    0,
+  ) + 1;
+
+  for (const submission of valid) {
+    const current = byTeam.get(submission.quiz_team_session_id);
+    if (!current) {
+      await db.meme_moderation_candidates.create({
+        data: {
+          meme_moderation_selection_id: selection.meme_moderation_selection_id,
+          team_answer_submission_id: submission.team_answer_submission_id,
+          position: nextPosition,
+        },
+      });
+      nextPosition += 1;
+      changed = true;
+      continue;
+    }
+    if (current.team_answer_submission_id !== submission.team_answer_submission_id) {
+      await db.meme_moderation_candidates.update({
+        where: { meme_moderation_candidate_id: current.meme_moderation_candidate_id },
+        data: {
+          team_answer_submission_id: submission.team_answer_submission_id,
+          review_status: "PENDING_REVIEW",
+          selected_for_presentation: false,
+          review_revision: { increment: 1 },
+          reviewed_by_user_id: null,
+          reviewed_at: null,
+        },
+      });
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    await db.meme_moderation_selections.update({
+      where: { meme_moderation_selection_id: selection.meme_moderation_selection_id },
+      data: { valid_submission_count: valid.length, revision: { increment: 1 } },
+    });
+    return readSelection(db, selection.meme_moderation_selection_id);
+  }
+  return selection;
+}
+
 export async function getOrCreateMemeModerationView(input: {
   quizId: number;
   quizFragenId: number;
@@ -141,11 +224,7 @@ export async function getOrCreateMemeModerationView(input: {
     orderBy: { interaction_run_id: "desc" },
   });
   if (!latestRun) return { phase: "UNAVAILABLE" };
-  if (
-    latestRun.state === "LOCKED" ||
-    latestRun.state === "OPEN" ||
-    latestRun.state === "COUNTDOWN"
-  ) {
+  if (latestRun.state === "LOCKED") {
     return { phase: "NOT_READY", interactionState: latestRun.state };
   }
 
@@ -161,7 +240,12 @@ export async function getOrCreateMemeModerationView(input: {
     ) {
       throw new Error("Der Meme-Run gehört nicht zu dieser Quizfrage.");
     }
-    if (run.state !== "CLOSED" && run.state !== "REVEALED") {
+    if (
+      run.state !== "OPEN" &&
+      run.state !== "COUNTDOWN" &&
+      run.state !== "CLOSED" &&
+      run.state !== "REVEALED"
+    ) {
       return { phase: "NOT_READY", interactionState: run.state as "LOCKED" | "OPEN" | "COUNTDOWN" };
     }
 
@@ -169,36 +253,22 @@ export async function getOrCreateMemeModerationView(input: {
       where: { interaction_run_id: run.interaction_run_id },
       include: selectionInclude,
     });
-    if (existing) return toView(existing);
+    const valid = await readValidSubmissions(tx, run.interaction_run_id);
+    if (existing) {
+      return toView(await syncReviewCandidates(tx, existing, valid));
+    }
 
     const config = readMemeLiveConfigSnapshot(run.config_snapshot);
     if (!config) throw new Error("Die gespeicherte Meme-Konfiguration ist ungültig.");
-    const stored = await tx.team_answer_submissions.findMany({
-      where: { interaction_run_id: run.interaction_run_id },
-      select: {
-        team_answer_submission_id: true,
-        interaction_run_id: true,
-        quiz_team_session_id: true,
-        submission_version: true,
-        status: true,
-        interaction_type: true,
-        payload: true,
-      },
-    });
-    const valid = collectValidMemeSubmissions(
-      run.interaction_run_id,
-      stored as StoredMemeSubmission[],
-    );
-    const plan = createMemeSelectionPlan(valid, config.maxPresentedMemes);
     const created = await tx.meme_moderation_selections.create({
       data: {
         interaction_run_id: run.interaction_run_id,
         quiz_fragen_id: input.quizFragenId,
-        valid_submission_count: plan.validSubmissionCount,
+        valid_submission_count: valid.length,
         selection_limit: config.maxPresentedMemes,
         created_by_user_id: input.actorUserId,
         candidates: {
-          create: plan.selected.map((submission, index) => ({
+          create: valid.map((submission, index) => ({
             team_answer_submission_id: submission.team_answer_submission_id,
             position: index + 1,
           })),
@@ -220,6 +290,16 @@ export async function setMemeCandidateReviewStatus(input: {
   actorUserId: number;
 }) {
   return prisma.$transaction(async (tx) => {
+    const identity = await tx.meme_moderation_selections.findFirst({
+      where: {
+        meme_moderation_selection_id: input.selectionId,
+        quiz_fragen_id: input.quizFragenId,
+        interaction_run: { quiz_id: input.quizId },
+      },
+      select: { interaction_run_id: true },
+    });
+    if (!identity) throw new Error("Die Meme-Auswahl gehört nicht zu diesem Quiz.");
+    await lockRun(tx, identity.interaction_run_id);
     await lockSelection(tx, input.selectionId);
     const selection = await tx.meme_moderation_selections.findFirst({
       where: {
@@ -265,8 +345,18 @@ export async function completeMemeModerationReview(input: {
   actorUserId: number;
 }) {
   return prisma.$transaction(async (tx) => {
+    const identity = await tx.meme_moderation_selections.findFirst({
+      where: {
+        meme_moderation_selection_id: input.selectionId,
+        quiz_fragen_id: input.quizFragenId,
+        interaction_run: { quiz_id: input.quizId },
+      },
+      select: { interaction_run_id: true },
+    });
+    if (!identity) throw new Error("Die Meme-Auswahl gehört nicht zu diesem Quiz.");
+    await lockRun(tx, identity.interaction_run_id);
     await lockSelection(tx, input.selectionId);
-    const selection = await tx.meme_moderation_selections.findFirst({
+    let selection = await tx.meme_moderation_selections.findFirst({
       where: {
         meme_moderation_selection_id: input.selectionId,
         quiz_fragen_id: input.quizFragenId,
@@ -275,17 +365,58 @@ export async function completeMemeModerationReview(input: {
       include: selectionInclude,
     });
     if (!selection) throw new Error("Die Meme-Auswahl gehört nicht zu diesem Quiz.");
+    selection = await syncReviewCandidates(
+      tx,
+      selection,
+      await readValidSubmissions(tx, selection.interaction_run_id),
+    );
     if (selection.revision !== input.expectedRevision) {
       return { success: false as const, reason: "REVISION_CONFLICT" as const, message: "Der Review wurde inzwischen geändert. Der aktuelle Stand wurde geladen.", view: toView(selection) };
     }
     if (selection.state !== "REVIEWING") {
       return { success: true as const, view: toView(selection) };
     }
+    if (selection.interaction_run.state === "OPEN" || selection.interaction_run.state === "COUNTDOWN") {
+      return {
+        success: false as const,
+        reason: "ANSWER_PHASE_OPEN" as const,
+        message: "Schließe zuerst die Antwortphase. Bis dahin können weitere finale Memes eingehen.",
+        view: toView(selection),
+      };
+    }
     const validation = validateMemeReviewCompletion({
       candidateStatuses: selection.candidates.map((item) => item.review_status),
     });
     if (!validation.ok) {
       return { success: false as const, reason: validation.reason, message: validation.message, view: toView(selection) };
+    }
+    if (validation.nextState === "COMPLETED") {
+      const approved = selection.candidates.filter((item) => item.review_status === "APPROVED");
+      const presented = randomizeMemeCandidates(approved, selection.selection_limit);
+      const presentedIds = new Set(presented.map((item) => item.meme_moderation_candidate_id));
+      const remainder = selection.candidates
+        .filter((item) => !presentedIds.has(item.meme_moderation_candidate_id))
+        .sort((left, right) => left.position - right.position);
+      const ordered = [...presented, ...remainder];
+      const temporaryBase = ordered.reduce(
+        (maximum, item) => Math.max(maximum, item.position),
+        0,
+      ) + ordered.length + 1;
+      for (const [index, candidate] of ordered.entries()) {
+        await tx.meme_moderation_candidates.update({
+          where: { meme_moderation_candidate_id: candidate.meme_moderation_candidate_id },
+          data: { position: temporaryBase + index },
+        });
+      }
+      for (const [index, candidate] of ordered.entries()) {
+        await tx.meme_moderation_candidates.update({
+          where: { meme_moderation_candidate_id: candidate.meme_moderation_candidate_id },
+          data: {
+            position: index + 1,
+            selected_for_presentation: presentedIds.has(candidate.meme_moderation_candidate_id),
+          },
+        });
+      }
     }
     await tx.meme_moderation_selections.update({
       where: { meme_moderation_selection_id: input.selectionId },
@@ -297,7 +428,7 @@ export async function completeMemeModerationReview(input: {
       },
     });
     return { success: true as const, view: toView(await readSelection(tx, input.selectionId)) };
-  });
+  }, { timeout: 30_000 });
 }
 
 export type ApprovedMemeCandidate = {
@@ -325,7 +456,7 @@ export async function readApprovedMemeCandidatesForAp3(input: {
     include: {
       interaction_run: { select: { config_snapshot: true } },
       candidates: {
-        where: { review_status: "APPROVED" },
+        where: { review_status: "APPROVED", selected_for_presentation: true },
         orderBy: { position: "asc" },
         include: {
           submission: {

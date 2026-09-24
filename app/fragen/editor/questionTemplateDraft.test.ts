@@ -193,6 +193,29 @@ test("template switches preserve question text and only apply defaults to empty 
   assert.equal(empty.questionText, "Welcher Songtext wurde hier übersetzt?");
 });
 
+test("the Meme template uses its visible name only for an empty question", () => {
+  const meme = findQuestionTemplate(
+    questionTemplates,
+    questionTemplateIds.memeCaption,
+  );
+  assert.ok(meme);
+
+  const empty = applyQuestionTemplateToDraft(
+    { ...createDraft(), questionText: "" },
+    meme,
+    () => "meme-answer-empty",
+  );
+  assert.equal(empty.templateId, "meme_beschriften");
+  assert.equal(empty.questionText, "What the Meme!");
+
+  const custom = applyQuestionTemplateToDraft(
+    { ...createDraft(), questionText: "Gebt diesem Montag ein Motto." },
+    meme,
+    () => "meme-answer-custom",
+  );
+  assert.equal(custom.questionText, "Gebt diesem Montag ein Motto.");
+});
+
 test("applying the pixel template creates a canonical editable draft", () => {
   const pixel = findQuestionTemplate(
     questionTemplates,

@@ -209,6 +209,17 @@ type DefaultFlowQuiz = {
   }[];
 };
 
+export function formatRoundContentCounts(questionCount: number, pollCount: number) {
+  const parts: string[] = [];
+  if (questionCount > 0 || pollCount === 0) {
+    parts.push(`${questionCount} ${questionCount === 1 ? "Frage" : "Fragen"}`);
+  }
+  if (pollCount > 0) {
+    parts.push(`${pollCount} ${pollCount === 1 ? "Umfrage" : "Umfragen"}`);
+  }
+  return parts.join(" · ");
+}
+
 const DEFAULT_RULES = [
   "Teamname wählen",
   "Antworten rechtzeitig absenden",
@@ -589,7 +600,7 @@ function buildRoundDefaults(
       {
         version: 1,
         title: section.titel || `Runde ${sectionIndex + 1}`,
-        subtitle: `${questionCount} ${questionCount === 1 ? "Frage" : "Fragen"}`,
+        subtitle: formatRoundContentCounts(questionCount, 0),
         body: section.bemerkung ?? undefined,
       },
     ),
@@ -822,7 +833,39 @@ export function resolveQuizFlow(
       ),
   );
 
-  return [...parsed, ...missingDefaults].sort(compareQuizFlowItems);
+  const resolved = [...parsed, ...missingDefaults];
+  const questionCountBySection = new Map<number, number>();
+  for (const question of quiz.fragen) {
+    if (question.quiz_abschnitt_id === null) continue;
+    questionCountBySection.set(
+      question.quiz_abschnitt_id,
+      (questionCountBySection.get(question.quiz_abschnitt_id) ?? 0) + 1,
+    );
+  }
+  const pollCountBySection = new Map<number, number>();
+  for (const item of resolved) {
+    if (item.type !== "LIVE_POLL" || !item.enabled || item.sectionId === null) continue;
+    pollCountBySection.set(
+      item.sectionId,
+      (pollCountBySection.get(item.sectionId) ?? 0) + 1,
+    );
+  }
+
+  return resolved.map((item) => {
+    if (item.type !== "ROUND_INTRO" || !item.isStandard || item.sectionId === null) {
+      return item;
+    }
+    return {
+      ...item,
+      config: {
+        ...item.config,
+        subtitle: formatRoundContentCounts(
+          questionCountBySection.get(item.sectionId) ?? 0,
+          pollCountBySection.get(item.sectionId) ?? 0,
+        ),
+      },
+    };
+  }).sort(compareQuizFlowItems);
 }
 
 const ANCHOR_ORDER: Record<QuizFlowAnchorType, number> = {

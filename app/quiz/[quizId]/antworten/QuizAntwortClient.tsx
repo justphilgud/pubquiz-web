@@ -41,6 +41,7 @@ import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
 import MemeVotingPanel from "./MemeVotingPanel";
+import { PasswordInput } from "@/app/components/PasswordInput";
 import type { saveTeamAntwortDraft, startQuizTeamSession } from "../../actions";
 type QuizLiveSnapshot = Awaited<
   ReturnType<typeof import("../../actions").getQuizLiveSnapshot>
@@ -751,19 +752,15 @@ export default function QuizAntwortClient({
               </label>
 
               {teamExistiert && (
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-700">
-                    Team-Passwort
-                  </span>
-
-                  <input
-                    type="password"
-                    value={teamPasswort}
-                    onChange={(e) => setTeamPasswort(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-                    placeholder="Passwort eingeben"
-                  />
-                </label>
+                <PasswordInput
+                  label="Team-Passwort"
+                  name="team-password"
+                  autoComplete="current-password"
+                  value={teamPasswort}
+                  onChange={(event) => setTeamPasswort(event.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+                  placeholder="Passwort eingeben"
+                />
               )}
 
               <button

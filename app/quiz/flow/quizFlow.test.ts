@@ -7,6 +7,7 @@ import {
   isQuizBlockFlowItemType,
   isQuizGlobalFlowItemType,
   validateQuizFlowConfig,
+  formatRoundContentCounts,
 } from "./quizFlow";
 
 function quizFixture() {
@@ -151,4 +152,76 @@ test("ergänzt neue Runden bei einem bereits persistierten Ablauf", () => {
   }]);
   assert.equal(flow.filter((item) => item.type === "ROUND_INTRO").length, 2);
   assert.equal(flow.find((item) => item.type === "WELCOME")?.config.title, "Eigener Auftakt");
+});
+
+test("formatiert die gemeinsame Fragen- und Umfragezählung mit korrektem Singular", () => {
+  assert.equal(formatRoundContentCounts(8, 0), "8 Fragen");
+  assert.equal(formatRoundContentCounts(8, 2), "8 Fragen · 2 Umfragen");
+  assert.equal(formatRoundContentCounts(1, 1), "1 Frage · 1 Umfrage");
+  assert.equal(formatRoundContentCounts(0, 2), "2 Umfragen");
+  assert.equal(formatRoundContentCounts(0, 0), "0 Fragen");
+});
+
+test("aktualisiert nur persistierte Standard-Rundenintros aus dem aktuellen Blockbestand", () => {
+  const quiz = quizFixture();
+  const stored = [
+    {
+      quiz_ablauf_element_id: 100,
+      typ: "ROUND_INTRO",
+      anker_typ: "ROUND_START",
+      anker_schluessel: "10",
+      quiz_abschnitt_id: 10,
+      sortierung: 10,
+      ist_sichtbar: true,
+      bezeichnung: null,
+      konfiguration: { version: 1, title: "Runde 1", subtitle: "0 Fragen" },
+      ist_standard: true,
+    },
+    {
+      quiz_ablauf_element_id: 101,
+      typ: "LIVE_POLL",
+      anker_typ: "BLOCK",
+      anker_schluessel: "10",
+      quiz_abschnitt_id: 10,
+      sortierung: 40,
+      ist_sichtbar: true,
+      bezeichnung: "Umfrage A",
+      konfiguration: { version: 1 },
+      ist_standard: false,
+      live_poll: {
+        version: 1,
+        pollId: 1,
+        pollRevisionId: 1,
+        prompt: "A?",
+        type: "SINGLE_CHOICE",
+        publicationMode: "AUTOMATIC",
+        options: [{ id: "yes", label: "Ja" }, { id: "no", label: "Nein" }],
+      },
+    },
+    {
+      quiz_ablauf_element_id: 102,
+      typ: "LIVE_POLL",
+      anker_typ: "BLOCK",
+      anker_schluessel: "10",
+      quiz_abschnitt_id: 10,
+      sortierung: 41,
+      ist_sichtbar: true,
+      bezeichnung: "Umfrage B",
+      konfiguration: { version: 1 },
+      ist_standard: false,
+      live_poll: {
+        version: 1,
+        pollId: 2,
+        pollRevisionId: 2,
+        prompt: "B?",
+        type: "SINGLE_CHOICE",
+        publicationMode: "AUTOMATIC",
+        options: [{ id: "yes", label: "Ja" }, { id: "no", label: "Nein" }],
+      },
+    },
+  ] as const;
+  const intro = resolveQuizFlow(quiz, stored).find(
+    (item) => item.type === "ROUND_INTRO" && item.sectionId === 10,
+  );
+  assert.equal(intro?.config.subtitle, "2 Fragen · 2 Umfragen");
 });

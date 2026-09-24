@@ -9,7 +9,7 @@ test("AP4 finalization is moderator-only and accepts only a closed AP3 voting", 
   const service = read("app/quiz/memeResults.server.ts");
   assert.match(action, /requireQuizLiveController/);
   assert.match(service, /state: "VOTING_CLOSED"/);
-  assert.match(service, /where: \{ review_status: "APPROVED" \}/);
+  assert.match(service, /where: \{ review_status: "APPROVED", selected_for_presentation: true \}/);
   assert.match(service, /votes: \{ select: \{ meme_moderation_candidate_id: true \} \}/);
 });
 

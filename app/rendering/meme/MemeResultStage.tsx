@@ -19,11 +19,11 @@ export function MemeResultStage({
     <section
       data-meme-result-stage
       data-result-page={page.page}
-      className="flex h-full min-h-0 flex-col gap-3 px-7 py-5 text-white"
+      className="flex h-full min-h-0 flex-col gap-3 px-7 py-5 text-[var(--quiz-text)]"
     >
       <header className="flex shrink-0 items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-200">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-[var(--quiz-primary)]">
             Meme-Ergebnis
           </p>
           <h1 className="text-3xl font-black">
@@ -31,7 +31,7 @@ export function MemeResultStage({
           </h1>
         </div>
         <div className="text-right">
-          <p className="text-xl font-black text-cyan-100">{result.totalVotes} Stimmen</p>
+          <p className="text-xl font-black text-[var(--quiz-secondary)]">{result.totalVotes} Stimmen</p>
           {page.pageCount > 1 ? (
             <p className="text-sm font-bold text-white/70">Seite {page.page} / {page.pageCount}</p>
           ) : null}
@@ -46,8 +46,8 @@ export function MemeResultStage({
             data-winner={entry.isWinner ? "true" : "false"}
             className={`grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(12rem,0.58fr)] gap-3 overflow-hidden rounded-2xl border-2 p-3 ${
               entry.isWinner
-                ? "border-yellow-300 bg-yellow-300/15 shadow-[5px_5px_0_#f0abfc]"
-                : "border-white/25 bg-black/45"
+                ? "border-[var(--quiz-accent)] bg-[var(--quiz-surface-strong)] shadow-[5px_5px_0_var(--quiz-primary)]"
+                : "border-[var(--quiz-border)] bg-[var(--quiz-surface)]"
             }`}
           >
             {imageUrl ? (
@@ -58,7 +58,7 @@ export function MemeResultStage({
                 captions={entry.captions}
                 layout={entry.layout}
                 alt={`Meme ${entry.number} von Team ${entry.teamName}`}
-                className="max-h-full border border-white/20"
+                className="max-h-full border border-[var(--quiz-border)]"
               />
             ) : (
               <div className="flex h-full items-center justify-center rounded-2xl bg-black/60 font-bold text-white/60">
@@ -67,7 +67,7 @@ export function MemeResultStage({
             )}
             <div className="flex min-w-0 flex-col justify-center gap-2 min-[1600px]:gap-3">
               <div className="flex items-center gap-2 min-[1600px]:gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-fuchsia-500 text-base font-black min-[1600px]:h-12 min-[1600px]:w-12 min-[1600px]:text-lg">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--quiz-primary)] text-base font-black text-[var(--quiz-background)] min-[1600px]:h-12 min-[1600px]:w-12 min-[1600px]:text-lg">
                   {entry.number}
                 </span>
                 <TeamIdentityVisual
@@ -81,11 +81,11 @@ export function MemeResultStage({
               <p className="text-xl font-black tabular-nums min-[1600px]:text-2xl">
                 {entry.voteCount} {entry.voteCount === 1 ? "Stimme" : "Stimmen"}
               </p>
-              <p className="text-sm font-bold text-cyan-100 min-[1600px]:text-base">{entry.share.toFixed(1).replace(".0", "")} %</p>
+              <p className="text-sm font-bold text-[var(--quiz-secondary)] min-[1600px]:text-base">{entry.share.toFixed(1).replace(".0", "")} %</p>
               {entry.isWinner ? (
                 <p
                   data-meme-result-winner
-                  className="rounded-xl bg-yellow-300 px-3 py-1.5 text-center text-sm font-black text-slate-950 min-[1600px]:py-2 min-[1600px]:text-base"
+                  className="rounded-xl bg-[var(--quiz-accent)] px-3 py-1.5 text-center text-sm font-black text-[var(--quiz-background)] min-[1600px]:py-2 min-[1600px]:text-base"
                 >
                   Gewinner · +{entry.awardedPoints} Punkt
                 </p>
@@ -96,7 +96,7 @@ export function MemeResultStage({
       </div>
 
       {!hasWinner ? (
-        <p className="shrink-0 rounded-xl border border-white/30 bg-black/50 px-4 py-2 text-center text-lg font-bold text-white/80">
+        <p className="shrink-0 rounded-xl border border-[var(--quiz-border)] bg-[var(--quiz-surface)] px-4 py-2 text-center text-lg font-bold text-[var(--quiz-text-muted)]">
           Ohne abgegebene Stimme wird kein Punkt vergeben.
         </p>
       ) : null}
