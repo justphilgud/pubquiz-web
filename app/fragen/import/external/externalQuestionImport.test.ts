@@ -324,11 +324,9 @@ test("phase-two quality gate produces reproducible review statuses", () => {
   assert.ok(contradicted.issues.includes("FACT_CONTRADICTED"));
 });
 
-test("gateway adapter uses short-lived Vercel OIDC without exposing it", async () => {
-  const previousOidc = process.env.VERCEL_OIDC_TOKEN;
+test("gateway adapter uses the short-lived Vercel runtime OIDC header without exposing it", async () => {
   const previousGatewayKey = process.env.AI_GATEWAY_API_KEY;
   delete process.env.AI_GATEWAY_API_KEY;
-  process.env.VERCEL_OIDC_TOKEN = "test-oidc-token";
   try {
     const adapter = new VercelAiGatewayQuestionAutomationAdapter(async (_input, init) => {
       assert.equal(new Headers(init?.headers).get("authorization"), "Bearer test-oidc-token");
@@ -336,7 +334,7 @@ test("gateway adapter uses short-lived Vercel OIDC without exposing it", async (
         choices: [{ message: { content: JSON.stringify(gatewayPayload()) } }],
         citations: ["https://example.edu/mathematics/addition"],
       });
-    });
+    }, "test-oidc-token");
     const question = normalizeOpenTdbQuestion(rawQuestion());
     assert.ok(question);
     const result = await adapter.process({
@@ -345,8 +343,6 @@ test("gateway adapter uses short-lived Vercel OIDC without exposing it", async (
     });
     assert.equal(result.verificationStatus, "VERIFIED");
   } finally {
-    if (previousOidc === undefined) delete process.env.VERCEL_OIDC_TOKEN;
-    else process.env.VERCEL_OIDC_TOKEN = previousOidc;
     if (previousGatewayKey === undefined) delete process.env.AI_GATEWAY_API_KEY;
     else process.env.AI_GATEWAY_API_KEY = previousGatewayKey;
   }

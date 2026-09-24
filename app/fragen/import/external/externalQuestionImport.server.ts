@@ -313,6 +313,7 @@ async function refreshOpenTdbPhaseTwoReport(batchId: number) {
 export async function processOpenTdbPhaseTwo(input: {
   batchId: number;
   adapter?: ExternalQuestionAutomationAdapter;
+  authorizationToken?: string;
   retryFailures?: boolean;
 }) {
   assertOpenTdbPilotEnvironment();
@@ -354,7 +355,10 @@ export async function processOpenTdbPhaseTwo(input: {
       select: { fragenkategorie_id: true, kategorie: true },
     }),
   ]);
-  const adapter = input.adapter ?? new VercelAiGatewayQuestionAutomationAdapter();
+  const adapter = input.adapter ?? new VercelAiGatewayQuestionAutomationAdapter(
+    fetch,
+    input.authorizationToken,
+  );
   const results = await Promise.all(items.map(async (item) => {
     const startedAt = new Date();
     await prisma.external_question_import_items.update({
