@@ -3256,7 +3256,10 @@ export async function closeQuizQuestionAnswerPhase(data: {
       quiz_id: data.quizId,
       quiz_fragen_id: data.quizFragenId,
       is_current: true,
-      quiz_fragen: { ergebnisdarstellung: "LIVE" },
+      OR: [
+        { quiz_fragen: { ergebnisdarstellung: "LIVE" } },
+        { interaction_type: "MEME_CAPTION" },
+      ],
     },
     select: { interaction_run_id: true },
   });
