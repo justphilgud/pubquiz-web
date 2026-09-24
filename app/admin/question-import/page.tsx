@@ -171,6 +171,15 @@ export default async function ExternalQuestionImportPage({
                       </button>
                     </form>
                   )}
+                  {(overview.summary?.verificationCounts.NO_RELIABLE_SOURCE ?? 0) > 0 && (
+                    <form action={processOpenTdbPhaseTwoAction}>
+                      <input type="hidden" name="batchId" value={overview.batch!.import_batch_id} />
+                      <input type="hidden" name="mode" value="retry-sources" />
+                      <button className="rounded-xl border border-amber-300 px-4 py-2.5 text-sm font-semibold text-amber-900">
+                        Bis zu 5 fehlende Quellen erneut prüfen
+                      </button>
+                    </form>
+                  )}
                 </div>
                 <p className="mt-3 text-xs text-slate-500">
                   Jeder Lauf verarbeitet ausschließlich fünf bereits vorhandene Datensätze aus Batch #1. Es werden keine weiteren OpenTDB-Fragen abgerufen.

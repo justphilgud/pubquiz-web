@@ -315,6 +315,7 @@ export async function processOpenTdbPhaseTwo(input: {
   adapter?: ExternalQuestionAutomationAdapter;
   authorizationToken?: string;
   retryFailures?: boolean;
+  retryMissingSources?: boolean;
 }) {
   assertOpenTdbPilotEnvironment();
   if (input.batchId !== PHASE_TWO_BATCH_ID) {
@@ -340,7 +341,14 @@ export async function processOpenTdbPhaseTwo(input: {
         status: { notIn: ["APPROVED", "REJECTED"] },
         ...(input.retryFailures
           ? { automation_error: { not: null } }
-          : { automation_completed_at: null }),
+          : input.retryMissingSources
+            ? {
+                automation_error: null,
+                verification_status: "NO_RELIABLE_SOURCE" as const,
+                review_started_at: null,
+                manually_edited: false,
+              }
+            : { automation_completed_at: null }),
       },
       orderBy: { import_item_id: "asc" },
       take: PHASE_TWO_CHUNK_SIZE,

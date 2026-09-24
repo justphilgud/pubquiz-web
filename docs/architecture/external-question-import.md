@@ -60,6 +60,11 @@ gestütztes Ergebnis darf nicht `VERIFIED` werden. Ohne natürliche deutsche
 Lokalisierung und belastbare HTTPS-Fachquelle bleibt der Datensatz blockiert.
 Freie Modellausgaben gelangen nicht ungeprüft in die Datenbank.
 
+Nicht manuell bearbeitete und noch nicht in die Endkontrolle übernommene
+Kandidaten mit `NO_RELIABLE_SOURCE` können in Fünfergruppen erneut durch die
+Faktenprüfung laufen. Der Wiederaufnahmeweg ändert weder Originaldaten noch den
+Freigabe-Lifecycle und ruft keine weiteren Providerfragen ab.
+
 Deterministische Regeln markieren unter anderem zeitabhängige,
 sprachabhängige, lokal stark gebundene, strukturell ungültige und doppelte
 Inhalte. Exakte Dubletten blockieren die Übernahme. Semantische Treffer werden
