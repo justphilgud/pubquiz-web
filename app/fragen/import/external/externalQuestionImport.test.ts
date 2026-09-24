@@ -265,6 +265,22 @@ test("gateway enrichment accepts only provider-cited HTTPS sources", () => {
   assert.equal(result.enrichment.suggestedCategoryName, "Allgemeinwissen");
 });
 
+test("provider citations remain authoritative when structured source selection is empty", () => {
+  const result = validateGatewayAutomationResponse({
+    choices: [{ message: { content: JSON.stringify(gatewayPayload({ sourceUrls: [] })) } }],
+    search_results: [{
+      title: "University Mathematics",
+      url: "https://example.edu/mathematics/addition",
+    }],
+    citations: ["https://example.edu/mathematics/addition"],
+  }, ["Allgemeinwissen"]);
+  assert.equal(result.verificationStatus, "VERIFIED");
+  assert.deepEqual(result.verificationSources, [{
+    title: "University Mathematics",
+    url: "https://example.edu/mathematics/addition",
+  }]);
+});
+
 test("uncited or low-quality-only claims cannot become VERIFIED", () => {
   const uncited = validateGatewayAutomationResponse({
     choices: [{ message: { content: JSON.stringify(gatewayPayload({

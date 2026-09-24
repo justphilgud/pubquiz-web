@@ -51,7 +51,10 @@ validierten strukturierten Vertrag und verwendet `perplexity/sonar`, dessen
 Anfragen eine Live-Websuche ausführen.
 
 Eine vom Modell genannte Quellen-URL wird nur gespeichert, wenn sie zugleich in
-den vom Gateway gelieferten Suchzitaten vorkommt. OpenTDB und Quizseiten werden
+den vom Gateway gelieferten Suchzitaten vorkommt. Bleibt die strukturierte
+Quellenauswahl leer, verwendet der Adapter ausschließlich die vom Provider als
+für die Antwort verwendete Suchzitate gelieferten HTTPS-Quellen. Eine genannte,
+aber nicht zitierte URL wird weiterhin abgewiesen. OpenTDB und Quizseiten werden
 als Fachquelle abgewiesen. Ein ausschließlich auf Wikipedia, Fandom oder Reddit
 gestütztes Ergebnis darf nicht `VERIFIED` werden. Ohne natürliche deutsche
 Lokalisierung und belastbare HTTPS-Fachquelle bleibt der Datensatz blockiert.
