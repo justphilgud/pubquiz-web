@@ -206,6 +206,24 @@ test("MEME_CAPTION renders the shared local preview, both limited fields and cou
   assert.equal((html.match(/maxLength="80"/g) ?? []).length, 2);
 });
 
+test("MEME_CAPTION warns when real layout rules cannot keep text readable", () => {
+  const html = render(
+    {
+      type: "MEME_CAPTION",
+      imageUrl: "/medien/base.webp",
+      maxLength: 80,
+    },
+    {
+      ...emptyDraft,
+      antwortText: JSON.stringify({ topText: "W".repeat(80), bottomText: "" }),
+    },
+  );
+
+  assert.match(html, /data-meme-caption-validation="overflow"/);
+  assert.match(html, /Dein Text ist zu lang/);
+  assert.match(html, /aria-invalid="true"/);
+});
+
 test("poll choices and mobile scale render as first-class interactions", () => {
   const options = [{ id: 1, label: "Option A" }, { id: 2, label: "Option B" }];
   const single = render({ type: "POLL_SINGLE", selectionMode: "SINGLE", options });

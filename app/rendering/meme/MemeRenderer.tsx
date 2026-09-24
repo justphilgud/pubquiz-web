@@ -1,4 +1,8 @@
+"use client";
+
 import type { CSSProperties } from "react";
+
+import { AutoFitText } from "./AutoFitText";
 
 type Props = {
   imageUrl: string;
@@ -6,14 +10,21 @@ type Props = {
   bottomText?: string;
   alt: string;
   className?: string;
+  onCaptionFitChange?: (
+    position: "top" | "bottom",
+    text: string,
+    fits: boolean,
+  ) => void;
 };
 
-const captionStyle: CSSProperties = {
-  fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
-  WebkitTextStroke: "clamp(1px, 0.16em, 4px) #000",
-  paintOrder: "stroke fill",
-  textShadow: "0 0.08em 0 #000, 0.05em 0.08em 0 #000, -0.05em 0.08em 0 #000",
-};
+function gridRows(hasTopCaption: boolean, hasBottomCaption: boolean) {
+  if (hasTopCaption && hasBottomCaption) {
+    return "21% minmax(0, 1fr) 21%";
+  }
+  if (hasTopCaption) return "21% minmax(0, 1fr)";
+  if (hasBottomCaption) return "minmax(0, 1fr) 21%";
+  return "minmax(0, 1fr)";
+}
 
 export function MemeRenderer({
   imageUrl,
@@ -21,32 +32,44 @@ export function MemeRenderer({
   bottomText = "",
   alt,
   className = "",
+  onCaptionFitChange,
 }: Props) {
+  const normalizedTopText = topText.trim();
+  const normalizedBottomText = bottomText.trim();
+  const figureStyle: CSSProperties = {
+    containerType: "inline-size",
+    gridTemplateRows: gridRows(
+      Boolean(normalizedTopText),
+      Boolean(normalizedBottomText),
+    ),
+  };
+
   return (
     <figure
       data-meme-renderer
-      className={`relative isolate aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black ${className}`}
+      data-has-top-caption={normalizedTopText ? "true" : "false"}
+      data-has-bottom-caption={normalizedBottomText ? "true" : "false"}
+      style={figureStyle}
+      className={`isolate grid aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black ${className}`}
     >
-      {/* Dynamic quiz media has no build-time dimensions and may come from Blob. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={imageUrl} alt={alt} className="h-full w-full object-contain" />
-      {topText && (
-        <figcaption
-          data-meme-caption="top"
-          style={captionStyle}
-          className="absolute inset-x-[3%] top-[3%] text-center text-[clamp(1.4rem,6cqw,4.5rem)] font-black uppercase leading-[0.95] tracking-tight text-white"
-        >
-          {topText}
-        </figcaption>
+      {normalizedTopText && (
+        <AutoFitText
+          text={normalizedTopText}
+          position="top"
+          onFitChange={onCaptionFitChange}
+        />
       )}
-      {bottomText && (
-        <figcaption
-          data-meme-caption="bottom"
-          style={captionStyle}
-          className="absolute inset-x-[3%] bottom-[3%] text-center text-[clamp(1.4rem,6cqw,4.5rem)] font-black uppercase leading-[0.95] tracking-tight text-white"
-        >
-          {bottomText}
-        </figcaption>
+      <div data-meme-image className="min-h-0 overflow-hidden bg-black">
+        {/* Dynamic quiz media has no build-time dimensions and may come from Blob. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={imageUrl} alt={alt} className="h-full w-full object-contain" />
+      </div>
+      {normalizedBottomText && (
+        <AutoFitText
+          text={normalizedBottomText}
+          position="bottom"
+          onFitChange={onCaptionFitChange}
+        />
       )}
     </figure>
   );
