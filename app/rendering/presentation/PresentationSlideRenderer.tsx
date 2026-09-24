@@ -624,7 +624,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   if (frage.templateId === "meme_beschriften") {
     const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
       frage.medien.find((medium) => isBild(medium.datei));
-    const remaining = memeState
+    const remaining = memeState?.timerEnabled
       ? memeCountdownRemainingSeconds(memeState.deadlineAt, memeState.state, now)
       : null;
     return (
