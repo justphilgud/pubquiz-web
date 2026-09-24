@@ -79,11 +79,15 @@ import {
 } from "./evaluation/questionPointPolicy";
 import { getQuizQuestionPointsDisplay } from "./evaluation/quizQuestionPointsDisplay";
 import {
+  findQuestionTemplate,
   isMemeCaptionQuestionTemplateId,
   isPollQuestionTemplateId,
   questionTemplateIds,
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { localizeQuestionTemplates } from "@/app/fragen/editor/templates/questionTemplates";
+import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import {
   resolvePresentationLayout,
@@ -160,6 +164,10 @@ import {
   parseMemeQuestionConfig,
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
+
+const localizedQuestionTemplates = localizeQuestionTemplates(
+  loadQuestionEditorMessages(getDefaultLocale()),
+);
 
 async function getPresentationTemplateValidationOptions(
   additionallyAllowed: readonly string[] = [],
@@ -1199,7 +1207,11 @@ export async function getQuizDetails(
         live_ergebnis_unterstuetzt: liveResultSupported,
         kann_freie_antwort_aktivieren: answerMode.canEnableFreeAnswer,
         effektiver_antwortmodus: answerMode.effectiveMode,
-        vorlagenname: eintrag.fragen.vorlage?.name ?? "Standard",
+        vorlagenname:
+          findQuestionTemplate(
+            localizedQuestionTemplates,
+            eintrag.fragen.vorlage?.code ?? null,
+          )?.name ?? eintrag.fragen.vorlage?.name ?? "Standardfrage",
         templateId: eintrag.fragen.vorlage?.code ?? null,
         teilpunkte_faehig: partialPointsCapable,
         schwierigkeitslevel:

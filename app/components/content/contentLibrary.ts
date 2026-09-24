@@ -17,6 +17,7 @@ export type ContentQuestionLifecycleFilter =
 export type ContentFiltersState = {
   query: string;
   contentType: ContentTypeFilter;
+  templateId: string | null;
   categoryIds: number[];
   storyType: string;
   status: ContentStatusFilter;
@@ -27,6 +28,11 @@ export type ContentFiltersState = {
 };
 
 export type ContentFilterOption = { id: number; name: string };
+export type ContentTemplateOption = {
+  id: string;
+  name: string;
+  availableForFiltering: boolean;
+};
 
 export type ContentQuizUsage = {
   quizId: number;
@@ -86,17 +92,24 @@ export type ContentQuizOption = {
 export function parseContentFilters(
   params: URLSearchParams,
   initialType?: ContentType,
+  allowedTemplateIds?: readonly string[],
 ): ContentFiltersState {
   const requestedType = params.get("contentType");
   const requestedStatus = params.get("status");
   const requestedMedia = params.get("media");
   const requestedUsage = params.get("usage");
   const requestedQuestionLifecycle = params.get("questionLifecycle");
+  const requestedTemplateId = params.get("template");
+  const templateId = requestedTemplateId &&
+      (!allowedTemplateIds || allowedTemplateIds.includes(requestedTemplateId))
+    ? requestedTemplateId
+    : null;
   return normalizeContentFiltersForType({
     query: (params.get("q") ?? "").slice(0, 300),
     contentType: CONTENT_TYPES.includes(requestedType as ContentTypeFilter)
       ? requestedType as ContentTypeFilter
       : initialType ?? "ALL",
+    templateId,
     categoryIds: [...new Set(params.getAll("categoryId")
       .map((value) => parsePositiveId(value))
       .filter((value): value is number => value !== null))],
@@ -124,10 +137,11 @@ function parsePositiveId(value: string | null) {
 
 export function normalizeContentFiltersForType(filters: ContentFiltersState) {
   if (filters.contentType === "QUESTION") return { ...filters, storyType: "ALL" };
-  if (filters.contentType === "STORY_ELEMENT") return { ...filters, categoryIds: [], questionLifecycle: "ALL" as const };
+  if (filters.contentType === "STORY_ELEMENT") return { ...filters, templateId: null, categoryIds: [], questionLifecycle: "ALL" as const };
   if (filters.contentType === "POLL") {
     return {
       ...filters,
+      templateId: null,
       categoryIds: [],
       storyType: "ALL",
       questionLifecycle: "ALL" as const,
@@ -146,10 +160,11 @@ export function resolveContentFilterDraft(
   draft: ContentFilterDraft,
   initialType: ContentInitialType,
   paramsKey: string,
+  allowedTemplateIds?: readonly string[],
 ) {
   return draft.initialType === initialType && draft.paramsKey === paramsKey
     ? draft.filters
-    : parseContentFilters(new URLSearchParams(paramsKey), initialType);
+    : parseContentFilters(new URLSearchParams(paramsKey), initialType, allowedTemplateIds);
 }
 
 export function serializeContentFilters(filters: ContentFiltersState) {
@@ -157,6 +172,7 @@ export function serializeContentFilters(filters: ContentFiltersState) {
   if (filters.query.trim()) params.set("q", filters.query.trim());
   if (filters.contentType !== "ALL") params.set("contentType", filters.contentType);
   if (filters.contentType === "QUESTION" || filters.contentType === "ALL") {
+    if (filters.templateId) params.set("template", filters.templateId);
     for (const categoryId of filters.categoryIds) params.append("categoryId", String(categoryId));
   }
   if (filters.storyType !== "ALL") params.set("storyType", filters.storyType);

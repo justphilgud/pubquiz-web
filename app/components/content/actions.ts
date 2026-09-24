@@ -50,9 +50,10 @@ function questionStatuses(status: ContentFiltersState["status"]) {
 
 export async function searchContent(filters: ContentFiltersState): Promise<ContentSearchResult> {
   const { actor } = await requireActor();
+  const restrictToQuestionTemplate = filters.templateId !== null;
   const includeQuestions = filters.contentType !== "STORY_ELEMENT" && filters.contentType !== "POLL";
-  const includeStories = filters.contentType !== "QUESTION" && filters.contentType !== "POLL";
-  const includePolls = filters.contentType !== "QUESTION" && filters.contentType !== "STORY_ELEMENT";
+  const includeStories = !restrictToQuestionTemplate && filters.contentType !== "QUESTION" && filters.contentType !== "POLL";
+  const includePolls = !restrictToQuestionTemplate && filters.contentType !== "QUESTION" && filters.contentType !== "STORY_ELEMENT";
   const [questionResult, stories, polls, quizzes] = await Promise.all([
     includeQuestions
       ? searchFragen({
@@ -63,7 +64,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
           mediaState: filters.media === "ALL" ? null : filters.media === "WITH" ? "with" : "without",
           answerMode: null,
           statuses: [...questionStatuses(filters.status)],
-          templateIds: [],
+          templateIds: filters.templateId ? [filters.templateId] : [],
           eventSeriesId: filters.eventSeriesId,
           usageState: filters.usage === "ALL" ? null : filters.usage,
           lifecycleFilter: filters.questionLifecycle,

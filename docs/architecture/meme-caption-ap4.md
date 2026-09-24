@@ -1,4 +1,4 @@
-# Meme beschriften – AP4 Ergebnis, Punkte und Auflösung
+# What the Meme! – AP4 Ergebnis, Punkte und Auflösung
 
 Stand: 23. September 2026
 

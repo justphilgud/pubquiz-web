@@ -637,7 +637,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
           )}
         </div>
         <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/85 p-6 text-center shadow-[8px_8px_0_#ff00aa]">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-cyan-200">Meme beschriften</p>
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-cyan-200">What the Meme!</p>
           <strong className="mt-4 text-[7rem] font-black leading-none text-yellow-200" aria-label={`${remaining ?? 0} Sekunden verbleibend`}>
             {remaining ?? "–"}
           </strong>

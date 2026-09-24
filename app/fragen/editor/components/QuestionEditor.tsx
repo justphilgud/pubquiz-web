@@ -904,7 +904,10 @@ export function QuestionEditor({
 
       {questionRecord && (
         <QuestionReviewPanel
-          record={questionRecord}
+          record={{
+            ...questionRecord,
+            templateName: selectedTemplate?.name ?? questionRecord.templateName,
+          }}
           editorContext={editorContext}
           quality={quality}
         />
