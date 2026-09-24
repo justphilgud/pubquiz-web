@@ -1043,6 +1043,7 @@ export default function QuizAntwortClient({
                           submissionLocksEditing ||
                           !session
                         }
+                        submissionOpen={questionIsWritable}
                         deadlineAt={frage.interactionRun?.deadlineAt ?? null}
                         now={now}
                         onChange={(value) => controller.edit(frage.quiz_fragen_id, value)}
