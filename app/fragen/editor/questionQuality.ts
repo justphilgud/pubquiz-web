@@ -35,6 +35,7 @@ export type QuestionQualityIssueCode =
   | "GENERATOR_LEGACY_OUTPUT"
   | "GENERATOR_CONFLICT"
   | "PIXEL_STAGE_DURATIONS_INVALID"
+  | "MEME_CAPTION_LAYOUT_INVALID"
   | "ESTIMATE_UNIT_REQUIRED"
   | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
   | "GOOGLE_PLACE_REVIEW_COUNT_INVALID"
@@ -60,6 +61,7 @@ export type QuestionQualityIssue = {
     | "templateUnit"
     | "templatePlaceAverageRating"
     | "templatePlaceReviewCount"
+    | "templateMemeCaptionLayout"
     | "answers"
     | "categories"
     | "validUntil"
@@ -151,6 +153,13 @@ export function evaluateQuestionQuality(
     !normalizeQuestionTemplateConfig(draft.templateConfig, draft.templateId)
   ) {
     blockers.push({ code: "PIXEL_STAGE_DURATIONS_INVALID", field: "questionMedia" });
+  }
+
+  if (
+    template?.id === questionTemplateIds.memeCaption &&
+    !normalizeQuestionTemplateConfig(draft.templateConfig, draft.templateId)
+  ) {
+    blockers.push({ code: "MEME_CAPTION_LAYOUT_INVALID", field: "templateMemeCaptionLayout" });
   }
 
   if (

@@ -2,6 +2,7 @@ import { randomInt } from "node:crypto";
 
 import {
   parseMemeCaptionPayload,
+  hasMemeCaptionContent,
   type MemeCaptionPayload,
 } from "@/app/quiz/memeCaption";
 
@@ -45,7 +46,7 @@ export function collectValidMemeSubmissions(
       continue;
     }
     const payload = parseMemeCaptionPayload(submission.payload);
-    if (!payload || (!payload.topText && !payload.bottomText)) continue;
+    if (!payload || !hasMemeCaptionContent(payload)) continue;
 
     const candidate = { ...submission, payload };
     const current = latestByTeam.get(submission.quiz_team_session_id);

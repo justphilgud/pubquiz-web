@@ -55,6 +55,8 @@ export function MemeResultStage({
                 imageUrl={imageUrl}
                 topText={entry.topText}
                 bottomText={entry.bottomText}
+                captions={entry.captions}
+                layout={entry.layout}
                 alt={`Meme ${entry.number} von Team ${entry.teamName}`}
                 className="max-h-full border border-white/20"
               />

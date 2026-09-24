@@ -60,6 +60,7 @@ Die zentralen Identitäten sind:
 | Pixel-Lifecycle und Punkteallokation | `app/quiz/interaction/pixelLiveInteraction.ts` |
 | Meme-Konfiguration, Payload und Deadline-Anzeige | `app/quiz/memeCaption.ts` |
 | Meme-Lesbarkeit, Umbruch und Größenregeln | `app/quiz/memeCaptionLayout.ts` |
+| Meme-Zonen, Presets und versionierte Layoutvalidierung | `app/quiz/memeCaptionZones.ts` |
 | Gemeinsames Meme-Rendering | `app/rendering/meme/MemeRenderer.tsx` |
 | Meme-Auswahl und Moderation nach Run-Ende | `app/quiz/memeModeration.server.ts` |
 | Meme-Präsentation und Abstimmung | `app/quiz/memeVoting.server.ts` |

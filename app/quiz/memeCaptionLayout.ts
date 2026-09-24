@@ -1,3 +1,13 @@
+import {
+  resolveMemeCaptionLayout,
+  type MemeCaptionZone,
+  type ResolvedMemeCaptionLayout,
+} from "@/app/quiz/memeCaptionZones";
+import {
+  memeCaptionPayloadValues,
+  type MemeCaptionPayload,
+} from "@/app/quiz/memeCaption";
+
 export const MEME_CAPTION_MAX_LINES = 3;
 export const MEME_CAPTION_MIN_FONT_CQW = 4.5;
 export const MEME_CAPTION_PREFERRED_FONT_CQW = 7.5;
@@ -60,16 +70,21 @@ export function countMemeCaptionLines(text: string, lineCapacity: number) {
   return lineCount;
 }
 
-function lineCapacity(fontSizeCqw: number) {
+function lineCapacity(fontSizeCqw: number, widthPercent = 100) {
   return LINE_CAPACITY_AT_MIN_FONT *
-    (MEME_CAPTION_MIN_FONT_CQW / fontSizeCqw);
+    (MEME_CAPTION_MIN_FONT_CQW / fontSizeCqw) *
+    (widthPercent / 100);
 }
 
-function verticalLineCapacity(fontSizeCqw: number) {
+function verticalLineCapacity(
+  fontSizeCqw: number,
+  heightCqw = CAPTION_ROW_HEIGHT_CQW,
+  maxLines = MEME_CAPTION_MAX_LINES,
+) {
   return Math.min(
-    MEME_CAPTION_MAX_LINES,
+    maxLines,
     Math.floor(
-      (CAPTION_ROW_HEIGHT_CQW - CAPTION_VERTICAL_PADDING_CQW) /
+      (heightCqw - CAPTION_VERTICAL_PADDING_CQW) /
       (fontSizeCqw * CAPTION_LINE_HEIGHT),
     ),
   );
@@ -77,6 +92,8 @@ function verticalLineCapacity(fontSizeCqw: number) {
 
 export function analyzeMemeCaptionLayout(
   text: string,
+  zone?: MemeCaptionZone,
+  imageHeightCqw = 75,
 ): MemeCaptionLayoutAnalysis {
   const trimmed = text.trim();
   if (!trimmed) {
@@ -87,13 +104,21 @@ export function analyzeMemeCaptionLayout(
     };
   }
 
+  const widthPercent = zone?.placement === "IMAGE"
+    ? Math.max(1, ((zone.width - 6) / 94) * 100)
+    : 100;
+  const heightCqw = zone?.placement === "IMAGE"
+    ? imageHeightCqw * (zone.height / 100)
+    : CAPTION_ROW_HEIGHT_CQW;
+  const maxLines = zone?.maxLines ?? MEME_CAPTION_MAX_LINES;
+
   for (
     let fontSize = MEME_CAPTION_PREFERRED_FONT_CQW;
     fontSize >= MEME_CAPTION_MIN_FONT_CQW;
     fontSize -= MEME_CAPTION_FONT_STEP_CQW
   ) {
-    const lineCount = countMemeCaptionLines(trimmed, lineCapacity(fontSize));
-    if (lineCount <= verticalLineCapacity(fontSize)) {
+    const lineCount = countMemeCaptionLines(trimmed, lineCapacity(fontSize, widthPercent));
+    if (lineCount <= verticalLineCapacity(fontSize, heightCqw, maxLines)) {
       return { fits: true, fontSizeCqw: fontSize, lineCount };
     }
   }
@@ -103,15 +128,26 @@ export function analyzeMemeCaptionLayout(
     fontSizeCqw: MEME_CAPTION_MIN_FONT_CQW,
     lineCount: countMemeCaptionLines(
       trimmed,
-      lineCapacity(MEME_CAPTION_MIN_FONT_CQW),
+      lineCapacity(MEME_CAPTION_MIN_FONT_CQW, widthPercent),
     ),
   };
 }
 
-export function isMemeCaptionPayloadReadable(payload: {
-  topText: string;
-  bottomText: string;
-}) {
-  return analyzeMemeCaptionLayout(payload.topText).fits &&
-    analyzeMemeCaptionLayout(payload.bottomText).fits;
+export function isMemeCaptionPayloadReadable(
+  payload: MemeCaptionPayload,
+  layout: ResolvedMemeCaptionLayout = resolveMemeCaptionLayout(null),
+) {
+  const values = memeCaptionPayloadValues(payload).captions;
+  const allowedZoneIds = new Set(layout.zones.map((zone) => zone.id));
+  if (Object.keys(values).some((zoneId) => !allowedZoneIds.has(zoneId))) return false;
+  const externalHeight = layout.zones.reduce((sum, zone) => {
+    if (zone.placement === "IMAGE" || !(values[zone.id] ?? "")) return sum;
+    return sum + CAPTION_ROW_HEIGHT_CQW;
+  }, 0);
+  const imageHeightCqw = 75 - externalHeight;
+  return layout.zones.every((zone) => {
+    const text = values[zone.id] ?? "";
+    if (zone.required && !text) return false;
+    return analyzeMemeCaptionLayout(text, zone, imageHeightCqw).fits;
+  });
 }

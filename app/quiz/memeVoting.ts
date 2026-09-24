@@ -11,6 +11,8 @@ export type MemePresentationCandidate = {
   number: number;
   topText: string;
   bottomText: string;
+  captions?: Record<string, string>;
+  layout?: ResolvedMemeCaptionLayout;
 };
 
 export type MemePresentationTransition =
@@ -138,3 +140,4 @@ export function planMemeVoteWrite(input: {
     nextRevision: (input.currentRevision ?? 0) + 1,
   };
 }
+import type { ResolvedMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";

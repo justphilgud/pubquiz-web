@@ -82,19 +82,19 @@ import {
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
 import { isMemeCaptionPayloadReadable } from "@/app/quiz/memeCaptionLayout";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 import { isMemeCaptionQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { getMemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 
 type DbClient = Prisma.TransactionClient;
 
 function isReadableMemeSubmission(
-  interactionType: string,
+  interaction: ResolvedQuizAnswerInteraction,
   payload: QuizInteractionPayload,
 ) {
-  if (interactionType !== "MEME_CAPTION") return true;
-  return "topText" in payload &&
-    "bottomText" in payload &&
-    isMemeCaptionPayloadReadable(payload);
+  if (interaction.type !== "MEME_CAPTION") return true;
+  if (!("topText" in payload && "bottomText" in payload) && !("captions" in payload)) return false;
+  return isMemeCaptionPayloadReadable(payload, resolveMemeCaptionLayout(interaction.layout));
 }
 
 /** Caller holds the quiz lock; all writes and closes share quiz -> run -> draft. */
@@ -236,6 +236,7 @@ export async function resolveInteractionAssignment(
     templateData: templateConfig?.templateData,
     orderingItems,
     memeImageUrl: assignment.fragen.medien[0]?.datei ?? null,
+    memeCaptionLayout: templateConfig?.memeCaptionLayout,
     answerFields: assignment.fragen.antwortfelder.map((field) => ({
       id: field.antwortfeld_id,
       label: field.label,
@@ -332,7 +333,7 @@ async function autoFinalizeDrafts(
       interaction,
       draftInputFromStored(draft),
     );
-    if (!isReadableMemeSubmission(run.interaction_type, validated.payload)) {
+    if (!isReadableMemeSubmission(interaction, validated.payload)) {
       continue;
     }
     const teamSubmissions = existing.filter(
@@ -1240,7 +1241,7 @@ export async function submitTeamAnswer(input: {
     if (!validated.hasContent) {
       return { success: false, reason: "EMPTY_DRAFT" as const };
     }
-    if (!isReadableMemeSubmission(run.interaction_type, validated.payload)) {
+    if (!isReadableMemeSubmission(interaction, validated.payload)) {
       return { success: false, reason: "MEME_CAPTION_TOO_LONG" as const };
     }
     const existingSubmissions = await tx.team_answer_submissions.findMany({

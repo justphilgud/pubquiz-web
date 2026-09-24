@@ -248,5 +248,27 @@ test("resolves the meme contract with the existing question image", () => {
     type: "MEME_CAPTION",
     imageUrl: "meme/base.webp",
     maxLength: 80,
+    layout: {
+      version: 1,
+      mode: "STANDARD",
+      zones: [
+        { id: "top", label: "Text oben", placement: "EXTERNAL_TOP", x: 0, y: 0, width: 100, height: 21, order: 1, maxLines: 3, required: false },
+        { id: "bottom", label: "Text unten", placement: "EXTERNAL_BOTTOM", x: 0, y: 79, width: 100, height: 21, order: 2, maxLines: 3, required: false },
+      ],
+    },
   });
+});
+
+test("resolves custom caption zones into the immutable interaction contract", () => {
+  const interaction = resolve({
+    templateId: questionTemplateIds.memeCaption,
+    memeImageUrl: "meme/base.webp",
+    memeCaptionLayout: {
+      version: 1,
+      mode: "CUSTOM",
+      zones: [{ id: "bubble", label: "Sprechblase", placement: "IMAGE", x: 50, y: 5, width: 40, height: 30, order: 1, maxLines: 2, required: true }],
+    },
+  });
+  assert.equal(interaction.type, "MEME_CAPTION");
+  assert.equal(interaction.type === "MEME_CAPTION" ? interaction.layout?.zones[0].id : null, "bubble");
 });
