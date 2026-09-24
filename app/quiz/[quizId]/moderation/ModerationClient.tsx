@@ -53,6 +53,7 @@ import AuswertungOverlay from "./components/AuswertungOverlay";
 import CurrentSlidePanel from "./components/CurrentSlidePanel";
 import MemeModerationReview, { type MemeModerationReviewHandle } from "./components/MemeModerationReview";
 import MemePresentationControls, { type MemePresentationControlsHandle } from "./components/MemePresentationControls";
+import MemeSubmissionControls from "./components/MemeSubmissionControls";
 import { startMemePresentationAction } from "@/app/quiz/memeVotingActions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
@@ -1199,13 +1200,21 @@ export default function ModerationClient({
             )}
 
             {aktuellerSlide?.typ === "frage" && memeState && memeImageUrl ? (
-              <MemeModerationReview
-                ref={memeReviewRef}
-                key={`${aktuellerSlide.frage.quiz_fragen_id}:${memeState.state}`}
-                quizId={quizId}
-                quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
-                imageUrl={memeImageUrl}
-              />
+              <>
+                <MemeSubmissionControls
+                  quizId={quizId}
+                  quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                  state={memeState}
+                  onChange={setMemeState}
+                />
+                <MemeModerationReview
+                  ref={memeReviewRef}
+                  key={`${aktuellerSlide.frage.quiz_fragen_id}:${memeState.state}`}
+                  quizId={quizId}
+                  quizFragenId={aktuellerSlide.frage.quiz_fragen_id}
+                  imageUrl={memeImageUrl}
+                />
+              </>
             ) : null}
 
             {aktuellerSlide?.typ === "frage" && memePresentationState ? (

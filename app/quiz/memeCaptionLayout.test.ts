@@ -5,6 +5,7 @@ import {
   analyzeMemeCaptionLayout,
   countMemeCaptionLines,
   isMemeCaptionPayloadReadable,
+  MEME_CAPTION_EXTERNAL_MIN_FONT_CQW,
   MEME_CAPTION_MAX_LINES,
   MEME_CAPTION_MIN_FONT_CQW,
   MEME_CAPTION_PREFERRED_FONT_CQW,
@@ -42,15 +43,15 @@ test("long individual words break deterministically and umlauts remain valid", (
   );
 });
 
-test("text beyond the two-line minimum-size boundary is rejected", () => {
-  const tooWide = "W".repeat(80);
-  const analysis = analyzeMemeCaptionLayout(tooWide);
-  assert.equal(analysis.fits, false);
-  assert.equal(analysis.fontSizeCqw, MEME_CAPTION_MIN_FONT_CQW);
-  assert.ok(analysis.lineCount > MEME_CAPTION_MAX_LINES);
+test("the full 80-character boundary fits standard top and bottom rows", () => {
+  const boundary = "W".repeat(80);
+  const analysis = analyzeMemeCaptionLayout(boundary);
+  assert.equal(analysis.fits, true);
+  assert.equal(analysis.fontSizeCqw, MEME_CAPTION_EXTERNAL_MIN_FONT_CQW);
+  assert.equal(analysis.lineCount, MEME_CAPTION_MAX_LINES);
   assert.equal(
-    isMemeCaptionPayloadReadable({ topText: tooWide, bottomText: "kurz" }),
-    false,
+    isMemeCaptionPayloadReadable({ topText: boundary, bottomText: boundary }),
+    true,
   );
 });
 
@@ -89,7 +90,7 @@ test("top and bottom captions share the same readability contract", () => {
       topText: "Oben kurz",
       bottomText: "W".repeat(80),
     }),
-    false,
+    true,
   );
 });
 

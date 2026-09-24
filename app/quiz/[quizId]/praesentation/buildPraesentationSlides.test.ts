@@ -57,6 +57,7 @@ test("AP1: each meme question has one explanation immediately before its questio
   quiz.fragen[0].templateId = "meme_beschriften";
   quiz.fragen[0].memeConfig = {
     version: 1,
+    timerEnabled: true,
     responseDurationSeconds: 120,
     maxPresentedMemes: 5,
   };

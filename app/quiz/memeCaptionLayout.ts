@@ -10,6 +10,7 @@ import {
 
 export const MEME_CAPTION_MAX_LINES = 2;
 export const MEME_CAPTION_MIN_FONT_CQW = 4.5;
+export const MEME_CAPTION_EXTERNAL_MIN_FONT_CQW = 2.25;
 export const MEME_CAPTION_PREFERRED_FONT_CQW = 7.5;
 export const MEME_CAPTION_FONT_STEP_CQW = 0.25;
 export const MEME_CAPTION_TOO_LONG_MESSAGE =
@@ -115,10 +116,13 @@ export function analyzeMemeCaptionLayout(
     ? imageHeightCqw * (zone.height / 100)
     : externalHeightCqw;
   const maxLines = zone?.maxLines ?? MEME_CAPTION_MAX_LINES;
+  const minimumFontSize = zone?.placement === "IMAGE"
+    ? MEME_CAPTION_MIN_FONT_CQW
+    : MEME_CAPTION_EXTERNAL_MIN_FONT_CQW;
 
   for (
     let fontSize = MEME_CAPTION_PREFERRED_FONT_CQW;
-    fontSize >= MEME_CAPTION_MIN_FONT_CQW;
+    fontSize >= minimumFontSize;
     fontSize -= MEME_CAPTION_FONT_STEP_CQW
   ) {
     const lineCount = countMemeCaptionLines(trimmed, lineCapacity(fontSize, widthPercent));
@@ -129,10 +133,10 @@ export function analyzeMemeCaptionLayout(
 
   return {
     fits: false,
-    fontSizeCqw: MEME_CAPTION_MIN_FONT_CQW,
+    fontSizeCqw: minimumFontSize,
     lineCount: countMemeCaptionLines(
       trimmed,
-      lineCapacity(MEME_CAPTION_MIN_FONT_CQW, widthPercent),
+      lineCapacity(minimumFontSize, widthPercent),
     ),
   };
 }

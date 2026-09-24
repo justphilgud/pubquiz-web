@@ -29,8 +29,11 @@ und wird weder beschnitten noch durch Text überlagert.
 
 `AutoFitText` misst ausschließlich lokal im Browser. Es startet mit der von
 `analyzeMemeCaptionLayout` bestimmten Größe und sucht per achtstufiger binärer
-Suche die größte passende Schriftgröße zwischen 7,5 cqw und 4,5 cqw. Auf sehr
-kleinen Flächen gilt zusätzlich eine Untergrenze von 12 Pixeln. Ein
+Suche die größte passende Schriftgröße. Die Standardzeilen ober- und unterhalb
+des Bildes dürfen bis 2,25 cqw beziehungsweise auf kleinen Flächen bis 8 Pixel
+skalieren, damit die verbindliche Grenze von 80 Zeichen vollständig darstellbar
+bleibt. Freie Bildzonen behalten die Lesbarkeitsuntergrenze von 4,5 cqw und 12
+Pixeln. Ein
 `ResizeObserver` wiederholt die Messung bei Größenänderungen; die Schriftmessung
 wird nach dem Laden der Fonts einmal aktualisiert. Dabei entstehen keine
 Netzwerkrequests.
@@ -38,8 +41,8 @@ Netzwerkrequests.
 Für SSR, Tests und serverseitige Finalisierung bildet
 `memeCaptionLayout.ts` dieselben festen Grenzen deterministisch ab:
 
-- höchstens drei Zeilen je Caption;
-- Mindestgröße 4,5 Prozent der Rendererbreite;
+- höchstens zwei Zeilen je Caption;
+- Mindestgröße 2,25 Prozent in den Standardzeilen und 4,5 Prozent in freien Bildzonen;
 - gewichtete Glyphenbreiten für breite, schmale und normale Zeichen;
 - Umbruch von Wörtern sowie sehr langen Einzelwörtern;
 - vertikaler Platz der festen Caption-Zeile inklusive Innenabstand.
@@ -62,9 +65,12 @@ beim Schließen automatisch finalisiert werden:
   gesperrten Servertransaktion;
 - `autoFinalizeDrafts` überspringt unlesbare Meme-Drafts.
 
-Die technische Grenze von 80 Zeichen je Feld, die erlaubten Payload-Felder und
-die Nichtleerprüfung bleiben bestehen. Historische Submissions werden beim
-Lesen nicht nachträglich abgewiesen oder verändert.
+Die fachliche Grenze von 80 Zeichen je Standardfeld ist zugleich die einzige
+Längengrenze: Auch breite Grenzfälle mit exakt 80 Zeichen bleiben speicherbar.
+Freie AP6-Bildzonen behalten zusätzlich ihre explizite geometrische
+Lesbarkeitsprüfung. Die erlaubten Payload-Felder und die Nichtleerprüfung
+bleiben bestehen. Historische Submissions werden beim Lesen nicht nachträglich
+abgewiesen oder verändert.
 
 ## Vorbereitung für AP6
 

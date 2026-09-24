@@ -39,7 +39,7 @@ const scenarios = new Map<string, Scenario>([
   ["/bottom", { topText: "", bottomText: "Ich aber schon Freitag fühle", image: "/portrait.svg", fits: true }],
   ["/both", { topText: "Quizmaster: ganz einfach", bottomText: "Die Teams nach Frage eins", image: "/wide.svg", fits: true }],
   ["/wrapped", { topText: "Wenn der Quizmaster sagt, diese Runde wird wirklich ganz einfach", bottomText: "Fünf große Boxkämpfer jagen Österreich quer über Sylt", image: "/portrait.svg", fits: true }],
-  ["/too-long", { topText: "W".repeat(80), bottomText: "", image: "/wide.svg", fits: false }],
+  ["/max-length", { topText: "W".repeat(80), bottomText: "M".repeat(80), image: "/wide.svg", fits: true }],
   ["/zones", {
     topText: "", bottomText: "", image: "/wide.svg", fits: true,
     captions: { left: "Linkes Panel", right: "Rechtes Panel" },

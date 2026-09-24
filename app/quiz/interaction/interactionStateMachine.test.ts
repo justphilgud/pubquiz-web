@@ -43,3 +43,11 @@ test("uses the server deadline as the authoritative write boundary", () => {
   assert.equal(isQuizInteractionWritable("CLOSED", null, now), false);
   assert.equal(isQuizInteractionWritable("REVEALED", null, now), false);
 });
+
+test("an untimed run stays writable until one idempotent server close and rejects stale clients afterwards", () => {
+  const now = new Date("2026-09-24T12:00:00.000Z");
+  assert.equal(isQuizInteractionWritable("OPEN", null, now), true);
+  assert.equal(canTransitionQuizInteraction("OPEN", "CLOSED"), true);
+  assert.equal(canTransitionQuizInteraction("CLOSED", "CLOSED"), true);
+  assert.equal(isQuizInteractionWritable("CLOSED", null, now), false);
+});
