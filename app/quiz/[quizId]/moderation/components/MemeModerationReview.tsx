@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import {
@@ -16,17 +16,24 @@ type Props = {
   imageUrl: string;
 };
 
+export type MemeModerationReviewHandle = {
+  preparePresentation: () => Promise<
+    | { ready: true; selectionId: number }
+    | { ready: false; skipped: boolean }
+  >;
+};
+
 const statusLabel = {
   PENDING_REVIEW: "Offen",
   APPROVED: "Freigegeben",
   REJECTED: "Ausgeschlossen",
 } as const;
 
-export default function MemeModerationReview({
+const MemeModerationReview = forwardRef<MemeModerationReviewHandle, Props>(function MemeModerationReview({
   quizId,
   quizFragenId,
   imageUrl,
-}: Props) {
+}: Props, ref) {
   const [view, setView] = useState<MemeModerationView | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -96,7 +103,7 @@ export default function MemeModerationReview({
   }
 
   async function complete() {
-    if (view?.phase !== "REVIEW") return;
+    if (view?.phase !== "REVIEW") return null;
     pendingRef.current = true;
     setPending(true);
     setMessage(null);
@@ -109,13 +116,43 @@ export default function MemeModerationReview({
       });
       setView(result.view);
       if (!result.success) setMessage(result.message);
+      return result;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Der Review konnte nicht abgeschlossen werden.");
+      return null;
     } finally {
       pendingRef.current = false;
       setPending(false);
     }
   }
+
+  useImperativeHandle(ref, () => ({
+    async preparePresentation() {
+      if (view?.phase !== "REVIEW") return { ready: false, skipped: false };
+      if (view.selectionState === "COMPLETED") {
+        return { ready: true, selectionId: view.selectionId };
+      }
+      if (view.selectionState === "SKIPPED") {
+        return { ready: false, skipped: true };
+      }
+      if (view.answerPhaseOpen) {
+        setMessage("Schließe zuerst die Antwortphase. Bereits finale Memes können bis dahin weiter geprüft werden.");
+        return { ready: false, skipped: false };
+      }
+      const result = await complete();
+      if (result?.success && result.view.phase === "REVIEW" && result.view.selectionState === "COMPLETED") {
+        return { ready: true, selectionId: result.view.selectionId };
+      }
+      return {
+        ready: false,
+        skipped: Boolean(
+          result?.success &&
+          result.view.phase === "REVIEW" &&
+          result.view.selectionState === "SKIPPED",
+        ),
+      };
+    },
+  }));
 
   if (!view || view.phase === "UNAVAILABLE") {
     return (
@@ -130,7 +167,7 @@ export default function MemeModerationReview({
       <section className="rounded-2xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-4">
         <h2 className="font-bold">Meme-Auswahl</h2>
         <p className="mt-2 text-sm text-zinc-300">
-          Die Auswahl wird erst nach dem serverseitigen Ende der Antwortphase erzeugt.
+          Die Vorabmoderation erscheint, sobald das erste Team sein Meme final abgegeben hat.
         </p>
       </section>
     );
@@ -143,17 +180,18 @@ export default function MemeModerationReview({
   return (
     <section
       data-meme-moderation-review
+      data-answer-phase-open={view.answerPhaseOpen ? "true" : "false"}
       className="rounded-2xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-4"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-bold">Meme-Auswahl &amp; Review</h2>
           <p className="mt-1 text-sm text-zinc-300">
-            {view.selectedCount} ausgewählt · {view.approvedCount} freigegeben ·{" "}
+            {view.selectedCount} eingereicht · {view.approvedCount} freigegeben ·{" "}
             {view.rejectedCount} ausgeschlossen · {view.pendingCount} offen
           </p>
           <p className="mt-1 text-xs text-zinc-400">
-            {view.validSubmissionCount} gültige Einreichungen ·{" "}
+            {view.validSubmissionCount} gültige finale Einreichungen ·{" "}
             {view.selectionLimit === null
               ? "Konfiguration: Alle"
               : `Limit: ${view.selectionLimit}`}
@@ -184,11 +222,11 @@ export default function MemeModerationReview({
           Für diesen abgeschlossenen Run gibt es keine gültige Meme-Einreichung.
         </p>
       ) : (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {view.candidates.map((candidate) => (
             <article
               key={candidate.candidateId}
-              className="rounded-2xl border border-zinc-700 bg-zinc-950/45 p-3"
+              className="rounded-xl border border-zinc-700 bg-zinc-950/45 p-2.5"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <strong>Kandidat {candidate.position}</strong>
@@ -207,6 +245,7 @@ export default function MemeModerationReview({
                 captions={candidate.captions}
                 layout={candidate.layout}
                 alt={`Meme-Kandidat ${candidate.position}`}
+                className="mx-auto max-w-[20rem] rounded-xl"
               />
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button
@@ -236,16 +275,22 @@ export default function MemeModerationReview({
       {view.selectionState === "REVIEWING" ? (
         <button
           type="button"
-          disabled={pending || view.pendingCount > 0 || allRejected}
+          disabled={pending || view.answerPhaseOpen || view.pendingCount > 0 || allRejected}
           onClick={() => void complete()}
           className="mt-4 min-h-11 rounded-xl bg-fuchsia-600 px-4 py-2 font-bold text-white disabled:opacity-50"
         >
-          {view.selectedCount === 0 ? "Ohne Meme fortfahren" : "Auswahl bestätigen / Review abschließen"}
+          {view.answerPhaseOpen
+            ? "Antwortphase läuft"
+            : view.selectedCount === 0
+              ? "Ohne Meme fortfahren"
+              : "Auswahl bestätigen / Review abschließen"}
         </button>
       ) : null}
       <p className="mt-3 text-xs text-zinc-400">
-        Die gespeicherte Zufallsauswahl und ihre Reihenfolge bleiben unverändert. Ausschlüsse werden nicht nachbesetzt.
+        Während der Eingabe bleibt die Prüfung anonym. Nach dem Schließen wird die freigegebene Auswahl einmal zufällig sortiert und persistent gespeichert; Ausschlüsse werden nicht nachbesetzt.
       </p>
     </section>
   );
-}
+});
+
+export default MemeModerationReview;

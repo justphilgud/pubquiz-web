@@ -1053,6 +1053,7 @@ model meme_moderation_candidates {
   team_answer_submission_id    Int                        @unique
   position                     Int
   review_status                MemeModerationReviewStatus @default(PENDING_REVIEW)
+  selected_for_presentation    Boolean                     @default(false)
   review_revision              Int                        @default(1)
   reviewed_by_user_id          Int?
   reviewed_at                  DateTime?
@@ -1066,6 +1067,7 @@ model meme_moderation_candidates {
 
   @@unique([meme_moderation_selection_id, position], map: "uq_meme_candidate_selection_position")
   @@index([meme_moderation_selection_id, review_status], map: "idx_meme_candidate_selection_status")
+  @@index([meme_moderation_selection_id, selected_for_presentation], map: "idx_meme_candidate_selection_presented")
   @@schema("pubquiz")
 }
 

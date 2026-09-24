@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { isEditableKeyboardTarget } from "@/app/quiz/keyboardShortcuts";
 
 type Props = {
   hatMedien: boolean;
@@ -27,17 +28,7 @@ export function useModerationHotkeys({
 }: Props) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      const tagName = target?.tagName?.toLowerCase();
-
-      if (
-        tagName === "input" ||
-        tagName === "textarea" ||
-        tagName === "select" ||
-        target?.isContentEditable
-      ) {
-        return;
-      }
+      if (isEditableKeyboardTarget(event.target)) return;
 
       if (
         event.key === "ArrowRight" ||

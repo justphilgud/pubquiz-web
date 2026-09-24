@@ -11,13 +11,13 @@ import {
   resolveMemeCaptionLayout,
 } from "./memeCaptionZones";
 
-test("legacy questions resolve to the unchanged AP5 top and bottom layout", () => {
+test("legacy questions resolve to the shared two-line top and bottom layout", () => {
   assert.deepEqual(parseMemeCaptionLayoutConfig(undefined), DEFAULT_MEME_CAPTION_LAYOUT);
   const layout = resolveMemeCaptionLayout(undefined);
   assert.equal(layout.mode, "STANDARD");
   assert.deepEqual(layout.zones.map(({ id, placement, height, maxLines }) => ({ id, placement, height, maxLines })), [
-    { id: "top", placement: "EXTERNAL_TOP", height: 21, maxLines: 3 },
-    { id: "bottom", placement: "EXTERNAL_BOTTOM", height: 21, maxLines: 3 },
+    { id: "top", placement: "EXTERNAL_TOP", height: 21, maxLines: 2 },
+    { id: "bottom", placement: "EXTERNAL_BOTTOM", height: 21, maxLines: 2 },
   ]);
 });
 

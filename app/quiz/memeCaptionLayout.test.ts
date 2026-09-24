@@ -26,7 +26,7 @@ test("short captions stay large while empty captions need no row", () => {
 
 test("longer captions wrap and scale without crossing the minimum", () => {
   const analysis = analyzeMemeCaptionLayout(
-    "Wenn der Quizmaster sagt, diese Runde wird wirklich ganz einfach und alle sofort lachen",
+    "Wenn der Quizmaster sagt wird diese Runde wirklich ganz einfach",
   );
   assert.equal(analysis.fits, true);
   assert.ok(analysis.lineCount >= 2 && analysis.lineCount <= MEME_CAPTION_MAX_LINES);
@@ -42,7 +42,7 @@ test("long individual words break deterministically and umlauts remain valid", (
   );
 });
 
-test("text beyond the three-line minimum-size boundary is rejected", () => {
+test("text beyond the two-line minimum-size boundary is rejected", () => {
   const tooWide = "W".repeat(80);
   const analysis = analyzeMemeCaptionLayout(tooWide);
   assert.equal(analysis.fits, false);
@@ -52,6 +52,28 @@ test("text beyond the three-line minimum-size boundary is rejected", () => {
     isMemeCaptionPayloadReadable({ topText: tooWide, bottomText: "kurz" }),
     false,
   );
+});
+
+test("punctuation, umlauts, emojis and the exact multiword regression stay intact", () => {
+  for (const value of [
+    "Das ist mein Meme",
+    "Ärger? Nein: völlig überraschend!",
+    "Quizabend 😂 – läuft!",
+  ]) {
+    const analysis = analyzeMemeCaptionLayout(value);
+    assert.equal(analysis.fits, true, value);
+    assert.ok(analysis.lineCount <= 2, value);
+  }
+});
+
+test("one-line and two-line rows use only the renderer's bounded dynamic heights", async () => {
+  const { getExternalMemeCaptionRowPercent } = await import("./memeCaptionLayout");
+  assert.equal(getExternalMemeCaptionRowPercent("Kurz"), 13);
+  assert.equal(
+    getExternalMemeCaptionRowPercent("Das ist ein längerer Memetext mit mehreren kurzen Wörtern"),
+    21,
+  );
+  assert.equal(getExternalMemeCaptionRowPercent(""), 0);
 });
 
 test("top and bottom captions share the same readability contract", () => {

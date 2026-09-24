@@ -17,6 +17,7 @@ type Props = {
   text: string;
   zone: MemeCaptionZone;
   overlay?: boolean;
+  externalHeightCqw?: number;
   onFitChange?: (
     zoneId: string,
     text: string,
@@ -27,11 +28,11 @@ type Props = {
 const LINE_HEIGHT = 1.02;
 const MAX_FONT_SIZE_PX = 76;
 
-export function AutoFitText({ text, zone, overlay = false, onFitChange }: Props) {
+export function AutoFitText({ text, zone, overlay = false, externalHeightCqw, onFitChange }: Props) {
   const captionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const fitCallbackRef = useRef(onFitChange);
-  const analysis = analyzeMemeCaptionLayout(text, zone);
+  const analysis = analyzeMemeCaptionLayout(text, zone, 75, externalHeightCqw);
   const [measuredFontSize, setMeasuredFontSize] = useState<number | null>(null);
   const [fits, setFits] = useState(analysis.fits);
 
@@ -116,7 +117,7 @@ export function AutoFitText({ text, zone, overlay = false, onFitChange }: Props)
       data-meme-caption={zone.id}
       data-meme-caption-placement={zone.placement}
       data-meme-caption-fit={fits ? "true" : "false"}
-      className={`flex h-full min-h-0 w-full items-center justify-center overflow-hidden px-[3cqw] py-[0.75cqw] text-center font-bold tracking-[-0.02em] ${overlay ? "bg-black/55 text-white [text-shadow:0_2px_4px_rgb(0_0_0/0.9)]" : "bg-slate-100 text-slate-950"}`}
+      className={`flex h-full min-h-0 w-full items-center justify-center overflow-hidden px-[3cqw] py-[0.75cqw] text-center font-bold tracking-[-0.02em] ${overlay ? "bg-black/55 text-white [text-shadow:0_2px_4px_rgb(0_0_0/0.9)]" : "bg-black text-white"}`}
     >
       <span
         ref={textRef}

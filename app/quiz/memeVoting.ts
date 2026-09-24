@@ -23,6 +23,31 @@ export type MemePresentationTransition =
   | "OPEN_VOTING"
   | "CLOSE_VOTING";
 
+export type MemeAdvanceCommand =
+  | "START_PRESENTATION"
+  | MemePresentationTransition
+  | "FINALIZE_RESULT"
+  | "NEXT_QUIZ_SLIDE";
+
+export function getNextMemeAdvanceCommand(input: {
+  phase: MemePresentationPhase | "READY";
+  activeCandidateNumber: number | null;
+  candidates: readonly { number: number }[];
+  overviewPage: number;
+  overviewPageCount: number;
+  hasResult: boolean;
+}): MemeAdvanceCommand {
+  if (input.phase === "READY") return "START_PRESENTATION";
+  if (input.phase === "PRESENTING") return "NEXT_CANDIDATE";
+  if (input.phase === "OVERVIEW") {
+    return input.overviewPage < input.overviewPageCount - 1
+      ? "NEXT_OVERVIEW_PAGE"
+      : "OPEN_VOTING";
+  }
+  if (input.phase === "VOTING_OPEN") return "CLOSE_VOTING";
+  return input.hasResult ? "NEXT_QUIZ_SLIDE" : "FINALIZE_RESULT";
+}
+
 export type StoredMemePresentationState = {
   state: MemePresentationPhase;
   activeCandidatePosition: number | null;
