@@ -61,6 +61,28 @@ export const QuestionReviewStatus = {
 export type QuestionReviewStatus = (typeof QuestionReviewStatus)[keyof typeof QuestionReviewStatus]
 
 
+export const ExternalQuestionImportBatchStatus = {
+  FETCHING: 'FETCHING',
+  PROCESSING: 'PROCESSING',
+  REVIEW_READY: 'REVIEW_READY',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type ExternalQuestionImportBatchStatus = (typeof ExternalQuestionImportBatchStatus)[keyof typeof ExternalQuestionImportBatchStatus]
+
+
+export const ExternalQuestionImportItemStatus = {
+  IMPORTED: 'IMPORTED',
+  AUTO_REJECTED: 'AUTO_REJECTED',
+  REVIEW_REQUIRED: 'REVIEW_REQUIRED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type ExternalQuestionImportItemStatus = (typeof ExternalQuestionImportItemStatus)[keyof typeof ExternalQuestionImportItemStatus]
+
+
 export const QuestionTemplateKind = {
   SYSTEM: 'SYSTEM',
   DYNAMIC: 'DYNAMIC'
