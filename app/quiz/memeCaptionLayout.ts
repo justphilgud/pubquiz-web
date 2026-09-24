@@ -8,7 +8,7 @@ import {
   type MemeCaptionPayload,
 } from "@/app/quiz/memeCaption";
 
-export const MEME_CAPTION_MAX_LINES = 3;
+export const MEME_CAPTION_MAX_LINES = 2;
 export const MEME_CAPTION_MIN_FONT_CQW = 4.5;
 export const MEME_CAPTION_PREFERRED_FONT_CQW = 7.5;
 export const MEME_CAPTION_FONT_STEP_CQW = 0.25;
@@ -16,7 +16,10 @@ export const MEME_CAPTION_TOO_LONG_MESSAGE =
   "Dein Text ist zu lang. Kürze ihn, damit er im Meme gut lesbar bleibt.";
 
 const LINE_CAPACITY_AT_MIN_FONT = 26;
-const CAPTION_ROW_HEIGHT_CQW = 15.75;
+export const MEME_CAPTION_SINGLE_LINE_ROW_PERCENT = 13;
+export const MEME_CAPTION_DOUBLE_LINE_ROW_PERCENT = 21;
+const MEME_CANVAS_HEIGHT_CQW = 75;
+const CAPTION_ROW_HEIGHT_CQW = MEME_CANVAS_HEIGHT_CQW * (MEME_CAPTION_DOUBLE_LINE_ROW_PERCENT / 100);
 const CAPTION_VERTICAL_PADDING_CQW = 1.5;
 const CAPTION_LINE_HEIGHT = 1.02;
 
@@ -94,6 +97,7 @@ export function analyzeMemeCaptionLayout(
   text: string,
   zone?: MemeCaptionZone,
   imageHeightCqw = 75,
+  externalHeightCqw = CAPTION_ROW_HEIGHT_CQW,
 ): MemeCaptionLayoutAnalysis {
   const trimmed = text.trim();
   if (!trimmed) {
@@ -109,7 +113,7 @@ export function analyzeMemeCaptionLayout(
     : 100;
   const heightCqw = zone?.placement === "IMAGE"
     ? imageHeightCqw * (zone.height / 100)
-    : CAPTION_ROW_HEIGHT_CQW;
+    : externalHeightCqw;
   const maxLines = zone?.maxLines ?? MEME_CAPTION_MAX_LINES;
 
   for (
@@ -133,6 +137,18 @@ export function analyzeMemeCaptionLayout(
   };
 }
 
+export function getExternalMemeCaptionRowPercent(text: string, zone?: MemeCaptionZone) {
+  if (!text.trim()) return 0;
+  const analysis = analyzeMemeCaptionLayout(text, zone);
+  return analysis.lineCount <= 1
+    ? MEME_CAPTION_SINGLE_LINE_ROW_PERCENT
+    : MEME_CAPTION_DOUBLE_LINE_ROW_PERCENT;
+}
+
+export function getExternalMemeCaptionRowHeightCqw(text: string, zone?: MemeCaptionZone) {
+  return MEME_CANVAS_HEIGHT_CQW * (getExternalMemeCaptionRowPercent(text, zone) / 100);
+}
+
 export function isMemeCaptionPayloadReadable(
   payload: MemeCaptionPayload,
   layout: ResolvedMemeCaptionLayout = resolveMemeCaptionLayout(null),
@@ -142,12 +158,15 @@ export function isMemeCaptionPayloadReadable(
   if (Object.keys(values).some((zoneId) => !allowedZoneIds.has(zoneId))) return false;
   const externalHeight = layout.zones.reduce((sum, zone) => {
     if (zone.placement === "IMAGE" || !(values[zone.id] ?? "")) return sum;
-    return sum + CAPTION_ROW_HEIGHT_CQW;
+    return sum + getExternalMemeCaptionRowHeightCqw(values[zone.id] ?? "", zone);
   }, 0);
   const imageHeightCqw = 75 - externalHeight;
   return layout.zones.every((zone) => {
     const text = values[zone.id] ?? "";
     if (zone.required && !text) return false;
-    return analyzeMemeCaptionLayout(text, zone, imageHeightCqw).fits;
+    const externalHeightCqw = zone.placement === "IMAGE"
+      ? CAPTION_ROW_HEIGHT_CQW
+      : getExternalMemeCaptionRowHeightCqw(text, zone);
+    return analyzeMemeCaptionLayout(text, zone, imageHeightCqw, externalHeightCqw).fits;
   });
 }

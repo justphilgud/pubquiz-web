@@ -30,6 +30,24 @@ export type MemeSelectionPlan = {
 
 export type RandomIndex = (upperExclusive: number) => number;
 
+export function randomizeMemeCandidates<T>(
+  candidates: readonly T[],
+  limit: number | null,
+  randomIndex: RandomIndex = defaultRandomIndex,
+) {
+  const shuffled = [...candidates];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomIndex(index + 1);
+    if (!Number.isSafeInteger(swapIndex) || swapIndex < 0 || swapIndex > index) {
+      throw new Error("Die Zufallsquelle hat einen ungültigen Index geliefert.");
+    }
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return limit === null
+    ? shuffled
+    : shuffled.slice(0, Math.min(limit, shuffled.length));
+}
+
 export function collectValidMemeSubmissions(
   interactionRunId: number,
   submissions: readonly StoredMemeSubmission[],
@@ -76,26 +94,7 @@ export function createMemeSelectionPlan(
   maxPresentedMemes: number | null,
   randomIndex: RandomIndex = defaultRandomIndex,
 ): MemeSelectionPlan {
-  const shuffled = [...validSubmissions];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = randomIndex(index + 1);
-    if (
-      !Number.isSafeInteger(swapIndex) ||
-      swapIndex < 0 ||
-      swapIndex > index
-    ) {
-      throw new Error("Die Zufallsquelle hat einen ungültigen Index geliefert.");
-    }
-    [shuffled[index], shuffled[swapIndex]] = [
-      shuffled[swapIndex],
-      shuffled[index],
-    ];
-  }
-
-  const selected =
-    maxPresentedMemes === null
-      ? shuffled
-      : shuffled.slice(0, Math.min(maxPresentedMemes, shuffled.length));
+  const selected = randomizeMemeCandidates(validSubmissions, maxPresentedMemes, randomIndex);
   return { validSubmissionCount: validSubmissions.length, selected };
 }
 

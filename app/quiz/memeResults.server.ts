@@ -77,7 +77,7 @@ export async function finalizeMemeResult(input: {
         selection: {
           include: {
             candidates: {
-              where: { review_status: "APPROVED" },
+              where: { review_status: "APPROVED", selected_for_presentation: true },
               orderBy: { position: "asc" },
               include: {
                 submission: {

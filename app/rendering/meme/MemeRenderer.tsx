@@ -8,6 +8,10 @@ import {
   resolveMemeCaptionLayout,
   type ResolvedMemeCaptionLayout,
 } from "@/app/quiz/memeCaptionZones";
+import {
+  getExternalMemeCaptionRowHeightCqw,
+  getExternalMemeCaptionRowPercent,
+} from "@/app/quiz/memeCaptionLayout";
 
 type Props = {
   imageUrl: string;
@@ -24,12 +28,12 @@ type Props = {
   ) => void;
 };
 
-function gridRows(hasTopCaption: boolean, hasBottomCaption: boolean) {
-  if (hasTopCaption && hasBottomCaption) {
-    return "21% minmax(0, 1fr) 21%";
+function gridRows(topPercent: number, bottomPercent: number) {
+  if (topPercent > 0 && bottomPercent > 0) {
+    return `${topPercent}% minmax(0, 1fr) ${bottomPercent}%`;
   }
-  if (hasTopCaption) return "21% minmax(0, 1fr)";
-  if (hasBottomCaption) return "minmax(0, 1fr) 21%";
+  if (topPercent > 0) return `${topPercent}% minmax(0, 1fr)`;
+  if (bottomPercent > 0) return `minmax(0, 1fr) ${bottomPercent}%`;
   return "minmax(0, 1fr)";
 }
 
@@ -54,12 +58,12 @@ export function MemeRenderer({
   const imageZones = layout.zones.filter(
     (zone) => zone.placement === "IMAGE" && Boolean(normalizedValues[zone.id]),
   );
+  const topPercent = getExternalMemeCaptionRowPercent(normalizedTopText, topZone);
+  const bottomPercent = getExternalMemeCaptionRowPercent(normalizedBottomText, bottomZone);
   const figureStyle: CSSProperties = {
     containerType: "inline-size",
-    gridTemplateRows: gridRows(
-      Boolean(normalizedTopText),
-      Boolean(normalizedBottomText),
-    ),
+    gridTemplateRows: gridRows(topPercent, bottomPercent),
+    fontFamily: "Arial, Helvetica, sans-serif",
   };
 
   return (
@@ -75,6 +79,7 @@ export function MemeRenderer({
         <AutoFitText
           text={normalizedTopText}
           zone={topZone!}
+          externalHeightCqw={getExternalMemeCaptionRowHeightCqw(normalizedTopText, topZone)}
           onFitChange={onCaptionFitChange}
         />
       )}
@@ -102,6 +107,7 @@ export function MemeRenderer({
         <AutoFitText
           text={normalizedBottomText}
           zone={bottomZone!}
+          externalHeightCqw={getExternalMemeCaptionRowHeightCqw(normalizedBottomText, bottomZone)}
           onFitChange={onCaptionFitChange}
         />
       )}

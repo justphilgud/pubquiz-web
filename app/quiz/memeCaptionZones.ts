@@ -41,7 +41,7 @@ export const STANDARD_MEME_CAPTION_ZONES: readonly MemeCaptionZone[] = [
     width: 100,
     height: 21,
     order: 1,
-    maxLines: 3,
+    maxLines: 2,
     required: false,
   },
   {
@@ -53,7 +53,7 @@ export const STANDARD_MEME_CAPTION_ZONES: readonly MemeCaptionZone[] = [
     width: 100,
     height: 21,
     order: 2,
-    maxLines: 3,
+    maxLines: 2,
     required: false,
   },
 ];

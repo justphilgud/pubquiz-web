@@ -40,7 +40,7 @@ const selectionInclude = {
     },
   },
   candidates: {
-    where: { review_status: "APPROVED" as const },
+    where: { review_status: "APPROVED" as const, selected_for_presentation: true },
     orderBy: { position: "asc" as const },
     include: {
       submission: {
@@ -299,7 +299,7 @@ export async function startMemePresentation(input: {
       },
       include: {
         candidates: {
-          where: { review_status: "APPROVED" },
+          where: { review_status: "APPROVED", selected_for_presentation: true },
           orderBy: { position: "asc" },
           select: { position: true },
         },
@@ -349,7 +349,7 @@ export async function transitionMemePresentationState(input: {
         selection: {
           include: {
             candidates: {
-              where: { review_status: "APPROVED" },
+              where: { review_status: "APPROVED", selected_for_presentation: true },
               orderBy: { position: "asc" },
               select: { position: true },
             },
@@ -407,7 +407,7 @@ export async function submitMemeVote(input: {
         selection: {
           include: {
             candidates: {
-              where: { review_status: "APPROVED" },
+              where: { review_status: "APPROVED", selected_for_presentation: true },
               include: {
                 submission: {
                   include: { quiz_team_session: { select: { team_id: true } } },
@@ -501,7 +501,7 @@ export async function readClosedMemeVotingForAp4(input: {
       selection: {
         include: {
           candidates: {
-            where: { review_status: "APPROVED" },
+            where: { review_status: "APPROVED", selected_for_presentation: true },
             orderBy: { position: "asc" },
             include: {
               submission: {

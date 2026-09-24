@@ -126,6 +126,7 @@ test("meme template keeps its technical id and uses the shared visible name", ()
 
   assert.equal(germanMeme?.id, "meme_beschriften");
   assert.equal(germanMeme?.name, "What the Meme!");
+  assert.equal(germanMeme?.defaultQuestionText, "What the Meme!");
   assert.equal(englishMeme?.name, "What the Meme!");
 });
 

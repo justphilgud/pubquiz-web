@@ -48,7 +48,26 @@ test("moderation reuses the shared MemeRenderer and does not expose team names",
 
 test("AP3 reads only approved candidates from a completed persisted review", () => {
   assert.match(service, /state: "COMPLETED"/);
-  assert.match(service, /where: \{ review_status: "APPROVED" \}/);
+  assert.match(service, /where: \{ review_status: "APPROVED", selected_for_presentation: true \}/);
   assert.match(service, /orderBy: \{ position: "asc" \}/);
   assert.match(service, /teamId: candidate\.submission\.quiz_team_session\.team_id/);
+});
+
+test("pre-moderation syncs final submissions while input is open and randomizes only after close", () => {
+  assert.match(service, /run\.state !== "OPEN"/);
+  assert.match(service, /syncReviewCandidates/);
+  assert.match(service, /ANSWER_PHASE_OPEN/);
+  assert.match(service, /randomizeMemeCandidates/);
+  assert.match(service, /selected_for_presentation:/);
+  assert.match(review, /answerPhaseOpen/);
+  assert.match(review, /keinen Teamnamen|anonym|anonyme/i);
+});
+
+test("a completed empty review lets the central Weiter flow leave the Meme question", () => {
+  const moderationClient = readFileSync(
+    "app/quiz/[quizId]/moderation/ModerationClient.tsx",
+    "utf8",
+  );
+  assert.match(review, /selectionState === "SKIPPED"/);
+  assert.match(moderationClient, /prepared\?\.skipped/);
 });

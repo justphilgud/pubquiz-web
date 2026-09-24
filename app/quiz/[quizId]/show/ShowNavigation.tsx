@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { isEditableKeyboardTarget } from "@/app/quiz/keyboardShortcuts";
 
 type Props = {
   href: string;
@@ -12,6 +13,7 @@ export function ShowNavigation({ href }: Props) {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
+      if (isEditableKeyboardTarget(event.target)) return;
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         router.push(href);

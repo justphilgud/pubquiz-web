@@ -253,8 +253,8 @@ test("resolves the meme contract with the existing question image", () => {
       version: 1,
       mode: "STANDARD",
       zones: [
-        { id: "top", label: "Text oben", placement: "EXTERNAL_TOP", x: 0, y: 0, width: 100, height: 21, order: 1, maxLines: 3, required: false },
-        { id: "bottom", label: "Text unten", placement: "EXTERNAL_BOTTOM", x: 0, y: 79, width: 100, height: 21, order: 2, maxLines: 3, required: false },
+        { id: "top", label: "Text oben", placement: "EXTERNAL_TOP", x: 0, y: 0, width: 100, height: 21, order: 1, maxLines: 2, required: false },
+        { id: "bottom", label: "Text unten", placement: "EXTERNAL_BOTTOM", x: 0, y: 79, width: 100, height: 21, order: 2, maxLines: 2, required: false },
       ],
     },
   });
