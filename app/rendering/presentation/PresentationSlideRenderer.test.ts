@@ -206,6 +206,27 @@ test("meme intro and live question reflect the authoritative timed or untimed co
   }));
   assert.match(untimedLiveHtml, /Einreichungen geöffnet/);
   assert.doesNotMatch(untimedLiveHtml, /Sekunden verbleibend|>–</);
+
+  const untimedClosedHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz: { ...quiz, fragen: [untimedQuestion] },
+    slide: untimedLive,
+    slides: [untimedIntro, untimedLive],
+    slideIndex: 1,
+    slideLabel: "What the Meme!",
+    theme: runtime.theme,
+    displayState: {
+      ...displayState,
+      memeState: {
+        state: "CLOSED",
+        deadlineAt: null,
+        timerEnabled: false,
+        responseDurationSeconds: null,
+        maxPresentedMemes: 4,
+      },
+    },
+  }));
+  assert.match(untimedClosedHtml, /Einreichungen beendet/);
+  assert.doesNotMatch(untimedClosedHtml, /Sekunden verbleibend|>0<|Sekunden/);
 });
 const playerSource = readFileSync(
   new URL(
