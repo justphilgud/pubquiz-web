@@ -41,10 +41,12 @@ export async function processOpenTdbPhaseTwoAction(formData: FormData) {
   await requireAdmin();
   const batchId = positiveInteger(formData.get("batchId"), "BATCH_ID");
   const oidcToken = (await headers()).get("x-vercel-oidc-token") ?? undefined;
+  const mode = text(formData, "mode");
   const result = await processOpenTdbPhaseTwo({
     batchId,
     authorizationToken: oidcToken,
-    retryFailures: text(formData, "mode") === "retry",
+    retryFailures: mode === "retry",
+    retryMissingSources: mode === "retry-sources",
   });
   revalidatePath("/admin/question-import");
   redirect(
