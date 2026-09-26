@@ -127,15 +127,75 @@ Konflikte werden weder überschrieben noch automatisch zusammengeführt.
 Nur explizit ausgewählte Kandidaten dürfen in den normalen Fragen-Lifecycle
 gelangen; KI-Prüfung ersetzt keine redaktionelle Freigabe. Ein reiner
 Contentimport benötigt weder Migration noch Deployment. Die bestehende
-Preview-Aktion wird nicht als Production-Importweg freigeschaltet. Der spätere
-Production-Importer benötigt einen eigenen Host-/Datenbankguard, den Nachweis
-des frischen Backups und eine ausdrückliche Betreiberfreigabe.
+Preview-Aktion wird nicht als Production-Importweg freigeschaltet.
+
+## Production-Guard-Vertrag
+
+`productionImportGuard.ts` bildet die zentrale, source-neutrale Sicherheitsgrenze.
+Der Vertrag besteht aus einem kanonischen Importplan, dessen SHA-256, einem
+read-only Production-Preflight, dem Backupnachweis und einer einmaligen
+Schreibautorisierung. OpenTDB liefert nur den ersten Planadapter; spätere Quellen
+verwenden denselben Vertrag.
+
+Der eingefrorene Plan enthält Batch-ID, Quelle, Kandidatenreferenz,
+Content-Fingerprint, Original- und vorbereitete Fassung, Antwortsatz, Kategorie,
+Quellen, Reviewstatus, Lizenz und optionale Medienprovenienz. Nach dem Einfrieren
+findet keine Recherche, Übersetzung oder Distraktorenerzeugung mehr statt.
+Kanonisches JSON und SHA-256 machen jede Änderung nach der Freigabe sichtbar.
+
+Der Preflight verwendet eine `REPEATABLE READ READ ONLY`-Transaktion und prüft
+Providerreferenz, Content-Fingerprint, normalisierte Frage, richtige Antwort und
+semantische Ähnlichkeit. Das Ergebnis je Kandidat ist `CREATE`,
+`ALREADY_PRESENT`, `CONFLICT` oder `REVIEW_REQUIRED`. Konflikt und offener Review
+blockieren den gesamten Schreibvertrag; bestehende Fragen werden nicht verändert.
+Ein erfolgreicher Re-Run liefert ausschließlich `ALREADY_PRESENT`.
+
+Der Guard prüft Defense in Depth:
+
+- logische Production-Umgebung,
+- erlaubten Vercel-Production- oder geschützten GitHub-Actions-Kontext,
+- `main`, Repository, Workflow und Operations-Environment,
+- feste Production-Datenbankidentität aus den bestehenden Operations-Guards,
+- Batch-ID und Plan-Digest,
+- aktuellen Production-SHA,
+- vollständig abgeschlossenes Backup mit Manifest, privatem Readback und
+  Integritätsnachweis,
+- identische Backup- und aktuelle Production-Identität,
+- explizite batch-, digest-, release- und datenbankgebundene Freigabe.
+
+Da es bisher keine allgemeine Backup-Freshness-Konvention gab, gilt für externe
+Contentimporte eine dokumentierte Obergrenze von zwei Stunden zwischen Snapshot
+und Importbeginn. Der Snapshot muss weiterhin unmittelbar vor dem Import geplant
+werden; die Obergrenze ersetzt keine operative Reihenfolge.
+
+`writeAuthorized` ist standardmäßig und nach jedem Lauf `false`. Die einmalige
+Autorisierung kann weder durch Preview noch Development erzeugt werden. Der
+jetzige AP stellt bewusst keinen ausführbaren Production-Writer bereit. Damit
+bleibt vor der späteren Main-Integration und der separaten Freigabe des ersten
+echten Contentimports eine harte technische Lücke statt eines versteckten
+Schreibpfads.
+
+Der vorhandene Operations-Workflow
+`external-question-import-preflight.yml` führt ausschließlich den read-only
+Preflight mit `PRODUCTION_BACKUP_DATABASE_URL` aus. Ein zukünftiger Writer muss
+den hier getesteten Guardvertrag unverändert konsumieren, im bestehenden
+Rollenmodell einen aktiven globalen Admin binden, Ergebnisse je Kandidat
+auditieren und seine Job-lokale Freigabe im `finally` schließen.
+
+## Medienvertrag
+
+Der Plan kann für jedes Medium Quell-URL, Lizenz, MIME-Type, erwartete Größe,
+SHA-256 und Zielreferenz enthalten. Die Planvalidierung prüft diese Metadaten.
+Ein späterer Writer darf die Frage erst abschließen, nachdem Download,
+Dekodierung, Production-Upload, privater Readback sowie Hash und Größe bestätigt
+sind. Der aktuelle OpenTDB-Testplan enthält keine Medien; es wurde keine zweite
+Medienpipeline eingeführt.
 
 ## Offene Ausbaustufe
 
 Vor einem Production-Massendurchlauf braucht es weiterhin die menschliche
 Stichprobe mit Annahme-, Änderungs- und Reviewzeitmessung. Der Phase-2-Adapter
 bleibt an Preview, Batch `#1` und den manuellen Fragen-Lifecycle gebunden. Die
-Implementierung des getrennten, backupgeschützten Production-Importers ist eine
-separate Freigabe und darf nicht durch Lockerung des Previewguards ersetzt
-werden.
+Anbindung eines ausführbaren Writers, eine geschützte einmalige
+Reviewer-Freigabe und der erste echte Production-Contentimport bleiben ein
+separates Freigabegate. Der Previewguard wird dafür nicht gelockert.

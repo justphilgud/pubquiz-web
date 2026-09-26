@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/app/lib/permissions";
 import { getCurrentUserId } from "@/app/services/questionService";
+import { loadExternalImportProductionGuardPreview } from "@/app/fragen/import/external/externalQuestionProductionPlan.server";
 import {
   approveExternalQuestion,
   processOpenTdbPhaseTwo,
@@ -119,4 +120,17 @@ export async function rejectExternalQuestionAction(formData: FormData) {
   });
   revalidatePath("/admin/question-import");
   redirect(`/admin/question-import?batch=${batchId}&page=${page}&rejected=${itemId}`);
+}
+
+export async function dryRunExternalImportProductionGuardAction(formData: FormData) {
+  const session = await requireAdmin();
+  const batchId = positiveInteger(formData.get("batchId"), "BATCH_ID");
+  const result = await loadExternalImportProductionGuardPreview({
+    batchId,
+    operatorUserId: getCurrentUserId(session),
+  });
+  revalidatePath("/admin/question-import");
+  redirect(
+    `/admin/question-import?batch=${batchId}&guardChecked=1&plan=${result.digest}`,
+  );
 }

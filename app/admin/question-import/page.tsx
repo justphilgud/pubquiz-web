@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { requireAdmin } from "@/app/lib/permissions";
+import { getCurrentUserId } from "@/app/services/questionService";
 import { loadOpenTdbImportOverview } from "@/app/fragen/import/external/externalQuestionImport.server";
+import { loadExternalImportProductionGuardPreview } from "@/app/fragen/import/external/externalQuestionProductionPlan.server";
 import {
   approveExternalQuestionAction,
+  dryRunExternalImportProductionGuardAction,
   processOpenTdbPhaseTwoAction,
   rejectExternalQuestionAction,
   saveExternalQuestionAction,
@@ -75,13 +78,19 @@ export default async function ExternalQuestionImportPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const params = await searchParams;
   const batchId = numberParam(params.batch, 0) || undefined;
   const page = numberParam(params.page, 1);
   const qualityStatus = qualityStatusParam(params.status);
   const overview = await loadOpenTdbImportOverview({ batchId, page, qualityStatus });
   const totalPages = Math.max(1, Math.ceil(overview.total / overview.pageSize));
+  const productionGuard = overview.batch
+    ? await loadExternalImportProductionGuardPreview({
+        batchId: overview.batch.import_batch_id,
+        operatorUserId: getCurrentUserId(session),
+      }).catch(() => null)
+    : null;
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950 md:px-8">
@@ -181,6 +190,69 @@ export default async function ExternalQuestionImportPage({
                 <p className="mt-3 text-xs text-slate-500">
                   Jeder Lauf verarbeitet ausschließlich fünf bereits vorhandene Datensätze aus Batch #1. Es werden keine weiteren OpenTDB-Fragen abgerufen.
                 </p>
+              </section>
+
+              <section className="rounded-2xl border-2 border-rose-300 bg-rose-50 p-5 shadow-sm">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.18em] text-rose-800">
+                      Production-Import gesperrt
+                    </p>
+                    <h2 className="mt-2 text-xl font-bold">Externer Production-Importguard</h2>
+                    <p className="mt-2 max-w-3xl text-sm text-slate-700">
+                      Diese Preview darf Production weder beschreiben noch einen Import freigeben.
+                      Der echte read-only Preflight läuft separat mit dem Production-Reader; ein
+                      späterer Schreibjob benötigt den identischen eingefrorenen Plan, ein frisches
+                      validiertes Backup und eine einmalige Reviewer-Freigabe.
+                    </p>
+                  </div>
+                  {productionGuard && (
+                    <a
+                      href={`/api/admin/question-import/${overview.batch!.import_batch_id}/plan`}
+                      className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900"
+                    >
+                      Eingefrorenen Plan exportieren
+                    </a>
+                  )}
+                </div>
+                {productionGuard ? (
+                  <>
+                    <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                      {[
+                        ["Umgebung", productionGuard.environment],
+                        ["Datenbankidentität", productionGuard.dbIdentityConfirmed ? "Production bestätigt" : "nicht Production"],
+                        ["Batch-ID", productionGuard.batchId],
+                        ["Kandidaten", String(productionGuard.itemCount)],
+                        ["READY_FOR_REVIEW", String(productionGuard.readyForReview)],
+                        ["REVIEW_REQUIRED", String(productionGuard.reviewRequired)],
+                        ["Production-Preflight", productionGuard.productionPreflight],
+                        ["Backup-Gate", productionGuard.backupStatus],
+                      ].map(([label, value]) => (
+                        <div key={label} className="rounded-xl border border-rose-200 bg-white p-3">
+                          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</dt>
+                          <dd className="mt-1 break-words font-bold text-slate-950">{value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <div className="mt-4 rounded-xl bg-slate-950 p-4 text-sm text-white">
+                      <p className="font-semibold">Plan-SHA-256</p>
+                      <code className="mt-1 block break-all text-xs text-slate-200">{productionGuard.digest}</code>
+                      <p className="mt-3 font-semibold text-rose-200">
+                        writeAuthorized = {String(productionGuard.writeAuthorized)}
+                      </p>
+                    </div>
+                    <form action={dryRunExternalImportProductionGuardAction} className="mt-4">
+                      <input type="hidden" name="batchId" value={overview.batch!.import_batch_id} />
+                      <button className="rounded-xl border border-rose-400 bg-white px-4 py-2.5 text-sm font-semibold text-rose-900">
+                        Sicheren Guard-Dry-run ausführen
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <p className="mt-4 text-sm font-semibold text-slate-700">
+                    Noch kein manuell geprüfter Kandidat für einen eingefrorenen Plan vorhanden.
+                  </p>
+                )}
               </section>
 
               <nav className="flex flex-wrap gap-2 text-sm">
