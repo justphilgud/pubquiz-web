@@ -5,7 +5,7 @@ import type {
   ExternalQuestionVerificationSource,
 } from "./types";
 
-export const OPENTDB_AUTOMATION_MODEL = "openai/gpt-5.4" as const;
+export const OPENTDB_AUTOMATION_MODEL = "perplexity/sonar" as const;
 const GATEWAY_URL = "https://ai-gateway.vercel.sh/v1/responses";
 const MAX_ATTEMPTS = 3;
 
@@ -454,11 +454,9 @@ export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestio
             model: this.model,
             instructions: "Du arbeitest als vorsichtige deutschsprachige Quizredaktion. Nutze zwingend die integrierte Websuche, antworte ausschließlich im vorgegebenen JSON-Schema und belege Fakten durch die gefundenen Quellen.",
             input: prompt(input.question, input.availableCategories),
-            tools: [{ type: "web_search", search_context_size: "medium" }],
-            tool_choice: "required",
             providerOptions: {
               gateway: {
-                only: ["openai"],
+                only: ["perplexity"],
               },
             },
             text: {
