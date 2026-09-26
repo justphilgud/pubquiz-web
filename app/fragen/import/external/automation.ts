@@ -32,6 +32,13 @@ type GatewayResponseOutput = {
   type?: unknown;
 };
 
+type GatewayErrorResponse = {
+  error?: {
+    code?: unknown;
+    type?: unknown;
+  };
+};
+
 type AutomationPayload = {
   localizedQuestion: string;
   localizedCorrectAnswer: string;
@@ -128,6 +135,30 @@ const responseSchema = {
 
 function sleep(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function safeGatewayErrorCode(value: unknown) {
+  if (typeof value !== "string") return "";
+  return value
+    .trim()
+    .toLocaleUpperCase("en")
+    .replace(/[^A-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80);
+}
+
+async function gatewayHttpError(response: Response) {
+  let payload: GatewayErrorResponse | null = null;
+  try {
+    payload = await response.json() as GatewayErrorResponse;
+  } catch {
+    // Provider messages can contain request details. Keep diagnostics code-only.
+  }
+  const providerCode = safeGatewayErrorCode(payload?.error?.code) ||
+    safeGatewayErrorCode(payload?.error?.type);
+  return new Error(
+    `OPENTDB_AUTOMATION_HTTP_${response.status}${providerCode ? `_${providerCode}` : ""}`,
+  );
 }
 
 function trimmedString(value: unknown, maxLength: number) {
@@ -442,7 +473,7 @@ export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestio
             await sleep(attempt * 1_000);
             continue;
           }
-          throw new Error(`OPENTDB_AUTOMATION_HTTP_${response.status}`);
+          throw await gatewayHttpError(response);
         }
         return validateGatewayAutomationResponse(
           await response.json() as GatewayResponse,
