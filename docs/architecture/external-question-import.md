@@ -46,11 +46,10 @@ Deployment bereitgestellten OIDC-Token. In Vercel Functions liest die
 authentifizierte Server Action den Token aus dem providerverwalteten
 `x-vercel-oidc-token`-Request-Header; Builds und lokale Vercel-Entwicklung
 können ihn als `VERCEL_OIDC_TOKEN` erhalten. Es wird kein statisches
-KI-Credential im Projekt gespeichert. Der Adapter arbeitet über den
-Responses-Endpunkt des Gateways mit einem streng validierten strukturierten
-Vertrag. `openai/gpt-5.4-mini` muss dabei das eingebaute `web_search`-Werkzeug
-verwenden; der Responses-Endpunkt liefert die tatsächlich verwendeten Quellen
-als `url_citation`-Annotationen zurück.
+KI-Credential im Projekt gespeichert. Der Adapter verwendet den offiziellen
+AI-SDK-Transport mit `perplexity/sonar`, strukturiertem Output und dem
+bestehenden streng validierten Vertrag. Die tatsächlich verwendeten Quellen
+werden ausschließlich aus `result.sources` des SDK-Resultats übernommen.
 
 Eine vom Modell genannte Quellen-URL wird nur gespeichert, wenn sie zugleich in
 den vom Gateway gelieferten URL-Zitaten vorkommt. Bleibt die strukturierte
@@ -79,9 +78,9 @@ Lizenz-URL und Importzeit bleiben am Importdatensatz. Bei Übernahme kombiniert
 das Quellenfeld die fachliche Quelle mit dem Hinweis auf die bearbeitete bzw.
 übersetzte OpenTDB-Fassung und die Lizenz-URL.
 
-## Umgebungsschutz
+## Umgebungsschutz und Batchbetrieb
 
-Der 100-Fragen-Pilot und seine Phase-2-Aufbereitung können nur in `preview`
+Der bestehende 100-Fragen-Pilot und seine Phase-2-Aufbereitung können nur in `preview`
 gestartet werden. Lokal ist der Schreibpfad nur
 mit dem expliziten Schalter `OPENTDB_PILOT_ALLOW_LOCAL=true` möglich. In
 Production verweigern alle schreibenden Importaktionen die Ausführung.
@@ -96,10 +95,47 @@ Das Quality Gate unterscheidet `READY_FOR_REVIEW`, `REVIEW_REQUIRED` und
 eine explizite Adminaktion erzeugt wie bisher eine unveröffentlichte Frage mit
 `review_status = IN_REVIEW`.
 
+Der Preview-Vollpilot ist mit Batch `#1` abgeschlossen. Preview wird künftig nur
+für kleine repräsentative Piloten und technische Workflow-Abnahmen verwendet.
+Weitere vollständige 100er- oder größere Contentbatches werden dort nicht
+persistiert. Der bestehende Batch und seine Entscheidungen bleiben als
+Abnahmenachweis erhalten; eine Bereinigung ist kein Bestandteil dieses Vertrags.
+
+## Künftiger Production-Contentimport
+
+Neue große Contentbatches werden außerhalb von Production vollständig
+vorbereitet. Vor dem ersten Production-Schreibzugriff müssen Kandidaten,
+Lokalisierung, Quellen, Qualitätsstatus und technische IDs feststehen. Ein
+read-only Bestandsabgleich gegen Production prüft exakte und semantische
+Dubletten, vorhandene Providerreferenzen, Quellenstatus und Kategorien.
+
+Der kontrollierte Ablauf ist:
+
+```text
+Recherche / Lokalisierung / Quellenprüfung
+  → Qualitätsbewertung
+  → read-only Dubletten- und Bestandsprüfung gegen Production
+  → finaler Importplan
+  → frisches, vollständig validiertes Production-Backup
+  → ausdrückliche Schreibfreigabe
+  → idempotenter Production-Contentimport
+  → lesende Nachvalidierung
+```
+
+Konflikte werden weder überschrieben noch automatisch zusammengeführt.
+`READY_FOR_REVIEW`, `REVIEW_REQUIRED` und `REJECT_RECOMMENDED` bleiben getrennt.
+Nur explizit ausgewählte Kandidaten dürfen in den normalen Fragen-Lifecycle
+gelangen; KI-Prüfung ersetzt keine redaktionelle Freigabe. Ein reiner
+Contentimport benötigt weder Migration noch Deployment. Die bestehende
+Preview-Aktion wird nicht als Production-Importweg freigeschaltet. Der spätere
+Production-Importer benötigt einen eigenen Host-/Datenbankguard, den Nachweis
+des frischen Backups und eine ausdrückliche Betreiberfreigabe.
+
 ## Offene Ausbaustufe
 
 Vor einem Production-Massendurchlauf braucht es weiterhin die menschliche
 Stichprobe mit Annahme-, Änderungs- und Reviewzeitmessung. Der Phase-2-Adapter
-ist absichtlich an Preview, Batch `#1` und den manuellen Fragen-Lifecycle
-gebunden. Eine spätere Freigabe für weitere Quellen oder Production ist eine
-separate Entscheidung.
+bleibt an Preview, Batch `#1` und den manuellen Fragen-Lifecycle gebunden. Die
+Implementierung des getrennten, backupgeschützten Production-Importers ist eine
+separate Freigabe und darf nicht durch Lockerung des Previewguards ersetzt
+werden.

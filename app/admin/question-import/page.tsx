@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AppHeader from "@/app/components/AppHeader";
 import { requireAdmin } from "@/app/lib/permissions";
 import { loadOpenTdbImportOverview } from "@/app/fragen/import/external/externalQuestionImport.server";
 import {
@@ -85,9 +84,7 @@ export default async function ExternalQuestionImportPage({
   const totalPages = Math.max(1, Math.ceil(overview.total / overview.pageSize));
 
   return (
-    <>
-      <AppHeader />
-      <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950 md:px-8">
+    <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950 md:px-8">
         <div className="mx-auto max-w-7xl space-y-6">
           <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -426,7 +423,6 @@ export default async function ExternalQuestionImportPage({
             </>
           )}
         </div>
-      </main>
-    </>
+    </main>
   );
 }

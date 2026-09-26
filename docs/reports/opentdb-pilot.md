@@ -80,3 +80,44 @@ Quellenadapter ergänzt und anschließend eine repräsentative manuelle Stichpro
 mit gemessener Annahmequote und Prüfzeit durchgeführt werden.
 
 Production und `main` wurden durch den Pilotlauf nicht verändert.
+
+## Phase 2 und aktueller Preview-Bestand
+
+Die Phase-2-Aufbereitung wurde am 26. September 2026 mit dem offiziellen
+AI-SDK-Transport und `perplexity/sonar` abgeschlossen. Alle 100 bestehenden
+Kandidaten aus Batch `#1` wurden verarbeitet; es wurden keine weiteren
+OpenTDB-Fragen abgerufen.
+
+| Kennzahl | Anzahl |
+|---|---:|
+| Automatisch verarbeitet | 100 |
+| Erfolgreich lokalisiert | 93 |
+| Lokalisierung problematisch | 7 |
+| Faktencheck `VERIFIED` | 92 |
+| Faktencheck `AMBIGUOUS` | 3 |
+| Faktencheck `CONTRADICTED` | 0 |
+| Faktencheck `NO_RELIABLE_SOURCE` | 5 |
+| `READY_FOR_REVIEW` | 51 |
+| `REVIEW_REQUIRED` | 45 |
+| `REJECT_RECOMMENDED` | 0 |
+| Manuell in den normalen Fragen-Lifecycle übernommen | 3 |
+| Manuell abgelehnt | 1 |
+
+Die 100 Zeilen in `external_question_import_items` bleiben Import-/Stagingdaten.
+Die expliziten Reviewentscheidungen erzeugten zusätzlich drei reguläre,
+unveröffentlichte Preview-Fragen im bestehenden Lifecycle:
+
+- Importkandidat `#2` → Preview-Frage `#122` (Megadeth / Dave Mustaine)
+- Importkandidat `#4` → Preview-Frage `#123` (Assassin’s Creed / Spanische Inquisition)
+- Importkandidat `#6` → Preview-Frage `#124` (Motorradhersteller / Toyota)
+
+Importkandidat `#3` wurde im Pilot manuell abgelehnt und erzeugte keine Frage.
+Die drei regulären Fragen dienen der Pilot- und Reviewabnahme. Alle übrigen
+Kandidaten bleiben ausschließlich Stagingdaten. Es erfolgt keine automatische
+Freigabe oder Veröffentlichung und keine Preview-Bereinigung.
+
+Weitere vollständige Contentbatches werden nicht zusätzlich in Preview
+persistiert. Preview bleibt für kleine repräsentative Piloten und technische
+Workflow-Abnahmen. Große neue Contentbatches folgen dem in
+`docs/architecture/external-question-import.md` festgelegten, durch read-only
+Production-Bestandsprüfung und frisches Backup geschützten Production-Prozess.

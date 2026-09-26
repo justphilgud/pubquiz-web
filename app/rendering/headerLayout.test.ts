@@ -7,9 +7,21 @@ const read = (path: string) => readFileSync(path, "utf8");
 test("the root layout is neutral and management boundaries own AppHeader", () => {
   assert.doesNotMatch(read("app/layout.tsx"), /AppHeader/);
   assert.match(read("app/admin/layout.tsx"), /AppHeader/);
+  assert.match(read("app/content/layout.tsx"), /AppHeader/);
   assert.match(read("app/fragen/layout.tsx"), /AppHeader/);
   assert.match(read("app/quiz/page.tsx"), /AppHeader/);
   assert.match(read("app/quiz/[quizId]/page.tsx"), /AppHeader/);
+});
+
+test("management pages rely on their route layout for exactly one AppHeader", () => {
+  for (const path of [
+    "app/admin/question-import/page.tsx",
+    "app/admin/users/page.tsx",
+    "app/content/page.tsx",
+    "app/fragen/editor/page.tsx",
+  ]) {
+    assert.doesNotMatch(read(path), /AppHeader/);
+  }
 });
 
 test("moderation, presentation, and answer form do not import AppHeader", () => {
