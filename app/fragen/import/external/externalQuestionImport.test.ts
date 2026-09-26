@@ -370,12 +370,12 @@ test("gateway adapter uses the short-lived Vercel runtime OIDC header without ex
       assert.equal(requestInput, "https://ai-gateway.vercel.sh/v1/responses");
       assert.equal(new Headers(init?.headers).get("authorization"), "Bearer test-oidc-token");
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
-      assert.equal(body.model, "openai/gpt-5.4");
-      assert.equal(body.tool_choice, "required");
-      assert.deepEqual(body.tools, [{ type: "web_search", search_context_size: "medium" }]);
+      assert.equal(body.model, "perplexity/sonar");
+      assert.equal("tool_choice" in body, false);
+      assert.equal("tools" in body, false);
       assert.deepEqual(body.providerOptions, {
         gateway: {
-          only: ["openai"],
+          only: ["perplexity"],
         },
       });
       return Response.json({
