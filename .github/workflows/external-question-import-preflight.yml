@@ -1,0 +1,91 @@
+name: External Question Production Preflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      plan_commit:
+        description: Immutable commit containing the frozen import plan
+        required: true
+        type: string
+      plan_path:
+        description: Repository path below external-import-plans/
+        required: true
+        type: string
+      plan_sha256:
+        description: Approved SHA-256 of the canonical import plan
+        required: true
+        type: string
+      production_commit:
+        description: Verified currently deployed Production SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-question-production-preflight
+  cancel-in-progress: false
+
+jobs:
+  dry-run:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: operations-backup
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Materialize immutable plan
+        shell: bash
+        env:
+          PLAN_COMMIT: ${{ inputs.plan_commit }}
+          PLAN_PATH: ${{ inputs.plan_path }}
+        run: |
+          set -euo pipefail
+          [[ "$PLAN_COMMIT" =~ ^[a-f0-9]{40}$ ]] || { echo "EXTERNAL_IMPORT_PLAN_COMMIT_INVALID"; exit 1; }
+          [[ "$PLAN_PATH" =~ ^external-import-plans/[A-Za-z0-9._/-]+\.json$ ]] || { echo "EXTERNAL_IMPORT_PLAN_PATH_INVALID"; exit 1; }
+          git fetch --no-tags --depth=1 origin "$PLAN_COMMIT"
+          git cat-file -e "$PLAN_COMMIT^{commit}"
+          git show "$PLAN_COMMIT:$PLAN_PATH" > "$RUNNER_TEMP/external-import-plan.json"
+      - name: Read-only Production preflight
+        shell: bash
+        env:
+          EXTERNAL_IMPORT_LOGICAL_ENVIRONMENT: production
+          EXTERNAL_IMPORT_GITHUB_ENVIRONMENT: operations-backup
+          EXTERNAL_IMPORT_EXPECTED_WORKFLOW_REF: justphilgud/pubquiz-web/.github/workflows/external-question-import-preflight.yml@refs/heads/main
+          EXTERNAL_IMPORT_PLAN_SHA256: ${{ inputs.plan_sha256 }}
+          PRODUCTION_RELEASE_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          node --import tsx scripts/external-import/dry-run.ts "$RUNNER_TEMP/external-import-plan.json" > "$RUNNER_TEMP/external-import-preflight.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const result = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/external-import-preflight.json`, 'utf8'));
+          const c = result.preflight.counts;
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `## External question Production preflight\n\n` +
+            `- Batch: ${result.batchId}\n` +
+            `- Plan SHA-256: ${result.planDigest}\n` +
+            `- Production read: ${result.productionRead}\n` +
+            `- Production changed: ${result.productionChanged}\n` +
+            `- DB identity confirmed: ${result.databaseIdentityConfirmed}\n` +
+            `- CREATE: ${c.CREATE}\n` +
+            `- ALREADY_PRESENT: ${c.ALREADY_PRESENT}\n` +
+            `- CONFLICT: ${c.CONFLICT}\n` +
+            `- REVIEW_REQUIRED: ${c.REVIEW_REQUIRED}\n` +
+            `- writeAuthorized: false\n`);
+          NODE
+      - name: Upload human-reviewable report
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-question-production-preflight
+          path: ${{ runner.temp }}/external-import-preflight.json
+          if-no-files-found: error
+          retention-days: 14
