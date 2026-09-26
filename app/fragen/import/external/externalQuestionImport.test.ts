@@ -281,6 +281,28 @@ test("provider citations remain authoritative when structured source selection i
   }]);
 });
 
+test("Responses API URL annotations are the source allowlist", () => {
+  const result = validateGatewayAutomationResponse({
+    output: [{
+      type: "message",
+      content: [{
+        type: "output_text",
+        text: JSON.stringify(gatewayPayload()),
+        annotations: [{
+          type: "url_citation",
+          title: "University Mathematics",
+          url: "https://example.edu/mathematics/addition",
+        }],
+      }],
+    }],
+  }, ["Allgemeinwissen"]);
+  assert.equal(result.verificationStatus, "VERIFIED");
+  assert.deepEqual(result.verificationSources, [{
+    title: "University Mathematics",
+    url: "https://example.edu/mathematics/addition",
+  }]);
+});
+
 test("uncited or low-quality-only claims cannot become VERIFIED", () => {
   const uncited = validateGatewayAutomationResponse({
     choices: [{ message: { content: JSON.stringify(gatewayPayload({
@@ -344,11 +366,26 @@ test("gateway adapter uses the short-lived Vercel runtime OIDC header without ex
   const previousGatewayKey = process.env.AI_GATEWAY_API_KEY;
   delete process.env.AI_GATEWAY_API_KEY;
   try {
-    const adapter = new VercelAiGatewayQuestionAutomationAdapter(async (_input, init) => {
+    const adapter = new VercelAiGatewayQuestionAutomationAdapter(async (requestInput, init) => {
+      assert.equal(requestInput, "https://ai-gateway.vercel.sh/v1/responses");
       assert.equal(new Headers(init?.headers).get("authorization"), "Bearer test-oidc-token");
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      assert.equal(body.model, "openai/gpt-5.4-mini");
+      assert.equal(body.tool_choice, "required");
+      assert.deepEqual(body.tools, [{ type: "web_search", search_context_size: "medium" }]);
       return Response.json({
-        choices: [{ message: { content: JSON.stringify(gatewayPayload()) } }],
-        citations: ["https://example.edu/mathematics/addition"],
+        output: [{
+          type: "message",
+          content: [{
+            type: "output_text",
+            text: JSON.stringify(gatewayPayload()),
+            annotations: [{
+              type: "url_citation",
+              title: "University Mathematics",
+              url: "https://example.edu/mathematics/addition",
+            }],
+          }],
+        }],
       });
     }, "test-oidc-token");
     const question = normalizeOpenTdbQuestion(rawQuestion());

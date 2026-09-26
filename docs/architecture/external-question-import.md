@@ -46,14 +46,16 @@ Deployment bereitgestellten OIDC-Token. In Vercel Functions liest die
 authentifizierte Server Action den Token aus dem providerverwalteten
 `x-vercel-oidc-token`-Request-Header; Builds und lokale Vercel-Entwicklung
 können ihn als `VERCEL_OIDC_TOKEN` erhalten. Es wird kein statisches
-KI-Credential im Projekt gespeichert. Der Adapter arbeitet über einen streng
-validierten strukturierten Vertrag und verwendet `perplexity/sonar`, dessen
-Anfragen eine Live-Websuche ausführen.
+KI-Credential im Projekt gespeichert. Der Adapter arbeitet über den
+Responses-Endpunkt des Gateways mit einem streng validierten strukturierten
+Vertrag. `openai/gpt-5.4-mini` muss dabei das eingebaute `web_search`-Werkzeug
+verwenden; der Responses-Endpunkt liefert die tatsächlich verwendeten Quellen
+als `url_citation`-Annotationen zurück.
 
 Eine vom Modell genannte Quellen-URL wird nur gespeichert, wenn sie zugleich in
-den vom Gateway gelieferten Suchzitaten vorkommt. Bleibt die strukturierte
+den vom Gateway gelieferten URL-Zitaten vorkommt. Bleibt die strukturierte
 Quellenauswahl leer, verwendet der Adapter ausschließlich die vom Provider als
-für die Antwort verwendete Suchzitate gelieferten HTTPS-Quellen. Eine genannte,
+für die Antwort verwendete URL-Zitate gelieferten HTTPS-Quellen. Eine genannte,
 aber nicht zitierte URL wird weiterhin abgewiesen. OpenTDB und Quizseiten werden
 als Fachquelle abgewiesen. Ein ausschließlich auf Wikipedia, Fandom oder Reddit
 gestütztes Ergebnis darf nicht `VERIFIED` werden. Ohne natürliche deutsche
