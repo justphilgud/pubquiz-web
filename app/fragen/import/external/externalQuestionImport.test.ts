@@ -373,6 +373,11 @@ test("gateway adapter uses the short-lived Vercel runtime OIDC header without ex
       assert.equal(body.model, "openai/gpt-5.4-mini");
       assert.equal(body.tool_choice, "required");
       assert.deepEqual(body.tools, [{ type: "web_search", search_context_size: "medium" }]);
+      assert.deepEqual(body.providerOptions, {
+        gateway: {
+          only: ["openai"],
+        },
+      });
       return Response.json({
         output: [{
           type: "message",

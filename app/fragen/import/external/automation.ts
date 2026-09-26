@@ -456,6 +456,11 @@ export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestio
             input: prompt(input.question, input.availableCategories),
             tools: [{ type: "web_search", search_context_size: "medium" }],
             tool_choice: "required",
+            providerOptions: {
+              gateway: {
+                only: ["openai"],
+              },
+            },
             text: {
               format: {
                 type: "json_schema",
