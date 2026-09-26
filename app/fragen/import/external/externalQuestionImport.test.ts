@@ -362,37 +362,27 @@ test("phase-two quality gate produces reproducible review statuses", () => {
   assert.ok(contradicted.issues.includes("FACT_CONTRADICTED"));
 });
 
-test("gateway adapter uses the short-lived Vercel runtime OIDC header without exposing it", async () => {
+test("AI SDK gateway adapter uses the short-lived Vercel runtime OIDC token and result.sources", async () => {
   const previousGatewayKey = process.env.AI_GATEWAY_API_KEY;
   delete process.env.AI_GATEWAY_API_KEY;
   try {
-    const adapter = new VercelAiGatewayQuestionAutomationAdapter(async (requestInput, init) => {
-      assert.equal(requestInput, "https://ai-gateway.vercel.sh/v1/responses");
-      assert.equal(new Headers(init?.headers).get("authorization"), "Bearer test-oidc-token");
-      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
-      assert.equal(body.model, "perplexity/sonar");
-      assert.equal("tool_choice" in body, false);
-      assert.equal("tools" in body, false);
-      assert.deepEqual(body.providerOptions, {
-        gateway: {
-          only: ["perplexity"],
-        },
-      });
-      return Response.json({
-        output: [{
-          type: "message",
-          content: [{
-            type: "output_text",
-            text: JSON.stringify(gatewayPayload()),
-            annotations: [{
-              type: "url_citation",
-              title: "University Mathematics",
-              url: "https://example.edu/mathematics/addition",
-            }],
+    const adapter = new VercelAiGatewayQuestionAutomationAdapter(
+      fetch,
+      "test-oidc-token",
+      async (request) => {
+        assert.equal(request.token, "test-oidc-token");
+        assert.equal(request.model, "perplexity/sonar");
+        assert.match(request.prompt, /allgemeines deutschsprachiges PubQuiz/);
+        return {
+          output: gatewayPayload(),
+          sources: [{
+            sourceType: "url",
+            title: "University Mathematics",
+            url: "https://example.edu/mathematics/addition",
           }],
-        }],
-      });
-    }, "test-oidc-token");
+        };
+      },
+    );
     const question = normalizeOpenTdbQuestion(rawQuestion());
     assert.ok(question);
     const result = await adapter.process({
@@ -400,6 +390,10 @@ test("gateway adapter uses the short-lived Vercel runtime OIDC header without ex
       availableCategories: ["Allgemeinwissen"],
     });
     assert.equal(result.verificationStatus, "VERIFIED");
+    assert.deepEqual(result.verificationSources, [{
+      title: "University Mathematics",
+      url: "https://example.edu/mathematics/addition",
+    }]);
   } finally {
     if (previousGatewayKey === undefined) delete process.env.AI_GATEWAY_API_KEY;
     else process.env.AI_GATEWAY_API_KEY = previousGatewayKey;
@@ -407,13 +401,17 @@ test("gateway adapter uses the short-lived Vercel runtime OIDC header without ex
 });
 
 test("gateway adapter reports only a sanitized provider error code", async () => {
-  const adapter = new VercelAiGatewayQuestionAutomationAdapter(async () => Response.json({
-    error: {
-      code: "insufficient_permissions",
-      type: "permission_error",
-      message: "sensitive provider detail",
+  const adapter = new VercelAiGatewayQuestionAutomationAdapter(
+    fetch,
+    "test-oidc-token",
+    async () => {
+      throw {
+        statusCode: 403,
+        type: "insufficient_permissions",
+        message: "sensitive provider detail",
+      };
     },
-  }, { status: 403 }), "test-oidc-token");
+  );
   const question = normalizeOpenTdbQuestion(rawQuestion());
   assert.ok(question);
   await assert.rejects(

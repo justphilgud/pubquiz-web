@@ -1,3 +1,4 @@
+import { createGateway, generateText, jsonSchema, Output } from "ai";
 import type {
   ExternalQuestion,
   ExternalQuestionAutomationAdapter,
@@ -6,8 +7,29 @@ import type {
 } from "./types";
 
 export const OPENTDB_AUTOMATION_MODEL = "perplexity/sonar" as const;
-const GATEWAY_URL = "https://ai-gateway.vercel.sh/v1/responses";
 const MAX_ATTEMPTS = 3;
+
+type AiSdkSource = {
+  sourceType: "document" | "url";
+  title?: string;
+  url?: string;
+};
+
+type AiSdkAutomationResult = {
+  output: unknown;
+  sources: AiSdkSource[];
+};
+
+type AiSdkAutomationRequest = {
+  fetch: typeof fetch;
+  model: typeof OPENTDB_AUTOMATION_MODEL;
+  prompt: string;
+  token: string;
+};
+
+type GenerateAiSdkAutomation = (
+  input: AiSdkAutomationRequest,
+) => Promise<AiSdkAutomationResult>;
 
 type GatewaySearchResult = {
   title?: unknown;
@@ -30,13 +52,6 @@ type GatewayResponseContent = {
 type GatewayResponseOutput = {
   content?: unknown;
   type?: unknown;
-};
-
-type GatewayErrorResponse = {
-  error?: {
-    code?: unknown;
-    type?: unknown;
-  };
 };
 
 type AutomationPayload = {
@@ -64,7 +79,7 @@ type AutomationPayload = {
   rejectionReason: string;
 };
 
-const responseSchema = {
+const responseSchema: Parameters<typeof jsonSchema<AutomationPayload>>[0] = {
   type: "object",
   additionalProperties: false,
   properties: {
@@ -131,7 +146,7 @@ const responseSchema = {
     "rejectRecommended",
     "rejectionReason",
   ],
-} as const;
+};
 
 function sleep(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -145,20 +160,6 @@ function safeGatewayErrorCode(value: unknown) {
     .replace(/[^A-Z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "")
     .slice(0, 80);
-}
-
-async function gatewayHttpError(response: Response) {
-  let payload: GatewayErrorResponse | null = null;
-  try {
-    payload = await response.json() as GatewayErrorResponse;
-  } catch {
-    // Provider messages can contain request details. Keep diagnostics code-only.
-  }
-  const providerCode = safeGatewayErrorCode(payload?.error?.code) ||
-    safeGatewayErrorCode(payload?.error?.type);
-  return new Error(
-    `OPENTDB_AUTOMATION_HTTP_${response.status}${providerCode ? `_${providerCode}` : ""}`,
-  );
 }
 
 function trimmedString(value: unknown, maxLength: number) {
@@ -337,6 +338,100 @@ function parsePayload(value: unknown): AutomationPayload {
   };
 }
 
+const automationOutputSchema = jsonSchema<AutomationPayload>(responseSchema, {
+  validate(value) {
+    try {
+      return { success: true, value: parsePayload(value) };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error
+          ? error
+          : new Error("OPENTDB_AUTOMATION_OUTPUT_INVALID"),
+      };
+    }
+  },
+});
+
+async function generateAiSdkAutomation(
+  input: AiSdkAutomationRequest,
+): Promise<AiSdkAutomationResult> {
+  const gateway = createGateway({
+    apiKey: input.token,
+    fetch: input.fetch,
+  });
+  const result = await generateText({
+    model: gateway(input.model),
+    system: "Du arbeitest als vorsichtige deutschsprachige Quizredaktion. Nutze zwingend die integrierte Websuche, antworte ausschließlich im vorgegebenen JSON-Schema und belege Fakten durch die gefundenen Quellen.",
+    prompt: input.prompt,
+    output: Output.object({
+      schema: automationOutputSchema,
+      name: "external_question_automation",
+    }),
+    maxOutputTokens: 4_000,
+    maxRetries: 0,
+    timeout: 50_000,
+    providerOptions: {
+      gateway: {
+        only: ["perplexity"],
+      },
+    },
+  });
+  return {
+    output: result.output,
+    sources: result.sources.map((source) => ({
+      sourceType: source.sourceType,
+      ...("title" in source && typeof source.title === "string"
+        ? { title: source.title }
+        : {}),
+      ...("url" in source && typeof source.url === "string"
+        ? { url: source.url }
+        : {}),
+    })),
+  };
+}
+
+function aiSdkGatewayResponse(result: AiSdkAutomationResult): GatewayResponse {
+  return {
+    choices: [{ message: { content: JSON.stringify(result.output) } }],
+    search_results: result.sources.flatMap((source) =>
+      source.sourceType === "url" && typeof source.url === "string"
+        ? [{ title: source.title, url: source.url }]
+        : []
+    ),
+  };
+}
+
+function normalizedAiSdkError(error: unknown) {
+  const fallback = new Error("OPENTDB_AUTOMATION_UNKNOWN_ERROR");
+  if (!error || typeof error !== "object") {
+    return { error: fallback, retryable: false };
+  }
+  const input = error as Record<string, unknown>;
+  const statusCode = typeof input.statusCode === "number"
+    ? input.statusCode
+    : null;
+  const cause = input.cause && typeof input.cause === "object"
+    ? input.cause as Record<string, unknown>
+    : null;
+  const providerCode = safeGatewayErrorCode(input.type) ||
+    safeGatewayErrorCode(input.code) ||
+    safeGatewayErrorCode(cause?.type) ||
+    safeGatewayErrorCode(cause?.code);
+  const normalized = statusCode
+    ? new Error(
+      `OPENTDB_AUTOMATION_HTTP_${statusCode}${providerCode ? `_${providerCode}` : ""}`,
+    )
+    : error instanceof Error && /^OPENTDB_AUTOMATION_[A-Z0-9_]+$/.test(error.message)
+      ? error
+      : fallback;
+  const retryable = input.isRetryable === true ||
+    statusCode === 429 ||
+    (statusCode !== null && statusCode >= 500) ||
+    (error instanceof Error && /fetch|timeout|abort/i.test(error.message));
+  return { error: normalized, retryable };
+}
+
 export function validateGatewayAutomationResponse(
   response: GatewayResponse,
   availableCategories: readonly string[],
@@ -430,6 +525,7 @@ export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestio
   constructor(
     private readonly request: typeof fetch = fetch,
     private readonly runtimeToken?: string,
+    private readonly generate: GenerateAiSdkAutomation = generateAiSdkAutomation,
   ) {}
 
   async process(input: {
@@ -444,47 +540,19 @@ export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestio
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
       try {
-        const response = await this.request(GATEWAY_URL, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: this.model,
-            instructions: "Du arbeitest als vorsichtige deutschsprachige Quizredaktion. Nutze zwingend die integrierte Websuche, antworte ausschließlich im vorgegebenen JSON-Schema und belege Fakten durch die gefundenen Quellen.",
-            input: prompt(input.question, input.availableCategories),
-            providerOptions: {
-              gateway: {
-                only: ["perplexity"],
-              },
-            },
-            text: {
-              format: {
-                type: "json_schema",
-                name: "external_question_automation",
-                strict: true,
-                schema: responseSchema,
-              },
-            },
-            max_output_tokens: 4_000,
-          }),
-          signal: AbortSignal.timeout(50_000),
-        });
-        if (!response.ok) {
-          if ((response.status === 429 || response.status >= 500) && attempt < MAX_ATTEMPTS) {
-            await sleep(attempt * 1_000);
-            continue;
-          }
-          throw await gatewayHttpError(response);
-        }
         return validateGatewayAutomationResponse(
-          await response.json() as GatewayResponse,
+          aiSdkGatewayResponse(await this.generate({
+            fetch: this.request,
+            model: this.model,
+            prompt: prompt(input.question, input.availableCategories),
+            token,
+          })),
           input.availableCategories,
         );
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error("OPENTDB_AUTOMATION_UNKNOWN_ERROR");
-        if (attempt < MAX_ATTEMPTS && /fetch|timeout|HTTP_429|HTTP_5\d\d/i.test(lastError.message)) {
+        const normalized = normalizedAiSdkError(error);
+        lastError = normalized.error;
+        if (attempt < MAX_ATTEMPTS && normalized.retryable) {
           await sleep(attempt * 1_000);
           continue;
         }
