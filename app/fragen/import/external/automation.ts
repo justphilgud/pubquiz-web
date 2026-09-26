@@ -5,7 +5,7 @@ import type {
   ExternalQuestionVerificationSource,
 } from "./types";
 
-export const OPENTDB_AUTOMATION_MODEL = "openai/gpt-5.4-mini" as const;
+export const OPENTDB_AUTOMATION_MODEL = "openai/gpt-5.4" as const;
 const GATEWAY_URL = "https://ai-gateway.vercel.sh/v1/responses";
 const MAX_ATTEMPTS = 3;
 
