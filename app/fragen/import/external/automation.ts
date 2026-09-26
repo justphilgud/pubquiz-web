@@ -5,8 +5,8 @@ import type {
   ExternalQuestionVerificationSource,
 } from "./types";
 
-export const OPENTDB_AUTOMATION_MODEL = "perplexity/sonar" as const;
-const GATEWAY_URL = "https://ai-gateway.vercel.sh/v1/chat/completions";
+export const OPENTDB_AUTOMATION_MODEL = "openai/gpt-5.4-mini" as const;
+const GATEWAY_URL = "https://ai-gateway.vercel.sh/v1/responses";
 const MAX_ATTEMPTS = 3;
 
 type GatewaySearchResult = {
@@ -18,6 +18,18 @@ type GatewayResponse = {
   choices?: Array<{ message?: { content?: unknown } }>;
   citations?: unknown;
   search_results?: unknown;
+  output?: unknown;
+};
+
+type GatewayResponseContent = {
+  annotations?: unknown;
+  text?: unknown;
+  type?: unknown;
+};
+
+type GatewayResponseOutput = {
+  content?: unknown;
+  type?: unknown;
 };
 
 type AutomationPayload = {
@@ -164,6 +176,29 @@ function sourcePriority(url: string) {
 
 function providerSources(response: GatewayResponse): ExternalQuestionVerificationSource[] {
   const sources: ExternalQuestionVerificationSource[] = [];
+  if (Array.isArray(response.output)) {
+    for (const output of response.output as GatewayResponseOutput[]) {
+      if (!Array.isArray(output?.content)) continue;
+      for (const content of output.content as GatewayResponseContent[]) {
+        if (!Array.isArray(content?.annotations)) continue;
+        for (const annotation of content.annotations) {
+          if (!annotation || typeof annotation !== "object") continue;
+          const citation = annotation as Record<string, unknown>;
+          if (citation.type !== "url_citation") continue;
+          const nested = citation.url_citation && typeof citation.url_citation === "object"
+            ? citation.url_citation as Record<string, unknown>
+            : null;
+          const url = trimmedString(citation.url ?? nested?.url, 2_000);
+          const key = sourceKey(url);
+          if (!key || isQuizSource(url)) continue;
+          sources.push({
+            title: trimmedString(citation.title ?? nested?.title, 300) || new URL(url).hostname,
+            url,
+          });
+        }
+      }
+    }
+  }
   if (Array.isArray(response.search_results)) {
     for (const entry of response.search_results as GatewaySearchResult[]) {
       const url = typeof entry?.url === "string" ? entry.url.trim() : "";
@@ -190,6 +225,21 @@ function providerSources(response: GatewayResponse): ExternalQuestionVerificatio
     seen.add(key);
     return true;
   });
+}
+
+function responseContent(response: GatewayResponse) {
+  const chatContent = response.choices?.[0]?.message?.content;
+  if (typeof chatContent === "string") return chatContent;
+  if (!Array.isArray(response.output)) return null;
+  for (const output of response.output as GatewayResponseOutput[]) {
+    if (!Array.isArray(output?.content)) continue;
+    for (const content of output.content as GatewayResponseContent[]) {
+      if (content?.type === "output_text" && typeof content.text === "string") {
+        return content.text;
+      }
+    }
+  }
+  return null;
 }
 
 function parsePayload(value: unknown): AutomationPayload {
@@ -260,7 +310,7 @@ export function validateGatewayAutomationResponse(
   response: GatewayResponse,
   availableCategories: readonly string[],
 ): ExternalQuestionAutomationResult {
-  const content = response.choices?.[0]?.message?.content;
+  const content = responseContent(response);
   if (typeof content !== "string") throw new Error("OPENTDB_AUTOMATION_RESPONSE_EMPTY");
   let raw: unknown;
   try {
@@ -371,21 +421,19 @@ export class VercelAiGatewayQuestionAutomationAdapter implements ExternalQuestio
           },
           body: JSON.stringify({
             model: this.model,
-            messages: [
-              {
-                role: "system",
-                content: "Du arbeitest als vorsichtige deutschsprachige Quizredaktion. Antworte ausschließlich im vorgegebenen JSON-Schema und belege Fakten durch die integrierte Websuche.",
-              },
-              { role: "user", content: prompt(input.question, input.availableCategories) },
-            ],
-            response_format: {
-              type: "json_schema",
-              json_schema: {
+            instructions: "Du arbeitest als vorsichtige deutschsprachige Quizredaktion. Nutze zwingend die integrierte Websuche, antworte ausschließlich im vorgegebenen JSON-Schema und belege Fakten durch die gefundenen Quellen.",
+            input: prompt(input.question, input.availableCategories),
+            tools: [{ type: "web_search", search_context_size: "medium" }],
+            tool_choice: "required",
+            text: {
+              format: {
+                type: "json_schema",
                 name: "external_question_automation",
                 strict: true,
                 schema: responseSchema,
               },
             },
+            max_output_tokens: 4_000,
           }),
           signal: AbortSignal.timeout(50_000),
         });
