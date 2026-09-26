@@ -400,3 +400,24 @@ test("gateway adapter uses the short-lived Vercel runtime OIDC header without ex
     else process.env.AI_GATEWAY_API_KEY = previousGatewayKey;
   }
 });
+
+test("gateway adapter reports only a sanitized provider error code", async () => {
+  const adapter = new VercelAiGatewayQuestionAutomationAdapter(async () => Response.json({
+    error: {
+      code: "insufficient_permissions",
+      type: "permission_error",
+      message: "sensitive provider detail",
+    },
+  }, { status: 403 }), "test-oidc-token");
+  const question = normalizeOpenTdbQuestion(rawQuestion());
+  assert.ok(question);
+  await assert.rejects(
+    () => adapter.process({ question, availableCategories: ["Allgemeinwissen"] }),
+    (error: unknown) => {
+      assert.ok(error instanceof Error);
+      assert.equal(error.message, "OPENTDB_AUTOMATION_HTTP_403_INSUFFICIENT_PERMISSIONS");
+      assert.doesNotMatch(error.message, /sensitive provider detail/);
+      return true;
+    },
+  );
+});
