@@ -8,8 +8,7 @@ SELECT :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
        AND current_user = 'neondb_owner' AS correct_target \gset
 \if :correct_target
 \else
-  \echo 'STOP: incorrect Production identity'
-  \quit 3
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_SETUP_INCORRECT_PRODUCTION_IDENTITY'; END $block$;
 \endif
 
 SELECT NOT EXISTS (
@@ -18,8 +17,7 @@ SELECT NOT EXISTS (
 ) AS role_absent \gset
 \if :role_absent
 \else
-  \echo 'STOP: pubquiz_external_import_writer already exists; inspect before continuing'
-  \quit 4
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_SETUP_ROLE_ALREADY_EXISTS'; END $block$;
 \endif
 
 -- A grant to PUBLIC reaches every login role and cannot be revoked only for this
@@ -40,8 +38,7 @@ SELECT NOT EXISTS (
 ) AS public_temporary_absent \gset
 \if :public_temporary_absent
 \else
-  \echo 'STOP: database PUBLIC grants TEMPORARY; strict writer no-DDL contract cannot be met per role'
-  \quit 5
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_SETUP_PUBLIC_TEMPORARY_INHERITED'; END $block$;
 \endif
 
 BEGIN;

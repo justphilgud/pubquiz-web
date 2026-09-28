@@ -1,0 +1,238 @@
+-- Read-only Production role/ACL inventory for the PUBLIC TEMPORARY decision.
+-- No password values, query texts or application data are selected.
+\set ON_ERROR_STOP on
+\pset pager off
+BEGIN TRANSACTION READ ONLY;
+
+SELECT :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
+       AND current_database() = 'neondb'
+       AND current_user = 'neondb_owner' AS correct_target \gset
+\if :correct_target
+\else
+  DO $block$ BEGIN RAISE EXCEPTION 'TEMPORARY_INVENTORY_INCORRECT_PRODUCTION_IDENTITY'; END $block$;
+\endif
+
+\echo '=== IDENTITY ==='
+SELECT current_database() AS database,
+       current_user AS connected_as,
+       :'HOST' AS host,
+       true AS production_identity_confirmed,
+       false AS write_executed;
+
+\echo '=== NON-SYSTEM ROLES ==='
+SELECT rolname AS role,
+       rolcanlogin AS login,
+       rolinherit AS inherits_role_memberships,
+       rolsuper AS superuser,
+       rolcreatedb AS createdb,
+       rolcreaterole AS createrole,
+       rolreplication AS replication,
+       rolbypassrls AS bypassrls
+FROM pg_catalog.pg_roles
+WHERE rolname !~ '^pg_'
+ORDER BY rolname;
+
+\echo '=== ROLE MEMBERSHIPS ==='
+SELECT member_role.rolname AS member_role,
+       granted_role.rolname AS granted_role,
+       membership.admin_option,
+       membership.inherit_option,
+       membership.set_option
+FROM pg_catalog.pg_auth_members membership
+JOIN pg_catalog.pg_roles member_role ON member_role.oid = membership.member
+JOIN pg_catalog.pg_roles granted_role ON granted_role.oid = membership.roleid
+WHERE member_role.rolname !~ '^pg_' OR granted_role.rolname !~ '^pg_'
+ORDER BY member_role.rolname, granted_role.rolname;
+
+\echo '=== EFFECTIVE DATABASE RIGHTS ==='
+SELECT role_row.rolname AS role,
+       role_row.rolcanlogin AS login,
+       has_database_privilege(role_row.oid, current_database(), 'CONNECT') AS connect,
+       has_database_privilege(role_row.oid, current_database(), 'CREATE') AS create_database_objects,
+       has_database_privilege(role_row.oid, current_database(), 'TEMPORARY') AS temporary,
+       public_temporary.granted AS public_temporary_source
+FROM pg_catalog.pg_roles role_row
+CROSS JOIN LATERAL (
+  SELECT EXISTS (
+    SELECT 1
+    FROM pg_catalog.pg_database database_row
+    CROSS JOIN LATERAL pg_catalog.aclexplode(
+      COALESCE(database_row.datacl, pg_catalog.acldefault('d', database_row.datdba))
+    ) privilege_row
+    WHERE database_row.datname = current_database()
+      AND privilege_row.grantee = 0
+      AND privilege_row.privilege_type = 'TEMPORARY'
+  ) AS granted
+) public_temporary
+WHERE role_row.rolname !~ '^pg_'
+ORDER BY role_row.rolname;
+
+\echo '=== EXPLICIT DATABASE ACL ==='
+SELECT CASE WHEN privilege_row.grantee = 0 THEN 'PUBLIC' ELSE grantee_role.rolname END AS grantee,
+       privilege_row.privilege_type,
+       privilege_row.is_grantable,
+       grantor_role.rolname AS grantor
+FROM pg_catalog.pg_database database_row
+CROSS JOIN LATERAL pg_catalog.aclexplode(
+  COALESCE(database_row.datacl, pg_catalog.acldefault('d', database_row.datdba))
+) privilege_row
+LEFT JOIN pg_catalog.pg_roles grantee_role ON grantee_role.oid = privilege_row.grantee
+LEFT JOIN pg_catalog.pg_roles grantor_role ON grantor_role.oid = privilege_row.grantor
+WHERE database_row.datname = current_database()
+ORDER BY grantee, privilege_row.privilege_type;
+
+\echo '=== EFFECTIVE SCHEMA RIGHTS ==='
+SELECT role_row.rolname AS role,
+       namespace_row.nspname AS schema,
+       has_schema_privilege(role_row.oid, namespace_row.oid, 'USAGE') AS usage,
+       has_schema_privilege(role_row.oid, namespace_row.oid, 'CREATE') AS create_objects
+FROM pg_catalog.pg_roles role_row
+CROSS JOIN pg_catalog.pg_namespace namespace_row
+WHERE role_row.rolname !~ '^pg_'
+  AND namespace_row.nspname IN ('public', 'pubquiz')
+ORDER BY role_row.rolname, namespace_row.nspname;
+
+\echo '=== EXPLICIT SCHEMA ACL ==='
+SELECT namespace_row.nspname AS schema,
+       CASE WHEN privilege_row.grantee = 0 THEN 'PUBLIC' ELSE grantee_role.rolname END AS grantee,
+       privilege_row.privilege_type,
+       privilege_row.is_grantable,
+       grantor_role.rolname AS grantor
+FROM pg_catalog.pg_namespace namespace_row
+CROSS JOIN LATERAL pg_catalog.aclexplode(
+  COALESCE(namespace_row.nspacl, pg_catalog.acldefault('n', namespace_row.nspowner))
+) privilege_row
+LEFT JOIN pg_catalog.pg_roles grantee_role ON grantee_role.oid = privilege_row.grantee
+LEFT JOIN pg_catalog.pg_roles grantor_role ON grantor_role.oid = privilege_row.grantor
+WHERE namespace_row.nspname IN ('public', 'pubquiz')
+ORDER BY namespace_row.nspname, grantee, privilege_row.privilege_type;
+
+\echo '=== OWNED RELATIONS AND SEQUENCES ==='
+SELECT owner_role.rolname AS owner,
+       namespace_row.nspname AS schema,
+       CASE
+         WHEN class_row.relkind IN ('S') THEN 'SEQUENCE'
+         WHEN class_row.relkind IN ('r', 'p') THEN 'TABLE'
+         WHEN class_row.relkind IN ('v', 'm') THEN 'VIEW'
+         ELSE class_row.relkind::text
+       END AS object_type,
+       count(*) AS object_count
+FROM pg_catalog.pg_class class_row
+JOIN pg_catalog.pg_namespace namespace_row ON namespace_row.oid = class_row.relnamespace
+JOIN pg_catalog.pg_roles owner_role ON owner_role.oid = class_row.relowner
+WHERE namespace_row.nspname IN ('public', 'pubquiz')
+GROUP BY owner_role.rolname, namespace_row.nspname, object_type
+ORDER BY owner_role.rolname, namespace_row.nspname, object_type;
+
+\echo '=== EFFECTIVE RELATION PRIVILEGE COUNTS ==='
+SELECT role_row.rolname AS role,
+       privilege_name.privilege,
+       count(*) AS relation_count
+FROM pg_catalog.pg_roles role_row
+CROSS JOIN pg_catalog.pg_class class_row
+JOIN pg_catalog.pg_namespace namespace_row ON namespace_row.oid = class_row.relnamespace
+CROSS JOIN (VALUES
+  ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE'),
+  ('TRUNCATE'), ('REFERENCES'), ('TRIGGER'), ('MAINTAIN')
+) privilege_name(privilege)
+WHERE role_row.rolname !~ '^pg_'
+  AND namespace_row.nspname IN ('public', 'pubquiz')
+  AND class_row.relkind IN ('r', 'p', 'v', 'm')
+  AND has_table_privilege(role_row.oid, class_row.oid, privilege_name.privilege)
+GROUP BY role_row.rolname, privilege_name.privilege
+ORDER BY role_row.rolname, privilege_name.privilege;
+
+\echo '=== EFFECTIVE SEQUENCE PRIVILEGE COUNTS ==='
+SELECT role_row.rolname AS role,
+       privilege_name.privilege,
+       count(*) AS sequence_count
+FROM pg_catalog.pg_roles role_row
+CROSS JOIN pg_catalog.pg_class class_row
+JOIN pg_catalog.pg_namespace namespace_row ON namespace_row.oid = class_row.relnamespace
+CROSS JOIN (VALUES ('SELECT'), ('UPDATE'), ('USAGE')) privilege_name(privilege)
+WHERE role_row.rolname !~ '^pg_'
+  AND namespace_row.nspname IN ('public', 'pubquiz')
+  AND class_row.relkind = 'S'
+  AND has_sequence_privilege(role_row.oid, class_row.oid, privilege_name.privilege)
+GROUP BY role_row.rolname, privilege_name.privilege
+ORDER BY role_row.rolname, privilege_name.privilege;
+
+\echo '=== EXPLICIT TABLE AND SEQUENCE ACL ==='
+SELECT namespace_row.nspname AS schema,
+       class_row.relname AS object,
+       CASE WHEN class_row.relkind = 'S' THEN 'SEQUENCE' ELSE 'RELATION' END AS object_type,
+       CASE WHEN privilege_row.grantee = 0 THEN 'PUBLIC' ELSE grantee_role.rolname END AS grantee,
+       privilege_row.privilege_type,
+       privilege_row.is_grantable,
+       grantor_role.rolname AS grantor
+FROM pg_catalog.pg_class class_row
+JOIN pg_catalog.pg_namespace namespace_row ON namespace_row.oid = class_row.relnamespace
+CROSS JOIN LATERAL pg_catalog.aclexplode(
+  class_row.relacl
+) privilege_row
+LEFT JOIN pg_catalog.pg_roles grantee_role ON grantee_role.oid = privilege_row.grantee
+LEFT JOIN pg_catalog.pg_roles grantor_role ON grantor_role.oid = privilege_row.grantor
+WHERE namespace_row.nspname IN ('public', 'pubquiz')
+  AND class_row.relkind IN ('r', 'p', 'v', 'm', 'S')
+  AND (privilege_row.grantee = 0 OR grantee_role.rolname !~ '^pg_')
+ORDER BY namespace_row.nspname, class_row.relname, grantee, privilege_row.privilege_type;
+
+\echo '=== EXPLICIT COLUMN ACL ==='
+SELECT namespace_row.nspname AS schema,
+       class_row.relname AS relation,
+       attribute_row.attname AS column,
+       CASE WHEN privilege_row.grantee = 0 THEN 'PUBLIC' ELSE grantee_role.rolname END AS grantee,
+       privilege_row.privilege_type,
+       privilege_row.is_grantable,
+       grantor_role.rolname AS grantor
+FROM pg_catalog.pg_attribute attribute_row
+JOIN pg_catalog.pg_class class_row ON class_row.oid = attribute_row.attrelid
+JOIN pg_catalog.pg_namespace namespace_row ON namespace_row.oid = class_row.relnamespace
+CROSS JOIN LATERAL pg_catalog.aclexplode(attribute_row.attacl) privilege_row
+LEFT JOIN pg_catalog.pg_roles grantee_role ON grantee_role.oid = privilege_row.grantee
+LEFT JOIN pg_catalog.pg_roles grantor_role ON grantor_role.oid = privilege_row.grantor
+WHERE namespace_row.nspname IN ('public', 'pubquiz')
+  AND attribute_row.attnum > 0
+  AND NOT attribute_row.attisdropped
+  AND (privilege_row.grantee = 0 OR grantee_role.rolname !~ '^pg_')
+ORDER BY namespace_row.nspname, class_row.relname, attribute_row.attnum, grantee;
+
+\echo '=== DEFAULT PRIVILEGES ==='
+SELECT owner_role.rolname AS default_owner,
+       COALESCE(namespace_row.nspname, '(all schemas)') AS schema,
+       default_acl.defaclobjtype AS object_type,
+       CASE WHEN privilege_row.grantee = 0 THEN 'PUBLIC' ELSE grantee_role.rolname END AS grantee,
+       privilege_row.privilege_type,
+       privilege_row.is_grantable,
+       grantor_role.rolname AS grantor
+FROM pg_catalog.pg_default_acl default_acl
+JOIN pg_catalog.pg_roles owner_role ON owner_role.oid = default_acl.defaclrole
+LEFT JOIN pg_catalog.pg_namespace namespace_row ON namespace_row.oid = default_acl.defaclnamespace
+CROSS JOIN LATERAL pg_catalog.aclexplode(default_acl.defaclacl) privilege_row
+LEFT JOIN pg_catalog.pg_roles grantee_role ON grantee_role.oid = privilege_row.grantee
+LEFT JOIN pg_catalog.pg_roles grantor_role ON grantor_role.oid = privilege_row.grantor
+WHERE owner_role.rolname !~ '^pg_'
+   OR privilege_row.grantee = 0
+   OR grantee_role.rolname !~ '^pg_'
+ORDER BY owner_role.rolname, schema, object_type, grantee, privilege_row.privilege_type;
+
+\echo '=== CURRENT TEMPORARY RELATIONS ==='
+SELECT owner_role.rolname AS owner,
+       count(*) AS temporary_relation_count
+FROM pg_catalog.pg_class class_row
+JOIN pg_catalog.pg_roles owner_role ON owner_role.oid = class_row.relowner
+WHERE class_row.relpersistence = 't'
+GROUP BY owner_role.rolname
+ORDER BY owner_role.rolname;
+
+\echo '=== CURRENT CLIENT SESSIONS BY ROLE ==='
+SELECT activity.usename AS role,
+       count(*) AS session_count,
+       count(*) FILTER (WHERE activity.state = 'active') AS active_sessions
+FROM pg_catalog.pg_stat_activity activity
+WHERE activity.datname = current_database()
+  AND activity.backend_type = 'client backend'
+GROUP BY activity.usename
+ORDER BY activity.usename;
+
+ROLLBACK;

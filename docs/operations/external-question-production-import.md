@@ -107,11 +107,58 @@ ACL, Spaltenzugriff auf `users`, die erlaubte Importfläche, benötigte Sequenze
 und fremde Domänen. Es führt keine Schreibprobe aus. Ein über `PUBLIC` geerbtes
 TEMPORARY-Recht blockiert die Verifikation ebenfalls; die für den Backup-Reader
 dokumentierte Ausnahme wird nicht auf den Production-Writer übertragen.
-`Setup` prüft dieses Recht vor `CREATE ROLE` und beendet sich mit Exitcode 5,
-damit am Gate auch keine teilweise eingerichtete Rolle zurückbleibt.
-`Precheck` führt dieselben Ziel-, Rollen- und PUBLIC-Prüfungen in einer explizit
-read-only Transaktion aus und ist deshalb der verpflichtende erste
-Betreiberschritt.
+`Precheck` führt Ziel-, Rollen- und PUBLIC-Prüfungen in einer explizit read-only
+Transaktion aus und liefert genau einen strukturierten Status an den Wrapper.
+Der Wrapper setzt den Prozessstatus selbst: `0` für PASS, `10` für einen
+fachlichen Sicherheitsblock, `20` für psql-/Verbindungs-/Ausführungsfehler und
+`21` für fehlende oder unerwartete Statusausgabe. `Setup` führt denselben
+read-only Precheck erneut aus, bevor es das Writer-Passwort abfragt oder
+mutierendes SQL sendet. Die Setup- und Verify-SQL-Skripte verwenden für ihre
+eigenen Sicherheitsabbrüche echte SQL-Exceptions mit `ON_ERROR_STOP`; sie
+verlassen sich nicht auf `\quit <code>`.
+
+### Read-only Inventur vor einer TEMPORARY-Entscheidung
+
+Solange `PUBLIC` auf `neondb` das Datenbankrecht `TEMPORARY` besitzt, bleibt das
+Writer-Setup blockiert. Vor einem möglichen globalen Entzug wird ausschließlich
+lesend inventarisiert:
+
+```powershell
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' `
+  "host=ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech port=5432 dbname=neondb user=neondb_owner sslmode=require channel_binding=require connect_timeout=30" `
+  -X -v ON_ERROR_STOP=1 `
+  -f './scripts/external-import/inventory-production-temporary.psql'
+```
+
+Das Skript startet `BEGIN TRANSACTION READ ONLY`, prüft Host, Datenbank und
+Owner, liest Rollen, Mitgliedschaften, effektive und explizite ACLs, Default
+Privileges, aktuell sichtbare temporäre Relationen sowie nur aggregierte
+Sessionzahlen und endet mit `ROLLBACK`. Es liest weder Passwörter noch SQL-Texte
+laufender Sessions oder Anwendungsdaten.
+
+Ein späterer ACL-Eingriff ist ein eigener, erneut freizugebender
+Production-Schritt. Der sichere Plan lautet:
+
+1. alle Rollen und ihren tatsächlichen TEMPORARY-Bedarf eindeutig klassifizieren,
+2. erforderliche rollenbezogene `GRANT TEMPORARY` in derselben kontrollierten
+   Änderung vorbereiten,
+3. `TEMPORARY` von `PUBLIC` entziehen,
+4. die vorbereiteten Grants erteilen und effektive Rechte neu prüfen,
+5. erst danach den Writer-Precheck und die Rollenerstellung ausführen.
+
+Der Rollback muss die gezielten Grants entfernen und den vorherigen Zustand mit
+`GRANT TEMPORARY ON DATABASE neondb TO PUBLIC` wiederherstellen. Vor Ausführung
+werden Rollenbestand, bestehende Verbindungen und ein mögliches Wartungsfenster
+erneut geprüft; dieses Runbook autorisiert die ACL-Änderung nicht.
+
+Die Read-only-Inventur vom 28. September 2026 ist unter
+`docs/reports/external-import-temporary-acl-inventory-20260928.md`
+dokumentiert. Im beobachteten Production-Rollenbestand hängt ausschließlich der
+`pubquiz_backup_reader` für TEMPORARY allein an `PUBLIC`; dieser Codepfad benötigt
+keine temporären Tabellen. Owner und Neon-Providerrollen behalten die Fähigkeit
+über explizite, geerbte oder Superuser-Rechte. Daher ist ein späterer Entzug von
+`PUBLIC TEMPORARY` ohne zusätzlichen rollenbezogenen Grant möglich, sofern der
+Rollen- und Sitzungsbestand unmittelbar davor unverändert bestätigt wird.
 
 Rollenerstellung und Secret-Setup bleiben bewusste Production-
 Betreiberaktionen. Nach `Store` darf nur der Secretname
