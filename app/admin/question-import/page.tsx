@@ -3,6 +3,7 @@ import { requireAdmin } from "@/app/lib/permissions";
 import { getCurrentUserId } from "@/app/services/questionService";
 import { loadOpenTdbImportOverview } from "@/app/fragen/import/external/externalQuestionImport.server";
 import { loadExternalImportProductionGuardPreview } from "@/app/fragen/import/external/externalQuestionProductionPlan.server";
+import { getLogicalEnvironment } from "@/config/environment";
 import {
   approveExternalQuestionAction,
   dryRunExternalImportProductionGuardAction,
@@ -84,6 +85,57 @@ export default async function ExternalQuestionImportPage({
   const page = numberParam(params.page, 1);
   const qualityStatus = qualityStatusParam(params.status);
   const overview = await loadOpenTdbImportOverview({ batchId, page, qualityStatus });
+
+  if (getLogicalEnvironment() === "production") {
+    return (
+      <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950 md:px-8">
+        <div className="mx-auto max-w-7xl space-y-6">
+          <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                Externe Fragen · Production
+              </p>
+              <h1 className="mt-2 text-3xl font-bold">OpenTDB-Importprüfung</h1>
+              <p className="mt-2 max-w-3xl text-sm text-slate-600">
+                Die Production-Importbasis ist ausschließlich lesend verfügbar.
+                Der Production-Preflight läuft separat mit dem geschützten
+                Production-Reader.
+              </p>
+            </div>
+            <Link href="/fragen" className="text-sm font-semibold text-slate-700 underline">
+              Zur Fragenredaktion
+            </Link>
+          </header>
+
+          <section className="rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">
+              Read-only Production-Basis
+            </p>
+            <h2 className="mt-2 text-xl font-bold">Production-Import gesperrt</h2>
+            <p className="mt-2 max-w-3xl text-sm text-slate-700">
+              In dieser Oberfläche sind keine Pilot-, Review- oder Übernahmeaktionen
+              verfügbar. Ein späterer Contentimport benötigt einen separaten Writer,
+              ein frisches validiertes Backup und eine einmalige Reviewer-Freigabe.
+            </p>
+            <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Import-Batches</dt>
+                <dd className="mt-1 font-bold text-slate-950">{overview.batches.length}</dd>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kandidaten</dt>
+                <dd className="mt-1 font-bold text-slate-950">{overview.total}</dd>
+              </div>
+            </dl>
+            <p className="mt-4 rounded-xl bg-slate-950 p-4 text-sm font-semibold text-rose-200">
+              writeAuthorized = false
+            </p>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   const totalPages = Math.max(1, Math.ceil(overview.total / overview.pageSize));
   const productionGuard = overview.batch
     ? await loadExternalImportProductionGuardPreview({
