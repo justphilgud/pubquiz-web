@@ -208,6 +208,15 @@ publiziert keine Frage; der Zielstatus ist `IN_REVIEW` und `freigegeben=false`.
 `ALREADY_PRESENT` wird protokolliert und nicht erneut geschrieben. `CONFLICT`
 oder `REVIEW_REQUIRED` blockieren den gesamten Lauf.
 
+Writer-Fehler werden secretsicher als strukturierter Diagnosecode ausgegeben.
+Der Code enthält ausschließlich die freigegebene Phase, Operation, Relation,
+Kandidaten-ID und gegebenenfalls einen PostgreSQL-SQLSTATE, zum Beispiel
+`EXTERNAL_IMPORT_WRITE_PHASE_FAILURE|phase=QUESTION_CREATE|candidate=2|operation=insert|relation=fragen|sqlstate=42501|cause=WITHHELD`.
+Verbindungsstrings, Tokens, Passwörter, SQL-Texte, Fehlermeldungen und Stacktraces
+werden nicht ausgegeben. Unbekannte oder nicht freigegebene Werte werden als
+`WITHHELD` maskiert. Diese Diagnose ändert weder Transaktionsgrenzen noch
+Guard-, Reviewer-, Backup- oder ACL-Prüfungen.
+
 Bei einem Teilfehler bleibt der Zustand eindeutig: committed Items sind
 `IMPORTED`, der Fehler ist `FAILED`, der Rest `NOT_RUN`. Eine Wiederaufnahme
 erfordert einen neuen Workflow-Run, ein erneut gültiges Backup und eine neue
