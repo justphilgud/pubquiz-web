@@ -12,6 +12,19 @@ test("Preview UI exposes safe guard state without a Production writer", () => {
   assert.doesNotMatch(page, /PRODUCTION_IMPORT_DATABASE_URL/);
 });
 
+test("Production UI is explicitly read-only and exposes no import actions", () => {
+  const page = read("app/admin/question-import/page.tsx");
+  const start = page.indexOf('if (getLogicalEnvironment() === "production")');
+  const end = page.indexOf("const totalPages");
+  assert.ok(start >= 0 && end > start, "Production read-only branch missing");
+  const productionBranch = page.slice(start, end);
+  assert.match(productionBranch, /Externe Fragen · Production/);
+  assert.match(productionBranch, /Read-only Production-Basis/);
+  assert.match(productionBranch, /writeAuthorized = false/);
+  assert.doesNotMatch(productionBranch, /<form|<button/);
+  assert.doesNotMatch(productionBranch, /startOpenTdbPilotAction/);
+});
+
 test("Production preflight is structurally read-only", () => {
   const adapter = read("scripts/external-import/production-preflight.ts");
   assert.match(adapter, /BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY/);
