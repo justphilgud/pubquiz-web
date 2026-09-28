@@ -396,7 +396,10 @@ function identityEquals(left: ProductionIdentity, right: ProductionIdentity) {
     left.database === right.database && left.schema === right.schema;
 }
 
-function executionIsProduction(execution: ExternalImportExecutionIdentity) {
+function executionIsProduction(
+  execution: ExternalImportExecutionIdentity,
+  mode: ExternalImportGuardInput["mode"],
+) {
   if (execution.logicalEnvironment !== "production") return false;
   if (execution.kind === "vercel") {
     return execution.vercelEnvironment === "production" &&
@@ -407,7 +410,9 @@ function executionIsProduction(execution: ExternalImportExecutionIdentity) {
     return execution.repository === "justphilgud/pubquiz-web" &&
       execution.ref === "refs/heads/main" &&
       execution.eventName === "workflow_dispatch" &&
-      execution.githubEnvironment === "operations-content-import" &&
+      execution.githubEnvironment === (
+        mode === "dry-run" ? "operations-backup" : "operations-content-import"
+      ) &&
       Boolean(execution.expectedWorkflowRef) &&
       execution.workflowRef === execution.expectedWorkflowRef;
   }
@@ -438,7 +443,7 @@ export function evaluateExternalImportGuard(input: ExternalImportGuardInput): Ex
   }
   const computedDigest = planValid ? externalImportPlanDigest(input.plan) : "";
   const environment = input.execution.logicalEnvironment === "production";
-  const host = executionIsProduction(input.execution);
+  const host = executionIsProduction(input.execution, input.mode);
   const database = identityEquals(input.actualDatabase, input.expectedDatabase);
   const preflight = input.preflight.counts.CONFLICT === 0 &&
     input.preflight.counts.REVIEW_REQUIRED === 0;
