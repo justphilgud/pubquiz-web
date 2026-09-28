@@ -354,6 +354,22 @@ test("dry-run can read gates but can never authorize writes", () => {
   assert.equal(result.writeAuthorized, false);
 });
 
+test("read-only Production preflight accepts operations-backup but cannot authorize writes", () => {
+  const input = guardInput();
+  const workflowRef = "justphilgud/pubquiz-web/.github/workflows/external-question-import-preflight.yml@refs/heads/main";
+  const result = evaluateExternalImportGuard({
+    ...input,
+    mode: "dry-run",
+    execution: execution({
+      githubEnvironment: "operations-backup",
+      workflowRef,
+      expectedWorkflowRef: workflowRef,
+    }),
+  });
+  assert.equal(result.gates.host, true);
+  assert.equal(result.writeAuthorized, false);
+});
+
 test("one-time authorization closes after success", async () => {
   const latch = new OneTimeExternalImportAuthorization();
   const guard = evaluateExternalImportGuard(guardInput());
