@@ -16,6 +16,10 @@ import {
   type ExternalImportWriteAuthorization,
   type ProductionIdentity,
 } from "./productionImportGuard";
+import {
+  VerifiedExternalImportReviewerApproval,
+  externalImportApprovalComment,
+} from "./reviewerApproval";
 
 const production: ProductionIdentity = {
   host: "ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech",
@@ -24,12 +28,20 @@ const production: ProductionIdentity = {
 };
 
 function plan(overrides: Partial<ExternalImportPlan> = {}): ExternalImportPlan {
-  return {
+  const value: ExternalImportPlan = {
     version: 1,
     batchId: "opentdb-batch-001",
     sourceType: "OpenTDB",
     frozenAt: "2026-09-26T10:00:00.000Z",
     operatorUserId: 7,
+    importApproval: {
+      records: [{
+        candidateId: "candidate-1",
+        sourceStatus: "APPROVED",
+        reviewedByUserId: 7,
+        reviewedAt: "2026-09-26T09:55:00.000Z",
+      }],
+    },
     items: [{
       candidateId: "candidate-1",
       externalReference: "opentdb-42",
@@ -62,6 +74,7 @@ function plan(overrides: Partial<ExternalImportPlan> = {}): ExternalImportPlan {
     }],
     ...overrides,
   };
+  return value;
 }
 
 const now = new Date("2026-09-26T10:30:00.000Z");
@@ -76,15 +89,20 @@ function execution(overrides: Partial<ExternalImportExecutionIdentity> = {}): Ex
     workflowRef: "justphilgud/pubquiz-web/.github/workflows/external-question-import.yml@refs/heads/main",
     expectedWorkflowRef: "justphilgud/pubquiz-web/.github/workflows/external-question-import.yml@refs/heads/main",
     githubEnvironment: "operations-content-import",
+    workflowRun: "789012",
+    workflowRunAttempt: "1",
     ...overrides,
   };
 }
 
 function backup(overrides: Partial<ExternalImportBackupEvidence> = {}): ExternalImportBackupEvidence {
   return {
+    version: 1,
     backupId: "production/acceptance/run-123456-1",
     backupRun: "123456",
+    backupAttempt: "1",
     snapshotAt: "2026-09-26T10:20:00.000Z",
+    completedAt: "2026-09-26T10:24:00.000Z",
     productionSha: "b".repeat(40),
     manifestSha256: "c".repeat(64),
     source: production,
@@ -105,9 +123,35 @@ function authorization(
     batchId: value.batchId,
     planDigest: externalImportPlanDigest(value),
     productionSha: "b".repeat(40),
+    backupId: "production/acceptance/run-123456-1",
+    backupRun: "123456",
+    backupAttempt: "1",
+    manifestSha256: "c".repeat(64),
+    workflowRun: "789012",
+    workflowRunAttempt: "1",
     productionIdentity: production,
     ...overrides,
   };
+}
+
+function reviewerApproval(value: ExternalImportPlan) {
+  const planDigest = externalImportPlanDigest(value);
+  const candidateIds = value.items.map((item) => item.candidateId);
+  const backupId = "production/acceptance/run-123456-1";
+  return VerifiedExternalImportReviewerApproval.fromGithubReviewHistory({
+    repository: "justphilgud/pubquiz-web",
+    runId: "789012",
+    runAttempt: "1",
+    planDigest,
+    candidateIds,
+    backupId,
+    response: [{
+      state: "approved",
+      comment: externalImportApprovalComment({ planDigest, candidateIds, backupId }),
+      environments: [{ name: "operations-content-import" }],
+      user: { id: 99, login: "reviewer" },
+    }],
+  });
 }
 
 function guardInput(value = plan()) {
@@ -124,6 +168,7 @@ function guardInput(value = plan()) {
     preflight,
     backup: backup(),
     authorization: authorization(value),
+    reviewerApproval: reviewerApproval(value),
   };
 }
 
@@ -157,7 +202,20 @@ test("review states are preserved in the frozen plan", () => {
     contentFingerprint: "d".repeat(64),
     reviewStatus: "REVIEW_REQUIRED" as const,
   };
-  const mixed = plan({ items: [value.items[0], second] });
+  const mixed = plan({
+    items: [value.items[0], second],
+    importApproval: {
+      records: [
+        ...value.importApproval.records,
+        {
+          candidateId: "candidate-2",
+          sourceStatus: "APPROVED",
+          reviewedByUserId: 7,
+          reviewedAt: "2026-09-26T09:56:00.000Z",
+        },
+      ],
+    },
+  });
   validateExternalImportPlan(mixed);
   assert.deepEqual(mixed.items.map((item) => item.reviewStatus), ["READY_FOR_REVIEW", "REVIEW_REQUIRED"]);
 });
@@ -231,12 +289,19 @@ test("semantic duplicate requires human review", () => {
   assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "REVIEW_REQUIRED");
 });
 
-test("candidate REVIEW_REQUIRED never becomes CREATE automatically", () => {
+test("durably approved REVIEW_REQUIRED candidate is eligible for current preflight", () => {
   const base = plan();
   const value = plan({
     items: [{ ...base.items[0], reviewStatus: "REVIEW_REQUIRED" }],
   });
-  assert.equal(preflightExternalImport(value, []).items[0].decision, "REVIEW_REQUIRED");
+  assert.equal(preflightExternalImport(value, []).items[0].decision, "CREATE");
+});
+
+test("plan validation rejects an item without its exact durable approval record", () => {
+  assert.throws(
+    () => validateExternalImportPlan({ ...plan(), importApproval: { records: [] } }),
+    /EXTERNAL_IMPORT_APPROVED_ITEMS_INVALID/,
+  );
 });
 
 test("complete re-run contains no CREATE, UPDATE or conflict", () => {
@@ -311,6 +376,12 @@ test("authorization is batch-, digest-, release- and database-bound", () => {
     { batchId: "other-batch" },
     { planDigest: "0".repeat(64) },
     { productionSha: "0".repeat(40) },
+    { backupId: "production/acceptance/run-999-1" },
+    { backupRun: "999" },
+    { backupAttempt: "2" },
+    { manifestSha256: "1".repeat(64) },
+    { workflowRun: "999" },
+    { workflowRunAttempt: "2" },
     { productionIdentity: { ...production, database: "other" } },
     { writeAuthorized: false },
   ]) {
@@ -322,6 +393,23 @@ test("authorization is batch-, digest-, release- and database-bound", () => {
     assert.equal(result.gates.authorization, false);
     assert.equal(result.writeAuthorized, false);
   }
+});
+
+test("missing live reviewer proof blocks a write", () => {
+  const input = guardInput();
+  const result = evaluateExternalImportGuard({ ...input, reviewerApproval: undefined });
+  assert.equal(result.gates.reviewer, false);
+  assert.equal(result.writeAuthorized, false);
+});
+
+test("a rerun attempt cannot reuse the original one-shot approval", () => {
+  const input = guardInput();
+  const result = evaluateExternalImportGuard({
+    ...input,
+    execution: execution({ workflowRunAttempt: "2" }),
+  });
+  assert.equal(result.gates.host, false);
+  assert.equal(result.writeAuthorized, false);
 });
 
 test("wrong or missing plan digest is blocked", () => {

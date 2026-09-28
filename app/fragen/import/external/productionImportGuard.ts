@@ -4,6 +4,10 @@ import {
   calculateQuestionSimilarity,
   normalizeQuestionForSimilarity,
 } from "@/app/fragen/editor/questionSimilarity";
+import {
+  isVerifiedExternalImportReviewerApproval,
+  type VerifiedExternalImportReviewerApproval,
+} from "./reviewerApproval";
 
 export const EXTERNAL_IMPORT_PLAN_VERSION = 1 as const;
 export const EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS = 2 * 60 * 60 * 1000;
@@ -56,6 +60,14 @@ export type ExternalImportPlan = Readonly<{
   sourceType: string;
   frozenAt: string;
   operatorUserId: number;
+  importApproval: Readonly<{
+    records: readonly Readonly<{
+      candidateId: string;
+      sourceStatus: "APPROVED";
+      reviewedByUserId: number;
+      reviewedAt: string;
+    }>[];
+  }>;
   items: readonly ExternalImportPlanItem[];
 }>;
 
@@ -94,9 +106,12 @@ export type ProductionIdentity = Readonly<{
 }>;
 
 export type ExternalImportBackupEvidence = Readonly<{
+  version: 1;
   backupId: string;
   backupRun: string;
+  backupAttempt: string;
   snapshotAt: string;
+  completedAt: string;
   productionSha: string;
   manifestSha256: string;
   source: ProductionIdentity;
@@ -111,6 +126,12 @@ export type ExternalImportWriteAuthorization = Readonly<{
   batchId: string;
   planDigest: string;
   productionSha: string;
+  backupId: string;
+  backupRun: string;
+  backupAttempt: string;
+  manifestSha256: string;
+  workflowRun: string;
+  workflowRunAttempt: string;
   productionIdentity: ProductionIdentity;
 }>;
 
@@ -126,6 +147,8 @@ export type ExternalImportExecutionIdentity = Readonly<{
   workflowRef?: string;
   expectedWorkflowRef?: string;
   githubEnvironment?: string;
+  workflowRun?: string;
+  workflowRunAttempt?: string;
 }>;
 
 export type ExternalImportGuardInput = Readonly<{
@@ -140,6 +163,7 @@ export type ExternalImportGuardInput = Readonly<{
   preflight: ExternalImportPreflight;
   backup?: ExternalImportBackupEvidence;
   authorization?: ExternalImportWriteAuthorization;
+  reviewerApproval?: VerifiedExternalImportReviewerApproval;
 }>;
 
 export type ExternalImportGuardResult = Readonly<{
@@ -153,6 +177,7 @@ export type ExternalImportGuardResult = Readonly<{
     database: boolean;
     preflight: boolean;
     backup: boolean;
+    reviewer: boolean;
     authorization: boolean;
   }>;
   failures: readonly string[];
@@ -200,6 +225,12 @@ export function externalImportPlanDigest(plan: ExternalImportPlan) {
     .digest("hex");
 }
 
+export function externalImportPreflightDigest(preflight: ExternalImportPreflight) {
+  return createHash("sha256")
+    .update(`${JSON.stringify(stableValue(preflight))}\n`, "utf8")
+    .digest("hex");
+}
+
 export function validateExternalImportPlan(value: unknown): asserts value is ExternalImportPlan {
   if (!isRecord(value) || value.version !== EXTERNAL_IMPORT_PLAN_VERSION) {
     throw new Error("EXTERNAL_IMPORT_PLAN_VERSION_INVALID");
@@ -221,6 +252,9 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
   }
   if (!Array.isArray(value.items) || value.items.length < 1 || value.items.length > 1_000) {
     throw new Error("EXTERNAL_IMPORT_ITEMS_INVALID");
+  }
+  if (!isRecord(value.importApproval) || !Array.isArray(value.importApproval.records)) {
+    throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
   }
   const candidateIds = new Set<string>();
   const references = new Set<string>();
@@ -291,6 +325,30 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
       }
     }
   }
+  const approvedIds = value.importApproval.records.map((record) => {
+    if (!isRecord(record) || record.sourceStatus !== "APPROVED") {
+      throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+    }
+    assertNonEmptyString(record.candidateId, "EXTERNAL_IMPORT_APPROVAL_INVALID", 128);
+    if (
+      typeof record.reviewedByUserId !== "number" ||
+      !Number.isInteger(record.reviewedByUserId) || record.reviewedByUserId < 1
+    ) {
+      throw new Error("EXTERNAL_IMPORT_APPROVER_INVALID");
+    }
+    assertNonEmptyString(record.reviewedAt, "EXTERNAL_IMPORT_APPROVAL_TIME_INVALID", 64);
+    if (!Number.isFinite(Date.parse(record.reviewedAt))) {
+      throw new Error("EXTERNAL_IMPORT_APPROVAL_TIME_INVALID");
+    }
+    return record.candidateId;
+  });
+  if (
+    approvedIds.length !== candidateIds.size ||
+    new Set(approvedIds).size !== approvedIds.length ||
+    approvedIds.some((candidateId) => !candidateIds.has(candidateId))
+  ) {
+    throw new Error("EXTERNAL_IMPORT_APPROVED_ITEMS_INVALID");
+  }
 }
 
 function normalizedAnswer(value: string | null) {
@@ -302,6 +360,9 @@ export function preflightExternalImport(
   existing: readonly ExistingExternalQuestion[],
 ): ExternalImportPreflight {
   validateExternalImportPlan(plan);
+  const approvedIds = new Set(
+    plan.importApproval.records.map((record) => record.candidateId),
+  );
   const items = plan.items.map<ExternalImportPreflightItem>((candidate) => {
     const mapping = existing.find((entry) =>
       entry.sourceType === plan.sourceType &&
@@ -363,13 +424,19 @@ export function preflightExternalImport(
         reason: `SEMANTIC_SIMILARITY_${semantic.similarity.toFixed(3)}`,
       };
     }
-    if (candidate.reviewStatus === "REVIEW_REQUIRED") {
+    if (
+      !approvedIds.has(candidate.candidateId) ||
+      candidate.verification.status !== "VERIFIED" ||
+      candidate.verification.sources.length === 0
+    ) {
       return {
         candidateId: candidate.candidateId,
         externalReference: candidate.externalReference,
         decision: "REVIEW_REQUIRED",
         existingQuestionId: null,
-        reason: "CANDIDATE_REVIEW_REQUIRED",
+        reason: !approvedIds.has(candidate.candidateId)
+          ? "EXPLICIT_IMPORT_APPROVAL_MISSING"
+          : "CANDIDATE_QUALITY_REVIEW_REQUIRED",
       };
     }
     return {
@@ -414,7 +481,11 @@ function executionIsProduction(
         mode === "dry-run" ? "operations-backup" : "operations-content-import"
       ) &&
       Boolean(execution.expectedWorkflowRef) &&
-      execution.workflowRef === execution.expectedWorkflowRef;
+      execution.workflowRef === execution.expectedWorkflowRef &&
+      (mode === "dry-run" || (
+        typeof execution.workflowRun === "string" && /^[1-9][0-9]{0,19}$/.test(execution.workflowRun) &&
+        execution.workflowRunAttempt === "1"
+      ));
   }
   return false;
 }
@@ -425,10 +496,13 @@ function validBackup(
 ) {
   if (!evidence) return false;
   const snapshot = Date.parse(evidence.snapshotAt);
-  return evidence.completed && evidence.manifestPresent && evidence.readbackVerified &&
+  const completed = Date.parse(evidence.completedAt);
+  return evidence.version === 1 && evidence.completed && evidence.manifestPresent && evidence.readbackVerified &&
     evidence.integrityVerified && /^[a-f0-9]{64}$/.test(evidence.manifestSha256) &&
     /^production\/(acceptance|scheduled)\/run-[0-9]+-[0-9]+$/.test(evidence.backupId) &&
-    /^[0-9]+$/.test(evidence.backupRun) && Number.isFinite(snapshot) &&
+    /^[1-9][0-9]{0,19}$/.test(evidence.backupRun) && /^[1-9][0-9]{0,5}$/.test(evidence.backupAttempt) &&
+    evidence.backupId === `production/acceptance/run-${evidence.backupRun}-${evidence.backupAttempt}` &&
+    Number.isFinite(snapshot) && Number.isFinite(completed) && completed >= snapshot &&
     snapshot <= input.now.getTime() && input.now.getTime() - snapshot <= EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS &&
     evidence.productionSha === input.currentProductionSha &&
     identityEquals(evidence.source, input.expectedDatabase);
@@ -454,9 +528,27 @@ export function evaluateExternalImportGuard(input: ExternalImportGuardInput): Ex
     input.authorization?.batchId === input.plan.batchId &&
     input.authorization?.planDigest === input.suppliedDigest &&
     input.authorization?.productionSha === input.currentProductionSha &&
+    input.authorization?.backupId === input.backup?.backupId &&
+    input.authorization?.backupRun === input.backup?.backupRun &&
+    input.authorization?.backupAttempt === input.backup?.backupAttempt &&
+    input.authorization?.manifestSha256 === input.backup?.manifestSha256 &&
+    input.authorization?.workflowRun === input.execution.workflowRun &&
+    input.authorization?.workflowRunAttempt === input.execution.workflowRunAttempt &&
     input.authorization !== undefined &&
     identityEquals(input.authorization.productionIdentity, input.expectedDatabase);
-  const gates = { plan: planValid, digest, environment, host, database, preflight, backup, authorization };
+  const reviewer = input.mode === "dry-run" || (
+    isVerifiedExternalImportReviewerApproval(input.reviewerApproval) &&
+    input.reviewerApproval.runId === input.execution.workflowRun &&
+    input.reviewerApproval.runAttempt === input.execution.workflowRunAttempt &&
+    input.reviewerApproval.environment === "operations-content-import" &&
+    input.reviewerApproval.planDigest === input.suppliedDigest &&
+    input.reviewerApproval.backupId === input.backup?.backupId &&
+    input.reviewerApproval.candidateIds.length === input.plan.items.length &&
+    input.reviewerApproval.candidateIds.every((candidateId, index) =>
+      candidateId === input.plan.items[index]?.candidateId
+    )
+  );
+  const gates = { plan: planValid, digest, environment, host, database, preflight, backup, reviewer, authorization };
   const failures = Object.entries(gates)
     .filter(([, passed]) => !passed)
     .map(([gate]) => `EXTERNAL_IMPORT_${gate.toUpperCase()}_GATE_BLOCKED`);
