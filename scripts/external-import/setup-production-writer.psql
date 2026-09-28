@@ -22,6 +22,28 @@ SELECT NOT EXISTS (
   \quit 4
 \endif
 
+-- A grant to PUBLIC reaches every login role and cannot be revoked only for this
+-- writer. Abort before CREATE ROLE instead of committing a role that could make
+-- temporary tables contrary to the strict no-DDL contract.
+SELECT NOT EXISTS (
+  SELECT 1
+  FROM pg_catalog.pg_database database_row
+  CROSS JOIN LATERAL pg_catalog.aclexplode(
+    COALESCE(
+      database_row.datacl,
+      pg_catalog.acldefault('d', database_row.datdba)
+    )
+  ) privilege_row
+  WHERE database_row.datname = current_database()
+    AND privilege_row.grantee = 0
+    AND privilege_row.privilege_type = 'TEMPORARY'
+) AS public_temporary_absent \gset
+\if :public_temporary_absent
+\else
+  \echo 'STOP: database PUBLIC grants TEMPORARY; strict writer no-DDL contract cannot be met per role'
+  \quit 5
+\endif
+
 BEGIN;
 
 CREATE ROLE pubquiz_external_import_writer

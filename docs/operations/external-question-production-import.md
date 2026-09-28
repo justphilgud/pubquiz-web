@@ -104,6 +104,8 @@ ACL, Spaltenzugriff auf `users`, die erlaubte Importfläche, benötigte Sequenze
 und fremde Domänen. Es führt keine Schreibprobe aus. Ein über `PUBLIC` geerbtes
 TEMPORARY-Recht blockiert die Verifikation ebenfalls; die für den Backup-Reader
 dokumentierte Ausnahme wird nicht auf den Production-Writer übertragen.
+`Setup` prüft dieses Recht vor `CREATE ROLE` und beendet sich mit Exitcode 5,
+damit am Gate auch keine teilweise eingerichtete Rolle zurückbleibt.
 
 Rollenerstellung und Secret-Setup bleiben bewusste Production-
 Betreiberaktionen. Nach `Store` darf nur der Secretname

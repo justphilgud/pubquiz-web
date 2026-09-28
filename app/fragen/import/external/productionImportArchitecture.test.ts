@@ -107,6 +107,13 @@ test("Production writer role setup is target-bound and keeps passwords out of fi
   assert.match(setup, /current_database\(\) = 'neondb'/);
   assert.match(setup, /current_user = 'neondb_owner'/);
   assert.match(setup, /NOT EXISTS[\s\S]+pubquiz_external_import_writer/);
+  assert.match(setup, /acldefault\('d', database_row\.datdba\)/);
+  assert.match(setup, /privilege_row\.grantee = 0/);
+  assert.match(setup, /public_temporary_absent[\s\S]+\\quit 5/);
+  assert.ok(
+    setup.indexOf("public_temporary_absent") <
+      setup.indexOf("CREATE ROLE pubquiz_external_import_writer"),
+  );
   assert.equal((setup.match(/__ROLE_PASSWORD_SQL_LITERAL__/g) ?? []).length, 1);
   assert.match(wrapper, /sslmode=require channel_binding=require/);
   assert.match(wrapper, /Read-Host[\s\S]+-AsSecureString/);

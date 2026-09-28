@@ -57,9 +57,21 @@ Payload strukturell identisch zum historischen Plan; damit ist keine fachliche
 Änderung seit der menschlichen Prüfung erkennbar. Reviewmetadaten und fachlicher
 Inhalt sind gemeinsam vom neuen Plandigest abgedeckt.
 
-Der geschützte read-only Production-Preflight wird erst mit dem unveränderlichen
-Commit dieses Plans ausgeführt. Seine tatsächlichen Zählwerte werden danach hier
-ergänzt; `CREATE` wird nicht hartcodiert.
+Der geschützte read-only Production-Preflight lief als GitHub-Run
+`36420627553` auf `main` und materialisierte den Plan aus Commit
+`67d289c732e2f0254fc6d32420c12030918460cb`. Ergebnis:
+
+- Production-Identität bestätigt: ja
+- Production-Fragenbestand gelesen: 713
+- Kandidat 2: `CREATE` (`NO_PRODUCTION_MATCH`)
+- Kandidat 4: `CREATE` (`NO_PRODUCTION_MATCH`)
+- Kandidat 6: `CREATE` (`NO_PRODUCTION_MATCH`)
+- Summen: `CREATE=3`, `ALREADY_PRESENT=0`, `CONFLICT=0`, `REVIEW_REQUIRED=0`
+- Preflight-Digest:
+  `2f31c77e503749d6eab6669b9c59f5068af450779c90aa391f218bb9a3e9a2d8`
+- Production verändert: nein
+- Backup-Gate: erwartungsgemäß geschlossen
+- `writeAuthorized = false`
 
 ## Berechtigungsreport
 
@@ -78,6 +90,11 @@ Die lokale ACL-Definition verweigert auch `TEMPORARY`. Da Production ein über
 angelegt: Ein solcher Ist-Zustand bleibt ein explizites Sicherheitsgate und darf
 weder stillschweigend akzeptiert noch durch eine breite Änderung an `PUBLIC`
 behoben werden.
+
+Der Setup-Precheck wertet die effektive Datenbank-ACL vor `CREATE ROLE` aus und
+bricht bei `PUBLIC TEMPORARY` mit Exitcode 5 ab. Ohne eine ausdrückliche
+Entscheidung zu diesem datenbankweiten Recht werden daher weder Rolle noch
+Secret angelegt.
 
 ## Unveränderter Sicherheitszustand
 
