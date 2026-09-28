@@ -62,6 +62,7 @@ export async function runProductionExternalImport(input: {
     media: readonly PreparedExternalImportMedium[],
   ) => Promise<Readonly<{ questionId: number; alreadyPresent?: boolean }>>;
   recordAudit?: (audit: ExternalImportWriteAudit) => Promise<void>;
+  classifyItemError?: (error: unknown) => string;
 }): Promise<ExternalImportWriteAudit> {
   const now = input.now ?? (() => new Date());
   const startedAt = now().toISOString();
@@ -138,9 +139,11 @@ export async function runProductionExternalImport(input: {
       } catch (error) {
         result = input.signal?.aborted ? "ABORTED" : "FAILED";
         stopped = true;
-        const code = error instanceof Error && /^EXTERNAL_IMPORT_[A-Z0-9_]+$/.test(error.message)
-          ? error.message
-          : "EXTERNAL_IMPORT_ITEM_FAILED_DETAILS_WITHHELD";
+        const code = input.classifyItemError
+          ? input.classifyItemError(error)
+          : error instanceof Error && /^EXTERNAL_IMPORT_[A-Z0-9_]+$/.test(error.message)
+            ? error.message
+            : "EXTERNAL_IMPORT_ITEM_FAILED_DETAILS_WITHHELD";
         audits.push({
           candidateId: item.candidateId,
           externalReference: item.externalReference,

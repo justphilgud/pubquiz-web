@@ -199,6 +199,22 @@ test("question failure after media preparation records the orphan without deleti
   assert.deepEqual(audit.items[0].orphanedMedia, ["media/object-1.webp"]);
 });
 
+test("production diagnostics can preserve a secretsafe item failure code", async () => {
+  const diagnostic =
+    "EXTERNAL_IMPORT_WRITE_PHASE_FAILURE|phase=QUESTION_CREATE|candidate=1|" +
+    "operation=insert|relation=fragen|sqlstate=42501|cause=WITHHELD";
+  const audit = await runProductionExternalImport({
+    ...input(new OneTimeExternalImportAuthorization()),
+    classifyItemError: () => diagnostic,
+    importItem: async () => {
+      throw new Error("password=npg_secret");
+    },
+  });
+
+  assert.equal(audit.items[0].reason, diagnostic);
+  assert.doesNotMatch(JSON.stringify(audit), /npg_secret/);
+});
+
 test("media preparation failure creates no question", async () => {
   const value = plan();
   const mediaPlan: ExternalImportPlan = {

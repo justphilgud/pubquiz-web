@@ -21,6 +21,10 @@ import {
   runProductionExternalImport,
   type ExternalImportWriteAudit,
 } from "../../app/fragen/import/external/productionImportWriter";
+import {
+  runProductionWriterPhase,
+  safeProductionWriterFailure,
+} from "../../app/fragen/import/external/productionWriterDiagnostics";
 import { fetchVerifiedExternalImportReviewerApproval } from "../../app/fragen/import/external/reviewerApproval";
 import { assertDatabase, assertOperationTransport, DATABASES } from "../operations/guards";
 import { loadExternalImportBackupEvidence, verifyBackupWorkflowRun } from "./backup-evidence";
@@ -159,8 +163,14 @@ async function importPlanItem(input: {
   item: ExternalImportPlanItem;
   planDigest: string;
 }) {
-  return input.prisma.$transaction(async (transaction) => {
-    const decision = await transactionPreflight(transaction, input.plan, input.item);
+  return runProductionWriterPhase("COMMIT", {
+    operation: "commit",
+    candidateId: input.item.candidateId,
+  }, () => input.prisma.$transaction(async (transaction) => {
+    const decision = await runProductionWriterPhase("TRANSACTION_BEGIN", {
+      operation: "read",
+      candidateId: input.item.candidateId,
+    }, () => transactionPreflight(transaction, input.plan, input.item));
     if (decision.decision === "ALREADY_PRESENT" && decision.existingQuestionId) {
       return { questionId: decision.existingQuestionId, alreadyPresent: true };
     }
@@ -171,16 +181,28 @@ async function importPlanItem(input: {
       (record) => record.candidateId === input.item.candidateId,
     );
     if (!approval) throw new Error("EXTERNAL_IMPORT_DURABLE_REVIEW_MISSING");
-    const batchId = await findOrCreateAuditBatch(transaction, input.plan, input.planDigest);
-    const question = await createExternalQuestionRecord(transaction, {
+    const batchId = await runProductionWriterPhase("AUDIT", {
+      operation: "insert",
+      candidateId: input.item.candidateId,
+      relation: "external_question_import_batches",
+    }, () => findOrCreateAuditBatch(transaction, input.plan, input.planDigest));
+    const question = await runProductionWriterPhase("QUESTION_CREATE", {
+      operation: "insert",
+      candidateId: input.item.candidateId,
+      relation: "fragen",
+    }, () => createExternalQuestionRecord(transaction, {
       operatorUserId: input.plan.operatorUserId,
       sourceType: input.plan.sourceType,
       externalReference: input.item.externalReference,
       prepared: input.item.prepared,
       verificationSources: input.item.verification.sources,
       license: input.item.license,
-    });
-    await transaction.external_question_import_items.create({
+    }));
+    await runProductionWriterPhase("EXTERNAL_MAPPING", {
+      operation: "insert",
+      candidateId: input.item.candidateId,
+      relation: "external_question_import_items",
+    }, () => transaction.external_question_import_items.create({
       data: {
         import_batch_id: batchId,
         provider: input.plan.sourceType,
@@ -222,11 +244,19 @@ async function importPlanItem(input: {
         reviewed_at: new Date(approval.reviewedAt),
         reviewed_by_user_id: approval.reviewedByUserId,
       },
-    });
-    const imported = await transaction.external_question_import_items.count({
+    }));
+    const imported = await runProductionWriterPhase("AUDIT", {
+      operation: "read",
+      candidateId: input.item.candidateId,
+      relation: "external_question_import_items",
+    }, () => transaction.external_question_import_items.count({
       where: { import_batch_id: batchId, question_id: { not: null } },
-    });
-    await transaction.external_question_import_batches.update({
+    }));
+    await runProductionWriterPhase("AUDIT", {
+      operation: "update",
+      candidateId: input.item.candidateId,
+      relation: "external_question_import_batches",
+    }, () => transaction.external_question_import_batches.update({
       where: { import_batch_id: batchId },
       data: {
         status: imported === input.plan.items.length ? "COMPLETED" : "PROCESSING",
@@ -240,9 +270,9 @@ async function importPlanItem(input: {
           state: imported === input.plan.items.length ? "COMPLETED" : "PROCESSING",
         }),
       },
-    });
+    }));
     return { questionId: question.fragen_id };
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }));
 }
 
 async function persistAudit(input: {
@@ -251,7 +281,10 @@ async function persistAudit(input: {
   planDigest: string;
   audit: ExternalImportWriteAudit;
 }) {
-  await input.prisma.$transaction(async (transaction) => {
+  await runProductionWriterPhase("AUDIT", {
+    operation: "update",
+    relation: "external_question_import_batches",
+  }, () => input.prisma.$transaction(async (transaction) => {
     const batchId = await findOrCreateAuditBatch(transaction, input.plan, input.planDigest);
     await transaction.external_question_import_batches.update({
       where: { import_batch_id: batchId },
@@ -267,7 +300,7 @@ async function persistAudit(input: {
         }),
       },
     });
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }));
 }
 
 export async function productionExternalImport(input: {
@@ -304,7 +337,7 @@ export async function productionExternalImport(input: {
   const backupManifest = required(env.EXTERNAL_IMPORT_BACKUP_MANIFEST_SHA256, "EXTERNAL_IMPORT_BACKUP_MANIFEST_REQUIRED");
   const githubToken = required(env.GITHUB_TOKEN, "EXTERNAL_IMPORT_GITHUB_TOKEN_REQUIRED");
   await verifyBackupWorkflowRun({
-    repository: env.GITHUB_REPOSITORY,
+    repository: required(env.GITHUB_REPOSITORY, "EXTERNAL_IMPORT_REPOSITORY_REQUIRED"),
     run: backupRun,
     attempt: backupAttempt,
     token: githubToken,
@@ -317,9 +350,16 @@ export async function productionExternalImport(input: {
     manifestSha256: backupManifest,
     productionSha,
   });
-  const connectionString = required(env.PRODUCTION_IMPORT_DATABASE_URL, "EXTERNAL_IMPORT_WRITER_REQUIRED");
-  const identity = assertDatabase(connectionString, "production");
-  assertOperationTransport(new URL(connectionString));
+  const connectionString = await runProductionWriterPhase("WRITER_SECRET", {
+    operation: "verify",
+  }, () => required(env.PRODUCTION_IMPORT_DATABASE_URL, "EXTERNAL_IMPORT_WRITER_REQUIRED"));
+  const identity = await runProductionWriterPhase("DB_IDENTITY", {
+    operation: "verify",
+  }, () => {
+    const value = assertDatabase(connectionString, "production");
+    assertOperationTransport(new URL(connectionString));
+    return value;
+  });
   const actualDatabase: ProductionIdentity = {
     host: identity.host,
     database: identity.name,
@@ -333,22 +373,26 @@ export async function productionExternalImport(input: {
   const preReview = JSON.parse(await readFile(input.preflightPath, "utf8")) as {
     preflightDigest?: unknown;
   };
-  const current = await readProductionExternalImportPreflight({ connectionString, plan });
+  const current = await runProductionWriterPhase("DB_CONNECTION", {
+    operation: "read",
+  }, () => readProductionExternalImportPreflight({ connectionString, plan }));
   const currentPreflightDigest = externalImportPreflightDigest(current.preflight);
   if (preReview.preflightDigest !== currentPreflightDigest) {
     throw new Error("EXTERNAL_IMPORT_TOCTOU_PREFLIGHT_CHANGED");
   }
   const workflowRun = required(env.GITHUB_RUN_ID, "EXTERNAL_IMPORT_WORKFLOW_RUN_REQUIRED");
   const workflowRunAttempt = required(env.GITHUB_RUN_ATTEMPT, "EXTERNAL_IMPORT_WORKFLOW_ATTEMPT_REQUIRED");
-  const reviewerApproval = await fetchVerifiedExternalImportReviewerApproval({
-    repository: env.GITHUB_REPOSITORY,
+  const reviewerApproval = await runProductionWriterPhase("AUTHORIZATION", {
+    operation: "verify",
+  }, () => fetchVerifiedExternalImportReviewerApproval({
+    repository: required(env.GITHUB_REPOSITORY, "EXTERNAL_IMPORT_REPOSITORY_REQUIRED"),
     runId: workflowRun,
     runAttempt: workflowRunAttempt,
     planDigest,
     candidateIds: plan.items.map((item) => item.candidateId),
     backupId,
     token: githubToken,
-  });
+  }));
   const authorization: ExternalImportWriteAuthorization = {
     writeAuthorized: true,
     batchId: plan.batchId,
@@ -362,7 +406,9 @@ export async function productionExternalImport(input: {
     workflowRunAttempt,
     productionIdentity: expectedDatabase,
   };
-  const guard = evaluateExternalImportGuard({
+  const guard = await runProductionWriterPhase("AUTHORIZATION", {
+    operation: "verify",
+  }, () => evaluateExternalImportGuard({
     mode: "write",
     now: input.now ?? new Date(),
     plan,
@@ -386,13 +432,15 @@ export async function productionExternalImport(input: {
     backup,
     authorization,
     reviewerApproval,
-  });
+  }));
   if (!guard.writeAuthorized) throw new Error("EXTERNAL_IMPORT_GUARD_BLOCKED");
 
   const pool = new Pool({ connectionString, max: 1 });
   const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
   try {
-    const session = await prisma.$queryRaw<Array<{
+    const session = await runProductionWriterPhase("DB_CONNECTION", {
+      operation: "read",
+    }, () => prisma.$queryRaw<Array<{
       role: string;
       database: string;
       superuser: boolean;
@@ -410,25 +458,31 @@ export async function productionExternalImport(input: {
              r.rolbypassrls AS bypassrls
       FROM pg_catalog.pg_roles r
       WHERE r.rolname = current_user
-    `);
+    `));
     const role = session[0];
-    if (
-      role?.role !== "pubquiz_external_import_writer" ||
-      role.database !== DATABASES.production.name || role.superuser || role.createdb ||
-      role.createrole || role.replication || role.bypassrls
-    ) throw new Error("EXTERNAL_IMPORT_WRITER_ROLE_INVALID");
-    const operator = await prisma.users.findFirst({
+    await runProductionWriterPhase("DB_IDENTITY", { operation: "verify" }, () => {
+      if (
+        role?.role !== "pubquiz_external_import_writer" ||
+        role.database !== DATABASES.production.name || role.superuser || role.createdb ||
+        role.createrole || role.replication || role.bypassrls
+      ) throw new Error("EXTERNAL_IMPORT_WRITER_ROLE_INVALID");
+    });
+    const operator = await runProductionWriterPhase("AUTHORIZATION", {
+      operation: "read",
+      relation: "users",
+    }, () => prisma.users.findFirst({
       where: {
         id: plan.operatorUserId,
         is_active: true,
         rollenzuweisungen: { some: { scope_typ: "GLOBAL", rolle: "ADMIN" } },
       },
       select: { id: true },
-    });
+    }));
     if (!operator) throw new Error("EXTERNAL_IMPORT_OPERATOR_NOT_ACTIVE_ADMIN");
+    const authorizationLatch = new OneTimeExternalImportAuthorization();
     const audit = await runProductionExternalImport({
       guard,
-      authorization: new OneTimeExternalImportAuthorization(),
+      authorization: authorizationLatch,
       plan,
       planDigest,
       productionSha,
@@ -437,9 +491,19 @@ export async function productionExternalImport(input: {
       preflight: current.preflight,
       importItem: (item) => importPlanItem({ prisma, plan, item, planDigest }),
       recordAudit: (audit) => persistAudit({ prisma, plan, planDigest, audit }),
+      classifyItemError: safeProductionWriterFailure,
     });
-    await writeFile(input.auditPath, `${JSON.stringify(audit)}\n`, { mode: 0o600 });
-    if (audit.result !== "COMPLETED") throw new Error("EXTERNAL_IMPORT_BATCH_FAILED");
+    await runProductionWriterPhase("SELF_CLOSE", { operation: "close" }, () => {
+      if (authorizationLatch.writeAuthorized) {
+        throw new Error("EXTERNAL_IMPORT_AUTHORIZATION_NOT_CLOSED");
+      }
+    });
+    await runProductionWriterPhase("AUDIT", { operation: "insert" }, () =>
+      writeFile(input.auditPath, `${JSON.stringify(audit)}\n`, { mode: 0o600 }));
+    if (audit.result !== "COMPLETED") {
+      const failure = audit.items.find((item) => item.status === "FAILED")?.reason;
+      throw new Error(failure ?? "EXTERNAL_IMPORT_BATCH_FAILED");
+    }
     return audit;
   } finally {
     await prisma.$disconnect();
@@ -465,9 +529,7 @@ async function main() {
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/scripts/external-import/production-writer.ts")) {
   main().catch((error) => {
-    const code = error instanceof Error && /^EXTERNAL_IMPORT_[A-Z0-9_]+$/.test(error.message)
-      ? error.message
-      : "EXTERNAL_IMPORT_WRITE_FAILED_DETAILS_WITHHELD";
+    const code = safeProductionWriterFailure(error);
     process.stderr.write(`${code}\n`);
     process.exitCode = 1;
   });
