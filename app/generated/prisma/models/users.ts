@@ -281,6 +281,8 @@ export type usersWhereInput = {
   gestartete_meme_praesentationen?: Prisma.Meme_presentationsListRelationFilter
   geschlossene_meme_votings?: Prisma.Meme_presentationsListRelationFilter
   finalisierte_meme_ergebnisse?: Prisma.Meme_presentationsListRelationFilter
+  erstellte_externe_frageimporte?: Prisma.External_question_import_batchesListRelationFilter
+  bewertete_externe_frageimporte?: Prisma.External_question_import_itemsListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -319,6 +321,8 @@ export type usersOrderByWithRelationInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsOrderByRelationAggregateInput
   geschlossene_meme_votings?: Prisma.meme_presentationsOrderByRelationAggregateInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsOrderByRelationAggregateInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesOrderByRelationAggregateInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -360,6 +364,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   gestartete_meme_praesentationen?: Prisma.Meme_presentationsListRelationFilter
   geschlossene_meme_votings?: Prisma.Meme_presentationsListRelationFilter
   finalisierte_meme_ergebnisse?: Prisma.Meme_presentationsListRelationFilter
+  erstellte_externe_frageimporte?: Prisma.External_question_import_batchesListRelationFilter
+  bewertete_externe_frageimporte?: Prisma.External_question_import_itemsListRelationFilter
 }, "id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -431,6 +437,8 @@ export type usersCreateInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -469,6 +477,8 @@ export type usersUncheckedCreateInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUpdateInput = {
@@ -506,6 +516,8 @@ export type usersUpdateInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -544,6 +556,8 @@ export type usersUncheckedUpdateInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -587,6 +601,11 @@ export type usersUncheckedUpdateManyInput = {
 export type UsersNullableScalarRelationFilter = {
   is?: Prisma.usersWhereInput | null
   isNot?: Prisma.usersWhereInput | null
+}
+
+export type UsersScalarRelationFilter = {
+  is?: Prisma.usersWhereInput
+  isNot?: Prisma.usersWhereInput
 }
 
 export type usersCountOrderByAggregateInput = {
@@ -636,11 +655,6 @@ export type usersSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type UsersScalarRelationFilter = {
-  is?: Prisma.usersWhereInput
-  isNot?: Prisma.usersWhereInput
-}
-
 export type usersCreateNestedOneWithoutAktualitaet_gepruefte_fragenInput = {
   create?: Prisma.XOR<Prisma.usersCreateWithoutAktualitaet_gepruefte_fragenInput, Prisma.usersUncheckedCreateWithoutAktualitaet_gepruefte_fragenInput>
   connectOrCreate?: Prisma.usersCreateOrConnectWithoutAktualitaet_gepruefte_fragenInput
@@ -655,6 +669,36 @@ export type usersUpdateOneWithoutAktualitaet_gepruefte_fragenNestedInput = {
   delete?: Prisma.usersWhereInput | boolean
   connect?: Prisma.usersWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutAktualitaet_gepruefte_fragenInput, Prisma.usersUpdateWithoutAktualitaet_gepruefte_fragenInput>, Prisma.usersUncheckedUpdateWithoutAktualitaet_gepruefte_fragenInput>
+}
+
+export type usersCreateNestedOneWithoutErstellte_externe_frageimporteInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutErstellte_externe_frageimporteInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_externe_frageimporteInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutErstellte_externe_frageimporteNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutErstellte_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutErstellte_externe_frageimporteInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutErstellte_externe_frageimporteInput
+  upsert?: Prisma.usersUpsertWithoutErstellte_externe_frageimporteInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutErstellte_externe_frageimporteInput, Prisma.usersUpdateWithoutErstellte_externe_frageimporteInput>, Prisma.usersUncheckedUpdateWithoutErstellte_externe_frageimporteInput>
+}
+
+export type usersCreateNestedOneWithoutBewertete_externe_frageimporteInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutBewertete_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutBewertete_externe_frageimporteInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutBewertete_externe_frageimporteInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneWithoutBewertete_externe_frageimporteNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutBewertete_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutBewertete_externe_frageimporteInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutBewertete_externe_frageimporteInput
+  upsert?: Prisma.usersUpsertWithoutBewertete_externe_frageimporteInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutBewertete_externe_frageimporteInput, Prisma.usersUpdateWithoutBewertete_externe_frageimporteInput>, Prisma.usersUncheckedUpdateWithoutBewertete_externe_frageimporteInput>
 }
 
 export type usersCreateNestedOneWithoutErstellte_kategorienInput = {
@@ -1075,6 +1119,8 @@ export type usersCreateWithoutAktualitaet_gepruefte_fragenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutAktualitaet_gepruefte_fragenInput = {
@@ -1112,6 +1158,8 @@ export type usersUncheckedCreateWithoutAktualitaet_gepruefte_fragenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutAktualitaet_gepruefte_fragenInput = {
@@ -1164,6 +1212,8 @@ export type usersUpdateWithoutAktualitaet_gepruefte_fragenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAktualitaet_gepruefte_fragenInput = {
@@ -1201,6 +1251,348 @@ export type usersUncheckedUpdateWithoutAktualitaet_gepruefte_fragenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersCreateWithoutErstellte_externe_frageimporteInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersUncheckedCreateWithoutErstellte_externe_frageimporteInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersCreateOrConnectWithoutErstellte_externe_frageimporteInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutErstellte_externe_frageimporteInput>
+}
+
+export type usersUpsertWithoutErstellte_externe_frageimporteInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_externe_frageimporteInput, Prisma.usersUncheckedUpdateWithoutErstellte_externe_frageimporteInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutErstellte_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutErstellte_externe_frageimporteInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutErstellte_externe_frageimporteInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutErstellte_externe_frageimporteInput, Prisma.usersUncheckedUpdateWithoutErstellte_externe_frageimporteInput>
+}
+
+export type usersUpdateWithoutErstellte_externe_frageimporteInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutErstellte_externe_frageimporteInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersCreateWithoutBewertete_externe_frageimporteInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+}
+
+export type usersUncheckedCreateWithoutBewertete_externe_frageimporteInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type usersCreateOrConnectWithoutBewertete_externe_frageimporteInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutBewertete_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutBewertete_externe_frageimporteInput>
+}
+
+export type usersUpsertWithoutBewertete_externe_frageimporteInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutBewertete_externe_frageimporteInput, Prisma.usersUncheckedUpdateWithoutBewertete_externe_frageimporteInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutBewertete_externe_frageimporteInput, Prisma.usersUncheckedCreateWithoutBewertete_externe_frageimporteInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutBewertete_externe_frageimporteInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutBewertete_externe_frageimporteInput, Prisma.usersUncheckedUpdateWithoutBewertete_externe_frageimporteInput>
+}
+
+export type usersUpdateWithoutBewertete_externe_frageimporteInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutBewertete_externe_frageimporteInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_kategorienInput = {
@@ -1237,6 +1629,8 @@ export type usersCreateWithoutErstellte_kategorienInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
@@ -1274,6 +1668,8 @@ export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_kategorienInput = {
@@ -1326,6 +1722,8 @@ export type usersUpdateWithoutErstellte_kategorienInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
@@ -1363,6 +1761,8 @@ export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
@@ -1399,6 +1799,8 @@ export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = {
@@ -1436,6 +1838,8 @@ export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = 
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_praesentationstemplatesInput = {
@@ -1488,6 +1892,8 @@ export type usersUpdateWithoutErstellte_praesentationstemplatesInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = {
@@ -1525,6 +1931,8 @@ export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = 
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_elementeInput = {
@@ -1561,6 +1969,8 @@ export type usersCreateWithoutErstellte_story_elementeInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
@@ -1598,6 +2008,8 @@ export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_elementeInput = {
@@ -1650,6 +2062,8 @@ export type usersUpdateWithoutErstellte_story_elementeInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
@@ -1687,6 +2101,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_revisionenInput = {
@@ -1723,6 +2139,8 @@ export type usersCreateWithoutErstellte_story_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
@@ -1760,6 +2178,8 @@ export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_revisionenInput = {
@@ -1812,6 +2232,8 @@ export type usersUpdateWithoutErstellte_story_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
@@ -1849,6 +2271,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_live_pollsInput = {
@@ -1885,6 +2309,8 @@ export type usersCreateWithoutErstellte_live_pollsInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_live_pollsInput = {
@@ -1922,6 +2348,8 @@ export type usersUncheckedCreateWithoutErstellte_live_pollsInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_live_pollsInput = {
@@ -1974,6 +2402,8 @@ export type usersUpdateWithoutErstellte_live_pollsInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_live_pollsInput = {
@@ -2011,6 +2441,8 @@ export type usersUncheckedUpdateWithoutErstellte_live_pollsInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_live_poll_revisionenInput = {
@@ -2047,6 +2479,8 @@ export type usersCreateWithoutErstellte_live_poll_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_live_poll_revisionenInput = {
@@ -2084,6 +2518,8 @@ export type usersUncheckedCreateWithoutErstellte_live_poll_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_live_poll_revisionenInput = {
@@ -2136,6 +2572,8 @@ export type usersUpdateWithoutErstellte_live_poll_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_live_poll_revisionenInput = {
@@ -2173,6 +2611,8 @@ export type usersUncheckedUpdateWithoutErstellte_live_poll_revisionenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
@@ -2209,6 +2649,8 @@ export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
@@ -2246,6 +2688,8 @@ export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_story_verknuepfungenInput = {
@@ -2298,6 +2742,8 @@ export type usersUpdateWithoutErstellte_story_verknuepfungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
@@ -2335,6 +2781,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutBewertete_team_antwortenInput = {
@@ -2371,6 +2819,8 @@ export type usersCreateWithoutBewertete_team_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
@@ -2408,6 +2858,8 @@ export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutBewertete_team_antwortenInput = {
@@ -2460,6 +2912,8 @@ export type usersUpdateWithoutBewertete_team_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
@@ -2497,6 +2951,8 @@ export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutModerierte_live_poll_antwortenInput = {
@@ -2533,6 +2989,8 @@ export type usersCreateWithoutModerierte_live_poll_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutModerierte_live_poll_antwortenInput = {
@@ -2570,6 +3028,8 @@ export type usersUncheckedCreateWithoutModerierte_live_poll_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutModerierte_live_poll_antwortenInput = {
@@ -2622,6 +3082,8 @@ export type usersUpdateWithoutModerierte_live_poll_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutModerierte_live_poll_antwortenInput = {
@@ -2659,6 +3121,8 @@ export type usersUncheckedUpdateWithoutModerierte_live_poll_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_fragevorlagenInput = {
@@ -2695,6 +3159,8 @@ export type usersCreateWithoutErstellte_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_fragevorlagenInput = {
@@ -2732,6 +3198,8 @@ export type usersUncheckedCreateWithoutErstellte_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_fragevorlagenInput = {
@@ -2773,6 +3241,8 @@ export type usersCreateWithoutBewertete_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutBewertete_fragevorlagenInput = {
@@ -2810,6 +3280,8 @@ export type usersUncheckedCreateWithoutBewertete_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutBewertete_fragevorlagenInput = {
@@ -2862,6 +3334,8 @@ export type usersUpdateWithoutErstellte_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_fragevorlagenInput = {
@@ -2899,6 +3373,8 @@ export type usersUncheckedUpdateWithoutErstellte_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutBewertete_fragevorlagenInput = {
@@ -2946,6 +3422,8 @@ export type usersUpdateWithoutBewertete_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutBewertete_fragevorlagenInput = {
@@ -2983,6 +3461,8 @@ export type usersUncheckedUpdateWithoutBewertete_fragevorlagenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_meme_auswahlenInput = {
@@ -3019,6 +3499,8 @@ export type usersCreateWithoutErstellte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_meme_auswahlenInput = {
@@ -3056,6 +3538,8 @@ export type usersUncheckedCreateWithoutErstellte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_meme_auswahlenInput = {
@@ -3097,6 +3581,8 @@ export type usersCreateWithoutFinalisierte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutFinalisierte_meme_auswahlenInput = {
@@ -3134,6 +3620,8 @@ export type usersUncheckedCreateWithoutFinalisierte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutFinalisierte_meme_auswahlenInput = {
@@ -3186,6 +3674,8 @@ export type usersUpdateWithoutErstellte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_meme_auswahlenInput = {
@@ -3223,6 +3713,8 @@ export type usersUncheckedUpdateWithoutErstellte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutFinalisierte_meme_auswahlenInput = {
@@ -3270,6 +3762,8 @@ export type usersUpdateWithoutFinalisierte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutFinalisierte_meme_auswahlenInput = {
@@ -3307,6 +3801,8 @@ export type usersUncheckedUpdateWithoutFinalisierte_meme_auswahlenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutModerierte_meme_kandidatenInput = {
@@ -3343,6 +3839,8 @@ export type usersCreateWithoutModerierte_meme_kandidatenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutModerierte_meme_kandidatenInput = {
@@ -3380,6 +3878,8 @@ export type usersUncheckedCreateWithoutModerierte_meme_kandidatenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutModerierte_meme_kandidatenInput = {
@@ -3432,6 +3932,8 @@ export type usersUpdateWithoutModerierte_meme_kandidatenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutModerierte_meme_kandidatenInput = {
@@ -3469,6 +3971,8 @@ export type usersUncheckedUpdateWithoutModerierte_meme_kandidatenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutGestartete_meme_praesentationenInput = {
@@ -3505,6 +4009,8 @@ export type usersCreateWithoutGestartete_meme_praesentationenInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutGestartete_meme_praesentationenInput = {
@@ -3542,6 +4048,8 @@ export type usersUncheckedCreateWithoutGestartete_meme_praesentationenInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutGestartete_meme_praesentationenInput = {
@@ -3583,6 +4091,8 @@ export type usersCreateWithoutGeschlossene_meme_votingsInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutGeschlossene_meme_votingsInput = {
@@ -3620,6 +4130,8 @@ export type usersUncheckedCreateWithoutGeschlossene_meme_votingsInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutGeschlossene_meme_votingsInput = {
@@ -3661,6 +4173,8 @@ export type usersCreateWithoutFinalisierte_meme_ergebnisseInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutFinalisierte_meme_ergebnisseInput = {
@@ -3698,6 +4212,8 @@ export type usersUncheckedCreateWithoutFinalisierte_meme_ergebnisseInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutFinalisierte_meme_ergebnisseInput = {
@@ -3750,6 +4266,8 @@ export type usersUpdateWithoutGestartete_meme_praesentationenInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutGestartete_meme_praesentationenInput = {
@@ -3787,6 +4305,8 @@ export type usersUncheckedUpdateWithoutGestartete_meme_praesentationenInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutGeschlossene_meme_votingsInput = {
@@ -3834,6 +4354,8 @@ export type usersUpdateWithoutGeschlossene_meme_votingsInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutGeschlossene_meme_votingsInput = {
@@ -3871,6 +4393,8 @@ export type usersUncheckedUpdateWithoutGeschlossene_meme_votingsInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutFinalisierte_meme_ergebnisseInput = {
@@ -3918,6 +4442,8 @@ export type usersUpdateWithoutFinalisierte_meme_ergebnisseInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutFinalisierte_meme_ergebnisseInput = {
@@ -3955,6 +4481,8 @@ export type usersUncheckedUpdateWithoutFinalisierte_meme_ergebnisseInput = {
   moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutModerierte_live_text_antwortenInput = {
@@ -3991,6 +4519,8 @@ export type usersCreateWithoutModerierte_live_text_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutModerierte_live_text_antwortenInput = {
@@ -4028,6 +4558,8 @@ export type usersUncheckedCreateWithoutModerierte_live_text_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutModerierte_live_text_antwortenInput = {
@@ -4080,6 +4612,8 @@ export type usersUpdateWithoutModerierte_live_text_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput = {
@@ -4117,6 +4651,8 @@ export type usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutErstellte_text_ersatzregelnInput = {
@@ -4153,6 +4689,8 @@ export type usersCreateWithoutErstellte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput = {
@@ -4190,6 +4728,8 @@ export type usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutErstellte_text_ersatzregelnInput = {
@@ -4231,6 +4771,8 @@ export type usersCreateWithoutAktualisierte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput = {
@@ -4268,6 +4810,8 @@ export type usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutAktualisierte_text_ersatzregelnInput = {
@@ -4320,6 +4864,8 @@ export type usersUpdateWithoutErstellte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput = {
@@ -4357,6 +4903,8 @@ export type usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutAktualisierte_text_ersatzregelnInput = {
@@ -4404,6 +4952,8 @@ export type usersUpdateWithoutAktualisierte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput = {
@@ -4441,6 +4991,8 @@ export type usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutRollenzuweisungenInput = {
@@ -4477,6 +5029,8 @@ export type usersCreateWithoutRollenzuweisungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
@@ -4514,6 +5068,8 @@ export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutRollenzuweisungenInput = {
@@ -4555,6 +5111,8 @@ export type usersCreateWithoutZugewiesene_rollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
@@ -4592,6 +5150,8 @@ export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_rollenInput = {
@@ -4644,6 +5204,8 @@ export type usersUpdateWithoutRollenzuweisungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
@@ -4681,6 +5243,8 @@ export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_rollenInput = {
@@ -4728,6 +5292,8 @@ export type usersUpdateWithoutZugewiesene_rollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
@@ -4765,6 +5331,8 @@ export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersCreateWithoutEventreihenrollenInput = {
@@ -4801,6 +5369,8 @@ export type usersCreateWithoutEventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutEventreihenrollenInput = {
@@ -4838,6 +5408,8 @@ export type usersUncheckedCreateWithoutEventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutEventreihenrollenInput = {
@@ -4879,6 +5451,8 @@ export type usersCreateWithoutZugewiesene_eventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
@@ -4916,6 +5490,8 @@ export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
 }
 
 export type usersCreateOrConnectWithoutZugewiesene_eventreihenrollenInput = {
@@ -4968,6 +5544,8 @@ export type usersUpdateWithoutEventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
@@ -5005,6 +5583,8 @@ export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUpsertWithoutZugewiesene_eventreihenrollenInput = {
@@ -5052,6 +5632,8 @@ export type usersUpdateWithoutZugewiesene_eventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
 }
 
 export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
@@ -5089,6 +5671,8 @@ export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
   gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
   geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
   finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
 }
 
 
@@ -5122,6 +5706,8 @@ export type UsersCountOutputType = {
   gestartete_meme_praesentationen: number
   geschlossene_meme_votings: number
   finalisierte_meme_ergebnisse: number
+  erstellte_externe_frageimporte: number
+  bewertete_externe_frageimporte: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5150,6 +5736,8 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   gestartete_meme_praesentationen?: boolean | UsersCountOutputTypeCountGestartete_meme_praesentationenArgs
   geschlossene_meme_votings?: boolean | UsersCountOutputTypeCountGeschlossene_meme_votingsArgs
   finalisierte_meme_ergebnisse?: boolean | UsersCountOutputTypeCountFinalisierte_meme_ergebnisseArgs
+  erstellte_externe_frageimporte?: boolean | UsersCountOutputTypeCountErstellte_externe_frageimporteArgs
+  bewertete_externe_frageimporte?: boolean | UsersCountOutputTypeCountBewertete_externe_frageimporteArgs
 }
 
 /**
@@ -5337,6 +5925,20 @@ export type UsersCountOutputTypeCountFinalisierte_meme_ergebnisseArgs<ExtArgs ex
   where?: Prisma.meme_presentationsWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountErstellte_externe_frageimporteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.external_question_import_batchesWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountBewertete_externe_frageimporteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.external_question_import_itemsWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5374,6 +5976,8 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   gestartete_meme_praesentationen?: boolean | Prisma.users$gestartete_meme_praesentationenArgs<ExtArgs>
   geschlossene_meme_votings?: boolean | Prisma.users$geschlossene_meme_votingsArgs<ExtArgs>
   finalisierte_meme_ergebnisse?: boolean | Prisma.users$finalisierte_meme_ergebnisseArgs<ExtArgs>
+  erstellte_externe_frageimporte?: boolean | Prisma.users$erstellte_externe_frageimporteArgs<ExtArgs>
+  bewertete_externe_frageimporte?: boolean | Prisma.users$bewertete_externe_frageimporteArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -5443,6 +6047,8 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   gestartete_meme_praesentationen?: boolean | Prisma.users$gestartete_meme_praesentationenArgs<ExtArgs>
   geschlossene_meme_votings?: boolean | Prisma.users$geschlossene_meme_votingsArgs<ExtArgs>
   finalisierte_meme_ergebnisse?: boolean | Prisma.users$finalisierte_meme_ergebnisseArgs<ExtArgs>
+  erstellte_externe_frageimporte?: boolean | Prisma.users$erstellte_externe_frageimporteArgs<ExtArgs>
+  bewertete_externe_frageimporte?: boolean | Prisma.users$bewertete_externe_frageimporteArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -5476,6 +6082,8 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     gestartete_meme_praesentationen: Prisma.$meme_presentationsPayload<ExtArgs>[]
     geschlossene_meme_votings: Prisma.$meme_presentationsPayload<ExtArgs>[]
     finalisierte_meme_ergebnisse: Prisma.$meme_presentationsPayload<ExtArgs>[]
+    erstellte_externe_frageimporte: Prisma.$external_question_import_batchesPayload<ExtArgs>[]
+    bewertete_externe_frageimporte: Prisma.$external_question_import_itemsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -5907,6 +6515,8 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   gestartete_meme_praesentationen<T extends Prisma.users$gestartete_meme_praesentationenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$gestartete_meme_praesentationenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_presentationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   geschlossene_meme_votings<T extends Prisma.users$geschlossene_meme_votingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$geschlossene_meme_votingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_presentationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   finalisierte_meme_ergebnisse<T extends Prisma.users$finalisierte_meme_ergebnisseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$finalisierte_meme_ergebnisseArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$meme_presentationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  erstellte_externe_frageimporte<T extends Prisma.users$erstellte_externe_frageimporteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$erstellte_externe_frageimporteArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$external_question_import_batchesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bewertete_externe_frageimporte<T extends Prisma.users$bewertete_externe_frageimporteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$bewertete_externe_frageimporteArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$external_question_import_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6936,6 +7546,54 @@ export type users$finalisierte_meme_ergebnisseArgs<ExtArgs extends runtime.Types
   take?: number
   skip?: number
   distinct?: Prisma.Meme_presentationsScalarFieldEnum | Prisma.Meme_presentationsScalarFieldEnum[]
+}
+
+/**
+ * users.erstellte_externe_frageimporte
+ */
+export type users$erstellte_externe_frageimporteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the external_question_import_batches
+   */
+  select?: Prisma.external_question_import_batchesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the external_question_import_batches
+   */
+  omit?: Prisma.external_question_import_batchesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.external_question_import_batchesInclude<ExtArgs> | null
+  where?: Prisma.external_question_import_batchesWhereInput
+  orderBy?: Prisma.external_question_import_batchesOrderByWithRelationInput | Prisma.external_question_import_batchesOrderByWithRelationInput[]
+  cursor?: Prisma.external_question_import_batchesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.External_question_import_batchesScalarFieldEnum | Prisma.External_question_import_batchesScalarFieldEnum[]
+}
+
+/**
+ * users.bewertete_externe_frageimporte
+ */
+export type users$bewertete_externe_frageimporteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the external_question_import_items
+   */
+  select?: Prisma.external_question_import_itemsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the external_question_import_items
+   */
+  omit?: Prisma.external_question_import_itemsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.external_question_import_itemsInclude<ExtArgs> | null
+  where?: Prisma.external_question_import_itemsWhereInput
+  orderBy?: Prisma.external_question_import_itemsOrderByWithRelationInput | Prisma.external_question_import_itemsOrderByWithRelationInput[]
+  cursor?: Prisma.external_question_import_itemsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.External_question_import_itemsScalarFieldEnum | Prisma.External_question_import_itemsScalarFieldEnum[]
 }
 
 /**
