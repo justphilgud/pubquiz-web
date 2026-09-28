@@ -79,8 +79,57 @@ höchstens zwei Stunden alt sein.
 6. Die Environment-Variable `PRODUCTION_RELEASE_SHA` muss dem tatsächlich
    laufenden Release entsprechen.
 
-Rollenerstellung und Secret-Setup sind eigene manuelle
-Production-Betreiberaktionen. Dieser Implementierungs-AP führt sie nicht aus.
+Die vorbereitete Rolleneinrichtung liegt unter
+`scripts/external-import/invoke-production-writer-role.ps1`. Sie verwendet den
+fest geprüften Direct Host, `neondb`, den Owner `neondb_owner`,
+`sslmode=require` und `channel_binding=require`. Owner- und Writer-Passwort
+werden verdeckt abgefragt. Das für Neon erforderliche Klartextpasswort wird nur
+im Prozessspeicher gehalten und über stdin an psql übergeben; es steht weder in
+Dateien noch in Prozessargumenten oder der Shell-History.
+
+```powershell
+# 1. Rolle und exakte ACL einmalig anlegen. Bei "already exists" stoppen.
+& './scripts/external-import/invoke-production-writer-role.ps1' -Mode Setup
+
+# 2. Mit dem neuen Credential ausschließlich lesend Rolle und ACL prüfen.
+& './scripts/external-import/invoke-production-writer-role.ps1' -Mode Verify
+
+# 3. Dieselbe Prüfung wiederholen und erst bei Erfolg das Secret per stdin speichern.
+& './scripts/external-import/invoke-production-writer-role.ps1' -Mode Store
+```
+
+`Setup` vergibt keine Default Privileges. Neue Tabellen oder Sequenzen sind
+damit fail-closed. `Verify` prüft Rollenattribute, Mitgliedschaften, DB-/Schema-
+ACL, Spaltenzugriff auf `users`, die erlaubte Importfläche, benötigte Sequenzen
+und fremde Domänen. Es führt keine Schreibprobe aus. Ein über `PUBLIC` geerbtes
+TEMPORARY-Recht blockiert die Verifikation ebenfalls; die für den Backup-Reader
+dokumentierte Ausnahme wird nicht auf den Production-Writer übertragen.
+
+Rollenerstellung und Secret-Setup bleiben bewusste Production-
+Betreiberaktionen. Nach `Store` darf nur der Secretname
+`PRODUCTION_IMPORT_DATABASE_URL` sichtbar werden, niemals sein Wert.
+
+### Effektive Writer-ACL
+
+Erforderliche Leseoberfläche:
+
+- `SELECT` auf Fragen, Antworten, Antworttypen, Kategorien, Kategorienmapping
+  und den beiden External-Import-Audittabellen,
+- ausschließlich `users.id`, `users.is_active` sowie die drei für den globalen
+  Admincheck benötigten Spalten der Rollenzuweisung; kein Zugriff auf
+  `users.password_hash` oder `users.email`.
+
+Erforderliche Schreiboberfläche:
+
+- spaltenbeschränktes `INSERT` auf Frage, Antworten, Kategorienmapping und
+  External-Import-Audit,
+- spaltenbeschränktes `UPDATE` ausschließlich auf Status, Report, Fehler und
+  Abschlusszeit des Batch-Audits,
+- `USAGE` nur auf den fünf dafür benötigten Sequenzen.
+
+Nicht vergeben werden `DELETE`, bestehende Frage-/Antwort-Updates, Schema-
+`CREATE`/`TEMPORARY`, Rollen-/Adminrechte sowie Schreibrechte auf Auth-, Quiz-, Team-,
+Antwort-, Vote-, Score-, Moderations-, Backup-, Restore- oder Retentiondaten.
 
 ## Geschützter Write
 
@@ -116,7 +165,15 @@ Ein reiner Contentimport erfordert keine Migration und kein App-Deployment.
 
 Der ältere Plan mit Digest `82bbdbad2125541fb2d28c49ce3f3d4da3311b00c2329f885b78fe2c6febdc87`
 enthält noch keine dauerhaften `importApproval.records` und ist deshalb
-absichtlich nicht writerfähig. Vor dem separat freizugebenden ersten Import
-muss er aus dem bestätigten Preview-Review neu exportiert, auf `main`
-versioniert und mit dem neuen Digest freigegeben werden. Kandidaten werden dabei
-weder neu recherchiert noch automatisch veröffentlicht.
+absichtlich nicht writerfähig. Der aus dem bestätigten Preview-Review zweimal
+identisch exportierte Nachfolger liegt unter
+`external-import-plans/opentdb-batch-1-production-approved-20260928.json`.
+Er enthält ausschließlich Kandidaten 2, 4 und 6 samt den bereits gespeicherten
+Reviewer-IDs und Reviewzeitpunkten. Sein kanonischer SHA-256 ist
+`971fab02b232fe8bac8ec31a6b6901f08415113f2a76cc38a284e3dab139581d`.
+
+Die Items sind bis auf die neu materialisierten `importApproval.records`
+inhaltlich identisch zum historischen Plan. Die Freigabedatensätze sind Teil des
+kanonischen JSON; jede nachträgliche Änderung an Inhalt oder Reviewmetadaten
+ändert dadurch den Plandigest. Der Import erzeugt weiterhin nur Fragen im
+Lifecycle `IN_REVIEW` mit `freigegeben=false`.
