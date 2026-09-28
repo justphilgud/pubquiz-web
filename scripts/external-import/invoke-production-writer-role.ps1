@@ -126,10 +126,13 @@ try {
       }
       $passwordLiteral = "'" + $writerPassword.Replace("'", "''") + "'"
       $setupSql = [IO.File]::ReadAllText($setupPath)
-      if (($setupSql.Split('__ROLE_PASSWORD_SQL_LITERAL__').Length - 1) -ne 1) {
+      $passwordPlaceholder = '__ROLE_PASSWORD_SQL_LITERAL__'
+      if ($setupSql.IndexOf($passwordPlaceholder, [StringComparison]::Ordinal) -lt 0 -or
+          $setupSql.IndexOf($passwordPlaceholder, [StringComparison]::Ordinal) -ne
+            $setupSql.LastIndexOf($passwordPlaceholder, [StringComparison]::Ordinal)) {
         Stop-WriterRoleOperation 'Setup password placeholder contract invalid.' $exitCodeTechnicalFailure
       }
-      $renderedSql = $setupSql.Replace('__ROLE_PASSWORD_SQL_LITERAL__', $passwordLiteral)
+      $renderedSql = $setupSql.Replace($passwordPlaceholder, $passwordLiteral)
       $renderedSql | & $PsqlPath -X -q -v ON_ERROR_STOP=1 -d $connection
       if ($LASTEXITCODE -ne 0) {
         Stop-WriterRoleOperation `
@@ -167,6 +170,7 @@ try {
 } finally {
   $loginPassword = $null
   $writerPassword = $null
+  $passwordPlaceholder = $null
   $passwordLiteral = $null
   $renderedSql = $null
   $encodedPassword = $null

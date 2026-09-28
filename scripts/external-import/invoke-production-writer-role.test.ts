@@ -17,23 +17,29 @@ function runWrapper(mode: "Precheck" | "Setup", fakeMode: FakeMode) {
   const callLog = join(directory, "calls.log");
   writeFileSync(
     fakePsql,
-    String.raw`param(
+    String.raw`[CmdletBinding(PositionalBinding = $false)]
+param(
+  [Parameter(ValueFromPipeline = $true)]
+  [AllowEmptyString()]
+  [string]$PipelineInput,
   [Parameter(ValueFromRemainingArguments = $true)]
   [string[]]$RemainingArgs
 )
 
-if ($RemainingArgs -contains '--version') {
-  Write-Output 'psql (PostgreSQL) 18.4'
-  exit 0
-}
+end {
+  if ($RemainingArgs -contains '--version') {
+    Write-Output 'psql (PostgreSQL) 18.4'
+    exit 0
+  }
 
-Add-Content -LiteralPath $env:PUBQUIZ_FAKE_PSQL_LOG -Value ($RemainingArgs -join ' ')
-switch ($env:PUBQUIZ_FAKE_PSQL_MODE) {
-  'PASS' { Write-Output 'PUBQUIZ_WRITER_PRECHECK|PASS|ALL_GATES_PASSED'; exit 0 }
-  'BLOCK' { Write-Output 'PUBQUIZ_WRITER_PRECHECK|BLOCK|PUBLIC_TEMPORARY_INHERITED'; exit 0 }
-  'TECHNICAL' { exit 73 }
-  'UNEXPECTED' { Write-Output 'unexpected output'; exit 0 }
-  default { exit 74 }
+  Add-Content -LiteralPath $env:PUBQUIZ_FAKE_PSQL_LOG -Value ($RemainingArgs -join ' ')
+  switch ($env:PUBQUIZ_FAKE_PSQL_MODE) {
+    'PASS' { Write-Output 'PUBQUIZ_WRITER_PRECHECK|PASS|ALL_GATES_PASSED'; exit 0 }
+    'BLOCK' { Write-Output 'PUBQUIZ_WRITER_PRECHECK|BLOCK|PUBLIC_TEMPORARY_INHERITED'; exit 0 }
+    'TECHNICAL' { exit 73 }
+    'UNEXPECTED' { Write-Output 'unexpected output'; exit 0 }
+    default { exit 74 }
+  }
 }
 `,
     "utf8",
@@ -91,6 +97,16 @@ test("Setup BLOCK returns exit code 10 before any setup SQL", () => {
   assert.match(result.stderr, /PUBLIC_TEMPORARY_INHERITED/);
   assert.match(result.calls, /precheck-production-writer\.psql/);
   assert.doesNotMatch(result.calls, /setup-production-writer\.psql/);
+});
+
+test("Setup PASS validates the single password placeholder and invokes setup SQL", () => {
+  const result = runWrapper("Setup", "PASS");
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /precheck passed/i);
+  const calls = result.calls.trim().split(/\r?\n/);
+  assert.equal(calls.length, 2, result.calls);
+  assert.match(calls[0], /precheck-production-writer\.psql/);
+  assert.doesNotMatch(calls[1], /precheck-production-writer\.psql/);
 });
 
 test("technical psql failure returns exit code 20", () => {
