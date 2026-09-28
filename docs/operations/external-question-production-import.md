@@ -88,13 +88,16 @@ im Prozessspeicher gehalten und über stdin an psql übergeben; es steht weder i
 Dateien noch in Prozessargumenten oder der Shell-History.
 
 ```powershell
-# 1. Rolle und exakte ACL einmalig anlegen. Bei "already exists" stoppen.
+# 1. Production-Ziel, Rollenabwesenheit und PUBLIC TEMPORARY ausschließlich lesend prüfen.
+& './scripts/external-import/invoke-production-writer-role.ps1' -Mode Precheck
+
+# 2. Rolle und exakte ACL einmalig anlegen. Bei "already exists" stoppen.
 & './scripts/external-import/invoke-production-writer-role.ps1' -Mode Setup
 
-# 2. Mit dem neuen Credential ausschließlich lesend Rolle und ACL prüfen.
+# 3. Mit dem neuen Credential ausschließlich lesend Rolle und ACL prüfen.
 & './scripts/external-import/invoke-production-writer-role.ps1' -Mode Verify
 
-# 3. Dieselbe Prüfung wiederholen und erst bei Erfolg das Secret per stdin speichern.
+# 4. Dieselbe Prüfung wiederholen und erst bei Erfolg das Secret per stdin speichern.
 & './scripts/external-import/invoke-production-writer-role.ps1' -Mode Store
 ```
 
@@ -106,6 +109,9 @@ TEMPORARY-Recht blockiert die Verifikation ebenfalls; die für den Backup-Reader
 dokumentierte Ausnahme wird nicht auf den Production-Writer übertragen.
 `Setup` prüft dieses Recht vor `CREATE ROLE` und beendet sich mit Exitcode 5,
 damit am Gate auch keine teilweise eingerichtete Rolle zurückbleibt.
+`Precheck` führt dieselben Ziel-, Rollen- und PUBLIC-Prüfungen in einer explizit
+read-only Transaktion aus und ist deshalb der verpflichtende erste
+Betreiberschritt.
 
 Rollenerstellung und Secret-Setup bleiben bewusste Production-
 Betreiberaktionen. Nach `Store` darf nur der Secretname

@@ -96,6 +96,12 @@ bricht bei `PUBLIC TEMPORARY` mit Exitcode 5 ab. Ohne eine ausdrückliche
 Entscheidung zu diesem datenbankweiten Recht werden daher weder Rolle noch
 Secret angelegt.
 
+Für die tatsächliche Production-Feststellung existiert zusätzlich der Modus
+`Precheck`. Er verbindet sich mit dem Owner ausschließlich für eine read-only
+Transaktion, bestätigt Ziel und Rollenabwesenheit und beendet sich vor jeder
+Rollen- oder ACL-Änderung. Erst ein grüner Precheck erlaubt den getrennten
+`Setup`-Schritt.
+
 ## Unveränderter Sicherheitszustand
 
 - Production-Deploy-Run `36415196235`: wartet weiterhin vor Migration/Deployment

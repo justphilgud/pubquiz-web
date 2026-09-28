@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('Setup', 'Verify', 'Store')]
+  [ValidateSet('Precheck', 'Setup', 'Verify', 'Store')]
   [string]$Mode = 'Verify',
   [string]$PsqlPath = 'C:\Program Files\PostgreSQL\18\bin\psql.exe',
   [switch]$DryRun
@@ -10,6 +10,7 @@ $targetHost = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
 $database = 'neondb'
 $owner = 'neondb_owner'
 $writer = 'pubquiz_external_import_writer'
+$precheckPath = Join-Path $PSScriptRoot 'precheck-production-writer.psql'
 $setupPath = Join-Path $PSScriptRoot 'setup-production-writer.psql'
 $verifyPath = Join-Path $PSScriptRoot 'verify-production-writer.psql'
 
@@ -22,9 +23,13 @@ function ConvertFrom-SecureValue([Security.SecureString]$Value) {
   }
 }
 
-$connectionUser = if ($Mode -eq 'Setup') { $owner } else { $writer }
+$connectionUser = if ($Mode -in @('Precheck', 'Setup')) { $owner } else { $writer }
 $connection = "host=$targetHost port=5432 dbname=$database user=$connectionUser sslmode=require channel_binding=require connect_timeout=30"
-$scriptPath = if ($Mode -eq 'Setup') { $setupPath } else { $verifyPath }
+$scriptPath = switch ($Mode) {
+  'Precheck' { $precheckPath }
+  'Setup' { $setupPath }
+  default { $verifyPath }
+}
 
 $previousPg = @{}
 Get-ChildItem Env: | Where-Object Name -Like 'PG*' | ForEach-Object {
@@ -59,7 +64,12 @@ try {
   $loginPassword = ConvertFrom-SecureValue $loginSecret
   [Environment]::SetEnvironmentVariable('PGPASSWORD', $loginPassword, 'Process')
 
-  if ($Mode -eq 'Setup') {
+  if ($Mode -eq 'Precheck') {
+    & $PsqlPath -X -q -v ON_ERROR_STOP=1 -d $connection -f $precheckPath
+    if ($LASTEXITCODE -ne 0) {
+      throw 'Writer role precheck failed; no role was created.'
+    }
+  } elseif ($Mode -eq 'Setup') {
     $writerSecret = Read-Host "Neues Passwort fuer $writer" -AsSecureString
     $writerPassword = ConvertFrom-SecureValue $writerSecret
     if ([string]::IsNullOrWhiteSpace($writerPassword)) {

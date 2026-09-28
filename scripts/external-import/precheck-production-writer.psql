@@ -1,0 +1,50 @@
+-- Read-only gate before creating pubquiz_external_import_writer.
+\set ON_ERROR_STOP on
+BEGIN TRANSACTION READ ONLY;
+
+SELECT :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
+       AND current_database() = 'neondb'
+       AND current_user = 'neondb_owner' AS correct_target \gset
+\if :correct_target
+\else
+  \echo 'STOP: incorrect Production identity'
+  \quit 3
+\endif
+
+SELECT NOT EXISTS (
+  SELECT 1 FROM pg_catalog.pg_roles
+  WHERE rolname = 'pubquiz_external_import_writer'
+) AS role_absent \gset
+\if :role_absent
+\else
+  \echo 'STOP: pubquiz_external_import_writer already exists; inspect before continuing'
+  \quit 4
+\endif
+
+SELECT NOT EXISTS (
+  SELECT 1
+  FROM pg_catalog.pg_database database_row
+  CROSS JOIN LATERAL pg_catalog.aclexplode(
+    COALESCE(
+      database_row.datacl,
+      pg_catalog.acldefault('d', database_row.datdba)
+    )
+  ) privilege_row
+  WHERE database_row.datname = current_database()
+    AND privilege_row.grantee = 0
+    AND privilege_row.privilege_type = 'TEMPORARY'
+) AS public_temporary_absent \gset
+\if :public_temporary_absent
+\else
+  \echo 'STOP: database PUBLIC grants TEMPORARY; strict writer no-DDL contract cannot be met per role'
+  \quit 5
+\endif
+
+SELECT current_database() AS database,
+       current_user AS owner,
+       true AS role_absent,
+       true AS public_temporary_absent,
+       false AS write_executed,
+       true AS writer_setup_precheck_passed;
+
+ROLLBACK;

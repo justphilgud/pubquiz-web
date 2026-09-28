@@ -102,6 +102,7 @@ test("future validated backups emit immutable content-import evidence", () => {
 
 test("Production writer role setup is target-bound and keeps passwords out of files and arguments", () => {
   const setup = read("scripts/external-import/setup-production-writer.psql");
+  const precheck = read("scripts/external-import/precheck-production-writer.psql");
   const wrapper = read("scripts/external-import/invoke-production-writer-role.ps1");
   assert.match(setup, /ep-dawn-paper-alws45vx\.c-3\.eu-central-1\.aws\.neon\.tech/);
   assert.match(setup, /current_database\(\) = 'neondb'/);
@@ -116,6 +117,8 @@ test("Production writer role setup is target-bound and keeps passwords out of fi
   );
   assert.equal((setup.match(/__ROLE_PASSWORD_SQL_LITERAL__/g) ?? []).length, 1);
   assert.match(wrapper, /sslmode=require channel_binding=require/);
+  assert.match(wrapper, /'Precheck'/);
+  assert.match(wrapper, /Writer role precheck failed; no role was created/);
   assert.match(wrapper, /Read-Host[\s\S]+-AsSecureString/);
   assert.match(wrapper, /PGPASSWORD/);
   assert.match(wrapper, /\$secretUrl \| & gh secret set PRODUCTION_IMPORT_DATABASE_URL --env operations-content-import/);
@@ -123,6 +126,10 @@ test("Production writer role setup is target-bound and keeps passwords out of fi
   assert.doesNotMatch(wrapper, /sslmode=(?:disable|prefer)/);
   assert.doesNotMatch(wrapper, /-v[^\r\n]*(?:password|secret)/i);
   assert.doesNotMatch(setup, /vercel_blob_rw_|npg_[A-Za-z0-9]/);
+  assert.match(precheck, /BEGIN TRANSACTION READ ONLY/);
+  assert.match(precheck, /public_temporary_absent[\s\S]+\\quit 5/);
+  assert.match(precheck, /false AS write_executed/);
+  assert.doesNotMatch(precheck, /\b(INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/i);
 });
 
 test("Production writer role grants only the external-import write surface", () => {
