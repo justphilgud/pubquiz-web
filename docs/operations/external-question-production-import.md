@@ -13,12 +13,25 @@ gesperrt. Die Existenz des Workflows ist keine dauerhafte Schreibfreigabe.
 2. Nur bewusst ausgewählte Kandidaten in den finalen Plan aufnehmen.
 3. `READY_FOR_REVIEW` und `REVIEW_REQUIRED` getrennt erhalten.
 4. Plan einschließlich `importApproval.records` als kanonisches JSON unter
-   `external-import-plans/` auf `main` ablegen. Jeder Eintrag bindet Kandidat,
-   `APPROVED`, Reviewer-ID und Reviewzeitpunkt.
+   `external-import-plans/` auf `main` ablegen. Eine menschliche Freigabe bindet
+   Kandidat, `APPROVED`, Reviewer-ID und Reviewzeitpunkt. Ein ausdrücklich
+   zugelassener automatisierter Lauf verwendet stattdessen
+   `approvalMode = AUTOMATED_QUALITY_GATE`, die feste Policy
+   `production-auto-quality-v1` und einen Auswertungszeitpunkt ohne menschliche
+   Reviewer-ID.
 5. Den vom Export gelieferten SHA-256 unabhängig dokumentieren.
 
 Der Plan darf danach nicht mehr durch KI-Recherche, Übersetzung,
 Distraktorerzeugung oder Kandidatenerweiterung verändert werden.
+
+Der Builder `scripts/external-import/build-auto-approved-plan.ts` nimmt nur
+bereits außerhalb von Production aufbereitete Kandidaten an. Er wendet die
+versionierte Policy an, entfernt semantische Dubletten innerhalb des Pools,
+erzwingt höchstens ungefähr 15 Prozent je Kategorie und strebt eine
+Schwierigkeitsverteilung von 25/50/25 Prozent an. Ein unzureichender Pool bricht
+fail-closed ab. Sein Report dokumentiert Rohmenge, Ablehnungsgründe,
+Verteilungen und den kanonischen Plandigest. Der nachfolgende Production-
+Preflight bleibt für Dubletten gegen den tatsächlichen Livebestand zuständig.
 
 ## Read-only Preflight
 
@@ -207,6 +220,12 @@ jedes `CREATE` seriell in einer eigenen `SERIALIZABLE`-Transaktion. Der Writer
 publiziert keine Frage; der Zielstatus ist `IN_REVIEW` und `freigegeben=false`.
 `ALREADY_PRESENT` wird protokolliert und nicht erneut geschrieben. `CONFLICT`
 oder `REVIEW_REQUIRED` blockieren den gesamten Lauf.
+
+Bei `AUTOMATED_QUALITY_GATE` speichert der Writer Approvalmodus und
+Policy-Version im Batch- und Item-Audit, verwendet den Auswertungszeitpunkt als
+Reviewzeit und lässt `reviewed_by_user_id` leer. Damit bleibt der fachliche
+Ursprung von einer menschlichen Freigabe unterscheidbar, ohne das Required-
+Reviewer-Gate des Operationsjobs zu verändern.
 
 Writer-Fehler werden secretsicher als strukturierter Diagnosecode ausgegeben.
 Der Code enthält ausschließlich die freigegebene Phase, Operation, Relation,

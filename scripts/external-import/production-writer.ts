@@ -7,6 +7,7 @@ import { createExternalQuestionRecord } from "../../app/fragen/import/external/e
 import {
   OneTimeExternalImportAuthorization,
   evaluateExternalImportGuard,
+  externalImportApprovalMetadata,
   externalImportPlanDigest,
   externalImportPreflightDigest,
   preflightExternalImport,
@@ -115,9 +116,22 @@ async function transactionPreflight(
   );
   if (!approval) throw new Error("EXTERNAL_IMPORT_DURABLE_REVIEW_MISSING");
   return preflightExternalImport(
-    { ...plan, items: [item], importApproval: { records: [approval] } },
+    {
+      ...plan,
+      items: [item],
+      importApproval: { ...plan.importApproval, records: [approval] } as ExternalImportPlan["importApproval"],
+    },
     existing,
   ).items[0];
+}
+
+function approvalSummary(plan: ExternalImportPlan) {
+  return plan.importApproval.approvalMode === "AUTOMATED_QUALITY_GATE"
+    ? {
+        approvalMode: plan.importApproval.approvalMode,
+        policyVersion: plan.importApproval.policyVersion,
+      }
+    : { approvalMode: "HUMAN_REVIEW" as const, policyVersion: null };
 }
 
 async function findOrCreateAuditBatch(
@@ -149,6 +163,7 @@ async function findOrCreateAuditBatch(
         kind: "production-external-import",
         batchId: plan.batchId,
         planDigest,
+        ...approvalSummary(plan),
         state: "PROCESSING",
       }),
     },
@@ -177,10 +192,10 @@ async function importPlanItem(input: {
     if (decision.decision !== "CREATE") {
       throw new Error(`EXTERNAL_IMPORT_TOCTOU_${decision.decision}`);
     }
-    const approval = input.plan.importApproval.records.find(
-      (record) => record.candidateId === input.item.candidateId,
+    const approval = externalImportApprovalMetadata(
+      input.plan,
+      input.item.candidateId,
     );
-    if (!approval) throw new Error("EXTERNAL_IMPORT_DURABLE_REVIEW_MISSING");
     const batchId = await runProductionWriterPhase("AUDIT", {
       operation: "insert",
       candidateId: input.item.candidateId,
@@ -222,6 +237,8 @@ async function importPlanItem(input: {
             batchId: input.plan.batchId,
             planDigest: input.planDigest,
             candidateId: input.item.candidateId,
+            approvalMode: approval.approvalMode,
+            policyVersion: approval.policyVersion,
           },
         }),
         prepared_question: input.item.prepared.question,
@@ -240,8 +257,8 @@ async function importPlanItem(input: {
         content_fingerprint: input.item.contentFingerprint,
         question_id: question.fragen_id,
         verified_at: new Date(input.plan.frozenAt),
-        review_started_at: new Date(approval.reviewedAt),
-        reviewed_at: new Date(approval.reviewedAt),
+        review_started_at: new Date(approval.approvedAt),
+        reviewed_at: new Date(approval.approvedAt),
         reviewed_by_user_id: approval.reviewedByUserId,
       },
     }));
@@ -265,6 +282,7 @@ async function importPlanItem(input: {
           kind: "production-external-import",
           batchId: input.plan.batchId,
           planDigest: input.planDigest,
+          ...approvalSummary(input.plan),
           imported,
           requested: input.plan.items.length,
           state: imported === input.plan.items.length ? "COMPLETED" : "PROCESSING",
@@ -296,6 +314,7 @@ async function persistAudit(input: {
           kind: "production-external-import",
           batchId: input.plan.batchId,
           planDigest: input.planDigest,
+          ...approvalSummary(input.plan),
           audit: input.audit,
         }),
       },

@@ -3,9 +3,11 @@ import test from "node:test";
 
 import {
   EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS,
+  EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
   OneTimeExternalImportAuthorization,
   canonicalExternalImportPlan,
   evaluateExternalImportGuard,
+  externalImportApprovalMetadata,
   externalImportPlanDigest,
   preflightExternalImport,
   validateExternalImportPlan,
@@ -75,6 +77,40 @@ function plan(overrides: Partial<ExternalImportPlan> = {}): ExternalImportPlan {
     ...overrides,
   };
   return value;
+}
+
+function automatedPlan(): ExternalImportPlan {
+  const base = plan();
+  return {
+    ...base,
+    importApproval: {
+      approvalMode: "AUTOMATED_QUALITY_GATE",
+      policyVersion: EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
+      records: [{
+        candidateId: "candidate-1",
+        sourceStatus: "APPROVED",
+        evaluatedAt: "2026-09-26T09:55:00.000Z",
+      }],
+    },
+    items: [{
+      ...base.items[0],
+      verification: {
+        status: "VERIFIED",
+        sources: [
+          { title: "Universität", url: "https://university.edu/math" },
+          { title: "Fachlexikon", url: "https://example.org/math" },
+        ],
+      },
+      autoQualityEvidence: {
+        classification: "AUTO_APPROVED_FOR_PRODUCTION",
+        policyVersion: EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
+        localizationStatus: "LOCALIZED",
+        qualityStatus: "READY_FOR_REVIEW",
+        issueCodes: [],
+        independentReliableSourceHosts: 2,
+      },
+    }],
+  };
 }
 
 const now = new Date("2026-09-26T10:30:00.000Z");
@@ -206,7 +242,12 @@ test("review states are preserved in the frozen plan", () => {
     items: [value.items[0], second],
     importApproval: {
       records: [
-        ...value.importApproval.records,
+        {
+          candidateId: "candidate-1",
+          sourceStatus: "APPROVED",
+          reviewedByUserId: 7,
+          reviewedAt: "2026-09-26T09:55:00.000Z",
+        },
         {
           candidateId: "candidate-2",
           sourceStatus: "APPROVED",
@@ -301,6 +342,53 @@ test("plan validation rejects an item without its exact durable approval record"
   assert.throws(
     () => validateExternalImportPlan({ ...plan(), importApproval: { records: [] } }),
     /EXTERNAL_IMPORT_APPROVED_ITEMS_INVALID/,
+  );
+});
+
+test("automated quality approval is explicit and never invents a human reviewer", () => {
+  const value = automatedPlan();
+  validateExternalImportPlan(value);
+  assert.deepEqual(externalImportApprovalMetadata(value, "candidate-1"), {
+    approvalMode: "AUTOMATED_QUALITY_GATE",
+    approvedAt: "2026-09-26T09:55:00.000Z",
+    reviewedByUserId: null,
+    policyVersion: "production-auto-quality-v1",
+  });
+});
+
+test("automated approval rejects missing evidence, one source, and false reviewer metadata", () => {
+  const value = automatedPlan();
+  assert.throws(() => validateExternalImportPlan({
+    ...value,
+    items: [{ ...value.items[0], autoQualityEvidence: undefined }],
+  }), /EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_MISSING/);
+  assert.throws(() => validateExternalImportPlan({
+    ...value,
+    items: [{
+      ...value.items[0],
+      verification: { status: "VERIFIED", sources: value.items[0].verification.sources.slice(0, 1) },
+      autoQualityEvidence: {
+        ...value.items[0].autoQualityEvidence!,
+        independentReliableSourceHosts: 1,
+      },
+    }],
+  }), /EXTERNAL_IMPORT_AUTO_SOURCE_POLICY_INVALID/);
+  const falseReviewer = {
+    ...value,
+    importApproval: {
+      approvalMode: "AUTOMATED_QUALITY_GATE",
+      policyVersion: EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
+      records: [{
+        candidateId: "candidate-1",
+        sourceStatus: "APPROVED",
+        evaluatedAt: "2026-09-26T09:55:00.000Z",
+        reviewedByUserId: 7,
+      }],
+    },
+  } as unknown as ExternalImportPlan;
+  assert.throws(
+    () => validateExternalImportPlan(falseReviewer),
+    /EXTERNAL_IMPORT_FALSE_REVIEWER_INVALID/,
   );
 });
 

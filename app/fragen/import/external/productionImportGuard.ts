@@ -8,9 +8,12 @@ import {
   isVerifiedExternalImportReviewerApproval,
   type VerifiedExternalImportReviewerApproval,
 } from "./reviewerApproval";
+import { countIndependentReliableSourceHosts } from "./sourceReliability";
 
 export const EXTERNAL_IMPORT_PLAN_VERSION = 1 as const;
 export const EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS = 2 * 60 * 60 * 1000;
+export const EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION =
+  "production-auto-quality-v1" as const;
 
 export type ExternalImportReviewStatus =
   | "READY_FOR_REVIEW"
@@ -42,6 +45,14 @@ export type ExternalImportPlanItem = Readonly<{
     status: string;
     sources: readonly Readonly<{ title: string; url: string }>[];
   }>;
+  autoQualityEvidence?: Readonly<{
+    classification: "AUTO_APPROVED_FOR_PRODUCTION";
+    policyVersion: typeof EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION;
+    localizationStatus: "LOCALIZED";
+    qualityStatus: "READY_FOR_REVIEW";
+    issueCodes: readonly [];
+    independentReliableSourceHosts: number;
+  }>;
   reviewStatus: ExternalImportReviewStatus;
   license: Readonly<{ name: string; url: string }>;
   media: readonly Readonly<{
@@ -60,15 +71,33 @@ export type ExternalImportPlan = Readonly<{
   sourceType: string;
   frozenAt: string;
   operatorUserId: number;
-  importApproval: Readonly<{
-    records: readonly Readonly<{
-      candidateId: string;
-      sourceStatus: "APPROVED";
-      reviewedByUserId: number;
-      reviewedAt: string;
-    }>[];
-  }>;
+  importApproval:
+    | Readonly<{
+        approvalMode?: "HUMAN_REVIEW";
+        records: readonly Readonly<{
+          candidateId: string;
+          sourceStatus: "APPROVED";
+          reviewedByUserId: number;
+          reviewedAt: string;
+        }>[];
+      }>
+    | Readonly<{
+        approvalMode: "AUTOMATED_QUALITY_GATE";
+        policyVersion: typeof EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION;
+        records: readonly Readonly<{
+          candidateId: string;
+          sourceStatus: "APPROVED";
+          evaluatedAt: string;
+        }>[];
+      }>;
   items: readonly ExternalImportPlanItem[];
+}>;
+
+export type ExternalImportApprovalMetadata = Readonly<{
+  approvalMode: "HUMAN_REVIEW" | "AUTOMATED_QUALITY_GATE";
+  approvedAt: string;
+  reviewedByUserId: number | null;
+  policyVersion: typeof EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION | null;
 }>;
 
 export type ExistingExternalQuestion = Readonly<{
@@ -256,6 +285,16 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
   if (!isRecord(value.importApproval) || !Array.isArray(value.importApproval.records)) {
     throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
   }
+  const approvalMode = value.importApproval.approvalMode ?? "HUMAN_REVIEW";
+  if (approvalMode !== "HUMAN_REVIEW" && approvalMode !== "AUTOMATED_QUALITY_GATE") {
+    throw new Error("EXTERNAL_IMPORT_APPROVAL_MODE_INVALID");
+  }
+  if (
+    approvalMode === "AUTOMATED_QUALITY_GATE" &&
+    value.importApproval.policyVersion !== EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION
+  ) {
+    throw new Error("EXTERNAL_IMPORT_AUTO_POLICY_INVALID");
+  }
   const candidateIds = new Set<string>();
   const references = new Set<string>();
   for (const item of value.items) {
@@ -312,6 +351,33 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
       assertNonEmptyString(source?.title, "EXTERNAL_IMPORT_SOURCE_TITLE_INVALID");
       assertUrl(source?.url, "EXTERNAL_IMPORT_SOURCE_URL_INVALID");
     }
+    if (approvalMode === "AUTOMATED_QUALITY_GATE") {
+      if (!isRecord(item.autoQualityEvidence)) {
+        throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_MISSING");
+      }
+      if (
+        item.autoQualityEvidence.classification !== "AUTO_APPROVED_FOR_PRODUCTION" ||
+        item.autoQualityEvidence.policyVersion !== EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION ||
+        item.autoQualityEvidence.localizationStatus !== "LOCALIZED" ||
+        item.autoQualityEvidence.qualityStatus !== "READY_FOR_REVIEW" ||
+        !Array.isArray(item.autoQualityEvidence.issueCodes) ||
+        item.autoQualityEvidence.issueCodes.length !== 0 ||
+        item.reviewStatus !== "READY_FOR_REVIEW" ||
+        item.verification.status !== "VERIFIED" ||
+        typeof item.prepared.category !== "string" || !item.prepared.category.trim()
+      ) {
+        throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_INVALID");
+      }
+      const independentHosts = countIndependentReliableSourceHosts(item.verification.sources);
+      if (
+        independentHosts < 2 ||
+        item.autoQualityEvidence.independentReliableSourceHosts !== independentHosts
+      ) {
+        throw new Error("EXTERNAL_IMPORT_AUTO_SOURCE_POLICY_INVALID");
+      }
+    } else if (item.autoQualityEvidence !== undefined) {
+      throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_UNEXPECTED");
+    }
     for (const medium of item.media) {
       assertUrl(medium?.sourceUrl, "EXTERNAL_IMPORT_MEDIA_SOURCE_INVALID");
       assertNonEmptyString(medium?.license, "EXTERNAL_IMPORT_MEDIA_LICENSE_INVALID");
@@ -330,15 +396,25 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
       throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
     }
     assertNonEmptyString(record.candidateId, "EXTERNAL_IMPORT_APPROVAL_INVALID", 128);
-    if (
-      typeof record.reviewedByUserId !== "number" ||
-      !Number.isInteger(record.reviewedByUserId) || record.reviewedByUserId < 1
-    ) {
-      throw new Error("EXTERNAL_IMPORT_APPROVER_INVALID");
-    }
-    assertNonEmptyString(record.reviewedAt, "EXTERNAL_IMPORT_APPROVAL_TIME_INVALID", 64);
-    if (!Number.isFinite(Date.parse(record.reviewedAt))) {
-      throw new Error("EXTERNAL_IMPORT_APPROVAL_TIME_INVALID");
+    if (approvalMode === "AUTOMATED_QUALITY_GATE") {
+      if ("reviewedByUserId" in record || "reviewedAt" in record) {
+        throw new Error("EXTERNAL_IMPORT_FALSE_REVIEWER_INVALID");
+      }
+      assertNonEmptyString(record.evaluatedAt, "EXTERNAL_IMPORT_APPROVAL_TIME_INVALID", 64);
+      if (!Number.isFinite(Date.parse(record.evaluatedAt))) {
+        throw new Error("EXTERNAL_IMPORT_APPROVAL_TIME_INVALID");
+      }
+    } else {
+      if (
+        typeof record.reviewedByUserId !== "number" ||
+        !Number.isInteger(record.reviewedByUserId) || record.reviewedByUserId < 1
+      ) {
+        throw new Error("EXTERNAL_IMPORT_APPROVER_INVALID");
+      }
+      assertNonEmptyString(record.reviewedAt, "EXTERNAL_IMPORT_APPROVAL_TIME_INVALID", 64);
+      if (!Number.isFinite(Date.parse(record.reviewedAt))) {
+        throw new Error("EXTERNAL_IMPORT_APPROVAL_TIME_INVALID");
+      }
     }
     return record.candidateId;
   });
@@ -349,6 +425,36 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
   ) {
     throw new Error("EXTERNAL_IMPORT_APPROVED_ITEMS_INVALID");
   }
+}
+
+export function externalImportApprovalMetadata(
+  plan: ExternalImportPlan,
+  candidateId: string,
+): ExternalImportApprovalMetadata {
+  const record = plan.importApproval.records.find(
+    (entry) => entry.candidateId === candidateId,
+  );
+  if (!record) throw new Error("EXTERNAL_IMPORT_DURABLE_REVIEW_MISSING");
+  if (plan.importApproval.approvalMode === "AUTOMATED_QUALITY_GATE") {
+    if (!("evaluatedAt" in record)) {
+      throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+    }
+    return {
+      approvalMode: "AUTOMATED_QUALITY_GATE",
+      approvedAt: record.evaluatedAt,
+      reviewedByUserId: null,
+      policyVersion: plan.importApproval.policyVersion,
+    };
+  }
+  if (!("reviewedAt" in record) || !("reviewedByUserId" in record)) {
+    throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+  }
+  return {
+    approvalMode: "HUMAN_REVIEW",
+    approvedAt: record.reviewedAt,
+    reviewedByUserId: record.reviewedByUserId,
+    policyVersion: null,
+  };
 }
 
 function normalizedAnswer(value: string | null) {
