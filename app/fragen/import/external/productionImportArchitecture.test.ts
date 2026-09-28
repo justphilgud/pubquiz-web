@@ -110,7 +110,7 @@ test("Production writer role setup is target-bound and keeps passwords out of fi
   assert.match(setup, /NOT EXISTS[\s\S]+pubquiz_external_import_writer/);
   assert.match(setup, /acldefault\('d', database_row\.datdba\)/);
   assert.match(setup, /privilege_row\.grantee = 0/);
-  assert.match(setup, /public_temporary_absent[\s\S]+\\quit 5/);
+  assert.match(setup, /public_temporary_absent[\s\S]+WRITER_SETUP_PUBLIC_TEMPORARY_INHERITED/);
   assert.ok(
     setup.indexOf("public_temporary_absent") <
       setup.indexOf("CREATE ROLE pubquiz_external_import_writer"),
@@ -118,7 +118,11 @@ test("Production writer role setup is target-bound and keeps passwords out of fi
   assert.equal((setup.match(/__ROLE_PASSWORD_SQL_LITERAL__/g) ?? []).length, 1);
   assert.match(wrapper, /sslmode=require channel_binding=require/);
   assert.match(wrapper, /'Precheck'/);
-  assert.match(wrapper, /Writer role precheck failed; no role was created/);
+  assert.match(wrapper, /PUBQUIZ_WRITER_PRECHECK\\\|\(PASS\|BLOCK\)/);
+  assert.match(wrapper, /\$exitCodeBlocked = 10/);
+  assert.match(wrapper, /\$exitCodeTechnicalFailure = 20/);
+  assert.match(wrapper, /\$exitCodeProtocolFailure = 21/);
+  assert.match(wrapper, /elseif \(\$Mode -eq 'Setup'\)[\s\S]+Invoke-WriterPrecheck[\s\S]+Neues Passwort/);
   assert.match(wrapper, /Read-Host[\s\S]+-AsSecureString/);
   assert.match(wrapper, /PGPASSWORD/);
   assert.match(wrapper, /\$secretUrl \| & gh secret set PRODUCTION_IMPORT_DATABASE_URL --env operations-content-import/);
@@ -127,9 +131,26 @@ test("Production writer role setup is target-bound and keeps passwords out of fi
   assert.doesNotMatch(wrapper, /-v[^\r\n]*(?:password|secret)/i);
   assert.doesNotMatch(setup, /vercel_blob_rw_|npg_[A-Za-z0-9]/);
   assert.match(precheck, /BEGIN TRANSACTION READ ONLY/);
-  assert.match(precheck, /public_temporary_absent[\s\S]+\\quit 5/);
-  assert.match(precheck, /false AS write_executed/);
+  assert.match(precheck, /PUBQUIZ_WRITER_PRECHECK/);
+  assert.match(precheck, /PUBLIC_TEMPORARY_INHERITED/);
+  assert.doesNotMatch(precheck, /\\quit\s+\d+/);
   assert.doesNotMatch(precheck, /\b(INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/i);
+});
+
+test("Production TEMPORARY inventory is read-only and excludes secret/query text", () => {
+  const inventory = read("scripts/external-import/inventory-production-temporary.psql");
+  assert.match(inventory, /BEGIN TRANSACTION READ ONLY/);
+  assert.match(inventory, /production_identity_confirmed/);
+  assert.match(inventory, /EFFECTIVE DATABASE RIGHTS/);
+  assert.match(inventory, /ROLE MEMBERSHIPS/);
+  assert.match(inventory, /DEFAULT PRIVILEGES/);
+  assert.match(inventory, /CURRENT TEMPORARY RELATIONS/);
+  assert.match(inventory, /ROLLBACK/);
+  assert.doesNotMatch(inventory, /rolpassword|activity\.query|password_hash/);
+  assert.doesNotMatch(
+    inventory,
+    /^\s*(?:INSERT\s+INTO|UPDATE\s+\S+\s+SET|DELETE\s+FROM|CREATE\s+(?:ROLE|TABLE|SCHEMA)|ALTER\s+ROLE|DROP\s+|TRUNCATE\s+|GRANT\s+|REVOKE\s+)/im,
+  );
 });
 
 test("Production writer role grants only the external-import write surface", () => {

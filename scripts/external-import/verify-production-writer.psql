@@ -7,8 +7,7 @@ SELECT :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
        AND current_user = 'pubquiz_external_import_writer' AS correct_target \gset
 \if :correct_target
 \else
-  \echo 'STOP: incorrect writer identity'
-  \quit 3
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_VERIFY_INCORRECT_IDENTITY'; END $block$;
 \endif
 
 DO $verify$
