@@ -45,6 +45,33 @@ test("withholds unapproved relation, candidate and error text", async () => {
   assert.doesNotMatch(output, /secret|password|private_table/);
 });
 
+test("extracts only the nested PostgreSQL SQLSTATE from a Prisma adapter error", async () => {
+  const databaseError = Object.assign(new Error("Database error contains password=npg_secret"), {
+    code: "P2039",
+    meta: {
+      driverAdapterError: {
+        cause: {
+          kind: "postgres",
+          originalCode: "42501",
+          originalMessage: "permission denied; password=npg_secret",
+        },
+      },
+    },
+  });
+  const error = await runProductionWriterPhase("AUDIT", {
+    operation: "update",
+    relation: "external_question_import_batches",
+  }, () => Promise.reject(databaseError)).catch((value: unknown) => value);
+  const output = safeProductionWriterFailure(error);
+
+  assert.equal(
+    output,
+    "EXTERNAL_IMPORT_WRITE_PHASE_FAILURE|phase=AUDIT|candidate=none|operation=update|" +
+      "relation=external_question_import_batches|sqlstate=42501|cause=WITHHELD",
+  );
+  assert.doesNotMatch(output, /password|permission|npg_secret/);
+});
+
 test("preserves an approved external-import error code without its stack", async () => {
   const error = await runProductionWriterPhase("AUTHORIZATION", {
     operation: "verify",

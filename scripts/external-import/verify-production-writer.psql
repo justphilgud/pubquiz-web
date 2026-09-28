@@ -62,6 +62,15 @@ BEGIN
     RAISE EXCEPTION 'WRITER_AUTH_ACL_INVALID';
   END IF;
 
+  IF NOT (
+    has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'status', 'UPDATE')
+    AND has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'report_json', 'UPDATE')
+    AND has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'error_message', 'UPDATE')
+    AND has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'completed_at', 'UPDATE')
+  ) THEN
+    RAISE EXCEPTION 'WRITER_REQUIRED_BATCH_UPDATE_ACL_MISSING';
+  END IF;
+
   IF has_table_privilege(current_user, 'pubquiz.fragen', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
      OR has_table_privilege(current_user, 'pubquiz.antworten', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
      OR has_table_privilege(current_user, 'pubquiz.fragen_kategorien', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')

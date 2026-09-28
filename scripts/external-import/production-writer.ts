@@ -486,6 +486,45 @@ export async function productionExternalImport(input: {
         role.createrole || role.replication || role.bypassrls
       ) throw new Error("EXTERNAL_IMPORT_WRITER_ROLE_INVALID");
     });
+    const batchUpdateAcl = await runProductionWriterPhase("AUDIT", {
+      operation: "read",
+      relation: "external_question_import_batches",
+    }, () => prisma.$queryRaw<Array<{ allowed: boolean }>>(Prisma.sql`
+      SELECT (
+        has_column_privilege(
+          current_user,
+          'pubquiz.external_question_import_batches',
+          'status',
+          'UPDATE'
+        )
+        AND has_column_privilege(
+          current_user,
+          'pubquiz.external_question_import_batches',
+          'report_json',
+          'UPDATE'
+        )
+        AND has_column_privilege(
+          current_user,
+          'pubquiz.external_question_import_batches',
+          'error_message',
+          'UPDATE'
+        )
+        AND has_column_privilege(
+          current_user,
+          'pubquiz.external_question_import_batches',
+          'completed_at',
+          'UPDATE'
+        )
+      ) AS allowed
+    `));
+    await runProductionWriterPhase("AUDIT", {
+      operation: "verify",
+      relation: "external_question_import_batches",
+    }, () => {
+      if (batchUpdateAcl[0]?.allowed !== true) {
+        throw new Error("EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_ACL_MISSING");
+      }
+    });
     const operator = await runProductionWriterPhase("AUTHORIZATION", {
       operation: "read",
       relation: "users",
