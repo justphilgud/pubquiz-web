@@ -9,6 +9,7 @@ import { prepareExternalQuestion } from "./pipeline";
 import { validateExternalQuestionEnrichment } from "./normalize";
 import { OpenTdbProvider } from "./opentdbProvider";
 import { canWriteOpenTdbPilot } from "./policy";
+import { createExternalQuestionRecord } from "./externalQuestionWriteService";
 import type {
   DuplicateCandidate,
   ExternalQuestionAutomationAdapter,
@@ -596,20 +597,6 @@ export async function saveExternalQuestionPreparation(input: {
   await refreshOpenTdbPhaseTwoReport(item.import_batch_id);
 }
 
-function attributionSource(item: {
-  verification_source_title: string | null;
-  verification_source_url: string | null;
-  external_reference: string;
-}) {
-  const factSource = item.verification_source_url
-    ? `${item.verification_source_title ?? "Fachquelle"}: ${item.verification_source_url}`
-    : "";
-  return [
-    factSource,
-    `Adaptiert/übersetzt aus OpenTDB (${item.external_reference}), CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/`,
-  ].filter(Boolean).join(" · ").slice(0, 1000);
-}
-
 export async function approveExternalQuestion(input: { itemId: number; userId: number }) {
   assertOpenTdbPilotEnvironment();
   const result = await prisma.$transaction(async (tx) => {
@@ -627,55 +614,27 @@ export async function approveExternalQuestion(input: { itemId: number; userId: n
     if (!item.prepared_question || !item.prepared_correct_answer) {
       throw new Error("EXTERNAL_IMPORT_PREPARATION_MISSING");
     }
-    const incorrectAnswers = stringArray(item.prepared_incorrect_answers);
-    if (incorrectAnswers.length !== 3) throw new Error("EXTERNAL_IMPORT_ANSWERS_INVALID");
-    const standardAnswerType = await tx.antworttyp.findFirst({
-      where: { antworttyp: { equals: "Standard", mode: "insensitive" } },
-      select: { antworttyp_id: true },
-    });
-    if (!standardAnswerType) throw new Error("STANDARD_ANSWER_TYPE_MISSING");
-
     const now = new Date();
-    const question = await tx.fragen.create({
-      data: {
-        frage: item.prepared_question,
-        quelle: attributionSource(item),
-        fragentyp: "Multiple Choice",
-        schwierigkeitslevel: item.mapped_difficulty,
-        created_by_user_id: input.userId,
-        last_modified_by_user_id: input.userId,
-        freigegeben: false,
-        ist_unfertig: false,
-        review_status: "IN_REVIEW",
-        submitted_at: now,
-        submitted_by_user_id: input.userId,
-        moderationsnotizen: item.explanation,
-        kategorienwunsch: item.suggested_category_id === null
-          ? item.suggested_category_name
-          : null,
-        antworten: {
-          create: [
-            {
-              antwort: item.prepared_correct_answer,
-              ist_richtig: true,
-              antworttyp_id: standardAnswerType.antworttyp_id,
-            },
-            ...incorrectAnswers.map((answer) => ({
-              antwort: answer,
-              ist_richtig: false,
-              antworttyp_id: standardAnswerType.antworttyp_id,
-            })),
-          ],
-        },
-        ...(item.suggested_category_id !== null
-          ? {
-              fragen_kategorien: {
-                create: { fragenkategorie_id: item.suggested_category_id },
-              },
-            }
-          : {}),
+    const question = await createExternalQuestionRecord(tx, {
+      operatorUserId: input.userId,
+      sourceType: EXTERNAL_QUESTION_PROVIDER,
+      externalReference: item.external_reference,
+      prepared: {
+        question: item.prepared_question,
+        correctAnswer: item.prepared_correct_answer,
+        distractors: stringArray(item.prepared_incorrect_answers),
+        explanation: item.explanation,
+        difficulty: Number(item.mapped_difficulty ?? 1),
+        category: item.suggested_category_name,
       },
-      select: { fragen_id: true },
+      verificationSources: item.verification_source_url
+        ? [{
+            title: item.verification_source_title ?? "Fachquelle",
+            url: item.verification_source_url,
+          }]
+        : [],
+      license: { name: item.license, url: item.license_url },
+      suggestedCategoryId: item.suggested_category_id,
     });
     await tx.external_question_import_items.update({
       where: { import_item_id: item.import_item_id },

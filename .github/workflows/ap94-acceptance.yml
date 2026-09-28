@@ -135,6 +135,46 @@ jobs:
           appendFileSync(process.env.GITHUB_OUTPUT,`key=${r.key}\nmanifest=${r.manifestSha256}\nautomation=${process.env.BACKUP_AUTOMATION_ENABLED}\nretention=${process.env.BACKUP_RETENTION_VERIFIED}\n`);
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Backup readback verified.\n\nType: ${r.backup.type}\n\nProtected: ${r.backup.protected}\n\nKey: ${r.key}\n\nManifest SHA-256: ${r.manifestSha256}\n\nBytes: ${r.bytes}\n\nSnapshot: ${r.snapshotAt}\n\nBackup ms: ${r.backupMs}\n\nBridge calls: ${r.oidc.bridgeCalls}\n\nOIDC token requests: ${r.oidc.tokenRequests}\n\nOIDC cache hits: ${r.oidc.cacheHits}\n\nOIDC single-flight joins: ${r.oidc.singleFlightJoins}\n\nOIDC refreshes: ${r.oidc.refreshes}\n\nOIDC retries: ${r.oidc.retries}\n\nOIDC final error: ${r.oidc.finalErrorClass ?? 'none'}\n\nRestore runs only when explicitly requested and requires operations-restore reviewer approval.\n`);
           NODE
+      - name: Create external-import backup evidence
+        if: steps.backup.outcome == 'success'
+        shell: bash
+        env:
+          PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && vars.PRODUCTION_RELEASE_SHA || inputs.production_commit }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const result = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/ap94-result.json`, 'utf8'));
+          const backupId = `production/acceptance/run-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
+          if (result.key !== backupId || !/^[a-f0-9]{64}$/.test(result.manifestSha256) ||
+              result.productionChanged === true || result.privateReadback !== 'verified' ||
+              result.authExcluded !== true || !result.source) {
+            throw new Error('EXTERNAL_IMPORT_BACKUP_EVIDENCE_REJECTED');
+          }
+          writeFileSync(`${process.env.RUNNER_TEMP}/external-import-backup-evidence.json`, JSON.stringify({
+            version: 1,
+            backupId,
+            backupRun: process.env.GITHUB_RUN_ID,
+            backupAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            snapshotAt: result.snapshotAt,
+            completedAt: result.completedAt,
+            productionSha: process.env.PRODUCTION_RELEASE_SHA,
+            manifestSha256: result.manifestSha256,
+            source: { host: result.source.host, database: result.source.name, schema: result.source.schema },
+            completed: true,
+            manifestPresent: true,
+            readbackVerified: true,
+            integrityVerified: true
+          }));
+          NODE
+      - name: Upload external-import backup evidence
+        if: steps.backup.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-import-backup-evidence
+          path: ${{ runner.temp }}/external-import-backup-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Retention policy evaluation after verified backup
         if: steps.backup.outcome == 'success' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'retention-dry-run')
         shell: bash

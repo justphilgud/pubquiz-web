@@ -54,6 +54,14 @@ export async function buildExternalQuestionProductionPlan(input: {
   });
   if (!batch) throw new Error("EXTERNAL_IMPORT_BATCH_NOT_FOUND");
   if (batch.items.length === 0) throw new Error("EXTERNAL_IMPORT_PLAN_EMPTY");
+  for (const item of batch.items) {
+    if (
+      item.status !== "APPROVED" || item.question_id === null ||
+      item.reviewed_by_user_id === null || item.reviewed_at === null
+    ) {
+      throw new Error("EXTERNAL_IMPORT_DURABLE_REVIEW_MISSING");
+    }
+  }
   const frozenAt = batch.items.reduce(
     (latest, item) => {
       const timestamp = item.reviewed_at ?? item.imported_at;
@@ -104,6 +112,14 @@ export async function buildExternalQuestionProductionPlan(input: {
     sourceType: sourceType(batch.provider),
     frozenAt: frozenAt.toISOString(),
     operatorUserId: input.operatorUserId,
+    importApproval: {
+      records: batch.items.map((item) => ({
+        candidateId: String(item.import_item_id),
+        sourceStatus: item.status as "APPROVED",
+        reviewedByUserId: item.reviewed_by_user_id!,
+        reviewedAt: item.reviewed_at!.toISOString(),
+      })),
+    },
     items,
   };
 }

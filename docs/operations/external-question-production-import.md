@@ -2,36 +2,39 @@
 
 ## Sicherheitszustand
 
-Der aktuelle Stand unterstützt Planexport, SHA-256, read-only
-Production-Preflight und Guardauswertung. Er enthält keinen ausführbaren
-Production-Writer. Preview, Development und unbekannte Umgebungen bleiben für
-Production-Schreibzugriffe gesperrt.
+Der Production-Writer ist ausschließlich als geschützter GitHub-Operationsjob
+implementiert. Die Production-Weboberfläche bleibt read-only; Preview,
+Development und unbekannte Umgebungen bleiben für Production-Schreibzugriffe
+gesperrt. Die Existenz des Workflows ist keine dauerhafte Schreibfreigabe.
 
 ## Vorbereitung
 
 1. Kandidaten außerhalb von Production recherchieren, lokalisieren und prüfen.
 2. Nur bewusst ausgewählte Kandidaten in den finalen Plan aufnehmen.
 3. `READY_FOR_REVIEW` und `REVIEW_REQUIRED` getrennt erhalten.
-4. Plan als kanonisches JSON unter `external-import-plans/` in einem
-   unveränderlichen Repository-Commit ablegen.
+4. Plan einschließlich `importApproval.records` als kanonisches JSON unter
+   `external-import-plans/` auf `main` ablegen. Jeder Eintrag bindet Kandidat,
+   `APPROVED`, Reviewer-ID und Reviewzeitpunkt.
 5. Den vom Export gelieferten SHA-256 unabhängig dokumentieren.
 
-Der Plan darf nach diesem Punkt nicht mehr durch KI-Recherche, Übersetzung,
+Der Plan darf danach nicht mehr durch KI-Recherche, Übersetzung,
 Distraktorerzeugung oder Kandidatenerweiterung verändert werden.
 
 ## Read-only Preflight
 
-Der Workflow **External Question Production Preflight** läuft ausschließlich auf
-`main` im geschützten Environment `operations-backup`. Er verwendet den
-vorhandenen `pubquiz_backup_reader`, materialisiert den Plan aus einem exakten
-Commit und prüft dessen Digest vor der Datenbankverbindung.
+Der Workflow **External Question Production Import** läuft ausschließlich auf
+`main`. Sein erster Job verwendet im Environment `operations-backup` den
+vorhandenen `pubquiz_backup_reader`, liest den Plan aus dem aktuellen
+Main-Commit und prüft dessen Digest vor der Datenbankverbindung.
 
 Eingaben:
 
-- vollständiger Plan-Commit-SHA,
+- Batch-ID,
 - Pfad unter `external-import-plans/`,
 - Plan-SHA-256,
-- tatsächlich laufender Production-SHA.
+- tatsächlich laufender Production-SHA,
+- exakter AP9.4-Backup-Run, Attempt, Backup-ID und Manifest-SHA-256,
+- `dry_run=true` für die bevorzugte rein lesende Prüfung.
 
 Der Datenbankzugriff erfolgt in `REPEATABLE READ READ ONLY`. Der Report enthält
 nur Batch, Digest, Zählwerte und sichere Gatezustände. Credentials und
@@ -43,31 +46,77 @@ Connection-Strings werden nicht ausgegeben.
 - `REVIEW_REQUIRED > 0`: fachlich klären und neuen Plan mit neuem Digest
   einfrieren.
 - `CREATE = 0` und alle `ALREADY_PRESENT`: kein Schreibjob erforderlich.
-- Nur `CREATE` und `ALREADY_PRESENT`: frisches Backup planen.
+- Nur `CREATE` und `ALREADY_PRESENT`: frisches Backup und Write-Gate zulässig.
 
 ## Backup-Gate
 
-Unmittelbar vor einem später freigegebenen Schreibjob wird das bestehende
-AP9.4/AP9.6-Backupverfahren verwendet. Akzeptiert werden ausschließlich
-abgeschlossene Production-Backups mit Manifest, Manifest-SHA-256, privatem
-Readback, Integritätsnachweis, passender Production-Datenbankidentität und
-identischem Production-SHA. Für externe Contentimporte darf der Snapshot bei
-Importbeginn höchstens zwei Stunden alt sein.
+Unmittelbar vor einem Schreibjob wird das bestehende AP9.4/AP9.6-Verfahren
+verwendet. Ein erfolgreicher Backup-Run erzeugt zusätzlich ein kleines
+`external-import-backup-evidence`-Artefakt. Es enthält ausschließlich Backup-ID,
+Run/Attempt, Snapshot, Abschlusszeit, Production-SHA, Manifest-SHA und sichere
+DB-Identitätsdaten. Dump, Medien, Credentials und signierte Blob-URLs gelangen
+nicht in GitHub-Artefakte.
 
-## Späteres Schreibgate
+Der Writer akzeptiert ausschließlich einen erfolgreichen
+`ap94-acceptance.yml`-Run auf `main`, dessen Evidence exakt zu den Workflowinputs
+passt. Manifest, privater Readback, Integrität, Production-Identität und
+Production-SHA müssen bestätigt sein. Der Snapshot darf bei Importbeginn
+höchstens zwei Stunden alt sein.
 
-Vor dem ersten echten Import ist ein separater AP erforderlich. Dieser muss den
-Writer an den bestehenden Guardvertrag anbinden und nachweisen:
+## Einmalige Einrichtung vor dem ersten Import
 
-- aktiver globaler Admin aus dem bestehenden Rollenmodell,
-- exakter Batch und Digest,
-- exakte Production-Identität,
-- einmalige Required-Reviewer-Freigabe,
-- serieller, je Kandidat auditierter Import,
-- kein automatisches Publish,
-- Wiederaufnahme über `ALREADY_PRESENT`,
-- geschlossenes Gate nach Erfolg, Fehler oder Abbruch.
+1. GitHub-Environment `operations-content-import` anlegen.
+2. Deployment-Branches auf exakt `main` begrenzen.
+3. Required Reviewer aktivieren und Administrator-Bypass deaktivieren.
+4. Eine dedizierte Neon-Rolle `pubquiz_external_import_writer` mit LOGIN, ohne
+   Superuser/Createdb/Createrole/Replication/BypassRLS anlegen. Sie erhält nur
+   die für SELECT sowie INSERT/UPDATE auf Fragen, Antworten, Kategorienmapping
+   und External-Import-Audit benötigten Rechte und Sequenz-USAGE. Keine DELETE-,
+   DDL- oder Adminrechte vergeben.
+5. Die Direct-Endpoint-URL dieser Rolle ausschließlich als Environment-Secret
+   `PRODUCTION_IMPORT_DATABASE_URL` hinterlegen. Der Vertrag bleibt
+   `sslmode=require&channel_binding=require`.
+6. Die Environment-Variable `PRODUCTION_RELEASE_SHA` muss dem tatsächlich
+   laufenden Release entsprechen.
 
-Ein reiner Contentimport erfordert keine Migration und kein Deployment. Benötigt
-der konkrete Import Codeänderungen, wird zuerst ein separater Software-Release
-durchgeführt.
+Rollenerstellung und Secret-Setup sind eigene manuelle
+Production-Betreiberaktionen. Dieser Implementierungs-AP führt sie nicht aus.
+
+## Geschützter Write
+
+Der Preflight-Report nennt vor dem Gate Batch, Digest, Production-SHA, Backup,
+Snapshot und alle vier Entscheidungszahlen. Er zeigt außerdem den exakt zu
+kopierenden Freigabekommentar:
+
+```text
+APPROVE_EXTERNAL_IMPORT plan=<digest> candidates=<candidate-digest> backup=<backup-id>
+```
+
+Nur `dry_run=false` erzeugt den zweiten Job im Environment
+`operations-content-import`. Nach Required-Reviewer-Freigabe liest der Writer
+die Approval-Historie dieses konkreten GitHub-Runs über die GitHub-API. Eine
+allgemeine Environment-Freigabe ohne exakt passenden Kommentar reicht nicht.
+
+Direkt vor dem ersten Write werden Plan, Digest, Production-SHA,
+Datenbankidentität, Backup-Evidence und Preflight erneut geprüft. Danach läuft
+jedes `CREATE` seriell in einer eigenen `SERIALIZABLE`-Transaktion. Der Writer
+publiziert keine Frage; der Zielstatus ist `IN_REVIEW` und `freigegeben=false`.
+`ALREADY_PRESENT` wird protokolliert und nicht erneut geschrieben. `CONFLICT`
+oder `REVIEW_REQUIRED` blockieren den gesamten Lauf.
+
+Bei einem Teilfehler bleibt der Zustand eindeutig: committed Items sind
+`IMPORTED`, der Fehler ist `FAILED`, der Rest `NOT_RUN`. Eine Wiederaufnahme
+erfordert einen neuen Workflow-Run, ein erneut gültiges Backup und eine neue
+Reviewer-Freigabe. Der Auditreport wird als Workflow-Artefakt gespeichert; die
+Autorisierung ist am Ende immer geschlossen.
+
+Ein reiner Contentimport erfordert keine Migration und kein App-Deployment.
+
+## Aktueller OpenTDB-Pilotplan
+
+Der ältere Plan mit Digest `82bbdbad2125541fb2d28c49ce3f3d4da3311b00c2329f885b78fe2c6febdc87`
+enthält noch keine dauerhaften `importApproval.records` und ist deshalb
+absichtlich nicht writerfähig. Vor dem separat freizugebenden ersten Import
+muss er aus dem bestätigten Preview-Review neu exportiert, auf `main`
+versioniert und mit dem neuen Digest freigegeben werden. Kandidaten werden dabei
+weder neu recherchiert noch automatisch veröffentlicht.
