@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "batchId": "opentdb-production-plus500-20260929",
+  "approvalMode": "AUTOMATED_QUALITY_GATE",
+  "policyVersion": "production-auto-quality-v2",
+  "evaluatedAt": "2026-09-29T18:52:41.572Z",
+  "sourcePools": [
+    {
+      "name": "pubquiz-opentdb-combined-excluding-canary.json",
+      "results": 804
+    },
+    {
+      "name": "pubquiz-opentdb-enriched-active-250.json",
+      "results": 58
+    },
+    {
+      "name": "pubquiz-opentdb-enriched-targeted-250.json",
+      "results": 250
+    },
+    {
+      "name": "pubquiz-opentdb-enriched-targeted-next-150.json",
+      "results": 150
+    },
+    {
+      "name": "pubquiz-opentdb-enriched-targeted-final-55.json",
+      "results": 10
+    }
+  ],
+  "rawCandidates": 1272,
+  "uniqueCandidates": 1267,
+  "autoApprovedBeforeSelection": 524,
+  "selected": 497,
+  "planDigest": "fb4706a5d43edcecdda035526fa8b9e55cfcf22bcc9ab3cad9d4b047a75ebf2b",
+  "categoryDistribution": {
+    "Alkohol": 1,
+    "Berge": 1,
+    "Fahrzeuge": 10,
+    "Film": 31,
+    "Flaggen": 5,
+    "Fußball": 1,
+    "Geografie": 52,
+    "Geschichte": 66,
+    "Japan": 18,
+    "Kultur": 77,
+    "Kunst": 1,
+    "Literatur": 21,
+    "Luftfahrt": 2,
+    "Musik": 61,
+    "Politik": 6,
+    "Religion": 9,
+    "Sport": 17,
+    "TV": 26,
+    "Tennis": 1,
+    "Tiere": 13,
+    "USA": 2,
+    "Wissenschaft": 76
+  },
+  "difficultyDistribution": {
+    "25": 162,
+    "50": 187,
+    "75": 148
+  },
+  "categoryDistributionPolicy": {
+    "previousCapPercent": 15,
+    "userAcceptedAbovePreviousCap": true,
+    "qualityPolicyUnchanged": true
+  },
+  "categoriesAbovePreviousCap": {
+    "Kultur": 77,
+    "Wissenschaft": 76
+  },
+  "mappingCounts": {
+    "ANIME_MANGA_TO_JAPAN": 17,
+    "COMICS_TO_KULTUR": 3,
+    "COMPUTER_&_TECHNIK_TO_WISSENSCHAFT": 12,
+    "EXACT_ACTIVE": 306,
+    "FILM_FERNSEHEN_BY_ORIGINAL_CATEGORY": 51,
+    "MATHEMATIK_TO_WISSENSCHAFT": 4,
+    "MYTHOLOGIE_TO_RELIGION": 7,
+    "NATURWISSENSCHAFTEN_TO_WISSENSCHAFT": 27,
+    "NATUR_BY_ORIGINAL_CATEGORY": 6,
+    "PROMIS_TO_KULTUR": 2,
+    "SPIELE_TO_KULTUR": 10,
+    "THEATER_&_MUSICAL_TO_KULTUR": 1,
+    "VIDEOSPIELE_TO_KULTUR": 51
+  },
+  "rejectionCounts": {
+    "ACTIVE_CATEGORY_UNMAPPED": 63,
+    "INSUFFICIENT_INDEPENDENT_SOURCES": 273,
+    "LOCALIZATION_NOT_LOCALIZED": 48,
+    "OPENTDB_AUTOMATION_HTTP_400_INTERNAL_SERVER_ERROR": 1,
+    "OPENTDB_AUTOMATION_HTTP_402_INTERNAL_SERVER_ERROR": 1,
+    "OPENTDB_AUTOMATION_UNKNOWN_ERROR": 3,
+    "QUALITY_NOT_READY": 545,
+    "VERIFICATION_NOT_VERIFIED": 108
+  }
+}
