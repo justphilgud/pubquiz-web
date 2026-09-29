@@ -192,7 +192,7 @@ function reviewerApproval(value: ExternalImportPlan) {
 }
 
 function guardInput(value = plan()) {
-  const preflight = preflightExternalImport(value, []);
+  const preflight = preflightExternalImport(value, [], ["Wissenschaft"]);
   return {
     mode: "write" as const,
     now,
@@ -263,12 +263,19 @@ test("review states are preserved in the frozen plan", () => {
 });
 
 test("empty Production inventory plans CREATE", () => {
-  assert.deepEqual(preflightExternalImport(plan(), []).counts, {
+  assert.deepEqual(preflightExternalImport(plan(), [], ["Wissenschaft"]).counts, {
     CREATE: 1,
     ALREADY_PRESENT: 0,
     CONFLICT: 0,
     REVIEW_REQUIRED: 0,
   });
+});
+
+test("missing active Production category blocks a new item", () => {
+  const result = preflightExternalImport(plan(), [], ["Musik", "Kultur"]);
+  assert.equal(result.items[0].decision, "REVIEW_REQUIRED");
+  assert.equal(result.items[0].reason, "ACTIVE_CATEGORY_MISSING");
+  assert.equal(result.counts.CREATE, 0);
 });
 
 test("source mapping with identical content is ALREADY_PRESENT", () => {
@@ -280,7 +287,7 @@ test("source mapping with identical content is ALREADY_PRESENT", () => {
     externalReference: "opentdb-42",
     contentFingerprint: "a".repeat(64),
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "ALREADY_PRESENT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "ALREADY_PRESENT");
 });
 
 test("source mapping with changed content is CONFLICT", () => {
@@ -292,7 +299,7 @@ test("source mapping with changed content is CONFLICT", () => {
     externalReference: "opentdb-42",
     contentFingerprint: "e".repeat(64),
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "CONFLICT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "CONFLICT");
 });
 
 test("exact untracked question with same answer is ALREADY_PRESENT", () => {
@@ -304,7 +311,7 @@ test("exact untracked question with same answer is ALREADY_PRESENT", () => {
     externalReference: null,
     contentFingerprint: null,
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "ALREADY_PRESENT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "ALREADY_PRESENT");
 });
 
 test("exact question with different answer is CONFLICT", () => {
@@ -316,7 +323,7 @@ test("exact question with different answer is CONFLICT", () => {
     externalReference: null,
     contentFingerprint: null,
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "CONFLICT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "CONFLICT");
 });
 
 test("semantic duplicate requires human review", () => {
@@ -328,7 +335,7 @@ test("semantic duplicate requires human review", () => {
     externalReference: null,
     contentFingerprint: null,
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "REVIEW_REQUIRED");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "REVIEW_REQUIRED");
 });
 
 test("durably approved REVIEW_REQUIRED candidate is eligible for current preflight", () => {
@@ -336,7 +343,7 @@ test("durably approved REVIEW_REQUIRED candidate is eligible for current preflig
   const value = plan({
     items: [{ ...base.items[0], reviewStatus: "REVIEW_REQUIRED" }],
   });
-  assert.equal(preflightExternalImport(value, []).items[0].decision, "CREATE");
+  assert.equal(preflightExternalImport(value, [], ["Wissenschaft"]).items[0].decision, "CREATE");
 });
 
 test("plan validation rejects an item without its exact durable approval record", () => {
@@ -404,7 +411,7 @@ test("complete re-run contains no CREATE, UPDATE or conflict", () => {
     externalReference: value.items[0].externalReference,
     contentFingerprint: value.items[0].contentFingerprint,
   }];
-  const result = preflightExternalImport(value, existing);
+  const result = preflightExternalImport(value, existing, ["Wissenschaft"]);
   assert.equal(result.counts.CREATE, 0);
   assert.equal(result.counts.ALREADY_PRESENT, 1);
   assert.equal(result.counts.CONFLICT, 0);
