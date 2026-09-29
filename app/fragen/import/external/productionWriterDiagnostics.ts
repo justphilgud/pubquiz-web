@@ -67,10 +67,50 @@ function safeRelation(error: unknown, fallback: string) {
   return allowedRelations.has(table) ? table : "none";
 }
 
+const safePermissionCauses = [
+  [
+    /permission denied for sequence external_question_import_batches_import_batch_id_seq/i,
+    "EXTERNAL_IMPORT_WRITER_BATCH_SEQUENCE_USAGE_MISSING",
+  ],
+  [
+    /permission denied for type ["']?(?:pubquiz\.)?ExternalQuestionImportBatchStatus["']?/i,
+    "EXTERNAL_IMPORT_WRITER_BATCH_STATUS_TYPE_USAGE_MISSING",
+  ],
+  [
+    /permission denied for table external_question_import_batches/i,
+    "EXTERNAL_IMPORT_WRITER_BATCH_TABLE_PRIVILEGE_MISSING",
+  ],
+  [
+    /permission denied for schema pubquiz/i,
+    "EXTERNAL_IMPORT_WRITER_SCHEMA_USAGE_MISSING",
+  ],
+] as const;
+
+function safePermissionCause(error: unknown) {
+  const queue: unknown[] = [error];
+  const visited = new Set<unknown>();
+  for (let depth = 0; depth < 6 && queue.length > 0; depth += 1) {
+    const value = queue.shift();
+    if (!record(value) || visited.has(value)) continue;
+    visited.add(value);
+    for (const key of ["message", "originalMessage"] as const) {
+      const message = value[key];
+      if (typeof message !== "string") continue;
+      const matched = safePermissionCauses.find(([pattern]) => pattern.test(message));
+      if (matched) return matched[1];
+    }
+    for (const key of ["meta", "driverAdapterError", "cause"] as const) {
+      if (record(value[key])) queue.push(value[key]);
+    }
+  }
+  return null;
+}
+
 function safeCause(error: unknown) {
-  return error instanceof Error && /^EXTERNAL_IMPORT_[A-Z0-9_]+$/.test(error.message)
-    ? error.message
-    : "WITHHELD";
+  if (error instanceof Error && /^EXTERNAL_IMPORT_[A-Z0-9_]+$/.test(error.message)) {
+    return error.message;
+  }
+  return safePermissionCause(error) ?? "WITHHELD";
 }
 
 function isSafeStructuredFailure(value: string) {
