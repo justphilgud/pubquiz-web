@@ -1,4 +1,4 @@
-import type { Prisma } from "@/app/generated/prisma/client";
+import { Prisma } from "@/app/generated/prisma/client";
 
 import type { ExternalImportPlanItem } from "./productionImportGuard";
 
@@ -23,6 +23,7 @@ function attribution(input: ExternalQuestionRecordInput) {
 export async function createExternalQuestionRecord(
   transaction: Prisma.TransactionClient,
   input: ExternalQuestionRecordInput,
+  options: Readonly<{ columnScoped?: boolean }> = {},
 ) {
   if (input.prepared.distractors.length !== 3) {
     throw new Error("EXTERNAL_IMPORT_ANSWERS_INVALID");
@@ -50,6 +51,51 @@ export async function createExternalQuestionRecord(
         })
       : null;
   const now = new Date();
+  if (options.columnScoped) {
+    const questions = await transaction.$queryRaw<Array<{ fragen_id: number }>>(Prisma.sql`
+      INSERT INTO pubquiz.fragen (
+        frage, quelle, fragentyp, schwierigkeitslevel,
+        created_by_user_id, last_modified_by_user_id,
+        freigegeben, ist_unfertig, review_status,
+        submitted_at, submitted_by_user_id,
+        moderationsnotizen, kategorienwunsch
+      ) VALUES (
+        ${input.prepared.question}, ${attribution(input)}, ${"Multiple Choice"},
+        ${input.prepared.difficulty}, ${input.operatorUserId}, ${input.operatorUserId},
+        ${false}, ${false}, ${"IN_REVIEW"}::pubquiz."QuestionReviewStatus",
+        ${now}, ${input.operatorUserId}, ${input.prepared.explanation},
+        ${category ? null : input.prepared.category}
+      )
+      RETURNING fragen_id
+    `);
+    if (questions.length !== 1) {
+      throw new Error("EXTERNAL_IMPORT_QUESTION_INSERT_INVALID");
+    }
+    const questionId = questions[0].fragen_id;
+    const answers = [input.prepared.correctAnswer, ...input.prepared.distractors]
+      .map((answer, index) => Prisma.sql`
+        (${questionId}, ${answer}, ${index === 0}, ${answerType.antworttyp_id})
+      `);
+    const answerCount = await transaction.$executeRaw(Prisma.sql`
+      INSERT INTO pubquiz.antworten (
+        fragen_id, antwort, ist_richtig, antworttyp_id
+      ) VALUES ${Prisma.join(answers)}
+    `);
+    if (answerCount !== 4) {
+      throw new Error("EXTERNAL_IMPORT_ANSWER_INSERT_INVALID");
+    }
+    if (category) {
+      const categoryCount = await transaction.$executeRaw(Prisma.sql`
+        INSERT INTO pubquiz.fragen_kategorien (
+          fragen_id, fragenkategorie_id
+        ) VALUES (${questionId}, ${category.fragenkategorie_id})
+      `);
+      if (categoryCount !== 1) {
+        throw new Error("EXTERNAL_IMPORT_CATEGORY_INSERT_INVALID");
+      }
+    }
+    return { fragen_id: questionId };
+  }
   return transaction.fragen.create({
     data: {
       frage: input.prepared.question,

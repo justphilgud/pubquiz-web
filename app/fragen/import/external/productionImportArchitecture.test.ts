@@ -125,12 +125,21 @@ test("Preview and Production reuse the same question record service", () => {
   const writer = read("scripts/external-import/production-writer.ts");
   assert.match(preview, /createExternalQuestionRecord/);
   assert.match(writer, /createExternalQuestionRecord/);
+  assert.match(writer, /createExternalQuestionRecord[\s\S]*?\{ columnScoped: true \}/);
   assert.match(writer, /TransactionIsolationLevel\.Serializable/);
   assert.match(writer, /external_question_import_items\.create/);
   const service = read("app/fragen/import/external/externalQuestionWriteService.ts");
   assert.match(service, /freigegeben: false/);
   assert.match(service, /review_status: "IN_REVIEW"/);
   assert.doesNotMatch(service, /approved_at|approved_by_user_id|freigegeben: true/);
+  assert.match(service, /if \(options\.columnScoped\)/);
+  assert.equal(service.match(/INSERT INTO pubquiz\.fragen \(/g)?.length, 1);
+  assert.equal(service.match(/INSERT INTO pubquiz\.antworten \(/g)?.length, 1);
+  assert.equal(service.match(/INSERT INTO pubquiz\.fragen_kategorien \(/g)?.length, 1);
+  assert.match(
+    service,
+    /INSERT INTO pubquiz\.fragen \([\s\S]*?frage, quelle, fragentyp, schwierigkeitslevel,[\s\S]*?moderationsnotizen, kategorienwunsch[\s\S]*?RETURNING fragen_id/,
+  );
 });
 
 test("future validated backups emit immutable content-import evidence", () => {

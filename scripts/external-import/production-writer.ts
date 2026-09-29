@@ -278,7 +278,7 @@ async function importPlanItem(input: {
       prepared: input.item.prepared,
       verificationSources: input.item.verification.sources,
       license: input.item.license,
-    }));
+    }, { columnScoped: true }));
     await runProductionWriterPhase("EXTERNAL_MAPPING", {
       operation: "insert",
       candidateId: input.item.candidateId,
