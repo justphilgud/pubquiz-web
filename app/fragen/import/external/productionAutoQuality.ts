@@ -3,7 +3,10 @@ import {
   EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
   type ExternalImportPlanItem,
 } from "./productionImportGuard";
-import { countIndependentReliableSourceHosts } from "./sourceReliability";
+import {
+  countIndependentReliableSourceHosts,
+  hasStrongPrimaryOrOfficialSource,
+} from "./sourceReliability";
 import type {
   ExistingQuestionForDuplicateCheck,
   ExternalQuestion,
@@ -24,6 +27,7 @@ export type ProductionAutoQualityAssessment = Readonly<{
   classification: "AUTO_APPROVED_FOR_PRODUCTION" | "NOT_AUTO_APPROVED";
   eligible: boolean;
   failures: readonly ProductionAutoQualityFailure[];
+  hasStrongPrimaryOrOfficialSource: boolean;
   independentReliableSourceHosts: number;
   prepared: PreparedExternalQuestion;
 }>;
@@ -46,6 +50,9 @@ export function assessProductionAutoQuality(input: {
   const independentReliableSourceHosts = countIndependentReliableSourceHosts(
     input.automation.verificationSources,
   );
+  const strongPrimaryOrOfficialSource = hasStrongPrimaryOrOfficialSource(
+    input.automation.verificationSources,
+  );
 
   if (input.automation.verificationStatus !== "VERIFIED") {
     failures.add("VERIFICATION_NOT_VERIFIED");
@@ -60,7 +67,7 @@ export function assessProductionAutoQuality(input: {
     failures.add("ANSWER_SET_INVALID");
   }
   if (!prepared.suggestedCategoryName.trim()) failures.add("CATEGORY_MISSING");
-  if (independentReliableSourceHosts < 2) {
+  if (independentReliableSourceHosts < 2 && !strongPrimaryOrOfficialSource) {
     failures.add("INSUFFICIENT_INDEPENDENT_SOURCES");
   }
 
@@ -70,6 +77,7 @@ export function assessProductionAutoQuality(input: {
       : "NOT_AUTO_APPROVED",
     eligible: failures.size === 0,
     failures: [...failures],
+    hasStrongPrimaryOrOfficialSource: strongPrimaryOrOfficialSource,
     independentReliableSourceHosts,
     prepared,
   };
@@ -117,6 +125,8 @@ export function toAutoApprovedPlanItem(input: {
       localizationStatus: "LOCALIZED",
       qualityStatus: "READY_FOR_REVIEW",
       issueCodes: [],
+      hasStrongPrimaryOrOfficialSource:
+        input.assessment.hasStrongPrimaryOrOfficialSource,
       independentReliableSourceHosts:
         input.assessment.independentReliableSourceHosts,
     },

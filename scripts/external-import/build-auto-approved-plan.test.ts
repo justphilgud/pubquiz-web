@@ -32,10 +32,11 @@ function candidate(id: number, category: string, difficulty: number): AutoApprov
       },
       autoQualityEvidence: {
         classification: "AUTO_APPROVED_FOR_PRODUCTION",
-        policyVersion: "production-auto-quality-v1",
+        policyVersion: "production-auto-quality-v2",
         localizationStatus: "LOCALIZED",
         qualityStatus: "READY_FOR_REVIEW",
         issueCodes: [],
+        hasStrongPrimaryOrOfficialSource: true,
         independentReliableSourceHosts: 2,
       },
       reviewStatus: "READY_FOR_REVIEW",

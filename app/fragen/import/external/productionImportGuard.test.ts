@@ -107,6 +107,7 @@ function automatedPlan(): ExternalImportPlan {
         localizationStatus: "LOCALIZED",
         qualityStatus: "READY_FOR_REVIEW",
         issueCodes: [],
+        hasStrongPrimaryOrOfficialSource: true,
         independentReliableSourceHosts: 2,
       },
     }],
@@ -352,7 +353,7 @@ test("automated quality approval is explicit and never invents a human reviewer"
     approvalMode: "AUTOMATED_QUALITY_GATE",
     approvedAt: "2026-09-26T09:55:00.000Z",
     reviewedByUserId: null,
-    policyVersion: "production-auto-quality-v1",
+    policyVersion: "production-auto-quality-v2",
   });
 });
 
@@ -366,9 +367,10 @@ test("automated approval rejects missing evidence, one source, and false reviewe
     ...value,
     items: [{
       ...value.items[0],
-      verification: { status: "VERIFIED", sources: value.items[0].verification.sources.slice(0, 1) },
+      verification: { status: "VERIFIED", sources: value.items[0].verification.sources.slice(1) },
       autoQualityEvidence: {
         ...value.items[0].autoQualityEvidence!,
+        hasStrongPrimaryOrOfficialSource: false,
         independentReliableSourceHosts: 1,
       },
     }],
