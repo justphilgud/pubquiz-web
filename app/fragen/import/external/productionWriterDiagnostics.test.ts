@@ -72,6 +72,53 @@ test("extracts only the nested PostgreSQL SQLSTATE from a Prisma adapter error",
   assert.doesNotMatch(output, /password|permission|npg_secret/);
 });
 
+test("classifies only whitelisted permission targets without exposing database text", async () => {
+  for (const [message, cause] of [
+    [
+      "permission denied for sequence external_question_import_batches_import_batch_id_seq; password=npg_secret",
+      "EXTERNAL_IMPORT_WRITER_BATCH_SEQUENCE_USAGE_MISSING",
+    ],
+    [
+      'permission denied for type "ExternalQuestionImportBatchStatus"; password=npg_secret',
+      "EXTERNAL_IMPORT_WRITER_BATCH_STATUS_TYPE_USAGE_MISSING",
+    ],
+    [
+      "permission denied for table external_question_import_batches; password=npg_secret",
+      "EXTERNAL_IMPORT_WRITER_BATCH_TABLE_PRIVILEGE_MISSING",
+    ],
+    [
+      "permission denied for schema pubquiz; password=npg_secret",
+      "EXTERNAL_IMPORT_WRITER_SCHEMA_USAGE_MISSING",
+    ],
+  ] as const) {
+    const databaseError = Object.assign(new Error("outer password=npg_secret"), {
+      code: "P2039",
+      meta: { driverAdapterError: { cause: { originalCode: "42501", originalMessage: message } } },
+    });
+    const error = await runProductionWriterPhase("AUDIT", {
+      operation: "insert",
+      relation: "external_question_import_batches",
+    }, () => Promise.reject(databaseError)).catch((value: unknown) => value);
+    const output = safeProductionWriterFailure(error);
+
+    assert.match(output, new RegExp(`cause=${cause}$`));
+    assert.doesNotMatch(output, /password|npg_secret|permission denied/i);
+  }
+});
+
+test("withholds permission targets outside the exact whitelist", async () => {
+  const databaseError = Object.assign(new Error("hidden"), {
+    code: "42501",
+    originalMessage: "permission denied for table teams",
+  });
+  const error = await runProductionWriterPhase("AUDIT", {
+    operation: "insert",
+    relation: "external_question_import_batches",
+  }, () => Promise.reject(databaseError)).catch((value: unknown) => value);
+
+  assert.match(safeProductionWriterFailure(error), /cause=WITHHELD$/);
+});
+
 test("preserves an approved external-import error code without its stack", async () => {
   const error = await runProductionWriterPhase("AUTHORIZATION", {
     operation: "verify",
