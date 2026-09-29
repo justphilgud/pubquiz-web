@@ -111,6 +111,9 @@ test("Production writer has a single protected server-side entry path", () => {
     /INSERT INTO pubquiz\.external_question_import_batches[\s\S]*?RETURNING import_batch_id/g,
     "",
   ).replace(
+    /INSERT INTO pubquiz\.external_question_import_items[\s\S]*?\n\s*`;/g,
+    "",
+  ).replace(
     /UPDATE pubquiz\.external_question_import_batches[\s\S]*?WHERE import_batch_id = \$\{batchId\}/g,
     "",
   );
@@ -127,7 +130,19 @@ test("Preview and Production reuse the same question record service", () => {
   assert.match(writer, /createExternalQuestionRecord/);
   assert.match(writer, /createExternalQuestionRecord[\s\S]*?\{ columnScoped: true \}/);
   assert.match(writer, /TransactionIsolationLevel\.Serializable/);
-  assert.match(writer, /external_question_import_items\.create/);
+  assert.doesNotMatch(writer, /external_question_import_items\.create/);
+  assert.equal(
+    writer.match(/INSERT INTO pubquiz\.external_question_import_items \(/g)?.length,
+    1,
+  );
+  assert.match(
+    writer,
+    /INSERT INTO pubquiz\.external_question_import_items \([\s\S]*?import_batch_id, provider, external_reference, license, license_url,[\s\S]*?automation_changes, content_fingerprint, question_id, verified_at,[\s\S]*?review_start[\s\S]*?reviewed_by_user_id[\s\S]*?\$\{\"APPROVED\"\}::pubquiz\.\"ExternalQuestionImportItemStatus\"/,
+  );
+  assert.doesNotMatch(
+    writer,
+    /INSERT INTO pubquiz\.external_question_import_items \([\s\S]*?\b(?:localization_note|verification_note|automation_model|rejection_reason)\b[\s\S]*?\) VALUES/,
+  );
   const service = read("app/fragen/import/external/externalQuestionWriteService.ts");
   assert.match(service, /freigegeben: false/);
   assert.match(service, /review_status: "IN_REVIEW"/);
