@@ -618,7 +618,11 @@ export async function productionExternalImport(input: {
       workflowRun,
       preflight: current.preflight,
       importItem: (item) => importPlanItem({ prisma, plan, item, planDigest }),
-      recordAudit: (audit) => persistAudit({ prisma, plan, planDigest, audit }),
+      recordAudit: async (audit) => {
+        await runProductionWriterPhase("AUDIT", { operation: "insert" }, () =>
+          writeFile(input.auditPath, `${JSON.stringify(audit)}\n`, { mode: 0o600 }));
+        await persistAudit({ prisma, plan, planDigest, audit });
+      },
       classifyItemError: safeProductionWriterFailure,
     });
     await runProductionWriterPhase("SELF_CLOSE", { operation: "close" }, () => {
@@ -626,8 +630,6 @@ export async function productionExternalImport(input: {
         throw new Error("EXTERNAL_IMPORT_AUTHORIZATION_NOT_CLOSED");
       }
     });
-    await runProductionWriterPhase("AUDIT", { operation: "insert" }, () =>
-      writeFile(input.auditPath, `${JSON.stringify(audit)}\n`, { mode: 0o600 }));
     if (audit.result !== "COMPLETED") {
       const failure = audit.items.find((item) => item.status === "FAILED")?.reason;
       throw new Error(failure ?? "EXTERNAL_IMPORT_BATCH_FAILED");

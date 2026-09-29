@@ -87,6 +87,10 @@ test("Production writer has a single protected server-side entry path", () => {
     /EXTERNAL_IMPORT_WRITER_BATCH_COMBINED_UPDATE_EXECUTION_FAILED/,
   );
   assert.match(writer, /EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_PROBE_MUTATED_ROWS/);
+  assert.match(
+    writer,
+    /recordAudit:\s*async \(audit\) => \{[\s\S]*?writeFile\(input\.auditPath,[\s\S]*?persistAudit\(\{ prisma, plan, planDigest, audit \}\);[\s\S]*?\}/,
+  );
   assert.match(core, /OneTimeExternalImportAuthorization/);
   const withoutNoOpAclProbes = writer.replace(
     /UPDATE pubquiz\.external_question_import_batches[\s\S]*?WHERE FALSE/g,
