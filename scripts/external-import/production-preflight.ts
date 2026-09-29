@@ -74,7 +74,7 @@ export async function readProductionExternalImportPreflight(input: {
     `);
     const categories = await client.query<CategoryRow>(`
       SELECT kategorie AS category
-      FROM pubquiz.fragenkategorien
+      FROM pubquiz.fragenkategorie
       WHERE status = 'ACTIVE'
       ORDER BY kategorie
     `);

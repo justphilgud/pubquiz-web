@@ -29,6 +29,8 @@ test("Production UI is explicitly read-only and exposes no import actions", () =
 test("Production preflight is structurally read-only", () => {
   const adapter = read("scripts/external-import/production-preflight.ts");
   assert.match(adapter, /BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY/);
+  assert.match(adapter, /FROM pubquiz\.fragenkategorie\b/);
+  assert.doesNotMatch(adapter, /FROM pubquiz\.fragenkategorien\b/);
   assert.match(adapter, /ROLLBACK/);
   assert.doesNotMatch(adapter, /\b(INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/i);
 });
