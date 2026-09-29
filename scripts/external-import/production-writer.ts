@@ -134,6 +134,68 @@ function approvalSummary(plan: ExternalImportPlan) {
     : { approvalMode: "HUMAN_REVIEW" as const, policyVersion: null };
 }
 
+async function verifyBatchUpdateExecution(prisma: PrismaClient) {
+  const probes = [
+    {
+      code: "EXTERNAL_IMPORT_WRITER_BATCH_STATUS_UPDATE_EXECUTION_FAILED",
+      run: () => prisma.$executeRaw`
+        UPDATE pubquiz.external_question_import_batches
+        SET status = status
+        WHERE FALSE
+      `,
+    },
+    {
+      code: "EXTERNAL_IMPORT_WRITER_BATCH_REPORT_UPDATE_EXECUTION_FAILED",
+      run: () => prisma.$executeRaw`
+        UPDATE pubquiz.external_question_import_batches
+        SET report_json = report_json
+        WHERE FALSE
+      `,
+    },
+    {
+      code: "EXTERNAL_IMPORT_WRITER_BATCH_ERROR_UPDATE_EXECUTION_FAILED",
+      run: () => prisma.$executeRaw`
+        UPDATE pubquiz.external_question_import_batches
+        SET error_message = error_message
+        WHERE FALSE
+      `,
+    },
+    {
+      code: "EXTERNAL_IMPORT_WRITER_BATCH_COMPLETED_UPDATE_EXECUTION_FAILED",
+      run: () => prisma.$executeRaw`
+        UPDATE pubquiz.external_question_import_batches
+        SET completed_at = completed_at
+        WHERE FALSE
+      `,
+    },
+    {
+      code: "EXTERNAL_IMPORT_WRITER_BATCH_COMBINED_UPDATE_EXECUTION_FAILED",
+      run: () => prisma.$executeRaw`
+        UPDATE pubquiz.external_question_import_batches
+        SET status = status,
+            report_json = report_json,
+            error_message = error_message,
+            completed_at = completed_at
+        WHERE FALSE
+      `,
+    },
+  ] as const;
+  for (const probe of probes) {
+    try {
+      const affected = await probe.run();
+      if (affected !== 0) {
+        throw new Error("EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_PROBE_MUTATED_ROWS");
+      }
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_PROBE_MUTATED_ROWS"
+      ) throw error;
+      throw new Error(probe.code, { cause: error });
+    }
+  }
+}
+
 async function findOrCreateAuditBatch(
   transaction: Prisma.TransactionClient,
   plan: ExternalImportPlan,
@@ -525,6 +587,14 @@ export async function productionExternalImport(input: {
         throw new Error("EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_ACL_MISSING");
       }
     });
+    await runProductionWriterPhase(
+      "AUDIT",
+      {
+        operation: "verify",
+        relation: "external_question_import_batches",
+      },
+      () => verifyBatchUpdateExecution(prisma),
+    );
     const operator = await runProductionWriterPhase("AUTHORIZATION", {
       operation: "read",
       relation: "users",

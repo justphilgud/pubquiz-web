@@ -75,8 +75,27 @@ test("Production writer has a single protected server-side entry path", () => {
   assert.match(writer, /guard\.writeAuthorized/);
   assert.match(writer, /fetchVerifiedExternalImportReviewerApproval/);
   assert.match(writer, /EXTERNAL_IMPORT_TOCTOU_PREFLIGHT_CHANGED/);
+  assert.match(writer, /verifyBatchUpdateExecution/);
+  for (const column of ["status", "report_json", "error_message", "completed_at"]) {
+    assert.match(
+      writer,
+      new RegExp(`SET ${column} = ${column}\\s+WHERE FALSE`),
+    );
+  }
+  assert.match(
+    writer,
+    /EXTERNAL_IMPORT_WRITER_BATCH_COMBINED_UPDATE_EXECUTION_FAILED/,
+  );
+  assert.match(writer, /EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_PROBE_MUTATED_ROWS/);
   assert.match(core, /OneTimeExternalImportAuthorization/);
-  assert.doesNotMatch(writer, /\b(INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\s/i);
+  const withoutNoOpAclProbes = writer.replace(
+    /UPDATE pubquiz\.external_question_import_batches[\s\S]*?WHERE FALSE/g,
+    "",
+  );
+  assert.doesNotMatch(
+    withoutNoOpAclProbes,
+    /\b(INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\s/i,
+  );
 });
 
 test("Preview and Production reuse the same question record service", () => {
