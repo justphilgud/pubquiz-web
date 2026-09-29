@@ -214,24 +214,28 @@ async function findOrCreateAuditBatch(
       report.planDigest === planDigest && report.batchId === plan.batchId;
   });
   if (existing) return existing.import_batch_id;
-  const created = await transaction.external_question_import_batches.create({
-    data: {
-      provider: plan.sourceType,
-      requested_count: plan.items.length,
-      fetched_count: plan.items.length,
-      status: "PROCESSING",
-      created_by_user_id: plan.operatorUserId,
-      report_json: safeJson({
-        kind: "production-external-import",
-        batchId: plan.batchId,
-        planDigest,
-        ...approvalSummary(plan),
-        state: "PROCESSING",
-      }),
-    },
-    select: { import_batch_id: true },
+  const reportJson = JSON.stringify({
+    kind: "production-external-import",
+    batchId: plan.batchId,
+    planDigest,
+    ...approvalSummary(plan),
+    state: "PROCESSING",
   });
-  return created.import_batch_id;
+  const created = await transaction.$queryRaw<Array<{ import_batch_id: number }>>`
+    INSERT INTO pubquiz.external_question_import_batches (
+      provider, requested_count, fetched_count, status,
+      report_json, created_by_user_id
+    ) VALUES (
+      ${plan.sourceType}, ${plan.items.length}, ${plan.items.length},
+      ${"PROCESSING"}::pubquiz."ExternalQuestionImportBatchStatus",
+      ${reportJson}::jsonb, ${plan.operatorUserId}
+    )
+    RETURNING import_batch_id
+  `;
+  if (created.length !== 1) {
+    throw new Error("EXTERNAL_IMPORT_AUDIT_BATCH_INSERT_INVALID");
+  }
+  return created[0].import_batch_id;
 }
 
 async function importPlanItem(input: {
@@ -335,22 +339,27 @@ async function importPlanItem(input: {
       operation: "update",
       candidateId: input.item.candidateId,
       relation: "external_question_import_batches",
-    }, () => transaction.external_question_import_batches.update({
-      where: { import_batch_id: batchId },
-      data: {
-        status: imported === input.plan.items.length ? "COMPLETED" : "PROCESSING",
-        completed_at: imported === input.plan.items.length ? new Date() : null,
-        report_json: safeJson({
-          kind: "production-external-import",
-          batchId: input.plan.batchId,
-          planDigest: input.planDigest,
-          ...approvalSummary(input.plan),
-          imported,
-          requested: input.plan.items.length,
-          state: imported === input.plan.items.length ? "COMPLETED" : "PROCESSING",
-        }),
-      },
-    }));
+    }, async () => {
+      const status = imported === input.plan.items.length ? "COMPLETED" : "PROCESSING";
+      const completedAt = imported === input.plan.items.length ? new Date() : null;
+      const reportJson = JSON.stringify({
+        kind: "production-external-import",
+        batchId: input.plan.batchId,
+        planDigest: input.planDigest,
+        ...approvalSummary(input.plan),
+        imported,
+        requested: input.plan.items.length,
+        state: status,
+      });
+      const affected = await transaction.$executeRaw`
+        UPDATE pubquiz.external_question_import_batches
+        SET status = ${status}::pubquiz."ExternalQuestionImportBatchStatus",
+            completed_at = ${completedAt},
+            report_json = ${reportJson}::jsonb
+        WHERE import_batch_id = ${batchId}
+      `;
+      if (affected !== 1) throw new Error("EXTERNAL_IMPORT_AUDIT_BATCH_UPDATE_INVALID");
+    });
     return { questionId: question.fragen_id };
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }));
 }
@@ -366,21 +375,26 @@ async function persistAudit(input: {
     relation: "external_question_import_batches",
   }, () => input.prisma.$transaction(async (transaction) => {
     const batchId = await findOrCreateAuditBatch(transaction, input.plan, input.planDigest);
-    await transaction.external_question_import_batches.update({
-      where: { import_batch_id: batchId },
-      data: {
-        status: input.audit.result === "COMPLETED" ? "COMPLETED" : "FAILED",
-        completed_at: new Date(input.audit.completedAt),
-        error_message: input.audit.result === "COMPLETED" ? null : "EXTERNAL_IMPORT_BATCH_INCOMPLETE",
-        report_json: safeJson({
-          kind: "production-external-import",
-          batchId: input.plan.batchId,
-          planDigest: input.planDigest,
-          ...approvalSummary(input.plan),
-          audit: input.audit,
-        }),
-      },
+    const status = input.audit.result === "COMPLETED" ? "COMPLETED" : "FAILED";
+    const errorMessage = input.audit.result === "COMPLETED"
+      ? null
+      : "EXTERNAL_IMPORT_BATCH_INCOMPLETE";
+    const reportJson = JSON.stringify({
+      kind: "production-external-import",
+      batchId: input.plan.batchId,
+      planDigest: input.planDigest,
+      ...approvalSummary(input.plan),
+      audit: input.audit,
     });
+    const affected = await transaction.$executeRaw`
+      UPDATE pubquiz.external_question_import_batches
+      SET status = ${status}::pubquiz."ExternalQuestionImportBatchStatus",
+          completed_at = ${new Date(input.audit.completedAt)},
+          error_message = ${errorMessage},
+          report_json = ${reportJson}::jsonb
+      WHERE import_batch_id = ${batchId}
+    `;
+    if (affected !== 1) throw new Error("EXTERNAL_IMPORT_AUDIT_BATCH_UPDATE_INVALID");
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }));
 }
 

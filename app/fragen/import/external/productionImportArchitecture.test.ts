@@ -87,17 +87,35 @@ test("Production writer has a single protected server-side entry path", () => {
     /EXTERNAL_IMPORT_WRITER_BATCH_COMBINED_UPDATE_EXECUTION_FAILED/,
   );
   assert.match(writer, /EXTERNAL_IMPORT_WRITER_BATCH_UPDATE_PROBE_MUTATED_ROWS/);
+  assert.equal(
+    writer.match(/INSERT INTO pubquiz\.external_question_import_batches/g)?.length,
+    1,
+  );
+  assert.match(
+    writer,
+    /INSERT INTO pubquiz\.external_question_import_batches \([\s\S]*?provider, requested_count, fetched_count, status,[\s\S]*?report_json, created_by_user_id[\s\S]*?RETURNING import_batch_id/,
+  );
+  assert.equal(
+    writer.match(/UPDATE pubquiz\.external_question_import_batches/g)?.length,
+    7,
+  );
   assert.match(
     writer,
     /recordAudit:\s*async \(audit\) => \{[\s\S]*?writeFile\(input\.auditPath,[\s\S]*?persistAudit\(\{ prisma, plan, planDigest, audit \}\);[\s\S]*?\}/,
   );
   assert.match(core, /OneTimeExternalImportAuthorization/);
-  const withoutNoOpAclProbes = writer.replace(
+  const withoutApprovedRawWrites = writer.replace(
     /UPDATE pubquiz\.external_question_import_batches[\s\S]*?WHERE FALSE/g,
+    "",
+  ).replace(
+    /INSERT INTO pubquiz\.external_question_import_batches[\s\S]*?RETURNING import_batch_id/g,
+    "",
+  ).replace(
+    /UPDATE pubquiz\.external_question_import_batches[\s\S]*?WHERE import_batch_id = \$\{batchId\}/g,
     "",
   );
   assert.doesNotMatch(
-    withoutNoOpAclProbes,
+    withoutApprovedRawWrites,
     /\b(INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\s/i,
   );
 });
