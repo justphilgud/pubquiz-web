@@ -39,10 +39,6 @@ function required(value: string | undefined, code: string) {
   return value.trim();
 }
 
-function safeJson(value: unknown): Prisma.InputJsonValue {
-  return value as Prisma.InputJsonValue;
-}
-
 function toExistingQuestion(row: {
   fragen_id: number;
   frage: string;
@@ -238,6 +234,69 @@ async function findOrCreateAuditBatch(
   return created[0].import_batch_id;
 }
 
+async function insertExternalQuestionMapping(
+  transaction: Prisma.TransactionClient,
+  input: {
+    plan: ExternalImportPlan;
+    item: ExternalImportPlanItem;
+    batchId: number;
+    questionId: number;
+    planDigest: string;
+  },
+) {
+  const approval = externalImportApprovalMetadata(
+    input.plan,
+    input.item.candidateId,
+  );
+  const providerPayload = JSON.stringify({
+    sourcePayload: input.item.original.providerPayload,
+    productionImport: {
+      batchId: input.plan.batchId,
+      planDigest: input.planDigest,
+      candidateId: input.item.candidateId,
+      approvalMode: approval.approvalMode,
+      policyVersion: approval.policyVersion,
+    },
+  });
+  const affected = await transaction.$executeRaw`
+    INSERT INTO pubquiz.external_question_import_items (
+      import_batch_id, provider, external_reference, license, license_url,
+      original_language, original_category, original_difficulty, original_type,
+      original_question, original_correct_answer, original_incorrect_answers,
+      provider_payload_json, prepared_question, prepared_correct_answer,
+      prepared_incorrect_answers, explanation, localization_status,
+      verification_status, verification_sources, suggested_category_name,
+      mapped_difficulty, status, issue_codes, duplicate_candidates,
+      automation_changes, content_fingerprint, question_id, verified_at,
+      review_started_at, reviewed_at, reviewed_by_user_id
+    ) VALUES (
+      ${input.batchId}, ${input.plan.sourceType}, ${input.item.externalReference},
+      ${input.item.license.name}, ${input.item.license.url},
+      ${input.item.original.language}, ${input.item.original.category},
+      ${input.item.original.difficulty}, ${input.item.original.type},
+      ${input.item.original.question}, ${input.item.original.correctAnswer},
+      ${JSON.stringify(input.item.original.incorrectAnswers)}::jsonb,
+      ${providerPayload}::jsonb, ${input.item.prepared.question},
+      ${input.item.prepared.correctAnswer},
+      ${JSON.stringify(input.item.prepared.distractors)}::jsonb,
+      ${input.item.prepared.explanation},
+      ${"LOCALIZED"}::pubquiz."ExternalQuestionLocalizationStatus",
+      ${"VERIFIED"}::pubquiz."ExternalQuestionVerificationStatus",
+      ${JSON.stringify(input.item.verification.sources)}::jsonb,
+      ${input.item.prepared.category}, ${input.item.prepared.difficulty}::numeric,
+      ${"APPROVED"}::pubquiz."ExternalQuestionImportItemStatus",
+      ${JSON.stringify([])}::jsonb, ${JSON.stringify([])}::jsonb,
+      ${JSON.stringify([])}::jsonb, ${input.item.contentFingerprint},
+      ${input.questionId}, ${new Date(input.plan.frozenAt)},
+      ${new Date(approval.approvedAt)}, ${new Date(approval.approvedAt)},
+      ${approval.reviewedByUserId}
+    )
+  `;
+  if (affected !== 1) {
+    throw new Error("EXTERNAL_IMPORT_MAPPING_INSERT_INVALID");
+  }
+}
+
 async function importPlanItem(input: {
   prisma: PrismaClient;
   plan: ExternalImportPlan;
@@ -258,10 +317,6 @@ async function importPlanItem(input: {
     if (decision.decision !== "CREATE") {
       throw new Error(`EXTERNAL_IMPORT_TOCTOU_${decision.decision}`);
     }
-    const approval = externalImportApprovalMetadata(
-      input.plan,
-      input.item.candidateId,
-    );
     const batchId = await runProductionWriterPhase("AUDIT", {
       operation: "insert",
       candidateId: input.item.candidateId,
@@ -283,50 +338,12 @@ async function importPlanItem(input: {
       operation: "insert",
       candidateId: input.item.candidateId,
       relation: "external_question_import_items",
-    }, () => transaction.external_question_import_items.create({
-      data: {
-        import_batch_id: batchId,
-        provider: input.plan.sourceType,
-        external_reference: input.item.externalReference,
-        license: input.item.license.name,
-        license_url: input.item.license.url,
-        original_language: input.item.original.language,
-        original_category: input.item.original.category,
-        original_difficulty: input.item.original.difficulty,
-        original_type: input.item.original.type,
-        original_question: input.item.original.question,
-        original_correct_answer: input.item.original.correctAnswer,
-        original_incorrect_answers: safeJson(input.item.original.incorrectAnswers),
-        provider_payload_json: safeJson({
-          sourcePayload: input.item.original.providerPayload,
-          productionImport: {
-            batchId: input.plan.batchId,
-            planDigest: input.planDigest,
-            candidateId: input.item.candidateId,
-            approvalMode: approval.approvalMode,
-            policyVersion: approval.policyVersion,
-          },
-        }),
-        prepared_question: input.item.prepared.question,
-        prepared_correct_answer: input.item.prepared.correctAnswer,
-        prepared_incorrect_answers: safeJson(input.item.prepared.distractors),
-        explanation: input.item.prepared.explanation,
-        localization_status: "LOCALIZED",
-        verification_status: "VERIFIED",
-        verification_sources: safeJson(input.item.verification.sources),
-        suggested_category_name: input.item.prepared.category,
-        mapped_difficulty: input.item.prepared.difficulty,
-        status: "APPROVED",
-        issue_codes: safeJson([]),
-        duplicate_candidates: safeJson([]),
-        automation_changes: safeJson([]),
-        content_fingerprint: input.item.contentFingerprint,
-        question_id: question.fragen_id,
-        verified_at: new Date(input.plan.frozenAt),
-        review_started_at: new Date(approval.approvedAt),
-        reviewed_at: new Date(approval.approvedAt),
-        reviewed_by_user_id: approval.reviewedByUserId,
-      },
+    }, () => insertExternalQuestionMapping(transaction, {
+      plan: input.plan,
+      item: input.item,
+      batchId,
+      questionId: question.fragen_id,
+      planDigest: input.planDigest,
     }));
     const imported = await runProductionWriterPhase("AUDIT", {
       operation: "read",
