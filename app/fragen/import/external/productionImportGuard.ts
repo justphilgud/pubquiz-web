@@ -8,12 +8,15 @@ import {
   isVerifiedExternalImportReviewerApproval,
   type VerifiedExternalImportReviewerApproval,
 } from "./reviewerApproval";
-import { countIndependentReliableSourceHosts } from "./sourceReliability";
+import {
+  countIndependentReliableSourceHosts,
+  hasStrongPrimaryOrOfficialSource,
+} from "./sourceReliability";
 
 export const EXTERNAL_IMPORT_PLAN_VERSION = 1 as const;
 export const EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS = 2 * 60 * 60 * 1000;
 export const EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION =
-  "production-auto-quality-v1" as const;
+  "production-auto-quality-v2" as const;
 
 export type ExternalImportReviewStatus =
   | "READY_FOR_REVIEW"
@@ -51,6 +54,7 @@ export type ExternalImportPlanItem = Readonly<{
     localizationStatus: "LOCALIZED";
     qualityStatus: "READY_FOR_REVIEW";
     issueCodes: readonly [];
+    hasStrongPrimaryOrOfficialSource: boolean;
     independentReliableSourceHosts: number;
   }>;
   reviewStatus: ExternalImportReviewStatus;
@@ -369,8 +373,13 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
         throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_INVALID");
       }
       const independentHosts = countIndependentReliableSourceHosts(item.verification.sources);
+      const strongPrimaryOrOfficialSource = hasStrongPrimaryOrOfficialSource(
+        item.verification.sources,
+      );
       if (
-        independentHosts < 2 ||
+        (independentHosts < 2 && !strongPrimaryOrOfficialSource) ||
+        item.autoQualityEvidence.hasStrongPrimaryOrOfficialSource !==
+          strongPrimaryOrOfficialSource ||
         item.autoQualityEvidence.independentReliableSourceHosts !== independentHosts
       ) {
         throw new Error("EXTERNAL_IMPORT_AUTO_SOURCE_POLICY_INVALID");

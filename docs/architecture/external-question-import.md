@@ -132,14 +132,18 @@ Preview-Aktion wird nicht als Production-Importweg freigeschaltet.
 Für ausdrücklich freigegebene Batchläufe kann der Plan alternativ die strengere
 Klasse `AUTO_APPROVED_FOR_PRODUCTION` verwenden. Diese Freigabe ist im Plan als
 `approvalMode = AUTOMATED_QUALITY_GATE` und mit der festen Policy
-`production-auto-quality-v1` gekennzeichnet. Sie verlangt `VERIFIED`, eine
+`production-auto-quality-v2` gekennzeichnet. Sie verlangt `VERIFIED`, eine
 abgeschlossene deutsche Lokalisierung, keinerlei offenen Quality-Gate-Befund,
-vier eindeutige Antworten, eine Kategorie sowie mindestens zwei voneinander
-unabhängige, vom bestehenden Quellenfilter akzeptierte Quellenorganisationen.
-Kandidaten mit nur einer Quelle werden auch dann nicht automatisch zugelassen.
-Der Plan speichert die prüfbare Evidenz pro Item und wird anschließend wie jeder
-andere Plan durch Digest, Production-Preflight, Backup und Required Reviewer
-gebunden.
+vier eindeutige Antworten, eine Kategorie sowie entweder mindestens zwei
+voneinander unabhängige, vom bestehenden Quellenfilter akzeptierte
+Quellenorganisationen oder mindestens eine starke, maschinell eindeutig
+erkennbare offizielle Primärquelle. Diese enge Primärquellenklasse umfasst
+staatliche, akademische, internationale und EU-Institutionen; gewöhnliche
+Unternehmens-, Community- und Sekundärquellen werden nicht allein anhand ihres
+Hostnamens als offiziell angenommen und benötigen weiterhin zwei unabhängige
+Organisationen. Der Plan speichert die prüfbare Evidenz pro Item und wird
+anschließend wie jeder andere Plan durch Digest, Production-Preflight, Backup
+und Required Reviewer gebunden.
 
 Automatisierte Freigaben erzeugen ausdrücklich keine erfundene Reviewer-ID.
 `reviewed_by_user_id` bleibt für diese Items `NULL`; Approvalmodus,

@@ -6,6 +6,7 @@ import {
   countIndependentReliableSourceHosts,
   toAutoApprovedPlanItem,
 } from "./productionAutoQuality";
+import { isStrongPrimaryOrOfficialSource } from "./sourceReliability";
 import type {
   ExternalQuestion,
   ExternalQuestionAutomationResult,
@@ -76,6 +77,7 @@ test("auto quality accepts only fully localized, verified candidates with two in
   assert.equal(result.eligible, true);
   assert.equal(result.classification, "AUTO_APPROVED_FOR_PRODUCTION");
   assert.equal(result.independentReliableSourceHosts, 2);
+  assert.equal(result.hasStrongPrimaryOrOfficialSource, true);
   assert.deepEqual(result.failures, []);
   const item = toAutoApprovedPlanItem({
     candidateId: "auto-a",
@@ -87,6 +89,33 @@ test("auto quality accepts only fully localized, verified candidates with two in
   assert.equal(item.autoQualityEvidence?.classification, "AUTO_APPROVED_FOR_PRODUCTION");
 });
 
+test("auto quality accepts one strong official primary source", () => {
+  const result = assessProductionAutoQuality({
+    question,
+    automation: automation({
+      verificationSources: [{ title: "NASA", url: "https://science.nasa.gov/mars/" }],
+    }),
+  });
+  assert.equal(result.eligible, true);
+  assert.equal(result.independentReliableSourceHosts, 1);
+  assert.equal(result.hasStrongPrimaryOrOfficialSource, true);
+});
+
+test("auto quality still rejects one ordinary secondary source", () => {
+  const result = assessProductionAutoQuality({
+    question,
+    automation: automation({
+      verificationSources: [{
+        title: "Britannica",
+        url: "https://www.britannica.com/place/Mars-planet",
+      }],
+    }),
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(result.hasStrongPrimaryOrOfficialSource, false);
+  assert.deepEqual(result.failures, ["INSUFFICIENT_INDEPENDENT_SOURCES"]);
+});
+
 test("subdomains and country domains of one organization do not count as independent", () => {
   assert.equal(countIndependentReliableSourceHosts([
     { url: "https://global.example.com/fact" },
@@ -94,11 +123,21 @@ test("subdomains and country domains of one organization do not count as indepen
   ]), 1);
 });
 
+test("official source detection is suffix-bound and cannot be spoofed by a middle label", () => {
+  assert.equal(isStrongPrimaryOrOfficialSource("https://science.nasa.gov/mars/"), true);
+  assert.equal(isStrongPrimaryOrOfficialSource("https://service.gov.uk/fact"), true);
+  assert.equal(isStrongPrimaryOrOfficialSource("https://gov.example.com/fact"), false);
+  assert.equal(isStrongPrimaryOrOfficialSource("https://university.example.com/fact"), false);
+});
+
 test("auto quality rejects one-source and unresolved quality cases", () => {
   const result = assessProductionAutoQuality({
     question,
     automation: automation({
-      verificationSources: [{ title: "NASA", url: "https://science.nasa.gov/mars/" }],
+      verificationSources: [{
+        title: "Britannica",
+        url: "https://www.britannica.com/place/Mars-planet",
+      }],
       flags: {
         ...automation().flags,
         poorDistractor: true,
