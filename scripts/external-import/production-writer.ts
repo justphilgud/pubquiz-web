@@ -107,6 +107,10 @@ async function transactionPreflight(
       contentFingerprint: mapping.content_fingerprint,
     })),
   ];
+  const categories = await transaction.fragenkategorie.findMany({
+    where: { status: "ACTIVE" },
+    select: { kategorie: true },
+  });
   const approval = plan.importApproval.records.find(
     (record) => record.candidateId === item.candidateId,
   );
@@ -118,6 +122,7 @@ async function transactionPreflight(
       importApproval: { ...plan.importApproval, records: [approval] } as ExternalImportPlan["importApproval"],
     },
     existing,
+    categories.map((category) => category.kategorie),
   ).items[0];
 }
 

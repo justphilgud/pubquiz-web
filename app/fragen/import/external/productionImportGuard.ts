@@ -473,10 +473,14 @@ function normalizedAnswer(value: string | null) {
 export function preflightExternalImport(
   plan: ExternalImportPlan,
   existing: readonly ExistingExternalQuestion[],
+  activeCategoryNames: readonly string[],
 ): ExternalImportPreflight {
   validateExternalImportPlan(plan);
   const approvedIds = new Set(
     plan.importApproval.records.map((record) => record.candidateId),
+  );
+  const activeCategories = new Set(
+    activeCategoryNames.map((category) => category.trim().toLocaleLowerCase("de")),
   );
   const items = plan.items.map<ExternalImportPreflightItem>((candidate) => {
     const mapping = existing.find((entry) =>
@@ -537,6 +541,16 @@ export function preflightExternalImport(
         decision: "REVIEW_REQUIRED",
         existingQuestionId: semantic.entry.questionId,
         reason: `SEMANTIC_SIMILARITY_${semantic.similarity.toFixed(3)}`,
+      };
+    }
+    const category = candidate.prepared.category?.trim().toLocaleLowerCase("de");
+    if (!category || !activeCategories.has(category)) {
+      return {
+        candidateId: candidate.candidateId,
+        externalReference: candidate.externalReference,
+        decision: "REVIEW_REQUIRED",
+        existingQuestionId: null,
+        reason: "ACTIVE_CATEGORY_MISSING",
       };
     }
     if (

@@ -209,6 +209,12 @@ dedizierte Credential `pubquiz_external_import_writer` akzeptiert. Owner- oder
 Adminrollen der Datenbank werden vom Writer abgewiesen. Der im Plan genannte
 Operator muss zusätzlich ein aktiver globaler App-Admin sein.
 
+Der Production-Preflight gleicht die vorbereitete Kategorie zusätzlich
+groß-/kleinschreibungsunabhängig mit den aktiven Production-Kategorien ab. Ein
+neuer Kandidat ohne exakten aktiven Match bleibt `REVIEW_REQUIRED` mit
+`ACTIVE_CATEGORY_MISSING`; der Production-Writer erzeugt in diesem Fall keine
+Frage mit bloßem Kategorienwunsch.
+
 Jedes Item läuft in einer eigenen serialisierbaren Transaktion. Frage,
 Antworten, Kategoriebezug und External-Mapping committen gemeinsam oder werden
 vollständig zurückgerollt. Erzeugte Fragen bleiben unveröffentlicht mit

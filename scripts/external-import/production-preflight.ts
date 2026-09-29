@@ -17,6 +17,10 @@ type QuestionRow = {
   content_fingerprint: string | null;
 };
 
+type CategoryRow = {
+  category: string;
+};
+
 export async function readProductionExternalImportPreflight(input: {
   connectionString: string;
   plan: ExternalImportPlan;
@@ -68,6 +72,12 @@ export async function readProductionExternalImportPreflight(input: {
       WHERE i.question_id IS NULL
       ORDER BY i.import_item_id
     `);
+    const categories = await client.query<CategoryRow>(`
+      SELECT kategorie AS category
+      FROM pubquiz.fragenkategorien
+      WHERE status = 'ACTIVE'
+      ORDER BY kategorie
+    `);
     const existing = [...rows.rows, ...orphanMappings.rows].map<ExistingExternalQuestion>((row) => ({
       questionId: row.question_id,
       question: row.question,
@@ -76,7 +86,11 @@ export async function readProductionExternalImportPreflight(input: {
       externalReference: row.external_reference,
       contentFingerprint: row.content_fingerprint,
     }));
-    const preflight = preflightExternalImport(input.plan, existing);
+    const preflight = preflightExternalImport(
+      input.plan,
+      existing,
+      categories.rows.map((category) => category.category),
+    );
     await client.query("ROLLBACK");
     const safeIdentity: ProductionIdentity = {
       host: identity.host,
