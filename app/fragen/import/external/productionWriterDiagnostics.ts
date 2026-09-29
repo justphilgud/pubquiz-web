@@ -40,8 +40,26 @@ function record(value: unknown): value is Record<string, unknown> {
 }
 
 function safeSqlState(error: unknown) {
-  const code = record(error) ? error.code : undefined;
-  return typeof code === "string" && /^[0-9A-Z]{5}$/.test(code) ? code : "none";
+  const queue: unknown[] = [error];
+  const visited = new Set<unknown>();
+  let fallback = "none";
+  for (let depth = 0; depth < 6 && queue.length > 0; depth += 1) {
+    const value = queue.shift();
+    if (!record(value) || visited.has(value)) continue;
+    visited.add(value);
+    const originalCode = value.originalCode;
+    if (typeof originalCode === "string" && /^[0-9A-Z]{5}$/.test(originalCode)) {
+      return originalCode;
+    }
+    const code = value.code;
+    if (fallback === "none" && typeof code === "string" && /^[0-9A-Z]{5}$/.test(code)) {
+      fallback = code;
+    }
+    for (const key of ["meta", "driverAdapterError", "cause"] as const) {
+      if (record(value[key])) queue.push(value[key]);
+    }
+  }
+  return fallback;
 }
 
 function safeRelation(error: unknown, fallback: string) {

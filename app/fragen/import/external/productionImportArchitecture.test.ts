@@ -166,6 +166,10 @@ test("Production writer role grants only the external-import write surface", () 
 
 test("Production writer verification rejects broad ACLs without executing writes", () => {
   const verify = read("scripts/external-import/verify-production-writer.psql");
+  assert.match(verify, /external_question_import_batches', 'status', 'UPDATE'/);
+  assert.match(verify, /external_question_import_batches', 'report_json', 'UPDATE'/);
+  assert.match(verify, /external_question_import_batches', 'error_message', 'UPDATE'/);
+  assert.match(verify, /external_question_import_batches', 'completed_at', 'UPDATE'/);
   for (const marker of [
     "WRITER_ROLE_ATTRIBUTES_INVALID",
     "WRITER_ROLE_MEMBERSHIP_INVALID",
