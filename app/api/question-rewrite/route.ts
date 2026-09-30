@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { questionRewriteResponse } from "@/app/fragen/editor/questionRewriteEndpoint";
 import { isQuestionRewriteEnabled } from "@/app/fragen/editor/questionRewriteFeature.server";
-import { createMistralQuestionRewriteProvider } from "@/app/fragen/editor/questionRewriteProvider.server";
+import { createOpenAIQuestionRewriteProvider } from "@/app/fragen/editor/questionRewriteProvider.server";
 import { questionRewriteRateLimit } from "@/app/fragen/editor/questionRewriteRateLimit.server";
 
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       const session = await auth();
       return session?.user ? getActorForSession(session) : null;
     },
-    provider: createMistralQuestionRewriteProvider,
+    provider: createOpenAIQuestionRewriteProvider,
     rateLimit: questionRewriteRateLimit,
   });
 }

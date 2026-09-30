@@ -1,0 +1,344 @@
+{
+  "generatedAt": "2026-09-30T16:51:01.760Z",
+  "model": "gpt-5.6-luna",
+  "pricingUsdPerMillionTokens": {
+    "input": 0.2,
+    "output": 1.2
+  },
+  "budgetUsd": 1,
+  "maximumEstimatedCostUsd": 0.00928,
+  "actualCostUsd": 0.0013873999999999998,
+  "results": [
+    {
+      "id": "short",
+      "original": "Wer war Mozart?",
+      "httpStatus": 200,
+      "latencyMs": 2790,
+      "ok": true,
+      "proposal": "Wer war Mozart?",
+      "usage": {
+        "promptTokens": 196,
+        "completionTokens": 17,
+        "totalTokens": 213
+      },
+      "cost": {
+        "amountUsd": 0.0000596,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "long",
+      "original": "Welche Stadt ist es, die als Hauptstadt von Frankreich gilt und zugleich an dem Fluss Seine gelegen ist?",
+      "httpStatus": 200,
+      "latencyMs": 4072,
+      "ok": true,
+      "proposal": "Welche Stadt gilt als Hauptstadt Frankreichs und liegt an der Seine?",
+      "usage": {
+        "promptTokens": 213,
+        "completionTokens": 26,
+        "totalTokens": 239
+      },
+      "cost": {
+        "amountUsd": 0.00007379999999999999,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "awkward",
+      "original": "Wie heißt denn eigentlich das Land, wo die Hauptstadt davon Ottawa ist?",
+      "httpStatus": 200,
+      "latencyMs": 2079,
+      "ok": true,
+      "proposal": "Wie heißt das Land, dessen Hauptstadt Ottawa ist?",
+      "usage": {
+        "promptTokens": 206,
+        "completionTokens": 23,
+        "totalTokens": 229
+      },
+      "cost": {
+        "amountUsd": 0.00006879999999999999,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "already-good",
+      "original": "Wie heißt die Hauptstadt von Japan?",
+      "httpStatus": 200,
+      "latencyMs": 1739,
+      "ok": true,
+      "proposal": "Wie heißt die Hauptstadt von Japan?",
+      "usage": {
+        "promptTokens": 199,
+        "completionTokens": 20,
+        "totalTokens": 219
+      },
+      "cost": {
+        "amountUsd": 0.0000638,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "year",
+      "original": "In welchem Jahr fiel die Berliner Mauer?",
+      "httpStatus": 200,
+      "latencyMs": 1646,
+      "ok": true,
+      "proposal": "In welchem Jahr fiel die Berliner Mauer?",
+      "usage": {
+        "promptTokens": 201,
+        "completionTokens": 22,
+        "totalTokens": 223
+      },
+      "cost": {
+        "amountUsd": 0.00006659999999999999,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "numbers",
+      "original": "Wie viele Minuten dauern 2 Stunden und 30 Minuten?",
+      "httpStatus": 200,
+      "latencyMs": 1822,
+      "ok": true,
+      "proposal": "Wie viele Minuten sind 2 Stunden und 30 Minuten?",
+      "usage": {
+        "promptTokens": 204,
+        "completionTokens": 25,
+        "totalTokens": 229
+      },
+      "cost": {
+        "amountUsd": 0.00007080000000000001,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "person",
+      "original": "Welches Werk schrieb Johann Wolfgang von Goethe?",
+      "httpStatus": 200,
+      "latencyMs": 6418,
+      "ok": true,
+      "proposal": "Welches Werk schrieb Johann Wolfgang von Goethe?",
+      "usage": {
+        "promptTokens": 201,
+        "completionTokens": 22,
+        "totalTokens": 223
+      },
+      "cost": {
+        "amountUsd": 0.00006659999999999999,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "names",
+      "original": "In welcher Stadt trafen sich John Lennon und Paul McCartney erstmals?",
+      "httpStatus": 200,
+      "latencyMs": 8849,
+      "ok": true,
+      "proposal": "In welcher Stadt trafen John Lennon und Paul McCartney erstmals aufeinander?",
+      "usage": {
+        "promptTokens": 206,
+        "completionTokens": 28,
+        "totalTokens": 234
+      },
+      "cost": {
+        "amountUsd": 0.00007480000000000002,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "place",
+      "original": "Durch welche Stadt fließt die Seine?",
+      "httpStatus": 200,
+      "latencyMs": 1191,
+      "ok": true,
+      "proposal": "Durch welche Stadt fließt die Seine?",
+      "usage": {
+        "promptTokens": 201,
+        "completionTokens": 22,
+        "totalTokens": 223
+      },
+      "cost": {
+        "amountUsd": 0.00006659999999999999,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "foreign-name",
+      "original": "Welches Unternehmen gründete Ingvar Kamprad?",
+      "httpStatus": 200,
+      "latencyMs": 1379,
+      "ok": true,
+      "proposal": "Welches Unternehmen gründete Ingvar Kamprad?",
+      "usage": {
+        "promptTokens": 203,
+        "completionTokens": 24,
+        "totalTokens": 227
+      },
+      "cost": {
+        "amountUsd": 0.0000694,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "quote",
+      "original": "Wer sagte „Ich denke, also bin ich“?",
+      "httpStatus": 200,
+      "latencyMs": 982,
+      "ok": true,
+      "proposal": "Wer sagte: „Ich denke, also bin ich“?",
+      "usage": {
+        "promptTokens": 203,
+        "completionTokens": 25,
+        "totalTokens": 228
+      },
+      "cost": {
+        "amountUsd": 0.0000706,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "parentheses",
+      "original": "Welcher Planet ist der Sonne am nächsten (benannt nach einem römischen Gott)?",
+      "httpStatus": 200,
+      "latencyMs": 1150,
+      "ok": true,
+      "proposal": "Welcher Planet ist der Sonne am nächsten und nach einem römischen Gott benannt?",
+      "usage": {
+        "promptTokens": 211,
+        "completionTokens": 31,
+        "totalTokens": 242
+      },
+      "cost": {
+        "amountUsd": 0.0000794,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "additional",
+      "original": "Welche Insel ist die größte der Erde, wenn Australien als Kontinent gezählt wird?",
+      "httpStatus": 200,
+      "latencyMs": 1418,
+      "ok": true,
+      "proposal": "Welche Insel ist die größte der Erde, wenn Australien als Kontinent gilt?",
+      "usage": {
+        "promptTokens": 210,
+        "completionTokens": 29,
+        "totalTokens": 239
+      },
+      "cost": {
+        "amountUsd": 0.0000768,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "term",
+      "original": "Wie heißt der Prozess, bei dem Pflanzen Lichtenergie in chemische Energie umwandeln?",
+      "httpStatus": 200,
+      "latencyMs": 1252,
+      "ok": true,
+      "proposal": "Wie heißt der Prozess, bei dem Pflanzen Lichtenergie in chemische Energie umwandeln?",
+      "usage": {
+        "promptTokens": 210,
+        "completionTokens": 31,
+        "totalTokens": 241
+      },
+      "cost": {
+        "amountUsd": 0.00007919999999999999,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "wordplay",
+      "original": "Welches Tier steckt im Wort Katerstimmung?",
+      "httpStatus": 502,
+      "latencyMs": 3389,
+      "ok": false,
+      "code": "PROVIDER_RESPONSE_INVALID"
+    },
+    {
+      "id": "answer-leak",
+      "original": "Welche rote Frucht, die oft für Ketchup verwendet wird, gehört botanisch zu den Beeren?",
+      "httpStatus": 200,
+      "latencyMs": 1289,
+      "ok": true,
+      "proposal": "Welche rote Frucht, die häufig für Ketchup verwendet wird, gehört botanisch zu den Beeren?",
+      "usage": {
+        "promptTokens": 213,
+        "completionTokens": 34,
+        "totalTokens": 247
+      },
+      "cost": {
+        "amountUsd": 0.00008340000000000001,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "difficulty",
+      "original": "Welches chemische Element trägt das Symbol W?",
+      "httpStatus": 200,
+      "latencyMs": 1222,
+      "ok": true,
+      "proposal": "Welches chemische Element hat das Symbol W?",
+      "usage": {
+        "promptTokens": 202,
+        "completionTokens": 23,
+        "totalTokens": 225
+      },
+      "cost": {
+        "amountUsd": 0.000068,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "minimal-change",
+      "original": "Wer malte die Mona Lisa?",
+      "httpStatus": 200,
+      "latencyMs": 1059,
+      "ok": true,
+      "proposal": "Wer malte die Mona Lisa?",
+      "usage": {
+        "promptTokens": 199,
+        "completionTokens": 20,
+        "totalTokens": 219
+      },
+      "cost": {
+        "amountUsd": 0.0000638,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "complex",
+      "original": "Wie heißt der Roman, den George Orwell im Jahr 1949 veröffentlichte und dessen Titel aus einer umgestellten Jahreszahl besteht?",
+      "httpStatus": 200,
+      "latencyMs": 1235,
+      "ok": true,
+      "proposal": "Wie heißt der Roman, den George Orwell 1949 veröffentlichte und dessen Titel aus einer umgestellten Jahreszahl besteht?",
+      "usage": {
+        "promptTokens": 220,
+        "completionTokens": 39,
+        "totalTokens": 259
+      },
+      "cost": {
+        "amountUsd": 0.0000908,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    },
+    {
+      "id": "sensitive-facts",
+      "original": "Welcher Physiker formulierte 1905 die spezielle Relativitätstheorie und erhielt 1921 den Nobelpreis für Physik?",
+      "httpStatus": 200,
+      "latencyMs": 1147,
+      "ok": true,
+      "proposal": "Welcher Physiker formulierte 1905 die spezielle Relativitätstheorie und erhielt 1921 den Nobelpreis für Physik?",
+      "usage": {
+        "promptTokens": 221,
+        "completionTokens": 42,
+        "totalTokens": 263
+      },
+      "cost": {
+        "amountUsd": 0.0000946,
+        "kind": "CONFIGURED_ESTIMATE"
+      }
+    }
+  ]
+}

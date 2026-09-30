@@ -68,10 +68,10 @@ function formatCost(cost: QuestionRewriteHistoryEntry["cost"]) {
   if (!cost) return null;
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
-    currency: "EUR",
+    currency: "USD",
     minimumFractionDigits: 4,
     maximumFractionDigits: 6,
-  }).format(cost.amountEuro);
+  }).format(cost.amountUsd);
 }
 
 export function QuestionRewritePanel({

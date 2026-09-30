@@ -1,5 +1,5 @@
 export function isQuestionRewriteEnabled(
-  value = process.env.MISTRAL_QUESTION_REWRITE_ENABLED,
+  value = process.env.OPENAI_QUESTION_REWRITE_ENABLED,
 ): boolean {
   return value?.trim().toLocaleLowerCase("en-US") === "true";
 }

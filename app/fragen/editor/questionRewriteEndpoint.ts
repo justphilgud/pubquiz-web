@@ -33,6 +33,8 @@ function providerErrorResponse(error: unknown) {
       return errorResponse("NOT_CONFIGURED", 503);
     case "TIMEOUT":
       return errorResponse("PROVIDER_TIMEOUT", 504);
+    case "RATE_LIMIT":
+      return errorResponse("PROVIDER_RATE_LIMIT", 429);
     case "INVALID_RESPONSE":
       return errorResponse("PROVIDER_RESPONSE_INVALID", 502);
     case "UNAVAILABLE":

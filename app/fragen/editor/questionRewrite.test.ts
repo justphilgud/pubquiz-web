@@ -100,5 +100,5 @@ test("editor integration exposes rewrite UI only behind the server flag", () => 
   const editor = readFileSync(new URL("./components/QuestionEditor.tsx", import.meta.url), "utf8");
   assert.match(editor, /questionRewriteEnabled && !isReadOnly/);
   assert.match(editor, /applyQuestionRewriteToDraft\(current, questionText\)/);
-  assert.doesNotMatch(editor, /NEXT_PUBLIC_MISTRAL/);
+  assert.doesNotMatch(editor, /NEXT_PUBLIC_OPENAI/);
 });

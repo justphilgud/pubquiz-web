@@ -7,7 +7,7 @@ export type QuestionRewriteTokenUsage = {
 };
 
 export type QuestionRewriteCost = {
-  amountEuro: number;
+  amountUsd: number;
   kind: "CONFIGURED_ESTIMATE";
 };
 
@@ -36,6 +36,7 @@ export type QuestionRewriteErrorCode =
   | "TOO_MANY_REQUESTS"
   | "NOT_CONFIGURED"
   | "PROVIDER_TIMEOUT"
+  | "PROVIDER_RATE_LIMIT"
   | "PROVIDER_RESPONSE_INVALID"
   | "PROVIDER_UNAVAILABLE";
 
@@ -47,6 +48,7 @@ const questionRewriteErrorCodes = new Set<QuestionRewriteErrorCode>([
   "TOO_MANY_REQUESTS",
   "NOT_CONFIGURED",
   "PROVIDER_TIMEOUT",
+  "PROVIDER_RATE_LIMIT",
   "PROVIDER_RESPONSE_INVALID",
   "PROVIDER_UNAVAILABLE",
 ]);
@@ -82,9 +84,9 @@ export function isQuestionRewriteSuccessResponse(
   const validCost = cost === null || (
     Boolean(cost) && typeof cost === "object" && !Array.isArray(cost) &&
     (cost as Record<string, unknown>).kind === "CONFIGURED_ESTIMATE" &&
-    typeof (cost as Record<string, unknown>).amountEuro === "number" &&
-    Number.isFinite((cost as Record<string, unknown>).amountEuro) &&
-    Number((cost as Record<string, unknown>).amountEuro) >= 0
+    typeof (cost as Record<string, unknown>).amountUsd === "number" &&
+    Number.isFinite((cost as Record<string, unknown>).amountUsd) &&
+    Number((cost as Record<string, unknown>).amountUsd) >= 0
   );
   return response.ok === true &&
     typeof response.proposal === "string" &&

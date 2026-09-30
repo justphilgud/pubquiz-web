@@ -40,7 +40,33 @@ test("successful response contains proposal and usage without persistence", asyn
   assert.equal(response.headers.get("Cache-Control"), "private, no-store");
 });
 
-for (const scenario of [["TIMEOUT", 504, "PROVIDER_TIMEOUT"], ["INVALID_RESPONSE", 502, "PROVIDER_RESPONSE_INVALID"], ["UNAVAILABLE", 503, "PROVIDER_UNAVAILABLE"], ["NOT_CONFIGURED", 503, "NOT_CONFIGURED"]] as const) {
+test("endpoint forwards only the validated question text to the provider", async () => {
+  let forwarded = "";
+  const response = await questionRewriteResponse(
+    new Request("http://localhost/api/question-rewrite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        questionText: "  Alte Frage?  ",
+        answers: ["Geheime Antwort"],
+        solution: "Geheime Lösung",
+        media: { url: "https://example.invalid/secret.jpg" },
+      }),
+    }),
+    dependencies({
+      provider: {
+        rewrite: async (questionText) => {
+          forwarded = questionText;
+          return { proposal: "Bessere Frage?", usage: null, cost: null };
+        },
+      },
+    }),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(forwarded, "Alte Frage?");
+});
+
+for (const scenario of [["TIMEOUT", 504, "PROVIDER_TIMEOUT"], ["RATE_LIMIT", 429, "PROVIDER_RATE_LIMIT"], ["INVALID_RESPONSE", 502, "PROVIDER_RESPONSE_INVALID"], ["UNAVAILABLE", 503, "PROVIDER_UNAVAILABLE"], ["NOT_CONFIGURED", 503, "NOT_CONFIGURED"]] as const) {
   test(`provider ${scenario[0]} is mapped to a safe response`, async () => {
     const response = await questionRewriteResponse(request(), dependencies({ provider: { rewrite: async () => { throw new QuestionRewriteProviderError(scenario[0]); } } }));
     assert.equal(response.status, scenario[1]);

@@ -9,7 +9,7 @@ test("rewrite panel starts with one explicit action and no proposal or automatic
   const html = renderToStaticMarkup(createElement(QuestionRewritePanel, { questionText: "Wer erfand das Telefon?", disabled: false, messages: deQuestionEditorMessages.question.rewrite, onAccept: () => undefined }));
   assert.match(html, /data-question-rewrite/);
   assert.match(html, /Frage umformulieren/);
-  assert.match(html, /Mistral erhält ausschließlich den Fragetext/);
+  assert.match(html, /OpenAI erhält ausschließlich den Fragetext/);
   assert.doesNotMatch(html, /id="questionRewriteProposal"/);
   assert.doesNotMatch(html, /Übernehmen/);
 });
