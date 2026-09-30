@@ -27,6 +27,7 @@ import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { PendingCategoryReviewDialog } from "./PendingCategoryReviewDialog";
 import { QuestionSection } from "./QuestionSection";
+import { QuestionRewritePanel } from "./QuestionRewritePanel";
 import { QuestionSponsorSection } from "./QuestionSponsorSection";
 import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
@@ -81,6 +82,7 @@ import {
   applySavedAnswerState,
   getQuestionDraftFingerprint,
   removeAnswerById,
+  applyQuestionRewriteToDraft,
 } from "../questionDraftState";
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
@@ -158,6 +160,7 @@ type QuestionEditorProps = {
   templates: QuestionTemplate[];
   scopeOptions: { canSelectGlobal: boolean; eventSeries: ContentScopeEventSeriesOption[] };
   googlePlacesFeature: GooglePlacesFeature;
+  questionRewriteEnabled?: boolean;
   storyElementOptions?: QuestionStoryElementDraftOption[];
   storyEditorOptions?: StoryElementEditorOptions;
 };
@@ -174,6 +177,7 @@ export function QuestionEditor({
   templates,
   scopeOptions,
   googlePlacesFeature,
+  questionRewriteEnabled = false,
   storyElementOptions = [],
   storyEditorOptions,
 }: QuestionEditorProps) {
@@ -992,6 +996,18 @@ export function QuestionEditor({
             }));
           }}
           validationError={fieldError?.target === "questionText" ? fieldError.text : null}
+          rewriteContent={questionRewriteEnabled && !isReadOnly ? (
+            <QuestionRewritePanel
+              questionText={draft.questionText}
+              disabled={isEditorDisabled}
+              messages={messages.question.rewrite}
+              onAccept={(questionText) => {
+                if (fieldError?.target === "questionText") setFieldError(null);
+                setDraft((current) =>
+                  applyQuestionRewriteToDraft(current, questionText));
+              }}
+            />
+          ) : undefined}
           mediaContent={
             <QuestionMediaSection
               slots={activeMediaSlots}
