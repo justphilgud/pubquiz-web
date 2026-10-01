@@ -67,6 +67,11 @@ export type ContentSearchItem = {
     questionMediaCount: number;
     answerMediaCount: number;
     storyElementCount: number;
+    solutionPreview: {
+      label: "Richtige Lösung" | "Richtige Lösungen";
+      values: string[];
+      remainingCount: number;
+    } | null;
   };
   storyMetrics?: {
     linkedQuestionCount: number;
@@ -79,6 +84,15 @@ export type ContentSearchItem = {
     revision: number;
   };
 };
+
+export function getQuestionStatusesForContentFilter(
+  status: ContentStatusFilter,
+) {
+  if (status === "DRAFT") return ["MY_DRAFTS"] as const;
+  if (status === "ACTIVE") return ["APPROVED"] as const;
+  if (status === "ARCHIVED") return ["ARCHIVED"] as const;
+  return [];
+}
 
 export type ContentSearchResult = { items: ContentSearchItem[]; total: number };
 

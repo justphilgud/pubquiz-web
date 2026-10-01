@@ -31,6 +31,11 @@ import { listSelectableStoryElementsForQuiz } from "@/app/story-elemente/storyEl
 import QuizConfigurationPanel from "./QuizConfigurationPanel";
 import { searchContent } from "@/app/components/content/actions";
 import { parseContentFilters } from "@/app/components/content/contentLibrary";
+import { localizeQuestionTemplates } from "@/app/fragen/editor/templates/questionTemplates";
+import { loadDynamicQuestionTemplates } from "@/app/fragen/editor/templates/dynamicQuestionTemplates.server";
+import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
+import { getDefaultLocale } from "@/app/i18n/locale";
+import { prisma } from "@/app/lib/prisma";
 
 const productActionAppearance: Record<QuizProductActionId, {
   icon: typeof PlayIcon;
@@ -54,10 +59,19 @@ export default async function QuizDetailPage({
   const { quizId } = await params;
   await requireQuizViewer(Number(quizId));
 
-  const [quiz, actorContext, pollSearch] = await Promise.all([
+  const baseQuestionTemplates = localizeQuestionTemplates(
+    loadQuestionEditorMessages(getDefaultLocale()),
+  ).filter((template) => template.enabled);
+  const [quiz, actorContext, pollSearch, questionCategories, questionTemplates] = await Promise.all([
     getQuizDetails(Number(quizId)),
     requireActor(),
     searchContent(parseContentFilters(new URLSearchParams("contentType=POLL"))),
+    prisma.fragenkategorie.findMany({
+      where: { status: "ACTIVE" },
+      select: { fragenkategorie_id: true, kategorie: true },
+      orderBy: { kategorie: "asc" },
+    }),
+    loadDynamicQuestionTemplates(baseQuestionTemplates),
   ]);
 
   if (!quiz) {
@@ -244,6 +258,15 @@ export default async function QuizDetailPage({
                 } : null,
               };
             })}
+            questionCategories={questionCategories.map((category) => ({
+              id: category.fragenkategorie_id,
+              name: category.kategorie,
+            }))}
+            questionTemplates={[...baseQuestionTemplates, ...questionTemplates].map((template) => ({
+              id: template.id,
+              name: template.name,
+              availableForFiltering: template.availableForFiltering,
+            }))}
           />
         </section>
 
