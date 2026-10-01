@@ -139,12 +139,10 @@ import {
   materializeQuizQuestionStoryItems,
   toStoredQuizFlowItem,
 } from "./flow/quizFlowRepository.server";
-import { getActorForSession } from "@/app/roles/roleAssignments.server";
-import {
-  getActorEventSeriesIds,
-  isAdministrator,
-} from "@/app/roles/roleAssignmentPolicy";
 import { isQuestionEligibleForQuiz } from "@/app/fragen/editor/questionScopePolicy";
+import { searchFragen } from "@/app/fragen/actions";
+import type { ContentFiltersState } from "@/app/components/content/contentLibrary";
+import { getQuestionStatusesForContentFilter } from "@/app/components/content/contentLibrary";
 import {
   isStoryPlacementHiddenConfig,
   storyPlacementFromRelationship,
@@ -1272,64 +1270,47 @@ export type QuizFrageSuchResult = {
   }>;
 };
 
+export type QuizFrageSearchResult = {
+  items: QuizFrageSuchResult[];
+  total: number;
+  hasMore: boolean;
+  nextOffset: number;
+};
+
 export async function searchFragenForQuiz(data: {
   quizId: number;
-  suchtext: string;
-}): Promise<QuizFrageSuchResult[]> {
+  filters: ContentFiltersState;
+  offset?: number;
+}): Promise<QuizFrageSearchResult> {
   const quizAccess = await requireQuizEditor(data.quizId);
   const eventSeriesId = quizAccess.ownership.eventSeriesId!;
-  const actor = await getActorForSession(quizAccess.session);
-  const actorEventSeriesIds = getActorEventSeriesIds(actor);
   const now = getBerlinDate();
-  const fragen = await prisma.fragen.findMany({
-    where: {
-      ist_archiviert: false,
-      frage: data.suchtext.trim()
-        ? {
-            contains: data.suchtext.trim(),
-            mode: "insensitive",
-          }
-        : undefined,
-      ...(isAdministrator(actor)
-        ? {}
-        : {
-            OR: [
-              { geltungsbereich: "GLOBAL" as const, freigegeben: true },
-              { geltungsbereich: "GLOBAL" as const, created_by_user_id: actor.userId },
-              {
-                geltungsbereich: "EVENT_SERIES" as const,
-                eventreihen: { some: { eventreihe_id: { in: actorEventSeriesIds } } },
-              },
-            ],
-          }),
-    },
-    orderBy: {
-      fragen_id: "desc",
-    },
-    take: 25,
-    include: {
-      vorlage: { select: { code: true } },
-      fragen_kategorien: {
-        include: {
-          fragenkategorie: true,
-        },
-      },
-      eventreihen: {
-        select: { eventreihe_id: true },
-      },
-      quiz_fragen: {
-        where: {
-          quiz_id: data.quizId,
-        },
-      },
+  const searchResult = await searchFragen({
+    suchtext: data.filters.query,
+    kategorieId: null,
+    kategorieIds: data.filters.categoryIds,
+    sourceState: null,
+    mediaState: data.filters.media === "ALL"
+      ? null
+      : data.filters.media === "WITH" ? "with" : "without",
+    answerMode: null,
+    statuses: [...getQuestionStatusesForContentFilter(data.filters.status)],
+    templateIds: data.filters.templateId ? [data.filters.templateId] : [],
+    usageState: data.filters.usage === "ALL" ? null : data.filters.usage,
+    lifecycleFilter: data.filters.questionLifecycle,
+    limit: 25,
+    offset: data.offset ?? 0,
+  });
+  const details = await prisma.fragen.findMany({
+    where: { fragen_id: { in: searchResult.results.map((question) => question.fragen_id) } },
+    select: {
+      fragen_id: true,
       story_element_verknuepfungen: {
-        orderBy: [
-          { sortierung: "asc" },
-          { frage_story_element_id: "asc" },
-        ],
-        include: {
+        orderBy: [{ sortierung: "asc" }, { frage_story_element_id: "asc" }],
+        select: {
           story_element: {
-            include: {
+            select: {
+              story_element_id: true,
               revisionen: {
                 orderBy: { revisionsnummer: "desc" },
                 take: 1,
@@ -1341,24 +1322,26 @@ export async function searchFragenForQuiz(data: {
       },
     },
   });
+  const detailsById = new Map(details.map((question) => [question.fragen_id, question]));
 
-  return fragen.map((frage) => {
+  const items = searchResult.results.map((frage) => {
     const istVerwendbar = isQuestionEligibleForQuiz({
       scope: frage.geltungsbereich,
-      eventSeriesIds: frage.eventreihen.map((entry) => entry.eventreihe_id),
+      eventSeriesIds: frage.eventreihe_ids,
       quizEventSeriesId: eventSeriesId,
       isApproved: frage.freigegeben,
       isArchived: frage.ist_archiviert,
-      validUntil: frage.gueltig_bis,
+      validUntil: frage.gueltig_bis ? new Date(`${frage.gueltig_bis}T00:00:00.000Z`) : null,
       now,
     });
+    const detail = detailsById.get(frage.fragen_id);
     return {
       fragen_id: frage.fragen_id,
       frage: frage.frage,
       quelle: frage.quelle,
-      schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
-      kategorien: frage.fragen_kategorien.map((k) => k.fragenkategorie.kategorie),
-      ist_bereits_im_quiz: frage.quiz_fragen.length > 0,
+      schwierigkeitslevel: frage.schwierigkeitslevel,
+      kategorien: frage.kategorien,
+      ist_bereits_im_quiz: frage.quizze.some((quiz) => quiz.quiz_id === data.quizId),
       review_status: frage.review_status,
       ist_verwendbar: istVerwendbar,
       status_hinweis: istVerwendbar
@@ -1370,19 +1353,25 @@ export async function searchFragenForQuiz(data: {
             : frage.review_status === "CHANGES_REQUESTED"
               ? "Änderungen angefordert – noch nicht freigegeben"
               : "Für diese Eventreihe nicht verwendbar",
-      templateId: frage.vorlage?.code ?? null,
-      storyElements: frage.story_element_verknuepfungen.flatMap((link) => {
+      templateId: frage.template_id,
+      storyElements: detail?.story_element_verknuepfungen.flatMap((link) => {
         const revision = link.story_element.revisionen[0];
         return revision
           ? [{
-              id: link.story_element_id,
+              id: link.story_element.story_element_id,
               title: revision.titel,
               type: revision.typ as StoryElementType,
             }]
           : [];
-      }),
+      }) ?? [],
     };
   });
+  return {
+    items,
+    total: searchResult.total,
+    hasMore: searchResult.hasMore,
+    nextOffset: searchResult.nextOffset,
+  };
 }
 
 export async function addFrageToQuiz(data: {

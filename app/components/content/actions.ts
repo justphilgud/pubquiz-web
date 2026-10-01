@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { requireActor } from "@/app/lib/permissions";
 import { searchFragen } from "@/app/fragen/actions";
 import { cloneQuestion, setQuestionArchived } from "@/app/fragen/editor/managementActions";
@@ -40,13 +41,7 @@ import type {
   ContentSearchItem,
   ContentType,
 } from "./contentLibrary";
-
-function questionStatuses(status: ContentFiltersState["status"]) {
-  if (status === "DRAFT") return ["MY_DRAFTS"] as const;
-  if (status === "ACTIVE") return ["APPROVED"] as const;
-  if (status === "ARCHIVED") return ["ARCHIVED"] as const;
-  return [];
-}
+import { getQuestionStatusesForContentFilter } from "./contentLibrary";
 
 export async function searchContent(filters: ContentFiltersState): Promise<ContentSearchResult> {
   const { actor } = await requireActor();
@@ -63,7 +58,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
           sourceState: null,
           mediaState: filters.media === "ALL" ? null : filters.media === "WITH" ? "with" : "without",
           answerMode: null,
-          statuses: [...questionStatuses(filters.status)],
+          statuses: [...getQuestionStatusesForContentFilter(filters.status)],
           templateIds: filters.templateId ? [filters.templateId] : [],
           eventSeriesId: filters.eventSeriesId,
           usageState: filters.usage === "ALL" ? null : filters.usage,
@@ -140,6 +135,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
         questionMediaCount: question.medien_frage_anzahl,
         answerMediaCount: question.medien_antworten_anzahl,
         storyElementCount: question.story_elemente_anzahl,
+        solutionPreview: question.loesungsvorschau,
       },
     });
     });
@@ -250,9 +246,11 @@ export async function assignContentToQuiz(input: { contentType: ContentType; con
   try {
     if (input.contentType === "QUESTION") {
       const result = await addFrageToQuiz({ quizId: input.quizId, fragenId: input.contentId });
-      return result.alreadyAssigned
-        ? { success: false, message: "Diese Frage ist diesem Quiz bereits zugeordnet." }
-        : { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." };
+      if (result.alreadyAssigned) {
+        return { success: false, message: "Diese Frage ist diesem Quiz bereits zugeordnet." };
+      }
+      refresh();
+      return { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." };
     }
     if (input.contentType === "POLL") {
       const result = await attachLivePollToQuiz({
@@ -260,11 +258,15 @@ export async function assignContentToQuiz(input: { contentType: ContentType; con
         quizId: input.quizId,
         sectionId: null,
       });
-      return result.success
-        ? { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." }
-        : { success: false, message: result.message };
+      if (!result.success || result.alreadyAssigned) {
+        return { success: false, message: result.message };
+      }
+      refresh();
+      return { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." };
     }
-    return await addStoryElementToQuiz({ quizId: input.quizId, storyElementId: input.contentId });
+    const result = await addStoryElementToQuiz({ quizId: input.quizId, storyElementId: input.contentId });
+    if (result.success) refresh();
+    return result;
   } catch (error) {
     return {
       success: false,

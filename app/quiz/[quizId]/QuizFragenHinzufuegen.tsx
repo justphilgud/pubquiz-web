@@ -9,6 +9,13 @@ import {
 } from "../actions";
 import type { QuizFrageSuchResult } from "../actions";
 import ContentSearchControls from "@/app/components/content/ContentSearchControls";
+import ContentFilters from "@/app/components/content/ContentFilters";
+import {
+  parseContentFilters,
+  type ContentFilterOption,
+  type ContentFiltersState,
+  type ContentTemplateOption,
+} from "@/app/components/content/contentLibrary";
 import StoryElementQuizPicker, {
   type QuizStoryElementOption,
 } from "@/app/story-elemente/StoryElementQuizPicker";
@@ -23,6 +30,8 @@ type Props = {
   quizId: number;
   storyElements: QuizStoryElementOption[];
   polls: QuizLivePollOption[];
+  questionCategories: ContentFilterOption[];
+  questionTemplates: ContentTemplateOption[];
 };
 
 export type QuizLivePollOption = {
@@ -41,36 +50,61 @@ export default function QuizFragenHinzufuegen({
   quizId,
   storyElements,
   polls,
+  questionCategories,
+  questionTemplates,
 }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [suchtext, setSuchtext] = useState("");
-  const [ergebnisse, setErgebnisse] = useState<QuizFrageSuchResult[]>([]);
+  const [filters, setFilters] = useState<ContentFiltersState>(() =>
+    parseContentFilters(
+      new URLSearchParams("contentType=QUESTION"),
+      "QUESTION",
+      questionTemplates.filter((template) => template.availableForFiltering).map((template) => template.id),
+    ),
+  );
+  const [searchResult, setSearchResult] = useState<{
+    items: QuizFrageSuchResult[];
+    total: number;
+    hasMore: boolean;
+    nextOffset: number;
+  }>({ items: [], total: 0, hasMore: false, nextOffset: 0 });
   const [meldung, setMeldung] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [includeLinkedStoryElements, setIncludeLinkedStoryElements] = useState(true);
   const [activeTab, setActiveTab] = useState<"QUESTION" | "STORY_ELEMENT" | "POLL">("QUESTION");
-  const visibleResults = ergebnisse.filter((question) =>
+  const [newlyAssignedPollIds, setNewlyAssignedPollIds] = useState<number[]>([]);
+  const assignedPollIds = [...new Set([
+    ...polls.filter((poll) => poll.isUsedInQuiz).map((poll) => poll.id),
+    ...newlyAssignedPollIds,
+  ])];
+  const visibleResults = searchResult.items.filter((question) =>
     activeTab === "QUESTION" && !isPollQuestionTemplateId(question.templateId),
   );
-  const normalizedPollQuery = suchtext.trim().toLocaleLowerCase("de-DE");
+  const normalizedPollQuery = filters.query.trim().toLocaleLowerCase("de-DE");
   const visiblePolls = polls.filter((poll) =>
     !normalizedPollQuery ||
     poll.prompt.toLocaleLowerCase("de-DE").includes(normalizedPollQuery) ||
     poll.subtype.toLocaleLowerCase("de-DE").includes(normalizedPollQuery),
   );
 
-  async function handleSearch() {
+  async function handleSearch(
+    nextFilters: ContentFiltersState = filters,
+    offset = 0,
+    append = false,
+  ) {
     setMeldung("");
     setIsLoading(true);
-
-    const result = await searchFragenForQuiz({
-      quizId,
-      suchtext,
-    });
-
-    setErgebnisse(result);
-    setIsLoading(false);
+    try {
+      const result = await searchFragenForQuiz({ quizId, filters: nextFilters, offset });
+      setSearchResult((current) => ({
+        ...result,
+        items: append ? [...current.items, ...result.items] : result.items,
+      }));
+    } catch {
+      setMeldung("Die Fragen konnten nicht geladen werden.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function handleAdd(fragenId: number) {
@@ -86,8 +120,7 @@ export default function QuizFragenHinzufuegen({
           ? "Frage wurde hinzugefügt. Hinweis: Die gekoppelte FaceMorph-/Pixelfrage ist ebenfalls in diesem Quiz."
           : "Frage wurde zum Quiz hinzugefügt.",
       );
-      const result = await searchFragenForQuiz({ quizId, suchtext });
-      setErgebnisse(result);
+      await handleSearch(filters);
       router.refresh();
     } catch (error) {
       setMeldung(error instanceof Error ? error.message : "Frage konnte nicht hinzugefügt werden.");
@@ -96,13 +129,16 @@ export default function QuizFragenHinzufuegen({
 
   async function handleAddPoll(pollId: number) {
     setMeldung("");
-    const result = await assignContentToQuiz({
-      contentType: "POLL",
-      contentId: pollId,
-      quizId,
-    });
-    setMeldung(result.message);
-    if (result.success) router.refresh();
+    try {
+      const result = await assignContentToQuiz({ contentType: "POLL", contentId: pollId, quizId });
+      setMeldung(result.message);
+      if (result.success) {
+        setNewlyAssignedPollIds((current) => current.includes(pollId) ? current : [...current, pollId]);
+        router.refresh();
+      }
+    } catch {
+      setMeldung("Die Umfrage konnte diesem Quiz nicht hinzugefügt werden.");
+    }
   }
 
   if (!isOpen) {
@@ -176,13 +212,36 @@ export default function QuizFragenHinzufuegen({
         <Link href="/content/polls/new" className="font-semibold underline">Neue Umfrage erstellen</Link>
       </div>}
 
-      <ContentSearchControls
-        query={suchtext}
+      {activeTab === "QUESTION" ? <ContentFilters
+        filters={filters}
+        categories={questionCategories}
+        eventSeries={[]}
+        templates={questionTemplates}
         loading={isLoading}
-        placeholder={activeTab === "POLL" ? "Umfragen durchsuchen …" : "Fragen durchsuchen …"}
-        onQueryChange={setSuchtext}
-        onSubmit={() => activeTab === "POLL" ? undefined : void handleSearch()}
-      />
+        hideContentType
+        onChange={setFilters}
+        onTemplateChange={(templateId) => {
+          const next = { ...filters, templateId };
+          setFilters(next);
+          void handleSearch(next);
+        }}
+        onApply={() => void handleSearch()}
+        onReset={() => {
+          const next = parseContentFilters(
+            new URLSearchParams("contentType=QUESTION"),
+            "QUESTION",
+            questionTemplates.filter((template) => template.availableForFiltering).map((template) => template.id),
+          );
+          setFilters(next);
+          void handleSearch(next);
+        }}
+      /> : <ContentSearchControls
+        query={filters.query}
+        loading={false}
+        placeholder="Umfragen durchsuchen …"
+        onQueryChange={(query) => setFilters((current) => ({ ...current, query }))}
+        onSubmit={() => undefined}
+      />}
 
       {activeTab === "QUESTION" && <label className="mt-3 flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800">
         <input type="checkbox" checked={includeLinkedStoryElements} onChange={(event) => setIncludeLinkedStoryElements(event.target.checked)} className="h-5 w-5 rounded border-slate-300" />
@@ -248,8 +307,8 @@ export default function QuizFragenHinzufuegen({
               <span className="rounded-full bg-violet-50 px-2 py-1 font-semibold text-violet-800">Umfrage</span>
               <span>Keine Punkte · keine Lösung</span>
             </>}
-            actionLabel={poll.isUsedInQuiz ? "Bereits im Quiz" : poll.canAssign ? "Hinzufügen" : "Nicht verfügbar"}
-            disabled={poll.isUsedInQuiz || !poll.canAssign}
+            actionLabel={assignedPollIds.includes(poll.id) ? "Bereits im Quiz" : poll.canAssign ? "Hinzufügen" : "Nicht verfügbar"}
+            disabled={assignedPollIds.includes(poll.id) || !poll.canAssign}
             onAction={() => void handleAddPoll(poll.id)}
           />
         ))}
@@ -259,6 +318,10 @@ export default function QuizFragenHinzufuegen({
             Noch keine Suchergebnisse. Starte eine Suche, um Fragen auszuwählen.
           </p>
         )}
+        {activeTab === "QUESTION" && visibleResults.length > 0 && <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-sm font-semibold text-slate-600">
+          <span>{visibleResults.length} von {searchResult.total} Treffern</span>
+          {searchResult.hasMore && <button type="button" disabled={isLoading} onClick={() => void handleSearch(filters, searchResult.nextOffset, true)} className={buttonSecondaryClass}>Weitere laden</button>}
+        </div>}
         {activeTab === "POLL" && visiblePolls.length === 0 && (
           <p className="text-sm text-slate-500">Keine passenden Umfragen gefunden.</p>
         )}
