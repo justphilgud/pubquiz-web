@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   DEFAULT_MEME_QUESTION_CONFIG,
   createMemeRunWindow,
+  hasMemeCaptionContent,
   memeCountdownRemainingSeconds,
   parseMemeCaptionPayload,
   parseMemeQuestionConfig,
@@ -65,16 +66,20 @@ test("keeps an untimed run open without a deadline across reconstruction", () =>
   assert.equal(memeCountdownRemainingSeconds(null, "OPEN", openedAt.getTime() + 86_400_000), null);
 });
 
-test("requires at least one field at submission level while preserving valid structured text", () => {
-  assert.deepEqual(parseMemeCaptionPayload({ topText: " oben ", bottomText: " unten " }), {
-    topText: "oben",
-    bottomText: "unten",
+test("preserves spaces while keeping blank captions empty at submission level", () => {
+  const payload = parseMemeCaptionPayload({ topText: " oben ", bottomText: " unten " });
+  assert.deepEqual(payload, {
+    topText: " oben ",
+    bottomText: " unten ",
   });
+  assert.ok(payload);
+  assert.equal(hasMemeCaptionContent(payload), true);
+  assert.equal(hasMemeCaptionContent({ topText: "   ", bottomText: "" }), false);
   assert.equal(parseMemeCaptionPayload({ topText: "x".repeat(81), bottomText: "" }), null);
   assert.equal(parseMemeCaptionPayload({ topText: "oben" }), null);
 });
 
-test("enforces the shared 80 character boundary before trimming for legacy and zoned captions", () => {
+test("enforces the shared 80 character boundary for legacy and zoned captions", () => {
   for (const field of ["topText", "bottomText"] as const) {
     for (const length of [79, 80]) {
       const value = { topText: "", bottomText: "", [field]: "x".repeat(length) };
@@ -89,9 +94,9 @@ test("enforces the shared 80 character boundary before trimming for legacy and z
   assert.equal(parseMemeCaptionPayload({ captions: { bubble: ` ${"x".repeat(79)} ` } }), null);
 });
 
-test("zoned payloads trim stable caption IDs while legacy payloads stay valid", () => {
+test("zoned payloads preserve spaces for stable caption IDs", () => {
   assert.deepEqual(parseMemeCaptionPayload({ captions: { bubble: " Hallo ", panel_2: " Welt " } }), {
-    captions: { bubble: "Hallo", panel_2: "Welt" },
+    captions: { bubble: " Hallo ", panel_2: " Welt " },
   });
   assert.equal(parseMemeCaptionPayload({ captions: { "not valid": "Text" } }), null);
   assert.equal(parseMemeCaptionPayload({ captions: { bubble: "x".repeat(81) } }), null);

@@ -1463,7 +1463,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
     templateConfig: frage.templateConfig,
     correctAnswers: richtigeAntworten.map((antwort) => ({ text: antwort.antwort })),
   });
-  const hatAntwortmoeglichkeiten = antworten.length > 1;
+  const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
   const richtigeAntwortfeldLoesungen = (frage.antwortfelder ?? []).map((feld) => ({
     label: feld.label,
     loesungen: (feld.loesungen ?? []).filter((loesung) => loesung.ist_akzeptiert),
