@@ -23,6 +23,7 @@ import { loadPublicQuestionSubmissionReviewMetadata } from "@/app/frage-einreich
 import QuestionStoryElementPanel from "@/app/story-elemente/QuestionStoryElementPanel";
 import { loadQuestionStoryElementPanel } from "@/app/story-elemente/questionStoryElements.server";
 import { getStoryElementEditorOptions } from "@/app/story-elemente/storyElementRepository.server";
+import { canUseQuestionRewrite, isQuestionRewriteEnabled } from "../questionRewriteFeature.server";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -126,6 +127,7 @@ export default async function ExistingQuestionEditorPage({
         apiKey: process.env.GOOGLE_MAPS_API_KEY,
         explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
       })}
+      questionRewriteEnabled={isQuestionRewriteEnabled() && canUseQuestionRewrite(actor)}
     />
     <QuestionStoryElementPanel
       questionId={questionId}
