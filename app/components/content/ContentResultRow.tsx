@@ -11,6 +11,7 @@ export default function ContentResultRow({ item, quizzes, templates }: { item: C
     <div className="flex flex-wrap items-center gap-2"><ContentTypeBadge type={item.contentType} /><StatusBadge status={item.status} archived={item.archived} />{item.lifecycleStatus && <StatusBadge status={item.lifecycleStatus} archived={false} />}<ScopeBadge scope={item.scope} />{item.contentType !== "POLL" && <MediaBadge count={item.mediaCount} />}</div>
     <h2 className="mt-3 break-words text-xl font-black text-slate-950">{item.title}</h2>
     <p className="mt-1 font-mono text-xs text-slate-500">Content-ID #{item.id} · {item.subtype}</p>
+    {item.questionMetrics && <QuestionSolutionPreview preview={item.questionMetrics.solutionPreview} />}
     <dl className="mt-4 grid gap-x-5 gap-y-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3 lg:grid-cols-4">
       {item.questionMetrics ? <>
         <Metric label="Kategorie" value={item.questionMetrics.categories.join(", ") || "Nicht gesetzt"} />
@@ -40,6 +41,17 @@ export default function ContentResultRow({ item, quizzes, templates }: { item: C
     <div id={detailsId} hidden className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-700"><strong>Technische Zuordnung:</strong> {item.contentType} #{item.id}. Neue Quiz-Zuordnungen landen zunächst unter „Kein Block“.</div>
     <ContentActions item={item} quizzes={quizzes} detailsId={detailsId} />
   </article>;
+}
+
+function QuestionSolutionPreview({ preview }: {
+  preview: NonNullable<ContentSearchItem["questionMetrics"]>["solutionPreview"];
+}) {
+  if (!preview) {
+    return <p className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-600"><strong>Lösung:</strong> Keine kompakte Lösung hinterlegt.</p>;
+  }
+  return <p className="mt-3 break-words rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-950">
+    <strong>{preview.label}:</strong> {preview.values.join(" · ")}{preview.remainingCount > 0 ? ` · +${preview.remainingCount} weitere` : ""}
+  </p>;
 }
 
 function ContentTypeBadge({ type }: { type: ContentSearchItem["contentType"] }) {

@@ -51,6 +51,7 @@ import {
   getQuestionAnswerModeWhereInput,
   type DerivedQuestionAnswerMode,
 } from "./questionAnswerMode";
+import { buildQuestionSolutionPreview } from "./questionSolutionPreview";
 
 function getMedientypIdAusDatei(datei: string) {
   const lower = datei.toLowerCase();
@@ -470,11 +471,16 @@ export async function searchFragen(data: {
         include: {
           medien: true,
         },
+        orderBy: { antwort_id: "asc" },
       },
       antwortfelder: {
         include: {
           medien: true,
+          loesungen: {
+            orderBy: [{ sortierung: "asc" }, { loesung_id: "asc" }],
+          },
         },
+        orderBy: [{ sortierung: "asc" }, { antwortfeld_id: "asc" }],
       },
       medien: true,
       quiz_fragen: {
@@ -541,6 +547,19 @@ export async function searchFragen(data: {
           : [],
       ),
       antworten_anzahl: frage.antworten.length,
+      loesungsvorschau: buildQuestionSolutionPreview({
+        classicAnswers: frage.antworten.map((answer) => ({
+          text: answer.antwort,
+          isCorrect: answer.ist_richtig,
+        })),
+        structuredFields: frage.antwortfelder.map((field) => ({
+          label: field.label,
+          solutions: field.loesungen.map((solution) => ({
+            text: solution.loesung_text,
+            isAccepted: solution.ist_akzeptiert,
+          })),
+        })),
+      }),
       medien_frage_anzahl: frage.medien.length,
       medien_antworten_anzahl: medienAntwortenAnzahl,
       medien_anzahl: frage.medien.length + medienAntwortenAnzahl,
