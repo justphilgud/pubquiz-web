@@ -1,11 +1,11 @@
-import { BridgeError, check, objectRule, runKey, storedBackupKey, STORE_ID, TTL_MS, type ContentType, type DeleteResult, type Grant, type InventoryObject, type InventoryResult, type Mode } from "./contract.js";
+import { BridgeError, check, INVENTORY_PAGE_LIMIT, inventoryCursor, objectRule, runKey, storedBackupKey, STORE_ID, TTL_MS, type ContentType, type DeleteResult, type Grant, type InventoryResult, type Mode } from "./contract.js";
 import type { Identity } from "./identity.js";
 
 export type Scope = { pathname: string; method: "PUT" | "GET"; maximumSize: number; expiresAt: number; contentType: ContentType };
 export interface BlobProvider {
   size(pathname: string): Promise<number | null>;
   sign(scope: Scope): Promise<string>;
-  inventory(prefix: string): Promise<InventoryObject[]>;
+  inventory(prefix: string, cursor?: string): Promise<InventoryResult>;
   remove(pathname: string, etag: string): Promise<void>;
 }
 export function authorize(body: unknown, identity: Identity, mode: Mode, now: number): Scope {
@@ -44,16 +44,20 @@ function record(value: unknown): value is Record<string, unknown> {
 export async function executeAccess(body: unknown, identity: Identity, mode: Mode, provider: BlobProvider, now = Date.now()): Promise<Grant | InventoryResult | DeleteResult> {
   if (record(body) && body.operation === "backup-inventory") {
     check(identity.environment === "operations-backup" && mode === "acceptance");
-    check(Object.keys(body).sort().join() === "operation,store" && body.store === STORE_ID);
+    const fields = Object.keys(body).sort().join();
+    check((fields === "operation,store" || fields === "cursor,operation,store") && body.store === STORE_ID);
+    const cursor = body.cursor;
+    check(cursor === undefined || inventoryCursor(cursor));
     try {
-      const objects = await provider.inventory("production/acceptance/");
-      check(objects.length <= 4096);
-      for (const object of objects) {
+      const result = await provider.inventory("production/acceptance/", cursor);
+      check(result.objects.length <= INVENTORY_PAGE_LIMIT && result.complete === (result.cursor === null));
+      check(result.cursor === null || inventoryCursor(result.cursor));
+      for (const object of result.objects) {
         check(object.pathname.startsWith("production/acceptance/") && object.pathname.length <= 240 &&
           Number.isSafeInteger(object.size) && object.size > 0 && Number.isFinite(Date.parse(object.uploadedAt)) &&
           /^[\x21-\x7e]{1,200}$/.test(object.etag));
       }
-      return { objects, complete: true };
+      return result;
     } catch (error) { if (error instanceof BridgeError) throw error; throw new BridgeError("PROVIDER_REJECTED"); }
   }
   if (record(body) && body.operation === "retention-delete") {

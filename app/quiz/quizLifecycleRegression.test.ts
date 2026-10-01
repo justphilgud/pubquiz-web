@@ -54,6 +54,11 @@ test("D/H: reset removes only quiz-scoped runtime data atomically and restores p
   for (const table of ["quiz_team_sessions", "quiz_interaction_runs", "quiz_block_freigaben", "quiz_teams"]) {
     assert.ok(reset.includes(`tx.${table}.deleteMany({ where: { quiz_id: quizId } })`));
   }
+  assert.match(reset, /tx\.meme_result_entries\.deleteMany\(\{ where: \{ presentation: \{ quiz_id: quizId \} \} \}\)/);
+  assert.match(reset, /tx\.meme_votes\.deleteMany\(\{ where: \{ presentation: \{ quiz_id: quizId \} \} \}\)/);
+  const sessionDelete = reset.indexOf("tx.quiz_team_sessions.deleteMany");
+  assert.ok(reset.indexOf("tx.meme_result_entries.deleteMany") < sessionDelete);
+  assert.ok(reset.indexOf("tx.meme_votes.deleteMany") < sessionDelete);
   assert.doesNotMatch(reset, /tx\.(teams|fragen|quiz_fragen)\.delete/);
   assert.match(reset, /lifecycle_revision: \{ increment: 1 \}/);
   assert.equal(resolveQuizLifecycle(RESET_PRESENTATION_DATA), "PREPARATION");

@@ -79,7 +79,11 @@ Teilnehmerreihenfolge.
 `resolveQuizBlockSequence` bestimmt die inhaltliche Frage-/Auflösungsstrategie.
 `buildPraesentationSlides` setzt diese Sequenz gemeinsam mit den konkreten
 Round-End-Elementen in Slides um. Sortierung und Runtime-Finalisierung sind
-getrennte Verantwortlichkeiten.
+getrennte Verantwortlichkeiten. Fehlt bei älteren oder unvollständig
+materialisierten Quizständen ein persistierter `QUESTION`-Floweintrag, verwendet
+die Runtime dieselbe aus `quiz_fragen.sortierung` abgeleitete Position wie der
+Quizeditor. Gemischte Fragen, Meme-Interaktionen und Live-Umfragen behalten
+dadurch exakt ihre konfigurierte Reihenfolge.
 
 ### Gesammelte Auflösung (`END_OF_BLOCK`)
 
@@ -131,6 +135,14 @@ sichergestellt. Erst die anschließende Navigation zeigt die Auflösungsphase.
 | `app/quiz/interaction/interactionArchitecture.test.ts` | Blockschließung finalisiert freigegebene Fragen; die erste gesammelte Auflösung schließt vor dem Runtime-Sync. |
 | `app/quiz/interaction/interactionStateMachine.test.ts` | Zulässige Run-Übergänge und die serverseitige Deadline als Schreibgrenze. |
 | `app/quiz/interaction/interactionSubmissionPolicy.test.ts` | Nur inhaltlich gefüllte, noch nicht finalisierte Draft-Revisionen werden beim Schließen auto-finalisiert. |
+
+### Antwortform in der Auflösung
+
+Die Auflösung richtet sich nach `effektiver_antwortmodus` der Quizzuordnung.
+`OPEN` zeigt ausschließlich die kanonischen richtigen Antworten, auch wenn die
+zugrunde liegende Frage weitere gespeicherte Auswahlantworten besitzt. Nur
+`CLOSED` rendert die Auswahloptionen. Evaluation und Submission-Verarbeitung
+bleiben davon getrennt.
 
 ## Evaluation Contract
 

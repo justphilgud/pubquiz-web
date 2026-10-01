@@ -61,8 +61,10 @@ serialisierte Draftform:
 Der Submission-Snapshot enthält dieselben strukturierten Felder als JSON. Für
 `Text oben` und `Text unten` gelten jeweils maximal 80 Zeichen. Client,
 Server und Renderer verwenden dieselbe fachliche Grenze. Die Rohfelder werden
-vor dem Trimmen auf diese Länge geprüft, anschließend getrimmt und sind einzeln
-optional. Mindestens eines muss für eine gültige Submission befüllt sein. Der
+unverändert gespeichert, damit innere und bewusst eingegebene Leerzeichen auch
+bei kontrollierten Eingaben, Reload und Rendering erhalten bleiben. Nur die
+Prüfung, ob mindestens ein Feld fachlich befüllt ist, ignoriert führende und
+nachfolgende Leerzeichen. Die Felder sind einzeln optional. Der
 Server validiert Form, Länge, Run-, Team- und Fragenidentität sowie die aktuelle
 Deadline erneut. Meme-Fragen haben in AP1 keine Bewertung und ein
 Basispunktemaximum von 0.

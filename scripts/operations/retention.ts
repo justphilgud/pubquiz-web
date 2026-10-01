@@ -2,7 +2,7 @@ import { parseManifest } from "./acceptance-restore";
 import type { AcceptanceManifest } from "./acceptance-backup";
 import type { BackupMetadata, BackupType } from "./backup-metadata";
 import { BridgeClient } from "./bridge-client";
-import type { InventoryObject } from "./bridge/lib/contract";
+import { runKey, type InventoryObject } from "./bridge/lib/contract";
 import { OperationsError, requireCondition } from "./guards";
 import { artifactName, backupKey } from "./private-artifacts";
 import { sha256 } from "./snapshot";
@@ -182,7 +182,7 @@ export async function applyRetentionPlan(
 
 export async function retentionAfterBackup(env: Readonly<Record<string, string | undefined>>, currentKey: string, currentManifestSha256: string) {
   requireCondition(env.BACKUP_RETENTION_VERIFIED === "true" || env.BACKUP_RETENTION_VERIFIED === "false", "BACKUP_RETENTION_SWITCH_INVALID");
-  const client = new BridgeClient(env, "backup", currentKey);
+  const client = new BridgeClient(env, "backup", retentionClientKey(env, currentKey));
   const inventory = await client.retentionInventory();
   const grouped = groupedInventory(inventory).groups;
   const manifests = new Map<string, Buffer>();
@@ -198,6 +198,15 @@ export async function retentionAfterBackup(env: Readonly<Record<string, string |
   const fresh = await client.retentionInventory();
   const deletedObjects = await applyRetentionPlan(plan, true, inventory, fresh, (key, object) => client.retentionDelete(key, object));
   return { dryRun: false, deletedObjects, plan };
+}
+
+export function retentionClientKey(env: Readonly<Record<string, string | undefined>>, currentKey: string) {
+  const executionKey = runKey("acceptance", env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
+  if (env.AP96_RETENTION_REUSE_EXISTING === "true") {
+    requireCondition(env.BACKUP_RETENTION_VERIFIED === "false", "RETENTION_REUSE_MUST_BE_DRY_RUN");
+    backupKey(currentKey);
+  } else requireCondition(currentKey === executionKey, "RETENTION_CURRENT_RUN_REQUIRED");
+  return executionKey;
 }
 
 export function safeRetentionError(error: unknown) {

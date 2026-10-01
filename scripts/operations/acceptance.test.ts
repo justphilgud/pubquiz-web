@@ -269,9 +269,14 @@ test("workflow schedules only the existing backup core and keeps restore behind 
   assert.match(text, /restore_after_backup/); assert.match(text, /AP96_RUN_RESTORE: 'true'/);
   assert.match(text, /BACKUP_AUTOMATION_ENABLED/); assert.match(text, /BACKUP_RETENTION_VERIFIED/);
   assert.match(text, /steps\.backup\.outcome == 'success'/);
+  assert.match(text, /retention-dry-run/); assert.match(text, /AP96_RETENTION_REUSE_EXISTING/);
+  assert.match(text, /inputs\.mode == 'retention-dry-run' && 'false'/);
   assert.ok(text.indexOf("acceptance-cli.ts backup") < text.indexOf("retention-cli.ts"));
   assert.match(text, /needs: backup/); assert.match(text, /group: ap94-manual-acceptance/);
-  assert.doesNotMatch(text, /environment: production|upload-artifact|db:deploy|--prod|contents: write|BACKUP_BLOB_READ_WRITE_TOKEN/);
+  assert.equal((text.match(/actions\/upload-artifact@v4/g) ?? []).length, 1);
+  assert.match(text, /name: external-import-backup-evidence[\s\S]+path: \$\{\{ runner\.temp \}\}\/external-import-backup-evidence\.json/);
+  assert.doesNotMatch(text, /path:.*(?:database\.dump|auth-redacted\.json|manifest\.json|pubquiz-ap94)/);
+  assert.doesNotMatch(text, /environment: production|db:deploy|--prod|contents: write|BACKUP_BLOB_READ_WRITE_TOKEN/);
 });
 test("restore remains explicit workflow-dispatch only and is independent from automation switches", () => {
   const restore = { ...env, AP96_RUN_RESTORE: "true", BACKUP_AUTOMATION_ENABLED: "true", BACKUP_RETENTION_VERIFIED: "true" };

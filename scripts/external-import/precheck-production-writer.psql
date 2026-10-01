@@ -1,0 +1,48 @@
+-- Read-only gate before creating pubquiz_external_import_writer. The wrapper
+-- owns process exit codes; this script emits exactly one protocol record.
+\set ON_ERROR_STOP on
+BEGIN TRANSACTION READ ONLY;
+
+WITH precheck AS (
+  SELECT
+    :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
+      AND current_database() = 'neondb'
+      AND current_user = 'neondb_owner' AS correct_target,
+    NOT EXISTS (
+      SELECT 1
+      FROM pg_catalog.pg_roles
+      WHERE rolname = 'pubquiz_external_import_writer'
+    ) AS role_absent,
+    NOT EXISTS (
+      SELECT 1
+      FROM pg_catalog.pg_database database_row
+      CROSS JOIN LATERAL pg_catalog.aclexplode(
+        COALESCE(
+          database_row.datacl,
+          pg_catalog.acldefault('d', database_row.datdba)
+        )
+      ) privilege_row
+      WHERE database_row.datname = current_database()
+        AND privilege_row.grantee = 0
+        AND privilege_row.privilege_type = 'TEMPORARY'
+    ) AS public_temporary_absent
+), outcome AS (
+  SELECT
+    CASE
+      WHEN NOT correct_target THEN 'BLOCK'
+      WHEN NOT role_absent THEN 'BLOCK'
+      WHEN NOT public_temporary_absent THEN 'BLOCK'
+      ELSE 'PASS'
+    END AS status,
+    CASE
+      WHEN NOT correct_target THEN 'INCORRECT_PRODUCTION_IDENTITY'
+      WHEN NOT role_absent THEN 'WRITER_ROLE_ALREADY_EXISTS'
+      WHEN NOT public_temporary_absent THEN 'PUBLIC_TEMPORARY_INHERITED'
+      ELSE 'ALL_GATES_PASSED'
+    END AS reason
+  FROM precheck
+)
+SELECT 'PUBQUIZ_WRITER_PRECHECK|' || status || '|' || reason
+FROM outcome;
+
+ROLLBACK;

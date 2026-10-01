@@ -102,8 +102,10 @@ Reset verlangt den bestehenden Bestätigungsdialog mit ausdrücklicher Beschreib
 der unwiderruflichen Löschung sowie serverseitig `confirmed === true` und die
 aktuelle `lifecycle_revision`. In einer Transaktion:
 
+- quizbezogene Meme-Ergebnisse und Stimmen vor den Sessions löschen, da deren
+  Kandidaten-Fremdschlüssel die nachfolgende Cascade absichtlich einschränken;
 - quizbezogene Team-Sessions löschen; deren FK-Cascades entfernen Drafts,
-  Feld-/Auswahlwerte, Bewertungen und Submission-Snapshots;
+  Feld-/Auswahlwerte, Bewertungen, Submission-Snapshots und Meme-Kandidaten;
 - Interaction-Runs und Blockfreigaben dieses Quiz löschen;
 - quizbezogene `quiz_teams` (Punkte/Platzierung) entfernen;
 - Team-/Teilnehmerzahl auf 0 setzen;

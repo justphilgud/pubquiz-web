@@ -1,0 +1,201 @@
+name: External Question Production Import
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_id:
+        description: Exact frozen batch identifier
+        required: true
+        type: string
+      plan_path:
+        description: Plan path below external-import-plans/ on current main
+        required: true
+        type: string
+      plan_sha256:
+        description: Exact canonical SHA-256 of the frozen plan
+        required: true
+        type: string
+      production_commit:
+        description: Verified currently deployed Production SHA
+        required: true
+        type: string
+      backup_run:
+        description: Successful AP9.4 backup workflow run
+        required: true
+        type: string
+      backup_attempt:
+        description: Exact AP9.4 backup run attempt
+        required: true
+        default: '1'
+        type: string
+      backup_id:
+        description: Exact production/acceptance/run-RUN-ATTEMPT key
+        required: true
+        type: string
+      backup_manifest_sha256:
+        description: Exact validated backup manifest SHA-256
+        required: true
+        type: string
+      dry_run:
+        description: Run all read-only checks without entering the writer environment
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: operations-backup
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Validate main-only inputs
+        shell: bash
+        env:
+          BATCH_ID: ${{ inputs.batch_id }}
+          PLAN_PATH: ${{ inputs.plan_path }}
+          PLAN_SHA256: ${{ inputs.plan_sha256 }}
+          REQUESTED_PRODUCTION_SHA: ${{ inputs.production_commit }}
+          TRUSTED_PRODUCTION_SHA: ${{ vars.PRODUCTION_RELEASE_SHA }}
+          BACKUP_RUN: ${{ inputs.backup_run }}
+          BACKUP_ATTEMPT: ${{ inputs.backup_attempt }}
+          BACKUP_ID: ${{ inputs.backup_id }}
+          BACKUP_MANIFEST: ${{ inputs.backup_manifest_sha256 }}
+        run: |
+          set -euo pipefail
+          [[ "$BATCH_ID" =~ ^[a-z0-9][a-z0-9._-]+$ ]] || { echo EXTERNAL_IMPORT_BATCH_ID_INVALID; exit 1; }
+          [[ "$PLAN_PATH" =~ ^external-import-plans/[A-Za-z0-9._/-]+\.json$ ]] || { echo EXTERNAL_IMPORT_PLAN_PATH_INVALID; exit 1; }
+          [[ "$PLAN_SHA256" =~ ^[a-f0-9]{64}$ ]] || { echo EXTERNAL_IMPORT_DIGEST_INVALID; exit 1; }
+          [[ "$REQUESTED_PRODUCTION_SHA" =~ ^[a-f0-9]{40}$ ]] || { echo EXTERNAL_IMPORT_PRODUCTION_SHA_INVALID; exit 1; }
+          [[ "$REQUESTED_PRODUCTION_SHA" == "$TRUSTED_PRODUCTION_SHA" ]] || { echo EXTERNAL_IMPORT_PRODUCTION_SHA_MISMATCH; exit 1; }
+          [[ "$BACKUP_RUN" =~ ^[1-9][0-9]{0,19}$ && "$BACKUP_ATTEMPT" =~ ^[1-9][0-9]{0,5}$ ]] || { echo EXTERNAL_IMPORT_BACKUP_RUN_INVALID; exit 1; }
+          [[ "$BACKUP_ID" == "production/acceptance/run-$BACKUP_RUN-$BACKUP_ATTEMPT" ]] || { echo EXTERNAL_IMPORT_BACKUP_ID_MISMATCH; exit 1; }
+          [[ "$BACKUP_MANIFEST" =~ ^[a-f0-9]{64}$ ]] || { echo EXTERNAL_IMPORT_BACKUP_MANIFEST_INVALID; exit 1; }
+          test -f "$PLAN_PATH"
+      - name: Download exact validated backup evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: external-import-backup-evidence
+          path: ${{ runner.temp }}/backup-evidence
+          github-token: ${{ github.token }}
+          repository: justphilgud/pubquiz-web
+          run-id: ${{ inputs.backup_run }}
+      - name: Read-only Production preflight and backup verification
+        shell: bash
+        env:
+          EXTERNAL_IMPORT_LOGICAL_ENVIRONMENT: production
+          EXTERNAL_IMPORT_GITHUB_ENVIRONMENT: operations-backup
+          EXTERNAL_IMPORT_EXPECTED_WORKFLOW_REF: justphilgud/pubquiz-web/.github/workflows/external-question-import.yml@refs/heads/main
+          EXTERNAL_IMPORT_BATCH_ID: ${{ inputs.batch_id }}
+          EXTERNAL_IMPORT_PLAN_SHA256: ${{ inputs.plan_sha256 }}
+          PRODUCTION_RELEASE_SHA: ${{ vars.PRODUCTION_RELEASE_SHA }}
+          EXTERNAL_IMPORT_BACKUP_RUN: ${{ inputs.backup_run }}
+          EXTERNAL_IMPORT_BACKUP_ATTEMPT: ${{ inputs.backup_attempt }}
+          EXTERNAL_IMPORT_BACKUP_ID: ${{ inputs.backup_id }}
+          EXTERNAL_IMPORT_BACKUP_MANIFEST_SHA256: ${{ inputs.backup_manifest_sha256 }}
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node --import tsx scripts/external-import/workflow-preflight.ts \
+            "${{ inputs.plan_path }}" \
+            "$RUNNER_TEMP/backup-evidence/external-import-backup-evidence.json" \
+            "$RUNNER_TEMP/external-import-preflight.json" \
+            > "$RUNNER_TEMP/external-import-preflight-summary.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const report = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/external-import-preflight.json`, 'utf8'));
+          const counts = report.preflight.counts;
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `## External question Production preflight\n\n` +
+            `- Batch: ${report.batchId}\n` +
+            `- Plan SHA-256: ${report.planDigest}\n` +
+            `- Production SHA: ${process.env.PRODUCTION_RELEASE_SHA}\n` +
+            `- Backup: ${report.backup.id}\n` +
+            `- Backup snapshot: ${report.backup.snapshotAt}\n` +
+            `- CREATE: ${counts.CREATE}\n` +
+            `- ALREADY_PRESENT: ${counts.ALREADY_PRESENT}\n` +
+            `- CONFLICT: ${counts.CONFLICT}\n` +
+            `- REVIEW_REQUIRED: ${counts.REVIEW_REQUIRED}\n` +
+            `- writeAuthorized: false\n\n` +
+            `Required approval comment (copy exactly):\n\n${report.approvalComment}\n`);
+          NODE
+      - name: Upload immutable preflight report
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-question-production-preflight
+          path: ${{ runner.temp }}/external-import-preflight.json
+          if-no-files-found: error
+          retention-days: 14
+
+  write:
+    needs: preflight
+    if: inputs.dry_run == false
+    runs-on: ubuntu-latest
+    environment: operations-content-import
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Download approved preflight report
+        uses: actions/download-artifact@v4
+        with:
+          name: external-question-production-preflight
+          path: ${{ runner.temp }}/preflight
+      - name: Download exact validated backup evidence again
+        uses: actions/download-artifact@v4
+        with:
+          name: external-import-backup-evidence
+          path: ${{ runner.temp }}/backup-evidence
+          github-token: ${{ github.token }}
+          repository: justphilgud/pubquiz-web
+          run-id: ${{ inputs.backup_run }}
+      - name: Write only after reviewer approval and immediate TOCTOU recheck
+        shell: bash
+        env:
+          EXTERNAL_IMPORT_LOGICAL_ENVIRONMENT: production
+          EXTERNAL_IMPORT_GITHUB_ENVIRONMENT: operations-content-import
+          EXTERNAL_IMPORT_BATCH_ID: ${{ inputs.batch_id }}
+          EXTERNAL_IMPORT_PLAN_SHA256: ${{ inputs.plan_sha256 }}
+          EXTERNAL_IMPORT_PRODUCTION_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ vars.PRODUCTION_RELEASE_SHA }}
+          EXTERNAL_IMPORT_BACKUP_RUN: ${{ inputs.backup_run }}
+          EXTERNAL_IMPORT_BACKUP_ATTEMPT: ${{ inputs.backup_attempt }}
+          EXTERNAL_IMPORT_BACKUP_ID: ${{ inputs.backup_id }}
+          EXTERNAL_IMPORT_BACKUP_MANIFEST_SHA256: ${{ inputs.backup_manifest_sha256 }}
+          PRODUCTION_IMPORT_DATABASE_URL: ${{ secrets.PRODUCTION_IMPORT_DATABASE_URL }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node --import tsx scripts/external-import/production-writer.ts \
+            "${{ inputs.plan_path }}" \
+            "$RUNNER_TEMP/preflight/external-import-preflight.json" \
+            "$RUNNER_TEMP/backup-evidence/external-import-backup-evidence.json" \
+            "$RUNNER_TEMP/external-import-audit.json"
+      - name: Upload write audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-question-production-import-audit
+          path: ${{ runner.temp }}/external-import-audit.json
+          if-no-files-found: warn
+          retention-days: 30

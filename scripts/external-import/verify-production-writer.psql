@@ -1,0 +1,116 @@
+-- Read-only ACL and identity verification for pubquiz_external_import_writer.
+\set ON_ERROR_STOP on
+BEGIN TRANSACTION READ ONLY;
+
+SELECT :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
+       AND current_database() = 'neondb'
+       AND current_user = 'pubquiz_external_import_writer' AS correct_target \gset
+\if :correct_target
+\else
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_VERIFY_INCORRECT_IDENTITY'; END $block$;
+\endif
+
+DO $verify$
+DECLARE
+  role_row pg_catalog.pg_roles%ROWTYPE;
+BEGIN
+  SELECT * INTO STRICT role_row
+  FROM pg_catalog.pg_roles
+  WHERE rolname = current_user;
+
+  IF role_row.rolsuper OR role_row.rolcreatedb OR role_row.rolcreaterole
+     OR role_row.rolreplication OR role_row.rolbypassrls OR role_row.rolinherit THEN
+    RAISE EXCEPTION 'WRITER_ROLE_ATTRIBUTES_INVALID';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM pg_catalog.pg_auth_members membership
+    WHERE membership.member = role_row.oid
+  ) THEN
+    RAISE EXCEPTION 'WRITER_ROLE_MEMBERSHIP_INVALID';
+  END IF;
+
+  IF NOT has_database_privilege(current_user, 'neondb', 'CONNECT')
+     OR has_database_privilege(current_user, 'neondb', 'CREATE')
+     OR has_database_privilege(current_user, 'neondb', 'TEMPORARY')
+     OR NOT has_schema_privilege(current_user, 'pubquiz', 'USAGE')
+     OR has_schema_privilege(current_user, 'pubquiz', 'CREATE') THEN
+    RAISE EXCEPTION 'WRITER_DATABASE_OR_SCHEMA_ACL_INVALID';
+  END IF;
+
+  IF NOT (
+    has_table_privilege(current_user, 'pubquiz.antworttyp', 'SELECT')
+    AND has_table_privilege(current_user, 'pubquiz.fragen', 'SELECT')
+    AND has_table_privilege(current_user, 'pubquiz.antworten', 'SELECT')
+    AND has_table_privilege(current_user, 'pubquiz.fragenkategorie', 'SELECT')
+    AND has_table_privilege(current_user, 'pubquiz.fragen_kategorien', 'SELECT')
+    AND has_table_privilege(current_user, 'pubquiz.external_question_import_batches', 'SELECT')
+    AND has_table_privilege(current_user, 'pubquiz.external_question_import_items', 'SELECT')
+    AND has_column_privilege(current_user, 'pubquiz.users', 'id', 'SELECT')
+    AND has_column_privilege(current_user, 'pubquiz.users', 'is_active', 'SELECT')
+    AND has_column_privilege(current_user, 'pubquiz.benutzer_rollenzuweisungen', 'benutzer_id', 'SELECT')
+    AND has_column_privilege(current_user, 'pubquiz.benutzer_rollenzuweisungen', 'rolle', 'SELECT')
+    AND has_column_privilege(current_user, 'pubquiz.benutzer_rollenzuweisungen', 'scope_typ', 'SELECT')
+  ) THEN
+    RAISE EXCEPTION 'WRITER_REQUIRED_READ_ACL_MISSING';
+  END IF;
+
+  IF has_column_privilege(current_user, 'pubquiz.users', 'password_hash', 'SELECT')
+     OR has_column_privilege(current_user, 'pubquiz.users', 'email', 'SELECT')
+     OR has_table_privilege(current_user, 'pubquiz.users', 'INSERT,UPDATE,DELETE')
+     OR has_table_privilege(current_user, 'pubquiz.benutzer_rollenzuweisungen', 'INSERT,UPDATE,DELETE') THEN
+    RAISE EXCEPTION 'WRITER_AUTH_ACL_INVALID';
+  END IF;
+
+  IF NOT (
+    has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'status', 'UPDATE')
+    AND has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'report_json', 'UPDATE')
+    AND has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'error_message', 'UPDATE')
+    AND has_column_privilege(current_user, 'pubquiz.external_question_import_batches', 'completed_at', 'UPDATE')
+  ) THEN
+    RAISE EXCEPTION 'WRITER_REQUIRED_BATCH_UPDATE_ACL_MISSING';
+  END IF;
+
+  IF has_table_privilege(current_user, 'pubquiz.fragen', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+     OR has_table_privilege(current_user, 'pubquiz.antworten', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+     OR has_table_privilege(current_user, 'pubquiz.fragen_kategorien', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+     OR has_table_privilege(current_user, 'pubquiz.external_question_import_batches', 'DELETE,TRUNCATE,REFERENCES,TRIGGER')
+     OR has_table_privilege(current_user, 'pubquiz.external_question_import_items', 'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') THEN
+    RAISE EXCEPTION 'WRITER_ALLOWED_TABLE_ACL_TOO_BROAD';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM (VALUES
+      ('quiz'), ('eventreihen'), ('teams'), ('quiz_teams'), ('team_antworten'),
+      ('team_answer_submissions'), ('meme_votes'), ('sessions')
+    ) AS denied(table_name)
+    WHERE to_regclass('pubquiz.' || quote_ident(denied.table_name)) IS NOT NULL
+      AND has_table_privilege(
+        current_user,
+        'pubquiz.' || quote_ident(denied.table_name),
+        'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'
+      )
+  ) THEN
+    RAISE EXCEPTION 'WRITER_FOREIGN_DOMAIN_WRITE_ACL_INVALID';
+  END IF;
+
+  IF NOT (
+    has_sequence_privilege(current_user, 'pubquiz.fragen_fragen_id_seq', 'USAGE')
+    AND has_sequence_privilege(current_user, 'pubquiz.antworten_antwort_id_seq', 'USAGE')
+    AND has_sequence_privilege(current_user, 'pubquiz.fragen_kategorien_fragen_kategorie_zuordnung_id_seq', 'USAGE')
+    AND has_sequence_privilege(current_user, 'pubquiz.external_question_import_batches_import_batch_id_seq', 'USAGE')
+    AND has_sequence_privilege(current_user, 'pubquiz.external_question_import_items_import_item_id_seq', 'USAGE')
+  ) THEN
+    RAISE EXCEPTION 'WRITER_REQUIRED_SEQUENCE_ACL_MISSING';
+  END IF;
+END
+$verify$;
+
+SELECT current_user AS role,
+       current_database() AS database,
+       false AS inherited_temporary,
+       false AS write_executed,
+       true AS least_privilege_verified;
+
+ROLLBACK;

@@ -97,7 +97,8 @@ export async function acceptanceBackup(env: Environment) {
     phase = "ANONYMOUS_READBACK";
     const anonymous = await fetch(`https://${env.BACKUP_PRIVATE_BLOB_HOST}/${key}/manifest.json`, { redirect: "error", signal: AbortSignal.timeout(30000) });
     requireCondition([401, 403, 404].includes(anonymous.status), "PRIVATE_ANONYMOUS_ACCESS_NOT_REJECTED");
-    return { key, manifestSha256: sha256(bytes), bytes: artifacts.reduce((n, a) => n + a.bytes, 0), snapshotAt: snapshot.time, backup,
+    return { key, manifestSha256: sha256(bytes), bytes: artifacts.reduce((n, a) => n + a.bytes, 0), snapshotAt: snapshot.time,
+      completedAt: manifest.completedAt, source: manifest.source, backup,
       ...manifest.timings, authExcluded: true, privateReadback: "verified", restore: "required-reviewer-pending",
       oidc: store.oidcDiagnostics() };
   } catch (error) { throw backupPhaseError(error, phase); }
