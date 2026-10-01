@@ -4,7 +4,7 @@ import { backupMetadataFromEnvironment, validateBackupMetadata, type BackupMetad
 import type { AcceptanceManifest } from "./acceptance-backup";
 import { RESTORE_TARGET } from "./acceptance-policy";
 import type { InventoryObject } from "./bridge/lib/contract";
-import { applyRetentionPlan, createRetentionPlan } from "./retention";
+import { applyRetentionPlan, createRetentionPlan, retentionClientKey } from "./retention";
 import { sha256 } from "./snapshot";
 
 const now = Date.UTC(2026, 8, 17, 12);
@@ -100,4 +100,15 @@ test("retention rejects a nonlatest current backup and never treats malformed cu
     /RETENTION_CURRENT_BACKUP_NOT_LATEST/);
   assert.throws(() => createRetentionPlan(current.objects, new Map<string, Buffer>([[current.key, Buffer.from("{}")]]), current.key, sha256(current.bytes), now),
     /RETENTION_CURRENT_BACKUP_NOT_VALID/);
+});
+
+test("standalone retention may reuse an existing backup only in forced dry-run mode", () => {
+  const runtime = { GITHUB_RUN_ID: "999", GITHUB_RUN_ATTEMPT: "1", BACKUP_RETENTION_VERIFIED: "false" };
+  const runtimeKey = "production/acceptance/run-999-1";
+  const existingKey = "production/acceptance/run-123-1";
+  assert.equal(retentionClientKey(runtime, runtimeKey), runtimeKey);
+  assert.throws(() => retentionClientKey(runtime, existingKey), /RETENTION_CURRENT_RUN_REQUIRED/);
+  assert.equal(retentionClientKey({ ...runtime, AP96_RETENTION_REUSE_EXISTING: "true" }, existingKey), runtimeKey);
+  assert.throws(() => retentionClientKey({ ...runtime, AP96_RETENTION_REUSE_EXISTING: "true", BACKUP_RETENTION_VERIFIED: "true" }, existingKey),
+    /RETENTION_REUSE_MUST_BE_DRY_RUN/);
 });

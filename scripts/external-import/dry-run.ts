@@ -3,7 +3,9 @@ import { readFile } from "node:fs/promises";
 import {
   evaluateExternalImportGuard,
   externalImportPlanDigest,
+  externalImportPreflightDigest,
   validateExternalImportPlan,
+  type ExternalImportBackupEvidence,
   type ExternalImportPlan,
 } from "../../app/fragen/import/external/productionImportGuard";
 import { DATABASES } from "../operations/guards";
@@ -21,6 +23,7 @@ export async function externalImportDryRun(input: {
   productionSha: string;
   now?: Date;
   environment?: Readonly<Record<string, string | undefined>>;
+  backup?: ExternalImportBackupEvidence;
 }) {
   const raw = JSON.parse(await readFile(input.planPath, "utf8")) as unknown;
   validateExternalImportPlan(raw);
@@ -48,6 +51,8 @@ export async function externalImportDryRun(input: {
       workflowRef: env.GITHUB_WORKFLOW_REF,
       expectedWorkflowRef: env.EXTERNAL_IMPORT_EXPECTED_WORKFLOW_REF,
       githubEnvironment: env.EXTERNAL_IMPORT_GITHUB_ENVIRONMENT,
+      workflowRun: env.GITHUB_RUN_ID,
+      workflowRunAttempt: env.GITHUB_RUN_ATTEMPT,
     },
     actualDatabase: snapshot.identity,
     expectedDatabase: {
@@ -57,6 +62,7 @@ export async function externalImportDryRun(input: {
     },
     currentProductionSha: input.productionSha,
     preflight: snapshot.preflight,
+    backup: input.backup,
   });
   return {
     mode: "dry-run" as const,
@@ -69,6 +75,7 @@ export async function externalImportDryRun(input: {
     productionQuestionCount: snapshot.questionCount,
     databaseIdentityConfirmed: guard.gates.database,
     preflight: snapshot.preflight,
+    preflightDigest: externalImportPreflightDigest(snapshot.preflight),
     guard: { ...guard, writeAuthorized: false },
   };
 }

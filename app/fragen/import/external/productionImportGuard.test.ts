@@ -3,9 +3,11 @@ import test from "node:test";
 
 import {
   EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS,
+  EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
   OneTimeExternalImportAuthorization,
   canonicalExternalImportPlan,
   evaluateExternalImportGuard,
+  externalImportApprovalMetadata,
   externalImportPlanDigest,
   preflightExternalImport,
   validateExternalImportPlan,
@@ -16,6 +18,10 @@ import {
   type ExternalImportWriteAuthorization,
   type ProductionIdentity,
 } from "./productionImportGuard";
+import {
+  VerifiedExternalImportReviewerApproval,
+  externalImportApprovalComment,
+} from "./reviewerApproval";
 
 const production: ProductionIdentity = {
   host: "ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech",
@@ -24,12 +30,20 @@ const production: ProductionIdentity = {
 };
 
 function plan(overrides: Partial<ExternalImportPlan> = {}): ExternalImportPlan {
-  return {
+  const value: ExternalImportPlan = {
     version: 1,
     batchId: "opentdb-batch-001",
     sourceType: "OpenTDB",
     frozenAt: "2026-09-26T10:00:00.000Z",
     operatorUserId: 7,
+    importApproval: {
+      records: [{
+        candidateId: "candidate-1",
+        sourceStatus: "APPROVED",
+        reviewedByUserId: 7,
+        reviewedAt: "2026-09-26T09:55:00.000Z",
+      }],
+    },
     items: [{
       candidateId: "candidate-1",
       externalReference: "opentdb-42",
@@ -62,6 +76,42 @@ function plan(overrides: Partial<ExternalImportPlan> = {}): ExternalImportPlan {
     }],
     ...overrides,
   };
+  return value;
+}
+
+function automatedPlan(): ExternalImportPlan {
+  const base = plan();
+  return {
+    ...base,
+    importApproval: {
+      approvalMode: "AUTOMATED_QUALITY_GATE",
+      policyVersion: EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
+      records: [{
+        candidateId: "candidate-1",
+        sourceStatus: "APPROVED",
+        evaluatedAt: "2026-09-26T09:55:00.000Z",
+      }],
+    },
+    items: [{
+      ...base.items[0],
+      verification: {
+        status: "VERIFIED",
+        sources: [
+          { title: "Universität", url: "https://university.edu/math" },
+          { title: "Fachlexikon", url: "https://example.org/math" },
+        ],
+      },
+      autoQualityEvidence: {
+        classification: "AUTO_APPROVED_FOR_PRODUCTION",
+        policyVersion: EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
+        localizationStatus: "LOCALIZED",
+        qualityStatus: "READY_FOR_REVIEW",
+        issueCodes: [],
+        hasStrongPrimaryOrOfficialSource: true,
+        independentReliableSourceHosts: 2,
+      },
+    }],
+  };
 }
 
 const now = new Date("2026-09-26T10:30:00.000Z");
@@ -76,15 +126,20 @@ function execution(overrides: Partial<ExternalImportExecutionIdentity> = {}): Ex
     workflowRef: "justphilgud/pubquiz-web/.github/workflows/external-question-import.yml@refs/heads/main",
     expectedWorkflowRef: "justphilgud/pubquiz-web/.github/workflows/external-question-import.yml@refs/heads/main",
     githubEnvironment: "operations-content-import",
+    workflowRun: "789012",
+    workflowRunAttempt: "1",
     ...overrides,
   };
 }
 
 function backup(overrides: Partial<ExternalImportBackupEvidence> = {}): ExternalImportBackupEvidence {
   return {
+    version: 1,
     backupId: "production/acceptance/run-123456-1",
     backupRun: "123456",
+    backupAttempt: "1",
     snapshotAt: "2026-09-26T10:20:00.000Z",
+    completedAt: "2026-09-26T10:24:00.000Z",
     productionSha: "b".repeat(40),
     manifestSha256: "c".repeat(64),
     source: production,
@@ -105,13 +160,39 @@ function authorization(
     batchId: value.batchId,
     planDigest: externalImportPlanDigest(value),
     productionSha: "b".repeat(40),
+    backupId: "production/acceptance/run-123456-1",
+    backupRun: "123456",
+    backupAttempt: "1",
+    manifestSha256: "c".repeat(64),
+    workflowRun: "789012",
+    workflowRunAttempt: "1",
     productionIdentity: production,
     ...overrides,
   };
 }
 
+function reviewerApproval(value: ExternalImportPlan) {
+  const planDigest = externalImportPlanDigest(value);
+  const candidateIds = value.items.map((item) => item.candidateId);
+  const backupId = "production/acceptance/run-123456-1";
+  return VerifiedExternalImportReviewerApproval.fromGithubReviewHistory({
+    repository: "justphilgud/pubquiz-web",
+    runId: "789012",
+    runAttempt: "1",
+    planDigest,
+    candidateIds,
+    backupId,
+    response: [{
+      state: "approved",
+      comment: externalImportApprovalComment({ planDigest, candidateIds, backupId }),
+      environments: [{ name: "operations-content-import" }],
+      user: { id: 99, login: "reviewer" },
+    }],
+  });
+}
+
 function guardInput(value = plan()) {
-  const preflight = preflightExternalImport(value, []);
+  const preflight = preflightExternalImport(value, [], ["Wissenschaft"]);
   return {
     mode: "write" as const,
     now,
@@ -124,6 +205,7 @@ function guardInput(value = plan()) {
     preflight,
     backup: backup(),
     authorization: authorization(value),
+    reviewerApproval: reviewerApproval(value),
   };
 }
 
@@ -157,18 +239,43 @@ test("review states are preserved in the frozen plan", () => {
     contentFingerprint: "d".repeat(64),
     reviewStatus: "REVIEW_REQUIRED" as const,
   };
-  const mixed = plan({ items: [value.items[0], second] });
+  const mixed = plan({
+    items: [value.items[0], second],
+    importApproval: {
+      records: [
+        {
+          candidateId: "candidate-1",
+          sourceStatus: "APPROVED",
+          reviewedByUserId: 7,
+          reviewedAt: "2026-09-26T09:55:00.000Z",
+        },
+        {
+          candidateId: "candidate-2",
+          sourceStatus: "APPROVED",
+          reviewedByUserId: 7,
+          reviewedAt: "2026-09-26T09:56:00.000Z",
+        },
+      ],
+    },
+  });
   validateExternalImportPlan(mixed);
   assert.deepEqual(mixed.items.map((item) => item.reviewStatus), ["READY_FOR_REVIEW", "REVIEW_REQUIRED"]);
 });
 
 test("empty Production inventory plans CREATE", () => {
-  assert.deepEqual(preflightExternalImport(plan(), []).counts, {
+  assert.deepEqual(preflightExternalImport(plan(), [], ["Wissenschaft"]).counts, {
     CREATE: 1,
     ALREADY_PRESENT: 0,
     CONFLICT: 0,
     REVIEW_REQUIRED: 0,
   });
+});
+
+test("missing active Production category blocks a new item", () => {
+  const result = preflightExternalImport(plan(), [], ["Musik", "Kultur"]);
+  assert.equal(result.items[0].decision, "REVIEW_REQUIRED");
+  assert.equal(result.items[0].reason, "ACTIVE_CATEGORY_MISSING");
+  assert.equal(result.counts.CREATE, 0);
 });
 
 test("source mapping with identical content is ALREADY_PRESENT", () => {
@@ -180,7 +287,7 @@ test("source mapping with identical content is ALREADY_PRESENT", () => {
     externalReference: "opentdb-42",
     contentFingerprint: "a".repeat(64),
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "ALREADY_PRESENT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "ALREADY_PRESENT");
 });
 
 test("source mapping with changed content is CONFLICT", () => {
@@ -192,7 +299,7 @@ test("source mapping with changed content is CONFLICT", () => {
     externalReference: "opentdb-42",
     contentFingerprint: "e".repeat(64),
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "CONFLICT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "CONFLICT");
 });
 
 test("exact untracked question with same answer is ALREADY_PRESENT", () => {
@@ -204,7 +311,7 @@ test("exact untracked question with same answer is ALREADY_PRESENT", () => {
     externalReference: null,
     contentFingerprint: null,
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "ALREADY_PRESENT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "ALREADY_PRESENT");
 });
 
 test("exact question with different answer is CONFLICT", () => {
@@ -216,7 +323,7 @@ test("exact question with different answer is CONFLICT", () => {
     externalReference: null,
     contentFingerprint: null,
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "CONFLICT");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "CONFLICT");
 });
 
 test("semantic duplicate requires human review", () => {
@@ -228,15 +335,70 @@ test("semantic duplicate requires human review", () => {
     externalReference: null,
     contentFingerprint: null,
   }];
-  assert.equal(preflightExternalImport(plan(), existing).items[0].decision, "REVIEW_REQUIRED");
+  assert.equal(preflightExternalImport(plan(), existing, ["Wissenschaft"]).items[0].decision, "REVIEW_REQUIRED");
 });
 
-test("candidate REVIEW_REQUIRED never becomes CREATE automatically", () => {
+test("durably approved REVIEW_REQUIRED candidate is eligible for current preflight", () => {
   const base = plan();
   const value = plan({
     items: [{ ...base.items[0], reviewStatus: "REVIEW_REQUIRED" }],
   });
-  assert.equal(preflightExternalImport(value, []).items[0].decision, "REVIEW_REQUIRED");
+  assert.equal(preflightExternalImport(value, [], ["Wissenschaft"]).items[0].decision, "CREATE");
+});
+
+test("plan validation rejects an item without its exact durable approval record", () => {
+  assert.throws(
+    () => validateExternalImportPlan({ ...plan(), importApproval: { records: [] } }),
+    /EXTERNAL_IMPORT_APPROVED_ITEMS_INVALID/,
+  );
+});
+
+test("automated quality approval is explicit and never invents a human reviewer", () => {
+  const value = automatedPlan();
+  validateExternalImportPlan(value);
+  assert.deepEqual(externalImportApprovalMetadata(value, "candidate-1"), {
+    approvalMode: "AUTOMATED_QUALITY_GATE",
+    approvedAt: "2026-09-26T09:55:00.000Z",
+    reviewedByUserId: null,
+    policyVersion: "production-auto-quality-v2",
+  });
+});
+
+test("automated approval rejects missing evidence, one source, and false reviewer metadata", () => {
+  const value = automatedPlan();
+  assert.throws(() => validateExternalImportPlan({
+    ...value,
+    items: [{ ...value.items[0], autoQualityEvidence: undefined }],
+  }), /EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_MISSING/);
+  assert.throws(() => validateExternalImportPlan({
+    ...value,
+    items: [{
+      ...value.items[0],
+      verification: { status: "VERIFIED", sources: value.items[0].verification.sources.slice(1) },
+      autoQualityEvidence: {
+        ...value.items[0].autoQualityEvidence!,
+        hasStrongPrimaryOrOfficialSource: false,
+        independentReliableSourceHosts: 1,
+      },
+    }],
+  }), /EXTERNAL_IMPORT_AUTO_SOURCE_POLICY_INVALID/);
+  const falseReviewer = {
+    ...value,
+    importApproval: {
+      approvalMode: "AUTOMATED_QUALITY_GATE",
+      policyVersion: EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION,
+      records: [{
+        candidateId: "candidate-1",
+        sourceStatus: "APPROVED",
+        evaluatedAt: "2026-09-26T09:55:00.000Z",
+        reviewedByUserId: 7,
+      }],
+    },
+  } as unknown as ExternalImportPlan;
+  assert.throws(
+    () => validateExternalImportPlan(falseReviewer),
+    /EXTERNAL_IMPORT_FALSE_REVIEWER_INVALID/,
+  );
 });
 
 test("complete re-run contains no CREATE, UPDATE or conflict", () => {
@@ -249,7 +411,7 @@ test("complete re-run contains no CREATE, UPDATE or conflict", () => {
     externalReference: value.items[0].externalReference,
     contentFingerprint: value.items[0].contentFingerprint,
   }];
-  const result = preflightExternalImport(value, existing);
+  const result = preflightExternalImport(value, existing, ["Wissenschaft"]);
   assert.equal(result.counts.CREATE, 0);
   assert.equal(result.counts.ALREADY_PRESENT, 1);
   assert.equal(result.counts.CONFLICT, 0);
@@ -311,6 +473,12 @@ test("authorization is batch-, digest-, release- and database-bound", () => {
     { batchId: "other-batch" },
     { planDigest: "0".repeat(64) },
     { productionSha: "0".repeat(40) },
+    { backupId: "production/acceptance/run-999-1" },
+    { backupRun: "999" },
+    { backupAttempt: "2" },
+    { manifestSha256: "1".repeat(64) },
+    { workflowRun: "999" },
+    { workflowRunAttempt: "2" },
     { productionIdentity: { ...production, database: "other" } },
     { writeAuthorized: false },
   ]) {
@@ -322,6 +490,23 @@ test("authorization is batch-, digest-, release- and database-bound", () => {
     assert.equal(result.gates.authorization, false);
     assert.equal(result.writeAuthorized, false);
   }
+});
+
+test("missing live reviewer proof blocks a write", () => {
+  const input = guardInput();
+  const result = evaluateExternalImportGuard({ ...input, reviewerApproval: undefined });
+  assert.equal(result.gates.reviewer, false);
+  assert.equal(result.writeAuthorized, false);
+});
+
+test("a rerun attempt cannot reuse the original one-shot approval", () => {
+  const input = guardInput();
+  const result = evaluateExternalImportGuard({
+    ...input,
+    execution: execution({ workflowRunAttempt: "2" }),
+  });
+  assert.equal(result.gates.host, false);
+  assert.equal(result.writeAuthorized, false);
 });
 
 test("wrong or missing plan digest is blocked", () => {
@@ -351,6 +536,22 @@ test("CONFLICT or REVIEW_REQUIRED blocks the entire write", () => {
 test("dry-run can read gates but can never authorize writes", () => {
   const result = evaluateExternalImportGuard({ ...guardInput(), mode: "dry-run" });
   assert.equal(result.dryRun, true);
+  assert.equal(result.writeAuthorized, false);
+});
+
+test("read-only Production preflight accepts operations-backup but cannot authorize writes", () => {
+  const input = guardInput();
+  const workflowRef = "justphilgud/pubquiz-web/.github/workflows/external-question-import-preflight.yml@refs/heads/main";
+  const result = evaluateExternalImportGuard({
+    ...input,
+    mode: "dry-run",
+    execution: execution({
+      githubEnvironment: "operations-backup",
+      workflowRef,
+      expectedWorkflowRef: workflowRef,
+    }),
+  });
+  assert.equal(result.gates.host, true);
   assert.equal(result.writeAuthorized, false);
 });
 

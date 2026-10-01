@@ -112,6 +112,54 @@ test("automatic strategies preserve story positions and derive solutions", () =>
   ]);
 });
 
+test("missing question placements keep their configured position among live polls", () => {
+  const mixedQuestions = Array.from({ length: 7 }, (_, index) => ({
+    quiz_fragen_id: 101 + index,
+    quiz_abschnitt_id: 7,
+    sortierung: index + 1,
+    frage: `Frage ${index + 1}`,
+  }));
+  const blockItems = [
+    ...mixedQuestions.slice(0, 6).map((question, index) =>
+      item({
+        id: index + 1,
+        type: "QUESTION",
+        order: (index + 1) * 1_000,
+        questionAssignmentId: question.quiz_fragen_id,
+      }),
+    ),
+    item({ id: 8, type: "LIVE_POLL", order: 8_000 }),
+    item({ id: 9, type: "LIVE_POLL", order: 9_000 }),
+  ];
+
+  const result = resolveQuizBlockSequence({
+    sectionId: 7,
+    quizStrategy: "END_OF_BLOCK",
+    sectionStrategy: null,
+    questions: mixedQuestions,
+    blockItems,
+  });
+
+  assert.deepEqual(
+    result.entries.slice(0, 9).map((entry) =>
+      entry.kind === "CONTENT"
+        ? `${entry.item.type}:${entry.item.id}`
+        : `${entry.kind}:${entry.question.quiz_fragen_id}`,
+    ),
+    [
+      "QUESTION:101",
+      "QUESTION:102",
+      "QUESTION:103",
+      "QUESTION:104",
+      "QUESTION:105",
+      "QUESTION:106",
+      "QUESTION:107",
+      "LIVE_POLL:flow:8",
+      "LIVE_POLL:flow:9",
+    ],
+  );
+});
+
 test("editorial question order wins over divergent persisted flow order", () => {
   const result = resolveQuizBlockSequence({
     sectionId: 7,

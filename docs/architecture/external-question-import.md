@@ -129,6 +129,28 @@ gelangen; KI-Prüfung ersetzt keine redaktionelle Freigabe. Ein reiner
 Contentimport benötigt weder Migration noch Deployment. Die bestehende
 Preview-Aktion wird nicht als Production-Importweg freigeschaltet.
 
+Für ausdrücklich freigegebene Batchläufe kann der Plan alternativ die strengere
+Klasse `AUTO_APPROVED_FOR_PRODUCTION` verwenden. Diese Freigabe ist im Plan als
+`approvalMode = AUTOMATED_QUALITY_GATE` und mit der festen Policy
+`production-auto-quality-v2` gekennzeichnet. Sie verlangt `VERIFIED`, eine
+abgeschlossene deutsche Lokalisierung, keinerlei offenen Quality-Gate-Befund,
+vier eindeutige Antworten, eine Kategorie sowie entweder mindestens zwei
+voneinander unabhängige, vom bestehenden Quellenfilter akzeptierte
+Quellenorganisationen oder mindestens eine starke, maschinell eindeutig
+erkennbare offizielle Primärquelle. Diese enge Primärquellenklasse umfasst
+staatliche, akademische, internationale und EU-Institutionen; gewöhnliche
+Unternehmens-, Community- und Sekundärquellen werden nicht allein anhand ihres
+Hostnamens als offiziell angenommen und benötigen weiterhin zwei unabhängige
+Organisationen. Der Plan speichert die prüfbare Evidenz pro Item und wird
+anschließend wie jeder andere Plan durch Digest, Production-Preflight, Backup
+und Required Reviewer gebunden.
+
+Automatisierte Freigaben erzeugen ausdrücklich keine erfundene Reviewer-ID.
+`reviewed_by_user_id` bleibt für diese Items `NULL`; Approvalmodus,
+Policy-Version und Auswertungszeit werden im unveränderlichen Plan und in den
+Import-Auditmetadaten abgelegt. Die GitHub-Environment-Freigabe des konkreten
+Schreibjobs bleibt davon unabhängig und vollständig erhalten.
+
 ## Production-Guard-Vertrag
 
 `productionImportGuard.ts` bildet die zentrale, source-neutrale Sicherheitsgrenze.
@@ -161,7 +183,9 @@ Der Guard prüft Defense in Depth:
 - vollständig abgeschlossenes Backup mit Manifest, privatem Readback und
   Integritätsnachweis,
 - identische Backup- und aktuelle Production-Identität,
-- explizite batch-, digest-, release- und datenbankgebundene Freigabe.
+- explizite batch-, digest-, release-, backup- und workflowgebundene Freigabe,
+- einen aus der GitHub-API gelesenen Required-Reviewer-Nachweis mit exakt an
+  Plan-Digest, Kandidatenliste und Backup-ID gebundenem Freigabekommentar.
 
 Da es bisher keine allgemeine Backup-Freshness-Konvention gab, gilt für externe
 Contentimporte eine dokumentierte Obergrenze von zwei Stunden zwischen Snapshot
@@ -170,32 +194,49 @@ werden; die Obergrenze ersetzt keine operative Reihenfolge.
 
 `writeAuthorized` ist standardmäßig und nach jedem Lauf `false`. Die einmalige
 Autorisierung kann weder durch Preview noch Development erzeugt werden. Der
-jetzige AP stellt bewusst keinen ausführbaren Production-Writer bereit. Damit
-bleibt vor der späteren Main-Integration und der separaten Freigabe des ersten
-echten Contentimports eine harte technische Lücke statt eines versteckten
-Schreibpfads.
+Writer läuft ausschließlich im GitHub-Workflow
+`external-question-import.yml`. Der Job im Environment
+`operations-content-import` beginnt erst nach dem read-only Preflight und dem
+Required-Reviewer-Gate. Nach der Freigabe werden Production-SHA, Plan, Digest,
+Backup und vollständiger Preflight erneut geprüft. Eine Änderung zwischen
+Freigabe und Write blockiert den Lauf.
 
-Der vorhandene Operations-Workflow
-`external-question-import-preflight.yml` führt ausschließlich den read-only
-Preflight mit `PRODUCTION_BACKUP_DATABASE_URL` aus. Ein zukünftiger Writer muss
-den hier getesteten Guardvertrag unverändert konsumieren, im bestehenden
-Rollenmodell einen aktiven globalen Admin binden, Ergebnisse je Kandidat
-auditieren und seine Job-lokale Freigabe im `finally` schließen.
+Der weiterhin verfügbare Workflow `external-question-import-preflight.yml`
+führt ausschließlich den read-only Preflight mit
+`PRODUCTION_BACKUP_DATABASE_URL` aus. Der kombinierte Writer-Workflow verwendet
+vor dem Gate ebenfalls nur diesen Reader. Erst im geschützten Write-Job wird das
+dedizierte Credential `pubquiz_external_import_writer` akzeptiert. Owner- oder
+Adminrollen der Datenbank werden vom Writer abgewiesen. Der im Plan genannte
+Operator muss zusätzlich ein aktiver globaler App-Admin sein.
+
+Der Production-Preflight gleicht die vorbereitete Kategorie zusätzlich
+groß-/kleinschreibungsunabhängig mit den aktiven Production-Kategorien ab. Ein
+neuer Kandidat ohne exakten aktiven Match bleibt `REVIEW_REQUIRED` mit
+`ACTIVE_CATEGORY_MISSING`; der Production-Writer erzeugt in diesem Fall keine
+Frage mit bloßem Kategorienwunsch.
+
+Jedes Item läuft in einer eigenen serialisierbaren Transaktion. Frage,
+Antworten, Kategoriebezug und External-Mapping committen gemeinsam oder werden
+vollständig zurückgerollt. Erzeugte Fragen bleiben unveröffentlicht mit
+`review_status = IN_REVIEW`. Der gleiche Record-Service wird vom Preview-Review
+und vom Production-Writer verwendet. Ein Batch-Audit dokumentiert importierte,
+bereits vorhandene, fehlgeschlagene und nicht gelaufene Items. Die One-shot-
+Autorisierung schließt sich bei Erfolg, Fehler und Abbruch.
 
 ## Medienvertrag
 
 Der Plan kann für jedes Medium Quell-URL, Lizenz, MIME-Type, erwartete Größe,
 SHA-256 und Zielreferenz enthalten. Die Planvalidierung prüft diese Metadaten.
-Ein späterer Writer darf die Frage erst abschließen, nachdem Download,
+Der Writer darf die Frage erst abschließen, nachdem Download,
 Dekodierung, Production-Upload, privater Readback sowie Hash und Größe bestätigt
 sind. Der aktuelle OpenTDB-Testplan enthält keine Medien; es wurde keine zweite
 Medienpipeline eingeführt.
 
-## Offene Ausbaustufe
+## Offene Betriebsfreigabe
 
 Vor einem Production-Massendurchlauf braucht es weiterhin die menschliche
 Stichprobe mit Annahme-, Änderungs- und Reviewzeitmessung. Der Phase-2-Adapter
 bleibt an Preview, Batch `#1` und den manuellen Fragen-Lifecycle gebunden. Die
-Anbindung eines ausführbaren Writers, eine geschützte einmalige
-Reviewer-Freigabe und der erste echte Production-Contentimport bleiben ein
-separates Freigabegate. Der Previewguard wird dafür nicht gelockert.
+Einrichtung des dedizierten Datenbank-Credentials und des GitHub-Environments
+sowie der erste echte Production-Contentimport bleiben separate manuelle
+Freigabegates. Der Previewguard wird dafür nicht gelockert.

@@ -4,9 +4,19 @@ import {
   calculateQuestionSimilarity,
   normalizeQuestionForSimilarity,
 } from "@/app/fragen/editor/questionSimilarity";
+import {
+  isVerifiedExternalImportReviewerApproval,
+  type VerifiedExternalImportReviewerApproval,
+} from "./reviewerApproval";
+import {
+  countIndependentReliableSourceHosts,
+  hasStrongPrimaryOrOfficialSource,
+} from "./sourceReliability";
 
 export const EXTERNAL_IMPORT_PLAN_VERSION = 1 as const;
 export const EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS = 2 * 60 * 60 * 1000;
+export const EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION =
+  "production-auto-quality-v2" as const;
 
 export type ExternalImportReviewStatus =
   | "READY_FOR_REVIEW"
@@ -38,6 +48,15 @@ export type ExternalImportPlanItem = Readonly<{
     status: string;
     sources: readonly Readonly<{ title: string; url: string }>[];
   }>;
+  autoQualityEvidence?: Readonly<{
+    classification: "AUTO_APPROVED_FOR_PRODUCTION";
+    policyVersion: typeof EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION;
+    localizationStatus: "LOCALIZED";
+    qualityStatus: "READY_FOR_REVIEW";
+    issueCodes: readonly [];
+    hasStrongPrimaryOrOfficialSource: boolean;
+    independentReliableSourceHosts: number;
+  }>;
   reviewStatus: ExternalImportReviewStatus;
   license: Readonly<{ name: string; url: string }>;
   media: readonly Readonly<{
@@ -56,7 +75,33 @@ export type ExternalImportPlan = Readonly<{
   sourceType: string;
   frozenAt: string;
   operatorUserId: number;
+  importApproval:
+    | Readonly<{
+        approvalMode?: "HUMAN_REVIEW";
+        records: readonly Readonly<{
+          candidateId: string;
+          sourceStatus: "APPROVED";
+          reviewedByUserId: number;
+          reviewedAt: string;
+        }>[];
+      }>
+    | Readonly<{
+        approvalMode: "AUTOMATED_QUALITY_GATE";
+        policyVersion: typeof EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION;
+        records: readonly Readonly<{
+          candidateId: string;
+          sourceStatus: "APPROVED";
+          evaluatedAt: string;
+        }>[];
+      }>;
   items: readonly ExternalImportPlanItem[];
+}>;
+
+export type ExternalImportApprovalMetadata = Readonly<{
+  approvalMode: "HUMAN_REVIEW" | "AUTOMATED_QUALITY_GATE";
+  approvedAt: string;
+  reviewedByUserId: number | null;
+  policyVersion: typeof EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION | null;
 }>;
 
 export type ExistingExternalQuestion = Readonly<{
@@ -94,9 +139,12 @@ export type ProductionIdentity = Readonly<{
 }>;
 
 export type ExternalImportBackupEvidence = Readonly<{
+  version: 1;
   backupId: string;
   backupRun: string;
+  backupAttempt: string;
   snapshotAt: string;
+  completedAt: string;
   productionSha: string;
   manifestSha256: string;
   source: ProductionIdentity;
@@ -111,6 +159,12 @@ export type ExternalImportWriteAuthorization = Readonly<{
   batchId: string;
   planDigest: string;
   productionSha: string;
+  backupId: string;
+  backupRun: string;
+  backupAttempt: string;
+  manifestSha256: string;
+  workflowRun: string;
+  workflowRunAttempt: string;
   productionIdentity: ProductionIdentity;
 }>;
 
@@ -126,6 +180,8 @@ export type ExternalImportExecutionIdentity = Readonly<{
   workflowRef?: string;
   expectedWorkflowRef?: string;
   githubEnvironment?: string;
+  workflowRun?: string;
+  workflowRunAttempt?: string;
 }>;
 
 export type ExternalImportGuardInput = Readonly<{
@@ -140,6 +196,7 @@ export type ExternalImportGuardInput = Readonly<{
   preflight: ExternalImportPreflight;
   backup?: ExternalImportBackupEvidence;
   authorization?: ExternalImportWriteAuthorization;
+  reviewerApproval?: VerifiedExternalImportReviewerApproval;
 }>;
 
 export type ExternalImportGuardResult = Readonly<{
@@ -153,6 +210,7 @@ export type ExternalImportGuardResult = Readonly<{
     database: boolean;
     preflight: boolean;
     backup: boolean;
+    reviewer: boolean;
     authorization: boolean;
   }>;
   failures: readonly string[];
@@ -200,6 +258,12 @@ export function externalImportPlanDigest(plan: ExternalImportPlan) {
     .digest("hex");
 }
 
+export function externalImportPreflightDigest(preflight: ExternalImportPreflight) {
+  return createHash("sha256")
+    .update(`${JSON.stringify(stableValue(preflight))}\n`, "utf8")
+    .digest("hex");
+}
+
 export function validateExternalImportPlan(value: unknown): asserts value is ExternalImportPlan {
   if (!isRecord(value) || value.version !== EXTERNAL_IMPORT_PLAN_VERSION) {
     throw new Error("EXTERNAL_IMPORT_PLAN_VERSION_INVALID");
@@ -221,6 +285,19 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
   }
   if (!Array.isArray(value.items) || value.items.length < 1 || value.items.length > 1_000) {
     throw new Error("EXTERNAL_IMPORT_ITEMS_INVALID");
+  }
+  if (!isRecord(value.importApproval) || !Array.isArray(value.importApproval.records)) {
+    throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+  }
+  const approvalMode = value.importApproval.approvalMode ?? "HUMAN_REVIEW";
+  if (approvalMode !== "HUMAN_REVIEW" && approvalMode !== "AUTOMATED_QUALITY_GATE") {
+    throw new Error("EXTERNAL_IMPORT_APPROVAL_MODE_INVALID");
+  }
+  if (
+    approvalMode === "AUTOMATED_QUALITY_GATE" &&
+    value.importApproval.policyVersion !== EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION
+  ) {
+    throw new Error("EXTERNAL_IMPORT_AUTO_POLICY_INVALID");
   }
   const candidateIds = new Set<string>();
   const references = new Set<string>();
@@ -278,6 +355,38 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
       assertNonEmptyString(source?.title, "EXTERNAL_IMPORT_SOURCE_TITLE_INVALID");
       assertUrl(source?.url, "EXTERNAL_IMPORT_SOURCE_URL_INVALID");
     }
+    if (approvalMode === "AUTOMATED_QUALITY_GATE") {
+      if (!isRecord(item.autoQualityEvidence)) {
+        throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_MISSING");
+      }
+      if (
+        item.autoQualityEvidence.classification !== "AUTO_APPROVED_FOR_PRODUCTION" ||
+        item.autoQualityEvidence.policyVersion !== EXTERNAL_IMPORT_AUTO_QUALITY_POLICY_VERSION ||
+        item.autoQualityEvidence.localizationStatus !== "LOCALIZED" ||
+        item.autoQualityEvidence.qualityStatus !== "READY_FOR_REVIEW" ||
+        !Array.isArray(item.autoQualityEvidence.issueCodes) ||
+        item.autoQualityEvidence.issueCodes.length !== 0 ||
+        item.reviewStatus !== "READY_FOR_REVIEW" ||
+        item.verification.status !== "VERIFIED" ||
+        typeof item.prepared.category !== "string" || !item.prepared.category.trim()
+      ) {
+        throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_INVALID");
+      }
+      const independentHosts = countIndependentReliableSourceHosts(item.verification.sources);
+      const strongPrimaryOrOfficialSource = hasStrongPrimaryOrOfficialSource(
+        item.verification.sources,
+      );
+      if (
+        (independentHosts < 2 && !strongPrimaryOrOfficialSource) ||
+        item.autoQualityEvidence.hasStrongPrimaryOrOfficialSource !==
+          strongPrimaryOrOfficialSource ||
+        item.autoQualityEvidence.independentReliableSourceHosts !== independentHosts
+      ) {
+        throw new Error("EXTERNAL_IMPORT_AUTO_SOURCE_POLICY_INVALID");
+      }
+    } else if (item.autoQualityEvidence !== undefined) {
+      throw new Error("EXTERNAL_IMPORT_AUTO_QUALITY_EVIDENCE_UNEXPECTED");
+    }
     for (const medium of item.media) {
       assertUrl(medium?.sourceUrl, "EXTERNAL_IMPORT_MEDIA_SOURCE_INVALID");
       assertNonEmptyString(medium?.license, "EXTERNAL_IMPORT_MEDIA_LICENSE_INVALID");
@@ -291,6 +400,70 @@ export function validateExternalImportPlan(value: unknown): asserts value is Ext
       }
     }
   }
+  const approvedIds = value.importApproval.records.map((record) => {
+    if (!isRecord(record) || record.sourceStatus !== "APPROVED") {
+      throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+    }
+    assertNonEmptyString(record.candidateId, "EXTERNAL_IMPORT_APPROVAL_INVALID", 128);
+    if (approvalMode === "AUTOMATED_QUALITY_GATE") {
+      if ("reviewedByUserId" in record || "reviewedAt" in record) {
+        throw new Error("EXTERNAL_IMPORT_FALSE_REVIEWER_INVALID");
+      }
+      assertNonEmptyString(record.evaluatedAt, "EXTERNAL_IMPORT_APPROVAL_TIME_INVALID", 64);
+      if (!Number.isFinite(Date.parse(record.evaluatedAt))) {
+        throw new Error("EXTERNAL_IMPORT_APPROVAL_TIME_INVALID");
+      }
+    } else {
+      if (
+        typeof record.reviewedByUserId !== "number" ||
+        !Number.isInteger(record.reviewedByUserId) || record.reviewedByUserId < 1
+      ) {
+        throw new Error("EXTERNAL_IMPORT_APPROVER_INVALID");
+      }
+      assertNonEmptyString(record.reviewedAt, "EXTERNAL_IMPORT_APPROVAL_TIME_INVALID", 64);
+      if (!Number.isFinite(Date.parse(record.reviewedAt))) {
+        throw new Error("EXTERNAL_IMPORT_APPROVAL_TIME_INVALID");
+      }
+    }
+    return record.candidateId;
+  });
+  if (
+    approvedIds.length !== candidateIds.size ||
+    new Set(approvedIds).size !== approvedIds.length ||
+    approvedIds.some((candidateId) => !candidateIds.has(candidateId))
+  ) {
+    throw new Error("EXTERNAL_IMPORT_APPROVED_ITEMS_INVALID");
+  }
+}
+
+export function externalImportApprovalMetadata(
+  plan: ExternalImportPlan,
+  candidateId: string,
+): ExternalImportApprovalMetadata {
+  const record = plan.importApproval.records.find(
+    (entry) => entry.candidateId === candidateId,
+  );
+  if (!record) throw new Error("EXTERNAL_IMPORT_DURABLE_REVIEW_MISSING");
+  if (plan.importApproval.approvalMode === "AUTOMATED_QUALITY_GATE") {
+    if (!("evaluatedAt" in record)) {
+      throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+    }
+    return {
+      approvalMode: "AUTOMATED_QUALITY_GATE",
+      approvedAt: record.evaluatedAt,
+      reviewedByUserId: null,
+      policyVersion: plan.importApproval.policyVersion,
+    };
+  }
+  if (!("reviewedAt" in record) || !("reviewedByUserId" in record)) {
+    throw new Error("EXTERNAL_IMPORT_APPROVAL_INVALID");
+  }
+  return {
+    approvalMode: "HUMAN_REVIEW",
+    approvedAt: record.reviewedAt,
+    reviewedByUserId: record.reviewedByUserId,
+    policyVersion: null,
+  };
 }
 
 function normalizedAnswer(value: string | null) {
@@ -300,8 +473,15 @@ function normalizedAnswer(value: string | null) {
 export function preflightExternalImport(
   plan: ExternalImportPlan,
   existing: readonly ExistingExternalQuestion[],
+  activeCategoryNames: readonly string[],
 ): ExternalImportPreflight {
   validateExternalImportPlan(plan);
+  const approvedIds = new Set(
+    plan.importApproval.records.map((record) => record.candidateId),
+  );
+  const activeCategories = new Set(
+    activeCategoryNames.map((category) => category.trim().toLocaleLowerCase("de")),
+  );
   const items = plan.items.map<ExternalImportPreflightItem>((candidate) => {
     const mapping = existing.find((entry) =>
       entry.sourceType === plan.sourceType &&
@@ -363,13 +543,29 @@ export function preflightExternalImport(
         reason: `SEMANTIC_SIMILARITY_${semantic.similarity.toFixed(3)}`,
       };
     }
-    if (candidate.reviewStatus === "REVIEW_REQUIRED") {
+    const category = candidate.prepared.category?.trim().toLocaleLowerCase("de");
+    if (!category || !activeCategories.has(category)) {
       return {
         candidateId: candidate.candidateId,
         externalReference: candidate.externalReference,
         decision: "REVIEW_REQUIRED",
         existingQuestionId: null,
-        reason: "CANDIDATE_REVIEW_REQUIRED",
+        reason: "ACTIVE_CATEGORY_MISSING",
+      };
+    }
+    if (
+      !approvedIds.has(candidate.candidateId) ||
+      candidate.verification.status !== "VERIFIED" ||
+      candidate.verification.sources.length === 0
+    ) {
+      return {
+        candidateId: candidate.candidateId,
+        externalReference: candidate.externalReference,
+        decision: "REVIEW_REQUIRED",
+        existingQuestionId: null,
+        reason: !approvedIds.has(candidate.candidateId)
+          ? "EXPLICIT_IMPORT_APPROVAL_MISSING"
+          : "CANDIDATE_QUALITY_REVIEW_REQUIRED",
       };
     }
     return {
@@ -396,7 +592,10 @@ function identityEquals(left: ProductionIdentity, right: ProductionIdentity) {
     left.database === right.database && left.schema === right.schema;
 }
 
-function executionIsProduction(execution: ExternalImportExecutionIdentity) {
+function executionIsProduction(
+  execution: ExternalImportExecutionIdentity,
+  mode: ExternalImportGuardInput["mode"],
+) {
   if (execution.logicalEnvironment !== "production") return false;
   if (execution.kind === "vercel") {
     return execution.vercelEnvironment === "production" &&
@@ -407,9 +606,15 @@ function executionIsProduction(execution: ExternalImportExecutionIdentity) {
     return execution.repository === "justphilgud/pubquiz-web" &&
       execution.ref === "refs/heads/main" &&
       execution.eventName === "workflow_dispatch" &&
-      execution.githubEnvironment === "operations-content-import" &&
+      execution.githubEnvironment === (
+        mode === "dry-run" ? "operations-backup" : "operations-content-import"
+      ) &&
       Boolean(execution.expectedWorkflowRef) &&
-      execution.workflowRef === execution.expectedWorkflowRef;
+      execution.workflowRef === execution.expectedWorkflowRef &&
+      (mode === "dry-run" || (
+        typeof execution.workflowRun === "string" && /^[1-9][0-9]{0,19}$/.test(execution.workflowRun) &&
+        execution.workflowRunAttempt === "1"
+      ));
   }
   return false;
 }
@@ -420,10 +625,13 @@ function validBackup(
 ) {
   if (!evidence) return false;
   const snapshot = Date.parse(evidence.snapshotAt);
-  return evidence.completed && evidence.manifestPresent && evidence.readbackVerified &&
+  const completed = Date.parse(evidence.completedAt);
+  return evidence.version === 1 && evidence.completed && evidence.manifestPresent && evidence.readbackVerified &&
     evidence.integrityVerified && /^[a-f0-9]{64}$/.test(evidence.manifestSha256) &&
     /^production\/(acceptance|scheduled)\/run-[0-9]+-[0-9]+$/.test(evidence.backupId) &&
-    /^[0-9]+$/.test(evidence.backupRun) && Number.isFinite(snapshot) &&
+    /^[1-9][0-9]{0,19}$/.test(evidence.backupRun) && /^[1-9][0-9]{0,5}$/.test(evidence.backupAttempt) &&
+    evidence.backupId === `production/acceptance/run-${evidence.backupRun}-${evidence.backupAttempt}` &&
+    Number.isFinite(snapshot) && Number.isFinite(completed) && completed >= snapshot &&
     snapshot <= input.now.getTime() && input.now.getTime() - snapshot <= EXTERNAL_IMPORT_BACKUP_MAX_AGE_MS &&
     evidence.productionSha === input.currentProductionSha &&
     identityEquals(evidence.source, input.expectedDatabase);
@@ -438,7 +646,7 @@ export function evaluateExternalImportGuard(input: ExternalImportGuardInput): Ex
   }
   const computedDigest = planValid ? externalImportPlanDigest(input.plan) : "";
   const environment = input.execution.logicalEnvironment === "production";
-  const host = executionIsProduction(input.execution);
+  const host = executionIsProduction(input.execution, input.mode);
   const database = identityEquals(input.actualDatabase, input.expectedDatabase);
   const preflight = input.preflight.counts.CONFLICT === 0 &&
     input.preflight.counts.REVIEW_REQUIRED === 0;
@@ -449,9 +657,27 @@ export function evaluateExternalImportGuard(input: ExternalImportGuardInput): Ex
     input.authorization?.batchId === input.plan.batchId &&
     input.authorization?.planDigest === input.suppliedDigest &&
     input.authorization?.productionSha === input.currentProductionSha &&
+    input.authorization?.backupId === input.backup?.backupId &&
+    input.authorization?.backupRun === input.backup?.backupRun &&
+    input.authorization?.backupAttempt === input.backup?.backupAttempt &&
+    input.authorization?.manifestSha256 === input.backup?.manifestSha256 &&
+    input.authorization?.workflowRun === input.execution.workflowRun &&
+    input.authorization?.workflowRunAttempt === input.execution.workflowRunAttempt &&
     input.authorization !== undefined &&
     identityEquals(input.authorization.productionIdentity, input.expectedDatabase);
-  const gates = { plan: planValid, digest, environment, host, database, preflight, backup, authorization };
+  const reviewer = input.mode === "dry-run" || (
+    isVerifiedExternalImportReviewerApproval(input.reviewerApproval) &&
+    input.reviewerApproval.runId === input.execution.workflowRun &&
+    input.reviewerApproval.runAttempt === input.execution.workflowRunAttempt &&
+    input.reviewerApproval.environment === "operations-content-import" &&
+    input.reviewerApproval.planDigest === input.suppliedDigest &&
+    input.reviewerApproval.backupId === input.backup?.backupId &&
+    input.reviewerApproval.candidateIds.length === input.plan.items.length &&
+    input.reviewerApproval.candidateIds.every((candidateId, index) =>
+      candidateId === input.plan.items[index]?.candidateId
+    )
+  );
+  const gates = { plan: planValid, digest, environment, host, database, preflight, backup, reviewer, authorization };
   const failures = Object.entries(gates)
     .filter(([, passed]) => !passed)
     .map(([gate]) => `EXTERNAL_IMPORT_${gate.toUpperCase()}_GATE_BLOCKED`);

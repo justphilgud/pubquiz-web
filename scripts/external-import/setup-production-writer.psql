@@ -1,0 +1,111 @@
+-- MANUAL ONLY. Invoke through invoke-production-writer-role.ps1 in Setup mode.
+-- The wrapper supplies both passwords through process memory/stdin. No password
+-- value belongs in this file, process arguments, shell history, Git or logs.
+\set ON_ERROR_STOP on
+
+SELECT :'HOST' = 'ep-dawn-paper-alws45vx.c-3.eu-central-1.aws.neon.tech'
+       AND current_database() = 'neondb'
+       AND current_user = 'neondb_owner' AS correct_target \gset
+\if :correct_target
+\else
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_SETUP_INCORRECT_PRODUCTION_IDENTITY'; END $block$;
+\endif
+
+SELECT NOT EXISTS (
+  SELECT 1 FROM pg_catalog.pg_roles
+  WHERE rolname = 'pubquiz_external_import_writer'
+) AS role_absent \gset
+\if :role_absent
+\else
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_SETUP_ROLE_ALREADY_EXISTS'; END $block$;
+\endif
+
+-- A grant to PUBLIC reaches every login role and cannot be revoked only for this
+-- writer. Abort before CREATE ROLE instead of committing a role that could make
+-- temporary tables contrary to the strict no-DDL contract.
+SELECT NOT EXISTS (
+  SELECT 1
+  FROM pg_catalog.pg_database database_row
+  CROSS JOIN LATERAL pg_catalog.aclexplode(
+    COALESCE(
+      database_row.datacl,
+      pg_catalog.acldefault('d', database_row.datdba)
+    )
+  ) privilege_row
+  WHERE database_row.datname = current_database()
+    AND privilege_row.grantee = 0
+    AND privilege_row.privilege_type = 'TEMPORARY'
+) AS public_temporary_absent \gset
+\if :public_temporary_absent
+\else
+  DO $block$ BEGIN RAISE EXCEPTION 'WRITER_SETUP_PUBLIC_TEMPORARY_INHERITED'; END $block$;
+\endif
+
+BEGIN;
+
+CREATE ROLE pubquiz_external_import_writer
+  NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
+
+GRANT CONNECT ON DATABASE neondb TO pubquiz_external_import_writer;
+GRANT USAGE ON SCHEMA pubquiz TO pubquiz_external_import_writer;
+
+-- Read surface required by duplicate detection, lookup data and the active-admin guard.
+GRANT SELECT ON TABLE
+  pubquiz.antworttyp,
+  pubquiz.fragen,
+  pubquiz.antworten,
+  pubquiz.fragenkategorie,
+  pubquiz.fragen_kategorien,
+  pubquiz.external_question_import_batches,
+  pubquiz.external_question_import_items
+TO pubquiz_external_import_writer;
+GRANT SELECT (id, is_active) ON pubquiz.users TO pubquiz_external_import_writer;
+GRANT SELECT (benutzer_id, rolle, scope_typ)
+  ON pubquiz.benutzer_rollenzuweisungen TO pubquiz_external_import_writer;
+
+-- Create-only question lifecycle. Existing questions, answers and categories cannot be changed.
+GRANT INSERT (
+  frage, quelle, fragentyp, schwierigkeitslevel,
+  created_by_user_id, last_modified_by_user_id,
+  freigegeben, ist_unfertig, review_status,
+  submitted_at, submitted_by_user_id,
+  moderationsnotizen, kategorienwunsch
+) ON pubquiz.fragen TO pubquiz_external_import_writer;
+GRANT INSERT (fragen_id, antwort, ist_richtig, antworttyp_id)
+  ON pubquiz.antworten TO pubquiz_external_import_writer;
+GRANT INSERT (fragen_id, fragenkategorie_id)
+  ON pubquiz.fragen_kategorien TO pubquiz_external_import_writer;
+
+-- Audit rows are append-only; only the batch envelope may advance its state.
+GRANT INSERT (
+  provider, requested_count, fetched_count, status,
+  report_json, created_by_user_id
+) ON pubquiz.external_question_import_batches TO pubquiz_external_import_writer;
+GRANT UPDATE (status, report_json, error_message, completed_at)
+  ON pubquiz.external_question_import_batches TO pubquiz_external_import_writer;
+GRANT INSERT (
+  import_batch_id, provider, external_reference, license, license_url,
+  original_language, original_category, original_difficulty, original_type,
+  original_question, original_correct_answer, original_incorrect_answers,
+  provider_payload_json, prepared_question, prepared_correct_answer,
+  prepared_incorrect_answers, explanation, localization_status,
+  verification_status, verification_sources, suggested_category_name,
+  mapped_difficulty, status, issue_codes, duplicate_candidates,
+  automation_changes, content_fingerprint, question_id, verified_at,
+  review_started_at, reviewed_at, reviewed_by_user_id
+) ON pubquiz.external_question_import_items TO pubquiz_external_import_writer;
+
+GRANT USAGE ON SEQUENCE
+  pubquiz.fragen_fragen_id_seq,
+  pubquiz.antworten_antwort_id_seq,
+  pubquiz.fragen_kategorien_fragen_kategorie_zuordnung_id_seq,
+  pubquiz.external_question_import_batches_import_batch_id_seq,
+  pubquiz.external_question_import_items_import_item_id_seq
+TO pubquiz_external_import_writer;
+
+ALTER ROLE pubquiz_external_import_writer SET search_path = pubquiz, pg_catalog;
+ALTER ROLE pubquiz_external_import_writer PASSWORD __ROLE_PASSWORD_SQL_LITERAL__;
+ALTER ROLE pubquiz_external_import_writer LOGIN;
+
+COMMIT;
+\echo 'Production import writer committed. Stop and verify before storing the credential.'

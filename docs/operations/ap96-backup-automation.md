@@ -149,15 +149,24 @@ Vor jeder auswählbaren Löschung gelten alle folgenden Bedingungen:
 Unvollständige, ungültige und fremde Pfade werden behalten und im Bericht
 ausgewiesen. Sie werden nicht stillschweigend bereinigt.
 
-Die Bridge bricht bei mehr als 4.096 inventarisierten Objekten sicher ab. Bei der
-V1-Policy mit heute etwa 102 Objekten pro vollständigem Backup liegt der reguläre
-Daily-/Weekly-Bestand deutlich darunter. Viele dauerhaft geschützte Backups müssen
-vor Erreichen dieser Grenze betrieblich geprüft werden; der Grenzwert wird nicht
-automatisch erweitert.
+Die Bridge liefert das fest auf `production/acceptance/` begrenzte Inventar in
+Seiten von höchstens 1.000 Objekten. Der Runner validiert jede Seite, akzeptiert
+nur einen opaken, druckbaren Provider-Cursor, verhindert Cursor-Schleifen, begrenzt
+einen Lauf auf 64 Seiten und setzt höchstens 32.000 Objekte zusammen. Damit bleibt die Antwort jeder einzelnen
+Bridge-Anfrage klein, während der reguläre Daily-/Weekly-Bestand auch bei der seit
+September 2026 auf rund 690 Objekte gewachsenen Medienmenge vollständig erfasst
+wird. Wird die Gesamtobergrenze erreicht oder liefert der Provider einen
+widersprüchlichen Cursor, bricht der Dry Run weiterhin sicher und ohne Löschung ab.
 
 Solange `BACKUP_RETENTION_VERIFIED=false` ist, erstellt der Workflow nach einem
 erfolgreichen Backup ausschließlich die Liste `keep/delete` mit Gründen, Alter,
 Typ, Größe sowie Speicher vorher/nachher. Es wird keine Delete-Operation angefordert.
+Für eine erneute Prüfung kann `mode=retention-dry-run` ein bereits vollständig
+validiertes Backup über dessen exakte Kennung und Manifest-SHA-256 wiederverwenden.
+Dieser Modus überspringt Datenbank und Medienbackup, setzt Retention unabhängig von
+der Environmentvariable zwingend auf `false` und kann deshalb keine Delete-Operation
+anfordern. Ein bestehendes Backup darf im normalen oder destruktiven Retentionpfad
+nicht als aktueller Lauf ausgegeben werden.
 Nach dem ersten realen Dry Run gilt Gate 1: Löschliste prüfen und ausdrücklich
 freigeben. Erst danach darf `BACKUP_RETENTION_VERIFIED=true` gesetzt werden.
 
