@@ -405,6 +405,76 @@ test("open solutions render short and long canonical answers without fake altern
   }
 });
 
+test("solution respects the effective quiz answer form when stored choices exist", () => {
+  const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
+  const theme = structuredClone(runtime.theme);
+  theme.design.stylePreset = "EDITORIAL";
+  const baseQuestion = runtime.quiz.fragen[0];
+  assert.ok(baseQuestion);
+  const answers = [
+    { antwort_id: 40, antwort: "40", ist_richtig: true, antworttyp: "Text", medien: [] },
+    { antwort_id: 50, antwort: "50", ist_richtig: false, antworttyp: "Text", medien: [] },
+    { antwort_id: 60, antwort: "60", ist_richtig: false, antworttyp: "Text", medien: [] },
+    { antwort_id: 90, antwort: "90", ist_richtig: false, antworttyp: "Text", medien: [] },
+  ];
+
+  const renderSolution = (effectiveMode: "OPEN" | "CLOSED") => {
+    const layoutInput = {
+      templateId: null,
+      questionText: "Welcher Zahl entspricht die römische Zahl XL?",
+      answerOptionCount: answers.length,
+      structuredFieldCount: 0,
+      media: [],
+    };
+    const question = {
+      ...baseQuestion,
+      frage: layoutInput.questionText,
+      templateId: null,
+      templateConfig: null,
+      freie_antwort_erlaubt: effectiveMode === "OPEN",
+      urspruenglicher_antwortmodus: "CLOSED" as const,
+      effektiver_antwortmodus: effectiveMode,
+      presentationLayouts: {
+        question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }),
+        solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }),
+      },
+      antwort_reihenfolge: answers.map((answer) => answer.antwort_id),
+      medien: [],
+      bildMedien: [],
+      antwortfelder: [],
+      antworten: answers,
+    };
+    const quiz = { ...runtime.quiz, fragen: [question] };
+    const slide: Slide = {
+      typ: "aufloesung",
+      abschnitt: quiz.abschnitte[0],
+      frage: question,
+      frageIndexImBlock: 1,
+      fragenAnzahlImBlock: 1,
+    };
+    return renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      quiz,
+      slide,
+      slides: [slide],
+      slideIndex: 0,
+      slideLabel: "XL · Auflösung",
+      theme,
+      displayState,
+    }));
+  };
+
+  const openHtml = renderSolution("OPEN");
+  assert.match(openHtml, />40</);
+  assert.doesNotMatch(openHtml, />50</);
+  assert.doesNotMatch(openHtml, />60</);
+  assert.doesNotMatch(openHtml, />90</);
+  assert.doesNotMatch(openHtml, /presentation-solution-option/);
+
+  const closedHtml = renderSolution("CLOSED");
+  for (const answer of answers) assert.ok(closedHtml.includes(answer.antwort));
+  assert.equal((closedHtml.match(/presentation-solution-option/g) ?? []).length, 4);
+});
+
 test("FaceMorph keeps structured answer fields out of the question slide and reveals both people", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const baseQuestion = runtime.quiz.fragen[0];

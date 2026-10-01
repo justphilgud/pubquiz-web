@@ -142,7 +142,7 @@ test("validates structured meme captions and rejects malformed or overlong field
     answerText: JSON.stringify({ topText: " Oben ", bottomText: "Unten" }),
   });
   assert.deepEqual(result, {
-    payload: { topText: "Oben", bottomText: "Unten" },
+    payload: { topText: " Oben ", bottomText: "Unten" },
     hasContent: true,
   });
   assert.equal(validate(meme, {
@@ -153,7 +153,7 @@ test("validates structured meme captions and rejects malformed or overlong field
     answerText: JSON.stringify({ topText: "x".repeat(81), bottomText: "" }),
   }), /höchstens 80 Zeichen/);
   assert.deepEqual(interactionPayloadToDraft(meme, result.payload), {
-    antwortText: JSON.stringify({ topText: "Oben", bottomText: "Unten" }),
+    antwortText: JSON.stringify({ topText: " Oben ", bottomText: "Unten" }),
     antwortId: null,
     antwortfelder: {},
   });
@@ -183,11 +183,11 @@ test("validates custom caption maps against the snapshotted zone contract", () =
     },
   };
   const result = validate(meme, { answerText: JSON.stringify({ captions: { bubble: " Hallo " } }) });
-  assert.deepEqual(result, { payload: { captions: { bubble: "Hallo" } }, hasContent: true });
+  assert.deepEqual(result, { payload: { captions: { bubble: " Hallo " } }, hasContent: true });
   assert.throws(() => validate(meme, { answerText: JSON.stringify({ captions: { unknown: "Text" } }) }), /Caption-Zonen/);
   assert.throws(() => validate(meme, { answerText: JSON.stringify({ captions: { bubble: "" } }) }), /erforderlichen/);
   assert.deepEqual(interactionPayloadToDraft(meme, result.payload), {
-    antwortText: JSON.stringify({ captions: { bubble: "Hallo" } }),
+    antwortText: JSON.stringify({ captions: { bubble: " Hallo " } }),
     antwortId: null,
     antwortfelder: {},
   });

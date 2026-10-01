@@ -77,19 +77,10 @@ function resolveOrderedQuestions<TQuestion extends QuizBlockQuestionIdentity>(
   const itemByQuestionId = new Map(
     persistedQuestionItems.map((item) => [item.questionAssignmentId!, item]),
   );
-  const maximumOrder = Math.max(
-    0,
-    ...blockItems.map((item) => item.order),
-    ...persistedQuestionItems.map((item) => item.order),
-  );
-
   return editorialQuestions.map((question, index) => ({
     order:
       persistedQuestionItems[index]?.order ??
-      (persistedQuestionItems.length === 0 && blockItems.length === 0
-          ? (index + 1) * 1_000
-          : maximumOrder +
-            (index - persistedQuestionItems.length + 1) * 1_000),
+      (question.sortierung ?? index + 1) * 1_000,
     question,
     item: itemByQuestionId.get(question.quiz_fragen_id) ?? null,
   })) satisfies OrderedQuestion<TQuestion>[];

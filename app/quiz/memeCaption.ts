@@ -92,8 +92,8 @@ export function parseMemeCaptionPayload(value: unknown): MemeCaptionPayload | nu
       value.bottomText.length > MEME_CAPTION_TEXT_MAX_LENGTH
     ) return null;
     const payload = {
-      topText: value.topText.trim(),
-      bottomText: value.bottomText.trim(),
+      topText: value.topText,
+      bottomText: value.bottomText,
     };
     return payload;
   }
@@ -105,7 +105,7 @@ export function parseMemeCaptionPayload(value: unknown): MemeCaptionPayload | nu
       typeof caption !== "string" ||
       caption.length > MEME_CAPTION_TEXT_MAX_LENGTH
     ) return null;
-    captions[key] = caption.trim();
+    captions[key] = caption;
   }
   return { captions };
 }
@@ -135,7 +135,9 @@ export function parseStoredMemeCaptionValues(value: string | null): MemeCaptionV
 }
 
 export function hasMemeCaptionContent(payload: MemeCaptionPayload) {
-  return Object.values(memeCaptionPayloadValues(payload).captions).some(Boolean);
+  return Object.values(memeCaptionPayloadValues(payload).captions).some(
+    (caption) => caption.trim().length > 0,
+  );
 }
 
 export function createMemeLiveConfigSnapshot(config: MemeQuestionConfig) {
