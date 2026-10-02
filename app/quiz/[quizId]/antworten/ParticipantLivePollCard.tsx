@@ -16,7 +16,7 @@ export default function ParticipantLivePollCard({
   active,
   response,
   text,
-  disabled,
+  saving,
   onTextChange,
   onSave,
 }: {
@@ -25,16 +25,18 @@ export default function ParticipantLivePollCard({
   active: boolean;
   response: ParticipantLivePoll["response"];
   text: string;
-  disabled: boolean;
+  saving: boolean;
   onTextChange: (value: string) => void;
   onSave: (value: { selectedOptionId?: string; text?: string }) => void;
 }) {
-  const writable = active && poll.state === "OPEN" && !disabled;
-  const stateLabel = writable
-    ? "Antwort offen – Änderungen sind bis zum Schließen möglich."
-    : poll.state === "OPEN"
-      ? "Diese Livefrage ist auf einem anderen Gerät geöffnet."
-      : "Die Livefrage ist geschlossen. Deine letzte gültige Antwort bleibt erhalten.";
+  const writable = active && poll.state === "OPEN" && !saving;
+  const stateLabel = poll.state !== "OPEN"
+    ? "Die Livefrage ist geschlossen. Deine letzte gültige Antwort bleibt erhalten."
+    : !active
+      ? "Diese Livefrage ist nicht mehr aktiv."
+      : saving
+        ? "Deine Antwort wird gespeichert …"
+        : "Antwort offen – Änderungen sind bis zum Schließen möglich.";
 
   return (
     <article
@@ -84,7 +86,7 @@ export default function ParticipantLivePollCard({
           <textarea
             className="min-h-28 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none focus:border-cyan-700 focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             maxLength={500}
-            value={active ? text : response?.text ?? ""}
+            value={active && poll.state === "OPEN" ? text : response?.text ?? ""}
             disabled={!writable}
             onChange={(event) => onTextChange(event.target.value)}
             placeholder="Kurzen Beitrag eingeben …"

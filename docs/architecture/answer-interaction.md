@@ -277,7 +277,13 @@ Position der gemeinsamen Blocksequenz; die aktive Umfrage ist hervorgehoben und
 nur sie ist beschreibbar. Geschlossene frühere Umfragen zeigen ausschließlich die
 eigene letzte Antwort des Teams. Noch nicht gestartete Umfragen werden nicht
 ausgeliefert. Der Server akzeptiert einen Poll-Write weiterhin nur für den
-aktuellen, nicht ausgeblendeten Run im Zustand `OPEN`.
+aktuellen, nicht ausgeblendeten Run im Zustand `OPEN`. Der Client sendet dabei
+die angezeigte Run-ID mit; stimmt sie nicht mehr mit dem gesperrten aktuellen
+Run überein, lehnt der Server den Schreibversuch mit `LIVE_STATE_CHANGED` ab.
+Der Blockschluss erfasst sowohl fragegebundene Runs als auch die im Block
+platzierten Content-Umfragen. Danach bleibt die eigene letzte Poll-Antwort im
+Teilnehmerformular lesbar, alle Eingaben sind jedoch client- und serverseitig
+gesperrt.
 
 Für Freitext bleiben `original_text` und die nach `public_text_replacement_rules` bereinigte öffentliche Fassung getrennt. Das Audience-View-Model enthält weder Teamname noch Profil; nur die Moderation erhält Identität und Originaltext. Auswahlantworten werden bis zum Schließen per Upsert ersetzt. Ein Content-Poll-Run schreibt niemals `team_antworten`, `team_answer_submissions` oder Evaluationen.
 

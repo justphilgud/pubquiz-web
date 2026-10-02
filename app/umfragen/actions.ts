@@ -221,10 +221,10 @@ export async function attachLivePollToQuiz(input: { pollId: number; quizId: numb
   };
 }
 
-export async function submitLivePollResponse(input: { quizId: number; quizTeamSessionToken: string; selectedOptionId?: string; text?: string }) {
+export async function submitLivePollResponse(input: { quizId: number; quizTeamSessionToken: string; interactionRunId: number; selectedOptionId?: string; text?: string }) {
   const session = await resolveParticipantSession(input.quizId, input.quizTeamSessionToken);
   if (!session || session.team.ist_archiviert) return { success: false as const, message: "Teamsitzung ist ungültig." };
-  return saveLivePollResponse({ quizId: input.quizId, quizTeamSessionId: session.quiz_team_session_id, selectedOptionId: input.selectedOptionId, text: input.text });
+  return saveLivePollResponse({ quizId: input.quizId, quizTeamSessionId: session.quiz_team_session_id, interactionRunId: input.interactionRunId, selectedOptionId: input.selectedOptionId, text: input.text });
 }
 
 export async function moderateLivePollResponse(input: { quizId: number; responseId: number; visible: boolean }) {
