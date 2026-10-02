@@ -27,6 +27,7 @@ import {
   materializeDefaultQuizFlow,
   resolveEditableQuizFlowItem,
 } from "@/app/quiz/flow/quizFlowRepository.server";
+import { mergeQuizEditorSequenceIntoSlot } from "@/app/quiz/flow/quizEditorSequencePersistence";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { loadStoryElement } from "@/app/story-elemente/storyElementRepository.server";
 import { canAttachStoryElementToQuiz } from "@/app/story-elemente/storyElementPolicy";
@@ -737,6 +738,7 @@ function editorSequenceKey(item: {
   quiz_fragen_id: number | null;
   story_element_revision_id: number | null;
   live_poll_revision_id: number | null;
+  story_bezugs_quiz_fragen_id: number | null;
 }) {
   if (item.typ === "QUESTION" && item.quiz_fragen_id !== null) {
     return `question-${item.quiz_fragen_id}`;
@@ -744,7 +746,10 @@ function editorSequenceKey(item: {
   if (item.live_poll_revision_id !== null) {
     return `poll-${item.quiz_ablauf_element_id}`;
   }
-  if (item.story_element_revision_id !== null) {
+  if (
+    item.story_element_revision_id !== null &&
+    item.story_bezugs_quiz_fragen_id === null
+  ) {
     return `story-${item.quiz_ablauf_element_id}`;
   }
   return null;
@@ -797,62 +802,68 @@ export async function updateQuizEditorElementSequence(data: {
     }
   }
 
-  const placements = await prisma.quiz_ablauf_elemente.findMany({
-    where: {
-      quiz_id: data.quizId,
-      quiz_abschnitt_id: data.sectionId,
-      OR: [
-        { typ: "QUESTION", quiz_fragen_id: { not: null } },
-        {
-          story_element_revision_id: { not: null },
-          story_bezugs_quiz_fragen_id: null,
-        },
-        { typ: "LIVE_POLL", live_poll_revision_id: { not: null } },
+  const sequenceUpdated = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(42001, ${data.quizId})`;
+    const slotPlacements = await tx.quiz_ablauf_elemente.findMany({
+      where: data.sectionId === null
+        ? {
+            quiz_id: data.quizId,
+            quiz_abschnitt_id: null,
+            anker_typ: "BEFORE_QUIZ",
+            anker_schluessel: "UNASSIGNED",
+          }
+        : {
+            quiz_id: data.quizId,
+            quiz_abschnitt_id: data.sectionId,
+            anker_typ: "BLOCK",
+            anker_schluessel: String(data.sectionId),
+          },
+      orderBy: [
+        { sortierung: "asc" },
+        { quiz_ablauf_element_id: "asc" },
       ],
-    },
-    select: {
-      quiz_ablauf_element_id: true,
-      typ: true,
-      quiz_fragen_id: true,
-      story_element_revision_id: true,
-      live_poll_revision_id: true,
-    },
+      select: {
+        quiz_ablauf_element_id: true,
+        typ: true,
+        quiz_fragen_id: true,
+        story_element_revision_id: true,
+        live_poll_revision_id: true,
+        story_bezugs_quiz_fragen_id: true,
+      },
+    });
+    const orderedPlacementIds = mergeQuizEditorSequenceIntoSlot(
+      slotPlacements.map((placement) => ({
+        id: placement.quiz_ablauf_element_id,
+        editorKey: editorSequenceKey(placement),
+      })),
+      data.itemKeys,
+    );
+    if (orderedPlacementIds === null) return false;
+
+    for (const placement of slotPlacements) {
+      await tx.quiz_ablauf_elemente.update({
+        where: {
+          quiz_ablauf_element_id: placement.quiz_ablauf_element_id,
+        },
+        data: {
+          sortierung: -10_000_000 - placement.quiz_ablauf_element_id,
+        },
+      });
+    }
+    for (const [index, placementId] of orderedPlacementIds.entries()) {
+      await tx.quiz_ablauf_elemente.update({
+        where: { quiz_ablauf_element_id: placementId },
+        data: { sortierung: (index + 1) * 1_000 },
+      });
+    }
+    return true;
   });
-  const placementByKey = new Map(
-    placements.flatMap((item) => {
-      const key = editorSequenceKey(item);
-      return key ? [[key, item] as const] : [];
-    }),
-  );
-  if (
-    new Set(data.itemKeys).size !== data.itemKeys.length ||
-    data.itemKeys.length !== placementByKey.size ||
-    data.itemKeys.some((key) => !placementByKey.has(key))
-  ) {
+  if (!sequenceUpdated) {
     return {
       success: false,
       message: "Die Elementreihenfolge ist unvollständig oder ungültig.",
     };
   }
-
-  await prisma.$transaction(async (tx) => {
-    for (const [index, key] of data.itemKeys.entries()) {
-      await tx.quiz_ablauf_elemente.update({
-        where: {
-          quiz_ablauf_element_id: placementByKey.get(key)!.quiz_ablauf_element_id,
-        },
-        data: { sortierung: -1_000_000 - index },
-      });
-    }
-    for (const [index, key] of data.itemKeys.entries()) {
-      await tx.quiz_ablauf_elemente.update({
-        where: {
-          quiz_ablauf_element_id: placementByKey.get(key)!.quiz_ablauf_element_id,
-        },
-        data: { sortierung: (index + 1) * 1_000 },
-      });
-    }
-  });
   revalidateQuizFlow(data.quizId);
   return { success: true };
 }
