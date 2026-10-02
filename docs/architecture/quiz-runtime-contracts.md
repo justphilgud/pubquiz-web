@@ -85,6 +85,14 @@ die Runtime dieselbe aus `quiz_fragen.sortierung` abgeleitete Position wie der
 Quizeditor. Gemischte Fragen, Meme-Interaktionen und Live-Umfragen behalten
 dadurch exakt ihre konfigurierte Reihenfolge.
 
+Alle Consumer verwenden dabei dieselbe deterministische Fragenordnung:
+explizite `sortierung` aufsteigend, gleiche Werte über `quiz_fragen_id` und
+fehlende Werte zuletzt ebenfalls über `quiz_fragen_id`. Die Zuweisungs-ID bleibt
+die Identität; ein Positionswechsel darf weder Antworten noch Runs einer anderen
+Frage zuordnen. Das Teilnehmerformular reduziert dieselbe Blocksequenz lediglich
+auf bereits freigegebene Fragen und bereits gestartete Live-Umfragen. Zukünftige
+Elemente werden nicht vorzeitig ausgeliefert.
+
 ### Gesammelte Auflösung (`END_OF_BLOCK`)
 
 ```text
