@@ -814,7 +814,15 @@ export async function closeBlockInteractions(
     where: {
       quiz_id: quizId,
       state: { in: ["OPEN", "COUNTDOWN"] },
-      quiz_fragen: { quiz_abschnitt_id: quizAbschnittId },
+      OR: [
+        { quiz_fragen: { quiz_abschnitt_id: quizAbschnittId } },
+        {
+          quiz_ablauf_elemente: {
+            quiz_abschnitt_id: quizAbschnittId,
+            typ: "LIVE_POLL",
+          },
+        },
+      ],
     },
     orderBy: { interaction_run_id: "asc" },
     select: { interaction_run_id: true },
