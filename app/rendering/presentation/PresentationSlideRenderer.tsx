@@ -75,6 +75,7 @@ import { getFunnyAnswerPage, type FunnyAnswerEntry } from "@/app/quiz/funnyAnswe
 import type { YearlyRankingEntry } from "@/app/quiz/yearlyRanking";
 import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
 import { presentationTextDensity } from "./presentationReadability";
+import { buildTrueFalsePresentationOptions } from "./trueFalsePresentation";
 import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import { MemePresentationStage } from "@/app/rendering/meme/MemePresentationStage";
@@ -628,7 +629,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
       ? memeCountdownRemainingSeconds(memeState.deadlineAt, memeState.state, now)
       : null;
     return (
-      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_18rem] gap-6 text-[var(--quiz-text)]">
+      <section data-presentation-layout="MEME_CAPTION" data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_18rem] gap-6 text-[var(--quiz-text)]">
         <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-4 shadow-[8px_8px_0_var(--quiz-primary)]">
           {image ? (
             <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full max-h-full" />
@@ -636,20 +637,20 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
             <PresentationMediaFallback kind="IMAGE" />
           )}
         </div>
-        <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center shadow-[8px_8px_0_var(--quiz-primary)]">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-primary)]">What the Meme!</p>
+        <aside className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center text-[var(--quiz-surface-strong-text)] shadow-[8px_8px_0_var(--quiz-primary)]">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-surface-strong-primary)]">What the Meme!</p>
           {remaining === null ? (
-            <strong className="mt-4 text-3xl font-black leading-tight text-[var(--quiz-accent)]">
+            <strong className="mt-4 text-3xl font-black leading-tight text-[var(--quiz-surface-strong-accent)]">
               {memeState?.state === "CLOSED" || memeState?.state === "REVEALED"
                 ? "Einreichungen beendet"
                 : "Einreichungen geöffnet"}
             </strong>
           ) : (
             <>
-              <strong className="mt-4 text-[7rem] font-black leading-none text-[var(--quiz-accent)]" aria-label={`${remaining} Sekunden verbleibend`}>
+              <strong className="mt-4 text-[7rem] font-black leading-none text-[var(--quiz-surface-strong-accent)]" aria-label={`${remaining} Sekunden verbleibend`}>
                 {remaining}
               </strong>
-              <p className="mt-4 text-xl font-bold text-[var(--quiz-text-muted)]">Sekunden</p>
+              <p className="mt-4 text-xl font-bold text-[var(--quiz-surface-strong-text-muted)]">Sekunden</p>
             </>
           )}
         </aside>
@@ -659,16 +660,16 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (liveResultState?.kind === "TEXT" && liveResultState.visible) {
     return (
-      <section data-live-result-kind="text" className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-8 text-[var(--quiz-text)]">
+      <section data-live-result-kind="text" className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-8 text-[var(--quiz-surface-text)]">
         <div className="flex items-start justify-between gap-8">
-          <div><p className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--quiz-text-muted)]">Live-Antworten</p><h2 className="mt-3 text-4xl font-bold leading-tight xl:text-5xl">{frage.frage}</h2></div>
+          <div><p className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--quiz-surface-text-muted)]">Live-Antworten</p><h2 className="mt-3 text-4xl font-bold leading-tight xl:text-5xl">{frage.frage}</h2></div>
           <p className="shrink-0 rounded-full border border-[var(--quiz-border)] px-4 py-2 font-semibold">{liveResultState.publicResponses.length} freigegeben</p>
         </div>
         <div className="mt-8 grid min-h-0 flex-1 auto-rows-fr grid-cols-2 gap-5 overflow-hidden">
           {liveResultState.publicResponses.slice(0, 6).map((response) => (
-            <article key={response.submissionId} className="flex items-center justify-center rounded-2xl border border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center text-2xl font-semibold leading-snug">„{response.publicText}“</article>
+            <article key={response.submissionId} className="flex items-center justify-center rounded-2xl border border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-6 text-center text-2xl font-semibold leading-snug text-[var(--quiz-surface-strong-text)]">„{response.publicText}“</article>
           ))}
-          {liveResultState.publicResponses.length === 0 && <p className="col-span-2 self-center text-center text-2xl text-[var(--quiz-text-muted)]">Noch keine Antwort freigegeben.</p>}
+          {liveResultState.publicResponses.length === 0 && <p className="col-span-2 self-center text-center text-2xl text-[var(--quiz-surface-text-muted)]">Noch keine Antwort freigegeben.</p>}
         </div>
       </section>
     );
@@ -678,11 +679,11 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     return (
       <section
         data-live-result-kind="choice"
-        className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-8 text-[var(--quiz-text)]"
+        className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-8 text-[var(--quiz-surface-text)]"
       >
         <div className="flex items-start justify-between gap-8">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--quiz-text-muted)]">Live-Ergebnis</p>
+            <p className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--quiz-surface-text-muted)]">Live-Ergebnis</p>
             <h2 className="mt-3 text-4xl font-bold leading-tight xl:text-5xl">{frage.frage}</h2>
           </div>
           <p className="shrink-0 rounded-full border border-[var(--quiz-border)] px-4 py-2 font-semibold">
@@ -703,8 +704,8 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
           ))}
           {liveResultState.scale && (
             <div className="grid grid-cols-2 gap-5">
-              <div className="rounded-2xl border border-[var(--quiz-border)] p-5 text-center"><span className="block text-sm text-[var(--quiz-text-muted)]">Durchschnitt</span><strong className="text-5xl">{liveResultState.scale.average?.toLocaleString("de-DE", { maximumFractionDigits: 2 }) ?? "–"}</strong></div>
-              <div className="rounded-2xl border border-[var(--quiz-border)] p-5 text-center"><span className="block text-sm text-[var(--quiz-text-muted)]">Antworten</span><strong className="text-5xl">{liveResultState.scale.values.reduce((sum, entry) => sum + entry.count, 0)}</strong></div>
+              <div className="rounded-2xl border border-[var(--quiz-border)] p-5 text-center"><span className="block text-sm text-[var(--quiz-surface-text-muted)]">Durchschnitt</span><strong className="text-5xl">{liveResultState.scale.average?.toLocaleString("de-DE", { maximumFractionDigits: 2 }) ?? "–"}</strong></div>
+              <div className="rounded-2xl border border-[var(--quiz-border)] p-5 text-center"><span className="block text-sm text-[var(--quiz-surface-text-muted)]">Antworten</span><strong className="text-5xl">{liveResultState.scale.values.reduce((sum, entry) => sum + entry.count, 0)}</strong></div>
             </div>
           )}
         </div>
@@ -777,13 +778,20 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   if (templateData?.kind === "TRUE_FALSE") {
+    const options = buildTrueFalsePresentationOptions(templateData.correctAnswer);
     return (
-      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} data-presentation-phase="question" className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#00e5ff]">
         <h2 className="text-5xl font-black leading-tight text-white xl:text-7xl">{frage.frage}</h2>
         {hatAntwortmoeglichkeiten && (
           <div className="mt-10 grid grid-cols-2 gap-6 text-4xl font-black">
-            <div className="rounded-2xl border-4 border-emerald-300 p-6 text-emerald-200">Wahr</div>
-            <div className="rounded-2xl border-4 border-pink-400 p-6 text-pink-200">Falsch</div>
+            {options.map((option) => (
+              <div
+                key={option.id}
+                className="presentation-true-false-option rounded-2xl border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-6 text-[var(--quiz-surface-text)]"
+              >
+                {option.label}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -1168,11 +1176,11 @@ function renderZwischenstandSlide() {
   return (
     <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <div className="inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        <div className="presentation-legacy-kicker inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Zwischenstand
         </div>
 
-        <div className="rounded-2xl border-4 border-yellow-300 bg-black/55 px-5 py-2 text-sm font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
+        <div className="presentation-legacy-badge rounded-2xl border-4 border-yellow-300 bg-black/55 px-5 py-2 text-sm font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
           Anonymer Zwischenstand
         </div>
       </div>
@@ -1337,7 +1345,7 @@ function renderEndstandSlide() {
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
-      <div className="mb-4 inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+      <div className="presentation-legacy-kicker mb-4 inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
         Endstand
       </div>
 
@@ -1454,6 +1462,7 @@ function renderFunnySlide(slide: Extract<Slide, { typ: "funny" }>) {
 
 function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const frage = slide.frage;
+  const templateData = frage.templateConfig?.templateData;
   const layoutVariant = frage.presentationLayouts.solution.variant;
   const antworten = sortiereAntworten(frage);
   const richtigeAntworten = antworten.filter((antwort) => antwort.ist_richtig);
@@ -1491,14 +1500,14 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
       );
     }
     return (
-      <section data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_0.75fr] gap-6 text-[var(--quiz-text)]">
+      <section data-presentation-layout="MEME_CAPTION_SOLUTION" data-question-template="meme_beschriften" className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_0.75fr] gap-6 text-[var(--quiz-text)]">
         <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-4 shadow-[8px_8px_0_var(--quiz-primary)]">
           {image ? <MemeRenderer imageUrl={getMediumUrl(image.datei)} alt={image.bemerkung ?? frage.frage} className="h-full" /> : <PresentationMediaFallback kind="IMAGE" />}
         </div>
-        <div className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-8 text-center shadow-[8px_8px_0_var(--quiz-primary)]">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-primary)]">Ergebnis ausstehend</p>
+        <div className="flex flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] p-8 text-center text-[var(--quiz-surface-strong-text)] shadow-[8px_8px_0_var(--quiz-primary)]">
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-surface-strong-primary)]">Ergebnis ausstehend</p>
           <h2 className="mt-5 text-5xl font-black">Meme-Runde beendet</h2>
-          <p className="mt-5 text-xl text-[var(--quiz-text-muted)]">Die Moderation finalisiert jetzt Stimmen und Punkte.</p>
+          <p className="mt-5 text-xl text-[var(--quiz-surface-strong-text-muted)]">Die Moderation finalisiert jetzt Stimmen und Punkte.</p>
         </div>
       </section>
     );
@@ -1552,6 +1561,34 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
           )}
         </div>
       </div>
+    );
+  }
+
+  if (templateData?.kind === "TRUE_FALSE" && theme.design.stylePreset !== "BIRTHDAY") {
+    const options = buildTrueFalsePresentationOptions(templateData.correctAnswer);
+    return (
+      <section
+        data-presentation-layout="TRUE_FALSE"
+        data-presentation-phase="solution"
+        className="presentation-question-card flex h-full flex-col justify-center rounded-[1.5rem] border-4 border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-10 text-center text-[var(--quiz-surface-text)] shadow-[8px_8px_0_var(--quiz-primary)]"
+      >
+        <p className="text-sm font-black uppercase tracking-[0.25em] text-[var(--quiz-surface-text-muted)]">Auflösung</p>
+        <h2 className="mt-4 text-5xl font-black leading-tight xl:text-7xl">{frage.frage}</h2>
+        <div className="mt-10 grid grid-cols-2 gap-6 text-left">
+          {options.map((option) => (
+            <div
+              key={option.id}
+              data-correct={option.isCorrect ? "true" : "false"}
+              className={`presentation-true-false-option rounded-2xl border-4 bg-[var(--quiz-surface)] p-6 text-[var(--quiz-surface-text)] ${option.isCorrect ? "border-[var(--quiz-correct)]" : "border-[var(--quiz-danger)]"}`}
+            >
+              <strong className="block text-4xl font-black">{option.label}</strong>
+              <span className="mt-3 block text-xl font-bold">
+                {option.isCorrect ? "✓ Richtige Antwort" : "✕ Falsche Antwort"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
@@ -1769,7 +1806,7 @@ function renderBekanntmachungenSlide() {
   return (
     <div className="presentation-legacy-slide presentation-announcements-slide flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/90 p-10 shadow-[8px_8px_0_#ff00aa]">
       <div className="mb-8">
-        <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        <div className="presentation-legacy-kicker inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Outro
         </div>
 
@@ -1835,16 +1872,16 @@ function renderAnkommenSlide() {
 
 function renderStartsequenzSlide() {
   return (
-    <section className="presentation-start-sequence relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[#050510] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,140,0.2),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(0,245,255,0.18),transparent_40%)]" />
-      <div className="presentation-start-sequence-content relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-400/80 bg-black/50 p-12 text-center shadow-[0_0_45px_rgba(0,240,255,0.9)]">
-        <p className="mb-10 max-w-5xl text-5xl font-black leading-tight text-white drop-shadow-[0_0_14px_rgba(255,255,255,0.8)]">
+    <section className="presentation-start-sequence relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[var(--quiz-background)] text-[var(--quiz-text)]">
+      <div className="presentation-start-sequence-backdrop absolute inset-0" />
+      <div className="presentation-start-sequence-content relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-secondary)] bg-[var(--quiz-surface-strong)] p-12 text-center text-[var(--quiz-surface-strong-text)]">
+        <p className="mb-10 max-w-5xl text-5xl font-black leading-tight">
           {praesentationQuiz.intro_startsequenz_text?.trim() ||
             "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen."}
         </p>
         <div
           aria-hidden="true"
-          className="presentation-start-play-mark rounded-3xl border-4 border-pink-500 px-20 py-10 text-[7rem] font-black leading-none text-pink-300 shadow-[0_0_45px_rgba(255,0,150,0.9)]"
+          className="presentation-start-play-mark rounded-3xl border-4 border-[var(--quiz-primary)] px-20 py-10 text-[7rem] font-black leading-none text-[var(--quiz-surface-strong-accent)]"
         >
           ▶
         </div>
@@ -1857,6 +1894,7 @@ function renderStartsequenzSlide() {
           command={playbackCommand}
           commandId={playbackCommandId}
           renderMode={renderMode}
+          activationClassName="presentation-start-media-activation"
         />
       </div>
     </section>
@@ -1934,7 +1972,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
   if (abschnitt.abschnitt_typ === "intro_begruessung") {
     return (
       <div className="presentation-legacy-slide presentation-welcome-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-        <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        <div className="presentation-legacy-kicker mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Willkommen im
         </div>
 
@@ -1957,7 +1995,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
         data-rule-count={regeln.length}
       >
         <div className="mb-8">
-          <div className="inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+          <div className="presentation-legacy-kicker inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
             Rules are good!
           </div>
 
@@ -1999,7 +2037,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
   if (abschnitt.abschnitt_typ === "intro_preise") {
     return (
       <div className="presentation-legacy-slide presentation-prizes-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-        <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+        <div className="presentation-legacy-kicker mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
           Preise
         </div>
 
@@ -2106,7 +2144,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
 function renderQrCodeSlide() {
   return (
     <div className="presentation-legacy-slide presentation-qr-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/70 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-      <div className="mb-10 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-8 py-4 text-2xl font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[5px_5px_0_#00e5ff]">
+      <div className="presentation-legacy-kicker mb-10 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-8 py-4 text-2xl font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[5px_5px_0_#00e5ff]">
         Jetzt scannen
       </div>
 
@@ -2169,7 +2207,7 @@ function renderPauseSlide(slide: Extract<Slide, { typ: "pause" }>) {
 
   return (
     <div className="presentation-legacy-slide presentation-countdown-slide flex h-full min-h-0 flex-col items-center justify-center rounded-[1.5rem] border-4 border-yellow-300 bg-black/60 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
-      <div className="mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
+      <div className="presentation-legacy-kicker mb-6 inline-flex rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
         Abgabezeit
       </div>
 

@@ -8,6 +8,10 @@ Reale Preview-Abnahme vom 7. September 2026: [Bericht und Belege](../reports/ap3
 Eigene Quizze bestätigen 3/2/1, falsch nach früher richtig = 0, Challenge-Stop mit
 Exklusivbonus, absolute Zeit über Reload, Stop-Sperre und vollständigen Quizreset.
 
+Neu angelegte deutsche Pixelbild-Fragen verwenden den personenbezogenen
+Standardtext „Wer ist hier zu sehen?“. Bereits gespeicherte oder manuell
+abweichend formulierte Fragetexte bleiben unverändert.
+
 ## Rekonstruierter IST-Vertrag
 
 Pixel nutzt TEXT, `team_antworten`, versionierte `team_answer_submissions` und

@@ -130,6 +130,13 @@ test("meme template keeps its technical id and uses the shared visible name", ()
   assert.equal(englishMeme?.name, "What the Meme!");
 });
 
+test("the German pixel template uses the person-specific default prompt", () => {
+  const german = localizeQuestionTemplates(loadQuestionEditorMessages("de"));
+  const pixel = german.find((template) => template.id === questionTemplateIds.pixelImage);
+
+  assert.equal(pixel?.defaultQuestionText, "Wer ist hier zu sehen?");
+});
+
 test("bitcrush copy does not claim 8-bit or chiptune synthesis", () => {
   const de = loadQuestionEditorMessages("de");
   const en = loadQuestionEditorMessages("en");

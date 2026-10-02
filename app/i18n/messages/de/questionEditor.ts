@@ -70,7 +70,7 @@ export const deQuestionEditorMessages = {
     },
     pixelImage: {
       name: "Pixelbild", description: "Ein Motiv anhand einer erzeugten Pixelgrafik erkennen.",
-      defaultQuestion: "Was ist auf diesem Pixelbild zu sehen?",
+      defaultQuestion: "Wer ist hier zu sehen?",
     },
     trueFalse: { name: "Wahr oder falsch", description: "Eine Aussage wird eindeutig als wahr oder falsch beantwortet.", defaultQuestion: "" },
     estimate: { name: "Schätzfrage", description: "Eine Zahl wird geschätzt; der nächstliegende Wert gewinnt.", defaultQuestion: "" },

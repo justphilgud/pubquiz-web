@@ -121,6 +121,26 @@ sichtbar. Quellenwechsel werden trotz gleicher Befehlsnummer neu berücksichtigt
 Reload, PREPARATION/RUNNING-Wechsel und Reset verlangen die AP1-Aktivierung.
 STOPPED und Stopbefehle verwenden unverändert den vorhandenen Lifecycle-Vertrag.
 
+Die Startsequenz verwendet denselben synchronisierten HTML-Audiopfad. Ohne
+konfigurierte URL bleibt die versionierte Datei
+`/medien/audio/intro/mexico.mp3` der bewusste Fallback. Play-Markierung,
+Aktivierungsknopf und Legacy-Kicker beziehen Farbe und Kontrast aus dem gewählten
+Theme; Komm.ONE erbt dadurch keine Neon-Pink-Akzente.
+
+## AP2–4: Flächenkontrast und Wahr/Falsch
+
+Text auf `surface` und `surfaceStrong` verwendet abgeleitete Vordergrund-Tokens
+mit mindestens 4,5:1 Kontrast. Das gilt insbesondere für Meme-Status,
+Meme-Ergebnis und veröffentlichte offene Liveantworten. Ein realer Chrome-Test
+misst die berechneten Farben in NEON, EDITORIAL, KOMM_ONE, BIRTHDAY und
+CORPORATE; große Statusschrift darf mindestens 3:1 verwenden.
+
+Wahr/Falsch-Optionen sind vor der Auflösung in allen Designwelten neutral. Erst
+die Auflösung markiert beide Optionen anhand von `templateData.correctAnswer` als
+richtig oder falsch und ergänzt `✓ Richtige Antwort` beziehungsweise
+`✕ Falsche Antwort`. Die Logik funktioniert deshalb auch, wenn „Falsch“ korrekt
+ist, und verändert weder Eingabe noch Bewertung.
+
 ## Invarianten und Tests
 
 | Invariante | Vertrag / Absicherung |
