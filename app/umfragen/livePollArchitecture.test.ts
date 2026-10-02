@@ -36,3 +36,19 @@ test("audience projection is anonymous while moderation retains original text", 
   assert.match(runtime, /LivePollModerationResponse = LivePollResponseProjection/);
   assert.match(runtime, /slice\(-20\)/);
 });
+
+test("participant polls are additive, release-gated and scoped to the own team session", () => {
+  const answerClient = read("app/quiz/[quizId]/antworten/QuizAntwortClient.tsx");
+  const quizActions = read("app/quiz/actions.ts");
+  const runtime = read("app/umfragen/livePollRuntime.server.ts");
+
+  assert.match(answerClient, /answerItems\.map/);
+  assert.match(answerClient, /ParticipantLivePollCard/);
+  assert.doesNotMatch(answerClient, /livePollState\s*\?\s*<div className="space-y-5"/);
+  assert.match(quizActions, /quiz_ablauf_element_id:\s*\{ not: null \}/);
+  assert.match(
+    quizActions,
+    /quiz_team_session_id:\s*participantSession\.quiz_team_session_id/,
+  );
+  assert.match(runtime, /run\.state !== "OPEN"/);
+});

@@ -270,6 +270,15 @@ Polls besitzen ausdrücklich:
 
 Die eigenständige Content-Art **Umfrage** ist davon bewusst getrennt. Sie besitzt keine `fragen`-Identität, keine Quizlösung, keine Bewertung und keine Punkte. Ihr stabiler Inhalt liegt in `live_polls` mit unveränderlichen `live_poll_revisions`; die jeweils letzte Antwort eines Teams pro Ausführung liegt in `live_poll_responses`. Die Ausführung verwendet weiterhin `quiz_interaction_runs`, die signierte Teamsitzung und die vorhandenen Live-Snapshot-Transporte. Damit entsteht keine zweite allgemeine Interaction-Engine, aber auch keine künstliche Quizfrage nur zur Persistierung eines nicht bewerteten Content-Elements.
 
+Eine aktive Content-Umfrage ergänzt das Teilnehmerformular und ersetzt es nicht.
+Bereits freigegebene reguläre Fragen bleiben mit ihren eigenen Drafts und
+Speicherständen sichtbar. Bereits gestartete Content-Umfragen erscheinen an der
+Position der gemeinsamen Blocksequenz; die aktive Umfrage ist hervorgehoben und
+nur sie ist beschreibbar. Geschlossene frühere Umfragen zeigen ausschließlich die
+eigene letzte Antwort des Teams. Noch nicht gestartete Umfragen werden nicht
+ausgeliefert. Der Server akzeptiert einen Poll-Write weiterhin nur für den
+aktuellen, nicht ausgeblendeten Run im Zustand `OPEN`.
+
 Für Freitext bleiben `original_text` und die nach `public_text_replacement_rules` bereinigte öffentliche Fassung getrennt. Das Audience-View-Model enthält weder Teamname noch Profil; nur die Moderation erhält Identität und Originaltext. Auswahlantworten werden bis zum Schließen per Upsert ersetzt. Ein Content-Poll-Run schreibt niemals `team_antworten`, `team_answer_submissions` oder Evaluationen.
 
 ## Countdown und Zeitautorität

@@ -7,6 +7,7 @@ import {
   resolveStoryPlacement,
   type StoryPlacement,
 } from "@/app/story-elemente/storyPlacement";
+import { sortQuizQuestionAssignments } from "../quizQuestionOrder";
 
 export type QuizBlockQuestionIdentity = {
   quiz_fragen_id: number;
@@ -36,16 +37,6 @@ type OrderedQuestion<TQuestion extends QuizBlockQuestionIdentity> = {
   item: QuizFlowItem | null;
 };
 
-function sortQuestionsEditorially<
-  TQuestion extends QuizBlockQuestionIdentity,
->(questions: readonly TQuestion[]) {
-  return [...questions].sort(
-    (left, right) =>
-      (left.sortierung ?? 0) - (right.sortierung ?? 0) ||
-      left.quiz_fragen_id - right.quiz_fragen_id,
-  );
-}
-
 function compareOrdered(
   left: { order: number; stable: string },
   right: { order: number; stable: string },
@@ -57,7 +48,7 @@ function resolveOrderedQuestions<TQuestion extends QuizBlockQuestionIdentity>(
   questions: readonly TQuestion[],
   blockItems: readonly QuizFlowItem[],
 ) {
-  const editorialQuestions = sortQuestionsEditorially(questions);
+  const editorialQuestions = sortQuizQuestionAssignments(questions);
   const questionIds = new Set(
     editorialQuestions.map((question) => question.quiz_fragen_id),
   );
@@ -89,7 +80,7 @@ function resolveOrderedQuestions<TQuestion extends QuizBlockQuestionIdentity>(
 function resolveCanonicalQuestionByFlowAssignment<
   TQuestion extends QuizBlockQuestionIdentity,
 >(questions: readonly TQuestion[], blockItems: readonly QuizFlowItem[]) {
-  const editorialQuestions = sortQuestionsEditorially(questions);
+  const editorialQuestions = sortQuizQuestionAssignments(questions);
   const questionIds = new Set(
     editorialQuestions.map((question) => question.quiz_fragen_id),
   );
@@ -297,7 +288,7 @@ function resolveManualSequence<TQuestion extends QuizBlockQuestionIdentity>(
     result.push({ kind: "CONTENT", item });
   }
 
-  for (const question of sortQuestionsEditorially(questions)) {
+  for (const question of sortQuizQuestionAssignments(questions)) {
     if (!seenQuestions.has(question.quiz_fragen_id)) {
       result.push(...(linkedStories.before.get(question.quiz_fragen_id) ?? [])
         .map((story) => ({ kind: "CONTENT" as const, item: story })));
