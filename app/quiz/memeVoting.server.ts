@@ -10,11 +10,11 @@ import {
   type MemeResultSnapshot,
 } from "@/app/quiz/memeResults.server";
 import {
+  buildMemeTeamVotingState,
   countEligibleMemeVoters,
   createInitialMemePresentationState,
   getMemeOverviewPageCount,
   planMemeVoteWrite,
-  teamCanVoteForCandidate,
   transitionMemePresentation,
   type MemePresentationCandidate,
   type MemePresentationTransition,
@@ -209,20 +209,13 @@ export async function getMemePresentationSnapshot(input: {
       })
     : null;
   const exposeCandidates = !isTeam || phase === "VOTING_OPEN" || phase === "VOTING_CLOSED";
-  const ownCandidateIds = voterTeamId === null
-    ? []
-    : internalCandidates
-        .filter((candidate) => candidate.ownerTeamId === voterTeamId)
-        .map((candidate) => candidate.candidateId);
-  const canVote = voterTeamId !== null &&
-    phase === "VOTING_OPEN" &&
-    internalCandidates.some((candidate) =>
-      teamCanVoteForCandidate({
-        votingOpen: true,
-        voterTeamId: voterTeamId!,
-        ownerTeamId: candidate.ownerTeamId,
-      }),
-    );
+  const teamVotingState = voterTeamId === null
+    ? { ownCandidateIds: [], canVote: false }
+    : buildMemeTeamVotingState(
+        internalCandidates,
+        voterTeamId,
+        phase === "VOTING_OPEN",
+      );
 
   return {
     phase,
@@ -250,8 +243,8 @@ export async function getMemePresentationSnapshot(input: {
     result,
     team: isTeam
       ? {
-          ownCandidateIds,
-          canVote,
+          ownCandidateIds: teamVotingState.ownCandidateIds,
+          canVote: teamVotingState.canVote,
           vote: ownVote
             ? {
                 candidateId: ownVote.meme_moderation_candidate_id,
