@@ -3,7 +3,7 @@ import { QUIZ_LIFECYCLE_LABELS, type QuizLifecycle } from "../../quizLifecycle";
 
 /* eslint-disable @next/next/no-img-element -- Pixel stages use dynamic question-media URLs. */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   searchTeamsForAntworten,
   submitTeamAntwort,
@@ -41,6 +41,9 @@ import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
 import MemeVotingPanel from "./MemeVotingPanel";
+import ParticipantLivePollCard, {
+  type ParticipantLivePoll,
+} from "./ParticipantLivePollCard";
 import { PasswordInput } from "@/app/components/PasswordInput";
 import type { saveTeamAntwortDraft, startQuizTeamSession } from "../../actions";
 type QuizLiveSnapshot = Awaited<
@@ -119,6 +122,11 @@ type AntwortStatus = {
   presentationStatusText: string | null;
   teamProfile: TeamProfile | null;
   answerConfirmations?: NonNullable<Awaited<ReturnType<typeof import("../../actions").getQuizAntwortStatus>>>["answerConfirmations"];
+  answerSequence: (
+    | { kind: "QUESTION"; questionAssignmentId: number }
+    | { kind: "LIVE_POLL"; runId: number }
+  )[];
+  livePolls: ParticipantLivePoll[];
 
   fragen: {
     quiz_fragen_id: number;
@@ -174,6 +182,10 @@ type AntwortStatus = {
     }[];
   }[];
 };
+
+type ParticipantAnswerItem =
+  | { kind: "QUESTION"; question: AntwortStatus["fragen"][number] }
+  | { kind: "LIVE_POLL"; poll: ParticipantLivePoll };
 
 type TeamSession = {
   quiz_team_session_id: number;
@@ -380,10 +392,19 @@ export default function QuizAntwortClient({
         );
         if (!active) return;
         consecutiveFailures = 0;
+        const previousLivePollRunId = livePollStateRef.current?.runId ?? null;
+        const nextLivePollRunId = snapshot.livePollState?.runId ?? null;
+        const livePollChanged = previousLivePollRunId !== nextLivePollRunId;
         livePollStateRef.current = snapshot.livePollState;
         setLivePollState(snapshot.livePollState);
         setMemePresentationState(snapshot.memePresentationState);
-        if (snapshot.teamSpecificState?.livePollResponse) {
+        if (livePollChanged) {
+          const response = snapshot.teamSpecificState?.livePollResponse ?? null;
+          setLivePollResponse(response
+            ? { selectedOptionId: response.selectedOptionId, text: response.text }
+            : null);
+          setLivePollText(response?.text ?? "");
+        } else if (snapshot.teamSpecificState?.livePollResponse) {
           const response = snapshot.teamSpecificState.livePollResponse;
           setLivePollResponse({ selectedOptionId: response.selectedOptionId, text: response.text });
           setLivePollText((current) => current || response.text || "");
@@ -689,6 +710,29 @@ export default function QuizAntwortClient({
     }
   }
 
+  const answerItems = useMemo<ParticipantAnswerItem[]>(() => {
+    const questionById = new Map(
+      liveDaten.fragen
+        .filter((question) => question.istFreigegeben)
+        .map((question) => [question.quiz_fragen_id, question] as const),
+    );
+    const pollByRunId = new Map(
+      liveDaten.livePolls.map((poll) => [poll.runId, poll] as const),
+    );
+
+    const items: ParticipantAnswerItem[] = [];
+    for (const item of liveDaten.answerSequence) {
+      if (item.kind === "QUESTION") {
+        const question = questionById.get(item.questionAssignmentId);
+        if (question) items.push({ kind: "QUESTION", question });
+        continue;
+      }
+      const poll = pollByRunId.get(item.runId);
+      if (poll) items.push({ kind: "LIVE_POLL", poll });
+    }
+    return items;
+  }, [liveDaten.answerSequence, liveDaten.fragen, liveDaten.livePolls]);
+
 
   return (
     <QuizThemeScope
@@ -838,10 +882,7 @@ export default function QuizAntwortClient({
 
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {livePollState ? <div className="space-y-5">
-            <div><div className="answer-kicker text-sm font-semibold uppercase tracking-wide text-cyan-700">Live-Umfrage</div><h2 className="mt-2 text-2xl font-bold">{livePollState.prompt}</h2><p className="mt-2 text-sm text-slate-600">{livePollState.state === "OPEN" ? "Antwort offen – Änderungen sind bis zum Schließen möglich." : "Die Umfrage ist geschlossen."}</p></div>
-            {livePollState.type === "SINGLE_CHOICE" ? <div className="grid gap-3">{livePollState.options.map((option) => <button key={option.id} type="button" disabled={isSubmitting || livePollState.state !== "OPEN"} onClick={() => saveLivePoll({ selectedOptionId: option.id })} className={`min-h-12 rounded-xl border px-4 py-3 text-left font-semibold transition disabled:opacity-60 ${livePollResponse?.selectedOptionId === option.id ? "border-cyan-700 bg-cyan-50 text-cyan-950 ring-2 ring-cyan-100" : "border-slate-300 bg-white text-slate-900 hover:border-cyan-500"}`}><span aria-hidden className="mr-2">{livePollResponse?.selectedOptionId === option.id ? "●" : "○"}</span>{option.label}</button>)}</div> : <div className="space-y-3"><textarea className="min-h-28 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none focus:border-cyan-700 focus:ring-2 focus:ring-cyan-100" maxLength={500} value={livePollText} disabled={isSubmitting || livePollState.state !== "OPEN"} onChange={(event) => setLivePollText(event.target.value)} placeholder="Kurzen Beitrag eingeben …" /><button type="button" className="answer-primary-button min-h-11 w-full rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50" disabled={isSubmitting || livePollState.state !== "OPEN" || !livePollText.trim()} onClick={() => saveLivePoll({ text: livePollText })}>Beitrag senden</button>{livePollResponse?.text ? <p className="text-sm text-slate-600">Gespeichert: {livePollResponse.text}</p> : null}</div>}
-          </div> : !blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
+          {!blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
             (liveDaten.answerPhase === "LEGACY" &&
               aktuellerBlock &&
               !liveDaten.presentationStatusText)) ? (
@@ -870,14 +911,41 @@ export default function QuizAntwortClient({
               </p>
 
               <div className="mt-6 space-y-5">
-                {liveDaten.fragen.length === 0 && (
+                {answerItems.length === 0 && (
                   <p className="answer-empty-state rounded-2xl border border-slate-200 bg-slate-50 p-5 font-semibold text-slate-700">
                     Der Fragenblock ist geöffnet. Die erste Frage folgt gleich.
                   </p>
                 )}
-                {liveDaten.fragen
-                .filter((frage) => frage.istFreigegeben)
-                .map((frage, frageIndex) => {
+                {answerItems.map((item, itemIndex) => {
+                  if (item.kind === "LIVE_POLL") {
+                    const active = livePollState?.runId === item.poll.runId;
+                    const poll = active && livePollState
+                      ? {
+                          ...item.poll,
+                          state: livePollState.state,
+                          type: livePollState.type,
+                          prompt: livePollState.prompt,
+                          options: livePollState.options.map((option) => ({
+                            id: option.id,
+                            label: option.label,
+                          })),
+                        }
+                      : item.poll;
+                    return (
+                      <ParticipantLivePollCard
+                        key={`live-poll-${poll.runId}`}
+                        poll={poll}
+                        position={itemIndex + 1}
+                        active={active}
+                        response={active ? livePollResponse ?? poll.response : poll.response}
+                        text={livePollText}
+                        disabled={isSubmitting}
+                        onTextChange={setLivePollText}
+                        onSave={saveLivePoll}
+                      />
+                    );
+                  }
+                  const frage = item.question;
                   const frageIstAktivePixelFrage =
                     frage.templateId === "pixelbild" &&
                     liveDaten.activeQuizFragenId === frage.quiz_fragen_id;
@@ -952,7 +1020,7 @@ export default function QuizAntwortClient({
                       className="answer-question rounded-2xl border border-slate-200 bg-slate-50 p-4"
                     >
                       <div className="answer-question-meta mb-3 text-sm font-semibold text-slate-500">
-                        Frage {frageIndex + 1}
+                        Frage {itemIndex + 1}
                       </div>
 
                       <h3 className="text-lg font-bold text-slate-900">

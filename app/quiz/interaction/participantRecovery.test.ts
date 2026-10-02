@@ -27,6 +27,13 @@ test("closed snapshots confirm accepted content without exposing questions or ac
     resolveParticipantSession: async (_id: number, token?: string) => token === "valid" ? { quiz_team_session_id: 9, team: {} } : null,
     ensureQuizBlockDeadlines: async () => {},
     repairQuizSpecificOrderingAssignments: async () => {},
+    loadStoredQuizFlowItems: async () => [],
+    toStoredQuizFlowItem: (item: unknown) => item,
+    parseStoredQuizFlowItem: (item: unknown) => item,
+    sortQuizQuestionAssignments: (items: unknown[]) => items,
+    resolveQuizBlockSequence: () => ({ entries: [] }),
+    buildParticipantAnswerSequence: () => [],
+    readLivePollRunSnapshot: () => null,
     prisma: {
       quiz: { findUnique: async () => ({ quiz_id: 7, titel: "Closed", quiz_abschnitte: [], quiz_fragen: [], praesentation_status: null }), findFirst: async () => ({ quiz_id: 7, titel: "Closed" }) },
       quiz_interaction_runs: { findMany: async () => [] },
