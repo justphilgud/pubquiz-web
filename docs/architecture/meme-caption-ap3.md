@@ -84,6 +84,10 @@ der AP2-Submission und lehnt Gleichheit ab.
 > Request wählen.
 
 Angemeldete Teams ohne freigegebenes eigenes Meme dürfen alle Kandidaten wählen.
+Die Sperre gilt dabei pro Kandidat und nicht für das ganze Besitzerteam: Sind
+Meme A und Meme B ausgewählt, darf Team A für B und Team B für A stimmen. Ein
+Team C ohne ausgewähltes Meme darf A oder B wählen. Erst nach Phasenschluss sind
+alle Kandidaten gesperrt.
 Existiert nur ein Kandidat und ist ein Team dessen Besitzer, bleibt dieser Vote
 gesperrt; es wird keine künstliche Selbststimme erzeugt. Der Moderator kann den
 Ablauf regulär schließen und an AP4 übergeben.

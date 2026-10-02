@@ -276,6 +276,74 @@ const displayState: PresentationSlideDisplayState = {
   playbackCommandId: 0,
 };
 
+test("true/false stays neutral before reveal and marks the configured false answer after reveal", () => {
+  const fixture = buildPresentationQualityFixture("true-false", "KOMM_ONE");
+  const questionHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+  assert.match(questionHtml, /data-presentation-phase="question"/);
+  assert.equal((questionHtml.match(/presentation-true-false-option/g) ?? []).length, 2);
+  assert.doesNotMatch(questionHtml, /data-correct=/);
+
+  assert.equal(fixture.slide.typ, "frage");
+  if (fixture.slide.typ !== "frage") return;
+  const falseQuestion = structuredClone(fixture.slide.frage);
+  assert.equal(falseQuestion.templateConfig?.templateData?.kind, "TRUE_FALSE");
+  if (falseQuestion.templateConfig?.templateData?.kind !== "TRUE_FALSE") return;
+  falseQuestion.templateConfig.templateData.correctAnswer = false;
+  const solutionSlide: Slide = {
+    typ: "aufloesung",
+    abschnitt: null,
+    frage: falseQuestion,
+    frageIndexImBlock: 1,
+    fragenAnzahlImBlock: 1,
+  };
+  const solutionHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    ...fixture,
+    slide: solutionSlide,
+    slides: [solutionSlide],
+    slideLabel: "Auflösung",
+  }));
+
+  assert.match(solutionHtml, /data-presentation-phase="solution"/);
+  assert.match(solutionHtml, /data-correct="false"[^>]*>[\s\S]*Wahr[\s\S]*✕ Falsche Antwort/);
+  assert.match(solutionHtml, /data-correct="true"[^>]*>[\s\S]*Falsch[\s\S]*✓ Richtige Antwort/);
+
+  const storybook = buildPresentationQualityFixture("true-false", "BIRTHDAY");
+  assert.equal(storybook.slide.typ, "frage");
+  if (storybook.slide.typ !== "frage") return;
+  const storybookQuestion = structuredClone(storybook.slide.frage);
+  assert.equal(storybookQuestion.templateConfig?.templateData?.kind, "TRUE_FALSE");
+  if (storybookQuestion.templateConfig?.templateData?.kind !== "TRUE_FALSE") return;
+  storybookQuestion.templateConfig.templateData.correctAnswer = false;
+  const storybookSolution: Slide = {
+    typ: "aufloesung",
+    abschnitt: null,
+    frage: storybookQuestion,
+    frageIndexImBlock: 1,
+    fragenAnzahlImBlock: 1,
+  };
+  const storybookHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    ...storybook,
+    slide: storybookSolution,
+    slides: [storybookSolution],
+    slideLabel: "Auflösung",
+  }));
+  assert.match(storybookHtml, /data-presentation-layout="SOLUTION_FOCUS"/);
+  assert.match(storybookHtml, /data-storybook-question-kind="TRUE_FALSE"/);
+  assert.match(storybookHtml, /data-correct="false"[^>]*>[\s\S]*Wahr[\s\S]*✕ Falsche Antwort/);
+  assert.match(storybookHtml, /data-correct="true"[^>]*>[\s\S]*Falsch[\s\S]*✓ Richtige Antwort/);
+});
+
+test("start sequence and shared legacy labels use theme-aware hooks", () => {
+  assert.match(rendererSource, /presentation-start-sequence-backdrop/);
+  assert.match(rendererSource, /activationClassName="presentation-start-media-activation"/);
+  assert.match(rendererSource, /presentation-start-play-mark[^\n]*var\(--quiz-primary\)/);
+  assert.match(rendererSource, /presentation-prizes-slide[\s\S]*presentation-legacy-kicker[\s\S]*Preise/);
+  assert.doesNotMatch(
+    rendererSource.match(/className="presentation-start-play-mark[^\n]+/)?.[0] ?? "",
+    /pink-/,
+  );
+});
+
 test("renderer covers the central slide types without player orchestration", () => {
   for (const slideType of [
     '"fixer-slide"',

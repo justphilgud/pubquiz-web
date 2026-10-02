@@ -134,6 +134,27 @@ export function teamCanVoteForCandidate(input: {
   return input.votingOpen && input.voterTeamId !== input.ownerTeamId;
 }
 
+export function buildMemeTeamVotingState(
+  candidates: readonly { candidateId: number; ownerTeamId: number }[],
+  voterTeamId: number,
+  votingOpen: boolean,
+) {
+  const ownCandidateIds = candidates
+    .filter((candidate) => candidate.ownerTeamId === voterTeamId)
+    .map((candidate) => candidate.candidateId);
+
+  return {
+    ownCandidateIds,
+    canVote: candidates.some((candidate) =>
+      teamCanVoteForCandidate({
+        votingOpen,
+        voterTeamId,
+        ownerTeamId: candidate.ownerTeamId,
+      }),
+    ),
+  };
+}
+
 export function countEligibleMemeVoters(
   teamIds: readonly number[],
   candidateOwnerTeamIds: readonly number[],

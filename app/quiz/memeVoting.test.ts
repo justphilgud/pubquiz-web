@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  buildMemeTeamVotingState,
   countEligibleMemeVoters,
   createInitialMemePresentationState,
   getMemeOverviewCandidates,
@@ -73,6 +74,30 @@ test("AP3 rejects self-votes but permits teams without an own candidate", () => 
   assert.equal(teamCanVoteForCandidate({ votingOpen: true, voterTeamId: 7, ownerTeamId: 7 }), false);
   assert.equal(teamCanVoteForCandidate({ votingOpen: true, voterTeamId: 7, ownerTeamId: 8 }), true);
   assert.equal(teamCanVoteForCandidate({ votingOpen: false, voterTeamId: 7, ownerTeamId: 8 }), false);
+});
+
+test("AP2 point 9: selected teams can vote for each other while an unselected team can vote for both", () => {
+  const candidates = [
+    { candidateId: 101, ownerTeamId: 1 },
+    { candidateId: 102, ownerTeamId: 2 },
+  ];
+
+  assert.deepEqual(buildMemeTeamVotingState(candidates, 1, true), {
+    ownCandidateIds: [101],
+    canVote: true,
+  });
+  assert.deepEqual(buildMemeTeamVotingState(candidates, 2, true), {
+    ownCandidateIds: [102],
+    canVote: true,
+  });
+  assert.deepEqual(buildMemeTeamVotingState(candidates, 3, true), {
+    ownCandidateIds: [],
+    canVote: true,
+  });
+  assert.deepEqual(buildMemeTeamVotingState(candidates, 1, false), {
+    ownCandidateIds: [101],
+    canVote: false,
+  });
 });
 
 test("AP3 eligible voter count handles the single-candidate owner without a fake vote", () => {

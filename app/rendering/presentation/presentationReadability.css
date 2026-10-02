@@ -1,4 +1,20 @@
 /* AP5: geometry and type roles only. Branding remains in the resolved theme. */
+.presentation-start-sequence-backdrop {
+  background:
+    radial-gradient(circle at center, color-mix(in srgb, var(--quiz-primary) 20%, transparent), transparent 42%),
+    radial-gradient(circle at bottom right, color-mix(in srgb, var(--quiz-secondary) 18%, transparent), transparent 40%);
+}
+
+.presentation-start-media-activation {
+  border: 2px solid var(--quiz-primary);
+  border-radius: var(--quiz-radius-small);
+  background: var(--quiz-surface);
+  padding: 0.75rem 1rem;
+  color: var(--quiz-surface-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
 .presentation-overflow-region { display: grid; grid-template-rows: minmax(0, 1fr) 1.6rem; height: 100%; min-height: 0; }
 .presentation-content-viewport { min-height: 0; overflow: auto; scrollbar-gutter: stable; }
 .presentation-content-inner { height: 100%; min-height: 0; }

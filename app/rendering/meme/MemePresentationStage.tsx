@@ -32,7 +32,7 @@ export function MemePresentationStage({
         data-meme-presentation-phase="PRESENTING"
         className="flex h-full min-h-0 flex-col items-center justify-center gap-4 px-10 py-6 text-[var(--quiz-text)]"
       >
-        <div className="rounded-full border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] px-6 py-2 text-2xl font-black">
+        <div className="rounded-full border-2 border-[var(--quiz-border)] bg-[var(--quiz-surface-strong)] px-6 py-2 text-2xl font-black text-[var(--quiz-surface-strong-text)]">
           Meme {activeCandidate.number}
         </div>
         <MemeRenderer
@@ -79,7 +79,7 @@ export function MemePresentationStage({
             key={candidate.candidateId}
             className="grid min-h-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-[var(--quiz-border)] bg-[var(--quiz-surface)] p-3"
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--quiz-primary)] text-xl font-black text-[var(--quiz-background)]">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--quiz-primary)] text-xl font-black text-[var(--quiz-primary-text)]">
               {candidate.number}
             </span>
             <MemeRenderer

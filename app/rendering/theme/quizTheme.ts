@@ -271,6 +271,54 @@ export type QuizThemeCssProperties = CSSProperties & {
 };
 
 export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties {
+  const surfaceText = accessibleColor(
+    theme.colors.text,
+    theme.colors.surface,
+    ["#0f172a", "#ffffff"],
+    4.5,
+  );
+  const surfaceTextMuted = accessibleColor(
+    theme.colors.textMuted,
+    theme.colors.surface,
+    ["#475569", surfaceText],
+    4.5,
+  );
+  const surfaceStrongText = accessibleColor(
+    theme.colors.text,
+    theme.colors.surfaceStrong,
+    ["#0f172a", "#ffffff"],
+    4.5,
+  );
+  const surfaceStrongTextMuted = accessibleColor(
+    theme.colors.textMuted,
+    theme.colors.surfaceStrong,
+    ["#475569", surfaceStrongText],
+    4.5,
+  );
+  const primaryText = accessibleColor(
+    theme.colors.background,
+    theme.colors.primary,
+    ["#0f172a", "#ffffff"],
+    4.5,
+  );
+  const accentText = accessibleColor(
+    theme.colors.background,
+    theme.colors.accent,
+    ["#0f172a", "#ffffff"],
+    4.5,
+  );
+  const surfaceStrongPrimary = accessibleColor(
+    theme.colors.primary,
+    theme.colors.surfaceStrong,
+    [surfaceStrongText],
+    4.5,
+  );
+  const surfaceStrongAccent = accessibleColor(
+    theme.colors.accent,
+    theme.colors.surfaceStrong,
+    [surfaceStrongText],
+    3,
+  );
   const style: QuizThemeCssProperties = {
     "--quiz-primary": theme.colors.primary,
     "--quiz-secondary": theme.colors.secondary,
@@ -278,6 +326,14 @@ export function quizThemeStyle(theme: ResolvedQuizTheme): QuizThemeCssProperties
     "--quiz-background": theme.colors.background,
     "--quiz-surface": theme.colors.surface,
     "--quiz-surface-strong": theme.colors.surfaceStrong,
+    "--quiz-surface-text": surfaceText,
+    "--quiz-surface-text-muted": surfaceTextMuted,
+    "--quiz-surface-strong-text": surfaceStrongText,
+    "--quiz-surface-strong-text-muted": surfaceStrongTextMuted,
+    "--quiz-primary-text": primaryText,
+    "--quiz-accent-text": accentText,
+    "--quiz-surface-strong-primary": surfaceStrongPrimary,
+    "--quiz-surface-strong-accent": surfaceStrongAccent,
     "--quiz-text": theme.colors.text,
     "--quiz-text-muted": theme.colors.textMuted,
     "--quiz-border": theme.colors.border,

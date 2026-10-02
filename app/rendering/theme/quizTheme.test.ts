@@ -70,6 +70,38 @@ test("theme style exposes quiz variables and compatibility aliases", () => {
   assert.equal(style.fontFamily, theme.appearance.fontFamily);
 });
 
+test("all presentation surfaces expose contrast-safe foreground pairs", () => {
+  for (const templateId of [
+    "ungegoogelt-default",
+    "ungegoogelt-dark",
+    "corporate-reference",
+    "birthday-reference",
+    "lovd-ungegoogelt",
+    "komm-one-pubquiz",
+  ]) {
+    const theme = createTheme(templateId, templateId);
+    const style = quizThemeStyle(theme);
+    const checks = [
+      ["surface", style["--quiz-surface-text"], theme.colors.surface],
+      ["surface muted", style["--quiz-surface-text-muted"], theme.colors.surface],
+      ["strong surface", style["--quiz-surface-strong-text"], theme.colors.surfaceStrong],
+      ["strong surface muted", style["--quiz-surface-strong-text-muted"], theme.colors.surfaceStrong],
+      ["primary", style["--quiz-primary-text"], theme.colors.primary],
+      ["accent", style["--quiz-accent-text"], theme.colors.accent],
+      ["strong surface primary", style["--quiz-surface-strong-primary"], theme.colors.surfaceStrong],
+      ["strong surface accent", style["--quiz-surface-strong-accent"], theme.colors.surfaceStrong],
+    ] as const;
+
+    for (const [label, foreground, background] of checks) {
+      assert.equal(typeof foreground, "string");
+      assert.ok(
+        contrastRatio(String(foreground), background) >= (label === "strong surface accent" ? 3 : 4.5),
+        `${templateId}: ${label}`,
+      );
+    }
+  }
+});
+
 test("answer forms resolve an accessible UI palette independently of presentation colors", () => {
   for (const templateId of ["lovd-ungegoogelt", "ungegoogelt-default"]) {
     const theme = createTheme(templateId, templateId);

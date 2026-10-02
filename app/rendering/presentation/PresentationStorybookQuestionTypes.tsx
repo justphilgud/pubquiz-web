@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { buildTrueFalsePresentationOptions } from "./trueFalsePresentation";
 
 /* eslint-disable @next/next/no-img-element -- Storybook renders dynamic quiz media with runtime URLs inside a fixed presentation canvas. */
 
@@ -354,21 +355,38 @@ function StorybookSolutionAnswers({
   const structuredSolutions = acceptedStructuredSolutions(question);
   const templateData = question.templateConfig?.templateData;
 
-  if (kind === "MULTIPLE_CHOICE" || kind === "TRUE_FALSE") {
+  if (kind === "TRUE_FALSE" && templateData?.kind === "TRUE_FALSE") {
+    const options = buildTrueFalsePresentationOptions(templateData.correctAnswer);
+    return (
+      <div>
+        <ol className="presentation-storybook-solution-choices presentation-storybook-solution-choices--binary">
+          {options.map((option, index) => (
+            <li key={option.id} data-correct={option.isCorrect ? "true" : "false"}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{option.label}</strong>
+              <small>{option.isCorrect ? "✓ Richtige Antwort" : "✕ Falsche Antwort"}</small>
+            </li>
+          ))}
+        </ol>
+        {templateData.explanation && (
+          <p className="presentation-storybook-solution-note">{templateData.explanation}</p>
+        )}
+      </div>
+    );
+  }
+
+  if (kind === "MULTIPLE_CHOICE") {
     return (
       <div>
         <ol className="presentation-storybook-solution-choices">
           {question.antworten.map((answer, index) => (
             <li key={answer.antwort_id} data-correct={answer.ist_richtig}>
-              <span>{kind === "TRUE_FALSE" ? String(index + 1).padStart(2, "0") : String.fromCharCode(65 + index)}</span>
+              <span>{String.fromCharCode(65 + index)}</span>
               <strong>{answer.antwort}</strong>
               {answer.ist_richtig && <small>Richtige Antwort</small>}
             </li>
           ))}
         </ol>
-        {kind === "TRUE_FALSE" && templateData?.kind === "TRUE_FALSE" && templateData.explanation && (
-          <p className="presentation-storybook-solution-note">{templateData.explanation}</p>
-        )}
       </div>
     );
   }
