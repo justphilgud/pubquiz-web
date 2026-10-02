@@ -53,6 +53,7 @@ function normalizeFreeText(value: unknown) {
 export async function saveLivePollResponse(input: {
   quizId: number;
   quizTeamSessionId: number;
+  interactionRunId: number;
   selectedOptionId?: unknown;
   text?: unknown;
 }) {
@@ -63,13 +64,25 @@ export async function saveLivePollResponse(input: {
       WHERE "quiz_id" = ${input.quizId} AND "is_current" = true FOR UPDATE
     `;
     const runId = rows[0]?.interaction_run_id;
-    if (!runId) return { success: false as const, message: "Aktuell läuft keine Umfrage." };
+    if (!runId || runId !== input.interactionRunId) {
+      return {
+        success: false as const,
+        reason: "LIVE_STATE_CHANGED" as const,
+        message: "Die Livefrage hat sich geändert. Bitte prüfe den aktuellen Stand.",
+      };
+    }
     const [run, session] = await Promise.all([
       tx.quiz_interaction_runs.findUnique({ where: { interaction_run_id: runId } }),
       tx.quiz_team_sessions.findFirst({ where: { quiz_team_session_id: input.quizTeamSessionId, quiz_id: input.quizId }, select: { quiz_team_session_id: true } }),
     ]);
     const config = run ? readLivePollRunSnapshot(run.config_snapshot) : null;
-    if (!run || !session || !config || run.is_hidden || run.state !== "OPEN") return { success: false as const, message: "Die Umfrage ist geschlossen." };
+    if (!run || !session || !config || run.is_hidden || run.state !== "OPEN") {
+      return {
+        success: false as const,
+        reason: "LIVE_STATE_CHANGED" as const,
+        message: "Die Livefrage ist geschlossen. Deine letzte gültige Antwort bleibt erhalten.",
+      };
+    }
 
     let selectedOptionId: string | null = null;
     let originalText: string | null = null;

@@ -208,8 +208,9 @@ test("full participant refresh does not hydrate the complete run history", () =>
   assert.match(participantStatus, /\{ is_current: true \}/);
   assert.match(
     participantStatus,
-    /opened_at: \{ gte: offenerBlockFreigabe\.freigegeben_ab \}/,
+    /opened_at: \{ gte: runtimeBlockFreigabe\.freigegeben_ab \}/,
   );
+  assert.match(participantStatus, /runtimeBlockFreigabe = offenerBlockFreigabe \?\? letzteBlockFreigabe/);
   assert.ok(
     participantRoute.indexOf("includeAnswerStatus === true") <
       participantRoute.indexOf("resolveParticipantSession(quizId, token)"),

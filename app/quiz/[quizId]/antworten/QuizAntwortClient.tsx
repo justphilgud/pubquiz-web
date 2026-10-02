@@ -505,11 +505,19 @@ export default function QuizAntwortClient({
     controller,
   ]);
 
-  function saveLivePoll(input: { selectedOptionId?: string; text?: string }) {
-    if (!session || !livePollState || livePollState.state !== "OPEN") return;
+  function saveLivePoll(
+    interactionRunId: number,
+    input: { selectedOptionId?: string; text?: string },
+  ) {
+    if (
+      !session ||
+      !livePollState ||
+      livePollState.runId !== interactionRunId ||
+      livePollState.state !== "OPEN"
+    ) return;
     setIsSubmitting(true);
     setMeldung("");
-    void boundedParticipantAction(submitLivePollResponse({ quizId: liveDaten.quiz_id, quizTeamSessionToken: session.sessionToken, ...input })).then((result) => {
+    void boundedParticipantAction(submitLivePollResponse({ quizId: liveDaten.quiz_id, quizTeamSessionToken: session.sessionToken, interactionRunId, ...input })).then((result) => {
       setMeldung(result.message);
       if (result.success) {
         setLivePollResponse({ selectedOptionId: input.selectedOptionId ?? null, text: input.text?.trim() ?? null });
@@ -732,6 +740,9 @@ export default function QuizAntwortClient({
     }
     return items;
   }, [liveDaten.answerSequence, liveDaten.fragen, liveDaten.livePolls]);
+  const hasReleasedLivePoll = answerItems.some(
+    (item) => item.kind === "LIVE_POLL",
+  );
 
 
   return (
@@ -882,10 +893,11 @@ export default function QuizAntwortClient({
 
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {!blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
+          {((!blockIstGesperrt && (liveDaten.answerPhase === "QUESTION" ||
             (liveDaten.answerPhase === "LEGACY" &&
               aktuellerBlock &&
-              !liveDaten.presentationStatusText)) ? (
+              !liveDaten.presentationStatusText))) ||
+            hasReleasedLivePoll) ? (
             <>
               <div className="answer-kicker text-sm font-semibold uppercase tracking-wide text-green-600">
                 {liveDaten.answerPhase === "QUESTION"
@@ -939,9 +951,9 @@ export default function QuizAntwortClient({
                         active={active}
                         response={active ? livePollResponse ?? poll.response : poll.response}
                         text={livePollText}
-                        disabled={isSubmitting}
+                        saving={isSubmitting}
                         onTextChange={setLivePollText}
-                        onSave={saveLivePoll}
+                        onSave={(input) => saveLivePoll(poll.runId, input)}
                       />
                     );
                   }
