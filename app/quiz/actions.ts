@@ -2579,30 +2579,36 @@ export async function getQuizAntwortStatus(
           offenerFragenblock.quiz_abschnitt_id,
       )?.quiz_block_freigaben[0] ?? null
     : null;
-  const offeneBlockFragenIds = offenerFragenblock
-    ? quiz.quiz_fragen.flatMap((entry) =>
-        entry.quiz_abschnitt_id === offenerFragenblock.quiz_abschnitt_id
-          ? [entry.quiz_fragen_id]
-          : [],
-      )
-    : [];
+  const letzteBlockFreigabe = quiz.quiz_abschnitte
+    .flatMap((abschnitt) => abschnitt.quiz_block_freigaben)
+    .sort(
+      (left, right) =>
+        (right.freigegeben_ab?.getTime() ?? 0) -
+          (left.freigegeben_ab?.getTime() ?? 0) ||
+        right.quiz_block_freigabe_id - left.quiz_block_freigabe_id,
+    )[0] ?? null;
+  const runtimeBlockFreigabe = offenerBlockFreigabe ?? letzteBlockFreigabe;
   const interactionRuns = await prisma.quiz_interaction_runs.findMany({
     where: {
       quiz_id: quizId,
       is_hidden: false,
       OR: [
         { is_current: true },
-        ...(offeneBlockFragenIds.length > 0 &&
-        offenerBlockFreigabe?.freigegeben_ab
+        ...(runtimeBlockFreigabe?.freigegeben_ab
           ? [{
-              quiz_fragen_id: { in: offeneBlockFragenIds },
-              opened_at: { gte: offenerBlockFreigabe.freigegeben_ab },
+              quiz_fragen: {
+                quiz_abschnitt_id: runtimeBlockFreigabe.quiz_abschnitt_id,
+              },
+              opened_at: { gte: runtimeBlockFreigabe.freigegeben_ab },
             }]
           : []),
-        ...(offenerBlockFreigabe?.freigegeben_ab
+        ...(runtimeBlockFreigabe?.freigegeben_ab
           ? [{
-              quiz_ablauf_element_id: { not: null },
-              opened_at: { gte: offenerBlockFreigabe.freigegeben_ab },
+              quiz_ablauf_elemente: {
+                quiz_abschnitt_id: runtimeBlockFreigabe.quiz_abschnitt_id,
+                typ: "LIVE_POLL",
+              },
+              opened_at: { gte: runtimeBlockFreigabe.freigegeben_ab },
             }]
           : []),
       ],
@@ -2642,6 +2648,10 @@ export async function getQuizAntwortStatus(
       ? audienceState
       : null;
   const aktuellerBlock = offenerFragenblock ??
+    abschnitte.find(
+      (abschnitt) =>
+        abschnitt.quiz_abschnitt_id === letzteBlockFreigabe?.quiz_abschnitt_id,
+    ) ??
     (audienceState.kind === "LEGACY" ? legacyAktuellerBlock : undefined);
   const blockIstGesperrt = !offenerFragenblock;
 
@@ -2649,15 +2659,6 @@ export async function getQuizAntwortStatus(
     (abschnitt) =>
       abschnitt.quiz_abschnitt_id === aktuellerBlock?.quiz_abschnitt_id,
   )?.quiz_block_freigaben[0];
-  const letzteBlockFreigabe = quiz.quiz_abschnitte
-    .flatMap((abschnitt) => abschnitt.quiz_block_freigaben)
-    .sort(
-      (left, right) =>
-        (right.freigegeben_ab?.getTime() ?? 0) -
-          (left.freigegeben_ab?.getTime() ?? 0) ||
-        right.quiz_block_freigabe_id - left.quiz_block_freigabe_id,
-    )[0] ?? null;
-
   const fragenImAktuellenBlock = aktuellerBlock
     ? sortQuizQuestionAssignments(
         quiz.quiz_fragen.filter(
@@ -2726,8 +2727,8 @@ export async function getQuizAntwortStatus(
       run.quiz_ablauf_element_id !== null &&
       currentBlockPollPlacementIds.has(run.quiz_ablauf_element_id) &&
       run.opened_at !== null &&
-      offenerBlockFreigabe?.freigegeben_ab &&
-      run.opened_at >= offenerBlockFreigabe.freigegeben_ab
+      blockFreigabe?.freigegeben_ab &&
+      run.opened_at >= blockFreigabe.freigegeben_ab
       ? [{
           run,
           config,

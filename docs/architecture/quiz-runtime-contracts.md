@@ -458,11 +458,12 @@ Umfrage-Platzierung
 → Teams überschreiben ihre aktuelle Auswahl oder ihren Textbeitrag
 → Audience erhält nur Aggregate bzw. freigegebene bereinigte Texte
 → Moderation erhält Original, öffentliche Fassung und Teamidentität
-→ CLOSED
+→ Block- oder Pollschluss setzt den Run auf CLOSED
+→ das Team sieht die eigene letzte Antwort schreibgesperrt
 → nächstes Ablaufelement (keine Lösung, keine Bewertung, keine Punkte)
 ```
 
-Auswahl erlaubt zwei bis sechs Optionen und genau eine wirksame Auswahl pro Team und Run. Freitext erlaubt einen wirksamen Beitrag pro Team und Run; Wiederholungen ersetzen ihn bis zum Schließen. `AUTOMATIC` veröffentlicht die bereinigte Fassung direkt, `MODERATED` erst nach serverseitiger Freigabe. Die öffentliche Wall ist auf die letzten 20 sichtbaren Beiträge begrenzt. Ranking-, Funny-, Evaluation- und Solution-Pfade lesen diese Tabellen nicht.
+Auswahl erlaubt zwei bis sechs Optionen und genau eine wirksame Auswahl pro Team und Run. Freitext erlaubt einen wirksamen Beitrag pro Team und Run; Wiederholungen ersetzen ihn bis zum Schließen. Jeder Schreibaufruf nennt die vom Teilnehmer angezeigte Run-ID. Der Server vergleicht sie unter derselben Run-Sperre mit dem aktuellen `OPEN`-Run und lehnt veraltete Clients fail-closed ab. `AUTOMATIC` veröffentlicht die bereinigte Fassung direkt, `MODERATED` erst nach serverseitiger Freigabe. Die öffentliche Wall ist auf die letzten 20 sichtbaren Beiträge begrenzt. Ranking-, Funny-, Evaluation- und Solution-Pfade lesen diese Tabellen nicht.
 
 Der Abruf nutzt die bestehenden autorisierten Live-Snapshot-Routen mit `no-store`. Für laufende Content-Umfragen beträgt der Takt 1,2 Sekunden in sichtbaren Tabs und 5 Sekunden in Hintergrund-Tabs; wiederholte Fehler führen zu exponentiellem Backoff bis 15 Sekunden. Die Darstellung interpoliert Änderungen clientseitig und führt keine Datenbankabfrage pro Animationsframe aus.
 | `app/quiz/liveResults/liveChoiceResults.test.ts` | Effektive Abgaben werden neutral und submissionsbasiert aggregiert. |

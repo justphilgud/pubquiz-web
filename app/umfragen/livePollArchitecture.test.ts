@@ -45,10 +45,15 @@ test("participant polls are additive, release-gated and scoped to the own team s
   assert.match(answerClient, /answerItems\.map/);
   assert.match(answerClient, /ParticipantLivePollCard/);
   assert.doesNotMatch(answerClient, /livePollState\s*\?\s*<div className="space-y-5"/);
-  assert.match(quizActions, /quiz_ablauf_element_id:\s*\{ not: null \}/);
+  assert.match(
+    quizActions,
+    /quiz_ablauf_elemente:\s*\{[\s\S]*quiz_abschnitt_id: runtimeBlockFreigabe\.quiz_abschnitt_id,[\s\S]*typ: "LIVE_POLL"/,
+  );
   assert.match(
     quizActions,
     /quiz_team_session_id:\s*participantSession\.quiz_team_session_id/,
   );
   assert.match(runtime, /run\.state !== "OPEN"/);
+  assert.match(runtime, /runId !== input\.interactionRunId/);
+  assert.match(answerClient, /hasReleasedLivePoll/);
 });
