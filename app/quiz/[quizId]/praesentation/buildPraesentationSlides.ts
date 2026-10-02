@@ -12,6 +12,7 @@ import {
   type QuizFlowItemType,
 } from "../../flow/quizFlow";
 import { resolveQuizBlockSequence } from "../../flow/quizBlockSequence";
+import { compareQuizQuestionAssignments } from "../../quizQuestionOrder";
 
 export type Medium = {
   medien_id: number;
@@ -189,7 +190,7 @@ export function buildPraesentationSlides(
           Number(frage.quiz_abschnitt_id) ===
           Number(abschnitt.quiz_abschnitt_id)
       )
-      .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0));
+      .sort(compareQuizQuestionAssignments);
 
     if (isIntroSection(abschnitt) || isOutroSection(abschnitt)) continue;
 
@@ -294,7 +295,7 @@ export function buildPraesentationSlides(
 
   const fragenOhneBlock = quiz.fragen
     .filter((frage) => frage.quiz_abschnitt_id == null)
-    .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0));
+    .sort(compareQuizQuestionAssignments);
 
   if (fragenOhneBlock.length > 0) {
     fragenOhneBlock.forEach((frage, index) => {
