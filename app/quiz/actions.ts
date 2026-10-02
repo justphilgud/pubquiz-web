@@ -132,13 +132,22 @@ import {
 import {
   DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
   isQuizSolutionStrategy,
+  parseStoredQuizFlowItem,
   type QuizSolutionStrategy,
 } from "./flow/quizFlow";
+import { resolveQuizBlockSequence } from "./flow/quizBlockSequence";
 import {
+  loadStoredQuizFlowItems,
   materializeQuizBlockQuestionItems,
   materializeQuizQuestionStoryItems,
   toStoredQuizFlowItem,
 } from "./flow/quizFlowRepository.server";
+import { readLivePollRunSnapshot } from "@/app/umfragen/livePollRuntime.server";
+import {
+  buildParticipantAnswerSequence,
+  type ParticipantAnswerSequenceSourceItem,
+} from "./participantAnswerSequence";
+import { sortQuizQuestionAssignments } from "./quizQuestionOrder";
 import { isQuestionEligibleForQuiz } from "@/app/fragen/editor/questionScopePolicy";
 import { searchFragen } from "@/app/fragen/actions";
 import type { ContentFiltersState } from "@/app/components/content/contentLibrary";
@@ -2485,6 +2494,8 @@ export async function getQuizAntwortStatus(
       presentationStatusText: null,
       teamProfile: null,
       answerConfirmations: [],
+      answerSequence: [],
+      livePolls: [],
       fragen: [],
     };
   }
@@ -2492,36 +2503,40 @@ export async function getQuizAntwortStatus(
   await ensureQuizBlockDeadlines(quizId);
   await repairQuizSpecificOrderingAssignments(quizId);
 
-  const quiz = await prisma.quiz.findUnique({
-    where: {
-      quiz_id: quizId,
-    },
-    include: {
-      quiz_abschnitte: {
-        orderBy: {
-          sortierung: "asc",
-        },
-        include: {
-          quiz_block_freigaben: true,
-        },
+  const [quiz, storedFlowItems] = await Promise.all([
+    prisma.quiz.findUnique({
+      where: {
+        quiz_id: quizId,
       },
-      quiz_fragen: {
-        orderBy: {
-          sortierung: "asc",
+      include: {
+        quiz_abschnitte: {
+          orderBy: {
+            sortierung: "asc",
+          },
+          include: {
+            quiz_block_freigaben: true,
+          },
         },
-        select: {
-          quiz_fragen_id: true,
-          fragen_id: true,
-          quiz_abschnitt_id: true,
-          sortierung: true,
-          antwort_reihenfolge: true,
-          freie_antwort_erlaubt: true,
-          punkte_modus: true,
+        quiz_fragen: {
+          orderBy: [
+            { sortierung: "asc" },
+            { quiz_fragen_id: "asc" },
+          ],
+          select: {
+            quiz_fragen_id: true,
+            fragen_id: true,
+            quiz_abschnitt_id: true,
+            sortierung: true,
+            antwort_reihenfolge: true,
+            freie_antwort_erlaubt: true,
+            punkte_modus: true,
+          },
         },
+        praesentation_status: true,
       },
-      praesentation_status: true,
-    },
-  });
+    }),
+    loadStoredQuizFlowItems(quizId),
+  ]);
 
   if (!quiz) {
     return null;
@@ -2530,6 +2545,9 @@ export async function getQuizAntwortStatus(
   if (quiz.ist_archiviert) {
     return null;
   }
+  const flowItems = storedFlowItems
+    .map((item) => parseStoredQuizFlowItem(toStoredQuizFlowItem(item)))
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 
   const abschnitte = quiz.quiz_abschnitte.map((abschnitt) => ({
     quiz_abschnitt_id: abschnitt.quiz_abschnitt_id,
@@ -2578,6 +2596,12 @@ export async function getQuizAntwortStatus(
         offenerBlockFreigabe?.freigegeben_ab
           ? [{
               quiz_fragen_id: { in: offeneBlockFragenIds },
+              opened_at: { gte: offenerBlockFreigabe.freigegeben_ab },
+            }]
+          : []),
+        ...(offenerBlockFreigabe?.freigegeben_ab
+          ? [{
+              quiz_ablauf_element_id: { not: null },
               opened_at: { gte: offenerBlockFreigabe.freigegeben_ab },
             }]
           : []),
@@ -2635,13 +2659,13 @@ export async function getQuizAntwortStatus(
     )[0] ?? null;
 
   const fragenImAktuellenBlock = aktuellerBlock
-    ? quiz.quiz_fragen
-        .filter(
+    ? sortQuizQuestionAssignments(
+        quiz.quiz_fragen.filter(
           (eintrag) =>
             Number(eintrag.quiz_abschnitt_id) ===
             Number(aktuellerBlock.quiz_abschnitt_id),
-        )
-        .sort((a, b) => (a.sortierung ?? 0) - (b.sortierung ?? 0))
+        ),
+      )
     : [];
 
   const releasedAssignmentIds =
@@ -2659,6 +2683,67 @@ export async function getQuizAntwortStatus(
         quiz.quiz_fragen,
         releasedAssignmentIds,
       );
+  const blockSection = quiz.quiz_abschnitte.find(
+    (section) =>
+      section.quiz_abschnitt_id === aktuellerBlock?.quiz_abschnitt_id,
+  );
+  const canonicalAnswerItems: ParticipantAnswerSequenceSourceItem[] = blockSection
+    ? resolveQuizBlockSequence({
+        sectionId: blockSection.quiz_abschnitt_id,
+        quizStrategy: quiz.aufloesungsstrategie,
+        sectionStrategy: blockSection.aufloesungsstrategie,
+        questions: fragenImAktuellenBlock,
+        blockItems: flowItems,
+      }).entries.reduce<ParticipantAnswerSequenceSourceItem[]>((items, entry) => {
+        if (entry.kind === "QUESTION") {
+          items.push({
+            kind: "QUESTION" as const,
+            questionAssignmentId: entry.question.quiz_fragen_id,
+          });
+          return items;
+        }
+        if (
+          entry.kind === "CONTENT" &&
+          entry.item.type === "LIVE_POLL" &&
+          entry.item.persistentId !== null
+        ) {
+          items.push({
+            kind: "LIVE_POLL" as const,
+            placementId: entry.item.persistentId,
+          });
+        }
+        return items;
+      }, [])
+    : [];
+  const currentBlockPollPlacementIds = new Set(
+    canonicalAnswerItems.flatMap((item) =>
+      item.kind === "LIVE_POLL" ? [item.placementId] : [],
+    ),
+  );
+  const releasedPollRuns = interactionRuns.flatMap((run) => {
+    const config = readLivePollRunSnapshot(run.config_snapshot);
+    return config &&
+      run.quiz_ablauf_element_id !== null &&
+      currentBlockPollPlacementIds.has(run.quiz_ablauf_element_id) &&
+      run.opened_at !== null &&
+      offenerBlockFreigabe?.freigegeben_ab &&
+      run.opened_at >= offenerBlockFreigabe.freigegeben_ab
+      ? [{
+          run,
+          config,
+          placementId: run.quiz_ablauf_element_id,
+        }]
+      : [];
+  });
+  const answerSequence = buildParticipantAnswerSequence({
+    canonicalItems: canonicalAnswerItems,
+    visibleQuestionIds: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
+    releasedPolls: releasedPollRuns.map(({ run, placementId }) => ({
+      runId: run.interaction_run_id,
+      placementId,
+      openedAt: run.opened_at,
+    })),
+  });
 
   const detailPromise = fragenZurAnzeige.length > 0
     ? prisma.quiz_fragen.findMany({
@@ -2668,7 +2753,10 @@ export async function getQuizAntwortStatus(
             in: fragenZurAnzeige.map((entry) => entry.quiz_fragen_id),
           },
         },
-        orderBy: { sortierung: "asc" },
+        orderBy: [
+          { sortierung: "asc" },
+          { quiz_fragen_id: "asc" },
+        ],
         include: {
           fragen: {
             include: {
@@ -2706,11 +2794,44 @@ export async function getQuizAntwortStatus(
       antwortfelder: { include: { antwortfeld: true } },
     },
   });
+  const livePollResponsePromise = releasedPollRuns.length > 0
+    ? prisma.live_poll_responses.findMany({
+        where: {
+          quiz_team_session_id: participantSession.quiz_team_session_id,
+          interaction_run_id: {
+            in: releasedPollRuns.map(({ run }) => run.interaction_run_id),
+          },
+        },
+        select: {
+          interaction_run_id: true,
+          selected_option_id: true,
+          original_text: true,
+          updated_at: true,
+        },
+      })
+    : Promise.resolve([]);
 
-  const [detaillierteFragen, gespeicherteAntworten] = await Promise.all([
+  const [
+    detaillierteFragen,
+    gespeicherteAntworten,
+    livePollResponses,
+  ] = await Promise.all([
     detailPromise,
     answerPromise,
+    livePollResponsePromise,
   ]);
+  const questionSequenceIndex = new Map(
+    answerSequence.flatMap((item, index) =>
+      item.kind === "QUESTION"
+        ? [[item.questionAssignmentId, index] as const]
+        : [],
+    ),
+  );
+  const pollSequenceIndex = new Map(
+    answerSequence.flatMap((item, index) =>
+      item.kind === "LIVE_POLL" ? [[item.runId, index] as const] : [],
+    ),
+  );
   const fragen = detaillierteFragen.map((eintrag) => {
           const antworten = [...eintrag.fragen.antworten].sort((a, b) => {
             const indexA = eintrag.antwort_reihenfolge.indexOf(a.antwort_id);
@@ -2873,7 +2994,40 @@ export async function getQuizAntwortStatus(
                 antwort: antwort.antwort,
               })),
           };
-        });
+        }).sort(
+          (left, right) =>
+            (questionSequenceIndex.get(left.quiz_fragen_id) ??
+              Number.MAX_SAFE_INTEGER) -
+              (questionSequenceIndex.get(right.quiz_fragen_id) ??
+                Number.MAX_SAFE_INTEGER) ||
+            left.quiz_fragen_id - right.quiz_fragen_id,
+        );
+  const livePollResponseByRunId = new Map(
+    livePollResponses.map((response) => [response.interaction_run_id, response]),
+  );
+  const livePolls = releasedPollRuns
+    .map(({ run, config }) => {
+      const response = livePollResponseByRunId.get(run.interaction_run_id);
+      return {
+        runId: run.interaction_run_id,
+        state: run.state,
+        type: config.type,
+        prompt: config.prompt,
+        options: config.options,
+        response: response
+          ? {
+              selectedOptionId: response.selected_option_id,
+              text: response.original_text,
+            }
+          : null,
+      };
+    })
+    .sort(
+      (left, right) =>
+        (pollSequenceIndex.get(left.runId) ?? Number.MAX_SAFE_INTEGER) -
+          (pollSequenceIndex.get(right.runId) ?? Number.MAX_SAFE_INTEGER) ||
+        left.runId - right.runId,
+    );
 
   const presentationStatusText = liveState.lifecycle === "STOPPED"
     ? "Das Quiz ist beendet"
@@ -2937,6 +3091,8 @@ export async function getQuizAntwortStatus(
         antwortfelder: Object.fromEntries(answer.antwortfelder.map(field => [field.antwortfeld_id, field.antwort_text ?? ""])),
       },
     }]),
+    answerSequence,
+    livePolls,
     fragen,
   };
 }
