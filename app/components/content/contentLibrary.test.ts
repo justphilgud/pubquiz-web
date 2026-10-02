@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  getQuestionStatusesForContentFilter,
   parseContentFilters,
   resolveContentFilterDraft,
   serializeContentFilters,
@@ -49,6 +50,23 @@ test("shared content filters parse and serialize mixed search state", () => {
   const filters = parseContentFilters(new URLSearchParams("q=musik&contentType=ALL&storyType=AUDIO&status=ACTIVE&media=WITH&usage=USED"), "QUESTION");
   assert.deepEqual(filters, { query: "musik", contentType: "ALL", templateId: null, categoryIds: [], storyType: "AUDIO", status: "ACTIVE", questionLifecycle: "ALL", media: "WITH", usage: "USED", eventSeriesId: null });
   assert.equal(serializeContentFilters(filters).toString(), "q=musik&storyType=AUDIO&status=ACTIVE&media=WITH&usage=USED");
+});
+
+test("quiz question discovery shares content status semantics", () => {
+  assert.deepEqual(getQuestionStatusesForContentFilter("ALL"), []);
+  assert.deepEqual(getQuestionStatusesForContentFilter("DRAFT"), ["MY_DRAFTS"]);
+  assert.deepEqual(getQuestionStatusesForContentFilter("ACTIVE"), ["APPROVED"]);
+  assert.deepEqual(getQuestionStatusesForContentFilter("ARCHIVED"), ["ARCHIVED"]);
+
+  const picker = readFileSync(new URL("../../quiz/[quizId]/QuizFragenHinzufuegen.tsx", import.meta.url), "utf8");
+  const actions = readFileSync(new URL("../../quiz/actions.ts", import.meta.url), "utf8");
+  assert.match(picker, /<ContentFilters/);
+  assert.match(picker, /questionTemplates/);
+  assert.match(picker, /questionCategories/);
+  assert.match(picker, /searchResult\.hasMore/);
+  assert.match(actions, /searchFragen\(\{/);
+  assert.match(actions, /getQuestionStatusesForContentFilter/);
+  assert.match(actions, /offset: data\.offset \?\? 0/);
 });
 
 test("question template filter round-trips with text, category and URL state", () => {
@@ -183,6 +201,23 @@ test("shared result row contains common and type-specific metrics", () => {
   const row = readFileSync(new URL("./ContentResultRow.tsx", import.meta.url), "utf8");
   for (const component of ["StatusBadge", "ScopeBadge", "MediaBadge", "UsageSummary", "ContentActions"]) assert.match(row, new RegExp(component));
   for (const metric of ["Antworten", "Schwierigkeit", "Antwortart", "Story-Typ", "Verknüpfte Frage", "Quiz-Verwendungen", "Quelle", "Umfragetyp", "Veröffentlichung"]) assert.match(row, new RegExp(metric));
+  assert.match(row, /QuestionSolutionPreview/);
+  assert.match(row, /Keine kompakte Lösung hinterlegt/);
+});
+
+test("question detail reuses guarded quiz assignment and reports current mappings", () => {
+  const page = readFileSync(new URL("../../fragen/editor/[questionId]/page.tsx", import.meta.url), "utf8");
+  const panel = readFileSync(new URL("./QuestionQuizAssignmentPanel.tsx", import.meta.url), "utf8");
+  const assignment = readFileSync(new URL("./ContentQuizAssignment.tsx", import.meta.url), "utf8");
+  const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
+
+  assert.match(page, /getQuizListe/);
+  assert.match(page, /getAssignableQuestionQuizIds/);
+  assert.match(page, /<QuestionQuizAssignmentPanel/);
+  assert.match(panel, /Aktuelle Quiz-Zuordnungen/);
+  assert.match(panel, /<ContentQuizAssignment/);
+  assert.match(assignment, /assigned\.includes/);
+  assert.match(actions, /addFrageToQuiz/);
 });
 
 test("question, story and poll library assignments persist without a block", () => {

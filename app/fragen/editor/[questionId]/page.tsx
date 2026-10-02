@@ -23,6 +23,10 @@ import { loadPublicQuestionSubmissionReviewMetadata } from "@/app/frage-einreich
 import QuestionStoryElementPanel from "@/app/story-elemente/QuestionStoryElementPanel";
 import { loadQuestionStoryElementPanel } from "@/app/story-elemente/questionStoryElements.server";
 import { getStoryElementEditorOptions } from "@/app/story-elemente/storyElementRepository.server";
+import { getQuizListe } from "@/app/quiz/actions";
+import { getAssignableQuestionQuizIds } from "@/app/components/content/contentQuizEligibility";
+import QuestionQuizAssignmentPanel from "@/app/components/content/QuestionQuizAssignmentPanel";
+import { getBerlinDate } from "@/app/lib/berlinDate";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -92,6 +96,42 @@ export default async function ExistingQuestionEditorPage({
     baseTemplates,
     loadedQuestion.draft.sourceTemplateId,
   );
+  const quizzes = await getQuizListe();
+  const quizOptions = quizzes.filter((quiz) => !quiz.ist_archiviert).map((quiz) => ({
+    quizId: quiz.quiz_id,
+    title: quiz.titel ?? `Quiz #${quiz.quiz_id}`,
+    date: quiz.quiz_datum,
+    eventSeriesId: quiz.eventreihe_id,
+  }));
+  const quizUsages = quizzes.length === 0
+    ? []
+    : await prisma.quiz_fragen.findMany({
+        where: {
+          fragen_id: questionId,
+          quiz_id: { in: quizzes.map((quiz) => quiz.quiz_id) },
+        },
+        orderBy: [{ quiz: { quiz_datum: "desc" } }, { quiz_id: "desc" }],
+        select: {
+          quiz: {
+            select: {
+              quiz_id: true,
+              titel: true,
+              quiz_datum: true,
+              ist_archiviert: true,
+            },
+          },
+        },
+      });
+  const assignableQuizIds = getAssignableQuestionQuizIds(
+    {
+      ...loadedQuestion.access,
+      validUntil: loadedQuestion.draft.validUntil
+        ? new Date(`${loadedQuestion.draft.validUntil}T00:00:00.000Z`)
+        : null,
+    },
+    quizOptions,
+    getBerlinDate(),
+  );
 
   return (
     <>
@@ -126,6 +166,18 @@ export default async function ExistingQuestionEditorPage({
         apiKey: process.env.GOOGLE_MAPS_API_KEY,
         explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
       })}
+    />
+    <QuestionQuizAssignmentPanel
+      questionId={questionId}
+      quizzes={quizOptions}
+      usages={quizUsages.map(({ quiz }) => ({
+        quizId: quiz.quiz_id,
+        title: quiz.titel ?? `Quiz #${quiz.quiz_id}`,
+        date: quiz.quiz_datum?.toISOString().slice(0, 10) ?? null,
+        archived: quiz.ist_archiviert,
+      }))}
+      assignableQuizIds={assignableQuizIds}
+      disabled={loadedQuestion.access.isArchived}
     />
     <QuestionStoryElementPanel
       questionId={questionId}
