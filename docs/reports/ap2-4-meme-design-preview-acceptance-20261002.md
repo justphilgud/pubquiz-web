@@ -7,6 +7,8 @@ Stand: 2. Oktober 2026
 - Branch: `codex/ap2-4-meme-design-webex`
 - PR: [#83](https://github.com/justphilgud/pubquiz-web/pull/83)
 - funktionaler Preview-SHA: `d1d3c20e3b9bde0be7c4d534fc0dac1d9b17ad2c`
+- geprüfter PR-Head vor der Release-Dokumentation:
+  `e41e8abc24b5b0e6caae5b03f98cb092fea4d028`
 - Preview: <https://pubquiz-hflysdq96-just-phil-gud.vercel.app>
 - Vercel-Deployment: `dpl_C6A9UULHhNtxYxRwGn6PF89hMiof`
 - primäres Testquiz: [#77 – TEST – AP2–4 Meme Voting 02.10.2026](https://pubquiz-hflysdq96-just-phil-gud.vercel.app/quiz/77)
@@ -16,6 +18,17 @@ Stand: 2. Oktober 2026
 Die Funktionsabnahme erfolgte mit drei getrennten Preview-Teams. A und B hatten
 je ein ausgewähltes Meme, C kein eigenes Meme. Es wurden keine Production-Daten
 gelesen, verändert oder kopiert.
+
+## Vergleich Funktions-SHA zu PR-Head
+
+Der vollständige Git-Vergleich
+`d1d3c20e3b9bde0be7c4d534fc0dac1d9b17ad2c..e41e8abc24b5b0e6caae5b03f98cb092fea4d028`
+enthält genau eine neue Datei: diesen Abnahmebericht mit 117 Zeilen. Es gibt
+keine weitere Änderung an Produktcode, Tests, Konfiguration, Abhängigkeiten oder
+Migrationen. Der auf Preview funktional geprüfte Stand ist damit unverändert;
+eine erneute fachliche Preview-Abnahme wegen des SHA-Unterschieds war nicht
+erforderlich. Die ergänzten visuellen Release-Nachweise verwenden dieselben
+Produktkomponenten und Styles.
 
 ## Status je Finding
 
@@ -54,25 +67,42 @@ Erfasste Browserbilder in der gemeinsamen Codex-Browsersitzung:
   Presentation-Quality-Preview,
 - Pixel-Referenz im Komm.ONE-Design.
 
-Screenshot-Lücken: Die eingesetzte In-App-Browsersteuerung begrenzte das
-interaktive Viewport auf mindestens 1280×720; ein zusätzlicher echter
-390-Pixel-Preview-Screenshot konnte deshalb nicht erzeugt werden. Die
-Teilnehmerfunktion wurde dennoch mit getrennten Browserkontexten geprüft, und
-die vorhandenen Browser-/Komponententests decken das responsive Layout ab. Für
-die Wahr/Falsch-Auflösung mit `false` als korrekter Lösung existiert ein
-Renderer-Nachweis im echten Markup, aber kein eigener Preview-Screenshot, weil
-das isolierte Testquiz keine Wahr/Falsch-Frage enthielt. Beide Lücken betreffen
-nur die Bilddokumentation; die jeweilige Semantik ist automatisiert geprüft.
+Die Teilnehmeransicht wurde zusätzlich auf der echten Preview mit einem
+expliziten Viewport von 390×844 Pixeln geprüft. Das Dokument meldete
+`innerWidth = 390`, `scrollWidth = clientWidth = 375`; es gab daher keinen
+horizontalen Overflow. Der folgende reproduzierbare Nachweis rendert die echte
+`MemeVotingPanel`-Komponente mit den produktiven Styles bei derselben Breite.
 
-In der Teilnehmer- und Adminansicht trat einmalig der bereits bekannte React-
-Hydration-Hinweis `#418` beim Wiederherstellen des clientseitigen Teamkontexts
-auf. Nach der Hydrierung war die Ansicht korrekt und sämtliche Aktionen
-funktionierten. Präsentations- und Designreferenz erzeugten keine neuen
-Browserfehler.
+![Teilnehmeransicht mit Meme-Wahl bei 390×844](assets/ap2-4-release-20261002/participant-meme-voting-390x844.png)
+
+Für Wahr/Falsch wurden beide fachlich möglichen Auflösungszustände mit dem
+echten `PresentationSlideRenderer` und dem Komm.ONE-Theme bei 1280×720 gerendert.
+Die korrekte Markierung folgt dem gespeicherten `correctAnswer`; sie ist nicht
+an die linke oder rechte Position gebunden.
+
+![Wahr ist die korrekte Antwort](assets/ap2-4-release-20261002/true-false-solution-true-1280x720.png)
+
+![Falsch ist die korrekte Antwort](assets/ap2-4-release-20261002/true-false-solution-false-1280x720.png)
+
+Die drei geforderten Bildnachweise sind damit vollständig. Es wurde kein
+visueller Produktfehler gefunden und deshalb kein Produktcode geändert.
+
+In der Teilnehmer- und Adminansicht trat der bereits vor diesem Patch
+dokumentierte React-Hydration-Hinweis `#418` beim Wiederherstellen des
+clientseitigen Kontexts auf. Die frühere AP2-Abnahme führt die bestehende
+zeitabhängige Initialisierung in `ModerationClient` als Ursache auf. Der
+Vergleich gegen `origin/main` bestätigt, dass PR #83 weder
+`ModerationClient.tsx` noch `QuizAntwortClient.tsx` verändert. Der Hinweis ist
+damit nicht durch diesen Patch entstanden; nach der Hydrierung waren Ansicht
+und Aktionen korrekt. Präsentations- und Designreferenz erzeugten keine neuen
+Browserfehler. Eine fachfremde Hydration-Änderung wurde nicht in PR #83
+aufgenommen.
 
 ## Qualitätssicherung
 
 - gezielte AP2/AP3-Regressionen: **52/52 grün**
+- abschließende Release-Regression für Meme, Wahr/Falsch und Renderer:
+  **32/32 grün**
 - echte Chrome-Kontrastmessung für Meme, offene Ergebnisse und neutrale
   Wahr/Falsch-Optionen: **grün**
 - vollständige lokale Suite: **687/688 grün**; ausschließlich der bekannte
@@ -84,6 +114,9 @@ Browserfehler.
 - ESLint für alle geänderten Dateien: **grün**
 - Production-Build: **grün**
 - `git diff --check`: **grün**
+- Merge-Basis: aktuelles `origin/main`
+  `fcb333f9dd39ebf0208ea3bd4622d7b17f1561d0`; PR vor der abschließenden
+  Dokumentations-CI **CLEAN**
 
 ## Architektur
 
