@@ -34,8 +34,8 @@ export function FactsPresentation({ question, facts, options }: Props) {
   }, [facts, options, twoColumns, dense]);
   return <div ref={container} data-facts-presentation className="presentation-question-card flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-8">
     <h2 className="shrink-0 break-words text-4xl font-bold leading-tight text-white">{question}</h2>
-    <ol ref={list} className={`mt-4 grid min-h-0 flex-1 auto-rows-fr gap-x-6 overflow-auto text-white ${dense ? "gap-y-1" : "gap-y-3"} ${twoColumns ? "grid-cols-2" : "grid-cols-1"}`} style={{ fontSize: 36, lineHeight: dense ? 1.15 : 1.25 }}>
-      {facts.map((fact, index) => <li key={fact.id} className={`flex min-h-0 items-start gap-3 border-t border-white/20 ${dense ? "pt-1" : "pt-3"}`}>
+    <ol ref={list} className={`mt-4 grid min-h-0 flex-1 gap-x-6 overflow-auto text-white ${dense ? "gap-y-1" : "gap-y-3"} ${twoColumns ? "grid-cols-2" : "grid-cols-1"}`} style={{ fontSize: 36, lineHeight: dense ? 1.15 : 1.25 }}>
+      {facts.map((fact, index) => <li key={fact.id} className={`flex min-h-0 items-start gap-3 border-t border-white/20 ${dense ? "pt-1" : "pt-3"} ${dense && twoColumns && facts.length % 2 === 1 && index === facts.length - 1 ? "col-span-2" : ""}`}>
         <span aria-hidden="true" className="shrink-0 font-semibold text-yellow-200">{index + 1}.</span>
         <span className="min-w-0 whitespace-pre-line break-words [overflow-wrap:anywhere]">{fact.text}</span>
       </li>)}
