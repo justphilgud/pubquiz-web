@@ -5,6 +5,7 @@
 import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
+import { FactsPresentation } from "./FactsPresentation";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
 import { SponsorMoment } from "./SponsorMoment";
 import { BookingSlide } from "./BookingSlide";
@@ -614,6 +615,10 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     : livePixelMedium
       ? [livePixelMedium]
       : [];
+  if (templateData?.kind === "FACTS") {
+    return <FactsPresentation question={frage.frage} facts={templateData.facts} options={hatAntwortmoeglichkeiten
+      ? frage.antworten.map((answer) => ({ id: answer.antwort_id, text: answer.antwort })) : []} />;
+  }
   const storybookKind = resolveStorybookQuestionKind(frage);
   const isFaceMorph =
     frage.presentationLayouts.question.contentRole === "FACE_MORPH";

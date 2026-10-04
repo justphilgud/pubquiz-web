@@ -176,6 +176,13 @@ export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation
     };
   }
 
+  if (templateId === questionTemplateIds.factsYear || templateId === questionTemplateIds.factsCountry) {
+    const maximum = new Prisma.Decimal(1);
+    if (!hasText(input.answerText)) return unanswered(maximum, "EXACT_OPEN_ANSWER");
+    const correct = input.answerOptions.some((option) => option.isCorrect && option.text === input.answerText);
+    return { basePoints: correct ? maximum : ZERO, maxPoints: maximum, status: correct ? "CORRECT" : "WRONG", details: { strategy: "EXACT_OPEN_ANSWER" } };
+  }
+
   if (templateId === questionTemplateIds.ordering) {
     return evaluateOrdering(input);
   }

@@ -349,6 +349,21 @@ export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
     generators: [],
     contentGenerators: [],
   },
+  { id: questionTemplateIds.factsYear, icon: "list-checks", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false, answerMode: "NUMBER",
+    evaluationMode: "EXACT_MATCH", editorKind: "FACTS", presentationKind: "FACTS", answerFormKind: "FACTS",
+    translationKey: "factsYear", questionLabelKey: "question", allowsOptionalQuestionImage: false,
+    initialAnswers: [{ isCorrect: true }], mediaSlots: [], generators: [], contentGenerators: [] },
+  { id: questionTemplateIds.factsCountry, icon: "list-checks", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false, answerMode: "OPEN_TEXT",
+    evaluationMode: "EXACT_MATCH", editorKind: "FACTS", presentationKind: "FACTS", answerFormKind: "FACTS",
+    translationKey: "factsCountry", questionLabelKey: "question", allowsOptionalQuestionImage: false,
+    initialAnswers: [{ isCorrect: true }], mediaSlots: [], generators: [], contentGenerators: [] },
+  { id: questionTemplateIds.factsText, icon: "list-checks", enabled: true, selectable: true,
+    availableForFiltering: true, requiresAnswerImages: false, answerMode: "OPEN_TEXT",
+    evaluationMode: "EXACT_MATCH", editorKind: "FACTS", presentationKind: "FACTS", answerFormKind: "FACTS",
+    translationKey: "factsText", questionLabelKey: "question", allowsOptionalQuestionImage: false,
+    initialAnswers: [{ isCorrect: true }], mediaSlots: [], generators: [], contentGenerators: [] },
 ];
 
 export const questionTemplateContractRegistry =

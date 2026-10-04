@@ -1,3 +1,4 @@
+import { defaultFacts, factsResponse, parseFacts, factsAnswers } from "./factsTemplate";
 import type {
   QuestionAnswerDraft,
   QuestionTemplateData,
@@ -82,6 +83,8 @@ const defaults: Record<string, QuestionTemplateData> = {
 export function getDefaultQuestionTemplateData(
   templateId: string | null,
 ): QuestionTemplateData | undefined {
+  const response = factsResponse(templateId);
+  if (response) return defaultFacts(response);
   const value = templateId ? defaults[templateId] : undefined;
   return value ? structuredClone(value) : undefined;
 }
@@ -107,6 +110,7 @@ export const ANAGRAM_WORD_COUNT_PREFERENCES = ["AUTO", "2", "3", "4", "5", "ANY"
 
 export type QuestionTemplateValidationIssue = {
   code:
+    | "FACTS_INVALID"
     | "ESTIMATE_UNIT_REQUIRED"
     | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
     | "GOOGLE_PLACE_REVIEW_COUNT_INVALID"
@@ -164,6 +168,10 @@ export function getQuestionTemplateValidationIssue(
   value: unknown,
   templateId: string | null,
 ): QuestionTemplateValidationIssue | null {
+  const response = factsResponse(templateId);
+  if (response && parseFacts(value, response, false) === null) return {
+    code: "FACTS_INVALID", field: "answers", message: "Bitte pflege 2 bis 7 nicht leere Fakten und eine gültige Lösungskonfiguration.",
+  };
   if (
     templateId === questionTemplateIds.pollScale &&
     parseQuestionTemplateData(value, templateId, true) === null
@@ -245,6 +253,8 @@ export function parseQuestionTemplateData(
   templateId: string | null,
   complete: boolean,
 ): QuestionTemplateData | undefined | null {
+  const response = factsResponse(templateId);
+  if (response && value !== undefined) return parseFacts(value, response, complete);
   const expected = getDefaultQuestionTemplateData(templateId);
   if (!expected) return value === undefined ? undefined : null;
   if (value === undefined) return expected;
@@ -746,6 +756,7 @@ export function getAnswersForTemplateData(
     additionalInfo: "",
     media: null,
   });
+  if (data.kind === "FACTS") return factsAnswers(data, current);
   if (data.kind === "TRUE_FALSE") {
     return [base(0, "Wahr", data.correctAnswer), base(1, "Falsch", !data.correctAnswer)];
   }

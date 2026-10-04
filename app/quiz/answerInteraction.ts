@@ -45,6 +45,7 @@ export type ResolvedQuizAnswerInteraction =
       multiline: true;
       inputMode: "text";
       placeholder: string;
+      selection?: "COUNTRY";
     }
   | {
       type: "STRUCTURED_TEXT";
@@ -57,6 +58,7 @@ export type ResolvedQuizAnswerInteraction =
       inputMode: "decimal";
       step: number | "any";
       unit: string;
+      selection?: "YEAR";
     }
   | {
       type: "SINGLE_CHOICE";
@@ -206,6 +208,7 @@ export function resolveQuizAnswerInteraction(
       multiline: answerForm.multiline,
       inputMode: answerForm.inputMode,
       placeholder: "Antwort eintragen...",
+      ...(input.templateData?.kind === "FACTS" && input.templateData.response === "COUNTRY" ? { selection: "COUNTRY" as const } : {}),
     };
   }
   if (answerForm.type === "STRUCTURED_TEXT") {
@@ -232,6 +235,7 @@ export function resolveQuizAnswerInteraction(
           ? 1
           : "any",
       unit: estimateData?.unit ?? "",
+      ...(input.templateData?.kind === "FACTS" && input.templateData.response === "YEAR" ? { selection: "YEAR" as const } : {}),
     };
   }
   if (answerForm.type === "SINGLE_CHOICE") {

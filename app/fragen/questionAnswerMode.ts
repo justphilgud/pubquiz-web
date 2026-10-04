@@ -12,6 +12,8 @@ export type DerivedQuestionAnswerMode =
   | "UNCLASSIFIED";
 
 const openSpecialTemplateIds = [
+  questionTemplateIds.factsYear,
+  questionTemplateIds.factsCountry,
   questionTemplateIds.faceMorph,
   questionTemplateIds.artwork,
   questionTemplateIds.musicReverse,
@@ -79,6 +81,7 @@ export function getQuestionAnswerMode({
   ) {
     return "CLOSED";
   }
+  if (canonicalTemplateId === questionTemplateIds.factsText) return answers.some((answer) => !answer.isCorrect) ? "CLOSED" : "OPEN";
   if (canonicalTemplateId !== null) return "UNCLASSIFIED";
 
   return answers.some((answer) => !answer.isCorrect)
@@ -111,7 +114,7 @@ export function getQuestionAnswerModeWhereInput(
         },
         {
           AND: [
-            standardQuestion,
+            { OR: [standardQuestion, { vorlage: { code: questionTemplateIds.factsText } }] },
             { antworten: { some: { ist_richtig: false } } },
           ],
         },
@@ -130,7 +133,7 @@ export function getQuestionAnswerModeWhereInput(
       },
       {
         AND: [
-          standardQuestion,
+          { OR: [standardQuestion, { vorlage: { code: questionTemplateIds.factsText } }] },
           { antworten: { none: { ist_richtig: false } } },
         ],
       },

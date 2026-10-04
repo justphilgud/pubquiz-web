@@ -714,6 +714,17 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     throw new DraftValidationError("Die Anzeigedauern der Pixelstufen sind ungültig.", "questionMedia");
   }
 
+  if (templateConfig.templateData?.kind === "FACTS") {
+    const data = templateConfig.templateData;
+    const expected = data.response === "TEXT" && data.options.length
+      ? data.options.map((option) => ({ text: option.text.trim(), isCorrect: option.isCorrect }))
+      : [data.solution, ...(data.response === "TEXT" ? data.acceptedVariants : [])].map((text) => ({ text: text.trim(), isCorrect: true }));
+    if (answers.length !== expected.length || answers.some((answer, index) =>
+      answer.text !== expected[index].text || answer.isCorrect !== expected[index].isCorrect || answer.fieldGroupId || answer.media)) {
+      throw new DraftValidationError("Fakten-Lösung und Antwortdaten stimmen nicht überein.", "answers");
+    }
+  }
+
   const validUntil = parseValidUntil(
     payload.validUntil,
     requiresCompleteQuestion,
