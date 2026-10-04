@@ -1,3 +1,5 @@
+import { countryName } from "@/app/lib/countries";
+
 export type QuestionSolutionPreview = {
   label: "Richtige Lösung" | "Richtige Lösungen";
   values: string[];
@@ -25,10 +27,11 @@ function uniqueNonEmpty(values: readonly string[]) {
 
 export function buildQuestionSolutionPreview(input: {
   classicAnswers: readonly ClassicAnswer[];
+  templateId?: string | null;
   structuredFields: readonly StructuredAnswerField[];
 }): QuestionSolutionPreview | null {
   const classicSolutions = uniqueNonEmpty(
-    input.classicAnswers.flatMap((answer) => answer.isCorrect ? [answer.text] : []),
+    input.classicAnswers.flatMap((answer) => answer.isCorrect ? [input.templateId === "fakten_land" ? countryName(answer.text) : answer.text] : []),
   );
   const structuredSolutions = uniqueNonEmpty(
     input.structuredFields.flatMap((field) =>
