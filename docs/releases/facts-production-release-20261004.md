@@ -1,6 +1,6 @@
 # Fakten-Templates: vorbereiteter Production-Release
 
-Stand: 4. Oktober 2026. Vorbereitung בלבד: kein Merge, kein Production-Deployment, keine Production-Testdaten und keine Bereinigung ausgeführt. Vor jeder Ausführung ist die ausdrückliche Betreiberfreigabe erforderlich.
+Stand: 4. Oktober 2026. Nur Vorbereitung: kein Merge, kein Production-Deployment, keine Production-Testdaten und keine Bereinigung ausgeführt. Vor jeder Ausführung ist die ausdrückliche Betreiberfreigabe erforderlich.
 
 ## Scope und Revisionen
 
