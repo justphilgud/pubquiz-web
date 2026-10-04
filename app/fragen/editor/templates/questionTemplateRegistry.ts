@@ -1,4 +1,7 @@
 export const questionTemplateIds = {
+  factsYear: "fakten_jahr",
+  factsCountry: "fakten_land",
+  factsText: "fakten_frei",
   standard: "standard",
   multipleChoice: "multiple_choice",
   faceMorph: "face_morph",

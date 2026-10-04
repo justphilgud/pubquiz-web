@@ -77,6 +77,9 @@ export const deQuestionEditorMessages = {
     ordering: { name: "Reihenfolge", description: "Begriffe werden in die fachlich richtige Reihenfolge gebracht.", defaultQuestion: "" },
     translationReadAloud: { name: "Übersetzt vorgelesen", description: "Original, Übersetzung und Audio bleiben getrennt bearbeitbar.", defaultQuestion: "Welcher Songtext wurde hier übersetzt?" },
     anagram: { name: "Anagramm", description: "Ein Name wird aus denselben Buchstaben neu angeordnet.", defaultQuestion: "Welcher Name verbirgt sich hinter diesem Anagramm?" },
+    factsYear: { name: "Fakten → Jahr", description: "Textuelle Fakten führen zu einer Jahreszahl.", defaultQuestion: "Welches Jahr wird gesucht?" },
+    factsCountry: { name: "Fakten → Land", description: "Textuelle Fakten führen zu einem Land.", defaultQuestion: "Welches Land wird gesucht?" },
+    factsText: { name: "Fakten → freie Antwort", description: "Textuelle Fakten mit freier Antwort oder sichtbaren Auswahloptionen.", defaultQuestion: "Welche Lösung wird gesucht?" },
     googleReviews: { name: "Google-Rezensionen", description: "Manuell gepflegte Rezensionen führen schrittweise zu einem gesuchten Ort.", defaultQuestion: "Welcher Ort wird in diesen Rezensionen beschrieben?" },
     pollSingle: { name: "Umfrage: eine Auswahl", description: "Teams wählen genau eine Option; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
     pollMulti: { name: "Umfrage: mehrere Auswahlen", description: "Teams können mehrere Optionen wählen; es gibt keine richtige Antwort und keine Punkte.", defaultQuestion: "" },
@@ -257,6 +260,7 @@ export const deQuestionEditorMessages = {
     openDraftActions: "Entwurf-Aktionen öffnen", requestChanges: "Zur Überarbeitung zurückgeben",
   },
   quality: {
+    FACTS_INVALID: "Bitte pflege 2 bis 7 nicht leere Fakten und eine gültige Lösungskonfiguration.",
     QUESTION_TEXT_REQUIRED: "Fragetext fehlt", TEMPLATE_MEDIA_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_REQUIRED: "{label} fehlt oder ist nicht verwendbar", MEDIA_SLOT_TYPE_MISMATCH: "{label} besitzt den falschen Medientyp", MEDIA_SLOT_CONFLICT: "{label} ist widersprüchlich zugeordnet", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} enthält zu viele Medien", MEDIA_UPLOAD_IN_PROGRESS: "Der Upload für {label} läuft noch", MEDIA_UPLOAD_FAILED: "Der Upload für {label} ist fehlgeschlagen", MEDIA_OWNER_INVALID: "{label} besitzt keine eindeutige Zuordnung", CORRECT_ANSWER_REQUIRED: "Keine ausgefüllte richtige Antwort vorhanden", POLL_OPTIONS_REQUIRED: "Mindestens zwei ausgefüllte Umfrageoptionen sind erforderlich", POLL_SCALE_INVALID: "Skala, Schrittweite und Beschriftungen müssen vollständig und gültig sein", ANSWER_MEDIA_REQUIRED: "Für FaceMorph sind beide Antwortbilder erforderlich",
     REQUIRED_LABELED_ANSWER_EMPTY: "Ein erforderliches beschriftetes Antwortfeld ist leer", VALID_UNTIL_INVALID: "Ablaufdatum ist unvollständig oder ungültig", REVIEW_FROM_INVALID: "Prüfdatum ist unvollständig oder ungültig", LIFECYCLE_DATE_CONFLICT: "Es kann nur ein Aktualitätsmodus aktiv sein",
     LABELED_ANSWERS_INCONSISTENT: "Beschriftete Antwortdaten sind technisch inkonsistent", SOURCE_MISSING: "Quelle fehlt", CATEGORY_MISSING: "Kategorie fehlt",

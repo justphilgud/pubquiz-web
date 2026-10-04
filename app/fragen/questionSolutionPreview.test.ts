@@ -54,3 +54,9 @@ test("solution preview stays compact and does not invent a special-template answ
   });
   assert.equal(buildQuestionSolutionPreview({ classicAnswers: [], structuredFields: [] }), null);
 });
+
+ test("country facts preview displays the country name while preserving classic answers", () => {
+  const answers = [{ text: "CH", isCorrect: true }];
+  assert.deepEqual(buildQuestionSolutionPreview({ templateId: "fakten_land", classicAnswers: answers, structuredFields: [] })?.values, ["Schweiz"]);
+  assert.deepEqual(buildQuestionSolutionPreview({ templateId: "standard", classicAnswers: answers, structuredFields: [] })?.values, ["CH"]);
+ });

@@ -1,3 +1,4 @@
+import { countryName } from "@/app/lib/countries";
 import type {
   QuestionAnswerMode,
   QuestionEvaluationMode,
@@ -58,6 +59,9 @@ export function buildQuestionTemplateRuntimeModel(input: {
     ...(data ? { templateData: data } : {}),
   };
 
+  if (data?.kind === "FACTS") {
+    return { ...base, solutionLines: [data.response === "COUNTRY" ? countryName(data.solution) : data.options.length ? data.options.find((option) => option.isCorrect)?.text ?? "" : data.solution] };
+  }
   if (data?.kind === "TRUE_FALSE") {
     return { ...base, solutionLines: [data.correctAnswer ? "Wahr" : "Falsch", data.explanation].filter(Boolean) };
   }

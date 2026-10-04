@@ -16,6 +16,7 @@ import { normalizeQuestionTemplateConfig } from "./pixelTemplateConfig";
 import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 
 export type QuestionQualityIssueCode =
+  | "FACTS_INVALID"
   | "QUESTION_TEXT_REQUIRED"
   | "TEMPLATE_MEDIA_REQUIRED"
   | "MEDIA_SLOT_REQUIRED"

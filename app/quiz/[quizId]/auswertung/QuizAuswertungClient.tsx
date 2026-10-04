@@ -1,5 +1,6 @@
 "use client";
 
+import { countryName } from "@/app/lib/countries";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -654,7 +655,7 @@ export default function QuizAuswertungClient({
                       </td>
 
                       <td className="max-w-xs px-4 py-3 font-semibold text-green-900">
-                        {antwort.richtigeAntwort}
+                        {antwort.templateId === "fakten_land" ? countryName(antwort.richtigeAntwort) : antwort.richtigeAntwort}
                       </td>
 
                       <td className="max-w-xs px-4 py-3 font-semibold text-slate-900">
@@ -662,9 +663,9 @@ export default function QuizAuswertungClient({
                           ? "-"
                           : antwort.istUnbeantwortet
                           ? "-"
-                          : antwort.antwortText ??
-                            antwort.ausgewaehlteAntwort ??
-                            "-"}
+                          : antwort.templateId === "fakten_land"
+                            ? countryName(antwort.antwortText ?? antwort.ausgewaehlteAntwort ?? "-")
+                            : antwort.antwortText ?? antwort.ausgewaehlteAntwort ?? "-"}
                         {!antwort.istNichtGespielt && !antwort.istUnbeantwortet && (
                           <div className="mt-1 text-xs font-normal text-slate-500">
                             {antwort.antwortQuelle === "LEGACY"
