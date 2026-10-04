@@ -41,6 +41,9 @@ export const enQuestionEditorMessages = {
     ordering: { name: "Ordering", description: "Put terms into the correct order.", defaultQuestion: "" },
     translationReadAloud: { name: "Translated and read aloud", description: "Keep original text, translation and audio separately editable.", defaultQuestion: "Which song lyrics were translated here?" },
     anagram: { name: "Anagram", description: "Rearrange a name using exactly the same letters.", defaultQuestion: "Which name is hidden in this anagram?" },
+    factsYear: { name: "Fakten → Jahr", description: "Textuelle Fakten führen zu einer Jahreszahl.", defaultQuestion: "Welches Jahr wird gesucht?" },
+    factsCountry: { name: "Fakten → Land", description: "Textuelle Fakten führen zu einem Land.", defaultQuestion: "Welches Land wird gesucht?" },
+    factsText: { name: "Fakten → freie Antwort", description: "Textuelle Fakten mit freier Antwort oder sichtbaren Auswahloptionen.", defaultQuestion: "Welche Lösung wird gesucht?" },
     googleReviews: { name: "Google reviews", description: "Manually curated reviews reveal a place step by step.", defaultQuestion: "Which place is described by these reviews?" },
     pollSingle: { name: "Poll: single choice", description: "Teams select exactly one option; there is no correct answer and no score.", defaultQuestion: "" },
     pollMulti: { name: "Poll: multiple choice", description: "Teams may select multiple options; there is no correct answer and no score.", defaultQuestion: "" },
@@ -128,6 +131,7 @@ export const enQuestionEditorMessages = {
   save: { saving: "Saving …", saveQuestion: "Save question", saveDraft: "Save draft", saveDraftAndNew: "Save draft & new question", submit: "Submit for review", approve: "Approve question", saveAndApprove: "Save and approve" },
   review: { statuses: { DRAFT: "Draft", IN_REVIEW: "In review", CHANGES_REQUESTED: "Changes requested", APPROVED: "Approved" }, quality: "Quality review", blockers: "Blocking criteria", warnings: "Warnings" },
   quality: {
+    FACTS_INVALID: "Bitte pflege 2 bis 7 nicht leere Fakten und eine gültige Lösungskonfiguration.",
     QUESTION_TEXT_REQUIRED: "Question text is missing", TEMPLATE_MEDIA_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_TYPE_MISMATCH: "{label} has the wrong media type", MEDIA_SLOT_CONFLICT: "{label} has a conflicting assignment", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} contains too many media items", MEDIA_UPLOAD_IN_PROGRESS: "The upload for {label} is still running", MEDIA_UPLOAD_FAILED: "The upload for {label} failed", MEDIA_OWNER_INVALID: "{label} has no unique owner", CORRECT_ANSWER_REQUIRED: "No completed correct answer is available", POLL_OPTIONS_REQUIRED: "At least two completed poll options are required", POLL_SCALE_INVALID: "Scale, step and labels must be complete and valid", ANSWER_MEDIA_REQUIRED: "Both FaceMorph answer images are required",
     REQUIRED_LABELED_ANSWER_EMPTY: "A required labelled answer field is empty", VALID_UNTIL_INVALID: "The expiry date is incomplete or invalid", REVIEW_FROM_INVALID: "The review date is incomplete or invalid", LIFECYCLE_DATE_CONFLICT: "Only one freshness mode can be active",
     LABELED_ANSWERS_INCONSISTENT: "Labelled answer data is technically inconsistent", SOURCE_MISSING: "Source is missing", CATEGORY_MISSING: "Category is missing",

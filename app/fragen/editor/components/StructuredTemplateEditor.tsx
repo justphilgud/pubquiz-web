@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ComponentType } from "react";
+import { FactsTemplateEditor } from "./FactsTemplateEditor";
 import { CharacterCount } from "./CharacterCount";
 import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import { templatePresentationTexts } from "@/app/rendering/presentation/presentationReadability";
@@ -617,6 +618,7 @@ function MemeCaptionEditor() {
 }
 
 const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorProps>>> = {
+  FACTS: FactsTemplateEditor,
   TRUE_FALSE: TrueFalseEditor,
   ESTIMATE: EstimateEditor,
   ORDERING: OrderingEditor,

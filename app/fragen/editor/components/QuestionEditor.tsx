@@ -1068,7 +1068,7 @@ export function QuestionEditor({
             data={draft.templateConfig.templateData}
             answers={draft.answers}
             disabled={isEditorDisabled}
-            validationError={fieldError?.target?.startsWith("template")
+            validationError={(selectedTemplate.editorKind === "FACTS" && fieldError?.target === "answers") || fieldError?.target?.startsWith("template")
               ? fieldError.text
               : null}
             validationTarget={fieldError?.target}
