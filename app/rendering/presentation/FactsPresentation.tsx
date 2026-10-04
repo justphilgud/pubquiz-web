@@ -17,7 +17,9 @@ export function FactsPresentation({ question, facts, options }: Props) {
       const minimum = 22 * scale;
       let size = 44 * scale;
       content.style.fontSize = `${size}px`;
-      while (size > minimum && content.scrollHeight > content.clientHeight + 1) {
+      const overflows = () => content.scrollHeight > content.clientHeight + 1 ||
+        Array.from(content.children).some((item) => item.scrollHeight > item.clientHeight + 1);
+      while (size > minimum && overflows()) {
         size = Math.max(minimum, size - scale);
         content.style.fontSize = `${size}px`;
       }
