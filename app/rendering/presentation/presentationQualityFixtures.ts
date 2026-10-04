@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro"] as const;
+export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -60,6 +60,22 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
       { antwort_id: 2, antwort: "Falsch", ist_richtig: false, antworttyp: "Text", medien: [] },
     ];
     question.frage = "Wahr oder falsch: Digitale Verwaltungsleistungen können Kommunen gemeinsam bereitstellen.";
+  }
+  if (scenario.startsWith("facts")) {
+    const count = scenario === "facts2" ? 2 : 7;
+    const sample = "Dieser Hinweis beschreibt ein historisches Ereignis, eine geografische Besonderheit oder eine bekannte Person. Alle Hinweise gehören zur selben gesuchten Lösung und sind in ihrer gespeicherten Reihenfolge zu lesen. ";
+    question.templateId = scenario === "facts-choice" ? questionTemplateIds.factsText : questionTemplateIds.factsYear;
+    question.frage = "Welches Jahr wird gesucht?";
+    question.templateConfig = {
+      stageDurationsSeconds: { stage3: 15, stage2: 15, stage1: 15 },
+      createPixelQuestionByAnswer: { answer1: false, answer2: false },
+      templateData: { kind: "FACTS", response: scenario === "facts-choice" ? "TEXT" : "YEAR", solution: "1994", acceptedVariants: [],
+        facts: Array.from({ length: count }, (_, index) => ({ id: `fact-${index}`, text: scenario === "facts7-long" ? `${index + 1}. ${sample}${sample}`.slice(0, 300) : ["Deutschland wird Fußball-Weltmeister.", "Nelson Mandela wird Präsident Südafrikas.", "Der Eurotunnel wird eröffnet.", "Kurt Cobain stirbt.", "Die erste PlayStation erscheint in Japan.", "Der Film Forrest Gump kommt ins Kino.", "Das World Wide Web Consortium wird gegründet."][index] })),
+        options: scenario === "facts-choice" ? ["1994", "1995", "1996", "1997"].map((text, index) => ({ id: String(index), text, isCorrect: index === 0 })) : [],
+      },
+    };
+    question.effektiver_antwortmodus = scenario === "facts-choice" ? "CLOSED" : "OPEN";
+    question.antworten = ["1994", ...(scenario === "facts-choice" ? ["1995", "1996", "1997"] : [])].map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
   }
   if (scenario === "estimate") {
     question.templateId = questionTemplateIds.estimate;

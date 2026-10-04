@@ -314,6 +314,12 @@ function contentFieldsForDefinition(
         }];
   }
 
+  if (definition.editorKind === "FACTS") {
+    return [prompt, solution, {
+      key: "facts", type: "STRING_LIST", cardinality: "MANY", requiredAt: "ON_SAVE", ownership: "CONTENT_ITEM",
+      validationRules: [{ type: "MIN_ITEMS", value: 2 }, { type: "MAX_ITEMS", value: 7 }],
+    }];
+  }
   if (definition.editorKind === "ESTIMATE") {
     return [
       prompt,
@@ -457,7 +463,8 @@ export function resolveLegacyQuestionTemplateContract(
     interaction === "MULTI_CHOICE" ||
     interaction === "ORDER";
   const supportsTextFallback = interaction === "STRUCTURED_TEXT";
-  const evaluation = evaluationFromQuestionDefinition(
+  const supportsFactsChoice = definition.id === questionTemplateIds.factsText;
+  const evaluation = definition.id === questionTemplateIds.factsYear ? "EXACT_NUMERIC" : evaluationFromQuestionDefinition(
     definition.evaluationMode,
     interaction,
   );
@@ -550,11 +557,12 @@ export function resolveLegacyQuestionTemplateContract(
       defaultType: interaction,
       allowedTypes: supportsTextOverride || supportsTextFallback
         ? [interaction, "TEXT"]
-        : [interaction],
+        : supportsFactsChoice ? [interaction, "SINGLE_CHOICE"] : [interaction],
       required: true,
       quizOverrideAllowed: supportsTextOverride,
       answerForms: [
         answerFormDefinition(interaction),
+        ...(supportsFactsChoice ? [answerFormDefinition("SINGLE_CHOICE")] : []),
         ...(supportsTextOverride || supportsTextFallback
           ? [answerFormDefinition("TEXT")]
           : []),
@@ -566,7 +574,7 @@ export function resolveLegacyQuestionTemplateContract(
       defaultType: evaluation,
       allowedTypes: supportsTextOverride || supportsTextFallback
         ? unique([evaluation, "MANUAL", "NORMALIZED_TEXT_MATCH"])
-        : [evaluation],
+        : supportsFactsChoice ? [evaluation, "CHOICE_MATCH"] : [evaluation],
     },
     reveal: {
       supported: false,

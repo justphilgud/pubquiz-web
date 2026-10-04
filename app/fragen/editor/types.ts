@@ -23,6 +23,7 @@ export type QuestionEvaluationMode =
   | "NONE";
 
 export type QuestionTemplateSurfaceKind =
+  | "FACTS"
   | "STANDARD"
   | "TRUE_FALSE"
   | "ESTIMATE"
@@ -43,6 +44,14 @@ export type AnagramWordCountPreference =
   | "ANY";
 
 export type QuestionTemplateData =
+  | {
+      kind: "FACTS";
+      facts: Array<{ id: string; text: string }>;
+      response: "YEAR" | "COUNTRY" | "TEXT";
+      solution: string;
+      acceptedVariants: string[];
+      options: Array<{ id: string; text: string; isCorrect: boolean }>;
+    }
   | {
       kind: "TRUE_FALSE";
       correctAnswer: boolean;
@@ -337,6 +346,9 @@ export type QuestionTemplateDefinition = {
   requiresAnswerImages: boolean;
   questionTextIsTemplateStatic?: boolean;
   translationKey:
+    | "factsYear"
+    | "factsCountry"
+    | "factsText"
     | "standard"
     | "multipleChoice"
     | "faceMorph"

@@ -1,3 +1,5 @@
+import { isCountryCode } from "@/app/lib/countries";
+import { isValidYear } from "@/app/fragen/editor/templates/factsTemplate";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 import {
@@ -59,11 +61,13 @@ export function validateInteractionPayload(
 
   if (interaction.type === "TEXT") {
     const text = draft.answerText ?? "";
+    if (interaction.selection === "COUNTRY" && text && !isCountryCode(text)) throw new Error("Die Länderauswahl ist ungültig.");
     return { payload: { text }, hasContent: text.trim().length > 0 };
   }
 
   if (interaction.type === "NUMBER") {
     const value = draft.answerText?.trim() ?? "";
+    if (interaction.selection === "YEAR" && value && !isValidYear(value)) throw new Error("Die Jahreszahl ist ungültig.");
     if (value && !Number.isFinite(Number(value))) {
       throw new Error("Der Sch\u00e4tzwert ist keine g\u00fcltige Zahl.");
     }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { FactsAnswerSelect } from "@/app/fragen/editor/components/FactsAnswerSelect";
 import { SortableTemplateList } from "@/app/fragen/editor/components/SortableTemplateList";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
@@ -220,6 +221,10 @@ export default function GenericAnswerRenderer({
 }: Props) {
   if (interaction.type === "NO_ANSWER" || "supported" in interaction) {
     return null;
+  }
+
+  if ((interaction.type === "TEXT" || interaction.type === "NUMBER") && interaction.selection) {
+    return <div className="mt-4" data-answer-interaction={interaction.type}><FactsAnswerSelect kind={interaction.selection} value={value?.antwortText ?? ""} disabled={disabled} onChange={(selected) => onChange(textDraft(selected))} /></div>;
   }
 
   if (interaction.type === "TEXT") {
