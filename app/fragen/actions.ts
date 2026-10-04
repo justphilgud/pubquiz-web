@@ -548,6 +548,7 @@ export async function searchFragen(data: {
       ),
       antworten_anzahl: frage.antworten.length,
       loesungsvorschau: buildQuestionSolutionPreview({
+        templateId: frage.vorlage?.code,
         classicAnswers: frage.antworten.map((answer) => ({
           text: answer.antwort,
           isCorrect: answer.ist_richtig,
