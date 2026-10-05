@@ -498,7 +498,7 @@
 }
 
 .presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage .presentation-flow-slide:is([data-flow-type="QR_CODE"], [data-flow-type="RULES"], [data-flow-type="INTERMEDIATE_STANDINGS"], [data-flow-type="YEARLY_STANDINGS"], [data-flow-type="TEXT"], [data-flow-type="QUOTE"], [data-flow-type="ANECDOTE"], [data-flow-type="PORTRAIT"])) :is(.presentation-flow-kicker, .presentation-flow-subtitle, .presentation-flow-lead, .presentation-flow-quote-source, .presentation-flow-qr-layout p) {
-  color: var(--komm-one-dark-lagoon);
+  color: var(--komm-one-midnight);
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-qr {

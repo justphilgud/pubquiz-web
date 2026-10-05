@@ -81,6 +81,8 @@ function renderCases(style: PresentationDesignStyle) {
   };
 
   const trueFalse = buildPresentationQualityFixture("true-false", style);
+  const qr = buildPresentationQualityFixture("qr", style);
+  qr.displayState.teamJoinState = { teams: [], totalTeams: 0, remainingTeams: 0 };
   return [
     ["meme", renderToStaticMarkup(createElement(PresentationSlideRenderer, meme))],
     ["live-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, liveText))],
@@ -91,6 +93,8 @@ function renderCases(style: PresentationDesignStyle) {
       ["solution-false", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("true-false-solution-false", style)))],
       ["long-live-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("live-text-long", style)))],
       ["poll-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("poll-text", style)))],
+      ["flow-rules", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("rules", style)))],
+      ["flow-qr", renderToStaticMarkup(createElement(PresentationSlideRenderer, qr))],
     ] : []),
   ].map(([name, markup]) => `<section data-case="${style}-${name}" class="case">${markup}</section>`).join("");
 }
@@ -122,7 +126,9 @@ function renderPage(css: string, width: number, height: number) {
     const results = [];
     for (const root of document.querySelectorAll('[data-case]')) {
       const name = root.dataset.case;
-      if (name.endsWith('-meme')) {
+      if (name.includes('-flow-')) {
+        for (const node of root.querySelectorAll('.presentation-flow-kicker, .presentation-flow-lead, .presentation-team-join-heading, .presentation-team-join-empty')) results.push(check(name, node.textContent, node, node, 4.5));
+      } else if (name.endsWith('-meme')) {
         const aside = root.querySelector('[data-question-template="meme_beschriften"] aside');
         results.push(check(name, 'meme status', aside.querySelector('strong'), aside, 3));
         results.push(check(name, 'meme timer label', aside.querySelector('p:last-child'), aside, 4.5));
@@ -204,7 +210,7 @@ for (const [width, height] of [[1280, 720], [1920, 1080]]) test(`meme, live resp
     }>;
     assert.ok(Array.isArray(parsed), "error" in parsed ? parsed.error : "Unexpected contrast result");
     const results = parsed;
-    assert.equal(results.length, styles.length * 7 + 21);
+    assert.equal(results.length, styles.length * 7 + 26);
     for (const result of results) {
       assert.ok(
         result.ratio >= result.minimum,
