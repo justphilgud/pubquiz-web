@@ -97,6 +97,10 @@ function renderCases(style: PresentationDesignStyle) {
       ["flow-qr", renderToStaticMarkup(createElement(PresentationSlideRenderer, qr))],
       ["flow-story", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("story", style)))],
       ["overflow", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("legacy", style)))],
+      ["extra-ranking", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("lovd-ranking", style)))],
+      ["extra-final", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("lovd-final", style)))],
+      ["extra-structured", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("structured-empty", style)))],
+      ["extra-source", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("solution-long", style)))],
     ] : []),
   ].map(([name, markup]) => `<section data-case="${style}-${name}" class="case">${markup}</section>`).join("");
 }
@@ -121,14 +125,19 @@ function renderPage(css: string, width: number, height: number) {
       return 'rgb(' + result.join(',') + ')';
     };
     const check = (caseName, label, foregroundNode, backgroundNode, minimum) => {
-      const foreground = getComputedStyle(foregroundNode).color;
       const background = effectiveBackground(backgroundNode);
+      const color = rgba(getComputedStyle(foregroundNode).color);
+      const behind = rgb(background); const alpha = color[3] / 255;
+      const foreground = 'rgb(' + color.slice(0, 3).map((part, index) => part * alpha + behind[index] * (1 - alpha)).join(',') + ')';
       return { caseName, label, foreground, background, minimum, ratio: ratio(foreground, background) };
     };
     const results = [];
     for (const root of document.querySelectorAll('[data-case]')) {
       const name = root.dataset.case;
-      if (name.endsWith('-overflow')) {
+      if (name.includes('-extra-')) {
+        const selectors = name.endsWith('-ranking') ? '.presentation-flow-kicker, .presentation-flow-ranking-list li > span:last-child' : name.endsWith('-final') ? '.presentation-ranking-table-place, .presentation-ranking-table-points' : name.endsWith('-structured') ? '[data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-pink"], [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-cyan"], [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-white/55"]' : '.presentation-solution-question [class*="text-white/50"]';
+        for (const node of root.querySelectorAll(selectors)) results.push(check(name, node.textContent, node, node, 4.5));
+      } else if (name.endsWith('-overflow')) {
         const node = root.querySelector('.presentation-overflow-hint');
         results.push(check(name, node.textContent, node, node, 4.5));
       } else if (name.includes('-flow-')) {
@@ -215,7 +224,7 @@ for (const [width, height] of [[1280, 720], [1920, 1080]]) test(`meme, live resp
     }>;
     assert.ok(Array.isArray(parsed), "error" in parsed ? parsed.error : "Unexpected contrast result");
     const results = parsed;
-    assert.equal(results.length, styles.length * 7 + 28);
+    assert.equal(results.length, styles.length * 7 + 44);
     for (const result of results) {
       assert.ok(
         result.ratio >= result.minimum,

@@ -308,6 +308,14 @@
   color: inherit !important;
 }
 
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-"] {
+  color: inherit !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-question [class*="text-white"] {
+  color: inherit !important;
+}
+
 .presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] {
   border-color: var(--komm-one-lagoon-60);
   background: var(--komm-one-warm-white);
@@ -537,7 +545,7 @@
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-ranking-list li > span:last-child {
-  color: var(--komm-one-dark-lagoon);
+  color: var(--komm-one-midnight);
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-countdown,
@@ -625,7 +633,7 @@
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table-place,
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table-points {
-  color: var(--komm-one-dark-lagoon) !important;
+  color: var(--komm-one-midnight) !important;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-podium article {
