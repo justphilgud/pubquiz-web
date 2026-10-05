@@ -290,11 +290,69 @@
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"][data-presentation-phase="solution"] .presentation-true-false-option[data-correct="true"] {
-  border-left-color: var(--komm-one-basil) !important;
+  border-color: #00784b !important;
+  background: #00784b !important;
+  color: var(--komm-one-white) !important;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"][data-presentation-phase="solution"] .presentation-true-false-option[data-correct="false"] {
-  border-left-color: var(--komm-one-dark-red) !important;
+  border-left-color: var(--komm-one-dark-lagoon) !important;
+}
+
+/* Explicit surface roles prevent dark-stage text from leaking onto light cards. */
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="CHOICE_GRID"]:has(> .presentation-question-card:only-child) {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] :is(.presentation-question-card, .presentation-answer-panel, .presentation-poll-question) [class*="text-white"] {
+  color: inherit !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="STRUCTURED_RESPONSE"] :is(.text-pink-300, .text-cyan-200, [class*="text-white/55"]) {
+  color: var(--komm-one-midnight) !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-question [class*="text-white"] {
+  color: inherit !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] {
+  border-color: var(--komm-one-lagoon-60);
+  background: var(--komm-one-warm-white);
+  color: var(--komm-one-midnight);
+  padding: clamp(1.25rem, 3cqw, 3rem);
+  gap: clamp(0.75rem, 2cqw, 1.75rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] > p {
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] span {
+  border-color: var(--komm-one-lagoon-60);
+  background: var(--komm-one-lagoon-40);
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-live-result-kind] {
+  background: var(--komm-one-warm-white);
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-live-result-kind] p {
+  color: var(--komm-one-midnight-80);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] :is([data-live-result-kind="text"], .presentation-live-poll-wall) article {
+  background: var(--komm-one-white);
+  color: var(--komm-one-midnight);
+  overflow-wrap: anywhere;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-live-result-kind="text"] article {
+  padding: clamp(0.75rem, 1.2cqw, 1.25rem);
+  font-size: clamp(1.25rem, 1.8cqw, 1.75rem);
+  line-height: 1.25;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-anagram-stimulus,
@@ -454,7 +512,7 @@
 }
 
 .presentation-template[data-design-style="KOMM_ONE"]:has(.presentation-stage .presentation-flow-slide:is([data-flow-type="QR_CODE"], [data-flow-type="RULES"], [data-flow-type="INTERMEDIATE_STANDINGS"], [data-flow-type="YEARLY_STANDINGS"], [data-flow-type="TEXT"], [data-flow-type="QUOTE"], [data-flow-type="ANECDOTE"], [data-flow-type="PORTRAIT"])) :is(.presentation-flow-kicker, .presentation-flow-subtitle, .presentation-flow-lead, .presentation-flow-quote-source, .presentation-flow-qr-layout p) {
-  color: var(--komm-one-dark-lagoon);
+  color: var(--komm-one-midnight);
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-qr {
@@ -468,6 +526,11 @@
   border-color: var(--komm-one-lagoon-60);
   background: color-mix(in srgb, var(--komm-one-lagoon-40) 22%, var(--komm-one-white));
   color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-overflow-hint {
+  background: var(--komm-one-midnight);
+  color: var(--komm-one-white);
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-rules li,
@@ -488,7 +551,7 @@
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-ranking-list li > span:last-child {
-  color: var(--komm-one-dark-lagoon);
+  color: var(--komm-one-midnight);
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-countdown,
@@ -576,7 +639,7 @@
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table-place,
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-table-points {
-  color: var(--komm-one-dark-lagoon) !important;
+  color: var(--komm-one-midnight) !important;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-ranking-podium article {
