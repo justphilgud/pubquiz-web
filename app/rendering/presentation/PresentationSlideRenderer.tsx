@@ -1024,9 +1024,10 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
+  const showAnswerPanel = theme.design.stylePreset !== "KOMM_ONE" || hatAntwortmoeglichkeiten || frage.medien.length > 0;
   return (
-    <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
-      <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
+    <div data-presentation-layout={layoutVariant} className={`grid h-full min-h-0 gap-4 ${showAnswerPanel ? "lg:grid-cols-[0.92fr_1.08fr]" : "grid-cols-1"}`}>
+      <div className={`presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff] ${showAnswerPanel ? "" : "justify-center"}`}>
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
             Frage {slide.frageIndexImBlock}
@@ -1041,7 +1042,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
       </div>
 
-      <div className="presentation-answer-panel min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
+      {showAnswerPanel && <div className="presentation-answer-panel min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
         {hatAntwortmoeglichkeiten ? (
           renderAntwortOptionen(frage)
         ) : frage.medien.length > 0 ? (
@@ -1055,7 +1056,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
             Keine Antwortmöglichkeiten
           </div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }
@@ -1587,9 +1588,9 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
               className={`presentation-true-false-option rounded-2xl border-4 bg-[var(--quiz-surface)] p-6 text-[var(--quiz-surface-text)] ${option.isCorrect ? "border-[var(--quiz-correct)]" : "border-[var(--quiz-danger)]"}`}
             >
               <strong className="block text-4xl font-black">{option.label}</strong>
-              <span className="mt-3 block text-xl font-bold">
+              {theme.design.stylePreset !== "KOMM_ONE" && <span className="mt-3 block text-xl font-bold">
                 {option.isCorrect ? "✓ Richtige Antwort" : "✕ Falsche Antwort"}
-              </span>
+              </span>}
             </div>
           ))}
         </div>

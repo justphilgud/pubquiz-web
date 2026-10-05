@@ -13,7 +13,8 @@ import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer"
 
 export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
-export type QualityScenario = typeof qualityScenarios[number];
+export const kommOneReadabilityScenarios = ["open-xl", "meme-explanation", "live-text", "live-text-long", "poll-text", "true-false-solution-true", "true-false-solution-false"] as const;
+export type QualityScenario = typeof qualityScenarios[number] | typeof kommOneReadabilityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
 export const longOptions = [
   "Berlin: Die Stadt an der Spree war jahrzehntelang geteilt und ist heute Sitz des Deutschen Bundestages sowie der Bundesregierung.",
@@ -47,12 +48,12 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     const labels = scenario === "choice-long" ? longOptions : scenario === "choice-mixed" ? ["Berlin", longOptions[1], "Prag", longOptions[3]] : ["Berlin", "Wien", "Prag", "Budapest", "Paris", "Rom"].slice(0, Number(scenario.at(-1)));
     question.antworten = labels.map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
   }
-  if (scenario === "true-false") {
+  if (scenario.startsWith("true-false")) {
     question.templateId = questionTemplateIds.trueFalse;
     question.templateConfig = {
       stageDurationsSeconds: { stage3: 15, stage2: 15, stage1: 15 },
       createPixelQuestionByAnswer: { answer1: false, answer2: false },
-      templateData: { kind: "TRUE_FALSE", correctAnswer: true, explanation: "Komm.ONE ist die gemeinsame IT-Dienstleisterin für den kommunalen Bereich in Baden-Württemberg." },
+      templateData: { kind: "TRUE_FALSE", correctAnswer: scenario !== "true-false-solution-false", explanation: "Komm.ONE ist die gemeinsame IT-Dienstleisterin für den kommunalen Bereich in Baden-Württemberg." },
     };
     question.effektiver_antwortmodus = "CLOSED";
     question.antworten = [
@@ -60,6 +61,10 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
       { antwort_id: 2, antwort: "Falsch", ist_richtig: false, antworttyp: "Text", medien: [] },
     ];
     question.frage = "Wahr oder falsch: Digitale Verwaltungsleistungen können Kommunen gemeinsam bereitstellen.";
+  }
+  if (scenario === "open-xl") {
+    question.frage = "Welcher Zahl entspricht die römische Zahl XL?";
+    question.antworten[0].antwort = "40";
   }
   if (scenario.startsWith("facts")) {
     const count = scenario === "facts2" ? 2 : 7;
@@ -112,9 +117,10 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   if (scenario === "solution-long") question.antworten[0].antwort = longOptions[0] + " Seit dem Umzug aus Bonn finden die Sitzungen des Parlaments im Reichstagsgebäude statt.";
   const layoutInput = { templateId: question.templateId, questionText: question.frage, answerOptionCount: question.effektiver_antwortmodus === "CLOSED" ? question.antworten.length : 0, structuredFieldCount: question.antwortfelder.length, media: question.medien.map((m) => ({ fileName: m.datei, mediaType: m.medientyp, scope: "QUESTION" as const })), templateData: question.templateConfig?.templateData };
   question.presentationLayouts = { question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }), solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }) };
+  if (scenario === "open-xl") question.presentationLayouts.question.variant = "CHOICE_GRID";
   let slide: Slide = { typ: scenario === "solution-long" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
-  if (scenario.startsWith("story") || scenario === "poll") slide = {
-    typ: "ablauf", abschnitt: null, element: { id: "quality-story", persistentId: null, type: scenario === "poll" ? "LIVE_POLL" : "TEXT", anchorType: "BEFORE_QUIZ", anchorKey: "global", sectionId: null, order: 1, enabled: true, label: "AP5 Referenz", config: { version: 1, title: "Ein unerwarteter Umweg", body: scenario === "story-legacy" ? `${storyText}\n\n${storyText}\n\n${storyText}` : storyText }, configVersion: 1, questionAssignmentId: null, isStandard: false },
+  if (scenario.startsWith("story") || scenario.startsWith("poll")) slide = {
+    typ: "ablauf", abschnitt: null, element: { id: "quality-story", persistentId: null, type: scenario.startsWith("poll") ? "LIVE_POLL" : "TEXT", anchorType: "BEFORE_QUIZ", anchorKey: "global", sectionId: null, order: 1, enabled: true, label: "AP5 Referenz", config: { version: 1, title: "Ein unerwarteter Umweg", body: scenario === "story-legacy" ? `${storyText}\n\n${storyText}\n\n${storyText}` : storyText }, configVersion: 1, questionAssignmentId: null, isStandard: false },
   };
   const managed = { id: "internal-presentation-quality", name: "AP5 Präsentationsreferenz", config: createPresentationStylePreset(style) };
   if (scenario === "qr") slide = {
@@ -147,6 +153,22 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   if (scenario === "sponsor-intro" && slide.typ === "ablauf" && (style === "EDITORIAL" || style === "KOMM_ONE")) {
     slide.presentationRole = { kind: "SPONSOR", questionAssignmentId: question.quiz_fragen_id };
     slide.element.config = { version: 1, title: question.templateConfig!.sponsor!.line, imageUrl: question.templateConfig!.sponsor!.logo };
+  }
+  if (scenario === "meme-explanation") {
+    slide = { typ: "meme-erklaerung", abschnitt: null, frage: question };
+  }
+  if (scenario.startsWith("true-false-solution")) {
+    slide = { typ: "aufloesung", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  }
+  if (scenario === "live-text" || scenario === "live-text-long") {
+    question.frage = "Was wollt ihr noch loswerden?";
+    displayState.liveResultState = {
+      kind: "TEXT", visible: true, state: "CLOSED", finalAnswers: 3, totalTeams: 3,
+      publicResponses: (scenario === "live-text" ? ["Test"] : ["Test", "Danke für den schönen gemeinsamen Quizabend!", "Wir wünschen uns beim nächsten Mal mehr Musikfragen und eine längere Pause zum Austausch. Auch ungewöhnlichlangezusammengesetzteWörter sollen vollständig lesbar bleiben."]).map((publicText, index) => ({ submissionId: index + 1, publicText })),
+    };
+  }
+  if (scenario === "poll-text") {
+    displayState.livePollState = { revision: "fixture", runId: 1, pollRevisionId: 1, state: "OPEN", type: "FREE_TEXT", prompt: "Was wollt ihr noch loswerden?", publicationMode: "AUTOMATIC", totalResponses: 3, options: [], publicResponses: ["Test", "Ein schöner Abend!", "Wir freuen uns auf die nächste Runde und wünschen uns weitere überraschende Fragen."].map((publicText, index) => ({ id: index + 1, publicText, updatedAt: "2026-10-05T00:00:00.000Z" })) };
   }
   return { quiz: { ...base.quiz, sponsorMomentsEnabled: style === "EDITORIAL" || style === "KOMM_ONE", titel: "Präsentationsreferenz", fragen: [question] }, slide, slides: [slide], slideIndex: 0, slideLabel: scenario === "intro" ? "Willkommen" : scenario === "lovd-intro" ? "VOR DEM START" : scenario === "sponsor-intro" ? "Partner" : scenario === "lovd-countdown" ? "Countdown" : scenario === "lovd-ranking" ? "Zwischenstand" : scenario === "lovd-final" ? "Endstand" : scenario === "lovd-outro" ? "Zum Abschluss" : scenario === "booking" ? "Buchung" : scenario === "qr" ? "Teambeitritt" : scenario === "solution-long" ? "Auflösung" : scenario.startsWith("story") ? "Geschichte" : scenario === "poll" ? "Umfrage" : "Frage", theme, displayState };
 }

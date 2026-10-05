@@ -290,11 +290,55 @@
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"][data-presentation-phase="solution"] .presentation-true-false-option[data-correct="true"] {
-  border-left-color: var(--komm-one-basil) !important;
+  border-color: #00784b !important;
+  background: #00784b !important;
+  color: var(--komm-one-white) !important;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"][data-presentation-phase="solution"] .presentation-true-false-option[data-correct="false"] {
-  border-left-color: var(--komm-one-dark-red) !important;
+  border-left-color: var(--komm-one-dark-lagoon) !important;
+}
+
+/* Explicit surface roles prevent dark-stage text from leaking onto light cards. */
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="CHOICE_GRID"]:has(> .presentation-question-card:only-child) {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] :is(.presentation-question-card, .presentation-answer-panel, .presentation-poll-question) [class*="text-white"] {
+  color: inherit !important;
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] {
+  border-color: var(--komm-one-lagoon-60);
+  background: var(--komm-one-warm-white);
+  color: var(--komm-one-midnight);
+  padding: clamp(1.25rem, 3cqw, 3rem);
+  gap: clamp(0.75rem, 2cqw, 1.75rem);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] > p {
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-slide-type="meme-explanation"] span {
+  border-color: var(--komm-one-lagoon-60);
+  background: var(--komm-one-lagoon-40);
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-live-result-kind] {
+  background: var(--komm-one-warm-white);
+  color: var(--komm-one-midnight);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] [data-live-result-kind] p {
+  color: var(--komm-one-midnight-80);
+}
+
+.presentation-template[data-design-style="KOMM_ONE"] :is([data-live-result-kind="text"], .presentation-live-poll-wall) article {
+  background: var(--komm-one-white);
+  color: var(--komm-one-midnight);
+  overflow-wrap: anywhere;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-anagram-stimulus,

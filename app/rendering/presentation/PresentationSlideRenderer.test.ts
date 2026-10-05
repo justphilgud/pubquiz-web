@@ -304,8 +304,9 @@ test("true/false stays neutral before reveal and marks the configured false answ
   }));
 
   assert.match(solutionHtml, /data-presentation-phase="solution"/);
-  assert.match(solutionHtml, /data-correct="false"[^>]*>[\s\S]*Wahr[\s\S]*✕ Falsche Antwort/);
-  assert.match(solutionHtml, /data-correct="true"[^>]*>[\s\S]*Falsch[\s\S]*✓ Richtige Antwort/);
+  assert.match(solutionHtml, /data-correct="false"[^>]*>\s*<strong[^>]*>Wahr<\/strong>\s*<\/div>/);
+  assert.match(solutionHtml, /data-correct="true"[^>]*>\s*<strong[^>]*>Falsch<\/strong>\s*<\/div>/);
+  assert.doesNotMatch(solutionHtml, /✓|✕|Richtige Antwort|Falsche Antwort/);
 
   const storybook = buildPresentationQualityFixture("true-false", "BIRTHDAY");
   assert.equal(storybook.slide.typ, "frage");
@@ -331,6 +332,38 @@ test("true/false stays neutral before reveal and marks the configured false answ
   assert.match(storybookHtml, /data-storybook-question-kind="TRUE_FALSE"/);
   assert.match(storybookHtml, /data-correct="false"[^>]*>[\s\S]*Wahr[\s\S]*✕ Falsche Antwort/);
   assert.match(storybookHtml, /data-correct="true"[^>]*>[\s\S]*Falsch[\s\S]*✓ Richtige Antwort/);
+});
+
+test("Komm.ONE removes the entire empty answer panel, preserves real options and media", () => {
+  const fixture = buildPresentationQualityFixture("open-xl", "KOMM_ONE");
+  assert.equal(fixture.slide.typ, "frage");
+  if (fixture.slide.typ !== "frage") return;
+  // Historical quiz layouts may still request a split/choice canvas for an open question.
+  fixture.slide.frage.presentationLayouts!.question.variant = "CHOICE_GRID";
+  for (const renderMode of ["PRESENTATION", "MODERATION_PREVIEW"] as const) {
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...fixture, displayState: { ...fixture.displayState, renderMode } }));
+    assert.match(html, /Welcher Zahl entspricht die römische Zahl XL/);
+    assert.doesNotMatch(html, /presentation-answer-panel|presentation-open-question|Keine Antwortmöglichkeiten/);
+    assert.match(html, /grid-cols-1/);
+  }
+  const choice = renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("choice2", "KOMM_ONE")));
+  assert.equal((choice.match(/class="presentation-answer-option /g) ?? []).length, 2);
+  assert.match(choice, /Berlin/);
+  assert.match(choice, /Wien/);
+  const media = renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("image-long", "KOMM_ONE")));
+  assert.match(media, /taipei-101_standard.jpg/);
+});
+
+test("Komm.ONE both true/false solutions use configured correctness and labels only", () => {
+  for (const correct of [true, false]) {
+    const fixture = buildPresentationQualityFixture(correct ? "true-false-solution-true" : "true-false-solution-false", "KOMM_ONE");
+    for (const renderMode of ["PRESENTATION", "MODERATION_PREVIEW"] as const) {
+      const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...fixture, displayState: { ...fixture.displayState, renderMode } }));
+      const labels = [...html.matchAll(/data-correct="(true|false)"[^>]*>\s*<strong[^>]*>(Wahr|Falsch)<\/strong>\s*<\/div>/g)].map(match => [match[1], match[2]]);
+      assert.deepEqual(labels, [[String(correct), "Wahr"], [String(!correct), "Falsch"]]);
+      assert.doesNotMatch(html, /✓|✕|Richtige Antwort|Falsche Antwort/);
+    }
+  }
 });
 
 test("start sequence and shared legacy labels use theme-aware hooks", () => {

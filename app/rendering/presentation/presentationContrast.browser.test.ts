@@ -85,25 +85,34 @@ function renderCases(style: PresentationDesignStyle) {
     ["meme", renderToStaticMarkup(createElement(PresentationSlideRenderer, meme))],
     ["live-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, liveText))],
     ["true-false", renderToStaticMarkup(createElement(PresentationSlideRenderer, trueFalse))],
+    ...(style === "KOMM_ONE" ? [
+      ["explanation", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("meme-explanation", style)))],
+      ["solution-true", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("true-false-solution-true", style)))],
+      ["solution-false", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("true-false-solution-false", style)))],
+      ["long-live-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("live-text-long", style)))],
+      ["poll-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("poll-text", style)))],
+    ] : []),
   ].map(([name, markup]) => `<section data-case="${style}-${name}" class="case">${markup}</section>`).join("");
 }
 
-function renderPage(css: string) {
+function renderPage(css: string, width: number, height: number) {
   const markup = styles.map(renderCases).join("");
   const script = String.raw`
     try {
-    const rgb = (value) => (value.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    const rgba = (value) => { context.clearRect(0, 0, 1, 1); context.fillStyle = value; context.fillRect(0, 0, 1, 1); return [...context.getImageData(0, 0, 1, 1).data]; };
+    const rgb = (value) => rgba(value).slice(0, 3);
     const luminance = (value) => rgb(value).map((part) => part / 255).map((part) => part <= .04045 ? part / 12.92 : ((part + .055) / 1.055) ** 2.4).reduce((sum, part, index) => sum + part * [.2126, .7152, .0722][index], 0);
     const ratio = (foreground, background) => {
       const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
       return (values[0] + .05) / (values[1] + .05);
     };
     const effectiveBackground = (node) => {
-      for (let current = node; current; current = current.parentElement) {
-        const background = getComputedStyle(current).backgroundColor;
-        if (background !== 'transparent' && !background.endsWith(', 0)')) return background;
-      }
-      return 'rgb(255, 255, 255)';
+      const ancestors = []; for (let current = node; current; current = current.parentElement) ancestors.unshift(current);
+      let result = [255, 255, 255];
+      for (const current of ancestors) { const color = rgba(getComputedStyle(current).backgroundColor); const alpha = color[3] / 255; result = result.map((part, index) => color[index] * alpha + part * (1 - alpha)); }
+      return 'rgb(' + result.join(',') + ')';
     };
     const check = (caseName, label, foregroundNode, backgroundNode, minimum) => {
       const foreground = getComputedStyle(foregroundNode).color;
@@ -117,12 +126,22 @@ function renderPage(css: string) {
         const aside = root.querySelector('[data-question-template="meme_beschriften"] aside');
         results.push(check(name, 'meme status', aside.querySelector('strong'), aside, 3));
         results.push(check(name, 'meme timer label', aside.querySelector('p:last-child'), aside, 4.5));
+      } else if (name.endsWith('-explanation')) {
+        const panel = root.querySelector('[data-slide-type="meme-explanation"]');
+        for (const node of panel.querySelectorAll('h1, p, li, span')) results.push(check(name, node.textContent, node, node, node.tagName === 'H1' || node.tagName === 'LI' ? 3 : 4.5));
+      } else if (name.endsWith('-poll-text')) {
+        for (const card of root.querySelectorAll('.presentation-live-poll-wall article')) results.push(check(name, card.textContent, card, card, 4.5));
+      } else if (name.includes('-solution-')) {
+        const options = [...root.querySelectorAll('.presentation-true-false-option')];
+        for (const option of options) results.push(check(name, option.textContent, option, option, 4.5));
+        const correct = options.find(node => node.dataset.correct === 'true');
+        const neutral = options.find(node => node.dataset.correct === 'false');
+        if (getComputedStyle(correct).backgroundColor === getComputedStyle(neutral).backgroundColor) throw new Error('Correct answer needs a distinct full background');
       } else if (name.endsWith('-live-text')) {
         const panel = root.querySelector('[data-live-result-kind="text"]');
         results.push(check(name, 'open result title', panel.querySelector('h2'), panel, 3));
         results.push(check(name, 'open result label', panel.querySelector('p'), panel, 4.5));
-        const card = panel.querySelector('article');
-        results.push(check(name, 'open response card', card, card, 4.5));
+        for (const card of panel.querySelectorAll('article')) results.push(check(name, 'open response card', card, card, 4.5));
       } else {
         const option = root.querySelector('.presentation-true-false-option, .presentation-storybook-choices--binary li');
         results.push(check(name, 'neutral true/false option', option, option, 3));
@@ -133,7 +152,7 @@ function renderPage(css: string) {
       document.querySelector('#contrast-result').textContent = JSON.stringify({ error: String(error?.stack || error) });
     }
   `;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:${width}px;height:${height}px;overflow:hidden;background:#000;padding:16px}</style></head><body>${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
 }
 
 function decodeHtml(value: string) {
@@ -145,9 +164,9 @@ function decodeHtml(value: string) {
     .replaceAll("&amp;", "&");
 }
 
-test("meme, open result and neutral true/false text meet contrast targets in a real browser", async () => {
+for (const [width, height] of [[1280, 720], [1920, 1080]]) test(`meme, live responses and true/false meet browser contrast targets at ${width}×${height}`, async () => {
   const chrome = resolveChromeExecutable();
-  const html = renderPage(await compileApplicationCss());
+  const html = renderPage(await compileApplicationCss(), width, height);
   const server = createServer((_request, response) => {
     response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     response.end(html);
@@ -167,7 +186,7 @@ test("meme, open result and neutral true/false text meet contrast targets in a r
       "--no-first-run",
       "--no-default-browser-check",
       "--force-device-scale-factor=1",
-      "--window-size=1280,720",
+      `--window-size=${width},${height}`,
       `--user-data-dir=${profile}`,
       "--virtual-time-budget=3000",
       "--dump-dom",
@@ -185,7 +204,7 @@ test("meme, open result and neutral true/false text meet contrast targets in a r
     }>;
     assert.ok(Array.isArray(parsed), "error" in parsed ? parsed.error : "Unexpected contrast result");
     const results = parsed;
-    assert.equal(results.length, styles.length * 6);
+    assert.equal(results.length, styles.length * 7 + 21);
     for (const result of results) {
       assert.ok(
         result.ratio >= result.minimum,
