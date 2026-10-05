@@ -101,6 +101,7 @@ function renderCases(style: PresentationDesignStyle) {
       ["extra-final", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("lovd-final", style)))],
       ["extra-structured", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("structured-empty", style)))],
       ["extra-source", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("solution-long", style)))],
+      ["extra-audio", renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture("structured-audio", style)))],
     ] : []),
   ].map(([name, markup]) => `<section data-case="${style}-${name}" class="case">${markup}</section>`).join("");
 }
@@ -135,7 +136,7 @@ function renderPage(css: string, width: number, height: number) {
     for (const root of document.querySelectorAll('[data-case]')) {
       const name = root.dataset.case;
       if (name.includes('-extra-')) {
-        const selectors = name.endsWith('-ranking') ? '.presentation-flow-kicker, .presentation-flow-ranking-list li > span:last-child' : name.endsWith('-final') ? '.presentation-ranking-table-place, .presentation-ranking-table-points' : name.endsWith('-structured') ? '[data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-pink"], [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-cyan"], [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-white/55"]' : '.presentation-solution-question [class*="text-white/50"]';
+        const selectors = name.endsWith('-ranking') ? '.presentation-flow-kicker, .presentation-flow-ranking-list li > span:last-child' : name.endsWith('-final') ? '.presentation-ranking-table-place, .presentation-ranking-table-points' : name.endsWith('-structured') ? '[data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-pink"], [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-cyan"], [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-white/55"]' : name.endsWith('-audio') ? '.presentation-audio-control-label, .presentation-audio-status-label' : '.presentation-solution-question [class*="text-white/50"]';
         for (const node of root.querySelectorAll(selectors)) results.push(check(name, node.textContent, node, node, 4.5));
       } else if (name.endsWith('-overflow')) {
         const node = root.querySelector('.presentation-overflow-hint');
@@ -231,7 +232,7 @@ for (const [width, height] of [[1280, 720], [1920, 1080]]) test(`meme, live resp
     }>;
     assert.ok(Array.isArray(parsed), "error" in parsed ? parsed.error : "Unexpected contrast result");
     const results = parsed;
-    assert.equal(results.length, styles.length * 7 + 44);
+    assert.equal(results.length, styles.length * 7 + 46);
     for (const result of results) {
       assert.ok(
         result.ratio >= result.minimum,

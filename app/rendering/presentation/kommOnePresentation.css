@@ -308,8 +308,8 @@
   color: inherit !important;
 }
 
-.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="STRUCTURED_RESPONSE"] [class*="text-"] {
-  color: inherit !important;
+.presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="STRUCTURED_RESPONSE"] :is(.text-pink-300, .text-cyan-200, [class*="text-white/55"]) {
+  color: var(--komm-one-midnight) !important;
 }
 
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-solution-question [class*="text-white"] {
