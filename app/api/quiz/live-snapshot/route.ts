@@ -4,7 +4,7 @@ import {
   logLivePerformance,
   withPrismaQueryDiagnostics,
 } from "@/app/lib/prismaQueryDiagnostics.server";
-import { requireQuizLiveController } from "@/app/quiz/quizAccess.server";
+import { requireQuizViewer, requireQuizLiveController } from "@/app/quiz/quizAccess.server";
 
 type LiveSnapshotRequest = {
   quizId?: unknown;
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "INVALID_QUESTION" }, { status: 400 });
     }
     phaseStartedAt = performance.now();
+    await requireQuizViewer(quizId);
     if (body.includeLiveModeration === true) {
       await requireQuizLiveController(quizId);
     }

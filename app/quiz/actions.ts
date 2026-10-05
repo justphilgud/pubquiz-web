@@ -113,6 +113,7 @@ import {
 import { serializeQuizParticipantLiveRevision } from "./quizBlockLiveState";
 import { resolveQuizAnswerInteraction } from "./answerInteraction";
 import { resolveParticipantInteractionFromSnapshot } from "./interaction/interactionStoredAnswer";
+import { canPublishParticipantMedium, projectParticipantQuestionContent } from "./participantQuestionProjection";
 import { supportsFunnyAnswerReveal } from "./funnyAnswerReveal";
 import { repairQuizSpecificOrderingAssignments } from "./orderingQuestionOrder.server";
 import {
@@ -2910,7 +2911,12 @@ export async function getQuizAntwortStatus(
             fragen_id: eintrag.fragen.fragen_id,
             frage: eintrag.fragen.frage,
             templateId: eintrag.fragen.vorlage?.code ?? null,
-            templateConfig,
+            ...projectParticipantQuestionContent(templateConfig, eintrag.fragen.antworten, {
+              state: interactionRun?.state,
+              isHidden: interactionRun?.is_hidden ?? true,
+              openedAt: interactionRun?.opened_at ?? null,
+              releasedAt: blockFreigabe?.freigegeben_ab ?? null,
+            }),
             interaction,
             interactionRun: interactionRun
               ? {
@@ -2932,6 +2938,12 @@ export async function getQuizAntwortStatus(
               interactionRun?.state,
               eintrag.fragen.medien ?? [],
             )
+              .filter((medium) => canPublishParticipantMedium(medium.slot_key, {
+                state: interactionRun?.state,
+                isHidden: interactionRun?.is_hidden ?? true,
+                openedAt: interactionRun?.opened_at ?? null,
+                releasedAt: blockFreigabe?.freigegeben_ab ?? null,
+              }))
               .filter((medium) =>
                 medium.medientyp.medientyp.toLowerCase().includes("bild"),
               )
@@ -3476,6 +3488,10 @@ export async function getQuizLiveSnapshot(
     quizId,
     quizTeamSessionToken,
   );
+  if (!participantSession || includePresentationState || includeTeamJoinState ||
+      presentationQuestionAssignmentId !== undefined) {
+    await requireQuizViewer(quizId);
+  }
   return getQuizLiveSnapshotData(
     quizId,
     participantSession?.quiz_team_session_id ?? null,
