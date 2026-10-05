@@ -161,7 +161,14 @@ function renderPage(css: string, width: number, height: number) {
         const panel = root.querySelector('[data-live-result-kind="text"]');
         results.push(check(name, 'open result title', panel.querySelector('h2'), panel, 3));
         results.push(check(name, 'open result label', panel.querySelector('p'), panel, 4.5));
-        for (const card of panel.querySelectorAll('article')) results.push(check(name, 'open response card', card, card, 4.5));
+        for (const card of panel.querySelectorAll('article')) {
+          results.push(check(name, 'open response card', card, card, 4.5));
+          if (name.endsWith('-long-live-text')) {
+            const range = document.createRange(); range.selectNodeContents(card);
+            const text = range.getBoundingClientRect(); const bounds = card.getBoundingClientRect();
+            if (text.top < bounds.top || text.bottom > bounds.bottom || text.left < bounds.left || text.right > bounds.right) throw new Error('Long live response is clipped: ' + card.textContent);
+          }
+        }
       } else {
         const option = root.querySelector('.presentation-true-false-option, .presentation-storybook-choices--binary li');
         results.push(check(name, 'neutral true/false option', option, option, 3));

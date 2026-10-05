@@ -349,6 +349,12 @@
   overflow-wrap: anywhere;
 }
 
+.presentation-template[data-design-style="KOMM_ONE"] [data-live-result-kind="text"] article {
+  padding: clamp(0.75rem, 1.2cqw, 1.25rem);
+  font-size: clamp(1.25rem, 1.8cqw, 1.75rem);
+  line-height: 1.25;
+}
+
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-anagram-stimulus,
 .presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="TRUE_FALSE"] h2,
 .presentation-template[data-design-style="KOMM_ONE"] [data-presentation-layout="ORDERING"] h2,
