@@ -19,7 +19,7 @@ export function PresentationQualityPreview() {
     return { participationId: id, teamId: id, teamName: `Referenzteam ${id}`, avatarCode: getDefaultTeamAvatarCode(id), photoUrl: null };
   })]);
   const fixture = useMemo(() => buildPresentationQualityFixture(scenario, style), [scenario, style]);
-  return <main className="h-dvh overflow-hidden bg-black p-4">
+  return <main className="h-dvh overflow-hidden bg-black p-4 text-zinc-100">
     {moderationPreview ? <CurrentSlidePanel
       slideIndex={fixture.slideIndex} slides={fixture.slides} aktuellerSlide={fixture.slide}
       quiz={fixture.quiz} theme={fixture.theme} countdownRestSekunden={0}
