@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
+import CurrentSlidePanel from "@/app/quiz/[quizId]/moderation/components/CurrentSlidePanel";
 import { buildPresentationQualityFixture, qualityScenarios, kommOneReadabilityScenarios, type QualityScenario } from "@/app/rendering/presentation/presentationQualityFixtures";
 import { getDefaultTeamAvatarCode } from "@/app/teams/teamProfile";
 import type { JoinedTeam } from "@/app/rendering/presentation/teamJoinQueue";
@@ -19,10 +20,22 @@ export function PresentationQualityPreview() {
   })]);
   const fixture = useMemo(() => buildPresentationQualityFixture(scenario, style), [scenario, style]);
   return <main className="h-dvh overflow-hidden bg-black p-4">
-    <PresentationSlideRenderer key={`${scenario}:${style}`} {...fixture} displayState={{ ...fixture.displayState,
-      renderMode: moderationPreview ? "MODERATION_PREVIEW" : kommOneReadabilityScenarios.some(item => item === scenario) ? "PRESENTATION" : "DESIGN_PREVIEW",
+    {moderationPreview ? <CurrentSlidePanel
+      slideIndex={fixture.slideIndex} slides={fixture.slides} aktuellerSlide={fixture.slide}
+      quiz={fixture.quiz} theme={fixture.theme} countdownRestSekunden={0}
+      punktestand={[]} audienceInterimStandings={[]} yearlyStandings={[]}
+      endstandRevealCount={fixture.displayState.templateRevealCount ?? 0}
+      mediaOverlayActive={false} playbackCommand={null} playbackCommandId={0}
+      estimationPhase={fixture.displayState.estimationPhase ?? "HIDDEN"}
+      estimationQuestion={fixture.displayState.schaetzfrage ?? null} now={fixture.displayState.now ?? 0}
+      pixelState={fixture.displayState.pixelState ?? null} memeState={fixture.displayState.memeState ?? null}
+      memePresentationState={fixture.displayState.memePresentationState ?? null}
+      pollState={fixture.displayState.pollState ?? null} liveResultState={fixture.displayState.liveResultState ?? null}
+      livePollState={fixture.displayState.livePollState ?? null} teamJoinState={null} funnyAnswers={[]}
+    /> : <PresentationSlideRenderer key={`${scenario}:${style}`} {...fixture} displayState={{ ...fixture.displayState,
+      renderMode: kommOneReadabilityScenarios.some(item => item === scenario) ? "PRESENTATION" : "DESIGN_PREVIEW",
       teamJoinState: scenario === "qr" ? { teams: teams.slice(0, 12), totalTeams: teams.length, remainingTeams: Math.max(0, teams.length - 12), joinObservation: { lifecycle: "PREPARATION", lifecycleRevision: 0, teams } } : null,
-    }} />
+    }} />}
     <details className="fixed bottom-1 left-2 z-[80] max-w-[95vw] rounded-lg bg-white p-2 text-sm text-slate-950 shadow-lg">
       <summary>Interne Präsentationsreferenz</summary>
       <div className="flex flex-wrap gap-3 p-2">
