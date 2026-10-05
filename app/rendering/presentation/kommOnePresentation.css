@@ -514,6 +514,11 @@
   color: var(--komm-one-midnight);
 }
 
+.presentation-template[data-design-style="KOMM_ONE"] .presentation-overflow-hint {
+  background: var(--komm-one-midnight);
+  color: var(--komm-one-white);
+}
+
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-rules li,
 .presentation-template[data-design-style="KOMM_ONE"] .presentation-flow-ranking-list li {
   border: 1px solid var(--komm-one-lagoon-60);
