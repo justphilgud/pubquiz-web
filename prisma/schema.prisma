@@ -321,7 +321,15 @@ model medientyp {
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+enum QuizPurpose {
+  REGULAR
+  TEST
+
+  @@schema("pubquiz")
+}
+
 model quiz {
+  purpose                  QuizPurpose                @default(REGULAR)
   quiz_id                  Int                        @id @default(autoincrement())
   eventreihe_id            Int
   quiz_datum               DateTime?                  @db.Date

@@ -5,9 +5,9 @@ import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import { DEFAULT_BOOKING } from "./bookingSlide";
 
-test("copyQuiz preserves content references and order, remaps assignments, and never accesses runtime tables", async () => {
+for (const purpose of ["REGULAR", "TEST"] as const) test(`copyQuiz ${purpose} preserves content references and order, remaps assignments, and never accesses runtime tables`, async () => {
   const original = {
-    quiz_id: 30, eventreihe_id: 2, eventreihe: { ist_archiviert: false },
+    purpose, quiz_id: 30, eventreihe_id: 2, eventreihe: { ist_archiviert: false },
     aufloesungsstrategie: "END_OF_BLOCK", intro_regeln: ["Regel A", "Regel B"],
     team_anzahl: 5, teilnehmer_anzahl: 10, ist_archiviert: true,
     quiz_abschnitte: [1, 2].map(id => ({ quiz_abschnitt_id: id, titel: `Block ${id}`, sortierung: id, abschnitt_typ: "QUESTIONS", aufloesungsstrategie: "END_OF_BLOCK" })),
@@ -45,6 +45,7 @@ test("copyQuiz preserves content references and order, remaps assignments, and n
   assert.equal((await exports.copyQuiz!({ quizId: 30, neuerTitel: value.title, quizDatum: "2026-09-08" })).quizId, 31);
   assert.deepEqual(original, before);
   assert.equal(writes.quiz.length, 1);
+  assert.equal(writes.quiz[0].purpose, purpose);
   assert.equal(writes.quiz[0].team_anzahl, 0); assert.equal(writes.quiz[0].teilnehmer_anzahl, 0);
   assert.equal(writes.quiz[0].ist_archiviert, false); assert.equal(writes.quiz[0].oeffentliche_url, null);
   assert.equal(writes.quiz[0].titel, value.title); assert.equal(writes.quiz[0].quiz_datum, value.dateValue);
