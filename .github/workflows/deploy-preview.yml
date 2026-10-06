@@ -30,7 +30,7 @@ jobs:
         ) ||
         (
           github.event_name == 'workflow_dispatch' &&
-          github.ref == 'refs/heads/preview/content-and-quiz-flow'
+          github.ref == 'refs/heads/codex/quiz-purpose-preview-ops'
         )
       )
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
       DEPLOYMENT_REF: ${{ github.event_name == 'workflow_run' && format('refs/heads/{0}', github.event.workflow_run.head_branch) || github.ref }}
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
       DEPLOYMENT_REPOSITORY_ID: ${{ github.repository_id }}
-      DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      DEPLOYMENT_SHA: 1ebc4ae4c523277567b97d53bba54f1346a50df0
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       EXPECTED_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
       EXPECTED_DATABASE_NAME: ${{ vars.EXPECTED_DATABASE_NAME }}
@@ -79,31 +79,31 @@ jobs:
       - name: Verify migration status after deploy
         run: npm run db:status
 
-      - name: Deploy targeted Vercel Git Preview
-        id: deploy
-        run: node --import tsx scripts/deploy-vercel-git-preview.ts
-
-      - name: Smoke-test Preview
-        env:
-          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+      - name: Isolated purpose acceptance fixtures and exact Git Preview
         shell: bash
         run: |
-          status="$(curl --silent --show-error --location --max-time 30 --retry 3 --output /dev/null --write-out '%{http_code}' "$DEPLOYMENT_URL/")"
-          if (( status < 200 || status >= 400 )); then
-            echo "Preview-Smoke-Test fehlgeschlagen (HTTP $status)." >&2
-            exit 1
-          fi
-
-      - name: Write Preview summary
-        env:
-          DEPLOYMENT_ID: ${{ steps.deploy.outputs.deployment_id }}
-          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
-        shell: bash
-        run: |
-          {
-            echo "## Preview deployment"
-            echo "- URL: $DEPLOYMENT_URL"
-            echo "- Deployment ID: $DEPLOYMENT_ID"
-            echo "- Branch: $DEPLOYMENT_BRANCH"
-            echo "- Commit: $DEPLOYMENT_SHA"
-          } >> "$GITHUB_STEP_SUMMARY"
+          node --input-type=module <<'NODE'
+          import pg from 'pg';
+          import { appendFileSync } from 'node:fs';
+          const client = new pg.Client({connectionString: process.env.DATABASE_URL});
+          await client.connect();
+          try {
+            await client.query('BEGIN');
+            const owner = await client.query('SELECT eventreihe_id FROM pubquiz.quiz WHERE quiz_id = 88');
+            if (owner.rows.length !== 1) throw new Error('PREVIEW_FIXTURE_OWNER_MISSING');
+            const existing = await client.query(`SELECT quiz_id FROM pubquiz.quiz WHERE titel IN ('PURPOSE-PR91 REGULAR','PURPOSE-PR91 TEST')`);
+            if (existing.rowCount) throw new Error('PREVIEW_FIXTURES_ALREADY_EXIST');
+            const result = await client.query(`INSERT INTO pubquiz.quiz (eventreihe_id,titel,quiz_datum,purpose,team_anzahl,teilnehmer_anzahl) VALUES ($1,'PURPOSE-PR91 REGULAR',CURRENT_DATE,'REGULAR',0,0),($1,'PURPOSE-PR91 TEST',CURRENT_DATE,'TEST',0,0) RETURNING quiz_id,purpose`,[owner.rows[0].eventreihe_id]);
+            for (const q of result.rows) await client.query(`INSERT INTO pubquiz.quiz_abschnitte (quiz_id,titel,abschnitt_typ,sortierung) VALUES ($1,'Intro','intro',0),($1,'Fragenblock 1','fragenblock',1),($1,'Outro','outro',2)`,[q.quiz_id]);
+            await client.query('COMMIT');
+            console.log(JSON.stringify({isolatedPreviewQuizzes:result.rows,eventSeriesId:owner.rows[0].eventreihe_id}));
+            appendFileSync(process.env.GITHUB_STEP_SUMMARY,`\nPreview fixtures: ${JSON.stringify(result.rows)}\n`);
+          } catch(e) { await client.query('ROLLBACK'); throw e; } finally {await client.end();}
+          const body = {name:'pubquiz-web',project:process.env.VERCEL_PROJECT_ID,gitSource:{ref:'preview/content-and-quiz-flow',type:'github',repoId:1253336192,sha:process.env.DEPLOYMENT_SHA}};
+          const r = await fetch(`https://api.vercel.com/v13/deployments?teamId=${process.env.VERCEL_ORG_ID}&forceNew=1&skipAutoDetectionConfirmation=1`,{method:'POST',headers:{Authorization:`Bearer ${process.env.VERCEL_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+          if(!r.ok) throw new Error(`PREVIEW_CREATE_${r.status}`);
+          const d=await r.json();
+          if(d.target==='production'||d.gitSource?.sha!==process.env.DEPLOYMENT_SHA) throw new Error('PREVIEW_IDENTITY_MISMATCH');
+          console.log(JSON.stringify({deploymentId:d.id,url:d.url,sha:d.gitSource.sha,target:d.target}));
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,`\nExact Preview: https://${d.url} (${d.id}) SHA ${d.gitSource.sha}\n`);
+          NODE
