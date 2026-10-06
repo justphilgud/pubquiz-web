@@ -19,6 +19,7 @@ const repositoryLintJob = ci.slice(
   ci.indexOf("  repository-lint-information:"),
 );
 const vercelConfiguration = JSON.parse(readRepositoryFile("vercel.json")) as {
+  buildCommand?: string;
   git?: { deploymentEnabled?: boolean };
   regions?: string[];
 };
@@ -188,4 +189,12 @@ test("Vercel Git deployments are disabled for every branch", () => {
 
 test("Vercel functions run next to the eu-central database", () => {
   assert.deepEqual(vercelConfiguration.regions, ["fra1"]);
+});
+
+test("every Vercel build generates its own Prisma client without applying migrations", () => {
+  assert.equal(vercelConfiguration.buildCommand, "npm run db:generate && npm run build");
+  const scripts = (JSON.parse(readRepositoryFile("package.json")) as { scripts: Record<string, string> }).scripts;
+  assert.equal(scripts["db:generate"], "prisma generate");
+  assert.equal(scripts.build, "next build");
+  assert.doesNotMatch(vercelConfiguration.buildCommand!, /migrate|db:deploy|db push|reset/);
 });
