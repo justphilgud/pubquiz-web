@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { matchesQuizFilters, resolveQuizPurposeFilter, updateQuizFilterUrl } from "./quizPurpose";
 import {
   archiveQuiz,
   createQuiz,
@@ -120,21 +121,25 @@ export default function QuizForm({
   );
   const [message, setMessage] = useState("");
   const [formOpen, setFormOpen] = useState(Boolean(initialEditingQuiz || initialEventSeriesId));
-  const [eventSeriesFilter, setEventSeriesFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const searchParams = useSearchParams();
+  const eventSeriesFilter = searchParams.get("eventSeries") ?? "";
+  const statusFilter = searchParams.get("status") ?? "";
+  const purposeFilter = resolveQuizPurposeFilter(searchParams.get("purpose"));
+  const queryFilter = searchParams.get("q") ?? "";
+  function setFilter(key: "purpose" | "eventSeries" | "status" | "q", value: string) {
+    const query = updateQuizFilterUrl(window.location.search, key, value);
+    window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+  }
   const customPresentationTemplates = presentationTemplates
     .filter((template) => !templateRegistry.presentation.some(({ id }) => id === template.id))
     .map(toRuntimePresentationTemplate);
 
   const activeEventSeries = eventSeries.filter((entry) => !entry.isArchived);
   const filteredQuizzes = useMemo(
-    () =>
-      quizze.filter(
-        (quiz) =>
-          (!eventSeriesFilter || quiz.eventreihe_id === Number(eventSeriesFilter)) &&
-          (!statusFilter || quiz.temporal_status === statusFilter),
-      ),
-    [eventSeriesFilter, quizze, statusFilter],
+    () => quizze.filter((quiz) => matchesQuizFilters(quiz, {
+      purpose: purposeFilter, eventSeries: eventSeriesFilter, status: statusFilter, query: queryFilter,
+    })),
+    [eventSeriesFilter, quizze, statusFilter, purposeFilter, queryFilter],
   );
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -316,8 +321,10 @@ export default function QuizForm({
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
         <h2 className="text-xl font-semibold">Bestehende Quizze</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="block"><span className="mb-1 block text-sm font-semibold">Eventreihe filtern</span><select value={eventSeriesFilter} onChange={(event) => setEventSeriesFilter(event.target.value)} className={inputClass}><option value="">Alle Eventreihen</option>{eventSeries.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}</select></label>
-          <label className="block"><span className="mb-1 block text-sm font-semibold">Status filtern</span><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClass}><option value="">Alle Status</option>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label className="block"><span className="mb-1 block text-sm font-semibold">Quizart</span><select value={purposeFilter} onChange={(event) => setFilter("purpose", event.target.value)} className={inputClass}><option value="REGULAR">Regulär</option><option value="TEST">Technisch</option><option value="ALL">Alle</option></select></label>
+          <label className="block"><span className="mb-1 block text-sm font-semibold">Quiz suchen</span><input type="search" value={queryFilter} onChange={(event) => setFilter("q", event.target.value)} className={inputClass} placeholder="Name oder Eventreihe" /></label>
+          <label className="block"><span className="mb-1 block text-sm font-semibold">Eventreihe filtern</span><select value={eventSeriesFilter} onChange={(event) => setFilter("eventSeries", event.target.value)} className={inputClass}><option value="">Alle Eventreihen</option>{eventSeries.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}</select></label>
+          <label className="block"><span className="mb-1 block text-sm font-semibold">Status filtern</span><select value={statusFilter} onChange={(event) => setFilter("status", event.target.value)} className={inputClass}><option value="">Alle Status</option>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
         </div>
 
         <div className="mt-5 grid gap-4 lg:grid-cols-2">

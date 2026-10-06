@@ -1,5 +1,7 @@
 "use server";
 
+import { resolveQuizPurpose, type QuizPurpose } from "./quizPurpose";
+
 import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluationRevisionSelect } from "./evaluation/evaluationRevision";
@@ -211,6 +213,7 @@ export async function getQuizFixedSlideVisibility(quizId: number) {
 }
 
 export type QuizResult = {
+  purpose: QuizPurpose;
   quiz_id: number;
   eventreihe_id: number;
   eventreihe_name: string;
@@ -367,6 +370,7 @@ export async function getQuizListe(): Promise<QuizResult[]> {
 
   return sortQuizResults(quizze.map((quiz) => ({
     quiz_id: quiz.quiz_id,
+    purpose: quiz.purpose,
     eventreihe_id: quiz.eventreihe_id,
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
@@ -415,6 +419,7 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 
   return quizze.map((quiz) => ({
     quiz_id: quiz.quiz_id,
+    purpose: quiz.purpose,
     eventreihe_id: quiz.eventreihe_id,
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
@@ -442,6 +447,7 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 }
 
 export async function createQuiz(data: {
+  purpose?: QuizPurpose;
   eventSeriesId: number;
   titel: string;
   quizDatum: string;
@@ -475,6 +481,7 @@ export async function createQuiz(data: {
 
   const quiz = await prisma.quiz.create({
     data: {
+      purpose: resolveQuizPurpose(data.purpose),
       eventreihe_id: validated.value.eventSeriesId,
       titel: validated.value.title,
       quiz_datum: validated.value.dateValue,
@@ -711,6 +718,7 @@ export async function copyQuiz(data: {
   const kopie = await prisma.$transaction(async (tx) => {
     const neuesQuiz = await tx.quiz.create({
       data: {
+        purpose: original.purpose,
         eventreihe_id: original.eventreihe_id,
         titel: validated.value.title,
         quiz_datum: validated.value.dateValue,
@@ -1040,6 +1048,7 @@ export async function getQuizDetails(
 
   return {
     quiz_id: quiz.quiz_id,
+    purpose: quiz.purpose,
     eventreihe_id: quiz.eventreihe_id,
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
@@ -5157,6 +5166,7 @@ export async function createSchnellQuiz(data: {
 
   const quiz = await prisma.quiz.create({
     data: {
+      purpose: "REGULAR",
       eventreihe_id: validated.value.eventSeriesId,
       titel: validated.value.title,
       quiz_datum: validated.value.dateValue,
