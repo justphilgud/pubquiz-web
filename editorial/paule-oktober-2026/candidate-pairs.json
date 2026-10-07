@@ -1,0 +1,1122 @@
+[
+  {
+    "slot": 1,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft / Geschichte",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Schneller Einstieg",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1212: Asteroidengürtel zwischen Mars und Jupiter",
+    "oktoberCandidate": "#100: Mastaba, altägyptischer Grabbau",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Lösungsbild bei #1212 bleibt TEXT; Quellen, Freigabe, Wiederholung und Schwierigkeit erneut prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "oktoberCategories": [
+      "Geschichte"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 2,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Visuelles Erfolgserlebnis mit Flagge",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Flagge Kanada → Kanada",
+    "oktoberCandidate": "NEU: Flagge Brasilien → Brasilien",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Zwei unterschiedliche Flaggenmedien erstellen, Rechte und Erkennbarkeit prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Geografie"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 3,
+    "block": 1,
+    "templateId": "musik_rueckwaerts",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Erster Audio-Wechsel",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#121: Bad Guy – Billie Eilish",
+    "oktoberCandidate": "#120: Angel – Shaggy",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Audio abspielen, Rückwärtsausschnitt und Lösung prüfen; beide zuvor verwendet",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Musik"
+    ],
+    "oktoberCategories": [
+      "Musik"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 4,
+    "block": 1,
+    "templateId": "fakten_jahr",
+    "experience": "TEXT",
+    "desiredTopic": "Geschichte",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Gemeinsam zeitlich kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1245: Fakten → 1989",
+    "oktoberCandidate": "#1246: Fakten → 1990",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Fakten und Jahr im aktuellen Datensatz prüfen; frühere Quellen nennen leicht",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geschichte"
+    ],
+    "oktoberCategories": [
+      "Geschichte"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 5,
+    "block": 1,
+    "templateId": "pixelbild",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Film & Fernsehen / Alltag & Kurioses",
+    "difficulty": "LEICHT",
+    "seconds": 150,
+    "purpose": "Pixelmechanik am leicht erkennbaren Motiv lernen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#117: Pixel-Kandidat A",
+    "oktoberCandidate": "#116: Pixel-Kandidat B",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Motive/Lösungen unbekannt; leichte Erkennbarkeit und Unterschied erst am Medium prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Film & Fernsehen"
+    ],
+    "oktoberCategories": [
+      "Alltag & Kurioses"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 6,
+    "block": 1,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Musik / Essen & Trinken",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Intuitive Schätzung statt Wissensdruck",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "EST-27: Standardflügel → 88 Tasten",
+    "oktoberCandidate": "EST-37: Espresso → 25 ml",
+    "status": "NEUER_POOL_ENTWURF",
+    "qaNeeded": "Quellen und Einheiten geprüft; redaktionelle Auswahl und fachliche Freigabe offen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Musik"
+    ],
+    "oktoberCategories": [
+      "Essen & Trinken"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 7,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Essen & Trinken",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Kurze Entlastung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Welcher Käse wird traditionell aus Wasserbüffelmilch hergestellt? → Mozzarella",
+    "oktoberCandidate": "NEU: Wie heißt die kalte spanische Gemüsesuppe? → Gazpacho",
+    "status": "IDEE_UNGEPRUEFT",
+    "qaNeeded": "Quelle, Eindeutigkeit, Kategorie und korrekte Antwortform prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Essen & Trinken"
+    ],
+    "oktoberCategories": [
+      "Essen & Trinken"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 8,
+    "block": 1,
+    "templateId": "anagramm",
+    "experience": "CREATIVE",
+    "desiredTopic": "Natur & Wissenschaft / Musik",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Wortpuzzle mit klarer Mechanik",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "ANA-13: Latino Lakes → Nikola Tesla",
+    "oktoberCandidate": "ANA-03: Evil Sly Spree → Elvis Presley",
+    "status": "NEUER_POOL_ENTWURF",
+    "qaNeeded": "Buchstaben geprüft; redaktionelle Bekanntheit und Spieltest offen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "oktoberCategories": [
+      "Musik"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 9,
+    "block": 1,
+    "templateId": "kunstwerk",
+    "experience": "VISUAL",
+    "desiredTopic": "Kunst & Kultur",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Ruhiger Bildmoment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#527: Zhang Zeduan – Qingming-Rolle",
+    "oktoberCandidate": "NEU: Hokusai – Die große Welle",
+    "status": "BESTAND_PLUS_GAP",
+    "qaNeeded": "#527 Medien prüfen; zweites Werk samt gemeinfreier Reproduktion beschaffen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Kunst & Kultur"
+    ],
+    "oktoberCategories": [
+      "Kunst & Kultur"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 10,
+    "block": 1,
+    "templateId": "wahr_falsch",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Schnelle gemeinsame Entscheidung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#101: Kogelmogel ist ein Berg → Falsch",
+    "oktoberCandidate": "NEU: Ein Oktopus hat drei Herzen → Wahr",
+    "status": "BESTAND_PLUS_GAP",
+    "qaNeeded": "#101 alte Kategorie Berge fachlich prüfen; neue Aussage aus Smithsonian-Quelle, nicht importiert",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Alltag & Kurioses"
+    ],
+    "oktoberCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 11,
+    "block": 1,
+    "templateId": "reihenfolge",
+    "experience": "SORT",
+    "desiredTopic": "Geografie / Technik & Digitales",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Teamgespräch und Sortieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#328: Fünf Ozeane nach Fläche",
+    "oktoberCandidate": "#1227: Römische Kfz-Kennzeichen",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Sortierobjekte, Antwortreihenfolge und Quelle prüfen; keine Reparatur beim Lesen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Technik & Digitales"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 12,
+    "block": 1,
+    "templateId": "meme_beschriften",
+    "experience": "CREATIVE",
+    "desiredTopic": "Alltag & Kurioses",
+    "difficulty": "LEICHT",
+    "seconds": 240,
+    "purpose": "Meme erklären, schreiben und abstimmen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1225: vorhandenes Meme A",
+    "oktoberCandidate": "#723: vorhandenes Meme B",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Bildmotive/Lizenzen prüfen; klare Caption-Zonen und verständliche Erstmechanik",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Alltag & Kurioses"
+    ],
+    "oktoberCategories": [
+      "Alltag & Kurioses"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 13,
+    "block": 1,
+    "templateId": "fakten_land",
+    "experience": "TEXT",
+    "desiredTopic": "Geografie",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Kombinationswissen mit leichter Lösung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1258: Fakten → Belgien",
+    "oktoberCandidate": "#1257: Fakten → Österreich",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Quelle, Status und globale Gültigkeit neu prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Geografie"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 14,
+    "block": 1,
+    "templateId": "face_morph",
+    "experience": "VISUAL",
+    "desiredTopic": "Gesellschaft / Film & Fernsehen",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Zwei Gesichter gemeinsam erkennen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#115: Heidi Klum / Angela Merkel",
+    "oktoberCandidate": "#76: zweiter FaceMorph-Kandidat",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "#76 Personen/Lösungen noch unbekannt; Bildrechte und Abgrenzung zum ersten Paar prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Gesellschaft"
+    ],
+    "oktoberCategories": [
+      "Film & Fernsehen"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 15,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Politik & Zeitgeschehen",
+    "difficulty": "MITTEL",
+    "seconds": 90,
+    "purpose": "Kurzes Wissensintermezzo",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Wer kniete 1970 in Warschau nieder? → Willy Brandt",
+    "oktoberCandidate": "NEU: Wie hieß der erste Bundeskanzler der Bundesrepublik? → Konrad Adenauer",
+    "status": "IDEE_UNGEPRUEFT",
+    "qaNeeded": "Quellen und vergleichbare Schwierigkeit prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Politik & Zeitgeschehen"
+    ],
+    "oktoberCategories": [
+      "Politik & Zeitgeschehen"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 16,
+    "block": 1,
+    "templateId": "uebersetzt_vorgelesen",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "PO-Inhalt und Browserstimme proben",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "PO: Übersetzt vorgelesen A",
+    "oktoberCandidate": "PO: Übersetzt vorgelesen B",
+    "status": "PRODUCT_OWNER",
+    "qaNeeded": "PO liefert zwei unterschiedliche Texte und Lösungen; keine Inhalte generiert",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Musik"
+    ],
+    "oktoberCategories": [
+      "Musik"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 17,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "MITTEL",
+    "seconds": 90,
+    "purpose": "Länderumriss ohne Textmonotonie",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Länderumriss Norwegen → Norwegen",
+    "oktoberCandidate": "NEU: Länderumriss Vietnam → Vietnam",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Medien und Schwierigkeit angleichen; nicht automatisch neue Templates anlegen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Geografie"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 18,
+    "block": 1,
+    "templateId": "fakten_frei",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft / Kunst & Kultur",
+    "difficulty": "SCHWER",
+    "seconds": 120,
+    "purpose": "Gezielter anspruchsvoller Moment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1279: Fakten → Richard Feynman",
+    "oktoberCandidate": "#1284: Fakten → Käthe Kollwitz",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Quelle und schwere redaktionelle Schwierigkeit prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "oktoberCategories": [
+      "Kunst & Kultur"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 19,
+    "block": 1,
+    "templateId": "google_rezensionen",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Kunst & Kultur / Gesellschaft",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Ort anhand gestaffelter Rezensionen kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Rezensionen eines Museums",
+    "oktoberCandidate": "NEU: Rezensionen eines Zoos",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Vier unterschiedliche Orte über beide Blöcke nötig; reale Texte und Attribution manuell kuratieren",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Kunst & Kultur"
+    ],
+    "oktoberCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 20,
+    "block": 1,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Sport / Wirtschaft",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Block mit diskutierbarer Zahl beenden",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "EST-23: Fußballtor → 7,32 m",
+    "oktoberCandidate": "EST-50: 50-Euro-Schein → 140 mm",
+    "status": "NEUER_POOL_ENTWURF",
+    "qaNeeded": "Quellen geprüft; unterschiedliche Einheiten sichtbar ankündigen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Sport"
+    ],
+    "oktoberCategories": [
+      "Wirtschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 21,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Technik & Digitales / Wirtschaft",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Schneller Einstieg",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Welche Einheit misst elektrische Spannung? → Volt",
+    "oktoberCandidate": "NEU: Wie heißt die Währung Polens? → Złoty",
+    "status": "IDEE_UNGEPRUEFT",
+    "qaNeeded": "Quellen, aktuelle Währung und redaktionelle Freigabe offen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Technik & Digitales"
+    ],
+    "oktoberCategories": [
+      "Wirtschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 22,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Visuelles Erfolgserlebnis mit Flagge",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Flagge Nepal → Nepal",
+    "oktoberCandidate": "NEU: Flagge Südafrika → Südafrika",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Zwei weitere eindeutige Flaggenmedien; keine Wiederholung der Länder aus Block 1",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Geografie"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 23,
+    "block": 2,
+    "templateId": "musik_rueckwaerts",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Erster Audio-Wechsel",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#96: Mr. Brightside – The Killers",
+    "oktoberCandidate": "NEU: Rückwärtsmusik Take on Me – a-ha",
+    "status": "BESTAND_PLUS_GAP",
+    "qaNeeded": "Neuen Ausschnitt herstellen; Musiknutzungsrechte und technische Wiedergabe prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Musik"
+    ],
+    "oktoberCategories": [
+      "Musik"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 24,
+    "block": 2,
+    "templateId": "fakten_jahr",
+    "experience": "TEXT",
+    "desiredTopic": "Geschichte",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Gemeinsam zeitlich kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1250: Fakten → 2012",
+    "oktoberCandidate": "#1249: Fakten → 2004",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Zeitfakten und mittlere Schwierigkeit prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geschichte"
+    ],
+    "oktoberCategories": [
+      "Geschichte"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 25,
+    "block": 2,
+    "templateId": "pixelbild",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Film & Fernsehen / Alltag & Kurioses",
+    "difficulty": "SCHWER",
+    "seconds": 150,
+    "purpose": "Pixelmechanik mit anspruchsvollerem Motiv anwenden",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#95: Pixel-Kandidat C",
+    "oktoberCandidate": "#78: Pixel-Kandidat D",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Vier voneinander verschiedene Motive und Lösungen noch nicht nachgewiesen; schwerere Erkennbarkeit testen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Film & Fernsehen"
+    ],
+    "oktoberCategories": [
+      "Alltag & Kurioses"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 26,
+    "block": 2,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Musik / Film & Fernsehen",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Intuitive Schätzung statt Wissensdruck",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "EST-30: ESC 1956 → 7 Länder",
+    "oktoberCandidate": "EST-33: Ben-Hur → 11 Oscars",
+    "status": "NEUER_POOL_ENTWURF",
+    "qaNeeded": "Quellen und Zeitbezug geprüft; mittlere Schwierigkeit redaktionell kalibrieren",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Musik"
+    ],
+    "oktoberCategories": [
+      "Film & Fernsehen"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 27,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Essen & Trinken",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Kurze Entlastung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Welcher Softdrink enthält klassisch Chinin? → Tonic Water",
+    "oktoberCandidate": "NEU: Aus welcher Saat besteht Tahini? → Sesam",
+    "status": "IDEE_UNGEPRUEFT",
+    "qaNeeded": "Markenunabhängige Formulierung und Quelle prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Essen & Trinken"
+    ],
+    "oktoberCategories": [
+      "Essen & Trinken"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 28,
+    "block": 2,
+    "templateId": "anagramm",
+    "experience": "CREATIVE",
+    "desiredTopic": "Gesellschaft / Sprache & Literatur",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Wortpuzzle mit klarer Mechanik",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "ANA-18: That Egg Burner → Greta Thunberg",
+    "oktoberCandidate": "ANA-34: Twin Karma → Mark Twain",
+    "status": "NEUER_POOL_ENTWURF",
+    "qaNeeded": "Buchstaben geprüft; mittlere Schwierigkeit testen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Gesellschaft"
+    ],
+    "oktoberCategories": [
+      "Sprache & Literatur"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 29,
+    "block": 2,
+    "templateId": "kunstwerk",
+    "experience": "VISUAL",
+    "desiredTopic": "Kunst & Kultur",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Ruhiger Bildmoment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Munch – Der Schrei",
+    "oktoberCandidate": "NEU: Grant Wood – American Gothic",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Zwei neue unterschiedliche Werkausschnitte und Rechtevermerke beschaffen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Kunst & Kultur"
+    ],
+    "oktoberCategories": [
+      "Kunst & Kultur"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 30,
+    "block": 2,
+    "templateId": "wahr_falsch",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Schnelle gemeinsame Entscheidung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Giraffen haben normalerweise sieben Halswirbel → Wahr",
+    "oktoberCandidate": "NEU: Ein erwachsenes Insekt hat acht Beine → Falsch",
+    "status": "IDEE_UNGEPRUEFT",
+    "qaNeeded": "Primärquellen im Schätzpool vorhanden; neue TRUE_FALSE-Konfiguration und Freigabe offen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "oktoberCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 31,
+    "block": 2,
+    "templateId": "reihenfolge",
+    "experience": "SORT",
+    "desiredTopic": "Geografie / Natur & Wissenschaft",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Teamgespräch und Sortieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1224: Stuttgarter Türme nach Höhe",
+    "oktoberCandidate": "#113: Tierarten nach Zahnzahl",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Zeit-/Bauwerksbezug und Zahnzahlmethodik prüfen; #113 schwache Instagram-Quelle ersetzen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 32,
+    "block": 2,
+    "templateId": "meme_beschriften",
+    "experience": "CREATIVE",
+    "desiredTopic": "Alltag & Kurioses",
+    "difficulty": "MITTEL",
+    "seconds": 240,
+    "purpose": "Meme mit offenerem Motiv; bekannte Mechanik vertiefen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Meme C mit offenem Alltagsmotiv",
+    "oktoberCandidate": "NEU: Meme D mit anderem offenen Alltagsmotiv",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Zwei Bilder samt Rechten und Caption-Zonen; keine Lösungsgleichheit erzwingen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Alltag & Kurioses"
+    ],
+    "oktoberCategories": [
+      "Alltag & Kurioses"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 33,
+    "block": 2,
+    "templateId": "fakten_land",
+    "experience": "TEXT",
+    "desiredTopic": "Geografie",
+    "difficulty": "SCHWER",
+    "seconds": 120,
+    "purpose": "Kombinationswissen mit leichter Lösung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1271: Fakten → Usbekistan",
+    "oktoberCandidate": "#1272: Fakten → Montenegro",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Schwere Fakten, zulässige Ländernamen und Freigabe prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Geografie"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 34,
+    "block": 2,
+    "templateId": "face_morph",
+    "experience": "VISUAL",
+    "desiredTopic": "Natur & Wissenschaft / Musik",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Zwei Gesichter gemeinsam erkennen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: FaceMorph Marie Curie / Albert Einstein",
+    "oktoberCandidate": "NEU: FaceMorph David Bowie / Freddie Mercury",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Zwei neue Gesichts-Morphs und Originalbilder beschaffen; Rechte und Erkennbarkeit prüfen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "oktoberCategories": [
+      "Musik"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 35,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Religion & Weltanschauung",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Kurzes Wissensintermezzo",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Wie heißt die jüdische Versammlungsstätte? → Synagoge",
+    "oktoberCandidate": "NEU: Wie heißt das islamische Gotteshaus? → Moschee",
+    "status": "IDEE_UNGEPRUEFT",
+    "qaNeeded": "Quellen prüfen; Kategorie Religion, vergleichbar leichter Entlastungsmoment",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Religion & Weltanschauung"
+    ],
+    "oktoberCategories": [
+      "Religion & Weltanschauung"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 36,
+    "block": 2,
+    "templateId": "uebersetzt_vorgelesen",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "PO-Inhalt und Browserstimme proben",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "PO: Übersetzt vorgelesen C",
+    "oktoberCandidate": "PO: Übersetzt vorgelesen D",
+    "status": "PRODUCT_OWNER",
+    "qaNeeded": "Vier getrennte PO-Inhalte nötig; Stimmen, Texte und Lösungen vor Generalprobe testen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Musik"
+    ],
+    "oktoberCategories": [
+      "Musik"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 37,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "MITTEL",
+    "seconds": 90,
+    "purpose": "Länderumriss ohne Textmonotonie",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Länderumriss Madagaskar → Madagaskar",
+    "oktoberCandidate": "NEU: Länderumriss Italien → Italien",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Medien erstellen; Italien eventuell zu leicht, Spieltest und Ersatzkandidat erforderlich",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geografie"
+    ],
+    "oktoberCategories": [
+      "Geografie"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 38,
+    "block": 2,
+    "templateId": "fakten_frei",
+    "experience": "TEXT",
+    "desiredTopic": "Geschichte / Natur & Wissenschaft",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Gezielter anspruchsvoller Moment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "#1274: Fakten → Martin Luther King",
+    "oktoberCandidate": "#1280: Fakten → Jane Goodall",
+    "status": "BESTAND_VORLAEUFIG",
+    "qaNeeded": "Fakten und mittlere Schwierigkeit prüfen; historische Ergebniswerte nicht verwenden",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Geschichte"
+    ],
+    "oktoberCategories": [
+      "Natur & Wissenschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 39,
+    "block": 2,
+    "templateId": "google_rezensionen",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Technik & Digitales / Wirtschaft",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Ort anhand gestaffelter Rezensionen kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "NEU: Rezensionen eines Bahnhofs",
+    "oktoberCandidate": "NEU: Rezensionen eines Freizeitparks",
+    "status": "CONTENT_GAP",
+    "qaNeeded": "Zwei weitere verschiedene Orte; keine großen automatischen Pools erzeugen",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Technik & Digitales"
+    ],
+    "oktoberCategories": [
+      "Wirtschaft"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  },
+  {
+    "slot": 40,
+    "block": 2,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Film & Fernsehen / Essen & Trinken",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Block mit diskutierbarer Zahl beenden",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false,
+    "pauleCandidate": "EST-32: Oscar → 34,3 cm",
+    "oktoberCandidate": "EST-38: Nutella → 13 Prozent",
+    "status": "NEUER_POOL_ENTWURF",
+    "qaNeeded": "Referenzen geprüft; Schätzmechanik mit kleinen Zahlen in Generalprobe bewerten",
+    "currentStatusVerified": false,
+    "source": "Bekannte frühere UI-Beobachtung oder neuer lokaler Entwurf; kein vollständiger Production-Snapshot",
+    "pauleCategories": [
+      "Film & Fernsehen"
+    ],
+    "oktoberCategories": [
+      "Essen & Trinken"
+    ],
+    "categoryStatus": "EDITORIAL_PROPOSAL_NOT_PERSISTED"
+  }
+]
