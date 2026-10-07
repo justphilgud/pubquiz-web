@@ -40,7 +40,7 @@ Der Integrationstest erhält ausschließlich eine Development-Verbindung in `QUI
 - Development: vollständiger Export von 121 Fragen, 5 Quizzen und 17 Datenbankvorlagen; Integritätsprüfung bestanden.
 - Production-Oberfläche: 1.286 Fragen insgesamt und 719 im Filter „Aktiv / freigegeben“ erneut bestätigt. Diese Zahl ist nicht gleichbedeutend mit vollständiger Zuordnungsfähigkeit.
 - Zielquizze weiterhin Paule II #30 (13.10.2026, 19 Uhr) und Oktober #31 (21.10.2026, 19 Uhr).
-- Vollständiger Production-Export noch nicht ausgeführt. Der reguläre Zugriff auf die Deployment-Datenbankverbindung ist nicht verfügbar. Ein versuchter breiterer Zugriff auf entschlüsselte Projekt-Umgebungswerte wurde von der automatischen Freigabeprüfung abgelehnt und entfernt.
+- Vollständiger Production-Export nicht ausgeführt. Der ausdrücklich autorisierte Einzelvariablen-Abruf über den regulären Vercel-Endpunkt bestätigte DATABASE_URL als Sensitive, lieferte aber keinen entschlüsselten Wert. Keine Production-Datenbankverbindung wurde aufgebaut. Weitere Entschlüsselungsversuche sind auf Nutzeranweisung ausgeschlossen. Ein früherer breiter Zugriff wurde von der automatischen Freigabeprüfung abgelehnt und entfernt.
 
 Development-Daten dürfen nicht als Production-Inventar behandelt werden. Eine vollständige aktuelle Production-Statusmatrix, erneute Poolprüfung, Kandidatenpaarung und exakte Content-Gaps setzen den vollständigen Read-only-Export voraus.
 
@@ -48,6 +48,12 @@ Development-Daten dürfen nicht als Production-Inventar behandelt werden. Eine v
 
 Das verbindliche Ziel ist 20 + 20 Fragen je Quiz, getrennte Inhalte und gleiche Slotstruktur. V1-Gewichte: Themenbreite 20, Themenbalance 20, Template-Breite 15, Template-Balance 10, Medien/Interaktion 20, Blockbalance/Formatwechsel 15. Zeit und Geografie gehören nicht zum V1-Score.
 
-Nach vollständigem Production-Inventar folgen das 40-Slot-Gerüst, 50 Anagramme und 50 recherchierte Schätzfragen, Kandidatenmatrix und Gap-Liste. Für „Übersetzt vorgelesen“ wird kein Content generiert. Keine finale Quizzuordnung, fachliche Freigabe, automatische Rekategorisierung oder Production-Umbenennung.
+Auf ausdrückliche Folgeanweisung werden 40-Slot-Gerüst, 50 Anagramme, 50 recherchierte Schätzfragen und reine Variety-Berechnung unabhängig vom blockierten Production-Inventar vorbereitet. Bestehende Kandidaten und Gaps bleiben vorläufig. Für „Übersetzt vorgelesen“ wird kein Content generiert. Keine finale Quizzuordnung, fachliche Freigabe, automatische Rekategorisierung oder Production-Umbenennung.
 
 Oberkategorien, Konfiguration, reine Score-Domainfunktion und UI bleiben getrennte PRs. Geplante Vererbung: kein Override verwendet den aktuellen Eventreihenstandard; ein Override ersetzt ihn vollständig. Kopieren erhält explizite Overrides, sonst den Standard der Zielreihe. Historische Konfigurations-/Score-Snapshots werden für V1 nicht erzwungen; spätere Versionierung muss ergänzbar bleiben.
+
+## Abschluss PR #92
+
+CI am 7. Oktober 2026: Prisma, TypeScript, vollständige Tests, Changed-file ESLint und Build bestanden. Acht Offline-Projektionstests bestanden; Development-Integration zuvor bestanden. PR bleibt offen, kein Merge/Deployment.
+
+Alternativer bestehender Export: `exportFragenFuerTransfer` in `app/fragen/actions.ts` ist adminberechtigt und liest Inhalte mit findMany, erzwingt aber keine READ-ONLY-Transaktion. Er erhält weder IDs/Review-/Archivstatus noch Medien, alle Kategorien, Eventreihenbindung oder Quizzuordnungen. Er ist deshalb kein Ersatz für die freigegebene vollständige Projektion. Es wird kein neuer Production-Endpunkt bereitgestellt und kein alternativer Datenbankzugang versucht.
