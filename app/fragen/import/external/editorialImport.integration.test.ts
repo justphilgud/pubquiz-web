@@ -55,5 +55,12 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     await assert.rejects(runEditorialDatabaseImport({...rollbackOptions,mode:"import",expectedDryRunDigest:integrityPreview.digest}),/INTEGRITY_CHANGED/);
     assert.equal((await client.query("SELECT quelle FROM pubquiz.fragen WHERE fragen_id=$1",[existing])).rows[0].quelle,"untouched");
     await client.query("DROP TRIGGER editorial_integrity_test ON pubquiz.fragen");await client.query("DROP FUNCTION pubquiz.editorial_integrity_test()");
+    // Even a trigger changing only a NEW row must not bypass metadata/approval checks.
+    await client.query("CREATE FUNCTION pubquiz.editorial_new_row_test() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.freigegeben=true; RETURN NEW; END $$");
+    await client.query("CREATE TRIGGER editorial_new_row_test BEFORE INSERT ON pubquiz.fragen FOR EACH ROW EXECUTE FUNCTION pubquiz.editorial_new_row_test()");
+    const newRowPreview=await runEditorialDatabaseImport({...rollbackOptions,mode:"dry-run"});
+    await assert.rejects(runEditorialDatabaseImport({...rollbackOptions,mode:"import",expectedDryRunDigest:newRowPreview.digest}),/PERSISTED_CONTENT_MISMATCH/);
+    assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before+3);
+    await client.query("DROP TRIGGER editorial_new_row_test ON pubquiz.fragen");await client.query("DROP FUNCTION pubquiz.editorial_new_row_test()");
   } finally {await client.end();}
 });

@@ -81,11 +81,11 @@ export function previewEditorialImport(source: EditorialSource, existing: Editor
     const duplicates: EditorialDecision["duplicates"] = [];
     for (const q of [...existing, ...accepted]) {
       let reason: string | null = null;
-      if (textKey(candidate.question) === textKey(q.question)) reason = "IDENTICAL_QUESTION";
+      if (textKey(candidate.question) === textKey(q.question)) reason = q.solutions.some(s => nameKey(s) === nameKey(candidate.solution)) ? "IDENTICAL_QUESTION" : "IDENTICAL_QUESTION_SOLUTION_REVIEW";
       const other = parseQuestionTemplateData(q.templateData, q.templateId, true);
       if (data?.kind === "ANAGRAM") {
         if (q.solutions.some(s => nameKey(s) === nameKey(data.name))) reason ??= "SAME_PERSON_OR_SOLUTION";
-        if (other?.kind === "ANAGRAM" && normalizeAnagramLetters(other.selectedSolution) === normalizeAnagramLetters(data.selectedSolution) && reason !== "IDENTICAL_QUESTION") reason = "SAME_ANAGRAM";
+        if (other?.kind === "ANAGRAM" && normalizeAnagramLetters(other.selectedSolution) === normalizeAnagramLetters(data.selectedSolution) && reason !== "IDENTICAL_QUESTION") reason = nameKey(other.name) === nameKey(data.name) ? "SAME_ANAGRAM" : "SAME_ANAGRAM_PERSON_REVIEW";
       }
       if (data?.kind === "ESTIMATE" && other?.kind === "ESTIMATE" && data.unit.trim().toLocaleLowerCase("de-DE") === other.unit.trim().toLocaleLowerCase("de-DE") && data.correctValue === other.correctValue) reason ??= "SAME_ESTIMATE_VALUE_AND_UNIT";
       if (data?.kind === "ESTIMATE" && overlapsSubject(candidate.question,q.question)) reason ??= "ESTIMATE_SUBJECT_REVIEW";

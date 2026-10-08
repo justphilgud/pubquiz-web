@@ -23,8 +23,23 @@ test("different people with shared anagram boilerplate do not become semantic du
 });
 test("identical text duplicate is skipped, regardless of existing template",()=>{
   const c=fixtureSource.candidates[0];
-  const d=previewEditorialImport({...fixtureSource,candidates:[c]},[{id:17,question:c.question.toUpperCase(),templateId:null,solutions:[],templateData:null}],new Map(),categories)[0];
+  const d=previewEditorialImport({...fixtureSource,candidates:[c]},[{id:17,question:c.question.toUpperCase(),templateId:null,solutions:[c.solution],templateData:null}],new Map(),categories)[0];
   assert.equal(d.action,"ÜBERSPRINGEN");assert.equal(d.duplicates[0].questionId,17);
+  assert.equal(d.existingQuestionId,17);
+});
+test("identical prompt with missing or conflicting solution requires manual review",()=>{
+  const c=fixtureSource.candidates[0];
+  for(const solutions of [[],["Another person"]]) {
+    const d=previewEditorialImport({...fixtureSource,candidates:[c]},[{id:17,question:c.question,templateId:null,solutions,templateData:null}],new Map(),categories)[0];
+    assert.equal(d.action,"MANUELL PRÜFEN");
+  }
+});
+test("explicit measurement and reference period detect equivalent facts even with unrelated wording",()=>{
+  const c={...fixtureSource.candidates[50],metadata:{measurementKey:"adult-human-bones",referenceDate:"2026"}};
+  for(const period of ["2026","2025"]) {
+    const d=previewEditorialImport({...fixtureSource,candidates:[c]},[{id:21,question:"Skelettbestand?",templateId:null,solutions:[],templateData:null,metadata:{measurementKey:"adult-human-bones",referenceDate:period}}],new Map(),categories)[0];
+    assert.equal(d.action,"MANUELL PRÜFEN");assert.equal(d.duplicates[0].reason,period==="2026"?"SAME_MEASUREMENT_PERIOD":"MEASUREMENT_PERIOD_REVIEW");
+  }
 });
 test("same personality in a differently phrased existing question requires manual review",()=>{
   const c=fixtureSource.candidates[0];

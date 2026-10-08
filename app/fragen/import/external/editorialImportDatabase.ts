@@ -3,7 +3,20 @@ import { isDeepStrictEqual } from "node:util";
 import { assertDatabase } from "../../../../scripts/operations/guards";
 import { candidateDigest, previewEditorialImport, sha256, type EditorialSource, type EditorialExistingQuestion } from "./editorialImport";
 
-const PROTECTED_TABLES = ["fragen", "antworten", "fragen_kategorien", "medien", "frage_antwortfelder", "frage_antwortfeld_loesungen", "fragen_eventreihen", "frage_story_elemente", "quiz_fragen", "team_antworten", "team_antwort_auswahlen", "team_antwortfelder", "team_answer_submissions", "quiz_team_sessions", "quiz_teams", "fragenkategorie", "frage_vorlagen"] as const;
+// Fixed application-table allowlist: neither identifiers nor SQL are caller-configurable.
+const PROTECTED_TABLES = [
+  "fragen", "antworten", "antworttyp", "fragen_kategorien", "fragen_relationen", "fragenkategorie",
+  "medien", "medientyp", "medien_generator_laefe", "medien_generator_lauf_medien",
+  "frage_antwortfelder", "frage_antwortfeld_loesungen", "fragen_eventreihen", "frage_story_elemente",
+  "frage_vorlagen", "frage_vorlage_antwortfelder", "public_question_submissions", "public_question_rate_limits",
+  "quiz", "eventreihen", "quiz_fragen", "quiz_abschnitte", "quiz_ablauf_elemente", "quiz_block_freigaben",
+  "quiz_praesentation_status", "quiz_interaction_runs", "quiz_team_sessions", "quiz_teams", "teams",
+  "team_antworten", "team_antwort_auswahlen", "team_antwortfelder", "team_answer_submissions",
+  "presentation_templates", "story_elemente", "story_element_revisionen", "live_polls", "live_poll_revisions",
+  "live_poll_responses", "meme_moderation_selections", "meme_moderation_candidates", "meme_presentations",
+  "meme_result_entries", "meme_votes", "live_text_response_publications", "public_text_replacement_rules",
+  "users", "benutzer_rollenzuweisungen", "eventreihe_benutzerrollen",
+] as const;
 type Integrity = Record<string, { count: number; digest: string }>;
 export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string };
 
