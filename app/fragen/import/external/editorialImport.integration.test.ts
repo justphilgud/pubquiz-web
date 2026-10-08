@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { resolve } from "node:path";
 import { test } from "node:test";
 import { Client } from "pg";
 import { runEditorialDatabaseImport } from "./editorialImportDatabase";
@@ -11,13 +13,17 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
   const url=new URL(connectionString!);assert.equal(url.hostname,"127.0.0.1");assert.equal(url.pathname,"/editorial_import_ci");
   url.searchParams.delete("schema");const client=new Client({connectionString:url.toString()});await client.connect();
   try{
-    // Fresh, disposable CI database only. Historical migration bytes stay untouched:
-    // PostgreSQL rejects the existing 0_init UTF-8 BOM when executed as a query.
-    const migrations=new URL("../../../../prisma/migrations/",import.meta.url);
-    for(const entry of readdirSync(migrations,{withFileTypes:true}).filter(e=>e.isDirectory()).sort((a,b)=>a.name.localeCompare(b.name))) {
-      const sql=readFileSync(new URL(`${entry.name}/migration.sql`,migrations),"utf8").replace(/^\uFEFF/,"");
+    // Historical 0_init contains a BOM and overlaps later migrations. Do not repair
+    // production migration history. Bootstrap ONLY this fresh CI database from the
+    // current model minus our new column, then test the actual additive migration.
+    const baselinePath=resolve(".editorial-ci-baseline.prisma");
+    writeFileSync(baselinePath,readFileSync("prisma/schema.prisma","utf8").replace(/^\s*redaktionelle_schwierigkeit[^\n]*$/m,""),{flag:"wx"});
+    try {
+      const sql=execFileSync(process.execPath,[resolve("node_modules/prisma/build/index.js"),"migrate","diff","--from-empty","--to-schema",baselinePath,"--script"],{env:{...process.env,JITI_CACHE:"false"},encoding:"utf8"});
       await client.query(sql);
-    }
+    } finally {unlinkSync(baselinePath);}
+    await client.query(readFileSync("prisma/migrations/20261008090000_editorial_question_difficulty/migration.sql","utf8"));
+    await client.query(readFileSync("prisma/migrations/20260724120000_add_phase_one_question_templates/migration.sql","utf8"));
     const operator=(await client.query("INSERT INTO pubquiz.users(email,password_hash,updated_at) VALUES('editorial-ci@example.invalid','test-only',now()) RETURNING id")).rows[0].id;
     await client.query("INSERT INTO pubquiz.antworttyp(antworttyp) VALUES('Standard') ON CONFLICT DO NOTHING");
     const raw=readFileSync(new URL("../../../../editorial/paule-oktober-2026/anagrams.json",import.meta.url),"utf8");
