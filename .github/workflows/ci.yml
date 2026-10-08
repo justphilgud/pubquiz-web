@@ -141,5 +141,4 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run db:generate
-      - run: npm run db:deploy
       - run: node --import tsx --test app/fragen/import/external/editorialImport.test.ts app/fragen/import/external/editorialImport.integration.test.ts

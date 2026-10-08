@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 import { Client } from "pg";
 import { runEditorialDatabaseImport } from "./editorialImportDatabase";
@@ -11,6 +11,13 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
   const url=new URL(connectionString!);assert.equal(url.hostname,"127.0.0.1");assert.equal(url.pathname,"/editorial_import_ci");
   url.searchParams.delete("schema");const client=new Client({connectionString:url.toString()});await client.connect();
   try{
+    // Fresh, disposable CI database only. Historical migration bytes stay untouched:
+    // PostgreSQL rejects the existing 0_init UTF-8 BOM when executed as a query.
+    const migrations=new URL("../../../../prisma/migrations/",import.meta.url);
+    for(const entry of readdirSync(migrations,{withFileTypes:true}).filter(e=>e.isDirectory()).sort((a,b)=>a.name.localeCompare(b.name))) {
+      const sql=readFileSync(new URL(`${entry.name}/migration.sql`,migrations),"utf8").replace(/^\uFEFF/,"");
+      await client.query(sql);
+    }
     const operator=(await client.query("INSERT INTO pubquiz.users(email,password_hash,updated_at) VALUES('editorial-ci@example.invalid','test-only',now()) RETURNING id")).rows[0].id;
     await client.query("INSERT INTO pubquiz.antworttyp(antworttyp) VALUES('Standard') ON CONFLICT DO NOTHING");
     const raw=readFileSync(new URL("../../../../editorial/paule-oktober-2026/anagrams.json",import.meta.url),"utf8");
