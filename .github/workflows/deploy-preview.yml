@@ -6,7 +6,12 @@ on:
       - CI
     types:
       - completed
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      editorial_dry_run_only:
+        description: 'Read-only PR93 editorial analysis; no migrations or deployment'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -20,6 +25,7 @@ jobs:
     name: Migrate and deploy Preview
     if: >-
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
+      !inputs.editorial_dry_run_only &&
       (
         (
           github.event_name == 'workflow_run' &&
@@ -110,3 +116,41 @@ jobs:
             echo "- Branch: $DEPLOYMENT_BRANCH"
             echo "- Commit: $DEPLOYMENT_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  editorial-dry-run:
+    name: Read-only approved editorial source analysis
+    if: >-
+      vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/codex/editorial-safe-import' &&
+      inputs.editorial_dry_run_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: preview
+    env:
+      CI: 'true'
+      DEPLOYMENT_ENV: preview
+      DEPLOYMENT_EVENT: workflow_dispatch
+      DEPLOYMENT_REF: ${{ github.ref }}
+      DEPLOYMENT_REPOSITORY: ${{ github.repository }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
+      EXPECTED_DATABASE_NAME: ${{ vars.EXPECTED_DATABASE_NAME }}
+      EXPECTED_DATABASE_BRANCH: ${{ vars.EXPECTED_DATABASE_BRANCH }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Verify Preview database identity
+        run: npm run deployment:validate
+      - name: Execute fixed READ ONLY projection
+        run: node --import tsx scripts/editorial-import-dry-run.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-pr93-read-only-dry-run
+          path: editorial-dry-run.json
+          if-no-files-found: error
+          retention-days: 14

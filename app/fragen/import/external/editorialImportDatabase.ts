@@ -18,7 +18,7 @@ const PROTECTED_TABLES = [
   "users", "benutzer_rollenzuweisungen", "eventreihe_benutzerrollen",
 ] as const;
 type Integrity = Record<string, { count: number; digest: string }>;
-export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string };
+export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId?: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string };
 
 async function snapshot(client: Client, exclude: number[] = []): Promise<Integrity> {
   const result: Integrity = {};
@@ -60,10 +60,11 @@ async function journalSnapshot(client: Client, excludedBatch = -1): Promise<Inte
 
 /** Fixed-query, Preview-only adapter; authenticated server wrapper supplies the operator. */
 export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) {
+  if (!["dry-run", "import"].includes(input.mode)) throw new Error("EDITORIAL_MODE_INVALID");
   const identity = new URL(input.connectionString);
   const isolatedCi = process.env.CI === "true" && identity.hostname === "127.0.0.1" && identity.pathname === "/editorial_import_ci";
   if (!isolatedCi) assertDatabase(input.connectionString, "preview");
-  if (!Number.isSafeInteger(input.operatorUserId) || input.operatorUserId <= 0) throw new Error("EDITORIAL_OPERATOR_REQUIRED");
+  if (input.mode === "import" && (!Number.isSafeInteger(input.operatorUserId) || (input.operatorUserId ?? 0) <= 0)) throw new Error("EDITORIAL_OPERATOR_REQUIRED");
   const url = new URL(input.connectionString); url.searchParams.delete("schema");
   const client = new Client({ connectionString: url.toString() });
   let begun = false;

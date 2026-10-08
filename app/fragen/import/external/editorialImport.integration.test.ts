@@ -37,7 +37,8 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     const source:EditorialSource={provider:"Editorial:integration",files:[{name:"anagrams.json",sha256:sha256(raw)},{name:"estimates.json",sha256:sha256(estimatesRaw)}],candidates};
     const options={connectionString:connectionString!,source,operatorUserId:operator};
     const before=(await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count;
-    const preview=await runEditorialDatabaseImport({...options,mode:"dry-run"});
+    const preview=await runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"dry-run"});
+    await assert.rejects(runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"import",expectedDryRunDigest:preview.digest}),/OPERATOR_REQUIRED/);
     assert.equal(preview.decisions.filter(d=>d.action==="IMPORTIEREN").length,4);
     assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before);
     const parallel=await Promise.allSettled([1,2].map(()=>runEditorialDatabaseImport({...options,mode:"import",expectedDryRunDigest:preview.digest})));
