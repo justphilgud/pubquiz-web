@@ -21,3 +21,5 @@ Integritätsnachweise speichern ausschließlich aggregierte Zähler/Hashes, kein
 ## Abnahmegrenzen
 
 PR #93, Commit `52b0729152a4e4d12947e1cee0961fe2293fc73a`, bleibt unverändert. Nur Preview ist zum Schreiben freigegeben. Echte PostgreSQL-Tests müssen Parallelität, Wiederholung und Rollback prüfen. Ein übersprungener Integrationstest ist keine Abnahme. Preview-Dry-Run, Import und Browser-End-to-End folgen erst erfolgreicher CI und kontrollierter Bereitstellung. Production-Import/-Deployment und Merge sind ausgeschlossen.
+
+Die manuelle Preview-Bereitstellung erlaubt zusätzlich ausschließlich den Importbranch codex/editorial-safe-import. Der reguläre Preview-Branch und sämtliche Production-Gates bleiben unverändert. Dispatch erst nach erfolgreicher CI des exakt zu deployenden SHAs. Die isolierte PostgreSQL-CI liest unveränderte historische Migrationen und entfernt beim Ausführen nur deren führende UTF-8-BOM; keine Änderung historischer Dateien oder Checksummen auf persistenten Datenbanken.

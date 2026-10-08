@@ -30,7 +30,10 @@ jobs:
         ) ||
         (
           github.event_name == 'workflow_dispatch' &&
-          github.ref == 'refs/heads/preview/content-and-quiz-flow'
+          (
+            github.ref == 'refs/heads/preview/content-and-quiz-flow' ||
+            github.ref == 'refs/heads/codex/editorial-safe-import'
+          )
         )
       )
     runs-on: ubuntu-latest
