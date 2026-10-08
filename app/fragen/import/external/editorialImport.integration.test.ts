@@ -30,24 +30,26 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     const operator=(await client.query("INSERT INTO pubquiz.users(email,password_hash,updated_at) VALUES('editorial-ci@example.invalid','test-only',now()) RETURNING id")).rows[0].id;
     await client.query("INSERT INTO pubquiz.antworttyp(antworttyp) VALUES('Standard') ON CONFLICT DO NOTHING");
     const raw=readFileSync(new URL("../../../../editorial/paule-oktober-2026/anagrams.json",import.meta.url),"utf8");
-    const candidates=parseEditorialPool("anagrams.json",raw).slice(0,3);
+    const estimatesRaw=readFileSync("editorial/paule-oktober-2026/estimates.json","utf8");
+    const candidates=[...parseEditorialPool("anagrams.json",raw).slice(0,3),parseEditorialPool("estimates.json",estimatesRaw)[0]];
     for(const category of new Set(candidates.map(c=>c.categories[0]))) await client.query("INSERT INTO pubquiz.fragenkategorie(kategorie) VALUES($1) ON CONFLICT DO NOTHING",[category]);
     const existing=(await client.query("INSERT INTO pubquiz.fragen(frage,quelle) VALUES('Existing integrity fixture','untouched') RETURNING fragen_id")).rows[0].fragen_id;
-    const source:EditorialSource={provider:"Editorial:integration",files:[{name:"anagrams.json",sha256:sha256(raw)}],candidates};
+    const source:EditorialSource={provider:"Editorial:integration",files:[{name:"anagrams.json",sha256:sha256(raw)},{name:"estimates.json",sha256:sha256(estimatesRaw)}],candidates};
     const options={connectionString:connectionString!,source,operatorUserId:operator};
     const before=(await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count;
     const preview=await runEditorialDatabaseImport({...options,mode:"dry-run"});
-    assert.equal(preview.decisions.filter(d=>d.action==="IMPORTIEREN").length,3);
+    assert.equal(preview.decisions.filter(d=>d.action==="IMPORTIEREN").length,4);
     assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before);
     const parallel=await Promise.allSettled([1,2].map(()=>runEditorialDatabaseImport({...options,mode:"import",expectedDryRunDigest:preview.digest})));
     assert.equal(parallel.filter(r=>r.status==="fulfilled").length,1);assert.equal(parallel.filter(r=>r.status==="rejected").length,1);
     const success=parallel.find(r=>r.status==="fulfilled");assert.ok(success?.status==="fulfilled");
-    assert.equal(success.value.questionIds.length,3);assert.equal(success.value.manifest?.items.length,3);
+    assert.equal(success.value.questionIds.length,4);assert.equal(success.value.manifest?.items.length,4);
     const inserted=await client.query("SELECT freigegeben,review_status,redaktionelle_schwierigkeit,template_config_json FROM pubquiz.fragen WHERE fragen_id=ANY($1::int[])",[success.value.questionIds]);
     assert.ok(inserted.rows.every(r=>!r.freigegeben&&r.review_status==="DRAFT"&&r.redaktionelle_schwierigkeit==="LEICHT"));
-    assert.deepEqual(success.value.before,preview.before);assert.equal(success.value.after.fragen.count,before+3);
+    assert.deepEqual(success.value.before,preview.before);assert.equal(success.value.after.fragen.count,before+4);
     const repeat=await runEditorialDatabaseImport({...options,mode:"dry-run"});assert.ok(repeat.decisions.every(d=>d.action==="ÜBERSPRINGEN"));
     const repeated=await runEditorialDatabaseImport({...options,mode:"import",expectedDryRunDigest:repeat.digest});assert.equal(repeated.questionIds.length,0);
+    assert.deepEqual(repeated.manifest?.items.map(i=>i.questionId),success.value.questionIds);
     const remaining=parseEditorialPool("anagrams.json",raw).slice(3,5);const rollbackSource={...source,provider:"Editorial:rollback",candidates:remaining};
     const rollbackOptions={...options,source:rollbackSource};const rollbackPreview=await runEditorialDatabaseImport({...rollbackOptions,mode:"dry-run"});
     await client.query(`CREATE FUNCTION pubquiz.editorial_fail_test() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.frage=$q$${remaining[1].question}$q$ THEN RAISE EXCEPTION 'Injected rollback failure'; END IF; RETURN NEW; END $$`);
@@ -55,7 +57,7 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     await assert.rejects(runEditorialDatabaseImport({...rollbackOptions,mode:"import",expectedDryRunDigest:rollbackPreview.digest}));
     await client.query("DROP TRIGGER editorial_fail_test ON pubquiz.fragen");await client.query("DROP FUNCTION pubquiz.editorial_fail_test()");
     assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.external_question_import_batches WHERE provider='Editorial:rollback'")).rows[0].count,0);
-    assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before+3);
+    assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before+4);
     assert.equal((await client.query("SELECT quelle FROM pubquiz.fragen WHERE fragen_id=$1",[existing])).rows[0].quelle,"untouched");
     // Trigger mutates an existing row: postflight must detect and roll back both writes.
     await client.query(`CREATE FUNCTION pubquiz.editorial_integrity_test() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN UPDATE pubquiz.fragen SET quelle='unexpected' WHERE fragen_id=${existing}; RETURN NEW; END $$`);
@@ -69,7 +71,7 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     await client.query("CREATE TRIGGER editorial_new_row_test BEFORE INSERT ON pubquiz.fragen FOR EACH ROW EXECUTE FUNCTION pubquiz.editorial_new_row_test()");
     const newRowPreview=await runEditorialDatabaseImport({...rollbackOptions,mode:"dry-run"});
     await assert.rejects(runEditorialDatabaseImport({...rollbackOptions,mode:"import",expectedDryRunDigest:newRowPreview.digest}),/PERSISTED_CONTENT_MISMATCH/);
-    assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before+3);
+    assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before+4);
     await client.query("DROP TRIGGER editorial_new_row_test ON pubquiz.fragen");await client.query("DROP FUNCTION pubquiz.editorial_new_row_test()");
   } finally {await client.end();}
 });

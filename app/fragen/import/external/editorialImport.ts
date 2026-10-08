@@ -76,7 +76,8 @@ export function previewEditorialImport(source: EditorialSource, existing: Editor
     if (candidate.categories.some(c => !knownCategories.has(c))) validation.push("CATEGORY_NOT_ACTIVE");
     const prior = imported.get(candidate.externalId);
     if (prior) return { candidate, action: prior.digest === candidateDigest(candidate) && prior.questionId !== null ? "ÜBERSPRINGEN" : "MANUELL PRÜFEN",
-      validation: prior.digest === candidateDigest(candidate) ? validation : [...validation, "IMPORT_ID_CONTENT_CONFLICT"], duplicates: [], existingQuestionId: prior.questionId };
+      validation: [...validation, ...(prior.digest !== candidateDigest(candidate) ? ["IMPORT_ID_CONTENT_CONFLICT"] : []), ...(prior.questionId === null ? ["IMPORT_REFERENCE_MISSING"] : [])],
+      duplicates: prior.questionId !== null ? [{questionId:prior.questionId,reason:"ALREADY_IMPORTED"}] : [], existingQuestionId: prior.questionId };
     const data = parseQuestionTemplateData(candidate.templateConfig?.templateData, candidate.templateId, true);
     const duplicates: EditorialDecision["duplicates"] = [];
     for (const q of [...existing, ...accepted]) {
