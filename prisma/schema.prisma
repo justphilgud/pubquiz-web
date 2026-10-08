@@ -40,6 +40,7 @@ model fragen {
   quelle                       String?
   fragentyp                    String?
   schwierigkeitslevel          Decimal?                 @db.Decimal(5, 2)
+  redaktionelle_schwierigkeit  String?                  @db.VarChar(10)
   erstellungsdatum             DateTime                 @default(dbgenerated("CURRENT_DATE")) @db.Date
   ist_archiviert               Boolean                  @default(false)
   archivierungsgrund           String?

@@ -110,3 +110,36 @@ jobs:
               echo "Changed JavaScript/TypeScript files are enforced separately in the blocking quality job."
             } >> "$GITHUB_STEP_SUMMARY"
           fi
+
+  postgres:
+    name: Real PostgreSQL editorial import transactions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: editorial_ci
+          POSTGRES_PASSWORD: isolated-ci-only
+          POSTGRES_DB: editorial_import_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      CI: 'true'
+      DATABASE_URL: postgresql://editorial_ci:isolated-ci-only@127.0.0.1:5432/editorial_import_ci?schema=pubquiz
+      EDITORIAL_IMPORT_TEST_DATABASE_URL: postgresql://editorial_ci:isolated-ci-only@127.0.0.1:5432/editorial_import_ci?schema=pubquiz
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm run db:deploy
+      - run: node --import tsx --test app/fragen/import/external/editorialImport.test.ts app/fragen/import/external/editorialImport.integration.test.ts
