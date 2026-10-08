@@ -17,6 +17,9 @@ export const candidateDigest = (candidate: EditorialCandidate) => sha256(JSON.st
 const textKey = (value: string) => normalizeQuestionForSimilarity(value);
 const nameKey = (value: string) => value.normalize("NFKD").toLocaleLowerCase("de-DE").replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]/gu, "");
 const QUESTION_STOP_WORDS = new Set(["wie","viele","viel","welche","welcher","welches","betragt","betragen","lang","hoch","gross","laut","insgesamt","typisch","typische","typischen","erwachsene","erwachsenen","normalerweise","sind","eine","einer","einen","einem","eines","der","die","das","den","dem","des","und","oder","von","fur","mit","hat","haben","ist","werden","wird","zahl","anzahl","meter","kilometer","jahr","jahre"]);
+// Approximation/source boilerplate describes neither the entity nor the measurement.
+for (const word of ["ungefahr", "ungefahre", "ungefahren", "gerundet", "gerundete", "gerundeten",
+  "angabe", "angaben", "markenangabe", "nach", "vollstandig", "vollstandige", "vollstandigen"]) QUESTION_STOP_WORDS.add(word);
 function subjectTokens(question: string) {
   return new Set(textKey(question).split(" ").filter(t => t.length > 3 && !QUESTION_STOP_WORDS.has(t) && !/^\d+$/.test(t)).map(t => t.replace(/(ern|en|er|es|e|s)$/,"")));
 }

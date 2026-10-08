@@ -21,6 +21,10 @@ test("100 immutable approved rows validate, including all 50 exact anagrams and 
 test("different people with shared anagram boilerplate do not become semantic duplicates",()=>{
   assert.ok(run().slice(0,50).every(d=>d.action==="IMPORTIEREN"));
 });
+test("approximation/source boilerplate cannot make unrelated measurements semantic duplicates",()=>{
+  const decisions=run();
+  for(const id of ["EST-13","EST-40"]) assert.equal(decisions.find(d=>d.candidate.externalId===id)?.action,"IMPORTIEREN",id);
+});
 test("identical text duplicate is skipped, regardless of existing template",()=>{
   const c=fixtureSource.candidates[0];
   const d=previewEditorialImport({...fixtureSource,candidates:[c]},[{id:17,question:c.question.toUpperCase(),templateId:null,solutions:[c.solution],templateData:null}],new Map(),categories)[0];
