@@ -22,6 +22,7 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
       const sql=execFileSync(process.execPath,[resolve("node_modules/prisma/build/index.js"),"migrate","diff","--from-empty","--to-schema",baselinePath,"--script"],{env:{...process.env,JITI_CACHE:"false"},encoding:"utf8"});
       const start=sql.indexOf("-- CreateSchema");assert.ok(start>=0,"Expected generated PostgreSQL schema SQL");
       // Existing prisma.config.ts logs its non-sensitive source label to stdout.
+      await client.query("CREATE SCHEMA IF NOT EXISTS pubquiz; SET search_path TO pubquiz, public");
       await client.query(sql.slice(start));
     } finally {unlinkSync(baselinePath);}
     await client.query(readFileSync("prisma/migrations/20261008090000_editorial_question_difficulty/migration.sql","utf8"));
