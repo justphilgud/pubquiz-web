@@ -175,3 +175,17 @@ Model table/column and enum inventory is compared against the immutable active
 Production schema; candidate difficulty remains pending. Types/defaults/constraints/
 indexes/sequences/views equivalence is not proven by inventory and is explicitly
 INCOMPLETE. Catalog evidence is retained for further review, never a schema PASS.
+
+## EOL and complete applied-schema gates
+
+Only exact SHA256 or LF/CRLF variants of the same immutable SQL bytes are accepted.
+BOM/whitespace/SQL are preserved; unknown checksums remain MIGRATION_DRIFT. Each
+history row reports EXACT_BYTES/EOL_EQUIVALENT/MISMATCH. A separate no-secrets job
+replays only the verified immutable active baseline SQL in disposable PostgreSQL17
+with network none, no host mounts or Production credentials. It never executes
+candidate migrations. The Production reader remains READ ONLY; same-run artifact
+provenance, PostgreSQL major and exact applied baseline set are required. Complete
+columns/defaults, constraints/FK actions, indexes, sequences, enums, views and
+relations/triggers/routines are compared; only Prisma history metadata is excluded.
+Missing evidence BLOCKED, unexpected differences FAIL. Pending candidate difficulty
+is not replayed and must remain the expected pending migration. No live writes.

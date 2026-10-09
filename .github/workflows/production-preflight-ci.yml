@@ -26,7 +26,13 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --import tsx --test scripts/operations/production-preflight.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts
+      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci
+      - name: Replay current approved immutable baseline in network-isolated PostgreSQL
+        env:
+          EXPECTED_PRODUCTION_SHA: 2258c182e68c40a54fbdc4f0a855c9a7306d1a10
+        run: |
+          git fetch --no-tags origin "$EXPECTED_PRODUCTION_SHA"
+          node --import tsx scripts/operations/production-preflight-schema-build.ts

@@ -1,3 +1,4 @@
+import {compareFullSchema,SCHEMA_OBJECTS_SQL,type SchemaEvidence} from "./production-preflight-schema";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { Client } from "pg";
@@ -5,7 +6,7 @@ import { prismaChecksumEvidence, DIAGNOSTIC_COLUMNS_SQL, DIAGNOSTIC_CATALOG_SQL,
 import { assertDatabase, assertOperationTransport } from "./guards";
 
 export type Gate = { status: "PASS" | "BLOCKED" | "FAIL"; code: string };
-export type Migration = { name: string; checksum: string };
+export type Migration = { name: string; checksum: string; eolChecksums?: {lf:string;crlf:string} };
 export type Applied = { migration_name: string; checksum: string; finished_at: unknown; rolled_back_at: unknown };
 export const gate = (status: Gate["status"], code: string): Gate => ({ status, code });
 export function assessMigrations(candidate: Migration[], baseline: Migration[], applied: Applied[]) {
@@ -15,10 +16,15 @@ export function assessMigrations(candidate: Migration[], baseline: Migration[], 
   const baselineNames = new Set(baseline.map(row => row.name));
   const expected = candidate.filter(row => !baselineNames.has(row.name)).map(row => row.name);
   const pending = candidate.filter(row => !completedNames.has(row.name)).map(row => row.name);
-  const drift = completed.filter(row => !candidate.some(file => file.name === row.migration_name && file.checksum === row.checksum)).map(row => row.migration_name);
+  const checksumComparisons=completed.map(row=>{
+    const file=candidate.find(file=>file.name===row.migration_name);
+    const match=file?.checksum===row.checksum?'EXACT_BYTES':file?.eolChecksums&&[file.eolChecksums.lf,file.eolChecksums.crlf].includes(row.checksum)?'EOL_EQUIVALENT':'MISMATCH';
+    return {name:row.migration_name,storedChecksum:row.checksum,repositoryChecksum:file?.checksum,match};
+  });
+  const drift=checksumComparisons.filter(row=>row.match==='MISMATCH').map(row=>row.name);
   const baselineDrift = baseline.filter(row => !candidate.some(file => file.name === row.name && file.checksum === row.checksum)).map(row => row.name);
   const unexpected = pending.filter(name => !expected.includes(name));
-  return { applied: completed.map(row => row.migration_name), failed, expected, pending, drift, baselineDrift,
+  return { checksumComparisons, applied: completed.map(row => row.migration_name), failed, expected, pending, drift, baselineDrift,
     gate: gate(failed.length || drift.length || baselineDrift.length || unexpected.length ? "FAIL" : "PASS",
       failed.length ? "FAILED_MIGRATION" : drift.length || baselineDrift.length ? "MIGRATION_DRIFT" : unexpected.length ? "UNEXPECTED_PENDING_MIGRATION" : "MIGRATIONS_CONFIRMED") };
 }
@@ -32,7 +38,10 @@ export function migrationFiles(sha: string): Migration[] {
   const names = execFileSync("git", ["ls-tree", "-r", "--name-only", sha, "prisma/migrations"], { encoding: "utf8" }).trim().split("\n");
   const files = names.filter(path => /^prisma\/migrations\/[a-zA-Z0-9_-]+\/migration\.sql$/.test(path));
   if (!files.length) throw new Error("MIGRATION_MANIFEST_UNAVAILABLE");
-  return files.map(path => ({ name: path.split("/")[2], checksum: createHash("sha256").update(execFileSync("git", ["show", `${sha}:${path}`])).digest("hex") }));
+  return files.map(path=>{const bytes=execFileSync('git',['show',`${sha}:${path}`]),script=bytes.toString('utf8');
+    if(!Buffer.from(script).equals(bytes))throw new Error('MIGRATION_UTF8_UNVERIFIED');
+    const hash=(value:Buffer|string)=>createHash('sha256').update(value).digest('hex');
+    return {name:path.split('/')[2],checksum:hash(bytes),eolChecksums:{lf:hash(script.replaceAll('\r\n','\n')),crlf:hash(script.replaceAll('\n','\r\n'))}};});
 }
 export const MIGRATION_CATALOG_SQL = `SELECT current_setting('search_path') AS search_path,
   ARRAY(SELECT nspname::text FROM pg_namespace WHERE nspname !~ '^pg_' AND nspname <> 'information_schema' ORDER BY nspname) AS schemas,
@@ -66,7 +75,7 @@ export const DATABASE_READ_QUERIES = [
   MIGRATION_PRIVILEGES_SQL,
   "SELECT migration_name, checksum, finished_at, rolled_back_at, started_at, applied_steps_count FROM public._prisma_migrations ORDER BY migration_name, started_at",
 ] as const;
-export async function readMigrationSession(client: Pick<Client, "query">, candidate: Migration[], baseline: Migration[], expectedRole = "pubquiz_backup_reader", expectedDatabase = "neondb", evidence?: {baseline:ReturnType<typeof initRepositoryEvidence>;candidate:ReturnType<typeof initRepositoryEvidence>;inventory:ReturnType<typeof inventoryFromGit>}) {
+export async function readMigrationSession(client: Pick<Client, "query">, candidate: Migration[], baseline: Migration[], expectedRole = "pubquiz_backup_reader", expectedDatabase = "neondb", evidence?: {baseline:ReturnType<typeof initRepositoryEvidence>;candidate:ReturnType<typeof initRepositoryEvidence>;inventory:ReturnType<typeof inventoryFromGit>;expectedSchema?:SchemaEvidence}) {
   try {
     await client.query(DATABASE_READ_QUERIES[0]);
     await client.query(DATABASE_READ_QUERIES[1]);
@@ -95,15 +104,22 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
       const checksum=completed.length===1?completed[0].checksum:null;
       const columns=(await client.query(DIAGNOSTIC_COLUMNS_SQL)).rows[0]?.columns;
       const catalog=(await client.query(DIAGNOSTIC_CATALOG_SQL)).rows[0]?.catalog;
-      additionalDiagnostics={init,checksumComparison:checksum?prismaChecksumEvidence(evidence.candidate.bytes,checksum):{diagnosis:'INIT_HISTORY_UNVERIFIED'},
+      const objects=(await client.query(SCHEMA_OBJECTS_SQL)).rows[0]?.objects;
+      const major=Number((await client.query("SELECT current_setting('server_version_num')::int/10000 AS major")).rows[0]?.major);
+      const schemaGate=compareFullSchema(evidence.expectedSchema,{major,columns,catalog,objects},evidence.baseline.sha,baseline.map(({name,checksum})=>({name,checksum})));
+      additionalDiagnostics={schemaGate,schemaObjects:objects,init,checksumComparison:checksum?prismaChecksumEvidence(evidence.candidate.bytes,checksum):{diagnosis:'INIT_HISTORY_UNVERIFIED'},
         baselineSha:evidence.baseline.sha,candidateSha:evidence.candidate.sha,baselineBytesIdentical:evidence.baseline.bytes.equals(evidence.candidate.bytes),
         schemaComparison:compareSchemaInventory(evidence.inventory,columns,catalog),schemaColumns:columns,schemaCatalog:catalog};
     }
-    return { ...assessMigrations(candidate, baseline, rows), additionalDiagnostics, privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
+    const assessment=assessMigrations(candidate,baseline,rows);
+    const appliedMatchesBaseline=assessment.applied.length===baseline.length&&baseline.every(file=>assessment.applied.includes(file.name));
+    const schemaGate=!appliedMatchesBaseline?gate('BLOCKED','APPLIED_SCHEMA_PLAN_UNVERIFIED'):additionalDiagnostics?.schemaGate;
+    const finalGate=assessment.gate.status!=='PASS'?assessment.gate:schemaGate?.status==='PASS'?assessment.gate:gate(schemaGate?.status==='FAIL'?'FAIL':'BLOCKED',schemaGate?.code??'EXPECTED_SCHEMA_UNAVAILABLE');
+    return { ...assessment, gate:evidence?finalGate:assessment.gate, schemaGate, additionalDiagnostics, privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
   } catch (error) { return { gate: gate("BLOCKED", (error as { code?: string }).code === "42501" ? "DATABASE_SELECT_PERMISSION_MISSING" : "MIGRATION_STATUS_UNAVAILABLE") }; }
   finally { await client.query("ROLLBACK").catch(() => undefined); }
 }
-export async function readProductionMigrations(connectionString: string, candidate: Migration[], baseline: Migration[], evidence?: {baseline:ReturnType<typeof initRepositoryEvidence>;candidate:ReturnType<typeof initRepositoryEvidence>;inventory:ReturnType<typeof inventoryFromGit>}) {
+export async function readProductionMigrations(connectionString: string, candidate: Migration[], baseline: Migration[], evidence?: {baseline:ReturnType<typeof initRepositoryEvidence>;candidate:ReturnType<typeof initRepositoryEvidence>;inventory:ReturnType<typeof inventoryFromGit>;expectedSchema?:SchemaEvidence}) {
   let identity;
   try { identity = assertDatabase(connectionString, "production"); assertOperationTransport(new URL(connectionString)); }
   catch { return { gate: gate("BLOCKED", "DATABASE_IDENTITY_OR_TRANSPORT_UNVERIFIED") }; }
