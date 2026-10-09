@@ -130,7 +130,10 @@ export async function readProductionDeployment(input: { token: string; project: 
     // Only validated identifiers enter the public artifact; never raw API fields or arbitrary strings.
     return { ...finish(), deploymentId: deploymentId(id)?id:undefined, sha:shaValue(sha)?sha:undefined, alias:input.alias,
       state:deployment.readyState==='READY'?'READY':undefined };
-  } catch { return finish(); }
+  } catch {
+    if (!gates.some(g=>g.status==='BLOCKED'||g.status==='FAIL')) gates.push(gate('BLOCKED','DEPLOYMENT_DIAGNOSTIC_UNAVAILABLE'));
+    return finish();
+  }
 }
 export function assertPreflightContext(env: Readonly<Record<string, string | undefined>>) {
   if (env.GITHUB_ACTIONS !== "true" || env.GITHUB_REPOSITORY !== "justphilgud/pubquiz-web" || env.GITHUB_REF !== "refs/heads/main" ||
