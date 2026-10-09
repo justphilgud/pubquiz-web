@@ -55,7 +55,7 @@ test('each missing identity and confirmed mismatch produces an individual safe g
     {id:'dpl_x',projectId:input.project,target:'production',readyState:'READY',meta:{githubCommitSha:sha}}];
   const cases:[number,string,unknown,string,string][]=[
     [0,'deployment',{},'BLOCKED','ALIAS_DEPLOYMENT_ID_MISSING'],[0,'alias','wrong.example.com','FAIL','ALIAS_HOST_MISMATCH'],
-    [0,'projectId','prj_wrong','FAIL','ALIAS_PROJECT_MISMATCH'],[1,'targets',{},'FAIL','UNAPPROVED_PRODUCTION_TARGET_DRIFT'],
+    [0,'projectId','prj_wrong','FAIL','ALIAS_PROJECT_MISMATCH'],[1,'targets',{},'BLOCKED','PROJECT_PRODUCTION_DEPLOYMENT_ID_MISSING'],
     [2,'meta',{},'BLOCKED','DEPLOYMENT_SHA_MISSING'],[2,'target','preview','FAIL','DEPLOYMENT_ENVIRONMENT_MISMATCH'],
     [2,'readyState','ERROR','FAIL','DEPLOYMENT_STATE_MISMATCH'],[2,'meta',{githubCommitSha:'b'.repeat(40)},'FAIL','DEPLOYMENT_SHA_MISMATCH'],
     [2,'id',undefined,'BLOCKED','DEPLOYMENT_ID_MISSING']];

@@ -119,6 +119,7 @@ export async function readProductionDeployment(input: { token: string; project: 
     const deployment=await get(`/v13/deployments/${id}`,'DEPLOYMENT');
     check('PROJECT_ID',project.id,input.project,string);
     const targetId=object(object(project.targets).production).id;
+    if (!deploymentId(targetId)) { gates.push(gate('BLOCKED','PROJECT_PRODUCTION_DEPLOYMENT_ID_MISSING'));return finish(); }
     const rollbackMismatch=targetId!==id;
     if (!rollbackMismatch) check('PROJECT_PRODUCTION_DEPLOYMENT_ID',targetId,id,deploymentId);
     check('DEPLOYMENT_ID',deployment.id,id,deploymentId);
