@@ -30,9 +30,17 @@ jobs:
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci
-      - name: Replay current approved immutable baseline in network-isolated PostgreSQL
+      - name: Build independent schema reference, delta proof and separate new-install result in network-isolated PostgreSQL
         env:
           EXPECTED_PRODUCTION_SHA: 2258c182e68c40a54fbdc4f0a855c9a7306d1a10
         run: |
-          git fetch --no-tags origin "$EXPECTED_PRODUCTION_SHA"
+          git fetch --no-tags origin "$EXPECTED_PRODUCTION_SHA" 912cd86e70ec51f15a8028c3f34fbe3e86f5fc69 b7666e1a3e4fcbe1aec4e7884a30b3603e25b151
           node --import tsx scripts/operations/production-preflight-schema-build.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schema-reference-proof
+          path: |
+            expected-schema.json
+            delta-test.json
+            new-install-replay.json
+          if-no-files-found: error

@@ -114,8 +114,15 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     const assessment=assessMigrations(candidate,baseline,rows);
     const appliedMatchesBaseline=assessment.applied.length===baseline.length&&baseline.every(file=>assessment.applied.includes(file.name));
     const schemaGate=!appliedMatchesBaseline?gate('BLOCKED','APPLIED_SCHEMA_PLAN_UNVERIFIED'):additionalDiagnostics?.schemaGate;
-    const finalGate=assessment.gate.status!=='PASS'?assessment.gate:schemaGate?.status==='PASS'?assessment.gate:gate(schemaGate?.status==='FAIL'?'FAIL':'BLOCKED',schemaGate?.code??'EXPECTED_SCHEMA_UNAVAILABLE');
-    return { ...assessment, gate:evidence?finalGate:assessment.gate, schemaGate, additionalDiagnostics, privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
+    const expectedDeltaGate=gate(assessment.pending.length===1&&assessment.pending[0]==='20261008090000_editorial_question_difficulty'?'PASS':'BLOCKED','EXPECTED_DELTA_CHECK');
+    const deltaEvidence=evidence?.expectedSchema?.deltaTest as {status?:string;migration?:string}|undefined;
+    const deltaGate=gate(deltaEvidence?.status==='PASS'&&deltaEvidence.migration==='20261008090000_editorial_question_difficulty'?'PASS':'BLOCKED','ISOLATED_DELTA_EVIDENCE');
+    const replay=evidence?.expectedSchema?.newInstallReplay as {status?:string;code?:string;migration?:string}|undefined;
+    const replayGate=gate(replay?.status==='FAIL'&&replay.code==='HISTORICAL_BASELINE_OVERLAP'&&replay.migration==='20260713130000_add_question_draft_fields'?'PASS':'BLOCKED','NEW_INSTALL_LIMITATION_DOCUMENTED');
+    const finalGate=[assessment.gate,schemaGate??gate('BLOCKED','EXPECTED_SCHEMA_UNAVAILABLE'),expectedDeltaGate,deltaGate,replayGate].find(item=>item.status!=='PASS')??assessment.gate;
+    return { ...assessment, gate:evidence?finalGate:assessment.gate, migrationHistoryGate:assessment.gate,
+      databaseIdentityGate:gate('PASS','DATABASE_SESSION_CONFIRMED'),expectedDeltaGate,deltaGate,replayGate,
+      newInstallReplay:evidence?.expectedSchema?.newInstallReplay??{status:'BLOCKED',code:'REPLAY_EVIDENCE_MISSING'},deltaTest:evidence?.expectedSchema?.deltaTest??{status:'BLOCKED',code:'DELTA_EVIDENCE_MISSING'},schemaGate, additionalDiagnostics, privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
   } catch (error) { return { gate: gate("BLOCKED", (error as { code?: string }).code === "42501" ? "DATABASE_SELECT_PERMISSION_MISSING" : "MIGRATION_STATUS_UNAVAILABLE") }; }
   finally { await client.query("ROLLBACK").catch(() => undefined); }
 }

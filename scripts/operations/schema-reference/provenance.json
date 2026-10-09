@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "baselineSha": "2258c182e68c40a54fbdc4f0a855c9a7306d1a10",
+  "modelSourceSha": "912cd86e70ec51f15a8028c3f34fbe3e86f5fc69",
+  "modelSourcePath": "prisma/schema.prisma",
+  "modelSourceSha256": "7ac20d824fa8b7214e7132da1e5cbf451dc7a509a8273b663917c18963fc7eab",
+  "prismaEngine": "e922089b7d7502aff4249d5da3420f6fa55fc6ad",
+  "referenceDdlSha256": "7380ba74cf941ef9ebfe2e158b2ad5812a669399067ac4268d86f46e9f2fb536",
+  "method": "Independent prehistory model DDL plus all versioned incremental schema changes. Not a linear 0_init replay.",
+  "baselineSnapshot": "0_init",
+  "baselineCollision": "Draft additions already present in 0_init; all history rows still validated separately",
+  "candidateSha": "b7666e1a3e4fcbe1aec4e7884a30b3603e25b151",
+  "delta": "20261008090000_editorial_question_difficulty"
+}
