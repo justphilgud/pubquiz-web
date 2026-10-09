@@ -1,7 +1,7 @@
 import { Client } from "pg";
 import { isDeepStrictEqual } from "node:util";
 import { assertDatabase, assertOperationTransport } from "../../../../scripts/operations/guards";
-import { assertProductionEditorialContext, assertProductionEditorialSource } from "./editorialProductionPolicy";
+import { assertProductionEditorialContext, assertProductionEditorialSource, EditorialProductionWriteAuthorization } from "./editorialProductionPolicy";
 import { candidateDigest, previewEditorialImport, sha256, type EditorialSource, type EditorialExistingQuestion } from "./editorialImport";
 
 // Fixed application-table allowlist: neither identifiers nor SQL are caller-configurable.
@@ -19,7 +19,7 @@ export const PROTECTED_TABLES = [
   "users", "benutzer_rollenzuweisungen", "eventreihe_benutzerrollen",
 ] as const;
 type Integrity = Record<string, { count: number; digest: string }>;
-export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId?: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string; productionPreflight?: boolean };
+export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId?: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string; productionPreflight?: boolean; productionWrite?: EditorialProductionWriteAuthorization };
 
 export async function editorialIntegritySnapshot(client: Client, exclude: number[] = []): Promise<Integrity> {
   const result: Integrity = {};
@@ -47,7 +47,9 @@ async function inventory(client: Client, source: EditorialSource) {
   const categories = await client.query(`SELECT fragenkategorie_id AS id, kategorie AS name FROM pubquiz.fragenkategorie WHERE status='ACTIVE' ORDER BY fragenkategorie_id`);
   const decisions = previewEditorialImport(source, questions.rows as EditorialExistingQuestion[], new Map(previous.rows.map(r => [r.external_reference, { questionId: r.question_id, digest: r.content_fingerprint }])), new Set(categories.rows.map(r => r.name)));
   const digest = sha256(JSON.stringify({ source, decisions, existing: questions.rows, previous: previous.rows, categories: categories.rows }));
-  return { decisions, digest, categories: categories.rows as { id: number; name: string }[] };
+  const duplicateIds = new Set(decisions.flatMap(d => d.duplicates.map(r => r.questionId)).filter(id => id > 0));
+  return { decisions, digest, categories: categories.rows as { id: number; name: string }[],
+    duplicateEvidence: questions.rows.filter(q => duplicateIds.has(q.id)).map(q => ({ id: q.id, question: q.question, templateId: q.templateId, solutions: q.solutions })) };
 }
 
 async function journalSnapshot(client: Client, excludedBatch = -1): Promise<Integrity> {
@@ -60,11 +62,18 @@ async function journalSnapshot(client: Client, excludedBatch = -1): Promise<Inte
   return result;
 }
 
-/** Shared fixed-query core. Production is a workflow-only read capability, never a writer. */
+/** Shared fixed-query core; Production writes require an independently reviewed one-use capability. */
 export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) {
   if (!["dry-run", "import"].includes(input.mode)) throw new Error("EDITORIAL_MODE_INVALID");
   const identity = new URL(input.connectionString);
   const isolatedCi = process.env.CI === "true" && identity.hostname === "127.0.0.1" && identity.pathname === "/editorial_import_ci";
+  let approvedWriteIds: string[] | undefined;
+  if (input.productionWrite) {
+    if (input.mode !== "import" || input.productionPreflight || !(input.productionWrite instanceof EditorialProductionWriteAuthorization)) throw new Error("EDITORIAL_PRODUCTION_WRITE_NOT_AUTHORIZED");
+    approvedWriteIds = input.productionWrite.consume(input.expectedDryRunDigest);
+    assertProductionEditorialSource(input.source);
+    if (!isolatedCi) { assertDatabase(input.connectionString, "production"); assertOperationTransport(identity); }
+  }
   if (input.productionPreflight) {
     if (input.mode !== "dry-run") throw new Error("EDITORIAL_PRODUCTION_WRITE_NOT_AUTHORIZED");
     assertProductionEditorialSource(input.source);
@@ -73,16 +82,30 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
       assertDatabase(input.connectionString, "production");
       assertOperationTransport(identity);
     }
-  } else if (!isolatedCi) assertDatabase(input.connectionString, "preview");
+  } else if (!input.productionWrite && !isolatedCi) assertDatabase(input.connectionString, "preview");
   if (input.mode === "import" && (!Number.isSafeInteger(input.operatorUserId) || (input.operatorUserId ?? 0) <= 0)) throw new Error("EDITORIAL_OPERATOR_REQUIRED");
   const url = new URL(input.connectionString); url.searchParams.delete("schema");
   const client = new Client({ connectionString: url.toString() });
   let begun = false;
   try {
     await client.connect();
-    await client.query(input.mode === "dry-run" ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN"); begun = true;
+    await client.query(input.mode === "dry-run" ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : input.productionWrite ? "BEGIN ISOLATION LEVEL SERIALIZABLE" : "BEGIN"); begun = true;
     await client.query("SET LOCAL lock_timeout = '5s'");
     await client.query("SET LOCAL statement_timeout = '30s'");
+    if (input.productionWrite) {
+      const role = (await client.query(`SELECT current_database() AS database, current_user AS role, rolsuper, rolcreatedb, rolcreaterole, rolreplication, rolbypassrls,
+        EXISTS(SELECT 1 FROM pg_roles other WHERE other.rolname<>current_user AND pg_has_role(current_user,other.oid,'MEMBER')) AS membership
+        FROM pg_roles WHERE rolname=current_user`)).rows[0];
+      if (!isolatedCi && (role?.role !== "pubquiz_external_import_writer" || role.database !== "neondb" || role.rolsuper || role.rolcreatedb || role.rolcreaterole || role.rolreplication || role.rolbypassrls || role.membership)) throw new Error("EDITORIAL_WRITER_ROLE_INVALID");
+      if (!isolatedCi) {
+        for (const table of PROTECTED_TABLES) {
+          const acl = (await client.query(`SELECT has_table_privilege(current_user,$1,'UPDATE,DELETE,TRUNCATE') OR has_any_column_privilege(current_user,$1,'UPDATE') OR EXISTS(SELECT 1 FROM pg_class WHERE oid=$1::regclass AND relowner=(SELECT oid FROM pg_roles WHERE rolname=current_user)) AS forbidden`, [`pubquiz.${table}`])).rows[0];
+          if (acl.forbidden) throw new Error("EDITORIAL_WRITER_EXISTING_DATA_PRIVILEGE");
+        }
+      }
+      const actor = (await client.query(`SELECT 1 FROM pubquiz.users u JOIN pubquiz.benutzer_rollenzuweisungen r ON r.benutzer_id=u.id WHERE u.id=$1 AND u.is_active AND r.rolle='ADMIN' AND r.scope_typ='GLOBAL'`, [input.operatorUserId])).rows;
+      if (!actor.length) throw new Error("EDITORIAL_ADMIN_REQUIRED");
+    }
     let productionSchema: unknown = null;
     if (input.productionPreflight) {
       const session = (await client.query("SELECT current_user AS role, current_database() AS database")).rows[0];
@@ -91,14 +114,26 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
       const history = await client.query('SELECT migration_name, checksum, finished_at, rolled_back_at FROM public._prisma_migrations ORDER BY migration_name');
       const column = await client.query("SELECT data_type,is_nullable,character_maximum_length FROM information_schema.columns WHERE table_schema='pubquiz' AND table_name='fragen' AND column_name='redaktionelle_schwierigkeit'");
       const constraint = await client.query("SELECT convalidated,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='pubquiz.fragen'::regclass AND conname='fragen_editorial_difficulty_check'");
-      productionSchema = { migrations: history.rows, difficultyColumn: column.rows, difficultyConstraint: constraint.rows };
+      const writerRole = (await client.query(`SELECT rolname, rolsuper, rolcreatedb, rolcreaterole, rolreplication, rolbypassrls FROM pg_roles WHERE rolname='pubquiz_external_import_writer'`)).rows[0];
+      const writerPrivileges: { relation: string; select: boolean }[] = [];
+      if (writerRole) for (const table of [...PROTECTED_TABLES, "external_question_import_batches", "external_question_import_items"]) {
+        writerPrivileges.push({ relation: table, select: (await client.query("SELECT has_table_privilege('pubquiz_external_import_writer', $1, 'SELECT') AS allowed", [`pubquiz.${table}`])).rows[0].allowed });
+      }
+      const writerColumns: { column: string; insert: boolean }[] = [];
+      if (writerRole) for (const name of ["frage", "quelle", "vorlage_id", "template_config_json", "redaktionelle_schwierigkeit", "created_by_user_id", "last_modified_by_user_id", "freigegeben", "review_status", "ist_unfertig"]) {
+        writerColumns.push({ column: name, insert: (await client.query("SELECT has_column_privilege('pubquiz_external_import_writer','pubquiz.fragen',$1,'INSERT') AS allowed", [name])).rows[0].allowed });
+      }
+      const operatorIds = (await client.query(`SELECT DISTINCT u.id FROM pubquiz.users u JOIN pubquiz.benutzer_rollenzuweisungen r ON r.benutzer_id=u.id WHERE u.is_active AND r.rolle='ADMIN' AND r.scope_typ='GLOBAL' ORDER BY u.id`)).rows.map(r=>r.id as number);
+      productionSchema = { migrations: history.rows, difficultyColumn: column.rows, difficultyConstraint: constraint.rows, writerRole, writerPrivileges, writerColumns, operatorIds };
     }
     if (input.mode === "dry-run") {
       const setting = (await client.query("SHOW transaction_read_only")).rows[0];
       if (setting.transaction_read_only !== "on") throw new Error("EDITORIAL_READ_ONLY_REQUIRED");
     } else {
       await client.query("SELECT pg_advisory_xact_lock(18431008)");
-      await client.query(`LOCK TABLE ${PROTECTED_TABLES.map(t => `pubquiz.${t}`).join(", ")}, pubquiz.external_question_import_batches, pubquiz.external_question_import_items IN SHARE ROW EXCLUSIVE MODE`);
+      // The restricted Production writer has no UPDATE/DELETE rights on protected
+      // tables. SERIALIZABLE supplies a stable snapshot without expanding its ACLs.
+      if (!input.productionWrite) await client.query(`LOCK TABLE ${PROTECTED_TABLES.map(t => `pubquiz.${t}`).join(", ")}, pubquiz.external_question_import_batches, pubquiz.external_question_import_items IN SHARE ROW EXCLUSIVE MODE`);
     }
     const before = await snapshot(client);
     const journalBefore = await journalSnapshot(client);
@@ -108,6 +143,7 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
       return { mode: input.mode, ...preview, before, after: before, questionIds: [], manifest: null, productionSchema };
     }
     if (preview.digest !== input.expectedDryRunDigest) throw new Error("EDITORIAL_DRY_RUN_STALE");
+    if (approvedWriteIds && JSON.stringify(preview.decisions.filter(d => d.action === "IMPORTIEREN").map(d => d.candidate.externalId)) !== JSON.stringify(approvedWriteIds)) throw new Error("EDITORIAL_APPROVED_CANDIDATES_CHANGED");
     const templates = (await client.query("SELECT vorlage_id AS id, code FROM pubquiz.frage_vorlagen WHERE code IN ('anagramm','schaetzfrage')")).rows as { id: number; code: string }[];
     const answerType = (await client.query("SELECT antworttyp_id AS id FROM pubquiz.antworttyp WHERE lower(antworttyp)='standard'")).rows[0];
     if (!answerType) throw new Error("EDITORIAL_ANSWER_TYPE_MISSING");

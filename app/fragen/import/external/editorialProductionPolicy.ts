@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import approvedIds from "../../../../editorial/paule-oktober-2026/production-allowlist.json";
 import { candidateDigest, parseEditorialPool, sha256, type EditorialSource } from "./editorialImport";
+import { isVerifiedExternalImportReviewerApproval, type VerifiedExternalImportReviewerApproval } from "./reviewerApproval";
 
 export const EDITORIAL_PRODUCTION_WORKFLOW = "justphilgud/pubquiz-web/.github/workflows/external-question-import-preflight.yml@refs/heads/main";
 const hashes = {
@@ -29,7 +30,27 @@ export function assertProductionEditorialSource(source: EditorialSource) {
 export function assertProductionEditorialContext(env: Readonly<Record<string, string | undefined>>) {
   if (env.GITHUB_ACTIONS !== "true" || env.GITHUB_REPOSITORY !== "justphilgud/pubquiz-web" ||
       env.GITHUB_REF !== "refs/heads/main" || env.GITHUB_EVENT_NAME !== "workflow_dispatch" ||
-      env.GITHUB_WORKFLOW_REF !== EDITORIAL_PRODUCTION_WORKFLOW || env.EDITORIAL_GITHUB_ENVIRONMENT !== "operations-backup" ||
+      ![EDITORIAL_PRODUCTION_WORKFLOW, EDITORIAL_WRITER_WORKFLOW].includes(env.GITHUB_WORKFLOW_REF ?? "") || env.EDITORIAL_GITHUB_ENVIRONMENT !== "operations-backup" ||
       !/^[a-f0-9]{40}$/.test(env.EDITORIAL_PRODUCTION_SHA ?? "") ||
       env.EDITORIAL_PRODUCTION_SHA !== env.PRODUCTION_RELEASE_SHA) throw new Error("EDITORIAL_PRODUCTION_CONTEXT_INVALID");
+}
+
+export const EDITORIAL_WRITER_WORKFLOW = "justphilgud/pubquiz-web/.github/workflows/external-question-import.yml@refs/heads/main";
+/** Capability derived from the existing GitHub environment review; never from a boolean input. */
+export class EditorialProductionWriteAuthorization {
+  private available = true;
+  constructor(readonly review: VerifiedExternalImportReviewerApproval) {}
+  consume(digest: string | undefined, env: Readonly<Record<string, string | undefined>> = process.env) {
+    if (!this.available || !isVerifiedExternalImportReviewerApproval(this.review) ||
+      env.GITHUB_ACTIONS !== "true" || env.GITHUB_REPOSITORY !== "justphilgud/pubquiz-web" ||
+      env.GITHUB_REF !== "refs/heads/main" || env.GITHUB_EVENT_NAME !== "workflow_dispatch" ||
+      env.GITHUB_WORKFLOW_REF !== EDITORIAL_WRITER_WORKFLOW || env.EDITORIAL_GITHUB_ENVIRONMENT !== "operations-content-import" ||
+      env.EDITORIAL_PRODUCTION_SHA !== env.PRODUCTION_RELEASE_SHA || !/^[a-f0-9]{40}$/.test(env.EDITORIAL_PRODUCTION_SHA ?? "") ||
+      this.review.runId !== env.GITHUB_RUN_ID || this.review.runAttempt !== env.GITHUB_RUN_ATTEMPT ||
+      this.review.planDigest !== digest || !/^[a-f0-9]{64}$/.test(digest ?? "") ||
+      this.review.backupId !== "production/acceptance/run-37971426600-1" ||
+      !this.review.candidateIds.every(id => approvedIds.includes(id))) throw new Error("EDITORIAL_PRODUCTION_WRITE_NOT_AUTHORIZED");
+    this.available = false;
+    return [...this.review.candidateIds];
+  }
 }

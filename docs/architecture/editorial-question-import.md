@@ -156,3 +156,12 @@ explizit in public._prisma_migrations. Der redaktionelle Nur-Lese-Adapter liest
 ausschliesslich diese feste Relation; kein search_path-/Namens-Fallback. Ein
 PostgreSQL-Regressionstest mit irrefuehrender pubquiz-Namensrelation stellt
 sicher, dass diese nicht verwendet wird. Keine Schema- oder ACL-Aenderung.
+
+## Production-Freigabepfad (gezielte Erweiterung nach PR #95)
+
+Der historische Preview-only-Vertrag bleibt fuer UI-Aktionen bestehen.
+Ein zusaetzlicher Workflow-only-Pfad nutzt denselben Importkern und die
+bestehende operations-content-import-Environment. Der aktuelle Vertrag,
+Einmalfreigabe, Digestbindung, SERIALIZABLE-Begruendung, Rechtegrenzen und
+Testnachweise sind in docs/operations/editorial-production-write.md beschrieben.
+Die Bereitstellung ist keine Schreibfreigabe; dry_run bleibt Standard.
