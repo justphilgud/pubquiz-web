@@ -123,6 +123,7 @@ export async function acceptanceRestore(env: Environment) {
       schemaTablesConstraintsSequencesMigrationsCountsSamples: "matched", authenticationValues: "excluded",
       resultReconstruction: "persisted-final-points-and-ranking-matched", applicationSmoke: "domain-points-formatter-and-ranking",
       browserSmoke: "not-executed", snapshotAt: manifest.snapshotAt,
+      backupCompletedAt: manifest.completedAt, backupVersion: manifest.version, sourceProductionSha: manifest.release,
       snapshotAgeAtRestoreMs: started - Date.parse(manifest.snapshotAt),
       measuredRecoveryMs: Date.now() - started, deletionEnabled: false };
     await writeFile(join(directory, "validation.json"), JSON.stringify(evidence), { mode: 0o600 });

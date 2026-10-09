@@ -10,7 +10,10 @@ async function main() {
 }
 main().then(result => {
   if (process.argv[2] === "restore" && process.env.RESTORE_EVIDENCE_PATH) {
-    const evidence = { version: 1, status: "PASS", backupId: (result as {key:string}).key,
+    const restore=result as {key:string;snapshotAt:string;backupCompletedAt:string;backupVersion:number;sourceProductionSha:string;restoredOriginals:number};
+    const evidence = { version: 1, status: "PASS", backupId: restore.key,
+      backupSnapshotAt:restore.snapshotAt,backupCompletedAt:restore.backupCompletedAt,
+      backupVersion:restore.backupVersion,sourceProductionSha:restore.sourceProductionSha,mediaCount:restore.restoredOriginals,
       manifestSha256: process.env.AP94_MANIFEST_SHA256, target: "isolated-test", completedAt: new Date().toISOString(),
       databaseIntegrity: "PASS", mediaIntegrity: "PASS", restoreExecuted: true };
     writeFileSync(process.env.RESTORE_EVIDENCE_PATH, JSON.stringify(evidence), {flag:"wx",mode:0o600});
