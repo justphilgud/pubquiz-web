@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   deployVercelGitPreview,
+  checkVercelGitPreview,
   GitPreviewDeploymentError,
   validateGitPreviewDeploymentInput,
+  verifyPreviewEnvironmentConfiguration,
 } from "./deploy-vercel-git-preview";
 
 const branch = "preview/content-and-quiz-flow";
@@ -18,6 +20,7 @@ const validInput = {
   sha,
   teamId: "team_preview",
   token: "vercel-test-token",
+  trustedBranches: JSON.stringify([branch]),
 } as const;
 
 const branchEnvironment = [
@@ -29,8 +32,9 @@ const branchEnvironment = [
   { key: "BLOB_WEBHOOK_PUBLIC_KEY", type: "encrypted" },
 ].map((variable) => ({
   ...variable,
-  gitBranch: branch,
+  gitBranch: null,
   target: ["preview"],
+  contentHint: { storeId: "store_VzfNwjccgkzhc9bi" },
 }));
 
 const deploymentEnvironmentKeys = branchEnvironment.map(
@@ -91,7 +95,7 @@ function createSuccessfulFetch(
       });
     }
 
-    if (url.pathname === "/v9/projects/prj_preview/env") {
+    if (url.pathname === "/v10/projects/prj_preview/env") {
       return jsonResponse({ envs: branchEnvironment });
     }
 
@@ -197,7 +201,7 @@ test("rejects main and every non-preview deployment environment", () => {
   );
 });
 
-test("requires all six branch-specific Preview variables before deployment", async () => {
+test("requires all six central Preview variables before deployment", async () => {
   const { fetchMock } = createSuccessfulFetch();
   const incompleteFetch = (async (
     input: URL | RequestInfo,
@@ -207,7 +211,7 @@ test("requires all six branch-specific Preview variables before deployment", asy
       input instanceof Request ? input.url : input.toString(),
     );
 
-    if (url.pathname === "/v9/projects/prj_preview/env") {
+    if (url.pathname === "/v10/projects/prj_preview/env") {
       return jsonResponse({ envs: branchEnvironment.slice(1) });
     }
 
@@ -245,4 +249,92 @@ test("rejects a deployment resolved as Production", async () => {
     deployVercelGitPreview(validInput, dependencies(fetchMock)),
     assertErrorCode("DEPLOYED_ENVIRONMENT_INVALID"),
   );
+});
+
+
+test("new branches inherit central Preview variables without branch configuration", () => {
+  for (const newBranch of ["codex/new-a", "feature/new-b"]) {
+    assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs: branchEnvironment }, newBranch));
+  }
+});
+
+test("media overrides on any branch block deployment", () => {
+  for (const key of deploymentEnvironmentKeys) {
+    assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: [
+      ...branchEnvironment, { key, gitBranch: branch, target: ["preview"], type: "encrypted" },
+    ] }, branch), assertErrorCode("PREVIEW_MEDIA_OVERRIDE_FORBIDDEN"));
+  }
+});
+
+test("ambiguous, cross-environment or wrong-type central variables fail closed", () => {
+  for (const envs of [
+    [...branchEnvironment, branchEnvironment[0]],
+    branchEnvironment.map((v) => ({ ...v, target: ["preview", "development"] })),
+    branchEnvironment.map((v) => ({ ...v, type: "plain" })),
+  ]) {
+    assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs }, branch),
+      assertErrorCode("PREVIEW_BRANCH_ENVIRONMENT_INVALID"));
+  }
+});
+
+test("store integration metadata prevents Production credentials in Preview", () => {
+  for (const storeId of [undefined, "store_bIx6H2j23vJzi240", "store_unknown"]) {
+    const envs = branchEnvironment.map((v) => v.key === "BLOB_READ_WRITE_TOKEN"
+      ? { ...v, contentHint: { storeId } } : v);
+    assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs }, branch),
+      assertErrorCode("PREVIEW_MEDIA_STORE_MISMATCH"));
+  }
+  assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: [
+    ...branchEnvironment, { key: "BLOB_READ_WRITE_TOKEN", type: "sensitive", target: ["production"],
+      contentHint: { storeId: "store_VzfNwjccgkzhc9bi" } },
+  ] }, branch), assertErrorCode("PRODUCTION_MEDIA_STORE_MISMATCH"));
+});
+
+test("preflight never accesses secret values and explicitly disables decryption", async () => {
+  const envs = branchEnvironment.map((v) => Object.defineProperty({ ...v }, "value", {
+    get() { throw new Error("Secret value accessed"); },
+  }));
+  assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs }, branch));
+  const { fetchMock, requests } = createSuccessfulFetch();
+  await deployVercelGitPreview(validInput, dependencies(fetchMock));
+  const request = requests.find((r) => r.url.pathname.endsWith("/env"));
+  assert.equal(request?.url.searchParams.get("decrypt"), "false");
+  assert.equal(request?.url.searchParams.has("gitBranch"), false);
+});
+
+
+test("read-only preflight issues no deployment request", async () => {
+  const { fetchMock, requests } = createSuccessfulFetch();
+  await checkVercelGitPreview(validInput, dependencies(fetchMock));
+  assert.equal(requests.length, 2);
+  assert.equal(requests.some((r) => r.init?.method === "POST"), false);
+});
+
+
+test("unapproved branches cannot obtain any Vercel request even with successful CI", async () => {
+  const { fetchMock, requests } = createSuccessfulFetch();
+  for (const trustedBranches of [undefined, "[]", '["codex/*"]', '["other-branch"]']) {
+    await assert.rejects(deployVercelGitPreview({ ...validInput, trustedBranches }, dependencies(fetchMock)), assertErrorCode("PREVIEW_BRANCH_NOT_TRUSTED"));
+  }
+  assert.equal(requests.length, 0);
+});
+
+test("central acceptance on a different branch does not consume existing legacy overrides", () => {
+  const envs = [...branchEnvironment, ...branchEnvironment.map((v) => ({ ...v, gitBranch: branch }))];
+  assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs }, "codex/preview-media-configuration"));
+  assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs }, branch), assertErrorCode("PREVIEW_MEDIA_OVERRIDE_FORBIDDEN"));
+});
+
+test("Vercel integration may expose the nonsecret store identity and public key as plain config", () => {
+  const integrated = branchEnvironment.map((variable) => ["BLOB_STORE_ID", "BLOB_WEBHOOK_PUBLIC_KEY"].includes(variable.key)
+    ? { ...variable, type: "plain" } : variable);
+  assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs: integrated }, branch));
+  const wrongStore = integrated.map((variable) => variable.key === "BLOB_STORE_ID"
+    ? { ...variable, contentHint: { storeId: "store_bIx6H2j23vJzi240" } } : variable);
+  assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: wrongStore }, branch),
+    (error: unknown) => error instanceof GitPreviewDeploymentError && error.code === "PREVIEW_MEDIA_STORE_MISMATCH");
+  const plainToken = integrated.map((variable) => variable.key === "BLOB_READ_WRITE_TOKEN"
+    ? { ...variable, type: "plain" } : variable);
+  assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: plainToken }, branch),
+    (error: unknown) => error instanceof GitPreviewDeploymentError && error.code === "PREVIEW_BRANCH_ENVIRONMENT_INVALID");
 });

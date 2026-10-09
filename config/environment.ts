@@ -1,4 +1,6 @@
 import type { BlobEnvironmentPrefix } from "../app/lib/blobPath";
+import { createHash } from "node:crypto";
+import { PREVIEW_MEDIA_STORE_ID } from "./media-store-policy";
 
 export type LogicalEnvironment = "development" | "preview" | "production";
 
@@ -121,16 +123,48 @@ export function getBlobEnvironmentPrefix(
     return "prod";
   }
 
+  if (environment === "preview" && process.env.VERCEL_ENV === "preview") {
+    const branch = process.env.VERCEL_GIT_COMMIT_REF;
+    if (!branch?.trim()) {
+      throw new EnvironmentConfigurationError(
+        "PREVIEW_MEDIA_BRANCH_MISSING",
+        "Die Vercel-Branch-Identität für Medien fehlt.",
+      );
+    }
+    return `preview/${createHash("sha256").update(branch).digest("hex")}`;
+  }
   return environment === "preview" ? "preview" : "dev";
 }
 
 export function getBlobReadWriteToken() {
+  if (process.env.VERCEL_ENV === "preview") {
+    getLogicalEnvironment();
+    getBlobEnvironmentPrefix();
+    const storeId = PREVIEW_MEDIA_STORE_ID.slice("store_".length);
+    if (process.env.MEDIA_UPLOAD_STORE_ENV !== "nonproduction" ||
+      ![PREVIEW_MEDIA_STORE_ID, storeId].includes(process.env.BLOB_STORE_ID ?? "")) {
+      throw new EnvironmentConfigurationError(
+        "PREVIEW_MEDIA_STORE_MISMATCH",
+        "Preview-Medien benötigen den freigegebenen Nonprod-Store.",
+      );
+    }
+  }
   const token = process.env.BLOB_READ_WRITE_TOKEN;
 
   if (!token) {
     throw new EnvironmentConfigurationError(
       "BLOB_READ_WRITE_TOKEN_MISSING",
       "BLOB_READ_WRITE_TOKEN fehlt in der Server-Umgebung.",
+    );
+  }
+
+  // Same identity contract used by the existing template-upload policy.
+  // Only the running server inspects its credential; no value is returned to diagnostics.
+  if (process.env.VERCEL_ENV === "preview" &&
+    !token.startsWith(`vercel_blob_rw_${PREVIEW_MEDIA_STORE_ID.slice("store_".length)}_`)) {
+    throw new EnvironmentConfigurationError(
+      "PREVIEW_MEDIA_CREDENTIAL_MISMATCH",
+      "Das Preview-Blob-Credential gehört nicht zum freigegebenen Nonprod-Store.",
     );
   }
 

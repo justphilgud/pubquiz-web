@@ -1,0 +1,1368 @@
+[
+  {
+    "id": "EST-01",
+    "question": "Wie viele Knochen zählt das typische erwachsene menschliche Skelett?",
+    "referenceValue": 206,
+    "unit": "Knochen",
+    "category": "Wissenschaft",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://www.hopkinsmedicine.org/health/wellness-and-prevention/anatomy-of-the-bone",
+    "sourcePublisher": "Johns Hopkins Medicine",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Typischer anatomischer Lehrbuchwert; individuelle Varianten sind möglich.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 206,
+        "unit": "Knochen",
+        "numberFormat": "INTEGER",
+        "explanation": "Typischer anatomischer Lehrbuchwert; individuelle Varianten sind möglich.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-02",
+    "question": "Wie viele Halswirbel hat eine Giraffe normalerweise?",
+    "referenceValue": 7,
+    "unit": "Halswirbel",
+    "category": "Wissenschaft",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://animals.sandiegozoo.org/animals/giraffe",
+    "sourcePublisher": "San Diego Zoo",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Der lange Hals enthält sieben stark verlängerte Halswirbel.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 7,
+        "unit": "Halswirbel",
+        "numberFormat": "INTEGER",
+        "explanation": "Der lange Hals enthält sieben stark verlängerte Halswirbel.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-03",
+    "question": "Wie viele Herzen besitzt ein Oktopus?",
+    "referenceValue": 3,
+    "unit": "Herzen",
+    "category": "Wissenschaft",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://ocean.si.edu/ocean-life/invertebrates/octopuses-squids-and-relatives",
+    "sourcePublisher": "Smithsonian Ocean",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Zwei Kiemenherzen ergänzen das Körperherz.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 3,
+        "unit": "Herzen",
+        "numberFormat": "INTEGER",
+        "explanation": "Zwei Kiemenherzen ergänzen das Körperherz.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-04",
+    "question": "Wie alt ist die Erde nach der vom USGS angegebenen wissenschaftlichen Altersbestimmung, in Milliarden Jahren?",
+    "referenceValue": 4.54,
+    "unit": "Milliarden Jahre",
+    "category": "Wissenschaft",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://pubs.usgs.gov/gip/geotime/age.html",
+    "sourcePublisher": "US Geological Survey",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Radiometrisch bestimmter Referenzwert; Unsicherheit laut Quelle unter einem Prozent.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 4.54,
+        "unit": "Milliarden Jahre",
+        "numberFormat": "DECIMAL",
+        "explanation": "Radiometrisch bestimmter Referenzwert; Unsicherheit laut Quelle unter einem Prozent.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-05",
+    "question": "Wie viele Erdentage dauert ein Jahr auf dem Mars ungefähr?",
+    "referenceValue": 687,
+    "unit": "Erdentage",
+    "category": "Wissenschaft",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://science.nasa.gov/mars/facts/?print=detailedfacts",
+    "sourcePublisher": "NASA",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Ein vollständiger Umlauf um die Sonne dauert ungefähr 687 Erdentage.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 687,
+        "unit": "Erdentage",
+        "numberFormat": "INTEGER",
+        "explanation": "Ein vollständiger Umlauf um die Sonne dauert ungefähr 687 Erdentage.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-06",
+    "question": "Wie viele Kilometer beträgt der mittlere Abstand zwischen Erde und Mond ungefähr?",
+    "referenceValue": 384400,
+    "unit": "Kilometer",
+    "category": "Wissenschaft",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://solarsystem.nasa.gov/moons/earths-moon/by-the-numbers/?mobile-app=true&theme=dark",
+    "sourcePublisher": "NASA",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Mittlerer Bahnradius; die tatsächliche Entfernung schwankt.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 384400,
+        "unit": "Kilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "Mittlerer Bahnradius; die tatsächliche Entfernung schwankt.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-07",
+    "question": "Wie viele Beine besitzt ein typisches erwachsenes Insekt?",
+    "referenceValue": 6,
+    "unit": "Beine",
+    "category": "Wissenschaft",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://naturalhistory.si.edu/education/teaching-resources/life-science/what-insect",
+    "sourcePublisher": "Smithsonian National Museum of Natural History",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Drei Beinpaare am Brustabschnitt; keine Larven-Scheinfüße mitzählen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 6,
+        "unit": "Beine",
+        "numberFormat": "INTEGER",
+        "explanation": "Drei Beinpaare am Brustabschnitt; keine Larven-Scheinfüße mitzählen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-08",
+    "question": "Wie viele Augen hat eine Honigbiene insgesamt?",
+    "referenceValue": 5,
+    "unit": "Augen",
+    "category": "Wissenschaft",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://ask.ifas.ufl.edu/publication/4H419/pdf",
+    "sourcePublisher": "University of Florida IFAS",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Zwei Facettenaugen und drei Punktaugen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 5,
+        "unit": "Augen",
+        "numberFormat": "INTEGER",
+        "explanation": "Zwei Facettenaugen und drei Punktaugen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-09",
+    "question": "Wie hoch ist der Mount Everest laut der 2020 gemeinsam veröffentlichten Vermessung Nepals und Chinas, in Metern über dem Meeresspiegel?",
+    "referenceValue": 8848.86,
+    "unit": "Meter",
+    "category": "Geografie",
+    "difficulty": "LEICHT",
+    "referenceDate": "2020",
+    "source": "https://www.tourism.gov.np/files/NOTICE%20MANAGER_FILES/25.pdf",
+    "sourcePublisher": "Government of Nepal",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Höhenwert einschließlich Schneedecke; ältere Angaben verwenden 8848 Meter.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 8848.86,
+        "unit": "Meter",
+        "numberFormat": "DECIMAL",
+        "explanation": "Höhenwert einschließlich Schneedecke; ältere Angaben verwenden 8848 Meter.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-10",
+    "question": "Wie groß ist die Wasseroberfläche des gesamten Bodensees einschließlich Untersee ungefähr, in Quadratkilometern?",
+    "referenceValue": 536,
+    "unit": "Quadratkilometer",
+    "category": "Geografie",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.igkb.org/fileadmin/user_upload/Downloads/Daten_und_Karten/Uferbewertung/uferbewertung_netzversion.pdf",
+    "sourcePublisher": "Internationale Gewässerschutzkommission für den Bodensee",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Obersee und Untersee zusammen; Einzugsgebiet und Uferfläche sind nicht gefragt.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 536,
+        "unit": "Quadratkilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "Obersee und Untersee zusammen; Einzugsgebiet und Uferfläche sind nicht gefragt.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-11",
+    "question": "Wie lang ist der Rhein laut der IKSR-Broschüre „Rhein für alle“, in Kilometern?",
+    "referenceValue": 1233,
+    "unit": "Kilometer",
+    "category": "Geografie",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://www.iksr.org/de/oeffentliches/dokumente/archiv/broschueren",
+    "sourcePublisher": "Internationale Kommission zum Schutz des Rheins",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Quelle nennt 1233 Kilometer; andere Messdefinitionen nennen geringfügig abweichende Werte.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 1233,
+        "unit": "Kilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "Quelle nennt 1233 Kilometer; andere Messdefinitionen nennen geringfügig abweichende Werte.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-12",
+    "question": "Wie viele Kilometer beträgt der Erdumfang am Äquator ungefähr, nach den gerundeten Angaben von NASA Imagine the Universe?",
+    "referenceValue": 40070,
+    "unit": "Kilometer",
+    "category": "Geografie",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://imagine.gsfc.nasa.gov/features/cosmic/earth_info.html",
+    "sourcePublisher": "NASA",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Gerundeter Äquatorumfang; nicht den meridionalen Umfang verwenden.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 40070,
+        "unit": "Kilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "Gerundeter Äquatorumfang; nicht den meridionalen Umfang verwenden.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-13",
+    "question": "Wie hoch ist der Stuttgarter Fernsehturm insgesamt ungefähr, nach der gerundeten Angabe der Stadt Stuttgart, in Metern?",
+    "referenceValue": 217,
+    "unit": "Meter",
+    "category": "Geografie",
+    "difficulty": "LEICHT",
+    "referenceDate": "2026-10-07",
+    "source": "https://www.stuttgart.de/tourismus/sehenswuerdigkeiten/fernsehturm-stuttgart",
+    "sourcePublisher": "Landeshauptstadt Stuttgart",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Die Stadt nennt gut 217 Meter; gerundeter Referenzwert, keine Zentimetergenauigkeit behauptet.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 217,
+        "unit": "Meter",
+        "numberFormat": "INTEGER",
+        "explanation": "Die Stadt nennt gut 217 Meter; gerundeter Referenzwert, keine Zentimetergenauigkeit behauptet.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-14",
+    "question": "Wie hoch ist der Eiffelturm einschließlich seiner seit 2022 montierten Antenne, in Metern?",
+    "referenceValue": 330,
+    "unit": "Meter",
+    "category": "Geografie",
+    "difficulty": "MITTEL",
+    "referenceDate": "seit 2022",
+    "source": "https://www.toureiffel.paris/fr/le-monument/chiffres-cle",
+    "sourcePublisher": "Société d’Exploitation de la Tour Eiffel",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Mit neuer Antenne 330 Meter; frühere Gesamtangabe 324 Meter.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 330,
+        "unit": "Meter",
+        "numberFormat": "INTEGER",
+        "explanation": "Mit neuer Antenne 330 Meter; frühere Gesamtangabe 324 Meter.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-15",
+    "question": "Wie groß ist die Spannweite der Internationalen Raumstation über die Solarpanels ungefähr, laut NASA-Faktenblatt, in Metern?",
+    "referenceValue": 109,
+    "unit": "Meter",
+    "category": "Technik & Digitales",
+    "difficulty": "MITTEL",
+    "referenceDate": "Faktenblatt abgerufen 2026-10-07",
+    "source": "https://www.nasa.gov/international-space-station/space-station-facts-and-figures/",
+    "sourcePublisher": "NASA",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Gesamtausdehnung über die Solarpanels; nicht Länge der bewohnbaren Module.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 109,
+        "unit": "Meter",
+        "numberFormat": "INTEGER",
+        "explanation": "Gesamtausdehnung über die Solarpanels; nicht Länge der bewohnbaren Module.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-16",
+    "question": "Wie hoch war eine Saturn-V-Rakete einschließlich des Apollo-Raumschiffs ungefähr, in Metern?",
+    "referenceValue": 111,
+    "unit": "Meter",
+    "category": "Technik & Digitales",
+    "difficulty": "LEICHT",
+    "referenceDate": "Apollo-Ära",
+    "source": "https://www.nasa.gov/learning-resources/for-kids-and-students/what-was-the-saturn-v-grades-5-8/",
+    "sourcePublisher": "NASA",
+    "retrievedAt": "2026-10-07",
+    "explanation": "NASA rundet 363 Fuß auf 111 Meter.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 111,
+        "unit": "Meter",
+        "numberFormat": "INTEGER",
+        "explanation": "NASA rundet 363 Fuß auf 111 Meter.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-17",
+    "question": "Wie groß ist die Spannweite eines Airbus A380 ungefähr, nach dem gerundeten Herstellerwert, in Metern?",
+    "referenceValue": 79.8,
+    "unit": "Meter",
+    "category": "Technik & Digitales",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.airbus.com/en/products-services/commercial-aircraft/passenger-aircraft/a380",
+    "sourcePublisher": "Airbus",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Herstellerwert gerundet auf 79,8 Meter; Länge des Flugzeugs ist geringer.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 79.8,
+        "unit": "Meter",
+        "numberFormat": "DECIMAL",
+        "explanation": "Herstellerwert gerundet auf 79,8 Meter; Länge des Flugzeugs ist geringer.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-18",
+    "question": "Wie lang ist der Ring des Large Hadron Collider am CERN ungefähr, in Kilometern?",
+    "referenceValue": 27,
+    "unit": "Kilometer",
+    "category": "Technik & Digitales",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://home.cern/science/accelerators/large-hadron-collider/",
+    "sourcePublisher": "CERN",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Beschleunigerring von ungefähr 27 Kilometern Umfang.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 27,
+        "unit": "Kilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "Beschleunigerring von ungefähr 27 Kilometern Umfang.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-19",
+    "question": "Wie lang ist der Eurotunnel zwischen Frankreich und England insgesamt, laut Betreiberangabe, in Kilometern?",
+    "referenceValue": 50.5,
+    "unit": "Kilometer",
+    "category": "Technik & Digitales",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.getlinkgroup.com/en/our-group/eurotunnel/channel-tunnel/",
+    "sourcePublisher": "Getlink / Eurotunnel",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Gesamtlänge einschließlich der Landabschnitte; Unterwasseranteil rund 37 Kilometer.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 50.5,
+        "unit": "Kilometer",
+        "numberFormat": "DECIMAL",
+        "explanation": "Gesamtlänge einschließlich der Landabschnitte; Unterwasseranteil rund 37 Kilometer.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-20",
+    "question": "Wie viele Kilometer legt Licht im Vakuum in einer Sekunde zurück? Runde auf ganze Kilometer.",
+    "referenceValue": 299792,
+    "unit": "Kilometer",
+    "category": "Wissenschaft",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.bipm.org/en/measurement-units",
+    "sourcePublisher": "BIPM",
+    "retrievedAt": "2026-10-07",
+    "explanation": "299792458 Meter pro Sekunde sind 299792,458 Kilometer; auf ganze Kilometer gerundet.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 299792,
+        "unit": "Kilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "299792458 Meter pro Sekunde sind 299792,458 Kilometer; auf ganze Kilometer gerundet.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-21",
+    "question": "Wie viele Passagiere fasste eine Concorde in der Kabinenkonfiguration von British Airways?",
+    "referenceValue": 100,
+    "unit": "Passagiere",
+    "category": "Technik & Digitales",
+    "difficulty": "SCHWER",
+    "referenceDate": "British-Airways-Betrieb bis 2003",
+    "source": "https://hotline.britishairways.com/content/en/at/information/about-ba/history-and-heritage/celebrating-concorde",
+    "sourcePublisher": "British Airways",
+    "retrievedAt": "2026-10-07",
+    "explanation": "BA nennt 100 Passagiere; andere Konfigurationen sind nicht gemeint.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 100,
+        "unit": "Passagiere",
+        "numberFormat": "INTEGER",
+        "explanation": "BA nennt 100 Passagiere; andere Konfigurationen sind nicht gemeint.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-22",
+    "question": "Wie lang ist die offizielle Marathondistanz, in Kilometern?",
+    "referenceValue": 42.195,
+    "unit": "Kilometer",
+    "category": "Sport",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://worldathletics.org/news/news/ultrarunning-introduction",
+    "sourcePublisher": "World Athletics",
+    "retrievedAt": "2026-10-07",
+    "explanation": "42 Kilometer und 195 Meter.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 42.195,
+        "unit": "Kilometer",
+        "numberFormat": "DECIMAL",
+        "explanation": "42 Kilometer und 195 Meter.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-23",
+    "question": "Wie breit ist ein reguläres Fußballtor zwischen den Innenkanten der Pfosten, laut IFAB, in Metern?",
+    "referenceValue": 7.32,
+    "unit": "Meter",
+    "category": "Sport",
+    "difficulty": "MITTEL",
+    "referenceDate": "Regelstand abgerufen 2026-10-07",
+    "source": "https://www.theifab.com/laws/latest/the-field-of-play/?side-menu-open=true",
+    "sourcePublisher": "IFAB",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Innenweite 7,32 Meter; Höhe 2,44 Meter ist nicht gefragt.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 7.32,
+        "unit": "Meter",
+        "numberFormat": "DECIMAL",
+        "explanation": "Innenweite 7,32 Meter; Höhe 2,44 Meter ist nicht gefragt.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-24",
+    "question": "Wie lang ist ein Tennisplatz von Grundlinie zu Grundlinie laut ITF, in Metern?",
+    "referenceValue": 23.77,
+    "unit": "Meter",
+    "category": "Sport",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.itftennis.com/en/about-us/organisation/tennis-glossary/",
+    "sourcePublisher": "International Tennis Federation",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Die Platzlänge beträgt 78 Fuß beziehungsweise 23,77 Meter.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 23.77,
+        "unit": "Meter",
+        "numberFormat": "DECIMAL",
+        "explanation": "Die Platzlänge beträgt 78 Fuß beziehungsweise 23,77 Meter.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-25",
+    "question": "Wie hoch liegt die Oberkante eines Basketballrings nach den FIBA-Ausrüstungsregeln von 2024, in Metern?",
+    "referenceValue": 3.05,
+    "unit": "Meter",
+    "category": "Sport",
+    "difficulty": "MITTEL",
+    "referenceDate": "FIBA 2024",
+    "source": "https://assets.fiba.basketball/image/upload/documents-corporate-fiba-official-rules-2024-official-basketball-rules-and-basketball-equipment.pdf",
+    "sourcePublisher": "FIBA",
+    "retrievedAt": "2026-10-07",
+    "explanation": "3050 Millimeter, mit der in der Norm genannten kleinen Messtoleranz.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 3.05,
+        "unit": "Meter",
+        "numberFormat": "DECIMAL",
+        "explanation": "3050 Millimeter, mit der in der Norm genannten kleinen Messtoleranz.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-26",
+    "question": "Wie viele Löcher umfasst eine klassische volle Golfrunde?",
+    "referenceValue": 18,
+    "unit": "Löcher",
+    "category": "Sport",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://www.randa.org/rog/the-rules-of-golf/rule-5",
+    "sourcePublisher": "The R&A",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Die Regeln erlauben auch kürzere Runden; gefragt ist ausdrücklich die vollständige 18-Loch-Runde.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 18,
+        "unit": "Löcher",
+        "numberFormat": "INTEGER",
+        "explanation": "Die Regeln erlauben auch kürzere Runden; gefragt ist ausdrücklich die vollständige 18-Loch-Runde.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-27",
+    "question": "Wie viele Tasten hat ein moderner Standard-Konzertflügel normalerweise?",
+    "referenceValue": 88,
+    "unit": "Tasten",
+    "category": "Musik",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://www.steinway.com/dam/jcr%3Ac94babcc-fa76-4b8c-b1a6-8e8dac935aac/Steinway%20%26%20Sons%20Buyers%20Guide.pdf",
+    "sourcePublisher": "Steinway & Sons",
+    "retrievedAt": "2026-10-07",
+    "explanation": "52 weiße und 36 schwarze Tasten; Sondermodelle mit mehr Tasten sind ausgenommen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 88,
+        "unit": "Tasten",
+        "numberFormat": "INTEGER",
+        "explanation": "52 weiße und 36 schwarze Tasten; Sondermodelle mit mehr Tasten sind ausgenommen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-28",
+    "question": "Wie viele Saiten besitzt die Konzertpedalharfe „Louis XV Special“ von Lyon & Healy?",
+    "referenceValue": 47,
+    "unit": "Saiten",
+    "category": "Musik",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://www.lyonhealy.com/harps/louis-xv-special/",
+    "sourcePublisher": "Lyon & Healy",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Hersteller nennt 47 Saiten; gemeint ist dieses Konzertmodell.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 47,
+        "unit": "Saiten",
+        "numberFormat": "INTEGER",
+        "explanation": "Hersteller nennt 47 Saiten; gemeint ist dieses Konzertmodell.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-29",
+    "question": "Wie viele vollendete Sinfonien komponierte Ludwig van Beethoven?",
+    "referenceValue": 9,
+    "unit": "Sinfonien",
+    "category": "Musik",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://www.beethoven.de/de/glossar_archiv/view/6197071065382912/Sinfonie%2B%28Symphonie%29",
+    "sourcePublisher": "Beethoven-Haus Bonn",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Unvollendete Skizzen und spätere Rekonstruktionen zählen nicht mit.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 9,
+        "unit": "Sinfonien",
+        "numberFormat": "INTEGER",
+        "explanation": "Unvollendete Skizzen und spätere Rekonstruktionen zählen nicht mit.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-30",
+    "question": "Wie viele Länder nahmen am ersten Eurovision Song Contest 1956 teil?",
+    "referenceValue": 7,
+    "unit": "Länder",
+    "category": "Musik",
+    "difficulty": "MITTEL",
+    "referenceDate": "1956",
+    "source": "https://eurovision.tv/sites/default/files/uploads/2023-05/EUROVISION%202023%20MEDIA%20HANDBOOK%20%281%29.pdf",
+    "sourcePublisher": "European Broadcasting Union",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Sieben Länder; jedes trat damals mit zwei Liedern an.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 7,
+        "unit": "Länder",
+        "numberFormat": "INTEGER",
+        "explanation": "Sieben Länder; jedes trat damals mit zwei Liedern an.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-31",
+    "question": "Welche Frequenz in Hertz hat der international übliche Kammerton a′?",
+    "referenceValue": 440,
+    "unit": "Hertz",
+    "category": "Musik",
+    "difficulty": "SCHWER",
+    "referenceDate": null,
+    "source": "https://www.ptb.de/cms/fileadmin/internet/publikationen/masstaebe/Einzelbeitraege/Heft_01/massstaebe_01_04.pdf",
+    "sourcePublisher": "Physikalisch-Technische Bundesanstalt",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Normstimmton 440 Hertz; praktische Orchesterstimmungen können abweichen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 440,
+        "unit": "Hertz",
+        "numberFormat": "INTEGER",
+        "explanation": "Normstimmton 440 Hertz; praktische Orchesterstimmungen können abweichen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-32",
+    "question": "Wie hoch ist die standardisierte Oscar-Statuette ungefähr, in Zentimetern?",
+    "referenceValue": 34.3,
+    "unit": "Zentimeter",
+    "category": "Kultur",
+    "difficulty": "MITTEL",
+    "referenceDate": "Standard seit 1945",
+    "source": "https://www.oscars.org/oscars/statuette",
+    "sourcePublisher": "Academy of Motion Picture Arts and Sciences",
+    "retrievedAt": "2026-10-07",
+    "explanation": "13,5 Zoll × 2,54 ergeben 34,29 Zentimeter, gerundet 34,3.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 34.3,
+        "unit": "Zentimeter",
+        "numberFormat": "DECIMAL",
+        "explanation": "13,5 Zoll × 2,54 ergeben 34,29 Zentimeter, gerundet 34,3.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-33",
+    "question": "Wie viele Oscars gewann „Ben-Hur“ bei der Verleihung 1960?",
+    "referenceValue": 11,
+    "unit": "Oscars",
+    "category": "Kultur",
+    "difficulty": "MITTEL",
+    "referenceDate": "1960",
+    "source": "https://www.oscars.org/oscars/ceremonies/embed/1960",
+    "sourcePublisher": "Academy of Motion Picture Arts and Sciences",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Elf Gewinne bei zwölf Nominierungen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 11,
+        "unit": "Oscars",
+        "numberFormat": "INTEGER",
+        "explanation": "Elf Gewinne bei zwölf Nominierungen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-34",
+    "question": "Wie lang ist der rote Teppich vor der berühmten Treppe des Filmfestivals Cannes laut Festivalbeschreibung, in Metern?",
+    "referenceValue": 60,
+    "unit": "Meter",
+    "category": "Kultur",
+    "difficulty": "MITTEL",
+    "referenceDate": "Festivalbeschreibung abgerufen 2026-10-07",
+    "source": "https://www.festival-cannes.com/en/cannes-focus/behind-the-scenes-on-the-festival-de-cannes-red-carpet/",
+    "sourcePublisher": "Festival de Cannes",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Der Weg über den Teppich führt anschließend über 24 Stufen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 60,
+        "unit": "Meter",
+        "numberFormat": "INTEGER",
+        "explanation": "Der Weg über den Teppich führt anschließend über 24 Stufen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-35",
+    "question": "Wie viele Kinofilme umfasst die ursprüngliche Harry-Potter-Reihe ohne „Phantastische Tierwesen“?",
+    "referenceValue": 8,
+    "unit": "Kinofilme",
+    "category": "Kultur",
+    "difficulty": "LEICHT",
+    "referenceDate": "abgeschlossene Reihe 2001–2011",
+    "source": "https://www.harrypotter.com/discover/films",
+    "sourcePublisher": "Offizielle Harry-Potter-Seite",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Sieben Romane wurden in acht Filme umgesetzt, da der letzte Band geteilt wurde.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 8,
+        "unit": "Kinofilme",
+        "numberFormat": "INTEGER",
+        "explanation": "Sieben Romane wurden in acht Filme umgesetzt, da der letzte Band geteilt wurde.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-36",
+    "question": "Wie viele Minuten dauert die Kinofassung von „Der Herr der Ringe: Die Rückkehr des Königs“ laut BFI?",
+    "referenceValue": 201,
+    "unit": "Minuten",
+    "category": "Kultur",
+    "difficulty": "MITTEL",
+    "referenceDate": "Kinofassung 2003",
+    "source": "https://www.bfi.org.uk/film/de658a5d-ddbc-589c-95d0-08dd1af9635f/the-lord-of-the-rings-the-return-of-the-king",
+    "sourcePublisher": "British Film Institute",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Kinofassung einschließlich Abspann; Extended Edition und PAL-Laufzeit nicht gemeint.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 201,
+        "unit": "Minuten",
+        "numberFormat": "INTEGER",
+        "explanation": "Kinofassung einschließlich Abspann; Extended Edition und PAL-Laufzeit nicht gemeint.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-37",
+    "question": "Wie viele Milliliter einschließlich Crema nennt der Standard für einen „Certified Italian Espresso“ als Zielmenge?",
+    "referenceValue": 25,
+    "unit": "Milliliter",
+    "category": "Essen & Trinken",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://www.espressoitaliano.org/files/File/istituzionale_inei_hq_en.pdf",
+    "sourcePublisher": "Istituto Nazionale Espresso Italiano",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Zielwert 25 Milliliter mit ±2,5 Millilitern Spezifikationstoleranz.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 25,
+        "unit": "Milliliter",
+        "numberFormat": "INTEGER",
+        "explanation": "Zielwert 25 Milliliter mit ±2,5 Millilitern Spezifikationstoleranz.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-38",
+    "question": "Wie viel Prozent Haselnüsse enthält die deutsche Nutella-Rezeptur laut Hersteller, Stand 7. Oktober 2026?",
+    "referenceValue": 13,
+    "unit": "Prozent",
+    "category": "Essen & Trinken",
+    "difficulty": "MITTEL",
+    "referenceDate": "2026-10-07",
+    "source": "https://www.nutella.com/de/de/produkte/nutella",
+    "sourcePublisher": "Ferrero",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Zutatenliste nennt 13 Prozent Haselnüsse; keine Nussanzahl je Glas geschätzt.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 13,
+        "unit": "Prozent",
+        "numberFormat": "INTEGER",
+        "explanation": "Zutatenliste nennt 13 Prozent Haselnüsse; keine Nussanzahl je Glas geschätzt.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-39",
+    "question": "Wie viele Jahre wird die Pfeffermaische für die klassische TABASCO-Sauce laut Hersteller höchstens im Fass gereift?",
+    "referenceValue": 3,
+    "unit": "Jahre",
+    "category": "Essen & Trinken",
+    "difficulty": "MITTEL",
+    "referenceDate": "Herstellerbeschreibung abgerufen 2026-10-07",
+    "source": "https://www.tabasco.com/blog/about-our-barrels/",
+    "sourcePublisher": "McIlhenny Company / TABASCO",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Quelle nennt bis zu drei Jahre; keine feste Dauer für jede Charge behauptet.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 3,
+        "unit": "Jahre",
+        "numberFormat": "INTEGER",
+        "explanation": "Quelle nennt bis zu drei Jahre; keine feste Dauer für jede Charge behauptet.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-40",
+    "question": "Wie viele Sekunden dauert das vollständige zweistufige Zapfen eines Guinness nach der ungefähren Markenangabe?",
+    "referenceValue": 119.5,
+    "unit": "Sekunden",
+    "category": "Alkohol",
+    "difficulty": "LEICHT",
+    "referenceDate": "Markenbeschreibung abgerufen 2026-10-07",
+    "source": "https://www.guinness-storehouse.com/en/whats-hoppening/most-popular-questions-about-guinness",
+    "sourcePublisher": "Guinness Storehouse",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Gesamter Zapfvorgang einschließlich Setzen, nicht allein die Wartezeit.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 119.5,
+        "unit": "Sekunden",
+        "numberFormat": "DECIMAL",
+        "explanation": "Gesamter Zapfvorgang einschließlich Setzen, nicht allein die Wartezeit.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-41",
+    "question": "Wie viele Minuten Kochzeit nennt Barilla für seine italienischen Spaghetti n.5, Stand 7. Oktober 2026?",
+    "referenceValue": 9,
+    "unit": "Minuten",
+    "category": "Essen & Trinken",
+    "difficulty": "MITTEL",
+    "referenceDate": "2026-10-07",
+    "source": "https://www.barilla.com/it-it/prodotti/pasta/i-classici/spaghetti-n-5",
+    "sourcePublisher": "Barilla",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Italienische Produktseite; US-Produkte können andere Zeitspannen angeben.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 9,
+        "unit": "Minuten",
+        "numberFormat": "INTEGER",
+        "explanation": "Italienische Produktseite; US-Produkte können andere Zeitspannen angeben.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-42",
+    "question": "Wie viele Kilometer lang waren die Grenzanlagen der Berliner Mauer um West-Berlin insgesamt ungefähr, laut bpb?",
+    "referenceValue": 155,
+    "unit": "Kilometer",
+    "category": "Geschichte",
+    "difficulty": "MITTEL",
+    "referenceDate": "1961–1989",
+    "source": "https://www.bpb.de/kurz-knapp/hintergrund-aktuell/337560/1961-bau-der-berliner-mauer/",
+    "sourcePublisher": "Bundeszentrale für politische Bildung",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Nicht die rund 43 Kilometer innerstädtische Sektorengrenze und nicht der heutige Mauerweg.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 155,
+        "unit": "Kilometer",
+        "numberFormat": "INTEGER",
+        "explanation": "Nicht die rund 43 Kilometer innerstädtische Sektorengrenze und nicht der heutige Mauerweg.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-43",
+    "question": "Wie viele Rettungsboote einschließlich der faltbaren Boote hatte die Titanic bei ihrer Jungfernfahrt 1912 an Bord?",
+    "referenceValue": 20,
+    "unit": "Rettungsboote",
+    "category": "Geschichte",
+    "difficulty": "SCHWER",
+    "referenceDate": "1912",
+    "source": "https://www.titanicinquiry.org/BOTInq/BOTReport/BOTRepBoats.php",
+    "sourcePublisher": "Britischer Untersuchungsbericht 1912, digitalisiert vom Titanic Inquiry Project",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Primärdokument nennt 20 Boote; tatsächlich gestartete Boote sind eine andere Zahl.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 20,
+        "unit": "Rettungsboote",
+        "numberFormat": "INTEGER",
+        "explanation": "Primärdokument nennt 20 Boote; tatsächlich gestartete Boote sind eine andere Zahl.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-44",
+    "question": "Wie lang ist die erhaltene Stickerei von Bayeux ungefähr, nach der technischen Beschreibung ihres Museums, in Metern?",
+    "referenceValue": 68.3,
+    "unit": "Meter",
+    "category": "Kultur",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.bayeuxmuseum.com/en/the-bayeux-tapestry/discover-the-bayeux-tapestry/tapestry-or-embroidery/",
+    "sourcePublisher": "Bayeux Museum",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Technische Beschreibung rund 68,3 Meter; touristisch oft auf 70 Meter gerundet.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 68.3,
+        "unit": "Meter",
+        "numberFormat": "DECIMAL",
+        "explanation": "Technische Beschreibung rund 68,3 Meter; touristisch oft auf 70 Meter gerundet.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-45",
+    "question": "Wie viele Mitgliedstaaten haben die Vereinten Nationen, Stand 7. Oktober 2026?",
+    "referenceValue": 193,
+    "unit": "Mitgliedstaaten",
+    "category": "Gesellschaft",
+    "difficulty": "MITTEL",
+    "referenceDate": "2026-10-07",
+    "source": "https://www.un.org/en/about-us",
+    "sourcePublisher": "Vereinte Nationen",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Mitgliedstaaten, keine Beobachterstaaten mitzählen.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 193,
+        "unit": "Mitgliedstaaten",
+        "numberFormat": "INTEGER",
+        "explanation": "Mitgliedstaaten, keine Beobachterstaaten mitzählen.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-46",
+    "question": "Wie viele Abgeordnete zogen nach der Bundestagswahl 2025 in den 21. Deutschen Bundestag ein?",
+    "referenceValue": 630,
+    "unit": "Abgeordnete",
+    "category": "Politik",
+    "difficulty": "MITTEL",
+    "referenceDate": "Bundestagswahl 2025",
+    "source": "https://www.bundestag.de/parlament/bundestagswahl",
+    "sourcePublisher": "Deutscher Bundestag",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Neu festgelegte Parlamentsgröße, nicht die größere vorherige Wahlperiode.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 630,
+        "unit": "Abgeordnete",
+        "numberFormat": "INTEGER",
+        "explanation": "Neu festgelegte Parlamentsgröße, nicht die größere vorherige Wahlperiode.",
+        "tolerance": null
+      }
+    }
+  },
+  {
+    "id": "EST-47",
+    "question": "Wie viele offizielle Amtssprachen hat die Europäische Union, Stand 7. Oktober 2026?",
+    "referenceValue": 24,
+    "unit": "Amtssprachen",
+    "category": "Sprache & Literatur",
+    "difficulty": "MITTEL",
+    "referenceDate": "2026-10-07",
+    "source": "https://european-union.europa.eu/principles-countries-history/languages_en",
+    "sourcePublisher": "Europäische Union",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Englisch bleibt auch nach dem Brexit Amtssprache.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 24,
+        "unit": "Amtssprachen",
+        "numberFormat": "INTEGER",
+        "explanation": "Englisch bleibt auch nach dem Brexit Amtssprache.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-48",
+    "question": "Wie viele Tonnen physisches Feingold in Barren hielt die Deutsche Bundesbank am 31. Dezember 2024 ungefähr? Runde auf ganze Tonnen.",
+    "referenceValue": 3352,
+    "unit": "Tonnen",
+    "category": "Wirtschaft",
+    "difficulty": "SCHWER",
+    "referenceDate": "2024-12-31",
+    "source": "https://publikationen.bundesbank.de/content/951398",
+    "sourcePublisher": "Deutsche Bundesbank, Jahresabschluss 2024",
+    "retrievedAt": "2026-10-07",
+    "explanation": "3351546 Kilogramm entsprechen 3351,546 Tonnen; gerundet 3352. Nicht den Goldwert in Euro verwenden.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 3352,
+        "unit": "Tonnen",
+        "numberFormat": "INTEGER",
+        "explanation": "3351546 Kilogramm entsprechen 3351,546 Tonnen; gerundet 3352. Nicht den Goldwert in Euro verwenden.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-49",
+    "question": "Welchen Durchmesser hat eine 2-Euro-Münze, in Millimetern?",
+    "referenceValue": 25.75,
+    "unit": "Millimeter",
+    "category": "Wirtschaft",
+    "difficulty": "LEICHT",
+    "referenceDate": null,
+    "source": "https://www.ecb.europa.eu/euro/coins/common/html/index.en.html",
+    "sourcePublisher": "Europäische Zentralbank",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Durchmesser 25,75 Millimeter; nicht Dicke oder Gewicht.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 25.75,
+        "unit": "Millimeter",
+        "numberFormat": "DECIMAL",
+        "explanation": "Durchmesser 25,75 Millimeter; nicht Dicke oder Gewicht.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "EST-50",
+    "question": "Wie lang ist eine 50-Euro-Banknote der Europa-Serie, in Millimetern?",
+    "referenceValue": 140,
+    "unit": "Millimeter",
+    "category": "Wirtschaft",
+    "difficulty": "MITTEL",
+    "referenceDate": null,
+    "source": "https://www.bundesbank.de/en/tasks/cash-management/euro-banknotes/50-euro",
+    "sourcePublisher": "Deutsche Bundesbank",
+    "retrievedAt": "2026-10-07",
+    "explanation": "Abmessungen 140 × 77 Millimeter; gefragt ist die längere Seite.",
+    "status": "EDITORIAL_DRAFT",
+    "sourceQA": "PRIMARY_SOURCE_CHECKED",
+    "releaseApproved": false,
+    "templateId": "schaetzfrage",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ESTIMATE",
+        "correctValue": 140,
+        "unit": "Millimeter",
+        "numberFormat": "INTEGER",
+        "explanation": "Abmessungen 140 × 77 Millimeter; gefragt ist die längere Seite.",
+        "tolerance": null
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  }
+]

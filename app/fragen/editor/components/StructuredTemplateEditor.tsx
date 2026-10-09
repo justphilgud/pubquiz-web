@@ -250,7 +250,7 @@ function AnagramEditor(props: EditorProps) {
     )}
     <label className="block text-sm font-medium">Anagramm (manuell editierbar)
       <input className={`${inputClass} mt-1 uppercase ${valid ? "" : "border-red-500"}`} value={data.selectedSolution} disabled={props.disabled}
-        onChange={(event) => commit(props, { ...data, selectedSolution: event.target.value.toLocaleUpperCase("de-DE") })} />
+        onChange={(event) => commit(props, { ...data, selectedSolution: event.target.value })} />
     </label>
     {!valid && <p role="alert" className="text-sm text-red-700">Das Anagramm muss exakt dieselben Buchstaben und Ziffern enthalten.</p>}
   </section>;

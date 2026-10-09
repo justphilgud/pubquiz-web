@@ -1,0 +1,1307 @@
+[
+  {
+    "id": "ANA-01",
+    "person": "Clint Eastwood",
+    "anagram": "Old West Action",
+    "solution": "Clint Eastwood",
+    "category": "Kultur",
+    "fameArea": "Western, Regie",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Clint_Eastwood",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Old West Action“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Clint Eastwood",
+        "suggestions": [
+          "Old West Action"
+        ],
+        "selectedSolution": "Old West Action",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-02",
+    "person": "Tom Cruise",
+    "anagram": "So I’m Cuter",
+    "solution": "Tom Cruise",
+    "category": "Kultur",
+    "fameArea": "Actionkino",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Tom_Cruise",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „So I’m Cuter“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Tom Cruise",
+        "suggestions": [
+          "So I’m Cuter"
+        ],
+        "selectedSolution": "So I’m Cuter",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-03",
+    "person": "Elvis Presley",
+    "anagram": "Evil Sly Spree",
+    "solution": "Elvis Presley",
+    "category": "Musik",
+    "fameArea": "Rock ’n’ Roll",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Elvis_Presley",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Evil Sly Spree“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Elvis Presley",
+        "suggestions": [
+          "Evil Sly Spree"
+        ],
+        "selectedSolution": "Evil Sly Spree",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-04",
+    "person": "Alec Guinness",
+    "anagram": "Genuine Class",
+    "solution": "Alec Guinness",
+    "category": "Kultur",
+    "fameArea": "Star Wars, Schauspiel",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Alec_Guinness",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Genuine Class“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Alec Guinness",
+        "suggestions": [
+          "Genuine Class"
+        ],
+        "selectedSolution": "Genuine Class",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-05",
+    "person": "Emma Watson",
+    "anagram": "Woman Steam",
+    "solution": "Emma Watson",
+    "category": "Kultur",
+    "fameArea": "Harry Potter",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Emma_Watson",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Woman Steam“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Emma Watson",
+        "suggestions": [
+          "Woman Steam"
+        ],
+        "selectedSolution": "Woman Steam",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-06",
+    "person": "Ed Sheeran",
+    "anagram": "She Earned",
+    "solution": "Ed Sheeran",
+    "category": "Musik",
+    "fameArea": "Pop",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Ed_Sheeran",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „She Earned“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Ed Sheeran",
+        "suggestions": [
+          "She Earned"
+        ],
+        "selectedSolution": "She Earned",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-07",
+    "person": "Bob Dylan",
+    "anagram": "And Lobby",
+    "solution": "Bob Dylan",
+    "category": "Musik",
+    "fameArea": "Songwriting",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Bob_Dylan",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „And Lobby“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Bob Dylan",
+        "suggestions": [
+          "And Lobby"
+        ],
+        "selectedSolution": "And Lobby",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-08",
+    "person": "Tina Turner",
+    "anagram": "Train Tuner",
+    "solution": "Tina Turner",
+    "category": "Musik",
+    "fameArea": "Rock und Soul",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Tina_Turner",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Train Tuner“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Tina Turner",
+        "suggestions": [
+          "Train Tuner"
+        ],
+        "selectedSolution": "Train Tuner",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-09",
+    "person": "Usain Bolt",
+    "anagram": "Bonus Tail",
+    "solution": "Usain Bolt",
+    "category": "Sport",
+    "fameArea": "Sprint",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Usain_Bolt",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Bonus Tail“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Usain Bolt",
+        "suggestions": [
+          "Bonus Tail"
+        ],
+        "selectedSolution": "Bonus Tail",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-10",
+    "person": "Coco Chanel",
+    "anagram": "Cool Chance",
+    "solution": "Coco Chanel",
+    "category": "Kultur",
+    "fameArea": "Mode",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Coco_Chanel",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Cool Chance“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Coco Chanel",
+        "suggestions": [
+          "Cool Chance"
+        ],
+        "selectedSolution": "Cool Chance",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-11",
+    "person": "Tom Hanks",
+    "anagram": "Month Ask",
+    "solution": "Tom Hanks",
+    "category": "Kultur",
+    "fameArea": "Schauspiel",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Tom_Hanks",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Month Ask“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Tom Hanks",
+        "suggestions": [
+          "Month Ask"
+        ],
+        "selectedSolution": "Month Ask",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-12",
+    "person": "Taylor Swift",
+    "anagram": "For Lay Twist",
+    "solution": "Taylor Swift",
+    "category": "Musik",
+    "fameArea": "Pop",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Taylor_Swift",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „For Lay Twist“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Taylor Swift",
+        "suggestions": [
+          "For Lay Twist"
+        ],
+        "selectedSolution": "For Lay Twist",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-13",
+    "person": "Nikola Tesla",
+    "anagram": "Latino Lakes",
+    "solution": "Nikola Tesla",
+    "category": "Wissenschaft",
+    "fameArea": "Elektrotechnik",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Nikola_Tesla",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Latino Lakes“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Nikola Tesla",
+        "suggestions": [
+          "Latino Lakes"
+        ],
+        "selectedSolution": "Latino Lakes",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-14",
+    "person": "Lionel Messi",
+    "anagram": "See Millions",
+    "solution": "Lionel Messi",
+    "category": "Sport",
+    "fameArea": "Fußball",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Lionel_Messi",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „See Millions“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Lionel Messi",
+        "suggestions": [
+          "See Millions"
+        ],
+        "selectedSolution": "See Millions",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-15",
+    "person": "Nicole Kidman",
+    "anagram": "Dance Mini Klo",
+    "solution": "Nicole Kidman",
+    "category": "Kultur",
+    "fameArea": "Schauspiel",
+    "difficulty": "LEICHT",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Nicole_Kidman",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Dance Mini Klo“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Nicole Kidman",
+        "suggestions": [
+          "Dance Mini Klo"
+        ],
+        "selectedSolution": "Dance Mini Klo",
+        "wordCountPreference": "3"
+      }
+    },
+    "editorialExcludeReason": "KNOWN_IDENTICAL_ANAGRAM_NICOLE_KIDMAN"
+  },
+  {
+    "id": "ANA-16",
+    "person": "Frida Kahlo",
+    "anagram": "If Dark Halo",
+    "solution": "Frida Kahlo",
+    "category": "Kultur",
+    "fameArea": "Malerei",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Frida_Kahlo",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „If Dark Halo“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Frida Kahlo",
+        "suggestions": [
+          "If Dark Halo"
+        ],
+        "selectedSolution": "If Dark Halo",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-17",
+    "person": "Serena Williams",
+    "anagram": "Wireless Animal",
+    "solution": "Serena Williams",
+    "category": "Sport",
+    "fameArea": "Tennis",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Serena_Williams",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Wireless Animal“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Serena Williams",
+        "suggestions": [
+          "Wireless Animal"
+        ],
+        "selectedSolution": "Wireless Animal",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-18",
+    "person": "Greta Thunberg",
+    "anagram": "That Egg Burner",
+    "solution": "Greta Thunberg",
+    "category": "Gesellschaft",
+    "fameArea": "Klimaaktivismus",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Greta_Thunberg",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „That Egg Burner“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Greta Thunberg",
+        "suggestions": [
+          "That Egg Burner"
+        ],
+        "selectedSolution": "That Egg Burner",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-19",
+    "person": "Julia Roberts",
+    "anagram": "Is Trouble Jar",
+    "solution": "Julia Roberts",
+    "category": "Kultur",
+    "fameArea": "Schauspiel",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Julia_Roberts",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Is Trouble Jar“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Julia Roberts",
+        "suggestions": [
+          "Is Trouble Jar"
+        ],
+        "selectedSolution": "Is Trouble Jar",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-20",
+    "person": "Emma Stone",
+    "anagram": "Sea Moment",
+    "solution": "Emma Stone",
+    "category": "Kultur",
+    "fameArea": "Schauspiel",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Emma_Stone",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Sea Moment“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Emma Stone",
+        "suggestions": [
+          "Sea Moment"
+        ],
+        "selectedSolution": "Sea Moment",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-21",
+    "person": "Meryl Streep",
+    "anagram": "Reply Meters",
+    "solution": "Meryl Streep",
+    "category": "Kultur",
+    "fameArea": "Schauspiel",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Meryl_Streep",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Reply Meters“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Meryl Streep",
+        "suggestions": [
+          "Reply Meters"
+        ],
+        "selectedSolution": "Reply Meters",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-22",
+    "person": "Kate Winslet",
+    "anagram": "In Sweet Talk",
+    "solution": "Kate Winslet",
+    "category": "Kultur",
+    "fameArea": "Schauspiel",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Kate_Winslet",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „In Sweet Talk“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Kate Winslet",
+        "suggestions": [
+          "In Sweet Talk"
+        ],
+        "selectedSolution": "In Sweet Talk",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-23",
+    "person": "Udo Lindenberg",
+    "anagram": "Round Bleeding",
+    "solution": "Udo Lindenberg",
+    "category": "Musik",
+    "fameArea": "Deutschrock",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Udo_Lindenberg",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Round Bleeding“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Udo Lindenberg",
+        "suggestions": [
+          "Round Bleeding"
+        ],
+        "selectedSolution": "Round Bleeding",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-24",
+    "person": "Angela Merkel",
+    "anagram": "All Make Green",
+    "solution": "Angela Merkel",
+    "category": "Politik",
+    "fameArea": "Bundeskanzlerin",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Angela_Merkel",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „All Make Green“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Angela Merkel",
+        "suggestions": [
+          "All Make Green"
+        ],
+        "selectedSolution": "All Make Green",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-25",
+    "person": "Nelson Mandela",
+    "anagram": "And Lemon Lanes",
+    "solution": "Nelson Mandela",
+    "category": "Politik",
+    "fameArea": "Südafrika",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Nelson_Mandela",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „And Lemon Lanes“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Nelson Mandela",
+        "suggestions": [
+          "And Lemon Lanes"
+        ],
+        "selectedSolution": "And Lemon Lanes",
+        "wordCountPreference": "3"
+      }
+    },
+    "editorialHoldReason": "PERSON_OVERLAP_DECISION_REQUIRED"
+  },
+  {
+    "id": "ANA-26",
+    "person": "Martin Luther",
+    "anagram": "Mineral Truth",
+    "solution": "Martin Luther",
+    "category": "Religion & Weltanschauung",
+    "fameArea": "Reformation",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Martin_Luther",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Mineral Truth“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Martin Luther",
+        "suggestions": [
+          "Mineral Truth"
+        ],
+        "selectedSolution": "Mineral Truth",
+        "wordCountPreference": "2"
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "ANA-27",
+    "person": "Cleopatra",
+    "anagram": "Pearl Coat",
+    "solution": "Cleopatra",
+    "category": "Geschichte",
+    "fameArea": "Ägypten",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Cleopatra",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Pearl Coat“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Cleopatra",
+        "suggestions": [
+          "Pearl Coat"
+        ],
+        "selectedSolution": "Pearl Coat",
+        "wordCountPreference": "2"
+      }
+    },
+    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "ANA-28",
+    "person": "Claude Monet",
+    "anagram": "Mounted Lace",
+    "solution": "Claude Monet",
+    "category": "Kultur",
+    "fameArea": "Impressionismus",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Claude_Monet",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Mounted Lace“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Claude Monet",
+        "suggestions": [
+          "Mounted Lace"
+        ],
+        "selectedSolution": "Mounted Lace",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-29",
+    "person": "Andy Warhol",
+    "anagram": "And Holy War",
+    "solution": "Andy Warhol",
+    "category": "Kultur",
+    "fameArea": "Pop Art",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Andy_Warhol",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „And Holy War“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Andy Warhol",
+        "suggestions": [
+          "And Holy War"
+        ],
+        "selectedSolution": "And Holy War",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-30",
+    "person": "Neil Armstrong",
+    "anagram": "Learning Storm",
+    "solution": "Neil Armstrong",
+    "category": "Wissenschaft",
+    "fameArea": "Raumfahrt",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Neil_Armstrong",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Learning Storm“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Neil Armstrong",
+        "suggestions": [
+          "Learning Storm"
+        ],
+        "selectedSolution": "Learning Storm",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-31",
+    "person": "Michael Jordan",
+    "anagram": "And Chrome Jail",
+    "solution": "Michael Jordan",
+    "category": "Sport",
+    "fameArea": "Basketball",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Michael_Jordan",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „And Chrome Jail“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Michael Jordan",
+        "suggestions": [
+          "And Chrome Jail"
+        ],
+        "selectedSolution": "And Chrome Jail",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-32",
+    "person": "Thomas Müller",
+    "anagram": "Smaller Mouth",
+    "solution": "Thomas Müller",
+    "category": "Sport",
+    "fameArea": "Fußball",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Thomas_M%C3%BCller",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Smaller Mouth“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Thomas Müller",
+        "suggestions": [
+          "Smaller Mouth"
+        ],
+        "selectedSolution": "Smaller Mouth",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-33",
+    "person": "Stephen King",
+    "anagram": "The Pen Kings",
+    "solution": "Stephen King",
+    "category": "Literatur",
+    "fameArea": "Horrorromane",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Stephen_King",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „The Pen Kings“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Stephen King",
+        "suggestions": [
+          "The Pen Kings"
+        ],
+        "selectedSolution": "The Pen Kings",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-34",
+    "person": "Mark Twain",
+    "anagram": "Twin Karma",
+    "solution": "Mark Twain",
+    "category": "Literatur",
+    "fameArea": "Romane",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Mark_Twain",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Twin Karma“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Mark Twain",
+        "suggestions": [
+          "Twin Karma"
+        ],
+        "selectedSolution": "Twin Karma",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-35",
+    "person": "Erich Kästner",
+    "anagram": "Research Knit",
+    "solution": "Erich Kästner",
+    "category": "Literatur",
+    "fameArea": "Kinderliteratur",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Erich_K%C3%A4stner",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Research Knit“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Erich Kästner",
+        "suggestions": [
+          "Research Knit"
+        ],
+        "selectedSolution": "Research Knit",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-36",
+    "person": "Günter Grass",
+    "anagram": "Strange Rugs",
+    "solution": "Günter Grass",
+    "category": "Literatur",
+    "fameArea": "Literaturnobelpreis",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/G%C3%BCnter_Grass",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Strange Rugs“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Günter Grass",
+        "suggestions": [
+          "Strange Rugs"
+        ],
+        "selectedSolution": "Strange Rugs",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-37",
+    "person": "Marlene Dietrich",
+    "anagram": "Ethical Reminder",
+    "solution": "Marlene Dietrich",
+    "category": "Kultur",
+    "fameArea": "Film und Chanson",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Marlene_Dietrich",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Ethical Reminder“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Marlene Dietrich",
+        "suggestions": [
+          "Ethical Reminder"
+        ],
+        "selectedSolution": "Ethical Reminder",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-38",
+    "person": "Charles Darwin",
+    "anagram": "As Children War",
+    "solution": "Charles Darwin",
+    "category": "Wissenschaft",
+    "fameArea": "Evolution",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Charles_Darwin",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „As Children War“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Charles Darwin",
+        "suggestions": [
+          "As Children War"
+        ],
+        "selectedSolution": "As Children War",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-39",
+    "person": "Isaac Newton",
+    "anagram": "Is Ocean Want",
+    "solution": "Isaac Newton",
+    "category": "Wissenschaft",
+    "fameArea": "Physik",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Isaac_Newton",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Is Ocean Want“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Isaac Newton",
+        "suggestions": [
+          "Is Ocean Want"
+        ],
+        "selectedSolution": "Is Ocean Want",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-40",
+    "person": "Paul McCartney",
+    "anagram": "My Cart Cleanup",
+    "solution": "Paul McCartney",
+    "category": "Musik",
+    "fameArea": "Beatles",
+    "difficulty": "MITTEL",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Paul_McCartney",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „My Cart Cleanup“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Paul McCartney",
+        "suggestions": [
+          "My Cart Cleanup"
+        ],
+        "selectedSolution": "My Cart Cleanup",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-41",
+    "person": "William Shakespeare",
+    "anagram": "Hear Plasma Likewise",
+    "solution": "William Shakespeare",
+    "category": "Literatur",
+    "fameArea": "Theater",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/William_Shakespeare",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Hear Plasma Likewise“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "William Shakespeare",
+        "suggestions": [
+          "Hear Plasma Likewise"
+        ],
+        "selectedSolution": "Hear Plasma Likewise",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-42",
+    "person": "Alexander Fleming",
+    "anagram": "Made Learning Flex",
+    "solution": "Alexander Fleming",
+    "category": "Wissenschaft",
+    "fameArea": "Penicillin",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Alexander_Fleming",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Made Learning Flex“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Alexander Fleming",
+        "suggestions": [
+          "Made Learning Flex"
+        ],
+        "selectedSolution": "Made Learning Flex",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-43",
+    "person": "Harrison Ford",
+    "anagram": "As Find Horror",
+    "solution": "Harrison Ford",
+    "category": "Kultur",
+    "fameArea": "Indiana Jones",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Harrison_Ford",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „As Find Horror“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Harrison Ford",
+        "suggestions": [
+          "As Find Horror"
+        ],
+        "selectedSolution": "As Find Horror",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-44",
+    "person": "Audrey Hepburn",
+    "anagram": "Hand Buyer Pure",
+    "solution": "Audrey Hepburn",
+    "category": "Kultur",
+    "fameArea": "Klassisches Kino",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Audrey_Hepburn",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Hand Buyer Pure“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Audrey Hepburn",
+        "suggestions": [
+          "Hand Buyer Pure"
+        ],
+        "selectedSolution": "Hand Buyer Pure",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-45",
+    "person": "Keanu Reeves",
+    "anagram": "Revenue Sake",
+    "solution": "Keanu Reeves",
+    "category": "Kultur",
+    "fameArea": "Matrix",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Keanu_Reeves",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Revenue Sake“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Keanu Reeves",
+        "suggestions": [
+          "Revenue Sake"
+        ],
+        "selectedSolution": "Revenue Sake",
+        "wordCountPreference": "2"
+      }
+    }
+  },
+  {
+    "id": "ANA-46",
+    "person": "Johann Sebastian Bach",
+    "anagram": "The John Basics Banana",
+    "solution": "Johann Sebastian Bach",
+    "category": "Musik",
+    "fameArea": "Barock",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Johann_Sebastian_Bach",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „The John Basics Banana“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Johann Sebastian Bach",
+        "suggestions": [
+          "The John Basics Banana"
+        ],
+        "selectedSolution": "The John Basics Banana",
+        "wordCountPreference": "4"
+      }
+    }
+  },
+  {
+    "id": "ANA-47",
+    "person": "Ludwig van Beethoven",
+    "anagram": "Involved Wheat Begun",
+    "solution": "Ludwig van Beethoven",
+    "category": "Musik",
+    "fameArea": "Klassik",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Ludwig_van_Beethoven",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Involved Wheat Begun“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Ludwig van Beethoven",
+        "suggestions": [
+          "Involved Wheat Begun"
+        ],
+        "selectedSolution": "Involved Wheat Begun",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-48",
+    "person": "Astrid Lindgren",
+    "anagram": "In String Ladder",
+    "solution": "Astrid Lindgren",
+    "category": "Literatur",
+    "fameArea": "Kinderliteratur",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Astrid_Lindgren",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „In String Ladder“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Astrid Lindgren",
+        "suggestions": [
+          "In String Ladder"
+        ],
+        "selectedSolution": "In String Ladder",
+        "wordCountPreference": "3"
+      }
+    }
+  },
+  {
+    "id": "ANA-49",
+    "person": "Amelia Earhart",
+    "anagram": "Are Aerial Math",
+    "solution": "Amelia Earhart",
+    "category": "Geschichte",
+    "fameArea": "Luftfahrtpionierin",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Amelia_Earhart",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „Are Aerial Math“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Amelia Earhart",
+        "suggestions": [
+          "Are Aerial Math"
+        ],
+        "selectedSolution": "Are Aerial Math",
+        "wordCountPreference": "3"
+      }
+    },
+    "editorialHoldReason": "PERSON_OVERLAP_DECISION_REQUIRED;CATEGORY_DECISION_REQUIRED"
+  },
+  {
+    "id": "ANA-50",
+    "person": "Florence Nightingale",
+    "anagram": "If Challenge Nitrogen",
+    "solution": "Florence Nightingale",
+    "category": "Gesellschaft",
+    "fameArea": "Pflegepionierin",
+    "difficulty": "SCHWER",
+    "status": "EDITORIAL_DRAFT",
+    "validation": "PASS",
+    "identitySource": "https://en.wikipedia.org/wiki/Florence_Nightingale",
+    "question": "Welche berühmte Persönlichkeit verbirgt sich in „If Challenge Nitrogen“?",
+    "qa": "Buchstaben geprüft; redaktionelle Bekanntheit und Schwierigkeit vorgeschlagen. Kein Import, keine Freigabe.",
+    "templateId": "anagramm",
+    "templateConfig": {
+      "templateData": {
+        "kind": "ANAGRAM",
+        "name": "Florence Nightingale",
+        "suggestions": [
+          "If Challenge Nitrogen"
+        ],
+        "selectedSolution": "If Challenge Nitrogen",
+        "wordCountPreference": "3"
+      }
+    }
+  }
+]

@@ -3,17 +3,22 @@ name: External Question Production Preflight
 on:
   workflow_dispatch:
     inputs:
+      editorial_pr95:
+        description: Fixed 79-candidate editorial READ ONLY preflight; no migration or import
+        type: boolean
+        default: false
+        required: true
       plan_commit:
         description: Immutable commit containing the frozen import plan
-        required: true
+        required: false
         type: string
       plan_path:
         description: Repository path below external-import-plans/
-        required: true
+        required: false
         type: string
       plan_sha256:
         description: Approved SHA-256 of the canonical import plan
-        required: true
+        required: false
         type: string
       production_commit:
         description: Verified currently deployed Production SHA
@@ -29,7 +34,7 @@ concurrency:
 
 jobs:
   dry-run:
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && !inputs.editorial_pr95
     runs-on: ubuntu-latest
     environment: operations-backup
     timeout-minutes: 20
@@ -87,5 +92,31 @@ jobs:
         with:
           name: external-question-production-preflight
           path: ${{ runner.temp }}/external-import-preflight.json
+          if-no-files-found: error
+          retention-days: 14
+
+  editorial-pr95:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && inputs.editorial_pr95
+    runs-on: ubuntu-latest
+    environment: operations-backup
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Read-only fixed editorial inventory and migration status
+        env:
+          EDITORIAL_GITHUB_ENVIRONMENT: operations-backup
+          EDITORIAL_PRODUCTION_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ vars.PRODUCTION_RELEASE_SHA }}
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+        run: node --import tsx scripts/editorial-production-preflight.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-production-preflight
+          path: editorial-production-preflight.json
           if-no-files-found: error
           retention-days: 14

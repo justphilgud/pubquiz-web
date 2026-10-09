@@ -117,3 +117,43 @@ Ab dem Tag nach „gültig bis“ gilt die Frage als veraltet:
 - Darf ein Editor eine eingereichte Frage noch direkt bearbeiten?
 - Soll OUTDATED gespeichert oder aus dem Datum abgeleitet werden?
 - Brauchen Reviewer feldbezogene Kommentare?
+
+## Inhaltstreue Statusänderung (PR95-Abnahme)
+
+Freigabe und Rücknahme eines gespeicherten Inhalts verwenden eine eigene Server
+Action `changeQuestionStatus`. Die bestehende Session-/Editorprüfung und
+`canApproveScopedQuestion` gelten in beiden Richtungen, einschließlich des
+Geltungsbereichs. Archivierte Fragen und veraltete `updated_at`-Stände blockieren.
+Die Frage wird in einer Transaktion gesperrt, erneut gelesen und für APPROVED mit
+dem bestehenden vollständigen Speichervalidator geprüft. Ausstehende Kategorien
+müssen vorher über den bestehenden Kategorienprozess geklärt werden.
+
+Der Statuspfad schreibt ausschließlich `review_status`, `freigegeben`,
+`approved_by_user_id`, `approved_at`, `reviewed_by_user_id`, `reviewed_at`,
+`review_feedback`, `last_modified_by_user_id` und das ORM-Änderungsdatum.
+APPROVED → DRAFT entfernt die aktuelle Freigabe-/Review-Markierung; Ersteller und
+Einreichung bleiben erhalten. `ist_unfertig`, sämtliche Inhalte, Quellen,
+Template-Konfiguration, Einheiten, Lösungsvarianten, Kategorie-/Medien-IDs,
+Quizzuordnungen und Antwort-/Bewertungsdaten bleiben unverändert. Keine
+Bewertungsneuberechnung, Pixel-Synchronisierung oder Generatorausführung.
+
+Bei bestehenden Fragen ohne ungespeicherte Änderungen verwendet die Freigabe
+im Editor diesen Pfad. Die explizite Rücknahme ist nur ohne ungespeicherte
+Änderungen verfügbar. „Speichern und freigeben“ bei geänderten oder neuen
+Inhalten bleibt ein vollständiger Speichervorgang und ist keine reine Freigabe.
+
+Der Anagramm-Parser erhält beim Laden die ursprüngliche Groß-/Kleinschreibung
+von selectedSolution und suggestions. Buchstabenprüfung bleibt normalisiert
+und unverändert; neu erzeugte Vorschläge dürfen weiterhin Großbuchstaben
+verwenden. Historisch wurden beim Lesen und erneuten Speichern diese beiden
+Felder in Großbuchstaben konvertiert. Explizite Anagrammeingabe übernimmt jetzt
+die eingegebene Schreibweise. Andere Templateparser werden nicht geändert.
+Der volle Speicherpfad kann weiterhin Leerraum trimmen, Konfigurationsdefaults
+materialisieren, Kategorieverknüpfungen erneuern und Bewertungen berechnen;
+diese Nebenwirkungen dürfen den Statuspfad niemals erreichen.
+
+Tests: questionStatus.test.ts, vorhandene Template-/Editor-Regressionen sowie
+reale PostgreSQL-Transaktionen in editorialImport.integration.test.ts mit
+vorhandenen Quizzuordnungen, finalisierten Antworten und manuellen Bewertungen.
+Sie prüfen beide Richtungen, Quellen/Einheiten/Varianten, unveränderte
+Relationstabellen, verweigerte Rechte, veraltete Daten und Validierungsrollback.

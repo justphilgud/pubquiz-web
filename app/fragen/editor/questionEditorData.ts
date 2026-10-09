@@ -1,4 +1,5 @@
 import { prisma } from "@/app/lib/prisma";
+import type { Prisma } from "@/app/generated/prisma/client";
 import type {
   QuestionAnswerDraft,
   QuestionEditorDraft,
@@ -16,8 +17,8 @@ import {
 } from "./pixelTemplateConfig";
 import { resolveQuestionText } from "./templates/questionTemplateData";
 
-export async function loadQuestionForEditor(questionId: number) {
-  const question = await prisma.fragen.findUnique({
+export async function loadQuestionForEditor(questionId: number, db: Prisma.TransactionClient = prisma) {
+  const question = await db.fragen.findUnique({
     where: { fragen_id: questionId },
     select: {
       fragen_id: true,
@@ -138,7 +139,7 @@ export async function loadQuestionForEditor(questionId: number) {
     question.aktualitaet_geprueft_von_user_id,
   ].filter((id): id is number => id !== null);
   const users = userIds.length
-    ? await prisma.users.findMany({
+    ? await db.users.findMany({
         where: { id: { in: [...new Set(userIds)] } },
         select: { id: true, name: true, email: true },
       })

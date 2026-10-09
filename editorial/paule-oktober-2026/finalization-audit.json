@@ -1,0 +1,2723 @@
+{
+  "version": "2026-10-09-units-categories-v1",
+  "provider": "Editorial:PR93",
+  "pr93Sha": "52b0729152a4e4d12947e1cee0961fe2293fc73a",
+  "pr95BaseSha": "c62047e80cf6e63ff2bc3e673384cd310195765c",
+  "reviewWorkbook": "Paule-II_Oktober_100-Fragen_Redaktion.xlsx",
+  "reviewWorkbookSha256": "e1ff007fb3bfe402979164a36c263d839b735fad4dc62b28891709296d4e7e3a",
+  "approvalBasis": "Master-Auftrag: eindeutige Kategorieempfehlungen bestätigt; leere Einzelentscheidungen nicht ergänzt",
+  "hashes": {
+    "anagrams.json": "dc0a2511690b0e4df4cd924dc6000b4d792f03ad95f87990dee24bd5f09cd4f0",
+    "estimates.json": "3fc63c06afe83c47c8192f374eeb9206628bbd03dc322e01abf6b6b99008c89f"
+  },
+  "categories": [
+    {
+      "importId": "ANA-01",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-02",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-03",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-04",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-05",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-06",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-07",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-08",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-09",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-10",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Kunst & Kultur",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Modegestaltung ist kulturelles Schaffen; keine Umdeutung zur Wirtschaftsfrage.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-11",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-12",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-13",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Erfinder und Elektrotechnik; Wissenschaft ist der nächste aktive Oberbegriff.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-14",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-15",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": "KNOWN_IDENTICAL_ANAGRAM_NICOLE_KIDMAN",
+      "existingQuestionId": 22
+    },
+    {
+      "importId": "ANA-16",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Kunst & Kultur",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Bildende Kunst passt zum aktiven breiten Kulturbegriff; Kunstwerk E2E ist ein Testtag und ungeeignet.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-17",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-18",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Gesellschaft",
+      "proposedCategory": "Gesellschaft",
+      "preparedCategory": "Gesellschaft",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-19",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-20",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-21",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-22",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-23",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-24",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Politik & Zeitgeschehen",
+      "proposedCategory": "Politik (#26)",
+      "preparedCategory": "Politik",
+      "rationale": "Politische Persönlichkeit; vorhandenes Politik-Tag passt direkt.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-25",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Geschichte",
+      "proposedCategory": "Politik (#26), nur Vorschlag",
+      "preparedCategory": "Politik",
+      "rationale": "Politische und historische Persönlichkeit; Kategorienentscheidung ersetzt keine Prüfung der Personenwiederholung mit Frage #147.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "PERSON_OVERLAP_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": 147
+    },
+    {
+      "importId": "ANA-26",
+      "group": "02 · Unklar",
+      "originalCategory": "Religion & Weltanschauung",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Religion & Weltanschauung",
+      "rationale": "Martin Luther ist primär Reformation/Religion. Politik oder Kultur wären fachliche Umdeutungen; explizite Entscheidung erforderlich.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-27",
+      "group": "02 · Unklar",
+      "originalCategory": "Geschichte",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Geschichte",
+      "rationale": "Cleopatra ist historisch eingeordnet. Politik ist denkbar, aber ersetzt den fehlenden Geschichtsbegriff nicht ungeprüft.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-28",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Kunst & Kultur",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Bildende Kunst passt zum aktiven breiten Kulturbegriff; Kunstwerk E2E ist ein Testtag und ungeeignet.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-29",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Kunst & Kultur",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Bildende Kunst passt zum aktiven breiten Kulturbegriff; Kunstwerk E2E ist ein Testtag und ungeeignet.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-30",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Raumfahrt und Astronautik; keine bloße Geografiezuordnung.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-31",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-32",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-33",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Literatur (#28)",
+      "preparedCategory": "Literatur",
+      "rationale": "Schriftsteller; der vorhandene engere Literaturbegriff deckt den konkreten Kandidaten ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-34",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Literatur (#28)",
+      "preparedCategory": "Literatur",
+      "rationale": "Schriftsteller; der vorhandene engere Literaturbegriff deckt den konkreten Kandidaten ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-35",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Literatur (#28)",
+      "preparedCategory": "Literatur",
+      "rationale": "Schriftsteller; der vorhandene engere Literaturbegriff deckt den konkreten Kandidaten ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-36",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Literatur (#28)",
+      "preparedCategory": "Literatur",
+      "rationale": "Schriftsteller; der vorhandene engere Literaturbegriff deckt den konkreten Kandidaten ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-37",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-38",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Naturwissenschaftliche Persönlichkeit; keine Korrektur oder Verwendung des Legacy-Tags Bieologie nötig.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-39",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Naturwissenschaftliche Persönlichkeit; keine Korrektur oder Verwendung des Legacy-Tags Bieologie nötig.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-40",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-41",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Literatur (#28)",
+      "preparedCategory": "Literatur",
+      "rationale": "Schriftsteller; der vorhandene engere Literaturbegriff deckt den konkreten Kandidaten ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-42",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Naturwissenschaftliche Persönlichkeit; keine Korrektur oder Verwendung des Legacy-Tags Bieologie nötig.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-43",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-44",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-45",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Filmschauspiel bzw. Filmkultur; Kultur ist der passende breite Oberbegriff. TV (#25) wäre für diese Kinopersönlichkeiten zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-46",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-47",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-48",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Literatur (#28)",
+      "preparedCategory": "Literatur",
+      "rationale": "Schriftsteller; der vorhandene engere Literaturbegriff deckt den konkreten Kandidaten ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "ANA-49",
+      "group": "02 · Unklar",
+      "originalCategory": "Geschichte",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Geschichte",
+      "rationale": "Amelia Earhart ist hier eine historische Luftfahrtpersönlichkeit; Wissenschaft oder Frauenpower sind kein gleichwertiger Oberkategorieersatz. Außerdem Personenwiederholung mit #23.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "PERSON_OVERLAP_DECISION_REQUIRED;CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": 23
+    },
+    {
+      "importId": "ANA-50",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Gesellschaft",
+      "proposedCategory": "Gesellschaft",
+      "preparedCategory": "Gesellschaft",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-01",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Anatomie des erwachsenen Menschen; Tiere ist als Ersatz ungeeignet.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-02",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27); optional Tiere (#8)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Zoologie bzw. Entomologie; Wissenschaft erhält den Oberbegriff, Tiere wäre ein ergänzendes vorhandenes Thema.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-03",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27); optional Tiere (#8)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Zoologie bzw. Entomologie; Wissenschaft erhält den Oberbegriff, Tiere wäre ein ergänzendes vorhandenes Thema.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-04",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Geowissenschaft bzw. Astronomie; der konkrete Sachverhalt wird vom aktiven Wissenschaftsbegriff abgedeckt.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-05",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Geowissenschaft bzw. Astronomie; der konkrete Sachverhalt wird vom aktiven Wissenschaftsbegriff abgedeckt.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-06",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Geowissenschaft bzw. Astronomie; der konkrete Sachverhalt wird vom aktiven Wissenschaftsbegriff abgedeckt.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-07",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27); optional Tiere (#8)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Zoologie bzw. Entomologie; Wissenschaft erhält den Oberbegriff, Tiere wäre ein ergänzendes vorhandenes Thema.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-08",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Natur & Wissenschaft",
+      "proposedCategory": "Wissenschaft (#27); optional Tiere (#8)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Zoologie bzw. Entomologie; Wissenschaft erhält den Oberbegriff, Tiere wäre ein ergänzendes vorhandenes Thema.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-09",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Geografie",
+      "proposedCategory": "Geografie",
+      "preparedCategory": "Geografie",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-10",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Geografie",
+      "proposedCategory": "Geografie",
+      "preparedCategory": "Geografie",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-11",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Geografie",
+      "proposedCategory": "Geografie",
+      "preparedCategory": "Geografie",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-12",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Geografie",
+      "proposedCategory": "Geografie",
+      "preparedCategory": "Geografie",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-13",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Geografie",
+      "proposedCategory": "Geografie",
+      "preparedCategory": "Geografie",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-14",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Geografie",
+      "proposedCategory": "Geografie",
+      "preparedCategory": "Geografie",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-15",
+      "group": "02 · Unklar",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27), nur bedingt",
+      "preparedCategory": "Technik & Digitales",
+      "rationale": "Technische Abmessung/Kapazität. Wissenschaft ist benachbart, deckt Ingenieurtechnik ohne definierten Kategoriescope aber nicht zweifelsfrei ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-16",
+      "group": "02 · Unklar",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27), nur bedingt",
+      "preparedCategory": "Technik & Digitales",
+      "rationale": "Technische Abmessung/Kapazität. Wissenschaft ist benachbart, deckt Ingenieurtechnik ohne definierten Kategoriescope aber nicht zweifelsfrei ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-17",
+      "group": "02 · Unklar",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27), nur bedingt",
+      "preparedCategory": "Technik & Digitales",
+      "rationale": "Technische Abmessung/Kapazität. Wissenschaft ist benachbart, deckt Ingenieurtechnik ohne definierten Kategoriescope aber nicht zweifelsfrei ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-18",
+      "group": "02 · Unklar",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27), nur bedingt",
+      "preparedCategory": "Technik & Digitales",
+      "rationale": "Technische Abmessung/Kapazität. Wissenschaft ist benachbart, deckt Ingenieurtechnik ohne definierten Kategoriescope aber nicht zweifelsfrei ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-19",
+      "group": "02 · Unklar",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27), nur bedingt",
+      "preparedCategory": "Technik & Digitales",
+      "rationale": "Technische Abmessung/Kapazität. Wissenschaft ist benachbart, deckt Ingenieurtechnik ohne definierten Kategoriescope aber nicht zweifelsfrei ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-20",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27)",
+      "preparedCategory": "Wissenschaft",
+      "rationale": "Lichtgeschwindigkeit im Vakuum ist ausdrücklich ein physikalischer Sachverhalt, unabhängig von der Quellkategorie Technik.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-21",
+      "group": "02 · Unklar",
+      "originalCategory": "Technik & Digitales",
+      "proposedCategory": "Wissenschaft (#27), nur bedingt",
+      "preparedCategory": "Technik & Digitales",
+      "rationale": "Technische Abmessung/Kapazität. Wissenschaft ist benachbart, deckt Ingenieurtechnik ohne definierten Kategoriescope aber nicht zweifelsfrei ab.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-22",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-23",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-24",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-25",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-26",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Sport",
+      "proposedCategory": "Sport",
+      "preparedCategory": "Sport",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-27",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-28",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-29",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-30",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-31",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Musik",
+      "proposedCategory": "Musik",
+      "preparedCategory": "Musik",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-32",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Kinofilm, Filmpreis oder Filmfestival passt zu Kultur; TV ist zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-33",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Kinofilm, Filmpreis oder Filmfestival passt zu Kultur; TV ist zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-34",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Kinofilm, Filmpreis oder Filmfestival passt zu Kultur; TV ist zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-35",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Kinofilm, Filmpreis oder Filmfestival passt zu Kultur; TV ist zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-36",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Film & Fernsehen",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Kinofilm, Filmpreis oder Filmfestival passt zu Kultur; TV ist zu eng.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-37",
+      "group": "02 · Unklar",
+      "originalCategory": "Essen & Trinken",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Essen & Trinken",
+      "rationale": "Lebensmittel/Zubereitung; weder Kultur noch Gesellschaft soll als unspezifische Auffangkategorie verwendet werden.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-38",
+      "group": "02 · Unklar",
+      "originalCategory": "Essen & Trinken",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Essen & Trinken",
+      "rationale": "Lebensmittel/Zubereitung; weder Kultur noch Gesellschaft soll als unspezifische Auffangkategorie verwendet werden.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-39",
+      "group": "02 · Unklar",
+      "originalCategory": "Essen & Trinken",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Essen & Trinken",
+      "rationale": "Lebensmittel/Zubereitung; weder Kultur noch Gesellschaft soll als unspezifische Auffangkategorie verwendet werden.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-40",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Essen & Trinken",
+      "proposedCategory": "Alkohol (#10)",
+      "preparedCategory": "Alkohol",
+      "rationale": "Konkrete Bier-Zapffrage wird vom vorhandenen Alkohol-Thema abgedeckt.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-41",
+      "group": "02 · Unklar",
+      "originalCategory": "Essen & Trinken",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Essen & Trinken",
+      "rationale": "Lebensmittel/Zubereitung; weder Kultur noch Gesellschaft soll als unspezifische Auffangkategorie verwendet werden.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-42",
+      "group": "02 · Unklar",
+      "originalCategory": "Geschichte",
+      "proposedCategory": "Politik (#26), nur bedingt",
+      "preparedCategory": "Geschichte",
+      "rationale": "Berliner Mauer: historische Grenzanlage. Politik ist benachbart, bedarf als Ersatz für Geschichte ausdrücklicher Prüfung.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-43",
+      "group": "02 · Unklar",
+      "originalCategory": "Geschichte",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Geschichte",
+      "rationale": "Historische Schiffsausstattung; Tourismus und Weltrekorde treffen die Messgröße nicht.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-44",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Geschichte",
+      "proposedCategory": "Kultur (#11)",
+      "preparedCategory": "Kultur",
+      "rationale": "Erhaltene historische Stickerei: Kunst-/Kulturobjekt, daher konkreter Kulturbezug.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-45",
+      "group": "03 · Bisher konfliktfrei",
+      "originalCategory": "Gesellschaft",
+      "proposedCategory": "Gesellschaft",
+      "preparedCategory": "Gesellschaft",
+      "rationale": "Quellkategorie ist bereits aktiv; keine Änderung vorgeschlagen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-46",
+      "group": "01 · Kategorie-Vorschlag",
+      "originalCategory": "Politik & Zeitgeschehen",
+      "proposedCategory": "Politik (#26)",
+      "preparedCategory": "Politik",
+      "rationale": "Abgeordnetenzahl nach einer konkret benannten Bundestagswahl.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": null,
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-47",
+      "group": "02 · Unklar",
+      "originalCategory": "Sprache & Literatur",
+      "proposedCategory": "Politik (#26), nur bedingt",
+      "preparedCategory": "Sprache & Literatur",
+      "rationale": "Institutionelle EU-Amtssprachenzahl. Politik ist plausibel, Literatur deckt Sprachpolitik nicht ab; Themenwechsel explizit prüfen.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-48",
+      "group": "02 · Unklar",
+      "originalCategory": "Wirtschaft",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Wirtschaft",
+      "rationale": "Goldreserve bzw. Euro-Bargeldabmessungen sind wirtschaftliche Sachfragen; Gesellschaft ist kein ausreichend genauer Ersatz.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-49",
+      "group": "02 · Unklar",
+      "originalCategory": "Wirtschaft",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Wirtschaft",
+      "rationale": "Goldreserve bzw. Euro-Bargeldabmessungen sind wirtschaftliche Sachfragen; Gesellschaft ist kein ausreichend genauer Ersatz.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    },
+    {
+      "importId": "EST-50",
+      "group": "02 · Unklar",
+      "originalCategory": "Wirtschaft",
+      "proposedCategory": "KEINE sichere Zuordnung",
+      "preparedCategory": "Wirtschaft",
+      "rationale": "Goldreserve bzw. Euro-Bargeldabmessungen sind wirtschaftliche Sachfragen; Gesellschaft ist kein ausreichend genauer Ersatz.",
+      "decisionCell": null,
+      "commentCell": null,
+      "hold": "CATEGORY_DECISION_REQUIRED",
+      "exclude": null,
+      "existingQuestionId": null
+    }
+  ],
+  "changes": [
+    {
+      "importId": "ANA-01",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-02",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-04",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-05",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-10",
+      "changes": {
+        "category": {
+          "before": "Kunst & Kultur",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-11",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-13",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "ANA-15",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        },
+        "editorialExcludeReason": {
+          "before": null,
+          "after": "KNOWN_IDENTICAL_ANAGRAM_NICOLE_KIDMAN"
+        }
+      }
+    },
+    {
+      "importId": "ANA-16",
+      "changes": {
+        "category": {
+          "before": "Kunst & Kultur",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-19",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-20",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-21",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-22",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-24",
+      "changes": {
+        "category": {
+          "before": "Politik & Zeitgeschehen",
+          "after": "Politik"
+        }
+      }
+    },
+    {
+      "importId": "ANA-25",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "PERSON_OVERLAP_DECISION_REQUIRED"
+        },
+        "category": {
+          "before": "Geschichte",
+          "after": "Politik"
+        }
+      }
+    },
+    {
+      "importId": "ANA-26",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "ANA-27",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "ANA-28",
+      "changes": {
+        "category": {
+          "before": "Kunst & Kultur",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-29",
+      "changes": {
+        "category": {
+          "before": "Kunst & Kultur",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-30",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "ANA-33",
+      "changes": {
+        "category": {
+          "before": "Sprache & Literatur",
+          "after": "Literatur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-34",
+      "changes": {
+        "category": {
+          "before": "Sprache & Literatur",
+          "after": "Literatur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-35",
+      "changes": {
+        "category": {
+          "before": "Sprache & Literatur",
+          "after": "Literatur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-36",
+      "changes": {
+        "category": {
+          "before": "Sprache & Literatur",
+          "after": "Literatur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-37",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-38",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "ANA-39",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "ANA-41",
+      "changes": {
+        "category": {
+          "before": "Sprache & Literatur",
+          "after": "Literatur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-42",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "ANA-43",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-44",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-45",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-48",
+      "changes": {
+        "category": {
+          "before": "Sprache & Literatur",
+          "after": "Literatur"
+        }
+      }
+    },
+    {
+      "importId": "ANA-49",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "PERSON_OVERLAP_DECISION_REQUIRED;CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-01",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-02",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-03",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-04",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-05",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-06",
+      "changes": {
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 384400,
+              "unit": "km",
+              "numberFormat": "INTEGER",
+              "explanation": "Mittlerer Bahnradius; die tatsächliche Entfernung schwankt.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 384400,
+              "unit": "Kilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "Mittlerer Bahnradius; die tatsächliche Entfernung schwankt.",
+              "tolerance": null
+            }
+          }
+        },
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-07",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-08",
+      "changes": {
+        "category": {
+          "before": "Natur & Wissenschaft",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-09",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 8848.86,
+              "unit": "m",
+              "numberFormat": "DECIMAL",
+              "explanation": "Höhenwert einschließlich Schneedecke; ältere Angaben verwenden 8848 Meter.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 8848.86,
+              "unit": "Meter",
+              "numberFormat": "DECIMAL",
+              "explanation": "Höhenwert einschließlich Schneedecke; ältere Angaben verwenden 8848 Meter.",
+              "tolerance": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "importId": "EST-10",
+      "changes": {
+        "unit": {
+          "before": "km²",
+          "after": "Quadratkilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 536,
+              "unit": "km²",
+              "numberFormat": "INTEGER",
+              "explanation": "Obersee und Untersee zusammen; Einzugsgebiet und Uferfläche sind nicht gefragt.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 536,
+              "unit": "Quadratkilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "Obersee und Untersee zusammen; Einzugsgebiet und Uferfläche sind nicht gefragt.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie groß ist die Wasseroberfläche des gesamten Bodensees einschließlich Untersee ungefähr?",
+          "after": "Wie groß ist die Wasseroberfläche des gesamten Bodensees einschließlich Untersee ungefähr, in Quadratkilometern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-11",
+      "changes": {
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 1233,
+              "unit": "km",
+              "numberFormat": "INTEGER",
+              "explanation": "Quelle nennt 1233 Kilometer; andere Messdefinitionen nennen geringfügig abweichende Werte.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 1233,
+              "unit": "Kilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "Quelle nennt 1233 Kilometer; andere Messdefinitionen nennen geringfügig abweichende Werte.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist der Rhein laut der IKSR-Broschüre „Rhein für alle“?",
+          "after": "Wie lang ist der Rhein laut der IKSR-Broschüre „Rhein für alle“, in Kilometern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-12",
+      "changes": {
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 40070,
+              "unit": "km",
+              "numberFormat": "INTEGER",
+              "explanation": "Gerundeter Äquatorumfang; nicht den meridionalen Umfang verwenden.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 40070,
+              "unit": "Kilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "Gerundeter Äquatorumfang; nicht den meridionalen Umfang verwenden.",
+              "tolerance": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "importId": "EST-13",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 217,
+              "unit": "m",
+              "numberFormat": "INTEGER",
+              "explanation": "Die Stadt nennt gut 217 Meter; gerundeter Referenzwert, keine Zentimetergenauigkeit behauptet.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 217,
+              "unit": "Meter",
+              "numberFormat": "INTEGER",
+              "explanation": "Die Stadt nennt gut 217 Meter; gerundeter Referenzwert, keine Zentimetergenauigkeit behauptet.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie hoch ist der Stuttgarter Fernsehturm insgesamt ungefähr, nach der gerundeten Angabe der Stadt Stuttgart?",
+          "after": "Wie hoch ist der Stuttgarter Fernsehturm insgesamt ungefähr, nach der gerundeten Angabe der Stadt Stuttgart, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-14",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 330,
+              "unit": "m",
+              "numberFormat": "INTEGER",
+              "explanation": "Mit neuer Antenne 330 Meter; frühere Gesamtangabe 324 Meter.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 330,
+              "unit": "Meter",
+              "numberFormat": "INTEGER",
+              "explanation": "Mit neuer Antenne 330 Meter; frühere Gesamtangabe 324 Meter.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie hoch ist der Eiffelturm einschließlich seiner seit 2022 montierten Antenne?",
+          "after": "Wie hoch ist der Eiffelturm einschließlich seiner seit 2022 montierten Antenne, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-15",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 109,
+              "unit": "m",
+              "numberFormat": "INTEGER",
+              "explanation": "Gesamtausdehnung über die Solarpanels; nicht Länge der bewohnbaren Module.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 109,
+              "unit": "Meter",
+              "numberFormat": "INTEGER",
+              "explanation": "Gesamtausdehnung über die Solarpanels; nicht Länge der bewohnbaren Module.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie groß ist die Spannweite der Internationalen Raumstation über die Solarpanels ungefähr, laut NASA-Faktenblatt?",
+          "after": "Wie groß ist die Spannweite der Internationalen Raumstation über die Solarpanels ungefähr, laut NASA-Faktenblatt, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-16",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 111,
+              "unit": "m",
+              "numberFormat": "INTEGER",
+              "explanation": "NASA rundet 363 Fuß auf 111 Meter.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 111,
+              "unit": "Meter",
+              "numberFormat": "INTEGER",
+              "explanation": "NASA rundet 363 Fuß auf 111 Meter.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie hoch war eine Saturn-V-Rakete einschließlich des Apollo-Raumschiffs ungefähr?",
+          "after": "Wie hoch war eine Saturn-V-Rakete einschließlich des Apollo-Raumschiffs ungefähr, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-17",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 79.8,
+              "unit": "m",
+              "numberFormat": "DECIMAL",
+              "explanation": "Herstellerwert gerundet auf 79,8 Meter; Länge des Flugzeugs ist geringer.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 79.8,
+              "unit": "Meter",
+              "numberFormat": "DECIMAL",
+              "explanation": "Herstellerwert gerundet auf 79,8 Meter; Länge des Flugzeugs ist geringer.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie groß ist die Spannweite eines Airbus A380 ungefähr, nach dem gerundeten Herstellerwert?",
+          "after": "Wie groß ist die Spannweite eines Airbus A380 ungefähr, nach dem gerundeten Herstellerwert, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-18",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 27,
+              "unit": "km",
+              "numberFormat": "INTEGER",
+              "explanation": "Beschleunigerring von ungefähr 27 Kilometern Umfang.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 27,
+              "unit": "Kilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "Beschleunigerring von ungefähr 27 Kilometern Umfang.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist der Ring des Large Hadron Collider am CERN ungefähr?",
+          "after": "Wie lang ist der Ring des Large Hadron Collider am CERN ungefähr, in Kilometern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-19",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 50.5,
+              "unit": "km",
+              "numberFormat": "DECIMAL",
+              "explanation": "Gesamtlänge einschließlich der Landabschnitte; Unterwasseranteil rund 37 Kilometer.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 50.5,
+              "unit": "Kilometer",
+              "numberFormat": "DECIMAL",
+              "explanation": "Gesamtlänge einschließlich der Landabschnitte; Unterwasseranteil rund 37 Kilometer.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist der Eurotunnel zwischen Frankreich und England insgesamt, laut Betreiberangabe?",
+          "after": "Wie lang ist der Eurotunnel zwischen Frankreich und England insgesamt, laut Betreiberangabe, in Kilometern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-20",
+      "changes": {
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 299792,
+              "unit": "km",
+              "numberFormat": "INTEGER",
+              "explanation": "299792458 Meter pro Sekunde sind 299792,458 Kilometer; auf ganze Kilometer gerundet.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 299792,
+              "unit": "Kilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "299792458 Meter pro Sekunde sind 299792,458 Kilometer; auf ganze Kilometer gerundet.",
+              "tolerance": null
+            }
+          }
+        },
+        "category": {
+          "before": "Technik & Digitales",
+          "after": "Wissenschaft"
+        }
+      }
+    },
+    {
+      "importId": "EST-21",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-22",
+      "changes": {
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 42.195,
+              "unit": "km",
+              "numberFormat": "DECIMAL",
+              "explanation": "42 Kilometer und 195 Meter.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 42.195,
+              "unit": "Kilometer",
+              "numberFormat": "DECIMAL",
+              "explanation": "42 Kilometer und 195 Meter.",
+              "tolerance": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "importId": "EST-23",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 7.32,
+              "unit": "m",
+              "numberFormat": "DECIMAL",
+              "explanation": "Innenweite 7,32 Meter; Höhe 2,44 Meter ist nicht gefragt.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 7.32,
+              "unit": "Meter",
+              "numberFormat": "DECIMAL",
+              "explanation": "Innenweite 7,32 Meter; Höhe 2,44 Meter ist nicht gefragt.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie breit ist ein reguläres Fußballtor zwischen den Innenkanten der Pfosten, laut IFAB?",
+          "after": "Wie breit ist ein reguläres Fußballtor zwischen den Innenkanten der Pfosten, laut IFAB, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-24",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 23.77,
+              "unit": "m",
+              "numberFormat": "DECIMAL",
+              "explanation": "Die Platzlänge beträgt 78 Fuß beziehungsweise 23,77 Meter.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 23.77,
+              "unit": "Meter",
+              "numberFormat": "DECIMAL",
+              "explanation": "Die Platzlänge beträgt 78 Fuß beziehungsweise 23,77 Meter.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist ein Tennisplatz von Grundlinie zu Grundlinie laut ITF?",
+          "after": "Wie lang ist ein Tennisplatz von Grundlinie zu Grundlinie laut ITF, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-25",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 3.05,
+              "unit": "m",
+              "numberFormat": "DECIMAL",
+              "explanation": "3050 Millimeter, mit der in der Norm genannten kleinen Messtoleranz.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 3.05,
+              "unit": "Meter",
+              "numberFormat": "DECIMAL",
+              "explanation": "3050 Millimeter, mit der in der Norm genannten kleinen Messtoleranz.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie hoch liegt die Oberkante eines Basketballrings nach den FIBA-Ausrüstungsregeln von 2024?",
+          "after": "Wie hoch liegt die Oberkante eines Basketballrings nach den FIBA-Ausrüstungsregeln von 2024, in Metern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-31",
+      "changes": {
+        "unit": {
+          "before": "Hz",
+          "after": "Hertz"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 440,
+              "unit": "Hz",
+              "numberFormat": "INTEGER",
+              "explanation": "Normstimmton 440 Hertz; praktische Orchesterstimmungen können abweichen.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 440,
+              "unit": "Hertz",
+              "numberFormat": "INTEGER",
+              "explanation": "Normstimmton 440 Hertz; praktische Orchesterstimmungen können abweichen.",
+              "tolerance": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "importId": "EST-32",
+      "changes": {
+        "unit": {
+          "before": "cm",
+          "after": "Zentimeter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 34.3,
+              "unit": "cm",
+              "numberFormat": "DECIMAL",
+              "explanation": "13,5 Zoll × 2,54 ergeben 34,29 Zentimeter, gerundet 34,3.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 34.3,
+              "unit": "Zentimeter",
+              "numberFormat": "DECIMAL",
+              "explanation": "13,5 Zoll × 2,54 ergeben 34,29 Zentimeter, gerundet 34,3.",
+              "tolerance": null
+            }
+          }
+        },
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "EST-33",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "EST-34",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 60,
+              "unit": "m",
+              "numberFormat": "INTEGER",
+              "explanation": "Der Weg über den Teppich führt anschließend über 24 Stufen.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 60,
+              "unit": "Meter",
+              "numberFormat": "INTEGER",
+              "explanation": "Der Weg über den Teppich führt anschließend über 24 Stufen.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist der rote Teppich vor der berühmten Treppe des Filmfestivals Cannes laut Festivalbeschreibung?",
+          "after": "Wie lang ist der rote Teppich vor der berühmten Treppe des Filmfestivals Cannes laut Festivalbeschreibung, in Metern?"
+        },
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "EST-35",
+      "changes": {
+        "unit": {
+          "before": "Filme",
+          "after": "Kinofilme"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 8,
+              "unit": "Filme",
+              "numberFormat": "INTEGER",
+              "explanation": "Sieben Romane wurden in acht Filme umgesetzt, da der letzte Band geteilt wurde.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 8,
+              "unit": "Kinofilme",
+              "numberFormat": "INTEGER",
+              "explanation": "Sieben Romane wurden in acht Filme umgesetzt, da der letzte Band geteilt wurde.",
+              "tolerance": null
+            }
+          }
+        },
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "EST-36",
+      "changes": {
+        "category": {
+          "before": "Film & Fernsehen",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "EST-37",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "ml",
+          "after": "Milliliter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 25,
+              "unit": "ml",
+              "numberFormat": "INTEGER",
+              "explanation": "Zielwert 25 Milliliter mit ±2,5 Millilitern Spezifikationstoleranz.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 25,
+              "unit": "Milliliter",
+              "numberFormat": "INTEGER",
+              "explanation": "Zielwert 25 Milliliter mit ±2,5 Millilitern Spezifikationstoleranz.",
+              "tolerance": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "importId": "EST-38",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-39",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-40",
+      "changes": {
+        "category": {
+          "before": "Essen & Trinken",
+          "after": "Alkohol"
+        }
+      }
+    },
+    {
+      "importId": "EST-41",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-42",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "km",
+          "after": "Kilometer"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 155,
+              "unit": "km",
+              "numberFormat": "INTEGER",
+              "explanation": "Nicht die rund 43 Kilometer innerstädtische Sektorengrenze und nicht der heutige Mauerweg.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 155,
+              "unit": "Kilometer",
+              "numberFormat": "INTEGER",
+              "explanation": "Nicht die rund 43 Kilometer innerstädtische Sektorengrenze und nicht der heutige Mauerweg.",
+              "tolerance": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "importId": "EST-43",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-44",
+      "changes": {
+        "unit": {
+          "before": "m",
+          "after": "Meter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 68.3,
+              "unit": "m",
+              "numberFormat": "DECIMAL",
+              "explanation": "Technische Beschreibung rund 68,3 Meter; touristisch oft auf 70 Meter gerundet.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 68.3,
+              "unit": "Meter",
+              "numberFormat": "DECIMAL",
+              "explanation": "Technische Beschreibung rund 68,3 Meter; touristisch oft auf 70 Meter gerundet.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist die erhaltene Stickerei von Bayeux ungefähr, nach der technischen Beschreibung ihres Museums?",
+          "after": "Wie lang ist die erhaltene Stickerei von Bayeux ungefähr, nach der technischen Beschreibung ihres Museums, in Metern?"
+        },
+        "category": {
+          "before": "Geschichte",
+          "after": "Kultur"
+        }
+      }
+    },
+    {
+      "importId": "EST-46",
+      "changes": {
+        "category": {
+          "before": "Politik & Zeitgeschehen",
+          "after": "Politik"
+        }
+      }
+    },
+    {
+      "importId": "EST-47",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-48",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        }
+      }
+    },
+    {
+      "importId": "EST-49",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "mm",
+          "after": "Millimeter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 25.75,
+              "unit": "mm",
+              "numberFormat": "DECIMAL",
+              "explanation": "Durchmesser 25,75 Millimeter; nicht Dicke oder Gewicht.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 25.75,
+              "unit": "Millimeter",
+              "numberFormat": "DECIMAL",
+              "explanation": "Durchmesser 25,75 Millimeter; nicht Dicke oder Gewicht.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Welchen Durchmesser hat eine 2-Euro-Münze?",
+          "after": "Welchen Durchmesser hat eine 2-Euro-Münze, in Millimetern?"
+        }
+      }
+    },
+    {
+      "importId": "EST-50",
+      "changes": {
+        "editorialHoldReason": {
+          "before": null,
+          "after": "CATEGORY_DECISION_REQUIRED"
+        },
+        "unit": {
+          "before": "mm",
+          "after": "Millimeter"
+        },
+        "templateConfig": {
+          "before": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 140,
+              "unit": "mm",
+              "numberFormat": "INTEGER",
+              "explanation": "Abmessungen 140 × 77 Millimeter; gefragt ist die längere Seite.",
+              "tolerance": null
+            }
+          },
+          "after": {
+            "templateData": {
+              "kind": "ESTIMATE",
+              "correctValue": 140,
+              "unit": "Millimeter",
+              "numberFormat": "INTEGER",
+              "explanation": "Abmessungen 140 × 77 Millimeter; gefragt ist die längere Seite.",
+              "tolerance": null
+            }
+          }
+        },
+        "question": {
+          "before": "Wie lang ist eine 50-Euro-Banknote der Europa-Serie?",
+          "after": "Wie lang ist eine 50-Euro-Banknote der Europa-Serie, in Millimetern?"
+        }
+      }
+    }
+  ]
+}

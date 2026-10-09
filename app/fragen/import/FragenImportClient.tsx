@@ -4,6 +4,7 @@ import { useState } from "react";
 import * as XLSX from "xlsx";
 import { XMLParser } from "fast-xml-parser";
 import { importFragenAusDatei, pruefeFragenImport } from "../actions";
+import EditorialImportPanel from "./EditorialImportPanel";
 
 
 type ImportZeile = {
@@ -283,6 +284,7 @@ export default function FragenImportClient() {
 
   return (
     <div className="space-y-6">
+      <EditorialImportPanel />
       <div className="rounded-3xl bg-white p-6 shadow-sm">
         <label className="block">
           <div className="mb-2 text-sm font-semibold text-slate-700">

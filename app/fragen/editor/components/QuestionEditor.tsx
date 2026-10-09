@@ -6,7 +6,8 @@ import ContentEditorShell from "@/app/components/content/ContentEditorShell";
 import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
-import { saveQuestion } from "../actions";
+import { saveQuestion, changeQuestionStatus } from "../actions";
+import { shouldChangeOnlyQuestionStatus } from "../questionStatus";
 import {
   findQuestionTemplate,
   questionTemplateIds,
@@ -821,6 +822,11 @@ export function QuestionEditor({
     }
 
     if (capabilities.canApproveQuestion) {
+      // Pure approval must never fall through to category decisions/full draft saving.
+      if (shouldChangeOnlyQuestionStatus(questionRecord?.questionId, hasUnsavedChanges, questionRecord?.reviewStatus)) {
+        void handleStatusChange("APPROVED");
+        return;
+      }
       if (editorContext === "review" && quality.blockers.length > 0) {
         setSaveMessage({
           tone: "error",
@@ -868,6 +874,23 @@ export function QuestionEditor({
     setSimilarQuestions([]);
   }
 
+  async function handleStatusChange(target: "DRAFT" | "APPROVED") {
+    if (!questionRecord || hasUnsavedChanges || saveInProgressRef.current) return;
+    saveInProgressRef.current = true;
+    setPendingAction("APPROVE");
+    try {
+      const result = await changeQuestionStatus({ questionId: questionRecord.questionId,
+        target, expectedUpdatedAt: questionRecord.updatedAt });
+      setSaveMessage({ tone: result.ok ? "success" : "error", text: result.message });
+      if (result.ok) router.refresh();
+    } catch {
+      setSaveMessage({ tone: "error", text: "Statusänderung konnte nicht bestätigt werden. Aktuellen Stand neu laden." });
+    } finally {
+      saveInProgressRef.current = false;
+      setPendingAction(null);
+    }
+  }
+
   function requestChanges(
     reviewReasonCodes: ReviewReasonCode[],
     reviewComment: string,
@@ -888,7 +911,9 @@ export function QuestionEditor({
 
   const pageTitle = messages.editor.titles[editorContext];
   const workflowIdleLabel =
-    questionRecord?.reviewStatus === "CHANGES_REQUESTED" &&
+    capabilities.canApproveQuestion && shouldChangeOnlyQuestionStatus(questionRecord?.questionId, hasUnsavedChanges, questionRecord?.reviewStatus)
+      ? "Gespeicherten Inhalt freigeben"
+      : questionRecord?.reviewStatus === "CHANGES_REQUESTED" &&
     capabilities.canSubmitForReview
       ? messages.editor.resubmit
       : undefined;
@@ -1247,6 +1272,18 @@ export function QuestionEditor({
               ))}
           </div>
         )}
+
+      {showSaveActions && (
+        questionRecord?.reviewStatus === "APPROVED" && capabilities.canApproveQuestion && !questionRecord.isArchived ? (
+          <section aria-label="Freigabestatus" className="rounded-xl border p-4">
+            <p className="mb-2 text-sm">Status des gespeicherten Inhalts ändern. Ungespeicherte Änderungen zuerst speichern oder verwerfen.</p>
+            <button type="button" className="rounded-lg border px-4 py-2" disabled={hasUnsavedChanges || isEditorDisabled}
+              onClick={() => void handleStatusChange("DRAFT")}>
+              Freigabe zurücknehmen
+            </button>
+          </section>
+        ) : null
+      )}
 
       {showSaveActions && (
         <EditorSaveActions

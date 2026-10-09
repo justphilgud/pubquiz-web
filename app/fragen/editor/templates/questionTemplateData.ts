@@ -312,11 +312,9 @@ export function parseQuestionTemplateData(
       ? {
           kind: value.kind,
           name: text(value.name)!,
-          selectedSolution: text(value.selectedSolution)!.toLocaleUpperCase("de-DE"),
+          selectedSolution: text(value.selectedSolution)!,
           wordCountPreference: wordCountPreference as typeof ANAGRAM_WORD_COUNT_PREFERENCES[number],
-          suggestions: value.suggestions
-            .filter((entry) => isExactAnagram(text(value.name)!, entry))
-            .map((entry) => entry.toLocaleUpperCase("de-DE")),
+          suggestions: value.suggestions.filter((entry) => isExactAnagram(text(value.name)!, entry)),
         }
       : null;
   } else if (value.kind === "GOOGLE_REVIEWS") {
