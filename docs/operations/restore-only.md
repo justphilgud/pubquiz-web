@@ -36,8 +36,14 @@ ein main-Merge aktualisiert diesen Bridge-Service nicht automatisch.
 
 ## Ziel und Abbruch
 
-Festes Ziel: Projekt icy-leaf-46256271, Branch br-bitter-paper-b20sx4lu,
-Endpoint ep-small-poetry-b2jfzg9w, neondb/neondb_owner/PostgreSQL17.
+Das bisherige feste neondb-Ziel ist nicht leer und bleibt geschützt. Reale
+Restores benötigen jetzt einen geschützten temporären Datenbanknachweis;
+Provisionierung, Laufzeit und Bereinigung siehe [temporäre Restore-Ziele](temporary-restore.md).
+Der Modus `restore-preflight` nutzt denselben Kern und stoppt vor der Schreibgrenze.
+
+Festes Nonprod-Projekt/Transport: Projekt icy-leaf-46256271, Branch br-bitter-paper-b20sx4lu,
+Endpoint ep-small-poetry-b2jfzg9w, Rolle neondb_owner/PostgreSQL17.
+Zieldatenbank ausschließlich ap94_restore_<freigegebene zufällige Test-ID>.
 `RESTORE_TEST_EXPECTED_HOST` muss zum Code-Pin passen, Transport TLS mit SCRAM-
 Channel-Binding, Environment-Label isolated-test. Production/Preview/Development-
 Hosts sind verboten. Keine Eingaben fÃ¼r Ziel-URL oder Datenbankrolle.

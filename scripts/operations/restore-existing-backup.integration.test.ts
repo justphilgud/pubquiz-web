@@ -8,6 +8,8 @@ import { collectSnapshot,compareSnapshots,sha256 } from "./snapshot";
 import type { PgSession } from "./pg-session";
 import { pgTool } from "./pg-session";
 import { restoreSql,TARGET_PREFLIGHT_SQL,assertTargetPreflight } from "./acceptance-restore";
+import { temporaryDatabaseMarker, temporaryCleanupPlan, assertTemporaryDatabaseMarker } from "./temporary-restore-target";
+import { RESTORE_TARGET } from "./acceptance-policy";
 import { verifyMediaFiles } from "./private-artifacts";
 
 test("actual PostgreSQL dump/restore: empty guard, rollback, permissions, complete DB/media",{skip:!process.env.RESTORE_CI_DATABASE_URL},async()=>{
@@ -57,6 +59,50 @@ test("actual PostgreSQL dump/restore: empty guard, rollback, permissions, comple
   assert.equal((await target.query("SELECT sum(vergebene_punkte)::text AS p FROM pubquiz.team_antworten")).rows[0].p,"2");
   assert.equal((await target.query("SELECT password_hash FROM pubquiz.users")).rows[0].password_hash,"");
   await assert.rejects(target.query("INSERT INTO pubquiz.team_antworten(quiz_team_session_id) VALUES(999)"));
+  // A fresh independent database on the same Nonprod compute: old neondb is never reset.
+  const lease={version:1 as const,id:"a".repeat(32),project:RESTORE_TARGET.project,branch:RESTORE_TARGET.branch,
+    endpoint:RESTORE_TARGET.endpoint,database:"ap94_restore_"+"a".repeat(32),createdAt:new Date().toISOString(),
+    expiresAt:new Date(Date.now()+3600000).toISOString(),backupId:"production/acceptance/run-123-1",manifestSha256:"b".repeat(64)};
+  const marker=temporaryDatabaseMarker(lease);
+  const persistent=await snapshot(target);
+  await admin.query(`CREATE DATABASE ${lease.database} OWNER neondb_owner TEMPLATE template0`);
+  await admin.query(`COMMENT ON DATABASE ${lease.database} IS '${marker}'`);
+  const fresh=await connect(lease.database,"neondb_owner");
+  const freshProbe=async()=>{await fresh.query("BEGIN READ ONLY");try{
+    assertTemporaryDatabaseMarker((await fresh.query("SELECT shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database') AS marker")).rows[0].marker,lease);
+    assertTargetPreflight(Object.values((await fresh.query(TARGET_PREFLIGHT_SQL)).rows[0])[0] as Parameters<typeof assertTargetPreflight>[0],lease.database);
+  }finally{await fresh.query("ROLLBACK");}};
+  try {
+    await freshProbe();
+    const expiredMarker=`ap94:restore-test:${lease.id}:2000-01-01T00:00:00.000Z`;
+    const expiredSql=restoreSql(directory,expected.authRows,{expected},envFor(lease.database),{database:lease.database,marker:expiredMarker});
+    assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),expiredSql));
+    await freshProbe();
+    const temporarySql=restoreSql(directory,expected.authRows,{expected},envFor(lease.database),{database:lease.database,marker});
+    await fresh.query("CREATE TABLE public.keep(id int); INSERT INTO public.keep VALUES(42)");
+    await assert.rejects(freshProbe(),/RESTORE_TARGET_NOT_EMPTY/);
+    assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql));
+    assert.equal((await fresh.query("SELECT id FROM public.keep")).rows[0].id,42);await fresh.query("DROP TABLE public.keep");
+    await admin.query(`COMMENT ON DATABASE ${lease.database} IS 'wrong'`);await assert.rejects(freshProbe(),/MARKER/);
+    assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql));
+    await admin.query(`COMMENT ON DATABASE ${lease.database} IS '${marker}'`);
+    const deniedTemporary=await connect(lease.database,"restore_denied");try{await deniedTemporary.query("BEGIN READ ONLY");
+      const deniedProof=Object.values((await deniedTemporary.query(TARGET_PREFLIGHT_SQL)).rows[0])[0] as Parameters<typeof assertTargetPreflight>[0];
+      assert.throws(()=>assertTargetPreflight(deniedProof,lease.database));
+      await deniedTemporary.query("ROLLBACK");}finally{await deniedTemporary.end();}
+    assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql+"\nSELECT 1/0;"));
+    await freshProbe();
+    pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql);
+    compareSnapshots(expected,await snapshot(fresh));
+    compareSnapshots(persistent,await snapshot(target));compareSnapshots(expected,await snapshot(source));
+  } finally {await fresh.end();}
+  const connections=Number((await admin.query("SELECT count(*) FROM pg_stat_activity WHERE datname=$1",[lease.database])).rows[0].count);
+  const cleanup=temporaryCleanupPlan(lease,{project:lease.project,branch:lease.branch,endpoint:lease.endpoint,
+    database:lease.database,marker,restoreActive:false,connections,separatelyApproved:true});
+  // Real deletion here is exclusively disposable local CI fixture cleanup, never a production workflow action.
+  await admin.query(`DROP DATABASE ${cleanup.database}`);
+  assert.equal((await admin.query("SELECT count(*) FROM pg_database WHERE datname=$1",[lease.database])).rows[0].count,"0");
+  compareSnapshots(persistent,await snapshot(target));
   const bytes=Buffer.from("synthetic media fixture"),name="media-"+"a".repeat(64)+".bin";
   const records=[{name,url:"https://synthetic.invalid",bytes:bytes.length,sha256:sha256(bytes),contentType:"application/octet-stream"}];
   await assert.rejects(verifyMediaFiles(records,directory));await writeFile(join(directory,name),bytes);assert.equal((await verifyMediaFiles(records,directory)).restoredOriginals,1);
