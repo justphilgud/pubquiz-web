@@ -106,7 +106,7 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
       const catalog=(await client.query(DIAGNOSTIC_CATALOG_SQL)).rows[0]?.catalog;
       const objects=(await client.query(SCHEMA_OBJECTS_SQL)).rows[0]?.objects;
       const major=Number((await client.query("SELECT current_setting('server_version_num')::int/10000 AS major")).rows[0]?.major);
-      const schemaGate=compareFullSchema(evidence.expectedSchema,{major,columns,catalog,objects},evidence.baseline.sha,baseline.map(({name,checksum})=>({name,checksum})));
+      const schemaGate=schemas.length!==2||!schemas.includes('public')?{status:'FAIL',code:'UNEXPECTED_SCHEMA'}:compareFullSchema(evidence.expectedSchema,{major,columns,catalog,objects},evidence.baseline.sha,baseline.map(({name,checksum})=>({name,checksum})));
       additionalDiagnostics={schemaGate,schemaObjects:objects,init,checksumComparison:checksum?prismaChecksumEvidence(evidence.candidate.bytes,checksum):{diagnosis:'INIT_HISTORY_UNVERIFIED'},
         baselineSha:evidence.baseline.sha,candidateSha:evidence.candidate.sha,baselineBytesIdentical:evidence.baseline.bytes.equals(evidence.candidate.bytes),
         schemaComparison:compareSchemaInventory(evidence.inventory,columns,catalog),schemaColumns:columns,schemaCatalog:catalog};
