@@ -387,7 +387,7 @@ export function verifyPreviewEnvironmentConfiguration(
     if (matches.length !== 1 || !validType || variable?.target?.length !== 1) {
       throw new GitPreviewDeploymentError(
         "PREVIEW_BRANCH_ENVIRONMENT_INVALID",
-        `Die zentrale Preview-Konfiguration für ${key} fehlt, ist nicht eindeutig oder überschneidet sich mit Production.`,
+        `Die zentrale Preview-Konfiguration für ${key} fehlt, ist nicht eindeutig oder überschneidet sich mit Production. Metadaten: Anzahl=${matches.length}, Typ=${["encrypted", "sensitive", "plain", "system", "secret"].includes(variable?.type ?? "") ? variable?.type : "unknown"}, Targets=${variable?.target?.length ?? 0}.`,
       );
     }
 

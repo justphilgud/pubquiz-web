@@ -146,7 +146,8 @@ Wildcard. Neue Namen werden erst nach menschlicher Vertrauensprüfung separat
 aufgenommen. Erfolgreiche CI allein erteilt keine Freigabe. Beide Scripts
 sperren fehlende/ungültige Listen sowie nicht enthaltene Branches vor Vercel-
 Anfragen. Die externe GitHub-Environment-Branch-Policy beschränkt zusätzlich,
-welche Workflow-Refs überhaupt Preview-Secrets erhalten. Der vertrauenswürdige
-main-Workflow kann workflow_run steuern; main bleibt als Preview-Ziel verboten.
+welche Workflow-Refs überhaupt Preview-Secrets erhalten. Auch main ist ausgeschlossen.
+Damit bleibt workflow_run vom main-Controller gesperrt; Abnahmen werden per
+workflow_dispatch auf einem der drei ausdrücklich freigegebenen Branches gestartet.
 Direkte administrative Vercel-Deployments müssen dieselbe geprüfte Auswahl
 beachten; keine pauschale Freigabe fremder PRs oder Branches.
