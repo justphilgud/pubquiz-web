@@ -4,7 +4,7 @@
     "question": "Wie viele Knochen zählt das typische erwachsene menschliche Skelett?",
     "referenceValue": 206,
     "unit": "Knochen",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "LEICHT",
     "referenceDate": null,
     "source": "https://www.hopkinsmedicine.org/health/wellness-and-prevention/anatomy-of-the-bone",
@@ -31,7 +31,7 @@
     "question": "Wie viele Halswirbel hat eine Giraffe normalerweise?",
     "referenceValue": 7,
     "unit": "Halswirbel",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "LEICHT",
     "referenceDate": null,
     "source": "https://animals.sandiegozoo.org/animals/giraffe",
@@ -58,7 +58,7 @@
     "question": "Wie viele Herzen besitzt ein Oktopus?",
     "referenceValue": 3,
     "unit": "Herzen",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "LEICHT",
     "referenceDate": null,
     "source": "https://ocean.si.edu/ocean-life/invertebrates/octopuses-squids-and-relatives",
@@ -85,7 +85,7 @@
     "question": "Wie alt ist die Erde nach der vom USGS angegebenen wissenschaftlichen Altersbestimmung, in Milliarden Jahren?",
     "referenceValue": 4.54,
     "unit": "Milliarden Jahre",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "SCHWER",
     "referenceDate": null,
     "source": "https://pubs.usgs.gov/gip/geotime/age.html",
@@ -112,7 +112,7 @@
     "question": "Wie viele Erdentage dauert ein Jahr auf dem Mars ungefähr?",
     "referenceValue": 687,
     "unit": "Erdentage",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "SCHWER",
     "referenceDate": null,
     "source": "https://science.nasa.gov/mars/facts/?print=detailedfacts",
@@ -138,8 +138,8 @@
     "id": "EST-06",
     "question": "Wie viele Kilometer beträgt der mittlere Abstand zwischen Erde und Mond ungefähr?",
     "referenceValue": 384400,
-    "unit": "Kilometer",
-    "category": "Wissenschaft",
+    "unit": "km",
+    "category": "Natur & Wissenschaft",
     "difficulty": "MITTEL",
     "referenceDate": null,
     "source": "https://solarsystem.nasa.gov/moons/earths-moon/by-the-numbers/?mobile-app=true&theme=dark",
@@ -154,7 +154,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 384400,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "INTEGER",
         "explanation": "Mittlerer Bahnradius; die tatsächliche Entfernung schwankt.",
         "tolerance": null
@@ -166,7 +166,7 @@
     "question": "Wie viele Beine besitzt ein typisches erwachsenes Insekt?",
     "referenceValue": 6,
     "unit": "Beine",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "LEICHT",
     "referenceDate": null,
     "source": "https://naturalhistory.si.edu/education/teaching-resources/life-science/what-insect",
@@ -193,7 +193,7 @@
     "question": "Wie viele Augen hat eine Honigbiene insgesamt?",
     "referenceValue": 5,
     "unit": "Augen",
-    "category": "Wissenschaft",
+    "category": "Natur & Wissenschaft",
     "difficulty": "SCHWER",
     "referenceDate": null,
     "source": "https://ask.ifas.ufl.edu/publication/4H419/pdf",
@@ -219,7 +219,7 @@
     "id": "EST-09",
     "question": "Wie hoch ist der Mount Everest laut der 2020 gemeinsam veröffentlichten Vermessung Nepals und Chinas, in Metern über dem Meeresspiegel?",
     "referenceValue": 8848.86,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Geografie",
     "difficulty": "LEICHT",
     "referenceDate": "2020",
@@ -235,7 +235,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 8848.86,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "DECIMAL",
         "explanation": "Höhenwert einschließlich Schneedecke; ältere Angaben verwenden 8848 Meter.",
         "tolerance": null
@@ -244,9 +244,9 @@
   },
   {
     "id": "EST-10",
-    "question": "Wie groß ist die Wasseroberfläche des gesamten Bodensees einschließlich Untersee ungefähr, in Quadratkilometern?",
+    "question": "Wie groß ist die Wasseroberfläche des gesamten Bodensees einschließlich Untersee ungefähr?",
     "referenceValue": 536,
-    "unit": "Quadratkilometer",
+    "unit": "km²",
     "category": "Geografie",
     "difficulty": "MITTEL",
     "referenceDate": null,
@@ -262,7 +262,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 536,
-        "unit": "Quadratkilometer",
+        "unit": "km²",
         "numberFormat": "INTEGER",
         "explanation": "Obersee und Untersee zusammen; Einzugsgebiet und Uferfläche sind nicht gefragt.",
         "tolerance": null
@@ -271,9 +271,9 @@
   },
   {
     "id": "EST-11",
-    "question": "Wie lang ist der Rhein laut der IKSR-Broschüre „Rhein für alle“, in Kilometern?",
+    "question": "Wie lang ist der Rhein laut der IKSR-Broschüre „Rhein für alle“?",
     "referenceValue": 1233,
-    "unit": "Kilometer",
+    "unit": "km",
     "category": "Geografie",
     "difficulty": "SCHWER",
     "referenceDate": null,
@@ -289,7 +289,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 1233,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "INTEGER",
         "explanation": "Quelle nennt 1233 Kilometer; andere Messdefinitionen nennen geringfügig abweichende Werte.",
         "tolerance": null
@@ -300,7 +300,7 @@
     "id": "EST-12",
     "question": "Wie viele Kilometer beträgt der Erdumfang am Äquator ungefähr, nach den gerundeten Angaben von NASA Imagine the Universe?",
     "referenceValue": 40070,
-    "unit": "Kilometer",
+    "unit": "km",
     "category": "Geografie",
     "difficulty": "MITTEL",
     "referenceDate": null,
@@ -316,7 +316,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 40070,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "INTEGER",
         "explanation": "Gerundeter Äquatorumfang; nicht den meridionalen Umfang verwenden.",
         "tolerance": null
@@ -325,9 +325,9 @@
   },
   {
     "id": "EST-13",
-    "question": "Wie hoch ist der Stuttgarter Fernsehturm insgesamt ungefähr, nach der gerundeten Angabe der Stadt Stuttgart, in Metern?",
+    "question": "Wie hoch ist der Stuttgarter Fernsehturm insgesamt ungefähr, nach der gerundeten Angabe der Stadt Stuttgart?",
     "referenceValue": 217,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Geografie",
     "difficulty": "LEICHT",
     "referenceDate": "2026-10-07",
@@ -343,7 +343,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 217,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "INTEGER",
         "explanation": "Die Stadt nennt gut 217 Meter; gerundeter Referenzwert, keine Zentimetergenauigkeit behauptet.",
         "tolerance": null
@@ -352,9 +352,9 @@
   },
   {
     "id": "EST-14",
-    "question": "Wie hoch ist der Eiffelturm einschließlich seiner seit 2022 montierten Antenne, in Metern?",
+    "question": "Wie hoch ist der Eiffelturm einschließlich seiner seit 2022 montierten Antenne?",
     "referenceValue": 330,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Geografie",
     "difficulty": "MITTEL",
     "referenceDate": "seit 2022",
@@ -370,7 +370,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 330,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "INTEGER",
         "explanation": "Mit neuer Antenne 330 Meter; frühere Gesamtangabe 324 Meter.",
         "tolerance": null
@@ -379,9 +379,9 @@
   },
   {
     "id": "EST-15",
-    "question": "Wie groß ist die Spannweite der Internationalen Raumstation über die Solarpanels ungefähr, laut NASA-Faktenblatt, in Metern?",
+    "question": "Wie groß ist die Spannweite der Internationalen Raumstation über die Solarpanels ungefähr, laut NASA-Faktenblatt?",
     "referenceValue": 109,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Technik & Digitales",
     "difficulty": "MITTEL",
     "referenceDate": "Faktenblatt abgerufen 2026-10-07",
@@ -397,19 +397,18 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 109,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "INTEGER",
         "explanation": "Gesamtausdehnung über die Solarpanels; nicht Länge der bewohnbaren Module.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-16",
-    "question": "Wie hoch war eine Saturn-V-Rakete einschließlich des Apollo-Raumschiffs ungefähr, in Metern?",
+    "question": "Wie hoch war eine Saturn-V-Rakete einschließlich des Apollo-Raumschiffs ungefähr?",
     "referenceValue": 111,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Technik & Digitales",
     "difficulty": "LEICHT",
     "referenceDate": "Apollo-Ära",
@@ -425,19 +424,18 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 111,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "INTEGER",
         "explanation": "NASA rundet 363 Fuß auf 111 Meter.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-17",
-    "question": "Wie groß ist die Spannweite eines Airbus A380 ungefähr, nach dem gerundeten Herstellerwert, in Metern?",
+    "question": "Wie groß ist die Spannweite eines Airbus A380 ungefähr, nach dem gerundeten Herstellerwert?",
     "referenceValue": 79.8,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Technik & Digitales",
     "difficulty": "MITTEL",
     "referenceDate": null,
@@ -453,19 +451,18 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 79.8,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "DECIMAL",
         "explanation": "Herstellerwert gerundet auf 79,8 Meter; Länge des Flugzeugs ist geringer.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-18",
-    "question": "Wie lang ist der Ring des Large Hadron Collider am CERN ungefähr, in Kilometern?",
+    "question": "Wie lang ist der Ring des Large Hadron Collider am CERN ungefähr?",
     "referenceValue": 27,
-    "unit": "Kilometer",
+    "unit": "km",
     "category": "Technik & Digitales",
     "difficulty": "SCHWER",
     "referenceDate": null,
@@ -481,19 +478,18 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 27,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "INTEGER",
         "explanation": "Beschleunigerring von ungefähr 27 Kilometern Umfang.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-19",
-    "question": "Wie lang ist der Eurotunnel zwischen Frankreich und England insgesamt, laut Betreiberangabe, in Kilometern?",
+    "question": "Wie lang ist der Eurotunnel zwischen Frankreich und England insgesamt, laut Betreiberangabe?",
     "referenceValue": 50.5,
-    "unit": "Kilometer",
+    "unit": "km",
     "category": "Technik & Digitales",
     "difficulty": "MITTEL",
     "referenceDate": null,
@@ -509,20 +505,19 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 50.5,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "DECIMAL",
         "explanation": "Gesamtlänge einschließlich der Landabschnitte; Unterwasseranteil rund 37 Kilometer.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-20",
     "question": "Wie viele Kilometer legt Licht im Vakuum in einer Sekunde zurück? Runde auf ganze Kilometer.",
     "referenceValue": 299792,
-    "unit": "Kilometer",
-    "category": "Wissenschaft",
+    "unit": "km",
+    "category": "Technik & Digitales",
     "difficulty": "MITTEL",
     "referenceDate": null,
     "source": "https://www.bipm.org/en/measurement-units",
@@ -537,7 +532,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 299792,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "INTEGER",
         "explanation": "299792458 Meter pro Sekunde sind 299792,458 Kilometer; auf ganze Kilometer gerundet.",
         "tolerance": null
@@ -569,14 +564,13 @@
         "explanation": "BA nennt 100 Passagiere; andere Konfigurationen sind nicht gemeint.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-22",
     "question": "Wie lang ist die offizielle Marathondistanz, in Kilometern?",
     "referenceValue": 42.195,
-    "unit": "Kilometer",
+    "unit": "km",
     "category": "Sport",
     "difficulty": "LEICHT",
     "referenceDate": null,
@@ -592,7 +586,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 42.195,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "DECIMAL",
         "explanation": "42 Kilometer und 195 Meter.",
         "tolerance": null
@@ -601,9 +595,9 @@
   },
   {
     "id": "EST-23",
-    "question": "Wie breit ist ein reguläres Fußballtor zwischen den Innenkanten der Pfosten, laut IFAB, in Metern?",
+    "question": "Wie breit ist ein reguläres Fußballtor zwischen den Innenkanten der Pfosten, laut IFAB?",
     "referenceValue": 7.32,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Sport",
     "difficulty": "MITTEL",
     "referenceDate": "Regelstand abgerufen 2026-10-07",
@@ -619,7 +613,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 7.32,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "DECIMAL",
         "explanation": "Innenweite 7,32 Meter; Höhe 2,44 Meter ist nicht gefragt.",
         "tolerance": null
@@ -628,9 +622,9 @@
   },
   {
     "id": "EST-24",
-    "question": "Wie lang ist ein Tennisplatz von Grundlinie zu Grundlinie laut ITF, in Metern?",
+    "question": "Wie lang ist ein Tennisplatz von Grundlinie zu Grundlinie laut ITF?",
     "referenceValue": 23.77,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Sport",
     "difficulty": "MITTEL",
     "referenceDate": null,
@@ -646,7 +640,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 23.77,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "DECIMAL",
         "explanation": "Die Platzlänge beträgt 78 Fuß beziehungsweise 23,77 Meter.",
         "tolerance": null
@@ -655,9 +649,9 @@
   },
   {
     "id": "EST-25",
-    "question": "Wie hoch liegt die Oberkante eines Basketballrings nach den FIBA-Ausrüstungsregeln von 2024, in Metern?",
+    "question": "Wie hoch liegt die Oberkante eines Basketballrings nach den FIBA-Ausrüstungsregeln von 2024?",
     "referenceValue": 3.05,
-    "unit": "Meter",
+    "unit": "m",
     "category": "Sport",
     "difficulty": "MITTEL",
     "referenceDate": "FIBA 2024",
@@ -673,7 +667,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 3.05,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "DECIMAL",
         "explanation": "3050 Millimeter, mit der in der Norm genannten kleinen Messtoleranz.",
         "tolerance": null
@@ -819,7 +813,7 @@
     "id": "EST-31",
     "question": "Welche Frequenz in Hertz hat der international übliche Kammerton a′?",
     "referenceValue": 440,
-    "unit": "Hertz",
+    "unit": "Hz",
     "category": "Musik",
     "difficulty": "SCHWER",
     "referenceDate": null,
@@ -835,7 +829,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 440,
-        "unit": "Hertz",
+        "unit": "Hz",
         "numberFormat": "INTEGER",
         "explanation": "Normstimmton 440 Hertz; praktische Orchesterstimmungen können abweichen.",
         "tolerance": null
@@ -846,8 +840,8 @@
     "id": "EST-32",
     "question": "Wie hoch ist die standardisierte Oscar-Statuette ungefähr, in Zentimetern?",
     "referenceValue": 34.3,
-    "unit": "Zentimeter",
-    "category": "Kultur",
+    "unit": "cm",
+    "category": "Film & Fernsehen",
     "difficulty": "MITTEL",
     "referenceDate": "Standard seit 1945",
     "source": "https://www.oscars.org/oscars/statuette",
@@ -862,7 +856,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 34.3,
-        "unit": "Zentimeter",
+        "unit": "cm",
         "numberFormat": "DECIMAL",
         "explanation": "13,5 Zoll × 2,54 ergeben 34,29 Zentimeter, gerundet 34,3.",
         "tolerance": null
@@ -874,7 +868,7 @@
     "question": "Wie viele Oscars gewann „Ben-Hur“ bei der Verleihung 1960?",
     "referenceValue": 11,
     "unit": "Oscars",
-    "category": "Kultur",
+    "category": "Film & Fernsehen",
     "difficulty": "MITTEL",
     "referenceDate": "1960",
     "source": "https://www.oscars.org/oscars/ceremonies/embed/1960",
@@ -898,10 +892,10 @@
   },
   {
     "id": "EST-34",
-    "question": "Wie lang ist der rote Teppich vor der berühmten Treppe des Filmfestivals Cannes laut Festivalbeschreibung, in Metern?",
+    "question": "Wie lang ist der rote Teppich vor der berühmten Treppe des Filmfestivals Cannes laut Festivalbeschreibung?",
     "referenceValue": 60,
-    "unit": "Meter",
-    "category": "Kultur",
+    "unit": "m",
+    "category": "Film & Fernsehen",
     "difficulty": "MITTEL",
     "referenceDate": "Festivalbeschreibung abgerufen 2026-10-07",
     "source": "https://www.festival-cannes.com/en/cannes-focus/behind-the-scenes-on-the-festival-de-cannes-red-carpet/",
@@ -916,7 +910,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 60,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "INTEGER",
         "explanation": "Der Weg über den Teppich führt anschließend über 24 Stufen.",
         "tolerance": null
@@ -927,8 +921,8 @@
     "id": "EST-35",
     "question": "Wie viele Kinofilme umfasst die ursprüngliche Harry-Potter-Reihe ohne „Phantastische Tierwesen“?",
     "referenceValue": 8,
-    "unit": "Kinofilme",
-    "category": "Kultur",
+    "unit": "Filme",
+    "category": "Film & Fernsehen",
     "difficulty": "LEICHT",
     "referenceDate": "abgeschlossene Reihe 2001–2011",
     "source": "https://www.harrypotter.com/discover/films",
@@ -943,7 +937,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 8,
-        "unit": "Kinofilme",
+        "unit": "Filme",
         "numberFormat": "INTEGER",
         "explanation": "Sieben Romane wurden in acht Filme umgesetzt, da der letzte Band geteilt wurde.",
         "tolerance": null
@@ -955,7 +949,7 @@
     "question": "Wie viele Minuten dauert die Kinofassung von „Der Herr der Ringe: Die Rückkehr des Königs“ laut BFI?",
     "referenceValue": 201,
     "unit": "Minuten",
-    "category": "Kultur",
+    "category": "Film & Fernsehen",
     "difficulty": "MITTEL",
     "referenceDate": "Kinofassung 2003",
     "source": "https://www.bfi.org.uk/film/de658a5d-ddbc-589c-95d0-08dd1af9635f/the-lord-of-the-rings-the-return-of-the-king",
@@ -981,7 +975,7 @@
     "id": "EST-37",
     "question": "Wie viele Milliliter einschließlich Crema nennt der Standard für einen „Certified Italian Espresso“ als Zielmenge?",
     "referenceValue": 25,
-    "unit": "Milliliter",
+    "unit": "ml",
     "category": "Essen & Trinken",
     "difficulty": "LEICHT",
     "referenceDate": null,
@@ -997,13 +991,12 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 25,
-        "unit": "Milliliter",
+        "unit": "ml",
         "numberFormat": "INTEGER",
         "explanation": "Zielwert 25 Milliliter mit ±2,5 Millilitern Spezifikationstoleranz.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-38",
@@ -1030,8 +1023,7 @@
         "explanation": "Zutatenliste nennt 13 Prozent Haselnüsse; keine Nussanzahl je Glas geschätzt.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-39",
@@ -1058,15 +1050,14 @@
         "explanation": "Quelle nennt bis zu drei Jahre; keine feste Dauer für jede Charge behauptet.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-40",
     "question": "Wie viele Sekunden dauert das vollständige zweistufige Zapfen eines Guinness nach der ungefähren Markenangabe?",
     "referenceValue": 119.5,
     "unit": "Sekunden",
-    "category": "Alkohol",
+    "category": "Essen & Trinken",
     "difficulty": "LEICHT",
     "referenceDate": "Markenbeschreibung abgerufen 2026-10-07",
     "source": "https://www.guinness-storehouse.com/en/whats-hoppening/most-popular-questions-about-guinness",
@@ -1113,14 +1104,13 @@
         "explanation": "Italienische Produktseite; US-Produkte können andere Zeitspannen angeben.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-42",
     "question": "Wie viele Kilometer lang waren die Grenzanlagen der Berliner Mauer um West-Berlin insgesamt ungefähr, laut bpb?",
     "referenceValue": 155,
-    "unit": "Kilometer",
+    "unit": "km",
     "category": "Geschichte",
     "difficulty": "MITTEL",
     "referenceDate": "1961–1989",
@@ -1136,13 +1126,12 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 155,
-        "unit": "Kilometer",
+        "unit": "km",
         "numberFormat": "INTEGER",
         "explanation": "Nicht die rund 43 Kilometer innerstädtische Sektorengrenze und nicht der heutige Mauerweg.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-43",
@@ -1169,15 +1158,14 @@
         "explanation": "Primärdokument nennt 20 Boote; tatsächlich gestartete Boote sind eine andere Zahl.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-44",
-    "question": "Wie lang ist die erhaltene Stickerei von Bayeux ungefähr, nach der technischen Beschreibung ihres Museums, in Metern?",
+    "question": "Wie lang ist die erhaltene Stickerei von Bayeux ungefähr, nach der technischen Beschreibung ihres Museums?",
     "referenceValue": 68.3,
-    "unit": "Meter",
-    "category": "Kultur",
+    "unit": "m",
+    "category": "Geschichte",
     "difficulty": "MITTEL",
     "referenceDate": null,
     "source": "https://www.bayeuxmuseum.com/en/the-bayeux-tapestry/discover-the-bayeux-tapestry/tapestry-or-embroidery/",
@@ -1192,7 +1180,7 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 68.3,
-        "unit": "Meter",
+        "unit": "m",
         "numberFormat": "DECIMAL",
         "explanation": "Technische Beschreibung rund 68,3 Meter; touristisch oft auf 70 Meter gerundet.",
         "tolerance": null
@@ -1231,7 +1219,7 @@
     "question": "Wie viele Abgeordnete zogen nach der Bundestagswahl 2025 in den 21. Deutschen Bundestag ein?",
     "referenceValue": 630,
     "unit": "Abgeordnete",
-    "category": "Politik",
+    "category": "Politik & Zeitgeschehen",
     "difficulty": "MITTEL",
     "referenceDate": "Bundestagswahl 2025",
     "source": "https://www.bundestag.de/parlament/bundestagswahl",
@@ -1278,8 +1266,7 @@
         "explanation": "Englisch bleibt auch nach dem Brexit Amtssprache.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-48",
@@ -1306,14 +1293,13 @@
         "explanation": "3351546 Kilogramm entsprechen 3351,546 Tonnen; gerundet 3352. Nicht den Goldwert in Euro verwenden.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-49",
-    "question": "Welchen Durchmesser hat eine 2-Euro-Münze, in Millimetern?",
+    "question": "Welchen Durchmesser hat eine 2-Euro-Münze?",
     "referenceValue": 25.75,
-    "unit": "Millimeter",
+    "unit": "mm",
     "category": "Wirtschaft",
     "difficulty": "LEICHT",
     "referenceDate": null,
@@ -1329,19 +1315,18 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 25.75,
-        "unit": "Millimeter",
+        "unit": "mm",
         "numberFormat": "DECIMAL",
         "explanation": "Durchmesser 25,75 Millimeter; nicht Dicke oder Gewicht.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   },
   {
     "id": "EST-50",
-    "question": "Wie lang ist eine 50-Euro-Banknote der Europa-Serie, in Millimetern?",
+    "question": "Wie lang ist eine 50-Euro-Banknote der Europa-Serie?",
     "referenceValue": 140,
-    "unit": "Millimeter",
+    "unit": "mm",
     "category": "Wirtschaft",
     "difficulty": "MITTEL",
     "referenceDate": null,
@@ -1357,12 +1342,11 @@
       "templateData": {
         "kind": "ESTIMATE",
         "correctValue": 140,
-        "unit": "Millimeter",
+        "unit": "mm",
         "numberFormat": "INTEGER",
         "explanation": "Abmessungen 140 × 77 Millimeter; gefragt ist die längere Seite.",
         "tolerance": null
       }
-    },
-    "editorialHoldReason": "CATEGORY_DECISION_REQUIRED"
+    }
   }
 ]

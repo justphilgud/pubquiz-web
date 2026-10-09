@@ -16,6 +16,16 @@ export const sha256 = (value: string | Buffer) => createHash("sha256").update(va
 export const candidateDigest = (candidate: EditorialCandidate) => sha256(JSON.stringify(candidate));
 const textKey = (value: string) => normalizeQuestionForSimilarity(value);
 const nameKey = (value: string) => value.normalize("NFKD").toLocaleLowerCase("de-DE").replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]/gu, "");
+const unitForms: Record<string, readonly string[]> = {
+  m: ["Meter", "Metern"], km: ["Kilometer", "Kilometern"], "km²": ["Quadratkilometer", "Quadratkilometern"],
+  cm: ["Zentimeter", "Zentimetern"], mm: ["Millimeter", "Millimetern"], Hz: ["Hertz"], ml: ["Milliliter", "Millilitern"],
+  "Milliarden Jahre": ["Milliarden Jahren"], Filme: ["Filme", "Kinofilme"],
+};
+export function hasVisibleEstimateUnit(question: string, unit: string): boolean {
+  const forms = unitForms[unit] ?? [unit, `${unit}n`];
+  const words = question.toLocaleLowerCase("de-DE").split(/[^\p{L}\p{N}²]+/u).filter(Boolean).join(" ");
+  return forms.some(form => (` ${words} `).includes(` ${form.toLocaleLowerCase("de-DE")} `));
+}
 const QUESTION_STOP_WORDS = new Set(["wie","viele","viel","welche","welcher","welches","betragt","betragen","lang","hoch","gross","laut","insgesamt","typisch","typische","typischen","erwachsene","erwachsenen","normalerweise","sind","eine","einer","einen","einem","eines","der","die","das","den","dem","des","und","oder","von","fur","mit","hat","haben","ist","werden","wird","zahl","anzahl","meter","kilometer","jahr","jahre"]);
 // Approximation/source boilerplate describes neither the entity nor the measurement.
 for (const word of ["ungefahr", "ungefahre", "ungefahren", "gerundet", "gerundete", "gerundeten",
@@ -41,13 +51,15 @@ export function parseEditorialPool(fileName: string, raw: string): EditorialCand
       externalId: typeof r.id === "string" ? r.id : "",
       templateId: typeof r.templateId === "string" ? r.templateId : "",
       question: typeof r.question === "string" ? r.question : "",
-      solution: anagram ? String(r.solution ?? "") : typeof r.referenceValue === "number" ? String(r.referenceValue) : "",
+      solution: anagram ? String(r.solution ?? "") : typeof r.referenceValue === "number" ? `${r.referenceValue} ${typeof r.unit === "string" ? r.unit : ""}`.trim() : "",
       variants: Array.isArray(r.variants) ? r.variants.filter((v): v is string => typeof v === "string") : [],
       difficulty: r.difficulty as EditorialCandidate["difficulty"],
       categories: Array.isArray(r.categories) ? r.categories.filter((v): v is string => typeof v === "string") : typeof r.category === "string" ? [r.category] : [],
       sources: [anagram ? r.identitySource : r.source].filter((v): v is string => typeof v === "string"),
       templateConfig: r.templateConfig as EditorialCandidate["templateConfig"],
       metadata: { sourceFile: fileName, original: r,
+        ...(typeof r.editorialHoldReason === "string" ? { editorialHoldReason: r.editorialHoldReason } : {}),
+        ...(typeof r.editorialExcludeReason === "string" ? { editorialExcludeReason: r.editorialExcludeReason } : {}),
         ...(typeof r.measurementKey === "string" ? { measurementKey: r.measurementKey } : {}),
         ...(typeof r.referenceDate === "string" ? { referenceDate: r.referenceDate } : {}) },
     };
@@ -59,12 +71,17 @@ export function validateEditorialCandidate(c: EditorialCandidate): string[] {
   if (!c.externalId || c.externalId.length > 128) issues.push("IMPORT_ID_INVALID");
   if (!c.question.trim() || !c.solution.trim()) issues.push("CONTENT_REQUIRED");
   if (!["LEICHT", "MITTEL", "SCHWER"].includes(c.difficulty)) issues.push("DIFFICULTY_INVALID");
-  if (!c.categories.length || new Set(c.categories).size !== c.categories.length) issues.push("CATEGORIES_INVALID");
+  if (!c.categories.length || c.categories.length > 2 || c.categories.some(v => !v.trim()) || new Set(c.categories.map(textKey)).size !== c.categories.length) issues.push("CATEGORIES_INVALID");
   if (!c.sources.length || c.sources.some(url => { try { return new URL(url).protocol !== "https:"; } catch { return true; } })) issues.push("SOURCE_INVALID");
   const data = parseQuestionTemplateData(c.templateConfig?.templateData, c.templateId, true);
   if (!data || !["anagramm", "schaetzfrage"].includes(c.templateId)) issues.push("TEMPLATE_INVALID");
   if (data?.kind === "ANAGRAM" && (data.name !== c.solution || !isExactAnagram(data.name, data.selectedSolution))) issues.push("ANAGRAM_INVALID");
-  if (data?.kind === "ESTIMATE" && (data.correctValue === null || !Number.isFinite(data.correctValue) || String(data.correctValue) !== c.solution || !data.unit.trim())) issues.push("ESTIMATE_INVALID");
+  if (data?.kind === "ESTIMATE") {
+    if (data.correctValue === null || !Number.isFinite(data.correctValue) || `${data.correctValue} ${data.unit}` !== c.solution || !data.unit.trim()) issues.push("ESTIMATE_INVALID");
+    if (!hasVisibleEstimateUnit(c.question, data.unit)) issues.push("ESTIMATE_QUESTION_UNIT_REQUIRED");
+    const original = c.metadata.original as Record<string, unknown> | undefined;
+    if (original && (original.referenceValue !== data.correctValue || original.unit !== data.unit)) issues.push("ESTIMATE_SOURCE_UNIT_VALUE_MISMATCH");
+  }
   if (c.variants.some(v => !v.trim())) issues.push("VARIANT_INVALID");
   return issues;
 }
@@ -77,6 +94,8 @@ export function previewEditorialImport(source: EditorialSource, existing: Editor
   return source.candidates.map((candidate, sourceIndex) => {
     const validation = validateEditorialCandidate(candidate);
     if (candidate.categories.some(c => !knownCategories.has(c))) validation.push("CATEGORY_NOT_ACTIVE");
+    if (candidate.metadata.editorialExcludeReason) validation.push("EDITORIAL_EXCLUDED");
+    if (candidate.metadata.editorialHoldReason) validation.push("EDITORIAL_DECISION_REQUIRED");
     const prior = imported.get(candidate.externalId);
     if (prior) return { candidate, action: prior.digest === candidateDigest(candidate) && prior.questionId !== null ? "ÜBERSPRINGEN" : "MANUELL PRÜFEN",
       validation: [...validation, ...(prior.digest !== candidateDigest(candidate) ? ["IMPORT_ID_CONTENT_CONFLICT"] : []), ...(prior.questionId === null ? ["IMPORT_REFERENCE_MISSING"] : [])],
@@ -101,7 +120,7 @@ export function previewEditorialImport(source: EditorialSource, existing: Editor
       if (reason) duplicates.push({ questionId: q.id, reason });
     }
     const exact = duplicates.some(d => d.reason === "IDENTICAL_QUESTION" || d.reason === "SAME_ANAGRAM");
-    const action = validation.length ? "MANUELL PRÜFEN" : exact ? "ÜBERSPRINGEN" : duplicates.length ? "MANUELL PRÜFEN" : "IMPORTIEREN";
+    const action = candidate.metadata.editorialExcludeReason ? "ÜBERSPRINGEN" : validation.length ? "MANUELL PRÜFEN" : exact ? "ÜBERSPRINGEN" : duplicates.length ? "MANUELL PRÜFEN" : "IMPORTIEREN";
     // Include every earlier source row to prevent hidden duplicates within one pool.
     accepted.push({ id: -(sourceIndex + 1), question: candidate.question, templateId: candidate.templateId, solutions: [candidate.solution, ...candidate.variants], templateData: candidate.templateConfig?.templateData, metadata: candidate.metadata });
     const exactExisting = duplicates.find(d => d.questionId > 0 && ["IDENTICAL_QUESTION", "SAME_ANAGRAM"].includes(d.reason));

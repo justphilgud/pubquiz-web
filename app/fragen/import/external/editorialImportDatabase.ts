@@ -130,7 +130,15 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
     const expectedAnswers = preview.decisions.filter(d => d.action === "IMPORTIEREN").reduce((n,d) => n + new Set([d.candidate.solution,...d.candidate.variants]).size,0);
     const expectedCategories = preview.decisions.filter(d => d.action === "IMPORTIEREN").reduce((n,d) => n + d.candidate.categories.length,0);
     if (after.antworten.count !== before.antworten.count + expectedAnswers || after.fragen_kategorien.count !== before.fragen_kategorien.count + expectedCategories) throw new Error("EDITORIAL_RELATION_COUNT_MISMATCH");
-    const manifest = { version: 1, provider: input.source.provider, files: input.source.files, batchId: batch, dryRunDigest: preview.digest, before, after, journalBefore, existingJournalUnchanged: true, items, reviewStatus: "DRAFT", approved: false };
+    const manifestItems = items.map(item => {
+      const candidate = input.source.candidates.find(c => c.externalId === item.externalId)!;
+      const original = candidate.metadata.original as Record<string, unknown>;
+      return { ...item, template: candidate.templateId, categories: candidate.categories,
+        unit: candidate.templateId === "schaetzfrage" ? original.unit : null,
+        referenceValue: candidate.templateId === "schaetzfrage" ? original.referenceValue : null,
+        solution: candidate.solution, sources: candidate.sources, sourceFiles: input.source.files };
+    });
+    const manifest = { version: 2, provider: input.source.provider, files: input.source.files, batchId: batch, dryRunDigest: preview.digest, before, after, journalBefore, existingJournalUnchanged: true, items: manifestItems, reviewStatus: "DRAFT", approved: false };
     await client.query("UPDATE pubquiz.external_question_import_batches SET status='COMPLETED', completed_at=now(), report_json=$1::jsonb WHERE import_batch_id=$2", [JSON.stringify(manifest),batch]);
     // Check actual persisted rows, including changes introduced by database triggers.
     for (const item of items.filter(i => i.action === "IMPORTIERT")) {

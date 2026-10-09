@@ -6,8 +6,8 @@ import { parseEditorialPool, sha256, type EditorialSource } from "./external/edi
 import { runEditorialDatabaseImport } from "./external/editorialImportDatabase";
 
 const PR93_HASHES: Record<string, string> = {
-  "anagrams.json": "631f16376a39a5a6b5d6d98fce593c064ccff7524235809f4740470867988c9b",
-  "estimates.json": "85af63d465b2457093fd62be1129241b82d430700ebfa3616d2222ab4058373c",
+  "anagrams.json": "dc0a2511690b0e4df4cd924dc6000b4d792f03ad95f87990dee24bd5f09cd4f0",
+  "estimates.json": "3fc63c06afe83c47c8192f374eeb9206628bbd03dc322e01abf6b6b99008c89f",
 };
 export async function editorialImportAction(input: { sourceKey: string; files: { name: string; raw: string }[]; digest?: string; mode: "dry-run" | "import" }) {
   const session = await requireAdmin();

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { candidateDigest, parseEditorialPool, previewEditorialImport, sha256, validateEditorialCandidate, type EditorialSource } from "./editorialImport";
+import { candidateDigest, hasVisibleEstimateUnit, parseEditorialPool, previewEditorialImport, sha256, validateEditorialCandidate, type EditorialSource } from "./editorialImport";
+import { buildQuestionTemplateRuntimeModel } from "../../editor/templates/questionTemplateRuntime";
+import { parseQuestionTemplateData } from "../../editor/templates/questionTemplateData";
+import { normalizeQuestionTemplateConfig } from "../../editor/pixelTemplateConfig";
 
 const base = new URL("../../../../editorial/paule-oktober-2026/", import.meta.url);
 const files = ["anagrams.json", "estimates.json"].map(name => ({name,raw:readFileSync(new URL(name,base),"utf8")}));
@@ -9,17 +12,48 @@ export const fixtureSource: EditorialSource = { provider:"Editorial:PR93", files
 const categories = new Set(fixtureSource.candidates.flatMap(c=>c.categories));
 const run = (source=fixtureSource) => previewEditorialImport(source,[],new Map(),categories);
 
-test("100 immutable approved rows validate, including all 50 exact anagrams and 50 numeric estimates",()=>{
+test("100 prepared rows validate, including all 50 exact anagrams and 50 numeric estimates",()=>{
   assert.equal(fixtureSource.candidates.length,100);
   assert.equal(fixtureSource.candidates.filter(c=>c.templateId==="anagramm").length,50);
   assert.equal(fixtureSource.candidates.filter(c=>c.templateId==="schaetzfrage").length,50);
   for(const c of fixtureSource.candidates) assert.deepEqual(validateEditorialCandidate(c),[],c.externalId);
   assert.equal(files[0].raw.includes("Clint Eastwood"),true);
-  assert.equal(fixtureSource.files[0].sha256,"631f16376a39a5a6b5d6d98fce593c064ccff7524235809f4740470867988c9b");
-  assert.equal(fixtureSource.files[1].sha256,"85af63d465b2457093fd62be1129241b82d430700ebfa3616d2222ab4058373c");
+  const audit=JSON.parse(readFileSync(new URL("finalization-audit.json",base),"utf8"));
+  for (const file of fixtureSource.files) assert.equal(file.sha256,audit.hashes[file.name]);
+  assert.equal(sha256(readFileSync(new URL("original-pr93/anagrams.json",base))),"631f16376a39a5a6b5d6d98fce593c064ccff7524235809f4740470867988c9b");
+  assert.equal(sha256(readFileSync(new URL("original-pr93/estimates.json",base))),"85af63d465b2457093fd62be1129241b82d430700ebfa3616d2222ab4058373c");
 });
 test("different people with shared anagram boilerplate do not become semantic duplicates",()=>{
-  assert.ok(run().slice(0,50).every(d=>d.action==="IMPORTIEREN"));
+  assert.ok(run().slice(0,50).filter(d=>!d.candidate.metadata.editorialHoldReason&&!d.candidate.metadata.editorialExcludeReason).every(d=>d.action==="IMPORTIEREN"));
+});
+test("all 50 estimates preserve reference/source and show the unit in prompt, stored answer and runtime reveal",()=>{
+  const original=JSON.parse(readFileSync(new URL("original-pr93/estimates.json",base),"utf8")) as Record<string,unknown>[];
+  for(const c of fixtureSource.candidates.filter(c=>c.templateId==="schaetzfrage")) {
+    const row=c.metadata.original as Record<string,unknown>;
+    const before=original.find(r=>r.id===c.externalId)!;
+    for(const key of ["referenceValue","source","sourcePublisher","retrievedAt","referenceDate","explanation"]) assert.deepEqual(row[key],before[key],`${c.externalId}:${key}`);
+    const data=parseQuestionTemplateData(c.templateConfig.templateData,c.templateId,true);
+    assert.ok(data?.kind==="ESTIMATE");
+    assert.ok(hasVisibleEstimateUnit(c.question,data.unit),c.externalId);
+    assert.equal(c.solution,`${data.correctValue} ${data.unit}`);
+    const runtime=buildQuestionTemplateRuntimeModel({templateId:c.templateId,questionText:c.question,templateConfig:normalizeQuestionTemplateConfig(c.templateConfig,c.templateId),correctAnswers:[{text:c.solution}]});
+    assert.equal(runtime.solutionLines[0],c.solution,c.externalId);
+  }
+});
+test("unit/value inconsistencies, missing prompt units and too many categories are blocked",()=>{
+  const c=structuredClone(fixtureSource.candidates[50]);
+  c.question="Wie groß ist das Skelett?";
+  assert.ok(validateEditorialCandidate(c).includes("ESTIMATE_QUESTION_UNIT_REQUIRED"));
+  (c.metadata.original as Record<string,unknown>).unit="Meter";
+  assert.ok(validateEditorialCandidate(c).includes("ESTIMATE_SOURCE_UNIT_VALUE_MISMATCH"));
+  c.categories=["a","b","c"];
+  assert.ok(validateEditorialCandidate(c).includes("CATEGORIES_INVALID"));
+});
+test("known Nicole Kidman duplicate is excluded even without a database hit; unresolved editorial decisions stay held",()=>{
+  const decisions=run();
+  assert.equal(decisions.find(d=>d.candidate.externalId==="ANA-15")?.action,"ÜBERSPRINGEN");
+  assert.equal(decisions.filter(d=>d.validation.includes("EDITORIAL_DECISION_REQUIRED")).length,20);
+  for(const id of ["ANA-25","ANA-49","EST-15","EST-50"]) assert.equal(decisions.find(d=>d.candidate.externalId===id)?.action,"MANUELL PRÜFEN");
 });
 test("approximation/source boilerplate cannot make unrelated measurements semantic duplicates",()=>{
   const decisions=run();

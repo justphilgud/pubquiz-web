@@ -45,6 +45,10 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     assert.equal(parallel.filter(r=>r.status==="fulfilled").length,1);assert.equal(parallel.filter(r=>r.status==="rejected").length,1);
     const success=parallel.find(r=>r.status==="fulfilled");assert.ok(success?.status==="fulfilled");
     assert.equal(success.value.questionIds.length,4);assert.equal(success.value.manifest?.items.length,4);
+    const estimateManifest=success.value.manifest?.items.find(i=>i.template==="schaetzfrage");
+    assert.equal(estimateManifest?.unit,"Knochen");assert.equal(estimateManifest?.referenceValue,206);
+    assert.equal(estimateManifest?.solution,"206 Knochen");assert.deepEqual(estimateManifest?.sources,candidates[3].sources);
+    assert.deepEqual(estimateManifest?.sourceFiles,source.files);
     const inserted=await client.query("SELECT freigegeben,review_status,redaktionelle_schwierigkeit,template_config_json FROM pubquiz.fragen WHERE fragen_id=ANY($1::int[])",[success.value.questionIds]);
     assert.ok(inserted.rows.every(r=>!r.freigegeben&&r.review_status==="DRAFT"&&r.redaktionelle_schwierigkeit==="LEICHT"));
     assert.deepEqual(success.value.before,preview.before);assert.equal(success.value.after.fragen.count,before+4);

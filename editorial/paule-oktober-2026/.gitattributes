@@ -1,0 +1,2 @@
+*.json text eol=lf
+original-pr93/*.json text eol=lf

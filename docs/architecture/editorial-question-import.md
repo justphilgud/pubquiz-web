@@ -1,5 +1,45 @@
 # Sicherer redaktioneller Fragenimport
 
+## Finalisierung 9. Oktober 2026
+
+Integrationsbranch `codex/editorial-units-integration` basiert ausschließlich auf
+PR #95 / `c62047e80cf6e63ff2bc3e673384cd310195765c`, das die Inhalte von PR #93
+/ `52b0729152a4e4d12947e1cee0961fe2293fc73a` bereits enthält. Veröffentlichung
+als Fast-forward auf PR #95; kein Merge nach main, keine unabhängigen Änderungen.
+PR #93 bleibt die unveränderte Originalquelle. Die bytegetreuen Originaldateien
+und die verwendete Excel-Prüftabelle liegen unter `original-pr93/`.
+`finalization-audit.json` dokumentiert sämtliche Änderungen und Prüfsummen.
+
+16 Schätzfragetexte erhalten die fehlende Einheit, 26 Einheiten werden
+ausgeschrieben/präzisiert. Alle 50 Referenzwerte, Quellen, Bezugsdaten und
+Erläuterungen bleiben unverändert. Das bestehende strukturierte Einheitenfeld
+wird wiederverwendet. Der Adapter speichert die klassische Lösungsantwort als
+`Referenzwert Einheit`; numerische Eingabe und manuelle Bewertung bleiben im
+bestehenden NUMBER-Vertrag, ohne Umrechnung. Die vorhandene Runtime stellt
+den strukturierten Wert mit Einheit dar. Der Importvalidator prüft zusätzlich
+die Einheit im Fragetext, Referenz-/Template-Konsistenz und maximal zwei Kategorien.
+
+Die Excel-Prüftabelle ist anhand ID, Originaltext, Lösung, Anagramm, Kategorie,
+Einheit und Quelle zu 100/100 Originalzeilen verifiziert. Die eindeutigen 48
+Empfehlungen und 33 bisherigen konfliktfreien Zuordnungen werden gemäß
+Master-Auftrag verwendet. Optionale Zweitkategorien werden nicht ergänzt.
+Die 19 als unklar markierten Fälle bleiben gesperrt; zusätzlich bleibt ANA-25
+wegen Personenüberschneidung gesperrt. ANA-49 gehört bereits zu den 19.
+ANA-15 wird unabhängig von der Bestandsheuristik ausgeschlossen. Die
+Sperrmetadaten dürfen Kandidaten nur zurückstellen oder ausschließen.
+Sie können keine Validierung oder Dublettenentscheidung freigeben.
+Es wird keine Kategorienhierarchie eingeführt. Für die vorbereiteten
+eindeutigen Kandidaten sind ausschließlich vorhandene Kategorien vorgesehen.
+
+Provider `Editorial:PR93` und sämtliche Import-IDs bleiben stabil. Geänderte
+Payloads unter bereits importierter ID bleiben Konflikte; keine automatische
+Aktualisierung. Die Prüfsummen-Allowlist in Server Action und READ ONLY-Skript
+wird auf die dokumentierte Version aktualisiert. LF-Attribute verhindern
+plattformabhängige Prüfsummen. Manifest v2 ergänzt Template, Kategorien,
+Einheit, Referenzwert, Lösung, Quellen und Quelldateiprüfsummen pro Kandidat.
+PostgreSQL-Tests prüfen diese Felder zusätzlich zum bestehenden Parallelitäts-,
+Idempotenz-, Rollback- und Integritätsvertrag.
+
 ## Prüfung vor Schemaänderung
 
 Das bestehende `fragen.schwierigkeitslevel` ist ein numerischer, aus Ergebnissen abgeleiteter Wert. Redaktionelle LEICHT/MITTEL/SCHWER dürfen ihn nicht ersetzen. Geplant ist ausschließlich `fragen.redaktionelle_schwierigkeit`, nullable Text mit CHECK für diese drei Werte. Keine Backfills, keine Umdeutung bestehender Werte, keine Änderung vorhandener Fragen. Ein zusätzliches nullable Feld ist kompatibel mit bestehenden Schreibern; alle bestehenden Zeilen erhalten NULL. Der CHECK wird erst NOT VALID angelegt und anschließend validiert. Der ALTER-Schritt benötigt einen kurzen Tabellenlock; Preview-Migration vor Deployment kontrolliert ausführen, Production bleibt ausgeschlossen. Rücknahme nur nach Prüfung neu importierter Inhalte, nicht durch Löschen anderer Daten.
