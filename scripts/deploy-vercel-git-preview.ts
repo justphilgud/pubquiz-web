@@ -383,6 +383,7 @@ export function verifyPreviewEnvironmentConfiguration(
 
     const variable = matches[0];
     const validType = variable?.type === expectedType ||
+      (key === "BLOB_STORE_ID" && variable?.type === "plain") ||
       (expectedType === "sensitive" && variable?.type === "encrypted" && variable?.visibility === "secret");
     if (matches.length !== 1 || !validType || variable?.target?.length !== 1) {
       throw new GitPreviewDeploymentError(
