@@ -4,6 +4,7 @@ import { type Environment } from "./acceptance-policy";
 import { BridgeClient, type UploadPosition } from "./bridge-client";
 import { type OidcDiagnostics } from "./oidc-token";
 import { requireCondition } from "./guards";
+import { backupPhase } from "./backup-diagnostics";
 import { sha256 } from "./snapshot";
 
 export type Artifact = { name: string; bytes: number; sha256: string };
@@ -37,7 +38,8 @@ export class PrivateArtifacts {
   async upload(name: string, bytes: Buffer, position?: UploadPosition): Promise<Artifact> {
     await this.client.upload(artifactName(name), bytes, position);
     const evidence = { name, bytes: bytes.length, sha256: sha256(bytes) };
-    verifyArtifact(await this.read(name), evidence);
+    const restored = await backupPhase("PRIVATE_READBACK", () => this.read(name));
+    await backupPhase("ARTIFACT_INTEGRITY", async () => verifyArtifact(restored, evidence));
     return evidence;
   }
   async download(artifact: Artifact, directory: string) {

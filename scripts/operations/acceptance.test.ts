@@ -7,11 +7,12 @@ import { join } from "node:path";
 import { spawn } from "node:child_process";
 import { AUTH_COLUMNS, RESTORE_TARGET, assertManualAcceptance, assertRestoreAcceptance, auditColumns, inspectRow, inspectValue, pinnedRestoreConnection, projection, type Column } from "./acceptance-policy";
 import { templateRegistry } from "../../app/rendering/templateRegistry";
-import { artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
+import { PrivateArtifacts, artifactName, backupKey, boundedBytes, captureMedia, verifyArtifact, verifyMediaFiles } from "./private-artifacts";
 import { authInsertSql, compareSnapshots, sha256, type Snapshot } from "./snapshot";
 import { canonicalCatalog, canonicalCatalogDefinition } from "./catalog-comparison";
 import catalogCastCases from "./fixtures/run19-catalog-casts.json";
 import { backupPhaseError, backupUploadPlan, dumpArguments, uploadBackupData } from "./acceptance-backup";
+import { backupFailureCodes, backupFailureEvidence, backupPhase } from "./backup-diagnostics";
 import { PgSession, sessionFailureCategory } from "./pg-session";
 import { OperationsError, safeError } from "./guards";
 import { BlobAccessError, BlobFileTooLargeError, BlobError, BlobServiceRateLimited } from "@vercel/blob";
@@ -117,14 +118,14 @@ test("private Blob errors identify operation/category without exposing messages 
 });
 test("backup phase diagnostics expose only fixed phases and preserve existing safety gates", () => {
   const error = new Error("postgresql://owner:SYNTHETIC_SECRET@host/db", { cause: { token: "SYNTHETIC_SECRET" } });
-  for (const phase of ["SOURCE_SESSION", "SOURCE_CAPTURE", "ARCHIVE", "MEDIA_CAPTURE", "AUTH_OVERLAY_FILE", "DATA_UPLOAD", "MANIFEST_UPLOAD", "ANONYMOUS_READBACK", "CLEANUP"] as const) {
+  for (const phase of ["SOURCE_SESSION", "SOURCE_CAPTURE", "DB_EXPORT", "MEDIA_CAPTURE", "AUTH_OVERLAY_FILE", "DATA_UPLOAD", "MANIFEST_UPLOAD", "ANONYMOUS_READBACK", "CLEANUP"] as const) {
     const classified = backupPhaseError(error, phase);
-    assert.equal(safeError(classified), `BACKUP_${phase}_FAILED_DETAILS_WITHHELD`);
+    assert.equal(safeError(classified), backupFailureCodes[phase]);
     assert.doesNotMatch(String(classified), /SYNTHETIC_SECRET|postgresql|owner|host/);
     assert.equal(classified.cause, undefined);
   }
   const gate = new OperationsError("AUTH_TABLE_DATA_IN_DUMP");
-  assert.equal(backupPhaseError(gate, "ARCHIVE"), gate);
+  assert.equal(backupPhaseError(gate, "DB_EXPORT").code, "DB_EXPORT_FAILED");
   assert.throws(() => backupPhaseError(error, "SYNTHETIC_SECRET" as never), /BACKUP_DIAGNOSTIC_PHASE_INVALID/);
 });
 test("manual acceptance cannot enable schedules/retention or run from another branch/repository", () => {
@@ -273,7 +274,7 @@ test("workflow schedules only the existing backup core and keeps restore behind 
   assert.match(text, /inputs\.mode == 'retention-dry-run' && 'false'/);
   assert.ok(text.indexOf("acceptance-cli.ts backup") < text.indexOf("retention-cli.ts"));
   assert.match(text, /needs: backup/); assert.match(text, /group: ap94-manual-acceptance/);
-  assert.equal((text.match(/actions\/upload-artifact@v4/g) ?? []).length, 1);
+  assert.equal((text.match(/actions\/upload-artifact@v4/g) ?? []).length, 2);
   assert.match(text, /name: external-import-backup-evidence[\s\S]+path: \$\{\{ runner\.temp \}\}\/external-import-backup-evidence\.json/);
   assert.doesNotMatch(text, /path:.*(?:database\.dump|auth-redacted\.json|manifest\.json|pubquiz-ap94)/);
   assert.doesNotMatch(text, /environment: production|db:deploy|--prod|contents: write|BACKUP_BLOB_READ_WRITE_TOKEN/);
@@ -300,4 +301,78 @@ test("media original bytes roundtrip, content hash, URL mapping and corruption r
     await assert.rejects(verifyMediaFiles(records, directory));
     await assert.rejects(captureMedia(["https://example.com/private.png"], directory));
   } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+for (const phase of Object.keys(backupFailureCodes) as (keyof typeof backupFailureCodes)[]) {
+  test(`safe diagnostic ${phase}: failure aborts and cannot leak or mark success`, async () => {
+    const artifacts = Object.freeze({ previous: "immutable-old-backup" });
+    let completed = false; let nextPhase = false;
+    const error = new Error("postgresql://owner:SYNTHETIC_SECRET@host/db", { cause: { token: "SYNTHETIC_SECRET" } });
+    try {
+      await backupPhase(phase, async () => { throw error; });
+      nextPhase = true; completed = true;
+    } catch (caught) {
+      assert.deepEqual(backupFailureEvidence(caught), { version: 1, status: "FAIL", phase, code: backupFailureCodes[phase] });
+      assert.doesNotMatch(JSON.stringify(backupFailureEvidence(caught)), /SYNTHETIC_SECRET|postgresql|owner|host/);
+      assert.equal((caught as Error).cause, undefined);
+    }
+    assert.equal(completed, false); assert.equal(nextPhase, false);
+    assert.deepEqual(artifacts, { previous: "immutable-old-backup" });
+  });
+}
+test("actual private upload distinguishes PUT, readback and checksum failure", async () => {
+  for (const phase of ["DATA_UPLOAD", "PRIVATE_READBACK", "ARTIFACT_INTEGRITY"] as const) {
+    const calls: string[] = [];
+    const store = Object.create(PrivateArtifacts.prototype) as PrivateArtifacts;
+    Object.assign(store, { client: {
+      upload: async () => { calls.push("upload"); if (phase === "DATA_UPLOAD") throw new Error("SYNTHETIC_SECRET"); },
+      read: async () => { calls.push("read"); if (phase === "PRIVATE_READBACK") throw new Error("SYNTHETIC_SECRET"); return Buffer.from("corrupt"); },
+    } });
+    await assert.rejects(backupPhase("DATA_UPLOAD", () => store.upload("database.dump", Buffer.from("original"))), error => {
+      assert.equal(backupFailureEvidence(error).phase, phase); return true;
+    });
+    assert.deepEqual(calls, phase === "DATA_UPLOAD" ? ["upload"] : ["upload", "read"]);
+  }
+});
+test("nested manifest verification failure remains readback/integrity, not manifest upload", async () => {
+  await assert.rejects(backupPhase("MANIFEST_UPLOAD", () => backupPhase("PRIVATE_READBACK", async () => { throw new Error("secret"); })), error => {
+    assert.equal(backupFailureEvidence(error).code, "PRIVATE_READBACK_FAILED"); return true;
+  });
+});
+test("failure artifact is gated, minimal, and cannot enable success/restore/retention", () => {
+  const workflow=readFileSync(".github/workflows/ap94-acceptance.yml","utf8");
+  assert.match(workflow, /if: failure\(\) && steps\.backup\.outcome == 'failure'/);
+  assert.match(workflow, /name: backup-failure-code/);
+  assert.match(workflow, /path: \$\{\{ runner\.temp \}\}\/backup-failure\.json/);
+  const cli=readFileSync("scripts/operations/acceptance-cli.ts","utf8");
+  assert.ok(cli.indexOf("process.exitCode = 1") < cli.indexOf("backupFailureEvidence(error)"));
+  assert.match(cli, /flag: "wx"/);
+  const core=readFileSync("scripts/operations/acceptance-backup.ts","utf8");
+  assert.match(core, /if \(!failed\) throw backupPhaseError/);
+  for (const phase of ["DB_EXPORT","DUMP_INTEGRITY","MANIFEST_UPLOAD","ANONYMOUS_READBACK"]) assert.ok(core.includes(`phase = "${phase}"`));
+});
+
+test("real backup CLI fails closed and creates only safe new evidence", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "backup-safe-test-"));
+  const path = join(directory, "failure.json");
+  const run = () => new Promise<{ code: number | null; stdout: string; stderr: string }>(resolve => {
+    const child = spawn(process.execPath, ["--import", "tsx", "scripts/operations/acceptance-cli.ts", "backup"], {
+      env: { NODE_ENV: "test", PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, BACKUP_FAILURE_EVIDENCE_PATH: path,
+        GITHUB_REPOSITORY: "invalid/SYNTHETIC_SECRET", PRODUCTION_BACKUP_DATABASE_URL: "postgresql://owner:SYNTHETIC_SECRET@invalid/db" },
+      windowsHide: true,
+    });
+    let stdout = ""; let stderr = "";
+    child.stdout.on("data", value => { stdout += value; }); child.stderr.on("data", value => { stderr += value; });
+    child.on("close", code => resolve({ code, stdout, stderr }));
+  });
+  try {
+    const result = await run();
+    assert.equal(result.code, 1); assert.equal(result.stdout, "");
+    assert.doesNotMatch(result.stderr, /SYNTHETIC_SECRET|postgresql|owner|invalid/);
+    assert.deepEqual(JSON.parse(readFileSync(path,"utf8")), { version: 1, status: "FAIL", phase: "PREPARATION", code: "BACKUP_PREPARATION_FAILED" });
+    await writeFile(path,"existing-protected-evidence");
+    const repeated = await run();
+    assert.equal(repeated.code,1); assert.equal(readFileSync(path,"utf8"),"existing-protected-evidence");
+    assert.match(repeated.stderr,/BACKUP_DIAGNOSTIC_WRITE_FAILED/);
+  } finally { await rm(directory,{recursive:true,force:true}); }
 });
