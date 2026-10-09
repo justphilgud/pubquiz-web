@@ -17,5 +17,26 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix scripts/operations/bridge
       - run: npm run typecheck --prefix scripts/operations/bridge
-      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
+      - run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/restore-existing-backup.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
       - run: npx eslint scripts/operations --max-warnings=0
+  isolated-restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container: postgres:17
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: restore_ci
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: node --import tsx --test scripts/operations/restore-existing-backup.test.ts scripts/operations/restore-existing-backup.integration.test.ts
+        env:
+          CI: 'true'
+          RESTORE_CI_DATABASE_URL: postgresql://postgres@postgres:5432/restore_ci
