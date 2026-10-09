@@ -41,8 +41,8 @@ export const DIAGNOSTIC_CATALOG_SQL=`SELECT ((${CATALOG_SQL})::jsonb || jsonb_bu
    LEFT JOIN pg_class t ON t.oid=d.refobjid LEFT JOIN pg_namespace tn ON tn.oid=t.relnamespace LEFT JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=d.refobjsubid
    WHERE n.nspname IN ('public','pubquiz') AND s.relkind='S') x),
  'indexHealth',(SELECT coalesce(jsonb_agg(x ORDER BY schema,name),'[]') FROM
-  (SELECT n.nspname AS schema,c.relname AS name,i.indisvalid AS valid,i.indisready AS ready,i.indislive AS live
-   FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','pubquiz')) x))) AS catalog`;
+  (SELECT n.nspname AS schema,c.relname AS name,t.relname AS "table",i.indisvalid AS valid,i.indisready AS ready,i.indislive AS live
+   FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid JOIN pg_class t ON t.oid=i.indrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','pubquiz')) x))) AS catalog`;
 export function compareSchemaInventory(expected:Inventory,columns:unknown,catalog:unknown) {
   if(!Array.isArray(columns)||!catalog||typeof catalog!=='object')return {status:'INCOMPLETE',reason:'CATALOG_UNAVAILABLE'};
   const rows=columns as {schema:string;table:string;column:string}[];
