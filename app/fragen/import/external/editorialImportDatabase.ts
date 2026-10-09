@@ -47,7 +47,9 @@ async function inventory(client: Client, source: EditorialSource) {
   const categories = await client.query(`SELECT fragenkategorie_id AS id, kategorie AS name FROM pubquiz.fragenkategorie WHERE status='ACTIVE' ORDER BY fragenkategorie_id`);
   const decisions = previewEditorialImport(source, questions.rows as EditorialExistingQuestion[], new Map(previous.rows.map(r => [r.external_reference, { questionId: r.question_id, digest: r.content_fingerprint }])), new Set(categories.rows.map(r => r.name)));
   const digest = sha256(JSON.stringify({ source, decisions, existing: questions.rows, previous: previous.rows, categories: categories.rows }));
-  return { decisions, digest, categories: categories.rows as { id: number; name: string }[] };
+  const duplicateIds = new Set(decisions.flatMap(d => d.duplicates.map(r => r.questionId)).filter(id => id > 0));
+  return { decisions, digest, categories: categories.rows as { id: number; name: string }[],
+    duplicateEvidence: questions.rows.filter(q => duplicateIds.has(q.id)).map(q => ({ id: q.id, question: q.question, templateId: q.templateId, solutions: q.solutions })) };
 }
 
 async function journalSnapshot(client: Client, excludedBatch = -1): Promise<Integrity> {
@@ -121,7 +123,8 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
       if (writerRole) for (const name of ["frage", "quelle", "vorlage_id", "template_config_json", "redaktionelle_schwierigkeit", "created_by_user_id", "last_modified_by_user_id", "freigegeben", "review_status", "ist_unfertig"]) {
         writerColumns.push({ column: name, insert: (await client.query("SELECT has_column_privilege('pubquiz_external_import_writer','pubquiz.fragen',$1,'INSERT') AS allowed", [name])).rows[0].allowed });
       }
-      productionSchema = { migrations: history.rows, difficultyColumn: column.rows, difficultyConstraint: constraint.rows, writerRole, writerPrivileges, writerColumns };
+      const operatorIds = (await client.query(`SELECT DISTINCT u.id FROM pubquiz.users u JOIN pubquiz.benutzer_rollenzuweisungen r ON r.benutzer_id=u.id WHERE u.is_active AND r.rolle='ADMIN' AND r.scope_typ='GLOBAL' ORDER BY u.id`)).rows.map(r=>r.id as number);
+      productionSchema = { migrations: history.rows, difficultyColumn: column.rows, difficultyConstraint: constraint.rows, writerRole, writerPrivileges, writerColumns, operatorIds };
     }
     if (input.mode === "dry-run") {
       const setting = (await client.query("SHOW transaction_read_only")).rows[0];
