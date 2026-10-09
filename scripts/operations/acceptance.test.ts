@@ -267,7 +267,7 @@ test("workflow schedules only the existing backup core and keeps restore behind 
   const text = readFileSync(new URL("../../.github/workflows/ap94-acceptance.yml", import.meta.url), "utf8");
   assert.match(text, /environment: operations-backup/); assert.match(text, /environment: operations-restore/);
   assert.match(text, /schedule:/); assert.match(text, /cron: '30 2 \* \* \*'/);
-  assert.match(text, /restore_after_backup/); assert.match(text, /AP96_RUN_RESTORE: 'true'/);
+  assert.match(text, /restore_after_backup/); assert.match(text, /AP96_RUN_RESTORE: \$\{\{ inputs.mode == 'restore-preflight' && 'false' \|\| 'true' \}\}/);
   assert.match(text, /BACKUP_AUTOMATION_ENABLED/); assert.match(text, /BACKUP_RETENTION_VERIFIED/);
   assert.match(text, /steps\.backup\.outcome == 'success'/);
   assert.match(text, /retention-dry-run/); assert.match(text, /AP96_RETENTION_REUSE_EXISTING/);
