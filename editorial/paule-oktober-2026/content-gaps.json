@@ -1,0 +1,110 @@
+[
+  {
+    "templateId": "meme_beschriften",
+    "needed": 4,
+    "presentKnownProduction": 3,
+    "usableProvisional": 2,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 2,
+    "missingVerifiedProduction": null,
+    "note": "#1225, #723; #722 technischer Smoke-Test ausgeschlossen",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "pixelbild",
+    "needed": 4,
+    "presentKnownProduction": 9,
+    "usableProvisional": 4,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 0,
+    "missingVerifiedProduction": null,
+    "note": "9 bekannt, davon 2 archiviert; vier IDs vorgeschlagen, Motive/Unterschied ungeprüft",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "musik_rueckwaerts",
+    "needed": 4,
+    "presentKnownProduction": 5,
+    "usableProvisional": 3,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 1,
+    "missingVerifiedProduction": null,
+    "note": "3 publikumstaugliche Titel; persönlicher Testinhalt und Archivfrage ausgeschlossen",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "wahr_falsch",
+    "needed": 4,
+    "presentKnownProduction": 4,
+    "usableProvisional": 1,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 3,
+    "missingVerifiedProduction": null,
+    "note": "#101 vorläufig; zwei fremde Eventbindungen und ein Akzeptanztest ausgeschlossen",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "face_morph",
+    "needed": 4,
+    "presentKnownProduction": 2,
+    "usableProvisional": 2,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 2,
+    "missingVerifiedProduction": null,
+    "note": "#115 und #76; zweites Personenpaar und alle Bildrechte noch prüfen",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "google_rezensionen",
+    "needed": 4,
+    "presentKnownProduction": 0,
+    "usableProvisional": 0,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 4,
+    "missingVerifiedProduction": null,
+    "note": "Vier einzelne Orte manuell kuratieren; kein großer neuer Pool",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "anagramm",
+    "needed": 4,
+    "presentKnownProduction": 0,
+    "usableProvisional": 4,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 0,
+    "missingVerifiedProduction": null,
+    "note": "50 lokale Entwürfe erstellt; noch 0 als Anagramm in Production verifiziert",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "schaetzfrage",
+    "needed": 8,
+    "presentKnownProduction": 0,
+    "usableProvisional": 8,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 0,
+    "missingVerifiedProduction": null,
+    "note": "50 lokale Entwürfe erstellt; noch 0 im Production-Pool verifiziert",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  },
+  {
+    "templateId": "uebersetzt_vorgelesen",
+    "needed": 4,
+    "presentKnownProduction": 0,
+    "usableProvisional": 0,
+    "usableVerifiedProduction": null,
+    "missingPlanning": 4,
+    "missingVerifiedProduction": null,
+    "note": "Ausschließlich Product Owner; keine Inhalte erzeugt",
+    "inventoryStatus": "VORLAEUFIG_KNOWN_UI_OBSERVATIONS",
+    "asOf": "2026-10-07"
+  }
+]

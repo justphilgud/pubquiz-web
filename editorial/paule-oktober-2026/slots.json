@@ -1,0 +1,602 @@
+[
+  {
+    "slot": 1,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft / Geschichte",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Schneller Einstieg",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 2,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Visuelles Erfolgserlebnis mit Flagge",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 3,
+    "block": 1,
+    "templateId": "musik_rueckwaerts",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Erster Audio-Wechsel",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 4,
+    "block": 1,
+    "templateId": "fakten_jahr",
+    "experience": "TEXT",
+    "desiredTopic": "Geschichte",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Gemeinsam zeitlich kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 5,
+    "block": 1,
+    "templateId": "pixelbild",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Film & Fernsehen / Alltag & Kurioses",
+    "difficulty": "LEICHT",
+    "seconds": 150,
+    "purpose": "Pixelmechanik am leicht erkennbaren Motiv lernen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 6,
+    "block": 1,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Musik / Essen & Trinken",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Intuitive Schätzung statt Wissensdruck",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 7,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Essen & Trinken",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Kurze Entlastung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 8,
+    "block": 1,
+    "templateId": "anagramm",
+    "experience": "CREATIVE",
+    "desiredTopic": "Natur & Wissenschaft / Musik",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Wortpuzzle mit klarer Mechanik",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 9,
+    "block": 1,
+    "templateId": "kunstwerk",
+    "experience": "VISUAL",
+    "desiredTopic": "Kunst & Kultur",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Ruhiger Bildmoment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 10,
+    "block": 1,
+    "templateId": "wahr_falsch",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Schnelle gemeinsame Entscheidung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 11,
+    "block": 1,
+    "templateId": "reihenfolge",
+    "experience": "SORT",
+    "desiredTopic": "Geografie / Technik & Digitales",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Teamgespräch und Sortieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 12,
+    "block": 1,
+    "templateId": "meme_beschriften",
+    "experience": "CREATIVE",
+    "desiredTopic": "Alltag & Kurioses",
+    "difficulty": "LEICHT",
+    "seconds": 240,
+    "purpose": "Meme erklären, schreiben und abstimmen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 13,
+    "block": 1,
+    "templateId": "fakten_land",
+    "experience": "TEXT",
+    "desiredTopic": "Geografie",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Kombinationswissen mit leichter Lösung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 14,
+    "block": 1,
+    "templateId": "face_morph",
+    "experience": "VISUAL",
+    "desiredTopic": "Gesellschaft / Film & Fernsehen",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Zwei Gesichter gemeinsam erkennen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 15,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Politik & Zeitgeschehen",
+    "difficulty": "MITTEL",
+    "seconds": 90,
+    "purpose": "Kurzes Wissensintermezzo",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 16,
+    "block": 1,
+    "templateId": "uebersetzt_vorgelesen",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "PO-Inhalt und Browserstimme proben",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 17,
+    "block": 1,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "MITTEL",
+    "seconds": 90,
+    "purpose": "Länderumriss ohne Textmonotonie",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 18,
+    "block": 1,
+    "templateId": "fakten_frei",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft / Kunst & Kultur",
+    "difficulty": "SCHWER",
+    "seconds": 120,
+    "purpose": "Gezielter anspruchsvoller Moment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 19,
+    "block": 1,
+    "templateId": "google_rezensionen",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Kunst & Kultur / Gesellschaft",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Ort anhand gestaffelter Rezensionen kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 20,
+    "block": 1,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Sport / Wirtschaft",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Block mit diskutierbarer Zahl beenden",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 21,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Technik & Digitales / Wirtschaft",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Schneller Einstieg",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 22,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Visuelles Erfolgserlebnis mit Flagge",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 23,
+    "block": 2,
+    "templateId": "musik_rueckwaerts",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Erster Audio-Wechsel",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 24,
+    "block": 2,
+    "templateId": "fakten_jahr",
+    "experience": "TEXT",
+    "desiredTopic": "Geschichte",
+    "difficulty": "LEICHT",
+    "seconds": 120,
+    "purpose": "Gemeinsam zeitlich kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 25,
+    "block": 2,
+    "templateId": "pixelbild",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Film & Fernsehen / Alltag & Kurioses",
+    "difficulty": "SCHWER",
+    "seconds": 150,
+    "purpose": "Pixelmechanik mit anspruchsvollerem Motiv anwenden",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 26,
+    "block": 2,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Musik / Film & Fernsehen",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Intuitive Schätzung statt Wissensdruck",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 27,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Essen & Trinken",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Kurze Entlastung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 28,
+    "block": 2,
+    "templateId": "anagramm",
+    "experience": "CREATIVE",
+    "desiredTopic": "Gesellschaft / Sprache & Literatur",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Wortpuzzle mit klarer Mechanik",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 29,
+    "block": 2,
+    "templateId": "kunstwerk",
+    "experience": "VISUAL",
+    "desiredTopic": "Kunst & Kultur",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Ruhiger Bildmoment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 30,
+    "block": 2,
+    "templateId": "wahr_falsch",
+    "experience": "TEXT",
+    "desiredTopic": "Natur & Wissenschaft",
+    "difficulty": "LEICHT",
+    "seconds": 75,
+    "purpose": "Schnelle gemeinsame Entscheidung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 31,
+    "block": 2,
+    "templateId": "reihenfolge",
+    "experience": "SORT",
+    "desiredTopic": "Geografie / Natur & Wissenschaft",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Teamgespräch und Sortieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 32,
+    "block": 2,
+    "templateId": "meme_beschriften",
+    "experience": "CREATIVE",
+    "desiredTopic": "Alltag & Kurioses",
+    "difficulty": "MITTEL",
+    "seconds": 240,
+    "purpose": "Meme mit offenerem Motiv; bekannte Mechanik vertiefen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 33,
+    "block": 2,
+    "templateId": "fakten_land",
+    "experience": "TEXT",
+    "desiredTopic": "Geografie",
+    "difficulty": "SCHWER",
+    "seconds": 120,
+    "purpose": "Kombinationswissen mit leichter Lösung",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 34,
+    "block": 2,
+    "templateId": "face_morph",
+    "experience": "VISUAL",
+    "desiredTopic": "Natur & Wissenschaft / Musik",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Zwei Gesichter gemeinsam erkennen",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 35,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "TEXT",
+    "desiredTopic": "Religion & Weltanschauung",
+    "difficulty": "LEICHT",
+    "seconds": 90,
+    "purpose": "Kurzes Wissensintermezzo",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 36,
+    "block": 2,
+    "templateId": "uebersetzt_vorgelesen",
+    "experience": "AUDIO",
+    "desiredTopic": "Musik",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "PO-Inhalt und Browserstimme proben",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 37,
+    "block": 2,
+    "templateId": "standard",
+    "experience": "VISUAL",
+    "desiredTopic": "Geografie",
+    "difficulty": "MITTEL",
+    "seconds": 90,
+    "purpose": "Länderumriss ohne Textmonotonie",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 38,
+    "block": 2,
+    "templateId": "fakten_frei",
+    "experience": "TEXT",
+    "desiredTopic": "Geschichte / Natur & Wissenschaft",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Gezielter anspruchsvoller Moment",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 39,
+    "block": 2,
+    "templateId": "google_rezensionen",
+    "experience": "LIVE_REVEAL",
+    "desiredTopic": "Technik & Digitales / Wirtschaft",
+    "difficulty": "MITTEL",
+    "seconds": 150,
+    "purpose": "Ort anhand gestaffelter Rezensionen kombinieren",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  },
+  {
+    "slot": 40,
+    "block": 2,
+    "templateId": "schaetzfrage",
+    "experience": "ESTIMATE",
+    "desiredTopic": "Film & Fernsehen / Essen & Trinken",
+    "difficulty": "MITTEL",
+    "seconds": 120,
+    "purpose": "Block mit diskutierbarer Zahl beenden",
+    "quizIds": [
+      30,
+      31
+    ],
+    "finalAssignment": false
+  }
+]
