@@ -39,5 +39,5 @@ test("the browser checks response content type before decoding upload JSON", () 
 
 test("profile removal deletes only unreferenced managed team-profile blobs", () => {
   assert.match(profileServer, /teams\.count\(\{ where: \{ foto_url: url \} \}\)/);
-  assert.match(profileServer, /getBlobAreaPrefix\([\s\S]+"team-profile"/);
+  assert.match(profileServer, /isBlobUrlInArea\([\s\S]+"team-profile"/);
 });

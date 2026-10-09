@@ -117,3 +117,15 @@ Deployments ausgelöst oder Verknüpfungen des alten Projekts entfernt werden.
   den drei aktiven Uploadpfaden testen.
 - `pubquiz-web-qvps` bis zur späteren, separat genehmigten Stilllegung nicht
   verändern.
+
+
+## Preview-Vererbung (vorbereitet 2026-10-09)
+
+Die Medienvariablen werden zentral und ausschließlich für Preview konfiguriert;
+Production bleibt getrennt. Neue vertrauenswürdige Repository-Branches benötigen
+keine eigene Medienkonfiguration. Der Preview-Guard lehnt Medien-Overrides ab
+und prüft die Store-Verknüpfung ohne Entschlüsselung. Vercel Preview verwendet
+Branch-Pfade; lokale Entwicklung und Production behalten ihre bisherigen Pfade.
+Details und Grenzen: `media-upload-environments.md`. Gemeinsame Preview-DB-
+Daten und gemeinsame Store-Tokens sind keine harte Isolation zwischen Branches.
+Vercel-Projekteinstellungen wurden im Rahmen der Vorbereitung nicht geändert.

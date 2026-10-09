@@ -109,17 +109,21 @@ test("Preview is gated, serialized and deploys a targeted Git SHA after migratio
   assert.match(preview, /ACTIONS_DEPLOYMENTS_ENABLED/);
   assert.match(preview, /head_repository\.full_name == github\.repository/);
   assert.match(preview, /head_branch == 'preview\/content-and-quiz-flow'/);
-  assert.match(preview, /github\.ref == 'refs\/heads\/preview\/content-and-quiz-flow'/);
+  assert.match(preview, /startsWith\(github\.ref, 'refs\/heads\/'\)/);
+  assert.match(preview, /github\.ref != 'refs\/heads\/main'/);
+  assert.match(preview, /Verify successful trusted push CI for the exact revision/);
+  assert.ok(preview.indexOf('scripts/verify-preview-ci.ts') < preview.indexOf('npm ci'));
+  assert.ok(preview.indexOf('--check-only') < preview.indexOf('npm run db:deploy'));
   assert.ok(
     preview.indexOf("Validate GitHub Preview database identity") <
       preview.indexOf("npm run db:deploy"),
   );
   assert.ok(
     preview.indexOf("npm run db:deploy") <
-      preview.indexOf("deploy-vercel-git-preview.ts"),
+      preview.indexOf("Deploy targeted Vercel Git Preview"),
   );
   assert.ok(
-    preview.indexOf("deploy-vercel-git-preview.ts") <
+    preview.indexOf("Deploy targeted Vercel Git Preview") <
       preview.indexOf("Smoke-test Preview"),
   );
   assert.match(
