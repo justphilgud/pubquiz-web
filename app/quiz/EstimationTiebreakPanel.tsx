@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import GenericAnswerRenderer from "./[quizId]/antworten/GenericAnswerRenderer";
 import { getModeratorTiebreak, getParticipantTiebreak, hideEstimationTiebreak, revealEstimationTiebreak, startEstimationTiebreak, submitEstimationTiebreak } from "./estimationTiebreakActions";
 import type { projectTiebreak } from "./estimationTiebreak";
+import { mayApplyLiveSnapshot } from "./liveSnapshotRevision";
 
 type View = ReturnType<typeof projectTiebreak>;
 export function EstimationTiebreakPanel({ quizId, token, moderator = false, onChanged }: { quizId: number; token?: string; moderator?: boolean; onChanged?: () => void }) {
@@ -13,13 +14,16 @@ export function EstimationTiebreakPanel({ quizId, token, moderator = false, onCh
   const [pending, setPending] = useState(false);
   const roundId = useRef<number | null>(null);
   const localEdit = useRef(false);
+  const mutationRevision = useRef(0);
+  const mutationPending = useRef(false);
   useEffect(() => {
     let active = true;
     let timer: ReturnType<typeof setTimeout>;
     async function refresh() {
+      const requestedRevision = mutationRevision.current;
       try {
         const next = moderator ? await getModeratorTiebreak(quizId) : token ? await getParticipantTiebreak(quizId, token) : null;
-        if (active) {
+        if (mayApplyLiveSnapshot(requestedRevision, mutationRevision.current, active, mutationPending.current)) {
           setView(next);
           if (roundId.current !== next?.round?.id || !localEdit.current) {
             setAnswer(next?.round?.ownAnswer ? String(next.round.ownAnswer.value) : "");
@@ -34,11 +38,13 @@ export function EstimationTiebreakPanel({ quizId, token, moderator = false, onCh
     return () => { active = false; clearTimeout(timer); };
   }, [quizId, moderator, token]);
   async function mutate(action: () => Promise<View>) {
-    if (pending) return;
+    if (mutationPending.current) return;
+    mutationPending.current = true;
+    mutationRevision.current += 1;
     setPending(true); setError(null);
     try { setView(await action()); localEdit.current = false; onChanged?.(); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Stichentscheid fehlgeschlagen."); }
-    finally { setPending(false); }
+    finally { mutationPending.current = false; setPending(false); }
   }
   if (!moderator && !view?.round) return null;
   const round = view?.round;

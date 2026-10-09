@@ -22,7 +22,7 @@
     "ci:validate": "npm run db:generate && npm run db:validate && npm run typecheck && npm test && npm run lint:changed && npm run build",
     "env:check": "tsx scripts/env-check.ts",
     "test:editorial-import": "node --import tsx --test app/fragen/import/external/editorialImport.test.ts app/fragen/import/external/editorialImport.integration.test.ts",
-    "test:lovd": "node --import tsx --test app/rendering/presentation/questionPhaseMedia.test.ts app/rendering/presentation/mediaCountdown.test.ts app/quiz/memeNavigationPolicy.test.ts app/quiz/estimationTiebreak.test.ts app/fragen/editor/questionRewrite.test.ts app/fragen/editor/questionRewriteEndpoint.test.ts app/fragen/editor/questionRewriteProvider.test.ts app/fragen/editor/questionRewriteRateLimit.test.ts app/fragen/editor/components/QuestionRewritePanel.test.tsx && tsx --test app/rendering/presentation/synchronizedMedia.browser.test.ts"
+    "test:lovd": "node --import tsx --test app/rendering/presentation/questionPhaseMedia.test.ts app/rendering/presentation/mediaCountdown.test.ts app/quiz/memeNavigationPolicy.test.ts app/quiz/liveSnapshotRevision.test.ts app/quiz/estimationTiebreak.test.ts app/fragen/editor/questionRewrite.test.ts app/fragen/editor/questionRewriteEndpoint.test.ts app/fragen/editor/questionRewriteProvider.test.ts app/fragen/editor/questionRewriteRateLimit.test.ts app/fragen/editor/components/QuestionRewritePanel.test.tsx && tsx --test app/rendering/presentation/synchronizedMedia.browser.test.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

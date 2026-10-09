@@ -54,3 +54,19 @@ Development-Konfiguration enthält keine OPENAI-Variablennamen. Kein Secret wurd
 entschlüsselt oder ausgegeben. Ohne vorhandenen Zugang kein echter Providerbeleg;
 Mocks gelten ausdrücklich nicht als vollständige AP6-Abnahme.
 Der Gesamt-Release bleibt bis vollständiger Preview-Abnahme gesperrt.
+
+## Nachtrag: Browser-Interaktion und CI
+
+CI 37997821229 und 37997825962 für 507ef5e6e1cfcffa5405de6561b56297d924527b
+grün einschließlich Linux-Releasebuild und PostgreSQL. Changed-file-Lint:
+48 Dateien, null neue Befunde. Nachfolgender gezielter Fix sichert auch die
+Stichentscheid-Pollingantworten gegen veraltete Mutationsstände ab; derselbe
+getestete Revisionsschutz wird in der Moderation verwendet.
+Der echte lokale Chrome-Test bedient zusätzlich die KI-UI mit ausdrücklich
+simuliertem Endpoint: keine automatische Anfrage, Vorschlag getrennt, geänderter
+Ausgangstext sperrt Übernahme, Verwerfen erhält Text, Übernehmen ändert nur Text,
+Provider-Timeout erhält Draft. Dies ist kein echter OpenAI-Provider-Nachweis.
+38 LOVD-Unit-Tests plus echter Browser-Test bestanden. Erneute CI für finalen Fix.
+Production-READY/Projekt/Commit und beide Aliasbindungen am 10.10.2026 kontrolliert:
+541b913c7a27e4a88ed0a339598dcae5904ea7aa, dpl_2BKPFmFFV4r1ZUCKLmnfLYZPE9Sp,
+pubquiz-web.vercel.app und pubquiz-web-just-phil-gud.vercel.app unverändert.

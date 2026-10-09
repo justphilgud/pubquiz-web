@@ -1,4 +1,5 @@
 "use client";
+import { mayApplyLiveSnapshot } from "../../liveSnapshotRevision";
 import { EstimationTiebreakPanel } from "../../EstimationTiebreakPanel";
 
 import { countdownRemainingSeconds } from "../../blockCountdown";
@@ -384,8 +385,8 @@ export default function ModerationClient({
         presentationQuestionAssignmentId,
         controller.signal,
       );
-      if (active && requestedNavigationRevision === navigationRevision.current && !navigationPending.current) {
-        if (!navigationPending.current) applyLiveState(snapshot.presentationState);
+      if (mayApplyLiveSnapshot(requestedNavigationRevision, navigationRevision.current, active, navigationPending.current)) {
+        applyLiveState(snapshot.presentationState);
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
         setMemeState(snapshot.memeState);
