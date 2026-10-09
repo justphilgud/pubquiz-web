@@ -27,3 +27,14 @@ test('complete PR97 integration skips the combined migration/deployment job',()=
   assert.match(guardedJob,/npm run db:deploy/);assert.match(guardedJob,/vercel@.* deploy --yes --prod/);
   assert.equal(workflow.split('  deploy-production:').length,2);
 });
+
+test('PR95 independent-reference scope cannot deploy the application',()=>{
+ const paths=['.github/workflows/production-preflight-ci.yml','.github/workflows/production-read-only-preflight.yml',
+ 'docs/operations/production-read-only-preflight.md','scripts/operations/production-preflight-cli.ts',
+ 'scripts/operations/production-preflight-diagnostics.ts','scripts/operations/production-preflight-schema-build.ts',
+ 'scripts/operations/production-preflight-schema.integration.test.ts','scripts/operations/production-preflight-schema.ts',
+ 'scripts/operations/production-preflight.test.ts','scripts/operations/production-preflight.ts',
+ 'scripts/operations/schema-reference/prehistory.sql','scripts/operations/schema-reference/provenance.json'];
+ assert.equal(needsApplicationDeployment(paths),false);
+ assert.equal(needsApplicationDeployment([...paths,'prisma/migrations/new/migration.sql']),true);
+});

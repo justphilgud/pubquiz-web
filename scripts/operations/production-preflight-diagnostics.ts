@@ -12,7 +12,7 @@ export function prismaChecksumEvidence(bytes:Buffer,stored:string) {
   const matches=Object.entries(variants).filter(([,hex])=>(stored.length===64?hex:legacy(hex))===stored).map(([name])=>name);
   return {storedChecksum:stored,sha256:variants,prismaCompatible:matches.length>0,matches,
     diagnosis:matches.includes('repository')?'EXACT_BYTES':matches.length?'LINE_ENDINGS_ONLY':'OTHER_CHECKSUM',
-    acceptedByPreflight:false};
+    diagnosticOnly:true};
 }
 export function initRepositoryEvidence(sha:string) {
   if(!/^[a-f0-9]{40}$/.test(sha))throw new Error('DIAGNOSTIC_SHA_INVALID');
@@ -34,7 +34,15 @@ export function inventoryFromGit(sha:string) {
   return prismaInventory(execFileSync('git',['show',`${sha}:prisma/schema.prisma`],{encoding:'utf8'}));
 }
 export const DIAGNOSTIC_COLUMNS_SQL=`SELECT (${COLUMN_SQL}) AS columns`;
-export const DIAGNOSTIC_CATALOG_SQL=`SELECT (${CATALOG_SQL}) AS catalog`;
+export const DIAGNOSTIC_CATALOG_SQL=`SELECT ((${CATALOG_SQL})::jsonb || jsonb_build_object(
+ 'sequenceBindings',(SELECT coalesce(jsonb_agg(x ORDER BY schema,name),'[]') FROM
+  (SELECT n.nspname AS schema,s.relname AS name,tn.nspname AS table_schema,t.relname AS "table",a.attname AS "column",d.deptype AS dependency
+   FROM pg_class s JOIN pg_namespace n ON n.oid=s.relnamespace LEFT JOIN pg_depend d ON d.classid='pg_class'::regclass AND d.objid=s.oid AND d.refclassid='pg_class'::regclass AND d.deptype IN ('a','i')
+   LEFT JOIN pg_class t ON t.oid=d.refobjid LEFT JOIN pg_namespace tn ON tn.oid=t.relnamespace LEFT JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=d.refobjsubid
+   WHERE n.nspname IN ('public','pubquiz') AND s.relkind='S') x),
+ 'indexHealth',(SELECT coalesce(jsonb_agg(x ORDER BY schema,name),'[]') FROM
+  (SELECT n.nspname AS schema,c.relname AS name,t.relname AS "table",i.indisvalid AS valid,i.indisready AS ready,i.indislive AS live
+   FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid JOIN pg_class t ON t.oid=i.indrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','pubquiz')) x))) AS catalog`;
 export function compareSchemaInventory(expected:Inventory,columns:unknown,catalog:unknown) {
   if(!Array.isArray(columns)||!catalog||typeof catalog!=='object')return {status:'INCOMPLETE',reason:'CATALOG_UNAVAILABLE'};
   const rows=columns as {schema:string;table:string;column:string}[];

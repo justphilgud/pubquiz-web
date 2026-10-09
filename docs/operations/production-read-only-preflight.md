@@ -175,3 +175,55 @@ Model table/column and enum inventory is compared against the immutable active
 Production schema; candidate difficulty remains pending. Types/defaults/constraints/
 indexes/sequences/views equivalence is not proven by inventory and is explicitly
 INCOMPLETE. Catalog evidence is retained for further review, never a schema PASS.
+
+## EOL and complete applied-schema gates
+
+Only exact SHA256 or LF/CRLF variants of the same immutable SQL bytes are accepted.
+BOM/whitespace/SQL are preserved; unknown checksums remain MIGRATION_DRIFT. Each
+history row reports EXACT_BYTES/EOL_EQUIVALENT/MISMATCH. A separate no-secrets job
+replays only the verified immutable active baseline SQL in disposable PostgreSQL17
+with network none, no host mounts or Production credentials. It never executes
+candidate migrations. The Production reader remains READ ONLY; same-run artifact
+provenance, PostgreSQL major and exact applied baseline set are required. Complete
+columns/defaults, constraints/FK actions, indexes, sequences, enums, views and
+relations/triggers/routines are compared; only Prisma history metadata is excluded.
+Missing evidence BLOCKED, unexpected differences FAIL. Pending candidate difficulty
+is not replayed and must remain the expected pending migration. No live writes.
+
+## Independent reference for the existing database (PR95)
+
+The complete linear new-install replay is NOT successful: 0_init already contains
+Draft fields and the subsequent Draft migration collides. Its separate artifact
+must retain FAIL / HISTORICAL_BASELINE_OVERLAP. It is not an existing-database
+schema proof and never silently becomes PASS.
+
+The replacement expected-schema proof starts from the immutable pre-migration
+Prisma model at 912cd86e70ec51f15a8028c3f34fbe3e86f5fc69 (parent of the baseline
+creation), converted offline with the pinned Prisma engine. The versioned DDL and
+source hashes are in scripts/operations/schema-reference/. All incremental SQL
+changes through the active Production commit are then applied to this independent
+model reference in network-isolated PostgreSQL17. This is reference construction,
+not a replay that selectively skips a failed migration. The complete registered
+history including 0_init is checked independently, without skips or rewrites.
+No Production catalog supplied the expected DDL. Physical column ordinal is not
+schema semantics and is excluded; column names, types, nullability and defaults
+are retained. Existing narrow PostgreSQL deparse equivalence remains documented
+in catalog-comparison.ts. Unknown objects/differences block or fail.
+
+The isolated candidate delta is applied only after capturing the expected current
+catalog. Tests enforce unchanged old-row JSON, NULL and permitted values, rejected
+invalid values, old-column projection compatibility and no schema changes except
+the new nullable column and CHECK. The application rollback needs no database
+restore for this additive change; the SQL projection test is not a complete old
+application end-to-end test. Execution uses lock_timeout 2s / statement_timeout
+30s. ADD COLUMN/ADD CHECK requires ACCESS EXCLUSIVE and VALIDATE scans with SHARE
+UPDATE EXCLUSIVE; tiny fixture timing is not a Production duration guarantee.
+
+Separate output gates: deployment identity, database identity, reader privileges,
+complete migration history, complete applied schema, new-install replay, expected
+pending delta, isolated delta evidence. A documented new-install FAIL can coexist
+with existing-database PASS only for this exact documented collision and with all
+other evidence passing. Any other replay result blocks. No migration or deploy is
+part of this workflow. Main-only protected execution remains mandatory. Before
+integration, saved catalog artifacts allow only an explicitly dated offline
+comparison: missing catalog sections and lack of a fresh live run remain BLOCKED.

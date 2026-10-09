@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       release_candidate_sha:
-        description: Exact approved release candidate SHA (migration files only, never executed)
+        description: Exact approved release candidate SHA (never executed; baseline SQL replay is isolated)
         type: string
         required: true
       expected_production_sha:
@@ -45,8 +45,36 @@ jobs:
           path: preflight-*.json
           if-no-files-found: error
           retention-days: 14
-  migrations:
+  expected-schema:
     needs: deployment-metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: git fetch --no-tags origin 912cd86e70ec51f15a8028c3f34fbe3e86f5fc69 b7666e1a3e4fcbe1aec4e7884a30b3603e25b151
+      - name: Build independent schema reference, isolated delta and explicit new-install result in disposable network-isolated PostgreSQL
+        env:
+          EXPECTED_PRODUCTION_SHA: ${{ inputs.expected_production_sha }}
+        run: node --import tsx scripts/operations/production-preflight-schema-build.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-preflight-expected-schema
+          path: |
+            expected-schema.json
+            delta-test.json
+            new-install-replay.json
+          if-no-files-found: error
+          retention-days: 14
+  migrations:
+    needs: [deployment-metadata, expected-schema]
     runs-on: ubuntu-latest
     environment: operations-backup
     timeout-minutes: 10
@@ -66,6 +94,9 @@ jobs:
         run: |
           [[ "$CANDIDATE" =~ ^[a-f0-9]{40}$ && "$BASELINE" =~ ^[a-f0-9]{40}$ ]] || exit 1
           git fetch --no-tags origin "$CANDIDATE" "$BASELINE"
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-preflight-expected-schema
       - name: Read database identity and migration history in READ ONLY transaction
         env:
           PREFLIGHT_ENVIRONMENT: operations-backup
