@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { assessMigrations, assertPreflightContext, DATABASE_READ_QUERIES, readProductionDeployment, readProductionMigrations } from "./production-preflight";
+import { assessMigrationPrivileges, readMigrationSession, assessMigrations, assertPreflightContext, DATABASE_READ_QUERIES, readProductionDeployment, readProductionMigrations } from "./production-preflight";
 const a = { name: "a", checksum: "1" };
 const b = { name: "b", checksum: "2" };
 const installed = { migration_name: "a", checksum: "1", finished_at: "date", rolled_back_at: null };
@@ -37,3 +37,14 @@ test("workflow is main-only, manual, separate from backup and deploy; SQL allowl
   assert.throws(()=>assertPreflightContext({}),/CONTEXT_UNVERIFIED/);
 });
 
+
+test('unconfirmed privileges block before any migration-history read', async()=>{
+  const proof={relation_exists:true,schema_usage:true,can_select:true,can_write:false,elevated_role:false,role_membership:false,owns_relation:false};
+  assert.equal(assessMigrationPrivileges(proof).status,'PASS');
+  for (const field of ['can_write','elevated_role','role_membership','owns_relation'] as const) assert.equal(assessMigrationPrivileges({...proof,[field]:true}).status,'BLOCKED');
+  assert.equal(assessMigrationPrivileges(undefined).status,'BLOCKED');
+  const queries:string[]=[];
+  const client={query:async(sql:string)=>{queries.push(sql);return {rows: sql===DATABASE_READ_QUERIES[2] ? [{role:'pubquiz_backup_reader',database:'neondb',read_only:'on'}] : sql===DATABASE_READ_QUERIES[3] ? [{...proof,can_write:true}] : []};}};
+  const result=await readMigrationSession(client as Parameters<typeof readMigrationSession>[0],[a],[a]);
+  assert.equal(result.gate.status,'BLOCKED');assert.ok(!queries.includes(DATABASE_READ_QUERIES[4]));assert.equal(queries.at(-1),'ROLLBACK');
+});

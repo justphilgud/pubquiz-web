@@ -99,3 +99,17 @@ Ein optionaler isolated Restore bleibt eigener geschÃ¼tzter Vorgang.
 API-VertrÃ¤ge: https://vercel.com/docs/rest-api/aliases/get-an-alias,
 https://vercel.com/docs/rest-api/projects/find-a-project-by-id-or-name,
 https://vercel.com/docs/rest-api/deployments/get-a-deployment-by-id-or-url.
+
+## Expliziter Berechtigungsnachweis vor Historienzugriff
+
+Nach READ ONLY und Sessionidentität werden PostgreSQL-Kataloge geprüft: Relation
+vorhanden, Schema-USAGE und wirksames SELECT; keinerlei INSERT/UPDATE/DELETE/TRUNCATE/
+REFERENCES/TRIGGER, erhöhte Rollenattribute, direkte/transitive Rollenmitgliedschaft
+oder Eigentümerrechte. Fehlende oder unbekannte Nachweise sind BLOCKED und verhindern
+den Historien-SELECT. Nur freigegebene boolesche Rechtebelege werden gespeichert.
+Keine GRANT/REVOKE-Anweisung wird im Production-Code ausgeführt. Integrationstests
+prüfen jede Schreibberechtigung, Rollenmitgliedschaft, privilegierte Eigentümerrolle,
+fehlendes SELECT sowie unveränderte Daten. Der kombinierte Migrations-/Deploymentjob
+bleibt bei sämtlichen neun PR97-Dateien durch required=false übersprungen; der reine
+Scope-Workflow darf starten. production/PRODUCTION_ALIAS ist ausdrücklich auf
+pubquiz-web.vercel.app bestätigt; keine Credentials wurden geändert.

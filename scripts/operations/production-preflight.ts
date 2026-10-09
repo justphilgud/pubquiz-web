@@ -28,10 +28,30 @@ export function migrationFiles(sha: string): Migration[] {
   if (!files.length) throw new Error("MIGRATION_MANIFEST_UNAVAILABLE");
   return files.map(path => ({ name: path.split("/")[2], checksum: createHash("sha256").update(execFileSync("git", ["show", `${sha}:${path}`])).digest("hex") }));
 }
+export const MIGRATION_PRIVILEGES_SQL = `SELECT
+  to_regclass('pubquiz._prisma_migrations') IS NOT NULL AS relation_exists,
+  has_schema_privilege(current_user, 'pubquiz', 'USAGE') AS schema_usage,
+  has_table_privilege(current_user, to_regclass('pubquiz._prisma_migrations'), 'SELECT') AS can_select,
+  has_table_privilege(current_user, to_regclass('pubquiz._prisma_migrations'), 'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AS can_write,
+  EXISTS (SELECT 1 FROM pg_roles WHERE rolname=current_user AND
+    (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)) AS elevated_role,
+  EXISTS (SELECT 1 FROM pg_roles WHERE rolname<>current_user AND pg_has_role(current_user,oid,'MEMBER')) AS role_membership,
+  EXISTS (SELECT 1 FROM pg_class WHERE oid=to_regclass('pubquiz._prisma_migrations')
+    AND pg_has_role(current_user,relowner,'USAGE')) AS owns_relation`;
+export type MigrationPrivileges = { relation_exists: boolean; schema_usage: boolean; can_select: boolean;
+  can_write: boolean; elevated_role: boolean; role_membership: boolean; owns_relation: boolean };
+export function assessMigrationPrivileges(proof: MigrationPrivileges | undefined): Gate {
+  if (!proof || proof.relation_exists !== true || proof.schema_usage !== true) return gate('BLOCKED','MIGRATION_RELATION_UNVERIFIED');
+  if (proof.can_select !== true) return gate('BLOCKED','DATABASE_SELECT_PERMISSION_MISSING');
+  if ([proof.can_write,proof.elevated_role,proof.role_membership,proof.owns_relation].some(value=>value!==false))
+    return gate('BLOCKED','DATABASE_READER_PRIVILEGES_REJECTED');
+  return gate('PASS','DATABASE_READER_PRIVILEGES_CONFIRMED');
+}
 export const DATABASE_READ_QUERIES = [
   "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY",
   "SET LOCAL statement_timeout='30s'",
   "SELECT current_user AS role, current_database() AS database, current_setting('transaction_read_only') AS read_only",
+  MIGRATION_PRIVILEGES_SQL,
   "SELECT migration_name, checksum, finished_at, rolled_back_at FROM pubquiz._prisma_migrations ORDER BY migration_name, started_at",
 ] as const;
 export async function readMigrationSession(client: Pick<Client, "query">, candidate: Migration[], baseline: Migration[], expectedRole = "pubquiz_backup_reader", expectedDatabase = "neondb") {
@@ -40,8 +60,11 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     await client.query(DATABASE_READ_QUERIES[1]);
     const session = (await client.query(DATABASE_READ_QUERIES[2])).rows[0];
     if (session?.read_only !== "on" || session.role !== expectedRole || session.database !== expectedDatabase) return { gate: gate("BLOCKED", "DATABASE_SESSION_UNVERIFIED") };
-    const rows = (await client.query(DATABASE_READ_QUERIES[3])).rows as Applied[];
-    return { ...assessMigrations(candidate, baseline, rows), identity: { role: session.role, database: session.database, readOnly: true } };
+    const privileges = (await client.query(DATABASE_READ_QUERIES[3])).rows[0] as MigrationPrivileges | undefined;
+    const privilegesGate = assessMigrationPrivileges(privileges);
+    if (privilegesGate.status !== 'PASS') return { gate: privilegesGate, privileges };
+    const rows = (await client.query(DATABASE_READ_QUERIES[4])).rows as Applied[];
+    return { ...assessMigrations(candidate, baseline, rows), privileges, privilegesGate, identity: { role: session.role, database: session.database, readOnly: true } };
   } catch (error) { return { gate: gate("BLOCKED", (error as { code?: string }).code === "42501" ? "DATABASE_SELECT_PERMISSION_MISSING" : "MIGRATION_STATUS_UNAVAILABLE") }; }
   finally { await client.query("ROLLBACK").catch(() => undefined); }
 }
