@@ -9,6 +9,7 @@ import { authInsertSql, collectSnapshot, compareSnapshots, sha256 } from "./snap
 import { artifactName, backupKey, PrivateArtifacts, verifyMediaFiles } from "./private-artifacts";
 import type { AcceptanceManifest } from "./acceptance-backup";
 import { validateBackupMetadata } from "./backup-metadata";
+import { temporaryRestoreTarget, temporaryRestoreConnection, temporaryDatabaseMarker, assertTemporaryDatabaseMarker, TEMPORARY_DATABASE_ACCESS_SQL, assertTemporaryDatabaseAccess } from "./temporary-restore-target";
 import { formatQuizPoints } from "../../app/quiz/formatQuizPoints";
 import { rankScores } from "../../app/rendering/presentation/presentationRankingPolicy";
 
@@ -40,8 +41,8 @@ export const TARGET_PREFLIGHT_SQL = `SELECT json_build_object('role',current_use
  'empty',${TARGET_EMPTY_EXPRESSION},'canRestore',
  EXISTS(SELECT 1 FROM pg_namespace WHERE nspname='public' AND pg_has_role(current_user,nspowner,'USAGE'))
  AND has_database_privilege(current_user,current_database(),'CREATE'))`;
-export function assertTargetPreflight(value: {role:string;db:string;major:number;readOnly:boolean;empty:boolean;canRestore:boolean}) {
- requireCondition(value.role === RESTORE_TARGET.role && value.db === RESTORE_TARGET.database && value.major === RESTORE_TARGET.major && value.readOnly,
+export function assertTargetPreflight(value: {role:string;db:string;major:number;readOnly:boolean;empty:boolean;canRestore:boolean}, database: string = RESTORE_TARGET.database) {
+ requireCondition(value.role === RESTORE_TARGET.role && value.db === database && value.major === RESTORE_TARGET.major && value.readOnly,
    "RESTORE_TARGET_IDENTITY_BLOCKED");
  requireCondition(value.empty, "RESTORE_TARGET_NOT_EMPTY");
  requireCondition(value.canRestore, "RESTORE_TARGET_PRIVILEGES_BLOCKED");
@@ -53,19 +54,34 @@ DO $ap94$ BEGIN
 END $ap94$;
 DROP SCHEMA public;`;
 
-export function restoreSql(directory: string, auth: Record<string, string>, manifest: Pick<AcceptanceManifest, "expected">, env: Environment) {
+export function temporaryEmptyTargetSql(database: string, marker: string) {
+  requireCondition(/^ap94_restore_[a-f0-9]{32}$/.test(database) && marker.startsWith(`ap94:restore-test:${database.slice(13)}:`) && /^ap94:restore-test:[a-f0-9]{32}:[0-9TZ:.+-]+$/.test(marker), "TEMPORARY_RESTORE_DATABASE_INVALID");
+  const expiry = marker.slice(`ap94:restore-test:${database.slice(13)}:`.length);
+  return `SELECT pg_advisory_xact_lock(940914);
+DO $ap94$ DECLARE access_proof json; BEGIN
+ IF current_database() <> '${database}' OR current_user <> 'neondb_owner' THEN RAISE EXCEPTION 'RESTORE_IDENTITY'; END IF;
+ IF clock_timestamp() >= '${expiry}'::timestamptz THEN RAISE EXCEPTION 'RESTORE_LEASE_EXPIRED'; END IF;
+ IF shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database') IS DISTINCT FROM '${marker}' THEN RAISE EXCEPTION 'RESTORE_MARKER'; END IF;
+ access_proof := (${TEMPORARY_DATABASE_ACCESS_SQL});
+ IF coalesce((access_proof->>'publicConnect')::boolean,true) OR coalesce((access_proof->>'otherLoginRoles')::int,-1) <> 0 THEN RAISE EXCEPTION 'RESTORE_ACCESS'; END IF;
+ IF NOT ${TARGET_EMPTY_EXPRESSION} THEN RAISE EXCEPTION 'RESTORE_TARGET_NOT_EMPTY'; END IF;
+END $ap94$;
+DROP SCHEMA public;`;
+}
+export function restoreSql(directory: string, auth: Record<string, string>, manifest: Pick<AcceptanceManifest, "expected">, env: Environment, target?: { database: string; marker: string }) {
   const args = ["--no-owner", "--no-acl", "--file=-", join(directory, "database.dump")];
   const toolEnv = { PATH: env.PATH, SystemRoot: env.SystemRoot };
   const pre = pgTool("pg_restore", ["--section=pre-data", ...args], toolEnv);
   const data = pgTool("pg_restore", ["--section=data", ...args], toolEnv);
   const post = pgTool("pg_restore", ["--section=post-data", ...args], toolEnv);
   requireCondition(!/COPY "?pubquiz"?\."?(users|teams)"?\s*\(/.test(data), "AUTH_TABLE_DATA_IN_DUMP");
-  return `${EMPTY_TARGET_SQL}\n${pre}\n${data}\nSET standard_conforming_strings=on;\n${authInsertSql(auth, manifest.expected.columns)}\n${post}`;
+  return `${target ? temporaryEmptyTargetSql(target.database, target.marker) : EMPTY_TARGET_SQL}\n${pre}\n${data}\nSET standard_conforming_strings=on;\n${authInsertSql(auth, manifest.expected.columns)}\n${post}`;
 }
 export async function acceptanceRestore(env: Environment) {
   assertRestoreAcceptance(env);
   if (env.AP94_RESTORE_EXISTING === "true") requireCondition(env.RESTORE_TARGET_KIND === "isolated-test", "RESTORE_ISOLATION_LABEL_REQUIRED");
-  const connection = pinnedRestoreConnection(env); toolsVersion(env);
+  const target = temporaryRestoreTarget(env);
+  const connection = temporaryRestoreConnection(pinnedRestoreConnection(env), target); toolsVersion(env);
   const store = new PrivateArtifacts(env, env.AP94_BACKUP_KEY ?? "", "restore");
   const manifest = parseManifest(await store.read("manifest.json"), env.AP94_MANIFEST_SHA256 ?? "", store.key);
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-restore-"));
@@ -73,17 +89,27 @@ export async function acceptanceRestore(env: Environment) {
     for (const artifact of manifest.artifacts) await store.download(artifact, directory);
     const media = await verifyMediaFiles(manifest.media, directory);
     const auth = JSON.parse(await readFile(join(directory, "auth-redacted.json"), "utf8")) as Record<string, string>;
-    const sql = restoreSql(directory, auth, manifest, env);
+    const marker = temporaryDatabaseMarker(target);
+    const sql = restoreSql(directory, auth, manifest, env, { database: target.database, marker });
+    temporaryRestoreTarget(env);
     const probe = new PgSession(connection, env);
     try {
       await probe.sql("BEGIN READ ONLY");
-      assertTargetPreflight(await probe.json(TARGET_PREFLIGHT_SQL));
+      assertTemporaryDatabaseMarker(await probe.json("SELECT to_json(shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database'))"), target);
+      assertTargetPreflight(await probe.json(TARGET_PREFLIGHT_SQL), target.database);
+      assertTemporaryDatabaseAccess(await probe.json(TEMPORARY_DATABASE_ACCESS_SQL));
       await probe.sql("ROLLBACK");
     } finally { probe.close(); }
+    if (env.AP94_RESTORE_PREFLIGHT === "true") return { preflightOnly: true as const,
+      key: store.key, target: { ...RESTORE_TARGET, database: target.database, id: target.id, expiresAt: target.expiresAt },
+      manifestSha256: env.AP94_MANIFEST_SHA256, databaseIntegrity: "NOT_RESTORED", mediaIntegrity: "PASS",
+      targetIdentityPermissionsEmpty: "PASS", restoreExecuted: false, ...media };
+    // Revalidate the lease immediately before the write boundary, after downloads.
+    temporaryRestoreTarget(env);
     const started = Date.now();
     // The only write connection: hard-pinned again at the call site. No caller-supplied
     // arbitrary target env or SQL path; psql owns one transaction including the empty guard.
-    const writeEnv = libpqEnvironment(pinnedRestoreConnection(env), env);
+    const writeEnv = libpqEnvironment(temporaryRestoreConnection(pinnedRestoreConnection(env), temporaryRestoreTarget(env)), env);
     writeEnv.PGOPTIONS = "-c default_transaction_read_only=off -c statement_timeout=600000";
     pgTool("psql", ["-X", "-w", "-q", "-v", "ON_ERROR_STOP=1", "--single-transaction", "--file=-"], writeEnv, sql);
     const restoreMs = Date.now() - started; const validateStart = Date.now();
@@ -118,7 +144,7 @@ export async function acceptanceRestore(env: Environment) {
       smoke = { quizResults: actual.resultRows.length, formattedResults };
       await session.sql("COMMIT");
     } finally { session.close(); }
-    const evidence = { version: 1, key: store.key, target: RESTORE_TARGET, completedAt: new Date().toISOString(),
+    const evidence = { version: 1, key: store.key, target: { ...RESTORE_TARGET, database: target.database, id: target.id, expiresAt: target.expiresAt }, completedAt: new Date().toISOString(),
       restoreMs, validationMs: Date.now() - validateStart, ...media, ...smoke,
       schemaTablesConstraintsSequencesMigrationsCountsSamples: "matched", authenticationValues: "excluded",
       resultReconstruction: "persisted-final-points-and-ranking-matched", applicationSmoke: "domain-points-formatter-and-ranking",
