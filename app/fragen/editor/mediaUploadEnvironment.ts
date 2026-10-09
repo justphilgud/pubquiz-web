@@ -12,6 +12,7 @@ import {
   buildBlobPath,
   getBlobAreaPrefix,
   type BlobPathArea,
+  type BlobEnvironmentPrefix,
 } from "@/app/lib/blobPath";
 
 export type MediaUploadAuthenticationKind = "BLOB_READ_WRITE_TOKEN";
@@ -25,7 +26,7 @@ export type MediaUploadFailureDetails = {
 
 export type MediaUploadServerConfig = {
   environment: LogicalEnvironment;
-  environmentPrefix: "dev" | "preview" | "prod";
+  environmentPrefix: BlobEnvironmentPrefix;
   blobAuthentication: { token: string };
   webhookPublicKey: string;
 };
