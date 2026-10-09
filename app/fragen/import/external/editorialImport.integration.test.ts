@@ -57,6 +57,42 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
       assert.deepEqual(schema.migrations,(await client.query('SELECT migration_name,checksum,finished_at,rolled_back_at FROM public._prisma_migrations ORDER BY migration_name')).rows);
     }
     await assert.rejects(runEditorialDatabaseImport({connectionString:connectionString!,source:frozenProductionSource,mode:'import',productionPreflight:true,operatorUserId:operator}),/WRITE_NOT_AUTHORIZED/);
+    // Real Production capability uses the exact same core on this isolated CI DB.
+    const {EditorialProductionWriteAuthorization,EDITORIAL_WRITER_WORKFLOW}=await import('./editorialProductionPolicy');
+    const {VerifiedExternalImportReviewerApproval,externalImportApprovalComment}=await import('./reviewerApproval');
+    for(const category of new Set(frozenProductionSource.candidates.flatMap(c=>c.categories))) await client.query("INSERT INTO pubquiz.fragenkategorie(kategorie) VALUES($1) ON CONFLICT DO NOTHING",[category]);
+    await client.query("INSERT INTO pubquiz.benutzer_rollenzuweisungen(benutzer_id,rolle,scope_typ,updated_at) VALUES($1,'ADMIN','GLOBAL',now())",[operator]);
+    const writerEnv={GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:'justphilgud/pubquiz-web',GITHUB_REF:'refs/heads/main',GITHUB_EVENT_NAME:'workflow_dispatch',GITHUB_WORKFLOW_REF:EDITORIAL_WRITER_WORKFLOW,
+      EDITORIAL_GITHUB_ENVIRONMENT:'operations-content-import',EDITORIAL_PRODUCTION_SHA:'a'.repeat(40),PRODUCTION_RELEASE_SHA:'a'.repeat(40),GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1'};
+    const oldEnv=Object.fromEntries(Object.keys(writerEnv).map(key=>[key,process.env[key]]));
+    const makeAuth=(digest:string,ids:string[])=>new EditorialProductionWriteAuthorization(VerifiedExternalImportReviewerApproval.fromGithubReviewHistory({repository:'justphilgud/pubquiz-web',runId:'123',runAttempt:'1',planDigest:digest,candidateIds:ids,backupId:'production/acceptance/run-37971426600-1',
+      response:[{state:'approved',comment:externalImportApprovalComment({planDigest:digest,candidateIds:ids,backupId:'production/acceptance/run-37971426600-1'}),environments:[{name:'operations-content-import'}],user:{id:1,login:'reviewer'}}]}));
+    const fixedPreview=await runEditorialDatabaseImport({connectionString:connectionString!,source:frozenProductionSource,mode:'dry-run',productionPreflight:true});
+    const fixedIds=fixedPreview.decisions.filter(d=>d.action==='IMPORTIEREN').map(d=>d.candidate.externalId);
+    assert.equal(fixedIds.length,79);
+    try {
+      Object.assign(process.env,writerEnv);
+      const writer={connectionString:connectionString!,source:frozenProductionSource,mode:'import' as const,operatorUserId:operator,expectedDryRunDigest:fixedPreview.digest};
+      await assert.rejects(runEditorialDatabaseImport({...writer,productionWrite:makeAuth(fixedPreview.digest,fixedIds.slice(1))}),/APPROVED_CANDIDATES_CHANGED/);
+      assert.deepEqual(await editorialIntegritySnapshot(client),fixedPreview.before);
+      const capability=makeAuth(fixedPreview.digest,fixedIds);
+      const written=await runEditorialDatabaseImport({...writer,productionWrite:capability});
+      assert.equal(written.questionIds.length,79);
+      assert.deepEqual(await editorialIntegritySnapshot(client,written.questionIds),fixedPreview.before);
+      await assert.rejects(runEditorialDatabaseImport({...writer,productionWrite:capability}),/WRITE_NOT_AUTHORIZED/);
+      const again=await runEditorialDatabaseImport({connectionString:connectionString!,source:frozenProductionSource,mode:'dry-run',productionPreflight:true});
+      assert.ok(again.decisions.every(d=>d.action==='\u00dcBERSPRINGEN'));
+      // Only test-created rows in the ephemeral CI database are removed.
+      await client.query('DELETE FROM pubquiz.external_question_import_items WHERE import_batch_id=$1',[written.manifest!.batchId]);
+      await client.query('DELETE FROM pubquiz.external_question_import_batches WHERE import_batch_id=$1',[written.manifest!.batchId]);
+      await client.query('DELETE FROM pubquiz.antworten WHERE fragen_id=ANY($1::int[])',[written.questionIds]);
+      await client.query('DELETE FROM pubquiz.fragen_kategorien WHERE fragen_id=ANY($1::int[])',[written.questionIds]);
+      await client.query('DELETE FROM pubquiz.fragen WHERE fragen_id=ANY($1::int[])',[written.questionIds]);
+      assert.deepEqual(await editorialIntegritySnapshot(client),fixedPreview.before);
+    } finally {
+      for(const [key,value] of Object.entries(oldEnv)) {if(value===undefined) delete process.env[key];else process.env[key]=value;}
+      await client.query("DELETE FROM pubquiz.benutzer_rollenzuweisungen WHERE benutzer_id=$1 AND rolle='ADMIN' AND scope_typ='GLOBAL'",[operator]);
+    }
     const before=(await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count;
     const preview=await runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"dry-run"});
     await assert.rejects(runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"import",expectedDryRunDigest:preview.digest}),/OPERATOR_REQUIRED/);
@@ -178,3 +214,4 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     } finally { await statusDb.$disconnect(); }
   } finally {await client.end();}
 });
+

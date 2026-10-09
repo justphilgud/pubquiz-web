@@ -3,42 +3,50 @@ name: External Question Production Import
 on:
   workflow_dispatch:
     inputs:
+      editorial_pr95:
+        description: Fixed editorial allowlist using the existing import core
+        type: boolean
+        default: false
+      editorial_operator_user_id:
+        description: Existing active global admin ID (writer checks role)
+        type: string
+        required: false
       batch_id:
         description: Exact frozen batch identifier
-        required: true
+        required: false
         type: string
       plan_path:
         description: Plan path below external-import-plans/ on current main
-        required: true
+        required: false
         type: string
       plan_sha256:
         description: Exact canonical SHA-256 of the frozen plan
-        required: true
+        required: false
         type: string
       production_commit:
         description: Verified currently deployed Production SHA
-        required: true
+        required: false
         type: string
       backup_run:
         description: Successful AP9.4 backup workflow run
-        required: true
+        required: false
         type: string
       backup_attempt:
         description: Exact AP9.4 backup run attempt
-        required: true
+        required: false
         default: '1'
         type: string
       backup_id:
         description: Exact production/acceptance/run-RUN-ATTEMPT key
-        required: true
+        required: false
         type: string
       backup_manifest_sha256:
         description: Exact validated backup manifest SHA-256
-        required: true
+        required: false
         type: string
       dry_run:
         description: Run all read-only checks without entering the writer environment
-        required: true
+        required: false
         default: true
         type: boolean
 
@@ -52,7 +60,7 @@ concurrency:
 
 jobs:
   preflight:
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && !inputs.editorial_pr95
     runs-on: ubuntu-latest
     environment: operations-backup
     timeout-minutes: 20
@@ -143,7 +151,7 @@ jobs:
 
   write:
     needs: preflight
-    if: inputs.dry_run == false
+    if: inputs.dry_run == false && !inputs.editorial_pr95
     runs-on: ubuntu-latest
     environment: operations-content-import
     timeout-minutes: 20
@@ -198,4 +206,74 @@ jobs:
           name: external-question-production-import-audit
           path: ${{ runner.temp }}/external-import-audit.json
           if-no-files-found: warn
+          retention-days: 30
+
+  editorial-preflight:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && inputs.editorial_pr95
+    runs-on: ubuntu-latest
+    environment: operations-backup
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: external-import-backup-evidence
+          path: evidence
+          github-token: ${{ github.token }}
+          run-id: 37971426600
+      - name: Read-only fixed editorial preflight
+        env:
+          EDITORIAL_GITHUB_ENVIRONMENT: operations-backup
+          EDITORIAL_PRODUCTION_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ vars.PRODUCTION_RELEASE_SHA }}
+          PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node --import tsx scripts/editorial-production-write.ts preflight evidence/external-import-backup-evidence.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-write-preflight
+          path: editorial-write-preflight.json
+          if-no-files-found: error
+          retention-days: 14
+
+  editorial-write:
+    needs: editorial-preflight
+    if: inputs.dry_run == false && inputs.editorial_pr95
+    runs-on: ubuntu-latest
+    environment: operations-content-import
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: editorial-write-preflight
+          path: preflight
+      - uses: actions/download-artifact@v4
+        with:
+          name: external-import-backup-evidence
+          path: evidence
+          github-token: ${{ github.token }}
+          run-id: 37971426600
+      - name: Exact reviewer approval and transactional import
+        env:
+          EDITORIAL_GITHUB_ENVIRONMENT: operations-content-import
+          EDITORIAL_PRODUCTION_SHA: ${{ inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ vars.PRODUCTION_RELEASE_SHA }}
+          EDITORIAL_OPERATOR_USER_ID: ${{ inputs.editorial_operator_user_id }}
+          PRODUCTION_IMPORT_DATABASE_URL: ${{ secrets.PRODUCTION_IMPORT_DATABASE_URL }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node --import tsx scripts/editorial-production-write.ts write evidence/external-import-backup-evidence.json preflight/editorial-write-preflight.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-import-manifest
+          path: editorial-import-manifest.json
+          if-no-files-found: error
           retention-days: 30
