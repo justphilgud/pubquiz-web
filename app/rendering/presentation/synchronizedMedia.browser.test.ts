@@ -45,6 +45,10 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       const short=document.querySelector('audio'); check(short!==original,'source reused stale media node');
       short.currentTime=12; short.dispatchEvent(new Event('ended')); await wait(()=>countdown()==='0:00');
       let settle; const realPlay=HTMLMediaElement.prototype.play;
+      let settleEarlier;let playCalls=0;
+      HTMLMediaElement.prototype.play=function(){return ++playCalls===1?new Promise(resolve=>settleEarlier=resolve):realPlay.call(this);};
+      phase='repeat play';short.currentTime=0;show('/short.wav','play',8);show('/short.wav','play',9);await wait(()=>!short.paused);settleEarlier();await new Promise(resolve=>setTimeout(resolve,20));check(!short.paused,'older play promise stopped current playback');
+      show('/short.wav','pause',10);await wait(()=>short.paused);
       HTMLMediaElement.prototype.play=function(){return new Promise(r=>settle=r);};
       phase='stale';show('/stale.wav','play',5); const stale=document.querySelector('audio');
       show('/short.wav',null,6); settle(); await wait(()=>stale.paused);

@@ -201,6 +201,7 @@ export function SynchronizedMedia({
   const [playbackBlocked, setPlaybackBlocked] = useState(false);
   const [failedSource, setFailedSource] = useState<string | null>(null);
   const [mediaProgress, setMediaProgress] = useState<{ src: string; remaining: number | null }>({ src, remaining: null });
+  const playbackIntentRef = useRef(command);
   function updateProgress(media: HTMLMediaElement) {
     setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, media.currentTime) });
   }
@@ -210,7 +211,7 @@ export function SynchronizedMedia({
     if (!target) return;
     try {
       await target.play();
-      if (target !== mediaRef.current) { target.pause(); return; }
+      if (target !== mediaRef.current || playbackIntentRef.current !== "play") { target.pause(); return; }
       setPlaybackBlocked(false);
     } catch {
       if (target !== mediaRef.current) return;
@@ -219,6 +220,7 @@ export function SynchronizedMedia({
   }
 
   useEffect(() => {
+    playbackIntentRef.current = command;
     if (renderMode !== "PRESENTATION") return;
     const media = mediaRef.current;
     if (!media) return;
@@ -235,7 +237,11 @@ export function SynchronizedMedia({
       let cancelled = false;
       void media
         .play()
-        .then(() => { if (cancelled) media.pause(); else setPlaybackBlocked(false); })
+        .then(() => {
+          if (cancelled) {
+            if (media !== mediaRef.current || playbackIntentRef.current !== "play") media.pause();
+          } else setPlaybackBlocked(false);
+        })
         .catch(() => { if (!cancelled) setPlaybackBlocked(true); });
       return () => { cancelled = true; media.pause(); };
     } else if (command === "pause") {
