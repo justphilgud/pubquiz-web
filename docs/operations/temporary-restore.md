@@ -65,6 +65,10 @@ Keine Test-ID/Datenbank nach erfolgreichem Restore wiederverwenden.
    neue leere Datenbank mit Owner `neondb_owner` erstellen; falls SQL-Weg
    autorisiert/verfÃ¼gbar, `TEMPLATE template0` verwenden. Nicht `neondb`
    klonen. Kommentar nur auf dieser neu erstellten Datenbank setzen.
+   CONNECT/TEMPORARY für PUBLIC ausschließlich auf der neuen Datenbank
+   entziehen. Keine anderen gewöhnlichen Loginrollen dürfen effektives CONNECT
+   haben; der Read-only-Preflight prüft das. Neon-Provideradministration und
+   Superuser bleiben eine dokumentierte administrative Vertrauensgrenze.
 3. BenÃ¶tigte Rechte: autorisierte Neon-Projektverwaltung fÃ¼r die neue
    Datenbank; alternativ tatsÃ¤chlich wirksames CREATEDB fÃ¼r einen gesondert
    freigegebenen SQL-Provisionierungsweg. Schema-Owner/CREATE fÃ¼r Restore.

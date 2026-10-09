@@ -35,6 +35,18 @@ export function temporaryDatabaseMarker(target: TemporaryRestoreTarget) {
 export function assertTemporaryDatabaseMarker(actual: unknown, target: TemporaryRestoreTarget) {
   requireCondition(actual === temporaryDatabaseMarker(target), "TEMPORARY_RESTORE_MARKER_INVALID");
 }
+// PostgreSQL superusers/provider administrators cannot be isolated by database ACLs.
+// Ordinary other login roles and PUBLIC must have no effective CONNECT permission.
+export const TEMPORARY_DATABASE_ACCESS_SQL = `SELECT json_build_object(
+  'publicConnect', EXISTS(SELECT 1 FROM pg_database d,
+    LATERAL aclexplode(coalesce(d.datacl,acldefault('d',d.datdba))) a
+    WHERE d.datname=current_database() AND a.grantee=0 AND a.privilege_type='CONNECT'),
+  'otherLoginRoles', (SELECT count(*)::int FROM pg_roles r WHERE r.rolcanlogin AND NOT r.rolsuper
+    AND r.rolname NOT IN (current_user,'cloud_admin')
+    AND has_database_privilege(r.oid,(SELECT oid FROM pg_database WHERE datname=current_database()),'CONNECT'))) `;
+export function assertTemporaryDatabaseAccess(proof: { publicConnect: boolean; otherLoginRoles: number }) {
+  requireCondition(proof.publicConnect === false && proof.otherLoginRoles === 0, "TEMPORARY_RESTORE_ACCESS_NOT_ISOLATED");
+}
 export function temporaryRestoreConnection(base: string, target: TemporaryRestoreTarget) {
   // Caller must first verify the existing pinned Nonprod host/role/TLS connection.
   const url = new URL(base);

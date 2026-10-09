@@ -8,7 +8,7 @@ import { collectSnapshot,compareSnapshots,sha256 } from "./snapshot";
 import type { PgSession } from "./pg-session";
 import { pgTool } from "./pg-session";
 import { restoreSql,TARGET_PREFLIGHT_SQL,assertTargetPreflight } from "./acceptance-restore";
-import { temporaryDatabaseMarker, temporaryCleanupPlan, assertTemporaryDatabaseMarker } from "./temporary-restore-target";
+import { temporaryDatabaseMarker, temporaryCleanupPlan, assertTemporaryDatabaseMarker, TEMPORARY_DATABASE_ACCESS_SQL, assertTemporaryDatabaseAccess } from "./temporary-restore-target";
 import { RESTORE_TARGET } from "./acceptance-policy";
 import { verifyMediaFiles } from "./private-artifacts";
 
@@ -71,8 +71,11 @@ test("actual PostgreSQL dump/restore: empty guard, rollback, permissions, comple
   const freshProbe=async()=>{await fresh.query("BEGIN READ ONLY");try{
     assertTemporaryDatabaseMarker((await fresh.query("SELECT shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database') AS marker")).rows[0].marker,lease);
     assertTargetPreflight(Object.values((await fresh.query(TARGET_PREFLIGHT_SQL)).rows[0])[0] as Parameters<typeof assertTargetPreflight>[0],lease.database);
+    assertTemporaryDatabaseAccess(Object.values((await fresh.query(TEMPORARY_DATABASE_ACCESS_SQL)).rows[0])[0] as Parameters<typeof assertTemporaryDatabaseAccess>[0]);
   }finally{await fresh.query("ROLLBACK");}};
   try {
+    await assert.rejects(freshProbe(),/ACCESS_NOT_ISOLATED/);
+    await admin.query(`REVOKE CONNECT, TEMPORARY ON DATABASE ${lease.database} FROM PUBLIC`);
     await freshProbe();
     const expiredMarker=`ap94:restore-test:${lease.id}:2000-01-01T00:00:00.000Z`;
     const expiredSql=restoreSql(directory,expected.authRows,{expected},envFor(lease.database),{database:lease.database,marker:expiredMarker});
@@ -86,10 +89,7 @@ test("actual PostgreSQL dump/restore: empty guard, rollback, permissions, comple
     await admin.query(`COMMENT ON DATABASE ${lease.database} IS 'wrong'`);await assert.rejects(freshProbe(),/MARKER/);
     assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql));
     await admin.query(`COMMENT ON DATABASE ${lease.database} IS '${marker}'`);
-    const deniedTemporary=await connect(lease.database,"restore_denied");try{await deniedTemporary.query("BEGIN READ ONLY");
-      const deniedProof=Object.values((await deniedTemporary.query(TARGET_PREFLIGHT_SQL)).rows[0])[0] as Parameters<typeof assertTargetPreflight>[0];
-      assert.throws(()=>assertTargetPreflight(deniedProof,lease.database));
-      await deniedTemporary.query("ROLLBACK");}finally{await deniedTemporary.end();}
+    await assert.rejects(connect(lease.database,"restore_denied"));
     assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql+"\nSELECT 1/0;"));
     await freshProbe();
     pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor(lease.database,"neondb_owner"),temporarySql);

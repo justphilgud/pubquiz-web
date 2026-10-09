@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { RESTORE_TARGET, pinnedRestoreConnection, assertRestoreAcceptance } from "./acceptance-policy";
-import { temporaryRestoreTarget, temporaryRestoreConnection, temporaryDatabaseMarker, assertTemporaryDatabaseMarker, temporaryCleanupPlan } from "./temporary-restore-target";
+import { temporaryRestoreTarget, temporaryRestoreConnection, temporaryDatabaseMarker, assertTemporaryDatabaseMarker, temporaryCleanupPlan, assertTemporaryDatabaseAccess } from "./temporary-restore-target";
 import { temporaryEmptyTargetSql } from "./acceptance-restore";
 import { needsApplicationDeployment } from "./deployment-scope";
 const now = Date.parse("2026-10-09T20:00:00Z");
@@ -68,4 +68,10 @@ test("read-only mode has an explicit no-write claim and branch/repository author
   const source=readFileSync("scripts/operations/acceptance-restore.ts","utf8");
   assert.ok(source.indexOf('if (env.AP94_RESTORE_PREFLIGHT === "true") return') < source.indexOf('const writeEnv ='));
   assert.match(source,/restoreExecuted: false/);
+});
+
+test("temporary database access rejects PUBLIC and other ordinary login roles",()=>{
+  assert.doesNotThrow(()=>assertTemporaryDatabaseAccess({publicConnect:false,otherLoginRoles:0}));
+  assert.throws(()=>assertTemporaryDatabaseAccess({publicConnect:true,otherLoginRoles:0}));
+  assert.throws(()=>assertTemporaryDatabaseAccess({publicConnect:false,otherLoginRoles:1}));
 });

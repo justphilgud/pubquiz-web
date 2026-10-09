@@ -9,7 +9,7 @@ import { authInsertSql, collectSnapshot, compareSnapshots, sha256 } from "./snap
 import { artifactName, backupKey, PrivateArtifacts, verifyMediaFiles } from "./private-artifacts";
 import type { AcceptanceManifest } from "./acceptance-backup";
 import { validateBackupMetadata } from "./backup-metadata";
-import { temporaryRestoreTarget, temporaryRestoreConnection, temporaryDatabaseMarker, assertTemporaryDatabaseMarker } from "./temporary-restore-target";
+import { temporaryRestoreTarget, temporaryRestoreConnection, temporaryDatabaseMarker, assertTemporaryDatabaseMarker, TEMPORARY_DATABASE_ACCESS_SQL, assertTemporaryDatabaseAccess } from "./temporary-restore-target";
 import { formatQuizPoints } from "../../app/quiz/formatQuizPoints";
 import { rankScores } from "../../app/rendering/presentation/presentationRankingPolicy";
 
@@ -56,8 +56,17 @@ DROP SCHEMA public;`;
 
 export function temporaryEmptyTargetSql(database: string, marker: string) {
   requireCondition(/^ap94_restore_[a-f0-9]{32}$/.test(database) && marker.startsWith(`ap94:restore-test:${database.slice(13)}:`) && /^ap94:restore-test:[a-f0-9]{32}:[0-9TZ:.+-]+$/.test(marker), "TEMPORARY_RESTORE_DATABASE_INVALID");
-  return EMPTY_TARGET_SQL.replace("current_database() <> 'neondb'", `current_database() <> '${database}'`)
-    .replace("IF NOT ", `IF clock_timestamp() >= '${marker.slice(`ap94:restore-test:${database.slice(13)}:`.length)}'::timestamptz THEN RAISE EXCEPTION 'RESTORE_LEASE_EXPIRED'; END IF;\n IF shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database') IS DISTINCT FROM '${marker}' THEN RAISE EXCEPTION 'RESTORE_MARKER'; END IF;\n IF NOT `);
+  const expiry = marker.slice(`ap94:restore-test:${database.slice(13)}:`.length);
+  return `SELECT pg_advisory_xact_lock(940914);
+DO $ap94$ DECLARE access_proof json; BEGIN
+ IF current_database() <> '${database}' OR current_user <> 'neondb_owner' THEN RAISE EXCEPTION 'RESTORE_IDENTITY'; END IF;
+ IF clock_timestamp() >= '${expiry}'::timestamptz THEN RAISE EXCEPTION 'RESTORE_LEASE_EXPIRED'; END IF;
+ IF shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database') IS DISTINCT FROM '${marker}' THEN RAISE EXCEPTION 'RESTORE_MARKER'; END IF;
+ access_proof := (${TEMPORARY_DATABASE_ACCESS_SQL});
+ IF coalesce((access_proof->>'publicConnect')::boolean,true) OR coalesce((access_proof->>'otherLoginRoles')::int,-1) <> 0 THEN RAISE EXCEPTION 'RESTORE_ACCESS'; END IF;
+ IF NOT ${TARGET_EMPTY_EXPRESSION} THEN RAISE EXCEPTION 'RESTORE_TARGET_NOT_EMPTY'; END IF;
+END $ap94$;
+DROP SCHEMA public;`;
 }
 export function restoreSql(directory: string, auth: Record<string, string>, manifest: Pick<AcceptanceManifest, "expected">, env: Environment, target?: { database: string; marker: string }) {
   const args = ["--no-owner", "--no-acl", "--file=-", join(directory, "database.dump")];
@@ -88,6 +97,7 @@ export async function acceptanceRestore(env: Environment) {
       await probe.sql("BEGIN READ ONLY");
       assertTemporaryDatabaseMarker(await probe.json("SELECT to_json(shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database'))"), target);
       assertTargetPreflight(await probe.json(TARGET_PREFLIGHT_SQL), target.database);
+      assertTemporaryDatabaseAccess(await probe.json(TEMPORARY_DATABASE_ACCESS_SQL));
       await probe.sql("ROLLBACK");
     } finally { probe.close(); }
     if (env.AP94_RESTORE_PREFLIGHT === "true") return { preflightOnly: true as const,
