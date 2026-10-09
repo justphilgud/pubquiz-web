@@ -324,3 +324,17 @@ test("central acceptance on a different branch does not consume existing legacy 
   assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs }, "codex/preview-media-configuration"));
   assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs }, branch), assertErrorCode("PREVIEW_MEDIA_OVERRIDE_FORBIDDEN"));
 });
+
+test("Vercel integration may expose the nonsecret store identity as plain config", () => {
+  const integrated = branchEnvironment.map((variable) => variable.key === "BLOB_STORE_ID"
+    ? { ...variable, type: "plain" } : variable);
+  assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs: integrated }, branch));
+  const wrongStore = integrated.map((variable) => variable.key === "BLOB_STORE_ID"
+    ? { ...variable, contentHint: { storeId: "store_bIx6H2j23vJzi240" } } : variable);
+  assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: wrongStore }, branch),
+    (error: unknown) => error instanceof GitPreviewDeploymentError && error.code === "PREVIEW_MEDIA_STORE_MISMATCH");
+  const plainToken = integrated.map((variable) => variable.key === "BLOB_READ_WRITE_TOKEN"
+    ? { ...variable, type: "plain" } : variable);
+  assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: plainToken }, branch),
+    (error: unknown) => error instanceof GitPreviewDeploymentError && error.code === "PREVIEW_BRANCH_ENVIRONMENT_INVALID");
+});
