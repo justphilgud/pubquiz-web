@@ -20,26 +20,29 @@ async function main() {
     headers: { authorization: `Bearer ${env.GITHUB_TOKEN}`, accept: "application/vnd.github+json" }, redirect: "error", signal: AbortSignal.timeout(30_000) });
   if (!restore.ok) throw new Error("EDITORIAL_RESTORE_EVIDENCE_UNAVAILABLE");
   const restored = await restore.json();
-  if (restored.id !== 37985816031 || restored.conclusion !== "success" || restored.head_branch !== "main") throw new Error("EDITORIAL_RESTORE_EVIDENCE_INVALID");
+  if (restored.id !== 37985816031 || restored.run_attempt !== 1 || restored.path !== ".github/workflows/ap94-acceptance.yml" || restored.conclusion !== "success" || restored.head_branch !== "main") throw new Error("EDITORIAL_RESTORE_EVIDENCE_INVALID");
   if (process.argv[2] === "preflight") {
     if (env.EDITORIAL_GITHUB_ENVIRONMENT !== "operations-backup") throw new Error("EDITORIAL_PRODUCTION_CONTEXT_INVALID");
     // Existing context guard pins the read-only entry point; preserve it unchanged.
     const result = await runEditorialDatabaseImport({ connectionString: env.PRODUCTION_BACKUP_DATABASE_URL ?? "", source, mode: "dry-run", productionPreflight: true });
     if (result.mode !== "dry-run") throw new Error("EDITORIAL_READ_ONLY_REQUIRED");
-    const schema = result.productionSchema as { migrations: {migration_name:string;finished_at:unknown;rolled_back_at:unknown}[]; difficultyColumn:{data_type:string;is_nullable:string;character_maximum_length:number}[]; difficultyConstraint:{convalidated:boolean;definition:string}[] };
+    const schema = result.productionSchema as { migrations: {migration_name:string;finished_at:unknown;rolled_back_at:unknown}[]; difficultyColumn:{data_type:string;is_nullable:string;character_maximum_length:number}[]; difficultyConstraint:{convalidated:boolean;definition:string}[]; writerRole?:unknown; writerPrivileges:{relation:string;select:boolean}[]; writerColumns:{column:string;insert:boolean}[] };
     if (schema.migrations.some(m=>!m.finished_at&&!m.rolled_back_at) || !schema.migrations.some(m=>m.migration_name==='20261008090000_editorial_question_difficulty'&&m.finished_at&&!m.rolled_back_at) ||
       schema.difficultyColumn.length!==1 || schema.difficultyColumn[0].is_nullable!=='YES' || schema.difficultyColumn[0].data_type!=='character varying' || schema.difficultyColumn[0].character_maximum_length!==10 ||
       schema.difficultyConstraint.length!==1 || !schema.difficultyConstraint[0].convalidated || !['LEICHT','MITTEL','SCHWER'].every(v=>schema.difficultyConstraint[0].definition.includes(`'${v}'`))) throw new Error('EDITORIAL_PRODUCTION_SCHEMA_BLOCKED');
     const candidateIds = result.decisions.filter(d => d.action === "IMPORTIEREN").map(d => d.candidate.externalId);
     if (!candidateIds.length) throw new Error("EDITORIAL_NOTHING_TO_IMPORT");
-    const report = { ...result, productionSha: env.EDITORIAL_PRODUCTION_SHA, backupId, candidateIds, createdAt: new Date().toISOString(),
+    const missingPrivileges = [...schema.writerPrivileges.filter(p=>!p.select).map(p=>`SELECT pubquiz.${p.relation}`), ...schema.writerColumns.filter(p=>!p.insert).map(p=>`INSERT pubquiz.fragen.${p.column}`)];
+    const writerReady = Boolean(schema.writerRole) && missingPrivileges.length===0;
+    const report = { ...result, productionSha: env.EDITORIAL_PRODUCTION_SHA, backupId, candidateIds, writerReady, missingPrivileges, createdAt: new Date().toISOString(),
       approvalComment: externalImportApprovalComment({ planDigest: result.digest, candidateIds, backupId }) };
     writeFileSync("editorial-write-preflight.json", JSON.stringify(report, null, 2), { flag: "wx" });
-    console.log(JSON.stringify({ candidates: source.candidates.length, importable: candidateIds.length, writeAuthorized: false }));
+    console.log(JSON.stringify({ candidates: source.candidates.length, importable: candidateIds.length, writerReady, writeAuthorized: false }));
     return;
   }
   if (process.argv[2] !== "write" || env.EDITORIAL_GITHUB_ENVIRONMENT !== "operations-content-import") throw new Error("EDITORIAL_WRITE_MODE_INVALID");
   const report = JSON.parse(readFileSync(process.argv[4], "utf8"));
+  if (report.writerReady !== true) throw new Error("EDITORIAL_WRITER_PRIVILEGES_BLOCKED");
   if (report.mode !== "dry-run" || report.productionSha !== env.EDITORIAL_PRODUCTION_SHA || report.backupId !== backupId ||
     Date.now() - Date.parse(report.createdAt) > 60 * 60 * 1000 || !Number.isFinite(Date.parse(report.createdAt))) throw new Error("EDITORIAL_PREFLIGHT_STALE");
   const review = await fetchVerifiedExternalImportReviewerApproval({ repository: "justphilgud/pubquiz-web", runId: env.GITHUB_RUN_ID ?? "", runAttempt: env.GITHUB_RUN_ATTEMPT ?? "",
