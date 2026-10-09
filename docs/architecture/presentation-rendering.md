@@ -178,3 +178,16 @@ prüfen vier Designwelten, die Browserabnahme ergänzt Geometrie und Scrollbarke
 
 [Intro-/QR-Flow und Teambeitritt](intro-team-join.md) definiert den manuellen QR-Abschluss,
 die rein lokale Begrüßungsqueue und die Wiederverwendung vorhandener Snapshots.
+
+## LOVD-Nachtauftrag 2026-10-10: Audio-Phasen
+
+Musik rückwärts und 8-Bit wählen in QUESTION ausschließlich ihren generierten
+Slot, in SOLUTION ausschließlich music_original_audio. Die Reihenfolge der
+persistierten Medien ist unerheblich. Fehlendes generiertes Audio fällt nicht
+auf das Original zurück. Mehrdeutige alte unmarkierte Dateien werden nicht
+erraten. Normale Vorlage musik nutzt question_audio in beiden Phasen, optional
+music_original_audio in der Auflösung. Vorhandene Medien werden nicht umgeschrieben.
+Der Player bleibt verantwortlich für die vorhandenen Moderationsbefehle;
+questionPhaseMedia enthält nur die deterministische Auswahl. Ein src-Wechsel
+ersetzt den Medienknoten; Cleanup und verspätete Play-Promises pausieren alte Knoten.
+Tests: questionPhaseMedia, bestehender audioReverse-Prozessor, synchronizedMedia.browser.

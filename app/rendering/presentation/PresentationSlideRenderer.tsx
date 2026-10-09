@@ -3,6 +3,8 @@
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
 import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
+import { questionPhaseMedia } from "./questionPhaseMedia";
+import { mediaRemainingSeconds, formatMediaRemaining } from "./mediaCountdown";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { FactsPresentation } from "./FactsPresentation";
@@ -170,7 +172,7 @@ type Props = {
   };
 };
 
-function SynchronizedMedia({
+export function SynchronizedMedia({
   kind,
   src,
   command,
@@ -180,6 +182,7 @@ function SynchronizedMedia({
   activationClassName,
   poster,
   loop = false,
+  showCountdown = false,
 }: {
   kind: "audio" | "video";
   src: string;
@@ -190,18 +193,27 @@ function SynchronizedMedia({
   activationClassName?: string;
   poster?: string;
   loop?: boolean;
+  showCountdown?: boolean;
 }) {
   const mediaRef = useRef<HTMLMediaElement | null>(null);
   const handledCommandIdRef = useRef<number | null>(null);
   const handledSourceRef = useRef<string | null>(null);
   const [playbackBlocked, setPlaybackBlocked] = useState(false);
   const [failedSource, setFailedSource] = useState<string | null>(null);
+  const [mediaProgress, setMediaProgress] = useState<{ src: string; remaining: number | null }>({ src, remaining: null });
+  function updateProgress(media: HTMLMediaElement) {
+    setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, media.currentTime) });
+  }
 
   async function play() {
+    const target = mediaRef.current;
+    if (!target) return;
     try {
-      await mediaRef.current?.play();
+      await target.play();
+      if (target !== mediaRef.current) { target.pause(); return; }
       setPlaybackBlocked(false);
     } catch {
+      if (target !== mediaRef.current) return;
       setPlaybackBlocked(true);
     }
   }
@@ -220,32 +232,46 @@ function SynchronizedMedia({
     handledSourceRef.current = src;
 
     if (command === "play") {
+      let cancelled = false;
       void media
         .play()
-        .then(() => setPlaybackBlocked(false))
-        .catch(() => setPlaybackBlocked(true));
+        .then(() => { if (cancelled) media.pause(); else setPlaybackBlocked(false); })
+        .catch(() => { if (!cancelled) setPlaybackBlocked(true); });
+      return () => { cancelled = true; media.pause(); };
     } else if (command === "pause") {
       media.pause();
     } else if (command === "stop") {
       media.pause();
       media.currentTime = 0;
+      setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, 0) });
     }
   }, [command, commandId, renderMode, src]);
+
+  useEffect(() => {
+    const media = mediaRef.current;
+    return () => { media?.pause(); };
+  }, [src]);
 
   const media =
     kind === "audio" ? (
       <audio
+        key={src}
         ref={(element) => {
           mediaRef.current = element;
         }}
         src={src}
         loop={loop}
         preload="metadata"
-        onError={() => setFailedSource(src)}
-        onLoadedMetadata={() => setFailedSource(null)}
+        onError={() => { setFailedSource(src); setMediaProgress({ src, remaining: null }); }}
+        onLoadedMetadata={(event) => { setFailedSource(null); updateProgress(event.currentTarget); }}
+        onDurationChange={(event) => updateProgress(event.currentTarget)}
+        onTimeUpdate={(event) => updateProgress(event.currentTarget)}
+        onSeeked={(event) => updateProgress(event.currentTarget)}
+        onEnded={() => setMediaProgress({ src, remaining: 0 })}
       />
     ) : (
       <video
+        key={src}
         ref={(element) => {
           mediaRef.current = element;
         }}
@@ -264,6 +290,11 @@ function SynchronizedMedia({
   return (
     <>
       {media}
+      {showCountdown && failedSource !== src && mediaProgress.src === src && mediaProgress.remaining !== null && (
+        <output className="presentation-intro-countdown text-5xl font-bold tabular-nums" aria-label="Verbleibende Intro-Musik">
+          {formatMediaRemaining(mediaProgress.remaining)}
+        </output>
+      )}
       {failedSource === src && <p role="status" className="presentation-media-error">Medium konnte nicht geladen werden. Bitte Datei und Verbindung prüfen.</p>}
       {playbackBlocked && command === "play" && failedSource !== src && renderMode === "PRESENTATION" && (
         <button
@@ -335,10 +366,10 @@ export default function PresentationSlideRenderer({
   }, [relativeAnswerUrl, relativeCalendarUrl, relativeQuestionSubmissionUrl]);
   const currentSlideMedia =
     slide?.typ === "frage"
-      ? slide.frage.medien
+      ? questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "QUESTION")
       : slide?.typ === "aufloesung"
         ? [
-            ...slide.frage.medien,
+            ...questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "SOLUTION"),
             ...slide.frage.antworten.flatMap((answer) => answer.medien),
           ]
         : [];
@@ -590,7 +621,7 @@ function renderPunkteBadge(punkteModus?: string | null) {
 }
 
 function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
-  const frage = slide.frage;
+  const frage = { ...slide.frage, medien: questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "QUESTION") };
   const templateData = frage.templateConfig?.templateData;
   const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
   const layoutVariant = frage.presentationLayouts.question.variant;
@@ -1466,7 +1497,7 @@ function renderFunnySlide(slide: Extract<Slide, { typ: "funny" }>) {
 }
 
 function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
-  const frage = slide.frage;
+  const frage = { ...slide.frage, medien: questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "SOLUTION") };
   const templateData = frage.templateConfig?.templateData;
   const layoutVariant = frage.presentationLayouts.solution.variant;
   const antworten = sortiereAntworten(frage);
@@ -1900,6 +1931,7 @@ function renderStartsequenzSlide() {
           commandId={playbackCommandId}
           renderMode={renderMode}
           activationClassName="presentation-start-media-activation"
+          showCountdown
         />
       </div>
     </section>
@@ -2099,6 +2131,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
           <SynchronizedMedia
             kind="audio"
             src={quiz.intro_musik_url}
+            showCountdown
             loop
             command={playbackCommand}
             commandId={playbackCommandId}

@@ -11,6 +11,7 @@ import {
 } from "../../actions";
 import { pollEvaluation } from "../../evaluation/pollEvaluation";
 import { formatQuizPoints } from "../../formatQuizPoints";
+import { rankScores } from "@/app/rendering/presentation/presentationRankingPolicy";
 import TeamQuestionEvaluationMatrix from "../../evaluation/TeamQuestionEvaluationMatrix";
 import {
   filterEvaluationMatrixByScope,
@@ -71,6 +72,7 @@ type AuswertungsAntwort = {
 };
 
 type PunktestandEintrag = {
+  tieBreakPlace?: number;
   teamname: string;
   punkte: number;
 };
@@ -432,10 +434,10 @@ export default function QuizAuswertungClient({
             </thead>
 
             <tbody className="divide-y divide-slate-200">
-              {punktestand.map((team, index) => (
+              {rankScores(punktestand).map((team) => (
                 <tr key={team.teamname}>
                   <td className="px-4 py-3 font-black text-slate-700">
-                    #{index + 1}
+                    #{team.place}
                   </td>
 
                   <td className="px-4 py-3 font-bold text-slate-900">

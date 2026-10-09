@@ -1,4 +1,5 @@
 "use client";
+import { EstimationTiebreakPanel } from "../../EstimationTiebreakPanel";
 
 import { countdownRemainingSeconds } from "../../blockCountdown";
 import { pollEvaluation } from "../../evaluation/pollEvaluation";
@@ -13,6 +14,7 @@ import {
   QuizPraesentationResult,
   getQuizPunktestand,
   getPresentationFunnyAnswers,
+  getSchaetzfrageById,
   getZufaelligeSchaetzfrage,
   setQuizLiveResultVisibility,
   closeQuizQuestionAnswerPhase,
@@ -190,6 +192,7 @@ export default function ModerationClient({
   const quizStartedAt = lifecycleState.quizStartedAt;
   const [questionHidden, setQuestionHidden] = useState(false);
   const navigationPending = useRef(false);
+  const navigationRevision = useRef(0);
   const memeReviewRef = useRef<MemeModerationReviewHandle>(null);
   const memePresentationControlsRef = useRef<MemePresentationControlsHandle>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -326,6 +329,12 @@ export default function ModerationClient({
   );
   const [estimationQuestion, setEstimationQuestion] =
     useState(initialEstimationQuestion);
+  useEffect(() => {
+    let active = true;
+    const id = lifecycleState.estimation.questionId;
+    if (id !== null) void getSchaetzfrageById(quizId, id).then(question => { if (active) setEstimationQuestion(question); });
+    return () => { active = false; };
+  }, [quizId, lifecycleState.estimation.questionId]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -367,6 +376,7 @@ export default function ModerationClient({
       if (refreshing) return schedule();
       refreshing = true;
       const liveResultMutationRevision = liveResultMutationRevisionRef.current;
+      const requestedNavigationRevision = navigationRevision.current;
       try {
       const snapshot = await fetchQuizLiveSnapshot(
         quizId,
@@ -374,7 +384,7 @@ export default function ModerationClient({
         presentationQuestionAssignmentId,
         controller.signal,
       );
-      if (active) {
+      if (active && requestedNavigationRevision === navigationRevision.current && !navigationPending.current) {
         if (!navigationPending.current) applyLiveState(snapshot.presentationState);
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
@@ -624,6 +634,7 @@ export default function ModerationClient({
 
     if (safeIndex === slideIndex || navigationPending.current || quizBeendet) return;
     navigationPending.current = true;
+    navigationRevision.current += 1;
 
     const nextSlide = slides[safeIndex];
     if (!nextSlide) { navigationPending.current = false; return; }
@@ -652,6 +663,7 @@ export default function ModerationClient({
       await setPraesentationSlideIndex(quizId, safeIndex, nextSlideKey, lifecycleState.lifecycleRevision);
       setActionError(null);
     } catch (cause) {
+      applyLiveState(lifecycleState);
       setActionError(cause instanceof Error ? cause.message : "Navigation fehlgeschlagen.");
     } finally {
       navigationPending.current = false;
@@ -1025,7 +1037,7 @@ export default function ModerationClient({
                 istCountdownSlide={istCountdownSlide}
                 countdownDauerMinuten={countdownDauerMinuten}
                 countdownRestSekunden={countdownRestSekunden}
-                showSchaetzfrageControls={aktuellerSlide?.typ === "endstand"}
+                showSchaetzfrageControls={false}
                 onZurErstenSlide={zurErstenSlide}
                 onZurueck={vorherigerSlide}
                 onWeiter={naechsterSlideAction}
@@ -1041,6 +1053,10 @@ export default function ModerationClient({
                 onCountdownReset={handleCountdownReset}
               />
             </div>
+
+            {(aktuellerSlide?.typ === "endstand" || (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "FINAL_STANDINGS")) && (
+              <EstimationTiebreakPanel quizId={quizId} moderator />
+            )}
 
             {aktuellerSlide?.typ === "frage" && naechsterSlide?.typ === "funny" && funnyAnswers.length > 0 && (
               <section className="rounded-2xl border border-pink-500/50 bg-pink-950/30 p-4">

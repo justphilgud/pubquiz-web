@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { applySavedAnswerState, getQuestionDraftFingerprint, removeAnswerById } from "./questionDraftState";
+import { applyQuestionRewriteToDraft, applySavedAnswerState, getQuestionDraftFingerprint, removeAnswerById } from "./questionDraftState";
 import type { QuestionEditorDraft, SaveQuestionResult } from "./types";
 
 function draft(): QuestionEditorDraft {
@@ -73,4 +73,11 @@ test("answer removal affects only the requested stable identity", () => {
   ];
   const remaining = removeAnswerById(answers, "temporary-1");
   assert.deepEqual(remaining.map((answer) => answer.id), ["temporary-2"]);
+});
+
+test("an accepted rewrite changes only the question text", () => {
+  const current = draft();
+  const changed = applyQuestionRewriteToDraft(current, "Neu formulierte Frage");
+  assert.equal(changed.questionText, "Neu formulierte Frage");
+  assert.deepEqual({ ...changed, questionText: current.questionText }, current);
 });

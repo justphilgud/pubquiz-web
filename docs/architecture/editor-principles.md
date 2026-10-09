@@ -292,3 +292,14 @@ For every implementation:
 5. Run typecheck.
 6. Run lint.
 7. Summarize the changes.
+
+## LOVD-Nachtauftrag 2026-10-10: optionale Formulierungshilfe
+
+Die bestehende Implementierung aus PR #71 wird gezielt wiederverwendet, ohne
+andere offene PRs zu integrieren. Sie bearbeitet ausschließlich Fragetext;
+Übernehmen ändert nur den ungespeicherten Draft. Verwerfen/Providerfehler speichern
+nichts. Ein nach Erstellung des Vorschlags geänderter Ausgangstext sperrt dessen
+Übernahme. Statische Template-Fragetexte bieten keinen Rewrite an. Rollenprüfung,
+Rate-Limit und Providerzugang bleiben serverseitig. Ohne Featureflag keine UI oder
+Provideranfrage. Ein fehlender realer Providerzugang blockiert die Live-Abnahme.
+Siehe docs/operations/openai-question-rewrite.md und Provider-/Endpoint-/Paneltests.

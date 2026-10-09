@@ -143,3 +143,7 @@ jobs:
       - run: npm ci
       - run: npm run db:generate
       - run: node --import tsx --test app/fragen/import/external/editorialImport.test.ts app/fragen/import/external/editorialImport.integration.test.ts
+      - name: PostgreSQL LOVD tiebreak persistence and integrity
+        env:
+          LOVD_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
+        run: node --import tsx --test app/quiz/estimationTiebreak.integration.test.ts

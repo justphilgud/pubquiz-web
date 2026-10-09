@@ -24,6 +24,16 @@ import {
 
 export const questionTemplateDefinitions: QuestionTemplateDefinition[] = [
   {
+    id: questionTemplateIds.music,
+    icon: "music", enabled: true, answerMode: "OPEN_TEXT", evaluationMode: "MANUAL",
+    editorKind: "STANDARD", presentationKind: "STANDARD", answerFormKind: "STANDARD",
+    selectable: true, availableForFiltering: true, requiresAnswerImages: false,
+    translationKey: "music", questionLabelKey: "question", allowsOptionalQuestionImage: false,
+    initialAnswers: [{ fieldLabelKey: "artist", isCorrect: true }, { fieldLabelKey: "title", isCorrect: true }],
+    mediaSlots: [{ slotKey: "question_audio", required: true }, { slotKey: "music_original_audio", required: false }],
+    generators: [], contentGenerators: [],
+  },
+  {
     id: questionTemplateIds.standard,
     icon: "message-square",
     enabled: true,
@@ -462,9 +472,13 @@ export function localizeQuestionTemplates(
           allowedMediaType: slotDefinition.mediaType,
           required: templateSlot.required,
           label: messages.mediaSlots[slotDefinition.labelKey].label,
-          helpText: messages.mediaSlots[slotDefinition.helpKey].help,
+          helpText: definition.id === questionTemplateIds.music
+            ? slotDefinition.key === "music_original_audio"
+              ? messages.templates.music.resolutionAudioHelp
+              : messages.templates.music.mediaHelp
+            : messages.mediaSlots[slotDefinition.helpKey].help,
           manualUploadAllowed: slotDefinition.manualUploadAllowed,
-          generatorInput: slotDefinition.generatorInput,
+          generatorInput: definition.id === questionTemplateIds.music ? false : slotDefinition.generatorInput,
           generatorOutput: slotDefinition.generatorOutput,
         };
       }),

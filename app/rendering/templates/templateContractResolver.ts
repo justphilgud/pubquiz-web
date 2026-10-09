@@ -211,6 +211,7 @@ function layoutContractForDefinition(
   }
   if (
     definition.id === questionTemplateIds.musicReverse ||
+    definition.id === questionTemplateIds.music ||
     definition.id === questionTemplateIds.musicEightBit ||
     definition.id === questionTemplateIds.translationReadAloud
   ) {

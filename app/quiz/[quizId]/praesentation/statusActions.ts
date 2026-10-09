@@ -1,6 +1,8 @@
 "use server";
 
 import { presentationCountdownDeadline } from "../../blockCountdown";
+import { mayLeaveMemeQuestion } from "../../memeNavigationPolicy";
+import { verifiedTiebreakPlaces } from "../../estimationTiebreak";
 import { getQuizAnswerProgress } from "../../interaction/answerProgress.server";
 import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
@@ -78,9 +80,12 @@ export async function getPraesentationPunktestand(quizId: number) {
     ]),
   );
 
+  const tieStatus = await tx.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId }, select: { stichentscheid_json: true } });
+  const tiePlaces = verifiedTiebreakPlaces(tieStatus?.stichentscheid_json, sessions.map(session => ({ sessionId: session.quiz_team_session_id, points: Number(totalsBySession.get(session.quiz_team_session_id) ?? 0) })));
   return sessions
     .map((session) => ({
       teamId: session.team.team_id,
+      tieBreakPlace: tiePlaces.get(session.quiz_team_session_id),
       teamname: session.teamname,
       avatarCode: mapTeamProfile(session.team).avatarCode,
       photoUrl: session.team.foto_url,
@@ -91,6 +96,7 @@ export async function getPraesentationPunktestand(quizId: number) {
     .sort((left, right) => right.punkte.cmp(left.punkte))
     .map((entry) => ({
       teamId: entry.teamId,
+      tieBreakPlace: entry.tieBreakPlace,
       teamname: entry.teamname,
       avatarCode: entry.avatarCode,
       photoUrl: entry.photoUrl,
@@ -204,7 +210,15 @@ export async function setPraesentationSlideIndex(
           },
           select: { meme_presentation_id: true },
         });
-        if (!finalizedResult) {
+        const latestRun = await tx.quiz_interaction_runs.findFirst({
+          where: { quiz_id: quizId, quiz_fragen_id: previousIdentity.questionAssignmentId },
+          orderBy: { interaction_run_id: "desc" },
+          select: { state: true, meme_moderation_selection: { select: { state: true,
+            _count: { select: { candidates: { where: { selected_for_presentation: true } } } } } } },
+        });
+        if (!mayLeaveMemeQuestion({ finalizedResult: Boolean(finalizedResult),
+          reviewState: latestRun?.meme_moderation_selection?.state ?? null, runState: latestRun?.state ?? null,
+          selectedCandidates: latestRun?.meme_moderation_selection?._count.candidates ?? 0 })) {
           throw new Error("Meme-Voting schließen und Ergebnis finalisieren, bevor du weitergehst.");
         }
       }

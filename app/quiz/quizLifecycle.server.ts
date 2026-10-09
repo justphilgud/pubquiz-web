@@ -1,4 +1,5 @@
 import type { Prisma } from "@/app/generated/prisma/client";
+import { Prisma as PrismaValue } from "@/app/generated/prisma/client";
 import { resolveQuizLifecycle } from "./quizLifecycle";
 
 // Lock order: quiz -> interaction run -> draft. Also locks quizzes without status.
@@ -18,6 +19,7 @@ export async function requireQuizNotStopped(tx: Prisma.TransactionClient, quizId
 }
 
 export const RESET_PRESENTATION_DATA = {
+  stichentscheid_json: PrismaValue.DbNull,
   slide_index: 0,
   slide_key: null,
   quiz_started_at: null,
