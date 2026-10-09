@@ -73,7 +73,8 @@ export class BridgeClient {
     this.origin = bridgeOrigin(env.AP94_BRIDGE_ORIGIN);
     requireCondition(env.AP94_TRANSPORT_MODE === "synthetic" || env.AP94_TRANSPORT_MODE === "acceptance", "BRIDGE_MODE_REQUIRED");
     this.mode = env.AP94_TRANSPORT_MODE;
-    this.key = runKey(this.mode, env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
+    this.key = role === "restore" && this.mode === "acceptance" && env.AP94_RESTORE_EXISTING === "true"
+      ? storedBackupKey(key) : runKey(this.mode, env.GITHUB_RUN_ID ?? "", env.GITHUB_RUN_ATTEMPT ?? "");
     requireCondition(key === this.key && env.BACKUP_PRIVATE_BLOB_HOST === STORE_HOST, "BRIDGE_KEY_OR_STORE_REJECTED");
     requireCondition(this.mode === "synthetic" || env.AP94_OIDC_TRANSPORT_ACCEPTED === "true", "OIDC_TRANSPORT_NOT_ACCEPTED");
     this.oidc = oidc ?? new GithubOidcTokenProvider(env, request);

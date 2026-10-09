@@ -30,12 +30,26 @@ export function parseManifest(bytes: Buffer, expectedSha: string, key: string): 
   requireCondition(Number.isFinite(Date.parse(m.snapshotAt)) && Date.parse(m.completedAt) >= Date.parse(m.snapshotAt), "MANIFEST_TIMES_INVALID");
   return m;
 }
+export const TARGET_EMPTY_EXPRESSION = `(NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname NOT IN ('public','information_schema') AND nspname !~ '^pg_')
+ AND NOT EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname !~ '^pg_' AND n.nspname <> 'information_schema')
+ AND NOT EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname !~ '^pg_' AND n.nspname <> 'information_schema')
+ AND NOT EXISTS(SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace WHERE n.nspname !~ '^pg_' AND n.nspname <> 'information_schema')
+ AND NOT EXISTS(SELECT 1 FROM pg_extension WHERE extname <> 'plpgsql'))`;
+export const TARGET_PREFLIGHT_SQL = `SELECT json_build_object('role',current_user,'db',current_database(),
+ 'major',current_setting('server_version_num')::int/10000,'readOnly',current_setting('transaction_read_only')='on',
+ 'empty',${TARGET_EMPTY_EXPRESSION},'canRestore',
+ EXISTS(SELECT 1 FROM pg_namespace WHERE nspname='public' AND pg_has_role(current_user,nspowner,'USAGE'))
+ AND has_database_privilege(current_user,current_database(),'CREATE'))`;
+export function assertTargetPreflight(value: {role:string;db:string;major:number;readOnly:boolean;empty:boolean;canRestore:boolean}) {
+ requireCondition(value.role === RESTORE_TARGET.role && value.db === RESTORE_TARGET.database && value.major === RESTORE_TARGET.major && value.readOnly,
+   "RESTORE_TARGET_IDENTITY_BLOCKED");
+ requireCondition(value.empty, "RESTORE_TARGET_NOT_EMPTY");
+ requireCondition(value.canRestore, "RESTORE_TARGET_PRIVILEGES_BLOCKED");
+}
 export const EMPTY_TARGET_SQL = `SELECT pg_advisory_xact_lock(940914);
 DO $ap94$ BEGIN
  IF current_database() <> 'neondb' OR current_user <> 'neondb_owner' THEN RAISE EXCEPTION 'RESTORE_IDENTITY'; END IF;
- IF EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname <> 'information_schema' AND c.relkind IN ('r','p','v','m','S','f'))
- OR EXISTS(SELECT 1 FROM pg_namespace WHERE nspname NOT IN ('public','information_schema') AND nspname NOT LIKE 'pg_%')
- THEN RAISE EXCEPTION 'RESTORE_TARGET_NOT_EMPTY'; END IF;
+ IF NOT ${TARGET_EMPTY_EXPRESSION} THEN RAISE EXCEPTION 'RESTORE_TARGET_NOT_EMPTY'; END IF;
 END $ap94$;
 DROP SCHEMA public;`;
 
@@ -49,7 +63,9 @@ export function restoreSql(directory: string, auth: Record<string, string>, mani
   return `${EMPTY_TARGET_SQL}\n${pre}\n${data}\nSET standard_conforming_strings=on;\n${authInsertSql(auth, manifest.expected.columns)}\n${post}`;
 }
 export async function acceptanceRestore(env: Environment) {
-  assertRestoreAcceptance(env); const connection = pinnedRestoreConnection(env); toolsVersion(env);
+  assertRestoreAcceptance(env);
+  if (env.AP94_RESTORE_EXISTING === "true") requireCondition(env.RESTORE_TARGET_KIND === "isolated-test", "RESTORE_ISOLATION_LABEL_REQUIRED");
+  const connection = pinnedRestoreConnection(env); toolsVersion(env);
   const store = new PrivateArtifacts(env, env.AP94_BACKUP_KEY ?? "", "restore");
   const manifest = parseManifest(await store.read("manifest.json"), env.AP94_MANIFEST_SHA256 ?? "", store.key);
   const directory = await mkdtemp(join(tmpdir(), "pubquiz-ap94-restore-"));
@@ -60,8 +76,9 @@ export async function acceptanceRestore(env: Environment) {
     const sql = restoreSql(directory, auth, manifest, env);
     const probe = new PgSession(connection, env);
     try {
-      const identity = await probe.json<{ role: string; db: string; major: number }>("SELECT json_build_object('role',current_user,'db',current_database(),'major',current_setting('server_version_num')::int/10000)");
-      requireCondition(identity.role === RESTORE_TARGET.role && identity.db === RESTORE_TARGET.database && identity.major === RESTORE_TARGET.major, "RESTORE_SESSION_IDENTITY_MISMATCH");
+      await probe.sql("BEGIN READ ONLY");
+      assertTargetPreflight(await probe.json(TARGET_PREFLIGHT_SQL));
+      await probe.sql("ROLLBACK");
     } finally { probe.close(); }
     const started = Date.now();
     // The only write connection: hard-pinned again at the call site. No caller-supplied
@@ -106,6 +123,7 @@ export async function acceptanceRestore(env: Environment) {
       schemaTablesConstraintsSequencesMigrationsCountsSamples: "matched", authenticationValues: "excluded",
       resultReconstruction: "persisted-final-points-and-ranking-matched", applicationSmoke: "domain-points-formatter-and-ranking",
       browserSmoke: "not-executed", snapshotAt: manifest.snapshotAt,
+      backupCompletedAt: manifest.completedAt, backupVersion: manifest.version, sourceProductionSha: manifest.release,
       snapshotAgeAtRestoreMs: started - Date.parse(manifest.snapshotAt),
       measuredRecoveryMs: Date.now() - started, deletionEnabled: false };
     await writeFile(join(directory, "validation.json"), JSON.stringify(evidence), { mode: 0o600 });

@@ -8,9 +8,17 @@ on:
       mode:
         description: Synthetic proof, real backup acceptance, claims, or non-destructive retention reuse
         type: choice
-        options: [synthetic, claims-only, acceptance, retention-dry-run]
+        options: [synthetic, claims-only, acceptance, retention-dry-run, restore-only]
         default: synthetic
         required: true
+      existing_backup_id:
+        description: Verified existing Production backup ID (restore-only)
+        type: string
+        required: false
+      existing_manifest_sha256:
+        description: Independently verified manifest SHA256 (restore-only)
+        type: string
+        required: false
       production_commit:
         description: Verified current Production release SHA (required only for acceptance)
         required: false
@@ -60,7 +68,7 @@ concurrency:
 
 jobs:
   backup:
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && inputs.mode != 'restore-only'
     permissions:
       contents: read
       id-token: write
@@ -206,9 +214,30 @@ jobs:
           const removed=r.plan.decisions.filter(x=>x.action==='delete').map(x=>`${x.key} (${x.reason})`);
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,`\n## Retention ${r.dryRun?'dry run':'execution'}\n- Keep: ${kept.length}\n- Delete: ${removed.length}\n- Bytes before: ${r.plan.beforeBytes}\n- Bytes after: ${r.plan.afterBytes}\n- Foreign paths retained: ${r.plan.foreignObjects.length}\n\nKept:\n${kept.map(x=>`- ${x}`).join('\n')||'- none'}\n\nSelected for deletion:\n${removed.map(x=>`- ${x}`).join('\n')||'- none'}\n`);
           NODE
+  verify-existing-backup:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.mode == 'restore-only'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      key: ${{ steps.verify.outputs.key }}
+      manifest: ${{ steps.verify.outputs.manifest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - id: verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXISTING_BACKUP_ID: ${{ inputs.existing_backup_id }}
+          EXISTING_MANIFEST_SHA256: ${{ inputs.existing_manifest_sha256 }}
+        run: node --import tsx scripts/operations/restore-existing-backup-cli.ts
   restore:
-    needs: backup
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && (inputs.mode == 'synthetic' || inputs.mode == 'acceptance') && inputs.restore_after_backup
+    needs: [backup, verify-existing-backup]
+    if: always() && !cancelled() && github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && ((inputs.mode == 'restore-only' && needs.verify-existing-backup.result == 'success') || ((inputs.mode == 'synthetic' || inputs.mode == 'acceptance') && inputs.restore_after_backup && needs.backup.result == 'success'))
     permissions:
       contents: read
       id-token: write
@@ -235,18 +264,31 @@ jobs:
           AP94_UPLOAD_DIAGNOSTIC_MATRIX: ${{ inputs.diagnostic_upload_matrix && 'true' || 'false' }}
         run: node --import tsx scripts/operations/transport-probe.ts restore
       - name: Restore only after required reviewer approval
-        if: inputs.mode == 'acceptance'
+        if: inputs.mode == 'acceptance' || inputs.mode == 'restore-only'
         env:
+          AP94_RESTORE_EXISTING: ${{ inputs.mode == 'restore-only' && 'true' || 'false' }}
+          RESTORE_TARGET_KIND: isolated-test
+          RESTORE_EVIDENCE_PATH: ${{ runner.temp }}/restore-evidence.json
+          RESTORE_FAILURE_PATH: ${{ runner.temp }}/restore-failure.json
           AP94_MANUAL_ACCEPTANCE: 'true'
           AP96_RUN_RESTORE: 'true'
           AP94_TRANSPORT_MODE: acceptance
           AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
-          AP94_BACKUP_KEY: ${{ needs.backup.outputs.key }}
-          AP94_MANIFEST_SHA256: ${{ needs.backup.outputs.manifest }}
+          AP94_BACKUP_KEY: ${{ inputs.mode == 'restore-only' && needs.verify-existing-backup.outputs.key || needs.backup.outputs.key }}
+          AP94_MANIFEST_SHA256: ${{ inputs.mode == 'restore-only' && needs.verify-existing-backup.outputs.manifest || needs.backup.outputs.manifest }}
           BACKUP_AUTOMATION_ENABLED: ${{ needs.backup.outputs.automation }}
           BACKUP_RETENTION_VERIFIED: ${{ needs.backup.outputs.retention }}
           RESTORE_TEST_DATABASE_URL: ${{ secrets.RESTORE_TEST_DATABASE_URL }}
           RESTORE_TEST_EXPECTED_HOST: ${{ vars.RESTORE_TEST_EXPECTED_HOST }}
           BACKUP_PRIVATE_BLOB_HOST: ${{ vars.BACKUP_PRIVATE_BLOB_HOST }}
         run: node --import tsx scripts/operations/acceptance-cli.ts restore
+      - uses: actions/upload-artifact@v4
+        if: always() && (inputs.mode == 'acceptance' || inputs.mode == 'restore-only')
+        with:
+          name: isolated-restore-evidence
+          path: |
+            ${{ runner.temp }}/restore-evidence.json
+            ${{ runner.temp }}/restore-failure.json
+          if-no-files-found: warn
+          retention-days: 14

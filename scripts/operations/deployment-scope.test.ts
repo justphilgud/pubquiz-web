@@ -38,3 +38,14 @@ test('PR95 independent-reference scope cannot deploy the application',()=>{
  assert.equal(needsApplicationDeployment(paths),false);
  assert.equal(needsApplicationDeployment([...paths,'prisma/migrations/new/migration.sql']),true);
 });
+
+test("restore-only integration cannot deploy Production application or migrate",()=>{
+ const paths=['.github/workflows/ap94-acceptance.yml','.github/workflows/ap94-bridge-ci.yml',
+ 'docs/operations/restore-only.md','scripts/operations/acceptance-cli.ts','scripts/operations/acceptance-restore.ts',
+ 'scripts/operations/acceptance.test.ts','scripts/operations/bridge-client.ts','scripts/operations/bridge.test.ts',
+ 'scripts/operations/bridge/lib/service.ts','scripts/operations/restore-existing-backup.ts',
+ 'scripts/operations/restore-existing-backup-cli.ts','scripts/operations/restore-existing-backup.test.ts',
+ 'scripts/operations/restore-existing-backup.integration.test.ts','scripts/operations/deployment-scope.test.ts'];
+ assert.equal(needsApplicationDeployment(paths),false);
+ assert.equal(needsApplicationDeployment([...paths,'prisma/schema.prisma']),true);
+});
