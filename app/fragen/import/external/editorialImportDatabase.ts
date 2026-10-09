@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import { isDeepStrictEqual } from "node:util";
-import { assertDatabase } from "../../../../scripts/operations/guards";
+import { assertDatabase, assertOperationTransport } from "../../../../scripts/operations/guards";
+import { assertProductionEditorialContext, assertProductionEditorialSource } from "./editorialProductionPolicy";
 import { candidateDigest, previewEditorialImport, sha256, type EditorialSource, type EditorialExistingQuestion } from "./editorialImport";
 
 // Fixed application-table allowlist: neither identifiers nor SQL are caller-configurable.
@@ -18,7 +19,7 @@ export const PROTECTED_TABLES = [
   "users", "benutzer_rollenzuweisungen", "eventreihe_benutzerrollen",
 ] as const;
 type Integrity = Record<string, { count: number; digest: string }>;
-export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId?: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string };
+export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId?: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string; productionPreflight?: boolean };
 
 export async function editorialIntegritySnapshot(client: Client, exclude: number[] = []): Promise<Integrity> {
   const result: Integrity = {};
@@ -59,12 +60,20 @@ async function journalSnapshot(client: Client, excludedBatch = -1): Promise<Inte
   return result;
 }
 
-/** Fixed-query, Preview-only adapter; authenticated server wrapper supplies the operator. */
+/** Shared fixed-query core. Production is a workflow-only read capability, never a writer. */
 export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) {
   if (!["dry-run", "import"].includes(input.mode)) throw new Error("EDITORIAL_MODE_INVALID");
   const identity = new URL(input.connectionString);
   const isolatedCi = process.env.CI === "true" && identity.hostname === "127.0.0.1" && identity.pathname === "/editorial_import_ci";
-  if (!isolatedCi) assertDatabase(input.connectionString, "preview");
+  if (input.productionPreflight) {
+    if (input.mode !== "dry-run") throw new Error("EDITORIAL_PRODUCTION_WRITE_NOT_AUTHORIZED");
+    assertProductionEditorialSource(input.source);
+    if (!isolatedCi) {
+      assertProductionEditorialContext(process.env);
+      assertDatabase(input.connectionString, "production");
+      assertOperationTransport(identity);
+    }
+  } else if (!isolatedCi) assertDatabase(input.connectionString, "preview");
   if (input.mode === "import" && (!Number.isSafeInteger(input.operatorUserId) || (input.operatorUserId ?? 0) <= 0)) throw new Error("EDITORIAL_OPERATOR_REQUIRED");
   const url = new URL(input.connectionString); url.searchParams.delete("schema");
   const client = new Client({ connectionString: url.toString() });
@@ -74,6 +83,16 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
     await client.query(input.mode === "dry-run" ? "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY" : "BEGIN"); begun = true;
     await client.query("SET LOCAL lock_timeout = '5s'");
     await client.query("SET LOCAL statement_timeout = '30s'");
+    let productionSchema: unknown = null;
+    if (input.productionPreflight) {
+      const session = (await client.query("SELECT current_user AS role, current_database() AS database")).rows[0];
+      if (!isolatedCi && (session.role !== "pubquiz_backup_reader" || session.database !== "neondb")) throw new Error("EDITORIAL_PRODUCTION_READER_REQUIRED");
+      // Read migration history without executing Prisma migrations or touching application data.
+      const history = await client.query('SELECT migration_name, checksum, finished_at, rolled_back_at FROM pubquiz._prisma_migrations ORDER BY migration_name');
+      const column = await client.query("SELECT data_type,is_nullable,character_maximum_length FROM information_schema.columns WHERE table_schema='pubquiz' AND table_name='fragen' AND column_name='redaktionelle_schwierigkeit'");
+      const constraint = await client.query("SELECT convalidated,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='pubquiz.fragen'::regclass AND conname='fragen_editorial_difficulty_check'");
+      productionSchema = { migrations: history.rows, difficultyColumn: column.rows, difficultyConstraint: constraint.rows };
+    }
     if (input.mode === "dry-run") {
       const setting = (await client.query("SHOW transaction_read_only")).rows[0];
       if (setting.transaction_read_only !== "on") throw new Error("EDITORIAL_READ_ONLY_REQUIRED");
@@ -86,7 +105,7 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
     const preview = await inventory(client, input.source);
     if (input.mode === "dry-run") {
       await client.query("ROLLBACK"); begun = false;
-      return { mode: input.mode, ...preview, before, after: before, questionIds: [], manifest: null };
+      return { mode: input.mode, ...preview, before, after: before, questionIds: [], manifest: null, productionSchema };
     }
     if (preview.digest !== input.expectedDryRunDigest) throw new Error("EDITORIAL_DRY_RUN_STALE");
     const templates = (await client.query("SELECT vorlage_id AS id, code FROM pubquiz.frage_vorlagen WHERE code IN ('anagramm','schaetzfrage')")).rows as { id: number; code: string }[];

@@ -110,3 +110,43 @@ Status DRAFT für alle 79, erhaltene Testantworten/manuelle Punkte, Idempotenz u
 Rollback bei einem absichtlich Bewertungen verändernden Datenbanktrigger.
 Der Nachweis enthält nur redaktionelle Unterschiede und aggregierte Hashes;
 keine Credentials oder Teilnehmerantwortinhalte.
+
+## Production-Vorbereitung (9. Oktober 2026)
+Der bestehende redaktionelle Importkern erhält ausschließlich eine zusätzliche,
+workflowgebundene READ ONLY Production-Capability. `productionPreflight=true`
+verlangt den fest geprüften Production-Endpoint und TLS/Channelbinding, den
+bestehenden Preflightworkflow auf main, operations-backup und dessen bestätigten
+Production-SHA. Die Session muss pubquiz_backup_reader sein. Preview-Serveraction
+und Preview-Guards bleiben unverändert; Production-Schreiben wird unabhängig von
+übergebenen Parametern vor dem Verbindungsaufbau zurückgewiesen.
+
+Die unveränderlichen Quellen werden erneut gehasht und geparst. Die versionierte
+production-allowlist.json enthält exakt die 79 auf Preview abgenommenen externen
+IDs (45 Anagramme, 34 Schätzfragen); Quellenpayload, Reihenfolge und Fingerprints
+werden überprüft. Die übrigen 20 Kandidaten und die Dublette gelangen nicht in
+den Production-Auftrag. Keine Preview-Frage-IDs werden übernommen.
+
+Im vorhandenen external-question-import-preflight.yml wählt editorial_pr95 den
+festen redaktionellen Nur-Lese-Job. Der bisherige externe Planpfad bleibt getrennt;
+sein bestehender Materialisierungsguard verlangt weiterhin gültige Eingaben.
+Der neue Job verwendet nur das bereits vorhandene Leser-Credential. Kein neuer
+Secretzugang, keine Branchfreigabe, keine Migration oder Writerumgebung. Er liest
+_prisma_migrations und Difficulty-Spalte/Constraint im selben Nur-Lese-Snapshot
+wie Dubletten-/Kategorie-/Bestandsinventur. Pending/failed Migrationen sowie rohe
+Schema-Metadaten werden zur manuellen Prüfung dokumentiert, nie automatisch
+angewendet. Ausgabe enthält Zähler und Integritätsdigests, keine Credentials.
+
+Aktuell ist operations-backup auf main beschränkt. Ein offener PR kann diesen
+neuen Job daher nicht real gegen Production abnehmen. Diese Grenze darf nicht
+für die Vorbereitung erweitert werden. Fehlende SELECT-Rechte blockieren, statt
+ACLs automatisch zu ändern. Production-Schreibfreigabe ist weiterhin ein eigenes
+Gate: vor deren Implementierung müssen aktueller Live-Dry-Run, Backup/Restore,
+exakte Reviewer-/Digestbindung und tatsächliche Writerrechte geprüft sein.
+Der bestehende generische Productionwriter wird nicht mit diesem abweichenden
+redaktionellen Payloadvertrag gestartet. Es gibt keine zweite Importlogik.
+
+Tests: gefrorene Allowlist/Payloads, Ausschlüsse, sämtliche Workflowkontext-Gates,
+Productionwrite-Abweisung vor Netzwerkzugriff, unveränderte Previewgrenze; reale
+PostgreSQL-Nur-Lese-Inventur aller 79 mit unveränderter Baseline und Migrations-
+metadaten. Bestehende Transaktions-/Idempotenz-/Rollback-/Status-Regressionssuite
+bleibt aktiv.

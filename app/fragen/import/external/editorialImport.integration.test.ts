@@ -40,6 +40,17 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     const existing=(await client.query("INSERT INTO pubquiz.fragen(frage,quelle) VALUES('Existing integrity fixture','untouched') RETURNING fragen_id")).rows[0].fragen_id;
     const source:EditorialSource={provider:"Editorial:integration",files:[{name:"anagrams.json",sha256:sha256(raw)},{name:"estimates.json",sha256:sha256(estimatesRaw)}],candidates};
     const options={connectionString:connectionString!,source,operatorUserId:operator};
+    await client.query('CREATE TABLE IF NOT EXISTS pubquiz._prisma_migrations (migration_name text, checksum text, finished_at timestamptz, rolled_back_at timestamptz)');
+    const { approvedProductionEditorialSource } = await import('./editorialProductionPolicy');
+    const frozenProductionSource = approvedProductionEditorialSource();
+    const beforeProduction = await editorialIntegritySnapshot(client);
+    const productionPreflight = await runEditorialDatabaseImport({connectionString:connectionString!, source:frozenProductionSource, mode:'dry-run', productionPreflight:true});
+    assert.equal(productionPreflight.decisions.length,79);
+    assert.deepEqual(productionPreflight.before,productionPreflight.after);
+    assert.deepEqual(await editorialIntegritySnapshot(client),beforeProduction);
+    assert.equal(productionPreflight.mode,'dry-run');
+    if (productionPreflight.mode === 'dry-run') assert.ok(productionPreflight.productionSchema);
+    await assert.rejects(runEditorialDatabaseImport({connectionString:connectionString!,source:frozenProductionSource,mode:'import',productionPreflight:true,operatorUserId:operator}),/WRITE_NOT_AUTHORIZED/);
     const before=(await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count;
     const preview=await runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"dry-run"});
     await assert.rejects(runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"import",expectedDryRunDigest:preview.digest}),/OPERATOR_REQUIRED/);
