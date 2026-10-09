@@ -203,7 +203,7 @@ export default function QuizAntwortClient({
   daten: AntwortStatus;
   theme: ResolvedQuizTheme;
   calendarSubscriptionUrl: string;
-  teamPhotoUploadEnvironment: "dev" | "preview" | "prod";
+  teamPhotoUploadEnvironment: import("@/app/lib/blobPath").BlobEnvironmentPrefix;
 }) {
   const [teamname, setTeamname] = useState("");
   const [spielerAnzahl, setSpielerAnzahl] = useState("1");

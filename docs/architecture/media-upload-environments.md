@@ -87,3 +87,66 @@ Vorhandensein der Variablen. Werte, Hosts und Secrets bleiben verborgen.
 4. Prüfen, dass der neue Blobpfad mit `dev/`, `preview/` beziehungsweise
    `prod/` beginnt.
 5. Function-Logs auf Fehlerphasen prüfen; keine Secretwerte kopieren.
+
+
+## Zentrale Preview-Konfiguration und Branch-Pfade (2026-10-09)
+
+Vorbereiteter Vertrag für vertrauenswürdige Branches desselben Repositorys:
+Die sechs Medienvariablen gelten ausschließlich global für Preview. Branch-
+Overrides sind nicht erlaubt. `MEDIA_UPLOAD_ENV=preview`,
+`MEDIA_UPLOAD_STORE_ENV=nonproduction`, `TEMPLATE_MEDIA_UPLOAD_ENABLED=true`.
+Die Blob-Integration muss `pubquiz-media-nonprod` zugeordnet sein; Token und
+Store-ID müssen laut nicht entschlüsselten Metadaten auf
+`store_VzfNwjccgkzhc9bi` zeigen. Production behält
+`store_bIx6H2j23vJzi240`. Sensitive-Werte werden weder ausgegeben noch gezogen.
+
+Der Git-Preview-Guard fordert zentrale Variablen statt sechs Kopien je Branch.
+Er inventarisiert die Preview-Metadaten und sperrt jeden Medien-Override, der
+für den tatsächlich deployten Branch gilt. Andere Branches können dessen
+zentrale Vererbung nicht überschreiben. So bleibt die zentrale Abnahme möglich,
+während alte Overrides bis zum Funktionsnachweis erhalten bleiben. Er prüft Typen, ausschließlich Preview als Scope,
+Integration und unveränderte Git-SHA. `--check-only` erzeugt kein Deployment
+und wird vor Migrationen ausgeführt. Die manuelle Preview-Auswahl erlaubt
+nur extern ausdrücklich freigegebene Nicht-main-Branches; erfolgreiche Push-CI aus dem freigegebenen Repository
+für exakt Branch und SHA bleibt Voraussetzung. Automatische Deployments
+bleiben auf den bestehenden Preview-Branch begrenzt; `vercel.json` deaktiviert
+weiterhin automatische Git-Deployments. Production-Workflow und DB-Guard
+werden nicht geändert.
+
+In Vercel Preview lautet das serverseitige Präfix
+`preview/<vollständiger SHA-256 von VERCEL_GIT_COMMIT_REF>/`. Es bleibt über
+Deployments desselben Branches stabil. Fehlende Branch-Identität, falsche
+Store-ID/-Klassifizierung und ein Token eines anderen Stores sperren den
+Medienzugriff. Der Browser bekommt nur das berechnete Präfix. Uploadfreigaben,
+Finalisierung und Teamfoto-Cleanup verwenden dieses Präfix. Dev und Prod
+behalten `dev/` beziehungsweise `prod/`.
+
+Bestehende URLs werden nicht migriert und bleiben lesbar. Fremde Branch-
+Medien und ältere ungetrennte Preview-Medien werden nicht als neue Uploads
+oder als Kopierquelle für neue feste Templates akzeptiert. Teamfoto-Cleanup
+löscht solche Dateien nicht. Es gibt keine automatische storeweite Bereinigung.
+
+Diese Pfade verhindern normale App-Konflikte, sind aber keine Blob-ACL:
+Ein Server mit dem gemeinsamen RW-Token kann grundsätzlich den gesamten
+Nonprod-Store ändern. Preview-Datenbankinhalte bleiben ebenfalls gemeinsam.
+Für nicht vertrauenswürdigen Code oder harte Branch-Isolation sind getrennte
+Stores (und bei Bedarf getrennte Datenbanken) mit automatisierter Provisionierung
+erforderlich. Öffentliche Blob-URLs, auch Production-URLs, bleiben öffentlich
+lesbar; die Trennung betrifft Credentials und verändernde Operationen.
+
+Die einmalige Vercel-Umstellung und Live-Abnahme benötigen Freigabe. Bis zur
+Umstellung sperrt der neue Guard bestehende Medien-Overrides absichtlich.
+
+
+## Explizite Branch-Vertrauensprüfung (freigegebener Rollout)
+
+`TRUSTED_PREVIEW_BRANCHES` ist eine JSON-Liste exakter Branch-Namen in der
+GitHub-Umgebung Preview, keine Liste aus dem zu deployenden Branch und keine
+Wildcard. Neue Namen werden erst nach menschlicher Vertrauensprüfung separat
+aufgenommen. Erfolgreiche CI allein erteilt keine Freigabe. Beide Scripts
+sperren fehlende/ungültige Listen sowie nicht enthaltene Branches vor Vercel-
+Anfragen. Die externe GitHub-Environment-Branch-Policy beschränkt zusätzlich,
+welche Workflow-Refs überhaupt Preview-Secrets erhalten. Der vertrauenswürdige
+main-Workflow kann workflow_run steuern; main bleibt als Preview-Ziel verboten.
+Direkte administrative Vercel-Deployments müssen dieselbe geprüfte Auswahl
+beachten; keine pauschale Freigabe fremder PRs oder Branches.

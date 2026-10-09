@@ -2,7 +2,7 @@ import "server-only";
 
 import { del } from "@vercel/blob";
 import { prisma } from "@/app/lib/prisma";
-import { getBlobAreaPrefix } from "@/app/lib/blobPath";
+import { isBlobUrlInArea } from "@/app/lib/blobPath";
 import { getMediaUploadEnvironmentPrefix, getBlobUploadAuthentication } from "@/app/fragen/editor/mediaUploadEnvironment";
 import { resolveParticipantSession } from "@/app/quiz/participantSession.server";
 import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
@@ -91,14 +91,7 @@ export async function clearTeamPhoto(teamId: number) {
 }
 
 async function deleteUnreferencedTeamPhoto(url: string) {
-  const expectedPrefix = `/${getBlobAreaPrefix(getMediaUploadEnvironmentPrefix(), "team-profile")}`;
-  let pathname: string;
-  try {
-    pathname = new URL(url).pathname;
-  } catch {
-    return;
-  }
-  if (!pathname.startsWith(expectedPrefix)) return;
+  if (!isBlobUrlInArea(url, getMediaUploadEnvironmentPrefix(), "team-profile")) return;
   const references = await prisma.teams.count({ where: { foto_url: url } });
   if (references > 0) return;
   try {
