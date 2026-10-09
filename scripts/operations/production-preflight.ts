@@ -78,37 +78,62 @@ export async function readProductionMigrations(connectionString: string, candida
   finally { await client.end().catch(() => undefined); }
 }
 type Json = Record<string, unknown>;
+const object = (value: unknown): Json => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Json : {};
 export async function readProductionDeployment(input: { token: string; project: string; team: string; alias: string; expectedSha: string }, request: typeof fetch = fetch) {
+  const gates: Gate[] = [];
+  const finish = () => ({ gate: gates.find(g=>g.status==='FAIL') ?? gates.find(g=>g.status==='BLOCKED') ?? gate('PASS','PRODUCTION_SHA_ALIAS_CONFIRMED'), gates });
+  const check = (code:string, value:unknown, expected:unknown, valid:(value:unknown)=>boolean) => {
+    gates.push(gate(!valid(value) ? 'BLOCKED' : value===expected ? 'PASS' : 'FAIL', !valid(value) ? `${code}_MISSING` : value===expected ? `${code}_CONFIRMED` : `${code}_MISMATCH`));
+  };
+  const string = (v:unknown)=>typeof v==='string' && v.length>0;
+  const deploymentId = (v:unknown)=>typeof v==='string' && /^dpl_[a-zA-Z0-9]+$/.test(v);
+  const shaValue = (v:unknown)=>typeof v==='string' && /^[a-f0-9]{40}$/.test(v);
   if (!input.token || !/^prj_[a-zA-Z0-9]+$/.test(input.project) || !/^team_[a-zA-Z0-9]+$/.test(input.team) ||
-      !/^[a-zA-Z0-9.-]+$/.test(input.alias) || !/^[a-f0-9]{40}$/.test(input.expectedSha)) return { gate: gate("BLOCKED", "DEPLOYMENT_INPUT_UNVERIFIED") };
-  const get = async (path: string): Promise<Json> => {
-    const response = await request(`https://api.vercel.com${path}?teamId=${encodeURIComponent(input.team)}`, {
-      method: "GET", redirect: "error", headers: { Authorization: `Bearer ${input.token}` }, signal: AbortSignal.timeout(30000) });
-    if (!response.ok) throw new Error("METADATA_UNAVAILABLE");
-    return await response.json() as Json;
+      !/^[a-zA-Z0-9.-]+$/.test(input.alias) || !shaValue(input.expectedSha)) return { gate: gate('BLOCKED','DEPLOYMENT_INPUT_UNVERIFIED'), gates:[gate('BLOCKED','DEPLOYMENT_INPUT_UNVERIFIED')] };
+  const get = async (path:string, endpoint:string):Promise<Json> => {
+    let response:Response;
+    try { response=await request(`https://api.vercel.com${path}?teamId=${encodeURIComponent(input.team)}`, {
+      method:'GET',redirect:'error',headers:{Authorization:`Bearer ${input.token}`},signal:AbortSignal.timeout(30000) }); }
+    catch { gates.push(gate('BLOCKED',`${endpoint}_API_NETWORK_ERROR`));throw new Error('SAFE_API_ERROR'); }
+    if (!response.ok) { gates.push(gate('BLOCKED',`${endpoint}_API_${response.status===401||response.status===403?'PERMISSION_DENIED':response.status===404?'NOT_FOUND':'HTTP_ERROR'}`));throw new Error('SAFE_API_ERROR'); }
+    try { const json:unknown=await response.json();if (json===null || typeof json!=='object' || Array.isArray(json)) throw new Error('INVALID');
+      gates.push(gate('PASS',`${endpoint}_API_CONFIRMED`));return json as Json; }
+    catch { gates.push(gate('BLOCKED',`${endpoint}_API_RESPONSE_INVALID`));throw new Error('SAFE_API_ERROR'); }
   };
   try {
-    const alias = await get(`/v4/aliases/${encodeURIComponent(input.alias)}`);
-    const aliasDeployment = alias.deployment as Json | undefined;
-    const id = aliasDeployment?.id ?? alias.deploymentId;
-    if (typeof id !== "string" || !/^dpl_[a-zA-Z0-9]+$/.test(id)) return { gate: gate("BLOCKED", "ALIAS_BINDING_UNVERIFIED") };
-    const project = await get(`/v9/projects/${input.project}`);
-    const deployment = await get(`/v13/deployments/${id}`);
-    const targets = project.targets as Json | undefined;
-    const production = targets?.production as Json | undefined;
-    const meta = deployment.meta as Json | undefined;
-    const source = deployment.gitSource as Json | undefined;
-    const sha = meta?.githubCommitSha ?? source?.sha;
-    if (project.id !== input.project || production?.id !== id || deployment.id !== id ||
-        (deployment.projectId !== undefined && deployment.projectId !== input.project) || alias.projectId !== input.project || alias.redirect || alias.deletedAt ||
-        deployment.target !== "production" || deployment.readyState !== "READY" || alias.alias !== input.alias ||
-        typeof sha !== "string" || !/^[a-f0-9]{40}$/.test(sha)) return { gate: gate("BLOCKED", "PRODUCTION_DEPLOYMENT_UNVERIFIED") };
-    if (sha !== input.expectedSha || (source?.sha && source.sha !== sha)) return { gate: gate("BLOCKED", "UNEXPECTED_PRODUCTION_SHA") };
-    // Resolve again after metadata reads: a concurrent promotion invalidates this proof.
-    const recheck = await get(`/v4/aliases/${encodeURIComponent(input.alias)}`);
-    if (((recheck.deployment as Json | undefined)?.id ?? recheck.deploymentId) !== id || recheck.projectId !== input.project || recheck.alias !== input.alias || recheck.redirect || recheck.deletedAt) return { gate: gate("BLOCKED", "ALIAS_CHANGED_DURING_PREFLIGHT") };
-    return { gate: gate("PASS", "PRODUCTION_SHA_ALIAS_CONFIRMED"), deploymentId: id, sha, alias: input.alias, state: "READY" };
-  } catch { return { gate: gate("BLOCKED", "VERCEL_METADATA_UNAVAILABLE") }; }
+    const alias=await get(`/v4/aliases/${encodeURIComponent(input.alias)}`,'ALIAS');
+    const id=object(alias.deployment).id ?? alias.deploymentId;
+    check('ALIAS_HOST',alias.alias,input.alias,string);
+    check('ALIAS_PROJECT',alias.projectId,input.project,string);
+    gates.push(gate(deploymentId(id)?'PASS':'BLOCKED',deploymentId(id)?'ALIAS_DEPLOYMENT_ID_CONFIRMED':'ALIAS_DEPLOYMENT_ID_MISSING'));
+    if (alias.deploymentId!==undefined && object(alias.deployment).id!==undefined) check('ALIAS_DEPLOYMENT_IDS',alias.deploymentId,object(alias.deployment).id,deploymentId);
+    gates.push(gate(alias.redirect || alias.deletedAt ? 'FAIL':'PASS',alias.redirect || alias.deletedAt?'ALIAS_REDIRECT_OR_DELETED':'ALIAS_ACTIVE_CONFIRMED'));
+    if (!deploymentId(id)) return finish();
+    const project=await get(`/v9/projects/${input.project}`,'PROJECT');
+    const deployment=await get(`/v13/deployments/${id}`,'DEPLOYMENT');
+    check('PROJECT_ID',project.id,input.project,string);
+    check('PROJECT_PRODUCTION_DEPLOYMENT_ID',object(object(project.targets).production).id,id,deploymentId);
+    check('DEPLOYMENT_ID',deployment.id,id,deploymentId);
+    // Alias and project response establish project ownership; optional deployment projectId must never contradict them.
+    if (deployment.projectId!==undefined) check('DEPLOYMENT_PROJECT',deployment.projectId,input.project,string);
+    check('DEPLOYMENT_ENVIRONMENT',deployment.target,'production',string);
+    check('DEPLOYMENT_STATE',deployment.readyState,'READY',string);
+    const meta=object(deployment.meta),source=object(deployment.gitSource);
+    const sha=meta.githubCommitSha ?? source.sha;
+    check('DEPLOYMENT_SHA',sha,input.expectedSha,shaValue);
+    if (meta.githubCommitSha!==undefined && source.sha!==undefined) check('DEPLOYMENT_SHA_SOURCES',source.sha,meta.githubCommitSha,shaValue);
+    const recheck=await get(`/v4/aliases/${encodeURIComponent(input.alias)}`,'ALIAS_RECHECK');
+    check('ALIAS_RECHECK_HOST',recheck.alias,input.alias,string);
+    check('ALIAS_RECHECK_PROJECT',recheck.projectId,input.project,string);
+    check('ALIAS_RECHECK_DEPLOYMENT_ID',object(recheck.deployment).id ?? recheck.deploymentId,id,deploymentId);
+    gates.push(gate(recheck.redirect || recheck.deletedAt?'FAIL':'PASS',recheck.redirect || recheck.deletedAt?'ALIAS_RECHECK_REDIRECT_OR_DELETED':'ALIAS_RECHECK_ACTIVE_CONFIRMED'));
+    // Only validated identifiers enter the public artifact; never raw API fields or arbitrary strings.
+    return { ...finish(), deploymentId: deploymentId(id)?id:undefined, sha:shaValue(sha)?sha:undefined, alias:input.alias,
+      state:deployment.readyState==='READY'?'READY':undefined };
+  } catch {
+    if (!gates.some(g=>g.status==='BLOCKED'||g.status==='FAIL')) gates.push(gate('BLOCKED','DEPLOYMENT_DIAGNOSTIC_UNAVAILABLE'));
+    return finish();
+  }
 }
 export function assertPreflightContext(env: Readonly<Record<string, string | undefined>>) {
   if (env.GITHUB_ACTIONS !== "true" || env.GITHUB_REPOSITORY !== "justphilgud/pubquiz-web" || env.GITHUB_REF !== "refs/heads/main" ||

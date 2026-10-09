@@ -27,7 +27,7 @@ test("Vercel target, alias, project and exact SHA must agree; every request is G
   const result=await readProductionDeployment(input,denied);assert.equal(result.gate.status,"BLOCKED");assert.ok(!JSON.stringify(result).includes("SECRET"));
   const wrong=(async (url:unknown)=>new Response(JSON.stringify(String(url).includes("projects")?{id:input.project,targets:{production:{id:"dpl_x"}}}:String(url).includes("deployments")?
     {id:"dpl_x",projectId:input.project,target:"production",readyState:"READY",meta:{githubCommitSha:"b".repeat(40)}}:{alias:input.alias,projectId:input.project,deployment:{id:"dpl_x"}}))) as typeof fetch;
-  assert.equal((await readProductionDeployment(input,wrong)).gate.code,"UNEXPECTED_PRODUCTION_SHA");
+  assert.equal((await readProductionDeployment(input,wrong)).gate.code,"DEPLOYMENT_SHA_MISMATCH");
 });
 test("workflow is main-only, manual, separate from backup and deploy; SQL allowlist is read-only", () => {
   const workflow=readFileSync(".github/workflows/production-read-only-preflight.yml","utf8");
@@ -47,4 +47,27 @@ test('unconfirmed privileges block before any migration-history read', async()=>
   const client={query:async(sql:string)=>{queries.push(sql);return {rows: sql===DATABASE_READ_QUERIES[2] ? [{role:'pubquiz_backup_reader',database:'neondb',read_only:'on'}] : sql===DATABASE_READ_QUERIES[3] ? [{...proof,can_write:true}] : []};}};
   const result=await readMigrationSession(client as Parameters<typeof readMigrationSession>[0],[a],[a]);
   assert.equal(result.gate.status,'BLOCKED');assert.ok(!queries.includes(DATABASE_READ_QUERIES[4]));assert.equal(queries.at(-1),'ROLLBACK');
+});
+
+test('each missing identity and confirmed mismatch produces an individual safe gate',async()=>{
+  const sha='a'.repeat(40),input={token:'SECRET',project:'prj_x',team:'team_x',alias:'quiz.example.com',expectedSha:sha};
+  const base=[{alias:input.alias,projectId:input.project,deployment:{id:'dpl_x'}},{id:input.project,targets:{production:{id:'dpl_x'}}},
+    {id:'dpl_x',projectId:input.project,target:'production',readyState:'READY',meta:{githubCommitSha:sha}}];
+  const cases:[number,string,unknown,string,string][]=[
+    [0,'deployment',{},'BLOCKED','ALIAS_DEPLOYMENT_ID_MISSING'],[0,'alias','wrong.example.com','FAIL','ALIAS_HOST_MISMATCH'],
+    [0,'projectId','prj_wrong','FAIL','ALIAS_PROJECT_MISMATCH'],[1,'targets',{},'BLOCKED','PROJECT_PRODUCTION_DEPLOYMENT_ID_MISSING'],
+    [2,'meta',{},'BLOCKED','DEPLOYMENT_SHA_MISSING'],[2,'target','preview','FAIL','DEPLOYMENT_ENVIRONMENT_MISMATCH'],
+    [2,'readyState','ERROR','FAIL','DEPLOYMENT_STATE_MISMATCH'],[2,'meta',{githubCommitSha:'b'.repeat(40)},'FAIL','DEPLOYMENT_SHA_MISMATCH'],
+    [2,'id',undefined,'BLOCKED','DEPLOYMENT_ID_MISSING']];
+  for(const [index,field,value,status,code] of cases){
+    const responses=structuredClone(base) as Record<string,unknown>[];responses[index][field]=value;responses.push(base[0]);
+    const request=(async(_url:unknown,opts:RequestInit)=>{assert.equal(opts.method,'GET');return new Response(JSON.stringify(responses.shift()));}) as typeof fetch;
+    const result=await readProductionDeployment(input,request);assert.equal(result.gate.status,status,code);assert.ok(result.gates.some(g=>g.code===code),code);
+    assert.ok(!JSON.stringify(result).includes('SECRET'));assert.ok(!JSON.stringify(result).includes('wrong.example.com'));
+  }
+  for(const status of [401,403,404,500]){
+    const result=await readProductionDeployment(input,(async()=>new Response('SECRET',{status})) as typeof fetch);
+    assert.equal(result.gate.status,'BLOCKED');assert.ok(result.gate.code.startsWith('ALIAS_API_'));assert.ok(!JSON.stringify(result).includes('SECRET'));
+  }
+  assert.equal((await readProductionDeployment(input,(async()=>new Response('null')) as typeof fetch)).gate.code,'ALIAS_API_RESPONSE_INVALID');
 });
