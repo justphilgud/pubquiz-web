@@ -206,3 +206,26 @@ Main-Integration und Bridge-Deployment:
 Gate 1 gibt ausschließlich echte Retention frei. Gate 2 gibt ausschließlich den
 täglichen Schedule frei. Restore, Required Reviewer, isoliertes Ziel und sämtliche
 Production-Hostausschlüsse bleiben davon unberührt.
+
+## Secretsichere Phasendiagnose
+
+Ein fehlgeschlagener Backup-CLI-Lauf bleibt Exit-Code 1. Das separate GitHub-
+Artefakt `backup-failure-code` enthält ausschließlich Version, Status FAIL,
+Phase und festen Fehlercode. Es enthält keine Fehlernachricht, Ursache, URL,
+Identität, Dateinamen, Daten oder Credentials und ist kein Backup-Erfolgsnachweis.
+Fehlt es (z.B. Runner-Abbruch), ist die interne Ursache unbekannt, nicht PASS.
+
+Die Grenzen sind Vorbereitung, Transport-Preflight, Quellsitzung/Snapshot,
+DB_EXPORT, DUMP_INTEGRITY, Sitzungsabschluss, MEDIA_CAPTURE, Auth-Overlay,
+DATA_UPLOAD, MANIFEST_UPLOAD, PRIVATE_READBACK, ARTIFACT_INTEGRITY,
+ANONYMOUS_READBACK und CLEANUP. Uploads behalten die bestehenden zwingenden
+Readback-/Hashprüfungen; verschachtelte Fehler nennen die präzisere Phase.
+Eine sekundäre Cleanup-Störung ersetzt keine primäre Backup-Fehlerphase.
+Codes stehen versioniert in `scripts/operations/backup-diagnostics.ts`.
+Sie klassifizieren den Ort, nicht pauschal die Netzwerk-/Berechtigungsursache.
+
+Bestehende private Backups/Manifeste werden nicht verändert. Neue Diagnosedateien
+werden ausschließlich neu angelegt. Kein automatischer Retry des Gesamtbackups,
+keine neue Berechtigung, kein ungeschützter Logabruf. Erst nach separater Integration
+und Betriebsfreigabe einen neuen regulären Attempt starten; dann ausschließlich
+das Diagnoseartefakt lesen. Run 37964063455 erhält rückwirkend keine neue Diagnose.

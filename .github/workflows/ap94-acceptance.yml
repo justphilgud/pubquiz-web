@@ -120,6 +120,7 @@ jobs:
           AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
           PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && vars.PRODUCTION_RELEASE_SHA || inputs.production_commit }}
+          BACKUP_FAILURE_EVIDENCE_PATH: ${{ runner.temp }}/backup-failure.json
           AP96_BACKUP_TYPE: ${{ github.event_name == 'schedule' && 'scheduled' || inputs.backup_type }}
           AP96_BACKUP_PROTECTED: ${{ github.event_name == 'schedule' && 'false' || inputs.protect_backup }}
           PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}
@@ -135,6 +136,14 @@ jobs:
           appendFileSync(process.env.GITHUB_OUTPUT,`key=${r.key}\nmanifest=${r.manifestSha256}\nautomation=${process.env.BACKUP_AUTOMATION_ENABLED}\nretention=${process.env.BACKUP_RETENTION_VERIFIED}\n`);
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Backup readback verified.\n\nType: ${r.backup.type}\n\nProtected: ${r.backup.protected}\n\nKey: ${r.key}\n\nManifest SHA-256: ${r.manifestSha256}\n\nBytes: ${r.bytes}\n\nSnapshot: ${r.snapshotAt}\n\nBackup ms: ${r.backupMs}\n\nBridge calls: ${r.oidc.bridgeCalls}\n\nOIDC token requests: ${r.oidc.tokenRequests}\n\nOIDC cache hits: ${r.oidc.cacheHits}\n\nOIDC single-flight joins: ${r.oidc.singleFlightJoins}\n\nOIDC refreshes: ${r.oidc.refreshes}\n\nOIDC retries: ${r.oidc.retries}\n\nOIDC final error: ${r.oidc.finalErrorClass ?? 'none'}\n\nRestore runs only when explicitly requested and requires operations-restore reviewer approval.\n`);
           NODE
+      - name: Upload non-confidential backup failure code
+        if: failure() && steps.backup.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-failure-code
+          path: ${{ runner.temp }}/backup-failure.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Create external-import backup evidence
         if: steps.backup.outcome == 'success'
         shell: bash
