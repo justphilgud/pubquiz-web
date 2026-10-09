@@ -18,7 +18,7 @@ function normalize(value:unknown,historyRelation=false):unknown {
 function fullCatalog(catalog:unknown) {
   if(!catalog||typeof catalog!=='object')return null;
   const data=canonicalCatalog(catalog) as Record<string,unknown>;
-  const keys=['schemas','constraints','indexes','sequences','enums','views'];
+  const keys=['schemas','constraints','indexes','indexHealth','sequences','sequenceBindings','enums','views'];
   if(keys.some(key=>!Array.isArray(data[key])))return null;
   return Object.fromEntries(keys.map(key=>[key,normalize(data[key])]));
 }
