@@ -121,3 +121,18 @@ test('no fallback for duplicate or unknown migration locations',async()=>{
     assert.equal(result.gate.code,'MIGRATION_SCHEMA_BINDING_UNVERIFIED');assert.ok(!queries.includes(DATABASE_READ_QUERIES[4]));
   }
 });
+
+test('diagnostic Prisma compatibility never accepts altered SQL or changes raw drift gate',async()=>{
+  const {prismaChecksumEvidence,prismaInventory,compareSchemaInventory}=await import('./production-preflight-diagnostics');
+  const {createHash}=await import('node:crypto');
+  const hash=(script:string)=>createHash('sha256').update(script).digest('hex');
+  for(const script of ['SELECT 1;\n','\ufeffSELECT 1;\n']){
+    const crlf=script.replaceAll('\n','\r\n');
+    const proof=prismaChecksumEvidence(Buffer.from(script),hash(crlf));assert.equal(proof.prismaCompatible,true);assert.equal(proof.acceptedByPreflight,false);
+    assert.equal(prismaChecksumEvidence(Buffer.from(script),hash('SELECT 2;\n')).prismaCompatible,false);
+    assert.equal(assessMigrations([{name:'0_init',checksum:hash(script)}],[],[{migration_name:'0_init',checksum:hash(crlf),finished_at:'date',rolled_back_at:null}]).gate.code,'MIGRATION_DRIFT');
+  }
+  const inv=prismaInventory('model questions {\n id Int @id\n text String\n @@schema("pubquiz")\n}');
+  const result=compareSchemaInventory(inv,[{schema:'pubquiz',table:'questions',column:'id'},{schema:'pubquiz',table:'questions',column:'text'}],{enums:[]});
+  assert.equal(result.status,'INCOMPLETE');assert.ok('inventoryMatches' in result&&result.inventoryMatches);
+});

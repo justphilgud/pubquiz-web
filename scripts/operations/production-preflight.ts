@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { Client } from "pg";
+import { prismaChecksumEvidence, DIAGNOSTIC_COLUMNS_SQL, DIAGNOSTIC_CATALOG_SQL, compareSchemaInventory, type initRepositoryEvidence, type inventoryFromGit } from "./production-preflight-diagnostics";
 import { assertDatabase, assertOperationTransport } from "./guards";
 
 export type Gate = { status: "PASS" | "BLOCKED" | "FAIL"; code: string };
@@ -63,9 +64,9 @@ export const DATABASE_READ_QUERIES = [
   "SET LOCAL statement_timeout='30s'",
   "SELECT current_user AS role, current_database() AS database, current_setting('transaction_read_only') AS read_only",
   MIGRATION_PRIVILEGES_SQL,
-  "SELECT migration_name, checksum, finished_at, rolled_back_at FROM public._prisma_migrations ORDER BY migration_name, started_at",
+  "SELECT migration_name, checksum, finished_at, rolled_back_at, started_at, applied_steps_count FROM public._prisma_migrations ORDER BY migration_name, started_at",
 ] as const;
-export async function readMigrationSession(client: Pick<Client, "query">, candidate: Migration[], baseline: Migration[], expectedRole = "pubquiz_backup_reader", expectedDatabase = "neondb") {
+export async function readMigrationSession(client: Pick<Client, "query">, candidate: Migration[], baseline: Migration[], expectedRole = "pubquiz_backup_reader", expectedDatabase = "neondb", evidence?: {baseline:ReturnType<typeof initRepositoryEvidence>;candidate:ReturnType<typeof initRepositoryEvidence>;inventory:ReturnType<typeof inventoryFromGit>}) {
   try {
     await client.query(DATABASE_READ_QUERIES[0]);
     await client.query(DATABASE_READ_QUERIES[1]);
@@ -83,16 +84,31 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     const privilegesGate = assessMigrationPrivileges(privileges);
     if (privilegesGate.status !== 'PASS') return { gate: privilegesGate, privileges, diagnosis };
     const rows = (await client.query(DATABASE_READ_QUERIES[4])).rows as Applied[];
-    return { ...assessMigrations(candidate, baseline, rows), privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
+    let additionalDiagnostics;
+    if(evidence){
+      const initRows=rows.filter(row=>row.migration_name==='0_init') as (Applied&{started_at:unknown;applied_steps_count:unknown})[];
+      const timestamp=(value:unknown)=>value instanceof Date?value.toISOString():typeof value==='string'&&/^\d{4}-\d{2}-\d{2}T[0-9:.]+Z$/.test(value)?value:null;
+      const init=initRows.map(row=>({checksum:typeof row.checksum==='string'&&/^[a-f0-9]{32,64}$/.test(row.checksum)?row.checksum:null,
+        startedAt:timestamp(row.started_at),finishedAt:timestamp(row.finished_at),rolledBackAt:timestamp(row.rolled_back_at),
+        appliedStepsCount:Number.isInteger(row.applied_steps_count)?row.applied_steps_count:null}));
+      const completed=init.filter(row=>row.finishedAt&&!row.rolledBackAt);
+      const checksum=completed.length===1?completed[0].checksum:null;
+      const columns=(await client.query(DIAGNOSTIC_COLUMNS_SQL)).rows[0]?.columns;
+      const catalog=(await client.query(DIAGNOSTIC_CATALOG_SQL)).rows[0]?.catalog;
+      additionalDiagnostics={init,checksumComparison:checksum?prismaChecksumEvidence(evidence.candidate.bytes,checksum):{diagnosis:'INIT_HISTORY_UNVERIFIED'},
+        baselineSha:evidence.baseline.sha,candidateSha:evidence.candidate.sha,baselineBytesIdentical:evidence.baseline.bytes.equals(evidence.candidate.bytes),
+        schemaComparison:compareSchemaInventory(evidence.inventory,columns,catalog),schemaColumns:columns,schemaCatalog:catalog};
+    }
+    return { ...assessMigrations(candidate, baseline, rows), additionalDiagnostics, privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
   } catch (error) { return { gate: gate("BLOCKED", (error as { code?: string }).code === "42501" ? "DATABASE_SELECT_PERMISSION_MISSING" : "MIGRATION_STATUS_UNAVAILABLE") }; }
   finally { await client.query("ROLLBACK").catch(() => undefined); }
 }
-export async function readProductionMigrations(connectionString: string, candidate: Migration[], baseline: Migration[]) {
+export async function readProductionMigrations(connectionString: string, candidate: Migration[], baseline: Migration[], evidence?: {baseline:ReturnType<typeof initRepositoryEvidence>;candidate:ReturnType<typeof initRepositoryEvidence>;inventory:ReturnType<typeof inventoryFromGit>}) {
   let identity;
   try { identity = assertDatabase(connectionString, "production"); assertOperationTransport(new URL(connectionString)); }
   catch { return { gate: gate("BLOCKED", "DATABASE_IDENTITY_OR_TRANSPORT_UNVERIFIED") }; }
   const client = new Client({ connectionString });
-  try { await client.connect(); return { ...await readMigrationSession(client, candidate, baseline), endpointIdentity: identity, connectionSchemaParameter:new URL(connectionString).searchParams.get("schema") ?? null }; }
+  try { await client.connect(); return { ...await readMigrationSession(client, candidate, baseline,"pubquiz_backup_reader","neondb",evidence), endpointIdentity: identity, connectionSchemaParameter:new URL(connectionString).searchParams.get("schema") ?? null }; }
   catch { return { gate: gate("BLOCKED", "DATABASE_CONNECTION_UNAVAILABLE") }; }
   finally { await client.end().catch(() => undefined); }
 }

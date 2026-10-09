@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync, writeFileSync } from "node:fs";
+import { initRepositoryEvidence, inventoryFromGit } from "./production-preflight-diagnostics";
 import { assertPreflightContext, gate, migrationFiles, readProductionDeployment, readProductionMigrations } from "./production-preflight";
 
 async function main() {
@@ -16,7 +17,7 @@ async function main() {
     migrationFiles(candidate); migrationFiles(baseline);
     try { execFileSync("git", ["merge-base", "--is-ancestor", baseline, candidate]); }
     catch { result = { gate: gate("BLOCKED", "RELEASE_ANCESTRY_UNVERIFIED") }; }
-    result ??= await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL ?? "", migrationFiles(candidate), migrationFiles(baseline));
+    result ??= await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL ?? "", migrationFiles(candidate), migrationFiles(baseline), {candidate:initRepositoryEvidence(candidate),baseline:initRepositoryEvidence(baseline),inventory:inventoryFromGit(baseline)});
   } else throw new Error("CONTEXT_INVALID");
   writeFileSync(`preflight-${mode}.json`, JSON.stringify({ candidateSha: process.env.RELEASE_CANDIDATE_SHA, baselineSha: process.env.EXPECTED_PRODUCTION_SHA,
     checkedAt: new Date().toISOString(), ...result }, null, 2), { flag: "wx" });
