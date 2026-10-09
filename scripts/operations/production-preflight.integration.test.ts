@@ -24,6 +24,6 @@ test("actual PostgreSQL SELECT-role preflight never mutates data; missing permis
     // Even a privileged session cannot write inside this explicit read-only transaction.
     await admin.query("BEGIN READ ONLY");await assert.rejects(admin.query("UPDATE pubquiz.protected_fixture SET value=3"),error=>(error as {code:string}).code==="25006");await admin.query("ROLLBACK");
     await admin.query("REVOKE SELECT ON pubquiz._prisma_migrations FROM preflight_reader");
-    assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),"preflight_reader","preflight_ci")).gate.status,"BLOCKED");
+    assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),"preflight_reader","preflight_ci")).gate.code,"DATABASE_SELECT_PERMISSION_MISSING");
   } finally {await reader.end();await admin.end();}
 });

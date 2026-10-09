@@ -42,14 +42,15 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     if (session?.read_only !== "on" || session.role !== expectedRole || session.database !== expectedDatabase) return { gate: gate("BLOCKED", "DATABASE_SESSION_UNVERIFIED") };
     const rows = (await client.query(DATABASE_READ_QUERIES[3])).rows as Applied[];
     return { ...assessMigrations(candidate, baseline, rows), identity: { role: session.role, database: session.database, readOnly: true } };
-  } catch { return { gate: gate("BLOCKED", "MIGRATION_STATUS_UNAVAILABLE") }; }
+  } catch (error) { return { gate: gate("BLOCKED", (error as { code?: string }).code === "42501" ? "DATABASE_SELECT_PERMISSION_MISSING" : "MIGRATION_STATUS_UNAVAILABLE") }; }
   finally { await client.query("ROLLBACK").catch(() => undefined); }
 }
 export async function readProductionMigrations(connectionString: string, candidate: Migration[], baseline: Migration[]) {
-  try { assertDatabase(connectionString, "production"); assertOperationTransport(new URL(connectionString)); }
+  let identity;
+  try { identity = assertDatabase(connectionString, "production"); assertOperationTransport(new URL(connectionString)); }
   catch { return { gate: gate("BLOCKED", "DATABASE_IDENTITY_OR_TRANSPORT_UNVERIFIED") }; }
   const client = new Client({ connectionString });
-  try { await client.connect(); return await readMigrationSession(client, candidate, baseline); }
+  try { await client.connect(); return { ...await readMigrationSession(client, candidate, baseline), endpointIdentity: identity }; }
   catch { return { gate: gate("BLOCKED", "DATABASE_CONNECTION_UNAVAILABLE") }; }
   finally { await client.end().catch(() => undefined); }
 }

@@ -4,6 +4,7 @@ import { assertPreflightContext, gate, migrationFiles, readProductionDeployment,
 
 async function main() {
   assertPreflightContext(process.env);
+  if (!/^[a-f0-9]{40}$/.test(process.env.RELEASE_CANDIDATE_SHA ?? "") || !/^[a-f0-9]{40}$/.test(process.env.EXPECTED_PRODUCTION_SHA ?? "")) throw new Error("INVALID_SHA");
   const mode = process.argv[2];
   let result;
   if (mode === "deployment" && process.env.PREFLIGHT_ENVIRONMENT === "production") {
