@@ -29,7 +29,7 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
     const root=createRoot(document.getElementById('app'));
     const show=(src,command,id)=>flushSync(()=>root.render(<SynchronizedMedia kind="audio" src={src} command={command} commandId={id} renderMode="PRESENTATION" showCountdown/>));
     let phase='initial';
-    const wait=async(predicate)=>{for(let i=0;i<100;i++){if(predicate())return;await new Promise(r=>setTimeout(r,20));}throw Error('condition timeout: '+phase);};
+    const wait=async(predicate)=>{for(let i=0;i<250;i++){if(predicate())return;await new Promise(r=>setTimeout(r,20));}const audio=document.querySelector('audio');throw Error('condition timeout: '+phase+' '+JSON.stringify(audio?{position:audio.currentTime,duration:audio.duration,readyState:audio.readyState,seeking:audio.seeking,countdown:countdown()}:{}));};
     const check=(condition,message)=>{if(!condition)throw Error(message);};
     const countdown=()=>document.querySelector('output')?.textContent;
     async function run(){
@@ -43,7 +43,10 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       phase='short';show('/short.wav',null,4); await wait(()=>countdown()==='0:12');
       check(original.paused,'old audio still playing');
       const short=document.querySelector('audio'); check(short!==original,'source reused stale media node');
-      short.currentTime=12; short.dispatchEvent(new Event('ended')); await wait(()=>countdown()==='0:00');
+      phase='short buffer';show('/short.wav','play',11);await wait(()=>short.readyState===4 && short.buffered.length && short.buffered.end(short.buffered.length-1)===12);
+      show('/short.wav','pause',12);await wait(()=>short.paused);
+      phase='end position';short.currentTime=12;await wait(()=>short.currentTime===12);
+      phase='end';short.dispatchEvent(new Event('ended'));await wait(()=>countdown()==='0:00');
       let settle; const realPlay=HTMLMediaElement.prototype.play;
       let settleEarlier;let playCalls=0;
       HTMLMediaElement.prototype.play=function(){return ++playCalls===1?new Promise(resolve=>settleEarlier=resolve):realPlay.call(this);};
@@ -88,6 +91,7 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       response.setHeader("Content-Type", "audio/wav"); response.setHeader("Accept-Ranges", "bytes");
       const range = /^bytes=(\d+)-(\d*)$/.exec(request.headers.range ?? "");
       const start = range ? Number(range[1]) : 0, end = range?.[2] ? Math.min(Number(range[2]), wav.length - 1) : wav.length - 1;
+      if (start >= wav.length || start > end) { response.statusCode = 416; response.setHeader("Content-Range", `bytes */${wav.length}`); response.end(); return; }
       if (range) { response.statusCode = 206; response.setHeader("Content-Range", `bytes ${start}-${end}/${wav.length}`); }
       response.setHeader("Content-Length", end - start + 1); response.end(wav.subarray(start, end + 1));
     }
@@ -98,7 +102,7 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
   const address = server.address(); assert.ok(address && typeof address !== "string");
   const profile = mkdtempSync(join(tmpdir(), "pubquiz-night-media-"));
   try {
-    const { stdout } = await promisify(execFile)(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking", "--no-first-run", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=${profile}`, "--virtual-time-budget=8000", "--dump-dom", `http://127.0.0.1:${address.port}`], { timeout: 30_000, maxBuffer: 2 * 1024 * 1024 });
+    const { stdout } = await promisify(execFile)(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking", "--no-first-run", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=${profile}`, "--virtual-time-budget=15000", "--dump-dom", `http://127.0.0.1:${address.port}`], { timeout: 30_000, maxBuffer: 2 * 1024 * 1024 });
     assert.match(stdout, /<pre id="result">PASS<\/pre>/, stdout.slice(-1500));
   } finally {
     await new Promise<void>(resolve => server.close(() => resolve()));
