@@ -1,6 +1,8 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import { transitionStoredQuestionStatus } from "./questionStatusPersistence";
+import type { QuestionStatusTarget } from "./questionStatus";
 import { copy, head } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { requireQuestionEditor } from "@/app/lib/permissions";
@@ -95,6 +97,40 @@ import {
 } from "./templates/dynamicQuestionTemplate";
 
 const serverMessages = loadQuestionEditorMessages("de");
+
+/** Uses stored content for validation, never serializes the browser draft back to the DB. */
+export async function changeQuestionStatus(input: {
+  questionId: number; target: QuestionStatusTarget; expectedUpdatedAt: string;
+}): Promise<{ ok: boolean; message: string }> {
+  const session = await requireQuestionEditor();
+  const actor = await getQuestionActor(session);
+  if (!input || !Number.isSafeInteger(input.questionId) || input.questionId <= 0 ||
+      (input.target !== "DRAFT" && input.target !== "APPROVED") || typeof input.expectedUpdatedAt !== "string") {
+    return { ok: false, message: "Ungültige Statusaktion." };
+  }
+  try {
+    await prisma.$transaction(async (tx) => {
+      await transitionStoredQuestionStatus(tx, actor, input, async (draft) => {
+        validateQuestion({
+          ...draft, sourceTemplateId: draft.sourceTemplateId ?? null,
+          questionId: input.questionId, intent: "APPROVE",
+          answers: draft.answers.map(({ id, ...answer }) => ({ ...answer, clientId: id })),
+        });
+        const pending = await tx.fragenkategorie.count({ where: {
+          fragenkategorie_id: { in: draft.categoryIds }, status: "PENDING",
+        } });
+        if (pending) throw new Error("PENDING_CATEGORIES");
+      });
+    });
+    revalidatePath("/content/questions");
+    revalidatePath(`/content/questions/${input.questionId}`);
+    revalidatePath("/fragen");
+    return { ok: true, message: input.target === "APPROVED" ? "Gespeicherter Inhalt freigegeben." : "Freigabe zurückgenommen; Inhalt und Quizdaten unverändert." };
+  } catch (error) {
+    return { ok: false, message: error instanceof DraftValidationError
+      ? error.message : "Statusänderung nicht möglich. Berechtigung, vollständigen Inhalt und aktuellen Stand prüfen." };
+  }
+}
 
 class DraftValidationError extends Error {
   constructor(

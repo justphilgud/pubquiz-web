@@ -65,3 +65,15 @@ PR #93, Commit `52b0729152a4e4d12947e1cee0961fe2293fc73a`, bleibt unverändert. 
 Die manuelle Preview-Bereitstellung erlaubt zusätzlich ausschließlich den Importbranch codex/editorial-safe-import. Der reguläre Preview-Branch und sämtliche Production-Gates bleiben unverändert. Dispatch erst nach erfolgreicher CI des exakt zu deployenden SHAs. Die historische Basismigration enthält eine BOM und überlappt spätere Migrationen. Die isolierte PostgreSQL-CI baut daher eine leere Datenbank aus dem aktuellen Prisma-Modell ohne das neue Schwierigkeitsfeld auf und führt anschließend die echte additive Migration aus. Historische Dateien, Checksummen und persistente Datenbanken bleiben unverändert.
 
 Der ausschließlich lesende GitHub-Workflow-Modus editorial_dry_run_only verwendet die bestehende Preview-Environment und nur deren DATABASE_URL. Er prüft zusätzlich die feste Preview-Identität, zwei genehmigte Quellprüfsummen und den festen READ ONLY-Modus. Er enthält keine Migration, keinen Writer-Aufruf und keinen Vercel-Zugriff. Das Ergebnis wird als JSON-Artefakt gespeichert; Zugangsdaten erscheinen darin nicht. Ein Operator ist nur für einen tatsächlichen Import verpflichtend, für diesen lesenden Zugang wird kein fiktiver Benutzer angelegt.
+
+## Nachkontrolle importierter Inhalte
+
+Der bestehende Preview-Nur-Lese-Workflow erzeugt zusätzlich
+`editorial-integrity-audit.json`. Fest geprüfte Quelldateien werden gegen die
+unveränderten Journalpayloads und gegen alle 79 importierten Fragen verglichen.
+Pro Frage werden öffentliche redaktionelle Unterschiede und Reviewstatus
+festgehalten. Die ursprünglichen 146 Fragen, Antworten und Kategoriezuordnungen
+werden nach Ausschluss der Import-IDs gegen den ursprünglichen Batchnachweis
+geprüft. Quiz-/Teamdaten erscheinen ausschließlich als aggregierte Hashes.
+Dieser Kontrollpfad schreibt weder Fragen noch Journal-/Quizdaten und ist auf
+den genehmigten Preview-Importbranch und die feste Preview-Datenbank begrenzt.

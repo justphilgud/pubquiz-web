@@ -4,7 +4,10 @@ import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { test } from "node:test";
 import { Client } from "pg";
-import { runEditorialDatabaseImport } from "./editorialImportDatabase";
+import { runEditorialDatabaseImport, editorialIntegritySnapshot } from "./editorialImportDatabase";
+import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { transitionStoredQuestionStatus } from "../../editor/questionStatusPersistence";
 import { parseEditorialPool, sha256, type EditorialSource } from "./editorialImport";
 
 const connectionString=process.env.EDITORIAL_IMPORT_TEST_DATABASE_URL;
@@ -78,5 +81,41 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     await assert.rejects(runEditorialDatabaseImport({...rollbackOptions,mode:"import",expectedDryRunDigest:newRowPreview.digest}),/PERSISTED_CONTENT_MISMATCH/);
     assert.equal((await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count,before+4);
     await client.query("DROP TRIGGER editorial_new_row_test ON pubquiz.fragen");await client.query("DROP FUNCTION pubquiz.editorial_new_row_test()");
+
+    // Real status transitions with existing quiz assignments, submissions and manual scores.
+    const questionIds = [success.value.questionIds[0], success.value.questionIds[3]];
+    const series = (await client.query("INSERT INTO pubquiz.eventreihen(name,slug,updated_at) VALUES('Status CI','status-ci',now()) RETURNING eventreihe_id")).rows[0].eventreihe_id;
+    const quiz = (await client.query("INSERT INTO pubquiz.quiz(eventreihe_id,titel) VALUES($1,'Status CI') RETURNING quiz_id", [series])).rows[0].quiz_id;
+    const block = (await client.query("INSERT INTO pubquiz.quiz_abschnitte(quiz_id,titel,abschnitt_typ,sortierung) VALUES($1,'Block','FRAGEN',1) RETURNING quiz_abschnitt_id", [quiz])).rows[0].quiz_abschnitt_id;
+    const team = (await client.query("INSERT INTO pubquiz.teams(teamname,teamname_normalisiert,updated_at) VALUES('Status CI','status ci',now()) RETURNING team_id")).rows[0].team_id;
+    const session = (await client.query("INSERT INTO pubquiz.quiz_team_sessions(quiz_id,team_id,teamname) VALUES($1,$2,'Status CI') RETURNING quiz_team_session_id", [quiz,team])).rows[0].quiz_team_session_id;
+    for (const id of questionIds) {
+      const assignment = (await client.query("INSERT INTO pubquiz.quiz_fragen(quiz_id,fragen_id,quiz_abschnitt_id) VALUES($1,$2,$3) RETURNING quiz_fragen_id", [quiz,id,block])).rows[0].quiz_fragen_id;
+      const run = (await client.query("INSERT INTO pubquiz.quiz_interaction_runs(quiz_id,quiz_fragen_id,interaction_type,config_snapshot,updated_at) VALUES($1,$2,'FREE_TEXT','{}',now()) RETURNING interaction_run_id", [quiz,assignment])).rows[0].interaction_run_id;
+      const answer = (await client.query("INSERT INTO pubquiz.team_antworten(quiz_id,quiz_abschnitt_id,quiz_fragen_id,quiz_team_session_id,antwort_text,manuelle_punkte,vergebene_punkte,ist_manuell_richtig,interaction_run_id) VALUES($1,$2,$3,$4,'Preserve answer',1,1,true,$5) RETURNING team_antwort_id", [quiz,block,assignment,session,run])).rows[0].team_antwort_id;
+      await client.query("INSERT INTO pubquiz.team_answer_submissions(interaction_run_id,team_antwort_id,quiz_team_session_id,status,interaction_type,payload,draft_revision) VALUES($1,$2,$3,'AUTO_FINALIZED','FREE_TEXT','{\"text\":\"Preserve answer\"}',1)", [run,answer,session]);
+      await client.query("INSERT INTO pubquiz.antworten(fragen_id,antwort,ist_richtig) VALUES($1,'Preserved variant',true)",[id]);
+    }
+    const statusDb = new PrismaClient({ adapter: new PrismaPg({ connectionString: url.toString() }) });
+    const actor = { userId: operator, assignments: [{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }] };
+    const protectedBefore = await editorialIntegritySnapshot(client, questionIds);
+    const content = async (id: number) => (await client.query(`SELECT to_jsonb(f) - ARRAY['review_status','freigegeben','approved_by_user_id','approved_at','reviewed_by_user_id','reviewed_at','review_feedback','last_modified_by_user_id','updated_at'] AS content FROM pubquiz.fragen f WHERE fragen_id=$1`,[id])).rows[0].content;
+    try {
+      for (const id of questionIds) {
+        const original = await content(id);
+        for (const target of ["APPROVED", "DRAFT"] as const) {
+          const updatedAt = (await client.query("SELECT updated_at FROM pubquiz.fragen WHERE fragen_id=$1",[id])).rows[0].updated_at.toISOString();
+          await statusDb.$transaction(tx => transitionStoredQuestionStatus(tx, actor, {questionId:id,target,expectedUpdatedAt:updatedAt}, async draft => {
+            assert.ok(draft.questionText); assert.ok(draft.sourceOrRemark); assert.equal(draft.answers.length,2);
+          }));
+          assert.deepEqual(await content(id),original);
+          assert.deepEqual(await editorialIntegritySnapshot(client,questionIds),protectedBefore);
+        }
+        await assert.rejects(statusDb.$transaction(tx => transitionStoredQuestionStatus(tx,actor,{questionId:id,target:"APPROVED",expectedUpdatedAt:"2000-01-01T00:00:00.000Z"},async()=>{})),/STALE_QUESTION/);
+        const updatedAt = (await client.query("SELECT updated_at FROM pubquiz.fragen WHERE fragen_id=$1",[id])).rows[0].updated_at.toISOString();
+        await assert.rejects(statusDb.$transaction(tx => transitionStoredQuestionStatus(tx,actor,{questionId:id,target:"APPROVED",expectedUpdatedAt:updatedAt},async()=>{throw new Error("INVALID_CONTENT");})),/INVALID_CONTENT/);
+        assert.deepEqual(await content(id),original);
+      }
+    } finally { await statusDb.$disconnect(); }
   } finally {await client.end();}
 });

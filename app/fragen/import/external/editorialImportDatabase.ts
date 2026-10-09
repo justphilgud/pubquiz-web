@@ -20,7 +20,7 @@ const PROTECTED_TABLES = [
 type Integrity = Record<string, { count: number; digest: string }>;
 export type EditorialDatabaseInput = { connectionString: string; source: EditorialSource; operatorUserId?: number; mode: "dry-run" | "import"; expectedDryRunDigest?: string };
 
-async function snapshot(client: Client, exclude: number[] = []): Promise<Integrity> {
+export async function editorialIntegritySnapshot(client: Client, exclude: number[] = []): Promise<Integrity> {
   const result: Integrity = {};
   for (const table of PROTECTED_TABLES) {
     // Table identifiers come exclusively from the constant allowlist above.
@@ -35,6 +35,7 @@ async function snapshot(client: Client, exclude: number[] = []): Promise<Integri
   for (const row of counts.rows) result[`template:${row.code}`] = { count: row.count, digest: String(row.count) };
   return result;
 }
+const snapshot = editorialIntegritySnapshot;
 async function inventory(client: Client, source: EditorialSource) {
   const questions = await client.query(`SELECT f.fragen_id AS id, f.frage AS question, v.code AS "templateId",
     COALESCE((SELECT jsonb_agg(a.antwort ORDER BY a.antwort_id) FROM pubquiz.antworten a WHERE a.fragen_id=f.fragen_id AND a.ist_richtig), '[]'::jsonb) AS solutions,
