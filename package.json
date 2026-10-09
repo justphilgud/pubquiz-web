@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npm run dev:check && next dev",
     "dev:check": "tsx scripts/env-check.ts",
+    "prebuild": "npm run db:generate",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

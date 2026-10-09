@@ -70,3 +70,13 @@ Provider-Timeout erhält Draft. Dies ist kein echter OpenAI-Provider-Nachweis.
 Production-READY/Projekt/Commit und beide Aliasbindungen am 10.10.2026 kontrolliert:
 541b913c7a27e4a88ed0a339598dcae5904ea7aa, dpl_2BKPFmFFV4r1ZUCKLmnfLYZPE9Sp,
 pubquiz-web.vercel.app und pubquiz-web-just-phil-gud.vercel.app unverändert.
+
+## Preview-Buildbefund
+
+Preview-Run 37999636585 auf c1537a170fe2c35f2fd92a67553159cbf56e0315:
+Guard, Datenbankidentität, Migration und Status erfolgreich; Vercel-Build scheiterte
+mit TypeScript: stichentscheid_json fehlt im eingecheckten Client. CI regeneriert
+den Client vor Typecheck, Vercels vorhandenes npm run build bisher nicht.
+Gezielte Korrektur im selben PR: npm-prebuild generiert Prisma ohne Datenbankzugriff.
+Keine Projektkonfiguration, Credentials, Daten oder historischen Migrationen geändert.
+Der kommende identische Preview-Versuch hat keine ausstehenden neuen Migrationen.
