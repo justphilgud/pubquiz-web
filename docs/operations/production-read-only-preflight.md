@@ -164,3 +164,14 @@ ambiguous/other locations block before history read. No dynamic SQL or fallback.
 History checksums bind the selected relation to both immutable Git manifests.
 Only the backup connection schema parameter (public metadata or null), never the
 application credential or complete URL, is recorded. No permissions are changed.
+
+## 0_init diagnostic evidence, no acceptance change
+
+After all existing gates, read-only history metadata for 0_init and existing pure
+column/catalog SELECTs are exported, without logs or application rows. Repository
+bytes, LF/CRLF hashes and legacy hex comparisons follow Prisma Engine e922089
+checksum.rs. BOM/SQL/whitespace are preserved. The raw drift gate is unchanged.
+Model table/column and enum inventory is compared against the immutable active
+Production schema; candidate difficulty remains pending. Types/defaults/constraints/
+indexes/sequences/views equivalence is not proven by inventory and is explicitly
+INCOMPLETE. Catalog evidence is retained for further review, never a schema PASS.
