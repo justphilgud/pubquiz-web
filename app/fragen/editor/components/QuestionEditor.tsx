@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { saveQuestion, changeQuestionStatus } from "../actions";
+import { shouldChangeOnlyQuestionStatus } from "../questionStatus";
 import {
   findQuestionTemplate,
   questionTemplateIds,
@@ -821,6 +822,11 @@ export function QuestionEditor({
     }
 
     if (capabilities.canApproveQuestion) {
+      // Pure approval must never fall through to category decisions/full draft saving.
+      if (shouldChangeOnlyQuestionStatus(questionRecord?.questionId, hasUnsavedChanges, questionRecord?.reviewStatus)) {
+        void handleStatusChange("APPROVED");
+        return;
+      }
       if (editorContext === "review" && quality.blockers.length > 0) {
         setSaveMessage({
           tone: "error",
@@ -851,11 +857,7 @@ export function QuestionEditor({
         return;
       }
 
-      if (questionRecord && !hasUnsavedChanges && questionRecord.reviewStatus !== "APPROVED") {
-        void handleStatusChange("APPROVED");
-      } else {
-        void handleSave("APPROVE", "APPROVE");
-      }
+      void handleSave("APPROVE", "APPROVE");
       return;
     }
 
@@ -909,7 +911,7 @@ export function QuestionEditor({
 
   const pageTitle = messages.editor.titles[editorContext];
   const workflowIdleLabel =
-    questionRecord && !hasUnsavedChanges && capabilities.canApproveQuestion && questionRecord.reviewStatus !== "APPROVED"
+    capabilities.canApproveQuestion && shouldChangeOnlyQuestionStatus(questionRecord?.questionId, hasUnsavedChanges, questionRecord?.reviewStatus)
       ? "Gespeicherten Inhalt freigeben"
       : questionRecord?.reviewStatus === "CHANGES_REQUESTED" &&
     capabilities.canSubmitForReview

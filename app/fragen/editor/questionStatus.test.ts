@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { questionStatusUpdate } from "./questionStatus";
+import { questionStatusUpdate, shouldChangeOnlyQuestionStatus } from "./questionStatus";
 import { parseQuestionTemplateData } from "./templates/questionTemplateData";
 import { questionTemplateIds } from "./templates/questionTemplateRegistry";
 import type { QuestionScopeAccessContext } from "./questionScopePolicy";
@@ -8,6 +8,13 @@ import type { QuestionScopeAccessContext } from "./questionScopePolicy";
 const admin = { userId: 1, assignments: [{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }] };
 const context: QuestionScopeAccessContext = { scope: "GLOBAL", eventSeriesIds: [], createdByUserId: 1,
   reviewStatus: "DRAFT", isArchived: false, isApproved: false };
+
+test("unchanged existing approval uses stored content; new/dirty drafts remain explicit saves", () => {
+  for (const status of ["DRAFT","IN_REVIEW","CHANGES_REQUESTED"]) assert.equal(shouldChangeOnlyQuestionStatus(154,false,status),true);
+  assert.equal(shouldChangeOnlyQuestionStatus(154,true,"DRAFT"),false);
+  assert.equal(shouldChangeOnlyQuestionStatus(undefined,false,undefined),false);
+  assert.equal(shouldChangeOnlyQuestionStatus(154,false,"APPROVED"),false);
+});
 
 test("status transitions preserve content, sources, units, variants and relation identities", () => {
   for (const template of ["anagramm", "schaetzfrage", "fakten_frei", "multiple_choice", "face_morph", "pixel"] ) {

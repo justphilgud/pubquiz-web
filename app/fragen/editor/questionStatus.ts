@@ -2,6 +2,10 @@ import { canApproveScopedQuestion, type QuestionActorContext, type QuestionScope
 
 export type QuestionStatusTarget = "DRAFT" | "APPROVED";
 
+export function shouldChangeOnlyQuestionStatus(questionId: number | undefined, hasUnsavedChanges: boolean, reviewStatus: string | undefined) {
+  return questionId !== undefined && !hasUnsavedChanges && reviewStatus !== "APPROVED";
+}
+
 /** Status metadata only. Neither incomplete/content fields nor quiz data belong here. */
 export function questionStatusUpdate(actor: QuestionActorContext, question: QuestionScopeAccessContext, target: QuestionStatusTarget, now = new Date()) {
   if (!Number.isSafeInteger(actor.userId) || actor.userId <= 0 || question.isArchived ||
