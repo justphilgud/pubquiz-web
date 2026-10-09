@@ -64,7 +64,7 @@ import {
   parseQuestionTemplateConfigDraft,
 } from "./pixelTemplateConfig";
 import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
-import { hasRequiredTemplateAnswerImages } from "./questionQuality";
+import { evaluateQuestionQuality, hasRequiredTemplateAnswerImages } from "./questionQuality";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
 import { getAffectedQuestionIds } from "./questionSaveResult";
 import {
@@ -111,11 +111,18 @@ export async function changeQuestionStatus(input: {
   try {
     await prisma.$transaction(async (tx) => {
       await transitionStoredQuestionStatus(tx, actor, input, async (draft) => {
-        validateQuestion({
+        const normalized = validateQuestion({
           ...draft, sourceTemplateId: draft.sourceTemplateId ?? null,
           questionId: input.questionId, intent: "APPROVE",
           answers: draft.answers.map(({ id, ...answer }) => ({ ...answer, clientId: id })),
         });
+        if (evaluateQuestionQuality(draft).blockers.length) {
+          throw new DraftValidationError("Vorlagendaten oder erforderliche Medien sind unvollständig.");
+        }
+        const snapshot = await resolveDynamicTemplateSnapshot(normalized.sourceTemplateId, normalized.templateId, input.questionId);
+        if (snapshot && getDynamicTemplateRequirementIssue(snapshot, normalized)) {
+          throw new DraftValidationError("Die Pflichtfelder der Spezialvorlage sind unvollständig.");
+        }
         const pending = await tx.fragenkategorie.count({ where: {
           fragenkategorie_id: { in: draft.categoryIds }, status: "PENDING",
         } });

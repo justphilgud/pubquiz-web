@@ -94,7 +94,7 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
       const run = (await client.query("INSERT INTO pubquiz.quiz_interaction_runs(quiz_id,quiz_fragen_id,interaction_type,config_snapshot,updated_at) VALUES($1,$2,'FREE_TEXT','{}',now()) RETURNING interaction_run_id", [quiz,assignment])).rows[0].interaction_run_id;
       const answer = (await client.query("INSERT INTO pubquiz.team_antworten(quiz_id,quiz_abschnitt_id,quiz_fragen_id,quiz_team_session_id,antwort_text,manuelle_punkte,vergebene_punkte,ist_manuell_richtig,interaction_run_id) VALUES($1,$2,$3,$4,'Preserve answer',1,1,true,$5) RETURNING team_antwort_id", [quiz,block,assignment,session,run])).rows[0].team_antwort_id;
       await client.query("INSERT INTO pubquiz.team_answer_submissions(interaction_run_id,team_antwort_id,quiz_team_session_id,status,interaction_type,payload,draft_revision) VALUES($1,$2,$3,'AUTO_FINALIZED','FREE_TEXT','{\"text\":\"Preserve answer\"}',1)", [run,answer,session]);
-      await client.query("INSERT INTO pubquiz.antworten(fragen_id,antwort,ist_richtig) VALUES($1,'Preserved variant',true)",[id]);
+      await client.query("INSERT INTO pubquiz.antworten(fragen_id,antwort,ist_richtig,antworttyp_id) SELECT $1,'Preserved variant',true,antworttyp_id FROM pubquiz.antworttyp WHERE antworttyp='Standard'",[id]);
     }
     const statusDb = new PrismaClient({ adapter: new PrismaPg({ connectionString: url.toString() }) });
     const actor = { userId: operator, assignments: [{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }] };
