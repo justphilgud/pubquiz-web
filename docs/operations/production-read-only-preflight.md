@@ -34,7 +34,7 @@ Writerumgebung. Bestehendes Vercelcredential kann umfangreichere API-Rechte habe
 der Code verwendet ausschließlich GET und ruft keine Environment-/Secret-API auf.
 Datenbank-SELECT-Rechte sollten zusätzlich rollenbedingt eingeschränkt bleiben;
 eine privilegiertere Rolle wird abgewiesen und fehlende Rechte nicht automatisch
-erweitert. Für `pubquiz._prisma_migrations` werden USAGE auf Schema und SELECT auf
+erweitert. Für `public._prisma_migrations` werden USAGE auf Schema und SELECT auf
 die Historientabelle benötigt; keine INSERT/UPDATE/DELETE/DDL-Rechte. Keine neue
 Rolle, Credentialkopie oder Secretrotation in diesem PR.
 
@@ -152,3 +152,15 @@ are diagnosed separately. No catalog result dynamically selects a history table.
 The existing pubquiz history gate remains unchanged until actual Production evidence
 proves its location and Prisma CLI linkage. Missing privileges block; no grants,
 connection strings, passwords or migration contents enter diagnostic artifacts.
+
+## Verified Production migration-history binding (09 Oct 2026)
+
+Run 37953169907 confirmed only public._prisma_migrations in the pinned Production
+endpoint/database, reader pubquiz_backup_reader, READ ONLY, schema USAGE and SELECT,
+no write privileges/elevated roles/membership/ownership. search_path is "$user", public.
+Model schemas remain pubquiz in both approved baseline and candidate. Runtime
+requires that exact Prisma configuration and only the public history relation;
+ambiguous/other locations block before history read. No dynamic SQL or fallback.
+History checksums bind the selected relation to both immutable Git manifests.
+Only the backup connection schema parameter (public metadata or null), never the
+application credential or complete URL, is recorded. No permissions are changed.

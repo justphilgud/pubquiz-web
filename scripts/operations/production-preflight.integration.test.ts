@@ -10,40 +10,36 @@ test("actual PostgreSQL SELECT-role preflight never mutates data; missing permis
   const reader=new Client({connectionString,options:"-c role=preflight_reader"});
   try {
     // Fixture creation is confined to disposable CI; the Production module has no DDL.
-    await admin.query("CREATE SCHEMA pubquiz; CREATE TABLE pubquiz._prisma_migrations(migration_name text,checksum text,finished_at timestamptz,rolled_back_at timestamptz,started_at timestamptz); CREATE TABLE pubquiz.protected_fixture(value int); INSERT INTO pubquiz.protected_fixture VALUES(1)");
-    await admin.query("INSERT INTO pubquiz._prisma_migrations VALUES('a','1',now(),null,now())");
-    await admin.query("CREATE ROLE preflight_reader NOLOGIN; GRANT USAGE ON SCHEMA pubquiz TO preflight_reader; GRANT SELECT ON ALL TABLES IN SCHEMA pubquiz TO preflight_reader");
+    await admin.query("CREATE SCHEMA pubquiz; CREATE TABLE public._prisma_migrations(migration_name text,checksum text,finished_at timestamptz,rolled_back_at timestamptz,started_at timestamptz); CREATE TABLE pubquiz.protected_fixture(value int); INSERT INTO pubquiz.protected_fixture VALUES(1)");
+    await admin.query("INSERT INTO public._prisma_migrations VALUES('a','1',now(),null,now())");
+    await admin.query("CREATE ROLE preflight_reader NOLOGIN; GRANT USAGE ON SCHEMA pubquiz TO preflight_reader; GRANT SELECT ON public._prisma_migrations, pubquiz.protected_fixture TO preflight_reader");
     await reader.connect();
-    const before=(await admin.query("SELECT md5(string_agg(to_jsonb(t)::text,',')) AS digest FROM pubquiz._prisma_migrations t")).rows;
+    const before=(await admin.query("SELECT md5(string_agg(to_jsonb(t)::text,',')) AS digest FROM public._prisma_migrations t")).rows;
     const candidate=[{name:"a",checksum:"1"},{name:"b",checksum:"2"}];
     const result=await readMigrationSession(reader,candidate,candidate.slice(0,1),"preflight_reader","preflight_ci");
     assert.equal(result.gate.status,"PASS");assert.ok('pending' in result);assert.deepEqual(result.pending,["b"]);
-    assert.deepEqual((await admin.query("SELECT md5(string_agg(to_jsonb(t)::text,',')) AS digest FROM pubquiz._prisma_migrations t")).rows,before);
+    assert.deepEqual((await admin.query("SELECT md5(string_agg(to_jsonb(t)::text,',')) AS digest FROM public._prisma_migrations t")).rows,before);
     await reader.query("BEGIN READ ONLY");await assert.rejects(reader.query("UPDATE pubquiz.protected_fixture SET value=2"));await reader.query("ROLLBACK");
     assert.equal((await admin.query("SELECT value FROM pubquiz.protected_fixture")).rows[0].value,1);
     // Even a privileged session cannot write inside this explicit read-only transaction.
     await admin.query("BEGIN READ ONLY");await assert.rejects(admin.query("UPDATE pubquiz.protected_fixture SET value=3"),error=>(error as {code:string}).code==="25006");await admin.query("ROLLBACK");
     for (const privilege of ['INSERT','UPDATE','DELETE','TRUNCATE']) {
-      await admin.query(`GRANT ${privilege} ON pubquiz._prisma_migrations TO preflight_reader`);
+      await admin.query(`GRANT ${privilege} ON public._prisma_migrations TO preflight_reader`);
       assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci')).gate.code,'DATABASE_READER_PRIVILEGES_REJECTED');
-      await admin.query(`REVOKE ${privilege} ON pubquiz._prisma_migrations FROM preflight_reader`);
+      await admin.query(`REVOKE ${privilege} ON public._prisma_migrations FROM preflight_reader`);
     }
     await admin.query('CREATE ROLE preflight_parent NOLOGIN; GRANT preflight_parent TO preflight_reader');
     assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci')).gate.code,'DATABASE_READER_PRIVILEGES_REJECTED');
     await admin.query('REVOKE preflight_parent FROM preflight_reader');
     assert.equal((await readMigrationSession(admin,candidate,candidate.slice(0,1),'preflight_ci','preflight_ci')).gate.code,'DATABASE_READER_PRIVILEGES_REJECTED');
-    await admin.query("ALTER TABLE pubquiz._prisma_migrations SET SCHEMA public");
-    const publicResult=await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci');
-    assert.equal(publicResult.gate.code,'MIGRATION_RELATION_UNVERIFIED');
-    assert.ok('diagnosis' in publicResult);
-    assert.deepEqual(publicResult.diagnosis?.migrationSchemas,['public']);
-    assert.equal(publicResult.diagnosis?.publicPrivileges?.can_select,true);
-    assert.equal(publicResult.diagnosis?.publicPrivileges?.can_write,false);
-    await admin.query("REVOKE SELECT ON public._prisma_migrations FROM preflight_reader");
-    const deniedPublic=await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci');
-    assert.ok('diagnosis' in deniedPublic);assert.equal(deniedPublic.diagnosis?.publicPrivileges?.can_select,false);
+    await admin.query("CREATE TABLE pubquiz._prisma_migrations (LIKE public._prisma_migrations)");
+    assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci')).gate.code,'MIGRATION_SCHEMA_BINDING_UNVERIFIED');
+    await admin.query("DROP TABLE pubquiz._prisma_migrations");
     await admin.query("ALTER TABLE public._prisma_migrations SET SCHEMA pubquiz");
-    await admin.query("REVOKE SELECT ON pubquiz._prisma_migrations FROM preflight_reader");
+    assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci')).gate.code,'MIGRATION_SCHEMA_BINDING_UNVERIFIED');
+    await admin.query("ALTER TABLE pubquiz._prisma_migrations SET SCHEMA public");
+    await admin.query("REVOKE SELECT ON public._prisma_migrations FROM preflight_reader");
     assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),"preflight_reader","preflight_ci")).gate.code,"DATABASE_SELECT_PERMISSION_MISSING");
+
   } finally {await reader.end();await admin.end();}
 });
