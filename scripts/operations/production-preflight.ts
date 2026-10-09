@@ -28,6 +28,21 @@ export function migrationFiles(sha: string): Migration[] {
   if (!files.length) throw new Error("MIGRATION_MANIFEST_UNAVAILABLE");
   return files.map(path => ({ name: path.split("/")[2], checksum: createHash("sha256").update(execFileSync("git", ["show", `${sha}:${path}`])).digest("hex") }));
 }
+export const MIGRATION_CATALOG_SQL = `SELECT current_setting('search_path') AS search_path,
+  ARRAY(SELECT nspname FROM pg_namespace WHERE nspname !~ '^pg_' AND nspname <> 'information_schema' ORDER BY nspname) AS schemas,
+  ARRAY(SELECT n.nspname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE c.relname='_prisma_migrations' AND c.relkind IN ('r','p') ORDER BY n.nspname) AS migration_schemas`;
+// Catalog diagnosis never chooses a relation or reads migration contents.
+export const PUBLIC_MIGRATION_PRIVILEGES_SQL = `SELECT
+  to_regclass('public._prisma_migrations') IS NOT NULL AS relation_exists,
+  has_schema_privilege(current_user, 'public', 'USAGE') AS schema_usage,
+  has_table_privilege(current_user, to_regclass('public._prisma_migrations'), 'SELECT') AS can_select,
+  has_table_privilege(current_user, to_regclass('public._prisma_migrations'), 'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AS can_write,
+  EXISTS (SELECT 1 FROM pg_roles WHERE rolname=current_user AND
+    (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)) AS elevated_role,
+  EXISTS (SELECT 1 FROM pg_roles WHERE rolname<>current_user AND pg_has_role(current_user,oid,'MEMBER')) AS role_membership,
+  EXISTS (SELECT 1 FROM pg_class WHERE oid=to_regclass('public._prisma_migrations')
+    AND pg_has_role(current_user,relowner,'USAGE')) AS owns_relation`;
 export const MIGRATION_PRIVILEGES_SQL = `SELECT
   to_regclass('pubquiz._prisma_migrations') IS NOT NULL AS relation_exists,
   has_schema_privilege(current_user, 'pubquiz', 'USAGE') AS schema_usage,
@@ -60,11 +75,18 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     await client.query(DATABASE_READ_QUERIES[1]);
     const session = (await client.query(DATABASE_READ_QUERIES[2])).rows[0];
     if (session?.read_only !== "on" || session.role !== expectedRole || session.database !== expectedDatabase) return { gate: gate("BLOCKED", "DATABASE_SESSION_UNVERIFIED") };
+    const catalogRow = (await client.query(MIGRATION_CATALOG_SQL)).rows[0];
+    const safeNames = (value: unknown): string[] | undefined => Array.isArray(value) && value.every(name=>typeof name==='string' && /^[a-zA-Z_][a-zA-Z0-9_$]{0,62}$/.test(name)) ? value : undefined;
+    const schemas=safeNames(catalogRow?.schemas), migrationSchemas=safeNames(catalogRow?.migration_schemas);
+    if (!schemas || !migrationSchemas || typeof catalogRow?.search_path !== 'string' || !/^[a-zA-Z0-9_$", .]+$/.test(catalogRow.search_path)) return {gate:gate('BLOCKED','MIGRATION_CATALOG_UNVERIFIED')};
+    const publicPrivileges=(await client.query(PUBLIC_MIGRATION_PRIVILEGES_SQL)).rows[0] as MigrationPrivileges | undefined;
+    const diagnosis={searchPath:catalogRow.search_path,schemas,migrationSchemas,publicPrivileges,
+      identity:{role:session.role,database:session.database,readOnly:true}};
     const privileges = (await client.query(DATABASE_READ_QUERIES[3])).rows[0] as MigrationPrivileges | undefined;
     const privilegesGate = assessMigrationPrivileges(privileges);
-    if (privilegesGate.status !== 'PASS') return { gate: privilegesGate, privileges };
+    if (privilegesGate.status !== 'PASS') return { gate: privilegesGate, privileges, diagnosis };
     const rows = (await client.query(DATABASE_READ_QUERIES[4])).rows as Applied[];
-    return { ...assessMigrations(candidate, baseline, rows), privileges, privilegesGate, identity: { role: session.role, database: session.database, readOnly: true } };
+    return { ...assessMigrations(candidate, baseline, rows), privileges, privilegesGate, diagnosis, identity: { role: session.role, database: session.database, readOnly: true } };
   } catch (error) { return { gate: gate("BLOCKED", (error as { code?: string }).code === "42501" ? "DATABASE_SELECT_PERMISSION_MISSING" : "MIGRATION_STATUS_UNAVAILABLE") }; }
   finally { await client.query("ROLLBACK").catch(() => undefined); }
 }

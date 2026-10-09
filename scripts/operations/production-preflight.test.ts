@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { APPROVED_ROLLBACK, assessMigrationPrivileges, readMigrationSession, assessMigrations, assertPreflightContext, DATABASE_READ_QUERIES, readProductionDeployment, readProductionMigrations } from "./production-preflight";
+import { MIGRATION_CATALOG_SQL, PUBLIC_MIGRATION_PRIVILEGES_SQL, APPROVED_ROLLBACK, assessMigrationPrivileges, readMigrationSession, assessMigrations, assertPreflightContext, DATABASE_READ_QUERIES, readProductionDeployment, readProductionMigrations } from "./production-preflight";
 const a = { name: "a", checksum: "1" };
 const b = { name: "b", checksum: "2" };
 const installed = { migration_name: "a", checksum: "1", finished_at: "date", rolled_back_at: null };
@@ -44,7 +44,7 @@ test('unconfirmed privileges block before any migration-history read', async()=>
   for (const field of ['can_write','elevated_role','role_membership','owns_relation'] as const) assert.equal(assessMigrationPrivileges({...proof,[field]:true}).status,'BLOCKED');
   assert.equal(assessMigrationPrivileges(undefined).status,'BLOCKED');
   const queries:string[]=[];
-  const client={query:async(sql:string)=>{queries.push(sql);return {rows: sql===DATABASE_READ_QUERIES[2] ? [{role:'pubquiz_backup_reader',database:'neondb',read_only:'on'}] : sql===DATABASE_READ_QUERIES[3] ? [{...proof,can_write:true}] : []};}};
+  const client={query:async(sql:string)=>{queries.push(sql);return {rows: sql===DATABASE_READ_QUERIES[2] ? [{role:'pubquiz_backup_reader',database:'neondb',read_only:'on'}] : sql===MIGRATION_CATALOG_SQL ? [{search_path:'public',schemas:['public','pubquiz'],migration_schemas:['public']}] : sql===PUBLIC_MIGRATION_PRIVILEGES_SQL ? [proof] : sql===DATABASE_READ_QUERIES[3] ? [{...proof,can_write:true}] : []};}};
   const result=await readMigrationSession(client as Parameters<typeof readMigrationSession>[0],[a],[a]);
   assert.equal(result.gate.status,'BLOCKED');assert.ok(!queries.includes(DATABASE_READ_QUERIES[4]));assert.equal(queries.at(-1),'ROLLBACK');
 });
@@ -95,4 +95,16 @@ test('only the pinned rollback pair with live history accepts divergent Producti
     [f=>{f.history.events=[];},'BLOCKED'],[f=>{f.target.meta={} as Fixture['target']['meta'];},'BLOCKED'],
     [f=>{f.project.autoAssignCustomDomains=true;},'FAIL'],[f=>{f.history.events[0].payload.toDeploymentId='dpl_changed';},'BLOCKED']];
   for(const [mutate,status]of cases){const f=structuredClone(base);mutate(f);const result=await run(f);assert.equal(result.gate.status,status);assert.ok(!JSON.stringify(result).includes('SECRET'));}
+});
+
+test('catalog diagnosis reports public relation but never selects its migration contents',async()=>{
+  const queries:string[]=[];
+  const proof={relation_exists:true,schema_usage:true,can_select:false,can_write:false,elevated_role:false,role_membership:false,owns_relation:false};
+  const client={query:async(sql:string)=>{queries.push(sql);return {rows:sql===DATABASE_READ_QUERIES[2]?[{role:'pubquiz_backup_reader',database:'neondb',read_only:'on'}]:sql===MIGRATION_CATALOG_SQL?[{search_path:'"$user", public',schemas:['public','pubquiz'],migration_schemas:['public']}]:sql===PUBLIC_MIGRATION_PRIVILEGES_SQL?[proof]:sql===DATABASE_READ_QUERIES[3]?[{...proof,relation_exists:false}]:[]};}};
+  const result=await readMigrationSession(client as Parameters<typeof readMigrationSession>[0],[a],[a]);
+  assert.equal(result.gate.status,'BLOCKED');assert.ok('diagnosis' in result);
+  assert.deepEqual(result.diagnosis?.migrationSchemas,['public']);
+  assert.equal(result.diagnosis?.publicPrivileges?.can_select,false);
+  assert.ok(!queries.includes(DATABASE_READ_QUERIES[4]));
+  assert.ok(queries.every(sql=>/^(BEGIN|SET LOCAL|SELECT|ROLLBACK)\b/.test(sql)));
 });
