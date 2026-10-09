@@ -21,7 +21,7 @@ async function main(){
   const sql=(query:Buffer|string)=>docker(['exec','-i',name,'psql','--no-psqlrc','--set','ON_ERROR_STOP=1','-U','postgres','-d','postgres','-At'],query);
   phase='REFERENCE_BOOTSTRAP';sql(bootstrap);
   for(const file of manifest.filter(file=>file.name!==plan.baselineSnapshot)){phase=`REFERENCE_INCREMENT_${file.name}`;sql(execFileSync('git',['show',`${sha}:prisma/migrations/${file.name}/migration.sql`]));}
-  const query=(query:string)=>JSON.parse(sql(`BEGIN READ ONLY;\n${query};\nROLLBACK;`).split('\n').filter(line=>line.startsWith('{')||line.startsWith('[')).join('\n'));
+  const query=(query:string)=>JSON.parse(sql(`BEGIN READ ONLY;\n${query};\nROLLBACK;`).split('\n').filter(line=>!['BEGIN','ROLLBACK',''].includes(line.trim())).join('\n'));
   phase='CATALOG_CAPTURE';
   const columns=query(DIAGNOSTIC_COLUMNS_SQL),catalog=query(DIAGNOSTIC_CATALOG_SQL),objects=query(SCHEMA_OBJECTS_SQL);
   phase='DELTA_TEST';
