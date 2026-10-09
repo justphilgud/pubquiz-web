@@ -32,6 +32,17 @@ test("actual PostgreSQL SELECT-role preflight never mutates data; missing permis
     assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci')).gate.code,'DATABASE_READER_PRIVILEGES_REJECTED');
     await admin.query('REVOKE preflight_parent FROM preflight_reader');
     assert.equal((await readMigrationSession(admin,candidate,candidate.slice(0,1),'preflight_ci','preflight_ci')).gate.code,'DATABASE_READER_PRIVILEGES_REJECTED');
+    await admin.query("ALTER TABLE pubquiz._prisma_migrations SET SCHEMA public");
+    const publicResult=await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci');
+    assert.equal(publicResult.gate.code,'MIGRATION_RELATION_UNVERIFIED');
+    assert.ok('diagnosis' in publicResult);
+    assert.deepEqual(publicResult.diagnosis?.migrationSchemas,['public']);
+    assert.equal(publicResult.diagnosis?.publicPrivileges?.can_select,true);
+    assert.equal(publicResult.diagnosis?.publicPrivileges?.can_write,false);
+    await admin.query("REVOKE SELECT ON public._prisma_migrations FROM preflight_reader");
+    const deniedPublic=await readMigrationSession(reader,candidate,candidate.slice(0,1),'preflight_reader','preflight_ci');
+    assert.ok('diagnosis' in deniedPublic);assert.equal(deniedPublic.diagnosis?.publicPrivileges?.can_select,false);
+    await admin.query("ALTER TABLE public._prisma_migrations SET SCHEMA pubquiz");
     await admin.query("REVOKE SELECT ON pubquiz._prisma_migrations FROM preflight_reader");
     assert.equal((await readMigrationSession(reader,candidate,candidate.slice(0,1),"preflight_reader","preflight_ci")).gate.code,"DATABASE_SELECT_PERMISSION_MISSING");
   } finally {await reader.end();await admin.end();}

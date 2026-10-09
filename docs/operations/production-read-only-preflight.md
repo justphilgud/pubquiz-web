@@ -143,3 +143,12 @@ Projektziel und Alias werden erneut gelesen. Normale identische Zuordnung bleibt
 gueltig; jede unbekannte Abweichung FAIL. Keine allgemeine Ausnahme, keine
 Rohhistorie gespeichert und keine DB-Abfrage vor Gesamt-PASS. Jede Aenderung
 dieses Ausnahmezustands benoetigt eine neue ausdrueckliche Freigabe.
+
+## Fixed read-only schema diagnosis
+
+After verified session identity, catalog SELECTs report search_path, non-system schemas
+and all physical _prisma_migrations locations. Rights for the exact public relation
+are diagnosed separately. No catalog result dynamically selects a history table.
+The existing pubquiz history gate remains unchanged until actual Production evidence
+proves its location and Prisma CLI linkage. Missing privileges block; no grants,
+connection strings, passwords or migration contents enter diagnostic artifacts.
