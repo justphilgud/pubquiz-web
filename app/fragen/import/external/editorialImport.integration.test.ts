@@ -40,7 +40,9 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     const existing=(await client.query("INSERT INTO pubquiz.fragen(frage,quelle) VALUES('Existing integrity fixture','untouched') RETURNING fragen_id")).rows[0].fragen_id;
     const source:EditorialSource={provider:"Editorial:integration",files:[{name:"anagrams.json",sha256:sha256(raw)},{name:"estimates.json",sha256:sha256(estimatesRaw)}],candidates};
     const options={connectionString:connectionString!,source,operatorUserId:operator};
-    await client.query('CREATE TABLE IF NOT EXISTS pubquiz._prisma_migrations (migration_name text, checksum text, finished_at timestamptz, rolled_back_at timestamptz)');
+    await client.query('CREATE TABLE IF NOT EXISTS public._prisma_migrations (migration_name text, checksum text, finished_at timestamptz, rolled_back_at timestamptz)');
+    // The real Production relation is public; a misleading pubquiz namesake must not be selected.
+    await client.query('CREATE TABLE pubquiz._prisma_migrations (migration_name text)');
     const { approvedProductionEditorialSource } = await import('./editorialProductionPolicy');
     const frozenProductionSource = approvedProductionEditorialSource();
     const beforeProduction = await editorialIntegritySnapshot(client);
@@ -49,7 +51,11 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
     assert.deepEqual(productionPreflight.before,productionPreflight.after);
     assert.deepEqual(await editorialIntegritySnapshot(client),beforeProduction);
     assert.equal(productionPreflight.mode,'dry-run');
-    if (productionPreflight.mode === 'dry-run') assert.ok(productionPreflight.productionSchema);
+    if (productionPreflight.mode === 'dry-run') {
+      const schema = productionPreflight.productionSchema as {migrations:unknown[]};
+      assert.ok(Array.isArray(schema.migrations));
+      assert.deepEqual(schema.migrations,(await client.query('SELECT migration_name,checksum,finished_at,rolled_back_at FROM public._prisma_migrations ORDER BY migration_name')).rows);
+    }
     await assert.rejects(runEditorialDatabaseImport({connectionString:connectionString!,source:frozenProductionSource,mode:'import',productionPreflight:true,operatorUserId:operator}),/WRITE_NOT_AUTHORIZED/);
     const before=(await client.query("SELECT count(*)::int AS count FROM pubquiz.fragen")).rows[0].count;
     const preview=await runEditorialDatabaseImport({...options,operatorUserId:undefined,mode:"dry-run"});

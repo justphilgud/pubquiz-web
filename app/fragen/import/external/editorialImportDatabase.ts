@@ -88,7 +88,7 @@ export async function runEditorialDatabaseImport(input: EditorialDatabaseInput) 
       const session = (await client.query("SELECT current_user AS role, current_database() AS database")).rows[0];
       if (!isolatedCi && (session.role !== "pubquiz_backup_reader" || session.database !== "neondb")) throw new Error("EDITORIAL_PRODUCTION_READER_REQUIRED");
       // Read migration history without executing Prisma migrations or touching application data.
-      const history = await client.query('SELECT migration_name, checksum, finished_at, rolled_back_at FROM pubquiz._prisma_migrations ORDER BY migration_name');
+      const history = await client.query('SELECT migration_name, checksum, finished_at, rolled_back_at FROM public._prisma_migrations ORDER BY migration_name');
       const column = await client.query("SELECT data_type,is_nullable,character_maximum_length FROM information_schema.columns WHERE table_schema='pubquiz' AND table_name='fragen' AND column_name='redaktionelle_schwierigkeit'");
       const constraint = await client.query("SELECT convalidated,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='pubquiz.fragen'::regclass AND conname='fragen_editorial_difficulty_check'");
       productionSchema = { migrations: history.rows, difficultyColumn: column.rows, difficultyConstraint: constraint.rows };

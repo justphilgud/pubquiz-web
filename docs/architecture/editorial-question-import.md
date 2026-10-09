@@ -150,3 +150,9 @@ Productionwrite-Abweisung vor Netzwerkzugriff, unveränderte Previewgrenze; real
 PostgreSQL-Nur-Lese-Inventur aller 79 mit unveränderter Baseline und Migrations-
 metadaten. Bestehende Transaktions-/Idempotenz-/Rollback-/Status-Regressionssuite
 bleibt aktiv.
+
+Production-Prismahistorie liegt nach dem autorisierten Production-Preflight
+explizit in public._prisma_migrations. Der redaktionelle Nur-Lese-Adapter liest
+ausschliesslich diese feste Relation; kein search_path-/Namens-Fallback. Ein
+PostgreSQL-Regressionstest mit irrefuehrender pubquiz-Namensrelation stellt
+sicher, dass diese nicht verwendet wird. Keine Schema- oder ACL-Aenderung.
