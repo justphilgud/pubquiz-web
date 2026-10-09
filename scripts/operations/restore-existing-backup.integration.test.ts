@@ -34,6 +34,13 @@ test("actual PostgreSQL dump/restore: empty guard, rollback, permissions, comple
   const path=join(directory,"database.dump");pgTool("pg_dump",["--format=custom","--no-owner","--no-acl","--no-comments","--schema=public","--schema=pubquiz","--exclude-table-data=pubquiz.users","--exclude-table-data=pubquiz.teams","--file",path],envFor("restore_source"));
   const sql=restoreSql(directory,expected.authRows,{expected},envFor("neondb"));
   await prove(target);
+  const ownerAdmin=await connect("neondb");
+  try {
+    await ownerAdmin.query("ALTER SCHEMA public OWNER TO postgres");
+    await assert.rejects(prove(target), /RESTORE_TARGET_PRIVILEGES_BLOCKED/);
+    await ownerAdmin.query("ALTER SCHEMA public OWNER TO pg_database_owner");
+  } finally {await ownerAdmin.end();}
+  await prove(target);
   // Single transaction includes guard and every DDL/data write: interruption rolls back.
   assert.throws(()=>pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor("neondb","neondb_owner"),sql+"\nSELECT 1/0;"));
   await prove(target);assert.equal((await target.query("SELECT to_regclass('pubquiz.users') AS r")).rows[0].r,null);
@@ -43,6 +50,10 @@ test("actual PostgreSQL dump/restore: empty guard, rollback, permissions, comple
   assert.equal((await target.query("SELECT id FROM public.unexpected")).rows[0].id,42);await target.query("DROP TABLE public.unexpected");
   pgTool("psql",["-X","-q","-v","ON_ERROR_STOP=1","--single-transaction","--file=-"],envFor("neondb","neondb_owner"),sql);
   compareSnapshots(expected,await snapshot(target));
+  for(const name of ["users_id_seq","teams_team_id_seq","quiz_team_sessions_quiz_team_session_id_seq","team_antworten_team_antwort_id_seq"]){
+    assert.deepEqual((await target.query(`SELECT last_value::text,is_called FROM pubquiz.${name}`)).rows,
+      (await source.query(`SELECT last_value::text,is_called FROM pubquiz.${name}`)).rows);
+  }
   assert.equal((await target.query("SELECT sum(vergebene_punkte)::text AS p FROM pubquiz.team_antworten")).rows[0].p,"2");
   assert.equal((await target.query("SELECT password_hash FROM pubquiz.users")).rows[0].password_hash,"");
   await assert.rejects(target.query("INSERT INTO pubquiz.team_antworten(quiz_team_session_id) VALUES(999)"));
