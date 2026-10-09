@@ -325,8 +325,8 @@ test("central acceptance on a different branch does not consume existing legacy 
   assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs }, branch), assertErrorCode("PREVIEW_MEDIA_OVERRIDE_FORBIDDEN"));
 });
 
-test("Vercel integration may expose the nonsecret store identity as plain config", () => {
-  const integrated = branchEnvironment.map((variable) => variable.key === "BLOB_STORE_ID"
+test("Vercel integration may expose the nonsecret store identity and public key as plain config", () => {
+  const integrated = branchEnvironment.map((variable) => ["BLOB_STORE_ID", "BLOB_WEBHOOK_PUBLIC_KEY"].includes(variable.key)
     ? { ...variable, type: "plain" } : variable);
   assert.doesNotThrow(() => verifyPreviewEnvironmentConfiguration({ envs: integrated }, branch));
   const wrongStore = integrated.map((variable) => variable.key === "BLOB_STORE_ID"
