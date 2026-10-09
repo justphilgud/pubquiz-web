@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { assessMigrationPrivileges, readMigrationSession, assessMigrations, assertPreflightContext, DATABASE_READ_QUERIES, readProductionDeployment, readProductionMigrations } from "./production-preflight";
+import { APPROVED_ROLLBACK, assessMigrationPrivileges, readMigrationSession, assessMigrations, assertPreflightContext, DATABASE_READ_QUERIES, readProductionDeployment, readProductionMigrations } from "./production-preflight";
 const a = { name: "a", checksum: "1" };
 const b = { name: "b", checksum: "2" };
 const installed = { migration_name: "a", checksum: "1", finished_at: "date", rolled_back_at: null };
@@ -55,7 +55,7 @@ test('each missing identity and confirmed mismatch produces an individual safe g
     {id:'dpl_x',projectId:input.project,target:'production',readyState:'READY',meta:{githubCommitSha:sha}}];
   const cases:[number,string,unknown,string,string][]=[
     [0,'deployment',{},'BLOCKED','ALIAS_DEPLOYMENT_ID_MISSING'],[0,'alias','wrong.example.com','FAIL','ALIAS_HOST_MISMATCH'],
-    [0,'projectId','prj_wrong','FAIL','ALIAS_PROJECT_MISMATCH'],[1,'targets',{},'BLOCKED','PROJECT_PRODUCTION_DEPLOYMENT_ID_MISSING'],
+    [0,'projectId','prj_wrong','FAIL','ALIAS_PROJECT_MISMATCH'],[1,'targets',{},'FAIL','UNAPPROVED_PRODUCTION_TARGET_DRIFT'],
     [2,'meta',{},'BLOCKED','DEPLOYMENT_SHA_MISSING'],[2,'target','preview','FAIL','DEPLOYMENT_ENVIRONMENT_MISMATCH'],
     [2,'readyState','ERROR','FAIL','DEPLOYMENT_STATE_MISMATCH'],[2,'meta',{githubCommitSha:'b'.repeat(40)},'FAIL','DEPLOYMENT_SHA_MISMATCH'],
     [2,'id',undefined,'BLOCKED','DEPLOYMENT_ID_MISSING']];
@@ -70,4 +70,29 @@ test('each missing identity and confirmed mismatch produces an individual safe g
     assert.equal(result.gate.status,'BLOCKED');assert.ok(result.gate.code.startsWith('ALIAS_API_'));assert.ok(!JSON.stringify(result).includes('SECRET'));
   }
   assert.equal((await readProductionDeployment(input,(async()=>new Response('null')) as typeof fetch)).gate.code,'ALIAS_API_RESPONSE_INVALID');
+});
+
+test('only the pinned rollback pair with live history accepts divergent Production targets',async()=>{
+  const approved=APPROVED_ROLLBACK,input={token:'SECRET',project:approved.project,team:approved.team,alias:approved.alias,expectedSha:approved.publicSha};
+  const base={alias:{alias:approved.alias,projectId:approved.project,deploymentId:approved.publicId},
+    project:{id:approved.project,targets:{production:{id:approved.targetId}},autoAssignCustomDomains:false},
+    public:{id:approved.publicId,projectId:approved.project,target:'production',readyState:'READY',meta:{githubCommitSha:approved.publicSha}},
+    target:{id:approved.targetId,projectId:approved.project,target:'production',readyState:'READY',meta:{githubCommitSha:approved.targetSha}},
+    history:{events:[{type:'instant-rollback-created',createdAt:approved.rollbackAt,payload:{projectId:approved.project,fromDeploymentId:approved.rollbackFrom,toDeploymentId:approved.targetId}},
+      {type:'aliases-assigned',createdAt:approved.aliasAssignedAt,payload:{projectId:approved.project,deployment:{id:approved.publicId}}}]}};
+  type Widen<T> = T extends string ? string : T extends number ? number : T extends boolean ? boolean : T extends Array<infer U> ? Widen<U>[] : { [K in keyof T]: Widen<T[K]> };
+  type Fixture=Widen<typeof base>;
+  const run=async(fixture:Fixture)=>readProductionDeployment(input,(async(url:unknown,options:RequestInit)=>{
+    assert.equal(options.method,'GET');const path=new URL(String(url)).pathname;
+    const value=path.startsWith('/v4/')?fixture.alias:path.startsWith('/v9/')?fixture.project:path==='/v3/events'?fixture.history:path.endsWith(approved.targetId)?fixture.target:fixture.public;
+    return new Response(JSON.stringify(value));
+  }) as typeof fetch);
+  assert.equal((await run(base)).gate.status,'PASS');
+  const cases:[(f:Fixture)=>void,string][]=[
+    [f=>{f.project.targets.production.id='dpl_unknown';},'FAIL'],[f=>{f.target.meta.githubCommitSha='b'.repeat(40);},'FAIL'],
+    [f=>{f.public.meta.githubCommitSha='b'.repeat(40);},'FAIL'],[f=>{f.target.projectId='prj_wrong';},'FAIL'],
+    [f=>{f.alias.alias='wrong.example.com';},'FAIL'],[f=>{f.alias.deploymentId='dpl_changed';},'FAIL'],
+    [f=>{f.history.events=[];},'BLOCKED'],[f=>{f.target.meta={} as Fixture['target']['meta'];},'BLOCKED'],
+    [f=>{f.project.autoAssignCustomDomains=true;},'FAIL'],[f=>{f.history.events[0].payload.toDeploymentId='dpl_changed';},'BLOCKED']];
+  for(const [mutate,status]of cases){const f=structuredClone(base);mutate(f);const result=await run(f);assert.equal(result.gate.status,status);assert.ok(!JSON.stringify(result).includes('SECRET'));}
 });

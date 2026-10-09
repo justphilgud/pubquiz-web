@@ -128,3 +128,18 @@ GitHub-Environment-Deploymentrecords von Preflightjobs belegen keinen Vercel-App
 und werden nicht als Ersatz für den Vercel-SHA verwendet.
 Die bisherigen generischen Artefakte erlauben keine rückwirkende Bestimmung des
 fehlenden Einzelnachweises. Erst die neue reale Ausführung kann diesen bestätigen.
+
+## Freigegebener dokumentierter Rollbackzustand
+
+Die Ausnahme gilt nur fuer Projekt prj_9Nnwer6B43P0nfrOZPIEygFWg666, Team
+team_BE4XNxNRwsaEnSb9N8FFvWEH und Alias pubquiz-web.vercel.app. Beide freigegebenen
+ID/SHA-Paare sind unveraenderlich in APPROVED_ROLLBACK hinterlegt. Beide Deployments
+muessen zum erwarteten Projekt gehoeren und Production/READY sein. Vollstaendige,
+widerspruchsfreie SHA-Nachweise, autoAssignCustomDomains=false und live gelesene
+historische Ereignisse sind zwingend: Rollback am 04.10.2026 22:40:18.367 UTC auf
+dpl_9CkTLdWXqJLcM3cdcT2S8UDZw54o und Aliaszuweisung am 06.10.2026 09:16:16.618 UTC
+auf dpl_Hr5Dji8br1THcwJdf79rLaLrz3SD. Fehlende Historie oder API-Rechte BLOCKED.
+Projektziel und Alias werden erneut gelesen. Normale identische Zuordnung bleibt
+gueltig; jede unbekannte Abweichung FAIL. Keine allgemeine Ausnahme, keine
+Rohhistorie gespeichert und keine DB-Abfrage vor Gesamt-PASS. Jede Aenderung
+dieses Ausnahmezustands benoetigt eine neue ausdrueckliche Freigabe.
