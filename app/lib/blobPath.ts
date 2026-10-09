@@ -1,4 +1,4 @@
-export type BlobEnvironmentPrefix = "dev" | "preview" | "prod";
+export type BlobEnvironmentPrefix = "dev" | "preview" | "prod" | `preview/${string}`;
 
 export type BlobPathArea =
   | "question-media"
@@ -35,6 +35,9 @@ export function buildBlobPath(
   area: BlobPathArea,
   segments: readonly string[] = [],
 ) {
+  if (!/^(?:dev|prod|preview(?:\/[a-f0-9]{64})?)$/.test(environmentPrefix)) {
+    throw new Error("Ungültiges Blob-Umgebungspräfix.");
+  }
   segments.forEach(assertSafePathSegment);
 
   return [environmentPrefix, area, ...segments].join("/");
@@ -45,4 +48,18 @@ export function getBlobAreaPrefix(
   area: BlobPathArea,
 ) {
   return `${buildBlobPath(environmentPrefix, area)}/`;
+}
+
+export function isBlobUrlInArea(
+  url: string,
+  environmentPrefix: BlobEnvironmentPrefix,
+  area: BlobPathArea,
+) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" &&
+      parsed.pathname.startsWith(`/${getBlobAreaPrefix(environmentPrefix, area)}`);
+  } catch {
+    return false;
+  }
 }

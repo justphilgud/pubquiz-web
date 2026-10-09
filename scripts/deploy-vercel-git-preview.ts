@@ -2,6 +2,9 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { PREVIEW_MEDIA_STORE_ID, PRODUCTION_MEDIA_STORE_ID } from "../config/media-store-policy";
+
+import { isTrustedPreviewBranch } from "./verify-preview-ci";
 
 const VERCEL_API_BASE_URL = "https://api.vercel.com";
 const EXPECTED_REPOSITORY = "justphilgud/pubquiz-web";
@@ -25,6 +28,7 @@ export type GitPreviewDeploymentInput = Readonly<{
   sha?: string;
   teamId?: string;
   token?: string;
+  trustedBranches?: string;
 }>;
 
 type ValidatedGitPreviewDeploymentInput = Readonly<{
@@ -50,6 +54,8 @@ type VercelProject = Readonly<{
 }>;
 
 type VercelEnvironmentVariable = Readonly<{
+  contentHint?: Readonly<{ storeId?: string }> | null;
+  visibility?: string;
   gitBranch?: string | null;
   key?: string;
   target?: string[];
@@ -58,7 +64,7 @@ type VercelEnvironmentVariable = Readonly<{
 
 type VercelEnvironmentResponse = Readonly<{
   envs?: VercelEnvironmentVariable[];
-}>;
+}> | VercelEnvironmentVariable[];
 
 type VercelDeployment = Readonly<{
   build?: Readonly<{ env?: unknown }>;
@@ -337,11 +343,33 @@ function verifyProject(
   }
 }
 
-function verifyPreviewEnvironmentConfiguration(
+export function verifyPreviewEnvironmentConfiguration(
   response: VercelEnvironmentResponse,
   branch: string,
 ) {
-  const variables = response.envs ?? [];
+  const variables = Array.isArray(response) ? response : response.envs ?? [];
+
+  if (variables.some((variable) =>
+    ["BLOB_STORE_ID", "BLOB_READ_WRITE_TOKEN"].includes(variable.key ?? "") &&
+    variable.target?.includes("production") &&
+    variable.contentHint?.storeId !== PRODUCTION_MEDIA_STORE_ID)) {
+    throw new GitPreviewDeploymentError(
+      "PRODUCTION_MEDIA_STORE_MISMATCH",
+      "Die Production-Blob-Verknüpfung muss ausschließlich ihren eigenen Store verwenden.",
+    );
+  }
+
+  // Audit all metadata; reject every override effective for the target branch.
+  // Other branches cannot affect this branch: this permits central acceptance
+  // before the approved removal of legacy overrides on the existing branch.
+  if (variables.some((variable) =>
+    variable.key && variable.key in REQUIRED_PREVIEW_ENVIRONMENT &&
+    variable.gitBranch === branch && variable.target?.includes("preview"))) {
+    throw new GitPreviewDeploymentError(
+      "PREVIEW_MEDIA_OVERRIDE_FORBIDDEN",
+      "Branch-spezifische Medien-Overrides müssen vor einem Preview-Deployment entfernt werden.",
+    );
+  }
 
   for (const [key, expectedType] of Object.entries(
     REQUIRED_PREVIEW_ENVIRONMENT,
@@ -349,14 +377,25 @@ function verifyPreviewEnvironmentConfiguration(
     const matches = variables.filter(
       (variable) =>
         variable.key === key &&
-        variable.gitBranch === branch &&
+        !variable.gitBranch &&
         variable.target?.includes("preview"),
     );
 
-    if (matches.length !== 1 || matches[0]?.type !== expectedType) {
+    const variable = matches[0];
+    const validType = variable?.type === expectedType ||
+      (expectedType === "sensitive" && variable?.type === "encrypted" && variable?.visibility === "secret");
+    if (matches.length !== 1 || !validType || variable?.target?.length !== 1) {
       throw new GitPreviewDeploymentError(
         "PREVIEW_BRANCH_ENVIRONMENT_INVALID",
-        `Die branch-spezifische Preview-Konfiguration für ${key} fehlt oder ist nicht eindeutig.`,
+        `Die zentrale Preview-Konfiguration für ${key} fehlt, ist nicht eindeutig oder überschneidet sich mit Production.`,
+      );
+    }
+
+    if ((key === "BLOB_READ_WRITE_TOKEN" || key === "BLOB_STORE_ID") &&
+      variable?.contentHint?.storeId !== PREVIEW_MEDIA_STORE_ID) {
+      throw new GitPreviewDeploymentError(
+        "PREVIEW_MEDIA_STORE_MISMATCH",
+        "Die Blob-Integration ist nicht mit dem freigegebenen Nonprod-Store verknüpft.",
       );
     }
   }
@@ -465,11 +504,14 @@ const defaultDependencies: GitPreviewDeploymentDependencies = {
     new Promise((resolvePromise) => setTimeout(resolvePromise, milliseconds)),
 };
 
-export async function deployVercelGitPreview(
+async function previewPreflight(
   rawInput: GitPreviewDeploymentInput,
   dependencyOverrides: Partial<GitPreviewDeploymentDependencies> = {},
-): Promise<GitPreviewDeploymentSummary> {
+) {
   const input = validateGitPreviewDeploymentInput(rawInput);
+  if (!isTrustedPreviewBranch(input.branch, rawInput.trustedBranches)) {
+    throw new GitPreviewDeploymentError("PREVIEW_BRANCH_NOT_TRUSTED", "Der Preview-Branch ist nicht ausdrücklich in der externen Freigabeliste genehmigt.");
+  }
   const dependencies = { ...defaultDependencies, ...dependencyOverrides };
   const remoteSha = dependencies.readRemoteBranchHead(input.branch).toLowerCase();
 
@@ -494,8 +536,8 @@ export async function deployVercelGitPreview(
   const environment = await requestJson<VercelEnvironmentResponse>(
     dependencies.fetch,
     buildApiUrl(
-      `/v9/projects/${encodeURIComponent(input.projectId)}/env`,
-      { ...commonParameters, gitBranch: input.branch },
+      `/v10/projects/${encodeURIComponent(input.projectId)}/env`,
+      { ...commonParameters, decrypt: "false" },
     ),
     input.token,
     undefined,
@@ -503,7 +545,30 @@ export async function deployVercelGitPreview(
   );
 
   verifyPreviewEnvironmentConfiguration(environment, input.branch);
+  const variables = Array.isArray(environment) ? environment : environment.envs ?? [];
+  const otherOverrideBranches = [...new Set(variables.flatMap((variable) =>
+    variable.key && variable.key in REQUIRED_PREVIEW_ENVIRONMENT &&
+    variable.target?.includes("preview") && variable.gitBranch &&
+    variable.gitBranch !== input.branch ? [variable.gitBranch] : []))];
+  if (otherOverrideBranches.length) {
+    console.log(`Medien-Overrides anderer Branches inventarisiert: ${otherOverrideBranches.join(", ")}`);
+  }
+  return { input, dependencies, project };
+}
 
+export async function checkVercelGitPreview(
+  rawInput: GitPreviewDeploymentInput,
+  dependencyOverrides: Partial<GitPreviewDeploymentDependencies> = {},
+): Promise<void> {
+  await previewPreflight(rawInput, dependencyOverrides);
+}
+
+export async function deployVercelGitPreview(
+  rawInput: GitPreviewDeploymentInput,
+  dependencyOverrides: Partial<GitPreviewDeploymentDependencies> = {},
+): Promise<GitPreviewDeploymentSummary> {
+  const { input, dependencies, project } = await previewPreflight(rawInput, dependencyOverrides);
+  const commonParameters = { teamId: input.teamId };
   const deployment = await requestJson<VercelDeployment>(
     dependencies.fetch,
     buildApiUrl("/v13/deployments", {
@@ -586,11 +651,17 @@ function inputFromEnvironment(): GitPreviewDeploymentInput {
     sha: process.env.DEPLOYMENT_SHA,
     teamId: process.env.VERCEL_ORG_ID,
     token: process.env.VERCEL_TOKEN,
+    trustedBranches: process.env.TRUSTED_PREVIEW_BRANCHES,
   };
 }
 
 async function main() {
   try {
+    if (process.argv.includes("--check-only")) {
+      await checkVercelGitPreview(inputFromEnvironment());
+      console.log("Vercel Preview preflight: OK (no deployment created)");
+      return;
+    }
     const summary = await deployVercelGitPreview(inputFromEnvironment());
     const githubOutput = process.env.GITHUB_OUTPUT;
 
@@ -613,7 +684,7 @@ async function main() {
     console.log(`Environment: ${summary.environment}`);
     console.log(`Deployment: ${summary.url}`);
     console.log(
-      `Branch environment keys verified: ${summary.environmentKeysVerified.length}`,
+      `Central Preview environment keys verified: ${summary.environmentKeysVerified.length}`,
     );
   } catch (error) {
     const safeError =

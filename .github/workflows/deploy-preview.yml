@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: preview-deployment
@@ -36,16 +37,15 @@ jobs:
         ) ||
         (
           github.event_name == 'workflow_dispatch' &&
-          (
-            github.ref == 'refs/heads/preview/content-and-quiz-flow' ||
-            github.ref == 'refs/heads/codex/editorial-safe-import'
-          )
+          startsWith(github.ref, 'refs/heads/') &&
+          github.ref != 'refs/heads/main'
         )
       )
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: preview
     env:
+      TRUSTED_PREVIEW_BRANCHES: ${{ vars.TRUSTED_PREVIEW_BRANCHES }}
       DEPLOYMENT_ENV: preview
       DEPLOYMENT_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
       DEPLOYMENT_EVENT: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event || github.event_name }}
@@ -72,8 +72,16 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Verify successful trusted push CI for the exact revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verify-preview-ci.ts
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Validate Vercel Preview media metadata before migrations
+        run: node --import tsx scripts/deploy-vercel-git-preview.ts --check-only
 
       - name: Validate GitHub Preview database identity
         run: npm run deployment:validate
