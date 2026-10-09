@@ -21,8 +21,13 @@ export function assessMigrations(candidate: Migration[], baseline: Migration[], 
     gate: gate(failed.length || drift.length || baselineDrift.length || unexpected.length ? "FAIL" : "PASS",
       failed.length ? "FAILED_MIGRATION" : drift.length || baselineDrift.length ? "MIGRATION_DRIFT" : unexpected.length ? "UNEXPECTED_PENDING_MIGRATION" : "MIGRATIONS_CONFIRMED") };
 }
+export function assertPrismaModelConfiguration(schema: string) {
+  const datasource=schema.match(/datasource\s+db\s*\{([^}]+)\}/)?.[1];
+  if (!datasource || !/provider\s*=\s*"postgresql"/.test(datasource) || !/schemas\s*=\s*\[\s*"pubquiz"\s*\]/.test(datasource)) throw new Error('PRISMA_SCHEMA_CONFIGURATION_UNVERIFIED');
+}
 export function migrationFiles(sha: string): Migration[] {
   if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error("INVALID_SHA");
+  assertPrismaModelConfiguration(execFileSync('git',['show',`${sha}:prisma/schema.prisma`],{encoding:'utf8'}));
   const names = execFileSync("git", ["ls-tree", "-r", "--name-only", sha, "prisma/migrations"], { encoding: "utf8" }).trim().split("\n");
   const files = names.filter(path => /^prisma\/migrations\/[a-zA-Z0-9_-]+\/migration\.sql$/.test(path));
   if (!files.length) throw new Error("MIGRATION_MANIFEST_UNAVAILABLE");
@@ -43,16 +48,7 @@ export const PUBLIC_MIGRATION_PRIVILEGES_SQL = `SELECT
   EXISTS (SELECT 1 FROM pg_roles WHERE rolname<>current_user AND pg_has_role(current_user,oid,'MEMBER')) AS role_membership,
   EXISTS (SELECT 1 FROM pg_class WHERE oid=to_regclass('public._prisma_migrations')
     AND pg_has_role(current_user,relowner,'USAGE')) AS owns_relation`;
-export const MIGRATION_PRIVILEGES_SQL = `SELECT
-  to_regclass('pubquiz._prisma_migrations') IS NOT NULL AS relation_exists,
-  has_schema_privilege(current_user, 'pubquiz', 'USAGE') AS schema_usage,
-  has_table_privilege(current_user, to_regclass('pubquiz._prisma_migrations'), 'SELECT') AS can_select,
-  has_table_privilege(current_user, to_regclass('pubquiz._prisma_migrations'), 'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AS can_write,
-  EXISTS (SELECT 1 FROM pg_roles WHERE rolname=current_user AND
-    (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)) AS elevated_role,
-  EXISTS (SELECT 1 FROM pg_roles WHERE rolname<>current_user AND pg_has_role(current_user,oid,'MEMBER')) AS role_membership,
-  EXISTS (SELECT 1 FROM pg_class WHERE oid=to_regclass('pubquiz._prisma_migrations')
-    AND pg_has_role(current_user,relowner,'USAGE')) AS owns_relation`;
+export const MIGRATION_PRIVILEGES_SQL = PUBLIC_MIGRATION_PRIVILEGES_SQL;
 export type MigrationPrivileges = { relation_exists: boolean; schema_usage: boolean; can_select: boolean;
   can_write: boolean; elevated_role: boolean; role_membership: boolean; owns_relation: boolean };
 export function assessMigrationPrivileges(proof: MigrationPrivileges | undefined): Gate {
@@ -67,7 +63,7 @@ export const DATABASE_READ_QUERIES = [
   "SET LOCAL statement_timeout='30s'",
   "SELECT current_user AS role, current_database() AS database, current_setting('transaction_read_only') AS read_only",
   MIGRATION_PRIVILEGES_SQL,
-  "SELECT migration_name, checksum, finished_at, rolled_back_at FROM pubquiz._prisma_migrations ORDER BY migration_name, started_at",
+  "SELECT migration_name, checksum, finished_at, rolled_back_at FROM public._prisma_migrations ORDER BY migration_name, started_at",
 ] as const;
 export async function readMigrationSession(client: Pick<Client, "query">, candidate: Migration[], baseline: Migration[], expectedRole = "pubquiz_backup_reader", expectedDatabase = "neondb") {
   try {
@@ -79,10 +75,11 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     const safeNames = (value: unknown): string[] | undefined => Array.isArray(value) && value.every(name=>typeof name==='string' && /^[a-zA-Z_][a-zA-Z0-9_$]{0,62}$/.test(name)) ? value : undefined;
     const schemas=safeNames(catalogRow?.schemas), migrationSchemas=safeNames(catalogRow?.migration_schemas);
     if (!schemas || !migrationSchemas || typeof catalogRow?.search_path !== 'string' || !/^[a-zA-Z0-9_$", .]+$/.test(catalogRow.search_path)) return {gate:gate('BLOCKED','MIGRATION_CATALOG_UNVERIFIED')};
-    const publicPrivileges=(await client.query(PUBLIC_MIGRATION_PRIVILEGES_SQL)).rows[0] as MigrationPrivileges | undefined;
-    const diagnosis={searchPath:catalogRow.search_path,schemas,migrationSchemas,publicPrivileges,
+    const diagnosis={searchPath:catalogRow.search_path,schemas,migrationSchemas,
       identity:{role:session.role,database:session.database,readOnly:true}};
-    const privileges = (await client.query(DATABASE_READ_QUERIES[3])).rows[0] as MigrationPrivileges | undefined;
+    if (migrationSchemas.length!==1 || migrationSchemas[0]!=='public' || !schemas.includes('pubquiz')) return {gate:gate('BLOCKED','MIGRATION_SCHEMA_BINDING_UNVERIFIED'),diagnosis};
+    const publicPrivileges=(await client.query(MIGRATION_PRIVILEGES_SQL)).rows[0] as MigrationPrivileges | undefined;
+    const privileges=publicPrivileges;
     const privilegesGate = assessMigrationPrivileges(privileges);
     if (privilegesGate.status !== 'PASS') return { gate: privilegesGate, privileges, diagnosis };
     const rows = (await client.query(DATABASE_READ_QUERIES[4])).rows as Applied[];
@@ -95,7 +92,7 @@ export async function readProductionMigrations(connectionString: string, candida
   try { identity = assertDatabase(connectionString, "production"); assertOperationTransport(new URL(connectionString)); }
   catch { return { gate: gate("BLOCKED", "DATABASE_IDENTITY_OR_TRANSPORT_UNVERIFIED") }; }
   const client = new Client({ connectionString });
-  try { await client.connect(); return { ...await readMigrationSession(client, candidate, baseline), endpointIdentity: identity }; }
+  try { await client.connect(); return { ...await readMigrationSession(client, candidate, baseline), endpointIdentity: identity, connectionSchemaParameter:new URL(connectionString).searchParams.get("schema") ?? null }; }
   catch { return { gate: gate("BLOCKED", "DATABASE_CONNECTION_UNAVAILABLE") }; }
   finally { await client.end().catch(() => undefined); }
 }
