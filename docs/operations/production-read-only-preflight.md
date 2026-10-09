@@ -113,3 +113,17 @@ fehlendes SELECT sowie unveränderte Daten. Der kombinierte Migrations-/Deploymen
 bleibt bei sämtlichen neun PR97-Dateien durch required=false übersprungen; der reine
 Scope-Workflow darf starten. production/PRODUCTION_ALIAS ist ausdrücklich auf
 pubquiz-web.vercel.app bestätigt; keine Credentials wurden geändert.
+
+## Registrierung des manuellen Workflows
+
+Die Datei war nach Integration auf dem Defaultbranch vorhanden, aber weder im
+Actions-Verzeichnis noch per GET/PUT-enable/POST-dispatch erreichbar (HTTP404).
+Actions war aktiviert, vorhandener Zugang hatte repo/workflow-Scopes und Adminrechte.
+Eine GitHub-interne Ursache ist nicht nachgewiesen. Ein enger Push-Trigger für genau
+diese Workflowdatei ermöglicht die reguläre Registrierung bei Dateiänderungen.
+Beide geschützten Jobs verlangen explizit workflow_dispatch, main und das feste
+Repository. Ein Registrierungspush überspringt deshalb sämtliche Prüfjobs, erhält
+keine Production-Secrets und startet keine Datenbankabfrage oder Vercel-Abfrage.
+Auch nach Registrierung ist ausschließlich ein manueller Preflight erlaubt.
+Nach Integration Registrierung, numerische Workflow-ID, state=active und tatsächliche
+SKIPPED-Jobs kontrollieren; anschließend separat den freigegebenen Preflight starten.

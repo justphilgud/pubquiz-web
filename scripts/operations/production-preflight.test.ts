@@ -48,3 +48,12 @@ test('unconfirmed privileges block before any migration-history read', async()=>
   const result=await readMigrationSession(client as Parameters<typeof readMigrationSession>[0],[a],[a]);
   assert.equal(result.gate.status,'BLOCKED');assert.ok(!queries.includes(DATABASE_READ_QUERIES[4]));assert.equal(queries.at(-1),'ROLLBACK');
 });
+
+test('registration push never executes either protected Production job',()=>{
+  const workflow=readFileSync('.github/workflows/production-read-only-preflight.yml','utf8');
+  assert.match(workflow,/push:\r?\n    paths: \['.github\/workflows\/production-read-only-preflight.yml'\]/);
+  for (const job of ['deployment-metadata','migrations']) {
+    const block=workflow.split(`  ${job}:`)[1];
+    assert.ok(block);assert.match(block.split('    steps:')[0],/if: github.event_name == 'workflow_dispatch' && github.repository == 'justphilgud\/pubquiz-web' && github.ref == 'refs\/heads\/main'/);
+  }
+});

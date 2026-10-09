@@ -1,5 +1,7 @@
 name: Production – Read-only Preflight
 on:
+  push:
+    paths: ['.github/workflows/production-read-only-preflight.yml']
   workflow_dispatch:
     inputs:
       release_candidate_sha:
@@ -17,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deployment-metadata:
-    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 10
@@ -46,6 +48,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   migrations:
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main'
     needs: deployment-metadata
     runs-on: ubuntu-latest
     environment: operations-backup
