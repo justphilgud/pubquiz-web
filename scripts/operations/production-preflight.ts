@@ -29,8 +29,8 @@ export function migrationFiles(sha: string): Migration[] {
   return files.map(path => ({ name: path.split("/")[2], checksum: createHash("sha256").update(execFileSync("git", ["show", `${sha}:${path}`])).digest("hex") }));
 }
 export const MIGRATION_CATALOG_SQL = `SELECT current_setting('search_path') AS search_path,
-  ARRAY(SELECT nspname FROM pg_namespace WHERE nspname !~ '^pg_' AND nspname <> 'information_schema' ORDER BY nspname) AS schemas,
-  ARRAY(SELECT n.nspname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+  ARRAY(SELECT nspname::text FROM pg_namespace WHERE nspname !~ '^pg_' AND nspname <> 'information_schema' ORDER BY nspname) AS schemas,
+  ARRAY(SELECT n.nspname::text FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE c.relname='_prisma_migrations' AND c.relkind IN ('r','p') ORDER BY n.nspname) AS migration_schemas`;
 // Catalog diagnosis never chooses a relation or reads migration contents.
 export const PUBLIC_MIGRATION_PRIVILEGES_SQL = `SELECT
@@ -199,3 +199,4 @@ export function assertPreflightContext(env: Readonly<Record<string, string | und
   if (env.GITHUB_ACTIONS !== "true" || env.GITHUB_REPOSITORY !== "justphilgud/pubquiz-web" || env.GITHUB_REF !== "refs/heads/main" ||
       env.GITHUB_EVENT_NAME !== "workflow_dispatch" || env.GITHUB_WORKFLOW_REF !== "justphilgud/pubquiz-web/.github/workflows/production-read-only-preflight.yml@refs/heads/main") throw new Error("PREFLIGHT_CONTEXT_UNVERIFIED");
 }
+
