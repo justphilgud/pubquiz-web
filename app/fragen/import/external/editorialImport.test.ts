@@ -5,6 +5,11 @@ import { candidateDigest, hasVisibleEstimateUnit, parseEditorialPool, previewEdi
 import { buildQuestionTemplateRuntimeModel } from "../../editor/templates/questionTemplateRuntime";
 import { parseQuestionTemplateData } from "../../editor/templates/questionTemplateData";
 import { normalizeQuestionTemplateConfig } from "../../editor/pixelTemplateConfig";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { resolveQuizAnswerInteraction } from "../../../quiz/answerInteraction";
+import GenericAnswerRenderer from "../../../quiz/[quizId]/antworten/GenericAnswerRenderer";
+import { evaluateBaseAnswer } from "../../../quiz/evaluation/evaluateBaseAnswer";
 
 const base = new URL("../../../../editorial/paule-oktober-2026/", import.meta.url);
 const files = ["anagrams.json", "estimates.json"].map(name => ({name,raw:readFileSync(new URL(name,base),"utf8")}));
@@ -38,6 +43,18 @@ test("all 50 estimates preserve reference/source and show the unit in prompt, st
     assert.equal(c.solution,`${data.correctValue} ${data.unit}`);
     const runtime=buildQuestionTemplateRuntimeModel({templateId:c.templateId,questionText:c.question,templateConfig:normalizeQuestionTemplateConfig(c.templateConfig,c.templateId),correctAnswers:[{text:c.solution}]});
     assert.equal(runtime.solutionLines[0],c.solution,c.externalId);
+    const interaction=resolveQuizAnswerInteraction({templateId:c.templateId,originalAnswerMode:"OPEN",effectiveAnswerMode:"OPEN",templateData:data,answerFields:[],answerOptions:[]});
+    assert.equal(interaction.type,"NUMBER");
+    const numericAnswer=String(data.correctValue);
+    const html=renderToStaticMarkup(createElement(GenericAnswerRenderer,{questionAssignmentId:42,interaction,
+      value:{antwortText:numericAnswer,antwortId:null,antwortIds:[],antwortfelder:{}},disabled:false,now:0,onChange:()=>undefined}));
+    assert.match(html,/type="number"/);assert.ok(html.includes(`>${data.unit}</span>`),c.externalId);
+    assert.ok(html.includes(`value="${numericAnswer}"`),c.externalId);
+    const evaluation=evaluateBaseAnswer({templateId:c.templateId,effectiveAnswerMode:"OPEN",
+      answerOptions:[{id:1,isCorrect:true,text:c.solution}],selectedAnswerIds:[],answerText:numericAnswer,
+      structuredFields:[],structuredAnswers:new Map(),orderingItems:[]});
+    assert.equal(evaluation.status,"REVIEW_REQUIRED",c.externalId);
+    assert.equal(evaluation.details.strategy,"MANUAL",c.externalId);
   }
 });
 test("unit/value inconsistencies, missing prompt units and too many categories are blocked",()=>{
