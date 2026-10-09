@@ -617,3 +617,16 @@ test("runner-to-HTTP-to-SDK fixes exactly one MIME type per artifact, preserving
     await assert.rejects(client.upload(name, bytes), /BRIDGE_ACCESS_REJECTED/);
   }
 });
+
+test("existing Production backup grants are read-only and exclusive to reviewed restore environment", async () => {
+ const oldKey="production/acceptance/run-37971426600-1";
+ const restore={...identity,environment:"operations-restore" as const,eventName:"workflow_dispatch" as const};
+ const body={operation:"restore-read",store:STORE_ID,key:oldKey,name:"database.dump",kind:"database"};
+ const issued: string[]=[];
+ const provider: BlobProvider={async size(){return 123;},async sign(scope){issued.push(scope.method);return "synthetic-url";},async inventory(){throw new Error("unexpected");},async remove(){throw new Error("unexpected");}};
+ assert.equal((await grantAccess(body,restore,"acceptance",provider,now)).method,"GET");assert.deepEqual(issued,["GET"]);
+ for(const input of [{...body,operation:"backup-upload",bytes:123},{...body,key:"synthetic/acceptance/run-123-1"},{...body,key:"../old"},{...body,operation:"retention-delete"}])await assert.rejects(grantAccess(input,restore,"acceptance",provider,now));
+ await assert.rejects(grantAccess(body,identity,"acceptance",provider,now));
+ await assert.rejects(grantAccess(body,{...restore,eventName:"schedule"},"acceptance",provider,now));
+ await assert.rejects(grantAccess({...body,operation:"backup-readback"},identity,"acceptance",provider,now));
+});

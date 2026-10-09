@@ -16,7 +16,8 @@ export function authorize(body: unknown, identity: Identity, mode: Mode, now: nu
   const retentionRead = b.operation === "backup-retention-read";
   check(identity.environment === "operations-backup" ? upload || b.operation === "backup-readback" || retentionRead : b.operation === "restore-read");
   check(identity.environment !== "operations-restore" || identity.eventName === "workflow_dispatch");
-  const expectedKey = retentionRead ? storedBackupKey(String(b.key)) : runKey(mode, identity.run, identity.attempt);
+  const existingRestoreRead = identity.environment === "operations-restore" && b.operation === "restore-read" && mode === "acceptance";
+  const expectedKey = retentionRead || existingRestoreRead ? storedBackupKey(String(b.key)) : runKey(mode, identity.run, identity.attempt);
   check(b.store === STORE_ID && b.key === expectedKey && typeof b.name === "string");
   const rule = objectRule(b.name, mode);
   if (retentionRead) check(mode === "acceptance" && b.name === "manifest.json" && b.kind === "manifest");

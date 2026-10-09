@@ -273,8 +273,8 @@ test("workflow schedules only the existing backup core and keeps restore behind 
   assert.match(text, /retention-dry-run/); assert.match(text, /AP96_RETENTION_REUSE_EXISTING/);
   assert.match(text, /inputs\.mode == 'retention-dry-run' && 'false'/);
   assert.ok(text.indexOf("acceptance-cli.ts backup") < text.indexOf("retention-cli.ts"));
-  assert.match(text, /needs: backup/); assert.match(text, /group: ap94-manual-acceptance/);
-  assert.equal((text.match(/actions\/upload-artifact@v4/g) ?? []).length, 2);
+  assert.match(text, /needs: \[backup, verify-existing-backup\]/); assert.match(text, /group: ap94-manual-acceptance/);
+  assert.equal((text.match(/actions\/upload-artifact@v4/g) ?? []).length, 3);
   assert.match(text, /name: external-import-backup-evidence[\s\S]+path: \$\{\{ runner\.temp \}\}\/external-import-backup-evidence\.json/);
   assert.doesNotMatch(text, /path:.*(?:database\.dump|auth-redacted\.json|manifest\.json|pubquiz-ap94)/);
   assert.doesNotMatch(text, /environment: production|db:deploy|--prod|contents: write|BACKUP_BLOB_READ_WRITE_TOKEN/);
