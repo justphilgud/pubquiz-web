@@ -4,7 +4,7 @@ import { assertDatabase } from "../../../../scripts/operations/guards";
 import { candidateDigest, previewEditorialImport, sha256, type EditorialSource, type EditorialExistingQuestion } from "./editorialImport";
 
 // Fixed application-table allowlist: neither identifiers nor SQL are caller-configurable.
-const PROTECTED_TABLES = [
+export const PROTECTED_TABLES = [
   "fragen", "antworten", "antworttyp", "fragen_kategorien", "fragen_relationen", "fragenkategorie",
   "medien", "medientyp", "medien_generator_laefe", "medien_generator_lauf_medien",
   "frage_antwortfelder", "frage_antwortfeld_loesungen", "fragen_eventreihen", "frage_story_elemente",

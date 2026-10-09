@@ -12,6 +12,10 @@ on:
         description: 'Read-only PR93 editorial analysis; no migrations or deployment'
         type: boolean
         default: false
+      editorial_repair_test_questions:
+        description: 'Restore only approved Preview test questions 154 and 207; no import, migration or deployment'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,7 +30,7 @@ jobs:
     name: Migrate and deploy Preview
     if: >-
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
-      !inputs.editorial_dry_run_only &&
+      !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
       (
         (
           github.event_name == 'workflow_run' &&
@@ -131,7 +135,7 @@ jobs:
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
       github.event_name == 'workflow_dispatch' &&
       github.ref == 'refs/heads/codex/editorial-safe-import' &&
-      inputs.editorial_dry_run_only
+      inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: preview
@@ -164,5 +168,46 @@ jobs:
           path: |
             editorial-dry-run.json
             editorial-integrity-audit.json
+          if-no-files-found: error
+          retention-days: 14
+
+  editorial-test-repair:
+    if: vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' && github.event_name == 'workflow_dispatch' && inputs.editorial_repair_test_questions && !inputs.editorial_dry_run_only && github.ref == 'refs/heads/codex/editorial-safe-import' && github.repository == 'justphilgud/pubquiz-web'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: preview
+    env:
+      CI: 'true'
+      DEPLOYMENT_ENV: preview
+      DEPLOYMENT_EVENT: workflow_dispatch
+      DEPLOYMENT_REF: ${{ github.ref }}
+      DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+      DEPLOYMENT_SHA: ${{ github.sha }}
+      DEPLOYMENT_REPOSITORY: ${{ github.repository }}
+      TRUSTED_PREVIEW_BRANCHES: ${{ vars.TRUSTED_PREVIEW_BRANCHES }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
+      EXPECTED_DATABASE_NAME: ${{ vars.EXPECTED_DATABASE_NAME }}
+      EXPECTED_DATABASE_BRANCH: ${{ vars.EXPECTED_DATABASE_BRANCH }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Verify trusted branch and successful full CI for this exact SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verify-preview-ci.ts
+      - run: npm ci
+      - run: npm run db:generate
+      - name: Verify fixed Preview database identity
+        run: npm run deployment:validate
+      - name: Restore only questions 154 and 207 with atomic integrity proof
+        run: node --import tsx scripts/editorial-test-question-repair.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-test-question-repair
+          path: editorial-test-question-repair.json
           if-no-files-found: error
           retention-days: 14

@@ -77,3 +77,36 @@ werden nach Ausschluss der Import-IDs gegen den ursprünglichen Batchnachweis
 geprüft. Quiz-/Teamdaten erscheinen ausschließlich als aggregierte Hashes.
 Dieser Kontrollpfad schreibt weder Fragen noch Journal-/Quizdaten und ist auf
 den genehmigten Preview-Importbranch und die feste Preview-Datenbank begrenzt.
+
+## Begrenzte Wiederherstellung der Preview-Testfragen
+
+Der manuelle Modus `editorial_repair_test_questions` des bestehenden Preview-
+Workflows ist ausschließlich für #154/ANA-01 und #207/EST-09 vorgesehen. Er ist
+gegenseitig exklusiv mit Deployment und Nur-Lese-Modus, verlangt die bestehende
+externe Branchfreigabe, erfolgreiche vollständige Push-CI des exakten SHAs,
+die feste Preview-Datenbank und einen weiterhin aktiven Administrator als
+ursprünglichen Importoperator. Keine neuen Secrets, Rollen oder Branchfreigaben.
+Kein HTTP-Admin-Endpunkt und keine frei wählbaren IDs/SQL/Quelldateien.
+
+Die einzige erlaubte Inhaltskorrektur ist die Rückkehr zur unveränderten
+Konfiguration des geprüften Importjournals: Großschreibung von Anagramm und
+Vorschlag bei #154 sowie materialisierte Pixel-Standardwerte bei beiden Fragen.
+Jede andere Inhaltsabweichung oder Änderung an den übrigen 77 Fragen blockiert.
+Beide Statusrücknahmen verwenden `transitionStoredQuestionStatus`, denselben
+Persistenzpfad wie die berechtigte Editor-Server-Action. Kein vollständiges
+Speichern und keine Neuberechnung. Der Pfad verändert `ist_unfertig` nicht.
+
+Alle Änderungen laufen in einer SERIALIZABLE-Transaktion mit festen Tabellen-
+locks und Zeitlimits. Alle 79 Quellen-/Journalprojektionen, der ursprüngliche
+Fragenbestand und sämtliche anderen Fragen, Antworten, Kategoriezuordnungen,
+Medien, Quiz-, Team-, Submission-, Bewertungs- und Journalhashes werden geprüft.
+Die Zielzeilen dürfen außerhalb der ursprünglichen Konfiguration und der
+Status-/Audit-Metadaten nicht abweichen. Jeder unerwartete Unterschied bewirkt
+Rollback der gesamten Transaktion. Das Verfahren ist wiederholbar ohne erneute
+Änderungen, wenn die beiden Fragen bereits korrekt und DRAFT sind.
+
+Echte PostgreSQL-CI prüft die 79-Fragen-Wiederherstellung, identische Quellen,
+Status DRAFT für alle 79, erhaltene Testantworten/manuelle Punkte, Idempotenz und
+Rollback bei einem absichtlich Bewertungen verändernden Datenbanktrigger.
+Der Nachweis enthält nur redaktionelle Unterschiede und aggregierte Hashes;
+keine Credentials oder Teilnehmerantwortinhalte.

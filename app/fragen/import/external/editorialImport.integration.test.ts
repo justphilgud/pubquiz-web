@@ -8,7 +8,8 @@ import { runEditorialDatabaseImport, editorialIntegritySnapshot } from "./editor
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { transitionStoredQuestionStatus } from "../../editor/questionStatusPersistence";
-import { parseEditorialPool, sha256, type EditorialSource } from "./editorialImport";
+import { repairEditorialTestQuestions } from "../../../../scripts/editorial-test-question-repair";
+import { parseEditorialPool, sha256, candidateDigest, type EditorialSource } from "./editorialImport";
 
 const connectionString=process.env.EDITORIAL_IMPORT_TEST_DATABASE_URL;
 test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imports, rollback and unchanged protected rows",{skip:!connectionString},async()=>{
@@ -116,6 +117,47 @@ test("real PostgreSQL: read-only dry-run, atomic manifest, repeat/concurrent imp
         await assert.rejects(statusDb.$transaction(tx => transitionStoredQuestionStatus(tx,actor,{questionId:id,target:"APPROVED",expectedUpdatedAt:updatedAt},async()=>{throw new Error("INVALID_CONTENT");})),/INVALID_CONTENT/);
         assert.deepEqual(await content(id),original);
       }
+      // Seed the exact 79-row recovery fixture only in this disposable CI database.
+      const recoveryCandidates = [...parseEditorialPool("anagrams.json",raw), ...parseEditorialPool("estimates.json",estimatesRaw)]
+        .filter(c=>!c.metadata.editorialHoldReason&&!c.metadata.editorialExcludeReason);
+      assert.equal(recoveryCandidates.length,79); assert.equal(recoveryCandidates[53].externalId,"EST-09");
+      const legacyBefore = await editorialIntegritySnapshot(client);
+      const batch = (await client.query("INSERT INTO pubquiz.external_question_import_batches(provider,requested_count,status,created_by_user_id,report_json) VALUES('Editorial:PR93',79,'COMPLETED',$1,$2::jsonb) RETURNING import_batch_id",[operator,JSON.stringify({before:legacyBefore})])).rows[0].import_batch_id;
+      await client.query("INSERT INTO pubquiz.benutzer_rollenzuweisungen(benutzer_id,rolle,scope_typ,updated_at) VALUES($1,'ADMIN','GLOBAL',now())",[operator]);
+      for (const [index,c] of recoveryCandidates.entries()) {
+        const id = 154+index;
+        const template = (await client.query("SELECT vorlage_id FROM pubquiz.frage_vorlagen WHERE code=$1",[c.templateId])).rows[0].vorlage_id;
+        await client.query("INSERT INTO pubquiz.fragen(fragen_id,frage,quelle,vorlage_id,template_config_json,redaktionelle_schwierigkeit,created_by_user_id,last_modified_by_user_id) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$7)",[id,c.question,c.sources.join("\n"),template,JSON.stringify(c.templateConfig),c.difficulty,operator]);
+        await client.query("INSERT INTO pubquiz.antworten(fragen_id,antwort,ist_richtig,antworttyp_id) SELECT $1,$2,true,antworttyp_id FROM pubquiz.antworttyp WHERE antworttyp='Standard'",[id,c.solution]);
+        for (const category of c.categories) {
+          await client.query("INSERT INTO pubquiz.fragenkategorie(kategorie) VALUES($1) ON CONFLICT DO NOTHING",[category]);
+          await client.query("INSERT INTO pubquiz.fragen_kategorien(fragen_id,fragenkategorie_id) SELECT $1,fragenkategorie_id FROM pubquiz.fragenkategorie WHERE kategorie=$2",[id,category]);
+        }
+        await client.query(`INSERT INTO pubquiz.external_question_import_items(import_batch_id,provider,external_reference,license,license_url,original_language,original_category,original_difficulty,original_type,original_question,original_correct_answer,original_incorrect_answers,provider_payload_json,content_fingerprint,question_id)
+          VALUES($1,'Editorial:PR93',$2,'CI only','','de',$3,$4,$5,$6,$7,'[]',$8::jsonb,$9,$10)`,[batch,c.externalId,c.categories.join(" / "),c.difficulty,c.templateId,c.question,c.solution,JSON.stringify({candidate:c}),candidateDigest(c),id]);
+      }
+      for (const id of [154,207]) {
+        const c = recoveryCandidates[id-154];
+        const config = structuredClone(c.templateConfig) as {templateData:Record<string,unknown>};
+        if(id===154){config.templateData.selectedSolution="OLD WEST ACTION";config.templateData.suggestions=["OLD WEST ACTION"];}
+        await client.query("UPDATE pubquiz.fragen SET freigegeben=true,review_status='APPROVED',approved_by_user_id=$1,template_config_json=$2::jsonb WHERE fragen_id=$3",[operator,JSON.stringify({...config,stageDurationsSeconds:{stage1:15,stage2:15,stage3:15},createPixelQuestionByAnswer:{answer1:false,answer2:false}}),id]);
+        const assignment=(await client.query("INSERT INTO pubquiz.quiz_fragen(quiz_id,fragen_id,quiz_abschnitt_id) VALUES($1,$2,$3) RETURNING quiz_fragen_id",[quiz,id,block])).rows[0].quiz_fragen_id;
+        await client.query("INSERT INTO pubquiz.team_antworten(quiz_id,quiz_abschnitt_id,quiz_fragen_id,quiz_team_session_id,antwort_text,manuelle_punkte,vergebene_punkte,ist_manuell_richtig) VALUES($1,$2,$3,$4,'Recovery answer',1,1,true)",[quiz,block,assignment,session]);
+      }
+      const recovery=await repairEditorialTestQuestions(statusDb);
+      assert.equal(recovery.protectedTablesUnchanged,true); assert.equal(recovery.otherQuestionsUnchanged,true);
+      assert.equal(recovery.after.comparisons.length,79);
+      assert.ok(recovery.after.comparisons.every(row=>!row.differences.length&&!row.approved&&row.reviewStatus==="DRAFT"));
+      const repeated=await repairEditorialTestQuestions(statusDb);
+      assert.ok(repeated.changes.every(row=>!row.configRestored&&!row.statusChanged));
+      // A trigger touching existing evaluations must abort the complete recovery.
+      await client.query("UPDATE pubquiz.fragen SET freigegeben=true,review_status='APPROVED' WHERE fragen_id IN (154,207)");
+      const guardedBefore=await editorialIntegritySnapshot(client);
+      await client.query(`CREATE FUNCTION pubquiz.recovery_integrity_test() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN UPDATE pubquiz.team_antworten SET vergebene_punkte=99 WHERE quiz_id=${quiz}; RETURN NEW; END $$`);
+      await client.query("CREATE TRIGGER recovery_integrity_test AFTER UPDATE ON pubquiz.fragen FOR EACH ROW EXECUTE FUNCTION pubquiz.recovery_integrity_test()");
+      await assert.rejects(repairEditorialTestQuestions(statusDb),/PROTECTED_TABLE_CHANGED/);
+      assert.deepEqual(await editorialIntegritySnapshot(client),guardedBefore);
+      await client.query("DROP TRIGGER recovery_integrity_test ON pubquiz.fragen"); await client.query("DROP FUNCTION pubquiz.recovery_integrity_test()");
     } finally { await statusDb.$disconnect(); }
   } finally {await client.end();}
 });
