@@ -113,3 +113,18 @@ fehlendes SELECT sowie unveränderte Daten. Der kombinierte Migrations-/Deploymen
 bleibt bei sämtlichen neun PR97-Dateien durch required=false übersprungen; der reine
 Scope-Workflow darf starten. production/PRODUCTION_ALIAS ist ausdrücklich auf
 pubquiz-web.vercel.app bestätigt; keine Credentials wurden geändert.
+
+## Einzelne Vercel-Identitätsgates
+
+Jeder feste GET-Endpunkt erhält einen API-Gate: fehlende Berechtigung, Not Found,
+Netzwerkfehler und ungültige Antwort sind getrennt BLOCKED. Aliasname, Projekt,
+Deployment-ID, Projekt-Productiontarget, Environment, READY, vollständiger SHA und
+wiederholte Aliasbindung erhalten eigene Gates. Fehlende Daten BLOCKED; bestätigte
+Abweichungen FAIL. Gesamt-PASS erfordert alle Nachweise. Keine fehlende SHA wird
+akzeptiert und der DB-Job bleibt durch needs: deployment-metadata gesperrt.
+Artefakte enthalten nur Codes und syntaktisch geprüfte IDs/SHA sowie den konfigurierten
+Alias; keine Rohantworten, Namen, E-Mails oder frei wählbare API-Strings.
+GitHub-Environment-Deploymentrecords von Preflightjobs belegen keinen Vercel-Apprelease
+und werden nicht als Ersatz für den Vercel-SHA verwendet.
+Die bisherigen generischen Artefakte erlauben keine rückwirkende Bestimmung des
+fehlenden Einzelnachweises. Erst die neue reale Ausführung kann diesen bestätigen.
