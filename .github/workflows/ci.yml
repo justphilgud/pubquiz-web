@@ -117,7 +117,8 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        image: postgres:17
+        # Same Docker Official Image via its public vendor mirror; no registry credentials.
+        image: public.ecr.aws/docker/library/postgres:17
         env:
           POSTGRES_USER: editorial_ci
           POSTGRES_PASSWORD: isolated-ci-only
