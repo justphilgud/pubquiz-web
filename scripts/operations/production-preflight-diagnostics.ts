@@ -12,7 +12,7 @@ export function prismaChecksumEvidence(bytes:Buffer,stored:string) {
   const matches=Object.entries(variants).filter(([,hex])=>(stored.length===64?hex:legacy(hex))===stored).map(([name])=>name);
   return {storedChecksum:stored,sha256:variants,prismaCompatible:matches.length>0,matches,
     diagnosis:matches.includes('repository')?'EXACT_BYTES':matches.length?'LINE_ENDINGS_ONLY':'OTHER_CHECKSUM',
-    acceptedByPreflight:false};
+    diagnosticOnly:true};
 }
 export function initRepositoryEvidence(sha:string) {
   if(!/^[a-f0-9]{40}$/.test(sha))throw new Error('DIAGNOSTIC_SHA_INVALID');

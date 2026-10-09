@@ -128,7 +128,7 @@ test('diagnostic Prisma compatibility never accepts altered SQL or changes raw d
   const hash=(script:string)=>createHash('sha256').update(script).digest('hex');
   for(const script of ['SELECT 1;\n','\ufeffSELECT 1;\n']){
     const crlf=script.replaceAll('\n','\r\n');
-    const proof=prismaChecksumEvidence(Buffer.from(script),hash(crlf));assert.equal(proof.prismaCompatible,true);assert.equal(proof.acceptedByPreflight,false);
+    const proof=prismaChecksumEvidence(Buffer.from(script),hash(crlf));assert.equal(proof.prismaCompatible,true);assert.equal(proof.diagnosticOnly,true);
     assert.equal(prismaChecksumEvidence(Buffer.from(script),hash('SELECT 2;\n')).prismaCompatible,false);
     assert.equal(assessMigrations([{name:'0_init',checksum:hash(script)}],[],[{migration_name:'0_init',checksum:hash(crlf),finished_at:'date',rolled_back_at:null}]).gate.code,'MIGRATION_DRIFT');
   }
