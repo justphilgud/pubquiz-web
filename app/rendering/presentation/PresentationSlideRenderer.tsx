@@ -383,6 +383,9 @@ export default function PresentationSlideRenderer({
     currentSlideMedia.find(
       (medium) => isAudio(medium.datei) || isVideo(medium.datei),
     )?.medien_id ?? null;
+  const musicSolutionAudio = slide?.typ === "aufloesung" &&
+    [questionTemplateIds.music, questionTemplateIds.musicReverse, questionTemplateIds.musicEightBit].some(id => id === slide.frage.templateId)
+      ? currentSlideMedia.find(medium => isAudio(medium.datei)) : undefined;
 
 function getMediumUrl(datei: string) {
   if (datei.startsWith("http://") || datei.startsWith("https://")) {
@@ -2952,6 +2955,15 @@ function renderAktuellenSlide() {
       data-pixel-status={slide?.typ === "frage" && pixelState ? "visible" : undefined}
     >
       <PresentationDesignBackdrop theme={theme} images={collageImages} storybookComposition={storybookComposition} />
+      {renderMode === "PRESENTATION" && !mediaOverlayActive && musicSolutionAudio && (
+        <SynchronizedMedia
+          kind="audio"
+          src={getMediumUrl(musicSolutionAudio.datei)}
+          command={playbackCommand}
+          commandId={playbackCommandId}
+          renderMode={renderMode}
+        />
+      )}
       {slideLabel !== "VOR DEM START" && (
         <PresentationDesignHeader
           theme={theme}
