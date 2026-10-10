@@ -59,6 +59,12 @@ export const deQuestionEditorMessages = {
       defaultQuestion: "Welcher Song wurde hier rückwärts abgespielt? Nennt Interpret und Titel.", artist: "Interpret", title: "Titel",
       mediaLabel: "Rückwärts abgespielte Audiodatei", mediaHelp: "Lade die bereits rückwärts vorbereitete MP3-, WAV- oder OGG-Datei hoch.",
     },
+    music: {
+      name: "Musik", description: "Interpret und Titel eines normal abgespielten Songs.",
+      defaultQuestion: "Welcher Song ist zu hören? Nennt Interpret und Titel.", artist: "Interpret", title: "Titel",
+      mediaLabel: "Audio zur Frage", mediaHelp: "Normales Audio; eine Rückwärtsverarbeitung ist nicht erforderlich.",
+      resolutionAudioHelp: "Optionales separates Audio für die Auflösung. Ohne diese Datei wird das Audio zur Frage wiederverwendet.",
+    },
     artwork: {
       name: "Kunstwerk",
       description: "Künstler und Titel eines abgebildeten Kunstwerks erkennen.",
@@ -175,6 +181,7 @@ export const deQuestionEditorMessages = {
     label: "Frage",
     labels: { question: "Frage", statement: "Aussage", task: "Aufgabenstellung", searchTarget: "Was wird gesucht?" },
     placeholder: "Formuliere deine Frage...",
+
   },
   answers: {
     title: "Antworten", description: "Richtige und falsche Antworten bilden gemeinsam die fachliche Grundlage. Die Darstellung kann später im Quiz überschrieben werden.",

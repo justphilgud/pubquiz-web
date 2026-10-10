@@ -84,6 +84,11 @@ async function main() {
   });
 
   await createVorlage({
+    code: "musik", name: "Musik", slide_typ: "audio_guess",
+    antwortfelder: [{ label: "Interpret", sortierung: 1 }, { label: "Songtitel", sortierung: 2 }],
+  });
+
+  await createVorlage({
     code: "musik_rueckwaerts",
     name: "Musik rückwärts",
     slide_typ: "audio_guess",

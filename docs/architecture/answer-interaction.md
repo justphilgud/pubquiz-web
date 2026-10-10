@@ -85,6 +85,11 @@ Das Ergebnis enthält ausschließlich ausführbare UI-Informationen. Ein Rendere
 
 Wichtige Fallbacks:
 
+- Normale Musik (`musik`) ist wie Rückwärts- und 8-Bit-Musik eine offene Frage,
+  auch ohne generische Antwortzeilen. Die bestehenden strukturierten Felder für
+  Interpret und Titel bleiben maßgeblich; der Filter für offene Fragen enthält
+  das Template ebenfalls. Regression: `quizQuestionAnswerMode.test.ts`.
+
 - Ein geschlossener Standard mit mehreren Optionen wird `SINGLE_CHOICE`.
 - Ein geschlossener Fragetyp mit aktivem Freitext-Override wird `TEXT`, sofern der Vertrag dies erlaubt.
 - Vorhandene strukturierte Antwortfelder werden `STRUCTURED_TEXT`.
@@ -481,3 +486,27 @@ Schluss- und Save-Funktionskörper mit kontrollierter Uhr und einer serialisiert
 Transaktionsfixture aus. Die Datenbankadapter und Auto-Finalisierungspersistenz
 sind dabei Fakes; die reale Persistenz und alle Oberflächen werden zusätzlich
 auf Preview abgenommen.
+
+## LOVD-Nachtauftrag 2026-10-10: abschließender Stichentscheid
+
+Die bisherige Schätzfrage war ein Präsentationsoverlay ohne persistente
+Teamantworten oder Rangentscheidung. Der ergänzte Ablauf nutzt dieselbe
+Schätzfrage, NUMBER-Validierung, signierte Teilnehmer-Sitzung und Quiz-Zeilensperre.
+Persistenz ausschließlich quiz_praesentation_status.stichentscheid_json (nullable
+JSONB). Reguläre team_antworten, Submissions und Punkte werden nicht verändert.
+Nur CONTROL_LIVE darf starten/auflösen/ausblenden; Teilnehmer schreiben nur als
+berechtigtes Team der aktiven Runde. Vor Start muss der Endstand aktiv und die
+reguläre Bewertung abgeschlossen sein. Team-/Punktänderungen blockieren eine
+bestehende Runde. Gefrorene Frage, Einheit und Lösung bleiben reproduzierbar.
+
+Kleinste absolute Abweichung entscheidet innerhalb einer Punktgruppe. Gültige
+Antworten stehen vor fehlenden; gleiche Abweichungen teilen den Platz und
+bekommen eine weitere unbenutzte, freigegebene Schätzfrage. Alle fehlend erzeugt
+keinen Sieger. Mehrere Gruppen werden nacheinander behandelt. Fehlende geeignete
+Frage blockiert mit redaktionellem Hinweis. Quiz-Lock, revisionsgeprüfte Antworten
+und idempotente Wiederholung verhindern doppelte Runden/Antworten. Die Teilnehmer-
+projektion enthält vor REVEALED keine Lösung und niemals fremde Antworten.
+Nach Auflösung kann das Overlay ohne Datenverlust geschlossen werden. Ranglisten
+verwenden nur bei unveränderten regulären Punkten die Stichplatzierung.
+Tests: estimationTiebreak unit und echte PostgreSQL-Transaktionen (Konkurrrenz,
+JSONB-Reload, Berechtigung, Rollback und unveränderte Fragen/Zuordnungen/Antworten).

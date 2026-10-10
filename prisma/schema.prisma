@@ -924,6 +924,7 @@ model frage_vorlage_antwortfelder {
 }
 
 model quiz_praesentation_status {
+  stichentscheid_json      Json?
   quiz_id                  Int       @id
   slide_index              Int       @default(0)
   slide_key                String?   @db.VarChar(160)

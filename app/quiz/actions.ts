@@ -37,6 +37,7 @@ import {
 } from "./teamSessionToken";
 import { getTeamSessionSigningSecret } from "./teamSessionSecret.server";
 import { resolveParticipantSession } from "./participantSession.server";
+import { readTiebreakState, verifiedTiebreakPlaces } from "./estimationTiebreak";
 import { assertTeamAnswerAuthorized } from "./teamAnswerPolicy";
 import {
   buildDefaultQuizSections,
@@ -4836,12 +4837,15 @@ async function loadQuizPunktestand(quizId: number, db: Prisma.TransactionClient 
       entry._sum.vergebene_punkte ?? new Prisma.Decimal(0),
     ]),
   );
+  const tieStatus = await db.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId }, select: { stichentscheid_json: true } });
+  const tiePlaces = verifiedTiebreakPlaces(tieStatus?.stichentscheid_json, sessions.map(session => ({ sessionId: session.quiz_team_session_id, points: Number(totalsBySession.get(session.quiz_team_session_id) ?? 0) })));
   return sessions
     .map((session) => {
       const total =
         totalsBySession.get(session.quiz_team_session_id) ?? new Prisma.Decimal(0);
       return {
         teamId: session.team.team_id,
+        tieBreakPlace: tiePlaces.get(session.quiz_team_session_id),
         teamname: session.teamname,
         avatarCode: mapTeamProfile(session.team).avatarCode,
         photoUrl: session.team.foto_url,
@@ -4857,9 +4861,10 @@ async function loadQuizPunktestand(quizId: number, db: Prisma.TransactionClient 
         _decimal: total,
       };
     })
-    .sort((left, right) => right._decimal.cmp(left._decimal))
+    .sort((left, right) => right._decimal.cmp(left._decimal) || (left.tieBreakPlace ?? 0) - (right.tieBreakPlace ?? 0))
     .map((entry) => ({
       teamId: entry.teamId,
+      tieBreakPlace: entry.tieBreakPlace,
       teamname: entry.teamname,
       avatarCode: entry.avatarCode,
       photoUrl: entry.photoUrl,
@@ -5018,6 +5023,9 @@ export async function getZufaelligeSchaetzfrage(quizId: number) {
 
 export async function getSchaetzfrageById(quizId: number, fragenId: number) {
   const access = await requireQuizLiveController(quizId);
+  const tieStatus = await prisma.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId }, select: { stichentscheid_json: true } });
+  const round = readTiebreakState(tieStatus?.stichentscheid_json)?.rounds.at(-1);
+  if (round?.questionId === fragenId) return { fragen_id: fragenId, frage: `${round.question} (${round.unit})`, richtigeAntwort: `${round.correctValue} ${round.unit}` };
   const frage = await prisma.fragen.findFirst({
     where: {
       fragen_id: fragenId,

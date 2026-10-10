@@ -32,6 +32,7 @@ export const enQuestionEditorMessages = {
     standard: { name: "Standard question", description: "Free-form question with any number of answers." },
     multipleChoice: { name: "Multiple choice", description: "Closed question with four answer choices." },
     faceMorph: { name: "FaceMorph", description: "Identify two people in one combined image.", defaultQuestion: "Which two people can you see in this image?", personA: "Person A", personB: "Person B" },
+    music: { name: "Music", description: "Identify the artist and title of a song played normally.", defaultQuestion: "Which song is playing? Name the artist and title.", artist: "Artist", title: "Title", mediaLabel: "Question audio", mediaHelp: "Normal audio; reverse processing is not required.", resolutionAudioHelp: "Optional separate resolution audio. Without it, question audio is reused." },
     musicReverse: { name: "Music reversed", description: "Identify the artist and title of a song played backwards.", defaultQuestion: "Which song is being played backwards? Name the artist and title.", artist: "Artist", title: "Title" },
     artwork: { name: "Artwork", description: "Identify the artist and title of an artwork.", defaultQuestion: "Who created this artwork and what is its title?" },
     musicEightBit: { name: "Bitcrush music", description: "Identify a song from a digitally reduced retro lo-fi version.", defaultQuestion: "Which song can you hear in this bitcrushed version?" },
@@ -75,6 +76,7 @@ export const enQuestionEditorMessages = {
     label: "Question",
     labels: { question: "Question", statement: "Statement", task: "Task", searchTarget: "What are you looking for?" },
     placeholder: "Write your question...",
+
   },
   answers: { title: "Answers", answer: "Answer", answers: "Answers", correctShort: "correct", inputPlaceholder: "Enter answer", correct: "This answer is correct", add: "+ Add answer", removeConfirm: "This answer already contains data. Do you really want to remove it?", imageRequired: "An image is required for this FaceMorph answer.", createPixelQuestionLater: "Also create a pixel question from this image later" },
   media: { existingLabel: "Question media", replace: "Replace media", choose: "Choose file", chooseImage: "Choose image", takePhoto: "Take photo", uploading: "Uploading …", playbackError: "The audio file could not be loaded." },

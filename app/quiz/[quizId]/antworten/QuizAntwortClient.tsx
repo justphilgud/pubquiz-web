@@ -4,6 +4,7 @@ import { QUIZ_LIFECYCLE_LABELS, type QuizLifecycle } from "../../quizLifecycle";
 /* eslint-disable @next/next/no-img-element -- Pixel stages use dynamic question-media URLs. */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { EstimationTiebreakPanel } from "../../EstimationTiebreakPanel";
 import {
   searchTeamsForAntworten,
   submitTeamAntwort,
@@ -752,6 +753,7 @@ export default function QuizAntwortClient({
       className="answer-template min-h-dvh px-4 py-6 text-slate-900 sm:py-8"
     >
       <div className="mx-auto max-w-2xl space-y-6">
+        {session && <EstimationTiebreakPanel quizId={liveDaten.quiz_id} token={session.sessionToken} />}
         <section className="answer-surface answer-brand-header rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           {(theme.design.stylePreset === "EDITORIAL" || theme.design.stylePreset === "KOMM_ONE") && theme.identity.logoUrl && (
             <img src={theme.identity.logoUrl} alt={theme.design.stylePreset === "KOMM_ONE" ? "Komm.ONE" : "LOVD STELP"} className={theme.design.stylePreset === "KOMM_ONE" ? "answer-komm-one-logo" : "answer-editorial-logo"} />

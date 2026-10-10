@@ -353,6 +353,7 @@ export type QuestionTemplateDefinition = {
     | "multipleChoice"
     | "faceMorph"
     | "musicReverse"
+    | "music"
     | "artwork"
     | "musicEightBit"
     | "pixelImage"

@@ -1,9 +1,9 @@
-export function rankScores<T extends { punkte: number }>(scores: readonly T[]) {
+export function rankScores<T extends { punkte: number; tieBreakPlace?: number }>(scores: readonly T[]) {
   return [...scores]
-    .sort((left, right) => right.punkte - left.punkte)
+    .sort((left, right) => right.punkte - left.punkte || (left.tieBreakPlace ?? 0) - (right.tieBreakPlace ?? 0))
     .map((entry, index, sorted) => ({
       ...entry,
-      place: sorted.findIndex((candidate) => candidate.punkte === entry.punkte) + 1,
+      place: entry.tieBreakPlace ?? sorted.findIndex((candidate) => candidate.punkte === entry.punkte) + 1,
     }));
 }
 

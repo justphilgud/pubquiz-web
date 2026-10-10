@@ -107,3 +107,14 @@ oder Pollingfunktion. Reale Animation und Requestzahlen werden zusätzlich auf e
 eigenen Preview-Testquiz geprüft; ein Screenshot ersetzt diese Abnahme nicht.
 
 Abnahme: [AP6-Bericht mit Messungen und Screenshots](../reports/ap6-intro-team-join.md).
+
+## LOVD-Nachtauftrag 2026-10-10: Intro-Audio-Restzeit
+
+Intro/QR zeigen nach gültigen Audiometadaten die Restzeit m:ss. Grundlage ist
+max(0, ceil(duration-currentTime)), kein eigener Sekundentimer. loadedmetadata,
+durationchange, timeupdate, seeked und ended aktualisieren die Anzeige; Stop
+setzt Position und Anzeige unmittelbar zurück. Ungültige/fehlende Metadaten und
+Ladefehler liefern keine Zeit. Kein automatischer Quizstart. Bestehende
+Moderationsbefehle und Begrüßungsqueue bleiben zuständig. Tests: mediaCountdown
+und echter Chrome-Player mit 125-/12-Sekunden-WAV, Pause, Seek, Stop, Wechsel,
+verspätetem Play, Fehler und Unmount.

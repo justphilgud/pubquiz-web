@@ -123,3 +123,16 @@ berechnet noch keinen Gewinner und vergibt keine Punkte.
 Die darauf aufbauende produktive Finalisierung ist in
 [What the Meme! – AP4](meme-caption-ap4.md) beschrieben. Sie liest diesen
 geschlossenen Stand, ohne Kandidaten oder Votes zu verändern.
+
+## LOVD-Nachtauftrag 2026-10-10: terminaler Leer-Skip
+
+Bestätigte Ursache: Die Moderation schloss eine leere Meme-Runde als SKIPPED;
+der Navigationsserver verlangte trotzdem ein finalisiertes Voting. Sein Fehler
+setzte den optimistischen Folienwechsel zurück. mayLeaveMemeQuestion erlaubt
+nur finalisierte Ergebnisse oder den neuesten CLOSED/REVEALED-Lauf mit SKIPPED
+und exakt null ausgewählten Kandidaten. Ein älterer Skip öffnet keinen neuen
+unfertigen Lauf. Reguläre Voting-Sperren bleiben erhalten. Moderations-Polling
+trägt eine Navigationsrevision; eine vor Navigation begonnene Antwort darf den
+neueren Zustand nicht ersetzen. Bewusstes Zurücknavigieren bleibt erhalten.
+Tests: memeNavigationPolicy und bestehende Meme-/Lifecycle-Regressionssuite;
+getrennte authentifizierte Preview-Browser sind zusätzliche Abnahme.

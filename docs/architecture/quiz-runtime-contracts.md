@@ -146,6 +146,13 @@ sichergestellt. Erst die anschließende Navigation zeigt die Auflösungsphase.
 
 ### Antwortform in der Auflösung
 
+Musikauflösungen verwenden das phasenrichtig ausgewählte Audio im bestehenden
+`SynchronizedMedia`-Player auch ohne Medienoverlay. Nur die Präsentation spielt
+Audio ab; die Moderationsvorschau bleibt stumm. Bei geöffnetem Overlay übernimmt
+dessen Player, damit niemals zwei Audioelemente zugleich wiedergeben.
+Regression: `questionPhaseMedia.test.ts` rendert alle drei Musiktemplates mit
+und ohne Overlay und prüft die tatsächlichen Audioelemente und Originalquellen.
+
 Die Auflösung richtet sich nach `effektiver_antwortmodus` der Quizzuordnung.
 `OPEN` zeigt ausschließlich die kanonischen richtigen Antworten, auch wenn die
 zugrunde liegende Frage weitere gespeicherte Auswahlantworten besitzt. Nur

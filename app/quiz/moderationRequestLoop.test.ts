@@ -5,12 +5,13 @@ import test from "node:test";
 import ts from "typescript";
 import * as deck from "./[quizId]/praesentation/buildPraesentationSlides";
 import * as live from "../rendering/presentation/presentationLiveState";
+import { mayApplyLiveSnapshot } from "./liveSnapshotRevision";
 
 const filename = "app/quiz/[quizId]/moderation/ModerationClient.tsx";
 const original = readFileSync(filename, "utf8");
 
 type Effect = { dependencies: readonly unknown[]; cleanup?: () => void };
-type View = { funnyQuestionIds: Set<number>; funnyAnswers: unknown[]; slideIndex: number; antwortStatus: { antwortenEingegangen: number }; lifecycleState: typeof initialState };
+type View = { funnyQuestionIds: Set<number>; funnyAnswers: unknown[]; slideIndex: number; antwortStatus: { antwortenEingegangen: number }; lifecycleState: typeof initialState; goToSlide: (index: number) => Promise<void> };
 const initialState: live.PresentationLiveState = { ...live.resolvePresentationLiveState(null), lifecycle: "RUNNING" as const, slideKey: "question:101:question" };
 
 /** Executes the actual component body/effects with deterministic React hook semantics.
@@ -29,7 +30,7 @@ function harness(source = original) {
     }
   }
   const body = source.slice(source.indexOf("type QuizLiveSnapshot"), source.indexOf("\n  return (", source.indexOf("  useModerationHotkeys"))) +
-    "\n return { funnyQuestionIds, funnyAnswers, slideIndex, antwortStatus, lifecycleState };\n}";
+    "\n return { funnyQuestionIds, funnyAnswers, slideIndex, antwortStatus, lifecycleState, goToSlide };\n}";
   const compiled = ts.transpileModule(body, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
   let cursor = 0;
   let dirty = false;
@@ -44,6 +45,8 @@ function harness(source = original) {
   const signals: AbortSignal[] = [];
   const pendingFunny: Array<(answers: unknown[]) => void> = [];
   let deferFunny = false;
+  let deferSnapshot = false;
+  const pendingSnapshots: Array<() => void> = [];
   let answers: unknown[] = [];
   let state = { ...initialState };
   const question = (id: number) => ({ quiz_fragen_id: id, fragen_id: id, quiz_abschnitt_id: 10, sortierung: id, frage: `Frage ${id}`, funnyRevealAvailable: false, medien: [], antworten: [] });
@@ -58,7 +61,7 @@ function harness(source = original) {
   const schedule = (callback: () => void, delay: number, repeat?: number) => { const id = ++timerId; timers.set(id, { callback, due: time + delay, repeat }); return id; };
   const exported: { default?: (input: typeof props) => View } = {};
   runInNewContext(compiled, {
-    ...imports, ...deck, ...live, exports: exported, AbortController, console,
+    ...imports, ...deck, ...live, mayApplyLiveSnapshot, exports: exported, AbortController, console,
     window: { setTimeout: (fn: () => void, delay: number) => schedule(fn, delay), clearTimeout: (id: number) => timers.delete(id), setInterval: (fn: () => void, delay: number) => schedule(fn, delay, delay), clearInterval: (id: number) => timers.delete(id) },
     document: { hidden: false },
     useMemo: memoSlot, useCallback: (fn: unknown, deps: unknown[]) => memoSlot(() => fn, deps),
@@ -76,8 +79,10 @@ function harness(source = original) {
     },
     fetch: async (_url: string, options: { signal: AbortSignal }) => {
       counts.snapshot++; signals.push(options.signal);
-      return { ok: true, json: async () => ({ presentationState: { ...state }, questionHidden: false, pixelState: null, serverNow: new Date().toISOString(), pollState: null, livePollState: null, liveResultState: null, teamJoinState: null, blockState: null }) };
+      const snapshot = { presentationState: { ...state }, questionHidden: false, pixelState: null, serverNow: new Date().toISOString(), pollState: null, livePollState: null, liveResultState: null, teamJoinState: null, blockState: null };
+      return { ok: true, json: async () => deferSnapshot ? new Promise(resolve => pendingSnapshots.push(() => resolve(snapshot))) : snapshot };
     },
+    setPraesentationSlideIndex: async (_quizId: number, index: number, key: string) => { state = { ...state, slideIndex: index, slideKey: key }; },
     getPresentationFunnyAnswers: async () => { counts.funny++; return deferFunny ? new Promise<unknown[]>(resolve => pendingFunny.push(resolve)) : [...answers]; },
     getAntwortStatus: async () => { counts.progress++; return { teamsAngemeldet: 1, antwortenEingegangen: 1, finaleAntworten: 0, prozent: 100, letzteAntwortAt: null }; },
   });
@@ -99,8 +104,24 @@ function harness(source = original) {
     time = end;
   };
   render();
-  return { counts, props, signals, timers, pendingFunny, render, settle, advance, view: () => view!, setAnswers: (value: unknown[]) => { answers = value; }, defer: () => { deferFunny = true; }, change: (patch: Partial<typeof state>) => { state = { ...state, ...patch }; }, unmount: () => { effects.forEach(effect => effect.cleanup?.()); effects.clear(); mounted = false; } };
+  return { counts, props, signals, timers, pendingFunny, pendingSnapshots, render, settle, advance, view: () => view!, setAnswers: (value: unknown[]) => { answers = value; }, defer: () => { deferFunny = true; }, holdSnapshots: (hold: boolean) => { deferSnapshot = hold; }, change: (patch: Partial<typeof state>) => { state = { ...state, ...patch }; }, unmount: () => { effects.forEach(effect => effect.cleanup?.()); effects.clear(); mounted = false; } };
 }
+
+test("LOVD: actual navigation remains current after a delayed old snapshot; intentional back still works", async () => {
+  const h = harness(); await h.settle();
+  const previousIndex = h.view().slideIndex;
+  h.holdSnapshots(true); await h.advance(750);
+  assert.equal(h.pendingSnapshots.length, 1);
+  await h.view().goToSlide(previousIndex + 1); await h.settle();
+  assert.equal(h.view().slideIndex, previousIndex + 1);
+  h.pendingSnapshots.shift()!(); await h.settle();
+  assert.equal(h.view().slideIndex, previousIndex + 1);
+  h.holdSnapshots(false); await h.advance(1500);
+  assert.equal(h.view().slideIndex, previousIndex + 1);
+  await h.view().goToSlide(previousIndex); await h.settle(); await h.advance(750);
+  assert.equal(h.view().slideIndex, previousIndex);
+  h.unmount();
+});
 
 test("B10a: unchanged empty funny state and reconstructed quiz do not restart requests", async () => {
   const h = harness(); await h.settle();
