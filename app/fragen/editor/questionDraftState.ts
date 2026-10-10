@@ -35,10 +35,3 @@ export function removeAnswerById(
 ): QuestionAnswerDraft[] {
   return answers.filter((answer) => answer.id !== answerId);
 }
-
-export function applyQuestionRewriteToDraft(
-  draft: QuestionEditorDraft,
-  questionText: string,
-): QuestionEditorDraft {
-  return { ...draft, questionText };
-}

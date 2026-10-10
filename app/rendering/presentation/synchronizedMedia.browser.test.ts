@@ -24,8 +24,6 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
     import {createRoot} from 'react-dom/client';
     import {flushSync} from 'react-dom';
     import {SynchronizedMedia} from './app/rendering/presentation/PresentationSlideRenderer';
-    import {QuestionRewritePanel} from './app/fragen/editor/components/QuestionRewritePanel';
-    import {deQuestionEditorMessages} from './app/i18n/messages/de/questionEditor';
     const root=createRoot(document.getElementById('app'));
     const show=(src,command,id)=>flushSync(()=>root.render(<SynchronizedMedia kind="audio" src={src} command={command} commandId={id} renderMode="PRESENTATION" showCountdown/>));
     let phase='initial';
@@ -60,25 +58,6 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       phase='missing';show('/missing.wav',null,7); await wait(()=>document.querySelector('[role="status"]'));
       check(!document.querySelector('output'),'invented countdown after failed audio');
       flushSync(()=>root.unmount()); check(short.paused,'unmounted audio continues');
-      // Real client interactions with a simulated endpoint: not a live-provider acceptance.
-      let draft='Wie heißt die Hauptstadt von Frankreich?', accepted=0, requests=0, fail=false;
-      const untouched={answer:'Paris',unit:'Stück',media:'original.wav',template:'standard'};
-      const before=JSON.stringify(untouched), messages=deQuestionEditorMessages.question.rewrite;
-      const rewriteRoot=createRoot(document.getElementById('app'));
-      const rewrite=()=>flushSync(()=>rewriteRoot.render(<QuestionRewritePanel questionText={draft} disabled={false} messages={messages} onAccept={text=>{draft=text;accepted++;rewrite();}}/>));
-      const button=text=>[...document.querySelectorAll('button')].find(node=>node.textContent===text);
-      const realFetch=window.fetch;
-      window.fetch=async(url,init)=>{check(url==='/api/question-rewrite','unexpected persistence request');check(Object.keys(JSON.parse(init.body)).join(',')==='questionText','structured data sent');requests++;return new Response(JSON.stringify(fail?{ok:false,code:'PROVIDER_TIMEOUT'}:{ok:true,proposal:'Welche Stadt ist Frankreichs Hauptstadt?',usage:null,cost:null}),{status:fail?504:200});};
-      phase='rewrite proposal';rewrite();check(requests===0,'automatic provider call');
-      button(messages.request).click();await wait(()=>document.querySelector('#questionRewriteProposal'));
-      check(accepted===0 && draft==='Wie heißt die Hauptstadt von Frankreich?','unsolicited draft overwrite');
-      phase='rewrite stale';draft='In welchem Jahr war das?';rewrite();check(button(messages.accept).disabled,'stale proposal accepted');
-      button(messages.discard).click();await wait(()=>!document.querySelector('#questionRewriteProposal'));check(draft==='In welchem Jahr war das?','discard lost draft');
-      phase='rewrite accept';button(messages.request).click();await wait(()=>document.querySelector('#questionRewriteProposal'));button(messages.accept).click();await wait(()=>accepted===1);
-      check(draft==='Welche Stadt ist Frankreichs Hauptstadt?' && JSON.stringify(untouched)===before,'structured editor data changed');
-      phase='rewrite timeout';button(messages.discard).click();await wait(()=>!document.querySelector('#questionRewriteProposal'));fail=true;button(messages.request).click();await wait(()=>document.querySelector('[role="alert"]'));
-      check(accepted===1 && draft==='Welche Stadt ist Frankreichs Hauptstadt?' && requests===3,'provider failure changed draft');
-      window.fetch=realFetch;flushSync(()=>rewriteRoot.unmount());
       document.getElementById('result').textContent='PASS';
     }
     run().catch(error=>document.getElementById('result').textContent='FAIL '+error.message);

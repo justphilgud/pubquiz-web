@@ -19,7 +19,6 @@ import {
 } from "../questionScopePolicy";
 import { canEditGlobalQuestions, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { resolveGooglePlacesFeature } from "../googlePlacesFeature";
-import { canUseQuestionRewrite, isQuestionRewriteEnabled } from "../questionRewriteFeature.server";
 import { loadPublicQuestionSubmissionReviewMetadata } from "@/app/frage-einreichen/publicQuestionSubmissionReview.server";
 import QuestionStoryElementPanel from "@/app/story-elemente/QuestionStoryElementPanel";
 import { loadQuestionStoryElementPanel } from "@/app/story-elemente/questionStoryElements.server";
@@ -167,7 +166,6 @@ export default async function ExistingQuestionEditorPage({
         apiKey: process.env.GOOGLE_MAPS_API_KEY,
         explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
       })}
-      questionRewriteEnabled={isQuestionRewriteEnabled() && canUseQuestionRewrite(actor)}
     />
     <QuestionQuizAssignmentPanel
       questionId={questionId}

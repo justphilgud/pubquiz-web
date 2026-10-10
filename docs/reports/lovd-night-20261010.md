@@ -1,5 +1,22 @@
 # LOVD-Nachtauftrag 2026-10-10 – fortlaufender Nachweis
 
+## Aktueller Releaseumfang nach gezielter Nutzeranweisung
+
+Der erste vollständige Stand 5f3786e9ec6942f9c722c5681e92cf7cec555cab
+hat vollständige CI und Preview-Deployment 38000409022 bestanden
+(dpl_3AA8Svb7Zo2FdpswQgxyh5HAtqZy, READY). Er bleibt im Git-Verlauf erhalten.
+Die nachfolgenden historischen Abschnitte beschreiben diesen Stand.
+
+Am 10.10.2026 ist der vorhandene Preview-Alias weiterhin nicht angemeldet.
+OpenAI-Konfigurationsmetadaten enthalten weiterhin weder OPENAI_API_KEY noch
+OPENAI_QUESTION_REWRITE_ENABLED. Kein echter Provideraufruf wurde ausgeführt.
+Auf ausdrückliche Anweisung werden AP1–5 unabhängig releasefähig vorbereitet:
+Die ungeprüfte KI-Anbindung einschließlich API, Editorintegration, Provider,
+zugehörigen Tests und Betriebsdokumenten ist vollständig aus dem PR-Releaseumfang
+entfernt. Die normale Musikvorlage und ihre Übersetzungen bleiben erhalten.
+Keine neue Architektur, Abhängigkeit oder Infrastruktur. Live-Spielabnahme bleibt
+bis zur vorhandenen Admin-Anmeldung offen; fachliche Releasefreigabe ist vorhanden.
+
 ## Umfang und Schutzgrenzen
 
 Ausgangs-main ab9bfb1f95af0e70a5ed797d6d5cdfb656869441; eigener Branch
