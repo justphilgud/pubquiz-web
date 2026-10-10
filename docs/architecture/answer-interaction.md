@@ -85,6 +85,11 @@ Das Ergebnis enthält ausschließlich ausführbare UI-Informationen. Ein Rendere
 
 Wichtige Fallbacks:
 
+- Normale Musik (`musik`) ist wie Rückwärts- und 8-Bit-Musik eine offene Frage,
+  auch ohne generische Antwortzeilen. Die bestehenden strukturierten Felder für
+  Interpret und Titel bleiben maßgeblich; der Filter für offene Fragen enthält
+  das Template ebenfalls. Regression: `quizQuestionAnswerMode.test.ts`.
+
 - Ein geschlossener Standard mit mehreren Optionen wird `SINGLE_CHOICE`.
 - Ein geschlossener Fragetyp mit aktivem Freitext-Override wird `TEXT`, sofern der Vertrag dies erlaubt.
 - Vorhandene strukturierte Antwortfelder werden `STRUCTURED_TEXT`.

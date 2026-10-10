@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { getQuestionAnswerModeWhereInput } from "@/app/fragen/questionAnswerMode";
 import {
   canEnableFreeAnswer,
   resolveQuizQuestionAnswerMode,
@@ -15,6 +16,25 @@ const openQuestion = {
   templateId: null,
   answers: [{ isCorrect: true }],
 };
+
+test("normal music is open without answer rows and remains in the open-question filter", () => {
+  for (const allowFreeAnswer of [false, true]) {
+    const question = { templateId: questionTemplateIds.music, answers: [] };
+    const result = resolveQuizQuestionAnswerMode({ ...question, allowFreeAnswer });
+    assert.equal(result.originalMode, "OPEN");
+    assert.equal(result.effectiveMode, "OPEN");
+    assert.equal(result.freeAnswerOverrideActive, false);
+    assert.equal(canEnableFreeAnswer(question), false);
+  }
+  const filter = getQuestionAnswerModeWhereInput("OPEN");
+  assert.ok(filter.OR?.some((branch) => {
+    const relation = branch.vorlage;
+    if (!relation || !("code" in relation)) return false;
+    const code = relation.code;
+    return typeof code === "object" && code !== null && "in" in code &&
+      Array.isArray(code.in) && code.in.includes(questionTemplateIds.music);
+  }));
+});
 
 test("closed quiz question remains closed without the override", () => {
   const result = resolveQuizQuestionAnswerMode({

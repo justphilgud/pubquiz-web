@@ -16,6 +16,7 @@ const openSpecialTemplateIds = [
   questionTemplateIds.factsCountry,
   questionTemplateIds.faceMorph,
   questionTemplateIds.artwork,
+  questionTemplateIds.music,
   questionTemplateIds.musicReverse,
   questionTemplateIds.musicEightBit,
   questionTemplateIds.pixelImage,
