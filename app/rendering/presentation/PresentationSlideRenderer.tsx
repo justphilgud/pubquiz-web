@@ -258,6 +258,8 @@ export function SynchronizedMedia({
     if (renderMode !== "PRESENTATION") return;
     const media = mediaRef.current;
     if (!media) return;
+    // A paused intro restored into a fresh node still needs metadata for its seek.
+    if (showCountdown && command !== "play" && media.readyState === 0) media.load();
     if (command === null) {
       media.pause();
       handledCommandIdRef.current = null;
