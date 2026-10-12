@@ -2,9 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { build } from "esbuild";
 import { createServer } from "node:http";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -84,12 +83,46 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
   await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
   const address = server.address(); assert.ok(address && typeof address !== "string");
   const profile = mkdtempSync(join(tmpdir(), "pubquiz-night-media-"));
+  const browser = spawn(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking", "--no-first-run", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "about:blank"], { stdio: "ignore" });
+  let socket: WebSocket | undefined;
   try {
-    const { stdout } = await promisify(execFile)(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking", "--no-first-run", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=${profile}`, "--virtual-time-budget=15000", "--dump-dom", `http://127.0.0.1:${address.port}`], { timeout: 30_000, maxBuffer: 2 * 1024 * 1024 });
-    assert.match(stdout, /<pre id="result">PASS<\/pre>/, stdout.slice(-1500));
+    // Use wall-clock waits: virtual time can exhaust media waits before metadata IO.
+    const deadline = Date.now() + 30_000;
+    const portFile = join(profile, "DevToolsActivePort");
+    while (!existsSync(portFile) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 50));
+    assert.ok(existsSync(portFile), "Test browser did not start");
+    const [port, endpoint] = readFileSync(portFile, "utf8").trim().split(/\r?\n/);
+    socket = new WebSocket(`ws://127.0.0.1:${port}${endpoint}`);
+    await new Promise<void>((resolve, reject) => { socket!.onopen = () => resolve(); socket!.onerror = () => reject(new Error("Test browser connection failed")); });
+    let nextId = 0;
+    type ProtocolResult = { targetId?: string; sessionId?: string; result?: { value?: string } };
+    const pending = new Map<number, { resolve: (result: ProtocolResult) => void; reject: (error: Error) => void }>();
+    socket.onmessage = event => {
+      const message = JSON.parse(String(event.data)) as { id?: number; result?: ProtocolResult; error?: { message: string } };
+      if (!message.id) return;
+      const request = pending.get(message.id); pending.delete(message.id);
+      if (message.error) request?.reject(new Error(message.error.message));
+      else request?.resolve(message.result ?? {});
+    };
+    const call = (method: string, params: Record<string, unknown>, sessionId?: string) => new Promise<ProtocolResult>((resolve, reject) => {
+      const id = ++nextId; pending.set(id, { resolve, reject }); socket!.send(JSON.stringify({ id, method, params, sessionId }));
+    });
+    const { targetId } = await call("Target.createTarget", { url: `http://127.0.0.1:${address.port}` });
+    const { sessionId } = await call("Target.attachToTarget", { targetId, flatten: true });
+    let result = "PENDING";
+    while (Date.now() < deadline) {
+      const response = await call("Runtime.evaluate", { expression: "document.getElementById('result')?.textContent || 'PENDING'", returnByValue: true }, sessionId);
+      result = response.result?.value ?? "PENDING";
+      if (result !== "PENDING") break;
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    assert.equal(result, "PASS");
   } finally {
+    socket?.close();
+    browser.kill();
+    if (browser.exitCode === null) await new Promise(resolve => browser.once("exit", resolve));
     await new Promise<void>(resolve => server.close(() => resolve()));
     // Fresh, test-owned directory under tmpdir, never a user browser profile.
-    rmSync(profile, { recursive: true, force: true });
+    rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   }
 });
