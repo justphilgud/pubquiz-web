@@ -318,6 +318,7 @@ export default function QuizPraesentationPlayer({
             mediaOverlayActive: liveState.mediaOverlayActive,
             playbackCommand: activated ? liveState.playbackCommand : null,
             playbackCommandId: liveState.playbackCommandId,
+            mediaPlaybackRevision: liveState.lifecycleRevision,
             pixelState,
             memeState,
             memePresentationState,

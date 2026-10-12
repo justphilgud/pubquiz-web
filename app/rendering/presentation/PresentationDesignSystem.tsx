@@ -356,7 +356,8 @@ export function PresentationDesignFooter({
 }) {
   if (theme.design.stylePreset === "EDITORIAL") {
     return (
-      <footer className="presentation-editorial-footer relative z-20 flex shrink-0 items-center justify-end">
+        <footer className="presentation-editorial-footer relative z-20 flex shrink-0 items-center justify-between">
+          <span>{theme.design.occasion.eventTitle || "PUBQUIZ"}</span>
         <span>{theme.design.occasion.extraText || "LOVD × Phil Gud"}</span>
       </footer>
     );

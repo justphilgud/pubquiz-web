@@ -322,6 +322,7 @@ export function getDynamicTemplateRequirementIssue(
   if (snapshot.questionText.role === "REQUIRED_NEW" && !draft.questionText.trim()) {
     return "QUESTION_TEXT";
   }
+  if (draft.templateConfig?.musicAnswerScope && !snapshot.media.some(media => media.mediaType === "AUDIO" && media.role !== "EXCLUDED")) return "MEDIA";
   if (snapshot.media.some((rule) =>
     (rule.role === "REQUIRED_NEW" || rule.role === "FIXED") &&
     !draft.questionMedia.some((medium) =>

@@ -167,6 +167,10 @@ export async function createDynamicQuestionTemplate(input: {
       return { ok: false, message: "Ein Fragenmedium ist nicht vollständig gespeichert." };
     }
 
+    if (loaded.draft.templateConfig.musicAnswerScope && !input.rules.media.some(rule =>
+      rule.role !== "EXCLUDED" && mediaById.get(rule.sourceMediaId)?.mediaType === "AUDIO")) {
+      return { ok: false, message: "Musikvorlagen benötigen Audio. Übernimm es fest oder als erforderlich neu zu befüllen." };
+    }
     const media: DynamicQuestionTemplateSnapshot["media"] = [];
     for (const rule of input.rules.media) {
       const source = mediaById.get(rule.sourceMediaId)!;

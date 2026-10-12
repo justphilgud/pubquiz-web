@@ -44,6 +44,7 @@ test("music answer scope survives config parsing and validates only the chosen c
     assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, answers: [{ text: "  " }] }), "ANSWER");
     assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, templateConfig: DEFAULT_PIXEL_TEMPLATE_CONFIG }), "ANSWER");
     assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, questionMedia: [] }), "MEDIA");
+    assert.equal(getDynamicTemplateRequirementIssue({ ...music, media: [] }, draft), "MEDIA");
     assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, answers: [{ text, fieldGroupId: "single" }, { text: "Variante", fieldGroupId: "single" }] }), null);
   }
 });

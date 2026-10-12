@@ -108,6 +108,7 @@ type RankingTableEntry = {
 type Abschnitt = QuizPraesentationResult["abschnitte"][number];
 
 type PresentationSlideSharedDisplayState = {
+  mediaPlaybackRevision?: number;
   templateRevealCount: number;
   punktestand: ScoreEntry[];
   yearlyStandings?: YearlyRankingEntry[];
@@ -185,6 +186,7 @@ export function SynchronizedMedia({
   loop = false,
   showCountdown = false,
   countdownClassName,
+  resumeContext,
 }: {
   kind: "audio" | "video";
   src: string;
@@ -198,6 +200,7 @@ export function SynchronizedMedia({
   loop?: boolean;
   showCountdown?: boolean;
   countdownClassName?: string;
+  resumeContext?: string;
 }) {
   const mediaRef = useRef<HTMLMediaElement | null>(null);
   const handledCommandIdRef = useRef<number | null>(null);
@@ -206,21 +209,34 @@ export function SynchronizedMedia({
   const [failedSource, setFailedSource] = useState<string | null>(null);
   const [mediaProgress, setMediaProgress] = useState<{ src: string; remaining: number | null }>({ src, remaining: null });
   const playbackIntentRef = useRef(command);
-  const resumeKey = `pubquiz:intro-media:${src}`;
+  const pendingIntroPositionRef = useRef<number | null>(null);
+  const introResumeAppliedRef = useRef<{ source: string; commandId: number } | null>(null);
+  const resumeSource = resumeContext ? JSON.stringify([resumeContext, src]) : src;
+  const resumeKey = `pubquiz:intro-media:${resumeSource}`;
   const readResume = useCallback((): unknown => {
     if (!showCountdown || renderMode !== "PRESENTATION") return null;
     try { return JSON.parse(sessionStorage.getItem(resumeKey) ?? "null"); } catch { return null; }
   }, [showCountdown, renderMode, resumeKey]);
   function restoreIntro(media: HTMLMediaElement) {
-    if (!showCountdown || renderMode !== "PRESENTATION" || (command !== "play" && command !== "pause")) return;
-    const position = introResumePosition(readResume(), src, commandId, media.duration, Date.now());
-    if (position !== null) media.currentTime = position;
+    if (media !== mediaRef.current || !showCountdown || renderMode !== "PRESENTATION" || (command !== "play" && command !== "pause")) return null;
+    const position = introResumePosition(readResume(), resumeSource, commandId, media.duration, Date.now());
+    if (position !== null) { pendingIntroPositionRef.current = position; media.currentTime = position; }
+    return position;
   }
   function updateProgress(media: HTMLMediaElement) {
-    setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, media.currentTime) });
+    if (media !== mediaRef.current) return;
+    if (showCountdown && renderMode === "PRESENTATION" && Number.isFinite(media.duration) && media.duration > 0 &&
+      (introResumeAppliedRef.current?.source !== resumeSource || introResumeAppliedRef.current.commandId !== commandId)) {
+      introResumeAppliedRef.current = { source: resumeSource, commandId };
+      restoreIntro(media);
+    }
+    const position = showCountdown && media.seeking && pendingIntroPositionRef.current !== null
+      ? pendingIntroPositionRef.current : media.currentTime;
+    if (!media.seeking) pendingIntroPositionRef.current = null;
+    setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, position) });
     if (showCountdown && renderMode === "PRESENTATION" && Number.isFinite(media.duration) && media.duration > 0) {
-      try { sessionStorage.setItem(resumeKey, JSON.stringify({ source: src, commandId,
-        duration: media.duration, position: media.currentTime, recordedAt: Date.now(), playing: !media.paused && !media.ended })); } catch { /* Playback still works when storage is unavailable. */ }
+      try { sessionStorage.setItem(resumeKey, JSON.stringify({ source: resumeSource, commandId,
+        duration: media.duration, position, recordedAt: Date.now(), playing: !media.paused && !media.ended && !media.seeking && media.readyState >= 2 })); } catch { /* Playback still works when storage is unavailable. */ }
     }
   }
 
@@ -254,7 +270,7 @@ export function SynchronizedMedia({
     if (command === "play") {
       const saved = readResume() as { duration?: number } | null;
       if (showCountdown && saved && typeof saved.duration === "number" &&
-        introResumePosition(saved, src, commandId, saved.duration, Date.now()) === saved.duration) {
+        introResumePosition(saved, resumeSource, commandId, saved.duration, Date.now()) === saved.duration) {
         media.pause();
         return;
       }
@@ -272,10 +288,11 @@ export function SynchronizedMedia({
       media.pause();
     } else if (command === "stop") {
       media.pause();
+      pendingIntroPositionRef.current = null;
       media.currentTime = 0;
       setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, 0) });
     }
-  }, [command, commandId, renderMode, src, showCountdown, readResume]);
+  }, [command, commandId, renderMode, src, showCountdown, readResume, resumeSource]);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -293,7 +310,7 @@ export function SynchronizedMedia({
         loop={loop}
         preload="metadata"
         onError={() => { setFailedSource(src); setMediaProgress({ src, remaining: null }); }}
-        onLoadedMetadata={(event) => { setFailedSource(null); restoreIntro(event.currentTarget); updateProgress(event.currentTarget); }}
+        onLoadedMetadata={(event) => { setFailedSource(null); updateProgress(event.currentTarget); }}
         onDurationChange={(event) => updateProgress(event.currentTarget)}
         onTimeUpdate={(event) => updateProgress(event.currentTarget)}
         onPlay={(event) => updateProgress(event.currentTarget)}
@@ -324,7 +341,7 @@ export function SynchronizedMedia({
       {media}
       {showCountdown && failedSource !== src && mediaProgress.src === src && mediaProgress.remaining !== null && (
         <output className={`presentation-intro-countdown ${countdownClassName ?? "text-5xl font-bold tabular-nums"}`} style={countdownClassName ? { fontSize: `${Math.min(15.5, 78 / formatMediaRemaining(mediaProgress.remaining).length)}cqw` } : undefined} aria-label="Verbleibende Intro-Musik">
-          {formatMediaRemaining(mediaProgress.remaining).padStart(5, "0")}
+          {countdownClassName ? formatMediaRemaining(mediaProgress.remaining).padStart(5, "0") : formatMediaRemaining(mediaProgress.remaining)}
         </output>
       )}
       {failedSource === src && <p role="status" className="presentation-media-error">Medium konnte nicht geladen werden. Bitte Datei und Verbindung prüfen.</p>}
@@ -1031,7 +1048,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
   if (layoutVariant === "CONTENT_CENTERED") {
     return (
-      <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
+      <div data-presentation-layout={layoutVariant} data-lovd-open-text={theme.design.stylePreset === "EDITORIAL" && frage.effektiver_antwortmodus === "OPEN" && !hatAntwortmoeglichkeiten && frage.medien.length === 0 || undefined} className="presentation-question-card flex h-full min-h-0 flex-col justify-center rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-10 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
             Frage {slide.frageIndexImBlock}
@@ -1946,6 +1963,7 @@ function renderAnkommenSlide() {
 function renderStartsequenzSlide() {
   const editorial = theme.design.stylePreset === "EDITORIAL";
   const introMedia = <SynchronizedMedia
+    key={`intro:${quiz.quiz_id}:${displayState.mediaPlaybackRevision ?? 0}`}
     kind="audio"
     src={praesentationQuiz.intro_musik_url?.trim() || "/medien/audio/intro/mexico.mp3"}
     command={playbackCommand}
@@ -1955,6 +1973,7 @@ function renderStartsequenzSlide() {
     allowPublicActivation={!editorial}
     showCountdown
     countdownClassName={editorial ? "lovd-start-countdown" : undefined}
+    resumeContext={`${quiz.quiz_id}:${displayState.mediaPlaybackRevision ?? 0}`}
   />;
   return (
     <section className="presentation-start-sequence relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[var(--quiz-background)] text-[var(--quiz-text)]">

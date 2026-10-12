@@ -7,6 +7,7 @@ test("intro reload resumes only the same audio command and preserves pause/end",
   assert.equal(introResumePosition(record, "intro.mp3", 7, 212, 6000), 55);
   assert.equal(introResumePosition({ ...record, playing: false }, "intro.mp3", 7, 212, 6000), 50);
   assert.equal(introResumePosition(record, "other.mp3", 7, 212, 6000), null);
+  assert.equal(introResumePosition({ ...record, source: "quiz:9:run1|intro.mp3" }, "quiz:9:run2|intro.mp3", 7, 212, 6000), null);
   assert.equal(introResumePosition(record, "intro.mp3", 8, 212, 6000), null);
   assert.equal(introResumePosition(record, "intro.mp3", 7, 16, 6000), null);
   assert.equal(introResumePosition({ ...record, position: 212, playing: false }, "intro.mp3", 7, 212, 6000), 212);

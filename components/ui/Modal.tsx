@@ -1,7 +1,9 @@
 "use client";
 
-import { ReactNode, useEffect, useId, useRef } from "react";
+import { ReactNode, useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+
+const subscribeToClient = () => () => {};
 
 export function Modal({
   open,
@@ -19,11 +21,12 @@ export function Modal({
   className?: string;
 }) {
   const titleId = useId();
+  const isClient = useSyncExternalStore(subscribeToClient, () => true, () => false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
   useEffect(() => {
-    if (!open) {
+    if (!open || !isClient) {
       return;
     }
 
@@ -59,9 +62,9 @@ export function Modal({
       document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
-  }, [open]);
+  }, [open, isClient]);
 
-  if (!open || typeof document === "undefined") return null;
+  if (!open || !isClient) return null;
 
   return createPortal(
     <div

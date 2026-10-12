@@ -37,6 +37,10 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       phase='pause';show('/long.wav','pause',2); await wait(()=>original.paused);
       phase='buffer';await wait(()=>original.seekable.length && original.seekable.end(original.seekable.length-1)>62);
       phase='seek';original.currentTime=61.2; await wait(()=>original.currentTime>61); original.dispatchEvent(new Event('timeupdate')); await wait(()=>countdown()==='1:04');
+      phase='paused reload';flushSync(()=>root.render(null));show('/long.wav','pause',2);
+      await wait(()=>document.querySelector('audio')?.currentTime>61 && countdown()==='1:04');
+      check(document.querySelector('audio').paused,'reload started paused intro');
+      check(original.paused,'reload kept previous media playing');
       phase='restart';show('/long.wav','stop',3); await wait(()=>countdown()==='2:05');
       phase='short';show('/short.wav',null,4); await wait(()=>countdown()==='0:12');
       check(original.paused,'old audio still playing');

@@ -33,9 +33,11 @@ const roleLabels: Record<DynamicQuestionTemplateRole, string> = {
 function RoleSelect({
   value,
   onChange,
+  excludeDisabled = false,
 }: {
   value: DynamicQuestionTemplateRole;
   onChange: (value: DynamicQuestionTemplateRole) => void;
+  excludeDisabled?: boolean;
 }) {
   return (
     <Select
@@ -46,7 +48,7 @@ function RoleSelect({
       className="mt-1 min-h-11"
     >
       {dynamicQuestionTemplateRoles.map((role) => (
-        <option key={role} value={role}>{roleLabels[role]}</option>
+        <option key={role} value={role} disabled={excludeDisabled && role === "EXCLUDED"}>{roleLabels[role]}</option>
       ))}
     </Select>
   );
@@ -188,7 +190,7 @@ export function CreateDynamicQuestionTemplate({
                 <label key={medium.slotKey} className="block rounded-xl border border-slate-200 p-3 text-sm">
                   <span className="font-medium">{medium.mediaType === "IMAGE" ? "Bild" : medium.mediaType === "AUDIO" ? "Audio" : "Video"}</span>
                   <span className="mt-1 block truncate text-slate-600">{medium.fileName ?? medium.url}</span>
-                  <RoleSelect value={rule.role} onChange={(role) => updateMediaRole(rule.slotKey, role)} />
+                  <RoleSelect value={rule.role} excludeDisabled={Boolean(draft.templateConfig.musicAnswerScope) && medium.mediaType === "AUDIO"} onChange={(role) => updateMediaRole(rule.slotKey, role)} />
                 </label>
               );
             })}
