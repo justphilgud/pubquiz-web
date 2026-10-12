@@ -65,6 +65,7 @@ import {
 } from "./pixelTemplateConfig";
 import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 import { evaluateQuestionQuality, hasRequiredTemplateAnswerImages } from "./questionQuality";
+import { isMusicAnswerStructure, supportsMusicAnswerScope } from "./templates/musicAnswerScope";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
 import { getAffectedQuestionIds } from "./questionSaveResult";
 import {
@@ -1146,6 +1147,19 @@ export async function saveQuestion(
     draft.templateId ?? "standard",
   );
   const templateMediaSlots = selectedTemplate?.mediaSlots ?? [];
+  const musicTemplate = supportsMusicAnswerScope(selectedTemplate) || (dynamicTemplateSnapshot && (
+    dynamicTemplateSnapshot.templateConfig.musicAnswerScope === "SINGLE" || isMusicAnswerStructure(
+      dynamicTemplateSnapshot.answers.filter(answer => answer.role !== "EXCLUDED").map(answer => answer.fieldLabel),
+      dynamicTemplateSnapshot.media.some(media => media.mediaType === "AUDIO" && media.role !== "EXCLUDED"),
+    )
+  ));
+  if (requiresCompleteQuestion && draft.templateConfig.musicAnswerScope && musicTemplate) {
+    const groups = new Set(draft.answers.map((answer, index) => answer.fieldGroupId ?? answer.fieldLabel ?? String(index)));
+    const expected = draft.templateConfig.musicAnswerScope === "SINGLE" ? 1 : 2;
+    if (groups.size !== expected || !draft.answers.some(answer => answer.isCorrect && answer.text.trim())) {
+      return createValidationFailure(new DraftValidationError(expected === 1 ? "Bitte gib genau eine richtige Antwort ein." : "Bitte gib Interpret und Titel ein.", "answers"));
+    }
+  }
   const requiredMediaSlots = templateMediaSlots.filter((slot) => slot.required);
   const requiredMediaSlot = requiredMediaSlots[0] ?? null;
   const requiredMediaLabel = requiredMediaSlot ? serverMessages.media.existingLabel : null;

@@ -4,8 +4,8 @@
 
 import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
 import { questionPhaseMedia } from "./questionPhaseMedia";
-import { mediaRemainingSeconds, formatMediaRemaining } from "./mediaCountdown";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { mediaRemainingSeconds, formatMediaRemaining, introResumePosition } from "./mediaCountdown";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { FactsPresentation } from "./FactsPresentation";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
@@ -180,9 +180,11 @@ export function SynchronizedMedia({
   renderMode,
   className,
   activationClassName,
+  allowPublicActivation = true,
   poster,
   loop = false,
   showCountdown = false,
+  countdownClassName,
 }: {
   kind: "audio" | "video";
   src: string;
@@ -191,9 +193,11 @@ export function SynchronizedMedia({
   renderMode: PresentationSlideDisplayState["renderMode"];
   className?: string;
   activationClassName?: string;
+  allowPublicActivation?: boolean;
   poster?: string;
   loop?: boolean;
   showCountdown?: boolean;
+  countdownClassName?: string;
 }) {
   const mediaRef = useRef<HTMLMediaElement | null>(null);
   const handledCommandIdRef = useRef<number | null>(null);
@@ -202,8 +206,22 @@ export function SynchronizedMedia({
   const [failedSource, setFailedSource] = useState<string | null>(null);
   const [mediaProgress, setMediaProgress] = useState<{ src: string; remaining: number | null }>({ src, remaining: null });
   const playbackIntentRef = useRef(command);
+  const resumeKey = `pubquiz:intro-media:${src}`;
+  const readResume = useCallback((): unknown => {
+    if (!showCountdown || renderMode !== "PRESENTATION") return null;
+    try { return JSON.parse(sessionStorage.getItem(resumeKey) ?? "null"); } catch { return null; }
+  }, [showCountdown, renderMode, resumeKey]);
+  function restoreIntro(media: HTMLMediaElement) {
+    if (!showCountdown || renderMode !== "PRESENTATION" || (command !== "play" && command !== "pause")) return;
+    const position = introResumePosition(readResume(), src, commandId, media.duration, Date.now());
+    if (position !== null) media.currentTime = position;
+  }
   function updateProgress(media: HTMLMediaElement) {
     setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, media.currentTime) });
+    if (showCountdown && renderMode === "PRESENTATION" && Number.isFinite(media.duration) && media.duration > 0) {
+      try { sessionStorage.setItem(resumeKey, JSON.stringify({ source: src, commandId,
+        duration: media.duration, position: media.currentTime, recordedAt: Date.now(), playing: !media.paused && !media.ended })); } catch { /* Playback still works when storage is unavailable. */ }
+    }
   }
 
   async function play() {
@@ -234,6 +252,12 @@ export function SynchronizedMedia({
     handledSourceRef.current = src;
 
     if (command === "play") {
+      const saved = readResume() as { duration?: number } | null;
+      if (showCountdown && saved && typeof saved.duration === "number" &&
+        introResumePosition(saved, src, commandId, saved.duration, Date.now()) === saved.duration) {
+        media.pause();
+        return;
+      }
       let cancelled = false;
       void media
         .play()
@@ -251,7 +275,7 @@ export function SynchronizedMedia({
       media.currentTime = 0;
       setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, 0) });
     }
-  }, [command, commandId, renderMode, src]);
+  }, [command, commandId, renderMode, src, showCountdown, readResume]);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -269,11 +293,13 @@ export function SynchronizedMedia({
         loop={loop}
         preload="metadata"
         onError={() => { setFailedSource(src); setMediaProgress({ src, remaining: null }); }}
-        onLoadedMetadata={(event) => { setFailedSource(null); updateProgress(event.currentTarget); }}
+        onLoadedMetadata={(event) => { setFailedSource(null); restoreIntro(event.currentTarget); updateProgress(event.currentTarget); }}
         onDurationChange={(event) => updateProgress(event.currentTarget)}
         onTimeUpdate={(event) => updateProgress(event.currentTarget)}
+        onPlay={(event) => updateProgress(event.currentTarget)}
+        onPause={(event) => updateProgress(event.currentTarget)}
         onSeeked={(event) => updateProgress(event.currentTarget)}
-        onEnded={() => setMediaProgress({ src, remaining: 0 })}
+        onEnded={(event) => updateProgress(event.currentTarget)}
       />
     ) : (
       <video
@@ -297,12 +323,12 @@ export function SynchronizedMedia({
     <>
       {media}
       {showCountdown && failedSource !== src && mediaProgress.src === src && mediaProgress.remaining !== null && (
-        <output className="presentation-intro-countdown text-5xl font-bold tabular-nums" aria-label="Verbleibende Intro-Musik">
-          {formatMediaRemaining(mediaProgress.remaining)}
+        <output className={`presentation-intro-countdown ${countdownClassName ?? "text-5xl font-bold tabular-nums"}`} style={countdownClassName ? { fontSize: `${Math.min(15.5, 78 / formatMediaRemaining(mediaProgress.remaining).length)}cqw` } : undefined} aria-label="Verbleibende Intro-Musik">
+          {formatMediaRemaining(mediaProgress.remaining).padStart(5, "0")}
         </output>
       )}
       {failedSource === src && <p role="status" className="presentation-media-error">Medium konnte nicht geladen werden. Bitte Datei und Verbindung prüfen.</p>}
-      {playbackBlocked && command === "play" && failedSource !== src && renderMode === "PRESENTATION" && (
+      {allowPublicActivation && playbackBlocked && command === "play" && failedSource !== src && renderMode === "PRESENTATION" && (
         <button
           type="button"
           onClick={() => void play()}
@@ -1064,9 +1090,11 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
+  const lovdOpenText = theme.design.stylePreset === "EDITORIAL" && frage.effektiver_antwortmodus === "OPEN" && !hatAntwortmoeglichkeiten && frage.medien.length === 0;
+  const showAnswerPanel = !lovdOpenText;
   return (
-    <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.92fr_1.08fr]">
-      <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff]">
+    <div data-presentation-layout={layoutVariant} data-lovd-open-text={lovdOpenText || undefined} className={`grid h-full min-h-0 gap-4 ${showAnswerPanel ? "lg:grid-cols-[0.92fr_1.08fr]" : "grid-cols-1"}`}>
+      <div className={`presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff] ${showAnswerPanel ? "" : "justify-center"}`}>
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
             Frage {slide.frageIndexImBlock}
@@ -1916,32 +1944,37 @@ function renderAnkommenSlide() {
 }
 
 function renderStartsequenzSlide() {
+  const editorial = theme.design.stylePreset === "EDITORIAL";
+  const introMedia = <SynchronizedMedia
+    kind="audio"
+    src={praesentationQuiz.intro_musik_url?.trim() || "/medien/audio/intro/mexico.mp3"}
+    command={playbackCommand}
+    commandId={playbackCommandId}
+    renderMode={renderMode}
+    activationClassName="presentation-start-media-activation"
+    allowPublicActivation={!editorial}
+    showCountdown
+    countdownClassName={editorial ? "lovd-start-countdown" : undefined}
+  />;
   return (
     <section className="presentation-start-sequence relative flex h-full min-h-0 w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-[var(--quiz-background)] text-[var(--quiz-text)]">
       <div className="presentation-start-sequence-backdrop absolute inset-0" />
       <div className="presentation-start-sequence-content relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-secondary)] bg-[var(--quiz-surface-strong)] p-12 text-center text-[var(--quiz-surface-strong-text)]">
+        {editorial && <>
+          <div className="lovd-start-countdown-slot">{introMedia}</div>
+          <h2 className="lovd-start-title">Gleich geht’s los</h2>
+        </>}
         <p className="mb-10 max-w-5xl text-5xl font-black leading-tight">
           {praesentationQuiz.intro_startsequenz_text?.trim() ||
             "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen."}
         </p>
-        <div
+        {!editorial && <div
           aria-hidden="true"
           className="presentation-start-play-mark rounded-3xl border-4 border-[var(--quiz-primary)] px-20 py-10 text-[7rem] font-black leading-none text-[var(--quiz-surface-strong-accent)]"
         >
           ▶
-        </div>
-        <SynchronizedMedia
-          kind="audio"
-          src={
-            praesentationQuiz.intro_musik_url?.trim() ||
-            "/medien/audio/intro/mexico.mp3"
-          }
-          command={playbackCommand}
-          commandId={playbackCommandId}
-          renderMode={renderMode}
-          activationClassName="presentation-start-media-activation"
-          showCountdown
-        />
+        </div>}
+        {!editorial && introMedia}
       </div>
     </section>
   );

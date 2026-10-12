@@ -45,6 +45,8 @@ export function parseQuestionTemplateConfigDraft(
   }
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const config = value as Record<string, unknown>;
+  if (config.musicAnswerScope !== undefined && config.musicAnswerScope !== "SINGLE" && config.musicAnswerScope !== "ARTIST_TITLE") return null;
+  const musicAnswerScope = config.musicAnswerScope as QuestionTemplateConfig["musicAnswerScope"];
   const sponsor = parseQuestionSponsor(config.sponsor);
   if (sponsor === null) return null;
   const memeCaptionLayout = parseMemeCaptionLayoutConfig(config.memeCaptionLayout);
@@ -96,6 +98,7 @@ export function parseQuestionTemplateConfigDraft(
   if (durations === undefined) {
     return {
       ...DEFAULT_PIXEL_TEMPLATE_CONFIG,
+      ...(musicAnswerScope ? { musicAnswerScope } : {}),
       ...(sponsor ? { sponsor } : {}),
       ...(templateId === questionTemplateIds.memeCaption ? { memeCaptionLayout } : {}),
       ...(pixelMode ? { pixelMode } : {}),
@@ -111,6 +114,7 @@ export function parseQuestionTemplateConfigDraft(
   }
   return {
     ...(sponsor ? { sponsor } : {}),
+    ...(musicAnswerScope ? { musicAnswerScope } : {}),
     ...(templateId === questionTemplateIds.memeCaption ? { memeCaptionLayout } : {}),
     ...(pixelMode ? { pixelMode } : {}),
     stageDurationsSeconds: {
