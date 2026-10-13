@@ -3,6 +3,11 @@ import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentation
 import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 import { getQuizFlowTypeLabel } from "@/app/quiz/flow/quizFlow";
 
+export function isIntroMusicSlide(slide: Slide | undefined) {
+  return (slide?.typ === "fixer-slide" && slide.slideTyp === "startsequenz") ||
+    (slide?.typ === "ablauf" && slide.element.type === "START_SEQUENCE");
+}
+
 function getSectionDisplayTitle(
   section: QuizPraesentationResult["abschnitte"][number] | null | undefined,
   slides: Slide[],

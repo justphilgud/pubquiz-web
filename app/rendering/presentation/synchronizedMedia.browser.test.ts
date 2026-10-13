@@ -64,6 +64,16 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       show('/short.wav',null,6); settle(); await wait(()=>stale.paused);
       check(document.querySelector('audio')!==stale,'stale node reused');
       HTMLMediaElement.prototype.play=realPlay;
+      phase='blocked intro';let activationRequests=0;
+      const requestActivation=()=>activationRequests++;
+      HTMLMediaElement.prototype.play=function(){return Promise.reject(new DOMException('Gesture required','NotAllowedError'));};
+      flushSync(()=>root.render(<SynchronizedMedia kind="audio" src="/long.wav" command="play" commandId={21} renderMode="PRESENTATION" showCountdown allowPublicActivation={false} onPlaybackBlocked={requestActivation}/>));
+      await wait(()=>activationRequests===1);
+      check(!document.querySelector('button'),'public intro play button leaked after blocked playback');
+      HTMLMediaElement.prototype.play=realPlay;
+      phase='activation retry';show('/long.wav',null,22);show('/long.wav','play',23);
+      await wait(()=>document.querySelector('audio')?.currentTime>0.1 && !document.querySelector('audio').paused);
+      check(document.querySelectorAll('audio').length===1,'duplicate media after activation retry');
       phase='missing';show('/missing.wav',null,7); await wait(()=>document.querySelector('[role="status"]'));
       check(!document.querySelector('output'),'invented countdown after failed audio');
       flushSync(()=>root.unmount()); check(short.paused,'unmounted audio continues');

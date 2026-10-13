@@ -11,11 +11,12 @@ import {
   LockOpenIcon,
   PhotoIcon,
   PlayIcon,
+  PauseIcon,
   ScaleIcon,
   SpeakerWaveIcon,
 } from "@heroicons/react/24/outline";
 
-import { IconButton } from "@/components/ui";
+import { Button, IconButton } from "@/components/ui";
 
 function formatSeconds(seconds: number | null | undefined) {
   if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
@@ -33,6 +34,7 @@ type Props = {
   blockFreigegeben: boolean;
   mediumOverlayAktiv: boolean;
   audioLaeuft: boolean;
+  istIntroMusikSlide: boolean;
   hatMedien: boolean;
   hatAudio: boolean;
   istCountdownSlide: boolean;
@@ -59,6 +61,7 @@ export default function ModerationToolbar({
   blockFreigegeben,
   mediumOverlayAktiv,
   audioLaeuft,
+  istIntroMusikSlide,
   hatMedien,
   hatAudio,
   istCountdownSlide,
@@ -117,7 +120,14 @@ export default function ModerationToolbar({
           onClick={onMediumToggle}
         />
 
-        <IconButton
+        {istIntroMusikSlide ? <div className="max-w-sm">
+          <Button type="button" disabled={!hatAudio} onClick={onAudioToggle}
+            className="min-h-11 gap-2 rounded-xl px-4 py-3 font-bold">
+            {audioLaeuft ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
+            {audioLaeuft ? "Intro-Musik pausieren" : "Intro-Musik starten / fortsetzen"}
+          </Button>
+          <p className="mt-1 text-xs text-zinc-300">Nach dem Quizstart einmal im Präsentationsfenster „Präsentation starten / fortsetzen“ aktivieren. Die Musik spielt ausschließlich dort.</p>
+        </div> : <IconButton
           icon={SpeakerWaveIcon}
           label={
             hatAudio
@@ -128,7 +138,7 @@ export default function ModerationToolbar({
           active={audioLaeuft}
           disabled={!hatAudio}
           onClick={onAudioToggle}
-        />
+        />}
 
         <IconButton
           icon={ChartBarIcon}

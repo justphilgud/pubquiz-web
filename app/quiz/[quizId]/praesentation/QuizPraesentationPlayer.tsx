@@ -2,7 +2,7 @@
 
 import { pollEvaluation } from "../../evaluation/pollEvaluation";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { QuizPraesentationResult } from "../../actions";
 import { getPresentationFunnyAnswers, getQuizLiveSnapshot, getSchaetzfrageById } from "../../actions";
@@ -61,6 +61,11 @@ export default function QuizPraesentationPlayer({
 }: Props) {
   const [liveState, setLiveState] = useState(() => resolvePresentationOpeningState(initialLiveState));
   const [activatedContext, setActivatedContext] = useState<string | null>(null);
+  const [mediaActivationBlocked, setMediaActivationBlocked] = useState(false);
+  const handleMediaPlaybackBlocked = useCallback(() => {
+    setMediaActivationBlocked(true);
+    setActivatedContext(null);
+  }, []);
   const activationContext = `${liveState.lifecycleRevision}:${liveState.quizStartedAt ?? "preparation"}`;
   const activated = activatedContext === activationContext && liveState.lifecycle !== "STOPPED";
   const presentationRoot = useRef<HTMLDivElement>(null);
@@ -295,6 +300,7 @@ export default function QuizPraesentationPlayer({
           slideIndex={slideIndex}
           slideLabel={getPresentationSlideTitle(slide, slides)}
           theme={theme}
+          onMediaPlaybackBlocked={handleMediaPlaybackBlocked}
           displayState={{
             renderMode: "PRESENTATION",
             templateRevealCount: liveState.revealCount,
@@ -332,12 +338,14 @@ export default function QuizPraesentationPlayer({
         {!activated && <div className="absolute inset-0 z-[70] flex items-center justify-center bg-black/85 p-6">
           <div className="max-w-lg text-center">
             <h1 className="text-3xl font-bold">{liveState.lifecycle === "STOPPED" ? "Quiz beendet" : "Präsentation bereit"}</h1>
+            {mediaActivationBlocked && liveState.lifecycle !== "STOPPED" && <p role="alert" className="my-4 font-bold text-amber-200">Der Browser hat den Audiostart blockiert. Aktiviere die Medienwiedergabe einmal in diesem Präsentationsfenster mit der Schaltfläche unten.</p>}
             <p className="my-4">{liveState.lifecycle === "PREPARATION" ? "Das Quiz ist in Vorbereitung. Der reguläre Durchlauf wird in der Moderation gestartet." : liveState.lifecycle === "RUNNING" ? "Das Quiz läuft. Aktiviere dieses Fenster, um die Präsentation und Medienwiedergabe fortzusetzen." : "Die Antworten bleiben gespeichert. Ein neuer Durchlauf beginnt nach dem Zurücksetzen."}</p>
             {liveState.lifecycle !== "STOPPED" && <button className="min-h-11 rounded-lg bg-white px-5 py-3 font-bold text-black" onClick={() => {
               // Invoke play synchronously in this window's user gesture. Individual
               // media retain their existing blocked-playback fallback for later slides.
+              setMediaActivationBlocked(false);
               if (liveState.playbackCommand === "play") {
-                presentationRoot.current?.querySelectorAll<HTMLMediaElement>("audio, video").forEach((media) => { void media.play().catch(() => {}); });
+                presentationRoot.current?.querySelectorAll<HTMLMediaElement>("audio, video").forEach((media) => { void media.play().catch(handleMediaPlaybackBlocked); });
               }
               setActivatedContext(activationContext);
             }}>{liveState.lifecycle === "RUNNING" ? "Präsentation starten / fortsetzen" : "Vorschau aktivieren"}</button>}

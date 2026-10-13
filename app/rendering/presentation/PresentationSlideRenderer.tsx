@@ -165,6 +165,7 @@ type Props = {
   slideLabel: string;
   theme: ResolvedQuizTheme;
   displayState: PresentationSlideDisplayState;
+  onMediaPlaybackBlocked?: () => void;
   storybookContext?: {
     personIds?: readonly string[];
     contentKind?: ResolveStorybookCompositionInput["contentKind"];
@@ -187,6 +188,7 @@ export function SynchronizedMedia({
   showCountdown = false,
   countdownClassName,
   resumeContext,
+  onPlaybackBlocked,
 }: {
   kind: "audio" | "video";
   src: string;
@@ -201,6 +203,7 @@ export function SynchronizedMedia({
   showCountdown?: boolean;
   countdownClassName?: string;
   resumeContext?: string;
+  onPlaybackBlocked?: () => void;
 }) {
   const mediaRef = useRef<HTMLMediaElement | null>(null);
   const handledCommandIdRef = useRef<number | null>(null);
@@ -289,7 +292,12 @@ export function SynchronizedMedia({
             if (media !== mediaRef.current || playbackIntentRef.current !== "play") media.pause();
           } else setPlaybackBlocked(false);
         })
-        .catch(() => { if (!cancelled) setPlaybackBlocked(true); });
+        .catch(() => {
+          if (!cancelled) {
+            setPlaybackBlocked(true);
+            if (!allowPublicActivation) onPlaybackBlocked?.();
+          }
+        });
       return () => { cancelled = true; media.pause(); };
     } else if (command === "pause") {
       media.pause();
@@ -299,7 +307,7 @@ export function SynchronizedMedia({
       media.currentTime = 0;
       setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, 0) });
     }
-  }, [command, commandId, renderMode, src, showCountdown, readResume, resumeSource, updateProgress]);
+  }, [command, commandId, renderMode, src, showCountdown, readResume, resumeSource, updateProgress, allowPublicActivation, onPlaybackBlocked]);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -374,6 +382,7 @@ export default function PresentationSlideRenderer({
   theme,
   displayState,
   storybookContext,
+  onMediaPlaybackBlocked,
 }: Props) {
   const praesentationQuiz = quiz as PraesentationQuiz;
   const {
@@ -1978,6 +1987,7 @@ function renderStartsequenzSlide() {
     renderMode={renderMode}
     activationClassName="presentation-start-media-activation"
     allowPublicActivation={!editorial}
+    onPlaybackBlocked={onMediaPlaybackBlocked}
     showCountdown
     countdownClassName={editorial ? "lovd-start-countdown" : undefined}
     resumeContext={`${quiz.quiz_id}:${displayState.mediaPlaybackRevision ?? 0}`}
