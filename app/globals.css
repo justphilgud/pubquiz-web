@@ -2727,7 +2727,14 @@ button {
 
 .answer-template[data-design-style="EDITORIAL"] .answer-editorial-logo {
   width: 10rem;
-  height: 4.25rem;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  object-position: center;
+  background: #63272c;
+  padding: .65rem;
+  border-radius: .35rem;
 }
 
 .answer-template[data-design-style="EDITORIAL"] [class*="text-slate"],

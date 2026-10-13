@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
+export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -25,9 +25,9 @@ export const storyText = "Als wir am frühen Morgen am Bahnhof ankamen, war der 
 
 export function buildPresentationQualityFixture(scenario: QualityScenario, style: PresentationDesignStyle = "NEON") {
   const base = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
-  const original = scenario.startsWith("structured") ? base.quiz.fragen.find((q) => q.antwortfelder.length > 0)! : scenario === "pixel" ? base.quiz.fragen.find((q) => q.templateId === "pixelbild")! : scenario === "ordering" ? base.quiz.fragen.find((q) => q.templateId === "reihenfolge")! : base.quiz.fragen[0];
+  const original = scenario.startsWith("structured") ? base.quiz.fragen.find((q) => q.antwortfelder.length > 0)! : scenario === "pixel" ? base.quiz.fragen.find((q) => q.templateId === "pixelbild")! : scenario.startsWith("ordering") ? base.quiz.fragen.find((q) => q.templateId === "reihenfolge")! : base.quiz.fragen[0];
   const question: QuizPraesentationResult["fragen"][number] = structuredClone(original);
-  if (!["pixel", "ordering"].includes(scenario) && !scenario.startsWith("structured")) {
+  if (scenario !== "pixel" && !scenario.startsWith("ordering") && !scenario.startsWith("structured")) {
     question.templateId = null;
     question.templateConfig = null;
     question.antwortfelder = [];
@@ -37,9 +37,17 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.effektiver_antwortmodus = "OPEN";
   }
   question.frage = scenario === "short" ? "Wie heißt die Hauptstadt von Deutschland?" : scenario === "legacy" ? `${longQuestion} ${longQuestion} ${longQuestion}` : ["long", "image-long", "solution-long"].includes(scenario) ? longQuestion : "Welche dieser Städte ist heute die Hauptstadt von Deutschland?";
-  if (scenario === "ordering" || scenario === "pixel") question.frage = original.frage;
-  if (scenario === "ordering") {
-    question.antworten = ["Ankommen am Bahnhof", "Spaziergang durch die Stadt", "Gemeinsames Abendessen", "Rückfahrt nach Hause"].map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: true, antworttyp: "Text", medien: [] }));
+  if (scenario.startsWith("ordering") || scenario === "pixel") question.frage = original.frage;
+  if (scenario.startsWith("ordering")) {
+    const labels = scenario === "ordering" ? ["Ankommen am Bahnhof", "Spaziergang durch die Stadt", "Gemeinsames Abendessen", "Rückfahrt nach Hause"]
+      : ["Bastei · Festung Königstein · Sächsische Schweiz", "Herzogenaurach – Technologie und Sport", "Historische Altstadt · Museum · Botanischer Garten", "Stadthafen · Aussichtsturm · Kulturlandschaft am Fluss"];
+    if (scenario !== "ordering") question.frage = "Ordnet diese vier touristischen Ortsbeschreibungen in die vorgegebene Reihenfolge.";
+    question.antworten = labels.map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: true, antworttyp: "Text", medien: [] }));
+    if (scenario !== "ordering") question.templateConfig = {
+      stageDurationsSeconds: { stage3: 15, stage2: 15, stage1: 15 },
+      createPixelQuestionByAnswer: { answer1: false, answer2: false },
+      templateData: { kind: "ORDERING", scoring: "EXACT", items: labels.map((text, index) => ({ id: String(index + 1), text, explanation: "" })) },
+    };
   }
   if (scenario.startsWith("choice")) {
     question.templateId = "multiple_choice";
@@ -87,7 +95,7 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.frage = "Wie viele Städte und Gemeinden gibt es in Baden-Württemberg?";
     question.antworten[0].antwort = "1.101 Kommunen";
   }
-  question.antwort_reihenfolge = scenario === "ordering"
+  question.antwort_reihenfolge = scenario.startsWith("ordering")
     ? [3, 1, 4, 2]
     : question.antworten.map((answer) => answer.antwort_id);
   if (scenario === "image-long") {
@@ -112,7 +120,7 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   if (scenario === "solution-long") question.antworten[0].antwort = longOptions[0] + " Seit dem Umzug aus Bonn finden die Sitzungen des Parlaments im Reichstagsgebäude statt.";
   const layoutInput = { templateId: question.templateId, questionText: question.frage, answerOptionCount: question.effektiver_antwortmodus === "CLOSED" ? question.antworten.length : 0, structuredFieldCount: question.antwortfelder.length, media: question.medien.map((m) => ({ fileName: m.datei, mediaType: m.medientyp, scope: "QUESTION" as const })), templateData: question.templateConfig?.templateData };
   question.presentationLayouts = { question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }), solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }) };
-  let slide: Slide = { typ: scenario === "solution-long" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  let slide: Slide = { typ: scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
   if (scenario.startsWith("story") || scenario === "poll") slide = {
     typ: "ablauf", abschnitt: null, element: { id: "quality-story", persistentId: null, type: scenario === "poll" ? "LIVE_POLL" : "TEXT", anchorType: "BEFORE_QUIZ", anchorKey: "global", sectionId: null, order: 1, enabled: true, label: "AP5 Referenz", config: { version: 1, title: "Ein unerwarteter Umweg", body: scenario === "story-legacy" ? `${storyText}\n\n${storyText}\n\n${storyText}` : storyText }, configVersion: 1, questionAssignmentId: null, isStandard: false },
   };

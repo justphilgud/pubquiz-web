@@ -1129,7 +1129,7 @@ test("translated reading keeps its TTS payload invisible and renders only the st
   );
 
   assert.match(questionHtml, /Welcher Songtext wurde hier übersetzt\?/);
-  assert.match(questionHtml, /Audio über den konfigurierten TTS-Ausgabeslot/);
+  assert.match(questionHtml, /Wiedergabe über das Lautsprechersymbol/);
   assert.doesNotMatch(questionHtml, /Sehr langer übersetzter Kontext/);
   assert.doesNotMatch(questionHtml, /I like big butts and I cannot lie/);
   assert.match(solutionHtml, /Baby Got Back/);
@@ -1142,6 +1142,63 @@ test("translated reading keeps its TTS payload invisible and renders only the st
     presentationAudioHtml,
     /Sehr langer übersetzter Kontext/,
   );
+  const directAudioHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz: runtime.quiz, slide: questionSlide, slides, slideIndex: 0, slideLabel: "FRAGE", theme,
+    displayState: { ...displayState, renderMode: "PRESENTATION", playbackCommand: "play", playbackCommandId: 2, mediaOverlayActive: false },
+  }));
+  assert.equal((directAudioHtml.match(/<audio/g) ?? []).length, 1);
+  assert.match(directAudioHtml, /translated-reading\.mp3/);
+  assert.doesNotMatch(directAudioHtml, /data-speech-position/);
+  const speechSlide = { ...questionSlide, frage: { ...translatedQuestion, medien: [] } };
+  const speechHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz: runtime.quiz, slide: speechSlide, slides: [speechSlide], slideIndex: 0, slideLabel: "FRAGE", theme,
+    displayState: { ...displayState, renderMode: "PRESENTATION", playbackCommand: "play", playbackCommandId: 2, mediaOverlayActive: false },
+  }));
+  assert.match(speechHtml, /data-speech-position="0"/);
+  assert.doesNotMatch(speechHtml, /Sehr langer übersetzter Kontext|I like big butts|<audio/);
+});
+
+test("empty answer panels disappear across themes while real choices and question media remain", () => {
+  for (const style of ["NEON", "EDITORIAL", "CORPORATE", "KOMM_ONE"] as const) {
+    const fixture = buildPresentationQualityFixture("choice4", style);
+    assert.ok(fixture.slide.typ === "frage");
+    const open = { ...fixture.slide, frage: { ...fixture.slide.frage, effektiver_antwortmodus: "OPEN" as const, medien: [] } };
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...fixture, slide: open }));
+    assert.doesNotMatch(html, /Keine Antwortmöglichkeiten|presentation-answer-panel|presentation-answer-option/);
+    assert.match(html, /grid-cols-1/);
+    const closedHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+    assert.match(closedHtml, /presentation-answer-option/);
+    const mediaSlide = { ...open, frage: { ...open.frage, medien: [{ medien_id: 777, datei: "qa/drums.jpg", medientyp: "Bild", slotKey: "question_image", sortierung: 1, bemerkung: null }] } };
+    const mediaHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...fixture, slide: mediaSlide }));
+    assert.match(mediaHtml, /drums\.jpg/);
+    assert.doesNotMatch(mediaHtml, /Keine Antwortmöglichkeiten/);
+  }
+});
+
+test("pixel enlargement shows only the current pixel stage; artwork enlargement still shows its image", () => {
+  const fixture = buildPresentationQualityFixture("pixel", "EDITORIAL");
+  assert.ok(fixture.slide.typ === "frage");
+  const media = [
+    { medien_id: 800, datei: "qa/secret-original.jpg", slotKey: "question_image", sortierung: 0 },
+    ...[3, 2, 1].map((stage, index) => ({ medien_id: 801 + index, datei: `qa/pixel-${stage}.jpg`, slotKey: `pixel_stage_${stage}_image`, sortierung: index + 1 })),
+  ].map(m => ({ ...m, medientyp: "Bild", bemerkung: null }));
+  const slide = { ...fixture.slide, frage: { ...fixture.slide.frage, medien: media } };
+  for (const stage of [1, 2, 3] as const) {
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      ...fixture, slide, displayState: { ...fixture.displayState, mediaOverlayActive: true, templateRevealCount: stage },
+    }));
+    assert.match(html, new RegExp(`qa/pixel-${4 - stage}\\.jpg`));
+    assert.doesNotMatch(html, /secret-original\.jpg/);
+    for (const other of [1, 2, 3].filter(s => s !== 4 - stage)) assert.doesNotMatch(html, new RegExp(`qa/pixel-${other}\\.jpg`));
+  }
+  const solution = { ...slide, typ: "aufloesung" as const };
+  const missingStage = { ...slide, frage: { ...slide.frage, medien: media.filter(m => m.slotKey !== "pixel_stage_3_image") } };
+  assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    ...fixture, slide: missingStage, displayState: { ...fixture.displayState, mediaOverlayActive: true, templateRevealCount: 1 },
+  })), /secret-original\.jpg|qa\/pixel-[12]\.jpg/);
+  assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...fixture, slide: solution, displayState: { ...fixture.displayState, mediaOverlayActive: true } })), /secret-original\.jpg/);
+  const artwork = buildPresentationQualityFixture("artwork", "EDITORIAL");
+  assert.match(renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...artwork, displayState: { ...artwork.displayState, mediaOverlayActive: true } })), /artwork-layout-test\.svg/);
 });
 
 

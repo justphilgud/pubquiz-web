@@ -1,6 +1,6 @@
 "use client";
 
-import { isIntroMusicSlide } from "@/app/rendering/presentation/presentationSlideMetadata";
+import { getPresentationSlideMedia, getSlideSpeech, isIntroMusicSlide } from "@/app/rendering/presentation/presentationSlideMetadata";
 import { mayApplyLiveSnapshot } from "../../liveSnapshotRevision";
 import { EstimationTiebreakPanel } from "../../EstimationTiebreakPanel";
 
@@ -222,14 +222,9 @@ export default function ModerationClient({
 
   const aktuelleMedien =
     aktuellerSlide?.typ === "frage"
-      ? aktuellerSlide.frage.medien
+      ? getPresentationSlideMedia(aktuellerSlide, pixelState?.effectivePixelStage ?? 1)
       : aktuellerSlide?.typ === "aufloesung"
-        ? [
-            ...aktuellerSlide.frage.medien,
-            ...aktuellerSlide.frage.antworten.flatMap(
-              (antwort) => antwort.medien,
-            ),
-          ]
+        ? getPresentationSlideMedia(aktuellerSlide)
         : aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "AUDIO" && aktuellerSlide.element.config.audioUrl
           ? [{ medien_id: aktuellerSlide.element.persistentId ?? -1, datei: aktuellerSlide.element.config.audioUrl, medientyp: "Audio", sortierung: 1, bemerkung: aktuellerSlide.element.config.description ?? null }]
           : aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "VIDEO" && aktuellerSlide.element.config.videoUrl
@@ -275,6 +270,7 @@ export default function ModerationClient({
       (aktuellerSlide.element.type === "VIDEO" && Boolean(aktuellerSlide.element.config.videoUrl)));
   const hatAudio =
     istIntroMusikSlide ||
+    Boolean(getSlideSpeech(aktuellerSlide)) ||
     hatAudioAufFixemSlide ||
     hatAudioAufAblaufSlide ||
     aktuelleMedien.some((medium) =>
@@ -612,8 +608,8 @@ export default function ModerationClient({
   }, [mediumOverlayAktiv, quizId, lifecycleState.lifecycleRevision]);
 
   const handleAudioPlay = useCallback(async () => {
-    if (istIntroMusikSlide && lifecycleState.lifecycle !== "RUNNING") {
-      setActionError("Starte zuerst das Quiz in der Moderation und aktiviere danach im Präsentationsfenster „Präsentation starten / fortsetzen“. Anschließend startet das Lautsprechersymbol die Intro-Musik.");
+    if (lifecycleState.lifecycle !== "RUNNING") {
+      setActionError("Starte zuerst das Quiz in der Moderation und aktiviere danach im Präsentationsfenster „Präsentation starten / fortsetzen“. Anschließend startet das Lautsprechersymbol die Audiowiedergabe.");
       return;
     }
     const naechsteAktion = audioLaeuft ? "pause" : "play";
@@ -632,7 +628,7 @@ export default function ModerationClient({
       setAudioLaeuft(audioLaeuft);
       setActionError("Musiksteuerung nicht gespeichert. Bitte Verbindung prüfen und erneut starten oder pausieren.");
     }
-  }, [audioLaeuft, quizId, istIntroMusikSlide, lifecycleState.lifecycle, lifecycleState.lifecycleRevision]);
+  }, [audioLaeuft, quizId, lifecycleState.lifecycle, lifecycleState.lifecycleRevision]);
 
   const handleAuswertungOeffnen = useCallback(() => {
     setShowAuswertungIframe(true);
@@ -1066,7 +1062,7 @@ export default function ModerationClient({
                 onCountdownStart={handleCountdownStart}
                 onCountdownReset={handleCountdownReset}
               />
-              {istIntroMusikSlide && audioLaeuft && <p role="status" className="mt-2 text-sm text-amber-200">Musikstart angefordert. Falls noch kein Ton zu hören ist: im separaten Präsentationsfenster „Präsentation starten / fortsetzen“ anklicken. Die Countdownfolie enthält absichtlich keinen Play-Button.</p>}
+              {hatAudio && audioLaeuft && <p role="status" className="mt-2 text-sm text-amber-200">Audiostart angefordert. Falls noch kein Ton zu hören ist: im separaten Präsentationsfenster „Präsentation starten / fortsetzen“ anklicken.</p>}
             </div>
 
             {(aktuellerSlide?.typ === "endstand" || (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "FINAL_STANDINGS")) && (

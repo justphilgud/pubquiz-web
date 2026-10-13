@@ -23,6 +23,7 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
     import {createRoot} from 'react-dom/client';
     import {flushSync} from 'react-dom';
     import {SynchronizedMedia} from './app/rendering/presentation/PresentationSlideRenderer';
+    import {SynchronizedSpeech} from './app/rendering/presentation/SynchronizedSpeech';
     const root=createRoot(document.getElementById('app'));
     const show=(src,command,id)=>flushSync(()=>root.render(<SynchronizedMedia kind="audio" src={src} command={command} commandId={id} renderMode="PRESENTATION" showCountdown/>));
     let phase='initial';
@@ -76,7 +77,46 @@ test("real browser audio metadata, pause/seek/restart, phase change and stale pl
       check(document.querySelectorAll('audio').length===1,'duplicate media after activation retry');
       phase='missing';show('/missing.wav',null,7); await wait(()=>document.querySelector('[role="status"]'));
       check(!document.querySelector('output'),'invented countdown after failed audio');
-      flushSync(()=>root.unmount()); check(short.paused,'unmounted audio continues');
+      flushSync(()=>root.render(null)); check(short.paused,'unmounted audio continues');
+      phase='browser speech commands';
+      const nativeSpeech=window.speechSynthesis, NativeUtterance=window.SpeechSynthesisUtterance;
+      const spoken=[];let currentSpeech=null, cancels=0, pauses=0, resumes=0;
+      const fakeVoice={voiceURI:'qa-voice',name:'QA Voice'};
+      Object.defineProperty(window,'speechSynthesis',{configurable:true,value:{
+        getVoices:()=>[fakeVoice],
+        speak:u=>{spoken.push(u);currentSpeech=u;queueMicrotask(()=>u.onstart?.());},
+        cancel:()=>{cancels++;currentSpeech=null;}, pause:()=>pauses++,resume:()=>resumes++,
+      }});
+      Object.defineProperty(window,'SpeechSynthesisUtterance',{configurable:true,value:class {constructor(text){this.text=text;}}});
+      const showSpeech=(text,command,id)=>flushSync(()=>root.render(<SynchronizedSpeech text={text} language="de" voiceId="qa-voice" speed={1.3} command={command} commandId={id} onPlaybackBlocked={requestActivation}/>));
+      showSpeech('First saved translation','play',30);
+      await wait(()=>document.querySelector('[data-speech-position]')?.textContent==='Text wird vorgelesen');
+      check(spoken.length===1 && spoken[0].text==='First saved translation','wrong speech source');
+      check(spoken[0].voice===fakeVoice && spoken[0].lang==='de' && spoken[0].rate===1.3,'saved speech metadata lost');
+      currentSpeech.onboundary({charIndex:12});
+      await wait(()=>document.querySelector('[data-speech-position]')?.dataset.speechPosition==='12');
+      showSpeech('First saved translation','pause',31);check(pauses===1,'speech pause missing');
+      showSpeech('First saved translation','play',32);check(spoken.length===1 && resumes>0,'speech resume restarted or duplicated');
+      const oldSpeech=currentSpeech, staleBoundary=oldSpeech.onboundary;
+      showSpeech('Second saved translation','play',33);
+      await wait(()=>spoken.length===2 && currentSpeech.text==='Second saved translation');
+      check(cancels>0 && oldSpeech.onboundary===null,'question change kept old speech active');
+      staleBoundary({charIndex:99}); await new Promise(resolve=>setTimeout(resolve,20));
+      check(document.querySelector('[data-speech-position]')?.dataset.speechPosition!=='99','stale speech event changed current question');
+      showSpeech('Second saved translation','stop',34);check(currentSpeech===null,'speech stop failed');
+      showSpeech('Blocked speech','play',35);await wait(()=>currentSpeech?.text==='Blocked speech');
+      const blockedSpeech=currentSpeech, beforeRequests=activationRequests;
+      blockedSpeech.onerror({error:'not-allowed'});
+      await wait(()=>activationRequests===beforeRequests+1 && document.querySelector('[role="alert"]'));
+      check(!document.body.textContent.includes('Blocked speech'),'speech stimulus leaked into presentation');
+      flushSync(()=>root.render(null));
+      showSpeech('','play',36);await wait(()=>document.querySelector('[role="alert"]')?.textContent.includes('kein übersetzter Text'));
+      flushSync(()=>root.render(null));
+      Object.defineProperty(window,'speechSynthesis',{configurable:true,value:undefined});
+      showSpeech('Unsupported speech','play',37);await wait(()=>document.querySelector('[role="alert"]')?.textContent.includes('unterstützt keine Sprachausgabe'));
+      flushSync(()=>root.unmount());
+      Object.defineProperty(window,'speechSynthesis',{configurable:true,value:nativeSpeech});
+      Object.defineProperty(window,'SpeechSynthesisUtterance',{configurable:true,value:NativeUtterance});
       document.getElementById('result').textContent='PASS';
     }
     run().catch(error=>document.getElementById('result').textContent='FAIL '+error.message);

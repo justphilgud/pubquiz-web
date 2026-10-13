@@ -4,6 +4,8 @@
 
 import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
 import { questionPhaseMedia } from "./questionPhaseMedia";
+import { getPresentationSlideMedia } from "./presentationSlideMetadata";
+import { SynchronizedSpeech } from "./SynchronizedSpeech";
 import { mediaRemainingSeconds, formatMediaRemaining, introResumePosition } from "./mediaCountdown";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
@@ -54,7 +56,6 @@ import type { StorybookMemoryAsset } from "@/app/rendering/templateRegistry";
 import {
   isPixelStageOpenEnded,
   PIXEL_OPEN_STAGE_LABEL,
-  pixelRuntimeStageToMediaSlot,
   resolvePixelCountdownSeconds,
   type PixelLiveState,
 } from "@/app/quiz/interaction/pixelLiveInteraction";
@@ -429,15 +430,7 @@ export default function PresentationSlideRenderer({
       `${window.location.origin}${relativeQuestionSubmissionUrl}`,
     );
   }, [relativeAnswerUrl, relativeCalendarUrl, relativeQuestionSubmissionUrl]);
-  const currentSlideMedia =
-    slide?.typ === "frage"
-      ? questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "QUESTION")
-      : slide?.typ === "aufloesung"
-        ? [
-            ...questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "SOLUTION"),
-            ...slide.frage.antworten.flatMap((answer) => answer.medien),
-          ]
-        : [];
+  const currentSlideMedia = getPresentationSlideMedia(slide, pixelState?.effectivePixelStage ?? Math.min(3, Math.max(1, templateRevealCount)));
   const primaryPlaybackMediaId =
     currentSlideMedia.find(
       (medium) => isAudio(medium.datei) || isVideo(medium.datei),
@@ -459,7 +452,7 @@ function isBild(datei: string) {
 }
 
 function isAudio(datei: string) {
-  return /\.(mp3|wav|ogg|m4a)$/i.test(datei);
+  return /\.(mp3|wav|ogg|m4a|aac)(?:[?#].*)?$/i.test(datei);
 }
 
 function isVideo(datei: string) {
@@ -705,16 +698,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const pixelRevealStep = pixelRevealMedia.length > 0
     ? pixelState?.effectivePixelStage ?? Math.min(pixelRevealMedia.length, Math.max(1, templateRevealCount))
     : null;
-  const livePixelMedium = pixelRevealStep === null
-    ? null
-    : pixelRevealMedia.find(
-        (medium) => medium.slotKey === pixelRuntimeStageToMediaSlot(pixelRevealStep as 1 | 2 | 3),
-      ) ?? pixelRevealMedia[pixelRevealStep - 1];
-  const questionMedia = pixelRevealStep === null
-    ? frage.medien
-    : livePixelMedium
-      ? [livePixelMedium]
-      : [];
+  const questionMedia = frage.templateId === "pixelbild" ? currentSlideMedia : frage.medien;
   if (templateData?.kind === "FACTS") {
     return <FactsPresentation question={frage.frage} facts={templateData.facts} options={hatAntwortmoeglichkeiten
       ? frage.antworten.map((answer) => ({ id: answer.antwort_id, text: answer.antwort })) : []} />;
@@ -817,7 +801,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     );
   }
 
-  if (theme.design.stylePreset === "BIRTHDAY" && storybookKind && !isFaceMorph) {
+  if (theme.design.stylePreset === "BIRTHDAY" && storybookKind && !isFaceMorph && templateData?.kind !== "TRANSLATION_READ_ALOUD") {
     const audioMedium = frage.medien.find((medium) => isAudio(medium.datei));
     const selectedMedium = storybookKind === "AUDIO" ? audioMedium : questionMedia[0];
     const audioElement = renderMode === "PRESENTATION" && audioMedium ? (
@@ -1002,6 +986,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   if (templateData?.kind === "TRANSLATION_READ_ALOUD") {
+    const preparedAudio = frage.medien.find(medium => medium.slotKey === "lyrics_tts_audio") ?? frage.medien.find(medium => isAudio(medium.datei));
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
         <h2 className="text-5xl font-black leading-tight text-white">{frage.frage}</h2>
@@ -1010,7 +995,14 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
           {" → "}
           {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.targetLanguage)}
         </p>
-        <p className="mt-4 text-lg text-white/60">Audio über den konfigurierten TTS-Ausgabeslot abspielen.</p>
+        <p className="mt-4 text-lg text-white/60">Wiedergabe über das Lautsprechersymbol in der Moderation.</p>
+        {renderMode === "PRESENTATION" && !mediaOverlayActive && (preparedAudio ?
+          <SynchronizedMedia kind="audio" src={getMediumUrl(preparedAudio.datei)}
+            command={playbackCommand} commandId={playbackCommandId} renderMode={renderMode}
+            allowPublicActivation={false} onPlaybackBlocked={onMediaPlaybackBlocked} /> :
+          <SynchronizedSpeech key={`${frage.quiz_fragen_id}:${templateData.translation}`} text={templateData.translation}
+            language={templateData.targetLanguage} voiceId={templateData.voiceId} speed={templateData.speed}
+            command={playbackCommand} commandId={playbackCommandId} onPlaybackBlocked={onMediaPlaybackBlocked} />)}
       </div>
     );
   }
@@ -1124,9 +1116,9 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   const lovdOpenText = theme.design.stylePreset === "EDITORIAL" && frage.effektiver_antwortmodus === "OPEN" && !hatAntwortmoeglichkeiten && frage.medien.length === 0;
-  const showAnswerPanel = !lovdOpenText;
+  const showAnswerPanel = hatAntwortmoeglichkeiten || frage.medien.length > 0;
   return (
-    <div data-presentation-layout={layoutVariant} data-lovd-open-text={lovdOpenText || undefined} className={`grid h-full min-h-0 gap-4 ${showAnswerPanel ? "lg:grid-cols-[0.92fr_1.08fr]" : "grid-cols-1"}`}>
+    <div data-presentation-layout={layoutVariant} data-empty-answer-panel-hidden={!showAnswerPanel || undefined} data-lovd-open-text={lovdOpenText || undefined} className={`grid h-full min-h-0 gap-4 ${showAnswerPanel ? "lg:grid-cols-[0.92fr_1.08fr]" : "grid-cols-1"}`}>
       <div className={`presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-gradient-to-br from-slate-950 to-purple-950 p-6 shadow-[8px_8px_0_#00e5ff] ${showAnswerPanel ? "" : "justify-center"}`}>
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="presentation-question-label inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-4 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-200 shadow-[4px_4px_0_#facc15]">
@@ -1142,7 +1134,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
 
       </div>
 
-      <div className="presentation-answer-panel min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
+      {showAnswerPanel && <div className="presentation-answer-panel min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-gradient-to-br from-blue-950 to-slate-950 p-5 shadow-[8px_8px_0_#ff00aa]">
         {hatAntwortmoeglichkeiten ? (
           renderAntwortOptionen(frage)
         ) : frage.medien.length > 0 ? (
@@ -1151,12 +1143,8 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
               renderMedienKarte(medium, "large")
             )}
           </div>
-        ) : (
-          <div className="flex h-full items-center justify-center rounded-3xl border-4 border-dashed border-cyan-300 bg-black/40 text-center text-xl font-black uppercase text-white/40">
-            Keine Antwortmöglichkeiten
-          </div>
-        )}
-      </div>
+        ) : null}
+      </div>}
     </div>
   );
 }
@@ -3021,6 +3009,7 @@ function renderAktuellenSlide() {
       className="presentation-template presentation-readable relative flex h-full min-h-0 flex-col text-white"
       data-question-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? slide.frage.frage.length : 0, "question")}
       data-answer-density={presentationTextDensity(slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? Math.max(0, ...slide.frage.antworten.map((answer) => answer.antwort.length), ...slide.frage.antwortfelder.flatMap((field) => field.loesungen.map((solution) => solution.loesung_text.length))) : 0, "answer")}
+      data-question-template={slide && (slide.typ === "frage" || slide.typ === "aufloesung") ? slide.frage.templateId ?? undefined : undefined}
       data-pixel-status={slide?.typ === "frage" && pixelState ? "visible" : undefined}
     >
       <PresentationDesignBackdrop theme={theme} images={collageImages} storybookComposition={storybookComposition} />

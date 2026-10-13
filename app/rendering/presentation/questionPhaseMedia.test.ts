@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { questionPhaseMedia } from "./questionPhaseMedia";
+
+test("translated reading uses its prepared output only and never substitutes an attached song", () => {
+  const original = { datei: "original.mp3", slotKey: "question_audio" };
+  const prepared = { datei: "spoken.mp3?download=1", slotKey: "lyrics_tts_audio" };
+  assert.deepEqual(questionPhaseMedia("uebersetzt_vorgelesen", [original, prepared], "QUESTION"), [prepared]);
+  assert.deepEqual(questionPhaseMedia("uebersetzt_vorgelesen", [original], "QUESTION"), []);
+  assert.deepEqual(questionPhaseMedia("uebersetzt_vorgelesen", [{ datei: "legacy-spoken.mp3" }], "QUESTION"), [{ datei: "legacy-spoken.mp3" }]);
+});
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import PresentationSlideRenderer from "./PresentationSlideRenderer";

@@ -125,18 +125,18 @@ export default function ModerationToolbar({
             istIntroMusikSlide
               ? audioLaeuft ? "Intro-Musik pausieren" : "Intro-Musik starten / fortsetzen"
               : hatAudio
-              ? "Audio/Video abspielen oder pausieren"
+              ? audioLaeuft ? "Audio/Video pausieren" : "Audio/Video starten / fortsetzen"
               : "Kein abspielbares Medium auf diesem Slide"
           }
           tone="pink"
           active={audioLaeuft}
           data-testid={istIntroMusikSlide ? "intro-speaker-control" : undefined}
           aria-pressed={audioLaeuft}
-          aria-describedby={istIntroMusikSlide ? "intro-audio-activation-help" : undefined}
+          aria-describedby={hatAudio ? istIntroMusikSlide ? "intro-audio-activation-help" : "audio-activation-help" : undefined}
           disabled={!hatAudio}
           onClick={onAudioToggle}
         />
-        {istIntroMusikSlide && <p id="intro-audio-activation-help" className="max-w-sm text-xs text-zinc-300">Lautsprecher: Start / Pause / Fortsetzen. Nach dem Quizstart einmal im Präsentationsfenster „Präsentation starten / fortsetzen“ aktivieren. Die Musik spielt ausschließlich dort.</p>}
+        {hatAudio && <p id={istIntroMusikSlide ? "intro-audio-activation-help" : "audio-activation-help"} className="max-w-sm text-xs text-zinc-300">Lautsprecher: Start / Pause / Fortsetzen. Nach dem Quizstart einmal im Präsentationsfenster „Präsentation starten / fortsetzen“ aktivieren. Audio spielt ausschließlich dort.</p>}
 
         <IconButton
           icon={ChartBarIcon}
