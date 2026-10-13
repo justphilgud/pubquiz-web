@@ -199,7 +199,6 @@ export default function ModerationClient({
   const memeReviewRef = useRef<MemeModerationReviewHandle>(null);
   const memePresentationControlsRef = useRef<MemePresentationControlsHandle>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [introAudioRequested, setIntroAudioRequested] = useState(false);
   const [antwortStatus, setAntwortStatus] = useState(initialAntwortStatus);
   const [mediumOverlayAktiv, setMediumOverlayAktivLokal] = useState(
     initialLiveState.mediaOverlayActive,
@@ -629,7 +628,6 @@ export default function ModerationClient({
         aktion: naechsteAktion,
       });
       setActionError(null);
-      if (istIntroMusikSlide) setIntroAudioRequested(naechsteAktion === "play");
     } catch {
       setAudioLaeuft(audioLaeuft);
       setActionError("Musiksteuerung nicht gespeichert. Bitte Verbindung prüfen und erneut starten oder pausieren.");
@@ -1068,7 +1066,7 @@ export default function ModerationClient({
                 onCountdownStart={handleCountdownStart}
                 onCountdownReset={handleCountdownReset}
               />
-              {istIntroMusikSlide && introAudioRequested && <p role="status" className="mt-2 text-sm text-amber-200">Musikstart angefordert. Falls noch kein Ton zu hören ist: im separaten Präsentationsfenster „Präsentation starten / fortsetzen“ anklicken. Die Countdownfolie enthält absichtlich keinen Play-Button.</p>}
+              {istIntroMusikSlide && audioLaeuft && <p role="status" className="mt-2 text-sm text-amber-200">Musikstart angefordert. Falls noch kein Ton zu hören ist: im separaten Präsentationsfenster „Präsentation starten / fortsetzen“ anklicken. Die Countdownfolie enthält absichtlich keinen Play-Button.</p>}
             </div>
 
             {(aktuellerSlide?.typ === "endstand" || (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "FINAL_STANDINGS")) && (
