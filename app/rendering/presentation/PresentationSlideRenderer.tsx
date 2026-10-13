@@ -217,28 +217,29 @@ export function SynchronizedMedia({
     if (!showCountdown || renderMode !== "PRESENTATION") return null;
     try { return JSON.parse(sessionStorage.getItem(resumeKey) ?? "null"); } catch { return null; }
   }, [showCountdown, renderMode, resumeKey]);
-  function restoreIntro(media: HTMLMediaElement) {
+  const restoreIntro = useCallback((media: HTMLMediaElement) => {
     if (media !== mediaRef.current || !showCountdown || renderMode !== "PRESENTATION" || (command !== "play" && command !== "pause")) return null;
     const position = introResumePosition(readResume(), resumeSource, commandId, media.duration, Date.now());
     if (position !== null) { pendingIntroPositionRef.current = position; media.currentTime = position; }
     return position;
-  }
-  function updateProgress(media: HTMLMediaElement) {
+  }, [showCountdown, renderMode, command, readResume, resumeSource, commandId]);
+  const updateProgress = useCallback((media: HTMLMediaElement) => {
     if (media !== mediaRef.current) return;
-    if (showCountdown && renderMode === "PRESENTATION" && Number.isFinite(media.duration) && media.duration > 0 &&
+    if (showCountdown && renderMode === "PRESENTATION" && command !== null && Number.isFinite(media.duration) && media.duration > 0 &&
       (introResumeAppliedRef.current?.source !== resumeSource || introResumeAppliedRef.current.commandId !== commandId)) {
       introResumeAppliedRef.current = { source: resumeSource, commandId };
+      pendingIntroPositionRef.current = null;
       restoreIntro(media);
     }
     const position = showCountdown && media.seeking && pendingIntroPositionRef.current !== null
       ? pendingIntroPositionRef.current : media.currentTime;
     if (!media.seeking) pendingIntroPositionRef.current = null;
     setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, position) });
-    if (showCountdown && renderMode === "PRESENTATION" && Number.isFinite(media.duration) && media.duration > 0) {
+    if (showCountdown && renderMode === "PRESENTATION" && command !== null && Number.isFinite(media.duration) && media.duration > 0) {
       try { sessionStorage.setItem(resumeKey, JSON.stringify({ source: resumeSource, commandId,
         duration: media.duration, position, recordedAt: Date.now(), playing: !media.paused && !media.ended && !media.seeking && media.readyState >= 2 })); } catch { /* Playback still works when storage is unavailable. */ }
     }
-  }
+  }, [showCountdown, renderMode, command, resumeSource, commandId, restoreIntro, src, resumeKey]);
 
   async function play() {
     const target = mediaRef.current;
@@ -269,6 +270,10 @@ export function SynchronizedMedia({
     handledCommandIdRef.current = commandId;
     handledSourceRef.current = src;
 
+    // Activation temporarily gates the command to null. Its metadata events must
+    // not overwrite the saved position; restore before issuing the real command.
+    if (showCountdown && Number.isFinite(media.duration) && media.duration > 0) updateProgress(media);
+
     if (command === "play") {
       const saved = readResume() as { duration?: number } | null;
       if (showCountdown && saved && typeof saved.duration === "number" &&
@@ -294,7 +299,7 @@ export function SynchronizedMedia({
       media.currentTime = 0;
       setMediaProgress({ src, remaining: mediaRemainingSeconds(media.duration, 0) });
     }
-  }, [command, commandId, renderMode, src, showCountdown, readResume, resumeSource]);
+  }, [command, commandId, renderMode, src, showCountdown, readResume, resumeSource, updateProgress]);
 
   useEffect(() => {
     const media = mediaRef.current;
