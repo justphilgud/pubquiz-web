@@ -8,6 +8,7 @@ import type {
   QuestionTemplateConfig,
 } from "../types";
 import { isMediaSlotKey } from "../mediaSlots";
+import { isMusicAnswerStructure } from "./musicAnswerScope";
 
 export const dynamicQuestionTemplateRoles = [
   "FIXED",
@@ -280,7 +281,9 @@ export function buildDynamicQuestionTemplate(
     baseTemplateId: baseTemplate.id === "standard" ? null : baseTemplate.id,
     sourceTemplateId: input.id,
     name: input.name,
-    description: input.description?.trim() || `Aus einer bestehenden Frage erstellte Vorlage auf Basis von ${baseTemplate.name}.`,
+    description: isMusicAnswerStructure(snapshot.answers.filter(answer => answer.role !== "EXCLUDED").map(answer => answer.fieldLabel), snapshot.media.some(media => media.mediaType === "AUDIO" && media.role !== "EXCLUDED")) || snapshot.templateConfig.musicAnswerScope === "SINGLE"
+      ? "Musikbeispiel mit einer Antwort oder Interpret und Titel. Audio ist erforderlich."
+      : input.description?.trim() || `Aus einer bestehenden Frage erstellte Vorlage auf Basis von ${baseTemplate.name}.`,
     defaultQuestionText:
       snapshot.questionText.role === "FIXED" ? snapshot.questionText.value : "",
     initialAnswers: snapshot.answers
@@ -312,12 +315,14 @@ export function getDynamicTemplateRequirementIssue(
   draft: {
     questionText: string;
     questionMedia: Array<Pick<QuestionMediaDraft, "slotKey" | "operation" | "url">>;
-    answers: Array<Pick<QuestionAnswerDraft, "text">>;
+    answers: Array<Pick<QuestionAnswerDraft, "text"> & Partial<Pick<QuestionAnswerDraft, "id" | "fieldGroupId" | "fieldLabel">>>;
+    templateConfig?: QuestionTemplateConfig;
   },
 ): "QUESTION_TEXT" | "MEDIA" | "ANSWER" | null {
   if (snapshot.questionText.role === "REQUIRED_NEW" && !draft.questionText.trim()) {
     return "QUESTION_TEXT";
   }
+  if (draft.templateConfig?.musicAnswerScope && !snapshot.media.some(media => media.mediaType === "AUDIO" && media.role !== "EXCLUDED")) return "MEDIA";
   if (snapshot.media.some((rule) =>
     (rule.role === "REQUIRED_NEW" || rule.role === "FIXED") &&
     !draft.questionMedia.some((medium) =>
@@ -325,6 +330,13 @@ export function getDynamicTemplateRequirementIssue(
     return "MEDIA";
   }
   const includedAnswers = snapshot.answers.filter((answer) => answer.role !== "EXCLUDED");
+  if (draft.templateConfig?.musicAnswerScope === "SINGLE" && isMusicAnswerStructure(
+    includedAnswers.map(answer => answer.fieldLabel),
+    snapshot.media.some(media => media.mediaType === "AUDIO" && media.role !== "EXCLUDED"),
+  )) {
+    const groups = new Set(draft.answers.map(answer => answer.fieldGroupId ?? answer.fieldLabel ?? answer.id ?? "single"));
+    return groups.size === 1 && draft.answers.some(answer => answer.text.trim()) ? null : "ANSWER";
+  }
   if (includedAnswers.some((rule, index) =>
     rule.role === "REQUIRED_NEW" && !draft.answers[index]?.text.trim())) {
     return "ANSWER";

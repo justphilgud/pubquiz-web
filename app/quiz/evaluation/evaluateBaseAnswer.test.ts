@@ -12,6 +12,20 @@ import {
 } from "./questionPointPolicy";
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
+test("music single component never awards or deducts a missing second component", () => {
+  for (const solution of ["Songtitel", "Interpret", "Serie"]) {
+    const input = { ...defaults, templateId: "standard", effectiveAnswerMode: "OPEN" as const,
+      structuredFields: [{ id: 1, acceptedSolutions: [solution] }] };
+    const correct = evaluateBaseAnswer({ ...input, structuredAnswers: new Map([[1, solution]]) });
+    const wrong = evaluateBaseAnswer({ ...input, structuredAnswers: new Map([[1, "Falsch"]]) });
+    assert.equal(correct.status, "CORRECT");
+    assert.equal(correct.basePoints.toString(), "0.5");
+    assert.equal(correct.maxPoints.toString(), "0.5");
+    assert.equal(wrong.status, "WRONG");
+    assert.equal(wrong.basePoints.toString(), "0");
+  }
+});
+
 const defaults = {
   effectiveAnswerMode: "CLOSED" as const,
   answerOptions: [] as { id: number; isCorrect: boolean; text?: string }[],

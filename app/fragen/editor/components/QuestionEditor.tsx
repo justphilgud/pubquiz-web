@@ -40,6 +40,8 @@ import {
 import { createDynamicQuestionTemplate } from "../templates/dynamicQuestionTemplateActions";
 import { remapDynamicTemplateRuleSelection } from "../templates/dynamicQuestionTemplate";
 import { StructuredTemplateEditor } from "./StructuredTemplateEditor";
+import { MusicAnswerScope } from "./MusicAnswerScope";
+import { supportsMusicAnswerScope } from "../templates/musicAnswerScope";
 import ContentScopeSection, {
   type ContentScopeEventSeriesOption,
 } from "@/app/components/content/ContentScopeSection";
@@ -434,7 +436,9 @@ export function QuestionEditor({
     if (fieldError?.target === "answers") setFieldError(null);
     setDraft((current) => ({
       ...current,
-      answers: [...current.answers, createAnswer()],
+      answers: [...current.answers, current.templateConfig.musicAnswerScope === "SINGLE" && supportsMusicAnswerScope(selectedTemplate) && current.answers[0]
+        ? { ...createAnswer({ fieldLabel: current.answers[0].fieldLabel || "Richtige Antwort", isCorrect: true }), fieldGroupId: current.answers[0].fieldGroupId ?? current.answers[0].id }
+        : createAnswer()],
     }));
   }
 
@@ -1125,6 +1129,15 @@ export function QuestionEditor({
           />
         ) : null}
 
+        {selectedTemplate && supportsMusicAnswerScope(selectedTemplate) && <MusicAnswerScope
+          key={selectedTemplate.id}
+          draft={draft} template={selectedTemplate} disabled={isEditorDisabled}
+          onChange={(musicAnswerScope, answers) => {
+            setFieldError(null);
+            setDraft(current => ({ ...current, answers, templateConfig: { ...current.templateConfig, musicAnswerScope } }));
+          }}
+        />}
+
         {similarQuestions.length > 0 && (
           <aside className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
             <h2 className="font-semibold">{messages.editor.duplicateTitle}</h2>
@@ -1177,6 +1190,7 @@ export function QuestionEditor({
           }}
           onAnswerChange={updateAnswer}
           onAddAnswer={addAnswer}
+          addAnswerLabel={draft.templateConfig.musicAnswerScope === "SINGLE" && supportsMusicAnswerScope(selectedTemplate) ? "Antwortvariante hinzufügen" : undefined}
           onRemoveAnswer={removeAnswer}
           onAnswerMediaChange={updateAnswerMedia}
           onAnswerMediaUploadStatusChange={(answerId, status) =>

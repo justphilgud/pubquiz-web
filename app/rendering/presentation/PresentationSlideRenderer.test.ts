@@ -28,6 +28,31 @@ const rendererSource = readFileSync(
   "utf8",
 );
 
+test("LOVD open text has no empty answer surface while closed choices and media remain", () => {
+  for (const scenario of ["short", "choice4", "image-long"] as const) {
+    const fixture = buildPresentationQualityFixture(scenario, "EDITORIAL");
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+    assert.doesNotMatch(html, /Keine Antwortmöglichkeiten/);
+    if (scenario === "short") assert.doesNotMatch(html, /presentation-answer-panel/);
+    if (scenario === "choice4") assert.match(html, /Berlin/);
+    if (scenario === "image-long") assert.match(html, /img/);
+  }
+});
+
+test("LOVD start sequence keeps audio countdown before copy without public activation", () => {
+  const fixture = buildPresentationQualityFixture("short", "EDITORIAL");
+  const start: Slide = { typ: "fixer-slide", slideTyp: "startsequenz" };
+  const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    ...fixture, slide: start, slides: [start],
+    displayState: { ...fixture.displayState, remoteCountdownDauerSekunden: 212, remoteCountdownStatus: "idle" },
+  }));
+  assert.match(html, /Gleich geht’s los/);
+  assert.doesNotMatch(html, /presentation-start-play-mark|Medienwiedergabe einmalig aktivieren/);
+  assert.ok(html.indexOf("lovd-start-countdown-slot") < html.indexOf("Gleich geht’s los"));
+  const startRenderer = rendererSource.slice(rendererSource.indexOf("function renderStartsequenzSlide"), rendererSource.indexOf("function renderFixenSlide"));
+  assert.doesNotMatch(startRenderer, /remoteCountdown|setInterval|Date\.now/);
+});
+
 test("AP3: both rules slides render distinct modes without revealing the answer", () => {
   const runtime = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const pixel = runtime.quiz.fragen.find((question) => question.templateId === "pixelbild");

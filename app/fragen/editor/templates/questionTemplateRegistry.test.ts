@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { localizeQuestionTemplates } from "./questionTemplates";
+import { supportsMusicAnswerScope } from "./musicAnswerScope";
 import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
 import {
   findQuestionTemplate,
@@ -15,6 +16,16 @@ const editorActions = readFileSync(
   new URL("../actions.ts", import.meta.url),
   "utf8",
 );
+
+test("music scope uses declared audio and answer fields in both editor languages", () => {
+  for (const locale of ["de", "en"] as const) {
+    const templates = localizeQuestionTemplates(loadQuestionEditorMessages(locale));
+    assert.equal(supportsMusicAnswerScope(findQuestionTemplate(templates, questionTemplateIds.music)), true);
+    assert.equal(supportsMusicAnswerScope(findQuestionTemplate(templates, questionTemplateIds.musicReverse)), true);
+    assert.equal(supportsMusicAnswerScope(findQuestionTemplate(templates, questionTemplateIds.artwork)), false);
+    assert.equal(supportsMusicAnswerScope(findQuestionTemplate(templates, questionTemplateIds.faceMorph)), false);
+  }
+});
 const artworkMigration = readFileSync(
   new URL(
     "../../../../prisma/migrations/20260921120000_add_artwork_question_template/migration.sql",

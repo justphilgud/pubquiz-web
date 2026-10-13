@@ -207,6 +207,7 @@ export type FaceMorphPixelQuestionOptions = Record<
 >;
 
 export type QuestionTemplateConfig = {
+  musicAnswerScope?: "SINGLE" | "ARTIST_TITLE";
   sponsor?: import("@/app/rendering/presentation/questionSponsor").QuestionSponsor;
   memeCaptionLayout?: import("@/app/quiz/memeCaptionZones").MemeCaptionLayoutConfig;
   pixelMode?: "CHALLENGE" | "STAGED";

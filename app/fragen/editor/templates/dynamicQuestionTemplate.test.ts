@@ -27,6 +27,28 @@ const baseTemplate: QuestionTemplate = {
   mediaSlots: [{ key: "question_image", allowedMediaType: "IMAGE", required: false, label: "Bild", manualUploadAllowed: true, generatorInput: false, generatorOutput: false }],
 };
 
+test("music answer scope survives config parsing and validates only the chosen components", () => {
+  const music: DynamicQuestionTemplateSnapshot = {
+    version: 1, questionText: { role: "REQUIRED_NEW", value: "" },
+    media: [{ slotKey: "question_audio", mediaType: "AUDIO", role: "REQUIRED_NEW" }],
+    answers: ["Interpret", "Titel"].map((fieldLabel, index) => ({ sourceKey: `answer:${index}`, fieldLabel,
+      isCorrect: true, role: "REQUIRED_NEW", text: "", additionalInfo: "" })),
+    templateConfig: { ...DEFAULT_PIXEL_TEMPLATE_CONFIG, musicAnswerScope: "SINGLE" },
+  };
+  const parsed = parseDynamicQuestionTemplateSnapshot(music);
+  assert.equal(parsed?.templateConfig.musicAnswerScope, "SINGLE");
+  for (const text of ["Songtitel", "Sänger", "Serienname"]) {
+    const draft = { questionText: "Was ist gesucht?", questionMedia: [{ slotKey: "question_audio" as const, operation: "UNCHANGED" as const, url: "https://example.test/audio.mp3" }],
+      answers: [{ text, fieldGroupId: "single" }], templateConfig: music.templateConfig };
+    assert.equal(getDynamicTemplateRequirementIssue(music, draft), null);
+    assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, answers: [{ text: "  " }] }), "ANSWER");
+    assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, templateConfig: DEFAULT_PIXEL_TEMPLATE_CONFIG }), "ANSWER");
+    assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, questionMedia: [] }), "MEDIA");
+    assert.equal(getDynamicTemplateRequirementIssue({ ...music, media: [] }, draft), "MEDIA");
+    assert.equal(getDynamicTemplateRequirementIssue(music, { ...draft, answers: [{ text, fieldGroupId: "single" }, { text: "Variante", fieldGroupId: "single" }] }), null);
+  }
+});
+
 const snapshot: DynamicQuestionTemplateSnapshot = {
   version: 1,
   questionText: { role: "FIXED", value: "Wer schrieb dieses Buch?" },

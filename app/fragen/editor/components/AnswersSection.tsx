@@ -29,6 +29,7 @@ type AnswersSectionProps = {
     changes: Partial<QuestionAnswerDraft>,
   ) => void;
   onAddAnswer: () => void;
+  addAnswerLabel?: string;
   onRemoveAnswer: (answerId: string) => void;
   onAnswerMediaChange: (
     answerId: string,
@@ -52,6 +53,7 @@ export function AnswersSection({
   onFaceMorphPixelQuestionOptionChange,
   onAnswerChange,
   onAddAnswer,
+  addAnswerLabel,
   onRemoveAnswer,
   onAnswerMediaChange,
   onAnswerMediaUploadStatusChange,
@@ -153,7 +155,7 @@ export function AnswersSection({
         onClick={onAddAnswer}
         className="mt-4 min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 font-medium sm:w-auto"
       >
-        {messages.answers.add}
+        {addAnswerLabel ?? messages.answers.add}
       </button>
     </section>
   );

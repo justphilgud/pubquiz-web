@@ -55,12 +55,12 @@ export const deQuestionEditorMessages = {
       mediaLabel: "FaceMorph-Bild", mediaHelp: "Lade das fertig erstellte FaceMorph als JPEG, PNG oder WebP hoch.",
     },
     musicReverse: {
-      name: "Musik rückwärts", description: "Interpret und Titel eines rückwärts abgespielten Songs.",
+      name: "Musik rückwärts", description: "Rückwärts abgespielte Musik mit einer Antwort oder Interpret und Titel.",
       defaultQuestion: "Welcher Song wurde hier rückwärts abgespielt? Nennt Interpret und Titel.", artist: "Interpret", title: "Titel",
       mediaLabel: "Rückwärts abgespielte Audiodatei", mediaHelp: "Lade die bereits rückwärts vorbereitete MP3-, WAV- oder OGG-Datei hoch.",
     },
     music: {
-      name: "Musik", description: "Interpret und Titel eines normal abgespielten Songs.",
+      name: "Musik", description: "Normal abgespielte Musik mit einer Antwort oder Interpret und Titel.",
       defaultQuestion: "Welcher Song ist zu hören? Nennt Interpret und Titel.", artist: "Interpret", title: "Titel",
       mediaLabel: "Audio zur Frage", mediaHelp: "Normales Audio; eine Rückwärtsverarbeitung ist nicht erforderlich.",
       resolutionAudioHelp: "Optionales separates Audio für die Auflösung. Ohne diese Datei wird das Audio zur Frage wiederverwendet.",
