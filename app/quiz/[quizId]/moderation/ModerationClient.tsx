@@ -612,6 +612,10 @@ export default function ModerationClient({
   }, [mediumOverlayAktiv, quizId, lifecycleState.lifecycleRevision]);
 
   const handleAudioPlay = useCallback(async () => {
+    if (istIntroMusikSlide && lifecycleState.lifecycle !== "RUNNING") {
+      setActionError("Starte zuerst das Quiz in der Moderation und aktiviere danach im Präsentationsfenster „Präsentation starten / fortsetzen“. Anschließend startet das Lautsprechersymbol die Intro-Musik.");
+      return;
+    }
     const naechsteAktion = audioLaeuft ? "pause" : "play";
 
     setAudioLaeuft(!audioLaeuft);
@@ -628,7 +632,7 @@ export default function ModerationClient({
       setAudioLaeuft(audioLaeuft);
       setActionError("Musiksteuerung nicht gespeichert. Bitte Verbindung prüfen und erneut starten oder pausieren.");
     }
-  }, [audioLaeuft, quizId, lifecycleState.lifecycleRevision]);
+  }, [audioLaeuft, quizId, istIntroMusikSlide, lifecycleState.lifecycle, lifecycleState.lifecycleRevision]);
 
   const handleAuswertungOeffnen = useCallback(() => {
     setShowAuswertungIframe(true);
@@ -1062,6 +1066,7 @@ export default function ModerationClient({
                 onCountdownStart={handleCountdownStart}
                 onCountdownReset={handleCountdownReset}
               />
+              {istIntroMusikSlide && audioLaeuft && <p role="status" className="mt-2 text-sm text-amber-200">Musikstart angefordert. Falls noch kein Ton zu hören ist: im separaten Präsentationsfenster „Präsentation starten / fortsetzen“ anklicken. Die Countdownfolie enthält absichtlich keinen Play-Button.</p>}
             </div>
 
             {(aktuellerSlide?.typ === "endstand" || (aktuellerSlide?.typ === "ablauf" && aktuellerSlide.element.type === "FINAL_STANDINGS")) && (
