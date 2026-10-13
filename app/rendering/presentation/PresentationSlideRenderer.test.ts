@@ -15,6 +15,8 @@ import PresentationSlideRenderer, {
 } from "./PresentationSlideRenderer";
 import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
+import { isIntroMusicSlide } from "./presentationSlideMetadata";
+import ModerationToolbar from "../../quiz/[quizId]/moderation/components/ModerationToolbar";
 import {
   resolveIntermediateStandingsAudience,
 } from "./presentationRankingPolicy";
@@ -27,6 +29,36 @@ const rendererSource = readFileSync(
   new URL("./PresentationSlideRenderer.tsx", import.meta.url),
   "utf8",
 );
+
+test("default intro audio is controllable for flow and legacy slides with visible start/pause labels", () => {
+  const fixture = buildPresentationQualityFixture("short", "EDITORIAL");
+  const quiz = { ...fixture.quiz, intro_musik_url: null, intro_startsequenz_text: "Intro-Test" };
+  const flowSlide = buildPraesentationSlides(quiz).find(isIntroMusicSlide);
+  assert.ok(flowSlide);
+  assert.equal(flowSlide.typ, "ablauf");
+  const legacySlide: Slide = { typ: "fixer-slide", slideTyp: "startsequenz" };
+  const action = () => {};
+  for (const slide of [flowSlide, legacySlide]) {
+    assert.equal(isIntroMusicSlide(slide), true);
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, { ...fixture, quiz, slide, slides: [slide] }));
+    assert.match(html, /src="\/medien\/audio\/intro\/mexico.mp3"/);
+    for (const playing of [false, true]) {
+      const controls = renderToStaticMarkup(createElement(ModerationToolbar, {
+        blockFreigegeben: false, mediumOverlayAktiv: false, audioLaeuft: playing,
+        istIntroMusikSlide: isIntroMusicSlide(slide), hatMedien: false, hatAudio: isIntroMusicSlide(slide),
+        istCountdownSlide: false, countdownDauerMinuten: 5, countdownRestSekunden: 300,
+        showSchaetzfrageControls: false, onZurErstenSlide: action, onZurueck: action, onWeiter: action,
+        onBlockToggle: action, onMediumToggle: action, onAudioToggle: action, onAuswertungOeffnen: action,
+        onSchaetzfrageStarten: action, onSchaetzfrageLoesungZeigen: action, onSchaetzfrageZurueck: action,
+        onCountdownDauerChange: action, onCountdownStart: action, onCountdownReset: action,
+      }));
+      assert.match(controls, playing ? /Intro-Musik pausieren/ : /Intro-Musik starten \/ fortsetzen/);
+      assert.doesNotMatch(controls, /disabled=""[^>]*>[^<]*Intro-Musik/);
+    }
+  }
+  assert.equal(isIntroMusicSlide(undefined), false);
+  assert.equal(isIntroMusicSlide({ typ: "fixer-slide", slideTyp: "regeln" }), false);
+});
 
 test("LOVD open text has no empty answer surface while closed choices and media remain", () => {
   for (const scenario of ["short", "choice4", "image-long"] as const) {

@@ -1,4 +1,6 @@
 "use client";
+
+import { isIntroMusicSlide } from "@/app/rendering/presentation/presentationSlideMetadata";
 import { mayApplyLiveSnapshot } from "../../liveSnapshotRevision";
 import { EstimationTiebreakPanel } from "../../EstimationTiebreakPanel";
 
@@ -259,20 +261,20 @@ export default function ModerationClient({
     aktuellerSlide.frage.templateId === "meme_beschriften"
   );
 
+  const istIntroMusikSlide = isIntroMusicSlide(aktuellerSlide);
   const hatAudioAufFixemSlide =
     aktuellerSlide?.typ === "fixer-slide" &&
-    (aktuellerSlide.slideTyp === "startsequenz" ||
-      (aktuellerSlide.slideTyp === "qrcode" &&
+    ((aktuellerSlide.slideTyp === "qrcode" &&
         Boolean(quiz.intro_musik_url)) ||
       (aktuellerSlide.slideTyp === "bekanntmachungen" &&
         Boolean(quiz.outro_musik_url)));
   const hatAudioAufAblaufSlide =
     aktuellerSlide?.typ === "ablauf" &&
-    ((aktuellerSlide.element.type === "START_SEQUENCE" && Boolean(quiz.intro_musik_url)) ||
-      (aktuellerSlide.element.type === "CLOSING" && Boolean(quiz.outro_musik_url)) ||
+    ((aktuellerSlide.element.type === "CLOSING" && Boolean(quiz.outro_musik_url)) ||
       (aktuellerSlide.element.type === "AUDIO" && Boolean(aktuellerSlide.element.config.audioUrl)) ||
       (aktuellerSlide.element.type === "VIDEO" && Boolean(aktuellerSlide.element.config.videoUrl)));
   const hatAudio =
+    istIntroMusikSlide ||
     hatAudioAufFixemSlide ||
     hatAudioAufAblaufSlide ||
     aktuelleMedien.some((medium) =>
@@ -615,11 +617,17 @@ export default function ModerationClient({
     setAudioLaeuft(!audioLaeuft);
     setPlaybackCommand(naechsteAktion);
     setPlaybackCommandId((current) => current + 1);
-    await setAudioAktion({
-      quizId,
-      lifecycleRevision: lifecycleState.lifecycleRevision,
-      aktion: naechsteAktion,
-    });
+    try {
+      await setAudioAktion({
+        quizId,
+        lifecycleRevision: lifecycleState.lifecycleRevision,
+        aktion: naechsteAktion,
+      });
+      setActionError(null);
+    } catch {
+      setAudioLaeuft(audioLaeuft);
+      setActionError("Musiksteuerung nicht gespeichert. Bitte Verbindung prüfen und erneut starten oder pausieren.");
+    }
   }, [audioLaeuft, quizId, lifecycleState.lifecycleRevision]);
 
   const handleAuswertungOeffnen = useCallback(() => {
@@ -1033,6 +1041,7 @@ export default function ModerationClient({
                 blockFreigegeben={blockFreigegeben}
                 mediumOverlayAktiv={mediumOverlayAktiv}
                 audioLaeuft={audioLaeuft}
+                istIntroMusikSlide={istIntroMusikSlide}
                 hatMedien={hatMedien}
                 hatAudio={hatAudio}
                 istCountdownSlide={istCountdownSlide}
