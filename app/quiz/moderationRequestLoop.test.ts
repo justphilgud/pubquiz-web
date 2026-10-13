@@ -5,6 +5,7 @@ import test from "node:test";
 import ts from "typescript";
 import * as deck from "./[quizId]/praesentation/buildPraesentationSlides";
 import * as live from "../rendering/presentation/presentationLiveState";
+import * as slideMetadata from "../rendering/presentation/presentationSlideMetadata";
 import { mayApplyLiveSnapshot } from "./liveSnapshotRevision";
 
 const filename = "app/quiz/[quizId]/moderation/ModerationClient.tsx";
@@ -61,7 +62,7 @@ function harness(source = original) {
   const schedule = (callback: () => void, delay: number, repeat?: number) => { const id = ++timerId; timers.set(id, { callback, due: time + delay, repeat }); return id; };
   const exported: { default?: (input: typeof props) => View } = {};
   runInNewContext(compiled, {
-    ...imports, ...deck, ...live, mayApplyLiveSnapshot, exports: exported, AbortController, console,
+    ...imports, ...deck, ...live, ...slideMetadata, mayApplyLiveSnapshot, exports: exported, AbortController, console,
     window: { setTimeout: (fn: () => void, delay: number) => schedule(fn, delay), clearTimeout: (id: number) => timers.delete(id), setInterval: (fn: () => void, delay: number) => schedule(fn, delay, delay), clearInterval: (id: number) => timers.delete(id) },
     document: { hidden: false },
     useMemo: memoSlot, useCallback: (fn: unknown, deps: unknown[]) => memoSlot(() => fn, deps),

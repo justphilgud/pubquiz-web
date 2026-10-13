@@ -2,6 +2,12 @@
 export function questionPhaseMedia<T extends { slotKey?: string | null; datei: string }>(
   templateId: string | null, media: readonly T[], phase: "QUESTION" | "SOLUTION",
 ): T[] {
+  if (templateId === "uebersetzt_vorgelesen") {
+    const prepared = media.filter(item => item.slotKey === "lyrics_tts_audio");
+    // A configured output is authoritative; never play another attached song instead.
+    const legacy = media.filter(item => !item.slotKey && /\.(mp3|wav|ogg|m4a|aac)(?:[?#].*)?$/i.test(item.datei));
+    return prepared.length ? prepared : legacy.length === 1 ? legacy : [];
+  }
   if (templateId === "musik") {
     const wanted = phase === "SOLUTION" && media.some(item => item.slotKey === "music_original_audio")
       ? "music_original_audio" : "question_audio";

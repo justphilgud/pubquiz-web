@@ -1,6 +1,5 @@
 import "server-only";
 
-import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { mapTeamProfile } from "@/app/teams/teamProfile";
 import { buildYearlyRanking } from "./yearlyRanking";
@@ -47,19 +46,25 @@ export async function loadYearlyRanking(quizId: number) {
     }),
     prisma.team_antworten.groupBy({
       by: ["quiz_team_session_id"],
-      where: { quiz_id: { in: quizIds } },
+      where: {
+        quiz_id: { in: quizIds },
+        OR: [
+          { bewertungsstatus: { in: ["CORRECT", "PARTIAL", "WRONG"] } },
+          { bewertungsstatus: "UNANSWERED", bewertungs_version: { gt: 0 } },
+        ],
+      },
       _sum: { vergebene_punkte: true },
     }),
   ]);
   const totalsBySession = new Map(
     totals.map((entry) => [
       entry.quiz_team_session_id,
-      entry._sum.vergebene_punkte ?? new Prisma.Decimal(0),
+      entry._sum.vergebene_punkte ?? 0,
     ]),
   );
 
   return buildYearlyRanking(
-    sessions.map((session) => ({
+    sessions.filter(session => totalsBySession.has(session.quiz_team_session_id)).map((session) => ({
       quizId: session.quiz_id,
       teamId: session.team.team_id,
       teamname: session.team.teamname,

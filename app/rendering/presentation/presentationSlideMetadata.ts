@@ -2,6 +2,32 @@ import type { QuizPraesentationResult } from "@/app/quiz/actions";
 import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
 import { isQuestionSection } from "@/app/quiz/quizSectionPolicy";
 import { getQuizFlowTypeLabel } from "@/app/quiz/flow/quizFlow";
+import { questionPhaseMedia } from "./questionPhaseMedia";
+import { pixelRuntimeStageToMediaSlot } from "@/app/quiz/interaction/pixelLiveInteraction";
+
+export function getSlideSpeech(slide: Slide | undefined) {
+  if (slide?.typ !== "frage") return null;
+  const data = slide.frage.templateConfig?.templateData;
+  return data?.kind === "TRANSLATION_READ_ALOUD" ? data : null;
+}
+
+export function getPresentationSlideMedia(slide: Slide | undefined, pixelStage = 1) {
+  if (slide?.typ === "frage") {
+    const media = questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "QUESTION");
+    if (slide.frage.templateId !== "pixelbild") return media;
+    const images = media.filter(item => /\.(jpe?g|png|gif|webp|svg)(?:[?#].*)?$/i.test(item.datei))
+      .sort((left, right) => left.sortierung - right.sortierung);
+    const keyed = images.filter(item => item.slotKey?.startsWith("pixel_stage_"));
+    const stages = keyed.length ? keyed : images.slice(-3);
+    const slot = pixelRuntimeStageToMediaSlot(Math.min(3, Math.max(1, pixelStage)) as 1 | 2 | 3);
+    const selected = keyed.length ? keyed.find(item => item.slotKey === slot) : stages[pixelStage - 1];
+    return selected ? [selected] : [];
+  }
+  return slide?.typ === "aufloesung" ? [
+    ...questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "SOLUTION"),
+    ...slide.frage.antworten.flatMap(answer => answer.medien),
+  ] : [];
+}
 
 export function isIntroMusicSlide(slide: Slide | undefined) {
   return (slide?.typ === "fixer-slide" && slide.slideTyp === "startsequenz") ||
