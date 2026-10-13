@@ -11,12 +11,11 @@ import {
   LockOpenIcon,
   PhotoIcon,
   PlayIcon,
-  PauseIcon,
   ScaleIcon,
   SpeakerWaveIcon,
 } from "@heroicons/react/24/outline";
 
-import { Button, IconButton } from "@/components/ui";
+import { IconButton } from "@/components/ui";
 
 function formatSeconds(seconds: number | null | undefined) {
   if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
@@ -120,25 +119,24 @@ export default function ModerationToolbar({
           onClick={onMediumToggle}
         />
 
-        {istIntroMusikSlide ? <div className="max-w-sm">
-          <Button type="button" disabled={!hatAudio} onClick={onAudioToggle}
-            className="min-h-11 gap-2 rounded-xl px-4 py-3 font-bold">
-            {audioLaeuft ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
-            {audioLaeuft ? "Intro-Musik pausieren" : "Intro-Musik starten / fortsetzen"}
-          </Button>
-          <p className="mt-1 text-xs text-zinc-300">Nach dem Quizstart einmal im Präsentationsfenster „Präsentation starten / fortsetzen“ aktivieren. Die Musik spielt ausschließlich dort.</p>
-        </div> : <IconButton
+        <IconButton
           icon={SpeakerWaveIcon}
           label={
-            hatAudio
+            istIntroMusikSlide
+              ? audioLaeuft ? "Intro-Musik pausieren" : "Intro-Musik starten / fortsetzen"
+              : hatAudio
               ? "Audio/Video abspielen oder pausieren"
               : "Kein abspielbares Medium auf diesem Slide"
           }
           tone="pink"
           active={audioLaeuft}
+          data-testid={istIntroMusikSlide ? "intro-speaker-control" : undefined}
+          aria-pressed={audioLaeuft}
+          aria-describedby={istIntroMusikSlide ? "intro-audio-activation-help" : undefined}
           disabled={!hatAudio}
           onClick={onAudioToggle}
-        />}
+        />
+        {istIntroMusikSlide && <p id="intro-audio-activation-help" className="max-w-sm text-xs text-zinc-300">Lautsprecher: Start / Pause / Fortsetzen. Nach dem Quizstart einmal im Präsentationsfenster „Präsentation starten / fortsetzen“ aktivieren. Die Musik spielt ausschließlich dort.</p>}
 
         <IconButton
           icon={ChartBarIcon}

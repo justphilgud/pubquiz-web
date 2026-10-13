@@ -53,6 +53,13 @@ test("default intro audio is controllable for flow and legacy slides with visibl
         onCountdownDauerChange: action, onCountdownStart: action, onCountdownReset: action,
       }));
       assert.match(controls, playing ? /Intro-Musik pausieren/ : /Intro-Musik starten \/ fortsetzen/);
+      assert.match(controls, /data-testid="intro-speaker-control"/);
+      assert.match(controls, new RegExp(`aria-pressed="${playing}"`));
+      assert.match(controls, /aria-describedby="intro-audio-activation-help"/);
+      const speakerContent = controls.match(/<button[^>]*data-testid="intro-speaker-control"[^>]*>([\s\S]*?)<\/button>/)?.[1];
+      assert.ok(speakerContent);
+      assert.match(speakerContent, /<svg/);
+      assert.doesNotMatch(speakerContent, /Intro-Musik/);
       assert.doesNotMatch(controls, /disabled=""[^>]*>[^<]*Intro-Musik/);
     }
   }
