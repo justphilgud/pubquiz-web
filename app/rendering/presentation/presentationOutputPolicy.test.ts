@@ -51,7 +51,9 @@ test("existing moderation owns navigation, releases and live decisions", () => {
   assert.match(toolbar, /label="Weiter"/);
   assert.match(toolbar, /Block schließen|Block freigeben/);
   assert.match(toolbar, /Schätzfrage starten/);
-  assert.match(toolbar, /Audio\/Video abspielen oder pausieren/);
+  assert.match(toolbar, /Audio\/Video starten \/ fortsetzen/);
+  assert.match(toolbar, /Audio\/Video pausieren/);
+  assert.match(toolbar, /onClick=\{onAudioToggle\}/);
   assert.match(moderation, /setPraesentationSlideIndex/);
   assert.doesNotMatch(moderation, /setAktuelleQuizFrage/);
   assert.match(statusActions, /parsePresentationSlideKey/);
