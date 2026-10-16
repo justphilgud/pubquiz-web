@@ -8,6 +8,7 @@ type QuestionSectionProps = {
   questionTextRef?: Ref<HTMLTextAreaElement>;
   onQuestionTextChange: (questionText: string) => void;
   mediaContent?: ReactNode;
+  rewriteContent?: ReactNode;
   validationError?: string | null;
   label?: string;
 };
@@ -17,6 +18,7 @@ export function QuestionSection({
   questionTextRef,
   onQuestionTextChange,
   mediaContent,
+  rewriteContent,
   validationError = null,
   label,
 }: QuestionSectionProps) {
@@ -52,6 +54,7 @@ export function QuestionSection({
         maximum={300}
         warningAt={220}
       />
+      {rewriteContent}
       {mediaContent}
       <PresentationContentWarning text={questionText} role="question" />
     </section>

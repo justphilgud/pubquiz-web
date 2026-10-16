@@ -48,6 +48,9 @@ jobs:
       - name: Tests
         run: npm test
 
+      - name: Question rewrite safety and stale-request regression
+        run: npm run test:question-rewrite
+
       - name: Meme PNG, encrypted files, ZIP and access controls
         env:
           FONTCONFIG_FILE: ${{ github.workspace }}/app/quiz/memeArchive/fixtures/empty-fontconfig.xml
@@ -73,6 +76,9 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Real HTTP question rewrite authentication and disabled flag
+        run: npm run test:question-rewrite:http
 
   repository-lint-information:
     name: Informational only — full repository ESLint debt

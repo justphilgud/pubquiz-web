@@ -310,6 +310,7 @@ export type QuestionTemplate = {
   description: string;
   defaultQuestionText: string;
   questionLabel: string;
+  questionTextIsTemplateStatic?: boolean;
 
   /**
    * Describes the future general question-media capability independently from

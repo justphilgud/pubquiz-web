@@ -1,0 +1,23 @@
+{
+  "zipCount": 3,
+  "afterReset": true,
+  "files": [
+    {
+      "sha256": "6C47FB50A8E2B3748D39A697ACCD3E9EB0C018C4CF3B023143BF5345FAC194CB",
+      "filename": "Quiz-34_Durchlauf-1_Frage-369_Codex-PR116-Production-Beta_f0fbe96d-c0db-45ee-9254-6e673d99d7a1.png",
+      "matchesIndividual": true
+    },
+    {
+      "sha256": "46B2DF0CFB2199166BF00C58B36529260FD24BDB68007725D67A4EA3E98519C6",
+      "filename": "Quiz-34_Durchlauf-1_Frage-369_Codex-PR116-Production-Gamma_753ba5a8-28ff-4772-8ada-71e15578dbac.png",
+      "matchesIndividual": true
+    },
+    {
+      "sha256": "7243CDE73577FDE64AF093ECB88D92562DAD57C29890C74E837F788125534061",
+      "filename": "Quiz-34_Durchlauf-1_Frage-370_Codex-PR116-Production-Gamma_e19d1f37-b866-4acb-bfd0-86e08ac5e94b.png",
+      "matchesIndividual": true
+    }
+  ],
+  "alphaPresent": false,
+  "afterConfirmedAlphaDeletion": true
+}

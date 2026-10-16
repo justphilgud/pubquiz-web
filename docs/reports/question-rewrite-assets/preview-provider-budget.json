@@ -1,0 +1,219 @@
+{
+  "budgetUsd": 1,
+  "modelPlannedPendingTargetVerification": "gpt-5.6-luna",
+  "officialDocumentationCheckedOn": "2026-10-16",
+  "inputUsdPerMillionTokens": 0.2,
+  "outputUsdPerMillionTokens": 1.2,
+  "maximumOutputTokens": 512,
+  "reservePerGenerationAttemptUsd": 0.01,
+  "maximumPlannedGenerationAttemptsIncludingUiAndProduction": 20,
+  "modelMetadataGets": 2,
+  "modelMetadataResult": "403 without OpenAI JSON from local Windows connection",
+  "generationAttempts": [
+    {
+      "id": 1,
+      "environment": "preview",
+      "deployment": "https://pubquiz-khcq9z809-just-phil-gud.vercel.app",
+      "commit": "906882899242c22aa8983ebf837ec0a56ff4fce6",
+      "case": "short",
+      "original": "Wie heisst die Hauptstadt von Frankreich?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T17:57:15.6820302Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "inputTokens": 222,
+        "estimatedCostUsd": 6.84E-05,
+        "outputTokens": 20,
+        "totalTokens": 242
+      },
+      "proposal": "Wie heißt die Hauptstadt von Frankreich?",
+      "editorialAssessment": "PASS: spelling corrected; meaning and intended answer retained; no answer leak."
+    },
+    {
+      "id": 2,
+      "environment": "preview",
+      "case": "saved-question-edit-accept",
+      "original": "Wie heisst die Hauptstadt von Frankreich?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T17:58:46.7603915Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "estimatedCostUsd": 6.96E-05,
+        "totalTokens": 243,
+        "outputTokens": 21,
+        "inputTokens": 222
+      },
+      "proposal": "Wie heisst die Hauptstadt von Frankreich?",
+      "editorialAssessment": "Meaning retained; unchanged spelling. Human-edited alternative accepted, only normal draft save persisted it."
+    },
+    {
+      "id": 3,
+      "environment": "preview",
+      "case": "name",
+      "original": "Mit welchem Computerpionier arbeitete Ada Lovelace zusammen?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:00:41.2113708Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "outputTokens": 27,
+        "inputTokens": 228,
+        "totalTokens": 255,
+        "estimatedCostUsd": 7.8E-05
+      },
+      "proposal": "Mit welchem Computerpionier arbeitete Ada Lovelace zusammen?",
+      "editorialAssessment": "PASS: proper name / exact quotation and number retained, no answer leak."
+    },
+    {
+      "id": 4,
+      "environment": "preview",
+      "case": "quotes-year",
+      "original": "Von wem ist der Roman „1984“ geschrieben worden?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:00:41.2235617Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "outputTokens": 23,
+        "inputTokens": 226,
+        "totalTokens": 249,
+        "estimatedCostUsd": 7.28E-05
+      },
+      "proposal": "Wer hat den Roman „1984“ geschrieben?",
+      "editorialAssessment": "PASS: proper name / exact quotation and number retained, no answer leak."
+    },
+    {
+      "id": 5,
+      "environment": "preview",
+      "case": "units",
+      "original": "Wie viele Meter entsprechen einer Entfernung von 2,5 km?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:00:41.2236135Z",
+      "status": "BLOCKED_BY_APP_RATE_LIMIT_NO_PROVIDER_INVOCATION",
+      "usage": {
+        "outputTokens": 0,
+        "inputTokens": 0,
+        "totalTokens": 0,
+        "estimatedCostUsd": 0
+      }
+    },
+    {
+      "id": 6,
+      "environment": "preview",
+      "case": "umlaut",
+      "original": "Welches chemische Element trägt das Kürzel Au?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:00:41.2236202Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "totalTokens": 249,
+        "inputTokens": 225,
+        "estimatedCostUsd": 7.38E-05,
+        "outputTokens": 24
+      },
+      "proposal": "Welches chemische Element trägt das Kürzel Au?",
+      "editorialAssessment": "PASS: Au and wording retained; no answer leaked."
+    },
+    {
+      "id": 7,
+      "environment": "preview",
+      "case": "long",
+      "original": "Welche deutsche Stadt ist gesucht, wenn sie seit 1990 die Hauptstadt des wiedervereinigten Deutschlands ist und zugleich als eines der 16 Bundesländer gilt?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:00:41.2236257Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "estimatedCostUsd": 0.000102,
+        "inputTokens": 246,
+        "totalTokens": 290,
+        "outputTokens": 44
+      },
+      "proposal": "Welche deutsche Stadt ist gesucht, die seit 1990 die Hauptstadt des wiedervereinigten Deutschlands ist und zugleich als eines der 16 Bundesländer gilt?",
+      "editorialAssessment": "PASS: 1990, 16, both factual clauses retained, slightly shorter, no added solution."
+    },
+    {
+      "id": 8,
+      "environment": "preview",
+      "case": "units-retry-after-app-cooldown",
+      "original": "Wie viele Meter entsprechen einer Entfernung von 2,5 km?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:01:48.0295247Z",
+      "status": "SUCCESS_ACTUAL_PREVIEW_UI",
+      "usage": {
+        "estimatedCostUsd": 7.3E-05,
+        "outputTokens": 23,
+        "totalTokens": 250,
+        "inputTokens": 227
+      },
+      "proposal": "Wie viele Meter entsprechen 2,5 km?",
+      "editorialAssessment": "PASS: concise, 2,5 and km preserved, no numeric answer disclosed."
+    },
+    {
+      "id": 9,
+      "environment": "preview",
+      "case": "in-flight-source-A-B-A",
+      "original": "Welche Stadt ist die Hauptstadt von Frankreich?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:02:41.2247082Z",
+      "status": "CLIENT_ABORTED_ON_SOURCE_CHANGE_USAGE_UNKNOWN",
+      "usage": null,
+      "editorialAssessment": "Pending state visibly confirmed before A-B-A change. No proposal reappeared later; no draft overwritten. Reserve retained because server-side usage was not returned."
+    },
+    {
+      "id": 10,
+      "environment": "preview-final",
+      "commit": "13c7aea0cc58be0997603d96cdeb4b1d2dae6764",
+      "case": "final-preview-accept-save",
+      "original": "Wie lautet der Name der Hauptstadt von Frankreich?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:08:39.904641Z",
+      "status": "SUCCESS_ACTUAL_FINAL_PREVIEW_UI",
+      "usage": {
+        "inputTokens": 223,
+        "outputTokens": 20,
+        "estimatedCostUsd": 6.86E-05,
+        "totalTokens": 243
+      },
+      "proposal": "Wie heißt die Hauptstadt von Frankreich?"
+    },
+    {
+      "id": 11,
+      "environment": "preview-final",
+      "commit": "13c7aea0cc58be0997603d96cdeb4b1d2dae6764",
+      "case": "final-preview-explicit-retry",
+      "original": "Wie lautet der Name der Hauptstadt von Frankreich?",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:08:39.9103075Z",
+      "status": "SUCCESS_ACTUAL_FINAL_PREVIEW_UI",
+      "usage": {
+        "totalTokens": 243,
+        "inputTokens": 223,
+        "estimatedCostUsd": 6.86E-05,
+        "outputTokens": 20
+      },
+      "proposal": "Wie heißt die Hauptstadt von Frankreich?",
+      "editorialAssessment": "PASS: explicit retry, two history entries; edited acceptance, normal draft update/reload, unchanged metadata and cleared unsaved notice verified on final application commit."
+    },
+    {
+      "id": 12,
+      "environment": "preview-final",
+      "commit": "13c7aea0cc58be0997603d96cdeb4b1d2dae6764",
+      "case": "music-answer-fields-preserved",
+      "original": "Welcher Song ist zu hören? Nennt Interpret und Titel.",
+      "reservedUsd": 0.01,
+      "reservedAtUtc": "2026-10-16T18:10:54.4943486Z",
+      "status": "SUCCESS_ACTUAL_FINAL_PREVIEW_UI",
+      "usage": {
+        "totalTokens": 253,
+        "outputTokens": 26,
+        "estimatedCostUsd": 7.66E-05,
+        "inputTokens": 227
+      },
+      "proposal": "Welcher Song ist zu hören? Nennt Interpret und Titel.",
+      "editorialAssessment": "PASS: human-edited proposal accepted; artist/title text and Interpret-und-Titel configuration unchanged; no music question persisted."
+    }
+  ],
+  "knownInputTokens": 2269,
+  "knownOutputTokens": 248,
+  "knownEstimatedCostUsd": 0.0007514,
+  "unknownUsageReservedUsd": 0.01,
+  "remainingConservativeBudgetUsd": 0.9892486
+}

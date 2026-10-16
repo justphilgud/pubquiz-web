@@ -35,3 +35,11 @@ export function removeAnswerById(
 ): QuestionAnswerDraft[] {
   return answers.filter((answer) => answer.id !== answerId);
 }
+
+/** Only changes the unsaved text; persistence remains the normal editor action. */
+export function applyQuestionRewriteToDraft(
+  draft: QuestionEditorDraft,
+  questionText: string,
+): QuestionEditorDraft {
+  return { ...draft, questionText };
+}

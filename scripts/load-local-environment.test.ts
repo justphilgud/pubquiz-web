@@ -23,6 +23,11 @@ const relevantProcessVariables = [
   "PRODUCTION_DATABASE_HOST",
   "VERCEL",
   "CI",
+  "OPENAI_API_KEY",
+  "OPENAI_QUESTION_REWRITE_ENABLED",
+  "OPENAI_QUESTION_REWRITE_MODEL",
+  "OPENAI_INPUT_USD_PER_MILLION_TOKENS",
+  "OPENAI_OUTPUT_USD_PER_MILLION_TOKENS",
 ] as const;
 
 function preserveProcessState() {
@@ -139,3 +144,26 @@ for (const platformVariable of ["VERCEL", "CI"] as const) {
     }
   });
 }
+
+test("explicit OpenAI configuration and disabled flag survive local defaults", () => {
+  const restore = preserveProcessState();
+  const directory = mkdtempSync(join(tmpdir(), "pubquiz-ai-env-"));
+  try {
+    writeFileSync(join(directory, LOCAL_ENV_FILE), "OPENAI_API_KEY=local-test-key\nOPENAI_QUESTION_REWRITE_ENABLED=true\nOPENAI_QUESTION_REWRITE_MODEL=file-model\nOPENAI_INPUT_USD_PER_MILLION_TOKENS=2\nOPENAI_OUTPUT_USD_PER_MILLION_TOKENS=3");
+    process.chdir(directory);
+    process.env.OPENAI_API_KEY = "explicit-test-key";
+    process.env.OPENAI_QUESTION_REWRITE_ENABLED = "false";
+    process.env.OPENAI_QUESTION_REWRITE_MODEL = "process-model";
+    process.env.OPENAI_INPUT_USD_PER_MILLION_TOKENS = "0.2";
+    process.env.OPENAI_OUTPUT_USD_PER_MILLION_TOKENS = "1.2";
+    loadLocalEnvironment({ required: true });
+    assert.equal(process.env.OPENAI_API_KEY, "explicit-test-key");
+    assert.equal(process.env.OPENAI_QUESTION_REWRITE_ENABLED, "false");
+    assert.equal(process.env.OPENAI_QUESTION_REWRITE_MODEL, "process-model");
+    assert.equal(process.env.OPENAI_INPUT_USD_PER_MILLION_TOKENS, "0.2");
+    assert.equal(process.env.OPENAI_OUTPUT_USD_PER_MILLION_TOKENS, "1.2");
+  } finally {
+    restore();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

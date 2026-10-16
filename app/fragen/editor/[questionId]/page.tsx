@@ -27,6 +27,7 @@ import { getQuizListe } from "@/app/quiz/actions";
 import { getAssignableQuestionQuizIds } from "@/app/components/content/contentQuizEligibility";
 import QuestionQuizAssignmentPanel from "@/app/components/content/QuestionQuizAssignmentPanel";
 import { getBerlinDate } from "@/app/lib/berlinDate";
+import { canUseQuestionRewrite, isQuestionRewriteEnabled } from "../questionRewriteFeature.server";
 
 export default async function ExistingQuestionEditorPage({
   params,
@@ -166,6 +167,7 @@ export default async function ExistingQuestionEditorPage({
         apiKey: process.env.GOOGLE_MAPS_API_KEY,
         explicitlyEnabled: process.env.GOOGLE_PLACES_FEATURE_ENABLED,
       })}
+      questionRewriteEnabled={isQuestionRewriteEnabled() && canUseQuestionRewrite(actor)}
     />
     <QuestionQuizAssignmentPanel
       questionId={questionId}

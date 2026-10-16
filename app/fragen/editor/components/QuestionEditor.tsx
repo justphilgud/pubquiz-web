@@ -29,6 +29,8 @@ import { QuestionMediaSlot } from "./QuestionMediaSlot";
 import { ReviewFeedbackDialog } from "./ReviewFeedbackDialog";
 import { PendingCategoryReviewDialog } from "./PendingCategoryReviewDialog";
 import { QuestionSection } from "./QuestionSection";
+import { QuestionRewritePanel } from "./QuestionRewritePanel";
+import { canOfferQuestionRewrite } from "../questionRewrite";
 import { QuestionSponsorSection } from "./QuestionSponsorSection";
 import { QuestionMediaSection } from "./QuestionMediaSection";
 import { QuestionGenerators } from "./QuestionGenerators";
@@ -85,6 +87,7 @@ import {
   applySavedAnswerState,
   getQuestionDraftFingerprint,
   removeAnswerById,
+  applyQuestionRewriteToDraft,
 } from "../questionDraftState";
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
@@ -162,6 +165,7 @@ type QuestionEditorProps = {
   templates: QuestionTemplate[];
   scopeOptions: { canSelectGlobal: boolean; eventSeries: ContentScopeEventSeriesOption[] };
   googlePlacesFeature: GooglePlacesFeature;
+  questionRewriteEnabled?: boolean;
   storyElementOptions?: QuestionStoryElementDraftOption[];
   storyEditorOptions?: StoryElementEditorOptions;
 };
@@ -178,6 +182,7 @@ export function QuestionEditor({
   templates,
   scopeOptions,
   googlePlacesFeature,
+  questionRewriteEnabled = false,
   storyElementOptions = [],
   storyEditorOptions,
 }: QuestionEditorProps) {
@@ -234,6 +239,7 @@ export function QuestionEditor({
   const saveInProgressRef = useRef(false);
   const allowNavigationRef = useRef(false);
   const questionTextRef = useRef<HTMLTextAreaElement>(null);
+  const [questionTextRevision, setQuestionTextRevision] = useState(0);
 
   const selectedTemplate = useMemo(
     () => draft.sourceTemplateId
@@ -1018,6 +1024,7 @@ export function QuestionEditor({
           label={selectedTemplate?.questionLabel}
           questionTextRef={questionTextRef}
           onQuestionTextChange={(questionText) => {
+            setQuestionTextRevision((current) => current + 1);
             if (fieldError?.target === "questionText") setFieldError(null);
             setDraft((current) => ({
               ...current,
@@ -1025,6 +1032,20 @@ export function QuestionEditor({
             }));
           }}
           validationError={fieldError?.target === "questionText" ? fieldError.text : null}
+          rewriteContent={canOfferQuestionRewrite({ enabled: questionRewriteEnabled, readOnly: isReadOnly, template: selectedTemplate, dynamicTemplate: Boolean(draft.sourceTemplateId) }) ? (
+            <QuestionRewritePanel
+              key={`${savedQuestionId ?? "new"}:${draft.templateId ?? "standard"}:${draft.sourceTemplateId ?? "base"}`}
+              questionText={draft.questionText}
+              inputRevision={questionTextRevision}
+              hasUnsavedChanges={hasUnsavedChanges}
+              disabled={isEditorDisabled}
+              messages={messages.question.rewrite}
+              onAccept={(questionText) => {
+                if (fieldError?.target === "questionText") setFieldError(null);
+                setDraft((current) => applyQuestionRewriteToDraft(current, questionText));
+              }}
+            />
+          ) : undefined}
           mediaContent={
             <QuestionMediaSection
               slots={activeMediaSlots}
