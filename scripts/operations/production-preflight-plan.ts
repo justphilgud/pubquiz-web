@@ -4,6 +4,8 @@ export const APPROVED_PREFLIGHT_PLANS = Object.freeze([
     delta: "20261008090000_editorial_question_difficulty", checksum: "2a96e6d7bde1854c534a90b1d2f7433e2ed67e3bbd60c725287d95952a726c3b", kind: "difficulty" },
   { baselineSha: "baedd479615d33a7eb7b5e15f18f36450061dc5b", candidateSha: "41f3c2a87fd320757f158c2854e76cab3dac8d6a",
     delta: "20261016120000_meme_archive", checksum: "99a4b9d18e55d2294383a31cf35fb30973e6a30f9750c3c5da752f102818f641", kind: "meme-archive" },
+  { baselineSha: "baedd479615d33a7eb7b5e15f18f36450061dc5b", candidateSha: "23c0b130e1cd6772fb8e1d98498a09f432d0ec08",
+    delta: "20261016120000_meme_archive", checksum: "99a4b9d18e55d2294383a31cf35fb30973e6a30f9750c3c5da752f102818f641", kind: "meme-archive" },
 ] as const);
 export type ApprovedPreflightPlan = typeof APPROVED_PREFLIGHT_PLANS[number];
 
