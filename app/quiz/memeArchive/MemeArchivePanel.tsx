@@ -4,6 +4,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { MemeArchiveItem } from "./archive.server";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export function MemeArchivePanel({ quizId, sessionToken }: { quizId: number; sessionToken?: string }) {
   const [items, setItems] = useState<MemeArchiveItem[]>([]);
@@ -11,6 +12,7 @@ export function MemeArchivePanel({ quizId, sessionToken }: { quizId: number; ses
   const [busy, setBusy] = useState(false);
   const [availableRevisions, setAvailableRevisions] = useState<number[]>([]);
   const [selectedRevision, setSelectedRevision] = useState("");
+  const [confirmation, setConfirmation] = useState<{ kind: "capture" } | { kind: "delete"; item: MemeArchiveItem } | null>(null);
   const team = sessionToken !== undefined;
   const endpoint = `/api/quiz/meme-archive?quizId=${quizId}${team ? "&team=1" : ""}`;
   const authorization = useCallback((): HeadersInit => sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}, [sessionToken]);
@@ -40,14 +42,20 @@ export function MemeArchivePanel({ quizId, sessionToken }: { quizId: number; ses
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Download fehlgeschlagen."); }
     finally { setBusy(false); }
   }
-  async function action(kind: "retry" | "delete" | "capture", item?: MemeArchiveItem) {
-    if (kind === "delete" && !window.confirm(`Meme von „${item!.teamName}“ einschließlich aller bestätigten Versionen dieser Frage in diesem Durchlauf dauerhaft löschen?`)) return;
-    if (kind === "capture" && !window.confirm("Noch vorhandene bestätigte Meme-Abgaben dieses Quiz dauerhaft sichern? Bereits gelöschte Abgaben können nicht wiederhergestellt werden.")) return;
+  async function action(kind: "retry" | "delete" | "capture", item?: MemeArchiveItem, confirmed = false) {
+    if (busy) return;
+    if (kind !== "retry" && !confirmed) {
+      setError("");
+      if (kind === "delete" && item) setConfirmation({ kind, item });
+      if (kind === "capture") setConfirmation({ kind });
+      return;
+    }
     setBusy(true); setError("");
     try {
       const response = await fetch(endpoint + (item ? `&id=${item.id}` : ""), { method: "POST", headers: { ...authorization(), "Content-Type": "application/json" }, body: JSON.stringify({ action: kind, confirmed: kind !== "retry" }) });
       if (!response.ok) throw new Error("Aktion fehlgeschlagen. Bitte erneut versuchen; die Abgabe bleibt gespeichert.");
       await refresh();
+      setConfirmation(null);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Aktion fehlgeschlagen."); }
     finally { setBusy(false); }
   }
@@ -57,7 +65,7 @@ export function MemeArchivePanel({ quizId, sessionToken }: { quizId: number; ses
   return <section aria-label={team ? "Meine Memes" : "Meme-Archiv"} className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-900">
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold">{team ? "Meine Memes" : "Meme-Archiv"}</h2>
       <button type="button" className={buttonClass} disabled={busy} onClick={() => void action("retry")}>Bilderstellung wiederholen</button></div>
-    {error && <p role="alert" className="text-red-700">{error}</p>}
+    {error && !confirmation && <p role="alert" className="text-red-700">{error}</p>}
     {!team && <button type="button" className={buttonClass} disabled={busy} onClick={() => void action("capture")}>Bestehende bestätigte Abgaben sichern</button>}
     {!team && availableRevisions.length > 0 && <label className="block space-x-2">Durchlauf auswählen
       <select className="min-h-11 rounded border border-slate-300 bg-white p-2" value={selectedRevision} onChange={event => setSelectedRevision(event.target.value)}>
@@ -75,5 +83,16 @@ export function MemeArchivePanel({ quizId, sessionToken }: { quizId: number; ses
         {!team && <button type="button" className={`${buttonClass} ml-2`} disabled={busy} onClick={() => void action("delete", item)}>Meme löschen</button>}
       </article>)}</div>
     </div>)}
+    <ConfirmDialog open={confirmation !== null}
+      title={confirmation?.kind === "delete" ? "Meme dauerhaft löschen?" : "Bestätigte Abgaben sichern?"}
+      danger={confirmation?.kind === "delete"}
+      confirmLabel={busy ? "Wird ausgeführt …" : confirmation?.kind === "delete" ? "Dauerhaft löschen" : "Jetzt sichern"}
+      onClose={() => { if (!busy) setConfirmation(null); }}
+      onConfirm={() => { if (confirmation && !busy) void action(confirmation.kind, confirmation.kind === "delete" ? confirmation.item : undefined, true); }}>
+      <p>{confirmation?.kind === "delete"
+        ? `Meme von „${confirmation.item.teamName}“ einschließlich aller bestätigten Versionen dieser Frage in Durchlauf ${confirmation.item.revision + 1} dauerhaft löschen? Andere Team-Abgaben bleiben erhalten.`
+        : "Noch vorhandene bestätigte Meme-Abgaben dieses Quiz dauerhaft sichern? Bereits gelöschte Abgaben können nicht wiederhergestellt werden."}</p>
+      {error && <p role="alert" className="mt-3 text-red-700">{error}</p>}
+    </ConfirmDialog>
   </section>;
 }
