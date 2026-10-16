@@ -1,8 +1,9 @@
 # Vorschlag: begrenzte Backup-Inventarkapazität
 
-Noch keine Freigabe zur Integration oder Ausführung mit erhöhter Grenze.
-Dieser kleine Folge-PR ist eine prüfbare Entscheidungsgrundlage für den konkret
-nachgewiesenen Betriebspunkt nach dem genehmigten Operations-PR117.
+Die begrenzte Korrektur wurde am 16.10.2026 ausdrücklich freigegeben: reguläre
+Integration nach grüner CI, anschließend lesender Retention-Test und eine neue
+geschützte Vorab-Sicherung. Keine Löschfreigabe. Dieser kleine Folge-PR behandelt
+den konkret nachgewiesenen Betriebspunkt nach dem genehmigten Operations-PR117.
 
 ## Nachgewiesener Fehler
 
