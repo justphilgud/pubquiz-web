@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     container: postgres:17
     environment: operations-backup
-    timeout-minutes: 45
+    timeout-minutes: 75
     outputs:
       key: ${{ steps.backup.outputs.key }}
       manifest: ${{ steps.backup.outputs.manifest }}
