@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "candidateSha": "41f3c2a87fd320757f158c2854e76cab3dac8d6a",
+  "migrationSha256": "99a4b9d18e55d2294383a31cf35fb30973e6a30f9750c3c5da752f102818f641",
+  "routines": [
+    {
+      "schema": "pubquiz",
+      "name": "archive_meme_submission",
+      "argumentTypes": [
+        "pubquiz.team_answer_submissions"
+      ],
+      "argumentNames": [
+        "candidate"
+      ],
+      "result": "boolean",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "94e2afe24997e98f2a6cddb4b313c35317104b0742679ff47b61cfb818a3df18"
+    },
+    {
+      "schema": "pubquiz",
+      "name": "capture_confirmed_meme",
+      "argumentTypes": [],
+      "argumentNames": null,
+      "result": "trigger",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "cd2ef913ac7b14456b13a7981d1ee38e67a9d9905cb0ffd12cadbb0a7f316238"
+    },
+    {
+      "schema": "pubquiz",
+      "name": "assert_meme_archive_reset_safe",
+      "argumentTypes": [
+        "integer"
+      ],
+      "argumentNames": [
+        "target_quiz"
+      ],
+      "result": "boolean",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "aac6c47b565a02b7dfab260a8d1402201c3d19dbdcb7791c7c3d10a4e9876a54"
+    }
+  ]
+}

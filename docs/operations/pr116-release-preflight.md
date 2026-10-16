@@ -59,7 +59,9 @@ der Datenbankjob wurde nicht ausgeführt. Das ist kein Gesamt-PASS.
 
 Vor der App-Migration sind ein erfolgreicher aktualisierter Preflight und ein
 frisches geschütztes Backup mit privatem Integritäts-/Readback-Nachweis nötig.
-Der bestehende Backup-Audit verweigert eigene Routinen grundsätzlich; die
-Kompatibilität der neuen Archivobjekte ist deshalb eine gesondert zu prüfende
-Releaseabhängigkeit. Diese Schutzregel wird durch die Preflight-Erweiterung nicht
-verändert. Kein Merge von PR116, solange diese Voraussetzung ungeklärt ist.
+Die zusätzlich ausdrücklich genehmigte [Backup-Kompatibilität](meme-archive-backup.md)
+erweitert den bisherigen Audit ausschließlich für exakt die überprüften
+Archivobjekte und erhält die sonstigen Schutzregeln. Auch die tatsächliche
+Sicherungs-/Restore-Provenienz muss vor dem App-Release geklärt sein; ein
+fehlgeschlagener Retention-Dry-Run wird nicht als insgesamt erfolgreicher Lauf
+ausgegeben. Kein Merge von PR116, solange diese Voraussetzung ungeklärt ist.

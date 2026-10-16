@@ -3,6 +3,7 @@ import { AUTH_COLUMNS, auditColumns, inspectRow, inspectValue, projection, table
 import { requireCondition } from "./guards";
 import type { PgSession } from "./pg-session";
 import { canonicalCatalog } from "./catalog-comparison";
+import {MEME_ARCHIVE_EXECUTABLE_SQL, MEME_ARCHIVE_REQUIRED_ORIGINAL_SQL, reviewMemeArchiveExecutables, inspectMemeArchiveRow, type ArchiveSchemaProof} from "./meme-archive-backup-policy";
 
 export const sha256 = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
 export const COLUMN_SQL = `SELECT coalesce(json_agg(x ORDER BY schema,"table",ordinal),'[]') FROM (
@@ -21,7 +22,7 @@ export const CATALOG_SQL = `SELECT json_build_object(
  'enums',(SELECT coalesce(json_agg(x ORDER BY schema,name,position),'[]') FROM (SELECT n.nspname AS schema,t.typname AS name,e.enumlabel AS label,e.enumsortorder AS position FROM pg_enum e JOIN pg_type t ON t.oid=e.enumtypid JOIN pg_namespace n ON n.oid=t.typnamespace WHERE n.nspname IN ('public','pubquiz')) x),
  'views',(SELECT coalesce(json_agg(x ORDER BY schemaname,viewname),'[]') FROM (SELECT schemaname,viewname,definition FROM pg_views WHERE schemaname IN ('public','pubquiz')) x))`;
 export type TableEvidence = { schema: string; table: string; rows: number; sha256: string; samples: string[] };
-export type Snapshot = { columns: Column[]; catalog: unknown; tables: TableEvidence[]; media: string[]; authRows: Record<string, string>; resultRows: string[] };
+export type Snapshot = { columns: Column[]; catalog: unknown; tables: TableEvidence[]; media: string[]; authRows: Record<string, string>; resultRows: string[]; archiveSchema?: ArchiveSchemaProof };
 
 export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
   // Foreign tables, partitions, custom schemas and executable user routines require
@@ -29,10 +30,13 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
   const unsafe = await session.json<number>(`SELECT (
     (SELECT count(*) FROM pg_namespace WHERE nspname NOT IN ('public','pubquiz','information_schema') AND nspname !~ '^pg_') +
     (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','pubquiz') AND c.relkind IN ('f','p','m')) +
-    (SELECT count(*) FROM pg_foreign_server) + (SELECT count(*) FROM pg_publication) +
-    (SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname IN ('public','pubquiz') AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e'))
+    (SELECT count(*) FROM pg_foreign_server) + (SELECT count(*) FROM pg_publication)
   )::int`, "SCHEMA_AUDIT");
   requireCondition(unsafe === 0, "SCHEMA_SECURITY_REVIEW_REQUIRED");
+  const archiveSchema = reviewMemeArchiveExecutables(await session.json(MEME_ARCHIVE_EXECUTABLE_SQL, "SCHEMA_AUDIT"));
+  const originalIds = archiveSchema ? await session.json<number[]>(MEME_ARCHIVE_REQUIRED_ORIGINAL_SQL, "SCHEMA_AUDIT") : [];
+  requireCondition(Array.isArray(originalIds) && originalIds.every(Number.isSafeInteger), "MEME_ARCHIVE_ROW_REVIEW_REQUIRED");
+  const requiredOriginals = new Set(originalIds);
   const columns = await session.json<Column[]>(COLUMN_SQL, "COLUMN_AUDIT"); auditColumns(columns);
   const tables: TableEvidence[] = []; const media = new Set<string>(); const authRows: Record<string, string> = {};
   for (const key of [...new Set(columns.map(c => `${c.schema}.${c.table}`))].sort()) {
@@ -41,7 +45,10 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
     // Each row is JSON TEXT inside the outer JSON array: keep bigints/decimals exact.
     const rows = await session.json<string[]>(`SELECT coalesce(json_agg(v ORDER BY v COLLATE "C"),'[]') FROM
       (SELECT row_to_json(r)::text AS v FROM (SELECT ${projection(cols)} FROM ${tableName(schema, table)}) r) s`, "TABLE_ROWS");
-    for (const row of rows) inspectRow(JSON.parse(row), media, schema, table);
+    for (const row of rows) {
+      if (archiveSchema && schema === "pubquiz" && ["meme_archive_sources", "meme_archive_entries"].includes(table)) inspectMemeArchiveRow(JSON.parse(row), media, table, requiredOriginals);
+      else inspectRow(JSON.parse(row), media, schema, table);
+    }
     tables.push({ schema, table, rows: rows.length, sha256: sha256(JSON.stringify(rows)), samples: rows.slice(0, 5).map(sha256) });
     if (cols.some(c => `${key}.${c.column}` in AUTH_COLUMNS)) authRows[key] = `[${rows.join(",")}]`;
   }
@@ -52,10 +59,10 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
      count(a.team_antwort_id) FILTER (WHERE NOT a.bewertung_final)::text AS pending
      FROM pubquiz.quiz_team_sessions s LEFT JOIN pubquiz.team_antworten a USING(quiz_team_session_id)
      GROUP BY s.quiz_id,s.team_id) r) x`, "RESULT_ROWS");
-  return { columns, catalog: await session.json(CATALOG_SQL, "CATALOG"), tables, media: [...media].sort(), authRows, resultRows };
+  return { columns, catalog: await session.json(CATALOG_SQL, "CATALOG"), tables, media: [...media].sort(), authRows, resultRows, ...(archiveSchema ? {archiveSchema} : {}) };
 }
 export function compareSnapshots(expected: Omit<Snapshot, "authRows">, actual: Snapshot) {
-  for (const part of ["columns", "catalog", "tables", "media", "resultRows"] as const) {
+  for (const part of ["columns", "catalog", "tables", "media", "resultRows", "archiveSchema"] as const) {
     const left = part === "catalog" ? canonicalCatalog(expected[part]) : expected[part];
     const right = part === "catalog" ? canonicalCatalog(actual[part]) : actual[part];
     requireCondition(JSON.stringify(left) === JSON.stringify(right), `RESTORE_${part.toUpperCase()}_MISMATCH`);
