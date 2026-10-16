@@ -106,8 +106,28 @@ function renderCases(style: PresentationDesignStyle) {
 
 function renderPage(css: string) {
   const markup = styles.map(renderCases).join("");
+  // Use the production grid/column classes, whose automatic minimum width can
+  // otherwise force even a correctly scaled triptych beyond a mobile screen.
+  const moderation = readFileSync(new URL("../../quiz/[quizId]/moderation/ModerationClient.tsx", import.meta.url), "utf8");
+  const grid = moderation.match(/className="(grid min-h-0 flex-1[^\"]+)"/)?.[1];
+  const column = moderation.match(/<section className="(flex min-h-0[^\"]+)"/)?.[1];
+  assert.ok(grid && column);
+  const narrowModeration = `<div data-moderation-narrow style="width:390px;padding:12px"><div class="${grid}"><section class="${column}"><div class="min-w-0 rounded-2xl border p-4"><div data-preview-host class="flex w-full justify-center"><div data-preview-frame class="overflow-hidden"><div data-preview-canvas style="width:1600px;height:900px;transform-origin:top left"><div style="width:1600px;height:900px">${renderToStaticMarkup(createElement(FaceMorphSolutionSlide, {
+    personA: { src: null, name: "Alexandra Maximiliane Testperson A" }, morphSrc: null,
+    personB: { src: null, name: "Benedikt Konstantin Testperson B" },
+  }))}</div></div></div></div></div><div style="width:490px;max-width:100%">Moderation controls</div></section><aside>Navigation</aside></div></div>`;
   const script = String.raw`
     try {
+    const mobile = document.querySelector('[data-moderation-narrow]');
+    const host = mobile.querySelector('[data-preview-host]');
+    const frame = mobile.querySelector('[data-preview-frame]');
+    const canvas = mobile.querySelector('[data-preview-canvas]');
+    frame.style.width = host.clientWidth + 'px';
+    frame.style.height = host.clientWidth * 9 / 16 + 'px';
+    canvas.style.transform = 'scale(' + host.clientWidth / 1600 + ')';
+    const edge = mobile.getBoundingClientRect().right;
+    const portraits = [...mobile.querySelectorAll('[data-facemorph-role]')];
+    if (host.getBoundingClientRect().right > edge || portraits.some(p => p.getBoundingClientRect().right > edge)) throw new Error('Moderation mobile preview clips a portrait');
     const rgb = (value) => (value.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
     const luminance = (value) => rgb(value).map((part) => part / 255).map((part) => part <= .04045 ? part / 12.92 : ((part + .055) / 1.055) ** 2.4).reduce((sum, part, index) => sum + part * [.2126, .7152, .0722][index], 0);
     const ratio = (foreground, background) => {
@@ -173,7 +193,7 @@ function renderPage(css: string) {
       document.querySelector('#contrast-result').textContent = JSON.stringify({ error: String(error?.stack || error) });
     }
   `;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${narrowModeration}${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
 }
 
 function decodeHtml(value: string) {

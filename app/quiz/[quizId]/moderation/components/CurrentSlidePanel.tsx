@@ -139,7 +139,7 @@ export default function CurrentSlidePanel({
   }, []);
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4 sm:p-5">
+    <div className="min-w-0 rounded-2xl border border-zinc-800 bg-zinc-900 p-4 sm:p-5">
       <div className="mb-3 text-sm text-zinc-400">
         Aktueller Slide {slideIndex + 1} / {slides.length}
       </div>
