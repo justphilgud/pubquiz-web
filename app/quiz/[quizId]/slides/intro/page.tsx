@@ -61,7 +61,8 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
   const [platz1, platz2, platz3] = parsePrizeSlots(quiz.intro_preise);
   const storedRules = ruleConfig.rules ?? rulesFromText(quiz.intro_regeln);
   const rulesText = storedRules.map(rule => rule.text).join("\n");
-  const legacyRulesDiffer = rulesText !== rulesFromText(quiz.intro_regeln).map(rule => rule.text).join("\n");
+  const legacyRuleText = quiz.intro_regeln === "" ? "" : rulesFromText(quiz.intro_regeln).map(rule => rule.text).join("\n");
+  const legacyRulesDiffer = storedRules.filter(rule => rule.enabled).map(rule => rule.text).join("\n") !== legacyRuleText;
   const quizIdValue = quiz.quiz_id;
   const previewHref = (route: string) =>
     `/quiz/${quizIdValue}/show/${route}`;
@@ -169,6 +170,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("regeln")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="rules" />
+        {storedRules.some(rule => !rule.enabled) && <p className="text-sm text-slate-600">Einzelne Regeln sind im Ablauf ausgeblendet. Unveränderte Einträge bleiben beim Speichern ausgeblendet; im Ablaufeditor kannst du sie wieder aktivieren.</p>}
         {legacyRulesDiffer && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-950">Der gespeicherte Ablauf weicht vom älteren Intro-Regeltext ab. Angezeigt wird der Präsentationsinhalt. Beim Speichern werden beide Quellen synchronisiert; individuelle Regelfolien bleiben erhalten.</p>}
         <FixedSlideEnabledField defaultEnabled={slideVisibility.rules} />
         <FixedSlideField

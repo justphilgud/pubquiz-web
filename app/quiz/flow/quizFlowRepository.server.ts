@@ -332,13 +332,15 @@ export async function saveStandardIntroRules(quizId: number, value: string, enab
   const rulesText = value.trim() || null;
   await prisma.$transaction(async tx => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(42001, ${quizId})`;
-    await tx.quiz.update({ where: { quiz_id: quizId }, data: { intro_regeln: rulesText } });
     const flow = await materializeDefaultQuizFlow(quizId, tx);
     const standard = flow.find(item => item.isStandard && item.type === "RULES" && item.anchorType === "BEFORE_QUIZ");
     if (!standard?.persistentId) throw new Error("Standard-Regelfolie fehlt.");
+    const rules = rulesFromText(rulesText, standard.config.rules);
+    const legacyText = rulesText === null && rules.every(rule => rule.enabled) ? null : rules.filter(rule => rule.enabled).map(rule => rule.text).join("\n");
+    await tx.quiz.update({ where: { quiz_id: quizId }, data: { intro_regeln: legacyText } });
     await tx.quiz_ablauf_elemente.update({
       where: { quiz_ablauf_element_id: standard.persistentId },
-      data: { ...(enabled !== undefined ? { ist_sichtbar: enabled } : {}), konfiguration: { ...standard.config, rules: rulesFromText(rulesText) } },
+      data: { ...(enabled !== undefined ? { ist_sichtbar: enabled } : {}), konfiguration: { ...standard.config, rules } },
     });
   });
 }

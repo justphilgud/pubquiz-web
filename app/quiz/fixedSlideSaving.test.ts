@@ -67,7 +67,7 @@ test("saving after materialization synchronizes legacy and standard flow, preser
   const data = fixture();
   const custom = JSON.stringify(data.quiz.quiz_ablauf_elemente[1]);
   assert.equal((await data.save("Neue Regel\r\nNoch eine Regel", false)).status, "success");
-  assert.equal(data.quiz.intro_regeln, "Neue Regel\r\nNoch eine Regel");
+  assert.equal(data.quiz.intro_regeln, "Neue Regel\nNoch eine Regel");
   const standard = data.quiz.quiz_ablauf_elemente[0];
   assert.equal(standard.ist_sichtbar, false);
   assert.equal(JSON.stringify(standard.konfiguration.rules), JSON.stringify(flow.rulesFromText("Neue Regel\nNoch eine Regel")));
@@ -84,6 +84,16 @@ test("failed rule write rolls back legacy change and denied writes never start a
   assert.equal(JSON.stringify(data.quiz), before);
   const denied = fixture(); denied.deny();
   assert.equal((await denied.save("Must not write", true)).status, "error"); assert.equal(denied.transactions(), 0);
+});
+
+test("saving text/visibility preserves disabled individual rules, including duplicate lines", async () => {
+  const data = fixture();
+  data.quiz.quiz_ablauf_elemente[0].konfiguration.rules = [
+    { id: "a", text: "Alte Regel", enabled: false }, { id: "b", text: "Alte Regel", enabled: true },
+  ];
+  assert.equal((await data.save("Alte Regel\nAlte Regel\nNeue Regel", true)).status, "success");
+  assert.deepEqual(Array.from(data.quiz.quiz_ablauf_elemente[0].konfiguration.rules.map(rule => rule.enabled)), [false, true, true]);
+  assert.equal(data.quiz.intro_regeln, "Alte Regel\nNeue Regel");
 });
 
 test("PostgreSQL: real materialization, committed reload, rollback and READ ONLY enforcement", { skip: !process.env.EDITORIAL_IMPORT_TEST_DATABASE_URL }, async () => {

@@ -104,7 +104,7 @@ export async function updateQuizFlowItem(data: {
     if (item.isStandard && item.type === "RULES" && item.anchorType === "BEFORE_QUIZ") {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(42001, ${data.quizId})`;
       await tx.quiz.update({ where: { quiz_id: data.quizId }, data: {
-        intro_regeln: validated.value.rules?.filter(rule => rule.enabled).map(rule => rule.text).join("\n") || null,
+        intro_regeln: validated.value.rules?.filter(rule => rule.enabled).map(rule => rule.text).join("\n") ?? null,
       } });
     }
     await tx.quiz_ablauf_elemente.update({

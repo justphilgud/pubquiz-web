@@ -567,16 +567,18 @@ function defaultItem(
   };
 }
 
-export function rulesFromText(value: string | null): QuizFlowRule[] {
+export function rulesFromText(value: string | null, previous: readonly QuizFlowRule[] = []): QuizFlowRule[] {
   const lines = (value ?? "")
     .replace(/\r\n?/g, "\n")
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+  const enabledByText = new Map<string, boolean[]>();
+  for (const rule of previous) enabledByText.set(rule.text, [...(enabledByText.get(rule.text) ?? []), rule.enabled]);
   return (lines.length > 0 ? lines : DEFAULT_RULES).map((text, index) => ({
     id: `rule-${index + 1}`,
     text,
-    enabled: true,
+    enabled: enabledByText.get(text)?.shift() ?? true,
   }));
 }
 
