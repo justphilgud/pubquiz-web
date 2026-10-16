@@ -33,7 +33,11 @@ historischer Projektschlüssel wurde ausschließlich im Prozessspeicher gelesen.
 Zwei lesende Modell-Metadatenversuche von Windows an api.openai.com ergaben
 HTTP403 ohne OpenAI-JSON-Fehler. Das beweist weder einen ungültigen Key noch
 funktionierenden Zielzugang. Keine Schlüsselwerte protokolliert oder neu erzeugt.
-Echte Zieldeployment-Responses-Abnahme steht noch aus; Funktion noch nicht live.
+Nach gezielter direkter Freigabe sind die fünf dokumentierten Werte ausschließlich
+für den Preview-Branch sensitive konfiguriert. Der vorhandene Key wurde nur im
+Prozessspeicher und über stdin übertragen. Zehn echte Responses aus dem Preview
+waren erfolgreich; damit sind Zielzugang, Modell und Parameter dort nachgewiesen.
+Production ist zu diesem Berichtsstand noch unverändert, kein KI-Release behauptet.
 
 ## Aktuelle offizielle API-Grundlage
 
@@ -42,7 +46,7 @@ Am16.10.2026 tatsächlich abgerufene offizielle Dokumentation:
 - [GPT5.6Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna):
   Responses und Structured Outputs unterstützt; Standardpreis0,20USD/Mio.Input,
   1,20USD/Mio.Output. Kein Nachweis der projektbezogenen Verfügbarkeit allein
-  durch diese Dokumentation. Modell erst nach echtem Zielaufruf freigeben.
+  durch diese Dokumentation. Inzwischen durch echte Preview-Aufrufe bestätigt.
 - [Responses-Migration](https://developers.openai.com/api/docs/guides/migrate-to-responses):
   `store:false`; striktes Ausgabeformat unter `text.format`.
 - [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses):
@@ -51,15 +55,20 @@ Am16.10.2026 tatsächlich abgerufene offizielle Dokumentation:
 Das Modell wird ausdrücklich zentral konfiguriert, ohne historischen Fallback.
 Der Provider setzt `service_tier:default`, `reasoning.effort:none`, maximal512
 Outputtokens und12Sekunden Timeout; die tatsächliche Parameterkompatibilität ist
-im Ziel zu prüfen. Keine Tools, kein Webzugriff, keine gespeicherte Konversation.
+im Preview bestätigt. Keine Tools, kein Webzugriff, keine gespeicherte Konversation.
 Antwortstream maximal64KiB, Request2KiB, Fragetext300Zeichen. Ausschließlich
 Fragetext und notwendige serverseitige Anweisung, keine Lösungen/Medien/Teilnehmerdaten.
 
 ## Kosten- und Testvertrag
 
 Gesamtes direkt freigegebenes Testbudget einschließlich Preview-/Browser-/Production-
-Generierungen maximal1USD. Bislang0kostenpflichtige Generierungen,0Tokens;
-zwei GET-Modellmetadatenversuche, keine Responses-Aufrufe. Budget unverbraucht.
+Generierungen maximal1USD. Stand nach Preview: zehn erfolgreiche Generierungen,
+2269Input-/248Outputtokens, konfigurierte Schätzung0,0007514USD. Zusätzlich ein
+nach sichtbar laufender Anfrage clientseitig abgebrochener Versuch ohne Usage:
+0,01USD Reserve bleibt gebunden. Ein weiterer UI-Request wurde vom Anwendungs-
+Cooldown vor dem Provider abgefangen. Zwei GET-Modellmetadatenversuche ohne
+Generierung. Konservativ noch0,9892486USD; weitere Production-Aufrufe gehören in
+dasselbe Ledger. Vollständiger [Abnahmebericht](../reports/openai-question-rewrite-release-20261016.md).
 
 Vor jedem echten Aufruf Modell/Preise und verbleibendes Budget prüfen. Geplanter
 synthetischer Satz höchstens20Fragen einschließlich UI-Fällen; Zahlen, Einheiten,

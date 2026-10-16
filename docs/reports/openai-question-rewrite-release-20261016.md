@@ -1,7 +1,7 @@
 # Release2: KI-Formulierungshilfe – Implementierungsstand
 
-Stand16.10.2026: **implementiert und lokal geprüft, noch nicht auf Preview oder
-Production abgenommen. Kein KI-Merge/Production-Release.** Der vorherige
+Stand16.10.2026: **implementiert, CI grün, Preview mit echtem Provider und
+Editorablauf abgenommen. Production noch ausstehend. Kein KI-Merge/Production-Release.** Der vorherige
 [PR116-Release ist erfolgreich abgeschlossen](../operations/pr116-production-release-20261016.md).
 
 ## Änderung und Verantwortung
@@ -54,22 +54,115 @@ Aktuelle offizielle Modell-/API-Dokumentation tatsächlich gelesen, siehe
 Responses/Structured Outputs und Standardpreise0,20/1,20USD pro Mio.Input/Output.
 Die projektbezogene Verfügbarkeit bleibt bis zum echten Zielaufruf ungeprüft.
 
-Vercel besitzt bisher keine OpenAI-Konfiguration. Ein bestehender lokaler
-Projektschlüssel ist vorhanden; zwei ausschließlich lesende Modellmetadata-
+Der vorhandene lokale Projektschlüssel wurde nach ausdrücklicher direkter Freigabe
+geschützt für ausschließlich diesen Preview-Branch hinterlegt. Zwei ausschließlich lesende Modellmetadata-
 Versuche aus Windows erhielten HTTP403 ohne OpenAI-JSON-Antwort. Keine Bewertung
-als gültiger oder ungültiger Key. **0Generierungen,0Tokens,0USD verbraucht;
-1USD Gesamttestbudget verfügbar.** Keine Schlüsselwerte in Dateien/Berichten.
+als gültiger oder ungültiger Key. Die später erfolgreichen Zielaufrufe beweisen
+den nutzbaren Zugang im Preview. Keine Schlüsselwerte in Dateien/Berichten.
 
-Für den nächsten Schritt fehlt die temporäre Freigabe ausschließlich des neuen
-Branches `codex/openai-question-rewrite-release` im bestehenden geschützten
-Preview-Prozess (TRUSTED_PREVIEW_BRANCHES + Environment-Branch-Policy). Die
-vorherigen Freigaben galten ausdrücklich anderen Branches. Zentrale Nonprod-
+Die direkte Freigabe für `codex/openai-question-rewrite-release` wurde umgesetzt:
+temporärer Eintrag in TRUSTED_PREVIEW_BRANCHES und zusätzliche Environment-
+Branch-Policy63303195. Die drei bestehenden Einträge/Policies blieben erhalten.
+Alle fünf dokumentierten OpenAI-Variablen sind als sensitive Werte ausschließlich
+für `preview:codex/openai-question-rewrite-release` gesetzt und anhand ihrer
+Metadaten geprüft. Schlüssel nur im Prozessspeicher und über stdin übertragen;
+keine neuen Zugangsdaten, keine Production-Konfiguration. Zentrale Nonprod-
 Medienkonfiguration unverändert; ihr Guard verbietet branchspezifische Overrides.
 
-Danach vorgesehen: vorhandenen OpenAI-Zugang ausschließlich auf dem Zielserver
-geschützt konfigurieren, echten angemeldeten UI-/HTTP-/Providerablauf mit eigenen
-synthetischen Fragen prüfen, Usage/Kostenschätzung/Reserve dokumentieren. Bei
-fehlender Providerabnahme Funktion deaktiviert lassen; kein KI-Release behaupten.
+## CI und tatsächliches Preview
+
+- [PR121](https://github.com/justphilgud/pubquiz-web/pull/121), Anwendungscode
+  `906882899242c22aa8983ebf837ec0a56ff4fce6`.
+- [Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/38942561004)
+  und [PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/38942568153):
+  beide SUCCESS, einschließlich Typecheck, Tests, Changed-file ESLint, Build,
+  tatsächlicher HTTP-Authentifizierung und echtem PostgreSQL-Job.
+- [Reguläres Preview-Deployment](https://github.com/justphilgud/pubquiz-web/actions/runs/38943133545):
+  SUCCESS. Vertrauens-/CI-, Datenbankidentitäts-, zentrale Medien- und
+  Migrationsstatusprüfungen sowie Smoke-Test erfolgreich.
+- Deployment `dpl_3qZAyoGGWUN2QjVKEJPqPb4c4fp6`:
+  [unveränderliches Preview](https://pubquiz-khcq9z809-just-phil-gud.vercel.app/).
+  Vercel-Alias:
+  [Branch-Preview](https://pubquiz-web-git-codex-openai-question-rewr-0cc965-just-phil-gud.vercel.app/).
+- Nach Anmeldung zehn echte Providerantworten über den tatsächlichen Editor.
+- Gefundene kleine UI-Korrektur: Nach erfolgreichem normalen Speichern blieb der
+  Hinweis auf die ungespeicherte Übernahme stehen. Panel erhält nun ausschließlich
+  den bestehenden Änderungsstatus des Editors; keine neue Speicherlogik.
+- Finaler Anwendungscode `13c7aea0cc58be0997603d96cdeb4b1d2dae6764`:
+  [Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/38944084074)
+  und [PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/38944093909)
+  SUCCESS. Typecheck und striktes ESLint der drei betroffenen TSX-Dateien lokal
+  nochmals PASS;39/39KI-Tests PASS. Vollständige CI einschließlich Build,
+  Repositoryregressionen und echtem PostgreSQL nochmals grün.
+- [Finales reguläres Preview-Deployment](https://github.com/justphilgud/pubquiz-web/actions/runs/38944602066):
+  SUCCESS, `dpl_26hvt9MaqFTaqkBc1tLq4pqeHJxo`,
+  [Deployment](https://pubquiz-g9rnazzkl-just-phil-gud.vercel.app/).
+  Angemeldetes Monitoring am Branch-Alias liefert tatsächlich den vollständigen
+  Commit13c7aea0cc58be0997603d96cdeb4b1d2dae6764.
+
+## Tatsächliche Browser-/Provider-Abnahme
+
+Nur eigene synthetische Daten: neue Preview-Frage253, Eventreihe
+TEST-PR88-INHALTE-20261004, StatusEntwurf, keine Quizzuordnung. Weitere Fälle
+blieben ungespeicherte Entwürfe. Keine realen Quizze/Bestandsfragen geändert.
+
+| Fall | Providerergebnis / redaktionelle Bewertung |
+| --- | --- |
+| Kurzer Text | „heisst“ zu „heißt“ korrigiert; Bedeutung/Antwort erhalten |
+| Eigennamen | Ada Lovelace unverändert; keine Antwort ergänzt |
+| Zitat/Jahr | `Wer hat den Roman „1984“ geschrieben?`; genaue Zeichen/Zahl erhalten |
+| Dezimalzahl/Einheit | `Wie viele Meter entsprechen 2,5 km?`;2,5/km erhalten, keine Lösung ergänzt |
+| Umlaut/Fachkürzel | Elementfrage mitAu unverändert, keine Lösung ergänzt |
+| Langer Satz | Kürzer, beide Fachinformationen sowie1990/16 erhalten |
+| Erneute Anfrage | Tatsächlich „Erneut formulieren“ bedient, Verlauf2, reale Usage kumuliert |
+| Musik | Nach bearbeiteter Übernahme nur Frage geändert; QA-Interpret, QA-Titel und Antwortumfang „Interpret und Titel“ unverändert |
+
+Unveränderte gute Vorschläge sind zulässig, keine garantierte Verbesserung oder
+automatische Faktenprüfung. Ein zweiter kurzer Vorschlag behielt sogar „heisst“;
+die menschliche redaktionelle Prüfung bleibt notwendig.
+
+- Anfordern → vergleichen → Vorschlag bearbeiten → übernehmen an Frage253.
+  Separat geöffneter Editor zeigte vor dem normalen Speichern weiterhin das
+  ursprüngliche „Wie heisst…“: Übernahme persistiert nicht automatisch.
+- Normales Entwurf-Speichern und echter Reload erfolgreich. AntwortParis,
+  KategorieGeografie, Quelle, Kontrollnotiz, Testreihenscope, Entwurfsstatus und
+  fehlende Quizzuordnung erhalten. Im finalen Preview Speicherhinweis vor Save
+  sichtbar, nach erfolgreichem Save verschwunden. Finaler Text „Wie heißt die
+  Hauptstadt von Frankreich?“.
+- Verwerfen ließ den Ausgangstext erhalten. Während einer sichtbar ausstehenden
+  Anfrage A→B→A geändert: später kein Vorschlag/Overwrite. Usage dieses
+  abgebrochenen Transports unbekannt und konservativ reserviert.
+- Zu schnelle zweite Anfrage verständlich durch App-Cooldown abgewiesen; kein
+  Provideraufruf dieses Requests, Text unverändert.
+- Tatsächlich statischer FaceMorph-Fragetext im finalen Preview ohne KI-Button.
+  Der Meme-Fragetext ist laut aktueller Definition dagegen editierbar und wird
+  bewusst nicht als statischer Testfall ausgegeben.
+- Suche q=253, Template=standard, Status=DRAFT: Editorlink trägt vollständiges
+  returnTo, Rückkehr liefert exakt dieselbe URL und Suchtext253.
+- Browsergrenze: Die bestehende native Bestätigung beim Wechsel bereits
+  befüllter Templates war mit der Browserautomation nicht bedienbar. Frische
+  FaceMorph-Auswahl im finalen Preview erfolgreich; Controller-Kontextwechsel
+  zusätzlich deterministisch getestet. Keine vorgetäuschte Bestätigung.
+- Berechtigungen: echte angemeldete UI geprüft; echte gebaute HTTP-Kette ohne
+  Sitzung401 und Flag aus404 separat geprüft. Pure Eventmanagerrolle und andere
+  Rollen serverseitig automatisiert getestet; kein behaupteter Live-Rollentausch.
+
+### Testbudget vor Production
+
+Modellgpt-5.6-luna und begrenzte Parameter sind durch zehn tatsächliche erfolgreiche
+Preview-Responses bestätigt.12UI-Versuche:10Erfolge,1App-Cooldown ohne Provider,
+1clientseitiger Abbruch ohne Usage. Dazu2lesende Modell-Metadaten-GETs.
+2269Input-/248Outputtokens:0,0007514USD konfigurierte Schätzung bei0,20/1,20USD
+je Mio.Tokens. Zusätzliche Reserve0,01USD für den Abbruch; konservativ noch
+0,9892486USD vom gesamten1USD-Budget. Production ebenfalls hier einrechnen.
+
+Öffentliche synthetische Nachweise ohne Secrets:
+[vollständiges Preview-Ledger](question-rewrite-assets/preview-provider-budget.json),
+[erster echter Vergleich](question-rewrite-assets/preview-first-provider.png),
+[Musikfelder nach Übernahme](question-rewrite-assets/preview-music-preserved.png).
+
+Nächster Release-Schritt: bewusste gültige Production-Konfiguration, regulärer
+Merge/Main-CI/Deployment und eigener Production-Ablauf einschließlich Reload.
 Allgemeine Merge-/Production-Freigabe besteht bereits und wird nicht erneut erfragt.
 
 ## Dateien und Verträge
