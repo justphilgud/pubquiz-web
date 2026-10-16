@@ -20,6 +20,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
     filters: parseContentFilters(new URLSearchParams(paramsKey), initialType, filterableTemplateIds),
   }));
   const filters = resolveContentFilterDraft(draft, initialType, paramsKey, filterableTemplateIds);
+  const appliedStatus = parseContentFilters(new URLSearchParams(paramsKey), initialType, filterableTemplateIds).status;
   const [result, setResult] = useState<ContentSearchResult>({ items: [], total: 0 });
   const generation = useRef(0);
   const activeSearch = useRef("");
@@ -113,12 +114,12 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   function reset() { const next = parseContentFilters(new URLSearchParams(), initialType, filterableTemplateIds); updateFilters(next); apply(next); }
   function changeTemplate(templateId: string | null) { const next = { ...filters, templateId }; updateFilters(next); apply(next); }
 
-  const heldCount = result.items.filter(item => item.justApproved && (filters.status === "NOT_APPROVED" || filters.status === "DRAFT")).length;
+  const heldCount = result.items.filter(item => item.justApproved && (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT")).length;
   return <div className="space-y-4">
     <ContentFilters filters={filters} categories={categories} eventSeries={eventSeries} templates={templates} loading={pending} onChange={updateFilters} onTemplateChange={changeTemplate} onApply={() => apply()} onReset={reset} />
     <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-700"><span aria-live="polite">{pending ? "Inhalte werden geladen …" : `${result.items.length - heldCount} geladene Treffer · ${result.total} Suchtreffer${heldCount ? ` · ${heldCount} gerade freigegeben` : ""}`}</span><span>Neu angelegt zuerst</span><button type="button" disabled={pending} onClick={() => apply()} className="min-h-11 rounded-xl border px-3">Aktualisieren</button></div>
     {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
-    <div className="space-y-3" aria-busy={pending} inert={pending}>{result.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => { if (activeSearch.current !== searchContext) return; setResult(current => ({ ...current, total: Math.max(0, current.total - (filters.status === "NOT_APPROVED" || filters.status === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) })); }} />)}</div>
+    <div className="space-y-3" aria-busy={pending} inert={pending}>{result.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => { if (activeSearch.current !== searchContext) return; setResult(current => ({ ...current, total: Math.max(0, current.total - (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) })); }} />)}</div>
     {result.nextCursor && <button type="button" disabled={pending} onClick={more} className="min-h-11 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white disabled:opacity-50">Weitere Treffer laden</button>}
     {!pending && !error && result.items.length === 0 && <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">Keine passenden Inhalte gefunden.</div>}
   </div>;

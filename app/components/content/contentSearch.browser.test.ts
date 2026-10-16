@@ -40,15 +40,21 @@ test("content UI: paging, inline approval/assignment, return anchor, rejection a
       window.qa.reject=false;window.qa.delay=true;button('Freigeben',row(79)).click();show('q=fast');await wait(()=>document.querySelector('h2')?.textContent==='fast');await new Promise(r=>setTimeout(r,100));check(document.body.textContent.includes('1 Suchtreffer'),'late approval changed another search total');
       show('q=slow');await new Promise(r=>setTimeout(r,5));show('q=fast');await wait(()=>document.querySelector('h2')?.textContent==='fast');
       await new Promise(r=>setTimeout(r,100));check(document.querySelector('h2').textContent==='fast','stale response replaced current search');
+      phase='unapplied draft filters';window.qa.delay=false;show('');await wait(()=>document.querySelectorAll('[data-content-key]').length===50&&!document.querySelector('[aria-busy=true]'));
+      const filterButton=[...document.querySelectorAll('button')].find(node=>node.hasAttribute('aria-expanded')&&node.textContent.includes('Filter'));if(filterButton.getAttribute('aria-expanded')==='false')filterButton.click();
+      await wait(()=>[...document.querySelectorAll('select')].some(node=>[...node.options].some(option=>option.value==='NOT_APPROVED')));
+      const statusSelect=[...document.querySelectorAll('select')].find(node=>[...node.options].some(option=>option.value==='NOT_APPROVED'));
+      flushSync(()=>{statusSelect.value='NOT_APPROVED';statusSelect.dispatchEvent(new Event('change',{bubbles:true}));});
+      button('Freigeben',row(160)).click();await wait(()=>row(160).textContent.includes('Gerade freigegeben'));check(document.body.textContent.includes('160 Suchtreffer'),'unapplied draft status changed applied result total');
       flushSync(()=>root.unmount());document.getElementById('result').textContent='PASS';
     }
-    run().catch(error=>document.getElementById('result').textContent='FAIL '+error.message);
+    run().catch(error=>document.getElementById('result').textContent='FAIL '+phase+' '+error.message);
   `;
   const mocks = {
     navigation: `export const usePathname=()=>'/content'; export const useSearchParams=()=>new URLSearchParams(); export const useRouter=()=>({push:href=>window.qa.lastHref=href,refresh:()=>{},back:()=>{}});`,
     link: `import React from 'react'; export default function Link({href,onClick,children,...props}){return <a {...props} href={href} onClick={event=>{event.preventDefault();onClick?.(event);window.qa.lastHref=href;}}>{children}</a>}`,
     actions: `window.qa={approved:new Set(),lastHref:'',reject:false}; const item=(id,title)=>({key:'QUESTION:'+id,id,contentType:'QUESTION',title:title||'Question '+id,status:window.qa.approved.has(id)?'Freigegeben':'Entwurf',archived:false,scope:'Global',mediaCount:0,quizUsages:[],assignableQuizIds:window.qa.approved.has(id)?[7]:[],editHref:'/content/questions/'+id,canClone:false,canArchive:false,canApprove:!window.qa.approved.has(id),updatedAt:'2026-10-14T00:00:00.000Z'});
-      export async function searchContent(filters,cursor){await new Promise(r=>setTimeout(r,filters.query==='slow'?80:3));if(filters.query)return{items:[item(999,filters.query)],total:1};const all=Array.from({length:160},(_,i)=>160-i).filter(id=>!window.qa.approved.has(id));const offset=Number(cursor||0);return{items:all.slice(offset,offset+50).map(id=>item(id)),total:all.length,nextCursor:offset+50<all.length?String(offset+50):null};}
+      export async function searchContent(filters,cursor){await new Promise(r=>setTimeout(r,filters.query==='slow'?80:3));if(filters.query)return{items:[item(999,filters.query)],total:1};const all=Array.from({length:160},(_,i)=>160-i).filter(id=>filters.status==='ALL'||!window.qa.approved.has(id));const offset=Number(cursor||0);return{items:all.slice(offset,offset+50).map(id=>item(id)),total:all.length,nextCursor:offset+50<all.length?String(offset+50):null};}
       export async function approveContentQuestion(input){if(window.qa.delay)await new Promise(r=>setTimeout(r,60));if(window.qa.reject)return{success:false,message:'Konflikt: anderer Stand',item:null};window.qa.approved.add(input.questionId);return{success:true,message:'Freigegeben',item:item(input.questionId)}}
       export async function assignContentToQuiz(){return{success:true,message:'Zum Quiz hinzugefügt'}};export async function cloneContent(){};export async function setContentArchived(){};`,
   };
