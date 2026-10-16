@@ -456,6 +456,7 @@ export function localizeQuestionTemplates(
       description: translation.description,
       defaultQuestionText: translation.defaultQuestion,
       questionLabel: messages.question.labels[definition.questionLabelKey],
+      questionTextIsTemplateStatic: definition.questionTextIsTemplateStatic === true,
       allowsOptionalQuestionImage: definition.allowsOptionalQuestionImage,
       generators: definition.generators,
       contentGenerators: definition.contentGenerators,

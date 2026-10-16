@@ -19,6 +19,9 @@ const PUBLIC_PATHS = [
 ];
 
 function isPublicPath(pathname: string) {
+  // Exact API route returns JSON after its own real session/editor-role checks.
+  // Do not redirect expired API sessions to an HTML login page.
+  if (pathname === "/api/question-rewrite") return true;
   if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) return true;
 
   if (pathname.startsWith("/quiz/") && pathname.endsWith("/antworten")) {

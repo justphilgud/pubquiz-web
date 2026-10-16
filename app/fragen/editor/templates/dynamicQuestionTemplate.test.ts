@@ -63,9 +63,20 @@ test("builds book and music-like templates through the same generic snapshot", (
   assert.equal(template.selectable, true);
   assert.equal(template.baseTemplateId, null);
   assert.equal(template.defaultQuestionText, "Wer schrieb dieses Buch?");
+  assert.equal(template.questionTextIsTemplateStatic, true);
   assert.equal(template.mediaSlots[0].required, true);
   assert.equal(template.initialQuestionMedia?.length, 0);
   assert.equal(template.initialAnswers[0].text, "");
+});
+
+test("rewrite editability follows stored dynamic question-text rules rather than the base template", () => {
+  for (const role of ["FIXED", "EXCLUDED", "REQUIRED_NEW"] as const) {
+    const template = buildDynamicQuestionTemplate({ id: 88, name: "QA field rule", description: null,
+      baseTemplate: { ...baseTemplate, questionTextIsTemplateStatic: true },
+      snapshot: { ...snapshot, questionText: { ...snapshot.questionText, role } },
+    });
+    assert.equal(template.questionTextIsTemplateStatic, role !== "REQUIRED_NEW");
+  }
 });
 
 test("fixed media is copied deliberately while required-new media stays empty", () => {

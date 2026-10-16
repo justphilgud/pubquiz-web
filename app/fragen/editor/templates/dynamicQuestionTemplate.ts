@@ -286,6 +286,7 @@ export function buildDynamicQuestionTemplate(
       : input.description?.trim() || `Aus einer bestehenden Frage erstellte Vorlage auf Basis von ${baseTemplate.name}.`,
     defaultQuestionText:
       snapshot.questionText.role === "FIXED" ? snapshot.questionText.value : "",
+    questionTextIsTemplateStatic: snapshot.questionText.role !== "REQUIRED_NEW",
     initialAnswers: snapshot.answers
       .filter((answer) => answer.role !== "EXCLUDED")
       .map((answer) => ({
