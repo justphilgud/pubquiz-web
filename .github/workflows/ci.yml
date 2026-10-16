@@ -122,8 +122,8 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        # Docker Official Image; the public ECR mirror currently rejects pulls at its data limit.
-        # Same PostgreSQL major version as before, without additional registry credentials.
+        # Docker Official Image, as in the isolated restore jobs. The ECR mirror
+        # rejected repeated pulls with its data limit; no registry credentials.
         image: postgres:17
         env:
           POSTGRES_USER: editorial_ci
