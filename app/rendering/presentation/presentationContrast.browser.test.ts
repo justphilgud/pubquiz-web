@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+/* eslint-disable react/no-children-prop -- Typed SSR theme fixtures require children in the props object. */
 import { execFile } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
@@ -13,6 +14,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import PresentationSlideRenderer from "./PresentationSlideRenderer";
+import { FaceMorphSolutionSlide } from "./FaceMorphSolutionSlide";
+import { MemeRenderer } from "../meme/MemeRenderer";
+import { QuizThemeScope } from "../theme/QuizThemeScope";
+import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import type { PresentationDesignStyle } from "../templateRegistry";
 
@@ -82,6 +87,17 @@ function renderCases(style: PresentationDesignStyle) {
 
   const trueFalse = buildPresentationQualityFixture("true-false", style);
   return [
+    ["facemorph", renderToStaticMarkup(createElement(QuizThemeScope, { theme: meme.theme, className: "presentation-template", children: [1280, 360].map(width => createElement("div", { key: width, style: { width, height: width * 9 / 16 - 16 } }, createElement(FaceMorphSolutionSlide, {
+      personA: { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='300'%3E%3Crect width='100' height='300' fill='blue'/%3E%3C/svg%3E", name: "Alexandra Elisabeth von Beispiel mit einem langen Namen" },
+      morphSrc: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='purple'/%3E%3C/svg%3E",
+      personB: { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='100'%3E%3Crect width='300' height='100' fill='green'/%3E%3C/svg%3E", name: "Christoph Ährenfeld mit einem ebenfalls längeren Familiennamen" },
+    }))) }))],
+    ["meme-captions", renderToStaticMarkup(createElement(QuizThemeScope, { theme: meme.theme, className: "presentation-template", children: createElement("div", { className: "presentation-solution-result" },
+      createElement(MemeRenderer, { imageUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect width='800' height='400' fill='gray'/%3E%3C/svg%3E", alt: "QA", captions: { top: "ÄÖÜ oben", bottom: "Weiß auf Schwarz", overlay: "Freie Zone" }, layout: resolveMemeCaptionLayout({ version: 1, mode: "CUSTOM", zones: [
+        { id: "top", label: "Oben", placement: "EXTERNAL_TOP", x: 0, y: 0, width: 100, height: 21, order: 1, maxLines: 2, required: false },
+        { id: "bottom", label: "Unten", placement: "EXTERNAL_BOTTOM", x: 0, y: 79, width: 100, height: 21, order: 2, maxLines: 2, required: false },
+        { id: "overlay", label: "Mitte", placement: "IMAGE", x: 10, y: 10, width: 80, height: 40, order: 3, maxLines: 2, required: false },
+      ] }) })) }))],
     ["meme", renderToStaticMarkup(createElement(PresentationSlideRenderer, meme))],
     ["live-text", renderToStaticMarkup(createElement(PresentationSlideRenderer, liveText))],
     ["true-false", renderToStaticMarkup(createElement(PresentationSlideRenderer, trueFalse))],
@@ -90,8 +106,28 @@ function renderCases(style: PresentationDesignStyle) {
 
 function renderPage(css: string) {
   const markup = styles.map(renderCases).join("");
+  // Use the production grid/column classes, whose automatic minimum width can
+  // otherwise force even a correctly scaled triptych beyond a mobile screen.
+  const moderation = readFileSync(new URL("../../quiz/[quizId]/moderation/ModerationClient.tsx", import.meta.url), "utf8");
+  const grid = moderation.match(/className="(grid min-h-0 flex-1[^\"]+)"/)?.[1];
+  const column = moderation.match(/<section className="(flex min-h-0[^\"]+)"/)?.[1];
+  assert.ok(grid && column);
+  const narrowModeration = `<div data-moderation-narrow style="width:390px;padding:12px"><div class="${grid}"><section class="${column}"><div class="min-w-0 rounded-2xl border p-4"><div data-preview-host class="flex w-full justify-center"><div data-preview-frame class="overflow-hidden"><div data-preview-canvas style="width:1600px;height:900px;transform-origin:top left"><div style="width:1600px;height:900px">${renderToStaticMarkup(createElement(FaceMorphSolutionSlide, {
+    personA: { src: null, name: "Alexandra Maximiliane Testperson A" }, morphSrc: null,
+    personB: { src: null, name: "Benedikt Konstantin Testperson B" },
+  }))}</div></div></div></div></div><div style="width:490px;max-width:100%">Moderation controls</div></section><aside>Navigation</aside></div></div>`;
   const script = String.raw`
     try {
+    const mobile = document.querySelector('[data-moderation-narrow]');
+    const host = mobile.querySelector('[data-preview-host]');
+    const frame = mobile.querySelector('[data-preview-frame]');
+    const canvas = mobile.querySelector('[data-preview-canvas]');
+    frame.style.width = host.clientWidth + 'px';
+    frame.style.height = host.clientWidth * 9 / 16 + 'px';
+    canvas.style.transform = 'scale(' + host.clientWidth / 1600 + ')';
+    const edge = mobile.getBoundingClientRect().right;
+    const portraits = [...mobile.querySelectorAll('[data-facemorph-role]')];
+    if (host.getBoundingClientRect().right > edge || portraits.some(p => p.getBoundingClientRect().right > edge)) throw new Error('Moderation mobile preview clips a portrait');
     const rgb = (value) => (value.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
     const luminance = (value) => rgb(value).map((part) => part / 255).map((part) => part <= .04045 ? part / 12.92 : ((part + .055) / 1.055) ** 2.4).reduce((sum, part, index) => sum + part * [.2126, .7152, .0722][index], 0);
     const ratio = (foreground, background) => {
@@ -101,7 +137,7 @@ function renderPage(css: string) {
     const effectiveBackground = (node) => {
       for (let current = node; current; current = current.parentElement) {
         const background = getComputedStyle(current).backgroundColor;
-        if (background !== 'transparent' && !background.endsWith(', 0)')) return background;
+        if (background !== 'transparent' && !/^rgba\(.*,[\s]*0\)$/.test(background)) return background;
       }
       return 'rgb(255, 255, 255)';
     };
@@ -113,7 +149,31 @@ function renderPage(css: string) {
     const results = [];
     for (const root of document.querySelectorAll('[data-case]')) {
       const name = root.dataset.case;
-      if (name.endsWith('-meme')) {
+      if (name.endsWith('-facemorph')) {
+        for (const layout of root.querySelectorAll('[data-facemorph-solution]')) {
+          const portraits = [...layout.querySelectorAll('figure')];
+          const bounds = layout.getBoundingClientRect();
+          const boxes = portraits.map(p => p.getBoundingClientRect());
+          if (!(boxes[0].left < boxes[1].left && boxes[1].left < boxes[2].left)) throw new Error(name + ' image order');
+          for (const portrait of portraits) {
+            const img = portrait.querySelector('img'); const caption = portrait.querySelector('figcaption');
+            if (getComputedStyle(img).objectFit !== 'contain' || img.clientHeight < 40) throw new Error(name + ' cropped/empty image');
+            if (caption.scrollHeight > caption.clientHeight + 1 || caption.scrollWidth > caption.clientWidth + 1 || portrait.getBoundingClientRect().bottom > bounds.bottom + 1) throw new Error(name + ' clipped caption');
+          }
+        }
+        results.push({ caseName: name, label: 'triptych wide/narrow', foreground: '', background: '', minimum: 1, ratio: 1 });
+      } else if (name.endsWith('-meme-captions')) {
+        const canvas = root.querySelector('[data-meme-renderer]');
+        for (const node of [canvas, canvas.querySelector('[data-meme-image]'), ...canvas.querySelectorAll('[data-meme-caption]:not([data-meme-caption-placement="IMAGE"])')]) {
+          if (getComputedStyle(node).backgroundColor !== 'rgb(0, 0, 0)') throw new Error(name + ' incorrect black surface: ' + getComputedStyle(node).backgroundColor);
+        }
+        for (const caption of canvas.querySelectorAll('[data-meme-caption]')) {
+          if (getComputedStyle(caption).color !== 'rgb(255, 255, 255)') throw new Error(name + ' incorrect caption color');
+        }
+        const overlay = canvas.querySelector('[data-meme-caption-placement="IMAGE"]');
+        if (!['rgba(0, 0, 0, 0.55)', 'oklab(0 0 0 / 0.55)'].includes(getComputedStyle(overlay).backgroundColor)) throw new Error(name + ' incorrect overlay alpha: ' + getComputedStyle(overlay).backgroundColor);
+        results.push(check(name, 'caption', canvas.querySelector('[data-meme-caption]'), canvas, 20));
+      } else if (name.endsWith('-meme')) {
         const aside = root.querySelector('[data-question-template="meme_beschriften"] aside');
         results.push(check(name, 'meme status', aside.querySelector('strong'), aside, 3));
         results.push(check(name, 'meme timer label', aside.querySelector('p:last-child'), aside, 4.5));
@@ -133,7 +193,7 @@ function renderPage(css: string) {
       document.querySelector('#contrast-result').textContent = JSON.stringify({ error: String(error?.stack || error) });
     }
   `;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${narrowModeration}${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
 }
 
 function decodeHtml(value: string) {
@@ -185,7 +245,7 @@ test("meme, open result and neutral true/false text meet contrast targets in a r
     }>;
     assert.ok(Array.isArray(parsed), "error" in parsed ? parsed.error : "Unexpected contrast result");
     const results = parsed;
-    assert.equal(results.length, styles.length * 6);
+    assert.equal(results.length, styles.length * 8);
     for (const result of results) {
       assert.ok(
         result.ratio >= result.minimum,

@@ -191,9 +191,9 @@ button {
   box-shadow: 0 1px 4px rgb(15 23 42 / 12%) !important;
 }
 .presentation-template[data-design-style="CORPORATE"] h2,
-.presentation-template[data-design-style="CORPORATE"] .text-white { color: var(--brand-text) !important; text-shadow: none !important; }
-.presentation-template[data-design-style="CORPORATE"] [class*="shadow-"],
-.presentation-template[data-design-style="CORPORATE"] [class*="drop-shadow-"] {
+.presentation-template[data-design-style="CORPORATE"] .text-white:not(:where([data-meme-renderer] *)) { color: var(--brand-text) !important; text-shadow: none !important; }
+.presentation-template[data-design-style="CORPORATE"] [class*="shadow-"]:not(:where([data-meme-renderer], [data-meme-renderer] *)),
+.presentation-template[data-design-style="CORPORATE"] [class*="drop-shadow-"]:not(:where([data-meme-renderer], [data-meme-renderer] *)) {
   box-shadow: none !important;
   filter: none !important;
   text-shadow: none !important;
@@ -212,7 +212,7 @@ button {
   border-color: var(--brand-border) !important;
 }
 .presentation-template[data-design-style="CORPORATE"] [class*="bg-pink"],
-.presentation-template[data-design-style="CORPORATE"] [class*="bg-black"],
+.presentation-template[data-design-style="CORPORATE"] [class*="bg-black"]:not(:where([data-meme-renderer], [data-meme-renderer] *)),
 .presentation-template[data-design-style="CORPORATE"] [class*="bg-slate-9"],
 .presentation-template[data-design-style="CORPORATE"] [class*="bg-gradient"] {
   background: var(--brand-surface) !important;
@@ -497,7 +497,7 @@ button {
   padding: 0 !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-answer-option,
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="rounded-"] {
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-solution-result [class*="rounded-"]:not(:where([data-meme-renderer], [data-meme-renderer] *)) {
   border: 0 !important;
   border-top: 1px solid color-mix(in srgb, var(--brand-border) 72%, transparent) !important;
   border-radius: 0 !important;
@@ -547,7 +547,7 @@ button {
   color: var(--brand-text) !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] h2,
-.presentation-template[data-design-style="BIRTHDAY"] .text-white {
+.presentation-template[data-design-style="BIRTHDAY"] .text-white:not(:where([data-meme-renderer] *)) {
   color: var(--brand-text) !important;
   text-shadow: none !important;
 }
@@ -2026,7 +2026,7 @@ button {
 }
 
 .presentation-template[data-design-style="EDITORIAL"] h2,
-.presentation-template[data-design-style="EDITORIAL"] .text-white {
+.presentation-template[data-design-style="EDITORIAL"] .text-white:not(:where([data-meme-renderer] *)) {
   color: var(--brand-text) !important;
   text-shadow: none !important;
 }
@@ -2074,7 +2074,7 @@ button {
 
 .presentation-template[data-design-style="EDITORIAL"] [class*="bg-gradient"],
 .presentation-template[data-design-style="EDITORIAL"] [class*="bg-slate-9"],
-.presentation-template[data-design-style="EDITORIAL"] [class*="bg-black"] {
+.presentation-template[data-design-style="EDITORIAL"] [class*="bg-black"]:not(:where([data-meme-renderer], [data-meme-renderer] *)) {
   background-color: transparent !important;
   background-image: none !important;
 }

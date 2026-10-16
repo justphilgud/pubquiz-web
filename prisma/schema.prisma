@@ -323,6 +323,7 @@ model medientyp {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model quiz {
+  meme_archive_sources meme_archive_sources[]
   quiz_id                  Int                        @id @default(autoincrement())
   eventreihe_id            Int
   quiz_datum               DateTime?                  @db.Date
@@ -367,6 +368,48 @@ model quiz {
   eventreihe               eventreihen                @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
 
   @@index([eventreihe_id], map: "idx_quiz_eventreihe_id")
+  @@schema("pubquiz")
+}
+
+/// Durable source snapshot; deliberately no FK to resettable runtime/question rows.
+model meme_archive_sources {
+  source_id Int @id
+  quiz_id Int
+  lifecycle_revision Int
+  quiz_question_id Int?
+  quiz_title String
+  question_text String
+  image_url String
+  layout Json
+  image_bytes Bytes?
+  quiz quiz @relation(fields: [quiz_id], references: [quiz_id], onDelete: Restrict)
+  entries meme_archive_entries[]
+  @@index([quiz_id, lifecycle_revision])
+  @@schema("pubquiz")
+}
+
+/// Immutable confirmed version, independent of team/session/submission cascades.
+model meme_archive_entries {
+  entry_id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  source_id Int
+  submission_id Int @unique
+  session_id Int
+  team_id Int
+  team_name String
+  submission_version Int
+  payload Json
+  submitted_at DateTime
+  status String @default("PENDING") @db.VarChar(16)
+  attempts Int @default(0)
+  error_message String?
+  blob_url String?
+  encryption_key Bytes?
+  png_sha256 String?
+  png_size Int?
+  pending_file Bytes?
+  source meme_archive_sources @relation(fields: [source_id], references: [source_id], onDelete: Cascade)
+  @@unique([source_id, session_id, submission_version])
+  @@index([source_id, session_id])
   @@schema("pubquiz")
 }
 

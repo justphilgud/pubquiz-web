@@ -18,7 +18,13 @@ const nextConfig: NextConfig = {
     ];
   },
   serverExternalPackages: ["ffmpeg-static", "sharp"],
+  // The archive reads local image sources. Dynamic fs tracing otherwise adds every
+  // public video/audio asset to all actions; these files are served as static media.
+  outputFileTracingExcludes: {
+    "/*": ["./public/medien/**/*.{mp4,webm,mov,mp3,wav,ogg,m4a,flac}"],
+  },
   outputFileTracingIncludes: {
+    "/*": ["./assets/fonts/arimo/Arimo.ttf"],
     "/hilfe": ["./docs/user-guide/**/*", "./docs/admin-guide/**/*.md"],
     "/hilfe/screenshots/[name]": ["./docs/user-guide/screenshots/*.jpg"],
     "/api/question-generator": [

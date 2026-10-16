@@ -1,5 +1,14 @@
 # Antwortformulare und Live-Interaction-Architektur
 
+## Ergänzung: bestätigte Meme-Dateien
+
+„Meine Memes“ bleibt als eigenständiger Bereich der Antwortseite auch nach einem
+Folienwechsel erhalten. Downloads verwenden nur die letzte bestätigte Submission,
+keinen aktuellen Entwurf, und lösen keine neue Abgabe aus. Die bestehende signierte
+Team-Session wird im Header geprüft; fremde Einträge und nach Reset ungültige Sessions
+erhalten keinen Zugriff. Der [Archivvertrag](meme-archive.md) beschreibt die dauerhafte
+Sicherung einschließlich automatischer Finalisierung und Fehlerwiederholung.
+
 Stand: 17. August 2026
 
 AP1-Ergänzung (7. September 2026): Für Quizstart, Stop, Reset, Rücknavigation und

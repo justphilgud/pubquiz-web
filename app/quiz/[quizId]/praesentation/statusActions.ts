@@ -1,4 +1,5 @@
 "use server";
+import { assertMemeArchiveResetSafe } from "../../memeArchive/archive.server";
 
 import { presentationCountdownDeadline } from "../../blockCountdown";
 import { mayLeaveMemeQuestion } from "../../memeNavigationPolicy";
@@ -448,6 +449,7 @@ export async function resetQuizDurchlauf(quizId: number, expectedRevision: numbe
     const status = await lockQuizLifecycle(tx, quizId);
     assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
     // Result entries and votes restrict candidate deletion. Remove those quiz-scoped
+    await assertMemeArchiveResetSafe(tx, quizId);
     // aggregates first so the session cascade can remove submissions and candidates.
     await tx.meme_result_entries.deleteMany({ where: { presentation: { quiz_id: quizId } } });
     await tx.meme_votes.deleteMany({ where: { presentation: { quiz_id: quizId } } });

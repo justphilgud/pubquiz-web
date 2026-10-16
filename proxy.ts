@@ -12,6 +12,8 @@ const PUBLIC_PATHS = [
   "/api/quiz/team-live-snapshot",
   "/api/quiz/team-answer-draft",
   "/api/quiz/team-session",
+  // This route verifies either a signed team session or manager access itself.
+  "/api/quiz/meme-archive",
   "/api/team-profile-photo",
   "/frage-einreichen",
 ];

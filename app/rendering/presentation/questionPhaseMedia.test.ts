@@ -1,6 +1,34 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { questionPhaseMedia } from "./questionPhaseMedia";
+import { faceMorphPresentationMedia } from "./faceMorphPresentationMedia";
+
+test("FaceMorph adapts editor field originals to fixed roles, independent of field/media order, without question leaks", () => {
+  const media = (datei: string, slot_key: string) => ({ datei, slot_key, medientyp: { medientyp: "Bild" } });
+  const morph = media("morph.png", "face_morph_result");
+  const a = media("a.png", "answer_image"); const b = media("b.png", "answer_image");
+  const fields = [{ sortierung: 2, medien: [b] }, { sortierung: 1, medien: [a] }];
+  const before = structuredClone(fields);
+  const adapted = faceMorphPresentationMedia("face_morph", [morph], fields);
+  assert.equal(adapted.find(m => m.slot_key === "face_morph_person_a_original")?.datei, "a.png");
+  assert.equal(adapted.find(m => m.slot_key === "face_morph_person_b_original")?.datei, "b.png");
+  assert.deepEqual(fields, before);
+  const phaseMedia = adapted.map(m => ({ datei: m.datei, slotKey: m.slot_key }));
+  assert.deepEqual(questionPhaseMedia("face_morph", phaseMedia, "QUESTION"), [{ datei: "morph.png", slotKey: "face_morph_result" }]);
+  assert.deepEqual(faceMorphPresentationMedia("standard", [morph], fields), [morph]);
+  const explicitA = media("explicit-a.png", "face_morph_person_a_original");
+  assert.equal(faceMorphPresentationMedia("face_morph", [explicitA, morph], fields).filter(m => m.slot_key === explicitA.slot_key).length, 1);
+  assert.equal(faceMorphPresentationMedia("face_morph", [explicitA, morph], fields)[0].datei, "explicit-a.png");
+});
+
+test("FaceMorph never borrows an unrelated image for a missing or ambiguous original", () => {
+  const image = { datei: "a.png", slot_key: "answer_image", medientyp: { medientyp: "Bild" } };
+  const missingA = [{ sortierung: 1, medien: [] }, { sortierung: 2, medien: [image] }];
+  assert.deepEqual(faceMorphPresentationMedia("face_morph", [], missingA).map(m => m.slot_key), ["face_morph_person_b_original"]);
+  assert.deepEqual(faceMorphPresentationMedia("face_morph", [], [{ sortierung: 1, medien: [image] }]), []);
+  assert.deepEqual(faceMorphPresentationMedia("face_morph", [], [{ sortierung: 1, medien: [image] }, { sortierung: 1, medien: [image] }]), []);
+  assert.deepEqual(faceMorphPresentationMedia("face_morph", [], [{ sortierung: 1, medien: [image, { ...image, datei: "other.png" }] }, { sortierung: 2, medien: [] }]), []);
+});
 
 test("translated reading uses its prepared output only and never substitutes an attached song", () => {
   const original = { datei: "original.mp3", slotKey: "question_audio" };

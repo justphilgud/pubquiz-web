@@ -182,6 +182,8 @@ export default async function QuizDetailPage({
               );
             })}
 
+            <Link href={`/quiz/${quiz.quiz_id}/meme-archiv`} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900">Meme-Archiv</Link>
+
             {canManageTemplates && (
               <Link
                 href={`/quiz/${quiz.quiz_id}/test`}

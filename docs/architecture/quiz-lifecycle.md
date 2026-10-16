@@ -1,5 +1,15 @@
 # Living Specification: Quiz-Lifecycle (AP1)
 
+## Ergänzung 16. Oktober 2026: dauerhaftes Meme-Archiv
+
+Reset löscht weiterhin Sessions, Antworten, Runs und Votingdaten, aber keine
+Meme-Archive. Vor der Löschung prüft er unter der bestehenden Quizsperre vollständige
+Abgaben-Snapshots und dauerhafte Bildbytes. Bei fehlender Sicherung bleibt der Lauf
+unverändert erhalten. Die PNG-Erstellung kann danach wiederholt werden.
+Vollständige Quizlöschung ist bei noch vorhandenen Archivdaten gesperrt; eine
+Teamlöschung entfernt keine archivierten Memes. Gezielte Archivlöschung ist eine
+separate bestätigte Manageraktion. Details: [Meme-Archivvertrag](meme-archive.md).
+
 Stand: 7. September 2026. Verbindliche Ausgangsbasis; Änderungen müssen die
 Anforderung bewusst gegen diesen Vertrag prüfen, Regressionen testen und den
 Vertrag aktualisieren. Siehe auch `answer-interaction.md` und `AGENTS.md`.

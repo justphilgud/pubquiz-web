@@ -1,5 +1,29 @@
 # Quiz Runtime Contracts
 
+## Ergänzung 16. Oktober 2026: Meme-Dateien und Auflösungen
+
+Der [Meme-Archivvertrag](meme-archive.md) ergänzt bestätigte Meme-Abgaben um
+dauerhafte, berechtigte PNG-Downloads. Er ändert weder Votingfreigabe noch Bewertung.
+Meme-Inhalte bleiben in allen Designs schwarz mit weißer Beschriftung; freie Zonen
+behalten ihren halbtransparenten Hintergrund. Memes erhalten keinen Schwierigkeitswert.
+
+„Übersetzt vorgelesen“ zeigt den bisherigen Bedienhinweis zum Lautsprechersymbol
+nicht mehr. Audio-, Sprach- und Textschutzverträge gelten unverändert.
+
+FaceMorph zeigt ausschließlich in der Auflösung Original A, Morph und Original B
+gleichzeitig nebeneinander. Zuordnung erfolgt über die drei vorhandenen Slot-Schlüssel;
+Lösungsnamen stammen aus den sortierten kanonischen Antwortfeldern. Fehlende Originale
+erhalten einen Platzhalter an ihrer Position. Die Fragephase verwendet ausschließlich
+den Morph-Slot; Originale und unbenannte Medien dürfen nie als Fallback dienen.
+Die Teilnehmerprojektion bleibt unverändert geschützt.
+Der Editor speichert Personenporträts als `answer_image` am jeweiligen kanonischen
+Antwortfeld. Der reine Presentation-Adapter ordnet bei genau zwei eindeutig sortierten
+Feldern deren jeweils einziges Bild den festen Original-Slots zu. Explizit vorbereitete
+Slots haben Vorrang. Fehlende/mehrdeutige Bilder werden nicht geraten; keine DB-Änderung
+und keine Erweiterung der Teilnehmer-Payloads.
+Auch die gemeinsame Bildvergrößerung filtert in der Fragephase auf den Morph-Slot.
+In der Auflösung hat das Dreierlayout Vorrang vor einem noch aktiven Medien-Overlay.
+
 Stand: 21. August 2026
 
 Dieses Dokument ist die verbindliche fachliche Spezifikation für den laufenden
@@ -347,8 +371,8 @@ Read-Model-Berechnung verändert weder Bewertung noch Scoring oder Persistenz.
 `face_morph_result` ist der sichtbare, dominante Inhalt der öffentlichen
 Fragephase. Die strukturierten Felder `Person A` und `Person B` gehören zum
 Team-Antwortformular und werden nicht als Eingabekarten in der Präsentation
-gerendert. Die Auflösung kombiniert das Morph-Bild mit den gepflegten Lösungen
-beider Antwortfelder. Presentation-View-Model und Answer-Interaction bleiben
+gerendert. Die Auflösung zeigt beide Originalporträts und das Morph-Bild mit den
+gepflegten Lösungen beider Antwortfelder. Presentation-View-Model und Answer-Interaction bleiben
 damit fachlich getrennt. Der zentrale Layout-Resolver trägt dafür die explizite
 Presentation-Rolle `FACE_MORPH`; der Renderer leitet sie nicht erneut aus der
 generischen Feldanzahl ab.
