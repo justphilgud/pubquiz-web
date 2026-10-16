@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
     "/*": ["./public/medien/**/*.{mp4,webm,mov,mp3,wav,ogg,m4a,flac}"],
   },
   outputFileTracingIncludes: {
+    "/*": ["./assets/fonts/arimo/Arimo.ttf"],
     "/hilfe": ["./docs/user-guide/**/*", "./docs/admin-guide/**/*.md"],
     "/hilfe/screenshots/[name]": ["./docs/user-guide/screenshots/*.jpg"],
     "/api/question-generator": [

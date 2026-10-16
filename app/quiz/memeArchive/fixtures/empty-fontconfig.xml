@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<!-- Deliberately no system font directories: CI must use the bundled font. -->
+<fontconfig></fontconfig>

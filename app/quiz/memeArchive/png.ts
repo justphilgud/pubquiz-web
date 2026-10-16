@@ -1,10 +1,13 @@
 import sharp from "sharp";
+import { resolve } from "node:path";
 import { parseMemeCaptionPayload, memeCaptionPayloadValues } from "../memeCaption";
 import { resolveMemeCaptionLayout } from "../memeCaptionZones";
 import { getExternalMemeCaptionRowPercent, analyzeMemeCaptionLayout, isMemeCaptionPayloadReadable } from "../memeCaptionLayout";
 
 const WIDTH = 1200;
 const HEIGHT = 900;
+// Serverless hosts need an explicit font file; Pango otherwise silently renders tofu.
+const FONT_FILE = resolve(process.cwd(), "assets/fonts/arimo/Arimo.ttf");
 const escapeMarkup = (text: string) => text.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
 
 /** Render only the immutable confirmed payload and layout, never a client screenshot. */
@@ -37,7 +40,7 @@ export async function renderArchivedMeme(image: Uint8Array, rawPayload: unknown,
     let rendered: Buffer | null = null;
     let dimensions: sharp.Metadata | null = null;
     for (let size = Math.min(76, Math.round(analysis.fontSizeCqw * 12)); size >= minimum; size--) {
-      const candidate = await sharp({ text: { text: `<span foreground="white" weight="bold">${escapeMarkup(text)}</span>`, font: `Arial ${size}`, width, align: "centre", wrap: "word-char", rgba: true, dpi: 72 } }).png().toBuffer();
+      const candidate = await sharp({ text: { text: `<span foreground="white" weight="bold">${escapeMarkup(text)}</span>`, font: `Arimo Bold ${size}`, fontfile: FONT_FILE, width, align: "centre", wrap: "word-char", rgba: true, dpi: 72 } }).png().toBuffer();
       const metadata = await sharp(candidate).metadata();
       if (metadata.height! <= availableHeight && metadata.height! <= size * 1.3 * zone.maxLines) { rendered = candidate; dimensions = metadata; break; }
     }

@@ -24,6 +24,10 @@ Worker sichert zuerst die Basisbildbytes und erzeugt daraus mit `sharp` ein PNG.
 Lokale Bildquellen bleiben im Server-Dateitrace enthalten. Audio-/Videodateien
 unter `public/medien` werden ausschließlich statisch ausgeliefert und aus diesem
 Trace ausgeschlossen; der Archivrenderer verarbeitet keine Audio-/Videoquellen.
+Der Renderer lädt die unveränderte, unter OFL 1.1 mitgelieferte Arimo-TTF explizit.
+Damit entstehen auch ohne installierte Systemfonts lesbare Glyphen; CI führt die
+PNG-Regression mit leerer Fontconfig aus. Quelle, Lizenz und Prüfsumme liegen beim
+Asset unter `assets/fonts/arimo`; keine Schrift wird zur Laufzeit heruntergeladen.
 `after()` beschleunigt die Verarbeitung nach einer Antwort; Archiv- und Teamabrufe
 können ausstehende Arbeit wiederholen. Eine eigene PostgreSQL-Advisory-Sperre
 serialisiert Archivworker und Archivlöschung pro Quiz. Worker verwenden Try-Lock

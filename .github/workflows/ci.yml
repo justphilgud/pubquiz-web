@@ -49,6 +49,8 @@ jobs:
         run: npm test
 
       - name: Meme PNG, encrypted files, ZIP and access controls
+        env:
+          FONTCONFIG_FILE: ${{ github.workspace }}/app/quiz/memeArchive/fixtures/empty-fontconfig.xml
         run: npm run test:meme-archive
 
       - name: Strict ESLint for CI/CD package TypeScript

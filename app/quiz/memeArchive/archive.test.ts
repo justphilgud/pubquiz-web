@@ -33,6 +33,24 @@ test("real PNG: 4:3, black bands, white text, umlauts, empty bands, long text an
   await assert.rejects(renderArchivedMeme(image, { topText: "X".repeat(81), bottomText: "" }, null), /Ungültige/);
 });
 
+test("archive captions use real proportional glyphs, including without installed system fonts", async () => {
+  const image = await sharp({ create: { width: 400, height: 200, channels: 3, background: "#3355cc" } }).png().toBuffer();
+  const glyphWidth = async (text: string) => {
+    const png = await renderArchivedMeme(image, { topText: text, bottomText: "" }, null);
+    const { data, info } = await sharp(png).extract({ left: 0, top: 0, width: 1200, height: 189 }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    let left = info.width; let right = -1;
+    for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) {
+      const offset = (y * info.width + x) * info.channels;
+      if (data[offset] > 230 && data[offset + 1] > 230 && data[offset + 2] > 230) {
+        left = Math.min(left, x); right = Math.max(right, x);
+      }
+    }
+    assert.ok(right >= left, "caption has visible white glyphs");
+    return right - left + 1;
+  };
+  assert.ok(await glyphWidth("WWWWWWWW") > 2 * await glyphWidth("IIIIIIII"), "missing-font boxes must not pass as readable text");
+});
+
 test("ZIP contains exact PNG bytes, independent names, valid headers and CRC; bounds reject invalid exports", async () => {
   const png = await sharp({ create: { width: 10, height: 10, channels: 3, background: "black" } }).png().toBuffer();
   const name = memeFilename({ quizId: 1, revision: 2, sourceId: 3, teamName: "../Ä <script>/Team", id: "abc-def" });
