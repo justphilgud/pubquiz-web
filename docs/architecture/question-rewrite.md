@@ -43,6 +43,9 @@ Draft erhalten. Verwerfen entfernt nur den aktiven Vorschlag; erneute Anfrage
 erzeugt eine neue, begrenzte Sitzungshistorie. Manuelle Vorschlagsbearbeitung
 verändert den Original-Draft nicht. Übernehmen liefert genau den Vorschlag an
 `applyQuestionRewriteToDraft`, ohne Speichern oder Statuswechsel.
+Der Hinweis auf die noch ungespeicherte Übernahme wird nur angezeigt, solange
+der bestehende Änderungsvergleich des Editors tatsächlich ungespeicherte Änderungen
+meldet. Nach erfolgreichem normalen Speichern verschwindet er; der Verlauf bleibt.
 
 Jede Originaltextänderung invalidiert Tickets und aktive Vorschläge. Eine zusätzliche
 Eingaberevision verhindert Wiederverwendung nach A→B→A. Der letzte Abgleich erfolgt

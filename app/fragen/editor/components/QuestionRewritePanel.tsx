@@ -15,6 +15,7 @@ import { CharacterCount } from "./CharacterCount";
 type QuestionRewritePanelProps = {
   questionText: string;
   inputRevision?: number;
+  hasUnsavedChanges: boolean;
   disabled: boolean;
   messages: QuestionEditorMessages["question"]["rewrite"];
   onAccept: (questionText: string) => void;
@@ -87,6 +88,7 @@ async function requestProposal(questionText: string, signal: AbortSignal) {
 export function QuestionRewritePanel({
   questionText,
   inputRevision = 0,
+  hasUnsavedChanges,
   disabled,
   messages,
   onAccept,
@@ -97,7 +99,7 @@ export function QuestionRewritePanel({
   useEffect(() => () => controller.dispose(), [controller]);
   const { pending: isPending, session } = state;
   const error = state.error ? messages.errors[state.error] : null;
-  const notice = state.notice === "stale" ? messages.staleProposal : state.notice === "accepted" ? messages.acceptedNotice : null;
+  const notice = state.notice === "stale" ? messages.staleProposal : state.notice === "accepted" && hasUnsavedChanges ? messages.acceptedNotice : null;
   const { active, history, cumulativeUsage } = session;
   const diff = useMemo(
     () => active ? diffQuestionText(active.original, active.proposal) : [],

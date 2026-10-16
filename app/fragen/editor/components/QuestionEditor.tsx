@@ -1037,6 +1037,7 @@ export function QuestionEditor({
               key={`${savedQuestionId ?? "new"}:${draft.templateId ?? "standard"}:${draft.sourceTemplateId ?? "base"}`}
               questionText={draft.questionText}
               inputRevision={questionTextRevision}
+              hasUnsavedChanges={hasUnsavedChanges}
               disabled={isEditorDisabled}
               messages={messages.question.rewrite}
               onAccept={(questionText) => {
