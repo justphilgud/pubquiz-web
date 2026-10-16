@@ -17,7 +17,9 @@ kein Production-Deployment und kein Production-Backfill.
 - TTS-Bedienhinweis entfernt, Audio- und Textschutzmechanik unverändert.
 - FaceMorph-Auflösung: Original A, Morph, Original B; sortierte kanonische Namen.
   Fehlende Originale erhalten positionsgetreue Platzhalter. Nur der Morph-Slot darf
-  in der Fragephase erscheinen. Alle drei Medien gelangen bereits unverändert aus
+  in der Fragephase erscheinen, einschließlich der Bildvergrößerung. Die Auflösung
+  bleibt auch bei noch gesetztem Vergrößerungsstatus als Dreierlayout sichtbar.
+  Alle drei Medien gelangen bereits unverändert aus
   `getQuizPraesentation` in das View-Model; die Teilnehmerprojektion bleibt geschützt.
 
 ## Architektur und Migration

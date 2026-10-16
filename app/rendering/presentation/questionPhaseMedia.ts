@@ -2,6 +2,10 @@
 export function questionPhaseMedia<T extends { slotKey?: string | null; datei: string }>(
   templateId: string | null, media: readonly T[], phase: "QUESTION" | "SOLUTION",
 ): T[] {
+  // The shared enlargement layer must not reveal solution portraits either.
+  if (templateId === "face_morph" && phase === "QUESTION") {
+    return media.filter(item => item.slotKey === "face_morph_result");
+  }
   if (templateId === "uebersetzt_vorgelesen") {
     const prepared = media.filter(item => item.slotKey === "lyrics_tts_audio");
     // A configured output is authoritative; never play another attached song instead.

@@ -2914,6 +2914,7 @@ function renderAktuellenSlide() {
 }
 
   const overlayMedia = currentSlideMedia;
+  const isFaceMorphSolution = slide?.typ === "aufloesung" && slide.frage.presentationLayouts.solution.contentRole === "FACE_MORPH";
   const isMemeQuestionOrSolution = Boolean(
     slide &&
     (slide.typ === "frage" || slide.typ === "aufloesung") &&
@@ -3051,7 +3052,7 @@ function renderAktuellenSlide() {
         observation={teamJoinState.joinObservation} />}
       <SponsorMoment moment={sponsorMoment?.sponsor ? { ...sponsorMoment, sponsor: sponsorMoment.sponsor } : null} />
       <PresentationDesignFooter theme={theme} storybookComposition={storybookComposition} />
-      {sponsorMoment?.phase !== "SPONSOR" && !isMemeQuestionOrSolution && mediaOverlayActive && overlayMedia.length > 0 && (
+      {sponsorMoment?.phase !== "SPONSOR" && !isMemeQuestionOrSolution && !isFaceMorphSolution && mediaOverlayActive && overlayMedia.length > 0 && (
         <div className="presentation-media-overlay absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-8">
           <div className="presentation-media-overlay-content grid max-h-full w-full max-w-6xl gap-5 overflow-hidden rounded-[2rem] border-4 border-yellow-300 bg-slate-950 p-8 shadow-[0_0_60px_rgba(255,0,170,0.65)]">
             {overlayMedia.slice(0, 2).map((medium) =>

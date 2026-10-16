@@ -110,6 +110,8 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     assert.equal(await db.quiz_team_sessions.count(), 0);
     assert.equal(await participant.resolveParticipantSession(quiz.quiz_id, token), null);
     assert.equal((await repository.listMemeArchive(quiz.quiz_id)).length, 2);
+    await db.meme_archive_entries.update({ where: { entry_id: own.id }, data: { status: "DELETED" } });
+    assert.equal((await repository.listMemeArchive(quiz.quiz_id, teams[0].session.quiz_team_session_id)).length, 0, "deleting latest must never resurrect an older version");
     assert.equal((await db.fragen.findUniqueOrThrow({ where: { fragen_id: question.fragen_id } })).frage, "Unchanged CI Meme");
     assert.equal(await db.quiz_fragen.count(), 1);
     // No team FK, no reset/runtime FK; full quiz delete is restricted until explicit archive removal.

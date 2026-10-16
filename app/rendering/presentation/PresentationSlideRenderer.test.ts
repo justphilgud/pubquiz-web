@@ -693,6 +693,15 @@ test("FaceMorph keeps structured answer fields out of the question slide and rev
   assert.match(solutionHtml, /Taylor Swift/);
   assert.match(solutionHtml, /Person B/);
   assert.match(solutionHtml, /Albert Einstein/);
+  const enlargedQuestion = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz, slide: questionSlide, slides: [questionSlide, solutionSlide], slideIndex: 0, slideLabel: "FaceMorph", theme, displayState: { ...displayState, mediaOverlayActive: true },
+  }));
+  assert.doesNotMatch(enlargedQuestion, /person-[ab]-original|Taylor Swift|Albert Einstein/);
+  const enlargedSolution = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz, slide: solutionSlide, slides: [questionSlide, solutionSlide], slideIndex: 1, slideLabel: "Auflösung", theme, displayState: { ...displayState, mediaOverlayActive: true },
+  }));
+  assert.doesNotMatch(enlargedSolution, /presentation-media-overlay/);
+  assert.match(enlargedSolution, /data-facemorph-solution/);
   assert.match(solutionHtml, /data-facemorph-role="person-a"[\s\S]*?person-a-original\.webp[\s\S]*?Taylor Swift[\s\S]*?data-facemorph-role="morph"[\s\S]*?face-morph\.webp[\s\S]*?data-facemorph-role="person-b"[\s\S]*?person-b-original\.webp[\s\S]*?Albert Einstein/);
   const missing = { ...faceMorphQuestion, medien: faceMorphQuestion.medien.filter(m => m.slotKey !== "face_morph_person_a_original") };
   const missingHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {

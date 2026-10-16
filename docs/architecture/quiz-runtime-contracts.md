@@ -16,6 +16,8 @@ Lösungsnamen stammen aus den sortierten kanonischen Antwortfeldern. Fehlende Or
 erhalten einen Platzhalter an ihrer Position. Die Fragephase verwendet ausschließlich
 den Morph-Slot; Originale und unbenannte Medien dürfen nie als Fallback dienen.
 Die Teilnehmerprojektion bleibt unverändert geschützt.
+Auch die gemeinsame Bildvergrößerung filtert in der Fragephase auf den Morph-Slot.
+In der Auflösung hat das Dreierlayout Vorrang vor einem noch aktiven Medien-Overlay.
 
 Stand: 21. August 2026
 
