@@ -21,6 +21,9 @@ PNG-Upload ändert den Erfolg der Antwort nicht.
 
 Die dauerhafte DB-Outbox enthält PENDING/READY/ERROR/DELETING/DELETED. Ein begrenzter
 Worker sichert zuerst die Basisbildbytes und erzeugt daraus mit `sharp` ein PNG.
+Lokale Bildquellen bleiben im Server-Dateitrace enthalten. Audio-/Videodateien
+unter `public/medien` werden ausschließlich statisch ausgeliefert und aus diesem
+Trace ausgeschlossen; der Archivrenderer verarbeitet keine Audio-/Videoquellen.
 `after()` beschleunigt die Verarbeitung nach einer Antwort; Archiv- und Teamabrufe
 können ausstehende Arbeit wiederholen. Eine eigene PostgreSQL-Advisory-Sperre
 serialisiert Archivworker und Archivlöschung pro Quiz. Worker verwenden Try-Lock
