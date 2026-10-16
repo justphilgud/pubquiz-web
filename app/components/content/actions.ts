@@ -1,6 +1,5 @@
 "use server";
 
-import { refresh } from "next/cache";
 import { requireActor } from "@/app/lib/permissions";
 import { searchFragen } from "@/app/fragen/actions";
 import { cloneQuestion, setQuestionArchived } from "@/app/fragen/editor/managementActions";
@@ -26,7 +25,7 @@ import {
 } from "@/app/umfragen/actions";
 import {
   canAttachLivePoll,
-  listLivePolls,
+  searchLivePollWindow,
 } from "@/app/umfragen/livePollRepository.server";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { getQuestionLifecycleState } from "@/app/fragen/editor/questionLifecycle";
@@ -34,22 +33,44 @@ import {
   getAssignableQuestionQuizIds,
   getAssignableStoryQuizIds,
 } from "./contentQuizEligibility";
-import { listStoryElements } from "@/app/story-elemente/storyElementRepository.server";
+import { searchStoryElementWindow } from "@/app/story-elemente/storyElementRepository.server";
 import type {
   ContentFiltersState,
   ContentSearchResult,
   ContentSearchItem,
   ContentType,
 } from "./contentLibrary";
-import { getQuestionStatusesForContentFilter } from "./contentLibrary";
+import { getQuestionStatusesForContentFilter, serializeContentFilters } from "./contentLibrary";
+import { compareContent, readContentCursor, CONTENT_PAGE_SIZE } from "./contentPaging";
+import { changeQuestionStatus } from "@/app/fragen/editor/actions";
 
-export async function searchContent(filters: ContentFiltersState): Promise<ContentSearchResult> {
+export async function searchContent(filters: ContentFiltersState, pageCursor?: string, questionId?: number): Promise<ContentSearchResult> {
   const { actor } = await requireActor();
+  const signature = serializeContentFilters(filters).toString();
+  const cursor = readContentCursor(pageCursor, signature);
+  const quizzes = await getAktiveQuizListe();
   const restrictToQuestionTemplate = filters.templateId !== null;
   const includeQuestions = filters.contentType !== "STORY_ELEMENT" && filters.contentType !== "POLL";
   const includeStories = !restrictToQuestionTemplate && filters.contentType !== "QUESTION" && filters.contentType !== "POLL";
   const includePolls = !restrictToQuestionTemplate && filters.contentType !== "QUESTION" && filters.contentType !== "STORY_ELEMENT";
-  const [questionResult, stories, polls, quizzes] = await Promise.all([
+  const normalizedQuery = filters.query.trim().toLocaleLowerCase("de-DE");
+  const acceptsPoll: Parameters<typeof searchLivePollWindow>[1] = (poll) => {
+      if (normalizedQuery && !poll.prompt.toLocaleLowerCase("de-DE").includes(normalizedQuery)) return false;
+      if (filters.status !== "ALL" && poll.status !== (filters.status === "NOT_APPROVED" ? "DRAFT" : filters.status)) return false;
+      if (filters.status === "DRAFT" && poll.createdByUserId !== actor.userId) return false;
+      if (filters.media === "WITH") return false;
+      if (filters.usage === "USED" && poll.quizUsages.length === 0) return false;
+      if (filters.usage === "UNUSED" && poll.quizUsages.length > 0) return false;
+      if (
+        filters.eventSeriesId !== null &&
+        poll.scope !== "GLOBAL" &&
+        poll.eventSeriesId !== filters.eventSeriesId &&
+        !quizzes.some((quiz) => quiz.quiz_id === poll.quizId && quiz.eventreihe_id === filters.eventSeriesId)
+      ) return false;
+      return true;
+    };
+
+  const [questionResult, stories, polls] = await Promise.all([
     includeQuestions
       ? searchFragen({
           suchtext: filters.query,
@@ -65,20 +86,22 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
           lifecycleFilter: filters.questionLifecycle,
           limit: 50,
           offset: 0,
+          contentCursor: cursor, contentOrder: true,
+          questionIds: questionId ? [questionId] : undefined,
         })
       : Promise.resolve({ results: [], hasMore: false, nextOffset: 0, total: 0 }),
     includeStories
-      ? listStoryElements(actor, {
+      ? searchStoryElementWindow(actor, {
           query: filters.query,
-          status: filters.status === "ACTIVE" ? "ACTIVE" : filters.status,
+          status: filters.status === "NOT_APPROVED" ? "DRAFT" : filters.status,
           type: isStoryElementType(filters.storyType) ? filters.storyType : undefined,
           mediaState: filters.media,
           usageState: filters.usage,
           eventSeriesId: filters.eventSeriesId === null ? undefined : String(filters.eventSeriesId),
-        })
-      : Promise.resolve([]),
-    includePolls ? listLivePolls(actor) : Promise.resolve([]),
-    getAktiveQuizListe(),
+          creator: filters.status === "DRAFT" ? "ME" : undefined,
+        }, cursor)
+      : Promise.resolve({ items: [], total: 0 }),
+    includePolls ? searchLivePollWindow(actor, acceptsPoll, cursor) : Promise.resolve({ items: [], total: 0 }),
   ]);
 
   const now = getBerlinDate();
@@ -104,6 +127,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
       return ({
       key: `QUESTION:${question.fragen_id}`,
       id: question.fragen_id,
+      createdAt: question.createdAt, updatedAt: question.updatedAt, canApprove: question.canApprove,
       contentType: "QUESTION",
       subtype: "Frage",
       title: question.frage,
@@ -112,6 +136,7 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
       archived: question.ist_archiviert,
       scope: question.geltungsbereich === "GLOBAL" ? "Global" : question.eventreihen.join(", ") || "Eventreihe",
       mediaCount: question.medien_anzahl,
+      imagePreview: question.imagePreview,
       quizUsages: question.quizze.map((quiz) => ({ quizId: quiz.quiz_id, title: quiz.titel ?? `Quiz ${quiz.quiz_id}`, date: quiz.quiz_datum, archived: quiz.ist_archiviert })),
       assignableQuizIds: getAssignableQuestionQuizIds({
         scope: question.geltungsbereich,
@@ -140,9 +165,10 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
     });
     });
 
-  const storyItems: ContentSearchItem[] = stories.map((story) => ({
+  const storyItems: ContentSearchItem[] = stories.items.map((story) => ({
     key: `STORY_ELEMENT:${story.id}`,
     id: story.id,
+    createdAt: story.createdAt.toISOString(),
     contentType: "STORY_ELEMENT",
     subtype: getStoryElementTypeLabel(story.type),
     title: story.title,
@@ -162,25 +188,11 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
     storyMetrics: { linkedQuestionCount: story.questionLinkCount, linkedQuestionTitle: story.linkedQuestion?.frage ?? null, revision: story.revisionNumber },
   }));
 
-  const normalizedQuery = filters.query.trim().toLocaleLowerCase("de-DE");
-  const pollItems: ContentSearchItem[] = polls
-    .filter((poll) => {
-      if (normalizedQuery && !poll.prompt.toLocaleLowerCase("de-DE").includes(normalizedQuery)) return false;
-      if (filters.status !== "ALL" && poll.status !== filters.status) return false;
-      if (filters.media === "WITH") return false;
-      if (filters.usage === "USED" && poll.quizUsages.length === 0) return false;
-      if (filters.usage === "UNUSED" && poll.quizUsages.length > 0) return false;
-      if (
-        filters.eventSeriesId !== null &&
-        poll.scope !== "GLOBAL" &&
-        poll.eventSeriesId !== filters.eventSeriesId &&
-        !quizzes.some((quiz) => quiz.quiz_id === poll.quizId && quiz.eventreihe_id === filters.eventSeriesId)
-      ) return false;
-      return true;
-    })
+  const pollItems: ContentSearchItem[] = polls.items
     .map((poll) => ({
       key: `POLL:${poll.id}`,
       id: poll.id,
+      createdAt: poll.createdAt.toISOString(),
       contentType: "POLL",
       subtype: getLivePollTypeLabel(poll.type),
       title: poll.prompt,
@@ -202,11 +214,17 @@ export async function searchContent(filters: ContentFiltersState): Promise<Conte
       },
     }));
 
+  const merged = [...questions, ...storyItems, ...pollItems].sort((a, b) => compareContent(
+    { ...a, createdAt: a.createdAt! }, { ...b, createdAt: b.createdAt! },
+  ));
+  const items = merged.slice(0, CONTENT_PAGE_SIZE);
+  const hasMore = questionResult.hasMore || merged.length > CONTENT_PAGE_SIZE;
+  const last = items.at(-1);
   return {
-    items: [...questions, ...storyItems, ...pollItems]
-      .sort((left, right) => right.id - left.id || left.contentType.localeCompare(right.contentType))
-      .slice(0, 50),
-    total: questionResult.total + stories.length + pollItems.length,
+    items,
+    total: questionResult.total + stories.total + polls.total,
+    hasMore,
+    nextCursor: hasMore && last ? JSON.stringify({ version: 1, signature, createdAt: last.createdAt, contentType: last.contentType, id: last.id }) : null,
   };
 }
 
@@ -249,7 +267,6 @@ export async function assignContentToQuiz(input: { contentType: ContentType; con
       if (result.alreadyAssigned) {
         return { success: false, message: "Diese Frage ist diesem Quiz bereits zugeordnet." };
       }
-      refresh();
       return { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." };
     }
     if (input.contentType === "POLL") {
@@ -261,11 +278,9 @@ export async function assignContentToQuiz(input: { contentType: ContentType; con
       if (!result.success || result.alreadyAssigned) {
         return { success: false, message: result.message };
       }
-      refresh();
       return { success: true, message: "Zum Quiz hinzugefügt. Block: Kein Block." };
     }
     const result = await addStoryElementToQuiz({ quizId: input.quizId, storyElementId: input.contentId });
-    if (result.success) refresh();
     return result;
   } catch (error) {
     return {
@@ -275,4 +290,13 @@ export async function assignContentToQuiz(input: { contentType: ContentType; con
         : "Der Inhalt konnte diesem Quiz nicht zugeordnet werden.",
     };
   }
+}
+
+export async function approveContentQuestion(input: { questionId: number; expectedUpdatedAt: string }) {
+  const result = await changeQuestionStatus({ ...input, target: "APPROVED" });
+  if (!result.ok) return { success: false, message: result.message, item: null };
+  try {
+  const refreshed = await searchContent({ query: "", contentType: "QUESTION", templateId: null, categoryIds: [], storyType: "ALL", status: "ALL", questionLifecycle: "ALL", media: "ALL", usage: "ALL", eventSeriesId: null }, undefined, input.questionId);
+  return { success: true, message: result.message, item: refreshed.items[0] ?? null };
+  } catch { return { success: true, message: "Freigegeben. Der aktualisierte Treffer konnte nicht geladen werden; bitte die Suche aktualisieren.", item: null }; }
 }

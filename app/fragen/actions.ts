@@ -15,7 +15,9 @@ import {
   requireQuestionEditor,
 } from "@/app/lib/permissions";
 import { getQuestionActor, mapQuestionAccessContext } from "./editor/questionAccess.server";
-import { canCloneScopedQuestion } from "./editor/questionScopePolicy";
+import { canCloneScopedQuestion, canApproveScopedQuestion } from "./editor/questionScopePolicy";
+import { questionSearchWhere } from "./questionSearch";
+import { contentCreatedBoundary, type ContentCursor } from "@/app/components/content/contentPaging";
 import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { createCategoryRecord } from "./editor/categoryService.server";
 import {
@@ -184,6 +186,9 @@ export async function searchFragen(data: {
   lifecycleFilter?: QuestionLifecycleFilter;
   limit?: number;
   offset?: number;
+  contentCursor?: ContentCursor | null;
+  contentOrder?: boolean;
+  questionIds?: number[];
 }) {
   const session = await requireQuestionEditor();
   const actor = await getQuestionActor(session);
@@ -261,6 +266,7 @@ export async function searchFragen(data: {
     : [];
   const statusConditions: Prisma.fragenWhereInput[] = statuses.map(
     (status) => {
+      if (status === "NOT_APPROVED") return { review_status: { not: "APPROVED" }, ist_archiviert: false };
       if (status === "MY_DRAFTS") {
         return {
           created_by_user_id: actor.userId,
@@ -404,14 +410,9 @@ export async function searchFragen(data: {
     fragen_id: sourceQuestionIds
       ? { in: sourceQuestionIds.map(({ fragen_id }) => fragen_id) }
       : undefined,
-    frage: data.suchtext.trim()
-      ? {
-          contains: data.suchtext.trim(),
-          mode: "insensitive" as const,
-        }
-      : undefined,
-
     AND: [
+      questionSearchWhere(data.suchtext),
+      ...(data.questionIds ? [{ fragen_id: { in: data.questionIds.slice(0, 50) } }] : []),
       ...(statusConditions.length > 0 ? [{ OR: statusConditions }] : []),
       ...(templateConditions.length > 0 ? [{ OR: templateConditions }] : []),
       ...(mediaCondition ? [mediaCondition] : []),
@@ -460,7 +461,7 @@ export async function searchFragen(data: {
       };
 
   const [fragen, total] = await Promise.all([prisma.fragen.findMany({
-    where,
+    where: { AND: [where, contentCreatedBoundary(data.contentCursor ?? null, "QUESTION", "fragen_id")] },
     include: {
       fragen_kategorien: {
         include: {
@@ -492,9 +493,7 @@ export async function searchFragen(data: {
       vorlage: { select: { code: true } },
       _count: { select: { story_element_verknuepfungen: true } },
     },
-    orderBy: {
-      fragen_id: "desc",
-    },
+    orderBy: data.contentOrder ? [{ created_at: "desc" }, { fragen_id: "desc" }] : [{ fragen_id: "desc" }],
     skip: offset,
     take: limit + 1,
   }), prisma.fragen.count({ where })]);
@@ -513,6 +512,9 @@ export async function searchFragen(data: {
 
     return {
       fragen_id: frage.fragen_id,
+      createdAt: frage.created_at.toISOString(),
+      updatedAt: frage.updated_at.toISOString(),
+      canApprove: !frage.ist_archiviert && !frage.freigegeben && canApproveScopedQuestion(actor, mapQuestionAccessContext(frage)),
       frage: frage.frage,
       quelle: frage.quelle,
       schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
@@ -561,6 +563,7 @@ export async function searchFragen(data: {
           })),
         })),
       }),
+      imagePreview: frage.medien.find(medium => /\.(jpg|jpeg|png|webp|gif)(?:[?#].*)?$/i.test(medium.datei))?.datei ?? null,
       medien_frage_anzahl: frage.medien.length,
       medien_antworten_anzahl: medienAntwortenAnzahl,
       medien_anzahl: frage.medien.length + medienAntwortenAnzahl,

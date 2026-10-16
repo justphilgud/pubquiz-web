@@ -100,12 +100,17 @@ export async function updateQuizFlowItem(data: {
   if (label && label.length > 160) {
     return { success: false, message: "Die Bezeichnung ist zu lang." };
   }
-  await prisma.quiz_ablauf_elemente.update({
-    where: { quiz_ablauf_element_id: item.persistentId },
-    data: {
-      bezeichnung: label,
-      konfiguration: validated.value as Prisma.InputJsonValue,
-    },
+  await prisma.$transaction(async tx => {
+    if (item.isStandard && item.type === "RULES" && item.anchorType === "BEFORE_QUIZ") {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(42001, ${data.quizId})`;
+      await tx.quiz.update({ where: { quiz_id: data.quizId }, data: {
+        intro_regeln: validated.value.rules?.filter(rule => rule.enabled).map(rule => rule.text).join("\n") || null,
+      } });
+    }
+    await tx.quiz_ablauf_elemente.update({
+      where: { quiz_ablauf_element_id: item.persistentId! },
+      data: { bezeichnung: label, konfiguration: validated.value as Prisma.InputJsonValue },
+    });
   });
   revalidateQuizFlow(data.quizId);
   return { success: true };

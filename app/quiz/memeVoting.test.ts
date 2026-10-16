@@ -128,3 +128,11 @@ test("AP3 vote planning creates once, replaces while open and rejects stale or l
   assert.equal(late.ok, false);
   if (!late.ok) assert.equal(late.reason, "VOTING_CLOSED");
 });
+
+import { getMemeAdvanceLabel } from "./memeVoting";
+test("Meme navigation names opening and closing explicitly", () => {
+  const state = { phase: "OVERVIEW" as const, activeCandidateNumber: null, candidates: [{ number: 1 }], overviewPage: 1, overviewPageCount: 2, hasResult: false };
+  assert.equal(getMemeAdvanceLabel(state), "Abstimmung öffnen");
+  assert.equal(getMemeAdvanceLabel({ ...state, phase: "VOTING_OPEN" }), "Abstimmung schließen");
+  assert.equal(getMemeAdvanceLabel({ ...state, overviewPage: 0 }), "Nächste Meme-Übersicht");
+});

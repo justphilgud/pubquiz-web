@@ -1,5 +1,7 @@
 "use server";
 
+import { saveStandardIntroRules } from "@/app/quiz/flow/quizFlowRepository.server";
+
 import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluationRevisionSelect } from "./evaluation/evaluationRevision";
@@ -5513,14 +5515,7 @@ export async function updateIntroRegeln(data: {
 }) {
   await requireQuizEditor(data.quizId);
 
-  await prisma.quiz.update({
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      intro_regeln: data.regeln.trim() || null,
-    },
-  });
+  await saveStandardIntroRules(data.quizId, data.regeln);
 
   revalidatePath(`/quiz/${data.quizId}`);
 

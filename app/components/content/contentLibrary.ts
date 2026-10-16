@@ -3,7 +3,7 @@ export type ContentTypeFilter = (typeof CONTENT_TYPES)[number];
 export type ContentType = Exclude<ContentTypeFilter, "ALL">;
 export type ContentInitialType = ContentType | undefined;
 
-export type ContentStatusFilter = "ALL" | "DRAFT" | "ACTIVE" | "ARCHIVED";
+export type ContentStatusFilter = "ALL" | "DRAFT" | "NOT_APPROVED" | "ACTIVE" | "ARCHIVED";
 export type ContentBinaryFilter = "ALL" | "WITH" | "WITHOUT";
 export type ContentUsageFilter = "ALL" | "USED" | "UNUSED";
 export type ContentQuestionLifecycleFilter =
@@ -52,11 +52,16 @@ export type ContentSearchItem = {
   archived: boolean;
   scope: string;
   mediaCount: number;
+  imagePreview?: string | null;
   quizUsages: ContentQuizUsage[];
   assignableQuizIds: number[];
   editHref: string;
   canClone: boolean;
   canArchive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  canApprove?: boolean;
+  justApproved?: boolean;
   questionMetrics?: {
     answerCount: number;
     difficulty: string | null;
@@ -89,12 +94,13 @@ export function getQuestionStatusesForContentFilter(
   status: ContentStatusFilter,
 ) {
   if (status === "DRAFT") return ["MY_DRAFTS"] as const;
+  if (status === "NOT_APPROVED") return ["NOT_APPROVED"] as const;
   if (status === "ACTIVE") return ["APPROVED"] as const;
   if (status === "ARCHIVED") return ["ARCHIVED"] as const;
   return [];
 }
 
-export type ContentSearchResult = { items: ContentSearchItem[]; total: number };
+export type ContentSearchResult = { items: ContentSearchItem[]; total: number; nextCursor?: string | null; hasMore?: boolean };
 
 export type ContentQuizOption = {
   quizId: number;
@@ -128,7 +134,7 @@ export function parseContentFilters(
       .map((value) => parsePositiveId(value))
       .filter((value): value is number => value !== null))],
     storyType: params.get("storyType") ?? "ALL",
-    status: ["ALL", "DRAFT", "ACTIVE", "ARCHIVED"].includes(requestedStatus ?? "")
+    status: ["ALL", "DRAFT", "NOT_APPROVED", "ACTIVE", "ARCHIVED"].includes(requestedStatus ?? "")
       ? requestedStatus as ContentStatusFilter
       : "ALL",
     questionLifecycle: ["ALL", "CURRENT", "OUTDATED_SOON", "OUTDATED", "REVIEW_SOON", "REVIEW_DUE"].includes(requestedQuestionLifecycle ?? "")

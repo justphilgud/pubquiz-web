@@ -567,7 +567,7 @@ function defaultItem(
   };
 }
 
-function rulesFromText(value: string | null): QuizFlowRule[] {
+export function rulesFromText(value: string | null): QuizFlowRule[] {
   const lines = (value ?? "")
     .replace(/\r\n?/g, "\n")
     .split("\n")

@@ -1,4 +1,5 @@
 import "server-only";
+import { collectContentWindow, type ContentCursor } from "@/app/components/content/contentPaging";
 
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -112,6 +113,18 @@ export async function listLivePolls(actor: AuthorizationActor) {
     orderBy: [{ updated_at: "desc" }, { live_poll_id: "desc" }],
   });
   return polls.map(mapPoll).filter((poll): poll is NonNullable<typeof poll> => Boolean(poll && canViewStoryElement(actor, poll.access)));
+}
+
+/** Filters remain in the library, but reads and retained windows are bounded. */
+export async function searchLivePollWindow(actor: AuthorizationActor, accepts: (poll: NonNullable<ReturnType<typeof mapPoll>>) => boolean, cursor: ContentCursor | null) {
+  return collectContentWindow(async beforeId => {
+    const rows = await prisma.live_polls.findMany({
+      where: { AND: [visibility(actor), beforeId ? { live_poll_id: { lt: beforeId } } : {}] },
+      include, orderBy: { live_poll_id: "desc" }, take: 100,
+    });
+    const items = rows.map(mapPoll).filter((poll): poll is NonNullable<typeof poll> => Boolean(poll && canViewStoryElement(actor, poll.access) && accepts(poll)));
+    return { items, nextId: rows.length === 100 ? rows[rows.length - 1].live_poll_id : null };
+  }, "POLL", cursor);
 }
 
 export async function loadLivePoll(actor: AuthorizationActor, pollId: number) {

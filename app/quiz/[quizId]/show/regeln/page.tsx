@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { getQuizDetails } from "@/app/quiz/actions";
+import { getFixedSlideConfig } from "../../slides/fixedSlideActions";
+import { rulesFromText } from "@/app/quiz/flow/quizFlow";
 import { ShowNavigation } from "../ShowNavigation";
 
 type Props = {
@@ -15,18 +17,8 @@ export default async function ShowRegelnPage({ params }: Props) {
     notFound();
   }
 
-  const defaultRegeln = [
-    "Bildet Teams und gebt euch einen Namen",
-    "Scannt den QR-Code",
-    "Bestimmt einen Schreiber",
-    "Nutzt euren Kopf, nicht das Internet",
-    "Der Quizmaster hat immer recht",
-  ].join("\n");
-
-  const regeln = (quiz.intro_regeln ?? defaultRegeln)
-    .split("\n")
-    .map((regel) => regel.trim())
-    .filter(Boolean);
+  const config = await getFixedSlideConfig(quiz.quiz_id, "rules");
+  const regeln = (config.rules ?? rulesFromText(quiz.intro_regeln)).filter(rule => rule.enabled).map(rule => rule.text);
 
   const nextUrl = `/quiz/${quiz.quiz_id}/show/preise`;
 

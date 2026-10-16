@@ -147,3 +147,5 @@ jobs:
         env:
           LOVD_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
         run: node --import tsx --test app/quiz/estimationTiebreak.integration.test.ts
+      - name: PostgreSQL rule synchronization and read-only guard
+        run: node --import tsx --test app/quiz/fixedSlideSaving.test.ts

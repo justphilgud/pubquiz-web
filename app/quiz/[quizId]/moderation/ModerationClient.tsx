@@ -1,5 +1,7 @@
 "use client";
 
+import { getMemeAdvanceLabel } from "@/app/quiz/memeVoting";
+
 import { getPresentationSlideMedia, getSlideSpeech, isIntroMusicSlide } from "@/app/rendering/presentation/presentationSlideMetadata";
 import { mayApplyLiveSnapshot } from "../../liveSnapshotRevision";
 import { EstimationTiebreakPanel } from "../../EstimationTiebreakPanel";
@@ -1038,6 +1040,7 @@ export default function ModerationClient({
 
             <div className="sticky top-0 z-20 rounded-xl border border-zinc-800 bg-zinc-950/95 p-2 shadow-lg backdrop-blur">
               <ModerationToolbar
+                nextLabel={aktuellerSlide?.typ === "frage" && aktuellerSlide.frage.templateId === "meme_beschriften" && memePresentationState ? getMemeAdvanceLabel({ ...memePresentationState, hasResult: Boolean(memePresentationState.result) }) : "Weiter"}
                 blockFreigegeben={blockFreigegeben}
                 mediumOverlayAktiv={mediumOverlayAktiv}
                 audioLaeuft={audioLaeuft}
