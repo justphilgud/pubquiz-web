@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { Client } from "pg";
 import { prismaChecksumEvidence, DIAGNOSTIC_COLUMNS_SQL, DIAGNOSTIC_CATALOG_SQL, compareSchemaInventory, type initRepositoryEvidence, type inventoryFromGit } from "./production-preflight-diagnostics";
 import { assertDatabase, assertOperationTransport } from "./guards";
+import { approvedPreflightPlan, hasApprovedPendingDelta, hasApprovedDeltaEvidence } from "./production-preflight-plan";
 
 export type Gate = { status: "PASS" | "BLOCKED" | "FAIL"; code: string };
 export type Migration = { name: string; checksum: string; eolChecksums?: {lf:string;crlf:string} };
@@ -114,9 +115,9 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     const assessment=assessMigrations(candidate,baseline,rows);
     const appliedMatchesBaseline=assessment.applied.length===baseline.length&&baseline.every(file=>assessment.applied.includes(file.name));
     const schemaGate=!appliedMatchesBaseline?gate('BLOCKED','APPLIED_SCHEMA_PLAN_UNVERIFIED'):additionalDiagnostics?.schemaGate;
-    const expectedDeltaGate=gate(assessment.pending.length===1&&assessment.pending[0]==='20261008090000_editorial_question_difficulty'?'PASS':'BLOCKED','EXPECTED_DELTA_CHECK');
-    const deltaEvidence=evidence?.expectedSchema?.deltaTest as {status?:string;migration?:string}|undefined;
-    const deltaGate=gate(deltaEvidence?.status==='PASS'&&deltaEvidence.migration==='20261008090000_editorial_question_difficulty'?'PASS':'BLOCKED','ISOLATED_DELTA_EVIDENCE');
+    const plan = evidence && approvedPreflightPlan(evidence.baseline.sha, evidence.candidate.sha);
+    const expectedDeltaGate=gate(hasApprovedPendingDelta(plan,assessment.expected,assessment.pending,candidate)?'PASS':'BLOCKED','EXPECTED_DELTA_CHECK');
+    const deltaGate=gate(hasApprovedDeltaEvidence(plan,evidence?.expectedSchema?.deltaTest)?'PASS':'BLOCKED','ISOLATED_DELTA_EVIDENCE');
     const replay=evidence?.expectedSchema?.newInstallReplay as {status?:string;code?:string;migration?:string}|undefined;
     const replayGate=gate(replay?.status==='FAIL'&&replay.code==='HISTORICAL_BASELINE_OVERLAP'&&replay.migration==='20260713130000_add_question_draft_fields'?'PASS':'BLOCKED','NEW_INSTALL_LIMITATION_DOCUMENTED');
     const finalGate=[assessment.gate,schemaGate??gate('BLOCKED','EXPECTED_SCHEMA_UNAVAILABLE'),expectedDeltaGate,deltaGate,replayGate].find(item=>item.status!=='PASS')??assessment.gate;
