@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { generateKeyPair, exportJWK, createLocalJWKSet, SignJWT } from "jose";
-import { AUDIENCE, ISSUER, REPOSITORY, STORE_ID, STORE_HOST, WORKFLOW, objectRule, runKey, TTL_MS, type Grant } from "./bridge/lib/contract";
+import { AUDIENCE, ISSUER, REPOSITORY, STORE_ID, STORE_HOST, WORKFLOW, objectRule, runKey, TTL_MS, INVENTORY_TOTAL_LIMIT, INVENTORY_MAX_PAGES, INVENTORY_PAGE_LIMIT, type Grant } from "./bridge/lib/contract";
 import { verifyGithub, type Identity } from "./bridge/lib/identity";
 import { executeAccess, grantAccess, type BlobProvider, type Scope } from "./bridge/lib/service";
 import { handleAccess, configuration } from "./bridge/lib/handler";
@@ -431,6 +431,48 @@ test("retention runner paginates inventory beyond the former 4096-object ceiling
   const client = new BridgeClient(clientEnv, "backup", "production/acceptance/run-123456-1", request);
   assert.deepEqual(await client.retentionInventory(), objects);
   assert.equal(bridgeCalls, 5);
+});
+
+test("retention capacity remains finite: complete 33000/64000 inventories, reject overflow, loops and invalid pages", async () => {
+  assert.equal(INVENTORY_TOTAL_LIMIT, 64_000); assert.equal(INVENTORY_MAX_PAGES, 64); assert.equal(INVENTORY_PAGE_LIMIT, 1000);
+  const run = async (total: number, pageSize = 1000, mutation?: (page: Record<string, unknown>) => void) => {
+    let calls = 0;
+    const jwt = `e30.${Buffer.from(JSON.stringify({exp: Math.floor(Date.now() / 1000) + 300})).toString("base64url")}.signature`;
+    const request: typeof fetch = async (input, init) => {
+      const url = new URL(String(input));
+      if (url.hostname === "example.actions.githubusercontent.com") return Response.json({value: jwt});
+      assert.equal(url.origin, "https://pubquiz-backup-operations.vercel.app");
+      const body = JSON.parse(String(init?.body)) as {operation: string; store: string; cursor?: string};
+      assert.equal(body.operation, "backup-inventory"); assert.equal(body.store, STORE_ID); calls++;
+      const offset = body.cursor ? Number(body.cursor.slice(2)) : 0;
+      const count = Math.min(pageSize, total - offset), next = offset + count;
+      const page: Record<string, unknown> = {objects: Array.from({length: count}, (_, i) => ({
+        pathname: `production/acceptance/run-123-1/object-${offset + i}.bin`, size: 1,
+        uploadedAt: "2026-10-16T00:00:00.000Z", etag: `etag-${offset + i}`,
+      })), cursor: next < total ? `p-${next}` : null, complete: next >= total};
+      mutation?.(page); return Response.json(page);
+    };
+    const client = new BridgeClient({ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+      ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-request", AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app",
+      AP94_TRANSPORT_MODE: "acceptance", AP94_OIDC_TRANSPORT_ACCEPTED: "true", GITHUB_RUN_ID: "123456",
+      GITHUB_RUN_ATTEMPT: "1", BACKUP_PRIVATE_BLOB_HOST: STORE_HOST}, "backup", "production/acceptance/run-123456-1", request);
+    return {inventory: client.retentionInventory(), calls: () => calls};
+  };
+  for (const total of [33_000, 64_000]) {
+    const attempt = await run(total), result = await attempt.inventory;
+    assert.equal(result.length, total); assert.equal(attempt.calls(), total / 1000);
+    assert.equal(result.at(-1)?.pathname, `production/acceptance/run-123-1/object-${total - 1}.bin`);
+  }
+  for (const [total, pageSize] of [[64_001, 1000], [65, 1]]) {
+    const attempt = await run(total, pageSize);
+    await assert.rejects(attempt.inventory, /INVENTORY_RESPONSE_INVALID/); assert.equal(attempt.calls(), 64);
+  }
+  const oversized = await run(1001, 1001);
+  await assert.rejects(oversized.inventory, /INVENTORY_RESPONSE_INVALID/); assert.equal(oversized.calls(), 1);
+  const cycle = await run(3000, 1000, page => {page.cursor = "p-1"; page.complete = false;});
+  await assert.rejects(cycle.inventory, /INVENTORY_RESPONSE_INVALID/); assert.equal(cycle.calls(), 2);
+  const foreign = await run(1, 1, page => {page.objects = [{pathname: "outside/manifest.json", size: 1, uploadedAt: "2026-10-16", etag: "etag"}];});
+  await assert.rejects(foreign.inventory, /INVENTORY_RESPONSE_INVALID/); assert.equal(foreign.calls(), 1);
 });
 
 test("synthetic object roundtrip, readback, restore read only and expiration (provider model, not live proof)", async () => {

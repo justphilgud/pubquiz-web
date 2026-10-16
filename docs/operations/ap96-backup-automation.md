@@ -152,7 +152,7 @@ ausgewiesen. Sie werden nicht stillschweigend bereinigt.
 Die Bridge liefert das fest auf `production/acceptance/` begrenzte Inventar in
 Seiten von höchstens 1.000 Objekten. Der Runner validiert jede Seite, akzeptiert
 nur einen opaken, druckbaren Provider-Cursor, verhindert Cursor-Schleifen, begrenzt
-einen Lauf auf 64 Seiten und setzt höchstens 32.000 Objekte zusammen. Damit bleibt die Antwort jeder einzelnen
+einen Lauf auf 64 Seiten und setzt höchstens 64.000 Objekte zusammen. Damit bleibt die Antwort jeder einzelnen
 Bridge-Anfrage klein, während der reguläre Daily-/Weekly-Bestand auch bei der seit
 September 2026 auf rund 690 Objekte gewachsenen Medienmenge vollständig erfasst
 wird. Wird die Gesamtobergrenze erreicht oder liefert der Provider einen
