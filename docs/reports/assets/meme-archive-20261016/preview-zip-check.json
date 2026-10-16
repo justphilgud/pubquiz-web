@@ -1,0 +1,20 @@
+[
+  {
+    "file": "Quiz-102_Durchlauf-2_Frage-763_PR116-PNG-Alpha_8190663c-e0e4-4887-8ce1-8a3200323098.png",
+    "sha256": "08235B0494CAE24CBC5A57F4C928F6F59A40FE4AB5F98940D439791488E04853",
+    "bytes": 77838,
+    "matchesSingleDownload": true
+  },
+  {
+    "file": "Quiz-102_Durchlauf-2_Frage-763_PR116-PNG-Beta_feff47a5-0ee8-4a5a-be18-a8137285374d.png",
+    "sha256": "3AFB2770A17168D3FE906AEAA300411FF5E05DE50CC42A06CC0F65281F91AD10",
+    "bytes": 61056,
+    "matchesSingleDownload": true
+  },
+  {
+    "file": "Quiz-102_Durchlauf-2_Frage-763_PR116-PNG-Gamma_f6cf2944-c06d-4640-9f3a-ade8ce68baf9.png",
+    "sha256": "9430F60F2CB52E7114C0F80E1079931CA2A139BD6749A8D1B8F4B3AB955DA9B0",
+    "bytes": 59774,
+    "matchesSingleDownload": true
+  }
+]

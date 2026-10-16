@@ -1,0 +1,27 @@
+{
+  "temporaryBranch": "codex/meme-download-archive",
+  "removedFromTrustedBranches": true,
+  "removedPolicyId": 63277762,
+  "remainingBranches": [
+    "preview/content-and-quiz-flow",
+    "codex/editorial-safe-import",
+    "codex/preview-media-configuration"
+  ],
+  "remainingPolicies": [
+    {
+      "id": 62465429,
+      "name": "codex/editorial-safe-import",
+      "type": "branch"
+    },
+    {
+      "id": 62465430,
+      "name": "codex/preview-media-configuration",
+      "type": "branch"
+    },
+    {
+      "id": 62465427,
+      "name": "preview/content-and-quiz-flow",
+      "type": "branch"
+    }
+  ]
+}
