@@ -1,5 +1,22 @@
 # Quiz Runtime Contracts
 
+## Ergänzung 16. Oktober 2026: Meme-Dateien und Auflösungen
+
+Der [Meme-Archivvertrag](meme-archive.md) ergänzt bestätigte Meme-Abgaben um
+dauerhafte, berechtigte PNG-Downloads. Er ändert weder Votingfreigabe noch Bewertung.
+Meme-Inhalte bleiben in allen Designs schwarz mit weißer Beschriftung; freie Zonen
+behalten ihren halbtransparenten Hintergrund. Memes erhalten keinen Schwierigkeitswert.
+
+„Übersetzt vorgelesen“ zeigt den bisherigen Bedienhinweis zum Lautsprechersymbol
+nicht mehr. Audio-, Sprach- und Textschutzverträge gelten unverändert.
+
+FaceMorph zeigt ausschließlich in der Auflösung Original A, Morph und Original B
+gleichzeitig nebeneinander. Zuordnung erfolgt über die drei vorhandenen Slot-Schlüssel;
+Lösungsnamen stammen aus den sortierten kanonischen Antwortfeldern. Fehlende Originale
+erhalten einen Platzhalter an ihrer Position. Die Fragephase verwendet ausschließlich
+den Morph-Slot; Originale und unbenannte Medien dürfen nie als Fallback dienen.
+Die Teilnehmerprojektion bleibt unverändert geschützt.
+
 Stand: 21. August 2026
 
 Dieses Dokument ist die verbindliche fachliche Spezifikation für den laufenden

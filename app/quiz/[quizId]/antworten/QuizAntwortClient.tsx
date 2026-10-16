@@ -42,6 +42,7 @@ import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
 import MemeVotingPanel from "./MemeVotingPanel";
+import { MemeArchivePanel } from "../../memeArchive/MemeArchivePanel";
 import ParticipantLivePollCard, {
   type ParticipantLivePoll,
 } from "./ParticipantLivePollCard";
@@ -892,6 +893,8 @@ export default function QuizAntwortClient({
             onChange={setMemePresentationState}
           />
         ) : null}
+
+        {session && <MemeArchivePanel key={`memes-${session.quiz_team_session_id}`} quizId={liveDaten.quiz_id} sessionToken={session.sessionToken} />}
 
         {session && (
         <section className="answer-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">

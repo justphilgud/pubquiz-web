@@ -81,6 +81,7 @@ import type { LivePollAudienceState } from "@/app/umfragen/livePollRuntime";
 import { presentationTextDensity } from "./presentationReadability";
 import { buildTrueFalsePresentationOptions } from "./trueFalsePresentation";
 import { ArtworkSolutionSlide } from "./ArtworkSolutionSlide";
+import { FaceMorphSolutionSlide } from "./FaceMorphSolutionSlide";
 import { MemeRenderer } from "@/app/rendering/meme/MemeRenderer";
 import { MemePresentationStage } from "@/app/rendering/meme/MemePresentationStage";
 import { MemeResultStage } from "@/app/rendering/meme/MemeResultStage";
@@ -707,8 +708,8 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const isFaceMorph =
     frage.presentationLayouts.question.contentRole === "FACE_MORPH";
   const faceMorphMedium = frage.medien.find(
-    (medium) => medium.slotKey === "face_morph_result",
-  ) ?? frage.medien.find((medium) => isBild(medium.datei));
+    (medium) => medium.slotKey === "face_morph_result" && isBild(medium.datei),
+  );
 
   if (frage.templateId === "meme_beschriften") {
     const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
@@ -995,7 +996,6 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
           {" → "}
           {new Intl.DisplayNames(["de"], { type: "language" }).of(templateData.targetLanguage)}
         </p>
-        <p className="mt-4 text-lg text-white/60">Wiedergabe über das Lautsprechersymbol in der Moderation.</p>
         {renderMode === "PRESENTATION" && !mediaOverlayActive && (preparedAudio ?
           <SynchronizedMedia kind="audio" src={getMediumUrl(preparedAudio.datei)}
             command={playbackCommand} commandId={playbackCommandId} renderMode={renderMode}
@@ -1578,8 +1578,8 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const isFaceMorph =
     frage.presentationLayouts.solution.contentRole === "FACE_MORPH";
   const faceMorphMedium = frage.medien.find(
-    (medium) => medium.slotKey === "face_morph_result",
-  ) ?? frage.medien.find((medium) => isBild(medium.datei));
+    (medium) => medium.slotKey === "face_morph_result" && isBild(medium.datei),
+  );
 
   if (frage.templateId === "meme_beschriften") {
     const image = frage.medien.find((medium) => medium.slotKey === "question_image") ??
@@ -1687,39 +1687,18 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   }
 
   if (isFaceMorph) {
+    const original = (slotKey: string) => {
+      const medium = frage.medien.find(item => item.slotKey === slotKey && isBild(item.datei));
+      return medium ? getMediumUrl(medium.datei) : null;
+    };
+    const names = [...(frage.antwortfelder ?? [])].sort((a, b) => a.sortierung - b.sortierung).map(field =>
+      [...(field.loesungen ?? [])].filter(solution => solution.ist_akzeptiert)
+        .sort((a, b) => a.sortierung - b.sortierung)[0]?.loesung_text ?? "");
     return (
-      <section
-        data-presentation-layout="SOLUTION_FOCUS"
-        data-question-template="face_morph"
-        className="grid h-full min-h-0 gap-5 lg:grid-cols-[1.38fr_0.62fr]"
-      >
-        <div className="min-h-0 overflow-hidden rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-4 shadow-[8px_8px_0_#ff00aa]">
-          {faceMorphMedium ? (
-            renderMedienKarte(faceMorphMedium, "large")
-          ) : (
-            <PresentationMediaFallback kind="IMAGE" />
-          )}
-        </div>
-        <div className="presentation-solution-result flex min-h-0 flex-col justify-center gap-4 rounded-[1.5rem] border-4 border-emerald-300 bg-gradient-to-br from-emerald-950 to-slate-950 p-6 shadow-[8px_8px_0_#facc15]">
-          <div className="presentation-solution-label text-sm font-black uppercase tracking-[0.25em] text-emerald-300">
-            Richtige Antwort
-          </div>
-          {richtigeAntwortfeldLoesungen.map((feld) => (
-            <div
-              key={feld.label}
-              data-correct="true"
-              className="presentation-correct-answer rounded-2xl border-2 border-emerald-300 bg-black/35 p-5"
-            >
-              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-300">
-                {feld.label}
-              </div>
-              <div className="presentation-correct-answer-value mt-2 text-3xl font-black leading-tight text-yellow-200 xl:text-4xl">
-                {feld.loesungen.map((loesung) => loesung.loesung_text).join(" / ")}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <FaceMorphSolutionSlide
+        personA={{ src: original("face_morph_person_a_original"), name: names[0] ?? "" }}
+        morphSrc={faceMorphMedium ? getMediumUrl(faceMorphMedium.datei) : null}
+        personB={{ src: original("face_morph_person_b_original"), name: names[1] ?? "" }} />
     );
   }
 

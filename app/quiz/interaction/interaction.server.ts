@@ -85,6 +85,7 @@ import { isMemeCaptionPayloadReadable } from "@/app/quiz/memeCaptionLayout";
 import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 import { isMemeCaptionQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { getMemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
+import { scheduleMemeArchive } from "@/app/quiz/memeArchive/schedule.server";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -283,6 +284,7 @@ async function autoFinalizeDrafts(
   db: DbClient,
   run: {
     interaction_run_id: number;
+    quiz_id: number;
     quiz_fragen_id: number | null;
     interaction_type: string;
     config_snapshot: Prisma.JsonValue;
@@ -372,6 +374,7 @@ async function autoFinalizeDrafts(
       data: submissions,
       skipDuplicates: true,
     });
+    if (run.interaction_type === "MEME_CAPTION") scheduleMemeArchive(run.quiz_id);
   }
   return submissions.length;
 }
@@ -1245,6 +1248,7 @@ export async function submitTeamAnswer(input: {
       return { success: false, reason: "LIVE_STATE_CHANGED" as const };
     }
     const interaction = readInteractionSnapshot(run.config_snapshot);
+    if (run.interaction_type === "MEME_CAPTION") scheduleMemeArchive(input.quizId);
     const validated = validateInteractionPayload(interaction, draftInputFromStored(draft));
     if (!validated.hasContent) {
       return { success: false, reason: "EMPTY_DRAFT" as const };

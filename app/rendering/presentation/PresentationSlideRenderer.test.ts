@@ -647,6 +647,10 @@ test("FaceMorph keeps structured answer fields out of the question slide and rev
       }),
     },
     medien: [{
+      medien_id: 44, datei: "questions/person-b-original.webp", medientyp: "Bild", sortierung: 0, bemerkung: null, slotKey: "face_morph_person_b_original",
+    }, {
+      medien_id: 43, datei: "questions/person-a-original.webp", medientyp: "Bild", sortierung: 2, bemerkung: null, slotKey: "face_morph_person_a_original",
+    }, {
       medien_id: 42,
       datei: "questions/face-morph.webp",
       medientyp: "Bild",
@@ -682,12 +686,24 @@ test("FaceMorph keeps structured answer fields out of the question slide and rev
 
   assert.match(questionHtml, /data-question-template="face_morph"/);
   assert.match(questionHtml, /questions\/face-morph\.webp/);
+  assert.doesNotMatch(questionHtml, /person-[ab]-original|Taylor Swift|Albert Einstein/);
   assert.doesNotMatch(questionHtml, /Mehrteilige Antwort|Antwortteil|Person A|Person B|Pflichtangabe/);
   assert.match(solutionHtml, /questions\/face-morph\.webp/);
   assert.match(solutionHtml, /Person A/);
   assert.match(solutionHtml, /Taylor Swift/);
   assert.match(solutionHtml, /Person B/);
   assert.match(solutionHtml, /Albert Einstein/);
+  assert.match(solutionHtml, /data-facemorph-role="person-a"[\s\S]*?person-a-original\.webp[\s\S]*?Taylor Swift[\s\S]*?data-facemorph-role="morph"[\s\S]*?face-morph\.webp[\s\S]*?data-facemorph-role="person-b"[\s\S]*?person-b-original\.webp[\s\S]*?Albert Einstein/);
+  const missing = { ...faceMorphQuestion, medien: faceMorphQuestion.medien.filter(m => m.slotKey !== "face_morph_person_a_original") };
+  const missingHtml = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz, slide: { ...solutionSlide, frage: missing }, slides: [solutionSlide], slideIndex: 0, slideLabel: "Auflösung", theme, displayState,
+  }));
+  assert.match(missingHtml, /Originalbild Person A fehlt/);
+  assert.match(missingHtml, /Taylor Swift/);
+  const originalsOnly = { ...faceMorphQuestion, medien: faceMorphQuestion.medien.filter(m => m.slotKey !== "face_morph_result") };
+  assert.doesNotMatch(renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    quiz, slide: { ...questionSlide, frage: originalsOnly }, slides: [questionSlide], slideIndex: 0, slideLabel: "Frage", theme, displayState,
+  })), /person-[ab]-original|Taylor Swift|Albert Einstein/);
 });
 
 test("public interim standings expose competition ranks and points without identity", () => {
@@ -1129,7 +1145,7 @@ test("translated reading keeps its TTS payload invisible and renders only the st
   );
 
   assert.match(questionHtml, /Welcher Songtext wurde hier übersetzt\?/);
-  assert.match(questionHtml, /Wiedergabe über das Lautsprechersymbol/);
+  assert.doesNotMatch(questionHtml, /Wiedergabe über das Lautsprechersymbol/);
   assert.doesNotMatch(questionHtml, /Sehr langer übersetzter Kontext/);
   assert.doesNotMatch(questionHtml, /I like big butts and I cannot lie/);
   assert.match(solutionHtml, /Baby Got Back/);

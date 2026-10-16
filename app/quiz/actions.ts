@@ -635,6 +635,9 @@ export async function deleteQuiz(quizId: number) {
     };
   }
 
+  const archiveEntries = await prisma.meme_archive_entries.count({ where: { source: { quiz_id: quizId }, status: { not: "DELETED" } } });
+  if (archiveEntries > 0) return { success: false, message: "Dieses Quiz besitzt ein dauerhaftes Meme-Archiv. Bitte die archivierten Memes zuerst ausdrücklich im Meme-Archiv löschen." };
+  await prisma.meme_archive_sources.deleteMany({ where: { quiz_id: quizId, entries: { every: { status: "DELETED" } } } });
   await prisma.quiz.delete({
     where: {
       quiz_id: quizId,
