@@ -22,8 +22,12 @@ PNG-Upload ändert den Erfolg der Antwort nicht.
 Die dauerhafte DB-Outbox enthält PENDING/READY/ERROR/DELETING/DELETED. Ein begrenzter
 Worker sichert zuerst die Basisbildbytes und erzeugt daraus mit `sharp` ein PNG.
 `after()` beschleunigt die Verarbeitung nach einer Antwort; Archiv- und Teamabrufe
-können ausstehende Arbeit wiederholen. Eine PostgreSQL-Sperre serialisiert die
-Verarbeitung eines Quiz mit Archivlöschung und Reset. Ein Prozessabbruch lässt
+können ausstehende Arbeit wiederholen. Eine eigene PostgreSQL-Advisory-Sperre
+serialisiert Archivworker und Archivlöschung pro Quiz. Worker verwenden Try-Lock
+und kehren bei Konkurrenz sofort zurück. Netzwerk-/PNG-Arbeit belegt nie die
+Quiz-Lifecycle-Sperre; normale Team-Abgaben bleiben unabhängig. Reset prüft unter
+seiner Quizsperre ausschließlich die bereits festgeschriebenen Quellbytes und bleibt
+bei ausstehender Sicherung unverändert stehen. Ein Prozessabbruch lässt
 wiederholbare Arbeit in der Datenbank, keine bloße Speicherwarteschlange.
 
 Der vorhandene Blob-Store liefert öffentliche Objekte. Deshalb enthält er ausschließlich

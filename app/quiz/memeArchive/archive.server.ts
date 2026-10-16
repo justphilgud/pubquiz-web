@@ -14,6 +14,13 @@ import { resolveMemeCaptionLayout } from "../memeCaptionZones";
 import { isMemeCaptionPayloadReadable } from "../memeCaptionLayout";
 
 const MAX_BYTES = 12_000_000;
+async function lockArchive(tx: Prisma.TransactionClient, quizId: number, wait = false) {
+  // Separate namespace from game lifecycle locks. Never hold the quiz row during I/O.
+  const rows = wait
+    ? await tx.$queryRaw<{ acquired: boolean }[]>`SELECT true AS acquired FROM pg_advisory_xact_lock(77116, ${quizId})`
+    : await tx.$queryRaw<{ acquired: boolean }[]>`SELECT pg_try_advisory_xact_lock(77116, ${quizId}) AS acquired`;
+  return rows[0]?.acquired === true;
+}
 async function boundedBlobFetch(url: string) {
   const parsed = new URL(url);
   if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.port ||
@@ -49,7 +56,7 @@ async function loadSourceImage(url: string) {
   return normalized;
 }
 
-/** Durable outbox; all operations on one quiz share its lifecycle lock. */
+/** Durable outbox; archive I/O never holds the game's quiz lifecycle lock. */
 export async function processMemeArchive(quizId: number, maximum = 3, retry = false) {
   const candidates = await prisma.meme_archive_entries.findMany({
     where: { source: { quiz_id: quizId }, OR: [{ status: "PENDING" }, { status: "ERROR", ...(retry ? {} : { attempts: { lt: 3 } }) }] },
@@ -58,26 +65,32 @@ export async function processMemeArchive(quizId: number, maximum = 3, retry = fa
   for (const candidate of candidates) {
     try {
       // Commit recoverable image bytes BEFORE attempting any downstream PNG/Blob I/O.
-      await prisma.$transaction(async tx => {
-        await lockQuizLifecycle(tx, quizId);
+      const secured = await prisma.$transaction(async tx => {
+        if (!await lockArchive(tx, quizId)) return false;
+        const entry = await tx.meme_archive_entries.findUniqueOrThrow({ where: { entry_id: candidate.entry_id } });
+        if (!["PENDING", "ERROR"].includes(entry.status)) return false;
         const source = await tx.meme_archive_sources.findUniqueOrThrow({ where: { source_id: candidate.source_id } });
         if (!source.image_bytes) await tx.meme_archive_sources.update({ where: { source_id: source.source_id }, data: { image_bytes: new Uint8Array(await loadSourceImage(source.image_url)) } });
+        return true;
       }, { timeout: 20_000 });
-      await prisma.$transaction(async tx => {
-        await lockQuizLifecycle(tx, quizId);
+      if (!secured) continue;
+      const rendered = await prisma.$transaction(async tx => {
+        if (!await lockArchive(tx, quizId)) return false;
         const entry = await tx.meme_archive_entries.findUniqueOrThrow({ where: { entry_id: candidate.entry_id }, include: { source: true } });
-        if (!["PENDING", "ERROR"].includes(entry.status)) return;
-        if (entry.pending_file) return;
+        if (!["PENDING", "ERROR"].includes(entry.status) || !entry.source.image_bytes) return false;
+        if (entry.pending_file) return true;
         const png = await renderArchivedMeme(entry.source.image_bytes!, entry.payload, entry.source.layout);
         const sealed = sealPng(png);
         await tx.meme_archive_entries.update({ where: { entry_id: entry.entry_id }, data: {
           pending_file: new Uint8Array(sealed.bytes), encryption_key: sealed.key, png_sha256: sealed.sha256, png_size: png.length,
         } });
+        return true;
       }, { timeout: 20_000 });
+      if (!rendered) continue;
       // Retrying an interrupted upload always writes the SAME encrypted bytes/key.
       // A cached earlier attempt therefore cannot disagree with the committed key.
       await prisma.$transaction(async tx => {
-        await lockQuizLifecycle(tx, quizId);
+        if (!await lockArchive(tx, quizId)) return;
         const entry = await tx.meme_archive_entries.findUniqueOrThrow({ where: { entry_id: candidate.entry_id } });
         if (!["PENDING", "ERROR"].includes(entry.status) || !entry.pending_file) return;
         const config = getMediaVerificationServerConfig();
@@ -140,14 +153,14 @@ export async function loadArchivedPng(quizId: number, id: string, sessionId?: nu
 
 export async function deleteArchivedMeme(quizId: number, id: string) {
   await prisma.$transaction(async tx => {
-    await lockQuizLifecycle(tx, quizId);
+    await lockArchive(tx, quizId, true);
     const entry = await tx.meme_archive_entries.findFirst({ where: { entry_id: id, source: { quiz_id: quizId } } });
     if (!entry) throw new Error("Meme nicht gefunden.");
     await tx.meme_archive_entries.updateMany({ where: { source_id: entry.source_id, session_id: entry.session_id, status: { not: "DELETED" } }, data: { status: "DELETING", error_message: null } });
   });
   // A failed delete stays DELETING (inaccessible) and can be retried explicitly.
   await prisma.$transaction(async tx => {
-    await lockQuizLifecycle(tx, quizId);
+    await lockArchive(tx, quizId, true);
     const entry = await tx.meme_archive_entries.findFirstOrThrow({ where: { entry_id: id, source: { quiz_id: quizId } } });
     const versions = await tx.meme_archive_entries.findMany({ where: { source_id: entry.source_id, session_id: entry.session_id, status: "DELETING" } });
     for (const version of versions) {

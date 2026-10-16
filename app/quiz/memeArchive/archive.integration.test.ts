@@ -59,9 +59,31 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     await db.team_answer_submissions.create({ data: submission(1, 1, "AUTO_FINALIZED") });
     await Promise.all([1, 2].map(() => db.team_answer_submissions.createMany({ data: [submission(0, 2)], skipDuplicates: true })));
     assert.equal(await db.meme_archive_entries.count(), 3);
-    const repository = loadActual<Pick<typeof import("./archive.server"), "listMemeArchive" | "loadArchivedPng">>("./archive.server.ts", {
-      "server-only": {}, "@/app/lib/prisma": { prisma: db }, "@/app/fragen/editor/mediaUploadEnvironment": {},
+    const uploadedPaths = new Set<string>();
+    const repository = loadActual<Pick<typeof import("./archive.server"), "listMemeArchive" | "loadArchivedPng" | "processMemeArchive" | "deleteArchivedMeme">>("./archive.server.ts", {
+      "server-only": {}, "@/app/lib/prisma": { prisma: db },
+      "@/app/fragen/editor/mediaUploadEnvironment": { getMediaVerificationServerConfig: () => ({ blobAuthentication: {} }), buildMediaUploadPathname: (_area: string, segments: string[]) => segments.join("/") },
+      "./png": { renderArchivedMeme: async () => Buffer.from("confirmed PNG") },
+      "@vercel/blob": { put: async (path: string) => { assert.ok(!uploadedPaths.has(path), "no duplicate parallel upload"); uploadedPaths.add(path); return { url: `https://test.public.blob.vercel-storage.com/${path}` }; }, del: async () => {} },
     });
+    await client.query("BEGIN");
+    await client.query("SELECT pg_advisory_xact_lock(77116,$1)", [quiz.quiz_id]);
+    try {
+      await repository.processMemeArchive(quiz.quiz_id, 1);
+      assert.equal(await db.meme_archive_entries.count({ where: { status: "PENDING" } }), 3, "busy archive worker returns without touching submissions");
+      await assert.rejects(db.$transaction(async tx => {
+        await tx.$executeRaw`SET LOCAL lock_timeout='1s'`;
+        await tx.$queryRaw`SELECT quiz_id FROM pubquiz.quiz WHERE quiz_id=${quiz.quiz_id} FOR UPDATE`;
+        await tx.team_answer_submissions.create({ data: submission(2, 1) });
+        throw new Error("normal answer reached commit boundary while archive busy");
+      }), /normal answer reached commit boundary/);
+    } finally { await client.query("ROLLBACK"); }
+    await db.meme_archive_sources.update({ where: { source_id: run.interaction_run_id }, data: { image_bytes: new Uint8Array([1, 2, 3]) } });
+    for (let round = 0; round < 10 && await db.meme_archive_entries.count({ where: { status: { not: "READY" } } }); round++) {
+      await Promise.all(Array.from({ length: 4 }, () => repository.processMemeArchive(quiz.quiz_id)));
+    }
+    assert.equal(await db.meme_archive_entries.count({ where: { status: "READY" } }), 3);
+    assert.equal(uploadedPaths.size, 3);
     const participant = loadActual<Pick<typeof import("../participantSession.server"), "resolveParticipantSession">>("../participantSession.server.ts", {
       "@/app/lib/prisma": { prisma: db }, "./teamSessionSecret.server": { getTeamSessionSigningSecret: () => "isolated-ci-secret" },
     });
@@ -83,6 +105,7 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     assert.equal((await db.meme_archive_sources.findUniqueOrThrow({ where: { source_id: run.interaction_run_id } })).lifecycle_revision, 4);
     await assert.rejects(db.$transaction(async tx => { await tx.team_answer_submissions.create({ data: submission(2, 1) }); throw new Error("rollback"); }), /rollback/);
     assert.equal(await db.meme_archive_entries.count(), 3);
+    await db.meme_archive_sources.update({ where: { source_id: run.interaction_run_id }, data: { image_bytes: null } });
     await assert.rejects(client.query("SELECT pubquiz.assert_meme_archive_reset_safe($1)", [quiz.quiz_id]), /noch nicht gesichert/);
     // Durable image bytes allow retry even if PNG upload failed and runtime is removed.
     await db.meme_archive_sources.update({ where: { source_id: run.interaction_run_id }, data: { image_bytes: new Uint8Array([1, 2, 3]) } });
@@ -119,6 +142,10 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     await assert.rejects(db.quiz.delete({ where: { quiz_id: quiz.quiz_id } }));
     const latest = await client.query("SELECT DISTINCT ON(source_id,session_id) submission_version,status FROM pubquiz.meme_archive_entries ORDER BY source_id,session_id,submission_version DESC");
     assert.deepEqual(latest.rows.map(r => r.submission_version).sort(), [1, 2]);
+    const archivedB = (await repository.listMemeArchive(quiz.quiz_id, teams[1].session.quiz_team_session_id))[0];
+    await repository.deleteArchivedMeme(quiz.quiz_id, archivedB.id);
+    const deletedB = await db.meme_archive_entries.findUniqueOrThrow({ where: { entry_id: archivedB.id } });
+    assert.equal(deletedB.status, "DELETED"); assert.equal(deletedB.encryption_key, null); assert.equal(deletedB.blob_url, null);
   } finally {
     try { unlinkSync(baselinePath); } catch { /* no baseline left */ }
     await db.$disconnect(); await client.end();

@@ -32,12 +32,12 @@ test("durable worker: upload failure preserves answer/source, retry is idempoten
     updateMany: async ({ data }: { data: Record<string, unknown> }) => update(data),
     count: async () => entry.status === "DELETED" ? 0 : 1,
   };
-  const db = { meme_archive_entries: table, meme_archive_sources: { findUniqueOrThrow: async () => source, update: async ({ data }: { data: object }) => Object.assign(source, data) },
+  const db = { $queryRaw: async () => [{ acquired: true }], meme_archive_entries: table, meme_archive_sources: { findUniqueOrThrow: async () => source, update: async ({ data }: { data: object }) => Object.assign(source, data) },
     $transaction: async (callback: (tx: unknown) => Promise<unknown>) => callback(db) };
   const dependencies: Record<string, unknown> = {
     "server-only": {}, "node:fs/promises": {}, "node:path": {}, sharp: {},
     "@vercel/blob": { put: async (_path: string, bytes: Buffer) => { uploads++; uploadedBytes = Buffer.from(bytes); if (uploadFails) throw new Error("private detail must not escape"); return { url: "https://test.public.blob.vercel-storage.com/test.bin" }; }, del: async () => { if (deleteFails) throw new Error("delete failed"); } },
-    "@/app/generated/prisma/client": { Prisma }, "@/app/lib/prisma": { prisma: db }, "../quizLifecycle.server": { lockQuizLifecycle: async () => {} },
+    "@/app/generated/prisma/client": { Prisma }, "@/app/lib/prisma": { prisma: db }, "../quizLifecycle.server": { lockQuizLifecycle: async () => { throw new Error("Archive I/O must not lock game submissions"); } },
     "@/app/fragen/editor/mediaUploadEnvironment": { getMediaVerificationServerConfig: () => ({ blobAuthentication: {} }), buildMediaUploadPathname: () => "dev/meme-archive/id.bin" },
     "./png": { renderArchivedMeme: async (_image: Uint8Array, payload: unknown) => { assert.deepEqual(payload, answer.payload === "confirmed" ? { topText: "confirmed", bottomText: "" } : {}); return Buffer.from("confirmed PNG"); } }, "./files": files,
     "../memeCaption": captions, "../memeCaptionZones": zones, "../memeCaptionLayout": layout,
