@@ -98,7 +98,8 @@ export default function StoryElementEditor({
   onCancel,
 }: Props) {
   const router = useRouter();
-  const libraryReturn = useSearchParams().get("returnTo");
+  const libraryReturnParam = useSearchParams().get("returnTo");
+  const libraryReturn = onCreated || onCancel || quizContext || returnTo ? null : libraryReturnParam;
   const [pending, startTransition] = useTransition();
   const initialType = initialStory?.type ?? "ANECDOTE";
   const [type, setType] = useState<StoryElementType>(initialType);
