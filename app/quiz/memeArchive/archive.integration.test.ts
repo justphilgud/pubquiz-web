@@ -37,10 +37,11 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     const baseline = readFileSync("prisma/schema.prisma", "utf8").replace(/^\s*meme_archive_sources meme_archive_sources\[\]\r?\n/m, "").replace(/model meme_archive_sources \{[\s\S]*?^\}/m, "").replace(/model meme_archive_entries \{[\s\S]*?^\}/m, "");
     writeFileSync(baselinePath, baseline, { flag: "wx" });
     const sql = execFileSync(process.execPath, [resolve("node_modules/prisma/build/index.js"), "migrate", "diff", "--from-empty", "--to-schema", baselinePath, "--script"], { encoding: "utf8", env: { ...process.env, JITI_CACHE: "false" } });
+    await client.query("CREATE SCHEMA IF NOT EXISTS pubquiz; SET search_path TO pubquiz, public");
     await client.query(sql.slice(sql.indexOf("-- CreateSchema")));
     await client.query(readFileSync("prisma/migrations/20261016120000_meme_archive/migration.sql", "utf8"));
     const series = await db.eventreihen.create({ data: { name: "Meme archive CI", slug: "meme-archive-ci" } });
-    const quiz = await db.quiz.create({ data: { eventreihe_id: series.eventreihe_id, titel: "Archive CI" } });
+    const quiz = await db.quiz.create({ data: { eventreihe_id: series.eventreihe_id, titel: null } });
     const block = await db.quiz_abschnitte.create({ data: { quiz_id: quiz.quiz_id, titel: "CI", abschnitt_typ: "FRAGEN", sortierung: 1 } });
     const question = await db.fragen.create({ data: { frage: "Unchanged CI Meme" } });
     const assignment = await db.quiz_fragen.create({ data: { quiz_id: quiz.quiz_id, fragen_id: question.fragen_id, quiz_abschnitt_id: block.quiz_abschnitt_id } });

@@ -41,7 +41,7 @@ BEGIN
   -- Same lock order as answer finalization and reset. No media I/O in this transaction.
   PERFORM quiz_id FROM pubquiz.quiz WHERE quiz_id=r.quiz_id FOR UPDATE;
   INSERT INTO pubquiz.meme_archive_sources(source_id,quiz_id,lifecycle_revision,quiz_question_id,quiz_title,question_text,image_url,layout)
-  SELECT r.interaction_run_id,r.quiz_id,COALESCE(s.lifecycle_revision,0),r.quiz_fragen_id,q.titel,
+  SELECT r.interaction_run_id,r.quiz_id,COALESCE(s.lifecycle_revision,0),r.quiz_fragen_id,COALESCE(q.titel,'Quiz ' || q.quiz_id::text),
     COALESCE(f.frage,'Meme'),r.config_snapshot->'interaction'->>'imageUrl',
     COALESCE(r.config_snapshot->'interaction'->'layout','{"version":1,"mode":"STANDARD"}'::jsonb)
   FROM pubquiz.quiz q
