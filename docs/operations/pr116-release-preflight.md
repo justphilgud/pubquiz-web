@@ -53,6 +53,16 @@ Die Safety-CI prüft beide unveränderlichen Pläne getrennt mit PostgreSQL17,
 zusätzlich echte SELECT-only-Reader, vollständige Schema-Driftfälle und
 Operations-only-Deploy-Scope. Die volle Repository-CI bleibt verpflichtend.
 
+Der ECR-Mirror verweigerte den PostgreSQL17-Download in drei Versuchen mit
+`toomanyrequests: Data limit exceeded`, während derselbe Test im PR-Lauf und
+die Archiv-Restoretests erfolgreich waren. Der CI-Service verwendet deshalb
+das gleiche offizielle `postgres:17`-Image wie die erfolgreichen Restorejobs;
+Version, Testumfang und Isolation bleiben unverändert. Da `ci.yml` nach dem
+bestehenden Deploy-Scope eine Anwendungsauslieferung anfordern kann, wird ein
+dadurch angebotener Production-Job dieses Operations-Commits am unveränderten
+Reviewer-Gate nicht freigegeben und abgebrochen. Kein zusätzlicher Deploy,
+keine Migration und keine Erweiterung der Deploy-Ausnahmen für diese Reparatur.
+
 Erster tatsächlicher Lauf `38918486225`: Production-Alias/Projekt/READY und
 Anwendungscode `baedd479` bestanden; der alte isolierte Schema-Plan blockierte,
 der Datenbankjob wurde nicht ausgeführt. Das ist kein Gesamt-PASS.
