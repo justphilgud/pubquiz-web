@@ -30,8 +30,8 @@ test("content filter draft follows URL and type changes without remounting", () 
 
 test("content search effect has one static dependency contract", () => {
   const source = readFileSync(new URL("./ContentSearch.tsx", import.meta.url), "utf8");
-  assert.match(source, /\}, \[initialType, paramsKey\]\);/);
-  assert.doesNotMatch(source, /useEffect\([^]*\?\s*\[/);
+  assert.match(source, /\}, \[initialType, paramsKey, refreshVersion\]\);/);
+  assert.match(source, /request !== generation.current/);
   assert.doesNotMatch(source, /<ContentSearchState key=/);
 });
 
@@ -150,7 +150,7 @@ test("content library uses common actions and quiz assignment without a block pi
   const assignment = readFileSync(new URL("./ContentQuizAssignment.tsx", import.meta.url), "utf8");
   assert.ok(actions.indexOf("Bearbeiten") < actions.indexOf("Klonen"));
   assert.ok(actions.indexOf("Klonen") < actions.indexOf("Archivieren"));
-  assert.ok(actions.indexOf("Archivieren") < actions.indexOf("Details"));
+  assert.match(actions, /approveContentQuestion/);
   assert.match(assignment, /Quiz auswählen/);
   assert.doesNotMatch(assignment, /Block auswählen|sectionId/);
   assert.doesNotMatch(assignment, />Hinzufügen<|window\.location\.reload/);
@@ -162,7 +162,7 @@ test("search exposes the current result total and permission-derived event serie
   const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
   const page = readFileSync(new URL("./ContentLibraryPage.tsx", import.meta.url), "utf8");
   assert.match(search, /result\.items\.length.*result\.total/);
-  assert.match(actions, /total: questionResult\.total \+ stories\.length \+ pollItems\.length/);
+  assert.match(actions, /total: questionResult\.total \+ stories\.total \+ polls\.total/);
   assert.match(page, /getAssignableQuestionEventSeries/);
 });
 
@@ -261,7 +261,7 @@ test("polls participate in shared discovery and the quiz add dialog", () => {
   const quizAdd = readFileSync(new URL("../../quiz/[quizId]/QuizFragenHinzufuegen.tsx", import.meta.url), "utf8");
   const quizPage = readFileSync(new URL("../../quiz/[quizId]/page.tsx", import.meta.url), "utf8");
   assert.match(filters, /<option value="POLL">Umfragen<\/option>/);
-  assert.match(actions, /includePolls \? listLivePolls\(actor\)/);
+  assert.match(actions, /includePolls \? searchLivePollWindow\(actor, acceptsPoll, cursor\)/);
   assert.match(actions, /poll\.prompt\.toLocaleLowerCase\("de-DE"\)\.includes\(normalizedQuery\)/);
   assert.match(actions, /contentType: "POLL"/);
   assert.match(quizPage, /searchContent\(parseContentFilters\(new URLSearchParams\("contentType=POLL"\)\)\)/);

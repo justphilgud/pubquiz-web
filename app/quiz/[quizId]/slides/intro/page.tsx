@@ -16,7 +16,7 @@ import {
   FixedSlideField,
   FixedSlideForm,
 } from "../FixedSlideEditor";
-import { saveIntroSlide } from "../fixedSlideActions";
+import { getFixedSlideConfig, saveIntroSlide } from "../fixedSlideActions";
 
 type Props = {
   params: Promise<{ quizId: string }>;
@@ -26,13 +26,7 @@ type Props = {
 const inputClassName =
   "min-h-11 rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100";
 
-const defaultRules = [
-  "Bildet Teams und gebt euch einen Namen",
-  "Scannt den QR-Code",
-  "Bestimmt einen Schreiber",
-  "Nutzt euren Kopf, nicht das Internet",
-  "Der Quizmaster hat immer recht",
-].join("\n");
+import { rulesFromText } from "@/app/quiz/flow/quizFlow";
 
 function HiddenSlideFields({
   quizId,
@@ -51,9 +45,10 @@ function HiddenSlideFields({
 
 export default async function IntroEditorPage({ params, searchParams }: Props) {
   const [{ quizId }, query] = await Promise.all([params, searchParams]);
-  const [quiz, slideVisibility] = await Promise.all([
+  const [quiz, slideVisibility, ruleConfig] = await Promise.all([
     getQuizDetails(Number(quizId)),
     getQuizFixedSlideVisibility(Number(quizId)),
+    getFixedSlideConfig(Number(quizId), "rules"),
   ]);
 
   if (!quiz) {
@@ -64,6 +59,10 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
     ? query.slide
     : INTRO_SLIDES[0].id;
   const [platz1, platz2, platz3] = parsePrizeSlots(quiz.intro_preise);
+  const storedRules = ruleConfig.rules ?? rulesFromText(quiz.intro_regeln);
+  const rulesText = storedRules.map(rule => rule.text).join("\n");
+  const legacyRuleText = quiz.intro_regeln === "" ? "" : rulesFromText(quiz.intro_regeln).map(rule => rule.text).join("\n");
+  const legacyRulesDiffer = storedRules.filter(rule => rule.enabled).map(rule => rule.text).join("\n") !== legacyRuleText;
   const quizIdValue = quiz.quiz_id;
   const previewHref = (route: string) =>
     `/quiz/${quizIdValue}/show/${route}`;
@@ -171,6 +170,8 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
         previewHref={previewHref("regeln")}
       >
         <HiddenSlideFields quizId={quizIdValue} slideId="rules" />
+        {storedRules.some(rule => !rule.enabled) && <p className="text-sm text-slate-600">Einzelne Regeln sind im Ablauf ausgeblendet. Unveränderte Einträge bleiben beim Speichern ausgeblendet; im Ablaufeditor kannst du sie wieder aktivieren.</p>}
+        {legacyRulesDiffer && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-950">Der gespeicherte Ablauf weicht vom älteren Intro-Regeltext ab. Angezeigt wird der Präsentationsinhalt. Beim Speichern werden beide Quellen synchronisiert; individuelle Regelfolien bleiben erhalten.</p>}
         <FixedSlideEnabledField defaultEnabled={slideVisibility.rules} />
         <FixedSlideField
           label="Regeln"
@@ -179,7 +180,7 @@ export default async function IntroEditorPage({ params, searchParams }: Props) {
           <textarea
             name="regeln"
             rows={12}
-            defaultValue={quiz.intro_regeln ?? defaultRules}
+            defaultValue={rulesText}
             className={inputClassName}
           />
         </FixedSlideField>

@@ -986,7 +986,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   }
 
   if (templateData?.kind === "TRANSLATION_READ_ALOUD") {
-    const preparedAudio = frage.medien.find(medium => medium.slotKey === "lyrics_tts_audio") ?? frage.medien.find(medium => isAudio(medium.datei));
+    const preparedAudio = questionPhaseMedia("uebersetzt_vorgelesen", frage.medien, "QUESTION").find(medium => isAudio(medium.datei));
     return (
       <div data-presentation-layout={layoutVariant} className="presentation-question-card flex h-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-cyan-300 bg-slate-950/80 p-10 text-center shadow-[8px_8px_0_#ff00aa]">
         <h2 className="text-5xl font-black leading-tight text-white">{frage.frage}</h2>

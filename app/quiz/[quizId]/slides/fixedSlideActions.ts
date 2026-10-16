@@ -13,7 +13,7 @@ import {
   isOutroSlideId,
   serializePrizeSlots,
 } from "@/app/quiz/fixedSlidesPolicy";
-import { materializeDefaultQuizFlow } from "@/app/quiz/flow/quizFlowRepository.server";
+import { materializeDefaultQuizFlow, saveStandardIntroRules } from "@/app/quiz/flow/quizFlowRepository.server";
 import {
   validateQuizFlowConfig,
   type QuizFlowConfig,
@@ -116,10 +116,7 @@ export async function saveIntroSlide(
         });
         break;
       case "rules":
-        await prisma.quiz.update({
-          where: { quiz_id: quizId },
-          data: { intro_regeln: text(formData, "regeln") || null },
-        });
+        await saveStandardIntroRules(quizId, text(formData, "regeln"), formData.get("enabled") === "on");
         break;
       case "prizes": {
         const preise = serializePrizeSlots([
@@ -135,7 +132,7 @@ export async function saveIntroSlide(
       }
     }
 
-    await saveSlideVisibility(
+    if (slideIdValue !== "rules") await saveSlideVisibility(
       quizId,
       slideIdValue,
       formData.get("enabled") === "on",

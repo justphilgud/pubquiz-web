@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { contentReturnHref } from "@/app/components/content/contentNavigation";
 import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import ContentEditorActionBar from "@/app/components/content/ContentEditorActionBar";
 import {
@@ -39,6 +40,7 @@ function newOption(index: number): LivePollOption {
 
 export default function LivePollEditor({ options, initialPoll, canEdit, canArchive }: Props) {
   const router = useRouter();
+  const libraryReturn = useSearchParams().get("returnTo");
   const [pending, startTransition] = useTransition();
   const [type, setType] = useState<LivePollType>(initialPoll?.type ?? "SINGLE_CHOICE");
   const [prompt, setPrompt] = useState(initialPoll?.prompt ?? "");
@@ -82,7 +84,8 @@ export default function LivePollEditor({ options, initialPoll, canEdit, canArchi
       setStatus(targetStatus);
       setExpectedUpdatedAt(result.updatedAt);
       setMessage({ tone: "success", text: result.message });
-      if (!initialPoll) router.push(`/content/polls/${result.pollId}`);
+      if (libraryReturn) router.push(contentReturnHref(libraryReturn));
+      else if (!initialPoll) router.push(`/content/polls/${result.pollId}`);
       router.refresh();
     });
   }
@@ -148,7 +151,7 @@ export default function LivePollEditor({ options, initialPoll, canEdit, canArchi
       message={message ? <p role={message.tone === "error" ? "alert" : "status"} className={`mb-2 rounded-xl border px-3 py-2 text-sm sm:hidden ${message.tone === "error" ? "border-red-200 bg-red-50 text-red-900" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : undefined}
       onSaveDraft={canEdit ? () => save("DRAFT") : undefined}
       onPublish={canEdit ? () => save("ACTIVE") : undefined}
-      onCancel={() => router.push("/content/polls")}
+      onCancel={() => router.push(libraryReturn ? contentReturnHref(libraryReturn) : "/content/polls")}
     />
     {initialPoll ? <div className="flex flex-wrap gap-3 border-t border-slate-200 pt-4">
       <button type="button" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold" disabled={pending} onClick={() => run(() => duplicateLivePoll(initialPoll.id), "duplicate")}>Duplizieren</button>

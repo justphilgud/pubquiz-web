@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import ContentEditorShell from "@/app/components/content/ContentEditorShell";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { contentReturnHref } from "@/app/components/content/contentNavigation";
 import type { QuestionEditorCapabilities } from "@/app/lib/permissions";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { saveQuestion, changeQuestionStatus } from "../actions";
@@ -184,6 +185,8 @@ export function QuestionEditor({
     (template) => template.enabled && template.selectable,
   );
   const router = useRouter();
+  const returnTo = useSearchParams().get("returnTo");
+  const returnHref = contentReturnHref(returnTo);
   const [draft, setDraft] = useState<QuestionEditorDraft>(() =>
     initialDraft ?? createInitialDraft(scopeOptions),
   );
@@ -712,7 +715,7 @@ export function QuestionEditor({
         if (intent !== "DRAFT" && !pixelSyncFailed) {
           allowNavigationRef.current = true;
           setIsReviewFeedbackOpen(false);
-          router.push("/content");
+          router.push(returnHref);
           router.refresh();
         } else if (options?.resetAfterSuccess) {
           const resetDraft = createInitialDraft(scopeOptions);
@@ -872,6 +875,7 @@ export function QuestionEditor({
 
   function cancelChanges() {
     if (hasUnsavedChanges && !window.confirm(messages.editor.unsavedChanges)) return;
+    if (returnTo) { allowNavigationRef.current = true; router.push(returnHref); return; }
     setDraft(structuredClone(savedDraftRef.current));
     setSaveMessage(null);
     setFieldError(null);
@@ -930,7 +934,7 @@ export function QuestionEditor({
 
   return (
     <QuestionEditorMessagesProvider locale={locale} messages={messages}>
-    <ContentEditorShell eyebrow={messages.editor.eyebrow} title={pageTitle} fallbackHref="/content" footerSpace={showSaveActions}>
+    <ContentEditorShell eyebrow={messages.editor.eyebrow} title={pageTitle} fallbackHref={returnHref} footerSpace={showSaveActions}>
 
       {questionRecord && (
         <QuestionReviewPanel

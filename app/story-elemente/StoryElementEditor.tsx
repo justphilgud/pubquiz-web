@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { contentReturnHref } from "@/app/components/content/contentNavigation";
 import {
   createStoryElement,
   deleteUnusedStoryElement,
@@ -97,6 +98,8 @@ export default function StoryElementEditor({
   onCancel,
 }: Props) {
   const router = useRouter();
+  const libraryReturnParam = useSearchParams().get("returnTo");
+  const libraryReturn = onCreated || onCancel || quizContext || returnTo ? null : libraryReturnParam;
   const [pending, startTransition] = useTransition();
   const initialType = initialStory?.type ?? "ANECDOTE";
   const [type, setType] = useState<StoryElementType>(initialType);
@@ -239,12 +242,14 @@ export default function StoryElementEditor({
       } else if (!initialStory) {
         router.push(`/content/story-elements/${result.storyElementId}`);
       }
+      if (libraryReturn) router.push(contentReturnHref(libraryReturn));
       router.refresh();
     });
   }
 
   function cancelChanges() {
     if (currentFingerprint !== savedFingerprint && !window.confirm("Ungespeicherte Änderungen verwerfen?")) return;
+    if (libraryReturn) { router.push(contentReturnHref(libraryReturn)); return; }
     const saved = savedStateRef.current;
     setType(saved.type);
     setTitle(saved.title);

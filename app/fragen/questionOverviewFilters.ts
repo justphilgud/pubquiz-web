@@ -1,5 +1,6 @@
 export const questionOverviewStatuses = [
   "MY_DRAFTS",
+  "NOT_APPROVED",
   "MY_SUBMITTED",
   "REVIEW_QUEUE",
   "CHANGES_REQUESTED",

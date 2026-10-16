@@ -1,18 +1,22 @@
+/* eslint-disable @next/next/no-img-element -- Authorized editorial thumbnails have dynamic source dimensions. */
 import { MediaBadge, ScopeBadge, StatusBadge, UsageSummary } from "./ContentBadges";
 import ContentActions from "./ContentActions";
 import type { ContentQuizOption, ContentSearchItem, ContentTemplateOption } from "./contentLibrary";
 
-export default function ContentResultRow({ item, quizzes, templates }: { item: ContentSearchItem; quizzes: ContentQuizOption[]; templates: ContentTemplateOption[] }) {
+export default function ContentResultRow({ item, quizzes, templates, returnTo, onNavigate, onUpdated }: { item: ContentSearchItem; quizzes: ContentQuizOption[]; templates: ContentTemplateOption[]; returnTo?: string; onNavigate?: () => void; onUpdated?: (item: ContentSearchItem) => void }) {
   const detailsId = `content-details-${item.contentType.toLowerCase()}-${item.id}`;
   const templateName = item.questionMetrics
     ? templates.find((template) => template.id === item.questionMetrics?.template)?.name ?? item.questionMetrics.template
     : null;
-  return <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+  return <article data-content-key={item.key} tabIndex={-1} className="min-w-0 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
     <div className="flex flex-wrap items-center gap-2"><ContentTypeBadge type={item.contentType} /><StatusBadge status={item.status} archived={item.archived} />{item.lifecycleStatus && <StatusBadge status={item.lifecycleStatus} archived={false} />}<ScopeBadge scope={item.scope} />{item.contentType !== "POLL" && <MediaBadge count={item.mediaCount} />}</div>
-    <h2 className="mt-3 break-words text-xl font-black text-slate-950">{item.title}</h2>
+    {item.imagePreview && <img src={/^https?:\/\//.test(item.imagePreview) || item.imagePreview.startsWith("/") ? item.imagePreview : `/medien/${item.imagePreview}`} alt="Medienvorschau zur Frage" loading="lazy" className="float-right ml-3 mt-2 h-16 w-20 rounded-lg object-contain" />}
+    <h2 className="mt-2 break-words text-base font-bold text-slate-950">{item.title}</h2>
     <p className="mt-1 font-mono text-xs text-slate-500">Content-ID #{item.id} · {item.subtype}</p>
     {item.questionMetrics && <QuestionSolutionPreview preview={item.questionMetrics.solutionPreview} />}
-    <dl className="mt-4 grid gap-x-5 gap-y-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3 lg:grid-cols-4">
+    {item.questionMetrics && <p className="mt-2 text-xs text-slate-600">{item.questionMetrics.categories.join(" · ") || "Keine Kategorie"} · {templateName}</p>}
+    {item.justApproved && <p role="status" className="mt-2 text-sm font-semibold text-emerald-800">Gerade freigegeben – wird beim Aktualisieren neu einsortiert bzw. ausgeblendet.</p>}
+    <details id={detailsId} className="mt-2"><summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">Details und Verwendungen</summary><dl className="mt-2 grid gap-x-5 gap-y-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3 lg:grid-cols-4">
       {item.questionMetrics ? <>
         <Metric label="Kategorie" value={item.questionMetrics.categories.join(", ") || "Nicht gesetzt"} />
         <Metric label="Quelle" value={item.questionMetrics.source || "Nicht gesetzt"} />
@@ -36,10 +40,9 @@ export default function ContentResultRow({ item, quizzes, templates }: { item: C
         <Metric label="Verknüpfte Frage" value={item.storyMetrics?.linkedQuestionTitle ?? "Nicht verknüpft"} />
         <Metric label="Revision" value={String(item.storyMetrics?.revision ?? 1)} />
       </>}
-    </dl>
+    </dl></details>
     <div className="mt-3"><UsageSummary quizCount={item.quizUsages.length} linkedQuestionCount={item.storyMetrics?.linkedQuestionCount} /></div>
-    <div id={detailsId} hidden className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-700"><strong>Technische Zuordnung:</strong> {item.contentType} #{item.id}. Neue Quiz-Zuordnungen landen zunächst unter „Kein Block“.</div>
-    <ContentActions item={item} quizzes={quizzes} detailsId={detailsId} />
+    <ContentActions item={item} quizzes={quizzes} detailsId={detailsId} returnTo={returnTo} onNavigate={onNavigate} onUpdated={onUpdated} />
   </article>;
 }
 

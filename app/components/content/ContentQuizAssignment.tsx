@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { assignContentToQuiz } from "./actions";
 import type { ContentQuizOption, ContentType } from "./contentLibrary";
 
@@ -13,7 +12,6 @@ export default function ContentQuizAssignment({ contentType, contentId, quizzes,
   assignableQuizIds: number[];
   disabled?: boolean;
 }) {
-  const router = useRouter();
   const [assigned, setAssigned] = useState(assignedQuizIds);
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
@@ -26,7 +24,7 @@ export default function ContentQuizAssignment({ contentType, contentId, quizzes,
         setMessage(result.message);
         if (result.success) {
           setAssigned((current) => [...current, Number(quizId)]);
-          router.refresh();
+          // The assignment and confirmation belong to this row; retain search position.
         }
       } catch {
         setMessage("Der Inhalt konnte diesem Quiz nicht zugeordnet werden.");

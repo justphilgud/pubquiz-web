@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 
 import type { MemePresentationSnapshot } from "@/app/quiz/memeVoting.server";
 import { getNextMemeAdvanceCommand, type MemePresentationTransition } from "@/app/quiz/memeVoting";
@@ -29,6 +29,7 @@ const MemePresentationControls = forwardRef<MemePresentationControlsHandle, {
   onChange,
 }, ref) {
   const [pending, setPending] = useState(false);
+  const advancing = useRef(false);
   const [message, setMessage] = useState<string | null>(null);
 
   async function start() {
@@ -107,6 +108,9 @@ const MemePresentationControls = forwardRef<MemePresentationControlsHandle, {
 
   useImperativeHandle(ref, () => ({
     async advance() {
+      if (advancing.current) return true;
+      advancing.current = true;
+      try {
       const command = getNextMemeAdvanceCommand({
         ...state,
         hasResult: Boolean(state.result),
@@ -116,6 +120,7 @@ const MemePresentationControls = forwardRef<MemePresentationControlsHandle, {
       else if (command === "FINALIZE_RESULT") await finalizeResult();
       else await transition(command);
       return true;
+      } finally { advancing.current = false; }
     },
   }));
 

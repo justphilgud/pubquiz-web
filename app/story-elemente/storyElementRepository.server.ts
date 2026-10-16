@@ -1,4 +1,5 @@
 import "server-only";
+import { collectContentWindow, type ContentCursor } from "@/app/components/content/contentPaging";
 
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -162,17 +163,19 @@ function mapStoryElement(
   };
 }
 
-async function queryStoryElements(where: Prisma.story_elementeWhereInput) {
+async function queryStoryElements(where: Prisma.story_elementeWhereInput, take?: number) {
   return prisma.story_elemente.findMany({
     where,
     include: storyElementInclude,
-    orderBy: [{ updated_at: "desc" }, { story_element_id: "desc" }],
+    orderBy: take ? [{ story_element_id: "desc" }] : [{ updated_at: "desc" }, { story_element_id: "desc" }],
+    take,
   });
 }
 
-export async function listStoryElements(
+async function readStoryElementBatch(
   actor: AuthorizationActor,
   filters: StoryElementFilters = {},
+  batch?: { beforeId: number | null; take: number },
 ) {
   const status = isStoryElementStatus(filters.status) ? filters.status : null;
   const type = isStoryElementType(filters.type) ? filters.type : null;
@@ -182,6 +185,7 @@ export async function listStoryElements(
   const stories = await queryStoryElements({
     AND: [
       buildVisibilityWhere(actor),
+      batch?.beforeId ? { story_element_id: { lt: batch.beforeId } } : {},
       status ? { status } : {},
       scope ? { geltungsbereich: scope } : {},
       Number.isSafeInteger(eventSeriesId) && eventSeriesId > 0
@@ -195,19 +199,28 @@ export async function listStoryElements(
       filters.creator === "ME" ? { created_by_user_id: actor.userId } : {},
       type ? { revisionen: { some: { typ: type } } } : {},
     ],
-  });
+  }, batch?.take);
   const normalizedQuery = query?.toLocaleLowerCase("de-DE");
-  return stories
+  const items = stories
     .map(mapStoryElement)
     .filter((story): story is NonNullable<typeof story> =>
       story !== null && canViewStoryElement(actor, story.access) &&
       (!type || story.type === type) &&
-      (!normalizedQuery || `${story.stableKey} ${story.id} ${story.title} ${story.description ?? ""} ${JSON.stringify(story.config)}`.toLocaleLowerCase("de-DE").includes(normalizedQuery)) &&
+      (!normalizedQuery || `${story.stableKey} ${story.id} ${story.title} ${story.description ?? ""}`.toLocaleLowerCase("de-DE").includes(normalizedQuery)) &&
       (filters.mediaState !== "WITH" || story.mediaCount > 0) &&
       (filters.mediaState !== "WITHOUT" || story.mediaCount === 0) &&
       (filters.usageState !== "USED" || story.usageCount + story.questionLinkCount > 0) &&
       (filters.usageState !== "UNUSED" || story.usageCount + story.questionLinkCount === 0),
     );
+  return { items, nextId: batch && stories.length === batch.take ? stories[stories.length - 1].story_element_id : null };
+}
+
+export async function listStoryElements(actor: AuthorizationActor, filters: StoryElementFilters = {}) {
+  return (await readStoryElementBatch(actor, filters)).items;
+}
+
+export async function searchStoryElementWindow(actor: AuthorizationActor, filters: StoryElementFilters, cursor: ContentCursor | null) {
+  return collectContentWindow(beforeId => readStoryElementBatch(actor, filters, { beforeId, take: 100 }), "STORY_ELEMENT", cursor);
 }
 
 export async function listStoryElementPage(

@@ -48,6 +48,11 @@ export function getNextMemeAdvanceCommand(input: {
   return input.hasResult ? "NEXT_QUIZ_SLIDE" : "FINALIZE_RESULT";
 }
 
+export function getMemeAdvanceLabel(input: Parameters<typeof getNextMemeAdvanceCommand>[0]) {
+  const command = getNextMemeAdvanceCommand(input);
+  return ({ START_PRESENTATION: "Memes vorstellen", NEXT_CANDIDATE: "Nächstes Meme / Übersicht", NEXT_OVERVIEW_PAGE: "Nächste Meme-Übersicht", OPEN_VOTING: "Abstimmung öffnen", CLOSE_VOTING: "Abstimmung schließen", FINALIZE_RESULT: "Meme-Ergebnis finalisieren", NEXT_QUIZ_SLIDE: "Weiter" } as Partial<Record<MemeAdvanceCommand, string>>)[command] ?? "Weiter";
+}
+
 export type StoredMemePresentationState = {
   state: MemePresentationPhase;
   activeCandidatePosition: number | null;

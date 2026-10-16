@@ -48,7 +48,8 @@ test("presentation is a read-only live-state consumer", () => {
 
 test("existing moderation owns navigation, releases and live decisions", () => {
   assert.match(toolbar, /label="Zurück"/);
-  assert.match(toolbar, /label="Weiter"/);
+  assert.match(toolbar, /nextLabel = "Weiter"/);
+  assert.match(toolbar, /label=\{nextLabel\}/);
   assert.match(toolbar, /Block schließen|Block freigeben/);
   assert.match(toolbar, /Schätzfrage starten/);
   assert.match(toolbar, /Audio\/Video starten \/ fortsetzen/);

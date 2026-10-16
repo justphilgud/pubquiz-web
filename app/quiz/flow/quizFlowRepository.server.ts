@@ -5,6 +5,7 @@ import { prisma } from "@/app/lib/prisma";
 import {
   buildDefaultQuizFlow,
   parseStoredQuizFlowItem,
+  rulesFromText,
   type QuizFlowItem,
   type StoredQuizFlowItem,
 } from "./quizFlow";
@@ -202,8 +203,9 @@ export async function loadStoredQuizFlowItems(quizId: number) {
 
 export async function materializeDefaultQuizFlow(
   quizId: number,
+  transaction?: Prisma.TransactionClient,
 ): Promise<QuizFlowItem[]> {
-  return prisma.$transaction(async (tx) => {
+  const materialize = async (tx: Prisma.TransactionClient) => {
     const quiz = await tx.quiz.findUnique({
       where: { quiz_id: quizId },
       include: flowQuizInclude,
@@ -296,7 +298,8 @@ export async function materializeDefaultQuizFlow(
     return stored
       .map((item) => parseStoredQuizFlowItem(toStoredQuizFlowItem(item)))
       .filter((item): item is QuizFlowItem => item !== null);
-  });
+  };
+  return transaction ? materialize(transaction) : prisma.$transaction(materialize);
 }
 
 export async function resolveEditableQuizFlowItem(
@@ -322,6 +325,24 @@ export async function resolveEditableQuizFlowItem(
         item.isStandard,
     ) ?? null
   );
+}
+
+/** Explicit saves synchronize only the standard intro; materialization never repairs content. */
+export async function saveStandardIntroRules(quizId: number, value: string, enabled?: boolean) {
+  const rulesText = value.trim() || null;
+  await prisma.$transaction(async tx => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(42001, ${quizId})`;
+    const flow = await materializeDefaultQuizFlow(quizId, tx);
+    const standard = flow.find(item => item.isStandard && item.type === "RULES" && item.anchorType === "BEFORE_QUIZ");
+    if (!standard?.persistentId) throw new Error("Standard-Regelfolie fehlt.");
+    const rules = rulesFromText(rulesText, standard.config.rules);
+    const legacyText = rulesText === null && rules.every(rule => rule.enabled) ? null : rules.filter(rule => rule.enabled).map(rule => rule.text).join("\n");
+    await tx.quiz.update({ where: { quiz_id: quizId }, data: { intro_regeln: legacyText } });
+    await tx.quiz_ablauf_elemente.update({
+      where: { quiz_ablauf_element_id: standard.persistentId },
+      data: { ...(enabled !== undefined ? { ist_sichtbar: enabled } : {}), konfiguration: { ...standard.config, rules } },
+    });
+  });
 }
 
 async function ensureQuizBlockQuestionItems(

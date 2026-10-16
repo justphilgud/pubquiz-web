@@ -30,6 +30,7 @@ function formatSeconds(seconds: number | null | undefined) {
 }
 
 type Props = {
+  nextLabel?: string;
   blockFreigegeben: boolean;
   mediumOverlayAktiv: boolean;
   audioLaeuft: boolean;
@@ -57,6 +58,7 @@ type Props = {
 };
 
 export default function ModerationToolbar({
+  nextLabel = "Weiter",
   blockFreigegeben,
   mediumOverlayAktiv,
   audioLaeuft,
@@ -92,7 +94,7 @@ export default function ModerationToolbar({
         <IconButton icon={ChevronLeftIcon} label="Zurück" onClick={onZurueck} />
         <IconButton
           icon={ChevronRightIcon}
-          label="Weiter"
+          label={nextLabel}
           tone="primary"
           onClick={onWeiter}
         />
