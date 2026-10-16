@@ -68,7 +68,7 @@ jobs:
         env:
           EXPECTED_PRODUCTION_SHA: ${{ inputs.expected_production_sha }}
           RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
-        # Only the two immutable reviewed release pairs in the code are accepted.
+        # Only the immutable reviewed release pairs in the code are accepted.
         # Candidate SQL is used exclusively inside the network-isolated container.
         run: node --import tsx scripts/operations/production-preflight-schema-build.ts
       - uses: actions/upload-artifact@v4
