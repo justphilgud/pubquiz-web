@@ -22,15 +22,19 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   const filters = resolveContentFilterDraft(draft, initialType, paramsKey, filterableTemplateIds);
   const [result, setResult] = useState<ContentSearchResult>({ items: [], total: 0 });
   const generation = useRef(0);
+  const activeSearch = useRef("");
+  const loadingPage = useRef<string | null>(null);
   const loadedPages = useRef(1);
   const resume = useRef<ContentResume | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
+  const searchContext = JSON.stringify([initialType, paramsKey, refreshVersion]);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     const requestFilters = parseContentFilters(new URLSearchParams(paramsKey), initialType, filterableTemplateIds);
     const request = ++generation.current;
+    activeSearch.current = searchContext;
     let previous: ContentResume | null = null;
     try { previous = readContentResume(sessionStorage.getItem(contentResumeKey(pathname, paramsKey))); } catch { /* Storage is optional. */ }
     loadedPages.current = 1;
@@ -40,6 +44,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
         const wantedPages = previous?.pages ?? 1;
         for (let index = 1; index < wantedPages && page.nextCursor && request === generation.current; index++) {
           const next = await searchContent(requestFilters, page.nextCursor);
+          if (request !== generation.current) return;
           page = { ...next, items: [...new Map([...page.items, ...next.items].map(item => [item.key, item])).values()] };
           loadedPages.current++;
         }
@@ -48,7 +53,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
         setResult(page); setError("");
       } catch { if (request === generation.current) setError("Die Inhalte konnten nicht geladen werden."); }
     });
-    return () => { generation.current = request + 1; };
+    return () => { generation.current = request + 1; activeSearch.current = ""; };
     // The localized registry is stable; applied URL filters define the request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialType, paramsKey, refreshVersion]);
@@ -78,6 +83,9 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   function more() {
     if (!result.nextCursor || pending) return;
     const request = generation.current;
+    const pageKey = `${request}:${result.nextCursor}`;
+    if (loadingPage.current === pageKey) return;
+    loadingPage.current = pageKey;
     startTransition(async () => {
       try {
         const page = await searchContent(parseContentFilters(new URLSearchParams(paramsKey), initialType, filterableTemplateIds), result.nextCursor!);
@@ -86,14 +94,20 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
         setResult(current => ({ ...page, items: [...new Map([...current.items, ...page.items].map(item => [item.key, item])).values()] }));
         setError("");
       } catch { if (request === generation.current) setError("Weitere Treffer konnten nicht geladen werden. Bitte erneut versuchen."); }
+      finally { if (loadingPage.current === pageKey) loadingPage.current = null; }
     });
   }
   function updateFilters(next: typeof filters) { setDraft({ initialType, paramsKey, filters: next }); }
   function apply(next = filters) {
-    generation.current++;
-    try { sessionStorage.removeItem(contentResumeKey(pathname, paramsKey)); } catch { /* Optional storage. */ }
+    generation.current++; activeSearch.current = "";
     const params = serializeContentFilters(next);
-    if (params.toString() === paramsKey) setRefreshVersion(value => value + 1);
+    const nextKey = params.toString();
+    if (nextKey !== paramsKey) {
+      const visible = [...document.querySelectorAll<HTMLElement>("[data-content-key]")].find(row => row.getBoundingClientRect().bottom > 0);
+      if (visible?.dataset.contentKey) remember(visible.dataset.contentKey);
+    }
+    try { sessionStorage.removeItem(contentResumeKey(pathname, nextKey)); } catch { /* Optional storage. */ }
+    if (nextKey === paramsKey) setRefreshVersion(value => value + 1);
     else router.push(params.size > 0 ? `${pathname}?${params}` : pathname);
   }
   function reset() { const next = parseContentFilters(new URLSearchParams(), initialType, filterableTemplateIds); updateFilters(next); apply(next); }
@@ -104,7 +118,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
     <ContentFilters filters={filters} categories={categories} eventSeries={eventSeries} templates={templates} loading={pending} onChange={updateFilters} onTemplateChange={changeTemplate} onApply={() => apply()} onReset={reset} />
     <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-700"><span aria-live="polite">{pending ? "Inhalte werden geladen …" : `${result.items.length - heldCount} geladene Treffer · ${result.total} Suchtreffer${heldCount ? ` · ${heldCount} gerade freigegeben` : ""}`}</span><span>Neu angelegt zuerst</span><button type="button" disabled={pending} onClick={() => apply()} className="min-h-11 rounded-xl border px-3">Aktualisieren</button></div>
     {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
-    <div className="space-y-3" aria-busy={pending} inert={pending}>{result.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => setResult(current => ({ ...current, total: Math.max(0, current.total - (filters.status === "NOT_APPROVED" || filters.status === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) }))} />)}</div>
+    <div className="space-y-3" aria-busy={pending} inert={pending}>{result.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => { if (activeSearch.current !== searchContext) return; setResult(current => ({ ...current, total: Math.max(0, current.total - (filters.status === "NOT_APPROVED" || filters.status === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) })); }} />)}</div>
     {result.nextCursor && <button type="button" disabled={pending} onClick={more} className="min-h-11 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white disabled:opacity-50">Weitere Treffer laden</button>}
     {!pending && !error && result.items.length === 0 && <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">Keine passenden Inhalte gefunden.</div>}
   </div>;
