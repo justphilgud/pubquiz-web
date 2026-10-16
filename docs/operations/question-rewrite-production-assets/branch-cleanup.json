@@ -1,0 +1,29 @@
+{
+  "verifiedAtUtc": "2026-10-16T18:26:01.5331898Z",
+  "removedPolicyId": 63303195,
+  "finalTrustedBranches": [
+    "preview/content-and-quiz-flow",
+    "codex/editorial-safe-import",
+    "codex/preview-media-configuration"
+  ],
+  "branch": "codex/openai-question-rewrite-release",
+  "unrelatedEntriesPreserved": true,
+  "mediaConfigurationChanged": false,
+  "finalBranchPolicies": [
+    {
+      "id": 62465429,
+      "name": "codex/editorial-safe-import",
+      "type": "branch"
+    },
+    {
+      "id": 62465430,
+      "name": "codex/preview-media-configuration",
+      "type": "branch"
+    },
+    {
+      "id": 62465427,
+      "name": "preview/content-and-quiz-flow",
+      "type": "branch"
+    }
+  ]
+}

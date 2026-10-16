@@ -1,5 +1,10 @@
 # OpenAI-Formulierungshilfe: Betrieb und Release2
 
+**Release abgeschlossen:** [Production-Abnahme mit Commit, beiden Aliasen,
+vollständiger Usage und entferntem temporärem Zugriff](openai-question-rewrite-production-20261016.md).
+Die folgenden Zwischenstände beschreiben die Vorbereitung und Preview-Abnahme;
+der verlinkte Abschlussbericht enthält den tatsächlichen Production-Nachweis.
+
 ## Ausgangspunkt
 
 Release1 ist auf Production kontrolliert:
