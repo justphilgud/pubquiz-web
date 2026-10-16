@@ -11,8 +11,8 @@ import * as layout from "../memeCaptionLayout";
 
 test("durable worker: upload failure preserves answer/source, retry is idempotent; deletion is inaccessible and retryable", async () => {
   let uploadFails = true; let deleteFails = true; let uploads = 0; let uploadedBytes = Buffer.alloc(0); let latestId = "11111111-1111-1111-1111-111111111111";
-  const source = { source_id: 5, quiz_id: 1, lifecycle_revision: 0, image_bytes: new Uint8Array([1]), layout: {}, image_url: "not-read" };
-  const entry = { entry_id: "11111111-1111-1111-1111-111111111111", source_id: 5, session_id: 7, status: "PENDING", attempts: 0, payload: { topText: "confirmed", bottomText: "" }, source, pending_file: null as Uint8Array | null, blob_url: null as string | null, encryption_key: null as Uint8Array | null, png_sha256: null as string | null, png_size: null as number | null, team_name: "Team", error_message: null as string | null };
+  const source = { source_id: 5, quiz_id: 1, quiz_question_id: 9, lifecycle_revision: 0, image_bytes: new Uint8Array([1]), layout: {}, image_url: "not-read" };
+  const entry = { entry_id: "11111111-1111-1111-1111-111111111111", source_id: 5, session_id: 7, team_id: 4, status: "PENDING", attempts: 0, payload: { topText: "confirmed", bottomText: "" }, source, pending_file: null as Uint8Array | null, blob_url: null as string | null, encryption_key: null as Uint8Array | null, png_sha256: null as string | null, png_size: null as number | null, team_name: "Team", error_message: null as string | null };
   const answer = Object.freeze({ payload: "confirmed", evaluation: "unchanged" });
   const update = (data: Record<string, unknown>) => {
     for (const [key, value] of Object.entries(data)) {

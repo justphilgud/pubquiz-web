@@ -99,6 +99,16 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     const old = await db.meme_archive_entries.findFirstOrThrow({ where: { session_id: teams[0].session.quiz_team_session_id, submission_version: 1 } });
     await db.meme_archive_entries.update({ where: { entry_id: old.entry_id }, data: { status: "READY", blob_url: "https://test.public.blob.vercel-storage.com/test.bin", encryption_key: encrypted.key, png_sha256: encrypted.sha256 } });
     await assert.rejects(repository.loadArchivedPng(quiz.quiz_id, old.entry_id, teams[0].session.quiz_team_session_id), /nicht mehr aktuell/);
+    // A second internal run still belongs to the same question/quiz lifecycle.
+    const repeatedRun = await db.quiz_interaction_runs.create({ data: { quiz_id: quiz.quiz_id, quiz_fragen_id: assignment.quiz_fragen_id, interaction_type: "MEME_CAPTION", state: "OPEN", config_snapshot: run.config_snapshot! } });
+    await db.team_answer_submissions.create({ data: { ...submission(0, 1), interaction_run_id: repeatedRun.interaction_run_id } });
+    const repeatedItems = await repository.listMemeArchive(quiz.quiz_id, teams[0].session.quiz_team_session_id);
+    assert.equal(repeatedItems.length, 1); assert.equal(repeatedItems[0].sourceId, repeatedRun.interaction_run_id);
+    await assert.rejects(repository.loadArchivedPng(quiz.quiz_id, own.id, teams[0].session.quiz_team_session_id), /nicht mehr aktuell/);
+    // Remove only this extra isolated fixture, restoring the three original entries.
+    await db.meme_archive_entries.deleteMany({ where: { source_id: repeatedRun.interaction_run_id } });
+    await db.meme_archive_sources.delete({ where: { source_id: repeatedRun.interaction_run_id } });
+    await db.quiz_interaction_runs.delete({ where: { interaction_run_id: repeatedRun.interaction_run_id } });
     // Explicit historical capture uses the same idempotent function and changes no answer.
     await client.query("SELECT pubquiz.archive_meme_submission(a) FROM pubquiz.team_answer_submissions a");
     assert.equal(await db.meme_archive_entries.count(), 3);

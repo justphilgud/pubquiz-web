@@ -116,6 +116,11 @@ export type MemeArchiveItem = {
 };
 type ArchiveRow = { entry_id: string; quiz_id: number; lifecycle_revision: number; source_id: number;
   team_name: string; question_text: string; submitted_at: Date; status: string; error_message: string | null };
+type SourceGroup = { source_id: number; quiz_id: number; lifecycle_revision: number; quiz_question_id: number | null };
+function groupWhere(source: SourceGroup, teamId: number): Prisma.meme_archive_entriesWhereInput {
+  return { team_id: teamId, source: { quiz_id: source.quiz_id, lifecycle_revision: source.lifecycle_revision,
+    ...(source.quiz_question_id == null ? { source_id: source.source_id } : { quiz_question_id: source.quiz_question_id }) } };
+}
 
 export async function availableMemeRevisions(quizId: number) {
   const rows = await prisma.meme_archive_sources.findMany({ where: { quiz_id: quizId }, distinct: ["lifecycle_revision"], select: { lifecycle_revision: true }, orderBy: { lifecycle_revision: "desc" } });
@@ -125,12 +130,12 @@ export async function availableMemeRevisions(quizId: number) {
 export async function listMemeArchive(quizId: number, sessionId?: number, revision?: number): Promise<MemeArchiveItem[]> {
   const rows = await prisma.$queryRaw<ArchiveRow[]>(Prisma.sql`
     SELECT * FROM (
-      SELECT DISTINCT ON (e.source_id,e.session_id) e.entry_id,e.team_name,e.submitted_at,e.status,e.error_message,
+      SELECT DISTINCT ON (s.lifecycle_revision,COALESCE(s.quiz_question_id,-s.source_id),e.team_id) e.entry_id,e.team_name,e.submitted_at,e.status,e.error_message,
         s.quiz_id,s.lifecycle_revision,s.source_id,s.question_text
       FROM pubquiz.meme_archive_entries e JOIN pubquiz.meme_archive_sources s USING(source_id)
       WHERE s.quiz_id=${quizId} ${sessionId === undefined ? Prisma.empty : Prisma.sql`AND e.session_id=${sessionId}`}
         ${revision === undefined ? Prisma.empty : Prisma.sql`AND s.lifecycle_revision=${revision}`}
-      ORDER BY e.source_id,e.session_id,e.submission_version DESC,e.submission_id DESC
+      ORDER BY s.lifecycle_revision,COALESCE(s.quiz_question_id,-s.source_id),e.team_id,e.submission_id DESC
     ) latest WHERE status <> 'DELETED' ORDER BY lifecycle_revision DESC,source_id,submitted_at LIMIT 501`);
   if (rows.length > 500) throw new Error("Archiv enthält mehr als 500 Memes; bitte den Export eingrenzen.");
   return rows.map(row => {
@@ -143,9 +148,9 @@ export async function listMemeArchive(quizId: number, sessionId?: number, revisi
 /** Caller has verified manager or signed team session; latest-version check prevents old-ID access. */
 export async function loadArchivedPng(quizId: number, id: string, sessionId?: number) {
   const entry = await prisma.meme_archive_entries.findFirst({ where: { entry_id: id, source: { quiz_id: quizId }, ...(sessionId === undefined ? {} : { session_id: sessionId }) },
-    select: { entry_id: true, source_id: true, session_id: true, team_name: true, status: true, blob_url: true, encryption_key: true, png_sha256: true, source: { select: { lifecycle_revision: true } } } });
+    select: { entry_id: true, source_id: true, session_id: true, team_id: true, team_name: true, status: true, blob_url: true, encryption_key: true, png_sha256: true, source: { select: { source_id: true, quiz_id: true, quiz_question_id: true, lifecycle_revision: true } } } });
   if (!entry || entry.status !== "READY" || !entry.blob_url || !entry.encryption_key || !entry.png_sha256) throw new Error("Meme wird noch erstellt oder ist nicht berechtigt.");
-  const latest = await prisma.meme_archive_entries.findFirst({ where: { source_id: entry.source_id, session_id: entry.session_id }, orderBy: [{ submission_version: "desc" }, { submission_id: "desc" }], select: { entry_id: true } });
+  const latest = await prisma.meme_archive_entries.findFirst({ where: groupWhere(entry.source, entry.team_id), orderBy: { submission_id: "desc" }, select: { entry_id: true } });
   if (latest?.entry_id !== id) throw new Error("Diese Version ist nicht mehr aktuell.");
   const png = openPng(await boundedBlobFetch(entry.blob_url), entry.encryption_key, entry.png_sha256);
   return { png, filename: memeFilename({ id, quizId, revision: entry.source.lifecycle_revision, sourceId: entry.source_id, teamName: entry.team_name }) };
@@ -154,15 +159,15 @@ export async function loadArchivedPng(quizId: number, id: string, sessionId?: nu
 export async function deleteArchivedMeme(quizId: number, id: string) {
   await prisma.$transaction(async tx => {
     await lockArchive(tx, quizId, true);
-    const entry = await tx.meme_archive_entries.findFirst({ where: { entry_id: id, source: { quiz_id: quizId } } });
+    const entry = await tx.meme_archive_entries.findFirst({ where: { entry_id: id, source: { quiz_id: quizId } }, include: { source: true } });
     if (!entry) throw new Error("Meme nicht gefunden.");
-    await tx.meme_archive_entries.updateMany({ where: { source_id: entry.source_id, session_id: entry.session_id, status: { not: "DELETED" } }, data: { status: "DELETING", error_message: null } });
+    await tx.meme_archive_entries.updateMany({ where: { ...groupWhere(entry.source, entry.team_id), status: { not: "DELETED" } }, data: { status: "DELETING", error_message: null } });
   });
   // A failed delete stays DELETING (inaccessible) and can be retried explicitly.
   await prisma.$transaction(async tx => {
     await lockArchive(tx, quizId, true);
-    const entry = await tx.meme_archive_entries.findFirstOrThrow({ where: { entry_id: id, source: { quiz_id: quizId } } });
-    const versions = await tx.meme_archive_entries.findMany({ where: { source_id: entry.source_id, session_id: entry.session_id, status: "DELETING" } });
+    const entry = await tx.meme_archive_entries.findFirstOrThrow({ where: { entry_id: id, source: { quiz_id: quizId } }, include: { source: true } });
+    const versions = await tx.meme_archive_entries.findMany({ where: { ...groupWhere(entry.source, entry.team_id), status: "DELETING" } });
     for (const version of versions) {
       // Deterministic path also removes an upload whose DB transaction was interrupted.
       const config = getMediaVerificationServerConfig();
@@ -171,8 +176,10 @@ export async function deleteArchivedMeme(quizId: number, id: string) {
         status: "DELETED", payload: {}, team_name: "", blob_url: null, encryption_key: null, png_sha256: null, png_size: null, pending_file: null, error_message: null,
       } });
     }
-    const remaining = await tx.meme_archive_entries.count({ where: { source_id: entry.source_id, status: { not: "DELETED" } } });
-    if (!remaining) await tx.meme_archive_sources.update({ where: { source_id: entry.source_id }, data: { image_bytes: null } });
+    for (const sourceId of new Set(versions.map(version => version.source_id))) {
+      const remaining = await tx.meme_archive_entries.count({ where: { source_id: sourceId, status: { not: "DELETED" } } });
+      if (!remaining) await tx.meme_archive_sources.update({ where: { source_id: sourceId }, data: { image_bytes: null } });
+    }
   }, { timeout: 30_000 });
 }
 

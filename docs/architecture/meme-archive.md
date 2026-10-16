@@ -40,9 +40,14 @@ Upload-Wiederholungen verwenden dieselben Bytes; nach READY wird die temporäre
 DB-Datei entfernt. Ein abgebrochener Upload kann dadurch weder einen fremden Schlüssel
 noch eine veraltete CDN-Datei hinterlassen.
 
-Die neueste bestätigte Version wird vor dem Statusfilter bestimmt; ein gelöschtes
+Die neueste bestätigte Version wird pro Team-ID, Quizfragenzuordnung und
+Lifecycle-Revision anhand der höchsten Submission-ID bestimmt. Submission-IDs
+werden beim bestätigten Schreiben unter der Quizsperre monoton vergeben; so sind
+auch erneut gestartete interne Question-Runs eindeutig. Bei fehlender Zuordnung
+bleibt der Source-Run ein eigener Fallback-Schlüssel. Die Auswahl erfolgt vor dem
+Statusfilter; ein gelöschtes
 Meme lässt keine ältere Version wieder erscheinen. Explizites Löschen betrifft alle
-Versionen dieses Teams in diesem Frage-Run: zuerst Zugriff sperren, Blob-Dateien
+Versionen dieses Teams für dieselbe Frage und denselben Durchlauf: zuerst Zugriff sperren, Blob-Dateien
 löschen, dann Inhalte und Schlüssel entfernen. Bei Blobfehler bleibt DELETING für
 gezielte Wiederholung bestehen. Technische Tombstones verhindern Wiederauferstehung.
 
