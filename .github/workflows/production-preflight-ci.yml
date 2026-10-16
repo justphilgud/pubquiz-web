@@ -10,6 +10,13 @@ jobs:
   isolated-postgres:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        include:
+          - baseline: 2258c182e68c40a54fbdc4f0a855c9a7306d1a10
+            candidate: b7666e1a3e4fcbe1aec4e7884a30b3603e25b151
+          - baseline: baedd479615d33a7eb7b5e15f18f36450061dc5b
+            candidate: 41f3c2a87fd320757f158c2854e76cab3dac8d6a
     services:
       postgres:
         image: postgres:17
@@ -26,19 +33,20 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
+      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci
       - name: Build independent schema reference, delta proof and separate new-install result in network-isolated PostgreSQL
         env:
-          EXPECTED_PRODUCTION_SHA: 2258c182e68c40a54fbdc4f0a855c9a7306d1a10
+          EXPECTED_PRODUCTION_SHA: ${{ matrix.baseline }}
+          RELEASE_CANDIDATE_SHA: ${{ matrix.candidate }}
         run: |
-          git fetch --no-tags origin "$EXPECTED_PRODUCTION_SHA" 912cd86e70ec51f15a8028c3f34fbe3e86f5fc69 b7666e1a3e4fcbe1aec4e7884a30b3603e25b151
+          git fetch --no-tags origin "$EXPECTED_PRODUCTION_SHA" "$RELEASE_CANDIDATE_SHA" 912cd86e70ec51f15a8028c3f34fbe3e86f5fc69
           node --import tsx scripts/operations/production-preflight-schema-build.ts
       - uses: actions/upload-artifact@v4
         with:
-          name: schema-reference-proof
+          name: schema-reference-proof-${{ matrix.baseline }}
           path: |
             expected-schema.json
             delta-test.json

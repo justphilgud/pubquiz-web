@@ -114,30 +114,35 @@ export class BridgeClient {
     try {
       requireCondition(this.role === "backup" && this.mode === "acceptance", "RETENTION_CONTEXT_REJECTED");
       const inventory: InventoryObject[] = []; const cursors = new Set<string>(); let cursor: string | undefined; let pages = 0;
+      const inspect: (value: unknown, reason: string) => asserts value = (value, reason) => {
+        if (!value) console.error(JSON.stringify({event: "backup-inventory-rejected", reason, pages, objects: inventory.length,
+          maximumPages: INVENTORY_MAX_PAGES, maximumObjects: INVENTORY_TOTAL_LIMIT}));
+        requireCondition(value, "INVENTORY_RESPONSE_INVALID");
+      };
       do {
-        pages += 1; requireCondition(pages <= INVENTORY_MAX_PAGES, "INVENTORY_RESPONSE_INVALID");
+        pages += 1; inspect(pages <= INVENTORY_MAX_PAGES, "PAGE_BOUND");
         const response = await this.access({ operation: "backup-inventory", store: STORE_ID, ...(cursor ? { cursor } : {}) });
         requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
         const result = JSON.parse((await limitedResponse(response, 1024 * 1024)).toString()) as Record<string, unknown>;
-        requireCondition(Object.keys(result).sort().join() === "complete,cursor,objects" && typeof result.complete === "boolean" &&
+        inspect(Object.keys(result).sort().join() === "complete,cursor,objects" && typeof result.complete === "boolean" &&
           Array.isArray(result.objects) && result.objects.length <= INVENTORY_PAGE_LIMIT &&
           (result.cursor === null || inventoryCursor(result.cursor)) &&
-          result.complete === (result.cursor === null), "INVENTORY_RESPONSE_INVALID");
+          result.complete === (result.cursor === null), "PAGE_METADATA");
         inventory.push(...result.objects.map(value => {
-          requireCondition(value !== null && typeof value === "object" && !Array.isArray(value), "INVENTORY_RESPONSE_INVALID");
+          inspect(value !== null && typeof value === "object" && !Array.isArray(value), "OBJECT_SHAPE");
           const object = value as Record<string, unknown>;
-          requireCondition(Object.keys(object).sort().join() === "etag,pathname,size,uploadedAt" &&
+          inspect(Object.keys(object).sort().join() === "etag,pathname,size,uploadedAt" &&
             typeof object.pathname === "string" && object.pathname.startsWith("production/acceptance/") && object.pathname.length <= 240 &&
             typeof object.size === "number" && Number.isSafeInteger(object.size) && object.size > 0 &&
             typeof object.uploadedAt === "string" && Number.isFinite(Date.parse(object.uploadedAt)) &&
-            typeof object.etag === "string" && /^[\x21-\x7e]{1,200}$/.test(object.etag), "INVENTORY_RESPONSE_INVALID");
+            typeof object.etag === "string" && /^[\x21-\x7e]{1,200}$/.test(object.etag), "OBJECT_METADATA");
           return object as InventoryObject;
         }));
-        requireCondition(inventory.length <= INVENTORY_TOTAL_LIMIT, "INVENTORY_RESPONSE_INVALID");
+        inspect(inventory.length <= INVENTORY_TOTAL_LIMIT, "OBJECT_BOUND");
         if (result.complete) cursor = undefined;
         else {
           const next = result.cursor as string;
-          requireCondition(!cursors.has(next), "INVENTORY_RESPONSE_INVALID");
+          inspect(!cursors.has(next), "CURSOR_CYCLE");
           cursors.add(next); cursor = next;
         }
       } while (cursor);

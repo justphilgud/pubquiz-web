@@ -52,12 +52,12 @@ export function verifyArtifact(bytes: Buffer, expected: Artifact) {
   requireCondition(Number.isSafeInteger(expected.bytes) && expected.bytes >= 0 && /^[a-f0-9]{64}$/.test(expected.sha256) &&
     bytes.length === expected.bytes && sha256(bytes) === expected.sha256, "ARTIFACT_CHECKSUM_MISMATCH");
 }
-export async function captureMedia(urls: string[], directory: string) {
+export async function captureMedia(urls: string[], directory: string, request: typeof fetch = fetch) {
   const records: { url: string; name: string; bytes: number; sha256: string; contentType: string }[] = [];
   for (const url of urls) {
     const parsed = new URL(url);
     requireCondition(parsed.protocol === "https:" && parsed.hostname === "bix6h2j23vjzi240.public.blob.vercel-storage.com" && !parsed.port && !parsed.username && !parsed.password && !parsed.search && !parsed.hash, "MEDIA_URL_REJECTED");
-    const response = await fetch(url, { redirect: "error", signal: AbortSignal.timeout(120000), cache: "no-store" });
+    const response = await request(url, { redirect: "error", signal: AbortSignal.timeout(120000), cache: "no-store" });
     requireCondition(response.status === 200 && response.body, "MEDIA_READ_FAILED");
     const bytes = await boundedBytes(response.body); requireCondition(bytes.length > 0, "MEDIA_EMPTY");
     const name = `media-${sha256(url)}.bin`;

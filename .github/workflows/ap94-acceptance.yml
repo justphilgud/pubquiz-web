@@ -104,7 +104,7 @@ jobs:
       - if: steps.gate.outputs.run == 'true'
         run: npm ci
       - if: steps.gate.outputs.run == 'true'
-        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
+        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/meme-archive-backup.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
       - name: Record verified identity claims only
         if: steps.gate.outputs.run == 'true'
         run: node --import tsx scripts/operations/print-claims.ts
