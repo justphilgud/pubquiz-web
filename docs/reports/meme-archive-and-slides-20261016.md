@@ -19,8 +19,10 @@ kein Production-Deployment und kein Production-Backfill.
   Fehlende Originale erhalten positionsgetreue Platzhalter. Nur der Morph-Slot darf
   in der Fragephase erscheinen, einschließlich der Bildvergrößerung. Die Auflösung
   bleibt auch bei noch gesetztem Vergrößerungsstatus als Dreierlayout sichtbar.
-  Alle drei Medien gelangen bereits unverändert aus
-  `getQuizPraesentation` in das View-Model; die Teilnehmerprojektion bleibt geschützt.
+  Explizit vorbereitete Slots bleiben erhalten. Bei im Editor gepflegten Originalen
+  ergänzt ein reiner Presentation-Adapter die festen Rollen aus den eindeutig sortierten
+  Antwortfeldern und deren einzigem `answer_image`. Keine DB-Umschreibung und kein
+  Fallback auf fremde oder mehrdeutige Bilder; die Teilnehmerprojektion bleibt geschützt.
 
 ## Architektur und Migration
 

@@ -3,6 +3,7 @@
 import { saveStandardIntroRules } from "@/app/quiz/flow/quizFlowRepository.server";
 
 import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
+import { faceMorphPresentationMedia } from "@/app/rendering/presentation/faceMorphPresentationMedia";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "./quizLifecycle";
 import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluationRevisionSelect } from "./evaluation/evaluationRevision";
 import { requireQuizAnswerWindow as requireQuizNotStopped, ensureQuizBlockDeadlines } from "./interaction/interaction.server";
@@ -2015,8 +2016,13 @@ export async function getQuizPraesentation(
       const templateConfig = eintrag.fragen.template_config_json as
         | QuestionTemplateConfig
         | null;
+      const questionMedia = faceMorphPresentationMedia(
+        eintrag.fragen.vorlage?.code ?? null,
+        eintrag.fragen.medien,
+        eintrag.fragen.antwortfelder,
+      );
       const presentationMedia: PresentationLayoutMedium[] = [
-        ...eintrag.fragen.medien.map((medium) => ({
+        ...questionMedia.map((medium) => ({
           fileName: medium.datei,
           mediaType: medium.medientyp.medientyp,
           scope: "QUESTION" as const,
@@ -2115,7 +2121,7 @@ export async function getQuizPraesentation(
       kategorien: eintrag.fragen.fragen_kategorien.map(
         (k) => k.fragenkategorie.kategorie,
       ),
-      medien: eintrag.fragen.medien.map((medium) => ({
+      medien: questionMedia.map((medium) => ({
         medien_id: medium.medien_id,
         datei: medium.datei,
         medientyp: medium.medientyp.medientyp,
@@ -2136,7 +2142,7 @@ export async function getQuizPraesentation(
           bemerkung: medium.bemerkung,
         })),
       })),
-      bildMedien: eintrag.fragen.medien
+      bildMedien: questionMedia
         .filter((medium) =>
           medium.medientyp.medientyp.toLowerCase().includes("bild"),
         )

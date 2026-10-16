@@ -16,6 +16,11 @@ Lösungsnamen stammen aus den sortierten kanonischen Antwortfeldern. Fehlende Or
 erhalten einen Platzhalter an ihrer Position. Die Fragephase verwendet ausschließlich
 den Morph-Slot; Originale und unbenannte Medien dürfen nie als Fallback dienen.
 Die Teilnehmerprojektion bleibt unverändert geschützt.
+Der Editor speichert Personenporträts als `answer_image` am jeweiligen kanonischen
+Antwortfeld. Der reine Presentation-Adapter ordnet bei genau zwei eindeutig sortierten
+Feldern deren jeweils einziges Bild den festen Original-Slots zu. Explizit vorbereitete
+Slots haben Vorrang. Fehlende/mehrdeutige Bilder werden nicht geraten; keine DB-Änderung
+und keine Erweiterung der Teilnehmer-Payloads.
 Auch die gemeinsame Bildvergrößerung filtert in der Fragephase auf den Morph-Slot.
 In der Auflösung hat das Dreierlayout Vorrang vor einem noch aktiven Medien-Overlay.
 
@@ -366,8 +371,8 @@ Read-Model-Berechnung verändert weder Bewertung noch Scoring oder Persistenz.
 `face_morph_result` ist der sichtbare, dominante Inhalt der öffentlichen
 Fragephase. Die strukturierten Felder `Person A` und `Person B` gehören zum
 Team-Antwortformular und werden nicht als Eingabekarten in der Präsentation
-gerendert. Die Auflösung kombiniert das Morph-Bild mit den gepflegten Lösungen
-beider Antwortfelder. Presentation-View-Model und Answer-Interaction bleiben
+gerendert. Die Auflösung zeigt beide Originalporträts und das Morph-Bild mit den
+gepflegten Lösungen beider Antwortfelder. Presentation-View-Model und Answer-Interaction bleiben
 damit fachlich getrennt. Der zentrale Layout-Resolver trägt dafür die explizite
 Presentation-Rolle `FACE_MORPH`; der Renderer leitet sie nicht erneut aus der
 generischen Feldanzahl ab.
