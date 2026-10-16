@@ -120,8 +120,9 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        # Same Docker Official Image via its public vendor mirror; no registry credentials.
-        image: public.ecr.aws/docker/library/postgres:17
+        # Docker Official Image; the public ECR mirror currently rejects pulls at its data limit.
+        # Same PostgreSQL major version as before, without additional registry credentials.
+        image: postgres:17
         env:
           POSTGRES_USER: editorial_ci
           POSTGRES_PASSWORD: isolated-ci-only
