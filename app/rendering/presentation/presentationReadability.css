@@ -123,11 +123,16 @@
 }
 .presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-options {
   height: auto;
+  flex-shrink: 0;
   margin-top: 1rem;
   grid-template-columns: minmax(0, 1fr);
   gap: .6rem;
 }
 .presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-option { padding: .5em .75em; }
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-question-card h2 {
+  flex-shrink: 0;
+  font-size: clamp(2rem, 2.5cqw, 3rem) !important;
+}
 .presentation-answer-information {
   margin-top: .5rem;
   font-size: var(--pres-info);

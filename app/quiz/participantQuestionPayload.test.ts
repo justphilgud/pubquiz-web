@@ -161,3 +161,14 @@ test("moderator HTTP transport rejects a normal participant before reading data"
   })) as Response;
   assert.equal(res.status, 401); assert.equal(reads, 0);
 });
+
+test("presentation answer information requires quiz authorization before database access", async () => {
+  let reads = 0;
+  const fn = execute("getQuizPraesentation", "app/quiz/actions.ts", {
+    requireQuizViewer: async () => { throw new Error("FORBIDDEN"); },
+    repairQuizSpecificOrderingAssignments: async () => { reads++; },
+    prisma: { quiz: { findUnique: async () => { reads++; } } },
+  });
+  await assert.rejects(fn(7), /FORBIDDEN/);
+  assert.equal(reads, 0);
+});

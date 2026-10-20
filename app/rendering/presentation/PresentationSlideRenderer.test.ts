@@ -70,6 +70,22 @@ for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "CORPORATE"] as const) {
   });
 }
 
+for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
+  test(`${style}: stored image-question reproduction keeps notes exclusively on the associated resolution`, () => {
+    const question = renderToStaticMarkup(createElement(PresentationSlideRenderer,
+      buildPresentationQualityFixture("image-choice", style)));
+    const solution = renderToStaticMarkup(createElement(PresentationSlideRenderer,
+      buildPresentationQualityFixture("image-choice-solution", style)));
+    for (const answer of ["Hollywood", "Samsung", "Copacabana", "Coca-Cola"]) {
+      assert.ok(question.includes(answer));
+      assert.ok(solution.includes(answer));
+    }
+    assert.doesNotMatch(question, /ca\. 107|41x13m|Gibt es gar nicht|data-correct=/);
+    for (const note of ["ca. 107 × 13,7 m", "41x13m", "Gibt es gar nicht"]) assert.ok(solution.includes(note));
+    assert.match(solution, /data-correct="true"/);
+  });
+}
+
 test("default intro audio is controllable for flow and legacy slides with visible start/pause labels", () => {
   const fixture = buildPresentationQualityFixture("short", "EDITORIAL");
   const quiz = { ...fixture.quiz, intro_musik_url: null, intro_startsequenz_text: "Intro-Test" };
