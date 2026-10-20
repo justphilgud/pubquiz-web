@@ -117,6 +117,28 @@
 .presentation-template.presentation-readable[data-design-style] .presentation-answer-option { display: flex; align-items: center; padding: .8em; }
 .presentation-template.presentation-readable[data-design-style] .presentation-answer-option > span { flex-shrink: 0; }
 
+/* Closed image questions reserve a reading column for question and choices. */
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+}
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-options {
+  height: auto;
+  margin-top: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: .6rem;
+}
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-option { padding: .5em .75em; }
+.presentation-answer-information {
+  margin-top: .5rem;
+  font-size: var(--pres-info);
+  line-height: 1.35;
+  font-weight: 400;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--quiz-surface-text);
+}
+.presentation-solution-answer:has(> .presentation-answer-information) { flex-direction: column; align-items: stretch; }
+
 /* Structured fields and all attached media share the existing media renderer. */
 .presentation-structured-lead { min-width: 0; }
 .presentation-structured-media { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; min-height: 0; margin-top: 1rem; }

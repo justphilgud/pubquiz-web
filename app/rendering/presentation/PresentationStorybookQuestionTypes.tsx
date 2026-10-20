@@ -307,9 +307,12 @@ export function PresentationStorybookQuestionSlide({
       data-presentation-layout={layoutVariant}
       data-storybook-question-kind={kind}
       data-pixel-reveal-step={pixelRevealStep ?? undefined}
+      data-media-choices={kind === "IMAGE" && question.effektiver_antwortmodus === "CLOSED" || undefined}
       className="presentation-storybook-question presentation-storybook-question--media"
     >
-      {lead}
+      {kind === "IMAGE" && question.effektiver_antwortmodus === "CLOSED"
+        ? <div>{lead}<StorybookChoiceRows question={question} /></div>
+        : lead}
       <div className="presentation-storybook-question-media">
         <StorybookMediaFrame medium={medium} label={isPixel ? "Bildenthüllung" : "Fotografie"} />
         {isPixel && pixelRevealStep !== null && (
@@ -375,15 +378,16 @@ function StorybookSolutionAnswers({
     );
   }
 
-  if (kind === "MULTIPLE_CHOICE") {
+  if (kind === "MULTIPLE_CHOICE" || kind === "IMAGE" && question.effektiver_antwortmodus === "CLOSED") {
     return (
       <div>
         <ol className="presentation-storybook-solution-choices">
-          {question.antworten.map((answer, index) => (
+          {[...question.antworten].sort((left, right) => question.antwort_reihenfolge.indexOf(left.antwort_id) - question.antwort_reihenfolge.indexOf(right.antwort_id)).map((answer, index) => (
             <li key={answer.antwort_id} data-correct={answer.ist_richtig}>
               <span>{String.fromCharCode(65 + index)}</span>
               <strong>{answer.antwort}</strong>
               {answer.ist_richtig && <small>Richtige Antwort</small>}
+              {answer.zusatzinformation?.trim() && <p className="presentation-answer-information">{answer.zusatzinformation}</p>}
             </li>
           ))}
         </ol>
@@ -416,6 +420,9 @@ function StorybookSolutionAnswers({
   return (
     <div className={`presentation-storybook-primary-solution presentation-storybook-primary-solution--${kind.toLowerCase()}`}>
       <strong>{primaryLine}</strong>
+      {correctAnswers.map((answer) => answer.zusatzinformation?.trim() ? (
+        <section key={answer.antwort_id}><strong>{answer.antwort}</strong><p className="presentation-answer-information">{answer.zusatzinformation}</p></section>
+      ) : null)}
       {kind === "ESTIMATE" && templateData?.kind === "ESTIMATE" && templateData.explanation && <p>{templateData.explanation}</p>}
     </div>
   );

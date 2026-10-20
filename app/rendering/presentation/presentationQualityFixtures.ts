@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
+export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -118,9 +118,22 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.medien = scenario === "structured-empty" ? [] : [{ medien_id: 42, datei: "audio/unsortiert/Test.wav", medientyp: "Audio", sortierung: 1, bemerkung: null }];
   }
   if (scenario === "solution-long") question.antworten[0].antwort = longOptions[0] + " Seit dem Umzug aus Bonn finden die Sitzungen des Parlaments im Reichstagsgebäude statt.";
+  // Read-only reproduction of existing Oktober question #1361; never writes content.
+  if (scenario === "image-choice" || scenario === "image-choice-solution") {
+    question.frage = "Welcher Schriftzug ist laut Bosch der einzige weltweit, der größer ist als der am Bosch-Parkhaus über der A8?";
+    question.effektiver_antwortmodus = "CLOSED";
+    question.antworten = [
+      ["„Hollywood“ in Los Angeles", "ca. 107 × 13,7 m"],
+      ["„Samsung“ in Seoul", "Gibt es gar nicht"],
+      ["„Copacabana“ in Rio de Janeiro", "Gibt es gar nicht"],
+      ["„Coca-Cola“ in Sydney", "41x13m"],
+    ].map(([antwort, zusatzinformation], index) => ({ antwort_id: index + 1, antwort, zusatzinformation, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
+    question.antwort_reihenfolge = [3, 1, 4, 2];
+    question.medien = [{ medien_id: 77, datei: "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/prod/question-media/question_image/image/580efcbe-042a-42ea-9e6d-8fc2896d400c-147090-AB1dPx4JumbKJbWJJXzy4QVYNga6Uu.jpg", medientyp: "Bild", sortierung: 1, bemerkung: null }];
+  }
   const layoutInput = { templateId: question.templateId, questionText: question.frage, answerOptionCount: question.effektiver_antwortmodus === "CLOSED" ? question.antworten.length : 0, structuredFieldCount: question.antwortfelder.length, media: question.medien.map((m) => ({ fileName: m.datei, mediaType: m.medientyp, scope: "QUESTION" as const })), templateData: question.templateConfig?.templateData };
   question.presentationLayouts = { question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }), solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }) };
-  let slide: Slide = { typ: scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  let slide: Slide = { typ: scenario === "image-choice-solution" || scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
   if (scenario.startsWith("story") || scenario === "poll") slide = {
     typ: "ablauf", abschnitt: null, element: { id: "quality-story", persistentId: null, type: scenario === "poll" ? "LIVE_POLL" : "TEXT", anchorType: "BEFORE_QUIZ", anchorKey: "global", sectionId: null, order: 1, enabled: true, label: "AP5 Referenz", config: { version: 1, title: "Ein unerwarteter Umweg", body: scenario === "story-legacy" ? `${storyText}\n\n${storyText}\n\n${storyText}` : storyText }, configVersion: 1, questionAssignmentId: null, isStandard: false },
   };

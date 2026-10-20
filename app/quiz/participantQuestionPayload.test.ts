@@ -49,7 +49,7 @@ async function status(response: "YEAR" | "COUNTRY" | "TEXT" | "TRUE_FALSE", stat
       : { kind: "FACTS", response, solution: "private-solution", acceptedVariants: ["private-alias"],
           facts: [{ id: "1", text: "Public clue" }], options: [], nestedFutureSolution: "private-future" } },
     vorlage: { code: templateId }, antworten: [
-      { antwort_id: 1, antwort: "Wahr", ist_richtig: true, antworttyp: { antworttyp: "Auswahl" } },
+      { antwort_id: 1, antwort: "Wahr", ist_richtig: true, zusatzinformation: "private-answer-information", antworttyp: { antworttyp: "Auswahl" } },
       { antwort_id: 2, antwort: "Falsch", ist_richtig: false, antworttyp: { antworttyp: "Auswahl" } },
     ], medien: [], antwortfelder: [] } };
   const own = overrides.ownAnswer === undefined ? [] : [{ quiz_fragen_id: 1,
@@ -94,7 +94,7 @@ for (const response of ["YEAR", "COUNTRY", "TEXT", "TRUE_FALSE"] as const) {
       assert.equal(payload.fragen.length, 1);
       assert.equal(payload.fragen[0].resolution ?? null, null);
       const editorial = { ...payload.fragen[0], gespeicherteAntwort: null };
-      assert.doesNotMatch(JSON.stringify(editorial), /private-solution|private-alias|private-explanation|nestedFutureSolution/);
+      assert.doesNotMatch(JSON.stringify(editorial), /private-solution|private-alias|private-explanation|nestedFutureSolution|private-answer-information|zusatzinformation/);
       assert.equal(payload.fragen[0].gespeicherteAntwort?.antwortText, "private-solution");
       for (const light of [false, true]) {
         const route = execute("POST", "app/api/quiz/team-live-snapshot/route.ts", {
