@@ -55,6 +55,17 @@ Farben, Fonts, Rahmen, Bildwelten und visuelle Identität stammen aus dem Theme.
 
 ## Layout und Priorität
 
+Geschlossene Bildfragen behalten das Medienlayout, zeigen aber im Lesebereich
+auch sämtliche Optionen in `antwort_reihenfolge` mit denselben A/B/C-Labels wie
+andere Auswahlfragen. Die Bildfläche gibt dafür Breite ab; offene Bildfragen und
+spezialisierte Renderzweige behalten ihre bestehende Komposition.
+
+`antworten.zusatzinformation` wird unverändert im autorisierten Präsentationsmodell
+bereitgestellt und ausschließlich in der Auflösung an der zugehörigen Antwort
+angezeigt. Zeilenumbrüche und Leerraum bleiben erhalten; leere Informationen
+erzeugen kein Element. Die öffentliche Teilnehmerprojektion enthält dieses Feld
+nicht, auch nicht vor der Auflösung. Keine neuen Speicherfelder oder Datenänderungen.
+
 Kernfrage und Optionen haben Vorrang vor großen Innenabständen und Dekoration.
 Choice verwendet die Frage oben und gleichgewichtete Optionen in zwei Spalten,
 unter 1000 logischen Pixeln in einer Spalte. Die inhaltsbasierte Mindesthöhe der

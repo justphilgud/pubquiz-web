@@ -30,6 +30,62 @@ const rendererSource = readFileSync(
   "utf8",
 );
 
+for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "CORPORATE"] as const) {
+  test(`${style}: image choices retain order and only resolution renders answer information`, () => {
+    const fixture = buildPresentationQualityFixture("choice4", style);
+    assert.equal(fixture.slide.typ, "frage");
+    if (fixture.slide.typ !== "frage") return;
+    const question = fixture.slide.frage;
+    question.medien = [{ medien_id: 77, datei: "flag.png", medientyp: "Bild", sortierung: 1, bemerkung: null }];
+    question.antwort_reihenfolge = [3, 1, 4, 2];
+    question.antworten = question.antworten.map((answer, index) => ({ ...answer,
+      zusatzinformation: index < 2 ? `Information-${answer.antwort_id}\nZweite Zeile` : null,
+    }));
+    question.presentationLayouts.question = resolvePresentationLayout({ templateId: null,
+      phase: "QUESTION", questionText: question.frage, answerOptionCount: 4,
+      structuredFieldCount: 0, media: [{ fileName: "flag.png", mediaType: "Bild", scope: "QUESTION" }],
+    });
+    assert.equal(question.presentationLayouts.question.variant, "MEDIA_FOCUS");
+    const before = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+    assert.match(before, /data-media-choices="true"/);
+    assert.match(before, /src="[^"]*flag.png"/);
+    const options = [...before.matchAll(/class="presentation-answer-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+    assert.equal(options.length, 4);
+    for (const [index, id] of question.antwort_reihenfolge.entries()) {
+      assert.ok(options[index][1].includes(question.antworten.find(answer => answer.antwort_id === id)!.antwort));
+      assert.ok(options[index][1].includes(`${String.fromCharCode(65 + index)}.`));
+    }
+    assert.doesNotMatch(before, /Information-|data-correct=|Richtige Antwort/);
+    const after = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+      ...fixture, slide: { ...fixture.slide, typ: "aufloesung" },
+    }));
+    const resolved = [...after.matchAll(/class="presentation-solution-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+    assert.equal(resolved.length, 4);
+    for (const [index, id] of question.antwort_reihenfolge.entries()) {
+      const answer = question.antworten.find(entry => entry.antwort_id === id)!;
+      if (answer.zusatzinformation) assert.ok(resolved[index][1].includes(answer.zusatzinformation));
+      else assert.doesNotMatch(resolved[index][1], /presentation-answer-information/);
+    }
+    assert.match(after, /data-correct="true"/);
+  });
+}
+
+for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
+  test(`${style}: stored image-question reproduction keeps notes exclusively on the associated resolution`, () => {
+    const question = renderToStaticMarkup(createElement(PresentationSlideRenderer,
+      buildPresentationQualityFixture("image-choice", style)));
+    const solution = renderToStaticMarkup(createElement(PresentationSlideRenderer,
+      buildPresentationQualityFixture("image-choice-solution", style)));
+    for (const answer of ["Hollywood", "Samsung", "Copacabana", "Coca-Cola"]) {
+      assert.ok(question.includes(answer));
+      assert.ok(solution.includes(answer));
+    }
+    assert.doesNotMatch(question, /ca\. 107|41x13m|Gibt es gar nicht|data-correct=/);
+    for (const note of ["ca. 107 × 13,7 m", "41x13m", "Gibt es gar nicht"]) assert.ok(solution.includes(note));
+    assert.match(solution, /data-correct="true"/);
+  });
+}
+
 test("default intro audio is controllable for flow and legacy slides with visible start/pause labels", () => {
   const fixture = buildPresentationQualityFixture("short", "EDITORIAL");
   const quiz = { ...fixture.quiz, intro_musik_url: null, intro_startsequenz_text: "Intro-Test" };

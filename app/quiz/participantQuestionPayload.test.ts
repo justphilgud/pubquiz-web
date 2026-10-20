@@ -49,7 +49,7 @@ async function status(response: "YEAR" | "COUNTRY" | "TEXT" | "TRUE_FALSE", stat
       : { kind: "FACTS", response, solution: "private-solution", acceptedVariants: ["private-alias"],
           facts: [{ id: "1", text: "Public clue" }], options: [], nestedFutureSolution: "private-future" } },
     vorlage: { code: templateId }, antworten: [
-      { antwort_id: 1, antwort: "Wahr", ist_richtig: true, antworttyp: { antworttyp: "Auswahl" } },
+      { antwort_id: 1, antwort: "Wahr", ist_richtig: true, zusatzinformation: "private-answer-information", antworttyp: { antworttyp: "Auswahl" } },
       { antwort_id: 2, antwort: "Falsch", ist_richtig: false, antworttyp: { antworttyp: "Auswahl" } },
     ], medien: [], antwortfelder: [] } };
   const own = overrides.ownAnswer === undefined ? [] : [{ quiz_fragen_id: 1,
@@ -94,7 +94,7 @@ for (const response of ["YEAR", "COUNTRY", "TEXT", "TRUE_FALSE"] as const) {
       assert.equal(payload.fragen.length, 1);
       assert.equal(payload.fragen[0].resolution ?? null, null);
       const editorial = { ...payload.fragen[0], gespeicherteAntwort: null };
-      assert.doesNotMatch(JSON.stringify(editorial), /private-solution|private-alias|private-explanation|nestedFutureSolution/);
+      assert.doesNotMatch(JSON.stringify(editorial), /private-solution|private-alias|private-explanation|nestedFutureSolution|private-answer-information|zusatzinformation/);
       assert.equal(payload.fragen[0].gespeicherteAntwort?.antwortText, "private-solution");
       for (const light of [false, true]) {
         const route = execute("POST", "app/api/quiz/team-live-snapshot/route.ts", {
@@ -160,4 +160,15 @@ test("moderator HTTP transport rejects a normal participant before reading data"
     method: "POST", body: JSON.stringify({ quizId: 7, role: "ADMIN", includeLiveModeration: true }),
   })) as Response;
   assert.equal(res.status, 401); assert.equal(reads, 0);
+});
+
+test("presentation answer information requires quiz authorization before database access", async () => {
+  let reads = 0;
+  const fn = execute("getQuizPraesentation", "app/quiz/actions.ts", {
+    requireQuizViewer: async () => { throw new Error("FORBIDDEN"); },
+    repairQuizSpecificOrderingAssignments: async () => { reads++; },
+    prisma: { quiz: { findUnique: async () => { reads++; } } },
+  });
+  await assert.rejects(fn(7), /FORBIDDEN/);
+  assert.equal(reads, 0);
 });

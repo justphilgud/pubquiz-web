@@ -1802,6 +1802,7 @@ export type QuizPraesentationResult = {
       antwort: string;
       ist_richtig: boolean;
       antworttyp: string;
+      zusatzinformation?: string | null;
       medien: {
         medien_id: number;
         datei: string;
@@ -2134,6 +2135,7 @@ export async function getQuizPraesentation(
         antwort: antwort.antwort,
         ist_richtig: antwort.ist_richtig,
         antworttyp: antwort.antworttyp.antworttyp,
+        zusatzinformation: antwort.zusatzinformation,
         medien: antwort.medien.map((medium) => ({
           medien_id: medium.medien_id,
           datei: medium.datei,

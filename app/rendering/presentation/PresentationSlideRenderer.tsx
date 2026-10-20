@@ -1020,6 +1020,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
         data-presentation-layout={layoutVariant}
         data-question-template={frage.templateId ?? undefined}
         data-pixel-reveal-step={pixelRevealStep ?? undefined}
+        data-media-choices={hatAntwortmoeglichkeiten || undefined}
         className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.48fr_1.52fr]"
       >
         <div className="presentation-question-card flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/70 p-5 shadow-[7px_7px_0_#00e5ff]">
@@ -1034,7 +1035,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
           <h2 className="text-3xl font-black leading-tight text-white drop-shadow-[3px_3px_0_#ff00aa] xl:text-4xl">
             {frage.frage}
           </h2>
-
+          {hatAntwortmoeglichkeiten && renderAntwortOptionen(frage)}
         </div>
 
         <div className="min-h-0 rounded-[1.5rem] border-4 border-yellow-300 bg-black/45 p-5 shadow-[8px_8px_0_#ff00aa]">
@@ -1762,6 +1763,9 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
                   {String.fromCharCode(65 + index)}.
                 </span>
                 {antwort.antwort}
+                {antwort.zusatzinformation?.trim() && (
+                  <p className="presentation-answer-information">{antwort.zusatzinformation}</p>
+                )}
               </div>
             ))}
 
@@ -1794,6 +1798,9 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
             richtigeAntworten.map((antwort) => (
               <div key={antwort.antwort_id} data-correct="true" className="presentation-solution-answer presentation-correct-answer flex min-h-0 items-center rounded-3xl border-4 border-emerald-300 bg-black/45 p-7 shadow-[6px_6px_0_#00e5ff]">
                 <div className="presentation-correct-answer-value text-5xl font-black leading-tight text-yellow-200 drop-shadow-[4px_4px_0_#16a34a] xl:text-7xl">{antwort.antwort}</div>
+                {antwort.zusatzinformation?.trim() && (
+                  <p className="presentation-answer-information">{antwort.zusatzinformation}</p>
+                )}
               </div>
             ))}
 
