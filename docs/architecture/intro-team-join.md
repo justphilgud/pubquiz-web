@@ -19,6 +19,17 @@ QR-DOM, QR-Wert und bestehender Beitrittslink werden durch Animation nicht erset
 
 ## Beitritt und Live-State
 
+Die Standardbegrüßung übernimmt bei der Ablaufauflösung die gespeicherten
+`quiz.intro_begruessungstitel` und `quiz.intro_begruessungstext` vor einer älteren
+materialisierten WELCOME-Konfiguration. Ohne individuellen Quizwert bleibt die
+bisherige Ablaufkonfiguration beziehungsweise der Standard-Fallback erhalten.
+Zusätzliche eigene WELCOME-Elemente bleiben unverändert. Titel behalten ihre
+Schreibweise; der vollständige Text nutzt die vorhandene Absatzdarstellung.
+Eine bereits geöffnete Präsentation benötigt nach Inhaltsänderungen ein Neuladen,
+da die Live-Snapshots nur den Laufzeitstand aktualisieren. Keine Persistenzänderung.
+Regression: `quizFlow.test.ts` prüft aktuelle Inhalte, Fallback und unveränderte
+Nachbarfolien sowie die erneute Auflösung nach Reload.
+
 `startGlobalTeamQuizSession` bleibt unverändert. Globale Team-ID und Profil bleiben
 in `teams`, die konkrete Teilnahme in `quiz_team_sessions`. Upsert auf Quiz/Team
 verwendet bei Wiederanmeldung dieselbe Session-ID. PREPARATION und RUNNING erlauben

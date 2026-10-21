@@ -854,6 +854,18 @@ export function resolveQuizFlow(
   }
 
   return resolved.map((item) => {
+    // The intro editor saves these fields on the quiz; a materialized standard
+    // welcome may still contain the values from when the flow was first created.
+    if (item.type === "WELCOME" && item.isStandard) {
+      return {
+        ...item,
+        config: {
+          ...item.config,
+          title: quiz.intro_begruessungstitel ?? item.config.title,
+          body: quiz.intro_begruessungstext ?? item.config.body,
+        },
+      };
+    }
     if (item.type !== "ROUND_INTRO" || !item.isStandard || item.sectionId === null) {
       return item;
     }
