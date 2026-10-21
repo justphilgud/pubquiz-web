@@ -2777,7 +2777,7 @@ function renderFlowContentSlide(slide: Extract<Slide, { typ: "ablauf" }>) {
                   ? "Zum Abschluss"
                   : "Hinweis"}
       </p>
-      <h2>{config.title ?? slide.element.label ?? "Quizabend"}</h2>
+      <h2 style={type === "WELCOME" && slide.element.isStandard && quiz.intro_begruessungstitel != null ? { textTransform: "none" } : undefined}>{config.title ?? slide.element.label ?? "Quizabend"}</h2>
       {config.subtitle && <p className="presentation-flow-subtitle">{config.subtitle}</p>}
       {config.body && <p className="presentation-flow-lead">{config.body}</p>}
 

@@ -30,6 +30,26 @@ const rendererSource = readFileSync(
   "utf8",
 );
 
+test("standard welcome renders current quiz copy with intact paragraphs and title casing", () => {
+  const fixture = buildPresentationQualityFixture("intro", "CORPORATE");
+  fixture.quiz.intro_begruessungstitel = "im LOVD";
+  fixture.quiz.intro_begruessungstext = "Willkommen zum heutigen Quizabend!\n\nNATAN heißt jetzt LOVD";
+  fixture.quiz.ablaufElemente = [{
+    quiz_ablauf_element_id: 31, typ: "WELCOME", anker_typ: "BEFORE_QUIZ",
+    anker_schluessel: "QUIZ", quiz_abschnitt_id: null, sortierung: 30,
+    ist_sichtbar: true, ist_standard: true, bezeichnung: "Begrüßung",
+    konfiguration: { version: 1, title: "Oktober", body: "Willkommen zum heutigen Quizabend!" },
+  }];
+  const slides = buildPraesentationSlides(fixture.quiz);
+  const slideIndex = slides.findIndex((slide) => slide.typ === "ablauf" && slide.element.type === "WELCOME");
+  const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    ...fixture, slides, slideIndex, slide: slides[slideIndex],
+  }));
+  assert.match(html, /<h2 style="text-transform:none">im LOVD<\/h2>/);
+  assert.ok(html.includes(`class="presentation-flow-lead">${fixture.quiz.intro_begruessungstext}</p>`));
+  assert.ok(!html.includes(">Oktober<"));
+});
+
 for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "CORPORATE"] as const) {
   test(`${style}: image choices retain order and only resolution renders answer information`, () => {
     const fixture = buildPresentationQualityFixture("choice4", style);

@@ -8,7 +8,58 @@ import {
   isQuizGlobalFlowItemType,
   validateQuizFlowConfig,
   formatRoundContentCounts,
+  type QuizFlowItem,
 } from "./quizFlow";
+
+function storedFlowItem(item: QuizFlowItem, index: number) {
+  return {
+    quiz_ablauf_element_id: index + 1,
+    typ: item.type,
+    anker_typ: item.anchorType,
+    anker_schluessel: item.anchorKey,
+    quiz_abschnitt_id: item.sectionId,
+    sortierung: item.order,
+    ist_sichtbar: item.enabled,
+    bezeichnung: item.label,
+    konfiguration: item.config,
+    ist_standard: item.isStandard,
+  };
+}
+
+test("aktuelle Intro-Begrüßung ersetzt nur die veraltete Standardkopie, auch nach Reload", () => {
+  const original = { ...quizFixture(), titel: "Oktober", intro_video_url: "/intro.mp4", intro_preise: "Preise" };
+  const stored = buildDefaultQuizFlow(original).map(storedFlowItem);
+  const quiz = {
+    ...original,
+    intro_begruessungstitel: "im LOVD",
+    intro_begruessungstext: "Willkommen zum heutigen Quizabend!\n\nNATAN heißt jetzt LOVD",
+  };
+  const before = resolveQuizFlow(original, stored);
+  const after = resolveQuizFlow(quiz, stored);
+  const welcome = after.find((item) => item.type === "WELCOME");
+  assert.equal(welcome?.config.title, "im LOVD");
+  assert.equal(welcome?.config.body, quiz.intro_begruessungstext);
+  assert.deepEqual(after.map((item) => item.id), before.map((item) => item.id));
+  assert.deepEqual(after.filter((item) => item.type !== "WELCOME"), before.filter((item) => item.type !== "WELCOME"));
+  assert.deepEqual(resolveQuizFlow(quiz, JSON.parse(JSON.stringify(stored))), after);
+  assert.equal(resolveQuizFlow(quiz, []).find((item) => item.type === "WELCOME")?.config.body, quiz.intro_begruessungstext);
+});
+
+test("Begrüßung bewahrt Fallbacks und zusätzliche eigene WELCOME-Inhalte", () => {
+  const quiz = quizFixture();
+  const stored = buildDefaultQuizFlow(quiz).map(storedFlowItem);
+  const welcome = resolveQuizFlow(quiz, stored).find((item) => item.type === "WELCOME");
+  assert.equal(welcome?.config.title, "Testquiz");
+  assert.equal(welcome?.config.body, "Willkommen zum heutigen Quizabend!");
+  const custom = {
+    ...stored.find((item) => item.typ === "WELCOME")!,
+    quiz_ablauf_element_id: 1000,
+    ist_standard: false,
+    konfiguration: { version: 1, title: "Eigener Auftakt", body: "Eigener Text" },
+  };
+  const result = resolveQuizFlow({ ...quiz, intro_begruessungstitel: "im LOVD", intro_begruessungstext: "Aktuell" }, [...stored, custom]);
+  assert.deepEqual(result.find((item) => item.persistentId === 1000)?.config, custom.konfiguration);
+});
 
 function quizFixture() {
   return {
