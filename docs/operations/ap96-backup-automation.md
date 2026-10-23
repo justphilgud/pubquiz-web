@@ -300,5 +300,11 @@ nicht als Wiederherstellungspunkt. Der isolierte Preflight des verifizierten
 Manifest/Medienintegrität sowie Identität, Rechte und Leerzustand der temporären
 Testdatenbank PASS; `restoreExecuted=false`. Die anschließende tatsächliche
 Wiederherstellung wurde als Run 39932475893 mit derselben Backupkennung,
-Manifest-SHA und isolierten Testdatenbank gestartet. Sie benötigt erneut den
-menschlichen Required Reviewer; Preflight-PASS ist noch kein Restore-PASS.
+Manifest-SHA und isolierten Testdatenbank separat menschlich freigegeben und ist
+am 23.10.2026 um 11:51:50 MESZ erfolgreich abgeschlossen: `restoreExecuted=true`,
+`databaseIntegrity=PASS`, `mediaIntegrity=PASS`, 834 Medienobjekte. Das Artefakt
+`isolated-restore-evidence` (ID 12493356240) belegt den tatsächlichen Restore.
+Details, Zielbindung und bewusst nicht ausgeführter Browser-Spieltest stehen im
+[Änderungsbericht](../reports/ten-improvements-20261023.md#echter-isolierter-restore--abgeschlossen).
+Der heutige Readbackfehler und die erst nach Integration aktive Wochenumstellung
+bleiben unabhängig von diesem erfolgreichen Wiederherstellungstest offen.
