@@ -308,3 +308,33 @@ Details, Zielbindung und bewusst nicht ausgeführter Browser-Spieltest stehen im
 [Änderungsbericht](../reports/ten-improvements-20261023.md#echter-isolierter-restore--abgeschlossen).
 Der heutige Readbackfehler und die erst nach Integration aktive Wochenumstellung
 bleiben unabhängig von diesem erfolgreichen Wiederherstellungstest offen.
+
+## Frischer Backup-/Readbacknachweis nach der Ursachenuntersuchung
+
+Operations-PR #126 ist nach vollständiger grüner CI auf Main
+`ab82b41798a0106386302f6a515aaf306c2ae5c1` integriert. Das 90-Minuten-Jobbudget
+ist damit bereits aktiv, unabhängig von der späteren Wochenumstellung in #125.
+Die neue Diagnose gibt ausschließlich Zugriffsstufe und numerischen HTTP-Status
+aus; keine Tokens, signierten URLs, Header oder Providertexte. Sie ist noch kein
+behaupteter Fix des unbekannten historischen Readback-Auslösers.
+
+Der **frische** manuelle [Run 39974643272](https://github.com/justphilgud/pubquiz-web/actions/runs/39974643272)
+ist einschließlich Retention-Dry-Run erfolgreich. Snapshot 23.10.2026 17:02:15 MESZ,
+Manifest-SHA256 `5ec1ca5e3571cf88db9627fdac4ccdc77f41844fc7e408301f1341b520af3727`.
+Sein eigenes Artefakt `external-import-backup-evidence` bestätigt vollständiges
+Backup, vorhandenes Manifest, verifizierten Readback und Integrität. Alle
+841 Objekte einschließlich 838 Medienobjekten, Dump, Auth-Overlay und Manifest
+werden vollständig zurückgelesen und mit den ursprünglichen Größen/Hashes verglichen.
+Anonymer Manifestzugriff bleibt gesperrt. Das ist ein neuer Funktionsnachweis,
+kein Verweis auf den älteren Restore. Keine Quelldatenänderung und kein neuer Restore.
+
+Der zweite frische [Run 39980092521](https://github.com/justphilgud/pubquiz-web/actions/runs/39980092521)
+hat ebenfalls den vollständigen Backup-Schritt bestanden (Snapshot 17:40:36 MESZ,
+Manifest fertig 18:21:36 MESZ, 841 Objekte). Sein eigenes Erfolgsartefakt bestätigt
+Readback und Integrität; Manifest-SHA256
+`f9188b9ab660a40a1417048b1362ff40a18c662160d5a397fc3d58b9503f38e0`.
+Der genaue historische Readback-Auslöser ist in beiden Läufen nicht reproduziert
+und weiterhin nicht gezielt behoben. Die konkrete Merge-Bewertung steht im
+[Abschlussbericht](../reports/ten-improvements-20261023.md).
+Der echte Wochenlauf kann erst nach Integration des Cronwechsels belegt werden;
+sein Fehlen vor Integration wird nicht mit einer ungeprüften Backup-Funktion gleichgesetzt.

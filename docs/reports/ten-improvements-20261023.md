@@ -116,6 +116,91 @@ Outroprops werden beim Laden bezogen; die vorhandene Laufzeitabfrage ersetzt
 keinen Reload der Inhaltsdaten. Die Moderation speichert Prognosebeobachtungen
 lokal; Quizlaufzeit, Antworten und Punkte werden dadurch nicht zurückgesetzt.
 
+## PRIVATE_READBACK_FAILED – neue Untersuchung und frischer Nachweis
+
+Der Nachtrag trennt die vorab prüfbare Backup-Funktion, den noch offenen konkreten
+Auslöser der historischen Abbrüche und den echten Wochenplanlauf nach Integration.
+Ein erfolgreicher Restore eines alten Backups wird ausdrücklich nicht als frischer
+Backup-/Readbacknachweis verwendet.
+
+- Historische Abbrüche: Run 39389454561 vom 20.10. nach Objekt 361/798
+  (1.972.216 Bytes) und Run 39920641414 vom 23.10. nach Objekt 503/840
+  (8.480 Bytes), jeweils im privaten Readback nach erfolgreichem Upload.
+  Die betroffenen Inhalte haben unterschiedliche SHA-256-Werte. Der damalige
+  Phasenfilter fasst Grant-, GET- und Lesefehler zusammen; der konkrete HTTP-Status
+  ist nicht erhalten. Zugängliche Bridge-Logs und Blob-Nutzungsmetriken liefern
+  keine nachträglich belastbare konkrete Blob-GET-Fehlerantwort.
+- [Operations-PR #126](https://github.com/justphilgud/pubquiz-web/pull/126), nach
+  vollständiger grüner CI regulär auf Main `ab82b41798a0106386302f6a515aaf306c2ae5c1`
+  integriert: Diagnose ausschließlich aus `GRANT`/`GET`/`BODY` und numerischem
+  HTTP-Status, keine URLs, Tokens, Header, Providertexte oder Exception-Causes.
+  Keine neuen Retries, keine geänderten Berechtigungen oder abgeschwächten
+  Größen-/Hashprüfungen. Der separate nachgewiesene 45-Minuten-Timeout wird durch
+  90 Minuten Jobbudget behoben; das ist kein behaupteter Readback-Ursachenfix.
+- Der Deployment-Scope in [Run 39975013936](https://github.com/justphilgud/pubquiz-web/actions/runs/39975013936)
+  hat `Approve, migrate and deploy Production` ausdrücklich übersprungen.
+  Production bleibt auf `a4c3dd8bce44dfe9a16d4e8138635df92780b05e`.
+- **Frischer Funktionsnachweis PASS:**
+  [Run 39974643272](https://github.com/justphilgud/pubquiz-web/actions/runs/39974643272),
+  neuer Snapshot 23.10.2026 17:02:15 MESZ, Backupmanifest 17:37:33 MESZ,
+  gesamter Workflow einschließlich Retention-Dry-Run erfolgreich um 17:39:51 MESZ.
+  Backupkennung `production/acceptance/run-39974643272-1`,
+  Manifest-SHA256 `5ec1ca5e3571cf88db9627fdac4ccdc77f41844fc7e408301f1341b520af3727`.
+  Das maschinelle Artefakt `external-import-backup-evidence` (ID 12512448347)
+  bestätigt `completed=true`, `manifestPresent=true`, `readbackVerified=true` und
+  `integrityVerified=true`. 841 Objekte einschließlich Datenbankdump,
+  Auth-Overlay, 838 Medienobjekten und Manifest wurden seriell verarbeitet;
+  jedes wird vollständig gelesen und nach Größe/SHA-256 verglichen. Auch der
+  negative anonyme Manifestzugriff ist Voraussetzung des erfolgreichen Schritts.
+  Keine Wiederherstellung und keine Quelldatenänderung ausgeführt.
+- Beide früher betroffenen Medienbytes sind im frischen erfolgreichen Lauf wieder
+  enthalten (nun Objekt 391 und 504) und wurden mit identischen Hashes verifiziert.
+  Es gab keinen protokollierten Readbackfehler, 1.683 Bridge-Aufrufe und neun
+  OIDC-Abrufe mit acht regulären Refreshes; kein OIDC-Endfehler.
+- Der historische Readback-Auslöser ist damit **noch nicht reproduziert oder
+  gezielt behoben**. Ein erster erfolgreicher neuer Lauf wird nicht als Beweis
+  einer Ursachenkorrektur ausgegeben. Auch der zweite serielle Reproduktionslauf
+  [39980092521](https://github.com/justphilgud/pubquiz-web/actions/runs/39980092521)
+  hat den frischen Backup-Schritt erfolgreich abgeschlossen: Snapshot 17:40:36 MESZ,
+  Manifest fertig 18:21:36 MESZ, erneut 841 vollständig zurückgelesene Objekte.
+  Manifest-SHA256 `f9188b9ab660a40a1417048b1362ff40a18c662160d5a397fc3d58b9503f38e0`.
+  Sein eigenes Artefakt bestätigt ebenfalls alle vier Erfolgsflags. Kein Restore.
+- Die neue reine Production-Releaseermittlung aus PR #125 wurde zusätzlich gegen
+  die tatsächlichen GitHub-Deploymentmetadaten ausgeführt und liefert korrekt
+  `a4c3dd8`. Das bestätigt diese vorab prüfbare Komponente. Der echte Wochenlauf
+  nach dem Cronwechsel ist davon getrennt und kann erst nach Integration von #125
+  auftreten; sein Fehlen vor Integration ist kein eigenständiger Vorabblocker.
+
+## Merge-Bereitschaft von PR #125 nach der Readback-Untersuchung
+
+- Main `ab82b417` ist in den PR integriert. Für Stand `1037ff2c` sind Prisma,
+  TypeScript, Tests, Changed-file-ESLint, Build, echte PostgreSQL-Importtransaktionen,
+  Bridge und isolierte Restore-Integration grün. Keine Mergekonflikte; keine
+  ausstehende verpflichtende Review-Entscheidung vom GitHub-API gemeldet.
+- **Noch keine uneingeschränkte Freigabe:** Der ausdrücklich verlangte gezielte
+  Ursachenfix für den historischen `PRIVATE_READBACK_FAILED` ist nicht nachgewiesen.
+  Zwei frische vollständige Erfolge ersetzen diese Ursachenklärung nicht. Die
+  alten Logs enthalten keine konkrete Fehlerstufe/HTTP-Antwort; zugängliche
+  Provideransichten liefern die private Blob-GET-Antwort nicht nachträglich.
+  Ein erneuter realer Fehler mit der jetzt aktiven redigierten Diagnose oder
+  korrelierbare Providerdaten sind nötig, bevor ein gezielter Verhaltensfix möglich ist.
+  Keine pauschalen Retries oder gelockerten Sicherheitsprüfungen auf Verdacht.
+- Die offene öffentliche Meme-Abstimmungsphase wurde in dieser Abnahme nur in
+  der Moderationsvorschau gesehen, nicht vor der Startüberlagerung der tatsächlichen
+  Präsentation. Das bleibt eine Browser-Abnahmelücke. Physischer Monitorwechsel/
+  echtes OS-Vollbild und der reale zehnminütige Warteversuch bleiben ebenfalls
+  wie oben beschrieben unverifiziert; automatische Ersatzprüfungen sind benannt.
+- Die vom Nutzer bestätigte Meme-Navigationssperre ist eine bewusste Einschränkung,
+  kein heimlich geänderter Vertrag. Der Zwischenfragen-Livefall ist nicht abgenommen.
+- Der echte Wochenplanlauf ist erst nach Integration des Cronwechsels nachweisbar.
+  Vorab sind Sicherung/Readback/Integrität zweimal real und die Releaseermittlung
+  separat geprüft. Nach Integration muss der erste planmäßige Montagslauf mit
+  korrekter Production-SHA und Integritätsartefakt kontrolliert werden.
+- PR #125 bleibt Draft und ungemergt. Kein Anwendungsdeployment ausgeführt;
+  Production bleibt `a4c3dd8`. Operations-PR #126 ist regulär gemergt; dessen
+  Deployment-Scope hat den Anwendungsdeploy übersprungen. Keine Produktionsdaten
+  zurückgesetzt. Dokumentationsnachtrag erhält erneut die normalen PR-Prüfungen.
+
 ## Echter isolierter Restore – abgeschlossen
 
 - [Preflight 39924682983](https://github.com/justphilgud/pubquiz-web/actions/runs/39924682983):
@@ -139,8 +224,9 @@ lokal; Quizlaufzeit, Antworten und Punkte werden dadurch nicht zurückgesetzt.
   Eine spätere Bereinigung ist separat zu autorisieren.
 - Das bestehende Backup enthält die veraltete Releasezuordnung `fecca333`; der
   bestätigte Daten-/Medien-Snapshot wird dadurch nicht zu einem aktuellen Backup.
-  Der PR korrigiert die Ermittlung für zukünftige planmäßige Läufe. Neuer Wochenplan
-  und 90-Minuten-Budget sind vor Integration nicht aktiv. Heutiger Readbackfehler
+  Der PR korrigiert die Ermittlung für zukünftige planmäßige Läufe. Der neue Wochenplan
+  ist vor Integration von #125 nicht aktiv; das 90-Minuten-Budget ist über #126
+  bereits auf Main integriert und im frischen Backup geprüft. Heutiger Readbackfehler
   bleibt als offenes Betriebsproblem dokumentiert; Restore-PASS behebt ihn nicht.
 
 ## Zentrale Änderungen und Betriebsanleitung
