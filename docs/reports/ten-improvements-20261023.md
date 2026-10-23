@@ -160,6 +160,14 @@ Zusätzliche bisher offene Abnahmen:
   außerhalb der verfügbaren Hardwareprüfung; Größenwechsel und DOM-Vollbild
   sind tatsächlich geprüft. Die bewusst erhaltene Meme-Navigationssperre bleibt
   die vom Nutzer bestätigte Einschränkung für normale Zwischenfragen vor Voting.
+- Beim Bearbeiten des lokalen Checkouts meldete die Browserkonsole einen
+  Next.js-**Fast Refresh full reload**; danach erschien die bestehende
+  Präsentationsfreigabe erneut. Die persistierte Folgefrage blieb erhalten,
+  Freigeben stellte dieselbe Frage wieder her; anschließend auch deren normale
+  Auflösung geprüft. Das ist kein behaupteter Production- oder Votingfehler.
+  Quizze 104 und 105 regulär beendet, nicht zurückgesetzt. Testdaten erhalten,
+  lokale Server gestoppt, temporäre Preview-Zugangskopie entfernt und generierte
+  Clientdateien von den Änderungen ausgeschlossen.
 
 ## Prüfungen und Bereitstellung
 
