@@ -338,3 +338,11 @@ und weiterhin nicht gezielt behoben. Die konkrete Merge-Bewertung steht im
 [Abschlussbericht](../reports/ten-improvements-20261023.md).
 Der echte Wochenlauf kann erst nach Integration des Cronwechsels belegt werden;
 sein Fehlen vor Integration wird nicht mit einer ungeprüften Backup-Funktion gleichgesetzt.
+
+Der historische `PRIVATE_READBACK_FAILED` bleibt ausdrücklich ungeklärt. Nach
+Nutzerentscheidung ist er allein kein dauerhafter Draft-/Merge-Blocker: Beide
+frischen Vollsicherungen sind erfolgreich, und die sichere Diagnose ist auf Main
+aktiv. Bei Wiederauftreten feste Stufe (`GRANT`/`GET`/`BODY`), HTTP-Status und
+Laufkennung auswerten; keine signierten URLs oder Geheimnisse protokollieren.
+Kein Ursachenfix behauptet. Keine weiteren manuellen Backups als Ersatz für den
+erst nach Integration möglichen echten Wochenplanlauf.

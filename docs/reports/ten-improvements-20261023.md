@@ -18,14 +18,14 @@ bleibt für Backups zuständig; es entsteht kein Backupdienst in der Anwendung.
 
 | Punkt | Bestätigter Ausgangszustand und Umsetzung | Abnahme und Grenzen |
 | --- | --- | --- |
-| 1 | Antwortschrift war bis 2,25rem begrenzt; eine Laptopregel verkleinerte Fragen zusätzlich. Größere containerabhängige Antwortschrift, bestehende Fragevariable, geringere Innenabstände ausschließlich bei Bildantworten. | Gerenderter Chrome-Test: fünf Designs, kurze/lange Antworten, Bildfrage und Bildauflösung, Größenfolge 1280/1920/1600/1280; 160 Geometrieprüfungen. Tatsächliche lokale Präsentation zusätzlich geprüft. Physischer Bildschirmwechsel und echtes Betriebssystem-Vollbild sind im verfügbaren In-App-Browser nicht verifiziert. |
+| 1 | Antwortschrift war bis 2,25rem begrenzt; eine Laptopregel verkleinerte Fragen zusätzlich. Größere containerabhängige Antwortschrift, bestehende Fragevariable, geringere Innenabstände ausschließlich bei Bildantworten. | Gerenderter Chrome-Test: fünf Designs, kurze/lange Antworten, Bildfrage und Bildauflösung, Größenfolge 1280/1920/1600/1280; 160 Geometrieprüfungen. Tatsächliche lokale Präsentation zusätzlich geprüft. DOM-Vollbild 1440×900 im Nachlauf tatsächlich geprüft; physischer Bildschirmwechsel bleibt außerhalb der verfügbaren Hardwareprüfung. |
 | 2 | Der Livebuilder hängte unzugeordnete Fragen ausdrücklich an; ein alter Lauf konnte sie erneut publizieren. Livebuilder und serverseitige Publikations-/Schreibprüfung schließen sie aus. Editor und Diagnose behalten die Fragen. | Fixture mit zwei Blöcken, vier zugeordneten und fünf unzugeordneten Fragen; Liveumfang 27 statt Diagnoseumfang 39 Folien. Builder- und veralteter-Lauf-Regressionen. Vollständiger Abschlussablauf siehe Browserprotokoll. |
 | 3 | Standard und Aktivierungswert waren 90 Sekunden. Beide sind 120; explizite Werte bleiben erhalten, ebenso ausgeschalteter Timer. | Tests mit fehlendem Wert sowie 60/90/120/180 Sekunden. Tatsächliche Meme-Erstellung startet bei 2:00. Bestehende gespeicherte 90 Sekunden bleiben 90. |
 | 4 | Materialisierte Flowkonfiguration konnte gespeicherte Intro-/Outrofelder verdrängen; der reguläre Wartebildschirm ignorierte seinen Text. Kanonische Werte werden geladen und beim Speichern synchronisiert; Wartehinweis wird gerendert. | Alle neun konfigurierbaren Folienarten mit erkennbaren QA-Werten gespeichert, Editor erneut geöffnet, tatsächliche Präsentation neu geladen und Ausgabe geprüft. Begrüßung zeigt „im LOVD“ und beide Absätze. Gewollt leere QR-/Hinweisfelder und Standardfallbacks durch Tests abgesichert. |
 | 5 | Abstimmung wurde vor der Fragenliste gerendert. Sie wird einmal anhand des persistierten Aktivierungszeitpunkts in die bestehende Reihenfolge eingesetzt. | Drei echte getrennte Teamsitzungen, Smartphone-Rahmen 390×844, eigene Beiträge gesperrt, Stimmwechsel überschreibt statt zu verdoppeln, erneutes Öffnen, Abschluss und Folgefrage geprüft. **Bewusste Einschränkung:** Nutzerentscheidung erhält die vorhandene Sperre vor finalisiertem Meme-Voting. Normale Zwischenfragen vor späterem Voting sind damit weiterhin nicht im Livebetrieb möglich; nur der reine Zeitstempeltest deckt diese Einordnung ab. |
 | 6 | Die vorhandene Folienzeituhr hatte keine Farbstufen. Nur ihre Schriftfarbe wird ergänzt; letzte Warnschwelle vorläufig 3:00 gemäß Nutzerentscheidung. | Grenzen 0/59/60/89/90/150/151/179/180 Sekunden und ungültiger Wert getestet. Bestehender Timer und Rücksetzung beim realen Folienwechsel im Browser erhalten. Keine zusätzliche Messung oder Einstellung eingeführt; gleiche Grenzen für alle Folien. |
-| 7 | Bisheriger globaler Durchschnitt vermischte Vorlauf, Fragen und Lösungen. Jetzt Summe der verbleibenden Folien mit Mittelwert je Fragetyp und Frage-/Lösungsphase; Wartefolie ausgeschlossen. | Reine Vergleichstests gleicher Restfolien bei kurzem/langem Vorlauf; getrennte Phasen und konfigurierte Pausen. Browser zeigt laufende Prognose. Fallbacks: Frage 120s, Lösung 30s, andere Folie 20s; Pause konfiguriert. Letzte 20 Beobachtungen lokal pro Quizstart; keine zugesicherte Endzeit. Ein zehnminütiger realer Warteversuch wurde nicht zusätzlich durchgeführt. |
-| 8 | Editorübersicht zeigte keine Lösung. Bestehender Vorschauhelfer liest kanonische typabhängige Lösungen und liefert eine sichtbare Zusammenfassung ausschließlich an den Editor. | Tatsächlich Musik- und Pixelkarten, Reihenfolge und kreative Frage in isolierter Übersicht geprüft; automatische Tests zusätzlich mehrere richtige Antworten, Musikvarianten 8-Bit/rückwärts und zwei unterschiedliche gespeicherte Songs bei gleichem Prompt. Anagramm nutzt die Lösung statt des Rätseltexts; kanonische Reihenfolgen werden nicht verdoppelt. Die exakte Gleichtext-Musikpaar-Abnahme ist automatisch, nicht zusätzlich im Editor nachgestellt. |
+| 7 | Bisheriger globaler Durchschnitt vermischte Vorlauf, Fragen und Lösungen. Jetzt Summe der verbleibenden Folien mit Mittelwert je Fragetyp und Frage-/Lösungsphase; Wartefolie ausgeschlossen. | Reine Vergleichstests gleicher Restfolien bei kurzem/langem Vorlauf; getrennte Phasen und konfigurierte Pausen. Browser zeigt laufende Prognose. Fallbacks: Frage 120s, Lösung 30s, andere Folie 20s; Pause konfiguriert. Letzte 20 Beobachtungen lokal pro Quizstart; keine zugesicherte Endzeit. Realer Vergleich im Nachlauf: 10:22 Wartefolie gegenüber kurzem Vorlauf, anschließend jeweils 13:40 Restprognose. |
+| 8 | Editorübersicht zeigte keine Lösung. Bestehender Vorschauhelfer liest kanonische typabhängige Lösungen und liefert eine sichtbare Zusammenfassung ausschließlich an den Editor. | Tatsächlich Musik- und Pixelkarten, Reihenfolge und kreative Frage in isolierter Übersicht geprüft; automatische Tests zusätzlich mehrere richtige Antworten, Musikvarianten 8-Bit/rückwärts und zwei unterschiedliche gespeicherte Songs bei gleichem Prompt. Anagramm nutzt die Lösung statt des Rätseltexts; kanonische Reihenfolgen werden nicht verdoppelt. Die exakte Gleichtext-Musikpaar-Abnahme wurde im Nachlauf im tatsächlichen Editor einschließlich Neuladen bestanden. |
 | 9 | Annahme einer Deaktivierung widerlegt: bestehender täglicher Schedule und Flag waren aktiv. Wöchentlich Montag 02:30 UTC eingerichtet; veraltete Releasevariable durch verifizierte Production-Deploymentmetadaten ersetzt. Jobbudget 45→90 Minuten nach nachgewiesenem Timeout. Monitoring verlinkt aktuelle Scheduleläufe. | Letzter belegter erfolgreicher Schedule: [39743653050](https://github.com/justphilgud/pubquiz-web/actions/runs/39743653050), 22.10.2026. Frischer manueller Lauf [39919171978](https://github.com/justphilgud/pubquiz-web/actions/runs/39919171978) bei 45 Minuten abgebrochen; heutiger Schedule [39920641414](https://github.com/justphilgud/pubquiz-web/actions/runs/39920641414) mit `PRIVATE_READBACK_FAILED`. Kein Erfolg behauptet. Isolierter Restore-Preflight [39924682983](https://github.com/justphilgud/pubquiz-web/actions/runs/39924682983) ist erfolgreich: Manifest/Medien sowie Identität, Rechte und leeres Ziel PASS; `restoreExecuted=false`. Die tatsächliche Wiederherstellung in [39932475893](https://github.com/justphilgud/pubquiz-web/actions/runs/39932475893) ist nach separater menschlicher Freigabe PASS: `restoreExecuted=true`, Datenbankintegrität PASS und Medienintegrität PASS für 834 Medienobjekte. Neuer Wochenplan erst nach Integration und einem echten Schedulelauf betrieblich belegt. |
 | 10 | Vorhandene Spezifikationen erweitert statt Parallelregelwerk. Alle 21 registrierten Templates erhalten eine verbindliche Phasen-/Ansichtenmatrix; AGENTS verweist darauf. | Gerenderte Regressionen für geschlossene Bildfragen, Zusatzinformationen und offene Fragen ohne bedeutungslosen Platzhalter in fünf Designs. Automatischer Abgleich Registry↔Dokumentation. Interaktive Sonderverträge bleiben verlinkt; vollständige Geräte-/Medienabdeckung wird nicht behauptet. |
 
@@ -85,11 +85,81 @@ Temporäre Preview-Zugangskopien wurden entfernt und die lokale Development-
 Konfiguration wiederhergestellt; lokale Testserver sind gestoppt.
 
 Die Teamansicht auf 390×844 und das Endergebnis wurden tatsächlich geprüft.
-Die tatsächliche öffentliche Präsentation war während der offenen Abstimmung
-zunächst noch hinter ihrer Startüberlagerung; die offene Phase wurde in der
-Moderationsvorschau geprüft, das finale Ergebnis danach in der tatsächlichen
-Präsentation. Diese Einschränkung wird nicht als volle öffentliche Live-Abnahme
-der offenen Phase ausgegeben.
+Die zunächst fehlende Abnahme der offenen öffentlichen Abstimmungsphase wurde
+im folgenden Nachlauf mit einem neuen isolierten Quiz geschlossen.
+
+## Funktionaler Abnahmenachlauf – tatsächliche öffentliche Präsentation
+
+Geprüfter Anwendungscode: PR #125 `0bcef81d` (Anwendungsdateien unverändert im
+Nachlauf). Neues Preview-Testquiz **104**, drei getrennte Team-Origins auf
+`localhost:3000`, `localhost:3001` und `localhost:3002`; Moderation und tatsächliche
+Präsentation in eigenen Tabs. Bestehende Quizze, insbesondere Production-Quiz 31,
+wurden nicht geändert. Der lokale Prisma-Client wurde vor der Abnahme aus dem
+unveränderten Schema regeneriert; keine Migration oder Datenbankänderung dadurch.
+
+1. Öffentliche `/quiz/104/praesentation` mit **Präsentation starten / fortsetzen**
+   freigegeben. Taste **F** aktiviert tatsächlich DOM-Vollbild, gemessen
+   `document.fullscreenElement != null`, 1440×900 CSS-Pixel. Die individuelle
+   Begrüßung zeigte danach „im LOVD“ und beide gespeicherten Absätze.
+2. Drei verschiedene Teams **QA Public Alpha**, **QA Public Beta**, **QA Public
+   Gamma** über **Team starten** angemeldet. Über **Weiter** Erklärung und
+   Erstellung geöffnet; tatsächliche Präsentation und Teamformulare zeigten die
+   120-Sekunden-Phase. Drei unterschiedliche obere/untere Texte mit **Meme
+   verbindlich abgeben** eingereicht und jeweils **Antwort abgegeben.** abgewartet.
+3. **Weiter** beendet die Einreichung; je Beitrag **Freigeben**, dann **Auswahl
+   bestätigen / Review abschließen**, **Memes vorstellen** und dreimal **Nächstes
+   Meme / Übersicht**. Die öffentliche Präsentation zeigte die Einzelbeiträge
+   und anschließend die Übersicht mit stabilen Nummern: 1 Beta, 2 Alpha, 3 Gamma.
+4. **Abstimmung öffnen**: Die tatsächliche Präsentation zeigte **Jetzt abstimmen**,
+   alle drei Memes und „Eine Stimme pro Team – das eigene Meme ist gesperrt.“
+   Keine Startüberlagerung; keine laufenden Kandidaten-Stimmenzahlen. Moderation:
+   **Voting offen**, zunächst 0/3, danach 3/3 Teilnahmen, keine Zwischenstände.
+   Alle drei Teamformulare: genau ein **Deine Stimme** nach der Meme-Erstellung,
+   jeweils eigener Beitrag gesperrt; zwei fremde Beiträge wählbar.
+5. Alpha wählt zunächst Meme 1 und wechselt zu Meme 3; Beta und Gamma wählen
+   Meme 2. Bestätigungen in allen Formularen. Neuladen des Alphaformulars erhält
+   Meme 3 und genau einen Votingabschnitt. Neuladen der tatsächlichen Präsentation
+   plus **Präsentation starten / fortsetzen** stellt das weiterhin offene
+   **Jetzt abstimmen** wieder her. Kein Reset und keine erneute Einreichung nötig.
+6. **Abstimmung schließen** zeigt in Präsentation und Formularen **Voting
+   geschlossen** und sperrt weitere Stimmen. **Meme-Ergebnis finalisieren**, dann
+   **Weiter**: Öffentliche Ergebnisfolie **Das Publikum hat entschieden** mit
+   Alpha 2 Stimmen/66,7 %/**Gewinner · +1 Punkt**, Gamma 1/33,3 %, Beta 0.
+   Teamformulare zeigen ebenfalls das finale Ergebnis; Moderation bestätigt den Punkt.
+   Zusätzliche READ-ONLY-Datenprüfung: genau drei Stimmzeilen; Alpha Revision 2,
+   Beta/Gamma Revision 1; Ergebniszeilen 0/2/1 Stimmen und genau 1 Punkt für Alpha.
+7. **Weiter** zur normalen Folgefrage **Wie groß ist Philipp?**, Folie 11/18.
+   Moderation, tatsächliche Präsentation und alle drei Teamformulare folgen.
+   Moderation und Präsentation neu geladen, Präsentation erneut freigegeben:
+   weiterhin dieselbe Folgefrage, auch über mehrere Minuten. Alle drei Teams
+   konnten normale Antworten (178/179/180) speichern. Kein Rücksprung zur Meme-Frage.
+
+Reviewbelege aus der tatsächlichen öffentlichen Präsentation:
+[offenes Voting](ten-improvements-assets/public-voting-open.png),
+[finales Ergebnis](ten-improvements-assets/public-meme-result.png),
+[Folgefrage nach Neuladen](ten-improvements-assets/public-next-question-reloaded.png).
+
+Zusätzliche bisher offene Abnahmen:
+
+- Zwei tatsächlich identische Musik-Fragetexte in der Quizübersicht erhalten
+  unterschiedliche gespeicherte Lösungen, auch nach Neuladen: **Interpret: ABBA ·
+  Titel: Dancing Queen** und **Interpret: Queen · Titel: Bohemian Rhapsody**.
+  Dafür ausschließlich zwei neue unzugeordnete Preview-Testfragen angelegt;
+  vorhandene Fragen nicht umgeschrieben und nicht live ausgespielt.
+- Reale Wartefoliendauer **10:22**, Quizlaufzeit **10:04**, Restprognose währenddessen
+  **14:00**. Nach **Weiter** auf Startsequenz **13:40**. Identischer Liveablauf im
+  neuen Vergleichsquiz **105** mit kurzem Vorlauf ebenfalls **13:40** an derselben
+  Stelle. Die lange Wartezeit verzerrt die Prognose nicht. Vergleichsquiz regulär
+  beendet. Getrennte Frage-/Lösungskategorien zusätzlich automatisch geprüft.
+- Typecheck und 28 gezielte Regressionen (Zeitprognose, Voting, Navigation,
+  Ergebnis, Reihenfolge, Lösungsvorschau) PASS. Reale Chrome-Layout-/Kontrasttests
+  erneut PASS, einschließlich 160 Geometrieprüfungen über fünf Designs und
+  Größenfolge 1280/1920/1600/1280.
+- Kein neuer Anwendungsfehler festgestellt und keine Anwendungsänderung zur
+  Abnahme nötig. Physisches Verschieben auf einen zweiten Bildschirm bleibt
+  außerhalb der verfügbaren Hardwareprüfung; Größenwechsel und DOM-Vollbild
+  sind tatsächlich geprüft. Die bewusst erhaltene Meme-Navigationssperre bleibt
+  die vom Nutzer bestätigte Einschränkung für normale Zwischenfragen vor Voting.
 
 ## Prüfungen und Bereitstellung
 
@@ -173,33 +243,36 @@ Backup-/Readbacknachweis verwendet.
 
 ## Merge-Bereitschaft von PR #125 nach der Readback-Untersuchung
 
-- Main `ab82b417` ist in den PR integriert. Für Stand `1037ff2c` sind Prisma,
+- Main `ab82b417` ist in den PR integriert. Für Stand `0bcef81d` sind Prisma,
   TypeScript, Tests, Changed-file-ESLint, Build, echte PostgreSQL-Importtransaktionen,
   Bridge und isolierte Restore-Integration grün. Keine Mergekonflikte; keine
   ausstehende verpflichtende Review-Entscheidung vom GitHub-API gemeldet.
-- **Noch keine uneingeschränkte Freigabe:** Der ausdrücklich verlangte gezielte
-  Ursachenfix für den historischen `PRIVATE_READBACK_FAILED` ist nicht nachgewiesen.
+- **Offenes Betriebsproblem, kein dauerhafter Draft-Blocker:** Gemäß ausdrücklicher
+  Nutzerentscheidung nach der Untersuchung verhindert der nicht reproduzierbare
+  historische `PRIVATE_READBACK_FAILED` allein den Merge nicht. Ein gezielter
+  Ursachenfix ist nicht nachgewiesen und wird nicht behauptet.
   Zwei frische vollständige Erfolge ersetzen diese Ursachenklärung nicht. Die
   alten Logs enthalten keine konkrete Fehlerstufe/HTTP-Antwort; zugängliche
   Provideransichten liefern die private Blob-GET-Antwort nicht nachträglich.
-  Ein erneuter realer Fehler mit der jetzt aktiven redigierten Diagnose oder
-  korrelierbare Providerdaten sind nötig, bevor ein gezielter Verhaltensfix möglich ist.
+  Bei erneutem Auftreten sind die jetzt aktive redigierte Diagnose und gegebenenfalls
+  korrelierbare Providerdaten auszuwerten, bevor ein gezielter Verhaltensfix erfolgt.
   Keine pauschalen Retries oder gelockerten Sicherheitsprüfungen auf Verdacht.
-- Die offene öffentliche Meme-Abstimmungsphase wurde in dieser Abnahme nur in
-  der Moderationsvorschau gesehen, nicht vor der Startüberlagerung der tatsächlichen
-  Präsentation. Das bleibt eine Browser-Abnahmelücke. Physischer Monitorwechsel/
-  echtes OS-Vollbild und der reale zehnminütige Warteversuch bleiben ebenfalls
-  wie oben beschrieben unverifiziert; automatische Ersatzprüfungen sind benannt.
+- Die funktionalen Abnahmelücken der offenen öffentlichen Meme-Abstimmung, des
+  realen langen Vorlaufs und des Gleichtext-Musikpaars sind im dokumentierten
+  Nachlauf geschlossen. Echtes DOM-Vollbild ist ebenfalls geprüft. Die physische
+  Mehrmonitorprüfung bleibt eine Hardwaregrenze, kein nachgewiesener Funktionsfehler.
 - Die vom Nutzer bestätigte Meme-Navigationssperre ist eine bewusste Einschränkung,
   kein heimlich geänderter Vertrag. Der Zwischenfragen-Livefall ist nicht abgenommen.
 - Der echte Wochenplanlauf ist erst nach Integration des Cronwechsels nachweisbar.
   Vorab sind Sicherung/Readback/Integrität zweimal real und die Releaseermittlung
   separat geprüft. Nach Integration muss der erste planmäßige Montagslauf mit
   korrekter Production-SHA und Integritätsartefakt kontrolliert werden.
-- PR #125 bleibt Draft und ungemergt. Kein Anwendungsdeployment ausgeführt;
-  Production bleibt `a4c3dd8`. Operations-PR #126 ist regulär gemergt; dessen
-  Deployment-Scope hat den Anwendungsdeploy übersprungen. Keine Produktionsdaten
-  zurückgesetzt. Dokumentationsnachtrag erhält erneut die normalen PR-Prüfungen.
+- Nach erfolgreicher Abschluss-CI ist PR #125 zur Review/Mergeprüfung bereit;
+  kein konkret nachgewiesener funktionaler Vorabblocker verbleibt. Kein Merge oder
+  Anwendungsdeployment im Abnahmenachlauf. Production bleibt `a4c3dd8`.
+  Operations-PR #126 ist regulär gemergt; dessen Deployment-Scope hat den
+  Anwendungsdeploy übersprungen. Keine Produktionsdaten zurückgesetzt.
+  Dokumentationsnachtrag erhält erneut die normalen PR-Prüfungen.
 
 ## Echter isolierter Restore – abgeschlossen
 
