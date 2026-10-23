@@ -296,4 +296,9 @@ ist damit noch nicht nachgewiesen. Eine Budgeterhöhung löst diesen separaten
 Readbackfehler nicht nachweislich. Letzter bestätigter erfolgreicher Schedule ist
 39743653050 vom 22.10.2026. Fehlgeschlagene Läufe und unvollständige Uploads gelten
 nicht als Wiederherstellungspunkt. Der isolierte Preflight des verifizierten
-22.10.-Backups wartet in Run 39924682983 auf den menschlichen Required Reviewer.
+22.10.-Backups ist in Run 39924682983 nach menschlicher Freigabe erfolgreich:
+Manifest/Medienintegrität sowie Identität, Rechte und Leerzustand der temporären
+Testdatenbank PASS; `restoreExecuted=false`. Die anschließende tatsächliche
+Wiederherstellung wurde als Run 39932475893 mit derselben Backupkennung,
+Manifest-SHA und isolierten Testdatenbank gestartet. Sie benötigt erneut den
+menschlichen Required Reviewer; Preflight-PASS ist noch kein Restore-PASS.
