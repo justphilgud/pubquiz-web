@@ -2,6 +2,21 @@ export type ParticipantAnswerSequenceSourceItem =
   | { kind: "QUESTION"; questionAssignmentId: number }
   | { kind: "LIVE_POLL"; placementId: number };
 
+// Insert an activated interaction without sorting or disturbing the authored sequence.
+// Persisted server timestamps make this position stable after a participant reload.
+export function insertActivatedStep<T>(items: readonly T[], step: T, activatedAt: string | null, openedAt: (item: T) => string | null | undefined): T[] {
+  const activation = activatedAt ? Date.parse(activatedAt) : Infinity;
+  let position = items.length;
+  if (Number.isFinite(activation)) {
+    position = 0;
+    items.forEach((item, index) => {
+      const opened = openedAt(item);
+      if (!opened || Date.parse(opened) <= activation) position = index + 1;
+    });
+  }
+  return [...items.slice(0, position), step, ...items.slice(position)];
+}
+
 export type ParticipantAnswerSequenceItem =
   | { kind: "QUESTION"; questionAssignmentId: number }
   | { kind: "LIVE_POLL"; runId: number };

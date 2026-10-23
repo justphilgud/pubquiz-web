@@ -266,7 +266,11 @@ test("artifact corruption, path traversal and stream overflow fail closed", asyn
 test("workflow schedules only the existing backup core and keeps restore behind its explicit reviewer boundary", () => {
   const text = readFileSync(new URL("../../.github/workflows/ap94-acceptance.yml", import.meta.url), "utf8");
   assert.match(text, /environment: operations-backup/); assert.match(text, /environment: operations-restore/);
-  assert.match(text, /schedule:/); assert.match(text, /cron: '30 2 \* \* \*'/);
+  assert.match(text, /schedule:/); assert.match(text, /cron: '30 2 \* \* 1'/);
+  assert.match(text, /environment: operations-backup\s+timeout-minutes: 90/);
+  assert.match(text, /deployments: read/);
+  assert.match(text, /production-release-cli\.ts/);
+  assert.doesNotMatch(text, /vars\.PRODUCTION_RELEASE_SHA/);
   assert.match(text, /restore_after_backup/); assert.match(text, /AP96_RUN_RESTORE: \$\{\{ inputs.mode == 'restore-preflight' && 'false' \|\| 'true' \}\}/);
   assert.match(text, /BACKUP_AUTOMATION_ENABLED/); assert.match(text, /BACKUP_RETENTION_VERIFIED/);
   assert.match(text, /steps\.backup\.outcome == 'success'/);

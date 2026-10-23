@@ -24,7 +24,7 @@
   container-type: inline-size;
   container-name: presentation;
   --pres-question: clamp(2rem, 3.5cqw, 4rem);
-  --pres-answer: clamp(1.5rem, 2cqw, 2.25rem);
+  --pres-answer: clamp(1.75rem, 2.6cqw, 3rem);
   --pres-title: clamp(2rem, 3.8cqw, 4.25rem);
   --pres-body: clamp(1.5rem, 1.9cqw, 2rem);
   --pres-info: clamp(1.125rem, 1.45cqw, 1.625rem);
@@ -34,7 +34,7 @@
 .presentation-readable[data-question-density="compact"] { --pres-question: clamp(2rem, 3cqw, 3.5rem); }
 .presentation-readable[data-question-density="extended"] { --pres-question: clamp(2rem, 2.5cqw, 3rem); }
 .presentation-readable[data-answer-density="compact"],
-.presentation-readable[data-answer-density="extended"] { --pres-answer: clamp(1.5rem, 1.7cqw, 2rem); --pres-result: clamp(1.5rem, 2cqw, 2.25rem); }
+.presentation-readable[data-answer-density="extended"] { --pres-answer: clamp(1.5rem, 2.1cqw, 2.5rem); --pres-result: clamp(1.5rem, 2cqw, 2.25rem); }
 
 .presentation-template.presentation-readable[data-design-style] :is(.presentation-question-card h2, .presentation-solution-question h2, .presentation-poll-question h2, .presentation-storybook-question-lead h2, .presentation-storybook-solution-lead p) {
   font-size: var(--pres-question) !important;
@@ -128,7 +128,7 @@
   grid-template-columns: minmax(0, 1fr);
   gap: .6rem;
 }
-.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-option { padding: .5em .75em; }
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-option { padding: .4em .65em; }
 .presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-question-card h2 {
   flex-shrink: 0;
   font-size: clamp(2rem, 2.5cqw, 3rem) !important;
@@ -235,7 +235,7 @@
 .presentation-template.presentation-readable[data-design-style="BIRTHDAY"] .presentation-storybook-primary-solution { padding-block: 1.25rem; }
 /* Compact chrome gives laptop slides more room without reducing reading text. */
 @container presentation (max-width: 1450px) {
-  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] h2 { font-size: 2rem !important; max-width: none; }
+  .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] h2 { font-size: var(--pres-question) !important; max-width: none; }
   .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] :is(.presentation-question-card, .presentation-answer-panel) { padding: .5rem !important; }
   .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="CHOICE_GRID"] .presentation-answer-option { padding: .5em; }
   .presentation-template.presentation-readable[data-design-style] .presentation-neon-header { height: 5rem; }

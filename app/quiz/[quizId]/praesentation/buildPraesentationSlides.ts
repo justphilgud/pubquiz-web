@@ -297,7 +297,8 @@ export function buildPraesentationSlides(
     .filter((frage) => frage.quiz_abschnitt_id == null)
     .sort(compareQuizQuestionAssignments);
 
-  if (fragenOhneBlock.length > 0) {
+  // Keep unassigned questions available to editorial diagnostics, never live.
+  if (options.includeDisabledFlowItems && fragenOhneBlock.length > 0) {
     fragenOhneBlock.forEach((frage, index) => {
       if (frage.templateId === "pixelbild") result.push({ typ: "pixel-erklaerung", abschnitt: null, frage });
       if (frage.templateId === "meme_beschriften") {

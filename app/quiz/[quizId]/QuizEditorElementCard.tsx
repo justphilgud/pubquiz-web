@@ -49,6 +49,7 @@ type Props = {
   sortingAction?: ReactNode;
   overflowAction?: ReactNode;
   details?: ReactNode;
+  summary?: ReactNode;
   dragAttributes: HTMLAttributes<HTMLButtonElement>;
   dragListeners: HTMLAttributes<HTMLButtonElement> | undefined;
   dragLabel: string;
@@ -67,6 +68,7 @@ export default function QuizEditorElementCard({
   sortingAction,
   overflowAction,
   details,
+  summary,
   dragAttributes,
   dragListeners,
   dragLabel,
@@ -108,6 +110,7 @@ export default function QuizEditorElementCard({
             <div className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold text-slate-600">
               {metadata}
             </div>
+            {summary}
           </div>
         </div>
 

@@ -2,6 +2,7 @@ import type { PresentationAudienceState } from "@/app/rendering/presentation/pre
 
 type QuizQuestionAssignment = {
   quiz_fragen_id: number;
+  quiz_abschnitt_id?: number | null;
 };
 
 export function selectQuizAnswerAssignments<
@@ -17,7 +18,7 @@ export function selectQuizAnswerAssignments<
   if (releasedAssignmentIds !== null) {
     const visibleIds = new Set(releasedAssignmentIds);
     return assignments.filter((assignment) =>
-      visibleIds.has(assignment.quiz_fragen_id),
+      assignment.quiz_abschnitt_id !== null && visibleIds.has(assignment.quiz_fragen_id),
     );
   }
 
@@ -27,7 +28,7 @@ export function selectQuizAnswerAssignments<
   ) {
     return assignments.filter(
       (assignment) =>
-        assignment.quiz_fragen_id === audienceState.questionAssignmentId,
+        assignment.quiz_abschnitt_id !== null && assignment.quiz_fragen_id === audienceState.questionAssignmentId,
     );
   }
 
@@ -77,7 +78,7 @@ export function isQuizAnswerRunReleasedForWrite(input: {
   } | null;
 }) {
   if (input.run.isHidden) return false;
-  if (input.assignmentSectionId === null) return input.run.isCurrent;
+  if (input.assignmentSectionId === null) return false;
   if (input.assignmentSectionId !== input.requestedSectionId) return false;
   if (input.run.isPixel && !input.run.isCurrent) return false;
   if (!input.release?.isReleased || input.release.isClosed) return false;

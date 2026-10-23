@@ -854,6 +854,11 @@ export function resolveQuizFlow(
   }
 
   return resolved.map((item) => {
+    if (item.type === "CLOSING" && item.isStandard) {
+      return { ...item, config: { ...item.config,
+        body: quiz.outro_bekanntmachungen ?? item.config.body,
+      } };
+    }
     // The intro editor saves these fields on the quiz; a materialized standard
     // welcome may still contain the values from when the flow was first created.
     if (item.type === "WELCOME" && item.isStandard) {

@@ -13,12 +13,13 @@ keinen neuen statischen Blobtokenpfad.
 Restore bleibt ein gesonderter, ausschließlich manueller Job in
 `operations-restore`. Er läuft nur bei der expliziten Workflow-Eingabe
 `restore_after_backup=true` und bleibt am Required-Reviewer-Gate geschützt. Der
-tägliche Schedule startet niemals einen Restore.
+wöchentliche Schedule startet niemals einen Restore.
 
 ## Zeitplan und Aktivierung
 
 Der bestehende Workflow `AP9.4 Manual Backup and Isolated Restore` enthält den
-Schedule `30 2 * * *`. GitHub wertet ihn in UTC aus:
+Schedule `30 2 * * 1`: montags um 02:30 UTC, unabhängig von Deployments.
+GitHub wertet ihn in UTC aus:
 
 - 03:30 Uhr in Europe/Berlin während der Winterzeit.
 - 04:30 Uhr in Europe/Berlin während der Sommerzeit.
@@ -31,11 +32,23 @@ serialisiert. Ein Retry erhält durch GitHub Run-ID und Run-Attempt eine neue,
 unveränderliche Backupkennung und überschreibt kein vorhandenes Objekt.
 
 Solange `BACKUP_AUTOMATION_ENABLED=false` ist, beendet der Schedule den Job vor
-Checkout, OIDC, Datenbank- oder Storezugriff. Vor einer späteren Aktivierung muss
-in `operations-backup` zusätzlich `PRODUCTION_RELEASE_SHA` auf den tatsächlich
-laufenden Production-SHA gesetzt und gemeinsam mit dem Production-Releaseprozess
-aktuell gehalten werden. Erst nach Gate 2 darf
-`BACKUP_AUTOMATION_ENABLED=true` gesetzt werden.
+Checkout, OIDC, Datenbank- oder Storezugriff. Der tatsächliche Zustand wurde am
+23.10.2026 geprüft: Workflow aktiv und `BACKUP_AUTOMATION_ENABLED=true`; der bisherige
+tägliche Schedule lief erfolgreich, zuletzt nachgewiesen am 22.10.2026 in
+[Run 39743653050](https://github.com/justphilgud/pubquiz-web/actions/runs/39743653050).
+Eine aktuelle Deaktivierung wurde damit widerlegt; ein früherer Grund ist aus diesem
+Zustand nicht ableitbar. Der Wochenrhythmus wird erst durch Integration dieser
+Workflowänderung auf `main` wirksam; ein manueller Test ersetzt keinen Schedule-Nachweis.
+GitHub kann geplante Starts verzögern; nach einem fehlgeschlagenen Wochenbackup kann
+der ausdrücklich akzeptierte Datenverlust von bis zu sieben Tagen überschritten werden.
+
+Planmäßige Läufe lesen jetzt den neuesten erfolgreichen GitHub-Deploymentnachweis für
+`environment=production` mit dem vorhandenen kurzlebigen `GITHUB_TOKEN` und reinem
+`deployments:read`. Kein Deployment wird gestartet. Fehlender, noch laufender oder
+fehlgeschlagener neuester Deploymentnachweis blockiert die Sicherung mit sichtbarem
+Fehler statt sie einem geratenen Release zuzuordnen. Die alte manuell gepflegte
+Variable `PRODUCTION_RELEASE_SHA` war veraltet und ist für Schedules keine Quelle mehr.
+Manuelle Abnahmen verlangen weiterhin den unabhängig geprüften Production-Commit.
 
 ## Manueller vollständiger Lauf
 
@@ -229,3 +242,46 @@ werden ausschließlich neu angelegt. Kein automatischer Retry des Gesamtbackups,
 keine neue Berechtigung, kein ungeschützter Logabruf. Erst nach separater Integration
 und Betriebsfreigabe einen neuen regulären Attempt starten; dann ausschließlich
 das Diagnoseartefakt lesen. Run 37964063455 erhält rückwirkend keine neue Diagnose.
+
+
+## Betreiber-Kurzanleitung und Überwachung (23.10.2026)
+
+- Aktuelle erfolgreiche/fehlgeschlagene planmäßige Läufe, Zeitpunkt und Step Summary:
+  [GitHub Actions – Schedule](https://github.com/justphilgud/pubquiz-web/actions/workflows/ap94-acceptance.yml?query=event%3Aschedule).
+  Der Adminmonitor verlinkt diese laufende Quelle zusätzlich zum ausdrücklich historischen
+  kuratierten Nachweis. Die App behauptet keinen Livezugriff auf GitHub; keine neuen
+  GitHub-Secrets in der Anwendung. GitHub-Workflowbenachrichtigungen im Betreiberkonto
+  aktivieren; keine unabhängige Eskalations-/SMS-Überwachung eingerichtet.
+- Speicherung: bestehender privater Vercel-Blobstore `store_BVRjATGCRBW0fBeF`, Prefix
+  `production/acceptance/run-<GitHub-ID>-<Attempt>/`, nur verschlüsselt transportiert und
+  nicht anonym abrufbar. DB-Snapshot/Dump einschließlich Quizkonfiguration, Flow,
+  Teamantworten, Ergebnissen und hochgeladenen referenzierten Medien mit SHA-256-Manifest.
+  Meme-Archiv umfasst verschlüsselte PNG-Quellen; Authpasswörter werden bewusst nicht
+  gesichert. Wiederhergestellte Konten benötigen daher eine gesonderte Zugangslösung.
+  Statische Repositorymedien gehören zum verifizierten Releasecommit. Nicht erlaubte
+  externe Medienquellen brechen den bestehenden Export geschlossen ab, statt unbemerkt
+  ungesicherte Medien als gesichert auszugeben.
+- Aufbewahrung: bestehende Policy 14 Tage vollständig plus acht UTC-Wochen je ein Punkt;
+  neuester Punkt immer, geschützte Event-/manuelle und Legacy-Punkte unbegrenzt.
+  `BACKUP_RETENTION_VERIFIED=false` bleibt bestehen: derzeit nur Dry Run, tatsächlich
+  keine automatische Löschung. Die Policy ist damit ein Auswahlziel, keine Zusage einer
+  aktiven Speicherbegrenzung. Vor Aktivierung reale Auswahl und Schutzpunkte prüfen.
+  Weniger Wochenläufe sparen Export-/Transferoperationen; bestehende geschützte Punkte
+  und der ausgeschaltete Löschlauf können den Speicher weiter wachsen lassen.
+- Keine neue Infrastruktur, kein neuer Tarif und keine Abhängigkeit. Bestehende GitHub-,
+  Neon- und Vercel-Nutzung kann Kosten verursachen; der oben genannte Größenvergleich
+  ist eine historische Größenordnung, kein aktuelles Preisangebot.
+- Wiederherstellung: zuerst Backupkennung, Manifest-SHA und erfolgreichen Backup-Run
+  prüfen; dann nach [temporärem Restore-Vertrag](temporary-restore.md) eine frische leere
+  Datenbank ausschließlich im gepinnten isolierten Projekt erstellen und markieren,
+  PUBLIC-Zugriff entziehen, 24h-Lease und Backupbindung als geschützte Variable hinterlegen.
+  `mode=restore-preflight` muss READ ONLY bestehen. Danach `mode=restore-only` mit exakt
+  derselben Kennung/Hash; Required Reviewer im Environment `operations-restore` muss
+  menschlich freigeben. Kein Agent-Selbstapproval und keine Schutzregeländerung.
+  Nach dem Restore müssen Schema, Zeilen, Sequenzen und Medienintegrität bestehen;
+  anschließend isolierte Appansichten prüfen. Kein Production-Restore, kein Reset einer
+  laufenden Session, kein erneutes Beschreiben eines bereits benutzten Restoreziels.
+  Bereinigung nur separat für die exakt dokumentierte temporäre Datenbank autorisieren.
+
+Der konkrete Sicherungs-/Restore-Nachweis dieses Auftrags und die tatsächlich
+bestandenen beziehungsweise noch blockierten Abnahmen stehen im Änderungsbericht.

@@ -1303,7 +1303,8 @@ export default function ModerationClient({
             now={now}
             quizBeendet={quizBeendet}
             slideIndex={slideIndex}
-            slidesLength={slides.length}
+            slides={slides}
+            quizId={quizId}
           />
         </div>
       </main>

@@ -205,6 +205,57 @@ function decodeHtml(value: string) {
     .replaceAll("&amp;", "&");
 }
 
+test("choices remain readable and image choices coexist after container resize", async () => {
+  const css = await compileApplicationCss();
+  const markup = styles.flatMap(style => (["choice4", "choice-long", "image-choice", "image-choice-solution"] as const).map(scenario =>
+    `<section data-readability-case="${style}-${scenario}" style="width:1280px;height:720px;padding:16px;box-sizing:border-box">${renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture(scenario, style)))}</section>`,
+  )).join("");
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${markup}<pre id="readability-result"></pre><script>
+  try {
+    const results=[];
+    for(const root of document.querySelectorAll('[data-readability-case]')) {
+      for(const width of [1280,1920,1600,1280]) {
+        root.style.width=width+'px';root.style.height=width*9/16+'px';
+        const question=root.querySelector('.presentation-question-card h2, .presentation-storybook-question h2');
+        const options=[...root.querySelectorAll('.presentation-answer-option, .presentation-solution-option, .presentation-storybook-choices li, .presentation-storybook-solution-choices li')];
+        if(options.length!==4) throw Error(root.dataset.readabilityCase+': missing choices '+options.length);
+        for(const option of options) {
+          if(option.scrollWidth>option.clientWidth+2 || option.scrollHeight>option.clientHeight+2) throw Error(root.dataset.readabilityCase+': clipped option at '+width);
+        }
+        const bounds=root.getBoundingClientRect();
+        if(root.dataset.readabilityCase.endsWith('-image-choice')) {
+          const image=root.querySelector('.presentation-media img, [data-presentation-layout] img');
+          if(!image || image.getBoundingClientRect().width<20 || image.getBoundingClientRect().height<20) throw Error(root.dataset.readabilityCase+': missing image at '+width);
+          for(const option of options) {const box=option.getBoundingClientRect();if(box.right>bounds.right+2 || box.bottom>bounds.bottom+2) throw Error(root.dataset.readabilityCase+': image choices outside viewport at '+width+' '+JSON.stringify({bounds:bounds.toJSON(),box:box.toJSON(),font:getComputedStyle(option).fontSize}));}
+        }
+        results.push({name:root.dataset.readabilityCase,width,font:parseFloat(getComputedStyle(options[0].querySelector('strong')??options[0]).fontSize),question:question?parseFloat(getComputedStyle(question).fontSize):null});
+      }
+    }
+    document.querySelector('#readability-result').textContent=JSON.stringify(results);
+  }catch(error){document.querySelector('#readability-result').textContent=JSON.stringify({error:String(error)});}
+  </script></body></html>`;
+  const server = createServer((_request, response) => { response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); response.end(html); });
+  await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  const profile = mkdtempSync(join(tmpdir(), "pubquiz-readability-"));
+  try {
+    const { stdout } = await execFileAsync(resolveChromeExecutable(), ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking", "--no-first-run", `--user-data-dir=${profile}`, "--virtual-time-budget=3000", "--dump-dom", `http://127.0.0.1:${address.port}`], { maxBuffer: 30 * 1024 * 1024, timeout: 30_000 });
+    const match = stdout.match(/<pre id="readability-result">([\s\S]*?)<\/pre>/);
+    assert.ok(match?.[1]);
+    const result = JSON.parse(decodeHtml(match[1])) as { error: string } | Array<{ name: string; width: number; font: number; question: number | null }>;
+    assert.ok(Array.isArray(result), "error" in result ? result.error : "Missing measurements");
+    assert.equal(result.length, styles.length * 4 * 4);
+    for (const entry of result.filter(entry => entry.name.endsWith("-choice4"))) {
+      assert.ok(entry.font >= 28, `${entry.name}: expected larger answers, got ${entry.font}px`);
+      if (entry.width === 1280 && entry.question !== null) assert.ok(entry.question > 32, "Laptop question text must not retain the old fixed 2rem cap");
+    }
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+    rmSync(profile, { recursive: true, force: true });
+  }
+});
+
 test("meme, open result and neutral true/false text meet contrast targets in a real browser", async () => {
   const chrome = resolveChromeExecutable();
   const html = renderPage(await compileApplicationCss());

@@ -30,6 +30,20 @@ const rendererSource = readFileSync(
   "utf8",
 );
 
+for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
+  test(`${style}: waiting preserves configured copy and paragraphs alongside video and start time`, () => {
+    const fixture = buildPresentationQualityFixture("lovd-intro", style);
+    fixture.quiz.intro_wartetext = "Eigener Wartehinweis\n\nZweiter Absatz";
+    fixture.quiz.intro_video_url = "/qa-intro.mp4";
+    fixture.quiz.intro_startzeit = "20:15";
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+    assert.ok(html.includes(fixture.quiz.intro_wartetext));
+    assert.match(html, /whitespace-pre-line/);
+    assert.match(html, /qa-intro.mp4/);
+    assert.match(html, /20:15/);
+  });
+}
+
 test("standard welcome renders current quiz copy with intact paragraphs and title casing", () => {
   const fixture = buildPresentationQualityFixture("intro", "CORPORATE");
   fixture.quiz.intro_begruessungstitel = "im LOVD";
@@ -50,7 +64,7 @@ test("standard welcome renders current quiz copy with intact paragraphs and titl
   assert.ok(!html.includes(">Oktober<"));
 });
 
-for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "CORPORATE"] as const) {
+for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
   test(`${style}: image choices retain order and only resolution renders answer information`, () => {
     const fixture = buildPresentationQualityFixture("choice4", style);
     assert.equal(fixture.slide.typ, "frage");
@@ -69,17 +83,21 @@ for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "CORPORATE"] as const) {
     const before = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
     assert.match(before, /data-media-choices="true"/);
     assert.match(before, /src="[^"]*flag.png"/);
-    const options = [...before.matchAll(/class="presentation-answer-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+    const options = style === "BIRTHDAY"
+      ? [...(before.match(/<ol class="presentation-storybook-choices">([\s\S]*?)<\/ol>/)?.[1] ?? "").matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)]
+      : [...before.matchAll(/class="presentation-answer-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
     assert.equal(options.length, 4);
     for (const [index, id] of question.antwort_reihenfolge.entries()) {
       assert.ok(options[index][1].includes(question.antworten.find(answer => answer.antwort_id === id)!.antwort));
-      assert.ok(options[index][1].includes(`${String.fromCharCode(65 + index)}.`));
+      assert.ok(options[index][1].includes(style === "BIRTHDAY" ? `${String.fromCharCode(65 + index)}</span>` : `${String.fromCharCode(65 + index)}.`));
     }
     assert.doesNotMatch(before, /Information-|data-correct=|Richtige Antwort/);
     const after = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
       ...fixture, slide: { ...fixture.slide, typ: "aufloesung" },
     }));
-    const resolved = [...after.matchAll(/class="presentation-solution-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+    const resolved = style === "BIRTHDAY"
+      ? [...(after.match(/<ol class="presentation-storybook-solution-choices">([\s\S]*?)<\/ol>/)?.[1] ?? "").matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)]
+      : [...after.matchAll(/class="presentation-solution-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
     assert.equal(resolved.length, 4);
     for (const [index, id] of question.antwort_reihenfolge.entries()) {
       const answer = question.antworten.find(entry => entry.antwort_id === id)!;
@@ -1390,3 +1408,18 @@ test("artwork question exposes an isolated layout hook without changing other me
   assert.match(pixel, /data-question-template="pixelbild"/);
   assert.doesNotMatch(pixel, /data-question-template="kunstwerk"/);
 });
+
+
+test("every registered template has an explicit phase/surface specification", () => {
+  const specification = readFileSync(new URL("../../../docs/architecture/presentation-rendering.md", import.meta.url), "utf8");
+  for (const id of Object.values(questionTemplateIds)) assert.ok(specification.includes(`| \`${id}\` |`), `Missing surface contract: ${id}`);
+});
+
+for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
+  test(`${style}: open questions never render a meaningless empty choice placeholder`, () => {
+    const fixture = buildPresentationQualityFixture("short", style);
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+    assert.ok(html.includes("Wie heißt die Hauptstadt von Deutschland?"));
+    assert.doesNotMatch(html, /keine Antwortmöglichkeiten|presentation-answer-option|data-correct=/i);
+  });
+}

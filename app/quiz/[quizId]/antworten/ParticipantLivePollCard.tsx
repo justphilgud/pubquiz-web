@@ -1,5 +1,6 @@
 type ParticipantLivePoll = {
   runId: number;
+  openedAt?: string | null;
   state: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
   type: "SINGLE_CHOICE" | "FREE_TEXT";
   prompt: string;

@@ -202,3 +202,109 @@ Der Player bleibt verantwortlich für die vorhandenen Moderationsbefehle;
 questionPhaseMedia enthält nur die deterministische Auswahl. Ein src-Wechsel
 ersetzt den Medienknoten; Cleanup und verspätete Play-Promises pausieren alte Knoten.
 Tests: questionPhaseMedia, bestehender audioReverse-Prozessor, synchronizedMedia.browser.
+
+
+## Template-Verträge (verbindliche Ergänzung, 23. Oktober 2026)
+
+Quelle: Auftrag „zehn Verbesserungen“ vom 23.10.2026, Designmanifest,
+[Runtime-Verträge](quiz-runtime-contracts.md), [Antwortinteraktion](answer-interaction.md)
+und die dort verlinkten Spezialverträge. Der Registry-Eintrag unter
+`app/fragen/editor/templates/questionTemplateRegistry.ts` bestimmt die vorhandenen
+Fragetemplates; Aliase sind keine zusätzlichen Templates. Die folgende Matrix ist
+Sollverhalten, keine pauschale Erklärung des aktuellen Codes zum fehlerfreien Zustand.
+
+### Gemeinsame Regeln für jede Designwelt und Oberfläche
+
+- Fragephase: vollständiger Fragetext, zugeordnete freigegebene Medien, bei geschlossenen
+  Fragen sämtliche Optionen in gespeicherter Quizreihenfolge mit konsistenten Buchstaben.
+  Bei Bildfragen bleiben Frage, Bild und Optionen gleichzeitig sichtbar. Keine
+  Richtig-Markierung, Lösungstexte, Originalbilder oder Lösungs-Zusatzinformationen.
+- Auflösung: kanonische richtige Lösung(en), zugehörige gespeicherte Zusatzinformation
+  einschließlich Absätzen. Fehlende Zusatzinformation erzeugt keinen Leerblock.
+  Antwortinformationen bleiben ihrer Antwort zugeordnet, auch bei gemischter Reihenfolge.
+- Offene Frage: kein leerer Optionskasten und kein bedeutungsloses „keine
+  Antwortmöglichkeiten“. Antwortfelder gehören ins Teamformular, nicht als Platzhalter
+  auf die Leinwand. Quiz-Override „offen“ hat Vorrang vor gespeicherten Distraktoren.
+- Teamformular: ausschließlich freigegebene Inhalte, passende Antwortinteraktion,
+  bestätigte eigene Abgabe und vorhandene Sperr-/Countdownzustände; keine kanonischen
+  Lösungen vor Freigabe. Moderation darf Lösung und Steuerung sehen; ihre Vorschau
+  zeigt den öffentlichen Phasenzustand und startet kein Audio.
+- Varianten pro betroffenem Template: kurz/lang, mit/ohne Fragebild, geschlossene
+  Bildfrage, mit/ohne Zusatzinformation, Frage/Auflösung, Team/Moderation,
+  Containerverkleinerung/-vergrößerung und Vollbild. Kein Ellipsis oder stilles Kürzen.
+  Extrem lange Altinhalte bleiben vollständig und dürfen die vorhandene Scroll-/
+  Überlaufbehandlung nutzen; beliebige Textmengen passen nicht garantiert auf eine Folie.
+- Gestaltung ist in allen bestehenden Designwelten konsistent; Template-Sonderverträge
+  (z. B. Kunstwerk, FaceMorph, Pixel, Meme) gehen generischen Layoutannahmen vor.
+  Inhalte und gespeicherte Medien werden durch Layoutänderungen nicht verändert.
+
+### Vollständige Fragetemplate-Matrix
+
+„Basis“ bedeutet sämtliche gemeinsamen Regeln oben. Moderation umfasst zusätzlich
+immer Navigation, Folienzeit, Vorschau und vorhandene Freigabe-/Auswertungssteuerung.
+
+| Registry-ID | Fragephase | Auflösung | Teamformular / besondere Moderation |
+|---|---|---|---|
+| `standard` | Basis; offene oder geschlossene Form gemäß Quiz | Richtige klassische/strukturierte Antworten und Zusatzinformation | Text, Felder oder Auswahl gemäß effektiver Form |
+| `multiple_choice` | Basis; alle Optionen, neutral | Alle Optionen, richtige markiert, zugeordnete Zusatzinformation | Bestehende Einfach-/Mehrfachauswahl; Regeln unverändert |
+| `fakten_jahr` | Hinweise in Reihenfolge, keine Jahreslösung | Jahr, gespeicherte Erklärung/Antwortinformation | Jahres-/Zahleneingabe; keine versteckten Lösungsdaten |
+| `fakten_land` | Hinweise, gegebenenfalls konfigurierte Optionen | Gespeichertes Land lesbar, keine erratene Lösung | Länder-/Auswahlinteraktion gemäß Konfiguration |
+| `fakten_frei` | Hinweise, offene oder geschlossene Variante | Gespeicherte Textlösung, akzeptierte Varianten nur an zulässiger Stelle | Freitext oder konfigurierte Auswahl |
+| `face_morph` | Nur Morph, keine Originale/Namen | Original A, Morph, Original B nebeneinander; kanonische Namen | Strukturierte Namen; Spezialvertrag Runtime und Medienprojektion |
+| `musik` | Frage und Audio; keine Metadaten als Lösung | Interpret und Titel aus Antwortfeldern, Zusatzinformation | Bestehende Interpret-/Titelfelder |
+| `musik_rueckwaerts` | Verarbeitetes rückwärts abgespieltes Audio | Hinterlegte Musiklösung, vorhandenes Lösungsmedium | Wie Musik; keine Änderung der Audioverarbeitung |
+| `eight_bit` | Vorhandenes 8-Bit-Medium | Hinterlegter Songtitel und Interpret | Wie Musik; individuelle Medien erhalten |
+| `kunstwerk` | Kunstbild im spezialisierten großen Medienbereich | Gespeicherter Künstler/Titel und Alternativen | Strukturierte Antwort; eigene Typografiegrenzen bleiben |
+| `pixelbild` | Live-Stufen, Countdown; Original streng verborgen | Original und gespeicherte Motivlösung | Stoppen/Antwort/Stufen nach [Pixel-Vertrag](pixel-question.md) |
+| `wahr_falsch` | Beide Möglichkeiten neutral | Konfigurierter Wahrheitswert und Erklärung | Einfachauswahl; bestehende Reihenfolge erhalten |
+| `schaetzfrage` | Frage und Einheit, kein Zielwert | Gespeicherter Wert, Einheit und Erklärung | Numerische Eingabe; bestehende Toleranz-/Bewertungsregel |
+| `reihenfolge` | Quizspezifisch gemischte Items | Kanonische gespeicherte Reihenfolge und Erläuterungen | Sortierinteraktion; Draft/Submission und Reihenfolgenvertrag |
+| `uebersetzt_vorgelesen` | Übersetzter Vorlesetext/Audio gemäß Sprachschutz | Gespeichertes Original und zulässige Erklärung | Freie Antwort; Moderations-/Vorschauaudio startet nicht automatisch |
+| `anagramm` | Generiertes Anagramm; gesuchter Name verborgen | Gespeicherter Name | Bestehende Textantwort |
+| `google_rezensionen` | Rezensionen; Autor/Rating gemäß Freigabekonfiguration | Ort und gespeicherte Auflösungsdaten | Text; Quellen-/Attributionspflichten erhalten |
+| `umfrage_einfach` | Frage und Optionen | Freigegebenes Ergebnis, keine erfundene richtige Lösung | Einfachabstimmung, vorhandene Publikationssteuerung |
+| `umfrage_mehrfach` | Frage und Optionen | Freigegebenes Ergebnis | Mehrfachabstimmung nach bestehender Regel |
+| `umfrage_skala` | Frage, Endpunkte und Skala | Freigegebene Verteilung | Konfigurierte Werte/Schrittweite |
+| `meme_beschriften` | Erklärung, Bild/Zonen, maßgeblicher Erstellungs-Countdown | Finalisiertes Publikumsergebnis/Gewinner | Verbindliche Meme-Abgabe, Review, Vorstellung, Abstimmung, Abschluss; eigene Beiträge ausgeschlossen, bestehende Stimme ersetzbar |
+
+### Informations- und Laufzeitfolien
+
+Intro/Outro, Rundenintro, Geschichte, Sponsor, Pause/Countdown, QR/Beitritt,
+Zwischenstand, Siegerehrung und Jahresrangliste sind Flow-/Präsentationstemplates,
+keine zusätzlichen Fragetypen. Ihre Verträge bleiben in diesem Dokument sowie
+`quiz-runtime-contracts.md`, `quiz-lifecycle.md`, den bestehenden Ranking-/Sponsor-Spezifikationen im Runtime-Vertrag und den
+typisierten Flow-Konfigurationen. Sie erzeugen keine bewertete
+Antwort. Team-/Moderationsoberflächen zeigen ihren Freigabestatus, keine versteckten
+Folgefragen. Sponsor darf den vorherigen Antwortlauf nicht als aktuelle Frage ausgeben.
+Begrüßung und Schluss verwenden individuelle gespeicherte Quizwerte vor alten
+materialisierten Standardkopien; eigene zusätzliche Flow-Folien bleiben unabhängig.
+
+### Bewusste Änderungen und offene Grenzen
+
+Der bisherige feste 2rem-Laptopdeckel für Auswahl-Fragetexte entfällt zugunsten der
+vorhandenen Container-Typografie; Antworttext wächst auf 1.75–3rem, bei dichten
+Antworten 1.5–2.5rem. Die 4rem-Obergrenze des allgemeinen Fragetextes und der separate
+Kunstwerkvertrag bleiben. Das aktualisiert die früheren kleineren Antwortwerte bewusst.
+Unzugeordnete Fragen sind redaktioneller Vorrat, kein impliziter letzter Liveblock.
+120 Sekunden ist nur der neue Meme-Erstellungsstandard, keine Migration gespeicherter
+90 Sekunden. Timer-Warnfarben gelten vorläufig für alle Folientypen mit letzter
+Warnschwelle 3:00; keine neue Einstellung und kein weiterer Timer.
+
+Nicht entschieden sind eigene Warnschwellen je Template, eine zentrale historische
+Zeitstatistik über mehrere Browser und ein neues UX-Konzept für beliebig lange Texte.
+Nicht vorhandene/reservierte Interaktionen (z. B. Matching/Buzzer) werden durch diese
+Matrix nicht als fertig implementiert erklärt. Zusätzliche Vorlagen oder abweichende
+Fachregeln müssen mit Quelle und Tests ergänzt werden.
+
+### Automatische Nachweise und Grenzen
+
+`PresentationSlideRenderer.test.ts`, `presentationReadability.test.ts` und
+`presentationContrast.browser.test.ts` prüfen gerenderte Frage-/Auflösungsvarianten
+in fünf Designwelten. Bildoptionen, Antwortreihenfolge und Zusatzinformationen werden
+in `PresentationSlideRenderer.test.ts` explizit gegen Regression geschützt;
+`participantQuestionPayload.test.ts` prüft den echten Server-Serializer gegen
+Lösungslecks, `GenericAnswerRenderer.test.ts` die Antwortinteraktionen.
+Die bestehenden Pixel-/Meme-/Ordering-/Medien-Browsertests bleiben Teil von `npm test`
+und damit der CI. Diese Tests belegen definierte Fälle, keine vollständige visuelle
+Fehlerfreiheit aller Inhalt-/Viewportkombinationen. Die interaktive Abnahme wird
+separat im Änderungsbericht mit tatsächlich getesteten Ansichten geführt.

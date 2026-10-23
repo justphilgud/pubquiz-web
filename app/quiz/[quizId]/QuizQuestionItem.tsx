@@ -47,6 +47,7 @@ export type QuizQuestion = {
     placementOverride: StoryPlacementOverride;
   }>;
   memeConfig?: MemeQuestionConfig | null;
+  solutionPreview?: string[];
 };
 
 type Props = {
@@ -125,6 +126,7 @@ export default function QuizQuestionItem({
       isDragging={isDragging}
       kind="QUESTION"
       title={frage.frage}
+      summary={<div className="mt-2 whitespace-pre-line break-words text-sm text-slate-700"><strong>Lösung: </strong>{frage.solutionPreview?.length ? frage.solutionPreview.join(" · ") : isPollQuestionTemplateId(frage.templateId) || frage.templateId === "meme_beschriften" ? "Keine feste Lösung" : "Keine Lösung hinterlegt"}</div>}
       displayIndex={displayIndex}
       dragAttributes={attributes}
       dragListeners={listeners}

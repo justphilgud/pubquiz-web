@@ -1,3 +1,5 @@
+import { slideTimerTone } from "@/app/quiz/presentationTiming";
+
 function formatSeconds(seconds: number | null | undefined) {
   if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
     return "--:--";
@@ -42,7 +44,7 @@ function LiveTimer({
   return (
     <div className="rounded-xl bg-zinc-950 p-4">
       <div className="text-sm text-zinc-400">{label}</div>
-      <div className="mt-1 text-2xl font-black" suppressHydrationWarning>
+      <div className={`mt-1 text-2xl font-black ${label === "Aktuelle Folie" ? slideTimerTone(seconds) : ""}`} suppressHydrationWarning>
         {stopped
           ? "Beendet"
           : seconds === null
