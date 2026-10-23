@@ -2,6 +2,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { needsApplicationDeployment } from "./deployment-scope";
+
+test("readback diagnosis integration does not deploy the quiz application", () => {
+  assert.equal(needsApplicationDeployment([
+    "scripts/operations/bridge-client.ts", "scripts/operations/bridge.test.ts",
+    "scripts/operations/deployment-scope.test.ts", ".github/workflows/ap94-acceptance.yml",
+    "docs/operations/private-readback-20261023.md",
+  ]), false);
+});
 test("operations-only deployment exclusion never suppresses mixed application/schema/package changes", () => {
   const ops = ["scripts/operations/acceptance-cli.ts", "scripts/operations/bridge/api/access.ts", "scripts/operations/bridge/package-lock.json",
     ".github/workflows/ap94-bridge-ci.yml", ".github/workflows/ap94-acceptance.yml", ".github/workflows/deploy-production.yml",
