@@ -521,3 +521,52 @@ Submission-Lifecycle auch in CI ausführbare Spezifikation.
 
 [Bewertungsworkflow](evaluation-workflow.md) definiert Persistenz, Konkurrenzschutz
 und automatische Ergebnisaktualisierung unter Erhaltung dieses Vertrags.
+
+
+## Ergänzung 23.10.2026: redaktioneller Vorrat, Teamchronologie und Zeitprognose
+
+Fragen mit `quiz_abschnitt_id=null` bleiben im Editor zuordenbar und werden weder
+an das Live-Deck angehängt noch als aktive Teamfrage publiziert oder beschreibbar.
+Ein alter aktueller Run darf seinen Inhalt nicht erneut freigeben; seine Daten bleiben
+bestehen. Die Diagnoseoption `includeDisabledFlowItems` darf redaktionelle Vorräte
+weiterhin zeigen und wird nicht für das Live-Deck verwendet.
+
+Die Meme-Abstimmung ist ein eigener Schritt im vorhandenen Teamablauf. Ihre Position
+folgt dem persistierten `voting_opened_at`, nicht der früheren Meme-Erstellung.
+Normale Fragen und Umfragen behalten ihre kanonische Reihenfolge; die Abstimmung wird
+hinter den bis zur Aktivierung geöffneten Schritten eingefügt, genau einmal pro
+aktueller Präsentation. Die bestehenden Blockfreigaben und Archivgrenzen bleiben;
+diese Änderung führt kein unbegrenztes blockübergreifendes Antwortarchiv ein.
+Explizite Entscheidung des Nutzers am 23.10.2026: Die vorhandene Navigationssperre
+bleibt erhalten. Normale Zwischenfragen zwischen Meme-Erstellung und noch nicht
+abgeschlossenem Voting sind dadurch im regulären Liveablauf nicht erreichbar.
+Der Aktivierungszeitpunkt wird für die Einordnung verwendet und mit Zwischenfragen
+als Datenfixture abgesichert; dieser Ablauf wird nicht als live durchgespielt behauptet.
+
+Die Folienverweildauer verwendet weiterhin dieselbe Server-Startzeit und den
+vorhandenen Moderations-Takt. Nur ihre Schriftfarbe ändert sich: <60 rot,
+60–<90 orange, 90–150 einschließlich grün, >150–<180 orange, >=180 rot.
+3:00 ist die ausdrücklich vorläufig genehmigte letzte Schwelle für alle Folientypen.
+Quiz-Gesamtzeit und Antwort-Countdowns erhalten diese Farblogik nicht.
+
+Restzeit ist die Summe der tatsächlich nach der aktuellen Folie verbleibenden
+Livefolien. Wartefolien tragen weder eine Dauer noch Trainingswerte bei. Für jede
+Kombination Fragetemplate/Frage beziehungsweise Fragetemplate/Auflösung wird der
+Durchschnitt der höchstens letzten 20 lokal beobachteten aufeinanderfolgenden
+Vorwärtswechsel verwendet; Rücksprünge, Überspringen und nicht beobachtete Phasen
+trainieren nicht. Ein Reload verliert die laufende Beobachtung, bewahrt bereits
+beobachtete Werte im Browserstore pro Quiz/Quizstart. Ungültige Werte und Dauern
+über zwei Stunden werden verworfen. Kein neues DB-Feld, keine Laufzeitmutation,
+kein zweiter Timer und keine globale Aussage über alle Moderationsbrowser.
+Fallbacks: Frage 120s, Lösung 30s, sonstige Folie 20s. Pausen/Countdowns verwenden
+ihre konfigurierte Dauer statt eines gemessenen Mittelwerts. Nicht konfigurierte
+Pausen behalten den bestehenden 300s-Fallback. Beobachtete weitere Folien teilen
+eine Gruppe „other“; Meme-Voting-/Pixelinteraktionen innerhalb einer Folie sind Teil
+ihrer beobachteten Verweildauer, keine zusätzlich erfundene Folie. Teamdiskussion,
+Auswertung, spontane Unterbrechungen und künftige Navigation können die Schätzung
+wesentlich verändern. Kein Genauigkeitsversprechen.
+
+Automatische Nachweise: `buildPraesentationSlides.test.ts`, `quizAnswerLiveState.test.ts`,
+`participantAnswerSequence.test.ts`, `presentationTiming.test.ts`,
+`fixedSlideSaving.test.ts` und die Template-Verträge in
+[presentation-rendering.md](presentation-rendering.md).

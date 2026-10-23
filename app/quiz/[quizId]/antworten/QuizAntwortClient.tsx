@@ -41,6 +41,7 @@ import { useAnswerDrafts } from "../../interaction/useAnswerDrafts";
 import { EMPTY_TEAM_DRAFT } from "../../interaction/answerDraftController";
 import { participantRequest, ParticipantRequestError, boundedParticipantAction } from "../../interaction/participantRequest";
 import AnswerSaveStatus from "./AnswerSaveStatus";
+import { insertActivatedStep } from "../../participantAnswerSequence";
 import MemeVotingPanel from "./MemeVotingPanel";
 import { MemeArchivePanel } from "../../memeArchive/MemeArchivePanel";
 import ParticipantLivePollCard, {
@@ -141,6 +142,7 @@ type AntwortStatus = {
       type: string;
       state: "LOCKED" | "OPEN" | "COUNTDOWN" | "CLOSED" | "REVEALED";
       deadlineAt: string | null;
+      openedAt?: string | null;
       revision: number;
     } | null;
     istFreigegeben: boolean;
@@ -187,7 +189,8 @@ type AntwortStatus = {
 
 type ParticipantAnswerItem =
   | { kind: "QUESTION"; question: AntwortStatus["fragen"][number] }
-  | { kind: "LIVE_POLL"; poll: ParticipantLivePoll };
+  | { kind: "LIVE_POLL"; poll: ParticipantLivePoll }
+  | { kind: "MEME_VOTING" };
 
 type TeamSession = {
   quiz_team_session_id: number;
@@ -740,8 +743,9 @@ export default function QuizAntwortClient({
       const poll = pollByRunId.get(item.runId);
       if (poll) items.push({ kind: "LIVE_POLL", poll });
     }
-    return items;
-  }, [liveDaten.answerSequence, liveDaten.fragen, liveDaten.livePolls]);
+    return memePresentationState ? insertActivatedStep<ParticipantAnswerItem>(items, { kind: "MEME_VOTING" }, memePresentationState.votingOpenedAt,
+      item => item.kind === "QUESTION" ? item.question.interactionRun?.openedAt : item.kind === "LIVE_POLL" ? item.poll.openedAt : null) : items;
+  }, [liveDaten.answerSequence, liveDaten.fragen, liveDaten.livePolls, memePresentationState]);
   const hasReleasedLivePoll = answerItems.some(
     (item) => item.kind === "LIVE_POLL",
   );
@@ -885,15 +889,6 @@ export default function QuizAntwortClient({
           />
         )}
 
-        {session && memePresentationState ? (
-          <MemeVotingPanel
-            quizId={liveDaten.quiz_id}
-            sessionToken={session.sessionToken}
-            state={memePresentationState}
-            onChange={setMemePresentationState}
-          />
-        ) : null}
-
         {session && <MemeArchivePanel key={`memes-${session.quiz_team_session_id}`} quizId={liveDaten.quiz_id} sessionToken={session.sessionToken} />}
 
         {session && (
@@ -902,7 +897,7 @@ export default function QuizAntwortClient({
             (liveDaten.answerPhase === "LEGACY" &&
               aktuellerBlock &&
               !liveDaten.presentationStatusText))) ||
-            hasReleasedLivePoll) ? (
+            hasReleasedLivePoll || memePresentationState) ? (
             <>
               <div className="answer-kicker text-sm font-semibold uppercase tracking-wide text-green-600">
                 {liveDaten.answerPhase === "QUESTION"
@@ -934,6 +929,7 @@ export default function QuizAntwortClient({
                   </p>
                 )}
                 {answerItems.map((item, itemIndex) => {
+                  if (item.kind === "MEME_VOTING") return memePresentationState ? <MemeVotingPanel key={`meme-voting-${memePresentationState.presentationId ?? memePresentationState.selectionId}`} quizId={liveDaten.quiz_id} sessionToken={session.sessionToken} state={memePresentationState} onChange={setMemePresentationState} /> : null;
                   if (item.kind === "LIVE_POLL") {
                     const active = livePollState?.runId === item.poll.runId;
                     const poll = active && livePollState

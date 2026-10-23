@@ -38,6 +38,13 @@ const productiveQuestionKinds = [
   { templateId: null, label: "strukturierte Antwort", hasFields: true },
 ] as const;
 
+test("an unassigned question is never published or writable even with a stale current run", () => {
+  const state = resolvePresentationAudienceState({ slideKey: "question:12:question" }, [{ questionAssignmentId: 12, questionId: 2, sectionId: null }]);
+  assert.deepEqual(selectQuizAnswerAssignments(state, [{ quiz_fragen_id: 12, quiz_abschnitt_id: null }], [12]), []);
+  assert.deepEqual(selectQuizAnswerAssignments(state, [{ quiz_fragen_id: 12, quiz_abschnitt_id: null }]), []);
+  assert.equal(isQuizAnswerRunReleasedForWrite({ run: { isCurrent: true, isPixel: false, openedAt: new Date() }, assignmentSectionId: null, requestedSectionId: 1, release: null }), false);
+});
+
 test("stable live state selects every productive question kind by assignment id", () => {
   for (const [index, fixture] of productiveQuestionKinds.entries()) {
     const assignment = {

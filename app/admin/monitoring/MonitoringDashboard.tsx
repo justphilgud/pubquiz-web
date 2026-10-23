@@ -110,6 +110,7 @@ export default function MonitoringDashboard({ preview }: { preview: boolean }) {
           <p>Beleg geprüft: {time(current.backup.checkedAt)}</p>
           <a href={current.backup.source} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-medium underline">AP9.4-Run ansehen ↗</a>
         </div>}
+        {card.area === "backup" && <a href="https://github.com/justphilgud/pubquiz-web/actions/workflows/ap94-acceptance.yml?query=event%3Aschedule" target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center text-sm font-medium underline">Aktuelle planmäßige Backups: letzter Lauf und Fehler bei GitHub ↗</a>}
         {card.area === "deployment" && current?.release && <code className="mt-3 block break-all text-xs text-slate-600">{current.release}</code>}
         <details className="mt-4 text-sm text-slate-600"><summary className="cursor-pointer py-2 font-medium text-slate-800">Quelle und Einordnung</summary><p className="mt-1 leading-relaxed">{card.detail}</p></details>
       </section>)}

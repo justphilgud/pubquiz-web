@@ -40,6 +40,16 @@ function quizFixture(): QuizPraesentationResult {
   };
 }
 
+test("unassigned editorial questions remain stored but are absent from the live deck", () => {
+  const quiz = quizFixture();
+  quiz.fragen.push({ ...quiz.fragen[0], quiz_fragen_id: 999, quiz_abschnitt_id: null });
+  const before = JSON.stringify(quiz);
+  const live = buildPraesentationSlides(quiz);
+  assert.equal(live.some(slide => "frage" in slide && slide.frage.quiz_fragen_id === 999), false);
+  assert.equal(buildPraesentationSlides(quiz, { includeDisabledFlowItems: true }).some(slide => "frage" in slide && slide.frage.quiz_fragen_id === 999), true);
+  assert.equal(JSON.stringify(quiz), before);
+});
+
 test("AP3: each pixel question has a distinct explanation before opening the question", () => {
   const quiz = quizFixture();
   quiz.fragen[0].templateId = "pixelbild";

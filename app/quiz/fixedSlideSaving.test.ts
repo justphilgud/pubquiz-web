@@ -30,6 +30,7 @@ function fixture() {
   const db = {
     quiz: {
       findUnique: async () => quiz,
+      findUniqueOrThrow: async () => quiz,
       update: async ({ data }: { data: object }) => Object.assign(quiz, data),
     },
     quiz_ablauf_elemente: {
@@ -56,12 +57,41 @@ function fixture() {
     "@/app/quiz/fixedSlidesPolicy": policy, "@/app/quiz/flow/quizFlowRepository.server": repository, "@/app/quiz/flow/quizFlow": flow,
   });
   return { quiz, fail: () => { fail = true; }, deny: () => { denied = true; }, transactions: () => transactions,
+    saveSlide: async (outro: boolean, slideId: string, values: Record<string, string>) => {
+      const data = new FormData(); data.set("quizId", "1"); data.set("slideId", slideId); data.set("enabled", "on");
+      Object.entries(values).forEach(([key, value]) => data.set(key, value));
+      return actions[outro ? "saveOutroSlide" : "saveIntroSlide"]({}, data) as Promise<{ status: string }>;
+    },
     save: async (text: string, enabled: boolean) => {
       const data = new FormData(); data.set("quizId", "1"); data.set("slideId", "rules"); data.set("regeln", text); if (enabled) data.set("enabled", "on");
       return actions.saveIntroSlide({}, data) as Promise<{ status: string }>;
     },
   };
 }
+
+test("welcome and closing save current copy and explicit clearing cannot resurrect a materialized old copy", async () => {
+  const data = fixture();
+  for (const [outro, id, values, type, expected] of [
+    [false, "welcome", { titel: "im LOVD", begruessung: "Absatz 1\n\nAbsatz 2" }, "WELCOME", "Absatz 1\n\nAbsatz 2"],
+    [true, "announcements", { bekanntmachungen: "Eigener Schluss\n\nBis bald" }, "CLOSING", "Eigener Schluss\n\nBis bald"],
+    [false, "welcome", { titel: "", begruessung: "" }, "WELCOME", "Willkommen zum heutigen Quizabend!"],
+    [true, "announcements", { bekanntmachungen: "" }, "CLOSING", "Wir freuen uns auf den nächsten gemeinsamen Quizabend."],
+  ] as const) {
+    assert.equal((await data.saveSlide(outro, id, values)).status, "success");
+    const stored = data.quiz.quiz_ablauf_elemente.find(item => item.typ === type && item.ist_standard);
+    assert.equal((stored?.konfiguration as { body?: string })?.body, expected);
+    assert.equal(JSON.parse(JSON.stringify(stored))?.konfiguration.body, expected);
+  }
+});
+
+test("explicitly empty calendar and submission copy is retained, not filled from defaults", async () => {
+  for (const id of ["calendar", "questionSubmission"]) {
+    const data = fixture();
+    assert.equal((await data.saveSlide(true, id, { title: "", body: "", ctaText: "" })).status, "success");
+    const config = data.quiz.quiz_ablauf_elemente.find(item => item.typ === (id === "calendar" ? "CALENDAR_SUBSCRIPTION" : "QUESTION_SUBMISSION_QR"))?.konfiguration as { title?: string; body?: string };
+    assert.equal(config.title, ""); assert.equal(config.body, "");
+  }
+});
 
 test("saving after materialization synchronizes legacy and standard flow, preserves custom rules", async () => {
   const data = fixture();

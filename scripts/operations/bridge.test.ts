@@ -641,7 +641,7 @@ test("bridge package and runtime import boundary contain no application or datab
   const workflow = readFileSync(new URL("../../.github/workflows/ap94-acceptance.yml", import.meta.url), "utf8");
   assert.equal((workflow.match(/id-token: write/g) ?? []).length, 2);
   assert.doesNotMatch(workflow, /BACKUP_BLOB_READ_WRITE_TOKEN/);
-  assert.match(workflow, /schedule:/); assert.match(workflow, /30 2 \* \* \*/);
+  assert.match(workflow, /schedule:/); assert.match(workflow, /30 2 \* \* 1/);
   assert.match(workflow, /BACKUP_AUTOMATION_ENABLED/); assert.match(workflow, /BACKUP_RETENTION_VERIFIED/);
   assert.match(workflow, /default: synthetic/); assert.match(workflow, /AP94_OIDC_TRANSPORT_ACCEPTED/);
   assert.match(workflow, /synthetic_bridge_target:[\s\S]*options: \[active-alias, verified-20260923\]/);

@@ -13,12 +13,13 @@ keinen neuen statischen Blobtokenpfad.
 Restore bleibt ein gesonderter, ausschließlich manueller Job in
 `operations-restore`. Er läuft nur bei der expliziten Workflow-Eingabe
 `restore_after_backup=true` und bleibt am Required-Reviewer-Gate geschützt. Der
-tägliche Schedule startet niemals einen Restore.
+wöchentliche Schedule startet niemals einen Restore.
 
 ## Zeitplan und Aktivierung
 
 Der bestehende Workflow `AP9.4 Manual Backup and Isolated Restore` enthält den
-Schedule `30 2 * * *`. GitHub wertet ihn in UTC aus:
+Schedule `30 2 * * 1`: montags um 02:30 UTC, unabhängig von Deployments.
+GitHub wertet ihn in UTC aus:
 
 - 03:30 Uhr in Europe/Berlin während der Winterzeit.
 - 04:30 Uhr in Europe/Berlin während der Sommerzeit.
@@ -31,11 +32,23 @@ serialisiert. Ein Retry erhält durch GitHub Run-ID und Run-Attempt eine neue,
 unveränderliche Backupkennung und überschreibt kein vorhandenes Objekt.
 
 Solange `BACKUP_AUTOMATION_ENABLED=false` ist, beendet der Schedule den Job vor
-Checkout, OIDC, Datenbank- oder Storezugriff. Vor einer späteren Aktivierung muss
-in `operations-backup` zusätzlich `PRODUCTION_RELEASE_SHA` auf den tatsächlich
-laufenden Production-SHA gesetzt und gemeinsam mit dem Production-Releaseprozess
-aktuell gehalten werden. Erst nach Gate 2 darf
-`BACKUP_AUTOMATION_ENABLED=true` gesetzt werden.
+Checkout, OIDC, Datenbank- oder Storezugriff. Der tatsächliche Zustand wurde am
+23.10.2026 geprüft: Workflow aktiv und `BACKUP_AUTOMATION_ENABLED=true`; der bisherige
+tägliche Schedule lief erfolgreich, zuletzt nachgewiesen am 22.10.2026 in
+[Run 39743653050](https://github.com/justphilgud/pubquiz-web/actions/runs/39743653050).
+Eine aktuelle Deaktivierung wurde damit widerlegt; ein früherer Grund ist aus diesem
+Zustand nicht ableitbar. Der Wochenrhythmus wird erst durch Integration dieser
+Workflowänderung auf `main` wirksam; ein manueller Test ersetzt keinen Schedule-Nachweis.
+GitHub kann geplante Starts verzögern; nach einem fehlgeschlagenen Wochenbackup kann
+der ausdrücklich akzeptierte Datenverlust von bis zu sieben Tagen überschritten werden.
+
+Planmäßige Läufe lesen jetzt den neuesten erfolgreichen GitHub-Deploymentnachweis für
+`environment=production` mit dem vorhandenen kurzlebigen `GITHUB_TOKEN` und reinem
+`deployments:read`. Kein Deployment wird gestartet. Fehlender, noch laufender oder
+fehlgeschlagener neuester Deploymentnachweis blockiert die Sicherung mit sichtbarem
+Fehler statt sie einem geratenen Release zuzuordnen. Die alte manuell gepflegte
+Variable `PRODUCTION_RELEASE_SHA` war veraltet und ist für Schedules keine Quelle mehr.
+Manuelle Abnahmen verlangen weiterhin den unabhängig geprüften Production-Commit.
 
 ## Manueller vollständiger Lauf
 
@@ -229,3 +242,107 @@ werden ausschließlich neu angelegt. Kein automatischer Retry des Gesamtbackups,
 keine neue Berechtigung, kein ungeschützter Logabruf. Erst nach separater Integration
 und Betriebsfreigabe einen neuen regulären Attempt starten; dann ausschließlich
 das Diagnoseartefakt lesen. Run 37964063455 erhält rückwirkend keine neue Diagnose.
+
+
+## Betreiber-Kurzanleitung und Überwachung (23.10.2026)
+
+- Aktuelle erfolgreiche/fehlgeschlagene planmäßige Läufe, Zeitpunkt und Step Summary:
+  [GitHub Actions – Schedule](https://github.com/justphilgud/pubquiz-web/actions/workflows/ap94-acceptance.yml?query=event%3Aschedule).
+  Der Adminmonitor verlinkt diese laufende Quelle zusätzlich zum ausdrücklich historischen
+  kuratierten Nachweis. Die App behauptet keinen Livezugriff auf GitHub; keine neuen
+  GitHub-Secrets in der Anwendung. GitHub-Workflowbenachrichtigungen im Betreiberkonto
+  aktivieren; keine unabhängige Eskalations-/SMS-Überwachung eingerichtet.
+- Speicherung: bestehender privater Vercel-Blobstore `store_BVRjATGCRBW0fBeF`, Prefix
+  `production/acceptance/run-<GitHub-ID>-<Attempt>/`, nur verschlüsselt transportiert und
+  nicht anonym abrufbar. DB-Snapshot/Dump einschließlich Quizkonfiguration, Flow,
+  Teamantworten, Ergebnissen und hochgeladenen referenzierten Medien mit SHA-256-Manifest.
+  Meme-Archiv umfasst verschlüsselte PNG-Quellen; Authpasswörter werden bewusst nicht
+  gesichert. Wiederhergestellte Konten benötigen daher eine gesonderte Zugangslösung.
+  Statische Repositorymedien gehören zum verifizierten Releasecommit. Nicht erlaubte
+  externe Medienquellen brechen den bestehenden Export geschlossen ab, statt unbemerkt
+  ungesicherte Medien als gesichert auszugeben.
+- Aufbewahrung: bestehende Policy 14 Tage vollständig plus acht UTC-Wochen je ein Punkt;
+  neuester Punkt immer, geschützte Event-/manuelle und Legacy-Punkte unbegrenzt.
+  `BACKUP_RETENTION_VERIFIED=false` bleibt bestehen: derzeit nur Dry Run, tatsächlich
+  keine automatische Löschung. Die Policy ist damit ein Auswahlziel, keine Zusage einer
+  aktiven Speicherbegrenzung. Vor Aktivierung reale Auswahl und Schutzpunkte prüfen.
+  Weniger Wochenläufe sparen Export-/Transferoperationen; bestehende geschützte Punkte
+  und der ausgeschaltete Löschlauf können den Speicher weiter wachsen lassen.
+- Keine neue Infrastruktur, kein neuer Tarif und keine Abhängigkeit. Bestehende GitHub-,
+  Neon- und Vercel-Nutzung kann Kosten verursachen; der oben genannte Größenvergleich
+  ist eine historische Größenordnung, kein aktuelles Preisangebot.
+- Wiederherstellung: zuerst Backupkennung, Manifest-SHA und erfolgreichen Backup-Run
+  prüfen; dann nach [temporärem Restore-Vertrag](temporary-restore.md) eine frische leere
+  Datenbank ausschließlich im gepinnten isolierten Projekt erstellen und markieren,
+  PUBLIC-Zugriff entziehen, 24h-Lease und Backupbindung als geschützte Variable hinterlegen.
+  `mode=restore-preflight` muss READ ONLY bestehen. Danach `mode=restore-only` mit exakt
+  derselben Kennung/Hash; Required Reviewer im Environment `operations-restore` muss
+  menschlich freigeben. Kein Agent-Selbstapproval und keine Schutzregeländerung.
+  Nach dem Restore müssen Schema, Zeilen, Sequenzen und Medienintegrität bestehen;
+  anschließend isolierte Appansichten prüfen. Kein Production-Restore, kein Reset einer
+  laufenden Session, kein erneutes Beschreiben eines bereits benutzten Restoreziels.
+  Bereinigung nur separat für die exakt dokumentierte temporäre Datenbank autorisieren.
+
+Der konkrete Sicherungs-/Restore-Nachweis dieses Auftrags und die tatsächlich
+bestandenen beziehungsweise noch blockierten Abnahmen stehen im
+[Änderungsbericht](../reports/ten-improvements-20261023.md).
+
+Am 23.10.2026 brach der manuelle Run 39919171978 nach 45 Minuten während der
+Medienübertragung ab (627 von 840 Objekten abgeschlossen). Das Jobbudget wird
+deshalb auf 90 Minuten erhöht; keine Medien werden ausgelassen und keine
+Integritätsprüfung abgeschwächt. Der danach gelaufene bestehende Schedule
+39920641414 scheiterte mit `PRIVATE_READBACK_FAILED`; die konkrete Transportursache
+ist damit noch nicht nachgewiesen. Eine Budgeterhöhung löst diesen separaten
+Readbackfehler nicht nachweislich. Letzter bestätigter erfolgreicher Schedule ist
+39743653050 vom 22.10.2026. Fehlgeschlagene Läufe und unvollständige Uploads gelten
+nicht als Wiederherstellungspunkt. Der isolierte Preflight des verifizierten
+22.10.-Backups ist in Run 39924682983 nach menschlicher Freigabe erfolgreich:
+Manifest/Medienintegrität sowie Identität, Rechte und Leerzustand der temporären
+Testdatenbank PASS; `restoreExecuted=false`. Die anschließende tatsächliche
+Wiederherstellung wurde als Run 39932475893 mit derselben Backupkennung,
+Manifest-SHA und isolierten Testdatenbank separat menschlich freigegeben und ist
+am 23.10.2026 um 11:51:50 MESZ erfolgreich abgeschlossen: `restoreExecuted=true`,
+`databaseIntegrity=PASS`, `mediaIntegrity=PASS`, 834 Medienobjekte. Das Artefakt
+`isolated-restore-evidence` (ID 12493356240) belegt den tatsächlichen Restore.
+Details, Zielbindung und bewusst nicht ausgeführter Browser-Spieltest stehen im
+[Änderungsbericht](../reports/ten-improvements-20261023.md#echter-isolierter-restore--abgeschlossen).
+Der heutige Readbackfehler und die erst nach Integration aktive Wochenumstellung
+bleiben unabhängig von diesem erfolgreichen Wiederherstellungstest offen.
+
+## Frischer Backup-/Readbacknachweis nach der Ursachenuntersuchung
+
+Operations-PR #126 ist nach vollständiger grüner CI auf Main
+`ab82b41798a0106386302f6a515aaf306c2ae5c1` integriert. Das 90-Minuten-Jobbudget
+ist damit bereits aktiv, unabhängig von der späteren Wochenumstellung in #125.
+Die neue Diagnose gibt ausschließlich Zugriffsstufe und numerischen HTTP-Status
+aus; keine Tokens, signierten URLs, Header oder Providertexte. Sie ist noch kein
+behaupteter Fix des unbekannten historischen Readback-Auslösers.
+
+Der **frische** manuelle [Run 39974643272](https://github.com/justphilgud/pubquiz-web/actions/runs/39974643272)
+ist einschließlich Retention-Dry-Run erfolgreich. Snapshot 23.10.2026 17:02:15 MESZ,
+Manifest-SHA256 `5ec1ca5e3571cf88db9627fdac4ccdc77f41844fc7e408301f1341b520af3727`.
+Sein eigenes Artefakt `external-import-backup-evidence` bestätigt vollständiges
+Backup, vorhandenes Manifest, verifizierten Readback und Integrität. Alle
+841 Objekte einschließlich 838 Medienobjekten, Dump, Auth-Overlay und Manifest
+werden vollständig zurückgelesen und mit den ursprünglichen Größen/Hashes verglichen.
+Anonymer Manifestzugriff bleibt gesperrt. Das ist ein neuer Funktionsnachweis,
+kein Verweis auf den älteren Restore. Keine Quelldatenänderung und kein neuer Restore.
+
+Der zweite frische [Run 39980092521](https://github.com/justphilgud/pubquiz-web/actions/runs/39980092521)
+hat ebenfalls den vollständigen Backup-Schritt bestanden (Snapshot 17:40:36 MESZ,
+Manifest fertig 18:21:36 MESZ, 841 Objekte). Sein eigenes Erfolgsartefakt bestätigt
+Readback und Integrität; Manifest-SHA256
+`f9188b9ab660a40a1417048b1362ff40a18c662160d5a397fc3d58b9503f38e0`.
+Der genaue historische Readback-Auslöser ist in beiden Läufen nicht reproduziert
+und weiterhin nicht gezielt behoben. Die konkrete Merge-Bewertung steht im
+[Abschlussbericht](../reports/ten-improvements-20261023.md).
+Der echte Wochenlauf kann erst nach Integration des Cronwechsels belegt werden;
+sein Fehlen vor Integration wird nicht mit einer ungeprüften Backup-Funktion gleichgesetzt.
+
+Der historische `PRIVATE_READBACK_FAILED` bleibt ausdrücklich ungeklärt. Nach
+Nutzerentscheidung ist er allein kein dauerhafter Draft-/Merge-Blocker: Beide
+frischen Vollsicherungen sind erfolgreich, und die sichere Diagnose ist auf Main
+aktiv. Bei Wiederauftreten feste Stufe (`GRANT`/`GET`/`BODY`), HTTP-Status und
+Laufkennung auswerten; keine signierten URLs oder Geheimnisse protokollieren.
+Kein Ursachenfix behauptet. Keine weiteren manuellen Backups als Ersatz für den
+erst nach Integration möglichen echten Wochenplanlauf.

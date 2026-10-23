@@ -26,6 +26,15 @@ function storedFlowItem(item: QuizFlowItem, index: number) {
   };
 }
 
+test("current closing copy overrides only stale standard closing content across reload", () => {
+  const quiz = { ...quizFixture(), outro_bekanntmachungen: "Neu\n\nVollständig" };
+  const stored = buildDefaultQuizFlow({ ...quiz, outro_bekanntmachungen: "Alt" }).map(storedFlowItem);
+  const custom = { ...stored.find(item => item.typ === "CLOSING")!, quiz_ablauf_element_id: 999, ist_standard: false, konfiguration: { version: 1, body: "Eigene Zusatzfolie" } };
+  const result = resolveQuizFlow(quiz, JSON.parse(JSON.stringify([...stored, custom])));
+  assert.equal(result.find(item => item.type === "CLOSING" && item.isStandard)?.config.body, quiz.outro_bekanntmachungen);
+  assert.equal(result.find(item => item.type === "CLOSING" && !item.isStandard)?.config.body, "Eigene Zusatzfolie");
+});
+
 test("aktuelle Intro-Begrüßung ersetzt nur die veraltete Standardkopie, auch nach Reload", () => {
   const original = { ...quizFixture(), titel: "Oktober", intro_video_url: "/intro.mp4", intro_preise: "Preise" };
   const stored = buildDefaultQuizFlow(original).map(storedFlowItem);

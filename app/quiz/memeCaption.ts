@@ -35,7 +35,7 @@ export type MemeLiveState = MemeTimerConfig & {
 export const DEFAULT_MEME_QUESTION_CONFIG: MemeQuestionConfig = {
   version: 1,
   timerEnabled: true,
-  responseDurationSeconds: 90,
+  responseDurationSeconds: 120,
   maxPresentedMemes: 5,
 };
 

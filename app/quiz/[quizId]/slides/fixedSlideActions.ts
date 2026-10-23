@@ -132,10 +132,17 @@ export async function saveIntroSlide(
       }
     }
 
+    const welcomeQuiz = slideIdValue === "welcome"
+      ? await prisma.quiz.findUniqueOrThrow({ where: { quiz_id: quizId }, select: { titel: true } })
+      : null;
     if (slideIdValue !== "rules") await saveSlideVisibility(
       quizId,
       slideIdValue,
       formData.get("enabled") === "on",
+      slideIdValue === "welcome" ? {
+        title: text(formData, "titel") || welcomeQuiz?.titel || "Willkommen",
+        body: text(formData, "begruessung") || "Willkommen zum heutigen Quizabend!",
+      } : undefined,
     );
 
     revalidatePath(`/quiz/${quizId}`);
@@ -188,7 +195,9 @@ export async function saveOutroSlide(
             body: text(formData, "body"),
             teamHint: text(formData, "ctaText"),
           }
-        : bookingPatch,
+        : slideIdValue === "announcements"
+          ? { body: text(formData, "bekanntmachungen") || "Wir freuen uns auf den nächsten gemeinsamen Quizabend." }
+          : bookingPatch,
     );
 
     revalidatePath(`/quiz/${quizId}`);

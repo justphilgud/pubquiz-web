@@ -938,7 +938,7 @@ async function isRunReleasedForAnswerWrite(
   quizId: number,
   requestedSectionId: number,
 ) {
-  if (assignment.quiz_abschnitt_id === null) return run.is_current;
+  if (assignment.quiz_abschnitt_id === null) return false;
   const release = await db.quiz_block_freigaben.findUnique({
     where: {
       quiz_id_quiz_abschnitt_id: {
@@ -1527,6 +1527,11 @@ export async function getQuizLiveSnapshotData(
     run = await runQuery();
   }
   const presentationIdentity = parsePresentationSlideKey(presentationStatus?.slide_key);
+  const unassignedQuestionId = run?.quiz_fragen?.quiz_abschnitt_id === null
+    ? run.quiz_fragen.quiz_fragen_id : null;
+  // Old current-run keys may survive an editorial unassignment. Hide that read
+  // model without resetting the session or deleting its submissions.
+  if (unassignedQuestionId !== null) run = null;
   const memePresentationQuestionId =
     options.presentationQuestionAssignmentId ??
     (presentationIdentity?.kind === "QUESTION"
@@ -1726,7 +1731,7 @@ export async function getQuizLiveSnapshotData(
     ).payload;
   }
   const submission = answer?.submissions[0] ?? null;
-  const memePresentationState = memePresentationQuestionId
+  const memePresentationState = memePresentationQuestionId && memePresentationQuestionId !== unassignedQuestionId
     ? await getMemePresentationSnapshot({
         quizId,
         quizFragenId: memePresentationQuestionId,

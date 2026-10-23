@@ -21,7 +21,8 @@ type Props = {
   now: number;
   quizBeendet: boolean;
   slideIndex: number;
-  slidesLength: number;
+  slides: Slide[];
+  quizId: number;
 };
 
 export default function ModerationSidebar({
@@ -32,7 +33,8 @@ export default function ModerationSidebar({
   now,
   quizBeendet,
   slideIndex,
-  slidesLength,
+  slides,
+  quizId,
 }: Props) {
   return (
     <aside className="flex min-h-0 flex-col gap-3 overflow-hidden">
@@ -49,7 +51,9 @@ export default function ModerationSidebar({
 
       <ProgressPanel
         slideIndex={slideIndex}
-        slidesLength={slidesLength}
+        slides={slides}
+        quizId={quizId}
+        slideStartedAt={slideStartedAt}
         quizStartedAt={quizStartedAt}
         now={now}
       />

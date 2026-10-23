@@ -1,5 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { insertActivatedStep } from "./participantAnswerSequence";
+
+test("Meme voting follows intervening questions by activation, preserving normal order and reload identity", () => {
+  const items = [{ id: "meme", at: "2026-10-23T18:00:00Z" }, { id: "normal", at: "2026-10-23T18:02:00Z" }, { id: "next", at: "2026-10-23T18:05:00Z" }];
+  const build = () => insertActivatedStep(items, { id: "voting", at: "2026-10-23T18:04:00Z" }, "2026-10-23T18:04:00Z", item => item.at);
+  assert.deepEqual(build().map(item => item.id), ["meme", "normal", "voting", "next"]);
+  assert.deepEqual(JSON.parse(JSON.stringify(build())), build());
+  assert.equal(build().filter(item => item.id === "voting").length, 1);
+  assert.deepEqual(items.map(item => item.id), ["meme", "normal", "next"]);
+});
 
 import { buildParticipantAnswerSequence } from "./participantAnswerSequence";
 

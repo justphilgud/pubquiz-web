@@ -2,7 +2,7 @@ name: AP9.4 Manual Backup and Isolated Restore
 
 on:
   schedule:
-    - cron: '30 2 * * *'
+    - cron: '30 2 * * 1'
   workflow_dispatch:
     inputs:
       mode:
@@ -72,6 +72,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      deployments: read
     runs-on: ubuntu-latest
     container: postgres:17
     environment: operations-backup
@@ -91,7 +92,7 @@ jobs:
           set -euo pipefail
           if [[ "$GITHUB_EVENT_NAME" == "schedule" && "$BACKUP_AUTOMATION_ENABLED" != "true" ]]; then
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Daily backup skipped: BACKUP_AUTOMATION_ENABLED is not true." >> "$GITHUB_STEP_SUMMARY"
+            echo "Weekly backup skipped: BACKUP_AUTOMATION_ENABLED is not true." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
           fi
@@ -104,7 +105,7 @@ jobs:
       - if: steps.gate.outputs.run == 'true'
         run: npm ci
       - if: steps.gate.outputs.run == 'true'
-        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/meme-archive-backup.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts
+        run: node --import tsx --test scripts/operations/acceptance.test.ts scripts/operations/meme-archive-backup.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/bridge.test.ts scripts/operations/retention.test.ts scripts/operations/upload-retry.test.ts scripts/operations/production-release.test.ts
       - name: Record verified identity claims only
         if: steps.gate.outputs.run == 'true'
         run: node --import tsx scripts/operations/print-claims.ts
@@ -118,6 +119,12 @@ jobs:
           BACKUP_RETENTION_VERIFIED: ${{ vars.BACKUP_RETENTION_VERIFIED }}
           AP94_UPLOAD_DIAGNOSTIC_MATRIX: ${{ inputs.diagnostic_upload_matrix && 'true' || 'false' }}
         run: node --import tsx scripts/operations/transport-probe.ts backup
+      - name: Resolve deployed Production release for scheduled backup
+        id: production
+        if: steps.gate.outputs.run == 'true' && github.event_name == 'schedule'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node --import tsx scripts/operations/production-release-cli.ts
       - name: Verified Production backup
         if: steps.gate.outputs.run == 'true' && (github.event_name == 'schedule' || inputs.mode == 'acceptance')
         id: backup
@@ -127,7 +134,7 @@ jobs:
           AP94_TRANSPORT_MODE: acceptance
           AP94_OIDC_TRANSPORT_ACCEPTED: ${{ vars.AP94_OIDC_TRANSPORT_ACCEPTED }}
           AP94_BRIDGE_ORIGIN: ${{ vars.AP94_BRIDGE_ORIGIN }}
-          PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && vars.PRODUCTION_RELEASE_SHA || inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && steps.production.outputs.sha || inputs.production_commit }}
           BACKUP_FAILURE_EVIDENCE_PATH: ${{ runner.temp }}/backup-failure.json
           AP96_BACKUP_TYPE: ${{ github.event_name == 'schedule' && 'scheduled' || inputs.backup_type }}
           AP96_BACKUP_PROTECTED: ${{ github.event_name == 'schedule' && 'false' || inputs.protect_backup }}
@@ -156,7 +163,7 @@ jobs:
         if: steps.backup.outcome == 'success'
         shell: bash
         env:
-          PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && vars.PRODUCTION_RELEASE_SHA || inputs.production_commit }}
+          PRODUCTION_RELEASE_SHA: ${{ github.event_name == 'schedule' && steps.production.outputs.sha || inputs.production_commit }}
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'

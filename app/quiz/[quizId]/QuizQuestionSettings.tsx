@@ -319,7 +319,7 @@ export default function QuizQuestionSettings({
                       ? {
                           version: 1,
                           timerEnabled: true,
-                          responseDurationSeconds: 90,
+                          responseDurationSeconds: 120,
                           maxPresentedMemes: config.maxPresentedMemes,
                         }
                       : {

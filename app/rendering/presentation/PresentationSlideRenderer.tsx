@@ -1943,6 +1943,11 @@ function renderAnkommenSlide() {
         </video>
       )}
 
+      {praesentationQuiz.intro_wartetext && (
+        <p className="presentation-arrival-message absolute inset-x-8 top-8 z-20 max-h-[calc(100%_-_10rem)] overflow-auto whitespace-pre-line rounded-2xl bg-black/70 px-7 py-4 text-3xl font-bold text-white">
+          {praesentationQuiz.intro_wartetext}
+        </p>
+      )}
       <div className="presentation-arrival-time absolute bottom-8 right-8 z-20 rounded-2xl border-4 border-yellow-300 bg-black/70 px-7 py-4 text-3xl font-black text-yellow-200 shadow-[5px_5px_0_#ff00aa]">
         Beginn: {praesentationQuiz.intro_startzeit ?? "19:30"} Uhr
       </div>

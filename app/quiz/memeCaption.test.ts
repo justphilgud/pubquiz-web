@@ -10,6 +10,14 @@ import {
   parseMemeQuestionConfig,
 } from "./memeCaption";
 
+test("new and missing meme configuration uses two minutes without rewriting saved durations", () => {
+  assert.equal(DEFAULT_MEME_QUESTION_CONFIG.responseDurationSeconds, 120);
+  assert.equal(parseMemeQuestionConfig(undefined)?.responseDurationSeconds, 120);
+  for (const seconds of [60, 90, 120, 180]) {
+    assert.equal(parseMemeQuestionConfig({ version: 1, responseDurationSeconds: seconds, maxPresentedMemes: 5 })?.responseDurationSeconds, seconds);
+  }
+});
+
 test("accepts the supported quiz configuration and rejects unsafe bounds", () => {
   assert.deepEqual(parseMemeQuestionConfig(null), DEFAULT_MEME_QUESTION_CONFIG);
   assert.deepEqual(parseMemeQuestionConfig({

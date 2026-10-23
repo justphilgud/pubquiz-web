@@ -1,5 +1,7 @@
 "use server";
 
+import { buildQuestionSolutionPreview } from "@/app/fragen/questionSolutionPreview";
+
 import { saveStandardIntroRules } from "@/app/quiz/flow/quizFlowRepository.server";
 
 import { resolveQuizTemplates } from "@/app/rendering/resolveQuizTemplates.server";
@@ -978,6 +980,7 @@ export async function getQuizDetails(
                   antwortfeld_id: true,
                   label: true,
                   ist_pflicht: true,
+                  loesungen: { orderBy: { sortierung: "asc" }, select: { loesung_text: true, ist_akzeptiert: true } },
                   medien: {
                     select: {
                       datei: true,
@@ -1211,6 +1214,13 @@ export async function getQuizDetails(
         quiz_abschnitt_id: eintrag.quiz_abschnitt_id,
         fragen_id: eintrag.fragen.fragen_id,
         frage: eintrag.fragen.frage,
+        solutionPreview: buildQuestionSolutionPreview({
+          templateId: eintrag.fragen.vorlage?.code,
+          templateData: config?.templateData,
+          maxValues: Number.MAX_SAFE_INTEGER,
+          classicAnswers: eintrag.fragen.antworten.map(answer => ({ text: answer.antwort, isCorrect: answer.ist_richtig })),
+          structuredFields: eintrag.fragen.antwortfelder.map(field => ({ label: field.label, solutions: field.loesungen.map(solution => ({ text: solution.loesung_text, isAccepted: solution.ist_akzeptiert })) })),
+        })?.values ?? [],
         punkte_basis: Number(eintrag.punkte_basis),
         punkte_modus: eintrag.punkte_modus ?? "standard",
         freie_antwort_erlaubt: eintrag.freie_antwort_erlaubt,
@@ -2938,6 +2948,7 @@ export async function getQuizAntwortStatus(
                   type: interactionRun.interaction_type,
                   state: interactionRun.state,
                   deadlineAt: interactionRun.deadline_at?.toISOString() ?? null,
+                  openedAt: interactionRun.opened_at?.toISOString() ?? null,
                   revision: interactionRun.revision,
                 }
               : null,
@@ -3037,6 +3048,7 @@ export async function getQuizAntwortStatus(
       const response = livePollResponseByRunId.get(run.interaction_run_id);
       return {
         runId: run.interaction_run_id,
+        openedAt: run.opened_at?.toISOString() ?? null,
         state: run.state,
         type: config.type,
         prompt: config.prompt,

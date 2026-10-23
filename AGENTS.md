@@ -43,6 +43,14 @@ docs/architecture/quiz-runtime-contracts.md
 
 Run the regression tests referenced there for the affected contract.
 
+Before any question-template change, read the binding surface matrix and variants in
+`docs/architecture/presentation-rendering.md` ("Template-Verträge") and its specialized
+runtime contracts. Check question, solution, participant and moderation surfaces.
+Update specification and rendered/browser regressions together. New requirements
+extend existing rules; identify genuine conflicts rather than changing tests to
+accept unintended regressions. Document already approved changes without requesting
+the same approval again.
+
 Before any work on presentation templates, Storybook, Corporate, ungegoogelt design worlds, renderers, design systems, generators, UX, animation, typography, or imagery, read and follow:
 
 docs/design/ungegoogelt-design-manifest.md
