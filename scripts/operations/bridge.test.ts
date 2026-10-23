@@ -17,6 +17,51 @@ import { expectProbeDenial, tamperedProbeUrl } from "./transport-probe-diagnosti
 import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
 import { GithubOidcTokenProvider, GITHUB_OIDC_REFRESH_MARGIN_MS, MAX_GITHUB_OIDC_ATTEMPTS, type OidcRuntime } from "./oidc-token";
 
+test("readback diagnosis preserves HTTP stage/status without exposing signed URLs or provider details", async t => {
+  const secret = "READBACK_SECRET_CANARY";
+  const log = t.mock.method(console, "error", () => undefined);
+  const key = "synthetic/acceptance/run-123456-1";
+  const settings = { AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app", AP94_TRANSPORT_MODE: "synthetic",
+    GITHUB_RUN_ID: "123456", GITHUB_RUN_ATTEMPT: "1", BACKUP_PRIVATE_BLOB_HOST: STORE_HOST };
+  for (const status of [403, 404, 429, 500, 503]) {
+    let requests = 0;
+    const client = new BridgeClient(settings, "backup", key, async () => {
+      requests++; return new Response(secret, { status, headers: { "x-provider-error": secret } });
+    });
+    client.grant = async () => ({ url: `https://${STORE_HOST}/${key}/probe.bin?secret=${secret}`, method: "GET", maximumSize: 100, expiresAt: Date.now() + 60000 });
+    await assert.rejects(client.read("probe.bin"), /PRIVATE_READBACK_FAILED/);
+    assert.equal(requests, 1, "diagnosis must not introduce retries or change failures");
+    assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "GET", httpStatus: status });
+  }
+  const network = new BridgeClient(settings, "backup", key, async () => { throw new Error(secret); });
+  network.grant = async () => ({ url: `https://${STORE_HOST}/${key}/probe.bin`, method: "GET", maximumSize: 100, expiresAt: Date.now() + 60000 });
+  await assert.rejects(network.read("probe.bin"), /SIGNED_READ_FAILED_DETAILS_WITHHELD/);
+  assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "GET", httpStatus: null });
+  network.grant = async () => { throw new Error(secret); };
+  await assert.rejects(network.read("probe.bin"), /SIGNED_READ_FAILED_DETAILS_WITHHELD/);
+  assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "GRANT", httpStatus: null });
+  network.grant = async () => ({ url: `https://${STORE_HOST}/${key}/probe.bin`, method: "GET", maximumSize: 100, expiresAt: Date.now() + 60000 });
+  const body = new BridgeClient(settings, "backup", key, async () => new Response(new ReadableStream({ start(controller) { controller.error(new Error(secret)); } })));
+  body.grant = network.grant;
+  await assert.rejects(body.read("probe.bin"), /SIGNED_READ_FAILED_DETAILS_WITHHELD/);
+  assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "BODY", httpStatus: 200 });
+  for (const status of [403, 503]) {
+    let requests = 0;
+    const token = `e30.${Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 300 })).toString("base64url")}.signature`;
+    const rejected = new BridgeClient({ ...settings, ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.actions.githubusercontent.com/token",
+      ACTIONS_ID_TOKEN_REQUEST_TOKEN: secret }, "backup", key, async input => {
+      requests++;
+      return new URL(String(input)).hostname === "example.actions.githubusercontent.com"
+        ? Response.json({ value: token }) : new Response(secret, { status });
+    });
+    await assert.rejects(rejected.read("probe.bin"), status === 403 ? /BRIDGE_ACCESS_REJECTED/ : /BRIDGE_UNAVAILABLE/);
+    assert.equal(requests, 2, "one token acquisition and one rejected grant, no retry");
+    assert.deepEqual(JSON.parse(String(log.mock.calls.at(-2)!.arguments[0])), { event: "private-readback-grant-rejected", httpStatus: status });
+    assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "GRANT", httpStatus: null });
+  }
+  assert.doesNotMatch(JSON.stringify(log.mock.calls.map(call => call.arguments)), new RegExp(secret));
+});
+
 test("upload denial preserves only artifact class, HTTP status and bounded provider category", async () => {
   const secret = "SECRET_CANARY_JWT_SIGNED_URL";
   const cases: [Response, string][] = [

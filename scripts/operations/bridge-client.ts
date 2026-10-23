@@ -88,6 +88,9 @@ export class BridgeClient {
         store: STORE_ID, key: this.key, name, kind: rule.kind, ...(uploadBytes !== undefined ? { bytes: uploadBytes } : {}) };
       if (uploadBytes !== undefined) requireCondition(Number.isSafeInteger(uploadBytes) && uploadBytes > 0 && uploadBytes <= rule.maximumSize, "ARTIFACT_SIZE_LIMIT");
       const response = await this.access(body);
+      if (uploadBytes === undefined && !response.ok) console.error(JSON.stringify({
+        event: "private-readback-grant-rejected", httpStatus: response.status,
+      }));
       requireCondition(response.ok, response.status === 403 ? "BRIDGE_ACCESS_REJECTED" : "BRIDGE_UNAVAILABLE");
       return validateGrant(JSON.parse((await limitedResponse(response, 20000)).toString()), body);
     } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("BRIDGE_REQUEST_FAILED_DETAILS_WITHHELD"); }
@@ -103,12 +106,23 @@ export class BridgeClient {
     } catch { throw new OperationsError("BRIDGE_REQUEST_FAILED_DETAILS_WITHHELD"); }
   }
   async read(name: string) {
+    let stage: "GRANT" | "GET" | "BODY" = "GRANT";
+    let httpStatus: number | null = null;
     try {
       const grant = await this.grant(name);
+      stage = "GET";
       const response = await this.request(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(120000) });
+      httpStatus = response.status;
       requireCondition(response.status === 200, "PRIVATE_READBACK_FAILED");
+      stage = "BODY";
       return await limitedResponse(response, grant.maximumSize);
-    } catch (error) { if (error instanceof OperationsError) throw error; throw new OperationsError("SIGNED_READ_FAILED_DETAILS_WITHHELD"); }
+    } catch (error) {
+      // Only a fixed stage and numeric status escape. Never log the URL, body,
+      // headers, provider error, JWT or exception/cause.
+      console.error(JSON.stringify({ event: "private-readback-failed", stage, httpStatus }));
+      if (error instanceof OperationsError) throw error;
+      throw new OperationsError("SIGNED_READ_FAILED_DETAILS_WITHHELD");
+    }
   }
   async retentionInventory(): Promise<InventoryObject[]> {
     try {
