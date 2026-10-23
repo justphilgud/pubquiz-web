@@ -284,4 +284,16 @@ das Diagnoseartefakt lesen. Run 37964063455 erhält rückwirkend keine neue Diag
   Bereinigung nur separat für die exakt dokumentierte temporäre Datenbank autorisieren.
 
 Der konkrete Sicherungs-/Restore-Nachweis dieses Auftrags und die tatsächlich
-bestandenen beziehungsweise noch blockierten Abnahmen stehen im Änderungsbericht.
+bestandenen beziehungsweise noch blockierten Abnahmen stehen im
+[Änderungsbericht](../reports/ten-improvements-20261023.md).
+
+Am 23.10.2026 brach der manuelle Run 39919171978 nach 45 Minuten während der
+Medienübertragung ab (627 von 840 Objekten abgeschlossen). Das Jobbudget wird
+deshalb auf 90 Minuten erhöht; keine Medien werden ausgelassen und keine
+Integritätsprüfung abgeschwächt. Der danach gelaufene bestehende Schedule
+39920641414 scheiterte mit `PRIVATE_READBACK_FAILED`; die konkrete Transportursache
+ist damit noch nicht nachgewiesen. Eine Budgeterhöhung löst diesen separaten
+Readbackfehler nicht nachweislich. Letzter bestätigter erfolgreicher Schedule ist
+39743653050 vom 22.10.2026. Fehlgeschlagene Läufe und unvollständige Uploads gelten
+nicht als Wiederherstellungspunkt. Der isolierte Preflight des verifizierten
+22.10.-Backups wartet in Run 39924682983 auf den menschlichen Required Reviewer.

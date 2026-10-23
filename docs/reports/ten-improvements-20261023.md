@@ -77,6 +77,13 @@ Typisch fehlende Voraussetzung ist Schritt 4 oder das ausdrückliche **Abstimmun
 öffnen** nach Vorstellung/Übersicht. Die interne Testansicht ersetzt keine drei
 persistenten Teamsitzungen, verbindlichen Einreichungen und Moderationsübergänge;
 eine reine Folienvorschau kann deshalb kein vollständiges Voting beweisen.
+Der vollständige Ablauf wurde danach über Block 2, Siegerehrung, Jahreswertung und
+alle Outrofolien bis Folie 27/27 durchlaufen. Die tatsächliche Präsentation zeigte
+abschließend die gespeicherte Buchungsfolie; keine unzugeordnete Frage erschien.
+Quiz 103 wurde regulär beendet, ohne Antworten oder Ergebnisse zurückzusetzen.
+Temporäre Preview-Zugangskopien wurden entfernt und die lokale Development-
+Konfiguration wiederhergestellt; lokale Testserver sind gestoppt.
+
 Die Teamansicht auf 390×844 und das Endergebnis wurden tatsächlich geprüft.
 Die tatsächliche öffentliche Präsentation war während der offenen Abstimmung
 zunächst noch hinter ihrer Startüberlagerung; die offene Phase wurde in der
@@ -97,6 +104,10 @@ der offenen Phase ausgegeben.
 - Die unveränderliche Importplandatei besitzt im Windows-Checkout CRLF; für den
   Hash-Test ausschließlich lokal auf LF normalisiert und vom Commit ausgeschlossen.
   Generierter Prisma-Client ebenfalls nur lokal regeneriert und nicht Teil des PR.
+- Question-Rewrite-Suite (39 Tests) und Meme-Archiv-Suite (5 Tests) erfolgreich.
+  GitHub-CI bestätigt außerdem echte isolierte PostgreSQL-Importtransaktionen sowie
+  Bridge- und isolierte Restore-Integrationstests. Diese Fixture-Restores ersetzen
+  nicht die noch ausstehende Wiederherstellung des echten Backups.
 - Kein Merge oder Production-Deployment dieses Zehn-Punkte-Pakets ohne tatsächlich
   abgeschlossene Prüfungen. PR- und CI-Stand werden im Übergabebericht genannt.
 
