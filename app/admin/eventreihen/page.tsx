@@ -1,3 +1,4 @@
+import { getMediaUploadEnvironmentPrefix } from "@/app/fragen/editor/mediaUploadEnvironment";
 import { isAdmin, requireActor } from "@/app/lib/permissions";
 import { getEventSeriesList } from "@/app/eventreihen/actions";
 import { EventSeriesManager } from "./EventSeriesManager";
@@ -18,7 +19,7 @@ export default async function EventSeriesPage() {
         <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div><h1 className="text-3xl font-bold">Eventreihen</h1><p className="mt-2 text-slate-600">Dauerhafte organisatorische Rahmen für konkrete Quiztermine.</p></div>
         </header>
-        <EventSeriesManager series={series} canCreate={isAdmin(actor)} messages={messages} presentationTemplates={presentationTemplates} canAssignPresentationTemplates={isAdmin(actor)} />
+        <EventSeriesManager environmentPrefix={getMediaUploadEnvironmentPrefix()} series={series} canCreate={isAdmin(actor)} messages={messages} presentationTemplates={presentationTemplates} canAssignPresentationTemplates={isAdmin(actor)} />
       </div>
     </main>
   );

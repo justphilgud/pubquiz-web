@@ -19,6 +19,7 @@ export async function saveEventSeriesLogo(id: number, url: string | null, expect
     });
     if (result.count !== 1) return { ok: false, message: "Das Logo wurde inzwischen geändert. Bitte Seite neu laden." };
     revalidatePath(`/admin/eventreihen/${id}`);
+    revalidatePath("/admin/eventreihen");
     return { ok: true, message: url ? "Logo gespeichert." : "Logo entfernt." };
   } catch {
     return { ok: false, message: "Logo konnte nicht gespeichert werden. Bitte Dateityp, Größe und Upload prüfen." };

@@ -43,3 +43,21 @@ test("logo persistence is additive, authorized, race-safe and does not delete sh
   assert.match(route, /requireEventSeriesEditor\(context.eventSeriesId\)/);
   assert.match(route, /maximumSizeInBytes: eventSeriesLogoRule.maximumSizeInBytes/);
 });
+
+test("create and edit forms stage logos until save, preserving created IDs on upload failure", () => {
+  const manager = readFileSync("app/admin/eventreihen/EventSeriesManager.tsx", "utf8");
+  assert.match(manager, /<EventSeriesLogoField/);
+  assert.match(manager, /logoDraft !== undefined/);
+  assert.match(manager, /editingId \?\? result.eventSeriesId/);
+  assert.ok(manager.indexOf("setEditingId(savedId)") < manager.indexOf("await uploadEventSeriesLogo"));
+  assert.match(manager, /<fieldset disabled=\{saving\}/);
+  assert.match(manager, /if \(!result.success\) return/);
+  assert.match(manager, /setLogoUrl\(entry.logoUrl\)/);
+  assert.match(manager, /setLogoUrl\(null\); setLogoDraft\(undefined\)/);
+  const field = readFileSync("app/eventreihen/EventSeriesLogoField.tsx", "utf8");
+  assert.doesNotMatch(field, /uploadPresigned|saveEventSeriesLogo/);
+  assert.match(field, /validateEventSeriesLogoFile\(file\)/);
+  assert.match(field, /reader.abort\(\)/);
+  const detail = readFileSync("app/eventreihen/EventSeriesLogoEditor.tsx", "utf8");
+  assert.match(detail, /uploadEventSeriesLogo\(file, id, environmentPrefix\)/);
+});

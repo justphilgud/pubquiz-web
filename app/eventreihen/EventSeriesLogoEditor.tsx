@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { uploadPresigned } from "@vercel/blob/client";
+import { uploadEventSeriesLogo } from "./uploadEventSeriesLogo";
 import { FileUpload, ImageViewer } from "@/components/ui";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
-import { buildEventSeriesLogoPath, eventSeriesLogoRule, validateEventSeriesLogoFile } from "./eventSeriesLogo";
+import { eventSeriesLogoRule, validateEventSeriesLogoFile } from "./eventSeriesLogo";
 import { saveEventSeriesLogo } from "./eventSeriesLogoActions";
 
 export function EventSeriesLogoEditor({ id, initialUrl, canEdit, environmentPrefix }: {
@@ -22,11 +22,7 @@ export function EventSeriesLogoEditor({ id, initialUrl, canEdit, environmentPref
     if (error) { setMessage(error); return; }
     setBusy(true); setMessage("Logo wird hochgeladen …");
     try {
-      const blob = await uploadPresigned(buildEventSeriesLogoPath(environmentPrefix, id, `${crypto.randomUUID()}-${file.name}`), file, {
-        access: "public", handleUploadUrl: "/api/question-media-upload",
-        clientPayload: JSON.stringify({ target: "EVENT_SERIES_LOGO", eventSeriesId: id }),
-      });
-      await save(blob.url);
+      await save(await uploadEventSeriesLogo(file, id, environmentPrefix));
     } catch { setMessage("Logo konnte nicht hochgeladen werden. Bitte erneut versuchen."); }
     finally { setBusy(false); }
   }

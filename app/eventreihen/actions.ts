@@ -40,6 +40,7 @@ export type EventSeriesOption = {
 };
 
 export type EventSeriesListItem = EventSeriesOption & {
+  logoUrl: string | null;
   slug: string;
   publicName: string | null;
   description: string | null;
@@ -70,6 +71,7 @@ export type EventSeriesActionResult = {
 };
 
 function toListItem(series: {
+  logo_url: string | null;
   eventreihe_id: number;
   name: string;
   slug: string;
@@ -86,6 +88,7 @@ function toListItem(series: {
 }, capabilities: { canEdit: boolean; canChangeArchiveState: boolean }): EventSeriesListItem {
   return {
     id: series.eventreihe_id,
+    logoUrl: series.logo_url,
     name: series.name,
     slug: series.slug,
     publicName: series.oeffentlicher_name,

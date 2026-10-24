@@ -152,3 +152,17 @@ Berlin-Mitternacht und Sommer-/Winterzeit, CORS/ETag/Rücknahme, ICS-UID/Metadat
 Bildformat, Transparenz/Seitenverhältnis, additive Persistenz/Berechtigungsvertrag.
 Zusätzlich bestehende `eventCalendar.test.ts`, `quizMasterData.test.ts` und
 `blobPath.test.ts`. Alle Fixtures sind lokal; keine Produktions-Testveranstaltungen.
+
+### Logo im Anlage- und Bearbeitungsformular
+
+Das gemeinsame Formular für neue und bestehende Eventreihen zeigt ebenfalls ein
+optionales Logo mit lokaler Vorschau, Ersetzen und Entfernen. Dort sind Änderungen
+bis zum Speichern vorgemerkt; Abbrechen verwirft sie. Erst nach erfolgreicher
+Stammdatenspeicherung wird ein ausgewähltes Bild über den gemeinsamen signierten
+Upload hochgeladen und an die feste Reihen-ID gebunden. Ein Uploadfehler lässt die
+bereits gespeicherte Reihe bestehen, hält deren ID im Bearbeitungsformular und
+meldet ausdrücklich den Teilerfolg: erneutes Speichern aktualisiert dieselbe Reihe.
+Während des Speicherns sind Formular und Reihenwechsel gesperrt. Die zusätzliche
+Logo-Funktion auf der Detailseite bleibt direkt speichernd erhalten.
+Regression: `eventSeriesLogo.test.ts` prüft Formularintegration, ID-Erhalt bei
+Teilfehlern, Entwurfszustand, Dateiprüfung und gemeinsamen Uploadpfad.
