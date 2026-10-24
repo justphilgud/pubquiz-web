@@ -37,6 +37,9 @@ export type EventSeriesOption = {
   name: string;
   isArchived: boolean;
   defaultPresentationTemplateId: string;
+  reservationUrl?: string | null;
+  logoUrl?: string | null;
+  description?: string | null;
 };
 
 export type EventSeriesListItem = EventSeriesOption & {
@@ -65,6 +68,7 @@ export type EventSeriesActionResult = {
     publicName: string | null;
     description: string | null;
     internalNote: string | null;
+    reservationUrl: string | null;
     isPublic: boolean;
     defaultPresentationTemplateId: string;
   };
@@ -72,6 +76,7 @@ export type EventSeriesActionResult = {
 
 function toListItem(series: {
   logo_url: string | null;
+  reservierungs_url: string | null;
   eventreihe_id: number;
   name: string;
   slug: string;
@@ -89,6 +94,7 @@ function toListItem(series: {
   return {
     id: series.eventreihe_id,
     logoUrl: series.logo_url,
+    reservationUrl: series.reservierungs_url,
     name: series.name,
     slug: series.slug,
     publicName: series.oeffentlicher_name,
@@ -137,6 +143,7 @@ export async function getEventSeriesOptions(
       name: true,
       ist_archiviert: true,
       default_presentation_template_id: true,
+      reservierungs_url: true, logo_url: true, beschreibung: true,
     },
   });
   return series.map((entry) => ({
@@ -144,6 +151,7 @@ export async function getEventSeriesOptions(
     name: entry.name,
     isArchived: entry.ist_archiviert,
     defaultPresentationTemplateId: entry.default_presentation_template_id,
+    reservationUrl: entry.reservierungs_url, logoUrl: entry.logo_url, description: entry.beschreibung,
   }));
 }
 
@@ -254,6 +262,7 @@ export async function updateEventSeries(
       publicName: saved.oeffentlicher_name,
       description: saved.beschreibung,
       internalNote: saved.interne_bemerkung,
+      reservationUrl: saved.reservierungs_url,
       isPublic: saved.ist_oeffentlich,
       defaultPresentationTemplateId: saved.default_presentation_template_id,
     },

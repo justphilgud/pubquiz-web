@@ -12,6 +12,9 @@ import {
   type QuizResult,
 } from "./actions";
 import type { EventSeriesOption } from "@/app/eventreihen/actions";
+import { resolvePublicEventContent } from "@/app/eventreihen/publicEventContent";
+import { QuizEventImageEditor } from "./QuizEventImageEditor";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { QuizCopyDialog } from "./QuizCopyDialog";
 import { isEventSeriesSelectable } from "@/app/eventreihen/eventSeriesPolicy";
 import {
@@ -61,6 +64,9 @@ type FormState = {
   mapUrl: string;
   publicUrl: string;
   internalNote: string;
+  reservationUrl: string;
+  publicDescription: string;
+  publicDescriptionMode: string;
   presentationTemplateId: string;
   solutionStrategy: QuizSolutionStrategy;
 };
@@ -75,6 +81,7 @@ function emptyForm(initialEventSeriesId?: number): FormState {
     mapUrl: "",
     publicUrl: "",
     internalNote: "",
+    reservationUrl: "", publicDescription: "", publicDescriptionMode: "APPEND",
     presentationTemplateId: "",
     solutionStrategy: DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
   };
@@ -90,6 +97,9 @@ function formFromQuiz(quiz: QuizResult): FormState {
     mapUrl: quiz.karten_url ?? "",
     publicUrl: quiz.oeffentliche_url ?? "",
     internalNote: quiz.bemerkung ?? "",
+    reservationUrl: quiz.reservierungs_url ?? "",
+    publicDescription: quiz.oeffentliche_beschreibung ?? "",
+    publicDescriptionMode: quiz.oeffentliche_beschreibung_modus ?? "APPEND",
     presentationTemplateId: quiz.presentation_template_id ?? "",
     solutionStrategy: quiz.aufloesungsstrategie,
   };
@@ -103,6 +113,7 @@ export default function QuizForm({
   presentationTemplates,
   canAssignPresentationTemplates,
   initialEditingQuizId,
+  environmentPrefix,
 }: {
   quizze: QuizResult[];
   eventSeries: EventSeriesOption[];
@@ -111,6 +122,7 @@ export default function QuizForm({
   presentationTemplates: AssignablePresentationTemplate[];
   canAssignPresentationTemplates: boolean;
   initialEditingQuizId?: number;
+  environmentPrefix: BlobEnvironmentPrefix;
 }) {
   const router = useRouter();
   const initialEditingQuiz = quizze.find((quiz) => quiz.quiz_id === initialEditingQuizId);
@@ -126,6 +138,10 @@ export default function QuizForm({
     .filter((template) => !templateRegistry.presentation.some(({ id }) => id === template.id))
     .map(toRuntimePresentationTemplate);
 
+  const selectedSeries = eventSeries.find((entry) => entry.id === Number(form.eventSeriesId));
+  const effectiveEvent = resolvePublicEventContent(selectedSeries ?? {}, {
+    reservationUrl: form.reservationUrl, description: form.publicDescription, descriptionMode: form.publicDescriptionMode,
+  });
   const activeEventSeries = eventSeries.filter((entry) => !entry.isArchived);
   const filteredQuizzes = useMemo(
     () =>
@@ -170,6 +186,9 @@ export default function QuizForm({
       kartenUrl: form.mapUrl,
       oeffentlicheUrl: form.publicUrl,
       bemerkung: form.internalNote,
+      reservationUrl: form.reservationUrl,
+      publicDescription: form.publicDescription,
+      publicDescriptionMode: form.publicDescriptionMode,
       presentationTemplateId: form.presentationTemplateId || null,
       solutionStrategy: form.solutionStrategy,
     };
@@ -274,6 +293,15 @@ export default function QuizForm({
               {effectivePresentation.usedFallback && <p role="status" className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">{messages.validation.fallback}</p>}
             </label>
           </div>
+          <section className="space-y-4 rounded-xl border border-slate-200 p-4" aria-label="Öffentliche Veranstaltungsinformationen">
+            <h3 className="font-semibold">Öffentliche Veranstaltungsinformationen</h3>
+            <label className="block"><span className="mb-1 block text-sm font-semibold">Eigener Reservierungslink</span><input type="url" maxLength={2048} value={form.reservationUrl} onChange={(event) => updateField("reservationUrl", event.target.value)} className={inputClass} placeholder="Leer: aus Eventreihe übernehmen" /></label>
+            <p className="break-words text-sm text-slate-600">Wirksamer Reservierungslink: {effectiveEvent.reservationUrl ?? "Keiner"} · {effectiveEvent.reservationSource === "QUIZ" ? "Eigener Link" : "Aus Eventreihe übernommen"}</p>
+            <label className="block"><span className="mb-1 block text-sm font-semibold">Öffentliche Beschreibung des Termins</span><textarea maxLength={2000} value={form.publicDescription} onChange={(event) => updateField("publicDescription", event.target.value)} className={`${inputClass} min-h-28`} /></label>
+            <label className="block"><span className="mb-1 block text-sm font-semibold">Beschreibung verwenden</span><select value={form.publicDescriptionMode} onChange={(event) => updateField("publicDescriptionMode", event.target.value)} className={inputClass}><option value="APPEND">Ergänzen</option><option value="REPLACE">Ersetzen</option></select></label>
+            <p className="whitespace-pre-wrap break-words text-sm text-slate-600">Wirksame öffentliche Beschreibung: {effectiveEvent.description ?? "Keine"}</p>
+            {editingQuizId !== null ? <QuizEventImageEditor key={editingQuizId} quizId={editingQuizId} savedUrl={quizze.find((quiz) => quiz.quiz_id === editingQuizId)?.veranstaltungsbild_url ?? null} seriesLogoUrl={selectedSeries?.logoUrl ?? null} environmentPrefix={environmentPrefix} /> : <p className="text-sm text-slate-600">Ein eigenes Veranstaltungsbild kann nach dem Anlegen in den Quiz-Einstellungen hochgeladen werden. Ohne eigenes Bild gilt das Logo der Eventreihe.</p>}
+          </section>
           <label className="block max-w-xl">
             <span className="mb-1 block text-sm font-semibold">Standard für Auflösungen</span>
             <select

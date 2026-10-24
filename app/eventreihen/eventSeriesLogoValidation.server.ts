@@ -1,18 +1,23 @@
 import "server-only";
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { head } from "@vercel/blob";
 import { verifyLogoImageBytes } from "./eventSeriesLogoImage";
 import { getMediaVerificationServerConfig } from "@/app/fragen/editor/mediaUploadEnvironment";
 import { eventSeriesLogoRule, isAllowedEventSeriesLogoPath, isPublicLogoBlobUrl, validateEventSeriesLogoFile } from "./eventSeriesLogo";
 
 export async function verifyEventSeriesLogo(url: string, eventSeriesId: number) {
+  return verifyEventImage(url, (path, prefix) => isAllowedEventSeriesLogoPath(path, prefix, eventSeriesId));
+}
+
+export async function verifyEventImage(url: string, isAllowedPath: (path: string, prefix: BlobEnvironmentPrefix) => boolean) {
   if (!isPublicLogoBlobUrl(url)) throw new Error("Ungültige Logo-URL.");
   const config = getMediaVerificationServerConfig();
   const parsed = new URL(url);
-  if (!isAllowedEventSeriesLogoPath(parsed.pathname.slice(1), config.environmentPrefix, eventSeriesId)) {
+  if (!isAllowedPath(parsed.pathname.slice(1), config.environmentPrefix)) {
     throw new Error("Das Logo gehört nicht zu dieser Eventreihe und Umgebung.");
   }
   const metadata = await head(url, config.blobAuthentication);
-  if (!isAllowedEventSeriesLogoPath(metadata.pathname, config.environmentPrefix, eventSeriesId) ||
+  if (!isAllowedPath(metadata.pathname, config.environmentPrefix) ||
     validateEventSeriesLogoFile({ name: metadata.pathname, type: metadata.contentType, size: metadata.size })) {
     throw new Error("Ungültige Logodatei oder Dateigröße.");
   }

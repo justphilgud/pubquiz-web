@@ -228,6 +228,10 @@ export type QuizResult = {
   veranstaltungsname: string | null;
   karten_url: string | null;
   oeffentliche_url: string | null;
+  reservierungs_url?: string | null;
+  veranstaltungsbild_url?: string | null;
+  oeffentliche_beschreibung?: string | null;
+  oeffentliche_beschreibung_modus?: string;
   temporal_status: QuizTemporalStatus;
   team_anzahl: number | null;
   teilnehmer_anzahl: number | null;
@@ -387,6 +391,10 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     veranstaltungsname: quiz.veranstaltungsname,
     karten_url: quiz.karten_url,
     oeffentliche_url: quiz.oeffentliche_url,
+    reservierungs_url: quiz.reservierungs_url,
+    veranstaltungsbild_url: quiz.veranstaltungsbild_url,
+    oeffentliche_beschreibung: quiz.oeffentliche_beschreibung,
+    oeffentliche_beschreibung_modus: quiz.oeffentliche_beschreibung_modus,
     temporal_status: getQuizTemporalStatus(quiz.quiz_datum, quiz.ist_archiviert),
     team_anzahl: quiz.team_anzahl,
     teilnehmer_anzahl: quiz.teilnehmer_anzahl,
@@ -432,6 +440,10 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
     veranstaltungsname: quiz.veranstaltungsname,
     karten_url: quiz.karten_url,
     oeffentliche_url: quiz.oeffentliche_url,
+    reservierungs_url: quiz.reservierungs_url,
+    veranstaltungsbild_url: quiz.veranstaltungsbild_url,
+    oeffentliche_beschreibung: quiz.oeffentliche_beschreibung,
+    oeffentliche_beschreibung_modus: quiz.oeffentliche_beschreibung_modus,
     temporal_status: getQuizTemporalStatus(quiz.quiz_datum, quiz.ist_archiviert),
     team_anzahl: quiz.team_anzahl,
     teilnehmer_anzahl: quiz.teilnehmer_anzahl,
@@ -455,6 +467,9 @@ export async function createQuiz(data: {
   veranstaltungsname?: string;
   kartenUrl?: string;
   oeffentlicheUrl?: string;
+  reservationUrl?: string;
+  publicDescription?: string;
+  publicDescriptionMode?: string;
   bemerkung: string;
   presentationTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
@@ -471,6 +486,9 @@ export async function createQuiz(data: {
     venueName: data.veranstaltungsname,
     mapUrl: data.kartenUrl,
     publicUrl: data.oeffentlicheUrl,
+    reservationUrl: data.reservationUrl,
+    publicDescription: data.publicDescription,
+    publicDescriptionMode: data.publicDescriptionMode,
     internalNote: data.bemerkung,
     presentationTemplateId: data.presentationTemplateId,
   }, templateOptions);
@@ -488,6 +506,9 @@ export async function createQuiz(data: {
       veranstaltungsname: validated.value.venueName,
       karten_url: validated.value.mapUrl,
       oeffentliche_url: validated.value.publicUrl,
+      reservierungs_url: data.reservationUrl === undefined ? undefined : validated.value.reservationUrl,
+      oeffentliche_beschreibung: data.publicDescription === undefined ? undefined : validated.value.publicDescription,
+      oeffentliche_beschreibung_modus: data.publicDescriptionMode === undefined ? undefined : validated.value.publicDescriptionMode,
       team_anzahl: 0,
       teilnehmer_anzahl: 0,
       bemerkung: validated.value.internalNote,
@@ -518,6 +539,9 @@ export async function updateQuiz(data: {
   veranstaltungsname?: string;
   kartenUrl?: string;
   oeffentlicheUrl?: string;
+  reservationUrl?: string;
+  publicDescription?: string;
+  publicDescriptionMode?: string;
   bemerkung: string;
   presentationTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
@@ -548,6 +572,9 @@ export async function updateQuiz(data: {
     venueName: data.veranstaltungsname,
     mapUrl: data.kartenUrl,
     publicUrl: data.oeffentlicheUrl,
+    reservationUrl: data.reservationUrl,
+    publicDescription: data.publicDescription,
+    publicDescriptionMode: data.publicDescriptionMode,
     internalNote: data.bemerkung,
     presentationTemplateId: data.presentationTemplateId,
   }, templateOptions);
@@ -570,6 +597,9 @@ export async function updateQuiz(data: {
       veranstaltungsname: validated.value.venueName,
       karten_url: validated.value.mapUrl,
       oeffentliche_url: validated.value.publicUrl,
+      reservierungs_url: data.reservationUrl === undefined ? undefined : validated.value.reservationUrl,
+      oeffentliche_beschreibung: data.publicDescription === undefined ? undefined : validated.value.publicDescription,
+      oeffentliche_beschreibung_modus: data.publicDescriptionMode === undefined ? undefined : validated.value.publicDescriptionMode,
       bemerkung: validated.value.internalNote,
       presentation_template_id: validated.value.presentationTemplateId,
       answer_form_template_id: validated.value.presentationTemplateId,
@@ -1061,6 +1091,10 @@ export async function getQuizDetails(
     veranstaltungsname: quiz.veranstaltungsname,
     karten_url: quiz.karten_url,
     oeffentliche_url: quiz.oeffentliche_url,
+    reservierungs_url: quiz.reservierungs_url,
+    veranstaltungsbild_url: quiz.veranstaltungsbild_url,
+    oeffentliche_beschreibung: quiz.oeffentliche_beschreibung,
+    oeffentliche_beschreibung_modus: quiz.oeffentliche_beschreibung_modus,
     temporal_status: getQuizTemporalStatus(quiz.quiz_datum, quiz.ist_archiviert),
     team_anzahl: quiz.team_anzahl,
     teilnehmer_anzahl: quiz.teilnehmer_anzahl,

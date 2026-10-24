@@ -5,8 +5,11 @@ import type { PublicSeriesSource } from "./publicEvents";
 // Explicit allowlist. Internal names, notes, users and quiz content never leave this query.
 export const publicSeriesSelect = {
   eventreihe_id: true, slug: true, oeffentlicher_name: true, beschreibung: true,
+  reservierungs_url: true,
   logo_url: true, ist_oeffentlich: true, ist_archiviert: true,
   quiz: { select: {
+    reservierungs_url: true, veranstaltungsbild_url: true,
+    oeffentliche_beschreibung: true, oeffentliche_beschreibung_modus: true,
     quiz_id: true, titel: true, quiz_datum: true, veranstaltungszeit: true,
     veranstaltungsname: true, karten_url: true, oeffentliche_url: true, ist_archiviert: true,
   } },
@@ -33,9 +36,12 @@ export async function readPublicEventSeries(
   });
   return rows.map((row) => ({
     id: row.eventreihe_id, slug: row.slug, publicName: row.oeffentlicher_name,
+    reservationUrl: row.reservierungs_url,
     description: row.beschreibung, logoUrl: row.logo_url,
     isPublic: row.ist_oeffentlich, isArchived: row.ist_archiviert,
     quizzes: row.quiz.map((quiz) => ({
+      reservationUrl: quiz.reservierungs_url, imageUrl: quiz.veranstaltungsbild_url,
+      description: quiz.oeffentliche_beschreibung, descriptionMode: quiz.oeffentliche_beschreibung_modus,
       id: quiz.quiz_id, title: quiz.titel?.trim() || `Quiz ${quiz.quiz_id}`,
       date: quiz.quiz_datum, time: quiz.veranstaltungszeit, venueName: quiz.veranstaltungsname,
       mapUrl: quiz.karten_url, publicUrl: quiz.oeffentliche_url, isArchived: quiz.ist_archiviert,

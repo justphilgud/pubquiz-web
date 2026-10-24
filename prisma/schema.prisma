@@ -332,6 +332,10 @@ model quiz {
   veranstaltungsname       String?                    @db.VarChar(200)
   karten_url               String?                    @db.VarChar(2048)
   oeffentliche_url         String?                    @db.VarChar(2048)
+  reservierungs_url        String?                    @db.VarChar(2048)
+  veranstaltungsbild_url   String?                    @db.VarChar(2048)
+  oeffentliche_beschreibung String?                   @db.VarChar(2000)
+  oeffentliche_beschreibung_modus String               @default("APPEND") @db.VarChar(16)
   team_anzahl              Int?
   teilnehmer_anzahl        Int?
   bemerkung                String?
@@ -414,6 +418,7 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  reservierungs_url                String?                      @db.VarChar(2048)
   logo_url                         String?                      @db.VarChar(2048)
   eventreihe_id                    Int                          @id @default(autoincrement())
   name                             String                       @db.VarChar(150)

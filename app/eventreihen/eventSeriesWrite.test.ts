@@ -26,6 +26,7 @@ function createRepository(initialIsPublic: boolean) {
     oeffentlicher_name: null,
     beschreibung: null,
     interne_bemerkung: null,
+    reservierungs_url: null,
     ist_oeffentlich: initialIsPublic,
     default_presentation_template_id: "ungegoogelt-default",
   };
@@ -38,6 +39,7 @@ function createRepository(initialIsPublic: boolean) {
         oeffentlicher_name: data.oeffentlicher_name,
         beschreibung: data.beschreibung,
         interne_bemerkung: data.interne_bemerkung,
+        reservierungs_url: data.reservierungs_url,
         ist_oeffentlich: data.ist_oeffentlich,
         default_presentation_template_id:
           data.default_presentation_template_id,

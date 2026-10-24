@@ -8,6 +8,7 @@ const eventSeriesUpdateSelect = {
   oeffentlicher_name: true,
   beschreibung: true,
   interne_bemerkung: true,
+  reservierungs_url: true,
   ist_oeffentlich: true,
   default_presentation_template_id: true,
 } as const;
@@ -19,6 +20,7 @@ export type SavedEventSeriesUpdate = {
   oeffentlicher_name: string | null;
   beschreibung: string | null;
   interne_bemerkung: string | null;
+  reservierungs_url: string | null;
   ist_oeffentlich: boolean;
   default_presentation_template_id: string;
 };

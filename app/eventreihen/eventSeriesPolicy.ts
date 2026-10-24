@@ -1,4 +1,5 @@
 import { deRenderingMessages } from "@/app/i18n/messages/de/rendering";
+import { publicHttpUrl } from "./publicEventContent";
 import {
   SYSTEM_PRESENTATION_TEMPLATE_ID,
   isSelectablePresentationTemplateId,
@@ -18,6 +19,7 @@ export type EventSeriesInput = {
   publicName?: string;
   description?: string;
   internalNote?: string;
+  reservationUrl?: string;
   isPublic: boolean;
   defaultPresentationTemplateId?: string;
 };
@@ -27,6 +29,7 @@ export type NormalizedEventSeriesInput = {
   publicName: string | null;
   description: string | null;
   internalNote: string | null;
+  reservationUrl: string | null;
   isPublic: boolean;
   defaultPresentationTemplateId: PresentationTemplate["id"];
   defaultAnswerFormTemplateId: PresentationTemplate["id"];
@@ -40,6 +43,7 @@ export function buildEventSeriesPersistenceData(
     oeffentlicher_name: value.publicName,
     beschreibung: value.description,
     interne_bemerkung: value.internalNote,
+    reservierungs_url: value.reservationUrl,
     ist_oeffentlich: value.isPublic,
     default_presentation_template_id: value.defaultPresentationTemplateId,
     default_answer_form_template_id: value.defaultAnswerFormTemplateId,
@@ -66,11 +70,15 @@ export function validateEventSeriesInput(
     publicName: optional(input.publicName),
     description: optional(input.description),
     internalNote: optional(input.internalNote),
+    reservationUrl: optional(input.reservationUrl),
     isPublic: input.isPublic,
     defaultPresentationTemplateId: (input.defaultPresentationTemplateId?.trim() || SYSTEM_PRESENTATION_TEMPLATE_ID) as PresentationTemplate["id"],
     defaultAnswerFormTemplateId: (input.defaultPresentationTemplateId?.trim() || SYSTEM_PRESENTATION_TEMPLATE_ID) as PresentationTemplate["id"],
   };
   const errors: Record<string, string> = {};
+  if (value.reservationUrl && (value.reservationUrl.length > 2048 || !publicHttpUrl(value.reservationUrl))) {
+    errors.reservationUrl = "Reservierungslink muss eine gültige HTTP- oder HTTPS-URL ohne Zugangsdaten sein.";
+  }
 
   if (!value.name) errors.name = "Name ist erforderlich.";
   else if (value.name.length > EVENT_SERIES_LIMITS.name) {

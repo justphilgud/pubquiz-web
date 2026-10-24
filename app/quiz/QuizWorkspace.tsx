@@ -1,5 +1,6 @@
 "use client";
 
+import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import QuizForm from "./QuizForm";
@@ -17,6 +18,7 @@ type Kategorie = {
 type Tab = "verwaltung" | "schnellquiz";
 
 export default function QuizWorkspace({
+  environmentPrefix,
   quizze,
   kategorien,
   eventSeries,
@@ -26,6 +28,7 @@ export default function QuizWorkspace({
   canAssignPresentationTemplates,
   initialEditingQuizId,
 }: {
+  environmentPrefix: BlobEnvironmentPrefix;
   quizze: QuizResult[];
   kategorien: Kategorie[];
   eventSeries: EventSeriesOption[];
@@ -83,6 +86,7 @@ export default function QuizWorkspace({
 
         <div className={activeTab === "verwaltung" ? "block" : "hidden"}>
           <QuizForm
+            environmentPrefix={environmentPrefix}
             quizze={quizze}
             eventSeries={eventSeries}
             initialEventSeriesId={initialEventSeriesId}

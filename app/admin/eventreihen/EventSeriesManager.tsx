@@ -35,6 +35,7 @@ type FormState = {
   publicName: string;
   description: string;
   internalNote: string;
+  reservationUrl: string;
   isPublic: boolean;
   defaultPresentationTemplateId: string;
 };
@@ -44,6 +45,7 @@ const emptyForm: FormState = {
   publicName: "",
   description: "",
   internalNote: "",
+  reservationUrl: "",
   isPublic: false,
   defaultPresentationTemplateId: "ungegoogelt-default",
 };
@@ -87,6 +89,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
       publicName: entry.publicName ?? "",
       description: entry.description ?? "",
       internalNote: entry.internalNote ?? "",
+      reservationUrl: entry.reservationUrl ?? "",
       isPublic: entry.isPublic,
       defaultPresentationTemplateId: entry.defaultPresentationTemplateId,
     });
@@ -97,7 +100,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
 
   async function submit(formData: FormData) {
     if (savingRef.current) return;
-    savingRef.current = true; setSaving(true);
+    savingRef.current = true; setSaving(true); setMessage("");
     try {
       const input = eventSeriesInputFromFormData(formData);
       const result = editingId === null
@@ -127,6 +130,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
           publicName: result.savedValue.publicName ?? "",
           description: result.savedValue.description ?? "",
           internalNote: result.savedValue.internalNote ?? "",
+          reservationUrl: result.savedValue.reservationUrl ?? "",
           isPublic: result.savedValue.isPublic,
           defaultPresentationTemplateId: result.savedValue.defaultPresentationTemplateId,
         });
@@ -135,6 +139,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
         setForm(emptyForm);
         setLogoUrl(null); setLogoDraft(undefined);
       }
+      setMessage("Änderungen gespeichert");
       router.refresh();
     } catch {
       setMessage("Speichern fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.");
@@ -146,11 +151,12 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
       {(canCreate || editingId !== null) && <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
         <h2 className="text-xl font-bold">{editingId === null ? "Eventreihe anlegen" : "Eventreihe bearbeiten"}</h2>
         <p className="mt-1 text-sm text-slate-600">Der Slug wird bei der Anlage automatisch erzeugt und bleibt danach stabil.</p>
-        <form action={submit} className="mt-5">
+        <form onChange={() => setMessage("")} onSubmit={(event) => { event.preventDefault(); void submit(new FormData(event.currentTarget)); }} aria-busy={saving} className="mt-5">
           <fieldset disabled={saving} className="grid gap-4">
           <label><span className="mb-1 block text-sm font-semibold">Interner Name *</span><input name="name" required maxLength={150} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "event-series-name-error" : undefined} className={inputClass} />{errors.name && <span id="event-series-name-error" className="mt-1 block text-sm text-red-700">{errors.name}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentlicher Name</span><input name="publicName" maxLength={150} value={form.publicName} onChange={(event) => setForm((current) => ({ ...current, publicName: event.target.value }))} className={inputClass} />{errors.publicName && <span className="mt-1 block text-sm text-red-700">{errors.publicName}</span>}</label>
-          <label><span className="mb-1 block text-sm font-semibold">Beschreibung</span><textarea name="description" maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>
+          <label><span className="mb-1 block text-sm font-semibold">Öffentliche Beschreibung</span><textarea name="description" maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>
+          <label><span className="mb-1 block text-sm font-semibold">Reservierungslink</span><input name="reservationUrl" type="url" maxLength={2048} value={form.reservationUrl} onChange={(event) => setForm((current) => ({ ...current, reservationUrl: event.target.value }))} className={inputClass} placeholder="https://…" />{errors.reservationUrl && <span role="alert" className="mt-1 block text-sm text-red-700">{errors.reservationUrl}</span>}</label>
           <EventSeriesLogoField key={editingId ?? "new"} savedUrl={logoUrl} draft={logoDraft} onChange={setLogoDraft} />
           <details className="rounded-xl border border-slate-200 p-3">
             <summary className="cursor-pointer font-semibold">Weitere Angaben</summary>
