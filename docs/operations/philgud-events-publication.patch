@@ -2,19 +2,13 @@ diff --git a/.gitignore b/.gitignore
 index 0e3c4fa..6193918 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -4,3 +4,4 @@ out/
- *.tsbuildinfo
- 
- node_modules
+@@ -6,0 +7 @@ node_modules
 +.env*
 diff --git a/source/README.md b/source/README.md
 index 0d74c8a..6a93a32 100644
 --- a/source/README.md
 +++ b/source/README.md
-@@ -23,3 +23,35 @@ Die öffentliche Website bindet `PublicEvents` unter `#termine` ein. Einzige Dat
- Die Liste sortiert nach Datum/Uhrzeit, bietet Besucherfilter und bestehende Kalender-Abos. Bilder werden vollständig eingepasst statt beschnitten. Fehlende Links werden nicht als Buttons ausgegeben. Bei Ausfall werden keine veralteten Termine weiter angezeigt; ein Wiederholen-Button ist verfügbar. Abruf beim Laden, nach Rückkehr zum Tab und jede Minute im sichtbaren Tab; keine lokale dauerhafte Datenkopie. Termine ohne Endzeit bleiben gemäß zentraler API bis Ende ihres Berliner Veranstaltungstags sichtbar.
- 
- Validierung: `node --test source/content/events.test.mjs`, `npm --prefix source run typecheck`, `npm run build`. Keine Änderungen an Quizdaten oder Spendenseite.
+@@ -25,0 +26,32 @@ Validierung: `node --test source/content/events.test.mjs`, `npm --prefix source
 +
 +## Effektive Terminwerte und Vierer-Anzeige (24.10.2026)
 +`PublicEvents` verwendet `events[].imageUrl`, `reservationUrl` und `description`
@@ -51,42 +45,29 @@ diff --git a/source/app/PublicEvents.tsx b/source/app/PublicEvents.tsx
 index 8ec89d1..7709420 100644
 --- a/source/app/PublicEvents.tsx
 +++ b/source/app/PublicEvents.tsx
-@@ -1,10 +1,12 @@
- 'use client';
- import {useEffect,useState} from 'react';
+@@ -3 +3 @@ import {useEffect,useState} from 'react';
 -import {dateParts,eventApiOrigin,eventSeriesIds,parseEvents,safeLink,type EventData} from '../content/events';
 +import {dateParts,eventPage,eventApiOrigin,eventSeriesIds,parseEvents,safeLink,type EventData} from '../content/events';
- export default function PublicEvents(){
-  const [data,setData]=useState<EventData|null>(null);
-  const [error,setError]=useState(false);
+@@ -7 +7,3 @@ export default function PublicEvents(){
 - const [selected,setSelected]=useState<number|null>(null);
 + const [selection,setSelection]=useState<{id:number|null;count:number}>({id:null,count:4});
 + const selected=selection.id;
 + const selectSeries=(id:number|null)=>setSelection({id,count:4});
-  const [retry,setRetry]=useState(0);
-  useEffect(()=>{
-   let active=true;
-@@ -27,23 +29,23 @@ export default function PublicEvents(){
-   return()=>{active=false;controller?.abort();clearInterval(timer);document.removeEventListener('visibilitychange',onVisible);};
-  },[retry]);
-  const activeSeries=data?.series.some(s=>s.id===selected)?selected:null;
+@@ -30 +32,2 @@ export default function PublicEvents(){
 - const events=data?.events.filter(e=>activeSeries===null||e.seriesId===activeSeries)||[];
 + const visibleCount=activeSeries===selected?selection.count:4;
 + const {events,total,hasMore}=eventPage(data?.events??[],activeSeries,visibleCount);
-  const calendarIds=activeSeries===null?eventSeriesIds:[activeSeries];
-  const feed=`${eventApiOrigin}/calendar/public.ics?series=${calendarIds.join(',')}`;
-  return <section id="termine" className="events-section"><div className="section wrap">
+@@ -34,3 +37,3 @@ export default function PublicEvents(){
 -  <div className="events-heading"><div><p className="eyebrow">GUTE ABENDE STEHEN IM KALENDER</p><h2>KOMM VORBEI.</h2><p className="events-intro">Hier treffen wir uns zum nächsten gemeinsamen Abend.</p></div><a className="textlink" href={feed.replace('https:','webcal:')}>Termine abonnieren ↗</a></div>
 -  {data&&data.series.length>1&&<div className="event-filters" role="group" aria-label="Termine nach Eventreihe filtern"><button type="button" aria-pressed={activeSeries===null} onClick={()=>setSelected(null)}>Alle Termine</button>{data.series.map(s=><button type="button" key={s.id} aria-pressed={activeSeries===s.id} onClick={()=>setSelected(s.id)}>{s.name}</button>)}</div>}
 -  <div aria-live="polite" aria-atomic="true" className="events-status">{error?<p>Die Termine lassen sich gerade nicht laden. <button type="button" onClick={()=>setRetry(n=>n+1)}>Noch einmal versuchen</button></p>:!data?<p>Die nächsten Termine werden geladen …</p>:events.length===0?<p>Die nächsten Termine stehen noch nicht fest. Schau bald wieder vorbei.</p>:<span className="sr-only">{events.length} {events.length===1?'Termin':'Termine'}</span>}</div>
 +  <div className="events-heading"><div><p className="eyebrow">GUTE ABENDE STEHEN IM KALENDER</p><h2>KOMM VORBEI.</h2><p className="events-intro">Hier treffen wir uns zum nächsten gemeinsamen Abend.</p></div><div className="events-calendar"><a className="textlink" href={feed.replace(/^https?:/,'webcal:')}>Termine abonnieren ↗</a><a className="events-download" href={feed}>Kalenderdatei herunterladen</a></div></div>
 +  {data&&data.series.length>1&&<div className="event-filters" role="group" aria-label="Termine nach Eventreihe filtern"><button type="button" aria-pressed={activeSeries===null} onClick={()=>selectSeries(null)}>Alle Termine</button>{data.series.map(s=><button type="button" key={s.id} aria-pressed={activeSeries===s.id} onClick={()=>selectSeries(s.id)}>{s.name}</button>)}</div>}
 +  <div aria-live="polite" aria-atomic="true" className="events-status">{error?<p>Die Termine lassen sich gerade nicht laden. <button type="button" onClick={()=>setRetry(n=>n+1)}>Noch einmal versuchen</button></p>:!data?<p>Die nächsten Termine werden geladen …</p>:events.length===0?<p>Die nächsten Termine stehen noch nicht fest. Schau bald wieder vorbei.</p>:<span className="sr-only">{total} {total===1?'Termin':'Termine'}</span>}</div>
-   <div className="event-list">{events.map(event=>{
-    const series=data!.series.find(s=>s.id===event.seriesId)!;
+@@ -39 +42 @@ export default function PublicEvents(){
 -   const date=dateParts(event.date);const logo=safeLink(series.logoUrl);const map=safeLink(event.mapUrl);const link=safeLink(event.eventUrl);
 +   const date=dateParts(event.date);const logo=safeLink(event.imageUrl);const reservation=safeLink(event.reservationUrl);const map=safeLink(event.mapUrl);const link=safeLink(event.eventUrl);
-    return <article className="event-card" key={event.id}>
+@@ -41,4 +44,3 @@ export default function PublicEvents(){
 -    <time className="event-date" dateTime={event.startsAt||event.date}><span>{date.weekday}</span><strong>{date.day}</strong><span>{date.month}</span></time>
 -    <div className="event-image">{logo?<img src={logo} alt={series.name} loading="lazy" onError={e=>{e.currentTarget.style.display='none';}}/>:<span aria-hidden="true">↗</span>}</div>
 -    <div className="event-info"><p className="event-series">{series.name}</p><h3>{event.title}</h3><p className="event-meta">{event.time?`${event.time} Uhr`:'Uhrzeit folgt'}{event.location&&<> · {event.location}</>}</p><div className="event-links">{map&&<a href={map} target="_blank" rel="noopener noreferrer">Anfahrt ↗</a>}<a href={`${eventApiOrigin}/calendar/event-series/${series.id}.ics`.replace('https:','webcal:')}>Reihe abonnieren ↗</a></div></div>
@@ -94,20 +75,14 @@ index 8ec89d1..7709420 100644
 +    <div className="event-image">{logo?<img key={logo} src={logo} alt={`Veranstaltungsbild: ${event.title}`} loading="lazy" onError={e=>{e.currentTarget.style.display='none';}}/>:<span aria-hidden="true">↗</span>}</div>
 +    <div className="event-info"><p className="event-series">{series.name}</p><h3>{event.title}</h3>{event.description?.trim()&&<p className="event-description">{event.description}</p>}<div className="event-links">{link&&<a href={link} target="_blank" rel="noopener noreferrer">Zum Event ↗</a>}<a href={`${eventApiOrigin}/calendar/event-series/${series.id}.ics`.replace(/^https?:/,'webcal:')}>Reihe abonnieren ↗</a></div></div>
 +    <div className="event-attend"><time className="event-date" dateTime={event.startsAt||event.date}><span>{date.weekday}</span><strong>{date.day}</strong><span>{date.month}</span></time><p className="event-meta">{event.time?`${event.time} Uhr`:'Uhrzeit folgt'}{event.location&&<><br/>{event.location}</>}</p>{map&&<a className="event-map" href={map} target="_blank" rel="noopener noreferrer">Anfahrt ↗</a>}{reservation&&<a className="button small" href={reservation} target="_blank" rel="noopener noreferrer">Tisch reservieren</a>}</div>
-    </article>;
-   })}</div>
+@@ -47 +49 @@ export default function PublicEvents(){
 -  <p className="events-footnote">Alle Uhrzeiten sind Ortszeit in Deutschland. <a href={feed}>Kalenderdatei herunterladen</a></p>
 +  {hasMore&&<button type="button" className="event-more" onClick={()=>setSelection({id:activeSeries,count:visibleCount+4})}>Weitere Termine anzeigen</button>}
-  </div></section>;
- }
 diff --git a/source/app/style.css b/source/app/style.css
 index 8c90026..88a15aa 100644
 --- a/source/app/style.css
 +++ b/source/app/style.css
-@@ -41,7 +41,16 @@
- 
- .team-portrait-philipp{width:260px;max-width:100%;margin-inline:auto;margin-bottom:39px;overflow:hidden}.team-portrait-philipp img{object-fit:cover;object-position:center top;border-radius:0;filter:grayscale(100%)}
- 
+@@ -44,4 +44,13 @@
 -/* Live public events: content and media stay in the Quiz application. */
 -.events-section{background:#f6c4dc;border-block:1px solid #17171715}.events-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:30px}.events-intro{margin:20px 0 0;max-width:540px}.events-heading>.textlink{flex-shrink:0;margin-bottom:5px}.event-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}.event-filters button{font:inherit;font-size:14px;font-weight:700;border:1px solid #171717;border-radius:30px;padding:10px 18px;background:transparent;color:#171717;cursor:pointer;min-height:44px}.event-filters button[aria-pressed=true]{background:#171717;color:#fff}.event-filters button:focus-visible,.events-status button:focus-visible{outline:3px solid #171717;outline-offset:4px}.event-list{display:grid;gap:14px}.event-card{display:grid;grid-template-columns:100px 140px minmax(0,1fr) auto;gap:24px;align-items:center;background:#faf8f2;padding:26px;border-radius:10px}.event-date{display:flex;flex-direction:column;text-align:center;line-height:1.4;font-size:13px}.event-date strong{font-family:PhilGud,Arial,sans-serif;font-weight:400;font-size:60px;line-height:1.15}.event-image{width:140px;height:130px;display:flex;align-items:center;justify-content:center}.event-image img{display:block;max-width:100%;max-height:100%;object-fit:contain}.event-image>span{font-size:54px}.event-series{font-size:12px;font-weight:700;letter-spacing:1px;margin:0 0 7px}.event-info h3{font-size:26px;overflow-wrap:anywhere}.event-meta{font-size:15px;margin:12px 0}.event-links{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13px;font-weight:700}.event-links a,.events-footnote a{text-decoration:underline;text-underline-offset:4px}.events-footnote{font-size:12px;margin:24px 0 0}.events-status p{padding:20px 0;margin:0}.events-status button{font:inherit;border:0;background:none;text-decoration:underline;cursor:pointer;color:inherit}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 -@media(max-width:900px){.event-card{grid-template-columns:80px 110px minmax(0,1fr);gap:18px}.event-image{width:110px;height:110px}.event-details{grid-column:3;justify-self:start}.events-heading{align-items:flex-start;flex-direction:column}.header nav{flex-wrap:wrap}}
@@ -129,18 +104,10 @@ diff --git a/source/content/events.test.mjs b/source/content/events.test.mjs
 index e3d2173..95f480a 100644
 --- a/source/content/events.test.mjs
 +++ b/source/content/events.test.mjs
-@@ -1,6 +1,6 @@
- import {test} from 'node:test';
- import assert from 'node:assert/strict';
+@@ -3 +3 @@ import assert from 'node:assert/strict';
 -import {parseEvents,safeLink,dateParts} from './events.ts';
 +import {parseEvents,safeLink,dateParts,eventPage} from './events.ts';
- test('only website-selected series and their events are displayed, sorted by local date',()=>{
-  const d=parseEvents({version:1,series:[{id:2,name:'LOVD'},{id:3,name:'Bekka'},{id:99,name:'Other'}],events:[{id:2,seriesId:2,title:'Later',date:'2026-11-01',time:'19:00'},{id:1,seriesId:3,title:'Earlier',date:'2026-10-25',time:'19:46'},{id:4,seriesId:99,title:'Hidden',date:'2026-10-24'}]});
-  assert.deepEqual(d.series.map(s=>s.id),[2,3]);assert.deepEqual(d.events.map(e=>e.id),[1,2]);
-@@ -8,3 +8,23 @@ test('only website-selected series and their events are displayed, sorted by loc
- test('empty results and malformed response are distinct',()=>{assert.deepEqual(parseEvents({version:1,series:[],events:[]}),{series:[],events:[]});assert.throws(()=>parseEvents({error:'unavailable'}));});
- test('external links reject executable protocols and embedded credentials',()=>{for(const x of ['javascript:alert(1)','data:text/html,test','https://user:pass@example.com',null])assert.equal(safeLink(x),undefined);assert.equal(safeLink('https://example.com/event'),'https://example.com/event');});
- test('calendar dates remain on their Berlin day across DST',()=>{assert.equal(dateParts('2026-10-25').day,'25');assert.equal(dateParts('2026-03-29').weekday,'Sonntag');});
+@@ -10,0 +11,20 @@ test('calendar dates remain on their Berlin day across DST',()=>{assert.equal(da
 +
 +test('effective event content is used directly; event and map URLs never become reservation links',()=>{
 + const raw={version:1,series:[{id:2,name:'QA',logoUrl:'https://example.org/series.png',description:'series'}],events:[{id:9,seriesId:2,title:'Original Quiztitel',date:'2026-12-17',imageUrl:'https://example.org/christmas.png',reservationUrl:'https://example.org/book',description:'Reihe\n\nTermin',eventUrl:'https://example.org/event',mapUrl:'https://example.org/map'}]};
@@ -165,32 +132,20 @@ diff --git a/source/content/events.ts b/source/content/events.ts
 index 13a2e20..fd1f2dd 100644
 --- a/source/content/events.ts
 +++ b/source/content/events.ts
-@@ -1,8 +1,10 @@
- // Website selection only. Names, images and dates are maintained in Pubquiz.
+@@ -2,2 +2,4 @@
 -export const eventSeriesIds = [2, 3];
 -export const eventApiOrigin = 'https://quiz.philgud.events';
 +const configuredIds = process.env.NEXT_PUBLIC_EVENT_SERIES_IDS?.split(',').map(Number);
 +if (configuredIds && (!configuredIds.length || configuredIds.some(id => !Number.isSafeInteger(id) || id <= 0))) throw new Error('Invalid public event series configuration');
 +export const eventSeriesIds = configuredIds ?? [2, 3];
 +export const eventApiOrigin = process.env.NEXT_PUBLIC_EVENT_API_ORIGIN || 'https://quiz.philgud.events';
- export type Series = {id:number; name:string; description:string|null; logoUrl:string|null; calendarPath:string};
+@@ -5 +7 @@ export type Series = {id:number; name:string; description:string|null; logoUrl:s
 -export type Event = {id:number; seriesId:number; title:string; date:string; time:string|null; startsAt:string|null; location:string|null; mapUrl:string|null; eventUrl:string|null};
 +export type Event = {id:number; seriesId:number; title:string; date:string; time:string|null; startsAt:string|null; location:string|null; mapUrl:string|null; eventUrl:string|null; imageUrl?:string|null; reservationUrl?:string|null; description?:string|null};
- export type EventData = {series:Series[]; events:Event[]};
- export function safeLink(value:unknown):string|undefined {
-  if(typeof value!=='string') return;
-@@ -13,10 +15,15 @@ export function parseEvents(value:unknown):EventData {
-  if(d?.version!==1||!Array.isArray(d.series)||!Array.isArray(d.events))throw new Error('Invalid events');
-  const series=d.series.filter(s=>eventSeriesIds.includes(s.id)&&typeof s.name==='string');
-  const ids=new Set(series.map(s=>s.id));
+@@ -16 +18 @@ export function parseEvents(value:unknown):EventData {
 - const events=d.events.filter(e=>ids.has(e.seriesId)&&Number.isSafeInteger(e.id)&&typeof e.title==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(e.date));
 + const events=d.events.filter(e=>ids.has(e.seriesId)&&Number.isSafeInteger(e.id)&&typeof e.title==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)).map(e=>({...e,imageUrl:safeLink(e.imageUrl)??null,reservationUrl:safeLink(e.reservationUrl)??null,description:typeof e.description==='string'?e.description:null}));
-  return {series,events:events.sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||'')||a.id-b.id)};
- }
- export function dateParts(date:string) {
-  const d=new Date(date+'T12:00:00Z');
-  return {day:new Intl.DateTimeFormat('de-DE',{day:'2-digit',timeZone:'Europe/Berlin'}).format(d),month:new Intl.DateTimeFormat('de-DE',{month:'short',year:'numeric',timeZone:'Europe/Berlin'}).format(d),weekday:new Intl.DateTimeFormat('de-DE',{weekday:'long',timeZone:'Europe/Berlin'}).format(d)};
- }
+@@ -22,0 +25,5 @@ export function dateParts(date:string) {
 +
 +export function eventPage(events:readonly Event[],seriesId:number|null,visibleCount=4){
 + const matching=events.filter(event=>seriesId===null||event.seriesId===seriesId);
