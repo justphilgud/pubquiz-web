@@ -1,3 +1,5 @@
+import { requireEventSeriesEditor } from "@/app/eventreihen/eventSeriesAccess.server";
+import { eventSeriesLogoRule, isAllowedEventSeriesLogoPath } from "@/app/eventreihen/eventSeriesLogo";
 import { issueSignedToken } from "@vercel/blob";
 import { handleUploadPresigned } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
@@ -37,6 +39,7 @@ import {
 } from "@/app/quiz/slideMediaUpload";
 
 type UploadContext =
+  | { target: "EVENT_SERIES_LOGO"; eventSeriesId: number }
   | {
       target: "TEMPLATE";
       templateId: string;
@@ -115,6 +118,9 @@ function parseUploadContext(clientPayload: string | null): UploadContext {
   }
 
   const target = Reflect.get(value, "target");
+  if (target === "EVENT_SERIES_LOGO") {
+    return { target, eventSeriesId: parseRequiredId(Reflect.get(value, "eventSeriesId")) };
+  }
   if (target === "TEMPLATE") {
     const templateId = Reflect.get(value, "templateId");
     const assetRole = Reflect.get(value, "assetRole");
@@ -243,6 +249,25 @@ export async function POST(request: Request) {
       getSignedToken: async (pathname, clientPayload) => {
         phase = "context-authorization";
         const context = parseUploadContext(clientPayload);
+        if (context.target === "EVENT_SERIES_LOGO") {
+          const access = await requireEventSeriesEditor(context.eventSeriesId);
+          if (access.eventSeries.ist_archiviert) throw new Error("Archivierte Eventreihe ist nicht bearbeitbar.");
+          if (!isAllowedEventSeriesLogoPath(pathname, uploadConfig.environmentPrefix, context.eventSeriesId)) {
+            throw new Error("Logo-Pfad oder Dateiendung ist ungültig.");
+          }
+          const validUntil = Date.now() + 10 * 60 * 1000;
+          phase = "signed-token";
+          const token = await issueSignedToken({
+            ...uploadConfig.blobAuthentication, pathname, operations: ["put"],
+            allowedContentTypes: eventSeriesLogoRule.mimeTypes,
+            maximumSizeInBytes: eventSeriesLogoRule.maximumSizeInBytes, validUntil,
+          });
+          return { token, urlOptions: {
+            allowedContentTypes: eventSeriesLogoRule.mimeTypes,
+            maximumSizeInBytes: eventSeriesLogoRule.maximumSizeInBytes,
+            addRandomSuffix: true, validUntil,
+          } };
+        }
         if (context.target === "TEMPLATE") {
           requirePresentationTemplateUploadContext();
           const actor = await getQuestionActor(session);

@@ -311,6 +311,7 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
       canEdit: isAdministrator(access.actor) || access.assignmentRole === "EVENT_MANAGER",
       canChangeArchiveState: isAdministrator(access.actor),
     }),
+    logoUrl: series.logo_url,
     canManageQuizzes: isAdministrator(access.actor) || access.assignmentRole === "EVENT_MANAGER",
     canManageMemberships: isAdministrator(access.actor),
     accessSummary: {

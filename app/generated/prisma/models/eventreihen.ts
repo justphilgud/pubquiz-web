@@ -35,6 +35,7 @@ export type EventreihenSumAggregateOutputType = {
 }
 
 export type EventreihenMinAggregateOutputType = {
+  logo_url: string | null
   eventreihe_id: number | null
   name: string | null
   slug: string | null
@@ -51,6 +52,7 @@ export type EventreihenMinAggregateOutputType = {
 }
 
 export type EventreihenMaxAggregateOutputType = {
+  logo_url: string | null
   eventreihe_id: number | null
   name: string | null
   slug: string | null
@@ -67,6 +69,7 @@ export type EventreihenMaxAggregateOutputType = {
 }
 
 export type EventreihenCountAggregateOutputType = {
+  logo_url: number
   eventreihe_id: number
   name: number
   slug: number
@@ -93,6 +96,7 @@ export type EventreihenSumAggregateInputType = {
 }
 
 export type EventreihenMinAggregateInputType = {
+  logo_url?: true
   eventreihe_id?: true
   name?: true
   slug?: true
@@ -109,6 +113,7 @@ export type EventreihenMinAggregateInputType = {
 }
 
 export type EventreihenMaxAggregateInputType = {
+  logo_url?: true
   eventreihe_id?: true
   name?: true
   slug?: true
@@ -125,6 +130,7 @@ export type EventreihenMaxAggregateInputType = {
 }
 
 export type EventreihenCountAggregateInputType = {
+  logo_url?: true
   eventreihe_id?: true
   name?: true
   slug?: true
@@ -228,6 +234,7 @@ export type eventreihenGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 export type EventreihenGroupByOutputType = {
+  logo_url: string | null
   eventreihe_id: number
   name: string
   slug: string
@@ -267,6 +274,7 @@ export type eventreihenWhereInput = {
   AND?: Prisma.eventreihenWhereInput | Prisma.eventreihenWhereInput[]
   OR?: Prisma.eventreihenWhereInput[]
   NOT?: Prisma.eventreihenWhereInput | Prisma.eventreihenWhereInput[]
+  logo_url?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   eventreihe_id?: Prisma.IntFilter<"eventreihen"> | number
   name?: Prisma.StringFilter<"eventreihen"> | string
   slug?: Prisma.StringFilter<"eventreihen"> | string
@@ -289,6 +297,7 @@ export type eventreihenWhereInput = {
 }
 
 export type eventreihenOrderByWithRelationInput = {
+  logo_url?: Prisma.SortOrderInput | Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
@@ -316,6 +325,7 @@ export type eventreihenWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.eventreihenWhereInput | Prisma.eventreihenWhereInput[]
   OR?: Prisma.eventreihenWhereInput[]
   NOT?: Prisma.eventreihenWhereInput | Prisma.eventreihenWhereInput[]
+  logo_url?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   name?: Prisma.StringFilter<"eventreihen"> | string
   oeffentlicher_name?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   beschreibung?: Prisma.StringNullableFilter<"eventreihen"> | string | null
@@ -336,6 +346,7 @@ export type eventreihenWhereUniqueInput = Prisma.AtLeast<{
 }, "eventreihe_id" | "slug">
 
 export type eventreihenOrderByWithAggregationInput = {
+  logo_url?: Prisma.SortOrderInput | Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
@@ -360,6 +371,7 @@ export type eventreihenScalarWhereWithAggregatesInput = {
   AND?: Prisma.eventreihenScalarWhereWithAggregatesInput | Prisma.eventreihenScalarWhereWithAggregatesInput[]
   OR?: Prisma.eventreihenScalarWhereWithAggregatesInput[]
   NOT?: Prisma.eventreihenScalarWhereWithAggregatesInput | Prisma.eventreihenScalarWhereWithAggregatesInput[]
+  logo_url?: Prisma.StringNullableWithAggregatesFilter<"eventreihen"> | string | null
   eventreihe_id?: Prisma.IntWithAggregatesFilter<"eventreihen"> | number
   name?: Prisma.StringWithAggregatesFilter<"eventreihen"> | string
   slug?: Prisma.StringWithAggregatesFilter<"eventreihen"> | string
@@ -376,6 +388,7 @@ export type eventreihenScalarWhereWithAggregatesInput = {
 }
 
 export type eventreihenCreateInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -397,6 +410,7 @@ export type eventreihenCreateInput = {
 }
 
 export type eventreihenUncheckedCreateInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -419,6 +433,7 @@ export type eventreihenUncheckedCreateInput = {
 }
 
 export type eventreihenUpdateInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -440,6 +455,7 @@ export type eventreihenUpdateInput = {
 }
 
 export type eventreihenUncheckedUpdateInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -462,6 +478,7 @@ export type eventreihenUncheckedUpdateInput = {
 }
 
 export type eventreihenCreateManyInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -478,6 +495,7 @@ export type eventreihenCreateManyInput = {
 }
 
 export type eventreihenUpdateManyMutationInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -493,6 +511,7 @@ export type eventreihenUpdateManyMutationInput = {
 }
 
 export type eventreihenUncheckedUpdateManyInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -514,6 +533,7 @@ export type EventreihenScalarRelationFilter = {
 }
 
 export type eventreihenCountOrderByAggregateInput = {
+  logo_url?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
@@ -534,6 +554,7 @@ export type eventreihenAvgOrderByAggregateInput = {
 }
 
 export type eventreihenMaxOrderByAggregateInput = {
+  logo_url?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
@@ -550,6 +571,7 @@ export type eventreihenMaxOrderByAggregateInput = {
 }
 
 export type eventreihenMinOrderByAggregateInput = {
+  logo_url?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
@@ -665,6 +687,7 @@ export type eventreihenUpdateOneRequiredWithoutFragenNestedInput = {
 }
 
 export type eventreihenCreateWithoutQuizInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -685,6 +708,7 @@ export type eventreihenCreateWithoutQuizInput = {
 }
 
 export type eventreihenUncheckedCreateWithoutQuizInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -722,6 +746,7 @@ export type eventreihenUpdateToOneWithWhereWithoutQuizInput = {
 }
 
 export type eventreihenUpdateWithoutQuizInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -742,6 +767,7 @@ export type eventreihenUpdateWithoutQuizInput = {
 }
 
 export type eventreihenUncheckedUpdateWithoutQuizInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -763,6 +789,7 @@ export type eventreihenUncheckedUpdateWithoutQuizInput = {
 }
 
 export type eventreihenCreateWithoutStory_elementeInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -783,6 +810,7 @@ export type eventreihenCreateWithoutStory_elementeInput = {
 }
 
 export type eventreihenUncheckedCreateWithoutStory_elementeInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -820,6 +848,7 @@ export type eventreihenUpdateToOneWithWhereWithoutStory_elementeInput = {
 }
 
 export type eventreihenUpdateWithoutStory_elementeInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -840,6 +869,7 @@ export type eventreihenUpdateWithoutStory_elementeInput = {
 }
 
 export type eventreihenUncheckedUpdateWithoutStory_elementeInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -861,6 +891,7 @@ export type eventreihenUncheckedUpdateWithoutStory_elementeInput = {
 }
 
 export type eventreihenCreateWithoutLive_pollsInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -881,6 +912,7 @@ export type eventreihenCreateWithoutLive_pollsInput = {
 }
 
 export type eventreihenUncheckedCreateWithoutLive_pollsInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -918,6 +950,7 @@ export type eventreihenUpdateToOneWithWhereWithoutLive_pollsInput = {
 }
 
 export type eventreihenUpdateWithoutLive_pollsInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -938,6 +971,7 @@ export type eventreihenUpdateWithoutLive_pollsInput = {
 }
 
 export type eventreihenUncheckedUpdateWithoutLive_pollsInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -959,6 +993,7 @@ export type eventreihenUncheckedUpdateWithoutLive_pollsInput = {
 }
 
 export type eventreihenCreateWithoutRollenzuweisungenInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -979,6 +1014,7 @@ export type eventreihenCreateWithoutRollenzuweisungenInput = {
 }
 
 export type eventreihenUncheckedCreateWithoutRollenzuweisungenInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -1016,6 +1052,7 @@ export type eventreihenUpdateToOneWithWhereWithoutRollenzuweisungenInput = {
 }
 
 export type eventreihenUpdateWithoutRollenzuweisungenInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1036,6 +1073,7 @@ export type eventreihenUpdateWithoutRollenzuweisungenInput = {
 }
 
 export type eventreihenUncheckedUpdateWithoutRollenzuweisungenInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1057,6 +1095,7 @@ export type eventreihenUncheckedUpdateWithoutRollenzuweisungenInput = {
 }
 
 export type eventreihenCreateWithoutBenutzerrollenInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -1077,6 +1116,7 @@ export type eventreihenCreateWithoutBenutzerrollenInput = {
 }
 
 export type eventreihenUncheckedCreateWithoutBenutzerrollenInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -1114,6 +1154,7 @@ export type eventreihenUpdateToOneWithWhereWithoutBenutzerrollenInput = {
 }
 
 export type eventreihenUpdateWithoutBenutzerrollenInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1134,6 +1175,7 @@ export type eventreihenUpdateWithoutBenutzerrollenInput = {
 }
 
 export type eventreihenUncheckedUpdateWithoutBenutzerrollenInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1155,6 +1197,7 @@ export type eventreihenUncheckedUpdateWithoutBenutzerrollenInput = {
 }
 
 export type eventreihenCreateWithoutFragenInput = {
+  logo_url?: string | null
   name: string
   slug: string
   oeffentlicher_name?: string | null
@@ -1175,6 +1218,7 @@ export type eventreihenCreateWithoutFragenInput = {
 }
 
 export type eventreihenUncheckedCreateWithoutFragenInput = {
+  logo_url?: string | null
   eventreihe_id?: number
   name: string
   slug: string
@@ -1212,6 +1256,7 @@ export type eventreihenUpdateToOneWithWhereWithoutFragenInput = {
 }
 
 export type eventreihenUpdateWithoutFragenInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1232,6 +1277,7 @@ export type eventreihenUpdateWithoutFragenInput = {
 }
 
 export type eventreihenUncheckedUpdateWithoutFragenInput = {
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1329,6 +1375,7 @@ export type EventreihenCountOutputTypeCountLive_pollsArgs<ExtArgs extends runtim
 
 
 export type eventreihenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  logo_url?: boolean
   eventreihe_id?: boolean
   name?: boolean
   slug?: boolean
@@ -1352,6 +1399,7 @@ export type eventreihenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 }, ExtArgs["result"]["eventreihen"]>
 
 export type eventreihenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  logo_url?: boolean
   eventreihe_id?: boolean
   name?: boolean
   slug?: boolean
@@ -1368,6 +1416,7 @@ export type eventreihenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 }, ExtArgs["result"]["eventreihen"]>
 
 export type eventreihenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  logo_url?: boolean
   eventreihe_id?: boolean
   name?: boolean
   slug?: boolean
@@ -1384,6 +1433,7 @@ export type eventreihenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 }, ExtArgs["result"]["eventreihen"]>
 
 export type eventreihenSelectScalar = {
+  logo_url?: boolean
   eventreihe_id?: boolean
   name?: boolean
   slug?: boolean
@@ -1399,7 +1449,7 @@ export type eventreihenSelectScalar = {
   default_answer_form_template_id?: boolean
 }
 
-export type eventreihenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"eventreihe_id" | "name" | "slug" | "oeffentlicher_name" | "beschreibung" | "interne_bemerkung" | "ist_oeffentlich" | "ist_archiviert" | "archiviert_am" | "created_at" | "updated_at" | "default_presentation_template_id" | "default_answer_form_template_id", ExtArgs["result"]["eventreihen"]>
+export type eventreihenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"logo_url" | "eventreihe_id" | "name" | "slug" | "oeffentlicher_name" | "beschreibung" | "interne_bemerkung" | "ist_oeffentlich" | "ist_archiviert" | "archiviert_am" | "created_at" | "updated_at" | "default_presentation_template_id" | "default_answer_form_template_id", ExtArgs["result"]["eventreihen"]>
 export type eventreihenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.eventreihen$quizArgs<ExtArgs>
   benutzerrollen?: boolean | Prisma.eventreihen$benutzerrollenArgs<ExtArgs>
@@ -1423,6 +1473,7 @@ export type $eventreihenPayload<ExtArgs extends runtime.Types.Extensions.Interna
     live_polls: Prisma.$live_pollsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    logo_url: string | null
     eventreihe_id: number
     name: string
     slug: string
@@ -1519,8 +1570,8 @@ export interface eventreihenDelegate<ExtArgs extends runtime.Types.Extensions.In
    * // Get first 10 Eventreihens
    * const eventreihens = await prisma.eventreihen.findMany({ take: 10 })
    *
-   * // Only select the `eventreihe_id`
-   * const eventreihenWithEventreihe_idOnly = await prisma.eventreihen.findMany({ select: { eventreihe_id: true } })
+   * // Only select the `logo_url`
+   * const eventreihenWithLogo_urlOnly = await prisma.eventreihen.findMany({ select: { logo_url: true } })
    *
    */
   findMany<T extends eventreihenFindManyArgs>(args?: Prisma.SelectSubset<T, eventreihenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$eventreihenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1564,9 +1615,9 @@ export interface eventreihenDelegate<ExtArgs extends runtime.Types.Extensions.In
    *   ]
    * })
    *
-   * // Create many Eventreihens and only return the `eventreihe_id`
-   * const eventreihenWithEventreihe_idOnly = await prisma.eventreihen.createManyAndReturn({
-   *   select: { eventreihe_id: true },
+   * // Create many Eventreihens and only return the `logo_url`
+   * const eventreihenWithLogo_urlOnly = await prisma.eventreihen.createManyAndReturn({
+   *   select: { logo_url: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1655,9 +1706,9 @@ export interface eventreihenDelegate<ExtArgs extends runtime.Types.Extensions.In
    *   ]
    * })
    *
-   * // Update zero or more Eventreihens and only return the `eventreihe_id`
-   * const eventreihenWithEventreihe_idOnly = await prisma.eventreihen.updateManyAndReturn({
-   *   select: { eventreihe_id: true },
+   * // Update zero or more Eventreihens and only return the `logo_url`
+   * const eventreihenWithLogo_urlOnly = await prisma.eventreihen.updateManyAndReturn({
+   *   select: { logo_url: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1865,6 +1916,7 @@ export interface Prisma__eventreihenClient<T, Null = never, ExtArgs extends runt
  * Fields of the eventreihen model
  */
 export interface eventreihenFieldRefs {
+  readonly logo_url: Prisma.FieldRef<"eventreihen", 'String'>
   readonly eventreihe_id: Prisma.FieldRef<"eventreihen", 'Int'>
   readonly name: Prisma.FieldRef<"eventreihen", 'String'>
   readonly slug: Prisma.FieldRef<"eventreihen", 'String'>

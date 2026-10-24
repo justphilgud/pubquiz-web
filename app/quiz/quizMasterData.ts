@@ -103,7 +103,7 @@ export function validateQuizMasterData(
     errors.time = "Uhrzeit muss im Format HH:MM angegeben werden.";
   }
   if ((venueName?.length ?? 0) > QUIZ_MASTER_DATA_LIMITS.venueName) {
-    errors.venueName = `Veranstaltungsname darf maximal ${QUIZ_MASTER_DATA_LIMITS.venueName} Zeichen enthalten.`;
+    errors.venueName = `Veranstaltungsort darf maximal ${QUIZ_MASTER_DATA_LIMITS.venueName} Zeichen enthalten.`;
   }
   if ((mapUrl?.length ?? 0) > QUIZ_MASTER_DATA_LIMITS.url || !isSafeHttpUrl(mapUrl)) {
     errors.mapUrl = "Kartenlink muss eine gültige HTTP- oder HTTPS-URL sein.";

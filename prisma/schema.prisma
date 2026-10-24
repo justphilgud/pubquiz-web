@@ -414,6 +414,7 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  logo_url                         String?                      @db.VarChar(2048)
   eventreihe_id                    Int                          @id @default(autoincrement())
   name                             String                       @db.VarChar(150)
   slug                             String                       @unique @db.VarChar(180)

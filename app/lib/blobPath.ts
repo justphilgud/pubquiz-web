@@ -1,6 +1,7 @@
 export type BlobEnvironmentPrefix = "dev" | "preview" | "prod" | `preview/${string}`;
 
 export type BlobPathArea =
+  | "event-series"
   | "question-media"
   | "answer-media"
   | "template-media"

@@ -58,6 +58,7 @@ export type FragenMinAggregateOutputType = {
   quelle: string | null
   fragentyp: string | null
   schwierigkeitslevel: runtime.Decimal | null
+  redaktionelle_schwierigkeit: string | null
   erstellungsdatum: Date | null
   ist_archiviert: boolean | null
   archivierungsgrund: string | null
@@ -92,6 +93,7 @@ export type FragenMaxAggregateOutputType = {
   quelle: string | null
   fragentyp: string | null
   schwierigkeitslevel: runtime.Decimal | null
+  redaktionelle_schwierigkeit: string | null
   erstellungsdatum: Date | null
   ist_archiviert: boolean | null
   archivierungsgrund: string | null
@@ -126,6 +128,7 @@ export type FragenCountAggregateOutputType = {
   quelle: number
   fragentyp: number
   schwierigkeitslevel: number
+  redaktionelle_schwierigkeit: number
   erstellungsdatum: number
   ist_archiviert: number
   archivierungsgrund: number
@@ -189,6 +192,7 @@ export type FragenMinAggregateInputType = {
   quelle?: true
   fragentyp?: true
   schwierigkeitslevel?: true
+  redaktionelle_schwierigkeit?: true
   erstellungsdatum?: true
   ist_archiviert?: true
   archivierungsgrund?: true
@@ -223,6 +227,7 @@ export type FragenMaxAggregateInputType = {
   quelle?: true
   fragentyp?: true
   schwierigkeitslevel?: true
+  redaktionelle_schwierigkeit?: true
   erstellungsdatum?: true
   ist_archiviert?: true
   archivierungsgrund?: true
@@ -257,6 +262,7 @@ export type FragenCountAggregateInputType = {
   quelle?: true
   fragentyp?: true
   schwierigkeitslevel?: true
+  redaktionelle_schwierigkeit?: true
   erstellungsdatum?: true
   ist_archiviert?: true
   archivierungsgrund?: true
@@ -379,6 +385,7 @@ export type FragenGroupByOutputType = {
   quelle: string | null
   fragentyp: string | null
   schwierigkeitslevel: runtime.Decimal | null
+  redaktionelle_schwierigkeit: string | null
   erstellungsdatum: Date
   ist_archiviert: boolean
   archivierungsgrund: string | null
@@ -437,6 +444,7 @@ export type fragenWhereInput = {
   quelle?: Prisma.StringNullableFilter<"fragen"> | string | null
   fragentyp?: Prisma.StringNullableFilter<"fragen"> | string | null
   schwierigkeitslevel?: Prisma.DecimalNullableFilter<"fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.StringNullableFilter<"fragen"> | string | null
   erstellungsdatum?: Prisma.DateTimeFilter<"fragen"> | Date | string
   ist_archiviert?: Prisma.BoolFilter<"fragen"> | boolean
   archivierungsgrund?: Prisma.StringNullableFilter<"fragen"> | string | null
@@ -488,6 +496,7 @@ export type fragenOrderByWithRelationInput = {
   quelle?: Prisma.SortOrderInput | Prisma.SortOrder
   fragentyp?: Prisma.SortOrderInput | Prisma.SortOrder
   schwierigkeitslevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  redaktionelle_schwierigkeit?: Prisma.SortOrderInput | Prisma.SortOrder
   erstellungsdatum?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -542,6 +551,7 @@ export type fragenWhereUniqueInput = Prisma.AtLeast<{
   quelle?: Prisma.StringNullableFilter<"fragen"> | string | null
   fragentyp?: Prisma.StringNullableFilter<"fragen"> | string | null
   schwierigkeitslevel?: Prisma.DecimalNullableFilter<"fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.StringNullableFilter<"fragen"> | string | null
   erstellungsdatum?: Prisma.DateTimeFilter<"fragen"> | Date | string
   ist_archiviert?: Prisma.BoolFilter<"fragen"> | boolean
   archivierungsgrund?: Prisma.StringNullableFilter<"fragen"> | string | null
@@ -593,6 +603,7 @@ export type fragenOrderByWithAggregationInput = {
   quelle?: Prisma.SortOrderInput | Prisma.SortOrder
   fragentyp?: Prisma.SortOrderInput | Prisma.SortOrder
   schwierigkeitslevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  redaktionelle_schwierigkeit?: Prisma.SortOrderInput | Prisma.SortOrder
   erstellungsdatum?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -636,6 +647,7 @@ export type fragenScalarWhereWithAggregatesInput = {
   quelle?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
   fragentyp?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
   schwierigkeitslevel?: Prisma.DecimalNullableWithAggregatesFilter<"fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
   erstellungsdatum?: Prisma.DateTimeWithAggregatesFilter<"fragen"> | Date | string
   ist_archiviert?: Prisma.BoolWithAggregatesFilter<"fragen"> | boolean
   archivierungsgrund?: Prisma.StringNullableWithAggregatesFilter<"fragen"> | string | null
@@ -670,6 +682,7 @@ export type fragenCreateInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -718,6 +731,7 @@ export type fragenUncheckedCreateInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -765,6 +779,7 @@ export type fragenUpdateInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -813,6 +828,7 @@ export type fragenUncheckedUpdateInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +877,7 @@ export type fragenCreateManyInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -895,6 +912,7 @@ export type fragenUpdateManyMutationInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -927,6 +945,7 @@ export type fragenUncheckedUpdateManyInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -967,6 +986,7 @@ export type fragenCountOrderByAggregateInput = {
   quelle?: Prisma.SortOrder
   fragentyp?: Prisma.SortOrder
   schwierigkeitslevel?: Prisma.SortOrder
+  redaktionelle_schwierigkeit?: Prisma.SortOrder
   erstellungsdatum?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrder
@@ -1015,6 +1035,7 @@ export type fragenMaxOrderByAggregateInput = {
   quelle?: Prisma.SortOrder
   fragentyp?: Prisma.SortOrder
   schwierigkeitslevel?: Prisma.SortOrder
+  redaktionelle_schwierigkeit?: Prisma.SortOrder
   erstellungsdatum?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrder
@@ -1049,6 +1070,7 @@ export type fragenMinOrderByAggregateInput = {
   quelle?: Prisma.SortOrder
   fragentyp?: Prisma.SortOrder
   schwierigkeitslevel?: Prisma.SortOrder
+  redaktionelle_schwierigkeit?: Prisma.SortOrder
   erstellungsdatum?: Prisma.SortOrder
   ist_archiviert?: Prisma.SortOrder
   archivierungsgrund?: Prisma.SortOrder
@@ -1456,6 +1478,7 @@ export type fragenCreateWithoutAntwortenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1503,6 +1526,7 @@ export type fragenUncheckedCreateWithoutAntwortenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1565,6 +1589,7 @@ export type fragenUpdateWithoutAntwortenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1612,6 +1637,7 @@ export type fragenUncheckedUpdateWithoutAntwortenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1658,6 +1684,7 @@ export type fragenCreateWithoutPublic_submissionInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1705,6 +1732,7 @@ export type fragenUncheckedCreateWithoutPublic_submissionInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1767,6 +1795,7 @@ export type fragenUpdateWithoutPublic_submissionInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1814,6 +1843,7 @@ export type fragenUncheckedUpdateWithoutPublic_submissionInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1860,6 +1890,7 @@ export type fragenCreateWithoutExternal_import_itemInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1907,6 +1938,7 @@ export type fragenUncheckedCreateWithoutExternal_import_itemInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -1969,6 +2001,7 @@ export type fragenUpdateWithoutExternal_import_itemInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2016,6 +2049,7 @@ export type fragenUncheckedUpdateWithoutExternal_import_itemInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2062,6 +2096,7 @@ export type fragenCreateWithoutRelationen_als_quelleInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2109,6 +2144,7 @@ export type fragenUncheckedCreateWithoutRelationen_als_quelleInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2160,6 +2196,7 @@ export type fragenCreateWithoutRelationen_als_zielInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2207,6 +2244,7 @@ export type fragenUncheckedCreateWithoutRelationen_als_zielInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2269,6 +2307,7 @@ export type fragenUpdateWithoutRelationen_als_quelleInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2316,6 +2355,7 @@ export type fragenUncheckedUpdateWithoutRelationen_als_quelleInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2373,6 +2413,7 @@ export type fragenUpdateWithoutRelationen_als_zielInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2420,6 +2461,7 @@ export type fragenUncheckedUpdateWithoutRelationen_als_zielInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2466,6 +2508,7 @@ export type fragenCreateWithoutFragen_kategorienInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2513,6 +2556,7 @@ export type fragenUncheckedCreateWithoutFragen_kategorienInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2575,6 +2619,7 @@ export type fragenUpdateWithoutFragen_kategorienInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2622,6 +2667,7 @@ export type fragenUncheckedUpdateWithoutFragen_kategorienInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2668,6 +2714,7 @@ export type fragenCreateWithoutMedienInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2715,6 +2762,7 @@ export type fragenUncheckedCreateWithoutMedienInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2777,6 +2825,7 @@ export type fragenUpdateWithoutMedienInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2824,6 +2873,7 @@ export type fragenUncheckedUpdateWithoutMedienInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2870,6 +2920,7 @@ export type fragenCreateWithoutGenerator_laefeInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2917,6 +2968,7 @@ export type fragenUncheckedCreateWithoutGenerator_laefeInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -2979,6 +3031,7 @@ export type fragenUpdateWithoutGenerator_laefeInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3026,6 +3079,7 @@ export type fragenUncheckedUpdateWithoutGenerator_laefeInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3072,6 +3126,7 @@ export type fragenCreateWithoutStory_element_verknuepfungenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3119,6 +3174,7 @@ export type fragenUncheckedCreateWithoutStory_element_verknuepfungenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3181,6 +3237,7 @@ export type fragenUpdateWithoutStory_element_verknuepfungenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3228,6 +3285,7 @@ export type fragenUncheckedUpdateWithoutStory_element_verknuepfungenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3274,6 +3332,7 @@ export type fragenCreateWithoutQuiz_fragenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3321,6 +3380,7 @@ export type fragenUncheckedCreateWithoutQuiz_fragenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3383,6 +3443,7 @@ export type fragenUpdateWithoutQuiz_fragenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3430,6 +3491,7 @@ export type fragenUncheckedUpdateWithoutQuiz_fragenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3476,6 +3538,7 @@ export type fragenCreateWithoutAntwortfelderInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3523,6 +3586,7 @@ export type fragenUncheckedCreateWithoutAntwortfelderInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3585,6 +3649,7 @@ export type fragenUpdateWithoutAntwortfelderInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3632,6 +3697,7 @@ export type fragenUncheckedUpdateWithoutAntwortfelderInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3678,6 +3744,7 @@ export type fragenCreateWithoutVorlageInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3725,6 +3792,7 @@ export type fragenUncheckedCreateWithoutVorlageInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3781,6 +3849,7 @@ export type fragenCreateWithoutSource_vorlageInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3828,6 +3897,7 @@ export type fragenUncheckedCreateWithoutSource_vorlageInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3884,6 +3954,7 @@ export type fragenCreateWithoutErzeugte_vorlagenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -3931,6 +4002,7 @@ export type fragenUncheckedCreateWithoutErzeugte_vorlagenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4002,6 +4074,7 @@ export type fragenScalarWhereInput = {
   quelle?: Prisma.StringNullableFilter<"fragen"> | string | null
   fragentyp?: Prisma.StringNullableFilter<"fragen"> | string | null
   schwierigkeitslevel?: Prisma.DecimalNullableFilter<"fragen"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.StringNullableFilter<"fragen"> | string | null
   erstellungsdatum?: Prisma.DateTimeFilter<"fragen"> | Date | string
   ist_archiviert?: Prisma.BoolFilter<"fragen"> | boolean
   archivierungsgrund?: Prisma.StringNullableFilter<"fragen"> | string | null
@@ -4063,6 +4136,7 @@ export type fragenUpdateWithoutErzeugte_vorlagenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4110,6 +4184,7 @@ export type fragenUncheckedUpdateWithoutErzeugte_vorlagenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4156,6 +4231,7 @@ export type fragenCreateWithoutAktualitaet_geprueft_vonInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4203,6 +4279,7 @@ export type fragenUncheckedCreateWithoutAktualitaet_geprueft_vonInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4275,6 +4352,7 @@ export type fragenCreateWithoutEventreihenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4322,6 +4400,7 @@ export type fragenUncheckedCreateWithoutEventreihenInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4384,6 +4463,7 @@ export type fragenUpdateWithoutEventreihenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4431,6 +4511,7 @@ export type fragenUncheckedUpdateWithoutEventreihenInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4478,6 +4559,7 @@ export type fragenCreateManyVorlageInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4512,6 +4594,7 @@ export type fragenCreateManySource_vorlageInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4545,6 +4628,7 @@ export type fragenUpdateWithoutVorlageInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4592,6 +4676,7 @@ export type fragenUncheckedUpdateWithoutVorlageInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4639,6 +4724,7 @@ export type fragenUncheckedUpdateManyWithoutVorlageInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4672,6 +4758,7 @@ export type fragenUpdateWithoutSource_vorlageInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4719,6 +4806,7 @@ export type fragenUncheckedUpdateWithoutSource_vorlageInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4766,6 +4854,7 @@ export type fragenUncheckedUpdateManyWithoutSource_vorlageInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4800,6 +4889,7 @@ export type fragenCreateManyAktualitaet_geprueft_vonInput = {
   quelle?: string | null
   fragentyp?: string | null
   schwierigkeitslevel?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: string | null
   erstellungsdatum?: Date | string
   ist_archiviert?: boolean
   archivierungsgrund?: string | null
@@ -4833,6 +4923,7 @@ export type fragenUpdateWithoutAktualitaet_geprueft_vonInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4880,6 +4971,7 @@ export type fragenUncheckedUpdateWithoutAktualitaet_geprueft_vonInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4927,6 +5019,7 @@ export type fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonInput = {
   quelle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fragentyp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schwierigkeitslevel?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  redaktionelle_schwierigkeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   erstellungsdatum?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
   archivierungsgrund?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5082,6 +5175,7 @@ export type fragenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   quelle?: boolean
   fragentyp?: boolean
   schwierigkeitslevel?: boolean
+  redaktionelle_schwierigkeit?: boolean
   erstellungsdatum?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -5134,6 +5228,7 @@ export type fragenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   quelle?: boolean
   fragentyp?: boolean
   schwierigkeitslevel?: boolean
+  redaktionelle_schwierigkeit?: boolean
   erstellungsdatum?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -5172,6 +5267,7 @@ export type fragenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   quelle?: boolean
   fragentyp?: boolean
   schwierigkeitslevel?: boolean
+  redaktionelle_schwierigkeit?: boolean
   erstellungsdatum?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -5210,6 +5306,7 @@ export type fragenSelectScalar = {
   quelle?: boolean
   fragentyp?: boolean
   schwierigkeitslevel?: boolean
+  redaktionelle_schwierigkeit?: boolean
   erstellungsdatum?: boolean
   ist_archiviert?: boolean
   archivierungsgrund?: boolean
@@ -5239,7 +5336,7 @@ export type fragenSelectScalar = {
   geltungsbereich?: boolean
 }
 
-export type fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragen_id" | "frage" | "quelle" | "fragentyp" | "schwierigkeitslevel" | "erstellungsdatum" | "ist_archiviert" | "archivierungsgrund" | "vorlage_id" | "source_vorlage_id" | "created_by_user_id" | "created_at" | "last_modified_by_user_id" | "updated_at" | "approved_by_user_id" | "approved_at" | "freigegeben" | "ist_unfertig" | "moderationsnotizen" | "kategorienwunsch" | "gueltig_bis" | "pruefen_ab" | "aktualitaet_geprueft_am" | "aktualitaet_geprueft_von_user_id" | "review_status" | "submitted_at" | "submitted_by_user_id" | "review_feedback" | "reviewed_at" | "reviewed_by_user_id" | "template_config_json" | "geltungsbereich", ExtArgs["result"]["fragen"]>
+export type fragenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"fragen_id" | "frage" | "quelle" | "fragentyp" | "schwierigkeitslevel" | "redaktionelle_schwierigkeit" | "erstellungsdatum" | "ist_archiviert" | "archivierungsgrund" | "vorlage_id" | "source_vorlage_id" | "created_by_user_id" | "created_at" | "last_modified_by_user_id" | "updated_at" | "approved_by_user_id" | "approved_at" | "freigegeben" | "ist_unfertig" | "moderationsnotizen" | "kategorienwunsch" | "gueltig_bis" | "pruefen_ab" | "aktualitaet_geprueft_am" | "aktualitaet_geprueft_von_user_id" | "review_status" | "submitted_at" | "submitted_by_user_id" | "review_feedback" | "reviewed_at" | "reviewed_by_user_id" | "template_config_json" | "geltungsbereich", ExtArgs["result"]["fragen"]>
 export type fragenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   antworten?: boolean | Prisma.fragen$antwortenArgs<ExtArgs>
   antwortfelder?: boolean | Prisma.fragen$antwortfelderArgs<ExtArgs>
@@ -5296,6 +5393,7 @@ export type $fragenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     quelle: string | null
     fragentyp: string | null
     schwierigkeitslevel: runtime.Decimal | null
+    redaktionelle_schwierigkeit: string | null
     erstellungsdatum: Date
     ist_archiviert: boolean
     archivierungsgrund: string | null
@@ -5767,6 +5865,7 @@ export interface fragenFieldRefs {
   readonly quelle: Prisma.FieldRef<"fragen", 'String'>
   readonly fragentyp: Prisma.FieldRef<"fragen", 'String'>
   readonly schwierigkeitslevel: Prisma.FieldRef<"fragen", 'Decimal'>
+  readonly redaktionelle_schwierigkeit: Prisma.FieldRef<"fragen", 'String'>
   readonly erstellungsdatum: Prisma.FieldRef<"fragen", 'DateTime'>
   readonly ist_archiviert: Prisma.FieldRef<"fragen", 'Boolean'>
   readonly archivierungsgrund: Prisma.FieldRef<"fragen", 'String'>

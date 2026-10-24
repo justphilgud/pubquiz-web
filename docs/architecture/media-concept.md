@@ -98,3 +98,12 @@ Medien können später sichtbar sein:
 - Reihenfolge von Medien
 - Auflösungsmedien
 - unterstützte Formate in Präsentation und Moderation
+
+### Optionale Eventreihen-Logos
+
+Reihenlogos verwenden den bestehenden signierten Blob-Upload mit Target
+`EVENT_SERIES_LOGO`, umgebungsgebundenem Pfad `event-series/<id>/logo/` und
+optionalem `eventreihen.logo_url`. PNG/JPEG/WebP bis 5 MiB bleiben unverändert;
+serverseitige Prüfung umfasst tatsächliches Bildformat und Dimensionen. Vorschau,
+Ersetzen und Entfernen stehen auf der Reihendetailseite bereit. Zugriff,
+Öffentlichkeit und Lebenszyklus: [public-events-api.md](public-events-api.md).

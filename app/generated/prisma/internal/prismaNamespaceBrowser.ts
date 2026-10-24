@@ -66,6 +66,8 @@ export const ModelName = {
   medien_generator_lauf_medien: 'medien_generator_lauf_medien',
   medientyp: 'medientyp',
   quiz: 'quiz',
+  meme_archive_sources: 'meme_archive_sources',
+  meme_archive_entries: 'meme_archive_entries',
   eventreihen: 'eventreihen',
   presentation_templates: 'presentation_templates',
   story_elemente: 'story_elemente',
@@ -146,6 +148,7 @@ export const FragenScalarFieldEnum = {
   quelle: 'quelle',
   fragentyp: 'fragentyp',
   schwierigkeitslevel: 'schwierigkeitslevel',
+  redaktionelle_schwierigkeit: 'redaktionelle_schwierigkeit',
   erstellungsdatum: 'erstellungsdatum',
   ist_archiviert: 'ist_archiviert',
   archivierungsgrund: 'archivierungsgrund',
@@ -393,7 +396,46 @@ export const QuizScalarFieldEnum = {
 export type QuizScalarFieldEnum = (typeof QuizScalarFieldEnum)[keyof typeof QuizScalarFieldEnum]
 
 
+export const Meme_archive_sourcesScalarFieldEnum = {
+  source_id: 'source_id',
+  quiz_id: 'quiz_id',
+  lifecycle_revision: 'lifecycle_revision',
+  quiz_question_id: 'quiz_question_id',
+  quiz_title: 'quiz_title',
+  question_text: 'question_text',
+  image_url: 'image_url',
+  layout: 'layout',
+  image_bytes: 'image_bytes'
+} as const
+
+export type Meme_archive_sourcesScalarFieldEnum = (typeof Meme_archive_sourcesScalarFieldEnum)[keyof typeof Meme_archive_sourcesScalarFieldEnum]
+
+
+export const Meme_archive_entriesScalarFieldEnum = {
+  entry_id: 'entry_id',
+  source_id: 'source_id',
+  submission_id: 'submission_id',
+  session_id: 'session_id',
+  team_id: 'team_id',
+  team_name: 'team_name',
+  submission_version: 'submission_version',
+  payload: 'payload',
+  submitted_at: 'submitted_at',
+  status: 'status',
+  attempts: 'attempts',
+  error_message: 'error_message',
+  blob_url: 'blob_url',
+  encryption_key: 'encryption_key',
+  png_sha256: 'png_sha256',
+  png_size: 'png_size',
+  pending_file: 'pending_file'
+} as const
+
+export type Meme_archive_entriesScalarFieldEnum = (typeof Meme_archive_entriesScalarFieldEnum)[keyof typeof Meme_archive_entriesScalarFieldEnum]
+
+
 export const EventreihenScalarFieldEnum = {
+  logo_url: 'logo_url',
   eventreihe_id: 'eventreihe_id',
   name: 'name',
   slug: 'slug',
@@ -797,6 +839,7 @@ export type Frage_vorlage_antwortfelderScalarFieldEnum = (typeof Frage_vorlage_a
 
 
 export const Quiz_praesentation_statusScalarFieldEnum = {
+  stichentscheid_json: 'stichentscheid_json',
   quiz_id: 'quiz_id',
   slide_index: 'slide_index',
   slide_key: 'slide_key',
