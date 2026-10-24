@@ -68,3 +68,20 @@ wiederhergestellt; danach vollständiger Testlauf grün. Kein inhaltlicher Pland
 Für spätere Production gelten die Release-Reihenfolge und Feldverträge in
 [public-events-api.md](../architecture/public-events-api.md). Geöffnete Editoransichten
 nach Bereitstellung neu laden. Kein Session-Reset notwendig.
+
+## Review-Artefakte
+
+- Backend-PR: [#128](https://github.com/justphilgud/pubquiz-web/pull/128),
+  `codex/event-publication` gegen Main. Nicht gemergt, kein Production-Deployment.
+  Die Head-CI wird direkt im PR ausgewiesen.
+- Bestehende Website: **Sites-Version 38**, Quellcommit
+  `afab4b0eab01cd950b2150558abb8d90d2c052f3`, gespeichert **ohne Deployment**
+  (`deployment_id: null`). Paket mit Produktions-API/Standardreihen 2,3 gebaut und
+  auf fehlende localhost-Testadresse geprüft. Keine Veröffentlichung ausgelöst.
+- [Website-Quellpatch](philgud-events-publication.patch): gegen ursprünglichen
+  Websitecommit `b4003d9c5cda12b0c4b5ea996c35a414ab749807`. Anwenden mit
+  `git apply --unidiff-zero`; Rückwärts-Anwendbarkeit am gespeicherten Website-
+  Quellstand geprüft. Der Patch enthält keine generierten Exportdateien oder
+  Testkonfiguration.
+- Vollständiger lokaler `npm test`-Durchlauf: **1.635 Tests**, keine Fehler.
+  Die zusätzlichen Website-Tests umfassen **7 Tests**.
