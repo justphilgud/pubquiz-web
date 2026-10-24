@@ -570,3 +570,11 @@ Automatische Nachweise: `buildPraesentationSlides.test.ts`, `quizAnswerLiveState
 `participantAnswerSequence.test.ts`, `presentationTiming.test.ts`,
 `fixedSlideSaving.test.ts` und die Template-Verträge in
 [presentation-rendering.md](presentation-rendering.md).
+
+### Öffentliche Eventdaten (Erweiterung Oktober 2026)
+
+JSON und ICS verwenden das gemeinsame öffentliche Read Model aus
+`app/eventreihen/publicEventsRepository.ts`. Bestehende Feed-Adressen und Quiz-UIDs
+bleiben stabil; ICS erhält `X-PHILGUD-SERIES-ID` und `X-PHILGUD-SERIES-NAME`.
+Der vollständige Vertrag einschließlich Reihenfilter, Feldzuordnung, Berliner
+Tagesgrenzen, Logo und Tests steht in [public-events-api.md](public-events-api.md).

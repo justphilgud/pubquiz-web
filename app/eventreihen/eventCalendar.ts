@@ -9,10 +9,12 @@ export type EventCalendarQuiz = {
   time: string | null;
   venueName: string | null;
   publicUrl: string | null;
+  mapUrl?: string | null;
   isArchived: boolean;
 };
 
 export type EventCalendarSeries = {
+  id?: number;
   publicName: string | null;
   description: string | null;
   isPublic: boolean;
@@ -76,6 +78,8 @@ type CalendarEvent = {
   quiz: EventCalendarQuiz;
   date: string;
   description: string | null;
+  seriesId?: number;
+  seriesName: string | null;
 };
 
 function normalizeCalendarEvents(
@@ -89,7 +93,7 @@ function normalizeCalendarEvents(
       (entry): entry is { quiz: EventCalendarQuiz; date: string } =>
         !entry.quiz.isArchived && entry.date !== null && entry.date >= today,
     )
-    .map(({ quiz, date }) => ({ quiz, date, description }))
+    .map(({ quiz, date }) => ({ quiz, date, description, seriesId: series.id, seriesName: series.publicName }))
     .sort((left, right) => {
       const dateComparison = left.date.localeCompare(right.date);
       if (dateComparison !== 0) return dateComparison;
@@ -131,7 +135,7 @@ function buildCalendar(
     "END:VTIMEZONE",
   ];
 
-  for (const { quiz, date, description } of events) {
+  for (const { quiz, date, description, seriesId, seriesName } of events) {
     const calendarDate = formatCalendarDate(date);
     const calendarTime = formatCalendarTime(quiz.time);
     lines.push(
@@ -143,6 +147,8 @@ function buildCalendar(
         : `DTSTART;VALUE=DATE:${calendarDate}`,
       `SUMMARY:${escapeCalendarText(quiz.title)}`,
     );
+    if (seriesId !== undefined) lines.push(`X-PHILGUD-SERIES-ID:${seriesId}`);
+    if (seriesName?.trim()) lines.push(`X-PHILGUD-SERIES-NAME:${escapeCalendarText(seriesName.trim())}`);
     if (quiz.venueName?.trim()) {
       lines.push(`LOCATION:${escapeCalendarText(quiz.venueName.trim())}`);
     }

@@ -250,7 +250,7 @@ export default function QuizForm({
               <input type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} className={inputClass} />
             </label>
             <label className="block md:col-span-2">
-              <span className="mb-1 block text-sm font-semibold">Veranstaltungsname</span>
+              <span className="mb-1 block text-sm font-semibold">Veranstaltungsort</span>
               <input maxLength={200} value={form.venueName} onChange={(event) => updateField("venueName", event.target.value)} className={inputClass} placeholder="z. B. Café Paule" />
             </label>
             <label className="block">

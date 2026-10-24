@@ -26,7 +26,7 @@ export default function SchnellQuizForm({
   const [titel, setTitel] = useState("Schnellquiz");
   const [quizDatum, setQuizDatum] = useState("");
   const [veranstaltungszeit, setVeranstaltungszeit] = useState("");
-  const [veranstaltungsname, setVeranstaltungsname] = useState("");
+  const [veranstaltungsname, setVeranstaltungsort] = useState("");
   const [kartenUrl, setKartenUrl] = useState("");
   const [oeffentlicheUrl, setOeffentlicheUrl] = useState("");
   const [bemerkung, setBemerkung] = useState("");
@@ -160,7 +160,7 @@ export default function SchnellQuizForm({
           <summary className="cursor-pointer font-semibold">Optionale Veranstaltungsdaten</summary>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <label className="block"><div className="mb-1 text-sm font-semibold">Uhrzeit</div><input type="time" value={veranstaltungszeit} onChange={(event) => setVeranstaltungszeit(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
-            <label className="block"><div className="mb-1 text-sm font-semibold">Veranstaltungsname</div><input maxLength={200} value={veranstaltungsname} onChange={(event) => setVeranstaltungsname(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
+            <label className="block"><div className="mb-1 text-sm font-semibold">Veranstaltungsort</div><input maxLength={200} value={veranstaltungsname} onChange={(event) => setVeranstaltungsort(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
             <label className="block"><div className="mb-1 text-sm font-semibold">Kartenlink</div><input type="url" maxLength={2048} value={kartenUrl} onChange={(event) => setKartenUrl(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
             <label className="block"><div className="mb-1 text-sm font-semibold">Veranstaltungs-URL</div><input type="url" maxLength={2048} value={oeffentlicheUrl} onChange={(event) => setOeffentlicheUrl(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>
             <label className="block md:col-span-2"><div className="mb-1 text-sm font-semibold">Interne Bemerkung</div><textarea maxLength={2000} value={bemerkung} onChange={(event) => setBemerkung(event.target.value)} className="min-h-24 w-full rounded-xl border border-slate-300 px-4 py-3" /></label>

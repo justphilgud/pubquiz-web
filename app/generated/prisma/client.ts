@@ -117,6 +117,16 @@ export type medientyp = Prisma.medientypModel
  */
 export type quiz = Prisma.quizModel
 /**
+ * Model meme_archive_sources
+ * Durable source snapshot; deliberately no FK to resettable runtime/question rows.
+ */
+export type meme_archive_sources = Prisma.meme_archive_sourcesModel
+/**
+ * Model meme_archive_entries
+ * Immutable confirmed version, independent of team/session/submission cascades.
+ */
+export type meme_archive_entries = Prisma.meme_archive_entriesModel
+/**
  * Model eventreihen
  * 
  */
