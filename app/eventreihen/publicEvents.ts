@@ -1,10 +1,14 @@
+import { publicHttpUrl, resolvePublicEventContent, type PublicEventContent } from "./publicEventContent";
+export { publicHttpUrl } from "./publicEventContent";
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { EVENT_CALENDAR_TIME_ZONE, type EventCalendarSeries } from "./eventCalendar";
 
-export type PublicSeriesSource = EventCalendarSeries & {
+export type PublicSeriesSource = Omit<EventCalendarSeries, "quizzes"> & {
   id: number;
   slug: string;
   logoUrl: string | null;
+  reservationUrl?: string | null;
+  quizzes: (EventCalendarSeries["quizzes"][number] & PublicEventContent)[];
 };
 
 export function parsePublicEventQuery(params: URLSearchParams) {
@@ -17,14 +21,6 @@ export function parsePublicEventQuery(params: URLSearchParams) {
     throw new Error("upcoming muss true oder false sein.");
   }
   return { seriesIds: [...new Set(raw.map(Number))], upcoming: upcoming === "true" };
-}
-
-export function publicHttpUrl(value: string | null | undefined) {
-  if (!value || /[\r\n]/.test(value)) return null;
-  try {
-    const url = new URL(value);
-    return ["https:", "http:"].includes(url.protocol) && !url.username && !url.password ? url.href : null;
-  } catch { return null; }
 }
 
 // The DB stores a local date and wall-clock time, not a UTC instant.
@@ -71,6 +67,7 @@ export function projectPublicEvents(
       timeZone: EVENT_CALENDAR_TIME_ZONE, startsAt, endsAt: null,
       allDay: time === null, location: quiz.venueName,
       mapUrl: publicHttpUrl(quiz.mapUrl), eventUrl: publicHttpUrl(quiz.publicUrl),
+      ...resolvePublicEventContent(entry, quiz),
     }];
   })).sort((a, b) => a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? "") || a.id - b.id);
   return { version: 1, timeZone: EVENT_CALENDAR_TIME_ZONE, series, events };

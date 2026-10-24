@@ -15,6 +15,7 @@ export function eventSeriesInputFromFormData(
     publicName: stringField(formData, "publicName"),
     description: stringField(formData, "description"),
     internalNote: stringField(formData, "internalNote"),
+    reservationUrl: stringField(formData, "reservationUrl"),
     isPublic: formData.get("isPublic") === "true",
     defaultPresentationTemplateId: stringField(
       formData,

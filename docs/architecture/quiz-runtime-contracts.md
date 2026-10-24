@@ -329,6 +329,13 @@ staler React-State aus einer Closure ist keine persistierte Quelle. Andere im
 selben Submit geänderte Felder bleiben erhalten. Die gespeicherte Sichtbarkeit
 steuert anschließend auch öffentliche Feeds.
 
+Der Eventreihen-Editor verwendet einen expliziten, gegen nativen Reset geschützten
+Submit. `FormData` wird vor dem Deaktivieren der Eingaben aufgenommen. Wiederholtes
+Speichern und normales Neuladen erhalten unveränderte Sichtbarkeit und Template.
+Der gerenderte Regressionstest `eventSeriesForm.browser.test.ts` ergänzt die
+Persistenztests; Ursache und öffentliche Terminwerte stehen in
+[public-events-api.md](public-events-api.md).
+
 | Testdatei | Geschützte Invariante |
 | --- | --- |
 | `app/eventreihen/eventSeriesWrite.test.ts` | Explizite Checkbox-Semantik, Persistenz in beide Richtungen, Reload und gemeinsames Speichern weiterer Felder. |

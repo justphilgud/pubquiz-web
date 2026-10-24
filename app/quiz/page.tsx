@@ -1,3 +1,4 @@
+import { getBlobEnvironmentPrefix } from "@/config/environment";
 import type { Metadata } from "next";
 import QuizWorkspace from "./QuizWorkspace";
 import { getQuizListe, getSchnellQuizKategorien } from "./actions";
@@ -39,6 +40,7 @@ export default async function QuizPage({ searchParams }: Props) {
 
   return (
     <><AppHeader /><QuizWorkspace
+      environmentPrefix={getBlobEnvironmentPrefix()}
       quizze={quizze}
       kategorien={kategorien}
       eventSeries={eventSeries}

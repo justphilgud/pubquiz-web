@@ -1,4 +1,5 @@
 import { getBerlinDate } from "@/app/lib/berlinDate";
+import { publicHttpUrl } from "@/app/eventreihen/publicEventContent";
 import { deRenderingMessages } from "@/app/i18n/messages/de/rendering";
 import {
   isSelectablePresentationTemplateId,
@@ -21,6 +22,9 @@ export type QuizMasterDataInput = {
   mapUrl?: string;
   publicUrl?: string;
   internalNote?: string;
+  reservationUrl?: string;
+  publicDescription?: string;
+  publicDescriptionMode?: string;
   presentationTemplateId?: string | null;
 };
 
@@ -34,6 +38,9 @@ export type NormalizedQuizMasterData = {
   mapUrl: string | null;
   publicUrl: string | null;
   internalNote: string | null;
+  reservationUrl: string | null;
+  publicDescription: string | null;
+  publicDescriptionMode: "APPEND" | "REPLACE";
   presentationTemplateId: PresentationTemplate["id"] | null;
 };
 
@@ -89,6 +96,14 @@ export function validateQuizMasterData(
   const internalNote = optional(input.internalNote);
   const presentationTemplateId = optional(input.presentationTemplateId ?? undefined);
   const errors: Record<string, string> = {};
+  const reservationUrl = optional(input.reservationUrl);
+  const publicDescription = optional(input.publicDescription);
+  const publicDescriptionMode = input.publicDescriptionMode ?? "APPEND";
+  if (reservationUrl && (reservationUrl.length > 2048 || !publicHttpUrl(reservationUrl))) {
+    errors.reservationUrl = "Reservierungslink muss eine gültige HTTP- oder HTTPS-URL ohne Zugangsdaten sein.";
+  }
+  if ((publicDescription?.length ?? 0) > 2000) errors.publicDescription = "Öffentliche Beschreibung darf maximal 2000 Zeichen enthalten.";
+  if (publicDescriptionMode !== "APPEND" && publicDescriptionMode !== "REPLACE") errors.publicDescriptionMode = "Ungültiger Beschreibungsmodus.";
 
   if (!Number.isInteger(input.eventSeriesId) || input.eventSeriesId <= 0) {
     errors.eventSeriesId = "Eventreihe ist erforderlich.";
@@ -141,6 +156,9 @@ export function validateQuizMasterData(
       mapUrl,
       publicUrl,
       internalNote,
+      reservationUrl,
+      publicDescription,
+      publicDescriptionMode: publicDescriptionMode as "APPEND" | "REPLACE",
       presentationTemplateId: presentationTemplateId as PresentationTemplate["id"] | null,
     },
   };
