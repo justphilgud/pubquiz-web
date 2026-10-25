@@ -39,3 +39,9 @@ export function bindWorkspaceContentParams(paramsKey: string, seriesId: number |
   }
   return params;
 }
+
+/** Only object pages need a readback. Collections and public live views do not. */
+export function needsWorkspaceObjectContext(pathname: string) {
+  return /^\/quiz\/[1-9]\d*(?:\/(?:slides|auswertung)(?:\/[^?#\\]*)?)?$/.test(pathname) ||
+    /^\/(?:content\/(?:questions|story-elements|polls)|fragen\/editor|story-elemente|admin\/eventreihen)\/[1-9]\d*$/.test(pathname);
+}

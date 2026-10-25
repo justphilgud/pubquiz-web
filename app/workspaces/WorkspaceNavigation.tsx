@@ -7,17 +7,18 @@ import { useCallback, useEffect, useState } from "react";
 import { resolveWorkspaceObjectContext } from "./actions";
 import { useDismissiblePopover } from "@/app/components/useDismissiblePopover";
 import { EVENT_TYPES, type EventType } from "@/app/roles/eventTypes";
-import { searchWorkspaceChoices, workspaceHref, workspaceSwitchHref, workspaceTypePaths, type WorkspaceChoice } from "./workspacePolicy";
+import { needsWorkspaceObjectContext, searchWorkspaceChoices, workspaceHref, workspaceSwitchHref, workspaceTypePaths, type WorkspaceChoice } from "./workspacePolicy";
 
 export default function WorkspaceNavigation({ choices, canUseContent, admin }: { choices: WorkspaceChoice[]; canUseContent: boolean; admin: boolean }) {
   const pathname = usePathname();
+  const needsObjectContext = needsWorkspaceObjectContext(pathname);
   const [resolved, setResolved] = useState<Awaited<ReturnType<typeof resolveWorkspaceObjectContext>> | null>(null);
   const legacyContext = resolved?.path === pathname ? resolved : null;
   useEffect(() => {
     let active = true;
-    if (!pathname.startsWith("/workspaces/")) resolveWorkspaceObjectContext(pathname).then(value => { if (active) setResolved(value); }).catch(() => { if (active) setResolved(null); });
+    if (needsObjectContext) resolveWorkspaceObjectContext(pathname).then(value => { if (active) setResolved(value); }).catch(() => { if (active) setResolved(null); });
     return () => { active = false; };
-  }, [pathname]);
+  }, [pathname, needsObjectContext]);
   const match = /^\/workspaces\/(\d+)\/(quiz|bingo|karaoke|settings)(?:\/|$)/.exec(pathname);
   const current = choices.find(choice => choice.id === (match ? Number(match[1]) : legacyContext?.seriesId));
   const currentType = EVENT_TYPES.find(type => workspaceTypePaths[type.id] === match?.[2])?.id ?? (current && !match && !legacyContext?.settings && current.eventTypes.includes("QUIZ") ? "QUIZ" : undefined);
@@ -26,7 +27,7 @@ export default function WorkspaceNavigation({ choices, canUseContent, admin }: {
   const close = useCallback(() => setOpen(false), []);
   const { containerRef, triggerRef } = useDismissiblePopover({ open, onClose: close });
   const linkClass = "flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm font-semibold hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600";
-  const waitingForObjectContext = !legacyContext && (/^\/quiz\/[1-9]\d*(?:\/|$)/.test(pathname) || /^\/(?:content\/(?:questions|story-elements|polls)|fragen\/editor|story-elemente|admin\/eventreihen)\/[1-9]\d*$/.test(pathname));
+  const waitingForObjectContext = needsObjectContext && !legacyContext;
   const crossSeries = /^\/(content|fragen|story-elemente|quiz|admin\/teams)(\/|$)/.test(pathname);
   function target(choice: WorkspaceChoice) {
     const area = match?.[2] === "settings" || legacyContext?.settings ? "settings" : pathname.split("/")[4];

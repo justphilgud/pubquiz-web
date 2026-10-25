@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bindWorkspaceContentParams, canAccessCrossSeriesContent, getWorkspaceChoices, searchWorkspaceChoices, workspaceHref, workspaceSwitchHref } from "./workspacePolicy";
+import { needsWorkspaceObjectContext, bindWorkspaceContentParams, canAccessCrossSeriesContent, getWorkspaceChoices, searchWorkspaceChoices, workspaceHref, workspaceSwitchHref } from "./workspacePolicy";
 import { contentReturnHref } from "@/app/components/content/contentNavigation";
 import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 const base: AuthorizationActor = { userId: 1, assignments: [] };
@@ -64,4 +64,9 @@ test("workspace path wins over manipulated scope/type filters; resets cannot dro
   assert.equal(query.get("q"), "bleibt");
   assert.equal(bindWorkspaceContentParams("", 7, "STORY_ELEMENT").toString(), "eventSeriesId=7&contentType=STORY_ELEMENT");
   assert.equal(bindWorkspaceContentParams("eventSeriesId=999&contentType=POLL", undefined, "QUESTION").toString(), "eventSeriesId=999&contentType=POLL");
+});
+
+test("background context readback is limited to actual objects, never home, collections or live views", () => {
+  for (const path of ["/", "/content", "/fragen", "/admin/users", "/quiz", "/workspaces/7/quiz/content", "/quiz/7/moderation", "/quiz/7/praesentation", "/quiz/7/antworten", "/content/questions/new"]) assert.equal(needsWorkspaceObjectContext(path), false, path);
+  for (const path of ["/quiz/7", "/quiz/7/slides/intro", "/quiz/7/auswertung", "/quiz/7/auswertung/teams", "/content/questions/7", "/content/story-elements/7", "/content/polls/7", "/admin/eventreihen/7"]) assert.equal(needsWorkspaceObjectContext(path), true, path);
 });
