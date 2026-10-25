@@ -75,7 +75,7 @@ test("preview has a distinct install name and icon without changing production",
 test("mobile navigation reuses the authenticated questions and quiz routes", () => {
   const home = read("app/page.tsx");
   const header = read("app/components/AppHeader.tsx");
-  const navigation = read("app/components/AppNav.tsx");
+  const navigation = read("app/workspaces/WorkspaceNavigation.tsx");
   const dashboardCards = read("app/components/dashboard/DashboardCards.tsx");
   const questionLibrary = read("app/components/content/ContentLibraryPage.tsx");
   const questionEditor = read("app/fragen/editor/QuestionCreationPage.tsx");
@@ -86,7 +86,8 @@ test("mobile navigation reuses the authenticated questions and quiz routes", () 
   assert.match(home, /href="\/fragen"/);
   assert.match(home, /href="\/quiz"/);
   assert.match(header, /grid-cols-\[minmax\(0,1fr\)_auto\]/);
-  assert.match(navigation, /grid-cols-2/);
+  assert.match(navigation, /flex-wrap/);
+  assert.match(navigation, /min-h-11/);
   assert.match(dashboardCards, /min-w-0 rounded-2xl/);
   assert.match(questionLibrary, /requireQuestionEditor\(\)/);
   assert.match(questionEditor, /requireQuestionEditor\(\)/);
