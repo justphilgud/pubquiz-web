@@ -291,7 +291,7 @@ Bestehende Review-Konten und individuelle Werte wurden nicht zurückgesetzt.
 
 Im tatsächlichen lokalen Browser reproduziert: gefiltertes Speichern mit 100
 Zuordnungen führte zu Prisma `P2028` nach dem Standardbudget von fünf Sekunden;
-Rollback erhielt sämtliche Rechte. Benutzeranlage und -bearbeitung erhalten nun
+Rollback erhielt sämtliche Rechte. Benutzeranlage/-bearbeitung und Produktfreischaltung erhalten nun
 gezielt ein begrenztes 30-Sekunden-Budget. Alle übrigen Transaktionen behalten ihre
 bisherige Vorgabe; Isolation, Retry, letzte-Admin-Schutz und atomare Spiegel bleiben.
 Erneutes gefiltertes Speichern, Reload und erneutes Öffnen mit allen 100 Zuordnungen

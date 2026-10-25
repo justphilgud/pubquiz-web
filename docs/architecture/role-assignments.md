@@ -129,7 +129,7 @@ Quizze und Fehlerbehandlung zuständig. Keine Vorauswahl und keine neue Batch-AP
 
 Die Browserabnahme mit 100 Zuordnungen reproduzierte `P2028`: das bisherige
 Fünf-Sekunden-Standardlimit reicht für kanonische Rollen und Kompatibilitätsspiegel
-über die gehostete Datenbank nicht. Ausschließlich Benutzeranlage/-bearbeitung
+über die gehostete Datenbank nicht. Benutzeranlage/-bearbeitung und Produktfreischaltung (dieselbe Rollenprojektion)
 verwenden deshalb ein begrenztes Transaktionsbudget von 30 Sekunden. Isolation,
 Retryregeln, Prüfungen und atomarer Rollback bleiben unverändert; andere Aufrufer
 behalten das bisherige Standardlimit. Keine fachliche Rechteänderung.

@@ -39,7 +39,8 @@ export async function setEventTypeEnabled(eventSeriesId: number, eventType: Even
       for (const role of roles) await syncLegacyQuizRoles(tx, role.benutzer_id, Number(user.id));
     }
     return { success: true, message: enabled ? "Eventart aktiviert. Erhaltene Rollenzuweisungen gelten wieder." : "Eventart deaktiviert. Inhalte und Rollenzuweisungen bleiben erhalten; ihr Zugriff ist gesperrt." };
-  }, { isolationLevel: "ReadCommitted" });
+  // Quiz activation projects the same large series assignments as the user form.
+  }, { isolationLevel: "ReadCommitted", timeout: 30_000 });
   if (result.success) logRoleAudit("event_type_changed", { eventSeriesId, eventType, enabled, assignedById: Number(user.id) });
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`); revalidatePath("/admin/users");
   return result;
