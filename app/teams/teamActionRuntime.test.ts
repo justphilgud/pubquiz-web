@@ -11,7 +11,7 @@ const lifecyclePanel = readFileSync(
   "app/admin/teams/TeamLifecyclePanel.tsx",
   "utf8",
 );
-const teamListPage = readFileSync("app/admin/teams/page.tsx", "utf8");
+const teamListPage = readFileSync("app/admin/teams/TeamManagementPage.tsx", "utf8");
 const deletionService = readFileSync("app/teams/teamDeletion.ts", "utf8");
 
 test("team server-action module exports runtime functions only", () => {

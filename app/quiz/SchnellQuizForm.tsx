@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import { createSchnellQuiz } from "./actions";
 import type { EventSeriesOption } from "@/app/eventreihen/actions";
 
@@ -41,6 +42,10 @@ export default function SchnellQuizForm({
   const [meldung, setMeldung] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const fingerprint = JSON.stringify([eventSeriesId, titel, quizDatum, veranstaltungszeit, veranstaltungsname, kartenUrl, oeffentlicheUrl, bemerkung, anzahlBloecke, fragenProBlock, kategorieIds, medienFilter, nurBereitsVerwendete, preisPlatz1, preisPlatz2, preisPlatz3]);
+  const [initialFingerprint] = useState(fingerprint);
+  const allowSavedNavigation = useContentNavigationGuard(fingerprint !== initialFingerprint);
+
   function toggleKategorie(kategorieId: number) {
     setKategorieIds((current) =>
       current.includes(kategorieId)
@@ -76,6 +81,7 @@ export default function SchnellQuizForm({
     setMeldung(result.message);
 
     if (result.success && result.quizId) {
+      allowSavedNavigation();
       window.location.href = `/quiz/${result.quizId}`;
     }
   }

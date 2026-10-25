@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { bindWorkspaceContentParams } from "@/app/workspaces/workspacePolicy";
 import { searchContent } from "./actions";
 import { contentResumeKey, readContentResume, type ContentResume } from "./contentNavigation";
 import ContentFilters from "./ContentFilters";
 import ContentResultRow from "./ContentResultRow";
 import { parseContentFilters, resolveContentFilterDraft, serializeContentFilters, type ContentFilterDraft, type ContentFilterOption, type ContentInitialType, type ContentQuizOption, type ContentSearchResult, type ContentTemplateOption } from "./contentLibrary";
 
-export function ContentSearchState({ initialType, quizzes, categories, eventSeries, templates, paramsKey }: { initialType: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[]; paramsKey: string }) {
+export function ContentSearchState({ initialType, quizzes, categories, eventSeries, templates, paramsKey, workspaceSeriesId }: { workspaceSeriesId?: number; initialType: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[]; paramsKey: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const filterableTemplateIds = templates
@@ -100,6 +101,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   }
   function updateFilters(next: typeof filters) { setDraft({ initialType, paramsKey, filters: next }); }
   function apply(next = filters) {
+    if (workspaceSeriesId !== undefined) next = { ...next, eventSeriesId: workspaceSeriesId, ...(initialType ? { contentType: initialType } : {}) };
     generation.current++; activeSearch.current = "";
     const params = serializeContentFilters(next);
     const nextKey = params.toString();
@@ -116,7 +118,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
 
   const heldCount = result.items.filter(item => item.justApproved && (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT")).length;
   return <div className="space-y-4">
-    <ContentFilters filters={filters} categories={categories} eventSeries={eventSeries} templates={templates} loading={pending} onChange={updateFilters} onTemplateChange={changeTemplate} onApply={() => apply()} onReset={reset} />
+    <ContentFilters hideContentType={workspaceSeriesId !== undefined && Boolean(initialType)} filters={filters} categories={categories} eventSeries={eventSeries} templates={templates} loading={pending} onChange={updateFilters} onTemplateChange={changeTemplate} onApply={() => apply()} onReset={reset} />
     <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-700"><span aria-live="polite">{pending ? "Inhalte werden geladen …" : `${result.items.length - heldCount} geladene Treffer · ${result.total} Suchtreffer${heldCount ? ` · ${heldCount} gerade freigegeben` : ""}`}</span><span>Neu angelegt zuerst</span><button type="button" disabled={pending} onClick={() => apply()} className="min-h-11 rounded-xl border px-3">Aktualisieren</button></div>
     {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
     <div className="space-y-3" aria-busy={pending} inert={pending}>{result.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => { if (activeSearch.current !== searchContext) return; setResult(current => ({ ...current, total: Math.max(0, current.total - (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) })); }} />)}</div>
@@ -125,7 +127,8 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   </div>;
 }
 
-export default function ContentSearch({ initialType, quizzes, categories, eventSeries, templates }: { initialType?: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[] }) {
-  const paramsKey = useSearchParams().toString();
-  return <ContentSearchState initialType={initialType} quizzes={quizzes} categories={categories} eventSeries={eventSeries} templates={templates} paramsKey={paramsKey} />;
+export default function ContentSearch({ initialType, quizzes, categories, eventSeries, templates, workspaceSeriesId }: { workspaceSeriesId?: number; initialType?: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[] }) {
+  const params = bindWorkspaceContentParams(useSearchParams().toString(), workspaceSeriesId, initialType);
+  const paramsKey = params.toString();
+  return <ContentSearchState workspaceSeriesId={workspaceSeriesId} initialType={initialType} quizzes={quizzes} categories={categories} eventSeries={eventSeries} templates={templates} paramsKey={paramsKey} />;
 }

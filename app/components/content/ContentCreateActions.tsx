@@ -6,13 +6,13 @@ const items = [
   { href: "/content/polls/new", label: "+ Umfrage" },
 ] as const;
 
-export default function ContentCreateActions() {
+export default function ContentCreateActions({ workspaceSeriesId }: { workspaceSeriesId?: number }) {
   return (
     <div className="flex flex-wrap gap-2" aria-label="Content erstellen">
       {items.map((item) => (
         <Link
           key={item.href}
-          href={item.href}
+          href={workspaceSeriesId === undefined ? item.href : `/workspaces/${workspaceSeriesId}/quiz/${item.label === "+ Frage" ? "new-question" : item.label === "+ Story-Element" ? "new-story" : "new-poll"}`}
           className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2"
         >
           {item.label}

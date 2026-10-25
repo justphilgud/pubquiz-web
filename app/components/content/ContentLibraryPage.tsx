@@ -9,7 +9,7 @@ import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
 import { getDefaultLocale } from "@/app/i18n/locale";
 import { loadDynamicQuestionTemplates } from "@/app/fragen/editor/templates/dynamicQuestionTemplates.server";
 
-export default async function ContentLibraryPage({ initialType }: { initialType?: ContentInitialType }) {
+export default async function ContentLibraryPage({ initialType, workspaceSeriesId }: { initialType?: ContentInitialType; workspaceSeriesId?: number }) {
   const session = await requireQuestionEditor();
   const baseTemplates = localizeQuestionTemplates(
     loadQuestionEditorMessages(getDefaultLocale()),
@@ -23,13 +23,14 @@ export default async function ContentLibraryPage({ initialType }: { initialType?
   const templates = [...baseTemplates, ...dynamicTemplates];
   return <ContentWorkspace
     initialType={initialType}
+    workspaceSeriesId={workspaceSeriesId}
     templates={templates.map(({ id, name, availableForFiltering }) => ({
       id,
       name,
       availableForFiltering,
     }))}
-    quizzes={quizzes.map((quiz) => ({ quizId: quiz.quiz_id, title: quiz.titel ?? `Quiz ${quiz.quiz_id}`, date: quiz.quiz_datum, eventSeriesId: quiz.eventreihe_id }))}
+    quizzes={quizzes.filter(quiz => workspaceSeriesId === undefined || quiz.eventreihe_id === workspaceSeriesId).map((quiz) => ({ quizId: quiz.quiz_id, title: quiz.titel ?? `Quiz ${quiz.quiz_id}`, date: quiz.quiz_datum, eventSeriesId: quiz.eventreihe_id }))}
     categories={categories.map((category) => ({ id: category.fragenkategorie_id, name: category.kategorie }))}
-    eventSeries={eventSeries.map((series) => ({ id: series.eventreihe_id, name: series.name }))}
+    eventSeries={eventSeries.filter(series => workspaceSeriesId === undefined || series.eventreihe_id === workspaceSeriesId).map((series) => ({ id: series.eventreihe_id, name: series.name }))}
   />;
 }

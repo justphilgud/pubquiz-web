@@ -37,7 +37,7 @@ export default function ContentFilters({ filters, categories, eventSeries, templ
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <ContentSearchControls query={filters.query} loading={loading} placeholder={hideContentType ? "Fragen durchsuchen …" : "Fragetext, Lösung, Land oder ID suchen …"} filterCount={filterCount} filtersOpen={open}
+      <ContentSearchControls query={filters.query} loading={loading} placeholder={hideContentType ? (filters.contentType === "QUESTION" ? "Fragen durchsuchen …" : "Inhalte durchsuchen …") : "Fragetext, Lösung, Land oder ID suchen …"} filterCount={filterCount} filtersOpen={open}
         onQueryChange={(query) => onChange({ ...filters, query })} onSubmit={onApply} onToggleFilters={() => setOpen((value) => !value)} onReset={onReset}>
         <div className="mt-3 grid gap-3 rounded-2xl bg-slate-50 p-3 sm:grid-cols-2 xl:grid-cols-5">
           {!hideContentType && <label><span className="mb-1 block text-xs font-bold text-slate-600">Inhaltstyp</span><select value={filters.contentType} onChange={(event) => onChange(normalizeContentFiltersForType({ ...filters, contentType: event.target.value as ContentFiltersState["contentType"] }))} className={inputClass}><option value="ALL">Alle Inhalte</option><option value="QUESTION">Fragen</option><option value="STORY_ELEMENT">Story-Elemente</option><option value="POLL">Umfragen</option></select></label>}

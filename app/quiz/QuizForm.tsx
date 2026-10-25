@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -130,6 +131,8 @@ export default function QuizForm({
   const [form, setForm] = useState(() =>
     initialEditingQuiz ? formFromQuiz(initialEditingQuiz) : emptyForm(initialEventSeriesId),
   );
+  const [savedForm, setSavedForm] = useState(() => JSON.stringify(form));
+  const allowSavedNavigation = useContentNavigationGuard(JSON.stringify(form) !== savedForm);
   const [message, setMessage] = useState("");
   const [formOpen, setFormOpen] = useState(Boolean(initialEditingQuiz || initialEventSeriesId));
   const [eventSeriesFilter, setEventSeriesFilter] = useState("");
@@ -160,12 +163,14 @@ export default function QuizForm({
   function resetForm() {
     setEditingQuizId(null);
     setForm(emptyForm(initialEventSeriesId));
+    setSavedForm(JSON.stringify(emptyForm(initialEventSeriesId)));
     setFormOpen(false);
   }
 
   function startEdit(quiz: QuizResult) {
     setEditingQuizId(quiz.quiz_id);
     setForm(formFromQuiz(quiz));
+    setSavedForm(JSON.stringify(formFromQuiz(quiz)));
     setFormOpen(true);
     setMessage(
       quiz.quiz_datum
@@ -197,6 +202,7 @@ export default function QuizForm({
       : await updateQuiz({ quizId: editingQuizId, ...data });
     setMessage(result.message);
     if (!result.success) return;
+    allowSavedNavigation();
     if ("quizId" in result && result.quizId) {
       router.push(`/quiz/${result.quizId}`);
       return;

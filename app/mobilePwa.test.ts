@@ -78,8 +78,8 @@ test("mobile navigation reuses the authenticated questions and quiz routes", () 
   const navigation = read("app/components/AppNav.tsx");
   const dashboardCards = read("app/components/dashboard/DashboardCards.tsx");
   const questionLibrary = read("app/components/content/ContentLibraryPage.tsx");
-  const questionEditor = read("app/fragen/editor/page.tsx");
-  const quizList = read("app/quiz/page.tsx");
+  const questionEditor = read("app/fragen/editor/QuestionCreationPage.tsx");
+  const quizList = read("app/quiz/QuizManagementPage.tsx");
   const quizDetail = read("app/quiz/[quizId]/page.tsx");
 
   assert.match(home, /href="\/fragen\/editor"/);
