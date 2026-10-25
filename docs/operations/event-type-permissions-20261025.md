@@ -248,3 +248,26 @@ Admin-Matrix: `/admin/users`; Produktfreischaltungen: `/admin/eventreihen`.
 Zugangsdaten werden ausschließlich direkt an den Auftraggeber übermittelt,
 nicht im Repository oder PR veröffentlicht. Kein Merge und kein Production-
 Deployment im Rahmen dieser Bereitstellung.
+
+
+## Korrektur der Schema-Kodierung bei der gehosteten Reihenrollen-Abnahme
+
+Bei der lokalen Schemaerweiterung wurde `schema.prisma` versehentlich in einer
+Windows-Kodierung geschrieben. Der native Prisma-Migrationsprozess brach beim
+strikten UTF-8-Lesen ab, während die CLI den Rückgabecode null lieferte. Dadurch
+wurde die neue Anwendung zunächst ohne `benutzer_reihenrollen` bereitgestellt;
+der Startseiten-Smoke-Test erfasste diesen authentifizierten Pfad nicht.
+Runtime-Log und lokale Diagnose bestätigten denselben Fehler. Keine SQL-/Datenursache.
+
+Schema wieder als UTF-8 gespeichert und Client regulär regeneriert. Ein rot/grün
+geprüfter automatischer Test in `scripts/ci-workflows.test.ts` dekodiert die
+Schema-Datei ausdrücklich mit fatalem UTF-8-Decoder. Damit blockiert dieser konkrete
+Fehler die erforderliche CI, bevor Preview deployen darf.
+
+Die exakt vorhandene Zusatzmigration wurde danach mit regulärem `prisma migrate
+deploy` im kontrollierten Ablauf auf `pr130_review_20261025` angewendet. Status
+vorher: Zusatzmigration ausstehend; nachher: 61 Migrationen aktuell. Zusätzlich
+Tabellenexistenz und genau einen erfolgreichen Migrationsbeleg direkt geprüft.
+Authentifizierte Benutzerseite anschließend im gehosteten Browser erfolgreich.
+Kein manuelles Eintragen oder Zurücksetzen von Migrationshistorien, keine
+Production-Verbindung und keine bestehende Quizsession zurückgesetzt.

@@ -202,3 +202,8 @@ test("PR130 review deployment requires its explicit isolated target and exact br
   assert.ok(preview.includes("inputs.isolated_pr130 && 'pr130_review_20261025'"));
   assert.ok(preview.includes("inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech'"));
 });
+
+
+test("Prisma schema is strict UTF-8 for the native migration engine", () => {
+  assert.doesNotThrow(() => new TextDecoder("utf-8", { fatal: true }).decode(readFileSync("prisma/schema.prisma")));
+});

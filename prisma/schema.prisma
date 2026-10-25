@@ -1403,7 +1403,7 @@ model users {
   verwaltete_eventreihen eventreihe_verwaltung[] @relation("SeriesManagementUser")
   id Int @id @default(autoincrement())
 
-  // Persönliche Daten
+  // PersÃ¶nliche Daten
   name       String?
   email      String  @unique
   avatar_url String?
