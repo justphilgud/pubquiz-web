@@ -7,6 +7,7 @@ import {
   getQuestionDuplicateFingerprint,
   type QuestionDuplicateInput,
 } from "./questionSimilarity";
+import { questionVisibilityWhere } from "./questionVisibility";
 import type { QuestionTemplateConfig } from "./types";
 
 export type SimilarQuestion = {
@@ -28,6 +29,7 @@ export async function findSimilarQuestions(
       fragen_id: excludeQuestionId ? { not: excludeQuestionId } : undefined,
       created_by_user_id: isAdmin(session.actor) ? undefined : Number(session.user.id),
       ist_archiviert: false,
+      AND: [questionVisibilityWhere(session.actor)],
     },
     orderBy: { updated_at: "desc" },
     take: 200,

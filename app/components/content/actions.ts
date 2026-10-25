@@ -149,7 +149,7 @@ export async function searchContent(filters: ContentFiltersState, pageCursor?: s
       }, quizzes.map((quiz) => ({ quizId: quiz.quiz_id, eventSeriesId: quiz.eventreihe_id })), now),
       editHref: `/content/questions/${question.fragen_id}`,
       canClone: question.can_clone,
-      canArchive: true,
+      canArchive: question.can_archive,
       questionMetrics: {
         answerCount: question.antworten_anzahl,
         difficulty: question.schwierigkeitslevel,

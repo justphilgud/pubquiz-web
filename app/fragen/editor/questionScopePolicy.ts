@@ -75,6 +75,26 @@ export function canRequestChangesForScopedQuestion(actor: QuestionActorContext, 
   return question.reviewStatus === "IN_REVIEW" && canApproveScopedQuestion(actor, question);
 }
 
+/** Authorize the persisted object as well as its requested destination. */
+export function canSaveScopedQuestion(
+  actor: QuestionActorContext,
+  intent: "DRAFT" | "SUBMIT_FOR_REVIEW" | "APPROVE" | "REQUEST_CHANGES",
+  current: QuestionScopeAccessContext | null,
+  target: QuestionScopeAccessContext,
+) {
+  if (!canUseQuestionScope(actor, target.scope, target.eventSeriesIds)) return false;
+  if (intent === "APPROVE") {
+    return (!current || canApproveScopedQuestion(actor, current)) &&
+      canApproveScopedQuestion(actor, target);
+  }
+  if (intent === "REQUEST_CHANGES") {
+    return current !== null && canRequestChangesForScopedQuestion(actor, current) &&
+      canRequestChangesForScopedQuestion(actor, target);
+  }
+  return (!current || canEditScopedQuestion(actor, current)) &&
+    (intent !== "SUBMIT_FOR_REVIEW" || !isAdministrator(actor));
+}
+
 export function canCloneScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
   if (!canViewScopedQuestion(actor, question)) return false;
   if (isAdministrator(actor)) return true;
@@ -92,5 +112,14 @@ export function isQuestionEligibleForQuiz(input: {
 }) {
   if (!input.isApproved || input.isArchived) return false;
   if (input.validUntil && input.validUntil < input.now) return false;
-  return input.scope === "GLOBAL" || input.eventSeriesIds.includes(input.quizEventSeriesId);
+  return isQuestionScopeCompatibleWithQuiz(input);
+}
+
+export function isQuestionScopeCompatibleWithQuiz(input: {
+  scope: QuestionScopeValue;
+  eventSeriesIds: readonly number[];
+  quizEventSeriesId: number;
+}) {
+  return input.scope === "GLOBAL" ||
+    (input.scope === "EVENT_SERIES" && input.eventSeriesIds.includes(input.quizEventSeriesId));
 }

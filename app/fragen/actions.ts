@@ -14,11 +14,11 @@ import {
   requireAdmin,
   requireQuestionEditor,
 } from "@/app/lib/permissions";
-import { getQuestionActor, mapQuestionAccessContext } from "./editor/questionAccess.server";
-import { canCloneScopedQuestion, canApproveScopedQuestion } from "./editor/questionScopePolicy";
+import { getQuestionActor, mapQuestionAccessContext, requireQuestionAccess } from "./editor/questionAccess.server";
+import { canCloneScopedQuestion, canApproveScopedQuestion, canEditScopedQuestion } from "./editor/questionScopePolicy";
+import { questionVisibilityWhere, questionQuizUsageWhere } from "./editor/questionVisibility";
 import { questionSearchWhere } from "./questionSearch";
 import { contentCreatedBoundary, type ContentCursor } from "@/app/components/content/contentPaging";
-import { getActorEventSeriesIds, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { createCategoryRecord } from "./editor/categoryService.server";
 import {
   normalizeCategoryComparisonKey,
@@ -122,6 +122,7 @@ export type FrageSuchResult = {
   pruefen_ab: string | null;
   aktualitaet_geprueft_am: string | null;
   can_clone: boolean;
+  can_archive: boolean;
   geltungsbereich: "GLOBAL" | "EVENT_SERIES";
   eventreihen: string[];
   eventreihe_ids: number[];
@@ -435,30 +436,14 @@ export async function searchFragen(data: {
       : undefined,
 
     quiz_fragen: data.usageState === "USED"
-      ? { some: {} }
+      ? { some: questionQuizUsageWhere(actor) }
       : data.usageState === "UNUSED"
-        ? { none: {} }
+        ? { none: questionQuizUsageWhere(actor) }
         : undefined,
 
   };
 
-  const where = isAdministrator(actor)
-    ? baseWhere
-    : {
-        AND: [
-          baseWhere,
-          {
-            OR: [
-              { geltungsbereich: "GLOBAL" as const, freigegeben: true },
-              { geltungsbereich: "GLOBAL" as const, created_by_user_id: actor.userId ?? -1 },
-              {
-                geltungsbereich: "EVENT_SERIES" as const,
-                eventreihen: { some: { eventreihe_id: { in: getActorEventSeriesIds(actor) } } },
-              },
-            ],
-          },
-        ],
-      };
+  const where: Prisma.fragenWhereInput = { AND: [baseWhere, questionVisibilityWhere(actor)] };
 
   const [fragen, total] = await Promise.all([prisma.fragen.findMany({
     where: { AND: [where, contentCreatedBoundary(data.contentCursor ?? null, "QUESTION", "fragen_id")] },
@@ -485,6 +470,7 @@ export async function searchFragen(data: {
       },
       medien: true,
       quiz_fragen: {
+        where: questionQuizUsageWhere(actor),
         include: {
           quiz: true,
         },
@@ -526,6 +512,7 @@ export async function searchFragen(data: {
       pruefen_ab: frage.pruefen_ab?.toISOString().slice(0, 10) ?? null,
       aktualitaet_geprueft_am: frage.aktualitaet_geprueft_am?.toISOString() ?? null,
       can_clone: canCloneScopedQuestion(actor, mapQuestionAccessContext(frage)),
+      can_archive: canEditScopedQuestion(actor, mapQuestionAccessContext(frage)),
       geltungsbereich: frage.geltungsbereich,
       eventreihen: frage.eventreihen.map((entry) => entry.eventreihe.name),
       eventreihe_ids: frage.eventreihen.map((entry) => entry.eventreihe_id),
@@ -592,6 +579,7 @@ export async function getFrageDetails(
   fragenId: number,
 ): Promise<FrageDetailsResult | null> {
   await requireQuestionEditor();
+  const { actor } = await requireQuestionAccess(fragenId, "VIEW");
   const frage = await prisma.fragen.findUnique({
     where: {
       fragen_id: fragenId,
@@ -627,6 +615,7 @@ export async function getFrageDetails(
         },
       },
       quiz_fragen: {
+        where: questionQuizUsageWhere(actor),
         include: {
           quiz: true,
         },
@@ -682,7 +671,7 @@ export async function getFrageDetails(
 }
 
 export async function getFrageForEdit(fragenId: number) {
-  await requireQuestionEditor();
+  await requireQuestionAccess(fragenId, "EDIT");
   const frage = await prisma.fragen.findUnique({
     where: {
       fragen_id: fragenId,
@@ -735,7 +724,7 @@ export async function updateFrage(data: {
     }[];
   }[];
 }) {
-  const session = await requireQuestionEditor();
+  const { session, actor } = await requireQuestionAccess(data.fragenId, "EDIT");
   await prisma.fragen.update({
     where: {
       fragen_id: data.fragenId,
@@ -761,7 +750,7 @@ export async function updateFrage(data: {
 
     const neueKategorie = await createCategoryRecord({
       name,
-      status: canManageCategories(session.actor) ? "ACTIVE" : "PENDING",
+      status: canManageCategories(actor) ? "ACTIVE" : "PENDING",
       createdByUserId: getCurrentUserId(session),
     });
 
