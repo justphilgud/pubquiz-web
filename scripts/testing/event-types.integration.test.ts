@@ -14,7 +14,7 @@ import bcrypt from "bcryptjs";
 
 const base = process.env.EVENT_TYPE_TEST_DATABASE_URL;
 const baseline = "5920a568afb6d650d52a9c819e347170b993ed80";
-test("real PostgreSQL migration, current Actions, product lifecycle and legacy guards", { skip: !base }, async () => {
+test("real PostgreSQL migration, current Actions, product lifecycle and legacy guards", { skip: !base, timeout: 120_000 }, async context => {
   const target = new URL(base!);
   // Explicit disposable base only. Never accept Production or a regular application database.
   assert.ok(["127.0.0.1", "localhost", "ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech"].includes(target.hostname));
@@ -22,9 +22,11 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
   else assert.match(target.pathname, /^\/(editorial_import_ci|event_type_test_base)$/);
   const name = `event_type_qa_${Date.now()}`;
   const control = new Client({ connectionString: target.toString() }); await control.connect();
-  await control.query(`CREATE DATABASE ${name}`); await control.end();
+  try { await control.query(`CREATE DATABASE ${name}`); } finally { await control.end(); }
   target.pathname = `/${name}`;
-  const db = new Client({ connectionString: target.toString() }); await db.connect();
+  const db = new Client({ connectionString: target.toString(), query_timeout: 30_000, statement_timeout: 30_000 }); await db.connect();
+  context.after(async () => { await db.end(); });
+  console.info("Event type DB stage: baseline schema");
   const directory = mkdtempSync(join(tmpdir(), "pubquiz-event-types-"));
   const schemaPath = join(directory, "schema.prisma");
   try {
@@ -34,6 +36,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     });
     await db.query(sql.slice(sql.indexOf("-- CreateSchema")));
   } finally { unlinkSync(schemaPath); rmdirSync(directory); }
+  console.info("Event type DB stage: legacy fixtures");
   const hash = await bcrypt.hash("EventType-QA-Only-2026!", 10);
   for (const [id, label, role] of [[1,"Admin","ADMIN"],[2,"Global Editor","EDITOR"],[3,"Manager A","USER"],[4,"Editor A","USER"],[5,"Manager B","USER"],[6,"Legacy only","ADMIN"]] as const) {
     await db.query("INSERT INTO pubquiz.users(id,name,email,password_hash,role,updated_at)VALUES($1,$2,$3,$4,$5,NOW())", [id,label,`eventqa${id}@example.invalid`,hash,role]);
@@ -64,6 +67,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
   `);
   const before = (await db.query("SELECT jsonb_agg(to_jsonb(q) ORDER BY quiz_id) AS data FROM pubquiz.quiz q")).rows[0].data;
   const oldRoles = (await db.query("SELECT * FROM pubquiz.benutzer_rollenzuweisungen ORDER BY rollenzuweisung_id")).rows;
+  console.info("Event type DB stage: migration");
   await db.query(readFileSync("prisma/migrations/20261025140000_event_type_permissions/migration.sql", "utf8"));
   assert.deepEqual((await db.query("SELECT jsonb_agg(to_jsonb(q) ORDER BY quiz_id) AS data FROM pubquiz.quiz q")).rows[0].data, before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_rollenzuweisungen ORDER BY rollenzuweisung_id")).rows, oldRoles);
@@ -73,6 +77,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
   await assert.rejects(db.query("UPDATE pubquiz.benutzer_rollenzuweisungen SET rolle='EDITOR' WHERE benutzer_id=3"), { code: "42501" });
   await assert.rejects(db.query("DELETE FROM pubquiz.eventreihe_benutzerrollen WHERE benutzer_id=3"), { code: "42501" });
   await assert.rejects(db.query("INSERT INTO pubquiz.benutzer_eventartrollen(benutzer_id,eventreihe_id,eventart,rolle)VALUES(4,20,'BINGO','ADMIN')"), { code: "23514" });
+  console.info("Event type DB stage: real Actions");
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
   let currentUser = 1;
   const fixture = { db: prisma, session: () => ({ user: { id: String(currentUser) } }) };
@@ -128,6 +133,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     assert.equal((await api.actions.setEventTypeEnabled(10,"QUIZ",true)).success, true);
     assert.equal((await api.actors.getActorPermissions(3)).assignments.some(r => r.eventSeriesId === 10),true);
     await db.query("INSERT INTO pubquiz.quiz(quiz_id,eventreihe_id,titel)VALUES(14,10,'Isolierter Start-Deaktivierungs-Race')");
+    console.info("Event type DB stage: concurrent start/deactivation");
     const race = await Promise.allSettled([api.live.starteQuiz(14,0), api.actions.setEventTypeEnabled(10,"QUIZ",false)]);
     const invariant = (await db.query(`SELECT
       (SELECT ist_freigeschaltet FROM pubquiz.eventreihe_eventarten WHERE eventreihe_id=10 AND eventart='QUIZ') AS enabled,
@@ -149,5 +155,5 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     // Restore only synthetic QA role configuration for the following browser acceptance.
     await api.actions.saveEventTypeMatrix(3,[{eventSeriesId:10,roles:{QUIZ:"EVENT_MANAGER"},manageSeries:true},{eventSeriesId:20,roles:{QUIZ:"EDITOR",BINGO:"EVENT_MANAGER"},manageSeries:false}]);
     console.info(`Isolated QA database retained for browser acceptance: ${name}`);
-  } finally { await prisma.$disconnect(); await db.end(); }
+  } finally { await prisma.$disconnect(); }
 });
