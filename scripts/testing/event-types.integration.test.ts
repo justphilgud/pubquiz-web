@@ -34,6 +34,9 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     const sql = execFileSync(process.execPath, ["node_modules/prisma/build/index.js", "migrate", "diff", "--from-empty", "--to-schema", schemaPath, "--script"], {
       encoding: "utf8", env: { ...process.env, DATABASE_URL: target.toString() }, maxBuffer: 10_000_000,
     });
+    // Prisma may omit schema qualifiers when DATABASE_URL contains schema=pubquiz;
+    // node-postgres does not apply that Prisma-only URL parameter as search_path.
+    await db.query("CREATE SCHEMA IF NOT EXISTS pubquiz; SET search_path TO pubquiz, public");
     await db.query(sql.slice(sql.indexOf("-- CreateSchema")));
   } finally { unlinkSync(schemaPath); rmdirSync(directory); }
   console.info("Event type DB stage: legacy fixtures");

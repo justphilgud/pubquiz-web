@@ -193,3 +193,11 @@ Quizfreischaltung ergänzt; die Teilnehmerprüfung und alle fachlichen Assertion
 bleiben unverändert. Dies ist eine erforderliche Anpassung an den bewusst neuen
 Fail-closed-Standard, kein Abschwächen der Produktprüfung. Neue Matrix-/Produktänderungen
 verwenden außerdem weiterhin das bestehende technische Console-Audit ohne Personendaten.
+
+Der neue Integrationstest wurde zusätzlich mit der tatsächlichen CI-URL-Variante
+`schema=pubquiz` rot/grün geprüft: Prisma lässt dann Schemaqualifizierungen teilweise
+weg, während node-postgres diesen Prisma-URL-Parameter nicht als Suchpfad anwendet.
+Der ausschließlich neue leere Testschemaufbau setzt deshalb `search_path` ausdrücklich.
+Frühe Fehler schließen nun ebenfalls ihre Testverbindungen; Phasen und Zeitlimits
+verhindern einen hängenden CI-Prozess. Keine Änderung der Produktionsmigration oder
+Produkt-/Objektprüfungen für diese Testharnesskorrektur.
