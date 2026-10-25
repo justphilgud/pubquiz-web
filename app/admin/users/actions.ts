@@ -120,6 +120,7 @@ async function createUser(formData: FormData) {
   if (passwordError) throw new UserFormValidationError(passwordError);
   const passwordHash = await bcrypt.hash(password, 12);
   const assignedById = actorId(session);
+  // Large series assignments also project compatibility rows atomically.
   const user = await withSerializableTransaction(async (transaction) => {
     await assertEventSeriesExist(
       transaction,
@@ -146,7 +147,7 @@ async function createUser(formData: FormData) {
       userId: created.id, assignments: roleSelection.series.assignments, managementIds: roleSelection.series.managementIds, assignedById,
     });
     return created;
-  });
+  }, { timeout: 30_000 });
   logRoleAudit("role_assignment_added", { userId: user.id, scope: "USER_FORM" });
   revalidatePath("/admin/users");
 }
@@ -214,7 +215,7 @@ async function updateUser(formData: FormData) {
       userId: id, assignments: roleSelection.series.assignments, managementIds: roleSelection.series.managementIds, assignedById,
     });
 
-  });
+  }, { timeout: 30_000 });
   logRoleAudit("role_assignment_changed", { userId: id, scope: "USER_FORM" });
   revalidatePath("/admin/users");
 }

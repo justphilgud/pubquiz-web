@@ -44,7 +44,7 @@ const roleFields = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const seriesPicker = readFileSync("app/admin/users/EventSeriesPicker.tsx", "utf8");
 const assignmentWrites = readFileSync("app/roles/roleAssignmentWrites.server.ts", "utf8");
 
-const matrix = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
+const matrix = readFileSync("app/admin/users/UserSeriesAssignments.tsx", "utf8");
 const eventTypeActions = readFileSync("app/roles/eventTypeActions.ts", "utf8");
 const eventTypeWrites = readFileSync("app/roles/eventTypeWrites.server.ts", "utf8");
 
@@ -201,7 +201,7 @@ test("event-series picker searches, preserves archive filtering and selects in b
 test("identity forms separate global roles from the event type matrix", () => {
   assert.match(userCreator, /UserRoleFields/); assert.match(userEditor, /UserRoleFields/);
   assert.match(roleFields, /Globaler Quiz-Editor/); assert.doesNotMatch(roleFields, /name="roleEventManager"/);
-  assert.match(matrix, /eventSeries.map/); assert.match(matrix, /Eventreihe verwalten/);
+  assert.match(matrix, /visible.map/); assert.match(matrix, /seriesDraftPayload\(rows\)/); assert.match(matrix, /Eventreihe verwalten/);
   assert.match(matrix, /Rollen je Eventreihe/); assert.match(matrix, /min-h-11/);
   assert.match(seriesPicker, /SearchInput/);
 });

@@ -11,7 +11,7 @@ const assignmentManager = readFileSync("app/eventreihen/EventSeriesMembershipMan
 const userEditor = readFileSync("app/admin/users/EditUserDialog.tsx", "utf8");
 const roleFields = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const eventTypeWrites = readFileSync("app/roles/eventTypeWrites.server.ts", "utf8");
-const matrix = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
+const matrix = readFileSync("app/admin/users/UserSeriesAssignments.tsx", "utf8");
 const documentation = readFileSync("docs/architecture/role-assignments.md", "utf8");
 
 test("assignment migration is additive and keeps every legacy structure", () => {

@@ -108,3 +108,28 @@ PostgreSQL-Migration einschließlich Konfliktabbruch, Benutzeranlage/-änderung,
 Rechteentzug, aktuelle Konten, Quizstart und konkurrierende Deaktivierung. Die
 gehostete Browserabnahme ergänzt diese Tests. Gemischte Events und eigentliche
 Bingo-/Karaokefunktionen bleiben separate Aufgaben.
+
+
+## Kompakte Verwaltungsformulare
+
+`UserRoleFields` behält globale Rollen. `UserSeriesAssignments` hält den vollständigen
+lokalen Entwurf aus der Vereinigung von Reihenrollen und unabhängigen Verwaltungsrechten.
+Die Suche filtert ausschließlich die Darstellung. Hidden Inputs serialisieren immer
+alle Rollen und alle Verwaltungs-IDs, auch nicht sichtbare/unbekannte Reihen. Sichtbare
+Checkboxen tragen bewusst keinen Submission-Namen. Entfernen ist eine explizite Aktion;
+Abbrechen unmountet den Entwurf. Neue leere Zeilen erteilen keine Rechte. Archivierte
+Zuordnungen bleiben bearbeitbar; archivierte Reihen werden nicht neu angeboten.
+`seriesAssignmentDraft` enthält Initialisierung/Serialisierung unabhängig von der Ansicht.
+Keine Änderung von Wireformat, Transaktion, Schema oder Berechtigungsprüfungen.
+
+`EventTypeSelect` ist ausschließlich die gemeinsame Dropdown-Darstellung. Bei der
+Reihenanlage übermittelt sie die Auswahl mit dem bestehenden Formular; im Detail bleibt
+`EventTypeProducts` für die bisherigen einzelnen Server Actions samt Sperre laufender
+Quizze und Fehlerbehandlung zuständig. Keine Vorauswahl und keine neue Batch-API.
+
+Die Browserabnahme mit 100 Zuordnungen reproduzierte `P2028`: das bisherige
+Fünf-Sekunden-Standardlimit reicht für kanonische Rollen und Kompatibilitätsspiegel
+über die gehostete Datenbank nicht. Ausschließlich Benutzeranlage/-bearbeitung
+verwenden deshalb ein begrenztes Transaktionsbudget von 30 Sekunden. Isolation,
+Retryregeln, Prüfungen und atomarer Rollback bleiben unverändert; andere Aufrufer
+behalten das bisherige Standardlimit. Keine fachliche Rechteänderung.

@@ -7,10 +7,11 @@ const MAX_ATTEMPTS = 3;
 
 export async function withSerializableTransaction<T>(
   operation: (transaction: Prisma.TransactionClient) => Promise<T>,
+  options: { timeout?: number } = {},
 ): Promise<T> {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
     try {
-      return await prisma.$transaction(operation, { isolationLevel: "Serializable" });
+      return await prisma.$transaction(operation, { isolationLevel: "Serializable", ...options });
     } catch (error) {
       const retryable = typeof error === "object" && error !== null &&
         "code" in error && error.code === "P2034";

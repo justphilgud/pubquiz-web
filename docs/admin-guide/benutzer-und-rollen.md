@@ -7,7 +7,8 @@ Benutzer auf **Bearbeiten** klicken. Im selben Formular:
 
 1. Kontodaten und gegebenenfalls globale Rolle einstellen. **Globaler Quiz-Editor**
    gilt nur für Quiz; **Administrator** bleibt global.
-2. Unter **Rollen je Eventreihe** für jede gewünschte Reihe **Editor** oder
+2. Unter **Rollen je Eventreihe** über **Eventreihe hinzufügen …** suchen und hinzufügen.
+   Nur zugeordnete Reihen erscheinen als kompakte Zeilen. Darin **Editor** oder
    **Eventmanager** wählen; **Kein Zugriff** entfernt die Reihenrolle.
 3. Bei Bedarf separat **Eventreihe verwalten** erlauben: gemeinsame Stammdaten und
    Branding, keine zusätzlichen Spielrechte, Benutzerverwaltung oder Produktfreigabe.
@@ -20,9 +21,19 @@ Für PowerPoint-Karaoke sind keine Editorfunktionen vorgesehen; Editor erhält d
 keinen Format-Zugriff. Eventmanager führen Veranstaltungen durch. Bingo und Karaoke
 sind weiterhin keine spielbaren Funktionen dieser Version.
 
+Über **Zuordnungen durchsuchen** wird nur die Anzeige gefiltert. Ausgeblendete
+Zuordnungen bleiben beim Speichern erhalten. **Entfernen** entfernt die gewählte
+Zeile samt Rolle und Verwaltungsrecht; **Abbrechen** verwirft ungespeicherte Änderungen.
+**Kein Zugriff** mit aktivem **Eventreihe verwalten** ist eine gültige reine
+Verwaltungszuordnung. Neu hinzugefügte leere Zeilen erteilen noch keine Rechte.
+**Hilfe zu Reihenrechten** enthält die ausführliche Erklärung.
+
 ## Eventarten der Reihe
 
 Beim Anlegen einer Eventreihe unter **Freigeschaltete Eventarten** auswählen.
+Das geschlossene Feld zeigt die Auswahl; im geöffneten Dropdown mehrere Checkboxen
+wählen oder alle abwählen. Bei der Anlage mit dem Formular speichern. Auf der
+Detailseite wird jede Änderung wie bisher sofort gespeichert.
 Es gibt keine automatische Vorauswahl. Spätere Änderungen sind auf der Detailseite
 unter demselben Titel möglich; ausschließlich Administratoren dürfen sie ändern.
 Ohne Freischaltung bleibt der Format-Zugriff gesperrt, selbst bei vorhandener Rolle.

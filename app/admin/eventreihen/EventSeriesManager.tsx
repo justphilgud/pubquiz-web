@@ -1,6 +1,6 @@
 "use client";
 
-import { EVENT_TYPES, type EventType } from "@/app/roles/eventTypes";
+import { type EventType } from "@/app/roles/eventTypes";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ import {
 } from "@/app/rendering/presentationTemplates/presentationTemplate";
 import { eventSeriesInputFromFormData } from "@/app/eventreihen/eventSeriesForm";
 
+import { EventTypeSelect } from "@/app/eventreihen/EventTypeSelect";
 import { EventSeriesLogoField } from "@/app/eventreihen/EventSeriesLogoField";
 import { uploadEventSeriesLogo } from "@/app/eventreihen/uploadEventSeriesLogo";
 import { saveEventSeriesLogo } from "@/app/eventreihen/eventSeriesLogoActions";
@@ -156,11 +157,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
         <p className="mt-1 text-sm text-slate-600">Der Slug wird bei der Anlage automatisch erzeugt und bleibt danach stabil.</p>
         <form onChange={() => setMessage("")} onSubmit={(event) => { event.preventDefault(); void submit(new FormData(event.currentTarget)); }} aria-busy={saving} className="mt-5">
           <fieldset disabled={saving} className="grid gap-4">
-          {editingId === null && <fieldset className="space-y-2 rounded-xl border border-slate-200 p-3">
-            <legend className="font-semibold">Freigeschaltete Eventarten</legend>
-            <p className="text-sm text-slate-600">Reihenrollen der Benutzer gelten für die hier freigeschalteten Formate. Ohne Auswahl bleibt der Spielzugriff gesperrt.</p>
-            {EVENT_TYPES.map(type => <label key={type.id} className="flex min-h-11 items-center gap-3"><input type="checkbox" name="enabledEventTypes" value={type.id} checked={newEventTypes.includes(type.id)} onChange={e => setNewEventTypes(current => e.target.checked ? [...current, type.id] : current.filter(id => id !== type.id))} />{type.label}{!type.implemented && " · Spielfunktion noch nicht verfügbar"}</label>)}
-          </fieldset>}
+          {editingId === null && <EventTypeSelect name="enabledEventTypes" enabled={newEventTypes} onToggle={(type, enabled) => setNewEventTypes(current => enabled ? [...current, type] : current.filter(id => id !== type))} />}
           <label><span className="mb-1 block text-sm font-semibold">Interner Name *</span><input name="name" required maxLength={150} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "event-series-name-error" : undefined} className={inputClass} />{errors.name && <span id="event-series-name-error" className="mt-1 block text-sm text-red-700">{errors.name}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentlicher Name</span><input name="publicName" maxLength={150} value={form.publicName} onChange={(event) => setForm((current) => ({ ...current, publicName: event.target.value }))} className={inputClass} />{errors.publicName && <span className="mt-1 block text-sm text-red-700">{errors.publicName}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentliche Beschreibung</span><textarea name="description" maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>

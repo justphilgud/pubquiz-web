@@ -271,3 +271,32 @@ Tabellenexistenz und genau einen erfolgreichen Migrationsbeleg direkt geprüft.
 Authentifizierte Benutzerseite anschließend im gehosteten Browser erfolgreich.
 Kein manuelles Eintragen oder Zurücksetzen von Migrationshistorien, keine
 Production-Verbindung und keine bestehende Quizsession zurückgesetzt.
+
+
+## Kompakte Formularabnahme (PR #130)
+
+Zusatzauftrag: keine vollständige Reihen-Kartenliste im Benutzerformular, sondern
+zugeordnete Tabellenzeilen mit Suche und separatem Suchdropdown zum Hinzufügen.
+Rollen und reine Verwaltungsrechte werden aus dem vollständigen Entwurf serialisiert;
+Filter und geschlossene Dropdowns beeinflussen den Submit nicht. Hilfe ist einklappbar.
+Die Eventartenauswahl nutzt eine gemeinsame kompakte Checkbox-Dropdown-Darstellung
+für Anlage und Detailbearbeitung, ohne neue Vorauswahl oder Änderung der Produktprüfung.
+Keine Schemaänderung, Migration oder neue Abhängigkeit für diese UI-Überarbeitung.
+
+110 zusätzliche interne synthetische Reihen `UI100 Prüfreihe 001` bis `110` wurden
+additiv ausschließlich in `pr130_review_20261025` angelegt, außerdem ein eigener
+inaktiver Testbenutzer mit anfangs 99 Reihenrollen und zwei Verwaltungsrechten
+(100 zugeordnete Reihen insgesamt). Kein Quiz und keine laufende Session angelegt.
+Bestehende Review-Konten und individuelle Werte wurden nicht zurückgesetzt.
+
+Im tatsächlichen lokalen Browser reproduziert: gefiltertes Speichern mit 100
+Zuordnungen führte zu Prisma `P2028` nach dem Standardbudget von fünf Sekunden;
+Rollback erhielt sämtliche Rechte. Benutzeranlage und -bearbeitung erhalten nun
+gezielt ein begrenztes 30-Sekunden-Budget. Alle übrigen Transaktionen behalten ihre
+bisherige Vorgabe; Isolation, Retry, letzte-Admin-Schutz und atomare Spiegel bleiben.
+Erneutes gefiltertes Speichern, Reload und erneutes Öffnen mit allen 100 Zuordnungen
+sowie reiner Verwaltung erfolgreich. Automatischer 100-Zuordnungen-Payloadtest,
+Typecheck, strikter ESLint und Berechtigungsregressionen erfolgreich.
+
+Aktuelle CI, finale gehostete Abnahme, Screenshotbelege und Deployment-SHA werden
+im PR-Abschlussprotokoll nachgetragen. Ausschließlich Preview, kein Merge/Production.
