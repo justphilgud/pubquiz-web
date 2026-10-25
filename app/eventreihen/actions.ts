@@ -314,8 +314,8 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
       eventarten: true,
       _count: { select: { quiz: true } },
       quiz: { orderBy: [{ quiz_datum: "desc" }, { quiz_id: "desc" }] },
-      rollenzuweisungen: {
-        where: { scope_typ: "EVENT_SERIES", benutzer: { is_active: true } },
+      reihenrollen: {
+        where: { benutzer: { is_active: true } },
         orderBy: [{ rolle: "asc" }, { benutzer: { name: "asc" } }],
         select: {
           rolle: true,
@@ -336,10 +336,10 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
     canManageProducts: isAdministrator(access.actor),
     canManageMemberships: isAdministrator(access.actor),
     accessSummary: {
-      managerCount: series.rollenzuweisungen.filter(
+      managerCount: series.reihenrollen.filter(
         ({ rolle }) => rolle === "EVENT_MANAGER",
       ).length,
-      editorCount: series.rollenzuweisungen.filter(
+      editorCount: series.reihenrollen.filter(
         ({ rolle }) => rolle === "EDITOR",
       ).length,
     },
