@@ -41,6 +41,9 @@ test("real PostgreSQL: capture, explicit/auto finalization, versions, rollback, 
     await client.query(sql.slice(sql.indexOf("-- CreateSchema")));
     await client.query(readFileSync("prisma/migrations/20261016120000_meme_archive/migration.sql", "utf8"));
     const series = await db.eventreihen.create({ data: { name: "Meme archive CI", slug: "meme-archive-ci" } });
+    // New series have no implicit product entitlement; this fixture explicitly runs Quiz.
+    await db.eventarten.create({ data: { kennung: "QUIZ", name: "Quiz" } });
+    await db.eventreihe_eventarten.create({ data: { eventreihe_id: series.eventreihe_id, eventart: "QUIZ", ist_freigeschaltet: true } });
     const quiz = await db.quiz.create({ data: { eventreihe_id: series.eventreihe_id, titel: null } });
     const block = await db.quiz_abschnitte.create({ data: { quiz_id: quiz.quiz_id, titel: "CI", abschnitt_typ: "FRAGEN", sortierung: 1 } });
     const question = await db.fragen.create({ data: { frage: "Unchanged CI Meme" } });

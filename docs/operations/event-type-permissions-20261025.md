@@ -186,3 +186,10 @@ in seinem eigenen PostgreSQL-Service aus. Der unveränderliche Importplan musste
 die lokale Windows-Hashprüfung mit originalen Git-Bytes (LF) gelesen werden; kein
 Inhalt, erwarteter Hash oder Test wurde dafür geändert. Die temporäre lokale
 Dev-Origin-Erweiterung ist zurückgenommen, keine neue Cache-/Origin-Konfiguration.
+
+Die erste CI fand eine bestehende Meme-Archiv-Testfixture, die ihre neu angelegte
+Reihe ohne explizites Quizprodukt verwendete. Deren Setup wurde um die ausdrückliche
+Quizfreischaltung ergänzt; die Teilnehmerprüfung und alle fachlichen Assertions
+bleiben unverändert. Dies ist eine erforderliche Anpassung an den bewusst neuen
+Fail-closed-Standard, kein Abschwächen der Produktprüfung. Neue Matrix-/Produktänderungen
+verwenden außerdem weiterhin das bestehende technische Console-Audit ohne Personendaten.

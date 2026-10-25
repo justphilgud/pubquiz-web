@@ -4,6 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
 import { withSerializableTransaction } from "./serializableTransaction.server";
 import { EVENT_TYPES, isEventType, isEventTypeRole, type EventType, type EventTypeRole } from "./eventTypes";
+import { logRoleAudit } from "./roleAudit.server";
 import { syncLegacyQuizRoles } from "./eventTypeWrites.server";
 
 export type EventTypeMatrixRow = {
@@ -51,6 +52,7 @@ export async function saveEventTypeMatrix(userId: number, input: { eventSeriesId
     }
     await syncLegacyQuizRoles(tx, userId, Number(user.id));
   });
+  logRoleAudit("role_assignment_changed", { userId, scope: "EVENT_TYPE_MATRIX", assignedById: Number(user.id) });
   revalidatePath("/admin/users"); revalidatePath("/admin/eventreihen");
   return { success: true, message: "Eventartrechte gespeichert. Nicht freigeschaltete Eventarten bleiben gesperrt." };
 }
@@ -82,6 +84,7 @@ export async function setEventTypeEnabled(eventSeriesId: number, eventType: Even
     }
     return { success: true, message: enabled ? "Eventart aktiviert. Erhaltene Rollenzuweisungen gelten wieder." : "Eventart deaktiviert. Inhalte und Rollenzuweisungen bleiben erhalten; ihr Zugriff ist gesperrt." };
   }, { isolationLevel: "ReadCommitted" });
+  if (result.success) logRoleAudit("event_type_changed", { eventSeriesId, eventType, enabled, assignedById: Number(user.id) });
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`); revalidatePath("/admin/users");
   return result;
 }

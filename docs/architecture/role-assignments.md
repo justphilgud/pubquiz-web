@@ -101,6 +101,7 @@ Rollenentzug und Kontodeaktivierung wirken beim nächsten Serveraufruf mit beste
 Cookie. Bereits gelieferte Inhalte verschwinden nicht rückwirkend; ein bereits
 autorisierter gleichzeitiger Aufruf wird nicht zentral abgebrochen. Teamidentitäten
 haben weiterhin ihren getrennten signierten Zugang, keine Benutzerrollenzuweisung.
+Erfolgreiche Matrix-/Produktänderungen verwenden das bestehende technische Console-Audit mit IDs und Eventart, ohne Personendaten.
 Es gibt keinen Session-Reset. Reconnect, Antworten und Bewertung bleiben unverändert.
 
 ## Administrative Bedienung
