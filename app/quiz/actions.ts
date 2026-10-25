@@ -11,6 +11,8 @@ import { assertEvaluationRevision, contentRevision, evaluationRevision, evaluati
 import { requireQuizAnswerWindow as requireQuizNotStopped, ensureQuizBlockDeadlines } from "./interaction/interaction.server";
 
 import { prisma } from "@/app/lib/prisma";
+import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
+import { getQuizSeriesChangeBlocker } from "./quizContentScope.server";
 import {
   logLivePerformance,
   withPrismaQueryDiagnostics,
@@ -585,31 +587,46 @@ export async function updateQuiz(data: {
   });
   if (!eventSeries.ok) return { success: false, message: eventSeries.message };
 
-  await prisma.quiz.update({
-    where: {
-      quiz_id: data.quizId,
-    },
-    data: {
-      eventreihe_id: validated.value.eventSeriesId,
-      titel: validated.value.title,
-      quiz_datum: validated.value.dateValue,
-      veranstaltungszeit: validated.value.time,
-      veranstaltungsname: validated.value.venueName,
-      karten_url: validated.value.mapUrl,
-      oeffentliche_url: validated.value.publicUrl,
-      reservierungs_url: data.reservationUrl === undefined ? undefined : validated.value.reservationUrl,
-      oeffentliche_beschreibung: data.publicDescription === undefined ? undefined : validated.value.publicDescription,
-      oeffentliche_beschreibung_modus: data.publicDescriptionMode === undefined ? undefined : validated.value.publicDescriptionMode,
-      bemerkung: validated.value.internalNote,
-      presentation_template_id: validated.value.presentationTemplateId,
-      answer_form_template_id: validated.value.presentationTemplateId,
-      aufloesungsstrategie:
-        data.solutionStrategy ??
-        (isQuizSolutionStrategy(existing.aufloesungsstrategie)
-          ? existing.aufloesungsstrategie
-          : "AFTER_EACH_QUESTION"),
-    },
+  const saved = await withSerializableTransaction(async (tx) => {
+    const current = await tx.quiz.findUnique({ where: { quiz_id: data.quizId }, select: { eventreihe_id: true } });
+    if (!current || current.eventreihe_id !== existing.eventreihe_id) {
+      return { success: false, message: "Die Quizzuordnung wurde zwischenzeitlich geändert. Bitte neu laden." };
+    }
+    await requireQuizEditor(data.quizId);
+    await requireEventSeriesAccess(validated.value.eventSeriesId, "MANAGE_QUIZZES");
+    if (current.eventreihe_id !== validated.value.eventSeriesId) {
+      const blocker = await getQuizSeriesChangeBlocker(tx, data.quizId, validated.value.eventSeriesId);
+      if (blocker) return { success: false, message: blocker };
+    }
+    await tx.quiz.update({
+      where: {
+        quiz_id: data.quizId,
+      },
+      data: {
+        eventreihe_id: validated.value.eventSeriesId,
+        titel: validated.value.title,
+        quiz_datum: validated.value.dateValue,
+        veranstaltungszeit: validated.value.time,
+        veranstaltungsname: validated.value.venueName,
+        karten_url: validated.value.mapUrl,
+        oeffentliche_url: validated.value.publicUrl,
+        reservierungs_url: data.reservationUrl === undefined ? undefined : validated.value.reservationUrl,
+        oeffentliche_beschreibung: data.publicDescription === undefined ? undefined : validated.value.publicDescription,
+        oeffentliche_beschreibung_modus: data.publicDescriptionMode === undefined ? undefined : validated.value.publicDescriptionMode,
+        bemerkung: validated.value.internalNote,
+        presentation_template_id: validated.value.presentationTemplateId,
+        answer_form_template_id: validated.value.presentationTemplateId,
+        aufloesungsstrategie:
+          data.solutionStrategy ??
+          (isQuizSolutionStrategy(existing.aufloesungsstrategie)
+            ? existing.aufloesungsstrategie
+            : "AFTER_EACH_QUESTION"),
+      },
+    });
+
+    return { success: true, message: "Quiz wurde aktualisiert." };
   });
+  if (!saved.success) return saved;
 
   revalidatePath("/quiz");
   revalidatePath(`/quiz/${data.quizId}`);

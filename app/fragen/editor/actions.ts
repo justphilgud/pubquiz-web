@@ -74,10 +74,7 @@ import {
   requireQuestionScopeSelection,
 } from "./questionAccess.server";
 import {
-  canApproveScopedQuestion,
-  canEditScopedQuestion,
-  canRequestChangesForScopedQuestion,
-  canUseQuestionScope,
+  canSaveScopedQuestion,
 } from "./questionScopePolicy";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import {
@@ -997,12 +994,9 @@ export async function saveQuestion(
     isArchived: currentContext?.isArchived ?? false,
     isApproved: currentContext?.isApproved ?? false,
   };
-  const keepsLegacyGlobalScope = currentContext?.scope === "GLOBAL" && payload.scope === "GLOBAL";
 
   try {
-    if (!keepsLegacyGlobalScope || isAdministrator(actor) || payload.questionId === undefined) {
-      await requireQuestionScopeSelection(payload.scope, payload.eventSeriesIds, session);
-    }
+    await requireQuestionScopeSelection(payload.scope, payload.eventSeriesIds, session);
   } catch {
     return {
       success: false,
@@ -1011,19 +1005,7 @@ export async function saveQuestion(
     };
   }
 
-  const mayPerformIntent = payload.questionId === undefined
-    ? payload.intent === "DRAFT" ||
-      (payload.intent === "SUBMIT_FOR_REVIEW" && !isAdministrator(actor)) ||
-      (payload.intent === "APPROVE" && canApproveScopedQuestion(actor, targetContext))
-    : payload.intent === "APPROVE"
-      ? canApproveScopedQuestion(actor, targetContext)
-      : payload.intent === "REQUEST_CHANGES"
-        ? canRequestChangesForScopedQuestion(actor, targetContext)
-        : (
-            canEditScopedQuestion(actor, currentContext!) &&
-            (canUseQuestionScope(actor, payload.scope, targetContext.eventSeriesIds) || keepsLegacyGlobalScope) &&
-            (payload.intent !== "SUBMIT_FOR_REVIEW" || !isAdministrator(actor))
-          );
+  const mayPerformIntent = canSaveScopedQuestion(actor, payload.intent, currentContext, targetContext);
   if (!mayPerformIntent) {
     return {
       success: false,
@@ -1629,6 +1611,9 @@ export async function saveQuestion(
       }
 
       if (payload.questionId === undefined) {
+        if (!canSaveScopedQuestion(await getQuestionActor(session), payload.intent, null, targetContext)) {
+          throw new DraftValidationError("Du darfst diese Aktion für diese Frage nicht ausführen.", undefined, "PERMISSION_DENIED");
+        }
         await finalizeDiscardedCategories();
         if (draft.questionMedia.some((media) => media.operation === "UNCHANGED" || media.existingMediaId !== null)) {
           throw new DraftValidationError(
@@ -1783,6 +1768,7 @@ export async function saveQuestion(
         };
       }
 
+      await tx.$queryRaw`SELECT fragen_id FROM pubquiz.fragen WHERE fragen_id = ${payload.questionId} FOR UPDATE`;
       const existingQuestion = await tx.fragen.findUnique({
         where: { fragen_id: payload.questionId },
         select: {
@@ -1875,7 +1861,11 @@ export async function saveQuestion(
           ? existingQuestion.vorlage
           : persistedTemplate;
 
-      if (!mayPerformIntent) {
+      const persistedContext = mapQuestionAccessContext(existingQuestion);
+      const currentActor = await getQuestionActor(session);
+      if (!canSaveScopedQuestion(currentActor, payload.intent, persistedContext, {
+        ...persistedContext, scope: payload.scope, eventSeriesIds: targetContext.eventSeriesIds,
+      })) {
         throw new DraftValidationError(
           "Du darfst diese Aktion für diese Frage nicht ausführen.",
           undefined,

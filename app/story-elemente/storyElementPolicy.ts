@@ -97,7 +97,14 @@ export function canAttachStoryElementToQuiz(
   const selectable = story.status === "ACTIVE" ||
     (story.status === "DRAFT" && story.createdByUserId === actor.userId);
   if (!selectable) return false;
+  return isStoryElementScopeCompatibleWithQuiz(story, quiz);
+}
+
+export function isStoryElementScopeCompatibleWithQuiz(
+  story: Pick<StoryElementAccessContext, "scope" | "eventSeriesId" | "quizId">,
+  quiz: { quizId: number; eventSeriesId: number },
+) {
   if (story.scope === "GLOBAL") return true;
   if (story.scope === "EVENT_SERIES") return story.eventSeriesId === quiz.eventSeriesId;
-  return story.quizId === quiz.quizId;
+  return story.scope === "QUIZ" && story.quizId === quiz.quizId;
 }

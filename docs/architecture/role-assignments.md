@@ -41,6 +41,54 @@ Globale Assignments übernehmen `users.created_at` und `users.updated_at`. Ein u
 
 Die Session enthält weiterhin nur Identitätsdaten und den Legacy-Rollenwert für Rückwärtskompatibilität und Anzeige. Jede serverseitige Berechtigungsentscheidung lädt die aktuellen Assignments anhand der Benutzer-ID. Client-Komponenten erhalten nur abgeleitete Capabilities; sie sind keine Sicherheitsgrenze.
 
+## Objektgrenzen und Bereichswechsel
+
+Die Fragen-Policies in `app/fragen/editor/questionScopePolicy.ts` sind maßgeblich:
+Lesen einer Reihenfrage benötigt eine passende Zuordnung; Bearbeitung und Freigabe
+benötigen die bestehenden Rechte für sämtliche zugeordneten Reihen. Globale Editoren
+behalten ihre globalen Entwurfsrechte, erhalten dadurch aber keine Reihenrechte.
+
+`canSaveScopedQuestion` prüft bei bestehenden Fragen sowohl das gespeicherte Objekt
+als auch den angeforderten Zielbereich. Das gilt auch für Freigaben und Rückgaben.
+`saveQuestion` prüft vor der Verarbeitung und erneut unmittelbar vor dem Schreiben;
+bestehende Fragen werden dabei in der Transaktion gesperrt. Die Angabe einer eigenen
+Reihe verleiht niemals Zugriff auf ein fremdes oder globales Original.
+
+Auch die erhaltenen Alt-Actions `getFrageDetails`, `getFrageForEdit` und `updateFrage`
+verwenden die konkreten VIEW-/EDIT-Prüfungen. Such- und Ähnlichkeitsabfragen verwenden
+`questionVisibilityWhere`, die Query-Entsprechung der bestehenden Lesepolicy.
+Urheberschaft allein erhält nach einem Rechteentzug keinen privaten Bereichszugriff.
+Quizverwendungen einschließlich Anzahl und Verwendungsfilter werden auf tatsächlich
+verwaltbare Quiz beschränkt (`questionQuizUsageWhere`); das gilt auch für Detaildaten.
+Die Content-Oberfläche erhält `can_archive` aus derselben Bearbeitungspolicy wie die
+Archivierungs-Action. Neue Reaktivierungs- oder globale Kopierrechte entstehen nicht.
+
+Ein Quizwechsel benötigt Verwaltungsrechte auf Quell- und Zielreihe. Prüfung der
+Inhaltsgrenzen und Änderung erfolgen gemeinsam in einer serialisierbaren Transaktion.
+`getQuizSeriesChangeBlocker` prüft Fragen, übernommene Fragen-/Story-Verknüpfungen,
+auch unsichtbare Story-Platzierungen und Umfragen. Globale und zur Zielreihe passende
+Inhalte sowie Inhalte dieses konkreten Quiz bleiben zulässig. Die Prüfung verändert
+keinen Freigabe-, Archiv-, Ablauf- oder Laufzeitstatus: Bestehende Inhalte werden
+weder entfernt noch automatisch freigegeben. Unverträgliche Inhalte blockieren den
+Wechsel mit einer verständlichen Meldung ohne fremde Objektmetadaten.
+
+`/api/quiz/live-snapshot` verwendet bereits `requireQuizViewer` und für Moderationsdaten
+zusätzlich `requireQuizLiveController`; beide prüfen über `requireUser` das aktive
+Konto und aktuelle Assignments. Teilnehmer behalten ihren separaten signierten
+Quiz-Sitzungszugriff. Die bestehende Publikumspräsentation benötigt weiterhin eine
+autorisierte Moderator-/Admin-Sitzung und die lokale Präsentationsfreigabe; es wird
+kein neuer anonymer Präsentationszugriff eingeführt.
+
+Entzogene Rechte oder deaktivierte Konten wirken beim nächsten Serveraufruf auch
+mit bestehendem Sitzungscookie. Bereits ausgelieferte Inhalte können nicht aus
+Browsern zurückgerufen werden. Ein gleichzeitig bereits autorisierter Aufruf ist
+keine zentrale Sitzungswiderrufsfunktion.
+
+Regression: `npm run test:authorization` führt echte Actions und die API-Route mit
+echten Guards/Policies und isolierten Auth-/Persistenzadaptern aus. Der Test ist Teil
+von `npm test`. Eine getrennte Browserabnahme und Befundzuordnung stehen im
+[Abnahmebericht vom 25.10.2026](../operations/authorization-hardening-20261025.md).
+
 Unbekannte Rollen, unbekannte Scopes, eine fehlende Eventreihen-ID oder eine Eventreihen-ID bei globalem Scope ergeben keine Rechte. Die Legacy-Struktur wird nicht als Rechte-Fallback verwendet.
 
 ## Dual Write und Schutzregeln
