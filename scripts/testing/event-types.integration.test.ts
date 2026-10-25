@@ -160,7 +160,8 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     actor = await api.actors.getActorPermissions(3);
     assert.equal(actor.assignments.some(r => r.eventSeriesId === 10), false);
     const disabledDetails = await api.series.getEventSeriesDetails(10);
-    assert.deepEqual(disabledDetails?.accessSummary,{managerCount:1,editorCount:1},"Stored series roles remain visible when Quiz is disabled");
+    assert.equal(disabledDetails?.accessSummary.managerCount,1,"Stored manager role remains visible when Quiz is disabled");
+    assert.equal(disabledDetails?.accessSummary.editorCount,1,"Stored editor role remains visible when Quiz is disabled");
     assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id=3 AND eventreihe_id=10")).rows[0].n,1);
     assert.equal((await api.actions.setEventTypeEnabled(10,"QUIZ",true)).success, true);
     assert.equal((await api.actors.getActorPermissions(3)).assignments.some(r => r.eventSeriesId === 10),true);
