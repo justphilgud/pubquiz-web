@@ -47,9 +47,9 @@ export const deRoleMessages = {
     area: "Bereich / Aktion",
     profiles: {
       ADMIN_GLOBAL: "Administrator",
-      EDITOR_GLOBAL: "Editor (global)",
-      EDITOR_EVENT_SERIES: "Editor (Eventreihe)",
-      EVENT_MANAGER_EVENT_SERIES: "Eventmanager",
+      EDITOR_GLOBAL: "Quiz-Editor (global)",
+      EDITOR_EVENT_SERIES: "Quiz-Editor (Eventreihe)",
+      EVENT_MANAGER_EVENT_SERIES: "Quiz-Eventmanager",
     },
     profileDescriptions: {
       ADMIN_GLOBAL: "Globale Administration und vollständige Verwaltung.",

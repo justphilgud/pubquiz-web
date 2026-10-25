@@ -1,4 +1,5 @@
 "use server";
+import { readSeriesRoleForm } from "./seriesRoleFormPolicy";
 
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -19,7 +20,6 @@ import {
 } from "@/app/roles/roleAssignmentWrites.server";
 import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
 
-import { resolveUserRoleSelection } from "./userRoleFormPolicy";
 
 export type UserFormActionResult = {
   success: boolean;
@@ -69,31 +69,20 @@ function globalRolesFromForm(formData: FormData): GlobalRole[] {
   return [...new Set(values)];
 }
 
-function eventSeriesIdsFromForm(formData: FormData, name: string) {
-  return formData.getAll(name).map((value) => Number(value));
-}
-
 function roleSelectionFromForm(formData: FormData) {
-  const legacyGlobalRoles = globalRolesFromForm(formData);
-  try {
-    return resolveUserRoleSelection({
-      administrator:
-        formData.get("roleAdministrator") === "on" ||
-        legacyGlobalRoles.includes("ADMIN"),
-      editor:
-        formData.get("roleEditor") === "on" ||
-        legacyGlobalRoles.includes("EDITOR"),
-      editorScope: formData.get("editorScope") ?? "GLOBAL",
-      editorEventSeriesIds: eventSeriesIdsFromForm(formData, "editorEventSeriesIds"),
-      eventManager: formData.get("roleEventManager") === "on",
-      eventManagerEventSeriesIds: eventSeriesIdsFromForm(formData, "eventManagerEventSeriesIds"),
-    });
-  } catch (error) {
-    logRoleAudit("invalid_role_assignment_rejected", { scope: "USER_FORM" });
-    throw new UserFormValidationError(
-      error instanceof Error ? error.message : "Ungültige Rollenzuweisung.",
-    );
+  if (formData.has("roleEventManager") || formData.has("editorEventSeriesIds") || formData.has("eventManagerEventSeriesIds") || formData.get("editorScope") === "EVENT_SERIES") {
+    throw new UserFormValidationError("Bitte die Eventartrechte-Matrix verwenden. Alte Reihenformulare sind nicht mehr gültig.");
   }
+  const legacyGlobalRoles = globalRolesFromForm(formData);
+  const globalRoles: GlobalRole[] = [...new Set<GlobalRole>([
+    ...(formData.get("roleAdministrator") === "on" || legacyGlobalRoles.includes("ADMIN") ? ["ADMIN" as const] : []),
+    ...(formData.get("roleEditor") === "on" || legacyGlobalRoles.includes("EDITOR") ? ["EDITOR" as const] : []),
+  ])];
+  let series;
+  try { series = readSeriesRoleForm(formData); } catch (error) {
+    throw new UserFormValidationError(error instanceof Error ? error.message : "Ungültige Reihenrollen.");
+  }
+  return { globalRoles, series, eventSeriesAssignments: series?.assignments ?? [] };
 }
 
 function actorId(session: { user?: { id?: string } }) {
@@ -131,10 +120,11 @@ async function createUser(formData: FormData) {
   if (passwordError) throw new UserFormValidationError(passwordError);
   const passwordHash = await bcrypt.hash(password, 12);
   const assignedById = actorId(session);
+  // Large series assignments also project compatibility rows atomically.
   const user = await withSerializableTransaction(async (transaction) => {
     await assertEventSeriesExist(
       transaction,
-      roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId),
+      [...roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId), ...(roleSelection.series?.managementIds ?? [])],
     );
     const created = await transaction.users.create({
       data: {
@@ -152,13 +142,12 @@ async function createUser(formData: FormData) {
       roles: roleSelection.globalRoles,
       assignedById,
     });
-    await replaceEventSeriesRoleAssignments(transaction, {
-      userId: created.id,
-      assignments: roleSelection.eventSeriesAssignments,
-      assignedById,
+
+    if (roleSelection.series) await replaceEventSeriesRoleAssignments(transaction, {
+      userId: created.id, assignments: roleSelection.series.assignments, managementIds: roleSelection.series.managementIds, assignedById,
     });
     return created;
-  });
+  }, { timeout: 30_000 });
   logRoleAudit("role_assignment_added", { userId: user.id, scope: "USER_FORM" });
   revalidatePath("/admin/users");
 }
@@ -210,7 +199,7 @@ async function updateUser(formData: FormData) {
     if (existing.is_active && !isActive) await assertCanDeactivateUser(transaction, id);
     await assertEventSeriesExist(
       transaction,
-      roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId),
+      [...roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId), ...(roleSelection.series?.managementIds ?? [])],
     );
     await transaction.users.update({
       where: { id },
@@ -222,13 +211,11 @@ async function updateUser(formData: FormData) {
       assignedById,
       verifyLegacy: true,
     });
-    await replaceEventSeriesRoleAssignments(transaction, {
-      userId: id,
-      assignments: roleSelection.eventSeriesAssignments,
-      assignedById,
-      verifyLegacy: true,
+    if (roleSelection.series) await replaceEventSeriesRoleAssignments(transaction, {
+      userId: id, assignments: roleSelection.series.assignments, managementIds: roleSelection.series.managementIds, assignedById,
     });
-  });
+
+  }, { timeout: 30_000 });
   logRoleAudit("role_assignment_changed", { userId: id, scope: "USER_FORM" });
   revalidatePath("/admin/users");
 }

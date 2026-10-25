@@ -12,6 +12,7 @@ export async function lockQuizLifecycle(tx: Prisma.TransactionClient, quizId: nu
 
 export async function requireQuizNotStopped(tx: Prisma.TransactionClient, quizId: number) {
   const status = await lockQuizLifecycle(tx, quizId);
+  await requireQuizProductEnabled(tx, quizId);
   if (resolveQuizLifecycle(status) === "STOPPED") {
     throw new Error("Das Quiz ist beendet. Für einen neuen Durchlauf bitte zurücksetzen.");
   }
@@ -35,3 +36,16 @@ export const RESET_PRESENTATION_DATA = {
   zeige_schaetzantwort: false,
   schaetzfrage_id: null,
 } as const;
+
+/** Call after the shared quiz lock for writes, so deactivation cannot race a start. */
+export async function requireQuizProductEnabled(tx: Prisma.TransactionClient, quizId: number) {
+  const quiz = await tx.quiz.findUnique({ where: { quiz_id: quizId }, select: {
+    eventreihe: { select: { eventarten: { where: { eventart: "QUIZ", ist_freigeschaltet: true }, select: { eventart: true } } } },
+  } });
+  if (!quiz?.eventreihe.eventarten.length) throw new Error("Quiz ist für diese Eventreihe nicht freigeschaltet.");
+}
+
+/** Starts and product toggles serialize before taking quiz lifecycle locks. */
+export async function lockQuizProductGate(tx: Prisma.TransactionClient, quizId: number) {
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(860012, eventreihe_id)::text FROM pubquiz.quiz WHERE quiz_id = ${quizId}`;
+}

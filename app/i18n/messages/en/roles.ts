@@ -50,9 +50,9 @@ export const enRoleMessages: WidenMessageCatalog<typeof deRoleMessages> = {
     area: "Area / action",
     profiles: {
       ADMIN_GLOBAL: "Administrator",
-      EDITOR_GLOBAL: "Editor (global)",
-      EDITOR_EVENT_SERIES: "Editor (event series)",
-      EVENT_MANAGER_EVENT_SERIES: "Event manager",
+      EDITOR_GLOBAL: "Quiz editor (global)",
+      EDITOR_EVENT_SERIES: "Quiz editor (event series)",
+      EVENT_MANAGER_EVENT_SERIES: "Quiz event manager",
     },
     profileDescriptions: {
       ADMIN_GLOBAL: "Global administration and complete management access.",

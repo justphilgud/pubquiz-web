@@ -1,6 +1,8 @@
 import "server-only";
 
 import type { QuestionReviewStatus } from "@/app/generated/prisma/enums";
+import { questionVisibilityWhere } from "@/app/fragen/editor/questionVisibility";
+import { getActorEventSeriesIds, isAdministrator, type AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 import { prisma } from "@/app/lib/prisma";
 
 const DASHBOARD_LIST_LIMIT = 5;
@@ -194,10 +196,12 @@ function toQuestionItem(
 
 export async function loadEditorDashboardData(
   userId: number,
+  actor: AuthorizationActor,
 ): Promise<EditorDashboardData> {
   const baseWhere = {
     created_by_user_id: userId,
     ist_archiviert: false,
+    AND: questionVisibilityWhere(actor),
   } as const;
   const weekStart = startOfCurrentBerlinWeek();
 
@@ -281,10 +285,14 @@ export async function loadEditorDashboardData(
   };
 }
 
-export async function loadAdminQuestionDashboardData(): Promise<AdminQuestionDashboardData> {
-  const activeWhere = { ist_archiviert: false } as const;
+export async function loadAdminQuestionDashboardData(actor: AuthorizationActor): Promise<AdminQuestionDashboardData> {
+  const activeWhere = { ist_archiviert: false, AND: questionVisibilityWhere(actor) };
   const reviewWhere = {
     ...activeWhere,
+    ...(!isAdministrator(actor) ? { geltungsbereich: "EVENT_SERIES" as const, eventreihen: {
+      some: { eventreihe_id: { in: getActorEventSeriesIds(actor, "EVENT_MANAGER") } },
+      none: { eventreihe_id: { notIn: getActorEventSeriesIds(actor, "EVENT_MANAGER") } },
+    } } : {}),
     review_status: "IN_REVIEW" as const,
   };
   const weekStart = startOfCurrentBerlinWeek();
@@ -390,12 +398,13 @@ export async function loadAdminQuestionDashboardData(): Promise<AdminQuestionDas
   };
 }
 
-export async function loadAdminQuizDashboardData(): Promise<AdminQuizDashboardData> {
+export async function loadAdminQuizDashboardData(actor: AuthorizationActor): Promise<AdminQuizDashboardData> {
   const today = toDatabaseDate(getBerlinDateParts());
   const quizzes = await prisma.quiz.findMany({
     where: {
       ist_archiviert: false,
       quiz_datum: { gte: today },
+      ...(!isAdministrator(actor) ? { eventreihe_id: { in: getActorEventSeriesIds(actor, "EVENT_MANAGER") } } : {}),
     },
     orderBy: [{ quiz_datum: "asc" }, { quiz_id: "asc" }],
     take: UPCOMING_QUIZ_LIMIT,

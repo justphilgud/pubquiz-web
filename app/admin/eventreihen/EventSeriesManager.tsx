@@ -1,5 +1,6 @@
 "use client";
 
+import { type EventType } from "@/app/roles/eventTypes";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ import {
 } from "@/app/rendering/presentationTemplates/presentationTemplate";
 import { eventSeriesInputFromFormData } from "@/app/eventreihen/eventSeriesForm";
 
+import { EventTypeSelect } from "@/app/eventreihen/EventTypeSelect";
 import { EventSeriesLogoField } from "@/app/eventreihen/EventSeriesLogoField";
 import { uploadEventSeriesLogo } from "@/app/eventreihen/uploadEventSeriesLogo";
 import { saveEventSeriesLogo } from "@/app/eventreihen/eventSeriesLogoActions";
@@ -54,6 +56,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
   const router = useRouter();
   const [filter, setFilter] = useState<"active" | "archived" | "all">("active");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [newEventTypes, setNewEventTypes] = useState<EventType[]>([]);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoDraft, setLogoDraft] = useState<File | null | undefined>(undefined);
@@ -104,7 +107,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
     try {
       const input = eventSeriesInputFromFormData(formData);
       const result = editingId === null
-        ? await createEventSeries(input)
+        ? await createEventSeries(input, formData.getAll("enabledEventTypes").map(String) as EventType[])
         : await updateEventSeries(editingId, input);
       setMessage(result.message);
       setErrors(result.errors ?? {});
@@ -137,6 +140,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
       } else {
         setEditingId(null);
         setForm(emptyForm);
+        setNewEventTypes([]);
         setLogoUrl(null); setLogoDraft(undefined);
       }
       setMessage("Änderungen gespeichert");
@@ -153,6 +157,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
         <p className="mt-1 text-sm text-slate-600">Der Slug wird bei der Anlage automatisch erzeugt und bleibt danach stabil.</p>
         <form onChange={() => setMessage("")} onSubmit={(event) => { event.preventDefault(); void submit(new FormData(event.currentTarget)); }} aria-busy={saving} className="mt-5">
           <fieldset disabled={saving} className="grid gap-4">
+          {editingId === null && <EventTypeSelect name="enabledEventTypes" enabled={newEventTypes} onToggle={(type, enabled) => setNewEventTypes(current => enabled ? [...current, type] : current.filter(id => id !== type))} />}
           <label><span className="mb-1 block text-sm font-semibold">Interner Name *</span><input name="name" required maxLength={150} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "event-series-name-error" : undefined} className={inputClass} />{errors.name && <span id="event-series-name-error" className="mt-1 block text-sm text-red-700">{errors.name}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentlicher Name</span><input name="publicName" maxLength={150} value={form.publicName} onChange={(event) => setForm((current) => ({ ...current, publicName: event.target.value }))} className={inputClass} />{errors.publicName && <span className="mt-1 block text-sm text-red-700">{errors.publicName}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentliche Beschreibung</span><textarea name="description" maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>

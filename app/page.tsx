@@ -35,6 +35,7 @@ import {
 } from "@/app/dashboardData";
 import {
   getDashboardCapabilities,
+  canManageEventSeries,
   requireActor,
 } from "@/app/lib/permissions";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -197,13 +198,13 @@ export default async function HomePage() {
   const [editorResult, questionsResult, quizResult, usersResult] =
     await Promise.allSettled([
       capabilities.canViewOwnQuestionWorklist
-        ? loadEditorDashboardData(userId)
+        ? loadEditorDashboardData(userId, actor)
         : Promise.resolve(null),
       capabilities.canViewReviewQueue
-        ? loadAdminQuestionDashboardData()
+        ? loadAdminQuestionDashboardData(actor)
         : Promise.resolve(null),
       capabilities.canManageQuizzes
-        ? loadAdminQuizDashboardData()
+        ? loadAdminQuizDashboardData(actor)
         : Promise.resolve(null),
       capabilities.canManageUsers
         ? loadAdminUserDashboardData()
@@ -234,7 +235,13 @@ export default async function HomePage() {
   return (
     <><AppHeader /><main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 md:px-8 md:py-10">
       <div className="mx-auto max-w-6xl space-y-7">
-        <DashboardHero {...hero} />
+        {capabilities.canCreateQuestion ? <DashboardHero {...hero} /> : (
+          <section className="rounded-3xl border border-slate-200 bg-white p-5">
+            <p>{greeting}</p><h1 className="mt-2 text-2xl font-bold">Deine Berechtigungen</h1>
+            <p className="mt-3">Für dich ist derzeit kein Quiz-Bereich freigegeben. Bingo und PowerPoint-Karaoke sind noch nicht als Spiele verfügbar.</p>
+            {canManageEventSeries(actor) && <Link className={panelActionClassName} href="/admin/eventreihen">Eventreihen öffnen</Link>}
+          </section>
+        )}
 
         <section aria-labelledby="quick-actions-heading">
           <h2 id="quick-actions-heading" className="text-base font-semibold">

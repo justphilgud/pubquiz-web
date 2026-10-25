@@ -1,3 +1,4 @@
+import { EventTypeProducts } from "@/app/eventreihen/EventTypeProducts";
 import { EventSeriesLogoEditor } from "@/app/eventreihen/EventSeriesLogoEditor";
 import { getMediaUploadEnvironmentPrefix } from "@/app/fragen/editor/mediaUploadEnvironment";
 import Link from "next/link";
@@ -58,6 +59,7 @@ export default async function EventSeriesDetailPage({
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>
+        <EventTypeProducts eventSeriesId={series.id} initialEnabled={series.enabledEventTypes} canEdit={series.canManageProducts} />
         <EventSeriesLogoEditor id={series.id} initialUrl={series.logoUrl} canEdit={series.canEdit && !series.isArchived} environmentPrefix={getMediaUploadEnvironmentPrefix()} />
         {series.isPublic && !series.isArchived && (
           <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
@@ -114,7 +116,7 @@ export default async function EventSeriesDetailPage({
               </article>
             ))}
           </div>
-          {series.quizzes.length === 0 && <p className="mt-5 text-sm text-slate-500">Noch keine Quizze vorhanden.</p>}
+          {series.quizzes.length === 0 && <p className="mt-5 text-sm text-slate-500">{series.canManageQuizzes ? "Noch keine Quizze vorhanden." : "Keine Quizverwaltungsrechte. Vorhandene Quizze werden hier nicht angezeigt."}</p>}
         </section>
       </div>
     </main>

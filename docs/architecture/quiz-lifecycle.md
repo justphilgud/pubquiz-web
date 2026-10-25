@@ -259,3 +259,13 @@ für diese Position übersprungen. Teilnehmer sehen den serverseitigen Wartezust
 Erst Weiter zur Frage verwendet unverändert die bestehende Fragenlogik. Bereits
 laufende Deadlines laufen unabhängig weiter. Details und Tests:
 [LOVD-Sponsorvertrag](../design/lovd-brand-refinement.md).
+
+## Eventarten-Rechte (25. Oktober 2026)
+
+Quizstart verlangt zusätzlich das aktive Quizprodukt der Eventreihe. Start und
+Produktdeaktivierung serialisieren über denselben Reihensperrschlüssel, bevor
+Quiz-Lifecycle-Locks genommen werden. Deaktivierung wird bei RUNNING verweigert;
+STOPPED/PREPARATION und fehlender Status erlauben sie. Signierte Teilnahme- und
+Antwortpfade prüfen die Produktfreischaltung ebenfalls. Es gibt keine neuen
+Lifecyclezustände, keine neue Durchlaufidentität und keinen impliziten Reset.
+Details: [Rollen-/Eventartenvertrag](role-assignments.md).

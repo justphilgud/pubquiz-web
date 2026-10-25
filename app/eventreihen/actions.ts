@@ -17,8 +17,9 @@ import {
 } from "./eventSeriesPolicy";
 import { getQuizTemporalStatus } from "@/app/quiz/quizMasterData";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
-import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
+import { canManageEventSeries, canManageEventSeriesQuizzes, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import { isEventType, type EventType } from "@/app/roles/eventTypes";
 import { persistEventSeriesUpdate } from "./eventSeriesRepository";
 
 async function getTemplateValidationOptions(additionallyAllowed: readonly string[] = []) {
@@ -121,7 +122,7 @@ export async function getEventSeriesList(): Promise<EventSeriesListItem[]> {
     include: { _count: { select: { quiz: true } } },
     orderBy: [{ ist_archiviert: "asc" }, { name: "asc" }],
   });
-  return series.map((entry) => toListItem(entry, {
+  return series.map((entry) => toListItem({ ...entry, _count: { quiz: canManageEventSeriesQuizzes(actor, entry.eventreihe_id) ? entry._count.quiz : 0 } }, {
     canEdit: editableIds === null || editableIds.includes(entry.eventreihe_id),
     canChangeArchiveState: isAdministrator(actor),
   }));
@@ -168,8 +169,12 @@ async function hasDuplicateName(name: string, exceptId?: number) {
 
 export async function createEventSeries(
   input: EventSeriesInput,
+  enabledEventTypes: EventType[] = [],
 ): Promise<EventSeriesActionResult> {
   await requireAdmin();
+  if (!Array.isArray(enabledEventTypes) || enabledEventTypes.length > 3 || !enabledEventTypes.every(isEventType)) {
+    return { success: false, message: "Ungültige Eventartauswahl." };
+  }
   const validated = validateEventSeriesInput(
     input,
     await getTemplateValidationOptions(),
@@ -199,6 +204,7 @@ export async function createEventSeries(
     data: {
       slug,
       ...buildEventSeriesPersistenceData(validated.value),
+      eventarten: { create: [...new Set(enabledEventTypes)].map(eventart => ({ eventart, ist_freigeschaltet: true })) },
     },
     select: { eventreihe_id: true },
   });
@@ -305,10 +311,11 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
   const series = await prisma.eventreihen.findUnique({
     where: { eventreihe_id: eventSeriesId },
     include: {
+      eventarten: true,
       _count: { select: { quiz: true } },
       quiz: { orderBy: [{ quiz_datum: "desc" }, { quiz_id: "desc" }] },
-      rollenzuweisungen: {
-        where: { scope_typ: "EVENT_SERIES", benutzer: { is_active: true } },
+      reihenrollen: {
+        where: { benutzer: { is_active: true } },
         orderBy: [{ rolle: "asc" }, { benutzer: { name: "asc" } }],
         select: {
           rolle: true,
@@ -319,22 +326,24 @@ export async function getEventSeriesDetails(eventSeriesId: number) {
   });
   if (!series) return null;
   return {
-    ...toListItem(series, {
-      canEdit: isAdministrator(access.actor) || access.assignmentRole === "EVENT_MANAGER",
+    ...toListItem({ ...series, _count: { quiz: canManageEventSeriesQuizzes(access.actor, eventSeriesId) ? series._count.quiz : 0 } }, {
+      canEdit: canManageEventSeries(access.actor, eventSeriesId),
       canChangeArchiveState: isAdministrator(access.actor),
     }),
     logoUrl: series.logo_url,
-    canManageQuizzes: isAdministrator(access.actor) || access.assignmentRole === "EVENT_MANAGER",
+    canManageQuizzes: canManageEventSeriesQuizzes(access.actor, eventSeriesId),
+    enabledEventTypes: series.eventarten.filter(p => p.ist_freigeschaltet).map(p => p.eventart),
+    canManageProducts: isAdministrator(access.actor),
     canManageMemberships: isAdministrator(access.actor),
     accessSummary: {
-      managerCount: series.rollenzuweisungen.filter(
+      managerCount: series.reihenrollen.filter(
         ({ rolle }) => rolle === "EVENT_MANAGER",
       ).length,
-      editorCount: series.rollenzuweisungen.filter(
+      editorCount: series.reihenrollen.filter(
         ({ rolle }) => rolle === "EDITOR",
       ).length,
     },
-    quizzes: series.quiz.map((quiz) => ({
+    quizzes: (canManageEventSeriesQuizzes(access.actor, eventSeriesId) ? series.quiz : []).map((quiz) => ({
       id: quiz.quiz_id,
       title: quiz.titel?.trim() || `Quiz ${quiz.quiz_id}`,
       date: quiz.quiz_datum?.toISOString().slice(0, 10) ?? null,

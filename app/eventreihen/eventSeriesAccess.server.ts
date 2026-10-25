@@ -5,7 +5,7 @@ import { prisma } from "@/app/lib/prisma";
 import { requireActor, requireSession } from "@/app/lib/permissions";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import {
-  getActorEventSeriesIds,
+  getVisibleEventSeriesIds,
   isAdministrator,
   type AuthorizationActor,
 } from "@/app/roles/roleAssignmentPolicy";
@@ -39,7 +39,7 @@ export async function getEventSeriesIdsForCapability(
   const currentSession = session ?? await requireSession();
   const actor = await getActorForSession(currentSession);
   if (isAdministrator(actor)) return null;
-  return getActorEventSeriesIds(actor).filter((eventSeriesId) =>
+  return getVisibleEventSeriesIds(actor).filter((eventSeriesId) =>
     hasEventSeriesCapability({ actor, eventSeriesId, capability }),
   );
 }

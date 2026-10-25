@@ -30,7 +30,7 @@ export async function readPublicEventSeries(
     },
     orderBy: [{ oeffentlicher_name: "asc" }, { eventreihe_id: "asc" }],
     select: { ...publicSeriesSelect, quiz: { ...publicSeriesSelect.quiz,
-      where: { ist_archiviert: false, quiz_datum: options.upcoming ? { gte: getBerlinDate(now) } : { not: null } },
+      where: { ist_archiviert: false, eventreihe: { eventarten: { some: { eventart: "QUIZ", ist_freigeschaltet: true } } }, quiz_datum: options.upcoming ? { gte: getBerlinDate(now) } : { not: null } },
       orderBy: [{ quiz_datum: "asc" }, { veranstaltungszeit: "asc" }, { quiz_id: "asc" }],
     } },
   });

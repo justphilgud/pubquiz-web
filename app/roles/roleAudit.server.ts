@@ -1,6 +1,7 @@
 import "server-only";
 
 type RoleAuditEvent =
+  | "event_type_changed"
   | "role_assignment_added"
   | "role_assignment_changed"
   | "role_assignment_removed"

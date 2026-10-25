@@ -35,12 +35,8 @@ export default async function UsersPage() {
     email: user.email,
     isActive: user.is_active,
     globalRoles: getGlobalAssignmentRoles(user.rollenzuweisungen),
-    roles: [...new Set(user.rollenzuweisungen.map((assignment) => assignment.rolle))],
-    eventSeriesIds: [...new Set(user.rollenzuweisungen.flatMap((assignment) =>
-      assignment.scope_typ === "EVENT_SERIES" && assignment.eventreihe_id !== null
-        ? [assignment.eventreihe_id]
-        : [],
-    ))],
+    roles: [...new Set([...getGlobalAssignmentRoles(user.rollenzuweisungen), ...assignmentData.assignments.filter(a => a.userId === user.id).map(a => a.role)])],
+    eventSeriesIds: assignmentData.assignments.filter(a => a.userId === user.id).map(a => a.eventSeriesId),
   }));
 
   return (

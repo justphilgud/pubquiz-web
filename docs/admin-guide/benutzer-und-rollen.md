@@ -1,28 +1,58 @@
-# Benutzer und Rollen
+# Benutzer, Eventreihen und Rollen
 
-Administratoren können Benutzer anlegen, bearbeiten, Rollen vergeben und Passwörter zurücksetzen. Das produktive Rollenmodell umfasst Administrator, globalen oder eventreihenbezogenen Editor sowie Eventmanager einer Eventreihe.
+## Benutzer anlegen oder bearbeiten
 
-## Teamverwaltung
+Als Administrator in **Benutzer** auf **Benutzer anlegen** oder beim betreffenden
+Benutzer auf **Bearbeiten** klicken. Im selben Formular:
 
-- Administrator: globale Teamverwaltung, Zugangswörter, Archivieren und Löschen.
-- Eventmanager: Zugangshilfe und Teamansicht ausschließlich für zugewiesene Eventreihen.
-- Editor: keine Teamverwaltung.
+1. Kontodaten und gegebenenfalls globale Rolle einstellen. **Globaler Quiz-Editor**
+   gilt nur für Quiz; **Administrator** bleibt global.
+2. Unter **Rollen je Eventreihe** über **Eventreihe hinzufügen …** suchen und hinzufügen.
+   Nur zugeordnete Reihen erscheinen als kompakte Zeilen. Darin **Editor** oder
+   **Eventmanager** wählen; **Kein Zugriff** entfernt die Reihenrolle.
+3. Bei Bedarf separat **Eventreihe verwalten** erlauben: gemeinsame Stammdaten und
+   Branding, keine zusätzlichen Spielrechte, Benutzerverwaltung oder Produktfreigabe.
+4. Mit **Speichern** übernehmen. Auch beim Anlegen können Reihenrollen sofort
+   vergeben werden. Keine zusätzliche Eventartrechte-Matrix nötig.
 
-Die Übersicht `/admin/users/roles` wird direkt aus den produktiven Authorization-Policies berechnet und zeigt diesen Team-Scope ebenfalls an.
+Eine Rolle gilt für die aktivierten Produkte der Reihe, auch bei späterer
+Freischaltung. Editor pflegt Quizinhalte und künftig Bingo-Begriffe/Feldinhalte.
+Für PowerPoint-Karaoke sind keine Editorfunktionen vorgesehen; Editor erhält dort
+keinen Format-Zugriff. Eventmanager führen Veranstaltungen durch. Bingo und Karaoke
+sind weiterhin keine spielbaren Funktionen dieser Version.
 
-Globale Editoren dürfen eigene globale Entwürfe und Rückgaben bearbeiten. Eine
-Reihenrolle verleiht dagegen keine globalen Schreib- oder Kopierrechte. Eventmanager
-können freigegebene globale Fragen in eigenen Quiz verwenden; das Original bleibt
-geschützt. Mehrfach zugeordnete Reihenfragen benötigen zum Bearbeiten/Freigeben die
-jeweiligen Rechte für alle zugeordneten Reihen.
+Über **Zuordnungen durchsuchen** wird nur die Anzeige gefiltert. Ausgeblendete
+Zuordnungen bleiben beim Speichern erhalten. **Entfernen** entfernt die gewählte
+Zeile samt Rolle und Verwaltungsrecht; **Abbrechen** verwirft ungespeicherte Änderungen.
+**Kein Zugriff** mit aktivem **Eventreihe verwalten** ist eine gültige reine
+Verwaltungszuordnung. Neu hinzugefügte leere Zeilen erteilen noch keine Rechte.
+**Hilfe zu Reihenrechten** enthält die ausführliche Erklärung.
 
-Deaktivierte Konten und entfernte Zuweisungen verlieren beim nächsten Serveraufruf
-ihren bisherigen Zugriff, auch wenn die Sitzung noch besteht. Bereits dargestellte
-Inhalte verschwinden dadurch nicht rückwirkend aus einem geöffneten Browser.
-Benutzerlöschung wird hier nicht neu spezifiziert.
+## Eventarten der Reihe
 
-Ein Wechsel der Quiz-Eventreihe wird abgelehnt, wenn Fragen, relevante Story-Elemente
-oder Umfragen in der Zielreihe nicht zulässig sind. Es werden dabei keine Inhalte
-entfernt oder automatisch freigegeben. Globale Rechte, Rollenverwaltung und
-Produktsichtbarkeit bleiben unverändert. Technische Regeln und Prüfbelege:
-[Scope-basierte Rollenzuweisungen](../architecture/role-assignments.md).
+Beim Anlegen einer Eventreihe unter **Freigeschaltete Eventarten** auswählen.
+Das geschlossene Feld zeigt die Auswahl; im geöffneten Dropdown mehrere Checkboxen
+wählen oder alle abwählen. Bei der Anlage mit dem Formular speichern. Auf der
+Detailseite wird jede Änderung wie bisher sofort gespeichert.
+Es gibt keine automatische Vorauswahl. Spätere Änderungen sind auf der Detailseite
+unter demselben Titel möglich; ausschließlich Administratoren dürfen sie ändern.
+Ohne Freischaltung bleibt der Format-Zugriff gesperrt, selbst bei vorhandener Rolle.
+
+Deaktivierung erhält Inhalte, Reihenrollen und gemeinsame Verwaltung. Nach erneuter
+Aktivierung gilt die bestehende Rolle wieder. Laufende Quizze müssen vor einer
+Quiz-Deaktivierung regulär beendet werden; keine Session zurücksetzen.
+
+## Bestehende Regeln und Übernahme
+
+Quiz-Editoren pflegen Inhalte, erhalten aber keine Quiz-/Teamverwaltung. Globale
+Fragen bleiben im bisherigen Freigabe-/Kopierworkflow geschützt. Mehrfach verwendete
+Inhalte verlangen die bisherigen Rechte in allen betroffenen Reihen.
+
+Die neue additive Übernahme erhält bestehende Quizrollen und individuelle Werte.
+Widersprüchliche alte Preview-Formatrollen werden nicht automatisch vereinheitlicht;
+in diesem Ausnahmefall stoppt die Migration mit konkreter Meldung. Es ist kein
+Konflikt des neuen Formularmodells, das nur eine Rolle je Reihe zulässt.
+
+Nach Berechtigungsänderungen geöffnete Ansichten neu laden und die Präsentation
+lokal freigeben. Rechteentzug greift bereits beim nächsten Serveraufruf. Kein Reset.
+Technische Details: [Rollenmodell](../architecture/role-assignments.md).

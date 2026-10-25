@@ -8,7 +8,7 @@ import { getQuizAnswerProgress } from "../../interaction/answerProgress.server";
 import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "../../quizLifecycle";
-import { lockQuizLifecycle, RESET_PRESENTATION_DATA } from "../../quizLifecycle.server";
+import { lockQuizLifecycle, lockQuizProductGate, RESET_PRESENTATION_DATA } from "../../quizLifecycle.server";
 import { getQuizPraesentation } from "../../actions";
 import { buildPraesentationSlides, getPresentationSlideKey } from "./buildPraesentationSlides";
 import {
@@ -410,6 +410,7 @@ export async function getAntwortStatus(
 export async function starteQuiz(quizId: number, expectedRevision: number) {
   await requireQuizLiveController(quizId);
   return prisma.$transaction(async (tx) => {
+    await lockQuizProductGate(tx, quizId);
     const status = await requireQuizNotStopped(tx, quizId);
     assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
     if (resolveQuizLifecycle(status) === "RUNNING") return status;

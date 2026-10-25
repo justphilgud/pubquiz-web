@@ -2550,7 +2550,7 @@ export async function getQuizAntwortStatus(
   );
   if (!participantSession) {
     const joinSafeQuiz = await prisma.quiz.findFirst({
-      where: { quiz_id: quizId, ist_archiviert: false },
+      where: { quiz_id: quizId, ist_archiviert: false, eventreihe: { eventarten: { some: { eventart: "QUIZ", ist_freigeschaltet: true } } } },
       select: { quiz_id: true, titel: true, praesentation_status: { select: { quiz_started_at: true, quiz_stopped_at: true } } },
     });
     if (!joinSafeQuiz) return null;

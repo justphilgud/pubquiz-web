@@ -1,3 +1,5 @@
+import { isEventType, type EventType, type EventTypeRole } from "./eventTypes";
+
 export const ROLE_ASSIGNMENT_ROLES = ["ADMIN", "EDITOR", "EVENT_MANAGER"] as const;
 
 export type RoleAssignmentRoleValue = (typeof ROLE_ASSIGNMENT_ROLES)[number];
@@ -12,7 +14,10 @@ export type RoleAssignmentSnapshot = {
 
 export type AuthorizationActor = {
   userId: number;
+  /** Effective Quiz assignments only; never raw legacy series rows. */
   assignments: readonly RoleAssignmentSnapshot[];
+  eventTypeAssignments?: readonly { eventSeriesId: number; eventType: string; role: string; enabled: boolean }[];
+  managedEventSeriesIds?: readonly number[];
 };
 
 export function isRoleAssignmentRole(value: unknown): value is RoleAssignmentRoleValue {
@@ -95,19 +100,19 @@ export function canReviewEventSeriesQuestions(actor: AuthorizationActor, eventSe
 }
 
 export function canManageEventSeries(actor: AuthorizationActor, eventSeriesId: number) {
-  return isAdministrator(actor) || hasEventSeriesRole(actor, eventSeriesId, "EVENT_MANAGER");
+  return isAdministrator(actor) || (actor.managedEventSeriesIds ?? []).includes(eventSeriesId);
 }
 
 export function canManageEventSeriesQuizzes(actor: AuthorizationActor, eventSeriesId: number) {
-  return canManageEventSeries(actor, eventSeriesId);
+  return isAdministrator(actor) || hasEventSeriesRole(actor, eventSeriesId, "EVENT_MANAGER");
 }
 
 export function canControlEventSeriesLive(actor: AuthorizationActor, eventSeriesId: number) {
-  return canManageEventSeries(actor, eventSeriesId);
+  return isAdministrator(actor) || hasEventSeriesRole(actor, eventSeriesId, "EVENT_MANAGER");
 }
 
 export function canViewEventSeries(actor: AuthorizationActor, eventSeriesId: number) {
-  return isAdministrator(actor) || canEditEventSeriesQuestions(actor, eventSeriesId);
+  return isAdministrator(actor) || getVisibleEventSeriesIds(actor).includes(eventSeriesId);
 }
 
 export function hasAnyEditorialAssignment(actor: AuthorizationActor) {
@@ -116,4 +121,19 @@ export function hasAnyEditorialAssignment(actor: AuthorizationActor) {
 
 export function isLastActiveRoleHolder(activeHolderCount: number) {
   return Number.isInteger(activeHolderCount) && activeHolderCount <= 1;
+}
+
+/** Object checks must be applied in addition to this product/role gate. */
+export function hasEventTypeAccess(actor: AuthorizationActor, eventSeriesId: number, eventType: EventType, minimum: EventTypeRole = "EDITOR") {
+  if (!Number.isInteger(eventSeriesId) || eventSeriesId <= 0 || !isEventType(eventType)) return false;
+  if (isAdministrator(actor)) return true;
+  if (eventType === "POWERPOINT_KARAOKE") minimum = "EVENT_MANAGER";
+  return (actor.eventTypeAssignments ?? []).some(assignment => assignment.eventSeriesId === eventSeriesId &&
+    assignment.eventType === eventType && assignment.enabled &&
+    (assignment.role === "EVENT_MANAGER" || (minimum === "EDITOR" && assignment.role === "EDITOR")));
+}
+export function getVisibleEventSeriesIds(actor: AuthorizationActor) {
+  return [...new Set([...(actor.managedEventSeriesIds ?? []), ...(actor.eventTypeAssignments ?? []).flatMap(a =>
+    a.enabled && isEventType(a.eventType) && (a.role === "EVENT_MANAGER" || (a.role === "EDITOR" && a.eventType !== "POWERPOINT_KARAOKE")) ? [a.eventSeriesId] : []),
+    ...getActorEventSeriesIds(actor)])];
 }

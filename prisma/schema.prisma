@@ -418,6 +418,10 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  reihenrollen benutzer_reihenrollen[]
+  eventarten eventreihe_eventarten[]
+  eventartrollen benutzer_eventartrollen[]
+  verwalter eventreihe_verwaltung[]
   reservierungs_url                String?                      @db.VarChar(2048)
   logo_url                         String?                      @db.VarChar(2048)
   eventreihe_id                    Int                          @id @default(autoincrement())
@@ -1394,6 +1398,9 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  reihenrollen benutzer_reihenrollen[] @relation("SeriesRoleUser")
+  eventartrollen benutzer_eventartrollen[] @relation("EventTypeRoleUser")
+  verwaltete_eventreihen eventreihe_verwaltung[] @relation("SeriesManagementUser")
   id Int @id @default(autoincrement())
 
   // Persönliche Daten
@@ -1493,5 +1500,69 @@ model fragen_eventreihen {
   @@unique([fragen_id, eventreihe_id], map: "uq_fragen_eventreihen_frage_eventreihe")
   @@index([fragen_id], map: "idx_fragen_eventreihen_frage")
   @@index([eventreihe_id], map: "idx_fragen_eventreihen_eventreihe")
+  @@schema("pubquiz")
+}
+
+/// Stable product catalogue; adding a product never grants access.
+model eventarten {
+  kennung String @id @db.VarChar(64)
+  name String @db.VarChar(120)
+  eventreihen eventreihe_eventarten[]
+  rollen benutzer_eventartrollen[]
+  @@schema("pubquiz")
+}
+
+model eventreihe_eventarten {
+  eventreihe_id Int
+  eventart String @db.VarChar(64)
+  ist_freigeschaltet Boolean @default(false)
+  updated_at DateTime @default(now()) @updatedAt
+  eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  produkt eventarten @relation(fields: [eventart], references: [kennung], onDelete: Restrict)
+  @@id([eventreihe_id, eventart])
+  @@schema("pubquiz")
+}
+
+model benutzer_eventartrollen {
+  benutzer_id Int
+  eventreihe_id Int
+  eventart String @db.VarChar(64)
+  rolle RoleAssignmentRole
+  zugewiesen_von_user_id Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  benutzer users @relation("EventTypeRoleUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
+  eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  produkt eventarten @relation(fields: [eventart], references: [kennung], onDelete: Restrict)
+  @@id([benutzer_id, eventreihe_id, eventart])
+  @@index([eventreihe_id, eventart])
+  @@schema("pubquiz")
+}
+
+model eventreihe_verwaltung {
+  benutzer_id Int
+  eventreihe_id Int
+  zugewiesen_von_user_id Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  benutzer users @relation("SeriesManagementUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
+  eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  @@id([benutzer_id, eventreihe_id])
+  @@index([eventreihe_id])
+  @@schema("pubquiz")
+}
+
+/// One format-independent role per user and event series. Product activation is separate.
+model benutzer_reihenrollen {
+  benutzer_id Int
+  eventreihe_id Int
+  rolle RoleAssignmentRole
+  zugewiesen_von_user_id Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  benutzer users @relation("SeriesRoleUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
+  eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  @@id([benutzer_id, eventreihe_id])
+  @@index([eventreihe_id])
   @@schema("pubquiz")
 }

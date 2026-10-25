@@ -8,6 +8,7 @@ import {
   getActorEventSeriesIds,
   canManageUsers as actorCanManageUsers,
   hasAnyEditorialAssignment,
+  getVisibleEventSeriesIds,
   isAdministrator,
   type AuthorizationActor,
 } from "@/app/roles/roleAssignmentPolicy";
@@ -194,7 +195,7 @@ export function canManageTeams(actor: AuthorizationActor) {
 }
 
 export function canManageEventSeries(actor: AuthorizationActor) {
-  return canManageQuizzes(actor);
+  return isAdministrator(actor) || getVisibleEventSeriesIds(actor).length > 0;
 }
 
 export function canViewAdminTools(actor: AuthorizationActor) {

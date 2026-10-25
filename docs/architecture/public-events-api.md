@@ -12,7 +12,7 @@ Reihen und nicht archivierte, datierte Quizzes mit einer expliziten Feldliste.
 `publicEvents.ts` projiziert die öffentliche Antwort und prüft Sichtbarkeit erneut.
 Interne Bemerkungen, Mitglieder, Fragen, Antworten und interne Reihennamen werden
 nicht ausgegeben. Es gibt derzeit keine separate öffentliche Freigabe pro Quiz:
-Alle aktiven, datierten Quizzes einer öffentlichen Reihe sind öffentlich.
+Alle aktiven, datierten Quizzes einer öffentlichen Reihe mit freigeschaltetem Quizprodukt sind öffentlich. Bei Produktdeaktivierung entfallen deren Quiztermine in JSON und ICS; öffentliche Reihenmetadaten bleiben erhalten.
 
 ## JSON-Vertrag, Version 1
 

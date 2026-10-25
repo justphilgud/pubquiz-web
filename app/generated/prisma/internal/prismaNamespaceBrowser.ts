@@ -103,7 +103,12 @@ export const ModelName = {
   users: 'users',
   benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
-  fragen_eventreihen: 'fragen_eventreihen'
+  fragen_eventreihen: 'fragen_eventreihen',
+  eventarten: 'eventarten',
+  eventreihe_eventarten: 'eventreihe_eventarten',
+  benutzer_eventartrollen: 'benutzer_eventartrollen',
+  eventreihe_verwaltung: 'eventreihe_verwaltung',
+  benutzer_reihenrollen: 'benutzer_reihenrollen'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -370,6 +375,10 @@ export const QuizScalarFieldEnum = {
   veranstaltungsname: 'veranstaltungsname',
   karten_url: 'karten_url',
   oeffentliche_url: 'oeffentliche_url',
+  reservierungs_url: 'reservierungs_url',
+  veranstaltungsbild_url: 'veranstaltungsbild_url',
+  oeffentliche_beschreibung: 'oeffentliche_beschreibung',
+  oeffentliche_beschreibung_modus: 'oeffentliche_beschreibung_modus',
   team_anzahl: 'team_anzahl',
   teilnehmer_anzahl: 'teilnehmer_anzahl',
   bemerkung: 'bemerkung',
@@ -435,6 +444,7 @@ export type Meme_archive_entriesScalarFieldEnum = (typeof Meme_archive_entriesSc
 
 
 export const EventreihenScalarFieldEnum = {
+  reservierungs_url: 'reservierungs_url',
   logo_url: 'logo_url',
   eventreihe_id: 'eventreihe_id',
   name: 'name',
@@ -1034,6 +1044,60 @@ export const Fragen_eventreihenScalarFieldEnum = {
 } as const
 
 export type Fragen_eventreihenScalarFieldEnum = (typeof Fragen_eventreihenScalarFieldEnum)[keyof typeof Fragen_eventreihenScalarFieldEnum]
+
+
+export const EventartenScalarFieldEnum = {
+  kennung: 'kennung',
+  name: 'name'
+} as const
+
+export type EventartenScalarFieldEnum = (typeof EventartenScalarFieldEnum)[keyof typeof EventartenScalarFieldEnum]
+
+
+export const Eventreihe_eventartenScalarFieldEnum = {
+  eventreihe_id: 'eventreihe_id',
+  eventart: 'eventart',
+  ist_freigeschaltet: 'ist_freigeschaltet',
+  updated_at: 'updated_at'
+} as const
+
+export type Eventreihe_eventartenScalarFieldEnum = (typeof Eventreihe_eventartenScalarFieldEnum)[keyof typeof Eventreihe_eventartenScalarFieldEnum]
+
+
+export const Benutzer_eventartrollenScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  eventart: 'eventart',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_eventartrollenScalarFieldEnum = (typeof Benutzer_eventartrollenScalarFieldEnum)[keyof typeof Benutzer_eventartrollenScalarFieldEnum]
+
+
+export const Eventreihe_verwaltungScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Eventreihe_verwaltungScalarFieldEnum = (typeof Eventreihe_verwaltungScalarFieldEnum)[keyof typeof Eventreihe_verwaltungScalarFieldEnum]
+
+
+export const Benutzer_reihenrollenScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollenScalarFieldEnum)[keyof typeof Benutzer_reihenrollenScalarFieldEnum]
 
 
 export const SortOrder = {

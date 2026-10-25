@@ -449,7 +449,12 @@ export const ModelName = {
   users: 'users',
   benutzer_rollenzuweisungen: 'benutzer_rollenzuweisungen',
   eventreihe_benutzerrollen: 'eventreihe_benutzerrollen',
-  fragen_eventreihen: 'fragen_eventreihen'
+  fragen_eventreihen: 'fragen_eventreihen',
+  eventarten: 'eventarten',
+  eventreihe_eventarten: 'eventreihe_eventarten',
+  benutzer_eventartrollen: 'benutzer_eventartrollen',
+  eventreihe_verwaltung: 'eventreihe_verwaltung',
+  benutzer_reihenrollen: 'benutzer_reihenrollen'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -465,7 +470,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4391,6 +4396,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    eventarten: {
+      payload: Prisma.$eventartenPayload<ExtArgs>
+      fields: Prisma.eventartenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.eventartenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.eventartenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>
+        }
+        findFirst: {
+          args: Prisma.eventartenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.eventartenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>
+        }
+        findMany: {
+          args: Prisma.eventartenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>[]
+        }
+        create: {
+          args: Prisma.eventartenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>
+        }
+        createMany: {
+          args: Prisma.eventartenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.eventartenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>[]
+        }
+        delete: {
+          args: Prisma.eventartenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>
+        }
+        update: {
+          args: Prisma.eventartenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>
+        }
+        deleteMany: {
+          args: Prisma.eventartenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.eventartenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.eventartenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>[]
+        }
+        upsert: {
+          args: Prisma.eventartenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventartenPayload>
+        }
+        aggregate: {
+          args: Prisma.EventartenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEventarten>
+        }
+        groupBy: {
+          args: Prisma.eventartenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EventartenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.eventartenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EventartenCountAggregateOutputType> | number
+        }
+      }
+    }
+    eventreihe_eventarten: {
+      payload: Prisma.$eventreihe_eventartenPayload<ExtArgs>
+      fields: Prisma.eventreihe_eventartenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.eventreihe_eventartenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.eventreihe_eventartenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>
+        }
+        findFirst: {
+          args: Prisma.eventreihe_eventartenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.eventreihe_eventartenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>
+        }
+        findMany: {
+          args: Prisma.eventreihe_eventartenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>[]
+        }
+        create: {
+          args: Prisma.eventreihe_eventartenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>
+        }
+        createMany: {
+          args: Prisma.eventreihe_eventartenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.eventreihe_eventartenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>[]
+        }
+        delete: {
+          args: Prisma.eventreihe_eventartenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>
+        }
+        update: {
+          args: Prisma.eventreihe_eventartenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>
+        }
+        deleteMany: {
+          args: Prisma.eventreihe_eventartenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.eventreihe_eventartenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.eventreihe_eventartenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>[]
+        }
+        upsert: {
+          args: Prisma.eventreihe_eventartenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_eventartenPayload>
+        }
+        aggregate: {
+          args: Prisma.Eventreihe_eventartenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEventreihe_eventarten>
+        }
+        groupBy: {
+          args: Prisma.eventreihe_eventartenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Eventreihe_eventartenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.eventreihe_eventartenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Eventreihe_eventartenCountAggregateOutputType> | number
+        }
+      }
+    }
+    benutzer_eventartrollen: {
+      payload: Prisma.$benutzer_eventartrollenPayload<ExtArgs>
+      fields: Prisma.benutzer_eventartrollenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.benutzer_eventartrollenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.benutzer_eventartrollenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>
+        }
+        findFirst: {
+          args: Prisma.benutzer_eventartrollenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.benutzer_eventartrollenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>
+        }
+        findMany: {
+          args: Prisma.benutzer_eventartrollenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>[]
+        }
+        create: {
+          args: Prisma.benutzer_eventartrollenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>
+        }
+        createMany: {
+          args: Prisma.benutzer_eventartrollenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.benutzer_eventartrollenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>[]
+        }
+        delete: {
+          args: Prisma.benutzer_eventartrollenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>
+        }
+        update: {
+          args: Prisma.benutzer_eventartrollenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>
+        }
+        deleteMany: {
+          args: Prisma.benutzer_eventartrollenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.benutzer_eventartrollenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.benutzer_eventartrollenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>[]
+        }
+        upsert: {
+          args: Prisma.benutzer_eventartrollenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_eventartrollenPayload>
+        }
+        aggregate: {
+          args: Prisma.Benutzer_eventartrollenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBenutzer_eventartrollen>
+        }
+        groupBy: {
+          args: Prisma.benutzer_eventartrollenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Benutzer_eventartrollenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.benutzer_eventartrollenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Benutzer_eventartrollenCountAggregateOutputType> | number
+        }
+      }
+    }
+    eventreihe_verwaltung: {
+      payload: Prisma.$eventreihe_verwaltungPayload<ExtArgs>
+      fields: Prisma.eventreihe_verwaltungFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.eventreihe_verwaltungFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.eventreihe_verwaltungFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>
+        }
+        findFirst: {
+          args: Prisma.eventreihe_verwaltungFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.eventreihe_verwaltungFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>
+        }
+        findMany: {
+          args: Prisma.eventreihe_verwaltungFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>[]
+        }
+        create: {
+          args: Prisma.eventreihe_verwaltungCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>
+        }
+        createMany: {
+          args: Prisma.eventreihe_verwaltungCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.eventreihe_verwaltungCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>[]
+        }
+        delete: {
+          args: Prisma.eventreihe_verwaltungDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>
+        }
+        update: {
+          args: Prisma.eventreihe_verwaltungUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>
+        }
+        deleteMany: {
+          args: Prisma.eventreihe_verwaltungDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.eventreihe_verwaltungUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.eventreihe_verwaltungUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>[]
+        }
+        upsert: {
+          args: Prisma.eventreihe_verwaltungUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$eventreihe_verwaltungPayload>
+        }
+        aggregate: {
+          args: Prisma.Eventreihe_verwaltungAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEventreihe_verwaltung>
+        }
+        groupBy: {
+          args: Prisma.eventreihe_verwaltungGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Eventreihe_verwaltungGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.eventreihe_verwaltungCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Eventreihe_verwaltungCountAggregateOutputType> | number
+        }
+      }
+    }
+    benutzer_reihenrollen: {
+      payload: Prisma.$benutzer_reihenrollenPayload<ExtArgs>
+      fields: Prisma.benutzer_reihenrollenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.benutzer_reihenrollenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.benutzer_reihenrollenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        findFirst: {
+          args: Prisma.benutzer_reihenrollenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.benutzer_reihenrollenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        findMany: {
+          args: Prisma.benutzer_reihenrollenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>[]
+        }
+        create: {
+          args: Prisma.benutzer_reihenrollenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        createMany: {
+          args: Prisma.benutzer_reihenrollenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.benutzer_reihenrollenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>[]
+        }
+        delete: {
+          args: Prisma.benutzer_reihenrollenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        update: {
+          args: Prisma.benutzer_reihenrollenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        deleteMany: {
+          args: Prisma.benutzer_reihenrollenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.benutzer_reihenrollenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.benutzer_reihenrollenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>[]
+        }
+        upsert: {
+          args: Prisma.benutzer_reihenrollenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        aggregate: {
+          args: Prisma.Benutzer_reihenrollenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBenutzer_reihenrollen>
+        }
+        groupBy: {
+          args: Prisma.benutzer_reihenrollenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Benutzer_reihenrollenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.benutzer_reihenrollenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Benutzer_reihenrollenCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4678,6 +5053,10 @@ export const QuizScalarFieldEnum = {
   veranstaltungsname: 'veranstaltungsname',
   karten_url: 'karten_url',
   oeffentliche_url: 'oeffentliche_url',
+  reservierungs_url: 'reservierungs_url',
+  veranstaltungsbild_url: 'veranstaltungsbild_url',
+  oeffentliche_beschreibung: 'oeffentliche_beschreibung',
+  oeffentliche_beschreibung_modus: 'oeffentliche_beschreibung_modus',
   team_anzahl: 'team_anzahl',
   teilnehmer_anzahl: 'teilnehmer_anzahl',
   bemerkung: 'bemerkung',
@@ -4743,6 +5122,7 @@ export type Meme_archive_entriesScalarFieldEnum = (typeof Meme_archive_entriesSc
 
 
 export const EventreihenScalarFieldEnum = {
+  reservierungs_url: 'reservierungs_url',
   logo_url: 'logo_url',
   eventreihe_id: 'eventreihe_id',
   name: 'name',
@@ -5342,6 +5722,60 @@ export const Fragen_eventreihenScalarFieldEnum = {
 } as const
 
 export type Fragen_eventreihenScalarFieldEnum = (typeof Fragen_eventreihenScalarFieldEnum)[keyof typeof Fragen_eventreihenScalarFieldEnum]
+
+
+export const EventartenScalarFieldEnum = {
+  kennung: 'kennung',
+  name: 'name'
+} as const
+
+export type EventartenScalarFieldEnum = (typeof EventartenScalarFieldEnum)[keyof typeof EventartenScalarFieldEnum]
+
+
+export const Eventreihe_eventartenScalarFieldEnum = {
+  eventreihe_id: 'eventreihe_id',
+  eventart: 'eventart',
+  ist_freigeschaltet: 'ist_freigeschaltet',
+  updated_at: 'updated_at'
+} as const
+
+export type Eventreihe_eventartenScalarFieldEnum = (typeof Eventreihe_eventartenScalarFieldEnum)[keyof typeof Eventreihe_eventartenScalarFieldEnum]
+
+
+export const Benutzer_eventartrollenScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  eventart: 'eventart',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_eventartrollenScalarFieldEnum = (typeof Benutzer_eventartrollenScalarFieldEnum)[keyof typeof Benutzer_eventartrollenScalarFieldEnum]
+
+
+export const Eventreihe_verwaltungScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Eventreihe_verwaltungScalarFieldEnum = (typeof Eventreihe_verwaltungScalarFieldEnum)[keyof typeof Eventreihe_verwaltungScalarFieldEnum]
+
+
+export const Benutzer_reihenrollenScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollenScalarFieldEnum)[keyof typeof Benutzer_reihenrollenScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -6098,6 +6532,11 @@ export type GlobalOmitConfig = {
   benutzer_rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenOmit
   eventreihe_benutzerrollen?: Prisma.eventreihe_benutzerrollenOmit
   fragen_eventreihen?: Prisma.fragen_eventreihenOmit
+  eventarten?: Prisma.eventartenOmit
+  eventreihe_eventarten?: Prisma.eventreihe_eventartenOmit
+  benutzer_eventartrollen?: Prisma.benutzer_eventartrollenOmit
+  eventreihe_verwaltung?: Prisma.eventreihe_verwaltungOmit
+  benutzer_reihenrollen?: Prisma.benutzer_reihenrollenOmit
 }
 
 /* Types for Logging */
